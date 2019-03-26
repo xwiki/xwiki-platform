@@ -25,7 +25,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
@@ -67,7 +67,7 @@ public class EditClassTest extends AbstractTest
 
         // Add an object of the class created
         ObjectEditPage oep = vp.editObjects();
-        FormElement objectForm = oep.addObject("Test.EditObjectsTestClass");
+        FormContainerElement objectForm = oep.addObject("Test.EditObjectsTestClass");
         objectForm.setFieldValue(By.id("Test.EditObjectsTestClass_0_prop"), "testing value");
         vp = oep.clickSaveAndView();
 
@@ -90,7 +90,7 @@ public class EditClassTest extends AbstractTest
 
         // Add an object of the class created
         ObjectEditPage oep = vp.editObjects();
-        FormElement objectForm = oep.addObject("Test.EditObjectsTestClass");
+        FormContainerElement objectForm = oep.addObject("Test.EditObjectsTestClass");
         objectForm.setFieldValue(By.id("Test.EditObjectsTestClass_0_prop1"), "testing value 1");
         objectForm.setFieldValue(By.id("Test.EditObjectsTestClass_0_prop2"), "testing value 2");
         vp = oep.clickSaveAndView();

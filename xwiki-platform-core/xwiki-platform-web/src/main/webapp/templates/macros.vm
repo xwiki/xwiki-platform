@@ -2610,7 +2610,8 @@ Recursive title display detected!##
   #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
   #set ($discard = $parameters.put('size', 1))
   #set ($attributes = [])
-  #set ($nonAttributes = ['value', 'separators'])
+  ## Note: Remove placeholder since it's not valid to have it on an HTML SELECT element.
+  #set ($nonAttributes = ['value', 'separators', 'placeholder'])
   #foreach ($entry in $parameters.entrySet())
     #if (!$nonAttributes.contains($entry.key))
       #if ($entry.value.equals($entry.value.toString()))

@@ -78,10 +78,10 @@ public class InvitationTest extends AbstractTest
 
             AdministrationSectionPage config = AdministrationSectionPage.gotoPage("Invitation");
             // Set port to 3025
-            config.getForm().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_smtp_port"),
+            config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_smtp_port"),
                 "3025");
             // Make sure that by default we don't allow non admin to send emails to multiple addresses
-            config.getForm().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
+            config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
                 + "usersMaySendToMultiple"), "false");
             config.clickSave();
 
@@ -245,7 +245,7 @@ public class InvitationTest extends AbstractTest
 
         // Make sure users don't have the right to send to multiple.
         AdministrationSectionPage config = AdministrationSectionPage.gotoPage("Invitation");
-        config.getForm().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
+        config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
             + "usersMaySendToMultiple"), "false");
         config.clickSave();
 
@@ -268,7 +268,7 @@ public class InvitationTest extends AbstractTest
             TestUtils.Session nonAdmin = getUtil().getSession();
             getUtil().setSession(admin);
             config = AdministrationSectionPage.gotoPage("Invitation");
-            config.getForm().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
+            config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
                 + "usersMaySendToMultiple"), "true");
             config.clickSave();
             getUtil().setSession(nonAdmin);
@@ -678,7 +678,7 @@ public class InvitationTest extends AbstractTest
         try {
             // Allow users to send to multiple.
             AdministrationSectionPage config = AdministrationSectionPage.gotoPage("Invitation");
-            config.getForm().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
+            config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
                 + "usersMaySendToMultiple"), "true");
             config.clickSave();
 

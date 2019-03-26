@@ -52,12 +52,9 @@ import org.xwiki.security.authorization.internal.AbstractSecurityRuleEntry;
 import org.xwiki.security.internal.UserBridge;
 
 /**
- * Default implementation of the security cache loader.
- *
- * It depends on a {@link org.xwiki.security.authorization.SecurityEntryReader}
- * for reading rules missing from the cache, and on a
- * {@link org.xwiki.security.authorization.AuthorizationSettler} for resolving
- * access from rules.
+ * Default implementation of the security cache loader. It depends on a
+ * {@link org.xwiki.security.authorization.SecurityEntryReader} for reading rules missing from the cache, and on a
+ * {@link org.xwiki.security.authorization.AuthorizationSettler} for resolving access from rules.
  *
  * @version $Id$
  * @since 4.0M2
@@ -75,7 +72,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
 
     /** The right cache. */
     @Inject
-    private SecurityCache securityCache;
+    private org.xwiki.security.authorization.cache.SecurityCache securityCache;
 
     /** Event listener responsible for invalidating cache entries. */
     @Inject
@@ -134,9 +131,13 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         }
     }
 
+    private SecurityCache getSecurityCache()
+    {
+        return (SecurityCache) this.securityCache;
+    }
+
     @Override
-    public SecurityAccessEntry load(UserSecurityReference user, SecurityReference entity)
-        throws AuthorizationException
+    public SecurityAccessEntry load(UserSecurityReference user, SecurityReference entity) throws AuthorizationException
     {
         int retries = 0;
         Exception lastException;
@@ -170,8 +171,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     }
 
     /**
-     * Load entity entries, group entries, and user entries required to settle the access, settle it,
-     * add this decision into the cache and return the access.
+     * Load entity entries, group entries, and user entries required to settle the access, settle it, add this decision
+     * into the cache and return the access.
      * 
      * @param user The user to check access for.
      * @param entity The entity to check access to.
@@ -185,8 +186,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     {
         // No entity, return default rights for user in its wiki
         if (entity == null) {
-            return authorizationSettlerProvider.get().settle(user,
-                loadUserEntry(user, user.getWikiReference(), null), null);
+            return authorizationSettlerProvider.get().settle(user, loadUserEntry(user, user.getWikiReference(), null),
+                null);
         }
 
         // Retrieve rules for the entity from the cache
@@ -197,8 +198,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
     }
 
     /**
-     * Load group entries, and user entries required, to settle the access, settle it,
-     * add this decision into the cache and return the access.
+     * Load group entries, and user entries required, to settle the access, settle it, add this decision into the cache
+     * and return the access.
      * 
      * @param user The user to check access for.
      * @param entity The lowest entity providing security rules on the path of the entity to check access for.
@@ -227,7 +228,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         SecurityAccessEntry accessEntry = authorizationSettlerProvider.get().settle(user, groups, ruleEntries);
 
         // Store the result into the cache
-        securityCache.add(accessEntry, entityWiki);
+        getSecurityCache().add(accessEntry, entityWiki);
 
         // Return the result
         return accessEntry;
@@ -241,8 +242,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      * @param user The user/group to load.
      * @param userWiki The user wiki. Should correspond to the wiki of the user/group provided above.
      * @param entityWiki Only for global user, the wiki of the entity currently evaluated if it differ from the user
-     * wiki, null otherwise. Local group information of the entity wiki will be evaluated for the user/group to load
-     * and a shadow user will be made available in that wiki to support access entries.
+     *            wiki, null otherwise. Local group information of the entity wiki will be evaluated for the user/group
+     *            to load and a shadow user will be made available in that wiki to support access entries.
      * @return A collection of groups associated to the requested user/group (both user wiki and entity wiki)
      * @throws ParentEntryEvictedException if any of the parent entries of the group were evicted.
      * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
@@ -253,24 +254,24 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         throws ParentEntryEvictedException, ConflictingInsertionException, AuthorizationException
     {
         // First, we try to get the groups of the user from the cache
-        Collection<GroupSecurityReference> groups = securityCache.getGroupsFor(user, entityWiki); 
+        Collection<GroupSecurityReference> groups = getSecurityCache().getGroupsFor(user, entityWiki);
         if (groups != null) {
             // Since we have then in the cache, it means that the entry is already loaded
             return groups;
         }
-        
+
         // Otherwise we have to load the entry
         groups = new HashSet<GroupSecurityReference>();
 
         // Public access could not appear in any group, no need to load it carefully, just optimized here
         if (user.getOriginalReference() == null) {
-            if (securityCache.get(user) == null) {
+            if (getSecurityCache().get(user) == null) {
                 // Main wiki entry should be loaded
                 getRules(user);
             }
             if (entityWiki != null) {
                 // Ensure there is a Public shadow in the subwiki of the checked entity
-                securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), null);
+                getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), null);
             }
             return groups;
         }
@@ -281,7 +282,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         if (entityWiki != null) {
             // First we add the global groups containing that user/group
             // Check availability of the information from the user/group entry in the cache
-            Collection<GroupSecurityReference> globalGroups = securityCache.getGroupsFor(user, null);
+            Collection<GroupSecurityReference> globalGroups = getSecurityCache().getGroupsFor(user, null);
             Collection<GroupSecurityReference> immediateGroups;
             if (globalGroups == null) {
                 // No luck, the global user does not seems to be in the cache, so we need to load it
@@ -289,7 +290,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
                 immediateGroups = loadUserGroups(user, userWiki, globalGroups);
                 loadUserEntry(user, immediateGroups);
             } else {
-                immediateGroups = securityCache.getImmediateGroupsFor(user);
+                immediateGroups = getSecurityCache().getImmediateGroupsFor(user);
             }
             groups.addAll(globalGroups);
 
@@ -297,12 +298,12 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             // should be considered indirectly a member of these groups as well
             for (GroupSecurityReference group : globalGroups) {
                 // Check availability of the information from the shadow entry of the global group in the entity wiki
-                Collection<GroupSecurityReference> localGroups = securityCache.getGroupsFor(group, entityWiki);
+                Collection<GroupSecurityReference> localGroups = getSecurityCache().getGroupsFor(group, entityWiki);
                 if (localGroups == null) {
                     // No luck, the shadow of the global group in the entity wiki does not seems to be in the cache,
                     // so we need to load it
                     localGroups = new HashSet<>();
-                    securityCache.add(new DefaultSecurityShadowEntry(group, entityWiki),
+                    getSecurityCache().add(new DefaultSecurityShadowEntry(group, entityWiki),
                         loadUserGroups(group, entityWiki, localGroups));
                 }
                 groups.addAll(localGroups);
@@ -311,7 +312,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             Collection<GroupSecurityReference> localGroups = new HashSet<>();
             immediateGroups.addAll(loadUserGroups(user, entityWiki, localGroups));
             // Store a shadow entry for a global user/group involved in a local wiki
-            securityCache.add(new DefaultSecurityShadowEntry(user, entityWiki), immediateGroups);
+            getSecurityCache().add(new DefaultSecurityShadowEntry(user, entityWiki), immediateGroups);
             groups.addAll(localGroups);
         } else {
             // We load the rules concerning the groups of the user, could be either
@@ -331,8 +332,8 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
      *
      * @param user the user/group being queried
      * @param wiki the wiki into which the query is applied
-     * @param allGroups For the initial call, this collection should normally be empty, and will receive all the
-     *                  group associated with the given user (either directly or indirectly).
+     * @param allGroups For the initial call, this collection should normally be empty, and will receive all the group
+     *            associated with the given user (either directly or indirectly).
      * @return the immediate group containing the user/group.
      * @throws ParentEntryEvictedException if any of the parent entries of the groups were evicted.
      * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
@@ -359,7 +360,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
             // Loads the group only if it has never been seen before in the current path to avoid infinite recursion
             if (!branchGroups.contains(group)) {
                 // We check the cache for real nodes (not shadows) since group are coming from their own wiki
-                Collection<GroupSecurityReference> groupsOfGroup = securityCache.getGroupsFor(group, null);
+                Collection<GroupSecurityReference> groupsOfGroup = getSecurityCache().getGroupsFor(group, null);
                 // And we load the groups only if they are not in the cache
                 if (groupsOfGroup == null) {
                     // Add this group into the list of immediate groups for this entry
@@ -411,28 +412,26 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         Deque<SecurityReference> chain = user.getReversedSecurityReferenceChain();
         chain.removeLast();
         for (SecurityReference ref : chain) {
-            SecurityRuleEntry entry = securityCache.get(ref);
+            SecurityRuleEntry entry = getSecurityCache().get(ref);
             if (entry == null) {
                 entry = securityEntryReader.read(ref);
-                securityCache.add(entry);
+                getSecurityCache().add(entry);
             }
         }
 
         SecurityRuleEntry entry = securityEntryReader.read(user);
-        securityCache.add(entry, groups);
+        getSecurityCache().add(entry, groups);
     }
 
     /**
-     * Retrieve rules for all hierarchy levels of the provided reference.
-     * Rules may be read from the cache, or from the entities and fill the cache.
+     * Retrieve rules for all hierarchy levels of the provided reference. Rules may be read from the cache, or from the
+     * entities and fill the cache.
      *
      * @param entity The entity for which rules should be loaded and retrieve.
      * @return A collection of security rule entry, once for each level of the hierarchy.
      * @exception org.xwiki.security.authorization.AuthorizationException if an error occurs
-     * @exception ParentEntryEvictedException if any parent entry is
-     * evicted before the operation completes.
-     * @throws ConflictingInsertionException When different threads
-     * have inserted conflicting entries into the cache.
+     * @exception ParentEntryEvictedException if any parent entry is evicted before the operation completes.
+     * @throws ConflictingInsertionException When different threads have inserted conflicting entries into the cache.
      */
     private Deque<SecurityRuleEntry> getRules(SecurityReference entity)
         throws AuthorizationException, ParentEntryEvictedException, ConflictingInsertionException
@@ -440,7 +439,7 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
         Deque<SecurityRuleEntry> rules = new LinkedList<SecurityRuleEntry>();
         List<SecurityRuleEntry> emptyRuleEntryTail = new ArrayList<SecurityRuleEntry>();
         for (SecurityReference ref : entity.getReversedSecurityReferenceChain()) {
-            SecurityRuleEntry entry = securityCache.get(ref);
+            SecurityRuleEntry entry = getSecurityCache().get(ref);
             if (entry == null) {
                 if (Right.getEnabledRights(ref.getType()).isEmpty()) {
                     // Do not call the reader on entity that will give useless rules
@@ -451,11 +450,11 @@ public class DefaultSecurityCacheLoader implements SecurityCacheLoader
                     if (!emptyRuleEntryTail.isEmpty()) {
                         // Add intermediate empty rules sets to the cache to hold this significant one
                         for (SecurityRuleEntry emptyRuleEntry : emptyRuleEntryTail) {
-                            securityCache.add(emptyRuleEntry);
+                            getSecurityCache().add(emptyRuleEntry);
                         }
                         emptyRuleEntryTail.clear();
                     }
-                    securityCache.add(entry);
+                    getSecurityCache().add(entry);
                 }
             }
             rules.push(entry);

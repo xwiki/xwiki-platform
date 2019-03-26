@@ -25,13 +25,14 @@
     <parent>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-eventstream</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.3-SNAPSHOT</version>
     </parent>
     <artifactId>xwiki-platform-eventstream-store</artifactId>
     <name>XWiki Platform - Event Stream - Store</name>
     <description>Store for Event Stream Events</description>
     <properties>
         <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
+        <xwiki.pitest.mutationThreshold>8</xwiki.pitest.mutationThreshold>
         <!-- Name to display by the Extension Manager -->
         <xwiki.extension.name>Event Stream Store</xwiki.extension.name>
     </properties>
@@ -75,6 +76,11 @@
         <dependency>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-scheduler-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-wiki-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- Test Dependencies -->

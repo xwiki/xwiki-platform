@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-watchlist-test</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-watchlist-test-tests</artifactId>
   <name>XWiki Platform - Watchlist - Tests - Functional Tests</name>
@@ -44,7 +44,7 @@
       com.xpn.xwiki.plugin.activitystream.plugin.ActivityStreamPlugin
     </xwikiCfgPlugins>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
-    <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml,mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
+    <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <xwikiPropertiesAdditionalProperties>watchlist.realtime.enabled = true</xwikiPropertiesAdditionalProperties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

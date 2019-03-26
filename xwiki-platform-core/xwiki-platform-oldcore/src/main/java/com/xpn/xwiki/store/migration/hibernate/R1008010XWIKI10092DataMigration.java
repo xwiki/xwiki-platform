@@ -40,7 +40,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -86,6 +88,13 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
                 migrateObjectsOfType(className, xclass);
             }
         }
+
+        // Clean the document cache to make sure the new properties we just added directly to the database are not lost
+        // during next save before a version of the document without those properties was already in the cache
+        XWikiStoreInterface store = xcontext.getWiki().getStore();
+        if (store instanceof XWikiCacheStoreInterface) {
+            ((XWikiCacheStoreInterface) store).flushCache();
+        }
     }
 
     private void migrateObjectsOfType(String className, BaseClass xclass) throws DataMigrationException, XWikiException
@@ -116,7 +125,7 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
             + "group by obj.id having count(prop) < :expectedPropertyCount");
         query.setString("className", className);
         query.setParameterList("expectedProperties", expectedProperties);
-        query.setLong("expectedPropertyCount", Integer.valueOf(expectedProperties.size()).longValue());
+        query.setLong("expectedPropertyCount", expectedProperties.size());
         return query.list();
     }
 

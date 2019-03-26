@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
+import org.xwiki.user.test.po.ProfileUserProfilePage;
 import org.xwiki.watchlist.test.po.WatchlistUserProfilePage;
 import org.xwiki.watchlist.test.po.editor.WatchlistPreferencesEditPage;
 
@@ -51,6 +52,10 @@ public class AutoWatchTest extends AbstractTest
         getUtil().deletePage("XWiki", testUserName);
 
         getUtil().createUserAndLogin(testUserName, "password");
+        // The first edition of the profile might introduce new objects: those might lead to a conflict window
+        // if the edit is performed too quickly (the version needs to be refreshed). To avoid this, we edit and cancel
+        // the edition, so the objects are created and we don't have any conflict in the further editions.
+        ProfileUserProfilePage.gotoPage(testUserName).editProfile().clickCancel();
     }
 
     @Test

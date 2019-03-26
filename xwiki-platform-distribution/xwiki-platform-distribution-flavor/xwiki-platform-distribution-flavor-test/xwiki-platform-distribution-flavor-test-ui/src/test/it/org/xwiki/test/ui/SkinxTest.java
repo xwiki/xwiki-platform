@@ -30,7 +30,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.xwiki.test.po.xe.HomePage;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -65,7 +65,7 @@ public class SkinxTest extends AbstractTest
 
         // Add an XWikiGroups object
         ObjectEditPage oep = vp.editObjects();
-        FormElement objectForm = oep.addObject("XWiki.JavaScriptExtension");
+        FormContainerElement objectForm = oep.addObject("XWiki.JavaScriptExtension");
         objectForm.setFieldValue(By.id("XWiki.JavaScriptExtension_0_code"), SCRIPT);
         objectForm.getSelectElement(By.id("XWiki.JavaScriptExtension_0_use")).select("always");
         oep.clickSaveAndView();

@@ -92,7 +92,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
         // NOTE: We scroll the page up because the drag&drop fails sometimes if the dragged field and the canvas (drop
         // target) are not fully visible. See https://code.google.com/p/selenium/issues/detail?id=3075 .
         palette.sendKeys(Keys.HOME);
-        new Actions(getDriver()).dragAndDrop(field, fieldsCanvas).perform();
+        getDriver().dragAndDrop(field, fieldsCanvas);
         final WebElement addedField = fieldsCanvas.findElement(By.xpath("./ul[@id='fields']/li[last()]"));
 
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()

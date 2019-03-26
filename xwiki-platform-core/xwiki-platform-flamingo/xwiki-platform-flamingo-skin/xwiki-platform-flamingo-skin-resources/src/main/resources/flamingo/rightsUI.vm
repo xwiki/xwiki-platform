@@ -1,3 +1,6 @@
+#if($xcontext.getAction() != 'edit' && $xcontext.getAction() != 'admin')
+  $response.sendRedirect($doc.getURL('edit', 'editor=rights'))
+#end
 #set ($formname = 'update')
 #set ($saveaction = 'save')
 ##

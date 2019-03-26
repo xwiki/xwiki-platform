@@ -27,6 +27,8 @@ import org.hibernate.Transaction;
 import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWiki;
@@ -61,6 +63,10 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
 
     protected HibernateStore hibernateStore;
 
+    protected DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
+    protected EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
     @Before
     public void setUp() throws Exception
     {
@@ -76,6 +82,12 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
         when(xcontextProvider.get()).thenReturn(this.xcontext);
         xcontextProvider = getMocker().registerMockComponent(XWikiContext.TYPE_PROVIDER, "readonly");
         when(xcontextProvider.get()).thenReturn(this.xcontext);
+
+        currentMixedDocumentReferenceResolver = getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING
+            , "currentmixed");
+
+        compactWikiEntityReferenceSerializer = getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING,
+            "compactwiki");
 
         XWiki wiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(wiki);

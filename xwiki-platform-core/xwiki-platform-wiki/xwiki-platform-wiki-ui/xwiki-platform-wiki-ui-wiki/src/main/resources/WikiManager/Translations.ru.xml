@@ -36,8 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-# Various translations that are used in the wiki template and, implicitly, in the created wiki.
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
 
 ## MENU
 core.menu.type.wiki=Вики
@@ -134,6 +133,5 @@ admin.xwiki.members.title=Текущие участники
 admin.xwiki.users.title=Все пользователи
     
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Домашняя страница
-</content>
+platform.wiki.drawer.homeWiki=Домашняя страница</content>
 </xwikidoc>

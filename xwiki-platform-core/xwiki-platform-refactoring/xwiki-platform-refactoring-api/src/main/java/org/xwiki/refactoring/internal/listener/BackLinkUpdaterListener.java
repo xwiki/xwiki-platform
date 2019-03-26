@@ -122,19 +122,16 @@ public class BackLinkUpdaterListener extends AbstractEventListener
             }
         }
 
-        boolean popLevelProgress = false;
-        try {
-            if (wikiIds.size() > 0) {
-                this.progressManager.pushLevelProgress(wikiIds.size(), this);
-                popLevelProgress = true;
-            }
-            for (String wikiId : wikiIds) {
-                this.progressManager.startStep(this);
-                updateBackLinks(event, canEdit, wikiId);
-                this.progressManager.endStep(this);
-            }
-        } finally {
-            if (popLevelProgress) {
+        if (!wikiIds.isEmpty()) {
+            this.progressManager.pushLevelProgress(wikiIds.size(), this);
+
+            try {
+                for (String wikiId : wikiIds) {
+                    this.progressManager.startStep(this);
+                    updateBackLinks(event, canEdit, wikiId);
+                    this.progressManager.endStep(this);
+                }
+            } finally {
                 this.progressManager.popLevelProgress(this);
             }
         }
@@ -145,6 +142,7 @@ public class BackLinkUpdaterListener extends AbstractEventListener
         this.logger.info("Updating the back-links for document [{}] in wiki [{}].", event.getSourceReference(), wikiId);
         List<DocumentReference> backlinkDocumentReferences =
             this.modelBridge.getBackLinkedReferences(event.getSourceReference(), wikiId);
+
         this.progressManager.pushLevelProgress(backlinkDocumentReferences.size(), this);
 
         try {

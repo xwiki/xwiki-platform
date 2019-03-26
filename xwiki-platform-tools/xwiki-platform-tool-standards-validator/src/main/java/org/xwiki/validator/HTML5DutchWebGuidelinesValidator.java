@@ -480,9 +480,9 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     public void validateRpd3s9()
     {
-        // <sub> and <sup> are not allowed.
-        assertFalse(Type.ERROR, "rpd3s9.sub", containsElement("sub"));
-        assertFalse(Type.ERROR, "rpd3s9.sup", containsElement("sup"));
+        // <sub> and <sup> are not recommended.
+        assertFalse(Type.WARNING, "rpd3s9.sub", containsElement("sub"));
+        assertFalse(Type.WARNING, "rpd3s9.sup", containsElement("sup"));
     }
 
     /**
@@ -1131,9 +1131,13 @@ public class HTML5DutchWebGuidelinesValidator extends AbstractHTML5Validator
      */
     public void validateRpd12s1()
     {
-        // Usage of iframes is forbidden
+        // Usage of iframes is discouraged, but title and role are mandatory on iframes.
         // frameset and frame tags are checked in RPD2.5.
-        assertFalse(Type.ERROR, "rpd12s1.iframe", containsElement(ELEM_IFRAME));
+        assertFalse(Type.WARNING, "rpd12s1.iframe", containsElement(ELEM_IFRAME));
+        for (Element iframe : getElements(ELEM_IFRAME)) {
+            assertTrue(Type.ERROR, "rpd12s1.role", iframe.hasAttr(ATTR_ROLE));
+            assertTrue(Type.ERROR, "rpd12s1.title", iframe.hasAttr(ATTR_TITLE));
+        }
     }
 
     /**

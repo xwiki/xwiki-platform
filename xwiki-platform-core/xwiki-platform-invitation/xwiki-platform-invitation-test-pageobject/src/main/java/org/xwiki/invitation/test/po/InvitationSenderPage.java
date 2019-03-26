@@ -26,7 +26,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BasePage;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.TableElement;
 
 /**
@@ -40,7 +40,7 @@ public class InvitationSenderPage extends BasePage
     @FindBy(id = "invitation-sender-form")
     private WebElement form;
 
-    private FormElement formElement;
+    private FormContainerElement formElement;
 
     @FindBy(xpath = "//form[@id='invitation-sender-form']/div/div/span/input[@type='submit'][@name='preview']")
     private WebElement previewButton;
@@ -114,10 +114,10 @@ public class InvitationSenderPage extends BasePage
         return this.previewElement;
     }
 
-    public FormElement getForm()
+    public FormContainerElement getForm()
     {
         if (this.formElement == null) {
-            this.formElement = new FormElement(this.form);
+            this.formElement = new FormContainerElement(this.form);
         }
         return this.formElement;
     }

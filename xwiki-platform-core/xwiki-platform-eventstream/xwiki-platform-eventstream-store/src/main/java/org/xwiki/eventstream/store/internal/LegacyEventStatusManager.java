@@ -32,6 +32,7 @@ import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.text.StringUtils;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -61,6 +62,9 @@ public class LegacyEventStatusManager implements EventStatusManager
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
     public List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception
@@ -133,11 +137,16 @@ public class LegacyEventStatusManager implements EventStatusManager
     {
         LegacyEventStatus status = eventConverter.convertEventStatusToLegacyActivityStatus(eventStatus);
 
+        boolean isSavedOnMainStore = false;
+
         if (configuration.useLocalStore()) {
             saveEventStatusInStore(status);
+            isSavedOnMainStore = wikiDescriptorManager.isMainWiki(eventStatus.getEvent().getWiki().getName());
         }
 
-        if (configuration.useMainStore()) {
+        if (configuration.useMainStore() && !isSavedOnMainStore) {
+            // save event into the main database (if the event was not already be recorded on the main store,
+            // otherwise we would duplicate the event)
             XWikiContext context = contextProvider.get();
             // store event in the main database
             String oriDatabase = context.getWikiId();

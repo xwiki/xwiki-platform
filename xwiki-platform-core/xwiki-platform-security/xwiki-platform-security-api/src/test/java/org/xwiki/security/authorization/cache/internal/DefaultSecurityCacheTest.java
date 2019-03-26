@@ -78,7 +78,7 @@ public class DefaultSecurityCacheTest extends AbstractSecurityTestCase
 {
     @Rule
     public final MockitoComponentMockingRule<SecurityCache> securityCacheMocker =
-        new MockitoComponentMockingRule<SecurityCache>(DefaultSecurityCache.class, SecurityCache.class,
+        new MockitoComponentMockingRule<SecurityCache>(DefaultSecurityCache.class,
             Arrays.asList(EntityReferenceSerializer.class));
 
     @Rule

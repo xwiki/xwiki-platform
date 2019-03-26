@@ -209,7 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Supprimer toutes les ent
 platform.appwithinminutes.appHomePageEditAppLabel=Modifier l'application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traduire l'application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Supprimer application
-### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+platform.appwithinminutes.appHomePageMovedWarning=L'application pourrait ne plus fonctionner correctement car elle a été renommée ou déplacée sans que son code n'ait été mis à jour. Merci de modifier l'application en mettant le code à jour pas à pas.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=L''application {0} et TOUS SES DOCUMENTS vont être détruits. Etes-vous certain de vouloir continuer ?
@@ -219,8 +219,8 @@ platform.appwithinminutes.deleteAppInvalidAppError=Le nom spécifié n'est pas u
 platform.appwithinminutes.deleteAppNotSpecifiedError=Aucun nom d'application n'a été indiqué.
 
 ### Rename Application
-### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
-### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+appWithinMinutes.renameApp.changeAppTitleInfo=Vous pouvez modifier le titre de l'application sans la renommer, simplement en éditant sa page d'accueil.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=Le code de l'application va être généré à nouveau si vous renommer l'application. Les personnalisations apportées au code seront par conséquent écrasées.
 appWithinMinutes.renameApp.newName.label=Nouveau nom
 appWithinMinutes.renameApp.pageExistsError=Une page portant ce nom existe déjà à l'emplacement sélectionné.
 appWithinMinutes.renameApp.locationForbiddenError=Vous n'êtes pas autorisés à déplacer l'application à l'emplacement sélectionné.

@@ -69,13 +69,8 @@ public class WikiTemplateTest extends AbstractTest
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
         
         // Creation step
-        WikiCreationPage wikiCreationPage = createWikiPageStepUser.create();
-        assertEquals("Wiki creation", wikiCreationPage.getStepTitle());
-        // Ensure there is no error in the log
-        assertFalse(wikiCreationPage.hasLogError());
-        
-        // Finalization
-        WikiHomePage wikiHomePage = wikiCreationPage.finalizeCreation();
+        // Creation step + click Finalize button
+        WikiHomePage wikiHomePage = executeCreationStepAndFinalize(createWikiPageStepUser);
 
         // Go to the created subwiki, and modify the home page content
         wikiHomePage.edit();
@@ -129,19 +124,9 @@ public class WikiTemplateTest extends AbstractTest
 
         // Second step
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
-        WikiCreationPage wikiCreationPage = createWikiPageStepUser.create();
-        assertEquals("Wiki creation", wikiCreationPage.getStepTitle());
 
-        // Wait for the finalize button to be displayed.
-        // Note that the whole flavor defined in the pom.xml (i.e. org.xwiki.platform:xwiki-platform-wiki-ui-wiki) will
-        // be copied and that's a lot of pages (over 800+), and this takes time. If the CI agent is busy with other
-        // jobs running in parallel it'll take even more time. Thus we put a large value to be safe.
-        wikiCreationPage.waitForFinalizeButton(60*3);
-        // Ensure there is no error in the log
-        assertFalse(wikiCreationPage.hasLogError());
-
-        // Finalization
-        WikiHomePage wikiHomePage = wikiCreationPage.finalizeCreation();
+        // Creation step + click Finalize button
+        WikiHomePage wikiHomePage = executeCreationStepAndFinalize(createWikiPageStepUser);
 
         // Go the created subwiki and verify the content of the main page is the same than in the template
         assertEquals(wikiHomePage.getContent(), TEMPLATE_CONTENT);
@@ -162,6 +147,24 @@ public class WikiTemplateTest extends AbstractTest
         // Verify the wiki has been deleted
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         assertNull(wikiIndexPage.getWikiLink("My new wiki"));
+    }
+
+    private WikiHomePage executeCreationStepAndFinalize(CreateWikiPageStepUser createWikiPageStepUser)
+    {
+        WikiCreationPage wikiCreationPage = createWikiPageStepUser.create();
+        assertEquals("Wiki creation", wikiCreationPage.getStepTitle());
+
+        // Wait for the finalize button to be displayed.
+        // Note that the whole flavor defined in the pom.xml (i.e. org.xwiki.platform:xwiki-platform-wiki-ui-wiki) will
+        // be copied and that's a lot of pages (over 800+), and this takes time. If the CI agent is busy with other
+        // jobs running in parallel it'll take even more time. Thus we put a large value to be safe.
+        wikiCreationPage.waitForFinalizeButton(60*3);
+        // Ensure there is no error in the log
+        assertFalse(wikiCreationPage.hasLogError());
+
+        // Finalization
+        WikiHomePage wikiHomePage = wikiCreationPage.finalizeCreation();
+        return wikiHomePage;
     }
 
     @Test

@@ -59,7 +59,37 @@ public interface NotificationsResource
             @QueryParam("displayReadEvents") String displayReadEvents,
             @QueryParam("displayReadStatus") String displayReadStatus,
             @QueryParam("tags") String tags,
-            @QueryParam("currentWiki") String currentWiki
+            @QueryParam("currentWiki") String currentWiki,
+            @QueryParam("async") String async,
+            @QueryParam("asyncId") String asyncId
+            ) throws Exception;
+
+    /**
+     * Get the number of notifications for the given parameters.
+     * @return notifications
+     * @throws Exception if an error occurs
+     * @since 10.11.4
+     * @since 11.3RC1
+     */
+    @GET
+    @Path("/count")
+    Response getNotificationsCount(
+            @QueryParam("useUserPreferences") String useUserPreferences,
+            @QueryParam("userId") String userId,
+            @QueryParam("pages") String pages,
+            @QueryParam("spaces") String spaces,
+            @QueryParam("wikis") String wikis,
+            @QueryParam("users") String users,
+            @QueryParam("count") String count,
+            @QueryParam("displayOwnEvents") String displayOwnEvents,
+            @QueryParam("displayMinorEvents") String displayMinorEvents,
+            @QueryParam("displaySystemEvents") String displaySystemEvents,
+            @QueryParam("displayReadEvents") String displayReadEvents,
+            @QueryParam("displayReadStatus") String displayReadStatus,
+            @QueryParam("tags") String tags,
+            @QueryParam("currentWiki") String currentWiki,
+            @QueryParam("async") String async,
+            @QueryParam("asyncId") String asyncId
             ) throws Exception;
 
     /**

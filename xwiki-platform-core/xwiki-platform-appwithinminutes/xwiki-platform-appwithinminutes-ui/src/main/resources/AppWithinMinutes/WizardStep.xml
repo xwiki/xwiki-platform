@@ -73,7 +73,7 @@
     #if ($stepId == 'presentation')
       #set ($nextLabel = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonLabel'))
       #set ($nextTip = $services.localization.render('platform.appwithinminutes.wizardStepFinishButtonTip'))
-      #set ($templateProviderReference = "$stringtool.removeEnd($className, 'Class')TemplateProvider")
+      #set ($templateProviderReference = "$stringtool.removeEnd($classReference, 'Class')TemplateProvider")
       #set ($previousURL = $xwiki.getURL($templateProviderReference, 'edit',
         'wizard=true&amp;sheet=AppWithinMinutes.TemplateProviderEditSheet'))
     #elseif ($stepId == 'entries')

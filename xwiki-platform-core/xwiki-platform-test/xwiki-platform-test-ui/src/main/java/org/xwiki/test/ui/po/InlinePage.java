@@ -167,7 +167,7 @@ public class InlinePage extends ViewPage
     public String getValue(String fieldName)
     {
         String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
-        return new FormElement(getForm()).getFieldValue(By.xpath(xpath));
+        return new FormContainerElement(getForm()).getFieldValue(By.xpath(xpath));
     }
 
     /**
@@ -182,10 +182,10 @@ public class InlinePage extends ViewPage
         String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
         WebElement field = getForm().findElement(By.xpath(xpath));
         if (field.getAttribute("name").equals(field.getAttribute("id"))) {
-            new FormElement(getForm()).setFieldValue(field, fieldValue);
+            new FormContainerElement(getForm()).setFieldValue(field, fieldValue);
         } else {
             xpath = String.format("//*[@name = '%s' and @value = '%s']", field.getAttribute("name"), fieldValue);
-            new FormElement(getForm()).setCheckBox(By.xpath(xpath), true);
+            new FormContainerElement(getForm()).setCheckBox(By.xpath(xpath), true);
         }
     }
 

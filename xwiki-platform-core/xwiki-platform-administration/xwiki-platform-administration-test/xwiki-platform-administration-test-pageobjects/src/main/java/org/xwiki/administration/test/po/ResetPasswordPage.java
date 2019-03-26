@@ -41,7 +41,7 @@ public class ResetPasswordPage extends ViewPage
     @FindBy(css = ".xcontent .box")
     private WebElement messageBox;
 
-    @FindBy(xpath = "//.[@class='xcontent']//a[contains(text(), 'Retry')]")
+    @FindBy(xpath = "//*[@class='xcontent']//a[contains(text(), 'Retry')]")
     private WebElement retryUserNameButton;
 
     public static ResetPasswordPage gotoPage()

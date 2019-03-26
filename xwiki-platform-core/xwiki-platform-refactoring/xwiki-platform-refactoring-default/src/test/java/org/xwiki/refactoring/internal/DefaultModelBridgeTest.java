@@ -57,6 +57,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.parentchild.ParentChildConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 import ch.qos.logback.classic.Level;
@@ -116,13 +117,17 @@ public class DefaultModelBridgeTest
     private XWikiRecycleBinStoreInterface recycleBin;
 
     @Mock
+    private XWikiStoreInterface store;
+
+    @Mock
     private AbstractCheckRightsRequest request;
 
     @BeforeEach
     public void configure(MockitoComponentManager mocker) throws Exception
     {
-        when(this.xcontext.getWiki()).thenReturn(xwiki);
-        when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
+        when(this.xcontext.getWiki()).thenReturn(this.xwiki);
+        when(xwiki.getRecycleBinStore()).thenReturn(this.recycleBin);
+        when(xwiki.getStore()).thenReturn(this.store);
 
         Provider<XWikiContext> xcontextProvider = mocker.getInstance(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
@@ -459,11 +464,8 @@ public class DefaultModelBridgeTest
     public void getBackLinkedReferences() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("alice", Arrays.asList("Path", "To"), "Page");
-        XWikiDocument document = mock(XWikiDocument.class);
-        when(this.xcontext.getWiki().getDocument(documentReference, this.xcontext)).thenReturn(document);
-
         List<DocumentReference> backLinks = Arrays.asList(new DocumentReference("bob", "One", "Two"));
-        when(document.getBackLinkedReferences(this.xcontext)).thenReturn(backLinks);
+        when(xwiki.getStore().loadBacklinks(documentReference, true, this.xcontext)).thenReturn(backLinks);
 
         this.xcontext.setWikiId("carol");
 

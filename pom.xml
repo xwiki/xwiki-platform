@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.3-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>11.2-SNAPSHOT</version>
+  <version>11.3-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -52,12 +52,12 @@
     <hsqldb.version>2.4.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.31</ckeditor.version>
+    <ckeditor.version>1.32</ckeditor.version>
     <bootstrap.version>3.3.7-1</bootstrap.version>
     <batik.version>1.11</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>1.20</tika.version>
-    <pdfbox.version>2.0.13</pdfbox.version>
+    <pdfbox.version>2.0.14</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
@@ -113,12 +113,6 @@
         <groupId>org.python</groupId>
         <artifactId>jython-standalone</artifactId>
         <version>2.7.1-xwiki-2</version>
-      </dependency>
-      <!-- Used on remote observation and also by JBossCache/Infinispan (even if it does not really use it) -->
-      <dependency>
-        <groupId>org.jgroups</groupId>
-        <artifactId>jgroups</artifactId>
-        <version>4.0.17.Final</version>
       </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>
@@ -409,7 +403,7 @@
       <dependency>
         <groupId>com.github.jsqlparser</groupId>
         <artifactId>jsqlparser</artifactId>
-        <version>1.4</version>
+        <version>2.0</version>
       </dependency>
 
       <!-- JNR -->

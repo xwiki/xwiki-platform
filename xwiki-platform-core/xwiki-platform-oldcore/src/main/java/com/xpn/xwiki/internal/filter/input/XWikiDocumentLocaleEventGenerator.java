@@ -84,44 +84,52 @@ public class XWikiDocumentLocaleEventGenerator
         DocumentInstanceInputProperties properties) throws FilterException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
+        String currentWiki = xcontext.getWikiId();
 
-        // > WikiDocumentLocale
+        try {
+            // the document might belong to another wiki, so we need to setup the context
+            xcontext.setWikiId(document.getDocumentReference().getWikiReference().getName());
 
-        FilterEventParameters localeParameters = new FilterEventParameters();
+            // > WikiDocumentLocale
 
-        if (properties.isWithJRCSRevisions()) {
-            try {
-                localeParameters.put(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS,
-                    document.getDocumentArchive(xcontext).getArchive(xcontext));
-            } catch (XWikiException e) {
-                this.logger.error("Document [{}] has malformed history", document.getDocumentReference(), e);
-            }
-        }
+            FilterEventParameters localeParameters = new FilterEventParameters();
 
-        localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, document.getCreator());
-        localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_DATE, document.getCreationDate());
-        localeParameters.put(WikiDocumentFilter.PARAMETER_LASTREVISION, document.getVersion());
-
-        documentFilter.beginWikiDocumentLocale(document.getLocale(), localeParameters);
-
-        if (properties.isWithRevisions()) {
-            try {
-                for (Version version : document.getRevisions(xcontext)) {
-                    XWikiDocument revisionDocument =
-                        xcontext.getWiki().getDocument(document, version.toString(), xcontext);
-
-                    writeRevision(revisionDocument, filter, documentFilter, properties);
+            if (properties.isWithJRCSRevisions()) {
+                try {
+                    localeParameters.put(XWikiWikiDocumentFilter.PARAMETER_JRCSREVISIONS,
+                        document.getDocumentArchive(xcontext).getArchive(xcontext));
+                } catch (XWikiException e) {
+                    this.logger.error("Document [{}] has malformed history", document.getDocumentReference(), e);
                 }
-            } catch (XWikiException e) {
-                this.logger.error("Failed to get document [{}] history", document.getDocumentReference(), e);
             }
+
+            localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_AUTHOR, document.getCreator());
+            localeParameters.put(WikiDocumentFilter.PARAMETER_CREATION_DATE, document.getCreationDate());
+            localeParameters.put(WikiDocumentFilter.PARAMETER_LASTREVISION, document.getVersion());
+
+            documentFilter.beginWikiDocumentLocale(document.getLocale(), localeParameters);
+
+            if (properties.isWithRevisions()) {
+                try {
+                    for (Version version : document.getRevisions(xcontext)) {
+                        XWikiDocument revisionDocument =
+                            xcontext.getWiki().getDocument(document, version.toString(), xcontext);
+
+                        writeRevision(revisionDocument, filter, documentFilter, properties);
+                    }
+                } catch (XWikiException e) {
+                    this.logger.error("Failed to get document [{}] history", document.getDocumentReference(), e);
+                }
+            }
+
+            writeRevision(document, filter, documentFilter, properties);
+
+            // < WikiDocumentLocale
+
+            documentFilter.endWikiDocumentLocale(document.getLocale(), FilterEventParameters.EMPTY);
+        } finally {
+            xcontext.setWikiId(currentWiki);
         }
-
-        writeRevision(document, filter, documentFilter, properties);
-
-        // < WikiDocumentLocale
-
-        documentFilter.endWikiDocumentLocale(document.getLocale(), FilterEventParameters.EMPTY);
     }
 
     private void writeRevision(XWikiDocument document, Object filter, XWikiDocumentFilter documentFilter,

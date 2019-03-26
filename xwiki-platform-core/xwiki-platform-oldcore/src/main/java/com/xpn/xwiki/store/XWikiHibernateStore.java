@@ -49,6 +49,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.ObjectNotFoundException;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -309,6 +311,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         try {
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
+
             session.doWork(connection -> {
                 stmt.set(connection.createStatement());
                 Statement statement = stmt.get();
@@ -326,12 +329,29 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 } else if (DatabaseProduct.HSQLDB == databaseProduct) {
                     statement.execute("CREATE SCHEMA " + escapedSchema + " AUTHORIZATION DBA");
                 } else if (DatabaseProduct.MYSQL == databaseProduct) {
-                    // TODO: find a proper java lib to convert from java encoding to mysql charset name and collation
-                    if (context.getWiki().getEncoding().equals("UTF-8")) {
-                        statement.execute("create database " + escapedSchema + " CHARACTER SET utf8 COLLATE utf8_bin");
-                    } else {
-                        statement.execute("create database " + escapedSchema);
+                    StringBuilder statementBuilder = new StringBuilder("create database " + escapedSchema);
+
+                    String charset = "utf8mb4";
+                    String collation = "utf8mb4_bin";
+
+                    // Get main wiki encoding
+                    if (!context.isMainWiki(wikiName)) {
+                        SQLQuery selectQuery = session.createSQLQuery(
+                            "select DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME from INFORMATION_SCHEMA.SCHEMATA"
+                                + " where SCHEMA_NAME='" + getSchemaFromWikiName(context.getMainXWiki(), context) + "'");
+                        Object[] result = (Object[]) selectQuery.uniqueResult();
+                        if (result != null) {
+                            charset = (String) result[0];
+                            collation = (String) result[1];
+                        }
                     }
+
+                    statementBuilder.append(" CHARACTER SET ");
+                    statementBuilder.append(charset);
+                    statementBuilder.append(" COLLATE ");
+                    statementBuilder.append(collation);
+
+                    statement.execute(statementBuilder.toString());
                 } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
                     if (isInSchemaMode()) {
                         statement.execute("CREATE SCHEMA " + escapedSchema);
@@ -2072,19 +2092,22 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             // the select clause is compulsory to reach the fullName i.e. the page pointed
-            org.hibernate.query.Query<String> query = session.createQuery(
+            Query query = session.createQuery(
                 "select backlink.fullName from XWikiLink as backlink where backlink.id.link = :backlink", String.class);
-            query.setParameter("backlink", this.localEntityReferenceSerializer.serialize(documentReference));
+
+            // if we are in the same wiki context, we should only get the local reference
+            // but if we are not, then we have to check the full reference, containing the wiki part since
+            // it's how the link are recorded.
+            // This should be changed once the refactoring to support backlinks properly has been done.
+            // See: XWIKI-16192
+            query.setString("backlink", this.compactWikiEntityReferenceSerializer.serialize(documentReference));
 
             List<String> backlinkNames = query.list();
 
             // Convert strings into references
             for (String backlinkName : backlinkNames) {
-                backlinkReferences.add(this.currentMixedDocumentReferenceResolver.resolve(backlinkName));
-            }
-
-            if (bTransaction) {
-                endTransaction(context, false);
+                DocumentReference backlinkreference = this.currentMixedDocumentReferenceResolver.resolve(backlinkName);
+                backlinkReferences.add(backlinkreference);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -2141,9 +2164,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Extract the links.
             Set<XWikiLink> links = new LinkedHashSet<>();
 
+            String fullName = this.localEntityReferenceSerializer.serialize(doc.getDocumentReference());
+
             // Add wiki syntax links.
-            // FIXME: replace with doc.getUniqueWikiLinkedPages(context) when OldRendering is dropped.
-            links.addAll(this.oldRenderingProvider.get().extractLinks(doc, context));
+            Set<String> linkedPages = doc.getUniqueLinkedPages(context);
+            for (String linkedPage : linkedPages) {
+                XWikiLink wikiLink = new XWikiLink();
+
+                wikiLink.setDocId(doc.getId());
+                wikiLink.setFullName(fullName);
+                wikiLink.setLink(linkedPage);
+
+                links.add(wikiLink);
+            }
 
             // Add included pages.
             List<String> includedPages = doc.getIncludedPages(context);
@@ -2151,7 +2184,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 XWikiLink wikiLink = new XWikiLink();
 
                 wikiLink.setDocId(doc.getId());
-                wikiLink.setFullName(this.localEntityReferenceSerializer.serialize(doc.getDocumentReference()));
+                wikiLink.setFullName(fullName);
                 wikiLink.setLink(includedPage);
 
                 links.add(wikiLink);

@@ -133,6 +133,9 @@ editors.XDataEditors = Class.create({
               },
               onComplete : function() {
                 item.disabled = false;
+                require(['xwiki-meta'], function (xm) {
+                  xm.refreshVersion();
+                });
                 document.fire('xwiki:dom:refresh');
               },
               // IE converts 204 status code into 1223...
@@ -208,6 +211,9 @@ editors.XDataEditors = Class.create({
                   }.bind(this),
                   onComplete : function() {
                     item.disabled = false;
+                    require(['xwiki-meta'], function (xm) {
+                      xm.refreshVersion();
+                    });
                     document.fire('xwiki:dom:refresh');
                   }
                 },

@@ -117,6 +117,5 @@ administration.section.export.backupPack.hint=Définit si le package est une sau
 admin.other=Divers
 admin.other.description=Autres configurations pour les extensions.
 administration.section.analytics.status=Status
-administration.section.analytics.status.hint=Définit si le suivi Google Analytics™ est actif ou non
-</content>
+administration.section.analytics.status.hint=Définit si le suivi Google Analytics™ est actif ou non</content>
 </xwikidoc>

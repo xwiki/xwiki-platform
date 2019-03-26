@@ -23,12 +23,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -39,8 +37,6 @@ import org.xwiki.text.StringUtils;
  */
 public class TestConfiguration
 {
-    private static final Pattern ARTIFACT_COORD_PATTERN = Pattern.compile("([^: ]+):([^: ]+)");
-
     private static final String DEFAULT = "default";
 
     private static final String BROWSER_PROPERTY = "xwiki.test.ui.browser";
@@ -99,7 +95,7 @@ public class TestConfiguration
 
     private Properties properties;
 
-    private List<List<String>> extraJARs;
+    private List<ArtifactCoordinate> extraJARs;
 
     private List<Integer> sshPorts;
 
@@ -138,8 +134,8 @@ public class TestConfiguration
     }
 
     /**
-     * Resolve the passed Enum property by getting the value from the System property and if not found, from the
-     * {@link UITest} annotation, and fallbacking to the passed default value if not found.
+     * Resolve the passed Enum property by getting the value from the System property and if not found, from the {@link
+     * UITest} annotation, and fallbacking to the passed default value if not found.
      *
      * @param enumType the type of the enum for which we want to resolve the value.
      * @param annotationValue the {@link UITest} annotation parameter value to use if no System property is defined
@@ -285,18 +281,11 @@ public class TestConfiguration
 
     private void resolveExtraJARs()
     {
-        List<List<String>> newExtraJARs = new ArrayList<>();
+        List<ArtifactCoordinate> artifactCoordinates = new ArrayList<>();
         for (String coordinate : this.uiTestAnnotation.extraJARs()) {
-            Matcher matcher = ARTIFACT_COORD_PATTERN.matcher(coordinate);
-            if (!matcher.matches()) {
-                throw new IllegalArgumentException(String.format("Bad artifact coordinates [%s]", coordinate));
-            }
-            List<String> jarCoordinates = new ArrayList<>();
-            jarCoordinates.add(matcher.group(1));
-            jarCoordinates.add(matcher.group(2));
-            newExtraJARs.add(jarCoordinates);
+            artifactCoordinates.add(ArtifactCoordinate.parseArtifacts(coordinate));
         }
-        this.extraJARs = newExtraJARs;
+        this.extraJARs = artifactCoordinates;
     }
 
     private void resolveSSHPorts()
@@ -372,7 +361,7 @@ public class TestConfiguration
 
     /**
      * @return true true if the database data should be mapped to a local directory on the host computer so that it can
-     *         be saved and reused for another run
+     * be saved and reused for another run
      * @since 10.10RC1
      */
     public boolean isDatabaseDataSaved()
@@ -381,9 +370,9 @@ public class TestConfiguration
     }
 
     /**
-     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in
-     *         your local repository). False by default to avoid developer problems but should be set to true in the
-     *         CI to improve performance of functional tests
+     * @return true if the Maven resolving is done in offline mode (i.e. you need to have the required artifacts in your
+     * local repository). False by default to avoid developer problems but should be set to true in the CI to improve
+     * performance of functional tests
      * @since 10.10RC1
      */
     public boolean isOffline()
@@ -411,7 +400,7 @@ public class TestConfiguration
 
     /**
      * @return the version of the JDBC driver to use for the selected database (if not specified, uses a default version
-     *         depending on the database)
+     * depending on the database)
      * @since 10.10RC1
      */
     public String getJDBCDriverVersion()
@@ -429,8 +418,8 @@ public class TestConfiguration
     }
 
     /**
-     * @return the list of configuration properties to use when generating the XWiki configuration files such as
-     *         as {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
+     * @return the list of configuration properties to use when generating the XWiki configuration files such as as
+     * {@code xwiki.properties} (check {@code xwiki.properties.vm} to find the list of supported properties)
      * @since 10.10RC1
      */
     public Properties getProperties()
@@ -440,7 +429,7 @@ public class TestConfiguration
 
     /**
      * @return the list of database docker commands to use and that will override default commands (example of command
-     *         {@code character-set-server=utf8mb4}
+     * {@code character-set-server=utf8mb4}
      * @since 11.2RC1
      */
     public Properties getDatabaseCommands()
@@ -449,20 +438,19 @@ public class TestConfiguration
     }
 
     /**
-     * @return the list of extra JARs to add to the {@code WEB-INF/lib} directory, specified as a List of Strings in
-     *         the following order: group id, artifact id.
+     * @return the list of extra JARs to add to the {@code WEB-INF/lib} directory
      * @since 10.11RC1
      */
-    public List<List<String>> getExtraJARs()
+    public List<ArtifactCoordinate> getExtraJARs()
     {
         return this.extraJARs;
     }
 
     /**
-     * @return the list of ports that should be SSH-forwarded when connecting from a Docker container to the
-     *         host (i.e. when using the {@code host.testcontainers.internal} host name). This is in addition to port
-     *         {@code 8080} which is always added. For example if you need XWiki to send a mail to a SMTP server
-     *         running on port 3025 on the host, you should add port 3025 to the list.
+     * @return the list of ports that should be SSH-forwarded when connecting from a Docker container to the host (i.e.
+     * when using the {@code host.testcontainers.internal} host name). This is in addition to port {@code 8080} which is
+     * always added. For example if you need XWiki to send a mail to a SMTP server running on port 3025 on the host, you
+     * should add port 3025 to the list.
      * @since 10.11RC1
      */
     public List<Integer> getSSHPorts()
@@ -481,7 +469,7 @@ public class TestConfiguration
 
     /**
      * @return the String representation of the configuration (used for example as a directory name where to save the
-     *         generated XWiki configuration - XWiki WAR file, etc)
+     * generated XWiki configuration - XWiki WAR file, etc)
      * @since 10.10RC1
      */
     public String getName()
@@ -497,10 +485,10 @@ public class TestConfiguration
 
     /**
      * @return the output directory where to output files required for running the tests. If the {@code maven.build.dir}
-     *         system property is not defined then construct an output directory name based on the defined configuration
-     *         so that we can run different configurations one after another without them overriding each other.
-     *         The {@code maven.build.dir} system property is there to allow controlling where the Maven output
-     *         directory is located when running from Maven.
+     * system property is not defined then construct an output directory name based on the defined configuration so that
+     * we can run different configurations one after another without them overriding each other. The {@code
+     * maven.build.dir} system property is there to allow controlling where the Maven output directory is located when
+     * running from Maven.
      */
     public String getOutputDirectory()
     {
@@ -525,7 +513,7 @@ public class TestConfiguration
 
     /**
      * @return the list of Servlet Engines on which this test must not be executed. If the Servlet Engine is selected
-     *         then the test will be skipped
+     * then the test will be skipped
      * @since 10.11RC1
      */
     public List<ServletEngine> getForbiddenServletEngines()

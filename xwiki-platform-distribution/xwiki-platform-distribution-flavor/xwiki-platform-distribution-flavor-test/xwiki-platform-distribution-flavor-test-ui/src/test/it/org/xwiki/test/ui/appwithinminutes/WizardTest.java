@@ -288,8 +288,8 @@ public class WizardTest extends AbstractTest
         Assert.assertTrue(classEditPage.getContent().contains(ClassEditorTest.EMPTY_CANVAS_HINT));
         classEditPage.addField("Number");
 
-        // Step 3 and back to Step 2
-        classEditPage = classEditPage.clickNextStep().clickPreviousStep();
+        // Step 4 and back to Step 2
+        classEditPage = classEditPage.clickNextStep().clickNextStep().clickPreviousStep().clickPreviousStep();
         Assert.assertFalse(classEditPage.getContent().contains(ClassEditorTest.EMPTY_CANVAS_HINT));
         Assert.assertFalse(classEditPage.hasPreviousStep());
     }

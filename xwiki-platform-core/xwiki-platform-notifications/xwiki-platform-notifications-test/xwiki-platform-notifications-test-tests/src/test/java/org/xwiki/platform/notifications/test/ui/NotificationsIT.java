@@ -359,7 +359,9 @@ public class NotificationsIT extends AbstractTest
         getUtil().login(SUPERADMIN_USER_NAME, SUPERADMIN_PASSWORD);
         SchedulerHomePage schedulerHomePage = SchedulerHomePage.gotoPage();
         schedulerHomePage.clickJobActionTrigger("Notifications daily email");
-        this.mail.waitForIncomingEmail(1);
+
+        // Wait 10s instead of the default 5s to make sure the mail has enough time to arrive.
+        this.mail.waitForIncomingEmail(10000L, 1);
 
         assertEquals(1, this.mail.getReceivedMessages().length);
         MimeMessage message = this.mail.getReceivedMessages()[0];

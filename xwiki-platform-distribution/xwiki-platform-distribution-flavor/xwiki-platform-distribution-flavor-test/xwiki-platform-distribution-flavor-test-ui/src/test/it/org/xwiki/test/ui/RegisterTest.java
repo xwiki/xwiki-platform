@@ -58,7 +58,7 @@ public class RegisterTest extends AbstractTest
             getUtil().recacheSecretToken();
             getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
             getUtil().assertOnPage(sectionPage.getURL());
-            sectionPage.getForm().setFieldValue(By.name("XWiki.Registration_0_liveValidation_enabled"),
+            sectionPage.getFormContainerElement().setFieldValue(By.name("XWiki.Registration_0_liveValidation_enabled"),
                 Boolean.valueOf(useLiveValidation()).toString());
             sectionPage.clickSave();
             if (x > 2) {

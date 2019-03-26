@@ -109,7 +109,8 @@ public class WikiMacroExecutionEventListener implements EventListener
     public void onWikiMacroExecutionStartsEvent(WikiMacro wikiMacro)
     {
         // Modify the context for that following code is executed with the right of wiki macro author
-        AutoCloseable sucontext = this.suExecutor.before(wikiMacro.getAuthorReference());
+        AutoCloseable sucontext =
+            this.suExecutor.before(wikiMacro.getAuthorReference(), wikiMacro.getDocumentReference());
 
         // Put it in an hidden context property to restore it later
         ExecutionContext econtext = this.execution.getContext();

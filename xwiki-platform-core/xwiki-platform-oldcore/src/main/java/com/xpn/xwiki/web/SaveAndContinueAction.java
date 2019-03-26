@@ -20,12 +20,16 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.csrf.CSRFToken;
 
 import com.xpn.xwiki.XWikiContext;
@@ -41,6 +45,11 @@ public class SaveAndContinueAction extends XWikiAction
 
     /** Key for storing the wrapped action in the context. */
     private static final String WRAPPED_ACTION_CONTEXT_KEY = "SaveAndContinueAction.wrappedAction";
+
+    /**
+     * The key to retrieve the saved object version from the context.
+     */
+    private static final String SAVED_OBJECT_VERSION_KEY = "SaveAction.savedObjectVersion";
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
@@ -96,17 +105,17 @@ public class SaveAndContinueAction extends XWikiAction
         } else {
             SaveAction sa = new SaveAction();
             if (sa.save(context)) {
-                if (isAjaxRequest) {
+                // if it's a 409 we managed the conflict directly inside SaveAction, which explains the return true
+                if (isAjaxRequest && context.getResponse().getStatus() != HttpStatus.SC_CONFLICT) {
                     String errorMessage =
                         localizePlainOrKey("core.editors.saveandcontinue.theDocumentWasNotSaved");
                     // This should not happen. SaveAction.save(context) should normally throw an
                     // exception when failing during save and continue.
                     LOGGER.error("SaveAction.save(context) returned true while using save & continue");
                     writeAjaxErrorResponse(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, errorMessage, context);
-                } else {
+                } else if (context.getResponse().getStatus() != HttpStatus.SC_CONFLICT) {
                     context.put(WRAPPED_ACTION_CONTEXT_KEY, sa);
                 }
-
                 failure = true;
             } else {
                 // Lock back the document
@@ -202,7 +211,16 @@ public class SaveAndContinueAction extends XWikiAction
 
         // If this is an ajax request, no need to redirect.
         if (isAjaxRequest) {
-            context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
+            Version newVersion = (Version) context.get(SAVED_OBJECT_VERSION_KEY);
+
+            // in case of property update, SaveAction has not been called, so we don't get the new version.
+            if (newVersion != null) {
+                Map<String, String> jsonAnswer = new LinkedHashMap<>();
+                jsonAnswer.put("newVersion", newVersion.toString());
+                answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
+            } else {
+                context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);
+            }
             return false;
         }
 

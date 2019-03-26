@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -70,12 +70,12 @@
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j</artifactId>
-      <version>0.42</version>
+      <version>0.42.3</version>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
-      <version>0.42</version>
+      <version>0.42.3</version>
     </dependency>
 
     <!-- Standard dependencies found in the central repository -->
@@ -176,6 +176,11 @@
           <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
+        <!-- Use javax.transaction:javax.transaction-api instead to not have duplicate JARs in generated WARs -->
+        <exclusion>
+          <groupId>javax.transaction</groupId>
+          <artifactId>jta</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- Hibernate use an older id -->
@@ -183,6 +188,11 @@
         <groupId>jakarta.xml.bind</groupId>
         <artifactId>jakarta.xml.bind-api</artifactId>
       </dependency>
+    <!-- Use javax.transaction:javax.transaction-api instead to not have duplicate JARs in generated WARs -->
+    <dependency>
+      <groupId>javax.transaction</groupId>
+      <artifactId>javax.transaction-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-c3p0</artifactId>

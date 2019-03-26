@@ -12,22 +12,11 @@ function addButton(imageFile, speedTip, tagOpen, tagClose, sampleText) {
   tagOpen = escapeQuotes(tagOpen);
   tagClose = escapeQuotes(tagClose);
   sampleText = escapeQuotes(sampleText);
-  var mouseOver = "";
-
-  // we can't change the selection, so we show example texts
-  // when moving the mouse instead, until the first button is clicked
-  if (!document.selection && !is_gecko) {
-    // filter backslashes so it can be shown in the infobox
-    var re = new RegExp("\\\\n","g");
-    tagOpen = tagOpen.replace(re,"");
-    tagClose = tagClose.replace(re,"");
-    mouseOver = "onMouseover=\"if(!noOverwrite){document.infoform.infobox.value='"+tagOpen+sampleText+tagClose+"'};\"";
-  }
 
   document.write("<a href=\"javascript:insertTags");
   document.write("('"+tagOpen+"','"+tagClose+"','"+sampleText+"');\">");
 
-  document.write("<img src=\""+imageFile+"\" border=\"0\" ALT=\""+speedTip+"\" TITLE=\""+speedTip+"\""+mouseOver+">");
+  document.write("<img src=\""+imageFile+"\" border=\"0\" ALT=\""+speedTip+"\" TITLE=\""+speedTip+"\">");
   document.write("</a>");
   return;
 }
@@ -78,8 +67,9 @@ function insertTags(tagOpen, tagClose, sampleText) {
     } else {
       subst = tagOpen + myText + tagClose;
     }
-    txtarea.value = txtarea.value.substring(0, startPos) + subst +
-      txtarea.value.substring(endPos, txtarea.value.length);
+    var textBegin = txtarea.value.substring(0, startPos);
+    var textEnd = txtarea.value.substring(endPos, txtarea.value.length);
+    txtarea.value = textBegin + subst + textEnd;
     txtarea.focus();
 
     var cPos = startPos + (tagOpen.length + myText.length + tagClose.length);
@@ -104,7 +94,6 @@ function insertTags(tagOpen, tagClose, sampleText) {
       text = sampleText;
     }
     text = tagOpen + text + tagClose;
-    document.infoform.infobox.value = text;
     // in Safari this causes scrolling
     if (!is_safari) {
       txtarea.focus();

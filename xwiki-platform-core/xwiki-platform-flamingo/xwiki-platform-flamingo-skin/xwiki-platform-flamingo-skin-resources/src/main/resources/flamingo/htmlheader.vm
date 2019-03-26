@@ -19,6 +19,7 @@
   #xwikiDataAttribute('space', $doc.space)##deprecated, use 'reference' instead
   #xwikiDataAttribute('page', $doc.documentReference.name)##deprecated, use 'reference' instead
   #xwikiDataAttribute('version', $tdoc.version)
+  #xwikiDataAttribute('isnew', $tdoc.isNew())
   #xwikiDataAttribute('rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")
   #xwikiDataAttribute('user-reference', $!services.model.serialize($xcontext.userReference, 'default'))

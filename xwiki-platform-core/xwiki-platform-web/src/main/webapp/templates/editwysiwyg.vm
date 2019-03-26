@@ -1,3 +1,6 @@
+#if($xcontext.getAction() != 'edit')
+  $response.sendRedirect($doc.getURL('edit', 'editor=wysiwyg'))
+#end
 #if ($services.wysiwyg.isSyntaxSupported($doc.syntax.toIdString()))
   ## Insert JS and CSS needed for the fullscreen edit feature
   $xwiki.jsfx.use('uicomponents/widgets/fullScreen.js', {

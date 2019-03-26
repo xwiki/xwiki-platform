@@ -97,14 +97,17 @@ public class LegacyEventSaver
         LegacyEvent legacyEvent = eventConverter.convertEventToLegacyActivity(event);
 
         try {
+            boolean isSavedOnMainStore = false;
 
             if (configuration.useLocalStore()) {
                 // save event into the database where it should be located
                 saveLegacyEvent(legacyEvent, legacyEvent.getWiki());
+                isSavedOnMainStore = wikiDescriptorManager.isMainWiki(legacyEvent.getWiki());
             }
 
-            if (configuration.useMainStore()) {
-                // save event into the main database
+            if (configuration.useMainStore() && !isSavedOnMainStore) {
+                // save event into the main database (if the event was not already be recorded on the main store,
+                // otherwise we would duplicate the event)
                 saveLegacyEvent(legacyEvent, wikiDescriptorManager.getMainWikiId());
             }
 

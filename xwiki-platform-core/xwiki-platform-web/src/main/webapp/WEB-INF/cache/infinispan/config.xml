@@ -1,65 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
 <infinispan
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="urn:infinispan:config:7.0 http://www.infinispan.org/schemas/infinispan-config-7.0.xsd"
-      xmlns="urn:infinispan:config:7.0">
+      xsi:schemaLocation="urn:infinispan:config:9.4 http://www.infinispan.org/schemas/infinispan-config-9.4.xsd"
+      xmlns="urn:infinispan:config:9.4">
 
    <!--
       ******************************************************************************************************************
-
-      This is a sample Infinispan configuration XML file.  Sensible defaults are always used if elements are left
-      out.  For example, have a look at "minimal.xml" which ships in this same distribution.
-
-      This file considers some popular configurations, some commented out, with references to documentation and
-      further reading.
 
       A summary of the format of this XML file and all available options can be see online:
 
-         http://docs.jboss.org/infinispan/7.0/apidocs/config.html
+         http://infinispan.org/docs/9.4.x/user_guide/user_guide.html
 
       ******************************************************************************************************************
    -->
 
-   <!--
-   ******************************************************************************************************************
-
-   Sample thread executor definitions. Each executor can be hooked to one or multiple services:
-
-   - The asynchronous listener executor is only useful if you have asynchronous listeners attached. See:
-         - http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_listeners_and_notifications for more details
-   - The persistence executor is passed down to cache loader/writer implementations to be able to execute tasks in parallel
-   - The asynchronous transport executor is only useful if you intend to use the async cache API or have configured your cluster to use asynchronous communications.  See:
-         - http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_asynchronous_api
-         - http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_asynchronous_options
-   - The eviction executor is useful when eviction enabled and wish to customize the executor used by the eviction process:
-         - http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#eviction_anchor
-   - The replication queue executors is useful if you have enabled a Replication Queue and wish to fine tune the scheduled thread that flushes such batch RPCs.  See:
-         - http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_replication_queue
-
-   ******************************************************************************************************************
-   -->
-
-   <!--
-      <threads>
-         <thread-factory name="infinispan-factory" group-name="infinispan" thread-name-pattern="%G %i" priority="5"/>
-         <cached-thread-pool name="infinispan-cached" thread-factory="infinispan-factory" />
-         <blocking-bounded-queue-thread-pool name="infinispan-listener" thread-factory="infinispan-factory" core-threads="1" max-threads="1" queue-length="0" keepalive-time="0" />
-         <blocking-bounded-queue-thread-pool name="infinispan-transport" thread-factory="infinispan-factory" core-threads="5" max-threads="10" queue-length="100" keepalive-time="10000" />
-         <scheduled-thread-pool name="infinispan-eviction" thread-factory="infinispan-factory" />
-         <scheduled-thread-pool name="infinispan-repl-queue" thread-factory="infinispan-factory" />
-      </threads>
-   -->
-
-   <!--
-      ******************************************************************************************************************
-
-      System-wide global settings, which are shared across all caches managed by the same EmbeddedCacheManager:
-      - Enables collection of global JMX statistics, and allows you to customize the JMX domain name under which MBeans are registered.
-
-      ******************************************************************************************************************
-   -->
-
-   <cache-container name="xwiki" statistics="true"  default-cache="the-default-cache" shutdown-hook="DEFAULT">
+   <cache-container name="xwiki" statistics="true" default-cache="the-default-cache" shutdown-hook="DEFAULT">
 
      <jmx domain="org.xwiki.infinispan" />
 
@@ -75,10 +51,9 @@
         The default cache.
      -->
      <local-cache name="the-default-cache" statistics="true">
-        <eviction
-           max-entries="10000"
-           strategy="LRU"
-        />
+        <memory>
+          <object size="10000"/>
+        </memory>
      </local-cache>
 
      <!--
@@ -104,134 +79,6 @@
            </file-store>
         </persistence>
      </local-cache>
-
-     <!--
-         ******************************************************************************************************************
-         Examples
-         ******************************************************************************************************************
-     -->
-
-     <!--
-        A persistent cache that stores state on the file system using either write-through or write-behind.
-
-        If passivation is enabled, state is offloaded to the stores _only_ when evicted from memory, giving you
-        the effect of paging to disk.  Similarly, when the state is accessed again, it is removed from the cache loader
-          and loaded into memory.
-
-        Set 'shared' to true if all instances in the cluster use the same cache loader instance, e.g., are talking to
-        the same database.
-
-        If "preload" is true, all keys are loaded from the cache loader into memory upon starting the cache.
-
-        Multiple stores - chaining - is also supported.
-
-        Write-through versus write-behind is controlled via the <async /> element
-
-        See:
-
-           http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_persistence
-           http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_write_through_and_write_behind_caching
-     -->
-     <!--
-     <local-cache name="writeThroughToFile">
-       <persistence passivation="false">
-         <file-store path="${java.io.tmpdir}" shared="false" preload="true" purge="true">
-            <write-behind flush-lock-timeout="12321" modification-queue-size="123" shutdown-timeout="321" thread-pool-size="22" />
-         </file-store>
-       </persistence>
-     </local-cache>
-     -->
-
-     <!--
-        A cache where data can be evicted if not used after some time, or if it exceeds certain capacity.
-       As shown in this example, passivation can be configured so that whenever data is removed due
-        eviction/expiration, this is in turn stored in a backend cache store. Afterwards, when data is
-        requested, the cache store will be checked and data will be activated and brought back to memory 
-     -->
-     <!--
-     <local-cache name="evictionAndPassivationCache">
-        <eviction
-           max-entries="5000"
-         strategy="LIRS"
-        />
-        <expiration
-           interval="500"
-           lifespan="60000"
-           max-idle="1000"
-        />
-
-        <persistence passivation="true">
-           <file-store path="${java.io.tmpdir}"/>
-        </persistence>
-     </local-cache>
-     -->
-
-     <!-- 
-        A cache configured with cache invalidation that instead of using state transfer to retrieve data on startup,
-        it is configured with a cluster cache loader that allows it to query the cluster for data if not present
-        locally. This type of cache loader is particularly interesting for situations where state transfer is a
-        lengthy process. 
-     -->
-     <!--
-     <invalidation-cache name="invalidatedWithClusterCacheLoaderCache" mode="SYNC" remote-timeout="20000">
-        <persistence>
-           <cluster-loader remote-timeout="20000" preload="false"/>
-        </persistence>
-     </namedCache>
-     -->
-
-     <!--
-        A cache making use of custom interceptors, to add custom behavior to each cache invocation.  All custom
-        interceptors need to extend org.jboss.cache.interceptors.base.CommandInterceptor
-
-        See:
-           http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_custom_interceptors
-     -->
-     <!--
-     <local-cache name="cacheWithCustomInterceptors">
-        <custom-interceptors>
-           <interceptor position="first" class="com.mycompany.CustomInterceptor1">
-              <property name="com.mycompany.attributeOne">value1</property>
-              <property name="com.mycompany.attributeTwo">value2</property>
-           </interceptor>
-           <interceptor
-              position="last"
-              class="com.mycompany.CustomInterceptor2"
-           />
-           <interceptor
-              index="3"
-              class="com.mycompany.CustomInterceptor1"
-           />
-           <interceptor
-              before="org.infinispanpan.interceptors.CallInterceptor"
-              class="com.mycompany.CustomInterceptor2"
-           />
-           <interceptor
-              after="org.infinispanpan.interceptors.CallInterceptor"
-              class="com.mycompany.CustomInterceptor1"
-           />
-        </custom-interceptors>
-     </local-cache>
-     -->
-
-     <!--
-        A transactional cache configured to run in pessimistic mode.
-        See:
-           http://infinispan.org/docs/7.0.x/user_guide/user_guide.html#_transactions
-     -->
-     <!--
-     <local-cache name="pessimisticCache">
-
-        <transaction
-           transaction-manager-lookup="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
-           stop-timeout="30000"
-           auto-commit="true"
-           locking="PESSIMISTIC"
-           mode="NON_DURABLE_XA"
-           />
-
-     </local-cache>
-     -->
 
    </cache-container>
 </infinispan>

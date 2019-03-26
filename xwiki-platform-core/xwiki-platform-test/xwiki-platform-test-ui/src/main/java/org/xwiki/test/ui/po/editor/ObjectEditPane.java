@@ -21,7 +21,7 @@ package org.xwiki.test.ui.po.editor;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  * @version $Id$
  * @since 5.1RC1
  */
-public class ObjectEditPane extends FormElement
+public class ObjectEditPane extends FormContainerElement
 {
     /**
      * The object type.
@@ -66,7 +66,7 @@ public class ObjectEditPane extends FormElement
      */
     public DatePicker openDatePicker(String datePropertyName)
     {
-        getDriver().findElementWithoutWaiting(getForm(), byPropertyName(datePropertyName)).click();
+        getDriver().findElementWithoutWaiting(getFormContainer(), byPropertyName(datePropertyName)).click();
         return new DatePicker();
     }
 
@@ -77,7 +77,7 @@ public class ObjectEditPane extends FormElement
     public SuggestInputElement getSuggestInput(String userPropertyName)
     {
         return new SuggestInputElement(
-            getDriver().findElementWithoutWaiting(getForm(), byPropertyName(userPropertyName)));
+            getDriver().findElementWithoutWaiting(getFormContainer(), byPropertyName(userPropertyName)));
     }
 
     /**
@@ -89,5 +89,18 @@ public class ObjectEditPane extends FormElement
     public By byPropertyName(String propertyName)
     {
         return By.id(this.className + "_" + this.objectNumber + "_" + propertyName);
+    }
+
+    /**
+     * Helper to fill property values quickly.
+     *
+     * @param propertyName the name of the property to set
+     * @param propertyValue the value of the property
+     * @return the current instance.
+     */
+    public ObjectEditPane setPropertyValue(String propertyName, String propertyValue)
+    {
+        this.setFieldValue(byPropertyName(propertyName), propertyValue);
+        return this;
     }
 }

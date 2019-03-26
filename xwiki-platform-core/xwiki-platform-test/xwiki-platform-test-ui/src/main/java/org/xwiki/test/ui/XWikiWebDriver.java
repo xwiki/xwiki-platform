@@ -38,6 +38,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.CommandExecutor;
@@ -102,7 +103,9 @@ public class XWikiWebDriver extends RemoteWebDriver
     public WebElement findElementWithoutWaitingWithoutScrolling(By by)
     {
         // Temporarily remove the implicit wait on the driver since we're doing our own waits...
-        manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        // Trying to use another unit in case there is a conflict when calling implicitlyWait both here
+        // and in waitUntilCondition.
+        manage().timeouts().implicitlyWait(1, TimeUnit.MILLISECONDS);
         try {
             return findElementWithoutScrolling(by);
         } finally {
@@ -994,5 +997,27 @@ public class XWikiWebDriver extends RemoteWebDriver
     public WebElement findElementWithoutScrolling(By by)
     {
         return this.wrappedDriver.findElement(by);
+    }
+
+    /**
+     * @return the original {@link RemoteWebDriver} created for selenium tests.
+     *          The original driver should be used for custom {@link org.openqa.selenium.interactions.Actions}.
+     * @since 11.3RC1
+     */
+    public RemoteWebDriver getWrappedDriver()
+    {
+        return this.wrappedDriver;
+    }
+
+    /**
+     * Utility method to perform a drag &amp; drop by using the appropriate WebDriver.
+     * @param source the element to drag
+     * @param target the element where to drop
+     *
+     * @since 11.3RC1
+     */
+    public void dragAndDrop(WebElement source, WebElement target)
+    {
+        new Actions(this.getWrappedDriver()).dragAndDrop(source, target).perform();
     }
 }

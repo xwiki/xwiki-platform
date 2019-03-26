@@ -2911,7 +2911,7 @@ public class XWiki implements EventListener
     {
         Locale defaultLocale = this.getDefaultLocale(context);
         Set<Locale> availableLocales = new HashSet<>(this.getAvailableLocales(context));
-        boolean forceSupported = getConfiguration().getProperty("xwiki.language.forceSupported", "0").equals("1");
+        boolean forceSupported = getConfiguration().getProperty("xwiki.language.forceSupported", "1").equals("1");
 
         // First we try to get the language from the XWiki Context. This is the current language
         // being used.
@@ -7068,7 +7068,8 @@ public class XWiki implements EventListener
         // Special treatment for deleted objects
         rolledbackDoc.addXObjectsToRemoveFromVersion(tdoc);
 
-        // now we save the final document..
+        // Prepare the XWikiDocument before save
+        rolledbackDoc.setNew(false);
         rolledbackDoc.setOriginalDocument(tdoc);
         rolledbackDoc.setAuthorReference(context.getUserReference());
         rolledbackDoc.setContentAuthorReference(context.getUserReference());
@@ -7082,6 +7083,7 @@ public class XWiki implements EventListener
             message = rolledbackDoc.getComment();
         } else {
             rolledbackDoc.setMetaDataDirty(true);
+            rolledbackDoc.setDocumentArchive(tdoc.getDocumentArchive());
             rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
             message = localizePlainOrKey("core.comment.rollback", rev);
         }

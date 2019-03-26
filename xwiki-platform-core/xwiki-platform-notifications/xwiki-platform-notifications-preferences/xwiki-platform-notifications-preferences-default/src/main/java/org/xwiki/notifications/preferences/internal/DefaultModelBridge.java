@@ -72,12 +72,20 @@ public class DefaultModelBridge implements ModelBridge
 
     private static final String CODE = "Code";
 
-    private static final LocalDocumentReference NOTIFICATION_PREFERENCE_CLASS = new LocalDocumentReference(
-            Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationPreferenceClass");
+    private static final String NOTIFICATION_PREFERENCE_CLASS_NAME = "NotificationPreferenceClass";
 
-    private static final LocalDocumentReference GLOBAL_PREFERENCES = new LocalDocumentReference(
-            Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration"
-    );
+    /**
+     * @since 10.11.4
+     * @since 11.2RC1
+     */
+    public static final String NOTIFICATION_PREFERENCE_CLASS_STRING =
+        WIKI_SPACE + '.' + NOTIFICATIONS + '.' + CODE + '.' + NOTIFICATION_PREFERENCE_CLASS_NAME;
+
+    private static final LocalDocumentReference NOTIFICATION_PREFERENCE_CLASS =
+        new LocalDocumentReference(Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), NOTIFICATION_PREFERENCE_CLASS_NAME);
+
+    private static final LocalDocumentReference GLOBAL_PREFERENCES =
+        new LocalDocumentReference(Arrays.asList(WIKI_SPACE, NOTIFICATIONS, CODE), "NotificationAdministration");
 
     private static final String NOTIFICATION_START_DATE_UPDATE_COMMENT = "Update start date for the notifications.";
 
@@ -121,14 +129,11 @@ public class DefaultModelBridge implements ModelBridge
         XWikiContext context = contextProvider.get();
         XWiki xwiki = context.getWiki();
 
-        final DocumentReference notificationPreferencesClass = new DocumentReference(NOTIFICATION_PREFERENCE_CLASS,
-                document.getWikiReference());
-
         List<NotificationPreference> preferences = new ArrayList<>();
 
         try {
             XWikiDocument doc = xwiki.getDocument(document, context);
-            List<BaseObject> preferencesObj = doc.getXObjects(notificationPreferencesClass);
+            List<BaseObject> preferencesObj = doc.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
             if (preferencesObj != null) {
                 for (BaseObject obj : preferencesObj) {
                     if (obj != null) {
@@ -185,9 +190,7 @@ public class DefaultModelBridge implements ModelBridge
             XWiki xwiki = context.getWiki();
             XWikiDocument document =  xwiki.getDocument(userReference, context);
 
-            final DocumentReference notificationPreferencesClass = new DocumentReference(NOTIFICATION_PREFERENCE_CLASS,
-                    userReference.getWikiReference());
-            List<BaseObject> objects = document.getXObjects(notificationPreferencesClass);
+            List<BaseObject> objects = document.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
             if (objects != null) {
                 for (BaseObject object : objects) {
                     if (object != null) {
@@ -218,9 +221,7 @@ public class DefaultModelBridge implements ModelBridge
     private BaseObject findNotificationPreference(XWikiDocument xWikiDocument,
             NotificationPreference notificationPreference) throws NotificationException
     {
-        final DocumentReference notificationPreferencesClass = new DocumentReference(NOTIFICATION_PREFERENCE_CLASS,
-                xWikiDocument.getDocumentReference().getWikiReference());
-        List<BaseObject> objects = xWikiDocument.getXObjects(notificationPreferencesClass);
+        List<BaseObject> objects = xWikiDocument.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
 
         if (objects != null) {
             for (BaseObject object : objects) {
@@ -248,9 +249,6 @@ public class DefaultModelBridge implements ModelBridge
     public void saveNotificationsPreferences(DocumentReference targetDocument,
             List<NotificationPreference> notificationPreferences) throws NotificationException
     {
-        final DocumentReference notificationPreferencesClass = new DocumentReference(NOTIFICATION_PREFERENCE_CLASS,
-                targetDocument.getWikiReference());
-
         try {
             XWikiContext context = contextProvider.get();
             XWiki xwiki = context.getWiki();
@@ -269,7 +267,7 @@ public class DefaultModelBridge implements ModelBridge
                 // If no preference exist, then create one
                 if (preferenceObject == null) {
                     preferenceObject = new BaseObject();
-                    preferenceObject.setXClassReference(notificationPreferencesClass);
+                    preferenceObject.setXClassReference(NOTIFICATION_PREFERENCE_CLASS);
                     document.addXObject(preferenceObject);
                 }
 

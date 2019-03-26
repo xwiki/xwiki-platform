@@ -25,12 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-administration-test</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
-  <name>XWiki Platform - Administration - Page Objects</name>
+  <name>XWiki Platform - Administration - Tests - Page Objects</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Administration - Page Objects</description>
+  <description>XWiki Platform - Administration - Tests - Page Objects</description>
   <properties>
     <!-- None of the classes is valid -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>

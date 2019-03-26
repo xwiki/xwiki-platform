@@ -25,7 +25,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.InlinePage;
 
 /**
@@ -79,7 +79,7 @@ public class EntryEditPage extends InlinePage
      */
     public void setTitle(String title)
     {
-        new FormElement(getForm()).setFieldValue(By.name("title"), title);
+        new FormContainerElement(getForm()).setFieldValue(By.name("title"), title);
     }
 
     /**
@@ -97,7 +97,7 @@ public class EntryEditPage extends InlinePage
      */
     public void setContent(String content)
     {
-        new FormElement(getForm()).setFieldValue(By.name("content"), content);
+        new FormContainerElement(getForm()).setFieldValue(By.name("content"), content);
     }
 
     /**

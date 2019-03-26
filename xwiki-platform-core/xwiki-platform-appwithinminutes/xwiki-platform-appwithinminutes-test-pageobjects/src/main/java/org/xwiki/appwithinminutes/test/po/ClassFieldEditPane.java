@@ -144,7 +144,7 @@ public class ClassFieldEditPane extends BaseElement
     private void clickToolBoxIcon(String alt)
     {
         // This doesn't trigger the :hover CSS pseudo class so we're forced to manually set the display of the tool box.
-        new Actions(getDriver()).moveToElement(container).perform();
+        new Actions(getDriver().getWrappedDriver()).moveToElement(container).perform();
 
         // FIXME: The following line is a hack to overcome the fact that the previous line doesn't trigger the :hover
         // CSS pseudo class on the field container (even if the mouse if moved over it).
@@ -227,14 +227,14 @@ public class ClassFieldEditPane extends BaseElement
     public void dragTo(WebElement element, int xOffset, int yOffset)
     {
         // This doesn't trigger the :hover CSS pseudo class so we're forced to manually set the display of the tool box.
-        new Actions(getDriver()).moveToElement(container).perform();
+        new Actions(getDriver().getWrappedDriver()).moveToElement(container).perform();
 
         // FIXME: The following line is a hack to overcome the fact that the previous line doesn't trigger the :hover
         // CSS pseudo class on the field container (even if the mouse if moved over it).
         showToolBox();
 
         WebElement dragHandler = toolBox.findElement(By.xpath("img[@alt = 'Move']"));
-        new Actions(getDriver()).clickAndHold(dragHandler).moveToElement(element, xOffset, yOffset).release().perform();
+        new Actions(getDriver().getWrappedDriver()).clickAndHold(dragHandler).moveToElement(element, xOffset, yOffset).release().perform();
 
         // Reset the tool box display. Remove this line when the :hover CSS class will be triggered by mouse over.
         hideToolBox();

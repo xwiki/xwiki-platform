@@ -948,11 +948,9 @@ function prepareName(form) {
     var cxwikiname = form.xwikiname;
     if (fname != "") {
         fname = fname.substring(0,1).toUpperCase() + fname.substring(1);
-        fname.replace(/ /g,"");
     }
     if (lname != "") {
         lname = lname.substring(0,1).toUpperCase() + lname.substring(1)
-        lname.replace(/ /g,"");
     }
     if (cxwikiname.value == "") {
         cxwikiname.value = noaccent(fname + lname);

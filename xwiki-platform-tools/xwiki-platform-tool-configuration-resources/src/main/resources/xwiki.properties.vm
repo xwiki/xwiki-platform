@@ -921,6 +921,22 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.watchedEntities.autoWatch = major
 
+#-# [Since 10.11.4]
+#-# [Since 11.3RC1]
+#-# The search for notifications in the REST API is done trough a thread pool to limit the impact on the rest of the
+#-# XWiki instance.
+#-# This properties controls the size of this pool. Any number lower than 1 disable the thread pool system.
+#-# 
+#-# The default is :
+# notifications.rest.poolSize=2
+
+#-# [Since 10.11.4]
+#-# [Since 11.3RC1]
+#-# Enable or disable caching of notification search result in the REST API.
+#-# 
+#-# The default is :
+# notifications.rest.cache=true
+
 #-------------------------------------------------------------------------------------
 # Event Stream
 #-------------------------------------------------------------------------------------

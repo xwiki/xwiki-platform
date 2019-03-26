@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activitystream</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activitystream-api</artifactId>
   <name>XWiki Platform - Activity Stream - API</name>
@@ -34,6 +34,8 @@
   <properties>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-activitystream</xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Activity Stream Plugin</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

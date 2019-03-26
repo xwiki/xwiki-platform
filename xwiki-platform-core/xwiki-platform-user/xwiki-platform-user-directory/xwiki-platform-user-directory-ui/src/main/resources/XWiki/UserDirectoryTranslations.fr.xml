@@ -43,6 +43,5 @@ userdirectory.userScopeFilter.global=Les utilisateurs globaux membres de ce wiki
 platform.userdirectory.customizeNotAllowed=Vous n'êtes pas autorisé à personnaliser cet annuaire utilisateur.
 platform.userdirectory.configTitle=Configuration de l'annuaire utilisateur
 platform.userdirectory.configSheetTitle=Fiche de configuration de l'annuaire utilisateur
-platform.userdirectory.configSheetApplyOnConfiguration=Cette sheet doit être appliquée sur le document de configuration de l'annuaire utilisateur.
-</content>
+platform.userdirectory.configSheetApplyOnConfiguration=Cette sheet doit être appliquée sur le document de configuration de l'annuaire utilisateur.</content>
 </xwikidoc>

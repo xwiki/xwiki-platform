@@ -145,7 +145,7 @@ public class LoginTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
-    public void testRedirectPreservesPOSTParameters()
+    public void testLogoutDuringEditDisplayLoginModal()
     {
         String test = "Test string " + System.currentTimeMillis();
         final String space = "Main";
@@ -159,20 +159,18 @@ public class LoginTest extends AbstractTest
         // emulate expired session: delete the cookies
         getDriver().manage().deleteAllCookies();
         // try to save
-        editPage.clickSaveAndView();
-        // we should have been redirected to login
-        String wantUrl = getUtil().getURL("XWiki", "XWikiLogin", "login");
-        if (wantUrl.indexOf('?') > 0) {
-            // strip parameters
-            wantUrl = wantUrl.substring(0, wantUrl.indexOf('?'));
-        }
-        Assert.assertTrue(getDriver().getCurrentUrl().startsWith(wantUrl));
+        editPage.clickSaveAndView(false);
+        Assert.assertTrue(editPage.loginModalDisplayed());
+        String mainWindow = getDriver().getWindowHandle();
+        loginPage = editPage.clickModalLoginLink();
         loginPage.loginAsAdmin();
-        // we should have been redirected back to view, and the page should have been saved
-        Assert.assertTrue(getDriver().getCurrentUrl().startsWith(getUtil().getURL(space, page)));
-        editPage = WikiEditPage.gotoPage(space, page);
-        Assert.assertEquals(test, editPage.getTitle());
-        Assert.assertEquals(test, editPage.getContent());
+        getDriver().switchTo().window(mainWindow);
+        editPage = new WikiEditPage();
+        editPage.closeLoginModal();
+        ViewPage viewPage = editPage.clickSaveAndView();
+
+        Assert.assertEquals(test, viewPage.getDocumentTitle());
+        Assert.assertEquals(test, viewPage.getContent());
     }
 
     @Test

@@ -21,6 +21,7 @@ package org.xwiki.panels.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.po.ViewPage;
 
 /**
@@ -36,6 +37,12 @@ public class PanelsAdministrationPage extends ViewPage
 
     @FindBy(id = "saveLayout")
     private WebElement saveLink;
+
+    public static PanelsAdministrationPage gotoPage()
+    {
+        AdministrationPage.gotoPage().clickSection("Look & Feel", "Panels");
+        return new PanelsAdministrationPage();
+    }
 
     public PageLayoutTabContent selectPageLayout()
     {

@@ -112,7 +112,7 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.parentchild.DefaultParentChildConfiguration
 com.xpn.xwiki.internal.pdf.FOPXSLFORenderer
-com.xpn.xwiki.internal.render.DefaultLinkedResourceHelper
+com.xpn.xwiki.internal.render.LinkedResourceHelper
 com.xpn.xwiki.internal.resource.ResourceReferenceHandlerAuthenticatorListener
 com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor
 com.xpn.xwiki.internal.skin.DefaultSkinManager

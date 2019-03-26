@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.script.ScriptContext;
@@ -77,6 +78,7 @@ import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -943,5 +945,28 @@ public abstract class XWikiAction extends Action
         }
 
         return false;
+    }
+
+    /**
+     * Answer to a request with a JSON content.
+     * @param context the current context of the request.
+     * @param status the status code to send back.
+     * @param answer the content of the JSON answer.
+     * @throws XWikiException in case of error during the serialization of the JSON.
+     */
+    protected void answerJSON(XWikiContext context, int status, Map<String, String> answer) throws XWikiException
+    {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            String jsonAnswerAsString = mapper.writeValueAsString(answer);
+            context.getResponse().setContentType("application/json");
+            context.getResponse().setContentLength(jsonAnswerAsString.length());
+            context.getResponse().setStatus(status);
+            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
+            context.getResponse().getWriter().print(jsonAnswerAsString);
+        } catch (IOException e) {
+            throw new XWikiException("Error while sending JSON answer.", e);
+        }
     }
 }

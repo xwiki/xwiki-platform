@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -151,20 +151,7 @@
                   }
                 },
                 "ignore" : [
-                  {
-                    "code": "java.annotation.added",
-                    "old": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters",
-                    "new": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.code.CodeMacroParameters",
-                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({java.util.List.class, org.xwiki.rendering.block.Block.class})",
-                    "justification": "The annotation has been added in box macro but is used in Code Macro. It's not an api breakage."
-                  },
-                  {
-                    "code": "java.annotation.added",
-                    "old": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.rss.RssMacroParameters",
-                    "new": "method void org.xwiki.rendering.macro.box.BoxMacroParameters::setTitle(java.lang.String) @ org.xwiki.rendering.macro.rss.RssMacroParameters",
-                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({java.util.List.class, org.xwiki.rendering.block.Block.class})",
-                    "justification": "The annotation has been added in box macro but is used in RSS Macro. It's not an api breakage."
-                  }
+                  // Add more ignores below...
                 ]
               }
             }

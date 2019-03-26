@@ -58,6 +58,5 @@ Consente di commentare e quindi non valutare la sintassi XWiki
 |Commentare un carattere|(((
 {{{Questo non è un ~[~[link~]~]}}}
 {{info}}Per inserire il carattere ~~ usare un doppio commento: ~~~~{{/info}}
-)))|{{{Questo non è un [[link]]}}}
-</content>
+)))|{{{Questo non è un [[link]]}}}</content>
 </xwikidoc>

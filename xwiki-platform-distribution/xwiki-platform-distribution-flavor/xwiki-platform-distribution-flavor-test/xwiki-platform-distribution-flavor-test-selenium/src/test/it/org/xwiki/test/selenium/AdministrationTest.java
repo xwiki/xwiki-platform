@@ -71,73 +71,6 @@ public class AdministrationTest extends AbstractXWikiTestCase
     }
 
     /**
-     * Test Panel Wizard
-     */
-    @Test
-    public void testPanelsAdmin()
-    {
-        open("XWiki", "XWikiPreferences", "admin");
-
-        // test panel wizard at global level
-        administrationMenu.expandCategoryWithName("Look & Feel").getSectionByName("Look & Feel", "Panels").click();
-        waitForBodyContains("Page Layout");
-        clickLinkWithXPath("//a[@href='#PageLayoutSection']", false);
-        waitForElement("//div[@id = 'rightcolumn']");
-        clickLinkWithXPath("//div[@id='rightcolumn']", false);
-        waitForBodyContains("Panel List");
-        clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.cssSelector(".panel.QuickLinks h1"), By.id("rightPanels"));
-        assertElementPresent("//div[@id = 'rightPanels']/div[contains(@class, 'QuickLinks')]");
-        clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
-        waitForNotificationSuccessMessage("The layout has been saved properly.");
-        open("Main", "WebHome");
-        assertElementNotPresent("leftPanels");
-        assertElementPresent("rightPanels");
-        assertElementPresent("//div[@id = 'rightPanels']/div[contains(@class, 'QuickLinks')]");
-
-        // Revert changes
-        open("XWiki", "XWikiPreferences", "admin");
-        administrationMenu.expandCategoryWithName("Look & Feel").getSectionByName("Look & Feel", "Panels").click();
-        waitForBodyContains("Page Layout");
-        clickLinkWithXPath("//a[@href='#PageLayoutSection']", false);
-        waitForCondition("selenium.isElementPresent(\"//div[@id='bothcolumns']\")!=false;");
-        clickLinkWithXPath("//div[@id='bothcolumns']", false);
-        waitForBodyContains("Panel List");
-        clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.cssSelector("#rightPanels .panel.QuickLinks h1"),
-            By.cssSelector("#allviewpanels .accordionTabContentBox"));
-        assertElementNotPresent("//div[@id = 'rightPanels']//div[contains(@class, 'QuickLinks')]");
-        clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
-        waitForNotificationSuccessMessage("The layout has been saved properly.");
-        open("Main", "WebHome");
-        assertElementPresent("leftPanels");
-        assertElementPresent("rightPanels");
-        assertElementNotPresent("//div[@id = 'rightPanels']//div[contains(@class, 'QuickLinks')]");
-
-        // test panel wizard at space level
-        open("TestPanelsAdmin", "WebHome", "edit", "editor=wiki");
-        setFieldValue("content", "aaa");
-        clickEditSaveAndView();
-        open("TestPanelsAdmin", "WebPreferences", "admin");
-        administrationMenu.expandCategoryWithName("Look & Feel").getSectionByName("Look & Feel", "Panels").click();
-        waitForBodyContains("Page Layout");
-        clickLinkWithXPath("//a[@href='#PageLayoutSection']", false);
-        waitForCondition("selenium.isElementPresent(\"//div[@id='leftcolumn']\")!=false;");
-        clickLinkWithXPath("//div[@id='leftcolumn']", false);
-        waitForBodyContains("Panel List");
-        clickLinkWithXPath("//a[@href='#PanelListSection']", false);
-        dragAndDrop(By.cssSelector(".panel.QuickLinks h1"), By.id("leftPanels"));
-        clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
-        waitForNotificationSuccessMessage("The layout has been saved properly.");
-        open("TestPanelsAdmin", "WebHome");
-        assertElementPresent("leftPanels");
-        assertElementPresent("//div[@id = 'leftPanels']//div[contains(@class, 'QuickLinks')]");
-        open("XWiki", "WebHome");
-        assertElementPresent("rightPanels");
-        assertElementNotPresent("//div[@id = 'leftPanels']//div[contains(@class, 'QuickLinks')]");
-    }
-
-    /**
      * Test add configurable application to existing section.
      *
      * This test depends on the "Presentation" section existing.
@@ -310,32 +243,6 @@ public class AdministrationTest extends AbstractXWikiTestCase
         waitForTextPresent(form + "/fieldset//textarea[@name='" + fullName + "_0_TextArea']", test);
         // Getting content from an input field required getValue and not getText
         assertTrue(getSelenium().getValue(form + "/fieldset//input[@name='" + fullName + "_0_String']").equals(test));
-    }
-
-    /*
-     * If a value is specified for linkPrefix, then a link is generated with linkPrefix + prettyName of the property from
-     * the configuration class.
-     * linkPrefix = "http://www.xwiki.org/bin/view/Main/"
-     * property prettyName = "WebHome"
-     * generated link should equal "http://www.xwiki.org/bin/view/Main/WebHome"
-     *
-     * Tests: XWiki.ConfigurableClass
-     */
-    @Test
-    public void testLabelLinkGeneration()
-    {
-        String space = "Main";
-        String page = "TestConfigurable";
-        createConfigurableApplication(space, page, "TestSection3", true);
-        open(space, page, "edit", "editor=object");
-        setFieldValue("XWiki.ConfigurableClass_0_linkPrefix", "TheLinkPrefix");
-        clickEditSaveAndView();
-
-        open("XWiki", "XWikiPreferences", "admin", "editor=globaladmin&section=TestSection3");
-        assertElementPresent("//form/fieldset//a[@href='TheLinkPrefixString']");
-        assertElementPresent("//form/fieldset//a[@href='TheLinkPrefixBoolean']");
-        assertElementPresent("//form/fieldset//a[@href='TheLinkPrefixTextArea']");
-        assertElementPresent("//form/fieldset//a[@href='TheLinkPrefixSelect']");
     }
 
     /*

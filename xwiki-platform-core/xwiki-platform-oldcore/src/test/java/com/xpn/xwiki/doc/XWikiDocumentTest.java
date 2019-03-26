@@ -121,11 +121,13 @@ public class XWikiDocumentTest
     @BeforeEach
     protected void setUp() throws Exception
     {
-        XWikiVersioningStoreInterface mockXWikiVersioningStore = this.componentManager.registerMockComponent(XWikiVersioningStoreInterface.class);
+        XWikiVersioningStoreInterface mockXWikiVersioningStore =
+            this.componentManager.registerMockComponent(XWikiVersioningStoreInterface.class);
         this.xWikiStoreInterface = this.componentManager.registerMockComponent(XWikiStoreInterface.class);
         this.velocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
         VelocityEngine mockVelocityEngine = this.componentManager.registerMockComponent(VelocityEngine.class);
-        ExtendedRenderingConfiguration extendedRenderingConfiguration = this.componentManager.registerMockComponent(ExtendedRenderingConfiguration.class);
+        ExtendedRenderingConfiguration extendedRenderingConfiguration =
+            this.componentManager.registerMockComponent(ExtendedRenderingConfiguration.class);
 
         when(velocityManager.getVelocityEngine()).thenReturn(mockVelocityEngine);
 
@@ -218,7 +220,7 @@ public class XWikiDocumentTest
     }
 
     @Test
-    public void getUniqueLinkedPages()
+    public void getUniqueLinkedPages20()
     {
         XWikiDocument contextDocument =
             new XWikiDocument(new DocumentReference("contextdocwiki", "contextdocspace", "contextdocpage"));
@@ -233,6 +235,29 @@ public class XWikiDocumentTest
 
         assertEquals(new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome",
             "TargetSpace.TargetPage.WebHome", "targetwiki:TargetSpace.TargetPage.WebHome")), linkedPages);
+    }
+
+    @Test
+    public void getUniqueLinkedPages21()
+    {
+        XWikiDocument contextDocument =
+            new XWikiDocument(new DocumentReference("contextdocwiki", "contextdocspace", "contextdocpage"));
+        this.oldcore.getXWikiContext().setDoc(contextDocument);
+
+        this.document.setSyntax(Syntax.XWIKI_2_1);
+        this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
+            + "[[http://externallink]][[mailto:mailto]][[]][[targetwiki:TargetSpace.TargetPage]][[page:OtherPage]]"
+            + "[[attach:AttachSpace.AttachDocument@attachment.ext]][[attach:attachent.ext]]"
+            + "image:ImageSpace.ImageDocument@image.png image:image.png");
+        this.baseObject.setLargeStringValue("area", "[[TargetPage]][[ObjectTargetPage]]");
+
+        Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
+
+        assertEquals(
+            new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome", "TargetSpace.TargetPage.WebHome",
+                "targetwiki:TargetSpace.TargetPage.WebHome", "OtherPage.WebHome", "AttachSpace.AttachDocument.WebHome",
+                "ImageSpace.ImageDocument.WebHome", "Space.ObjectTargetPage.WebHome")),
+            linkedPages);
     }
 
     @Test
@@ -611,9 +636,8 @@ public class XWikiDocumentTest
         this.translatedDocument.setNew(false);
 
         when(this.xWiki.getLanguagePreference(any())).thenReturn(Locale.FRENCH.toString());
-        when(this.xWiki.getDocument(
-            eq(new DocumentReference(this.translatedDocument.getDocumentReference(),
-                this.translatedDocument.getLocale())),
+        when(this.xWiki.getDocument(eq(
+            new DocumentReference(this.translatedDocument.getDocumentReference(), this.translatedDocument.getLocale())),
             any())).thenReturn(this.translatedDocument);
 
         assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
@@ -713,7 +737,8 @@ public class XWikiDocumentTest
         when(this.xWiki.getDocument(eq(targetReference), any())).thenReturn(targetDocument);
 
         this.document.rename(new DocumentReference("newwikiname", "newspace", "newpage"),
-            Collections.<DocumentReference>emptyList(), Collections.<DocumentReference>emptyList(), this.oldcore.getXWikiContext());
+            Collections.<DocumentReference>emptyList(), Collections.<DocumentReference>emptyList(),
+            this.oldcore.getXWikiContext());
 
         // Test links
         assertEquals("[pageinsamespace]", this.document.getContent());

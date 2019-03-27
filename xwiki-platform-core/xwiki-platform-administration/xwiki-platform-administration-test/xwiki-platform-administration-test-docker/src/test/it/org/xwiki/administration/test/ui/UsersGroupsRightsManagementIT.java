@@ -19,9 +19,13 @@
  */
 package org.xwiki.administration.test.ui;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationPage;
+import org.xwiki.administration.test.po.EditGroupModal;
+import org.xwiki.administration.test.po.GroupEditPage;
 import org.xwiki.administration.test.po.GroupsPage;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -38,6 +42,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 })
 public class UsersGroupsRightsManagementIT
 {
+    @BeforeAll
+    public void setup(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+    }
+
     /**
      * <ul>
      * <li>Validate group creation.</li>
@@ -49,7 +59,6 @@ public class UsersGroupsRightsManagementIT
     @Test
     public void testCreateAndDeleteGroup(TestUtils setup, TestReference testReference)
     {
-        setup.loginAsSuperAdmin();
         String groupName = testReference.getLastSpaceReference().getName();
 
         // Make sure the group doesn't exist.
@@ -90,5 +99,54 @@ public class UsersGroupsRightsManagementIT
             testReference.getName());
         rightsEditPage.switchToGroups();
         assertFalse(rightsEditPage.hasEntity(groupName));
+    }
+
+    @Test
+    public void addUserAndSubgroupToGroup(TestUtils setup, TestReference testReference) throws Exception
+    {
+        String testName = testReference.getLastSpaceReference().getName();
+        String BIG_GROUP = String.format("%s_%s", testName, "biggroup");
+        String SUB_GROUP = String.format("%s_%s", testName, "subgroup");
+        String TESTER = String.format("%s_%s", testName, "tester");
+        String TESTER2 = String.format("%s_%s", testName, "anothertester");
+
+        // Clean-up
+        setup.rest().deletePage("XWiki", BIG_GROUP);
+        setup.rest().deletePage("XWiki", SUB_GROUP);
+        setup.rest().deletePage("XWiki", TESTER);
+        setup.rest().deletePage("XWiki", TESTER2);
+
+        // Create the groups & the user
+        setup.createUser(TESTER, TESTER, "", "first_name", "", "last_name", "");
+        setup.createUser(TESTER2, TESTER2, "", "first_name", "", "last_name", "");
+        GroupsPage groupsPage = GroupsPage.gotoPage();
+        groupsPage.addNewGroup(SUB_GROUP);
+        groupsPage.addNewGroup(BIG_GROUP);
+
+        // Test that the 2 groups have been successfully added
+        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", BIG_GROUP), "bigGroup doesn't exist!");
+        assertTrue(groupsPage.getGroupsTable().hasRow("Group Name", SUB_GROUP), "subGroup doesn't exist!");
+
+        // Add SUB_GROUP & TESTER as members of BIG_GROUP
+        GroupEditPage bigGroupPage = GroupEditPage.gotoPage(new DocumentReference("xwiki", "XWiki", BIG_GROUP));
+        bigGroupPage.addMemberToGroup(SUB_GROUP, false);
+        bigGroupPage.addMemberToGroup(TESTER, true);
+
+        // Test that SUB_GROUP is a member of BIG_GROUP
+        bigGroupPage.filterMembers(SUB_GROUP);
+        assertTrue(bigGroupPage.getMembersTable().hasRow("Member", SUB_GROUP), "subGroup is not part of bigGroup!");
+
+        // Test that TESTER is a member of BIG_GROUP
+        bigGroupPage.filterMembers(TESTER);
+        assertTrue(bigGroupPage.getMembersTable().hasRow("Member", TESTER), "tester is not part of bigGroup!");
+
+        // Test adding an user through the modal edit
+        groupsPage = GroupsPage.gotoPage();
+        EditGroupModal editGroupModal = groupsPage.clickEditGroup(BIG_GROUP);
+        assertFalse(editGroupModal.getMembersTable().hasRow("Member", TESTER2), "anotherTester is part of bigGroup!");
+        editGroupModal.addMember(TESTER2, true);
+        editGroupModal.close();
+        editGroupModal = groupsPage.clickEditGroup(BIG_GROUP);
+        assertTrue(editGroupModal.getMembersTable().hasRow("Member", TESTER2), "anotherTester is not part of bigGroup!");
     }
 }

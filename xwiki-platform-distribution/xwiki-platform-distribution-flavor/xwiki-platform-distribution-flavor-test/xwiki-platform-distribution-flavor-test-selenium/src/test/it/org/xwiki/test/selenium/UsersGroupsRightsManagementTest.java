@@ -186,21 +186,6 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
     }
 
     /**
-     * Validate adding a member to a group via the administration.
-     */
-    @Test
-    public void testAddUserToGroup()
-    {
-        // Make sure there's no XWikiNewUser user before we try to create it
-        deleteUser("XWikiTestUser", true);
-        createUser("XWikiTestUser", "XWikiTestUser");
-
-        addUserToGroup("XWikiTestUser", "XWikiAdminGroup");
-
-        deleteUser("XWikiTestUser", true);
-    }
-
-    /**
      * Validate member filtering on group sheet.
      */
     @Test

@@ -86,12 +86,12 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         try {
             // Standard cache (long lived but small by default)
             this.longCache =
-                this.cacheManager.createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer", 100, 86400));
+                this.cacheManager.createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer.long", 100, 86400));
 
             // Cache to store asynchronous result kept only for the small period between which the job is finished
             // but it was not been asked yet by the client (short live but big size)
             this.asyncCache = this.cacheManager
-                .createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer.nocache", 10000, 600));
+                .createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer.async", 10000, 600));
         } catch (CacheException e) {
             throw new InitializationException("Failed to initialize cache", e);
         }
@@ -124,7 +124,7 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         AsyncRendererJobStatus status = this.asyncCache.get(cacheKey);
 
         if (status != null && status.removeClient(clientId)) {
-            // If there is no asynchronous client associated with the status get rid of it
+            // If there is no asynchronous client associated with the status anymore get rid of it
             if (!status.hasClients()) {
                 this.asyncCache.remove(cacheKey);
             }
@@ -152,8 +152,8 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
             this.longCache.set(cacheKey, status);
         }
 
-        // Asynchronous statuses are stored in the big cache to avoid race condition (result invalidated before it get a
-        // chance of being requested)
+        // Asynchronous statuses are stored in a short lived cache to avoid race condition (result invalidated before it
+        // get a chance of being received by the client who asked for it)
         if (status.isAsync()) {
             this.asyncCache.set(cacheKey, status);
         }

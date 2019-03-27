@@ -41,25 +41,27 @@
   <hidden>false</hidden>
   <content>**Table of Contents Macro** generates a table of contents for the page headings. [[Learn more&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/TOC+Macro]]
 
-{{example}}
-= Section 1 =
+= Description =
 
-== Sub-Section 1.1 ==
+The following examples use the current page structure constituted by two sections and three subsections.
 
-== Sub-Section 1.2 ==
+Learn more about structuring a page with headings [[on the syntax page.&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/?syntax=2.1&amp;section=Headings]]
 
-= Section 2 =
+= Macro Table of Contents Examples =
 
-= Section 3 =
-{{/example}}
+== Simple Table of Contents ==
 
 {{example}}
 {{toc/}}
 {{/example}}
 
+== Table of Contents with a starting point ==
+
 {{example}}
 {{toc start="2"/}}
 {{/example}}
+
+== Table of Contents inside a box ==
 
 {{example}}
 {{box cssClass="floatinginfobox"}}

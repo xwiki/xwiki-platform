@@ -110,9 +110,10 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
             throw new ResourceReferenceHandlerException("Failed to get content", e);
         }
 
-        // Check of a result was actually found for this id
+        // Check if a result was actually found for this id
         if (status == null) {
-            throw new ResourceReferenceHandlerException("Cannot find any status for id [" + reference.getId() + "]");
+            throw new ResourceReferenceHandlerException(
+                "Cannot find any status for job id [" + reference.getId() + "] and client if [" + clientId + "]");
         }
 
         // Send the result back

@@ -20,7 +20,10 @@
 package org.xwiki.notifications.rest.internal;
 
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -72,6 +75,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
     private final AtomicLong counter = new AtomicLong();
 
+    private final ConcurrentMap<String, CallableEntry> queue = new ConcurrentHashMap<>();
+
     private ThreadPoolExecutor executor;
 
     /**
@@ -95,35 +100,40 @@ public class NotificationEventExecutor implements Initializable, Disposable
     {
         private final String cacheKey;
 
-        private final String asyncId;
-
         private final Callable<List<CompositeEvent>> callable;
 
-        private boolean count;
+        private final Set<String> asyncIds = ConcurrentHashMap.newKeySet();
+
+        private final boolean count;
 
         CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count)
         {
-            this(longCacheKey, null, callable, count);
-        }
-
-        CallableEntry(String longCacheKey, String asyncId, Callable<List<CompositeEvent>> callable, boolean count)
-        {
             this.cacheKey = longCacheKey;
-            this.asyncId = asyncId;
             this.callable = callable;
             this.count = count;
+        }
+
+        public void addAsyncId(String asyncId)
+        {
+            this.asyncIds.add(asyncId);
         }
 
         @Override
         public Object call() throws Exception
         {
-            // Check if the result is not already in the event cache
-            Object result = getFromCache(this.cacheKey, this.count);
-            if (result != null) {
-                return result;
-            }
+            // Remember the thread name
+            String threadName = Thread.currentThread().getName();
+
+            // Make the thread name match what its currently doing
+            Thread.currentThread().setName(toString());
 
             try {
+                // Check if the result is not already in the event cache
+                Object result = getFromCache(this.cacheKey, this.count);
+                if (result != null) {
+                    return result;
+                }
+
                 // Initialize a proper execution context
                 contextManager.initialize(new ExecutionContext());
 
@@ -137,27 +147,36 @@ public class NotificationEventExecutor implements Initializable, Disposable
                     longEventCache.set(this.cacheKey, events);
                 }
 
-                if (this.asyncId != null) {
-                    shortCache.set(this.asyncId, result);
+                // Avoid race condition where an async id is added after the result is put in the cache
+                synchronized (queue) {
+                    // Notify the waiting client that the execution is done
+                    for (String asyncId : this.asyncIds) {
+                        shortCache.set(asyncId, result);
+                    }
+
+                    // Remove from the queue map
+                    queue.remove(this.cacheKey, this);
                 }
 
                 return result;
             } catch (Exception e) {
-                if (this.asyncId != null) {
-                    shortCache.set(this.asyncId, e);
-                }
+                this.asyncIds.stream().forEach(asyncId -> shortCache.set(asyncId, e));
 
                 throw e;
             } finally {
                 // Get rid of the execution context
                 execution.removeContext();
+
+                // Restore the thread name
+                Thread.currentThread().setName(threadName);
             }
         }
 
         @Override
         public String toString()
         {
-            return this.asyncId + " : " + this.cacheKey;
+            return String.format("Notification event executor: %s : %s : %s", this.asyncIds.iterator().next(),
+                (this.count ? "count" : "list"), this.cacheKey);
         }
     }
 
@@ -173,27 +192,13 @@ public class NotificationEventExecutor implements Initializable, Disposable
         }
 
         @Override
-        protected void beforeExecute(Thread t, Runnable r)
-        {
-            // Set a custom thread name corresponding to the Runnable to make debugging easier
-            Thread.currentThread().setName(r.toString());
-        }
-
-        @Override
-        protected void afterExecute(Runnable r, Throwable t)
-        {
-            // Reset thread name since it's not used anymore
-            Thread.currentThread().setName("Unused notification pool thread");
-        }
-
-        @Override
         public Thread newThread(Runnable r)
         {
             Thread thread = this.threadFactory.newThread(r);
 
             thread.setDaemon(true);
             thread.setName("Notification pool thread");
-            thread.setPriority(Thread.NORM_PRIORITY - 1);
+            thread.setPriority(Thread.NORM_PRIORITY);
 
             return thread;
         }
@@ -255,7 +260,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
             if (async) {
                 String asyncId = String.valueOf(this.counter.incrementAndGet());
 
-                this.executor.submit(new CallableEntry(cacheKey, asyncId, callable, count));
+                submit(cacheKey, callable, count, asyncId);
 
                 return asyncId;
             } else {
@@ -272,6 +277,22 @@ public class NotificationEventExecutor implements Initializable, Disposable
         }
     }
 
+    private void submit(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count, String asyncId)
+    {
+        synchronized (this.queue) {
+            CallableEntry entry = this.queue.get(longCacheKey);
+
+            // If not already in the queue, add another client
+            if (entry == null) {
+                entry = new CallableEntry(longCacheKey, callable, count);
+                this.executor.submit(entry);
+                this.queue.put(longCacheKey, entry);
+            }
+
+            entry.addAsyncId(asyncId);
+        }
+    }
+
     /**
      * Get and remove result of the asynchronous execution associated to the passed id.
      * 
@@ -284,6 +305,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
         Object result = this.shortCache.get(asyncId);
 
         if (result != null) {
+            // Remove from the cache
             this.shortCache.remove(asyncId);
         }
 

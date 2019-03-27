@@ -142,7 +142,7 @@
     : {{html}}&lt;input type="text" id="$spaceInputId" name="spaceReference" value="$!spaceReference" class="suggestSpaces" /&gt;{{/html}}
     ; {{html}}&lt;label for="$pageInputId"&gt;$services.localization.render('core.create.page')&lt;/label&gt;{{/html}}
     : {{html}}&lt;input type="text" id="$pageInputId" class="withTip" name="name" value="$pageText" /&gt;{{/html}}
-    \\ (% class="buttonwrapper" %){{html}}&lt;input type="submit" class="button" value="$services.localization.render('create')" /&gt;{{/html}}
+    ; (% class="buttonwrapper" %){{html}}&lt;input type="submit" class="button" value="$services.localization.render('create')" /&gt;{{/html}}
   )))
 {{html clean="false"}}
 &lt;/form&gt;

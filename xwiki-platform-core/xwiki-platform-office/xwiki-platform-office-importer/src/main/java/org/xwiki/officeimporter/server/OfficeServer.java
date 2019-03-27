@@ -79,6 +79,14 @@ public interface OfficeServer
     }
 
     /**
+     * Refresh the current state of the process.
+     *
+     * @since 11.3RC1
+     * @version $Id$
+     */
+    void refreshState();
+
+    /**
      * @return current server state
      */
     ServerState getState();

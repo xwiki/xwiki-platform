@@ -613,14 +613,16 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        XWikiAttachment attachment = context.getDoc().getAttachment(filename);
-        if (attachment != null) {
-            return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
-                querystring, xwikidb, context);
-        } else {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error(String.format("Exception while trying to get attachment [%s] from [%s.%s]!",
-                    filename, spaces, name));
+        if (isContextDoc(xwikidb, spaces, name, context)) {
+            XWikiAttachment attachment = context.getDoc().getAttachment(filename);
+            if (attachment != null) {
+                return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
+                    querystring, xwikidb, context);
+            } else {
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error(String.format("Exception while trying to get attachment [%s] from [%s.%s]!",
+                        filename, spaces, name));
+                }
             }
         }
 

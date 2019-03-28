@@ -44,7 +44,6 @@ panels.category=Kategorie
 panels._actions=Aktionen
 panels.emptyvalue=
 panels.children.title=Unterseiten
-### Missing: panels.siblings.title=Sibling Pages
-panels.documentInformation.configureSyntaxes=Weitere Syntaxen konfigurieren
-</content>
+panels.siblings.title=Geschwisterseiten
+panels.documentInformation.configureSyntaxes=Weitere Syntaxen konfigurieren</content>
 </xwikidoc>

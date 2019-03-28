@@ -120,6 +120,7 @@
     </property>
     <property>
       <content>{{velocity}}
+#set ($discard = $xwiki.ssx.use('Panels.NewPage'))
 #if ($hasEdit || $showEmptyPanels)
 #panelheader($services.localization.render('core.create.pageTitle'))
 #set ($panelId = $util.generateRandomString(4))
@@ -142,7 +143,10 @@
     : {{html}}&lt;input type="text" id="$spaceInputId" name="spaceReference" value="$!spaceReference" class="suggestSpaces" /&gt;{{/html}}
     ; {{html}}&lt;label for="$pageInputId"&gt;$services.localization.render('core.create.page')&lt;/label&gt;{{/html}}
     : {{html}}&lt;input type="text" id="$pageInputId" class="withTip" name="name" value="$pageText" /&gt;{{/html}}
-    ; (% class="buttonwrapper" %){{html}}&lt;input type="submit" class="button" value="$services.localization.render('create')" /&gt;{{/html}}
+    (% class="buttonwrapper" %)
+    (((
+        {{html}}&lt;input type="submit" class="button" value="$services.localization.render('create')" /&gt;{{/html}}
+    )))
   )))
 {{html clean="false"}}
 &lt;/form&gt;
@@ -159,6 +163,123 @@
     </property>
     <property>
       <type>view</type>
+    </property>
+  </object>
+  <object>
+    <name>Panels.NewPage</name>
+    <number>0</number>
+    <className>XWiki.StyleSheetExtension</className>
+    <guid>044a24a8-09d6-42eb-84a2-30905c6a7ca8</guid>
+    <class>
+      <name>XWiki.StyleSheetExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <contentType>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>contentType</name>
+        <number>6</number>
+        <prettyName>Content Type</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>CSS|LESS</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </contentType>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>.buttonwrapper {
+        margin-top: 1em;
+        margin-left: 30px;
+        }</code>
+    </property>
+    <property>
+      <contentType></contentType>
+    </property>
+    <property>
+      <name></name>
+    </property>
+    <property>
+      <parse/>
+    </property>
+    <property>
+      <use></use>
     </property>
   </object>
 </xwikidoc>

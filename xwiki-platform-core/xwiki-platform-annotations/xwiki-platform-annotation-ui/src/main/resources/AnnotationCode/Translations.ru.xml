@@ -36,20 +36,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: annotations.title=Annotate
+  <content>annotations.title=Аннотировать
 annotations.menu.loading=Загрузка настроек аннотаций
 annotations.menu.loaderror=Ошибка:
 annotations.tab.info.noannotations=Нет аннотаций на странице
 
 annotations.settings.display=Показать аннотации
-annotations.settings.error.wrongsyntax=Аннотации недоступны для страниц, написанных в синтаксисе XWiki/1.0.
+annotations.settings.error.wrongsyntax=Аннотации недоступны для страниц, написанных с использованием синтаксиса XWiki/1.0.
 annotations.settings.error.notarget=Не указана страница для получения настроек аннотаций.
 
 annotations.annotated.loading=Загрузка аннотированной страницы
 annotations.annotated.loaderror=Ошибка:
 annotations.annotated.loaderror.wrongresponse=Неправильно отформатированный ответ сервера
 annotations.annotated.error.noannotatedelement=Не удалось загрузить аннотации, поскольку контент недоступен.
-annotations.annotated.error.wrongsyntax=Аннотации недоступны для страниц, написанных в синтаксисе XWiki / 1.0.
+annotations.annotated.error.wrongsyntax=Аннотации недоступны для страниц, написанных с использованием синтаксиса XWiki / 1.0.
 
 annotations.action.edit.text=[Изменить]
 annotations.action.edit.tooltip=Изменить аннотацию
@@ -61,10 +61,10 @@ annotations.action.edit.error.notfound=Эта аннотация больше н
 
 annotations.action.delete.text=[Удалить]
 annotations.action.delete.tooltip=Удалить аннотацию
-annotations.action.delete.confirm=Вы уверены что хотите удалить эту аннотацию?
+annotations.action.delete.confirm=Вы уверены, что хотите удалить эту аннотацию?
 annotations.action.delete.inProgress=Удаление аннотации...
 annotations.action.delete.done=Аннотация удалена
-annotations.action.delete.failed=Ошибка при удалении аннотации:
+annotations.action.delete.failed=Не удалось удалить аннотацию:
 
 annotations.action.create.submit.text=Добавить аннотацию
 annotations.action.create.cancel.text=Отмена
@@ -75,8 +75,8 @@ annotations.action.create.loaderror=Ошибка:
 annotations.action.create.error.unauthorized=У вас нет прав на добавление аннотаций на этой странице.
 annotations.action.create.error.unauthorizedguest=У вас нет прав на добавление аннотаций на этой странице. Войдите в систему.
 annotations.action.create.helpmessage=Чтобы комментировать фрагмент текста, выделите его и нажмите {0}.
-annotations.action.create.error.wrongsyntax=Аннотации недоступны для страниц, написанных в синтаксисе XWiki / 1.0.
-annotations.action.create.error.notarget=Неуказанная цель (страница) для создания аннотаций.
+annotations.action.create.error.wrongsyntax=Аннотации недоступны для страниц, написанных с использованием синтаксиса XWiki / 1.0.
+annotations.action.create.error.notarget=Не указана цель (страница) для создания аннотаций.
 
 annotations.action.view.hide.text=скрыть
 annotations.action.view.form.loaderror=Ошибка:
@@ -91,7 +91,7 @@ annotations.action.validate.success=Аннотация подтверждена.
 annotations.action.validate.loaderror=Ошибка:
 
 annotations.filters.show=Фильтр
-annotations.filters.nooption=Нет значений для фильтрации по запросу "{0}"
+annotations.filters.nooption=Нет значений для фильтрации по критерию "{0}"
 annotations.filters.anyvalue=любое значение
 annotations.filters.clearvalue=очистить
 
@@ -99,17 +99,17 @@ annotations.config.title=Панель настройки аннотаций
 annotations.config.display.title=Отображение аннотации
 annotations.config.type.title=Тип аннотации
 annotations.config.activate.title=Активировать аннотации
-annotations.config.activate.explanation=Следующие два параметра позволяют настроить, в каких расположениях аннотации активны. Первый параметр определяет общее правило, а второй список указывает расположения, к которым правило не должно применяться. Например, активированные «да» и расположения исключений «XWiki» и «Main» означают, что аннотации будут активны во всех местах, кроме «XWiki» и «Main». В качестве противоположного примера, использование активированных «нет» и исключений расположения «Документы» означает, что аннотации будут активны только для расположения «Документы».
-annotations.config.type.explanation=Добавьте свойства в этот класс, если вы хотите дополнительные свойства для ваших аннотаций.
+annotations.config.activate.explanation=Следующие два параметра позволяют настроить, в каких расположениях аннотации активны. Первый параметр определяет общее правило, а второй список указывает расположения, к которым правило не должно применяться. Например, активированные «да» и исключение расположения «XWiki» и «Main» означает, что аннотации будут активны во всех местах, кроме «XWiki» и «Main». В качестве противоположного примера, активированные «нет» и исключение расположения «Документы» означает, что аннотации будут активны только для расположения «Документы».
+annotations.config.type.explanation=Добавьте свойства в этот класс, если вы хотите настроить дополнительные свойства для ваших аннотаций.
 admin.annotations=Аннотации
 admin.annotations.description=Настройте аннотации страницы
 
 AnnotationCode.AnnotationConfig_activated=Аннотации активированы
-AnnotationCode.AnnotationConfig_activated.hint=Определите, будут ли использоваться аннотации
+AnnotationCode.AnnotationConfig_activated.hint=Определите, будут ли аннотации использоваться в Вики
 AnnotationCode.AnnotationConfig_exceptionSpaces=За исключением следующих расположений
 AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Отключить аннотации для следующих расположений:
 AnnotationCode.AnnotationConfig_displayed=Отображать аннотации по умолчанию
-AnnotationCode.AnnotationConfig_displayed.hint=Определите, будут ли аннотации отображаться по умолчанию или только если на странице установлен флаг «Показать аннотации»
+AnnotationCode.AnnotationConfig_displayed.hint=Определите, будут ли аннотации отображаться по умолчанию или только если на каждой странице установлен флаг «Показать аннотации»
 AnnotationCode.AnnotationConfig_displayHighlight=Подсветка аннотаций по умолчанию
 AnnotationCode.AnnotationConfig_displayHighlight.hint=Определите, должна ли подсветка аннотации отображаться всегда или только при наведении курсора на аннотацию или структуру аннотаций
 AnnotationCode.AnnotationConfig_annotationClass=Класс XWiki, определяющий структуру аннотаций</content>

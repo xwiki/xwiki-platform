@@ -36,10 +36,8 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-admin.syntaxes=Syntaxes
+  <content>admin.syntaxes=Syntaxes
 admin.syntaxes.description=Sélectionnez la syntaxe de page par défaut et indiquez les autres syntaxes disponibles.
 Rendering.RenderingConfigClass_disabledSyntaxes=Syntaxes désactivées
-Rendering.RenderingConfigClass_disabledSyntaxes.hint=Liste des syntaxes dans lesquelles les pages ne peuvent pas être rédigées.
-</content>
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Liste des syntaxes dans lesquelles les pages ne peuvent pas être rédigées.</content>
 </xwikidoc>

@@ -46,6 +46,5 @@ rendering.macro.iconPicker.parameter.id.description=Ievadlauku DOM identifikator
 rendering.macro.iconPicker.parameter.class.name=Klase
 rendering.macro.iconPicker.parameter.class.description=Ievadlauka CSS klase, kurai tiks piemērota izvēlne
 rendering.macro.iconPicker.parameter.prefix.name=Priedēklis
-rendering.macro.iconPicker.parameter.prefix.description=Ievadlauka ikonas nosaukuma priedēklis (noklusētais\: "image\:icon\:")
-</content>
+rendering.macro.iconPicker.parameter.prefix.description=Ievadlauka ikonas nosaukuma priedēklis (noklusētais\: "image\:icon\:")</content>
 </xwikidoc>

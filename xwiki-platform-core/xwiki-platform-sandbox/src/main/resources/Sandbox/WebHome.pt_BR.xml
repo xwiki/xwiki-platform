@@ -104,13 +104,7 @@ Você pode criar vários tipos de listas nas suas páginas wiki:
 
 = Tabelas =
 
-Você pode criar tabelas simples diretamente na sua wiki:
-
-== Tabela Simples ==
-
-| célula 1 | célula 2 | célula 3
-| célula 4 | célula 5 | célula 6
-| célula 7 | célula 8 | célula 9
+Você pode criar tabelas diretamente na sua wiki:
 
 == Tabela com cabeçalho na linha superior ==
 

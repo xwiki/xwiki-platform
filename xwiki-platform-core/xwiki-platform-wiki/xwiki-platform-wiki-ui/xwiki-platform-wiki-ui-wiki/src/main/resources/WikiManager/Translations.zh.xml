@@ -41,7 +41,7 @@
 ## MENU
 core.menu.type.wiki=Wiki
 core.menu.watchlist.add.wiki=查看Wiki
-### Missing: core.menu.watchlist.remove.wiki=Unwatch Wiki
+core.menu.watchlist.remove.wiki=未查看的Wiki
 core.menu.admin.wiki=管理Wiki
 
 # WIKI INFORMATION PANEL
@@ -133,6 +133,5 @@ platform.wiki.currentwiki.inviteUserAlreadyMember={0} 现在是Wiki的成员。
 ### Missing: admin.xwiki.users.title=All Users
     
 # DRAWER ITEM
-### Missing: platform.wiki.drawer.homeWiki=Home
-</content>
+### Missing: platform.wiki.drawer.homeWiki=Home</content>
 </xwikidoc>

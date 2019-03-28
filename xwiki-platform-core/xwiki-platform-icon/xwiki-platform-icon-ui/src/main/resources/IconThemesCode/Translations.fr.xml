@@ -46,6 +46,5 @@ rendering.macro.iconPicker.parameter.id.description=DOM Id du champ d'entrée o�
 rendering.macro.iconPicker.parameter.class.name=Class
 rendering.macro.iconPicker.parameter.class.description=Classe CSS des entrées où le sélecteur s'appliquera
 rendering.macro.iconPicker.parameter.prefix.name=Prefix
-rendering.macro.iconPicker.parameter.prefix.description=Préfixe à ajouter avant le nom de l'icône dans le champ de saisie (par défaut\: "image\:icon\:")
-</content>
+rendering.macro.iconPicker.parameter.prefix.description=Préfixe à ajouter avant le nom de l'icône dans le champ de saisie (par défaut\: "image\:icon\:")</content>
 </xwikidoc>

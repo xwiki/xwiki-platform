@@ -37,8 +37,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>
-platform.core.profile.category.notifications=Notifications
+  <content>platform.core.profile.category.notifications=Notifications
 notifications.filters.cancel=Cancel
 notifications.filters.submit=Save
 notifications.filters.type.label=Filter type:
@@ -205,7 +204,13 @@ rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=T
 notifications.filters.preferences.label.page=Toggle Page notifications only
 notifications.filters.preferences.label.space=Toggle Page and children notifications
 notifications.filters.preferences.label.wiki=Toggle Wiki notifications
-</content>
+
+## Notifications switches
+notifications.switches.tooltip.page=Watch this page
+notifications.switches.tooltip.pageAndChildren=Watch this page and its children
+notifications.switches.tooltip.space=Watch the parent page and its children
+notifications.switches.tooltip.wiki=Watch this wiki
+notifications.switches.changeStatusError=Failed to change the status of the notifications.</content>
   <object>
     <name>XWiki.Notifications.Code.Translations</name>
     <number>0</number>

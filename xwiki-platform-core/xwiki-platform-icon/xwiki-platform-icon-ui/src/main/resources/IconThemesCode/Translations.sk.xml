@@ -46,6 +46,5 @@ rendering.macro.iconPicker.parameter.id.name=Id
 rendering.macro.iconPicker.parameter.class.name=Trieda
 ### Missing: rendering.macro.iconPicker.parameter.class.description=CSS class of inputs where the picker will apply to
 rendering.macro.iconPicker.parameter.prefix.name=Prefix
-### Missing: rendering.macro.iconPicker.parameter.prefix.description=Prefix to add before the name of the icon in the input field (default: "image:icon:")
-</content>
+### Missing: rendering.macro.iconPicker.parameter.prefix.description=Prefix to add before the name of the icon in the input field (default: "image:icon:")</content>
 </xwikidoc>

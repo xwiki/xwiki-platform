@@ -36,15 +36,15 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <parent>IconThemes.WebHome</parent>
-  <content>### Missing: platform.icon.picker.preview=Preview with:
-### Missing: platform.icon.picker.loading=Loading
+  <content>platform.icon.picker.preview=Предпросмотр:
+platform.icon.picker.loading=Загрузка
 
-### Missing: rendering.macro.iconPicker.name=Icon Picker
-### Missing: rendering.macro.iconPicker.description=Select an icon within the XWiki icon set.
-### Missing: rendering.macro.iconPicker.parameter.id.name=Id
-### Missing: rendering.macro.iconPicker.parameter.id.description=DOM id of the input field where the picker will apply to
-### Missing: rendering.macro.iconPicker.parameter.class.name=Class
-### Missing: rendering.macro.iconPicker.parameter.class.description=CSS class of inputs where the picker will apply to
-### Missing: rendering.macro.iconPicker.parameter.prefix.name=Prefix
-### Missing: rendering.macro.iconPicker.parameter.prefix.description=Prefix to add before the name of the icon in the input field (default: "image:icon:")</content>
+rendering.macro.iconPicker.name=Icon Picker
+rendering.macro.iconPicker.description=Выберите значок в наборе значков XWiki.
+rendering.macro.iconPicker.parameter.id.name=Id
+rendering.macro.iconPicker.parameter.id.description=Идентификатор DOM поля ввода, к которому будет применяться средство выбора
+rendering.macro.iconPicker.parameter.class.name=Класс
+rendering.macro.iconPicker.parameter.class.description=Класс CSS, к которым будет применяться средство выбора
+rendering.macro.iconPicker.parameter.prefix.name=Префикс
+rendering.macro.iconPicker.parameter.prefix.description=Префикс для добавления перед именем иконки в поле ввода (по умолчанию: "image:icon:")</content>
 </xwikidoc>

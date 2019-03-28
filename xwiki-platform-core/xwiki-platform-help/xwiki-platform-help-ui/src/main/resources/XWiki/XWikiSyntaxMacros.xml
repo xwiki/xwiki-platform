@@ -151,7 +151,7 @@ There is only one kind of macro in XWiki Syntax {{velocity}}$crtSyntaxVer{{/velo
 |Rendering Macro with a content|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");
-{{/code}
+{{/code}}
 }}}
 )))|{{code language="java"}}System.out.println("Hello World!");{{/code}}
 |Rendering Macro without content|(((

@@ -209,6 +209,7 @@ platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
 platform.appwithinminutes.appHomePageEditAppLabel=Edit application
 platform.appwithinminutes.appHomePageTranslateAppLabel=Translate application
 platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
+platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
@@ -216,6 +217,20 @@ platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the ap
 platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
 platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
 platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+
+### Rename Application
+appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
+appWithinMinutes.renameApp.newName.label=New Name
+appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
+appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
+appWithinMinutes.renameApp.location.label=New Location
+appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
+appWithinMinutes.renameApp.parent.label=New Parent
+appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
+appWithinMinutes.renameApp.inProgress=Renaming application...
+appWithinMinutes.renameApp.done=Application renamed
+appWithinMinutes.renameApp.failed=Failed to rename the application
 
 ### Deprecated keys
 ### Since 8.4

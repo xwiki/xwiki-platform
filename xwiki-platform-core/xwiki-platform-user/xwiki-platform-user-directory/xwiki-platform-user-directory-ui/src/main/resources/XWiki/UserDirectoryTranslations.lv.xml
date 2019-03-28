@@ -43,6 +43,5 @@ userdirectory.userScopeFilter.global=Globālie lietotāji, kas ir šī viki dal�
 platform.userdirectory.customizeNotAllowed=Jums nav tiesību pielāgot šo lietotāju sarakstu.
 platform.userdirectory.configTitle=Lietotāju saraksta pārvaldība
 platform.userdirectory.configSheetTitle=Lietotāju saraksta pārvaldības izklājlapa
-platform.userdirectory.configSheetApplyOnConfiguration=Šī izklājlapa ir jāpielieto Lietotāju saraksta pārvaldības dokumentam.
-</content>
+platform.userdirectory.configSheetApplyOnConfiguration=Šī izklājlapa ir jāpielieto Lietotāju saraksta pārvaldības dokumentam.</content>
 </xwikidoc>

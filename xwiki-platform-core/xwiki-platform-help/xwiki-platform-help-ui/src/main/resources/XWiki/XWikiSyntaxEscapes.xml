@@ -138,6 +138,5 @@ Allows to escape XWiki Syntax.
 {{info}}To enter a ~~ character use a double escape: ~~~~{{/info}}
 )))|{{{This is not a [[link]]}}}
 |Escape longer text
-(also see "Verbatim")|~{~{~{{{{ some **longer** text //without// formatting}}}~}~}~}|{{{ some **longer** text //without// formatting}}}
-</content>
+(also see "Verbatim")|~{~{~{{{{ some **longer** text //without// formatting}}}~}~}~}|{{{ some **longer** text //without// formatting}}}</content>
 </xwikidoc>

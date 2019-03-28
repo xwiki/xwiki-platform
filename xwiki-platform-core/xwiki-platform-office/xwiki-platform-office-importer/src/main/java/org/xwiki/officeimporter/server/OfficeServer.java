@@ -84,7 +84,10 @@ public interface OfficeServer
      * @since 11.3RC1
      * @version $Id$
      */
-    void refreshState();
+    default void refreshState()
+    {
+        // default implementation do nothing.
+    }
 
     /**
      * @return current server state

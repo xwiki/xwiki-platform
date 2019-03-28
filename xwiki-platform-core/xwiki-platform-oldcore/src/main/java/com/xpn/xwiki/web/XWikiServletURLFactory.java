@@ -613,17 +613,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        if (context != null) {
-            try {
-                XWikiAttachment attachment = findAttachmentForDoc(context.getDoc(), filename, context);
-                if (attachment != null) {
-                    return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
-                        querystring, xwikidb, context);
-                }
-            } catch (XWikiException e) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Exception while trying to get latest attachment version !", e);
-                }
+        XWikiAttachment attachment = context.getDoc().getAttachment(filename);
+        if (attachment != null) {
+            return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
+                querystring, xwikidb, context);
+        } else {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error(String.format("Exception while trying to get attachment [%s] from [%s.%s]!",
+                    filename, spaces, name));
             }
         }
 
@@ -803,18 +800,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         XWikiAttachment attachment = null;
         XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
-        if (filename != null) {
-            attachment = rdoc.getAttachment(filename);
-        }
-
-        return attachment;
-    }
-
-    private XWikiAttachment findAttachmentForDoc(XWikiDocument doc, String filename, XWikiContext context)
-        throws XWikiException
-    {
-        XWikiAttachment attachment = null;
-        XWikiDocument rdoc = context.getWiki().getDocument(doc, context);
         if (filename != null) {
             attachment = rdoc.getAttachment(filename);
         }

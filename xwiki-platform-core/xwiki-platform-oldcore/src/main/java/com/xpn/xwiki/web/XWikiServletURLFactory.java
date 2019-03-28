@@ -613,6 +613,40 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
+        if (context != null) {
+            try {
+                XWikiAttachment attachment = findAttachmentForDoc(context.getDoc(), filename, context);
+                if (attachment != null) {
+                    return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
+                        querystring, xwikidb, context);
+                }
+            } catch (XWikiException e) {
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Exception while trying to get latest attachment version !", e);
+                }
+            }
+        }
+
+        return this.internalCreateAttachmentURL(filename, spaces, name, action, querystring, xwikidb, context);
+    }
+
+    /**
+     * Internal call to create an attachment URL used both in
+     * {@link #createAttachmentURL(String, String, String, String, String, String, XWikiContext)} and
+     * {@link #createAttachmentRevisionURL(String, String, String, String, long, String, String, XWikiContext)}
+     *
+     * @param filename Name of the attachment file.
+     * @param spaces Spaces of the document.
+     * @param name Name of the document.
+     * @param action Action use for URL creation.
+     * @param querystring querystring to append at the end of the URL.
+     * @param xwikidb db where the document is stored.
+     * @param context current context.
+     * @return URL of the attachment.
+     */
+    private URL internalCreateAttachmentURL(String filename, String spaces, String name, String action,
+        String querystring, String xwikidb, XWikiContext context)
+    {
         StringBuilder path = new StringBuilder(this.contextPath);
         addServletPath(path, xwikidb, context);
 
@@ -674,16 +708,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         String querystring, String xwikidb, XWikiContext context)
     {
         String action = "downloadrev";
-        StringBuilder path = new StringBuilder(this.contextPath);
-        addServletPath(path, xwikidb, context);
-
-        // Parse the spaces list into Space References
-        EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
-
-        addAction(path, spaceReference, action, context);
-        addSpaces(path, spaceReference);
-        addName(path, name, action, context);
-        addFileName(path, filename, context);
 
         String qstring = "rev=" + revision;
         if (recycleId >= 0) {
@@ -692,15 +716,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (!StringUtils.isEmpty(querystring)) {
             qstring += "&" + querystring;
         }
-        path.append("?");
-        path.append(StringUtils.removeEnd(StringUtils.removeEnd(qstring, "&"), "&amp;"));
-
-        try {
-            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
-        } catch (MalformedURLException e) {
-            // This should not happen
-            return null;
-        }
+        return this.internalCreateAttachmentURL(filename, spaces, name, action, qstring, xwikidb, context);
     }
 
     /**
@@ -787,6 +803,18 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         XWikiAttachment attachment = null;
         XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
+        if (filename != null) {
+            attachment = rdoc.getAttachment(filename);
+        }
+
+        return attachment;
+    }
+
+    private XWikiAttachment findAttachmentForDoc(XWikiDocument doc, String filename, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiAttachment attachment = null;
+        XWikiDocument rdoc = context.getWiki().getDocument(doc, context);
         if (filename != null) {
             attachment = rdoc.getAttachment(filename);
         }

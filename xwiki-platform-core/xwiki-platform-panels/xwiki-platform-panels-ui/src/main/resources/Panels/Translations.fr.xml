@@ -45,6 +45,5 @@ panels._actions=Actions
 panels.emptyvalue=
 panels.children.title=Pages enfants
 panels.siblings.title=Pages sœurs
-panels.documentInformation.configureSyntaxes=Configurer d'autres syntaxes
-</content>
+panels.documentInformation.configureSyntaxes=Configurer d'autres syntaxes</content>
 </xwikidoc>

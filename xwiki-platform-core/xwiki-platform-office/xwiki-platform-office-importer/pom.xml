@@ -122,7 +122,13 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-
+    <!-- Some office content will generate usage of the Id macro when converted from HTML to XWiki Syntax. -->
+    <dependency>
+      <groupId>org.xwiki.rendering</groupId>
+      <artifactId>xwiki-rendering-macro-id</artifactId>
+      <version>${rendering.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

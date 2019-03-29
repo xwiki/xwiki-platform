@@ -61,7 +61,7 @@ menu.livetable.emptyvalue=-
 menu.livetable.content1=Structure du menu
 
 # Administration keys
-admin.menu.name=Menu
+admin.menu.name=Menus
 
 # UIX keys
 menu.uix.extensionPoint.label=Emplacement du menu

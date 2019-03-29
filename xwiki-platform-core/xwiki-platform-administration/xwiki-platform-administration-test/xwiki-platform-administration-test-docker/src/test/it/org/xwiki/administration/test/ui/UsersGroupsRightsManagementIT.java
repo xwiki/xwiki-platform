@@ -57,7 +57,7 @@ public class UsersGroupsRightsManagementIT
      * </ul>
      */
     @Test
-    public void testCreateAndDeleteGroup(TestUtils setup, TestReference testReference)
+    public void createAndDeleteGroup(TestUtils setup, TestReference testReference)
     {
         String groupName = testReference.getLastSpaceReference().getName();
 

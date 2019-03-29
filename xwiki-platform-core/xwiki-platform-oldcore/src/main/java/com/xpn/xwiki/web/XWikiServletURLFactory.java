@@ -619,10 +619,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
                     querystring, xwikidb, context);
             } else {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error(String.format("Exception while trying to get attachment [%s] from [%s.%s]!",
-                        filename, spaces, name));
-                }
+                LOGGER.error("Exception while trying to get attachment [{}] from space [{}] and page [{}]!", filename,
+                    spaces, name);
             }
         }
 

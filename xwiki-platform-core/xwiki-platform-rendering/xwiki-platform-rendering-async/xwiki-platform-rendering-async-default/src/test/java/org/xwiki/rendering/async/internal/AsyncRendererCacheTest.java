@@ -200,29 +200,29 @@ public class AsyncRendererCacheTest
     @Test
     public void getAsyncSingleClient()
     {
-        this.status.addClient(42);
+        this.status.addClient("42");
 
         this.asyncCache.put(this.status);
 
-        assertSame(this.status, this.asyncCache.getAsync(getId(), 42));
+        assertSame(this.status, this.asyncCache.getAsync("42"));
 
-        assertNull(this.asyncCache.getAsync(getId(), 42));
+        assertNull(this.asyncCache.getAsync("42"));
     }
 
     @Test
     public void getAsyncSeveralClients()
     {
-        this.status.addClient(1);
-        this.status.addClient(2);
+        this.status.addClient("1");
+        this.status.addClient("2");
 
         this.asyncCache.put(this.status);
 
-        assertSame(this.status, this.asyncCache.getAsync(getId(), 1));
+        assertSame(this.status, this.asyncCache.getAsync("1"));
 
-        assertNull(this.asyncCache.getAsync(getId(), 1));
+        assertNull(this.asyncCache.getAsync("1"));
 
-        assertSame(this.status, this.asyncCache.getAsync(getId(), 2));
+        assertSame(this.status, this.asyncCache.getAsync("2"));
 
-        assertNull(this.asyncCache.getAsync(getId(), 2));
+        assertNull(this.asyncCache.getAsync("2"));
     }
 }

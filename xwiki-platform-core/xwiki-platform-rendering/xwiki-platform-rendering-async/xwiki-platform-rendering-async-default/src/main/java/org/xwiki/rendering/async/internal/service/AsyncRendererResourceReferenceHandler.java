@@ -93,13 +93,11 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
     {
         AsyncRendererResourceReference reference = (AsyncRendererResourceReference) resourceReference;
 
-        String clientIdString = reference.getClientId();
+        String clientId = reference.getClientId();
 
-        if (clientIdString == null) {
+        if (clientId == null) {
             throw new ResourceReferenceHandlerException("Client id is mandatory");
         }
-
-        long clientId = Long.parseLong(clientIdString);
 
         // Get the asynchronous renderer status
         AsyncRendererJobStatus status;
@@ -112,8 +110,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
 
         // Check if a result was actually found for this id
         if (status == null) {
-            throw new ResourceReferenceHandlerException(
-                "Cannot find any status for job id [" + reference.getId() + "] and client if [" + clientId + "]");
+            throw new ResourceReferenceHandlerException("Cannot find any status for id [" + reference.getId() + "]");
         }
 
         // Send the result back

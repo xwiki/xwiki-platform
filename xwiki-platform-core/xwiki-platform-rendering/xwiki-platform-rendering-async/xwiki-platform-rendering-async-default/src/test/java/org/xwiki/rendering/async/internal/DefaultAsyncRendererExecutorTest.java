@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,6 +88,8 @@ public class DefaultAsyncRendererExecutorTest
 
     private AsyncRendererJob job;
 
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
     @BeforeEach
     private void beforeEach() throws RenderingException, ComponentLookupException, JobException
     {
@@ -96,6 +99,8 @@ public class DefaultAsyncRendererExecutorTest
         when(this.renderer.render(false, false)).thenReturn(new AsyncRendererResult("false false"));
         when(this.renderer.render(true, false)).thenReturn(new AsyncRendererResult("true false"));
         when(this.renderer.render(false, true)).thenReturn(new AsyncRendererResult("false true"));
+
+        when(cache.getLock()).thenReturn(this.lock);
 
         this.configuration = new AsyncRendererConfiguration();
         this.configuration.setContextEntries(CELEMENTS);

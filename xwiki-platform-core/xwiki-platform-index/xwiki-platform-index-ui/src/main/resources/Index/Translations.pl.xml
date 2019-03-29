@@ -20,28 +20,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Dashboard.Translations" locale="ru">
-  <web>Dashboard</web>
+<xwikidoc version="1.1">
+  <web>Index</web>
   <name>Translations</name>
-  <language>ru</language>
+  <language>pl</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Dashboard.WebHome</parent>
+  <parent>Index.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Translations</title>
+  <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>dashboard.templateProvider.description=Настраиваемые гаджеты
-
-dashboard.gadgetSelector.title=Выбрать гаджет
-dashboard.gadgetEditor.title=Редактировать гаджет
-dashboard.gadgetEditor.changeGadget.label=Изменить гаджет
-dashboard.gadgetEditor.gadgetTitle.label=Заголовок гаджета
-dashboard.gadgetEditor.gadgetTitle.hint=Название этого гаджета отображается в верхней части панели гаджетов на панели инструментов (может содержать velocity-код).
-dashboard.initialization.saveMessage=Инициализация пользовательских настроек панели инструментов по умолчанию</content>
+  <content>index.spacesMacro.title=Przestrzenie
+### Missing: index.spacesMacro.spaceIndex.title=See Space Index
+### Missing: index.spacesMacro.spaceIndex.alt=Space Index
+### Missing: index.spacesMacro.spaceAdministration.title=See Space Administration
+### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
+### Missing: index.spacesMacro.createSpace.link=Create a new space
+### Missing: index.spacesMacro.createSpace.defaultSpaceName=Space name
+### Missing: index.spacesMacro.createSpace.submit=Create
+### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+  
 </xwikidoc>

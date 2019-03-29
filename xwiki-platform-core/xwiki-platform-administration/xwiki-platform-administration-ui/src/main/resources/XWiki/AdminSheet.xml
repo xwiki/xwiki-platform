@@ -54,6 +54,9 @@
 ##
 ## Admin menu map
 ##
+## displayInSection: menu.name | sectionOrder: 200 | page: Menu.MenuConfigurationSection
+## displayInSection: panels.applications | sectionOrder: 400 | page: PanelsCode.ApplicationsPanelConfigurable
+## displayInSection: panels.navigation | sectionOrder: 500 | page: PanelsCode.NavigationConfigurationSection
 #set($adminMenu = [
   {
     'id' : 'lf',
@@ -61,10 +64,7 @@
     'displayBeforeCategory': 'content',
     'children': [
        {'id' : 'Themes', 'perSpace' : true, 'order' : 100},
-       ## displayInSection: menu.name | sectionOrder: 200 | page: Menu.MenuConfigurationSection
        {'id' : 'Panels.PanelWizard', 'perSpace' : true, 'order' : 300},
-       ## displayInSection: panels.applications | sectionOrder: 400 | page: PanelsCode.ApplicationsPanelConfigurable
-       ## displayInSection: panels.navigation | sectionOrder: 500 | page: PanelsCode.NavigationConfigurationSection
        {'id' : 'Presentation', 'perSpace' : true, 'order' : 600}
     ]
   },

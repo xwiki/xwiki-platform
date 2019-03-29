@@ -61,7 +61,7 @@ menu.livetable.emptyvalue=-
 menu.livetable.content1=Struktura izbornika
 
 # Administration keys
-### Missing: admin.menu.name=Menu
+### Missing: admin.menu.name=Menus
 
 # UIX keys
 menu.uix.extensionPoint.label=Lokacija prikaza izbornika

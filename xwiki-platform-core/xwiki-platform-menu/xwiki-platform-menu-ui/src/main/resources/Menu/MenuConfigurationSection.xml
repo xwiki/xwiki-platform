@@ -266,7 +266,7 @@
             <propertiesToShow/>
         </property>
         <property>
-            <sectionOrder>500</sectionOrder>
+            <sectionOrder>200</sectionOrder>
         </property>
     </object>
 </xwikidoc>

@@ -91,8 +91,13 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
     private AtomicLong clientIdCount = new AtomicLong();
 
+    private String newClientId()
+    {
+        return String.valueOf(this.clientIdCount.incrementAndGet());
+    }
+
     @Override
-    public AsyncRendererJobStatus getAsyncStatus(List<String> id, long clientId)
+    public AsyncRendererJobStatus getAsyncStatus(List<String> id, String clientId)
     {
         //////////////////////////////////////////////
         // Try running job
@@ -106,7 +111,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         //////////////////////////////////////////////
         // Try cache
 
-        AsyncRendererJobStatus status = this.cache.getAsync(id, clientId);
+        AsyncRendererJobStatus status = this.cache.getAsync(clientId);
 
         if (status != null) {
             return status;
@@ -116,7 +121,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     }
 
     @Override
-    public AsyncRendererJobStatus getAsyncStatus(List<String> id, long clientId, long time, TimeUnit unit)
+    public AsyncRendererJobStatus getAsyncStatus(List<String> id, String clientId, long time, TimeUnit unit)
         throws InterruptedException
     {
         AsyncRendererJobStatus status = getAsyncStatus(id, clientId);
@@ -145,19 +150,25 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         List<String> jobId = getJobId(renderer, context);
 
         if (renderer.isCacheAllowed()) {
-            AsyncRendererJobStatus status = getCurrent(jobId);
+            this.cache.getLock().readLock().lock();
 
-            if (status != null) {
-                if (status.getResult() != null) {
-                    // Available cached result, return it
+            try {
+                AsyncRendererJobStatus status = getCurrent(jobId);
 
-                    injectUses(status);
+                if (status != null) {
+                    if (status.getResult() != null) {
+                        // Available cached result, return it
 
-                    return new AsyncRendererExecutorResponse(status);
-                } else if (async) {
-                    // Already running job, associate it with another client
-                    return new AsyncRendererExecutorResponse(status, this.clientIdCount.incrementAndGet());
+                        injectUses(status);
+
+                        return new AsyncRendererExecutorResponse(status);
+                    } else if (async) {
+                        // Already running job, associate it with another client
+                        return new AsyncRendererExecutorResponse(status, newClientId());
+                    }
                 }
+            } finally {
+                this.cache.getLock().readLock().unlock();
             }
         }
 
@@ -170,24 +181,30 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         request.setRenderer(renderer);
 
         if (async) {
-            if (context != null) {
-                request.setContext(context);
+            this.cache.getLock().writeLock().lock();
+
+            try {
+                if (context != null) {
+                    request.setContext(context);
+                }
+
+                String asyncClientId = newClientId();
+
+                // If cache is disabled make sure the id is unique
+                if (!renderer.isCacheAllowed()) {
+                    jobId.add(asyncClientId);
+                }
+
+                request.setId(jobId);
+
+                Job job = this.executor.execute(AsyncRendererJobStatus.JOBTYPE, request);
+
+                AsyncRendererJobStatus status = (AsyncRendererJobStatus) job.getStatus();
+
+                response = new AsyncRendererExecutorResponse(status, asyncClientId);
+            } finally {
+                this.cache.getLock().writeLock().unlock();
             }
-
-            long asyncClientId = this.clientIdCount.incrementAndGet();
-
-            // If cache is disabled make sure the id is unique
-            if (!renderer.isCacheAllowed()) {
-                jobId.add(String.valueOf(asyncClientId));
-            }
-
-            request.setId(jobId);
-
-            Job job = this.executor.execute(AsyncRendererJobStatus.JOBTYPE, request);
-
-            AsyncRendererJobStatus status = (AsyncRendererJobStatus) job.getStatus();
-
-            response = new AsyncRendererExecutorResponse(status, asyncClientId);
         } else {
             AsyncRendererJobStatus status;
 
@@ -218,7 +235,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             } else {
                 AsyncRendererResult result = syncRender(renderer, false, configuration);
 
-                // Ceate a pseudo job status
+                // Create a pseudo job status
                 status = new AsyncRendererJobStatus(request, result);
             }
 

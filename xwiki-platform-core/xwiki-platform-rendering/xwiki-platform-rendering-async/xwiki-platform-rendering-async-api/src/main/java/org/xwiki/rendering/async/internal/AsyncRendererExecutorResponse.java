@@ -34,7 +34,7 @@ public class AsyncRendererExecutorResponse
 {
     private final AsyncRendererJobStatus status;
 
-    private final Long asyncClientId;
+    private final String asyncClientId;
 
     /**
      * @param status the status of the execution
@@ -48,13 +48,15 @@ public class AsyncRendererExecutorResponse
     /**
      * @param status the status of the execution
      * @param clientId the generated client identifier
+     * @since 10.11.5
+     * @since 11.3RC1
      */
-    public AsyncRendererExecutorResponse(AsyncRendererJobStatus status, long clientId)
+    public AsyncRendererExecutorResponse(AsyncRendererJobStatus status, String clientId)
     {
         this.status = status;
         this.asyncClientId = clientId;
 
-        status.addClient(asyncClientId);
+        status.addClient(this.asyncClientId);
     }
 
     /**
@@ -67,8 +69,10 @@ public class AsyncRendererExecutorResponse
 
     /**
      * @return the generated client identifier
+     * @since 10.11.5
+     * @since 11.3RC1
      */
-    public Long getAsyncClientId()
+    public String getAsyncClientId()
     {
         return this.asyncClientId;
     }

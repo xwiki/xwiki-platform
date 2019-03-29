@@ -35,7 +35,7 @@
   #end
   ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
   #set ($row = {
-    'username': $group.name,
+    'username': $group.documentReference.name,
     'fullname': $group.fullName,
     'wikiname': $wikiName,
     'userurl': $group.getURL(),

@@ -127,8 +127,7 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
                     query.set(CursorMarkParams.CURSOR_MARK_PARAM, response.getNextCursorMark());
                 }
             } catch (Exception e) {
-                results = Collections.emptyList();
-                logger.error("Failed to query the Solr index.", e);
+                throw new IllegalStateException("Failed to query the Solr index.", e);
             }
             index = 0;
         }

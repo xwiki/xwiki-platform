@@ -42,6 +42,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 
 import com.xpn.xwiki.XWiki;
@@ -624,7 +625,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     spaces, name);
             }
         } else {
-            String originalWikiId = context.getWikiId();
+            WikiReference originalWikiReference = context.getWikiReference();
             context.setWikiId(xwikidb);
 
             DocumentReference documentReference = new DocumentReference(xwikidb, spaces, name);
@@ -639,7 +640,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 LOGGER.error("Exception while trying to get out of context attachment [{}] from space [{}] and page "
                         + "[{}]!", filename, spaces, name, e);
             } finally {
-                context.setWikiId(originalWikiId);
+                context.setWikiReference(originalWikiReference);
             }
         }
 

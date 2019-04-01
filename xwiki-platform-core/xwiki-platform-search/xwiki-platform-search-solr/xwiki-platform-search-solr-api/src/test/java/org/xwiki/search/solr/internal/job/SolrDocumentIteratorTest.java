@@ -33,10 +33,8 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -44,11 +42,16 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.internal.api.FieldUtils;
 import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.search.solr.internal.reference.SolrReferenceResolver;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link SolrDocumentIterator}.
@@ -56,28 +59,29 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 5.4.5
  */
+@ComponentTest
 public class SolrDocumentIteratorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DocumentIterator<String>> mocker =
-        new MockitoComponentMockingRule<DocumentIterator<String>>(SolrDocumentIterator.class);
+    @MockComponent
+    private SolrReferenceResolver resolver;
+
+    @MockComponent
+    private Provider<SolrInstance> solrInstanceProvider;
+
+    @MockComponent
+    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
+
+    @InjectMockComponents
+    private SolrDocumentIterator solrIterator;
 
     private SolrInstance solr;
 
-    private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
-
-    @Before
+    @BeforeEach
     public void configure() throws Exception
     {
-        solr = mock(SolrInstance.class);
+        this.solr = mock(SolrInstance.class);
 
-        Provider<SolrInstance> solrInstanceProvider =
-            mocker.registerMockComponent(new DefaultParameterizedType(null, Provider.class, SolrInstance.class));
-        when(solrInstanceProvider.get()).thenReturn(solr);
-
-        this.solrDocumentReferenceResolver =
-            this.mocker.getInstance(new DefaultParameterizedType(null, DocumentReferenceResolver.class,
-                SolrDocument.class));
+        when(this.solrInstanceProvider.get()).thenReturn(this.solr);
     }
 
     @Test
@@ -91,21 +95,20 @@ public class SolrDocumentIteratorTest
 
         when(solr.query(any(SolrQuery.class))).thenReturn(response);
 
-        DocumentIterator<String> iterator = mocker.getComponentUnderTest();
+        DocumentIterator<String> iterator = this.solrIterator;
 
         WikiReference rootReference = new WikiReference("wiki");
         iterator.setRootReference(rootReference);
 
         assertEquals(12, iterator.size());
 
-        SolrReferenceResolver resolver = mocker.getInstance(SolrReferenceResolver.class);
-        verify(resolver).getQuery(rootReference);
+        verify(this.resolver).getQuery(rootReference);
     }
 
     @Test
     public void sizeWithException() throws Exception
     {
-        assertEquals(0, mocker.getComponentUnderTest().size());
+        assertThrows(IllegalStateException.class, () -> this.solrIterator.size(), "Failed to query the Solr index.");
     }
 
     @Test
@@ -128,7 +131,7 @@ public class SolrDocumentIteratorTest
 
         when(solr.query(any(SolrQuery.class))).thenReturn(firstResponse, secondResponse, secondResponse);
 
-        DocumentIterator<String> iterator = mocker.getComponentUnderTest();
+        DocumentIterator<String> iterator = this.solrIterator;
 
         WikiReference rootReference = new WikiReference("wiki");
         iterator.setRootReference(rootReference);
@@ -138,8 +141,7 @@ public class SolrDocumentIteratorTest
             actualResult.add(iterator.next());
         }
 
-        SolrReferenceResolver resolver = mocker.getInstance(SolrReferenceResolver.class);
-        verify(resolver).getQuery(rootReference);
+        verify(this.resolver).getQuery(rootReference);
 
         List<Pair<DocumentReference, String>> expectedResult = new ArrayList<Pair<DocumentReference, String>>();
         DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("A", "B"), "C");
@@ -152,7 +154,8 @@ public class SolrDocumentIteratorTest
         assertEquals(expectedResult, actualResult);
     }
 
-    private SolrDocument createSolrDocument(String wiki, List<String> spaces, String name, String locale, String version)
+    private SolrDocument createSolrDocument(String wiki, List<String> spaces, String name, String locale,
+        String version)
     {
         SolrDocument doc = new SolrDocument();
         DocumentReference docRef = new DocumentReference(wiki, spaces, name);

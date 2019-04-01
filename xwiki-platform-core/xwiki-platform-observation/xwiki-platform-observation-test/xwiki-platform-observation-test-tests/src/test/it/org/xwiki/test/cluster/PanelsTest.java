@@ -89,7 +89,6 @@ public class PanelsTest extends AbstractClusterHttpTest
         long t1 = System.currentTimeMillis();
         long t2;
         String result;
-        assertEquals(modifiedPanelContent, getUtil().getDriver().findElement(By.id(id)).getText());
         while (!(result = getUtil().getDriver().findElement(By.id(id)).getText())
             .equalsIgnoreCase(modifiedPanelContent)) {
             t2 = System.currentTimeMillis();

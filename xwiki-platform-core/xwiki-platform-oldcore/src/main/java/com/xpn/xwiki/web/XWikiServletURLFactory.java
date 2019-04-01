@@ -613,6 +613,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
+        // In the context of the current doc, no need to reload it.
         if (isContextDoc(xwikidb, spaces, name, context)) {
             XWikiAttachment attachment = context.getDoc().getAttachment(filename);
             if (attachment != null) {
@@ -621,6 +622,24 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             } else {
                 LOGGER.error("Exception while trying to get attachment [{}] from space [{}] and page [{}]!", filename,
                     spaces, name);
+            }
+        } else {
+            String originalWikiId = context.getWikiId();
+            context.setWikiId(xwikidb);
+
+            DocumentReference documentReference = new DocumentReference(xwikidb, spaces, name);
+            try {
+                XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+                XWikiAttachment attachment = document.getAttachment(filename);
+                if (attachment != null) {
+                    return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
+                        querystring, xwikidb, context);
+                }
+            } catch (XWikiException e) {
+                LOGGER.error("Exception while trying to get out of context attachment [{}] from space [{}] and page "
+                        + "[{}]!", filename, spaces, name, e);
+            } finally {
+                context.setWikiId(originalWikiId);
             }
         }
 

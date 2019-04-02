@@ -31,15 +31,6 @@
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Parent POM</description>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.w3c.css</groupId>
-        <artifactId>css-validator</artifactId>
-        <version>20100131</version>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

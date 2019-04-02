@@ -130,7 +130,7 @@ public class NotificationsIT extends AbstractTest
     @Before
     public void setUpEmails() throws Exception
     {
-        if (this.mail != null) {
+        if (mail != null) {
             // Already done
             return;
         }
@@ -148,8 +148,8 @@ public class NotificationsIT extends AbstractTest
         sendMailPage.setSendWaitTime("0");
         sendMailPage.clickSave();
 
-        this.mail = new GreenMail(ServerSetupTest.SMTP);
-        this.mail.start();
+        mail = new GreenMail(ServerSetupTest.SMTP);
+        mail.start();
     }
 
     @AfterClass
@@ -307,6 +307,13 @@ public class NotificationsIT extends AbstractTest
         assertEquals(9, tray.getUnreadNotificationsCount());
         assertEquals(1, tray.getReadNotificationsCount());
 
+        // Make sure it's still OK after a refresh
+        getUtil().gotoPage(getTestClassName(), "WebHome");
+        tray = new NotificationsTrayPage();
+        assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
+        assertEquals(9, tray.getUnreadNotificationsCount());
+        assertEquals(1, tray.getReadNotificationsCount());
+
         // Ensure that a notification has a correct type
         assertEquals("create", tray.getNotificationType(0));
 
@@ -361,10 +368,10 @@ public class NotificationsIT extends AbstractTest
         schedulerHomePage.clickJobActionTrigger("Notifications daily email");
 
         // Wait 10s instead of the default 5s to make sure the mail has enough time to arrive.
-        this.mail.waitForIncomingEmail(10000L, 1);
+        mail.waitForIncomingEmail(10000L, 1);
 
-        assertEquals(1, this.mail.getReceivedMessages().length);
-        MimeMessage message = this.mail.getReceivedMessages()[0];
+        assertEquals(1, mail.getReceivedMessages().length);
+        MimeMessage message = mail.getReceivedMessages()[0];
 
         // Convert to org.simplejavamail.email because it is more simple to read
         Email email = EmailConverter.mimeMessageToEmail(message);

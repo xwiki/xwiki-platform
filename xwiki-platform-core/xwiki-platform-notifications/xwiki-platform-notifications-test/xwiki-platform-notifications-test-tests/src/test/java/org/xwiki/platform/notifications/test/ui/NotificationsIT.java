@@ -130,7 +130,7 @@ public class NotificationsIT extends AbstractTest
     @Before
     public void setUpEmails() throws Exception
     {
-        if (this.mail != null) {
+        if (mail != null) {
             // Already done
             return;
         }
@@ -148,8 +148,8 @@ public class NotificationsIT extends AbstractTest
         sendMailPage.setSendWaitTime("0");
         sendMailPage.clickSave();
 
-        this.mail = new GreenMail(ServerSetupTest.SMTP);
-        this.mail.start();
+        mail = new GreenMail(ServerSetupTest.SMTP);
+        mail.start();
     }
 
     @AfterClass
@@ -307,6 +307,13 @@ public class NotificationsIT extends AbstractTest
         assertEquals(9, tray.getUnreadNotificationsCount());
         assertEquals(1, tray.getReadNotificationsCount());
 
+        // Make sure it's still OK after a refresh
+        getUtil().gotoPage(getTestClassName(), "WebHome");
+        tray = new NotificationsTrayPage();
+        assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
+        assertEquals(9, tray.getUnreadNotificationsCount());
+        assertEquals(1, tray.getReadNotificationsCount());
+
         // Ensure that a notification has a correct type
         assertEquals("create", tray.getNotificationType(0));
 
@@ -359,10 +366,10 @@ public class NotificationsIT extends AbstractTest
         getUtil().login(SUPERADMIN_USER_NAME, SUPERADMIN_PASSWORD);
         SchedulerHomePage schedulerHomePage = SchedulerHomePage.gotoPage();
         schedulerHomePage.clickJobActionTrigger("Notifications daily email");
-        this.mail.waitForIncomingEmail(1);
+        mail.waitForIncomingEmail(1);
 
-        assertEquals(1, this.mail.getReceivedMessages().length);
-        MimeMessage message = this.mail.getReceivedMessages()[0];
+        assertEquals(1, mail.getReceivedMessages().length);
+        MimeMessage message = mail.getReceivedMessages()[0];
 
         // Convert to org.simplejavamail.email because it is more simple to read
         Email email = EmailConverter.mimeMessageToEmail(message);

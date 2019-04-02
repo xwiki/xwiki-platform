@@ -38,11 +38,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!--dependency>
-      <groupId>org.w3c.css</groupId>
-      <artifactId>css-validator</artifactId>
-      <scope>test</scope>
-    </dependency-->
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>pdfbox</artifactId>

@@ -69,7 +69,7 @@ public interface NotificationsResource
      * @return notifications
      * @throws Exception if an error occurs
      * @since 10.11.4
-     * @since 11.3RC1
+     * @since 11.2
      */
     @GET
     @Path("/count")

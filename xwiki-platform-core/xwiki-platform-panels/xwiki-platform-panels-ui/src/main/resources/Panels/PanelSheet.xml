@@ -39,14 +39,14 @@
   <content>{{velocity output="false"}}
 #macro(displayPanelProperty $obj $propName)
   ; &lt;label#if ($xcontext.action == 'edit' || $xcontext.action == 'inline') for="${class.getName()}_${obj.number}_${propName}"#end&gt;$services.localization.render("${class.getName()}_${propName}")&lt;/label&gt;
-  : $doc.display($propName, $obj)
+  : $tdoc.display($propName, $obj)
 #end
 
-#set ($paneldoc = $doc)
+#set ($paneldoc = $tdoc)
 {{/velocity}}
 
 {{velocity}}
-#set ($obj = $doc.getObject('Panels.PanelClass'))
+#set ($obj = $tdoc.getObject('Panels.PanelClass'))
 #if ($obj)
   #set($class = $obj.xWikiClass)
   {{html wiki="true"}}

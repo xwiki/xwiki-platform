@@ -147,14 +147,20 @@ public class LanguageTest extends AbstractTest
         getUtil().rest().delete(referenceFR);
         getUtil().rest().delete(referenceDEFAULT);
 
+        // Create default version before setting the language settings
+        // Ensure that we don't have a conflict window when creating the translations (cf. XWIKI-16299)
+        ViewPage viewPage = getUtil().createPage("LanguageTest", "Page", "en content", "en title");
+        WikiEditPage editPage = viewPage.editWiki();
+        editPage.setContent("en content v2");
+        viewPage = editPage.clickSaveAndView();
+        assertEquals("en content v2", viewPage.getContent());
+
         // Set 2 locales
         setLanguageSettings(true, "en", Arrays.asList("en", "fr"));
 
-        // Create default version
-        ViewPage viewPage = getUtil().createPage("LanguageTest", "Page", "en content", "en title");
-
+        viewPage = getUtil().gotoPage(referenceDEFAULT);
         // Edit the page
-        WikiEditPage editPage = viewPage.editWiki();
+        editPage = viewPage.editWiki();
 
         // Make sure current translation is the right one
         assertTrue(getDriver().hasElement(By.xpath("//strong[text()='You are editing the original page (en).']")));
@@ -175,7 +181,7 @@ public class LanguageTest extends AbstractTest
         assertEquals("contenu fr", page.getContent());
         page = getUtil().rest().get(referenceDEFAULT);
         assertEquals("en title", page.getTitle());
-        assertEquals("en content", page.getContent());
+        assertEquals("en content v2", page.getContent());
 
         // Make sure two locales are listed for this page in the UI
         assertEquals(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH)), new HashSet<>(viewPage.getLocales()));

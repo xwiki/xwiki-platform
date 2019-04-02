@@ -18,8 +18,15 @@
   #xwikiDataAttribute('wiki', $doc.wiki)##deprecated, use 'reference' instead
   #xwikiDataAttribute('space', $doc.space)##deprecated, use 'reference' instead
   #xwikiDataAttribute('page', $doc.documentReference.name)##deprecated, use 'reference' instead
-  #xwikiDataAttribute('version', $tdoc.version)
   #xwikiDataAttribute('isnew', $tdoc.isNew())
+  ## If tdoc is a new document, its version when checking for conflict will be the original doc version.
+  ## This fix XWIKI-16299.
+  #if ($tdoc.isNew())
+    #set ($version = $doc.version)
+  #else
+    #set ($version = $tdoc.version)
+  #end
+  #xwikiDataAttribute('version', $version)
   #xwikiDataAttribute('rest-url', $services.rest.url($tdoc.documentReferenceWithLocale))
   #xwikiDataAttribute('form-token', "$!{services.csrf.token}")
   #xwikiDataAttribute('user-reference', $!services.model.serialize($xcontext.userReference, 'default'))

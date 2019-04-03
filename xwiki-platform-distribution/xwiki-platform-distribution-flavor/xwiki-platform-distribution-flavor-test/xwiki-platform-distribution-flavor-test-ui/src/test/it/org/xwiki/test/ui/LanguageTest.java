@@ -36,6 +36,9 @@ import org.xwiki.administration.test.po.LocalizationAdministrationSectionPage;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
+import org.xwiki.test.ui.po.CopyOrRenameOrDeleteStatusPage;
+import org.xwiki.test.ui.po.CopyPage;
+import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
@@ -257,6 +260,31 @@ public class LanguageTest extends AbstractTest
 
         assertEquals(Arrays.asList(), editPage.getNotExistingLocales());
         assertEquals(Arrays.asList(Locale.ENGLISH, Locale.FRENCH), editPage.getExistingLocales());
+    }
+
+    @Test
+    public void testTranslateNavigationPanel() throws Exception
+    {
+        ViewPage viewPage = getUtil().gotoPage("Panels", "Navigation");
+        CopyPage copyPage = viewPage.copy();
+        copyPage.setTargetSpaceName(getTestClassName());
+        copyPage.setTargetPageName(getTestMethodName());
+        CopyOrRenameOrDeleteStatusPage copyStatus = copyPage.clickCopyButton().waitUntilFinished();
+
+        assertEquals("Done.", copyStatus.getInfoMessage());
+        setLanguageSettings(true, "en", Arrays.asList("en", "fr"));
+        viewPage = getUtil().gotoPage(getTestClassName(), getTestMethodName());
+        InlinePage inlinePage = viewPage.editInline();
+        inlinePage.setValue("content", "test");
+        inlinePage.clickSaveAndView();
+        getUtil().gotoPage(getTestClassName(), getTestMethodName(), "inline", "language=en");
+        inlinePage = new InlinePage();
+        inlinePage.waitUntilPageJSIsLoaded();
+        assertEquals("test", inlinePage.getValue("content"));
+        inlinePage.setValue("content", "another value");
+        inlinePage.clickSaveAndView();
+        getUtil().gotoPage(getTestClassName(), getTestMethodName(), "inline", "language=en");
+        assertEquals("another value", inlinePage.getValue("content"));
     }
 
     /**

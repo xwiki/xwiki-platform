@@ -594,11 +594,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
     {
+        XWikiAttachment attachment = null;
         if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null
             && isContextDoc(xwikidb, spaces, name, context)) {
             try {
                 String docRevision = context.get("rev").toString();
-                XWikiAttachment attachment =
+                attachment =
                     findAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);
                 if (attachment == null) {
                     action = "viewattachrev";
@@ -614,34 +615,30 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        // In the context of the current doc, no need to reload it.
+        // The doc is in the current context, we directly get the attachment from the context doc.
         if (isContextDoc(xwikidb, spaces, name, context)) {
-            XWikiAttachment attachment = context.getDoc().getAttachment(filename);
-            if (attachment != null) {
-                return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
-                    querystring, xwikidb, context);
-            } else {
-                LOGGER.error("Exception while trying to get attachment [{}] from space [{}] and page [{}]!", filename,
-                    spaces, name);
-            }
+            attachment = context.getDoc().getAttachment(filename);
+        // If the doc is not in the current context, we need to load it first.
         } else {
+            // The doc might be in a different wiki.
             WikiReference originalWikiReference = context.getWikiReference();
             context.setWikiId(xwikidb);
 
             DocumentReference documentReference = new DocumentReference(xwikidb, spaces, name);
             try {
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);
-                XWikiAttachment attachment = document.getAttachment(filename);
-                if (attachment != null) {
-                    return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
-                        querystring, xwikidb, context);
-                }
+                attachment = document.getAttachment(filename);
             } catch (XWikiException e) {
-                LOGGER.error("Exception while trying to get out of context attachment [{}] from space [{}] and page "
-                        + "[{}]!", filename, spaces, name, e);
+                LOGGER.error("Exception while loading doc from wiki [{}] space [{}] and page [{}]", xwikidb,
+                    spaces, name, e);
             } finally {
                 context.setWikiReference(originalWikiReference);
             }
+        }
+
+        if (attachment != null) {
+            return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
+                querystring, xwikidb, context);
         }
 
         return this.internalCreateAttachmentURL(filename, spaces, name, action, querystring, xwikidb, context);

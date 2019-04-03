@@ -2921,7 +2921,7 @@ public class XWiki implements EventListener
         // in use.
         try {
             String language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
-            if (StringUtils.isNotEmpty(language)) {
+            if (language != null) {
                 if ("default".equals(language)) {
                     // forgetting language cookie
                     Cookie cookie = new Cookie("language", "");
@@ -5332,7 +5332,17 @@ public class XWiki implements EventListener
         context.put("cdoc", doc);
         vcontext.put("doc", doc.newDocument(context));
         vcontext.put("cdoc", vcontext.get("doc"));
-        XWikiDocument tdoc = doc.getTranslatedDocument(context);
+        XWikiDocument tdoc;
+
+        // If the parameter language exists and is empty, it means we want to force loading the regular document
+        // not a translation. This should be handled later by doing a better separation between locale used in the UI
+        // and for loading the documents.
+        if ("".equals(context.getRequest().getParameter("language"))) {
+            tdoc = doc;
+        } else {
+            tdoc = doc.getTranslatedDocument(context);
+        }
+
         try {
             String rev = (String) context.get("rev");
             if (StringUtils.isNotEmpty(rev)) {

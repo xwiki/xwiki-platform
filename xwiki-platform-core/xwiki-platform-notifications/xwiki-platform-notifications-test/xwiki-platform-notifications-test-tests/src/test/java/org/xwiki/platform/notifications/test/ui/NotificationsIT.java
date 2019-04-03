@@ -310,7 +310,7 @@ public class NotificationsIT extends AbstractTest
         // Make sure it's still OK after a refresh
         getUtil().gotoPage(getTestClassName(), "WebHome");
         tray = new NotificationsTrayPage();
-        assertEquals(Integer.MAX_VALUE, tray.getNotificationsCount());
+        assertEquals(20, tray.getNotificationsCount());
         assertEquals(9, tray.getUnreadNotificationsCount());
         assertEquals(1, tray.getReadNotificationsCount());
 

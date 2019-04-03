@@ -43,6 +43,7 @@
     <xwikiDbHbmCommonExtraMappings>activitystream.hbm.xml,mailsender.hbm.xml,notification-filter-preferences.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <!-- The UI we are testing-->

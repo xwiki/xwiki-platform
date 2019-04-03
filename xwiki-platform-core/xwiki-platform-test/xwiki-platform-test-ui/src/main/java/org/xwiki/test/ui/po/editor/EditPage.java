@@ -63,6 +63,9 @@ public class EditPage extends BasePage
     @FindBy(id = "xwikidoctitleinput")
     private WebElement titleField;
 
+    @FindBy(id = "xwikidoclanguageinput2")
+    private WebElement defaultLanguageField;
+
     /**
      * The top floating edit menu bar.
      */
@@ -319,11 +322,32 @@ public class EditPage extends BasePage
      */
     public WikiEditPage clickTranslate(String locale)
     {
-        WebElement element = getDriver().findElementWithoutWaiting(
-            By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));
+        WebElement element;
+        if ("default".equals(locale)) {
+            element = getDriver().findElementByLinkText("default");
+        } else {
+            element = getDriver().findElementWithoutWaiting(
+                By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));
+        }
 
         element.click();
 
         return new WikiEditPage();
+    }
+
+    /**
+     * Set the default language input field.
+     * @param defaultLanguage the string to fill the input.
+     * @since 11.3RC1
+     */
+    public void setDefaultLanguage(String defaultLanguage)
+    {
+        defaultLanguageField.clear();
+        defaultLanguageField.sendKeys(defaultLanguage);
+    }
+
+    public String getDefaultLanguage()
+    {
+        return defaultLanguageField.getAttribute("value");
     }
 }

@@ -607,9 +607,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                         querystring, xwikidb, context);
                 }
             } catch (XWikiException e) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Exception while trying to get attachment version !", e);
-                }
+                LOGGER.error("Failed to create attachment URL for filename [{}] in spaces [{}], page [{}], "
+                    + "action [{}], query string [{}] and wiki [{}]", filename, spaces, name, action, querystring,
+                    xwikidb, e);
             }
         }
 

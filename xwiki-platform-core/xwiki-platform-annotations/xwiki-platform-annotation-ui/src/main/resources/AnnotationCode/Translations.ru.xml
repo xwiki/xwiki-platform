@@ -68,7 +68,7 @@ annotations.action.delete.failed=Не удалось удалить аннота
 
 annotations.action.create.submit.text=Добавить аннотацию
 annotations.action.create.cancel.text=Отмена
-annotations.action.create.selection.invalid=Пожалуйста, выберите непустой текст в содержании страницы.
+annotations.action.create.selection.invalid=Пожалуйста, выберите непустой текст в содержимом страницы.
 annotations.action.create.form.loaderror=Ошибка:
 annotations.action.create.success=Аннотация добавлена.
 annotations.action.create.loaderror=Ошибка:

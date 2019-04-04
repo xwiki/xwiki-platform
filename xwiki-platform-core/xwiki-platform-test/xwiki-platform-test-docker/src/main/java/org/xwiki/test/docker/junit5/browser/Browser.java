@@ -20,8 +20,11 @@
 package org.xwiki.test.docker.junit5.browser;
 
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
  * The browser to use for the UI tests.
@@ -56,6 +59,19 @@ public enum Browser
     Browser(Capabilities capabilities)
     {
         this.capabilities = capabilities;
+        this.forceDefaultCapabilities();
+    }
+
+    /**
+     * Ensure that some capabilities are set as expected for our tests.
+     */
+    private void forceDefaultCapabilities()
+    {
+        DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        // By default we want to be able to handle alerts.
+        desiredCapabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        desiredCapabilities.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        this.capabilities.merge(desiredCapabilities);
     }
 
     /**

@@ -23,13 +23,17 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -185,5 +189,54 @@ public class EditIT
                 String.format("a" + format + "b" + format + "\nc" + format + "e", defaultText, defaultText, "d"),
                 wikiEditPage.getExactContent());
         }
+    }
+
+    /**
+     * Ensure that the Save&View display a "Saving..." message and that the form is disabled before loading the
+     * new page.
+     */
+    @Test
+    @Order(6)
+    public void saveAndFormManipulation(TestUtils setup, TestReference reference, TestConfiguration testConfiguration)
+    {
+        setup.deletePage(reference);
+        ViewPage viewPage = setup.gotoPage(reference);
+        WikiEditPage editWiki = viewPage.editWiki();
+
+        // I don't know why yet but right now I only manage to make this work on Chrome.
+        // On Firefox it seems that I don't get access to the alert preventing the current location to be changed.
+        // After investigation it seems related to selenium and not firefox itself: I'm able to get this window,
+        // even when using the docker container we use in our tests.
+        if (testConfiguration.getBrowser() == Browser.CHROME) {
+
+            // Prevent from leaving the page so that we can check the UI before moving out of the page
+            setup.getDriver().executeJavascript("window.onbeforeunload = function () { return false; }");
+            editWiki.clickSaveAndView(false);
+            try {
+                editWiki.waitForNotificationInProgressMessage("Saving...");
+                // Dismiss the alert to remain on the page
+                // Apparently we have to first do an action to catch the exception
+                // and then we are able to dismiss the alert.
+            } catch (UnhandledAlertException e) {
+                setup.getDriver().switchTo().alert().dismiss();
+                editWiki.waitForNotificationInProgressMessage("Saving...");
+            }
+            // the form should remain disabled since we should be driven to another page.
+            assertFalse(editWiki.isEnabled());
+
+            // Now allow to leave the page.
+            setup.getDriver().executeJavascript("window.onbeforeunload = null;");
+            // Go back to the editor to reset the status
+            viewPage = setup.gotoPage(reference);
+            editWiki = viewPage.editWiki();
+        }
+
+        editWiki.clickSaveAndContinue(true);
+        // After a save&continue the form remains enabled
+        assertTrue(editWiki.isEnabled());
+        editWiki.clickSaveAndView();
+
+        // Ensure the reload lead to the right page
+        assertEquals(setup.getURL(reference, "view", ""), setup.getDriver().getCurrentUrl() + "WebHome");
     }
 }

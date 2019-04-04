@@ -204,6 +204,41 @@ var XWiki = (function(XWiki) {
     addListeners : function() {
       document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));
     },
+    // Allow to disable the editors (form, WikiEditor or CKEditor) while a save&view is performed.
+    disableEditors : function () {
+      if (this.form) {
+        this.form.disable();
+      }
+
+      if ($$('.CodeMirror')[0]) {
+        try {
+          $$('.CodeMirror')[0].CodeMirror.setOption('readOnly', true);
+        } catch (e) {}
+      } else if (window.CKEDITOR) {
+        try {
+
+          // FIXME: This still allows to switch CKEditor from source mode to WYSIWYG and back
+          // and doing that would disable the readOnly and activate back the warning about leaving page
+          CKEDITOR.instances.content.resetDirty();
+          CKEDITOR.instances.content.setReadOnly();
+        } catch (e) {}
+      }
+    },
+    // Allow to enable back the editors (form, WikiEditor or CKEditor) in case of 401 for example.
+    enableEditors : function () {
+      if (this.form) {
+        this.form.enable();
+      }
+      if ($$('.CodeMirror')[0]) {
+        try {
+          $$('.CodeMirror')[0].CodeMirror.setOption('readOnly', false);
+        } catch (e) {}
+      } else if (window.CKEDITOR) {
+        try {
+          CKEDITOR.instances.content.setReadOnly(false);
+        } catch (e) {}
+      }
+    },
     onSave : function(event) {
       // Don't continue if the event has been stopped already
       if (event.stopped) {
@@ -276,7 +311,7 @@ var XWiki = (function(XWiki) {
       // Show the right notification message.
       if (isCreateFromTemplate) {
         this.progressBox.show();
-      } else if (isContinue) {
+      } else {
         this.savingBox.show();
       }
 
@@ -292,6 +327,9 @@ var XWiki = (function(XWiki) {
       if (!Prototype.Browser.Opera) {
         // Opera can't handle properly 204 responses.
         formData.set('ajax', 'true');
+      }
+      if (!isContinue) {
+        this.disableEditors();
       }
       new Ajax.Request(this.form.action, {
         method : 'post',
@@ -320,10 +358,6 @@ var XWiki = (function(XWiki) {
       }
 
       if (isCreateFromTemplate) {
-        if (!isContinue) {
-          // Disable the form while waiting for the save&view operation to finish.
-          this.form.disable();
-        }
         if (response.responseJSON) {
           // Start the progress display.
           this.getStatus(response.responseJSON.links[0].href, isContinue);
@@ -331,17 +365,7 @@ var XWiki = (function(XWiki) {
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
         }
-        // Save & View with no template specified needs no special handling.
-        // Same for Save & Continue with no template specified in preview mode.
       } else if (!isCreateFromTemplate && (!isContinue  || $('body').hasClassName('previewbody'))) {
-        // Disable the form while waiting for the save&view operation to finish.
-        this.form.disable();
-        // prevent the page to display a warning for leaving page.
-        if (window.CKEDITOR) {
-          try {
-            CKEDITOR.instances.content.resetDirty();
-          } catch (e) {}
-        }
         this.maybeRedirect(isContinue);
       } else {
         this.progressBox.hide();
@@ -418,6 +442,9 @@ var XWiki = (function(XWiki) {
       };
 
       displayAuthorizationErrorModal(response.responseJSON);
+      this.enableEditors();
+      // Announce that a document save attempt has failed
+      document.fire("xwiki:document:saveFailed", {'response' : response});
     },
     // 409 happens when the document is in conflict: i.e. someone's else edited it at the same time
     on409 : function(response) {
@@ -497,23 +524,7 @@ var XWiki = (function(XWiki) {
 
       displayConflictModal(response.responseJSON);
 
-      // CkEditor tries to block the user from leaving the page with unsaved content.
-      // Our save mechanism doesn't update the flag about unsaved content, so we have
-      // to do it manually
-      if ($$('.CodeMirror')[0]) {
-        try {
-          $$('.CodeMirror')[0].CodeMirror.setOption('readOnly', true);
-        } catch (e) {}
-      } else if (window.CKEDITOR) {
-        try {
-
-          // FIXME: This still allows to switch CKEditor from source mode to WYSIWYG and back
-          // and doing that would disable the readOnly and activate back the warning about leaving page
-          CKEDITOR.instances.content.resetDirty();
-          CKEDITOR.instances.content.setReadOnly();
-        } catch (e) {}
-      }
-      this.form.disable();
+      this.disableEditors();
       // Announce that a document save attempt has failed
       document.fire("xwiki:document:saveFailed", {'response' : response});
     },

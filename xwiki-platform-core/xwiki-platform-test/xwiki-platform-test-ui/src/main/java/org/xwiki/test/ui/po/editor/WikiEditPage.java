@@ -246,4 +246,9 @@ public class WikiEditPage extends PreviewableEditPage
             throw new RuntimeException(e);
         }
     }
+
+    public boolean isEnabled()
+    {
+        return this.contentText.isEnabled();
+    }
 }

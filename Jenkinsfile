@@ -119,16 +119,36 @@ def builds = [
   }
 ]
 
-stage ('Platform Builds') {
-  def selection = askUser(builds)
-  if (selection == 'All') {
-    buildAll(builds)
-  } else {
-    builds[selection].call()
+// Decide whether to execute the standard builds or the Docker ones.
+// See the build() method below and the definition of the "type" job parameter.
+if (!params.type || params.type == 'standard') {
+  stage('Platform Builds') {
+    def choices = builds.collect { k,v -> "$k" }.join('\n')
+    // Add the docker scheduled jobs so that we can trigger them manually too
+    choices = "${choices}\nDocker Latest\nDocker All\nDocker Unsupported"
+    def selection = askUser(choices)
+    if (selection == 'All') {
+      buildStandardAll(builds)
+    } else if (selection == 'Docker Latest') {
+      buildDocker('docker-latest')
+    } else if (selection == 'Docker All') {
+      buildDocker('docker-all')
+    } else if (selection == 'Docker Unsupported') {
+      buildDocker('docker-unsupported')
+    } else {
+      buildStandardSingle(builds[selection])
+    }
   }
+} else {
+  buildDocker(params.type)
 }
 
-def buildAll(builds)
+def buildStandardSingle(build)
+{
+  build.call()
+}
+
+def buildStandardAll(builds)
 {
   parallel(
     'main': {
@@ -204,35 +224,102 @@ def buildAll(builds)
   )
 }
 
-def build(map)
+def buildDocker(type)
 {
-  node(map.node ?: '') {
-    // Make sure the memory dump directory exists (see below)
-    // Note that the user used to run the job on the agent must have the permission to create these directories
-    def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
-    sh "mkdir -p \"${oomPath}\""
-    xwikiBuild(map.name) {
-      // Note: we want to get a memory dump on OOM errors.
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
-      if (map.goals) {
-        goals = map.goals
-      }
-      if (map.profiles) {
-        profiles = map.profiles
-      }
-      if (map.properties) {
-        properties = map.properties
-      }
-      if (map.pom) {
-        pom = map.pom
-      }
-      if (map.mavenFlags) {
-        mavenFlags = map.mavenFlags
-      }
-      if (map.sonar) {
-        sonar = map.sonar
+  node('docker') {
+    // Build xwiki-platform-docker test framework since we use it and we happen to make changes to it often and thus
+    // if we don't build it here, we have to wait for the full xwiki-platform to be built before being able to run
+    // the docker tests again. It can also lead to build failures since this method is called during scheduled jobs
+    // which could be triggered before xwiki-platform-docker has been rebuilt.
+    build(
+      name: 'Docker Test Framework',
+      profiles: 'docker,integration-tests',
+      mavenFlags: '--projects org.xwiki.platform:xwiki-platform-test-docker -U -e',
+      xvnc: false,
+      goals: 'clean install',
+      skipMail: true
+    )
+
+    // Build the minimal war module to make sure we have the latest dependencies present in the local maven repo
+    // before we run the docker tests. By default the Docker-based tests resolve the minimal war deps from the local
+    // repo only without going online.
+    // Note 1: skipCheckout is true since the previous build will have checked out xwiki-platform
+    // Note 2: Since the previous build will have checked out xwiki-platform, we need to set the current dir inside the
+    //         checkout for the build.
+    dir('xwiki-platform') {
+      build(
+        name: 'Minimal WAR Dependencies',
+        mavenFlags: '--projects org.xwiki.platform:xwiki-platform-minimaldependencies -U -e',
+        skipCheckout: true,
+        xvnc: false,
+        goals: 'clean install',
+        skipMail: true
+      )
+
+      xwikiDockerBuild {
+        configurations = dockerConfigurations(type, env.BRANCH_NAME)
+        if (type != 'docker-latest') {
+          modules = 'xwiki-platform-core/xwiki-platform-menu'
+        }
       }
     }
+  }
+}
+
+def build(map)
+{
+  // Make sure the memory dump directory exists (see below)
+  // Note that the user used to run the job on the agent must have the permission to create these directories
+  def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
+  sh "mkdir -p \"${oomPath}\""
+  xwikiBuild(map.name) {
+    // Note: we want to get a memory dump on OOM errors.
+    mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
+    if (map.goals) {
+      goals = map.goals
+    }
+    if (map.profiles) {
+      profiles = map.profiles
+    }
+    if (map.properties) {
+      properties = map.properties
+    }
+    if (map.pom) {
+      pom = map.pom
+    }
+    if (map.mavenFlags) {
+      mavenFlags = map.mavenFlags
+    }
+    if (map.sonar) {
+      sonar = map.sonar
+    }
+    if (map.skipCheckout) {
+      skipCheckout = map.skipCheckout
+    }
+    if (map.xvnc) {
+      xvnc = map.xvnc
+    }
+    if (map.skipMail) {
+      skipMail = map.skipMail
+    }
+    // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
+    // take time to execute and thus we cannot run them all the time.
+    // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
+    // we run the standard builds or the docker ones.
+    // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
+    // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
+    // found a way to merge properties and calling the properties() step will override any pre-existing properties.
+    jobProperties = [
+      parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
+      pipelineTriggers([
+        parameterizedCron('''
+@midnight %type=docker-latest
+@weekly %type=docker-all
+@monthly %type=docker-unsupported
+'''),
+        cron("@monthly")
+      ])
+    ]
   }
 }
 

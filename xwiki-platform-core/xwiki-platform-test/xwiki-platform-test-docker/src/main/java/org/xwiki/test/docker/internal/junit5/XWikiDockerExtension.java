@@ -178,13 +178,13 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             DockerTestUtils.startContainer(vnc);
         }
 
-        LOGGER.info("(*) Starting test...");
+        LOGGER.info("(*) Starting test [{}]", extensionContext.getTestMethod().get().getName());
     }
 
     @Override
     public void afterEach(ExtensionContext extensionContext)
     {
-        LOGGER.info("(*) Stopping test...");
+        LOGGER.info("(*) Stopping test [{}]", extensionContext.getTestMethod().get().getName());
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {

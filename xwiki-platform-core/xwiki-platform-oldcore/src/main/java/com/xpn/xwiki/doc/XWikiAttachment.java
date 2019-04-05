@@ -783,8 +783,9 @@ public class XWikiAttachment implements Cloneable
     public void setAttachment_content(XWikiAttachmentContent attachment_content)
     {
         this.content = attachment_content;
-        if (attachment_content != null) {
-            attachment_content.setOwnerDocument(this.doc);
+
+        if (this.content != null) {
+            this.content.setAttachment(this);
         }
     }
 
@@ -1175,7 +1176,11 @@ public class XWikiAttachment implements Cloneable
      */
     public void setMimeType(String mimeType)
     {
-        this.mimeType = mimeType;
+        if (!Objects.equals(mimeType, this.mimeType)) {
+            this.mimeType = mimeType;
+
+            setMetaDataDirty(true);
+        }
     }
 
     /**
@@ -1278,7 +1283,8 @@ public class XWikiAttachment implements Cloneable
         }
 
         try {
-            if (!IOUtils.contentEquals(getContentInputStream(null), attachment.getContentInputStream(null))) {
+            if (this.content == null
+                || !IOUtils.contentEquals(getContentInputStream(null), attachment.getContentInputStream(null))) {
                 setContent(attachment.getContentInputStream(null));
                 modified = true;
             }

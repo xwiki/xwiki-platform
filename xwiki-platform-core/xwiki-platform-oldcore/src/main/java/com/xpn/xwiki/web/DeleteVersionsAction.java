@@ -74,8 +74,9 @@ public class DeleteVersionsAction extends XWikiAction
             } else {
                 // There are still some versions left.
                 // If we delete the most recent (current) version, then rollback to latest undeleted version.
-                if (!tdoc.getRCSVersion().equals(archive.getLatestVersion())) {
-                    context.getWiki().rollback(tdoc, archive.getLatestVersion().toString(), false, context);
+                Version previousVersion = archive.getLatestVersion();
+                if (!tdoc.getRCSVersion().equals(previousVersion)) {
+                    context.getWiki().rollback(tdoc, previousVersion.toString(), false, context);
                 }
             }
         }

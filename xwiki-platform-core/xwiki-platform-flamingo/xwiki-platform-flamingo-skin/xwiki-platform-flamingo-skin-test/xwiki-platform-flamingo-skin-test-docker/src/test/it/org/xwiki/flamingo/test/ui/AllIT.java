@@ -38,4 +38,10 @@ public class AllIT
     class NestedEditIT extends EditIT
     {
     }
+
+    @Nested
+    @DisplayName("Edit Translation Tests")
+    class NestedEditTranslationIT extends EditTranslationIT
+    {
+    }
 }

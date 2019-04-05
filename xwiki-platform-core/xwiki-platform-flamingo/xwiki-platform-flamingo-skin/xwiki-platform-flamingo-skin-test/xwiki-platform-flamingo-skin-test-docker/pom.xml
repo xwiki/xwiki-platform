@@ -55,6 +55,18 @@
       <type>pom</type>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed for a test with Panel translation. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->

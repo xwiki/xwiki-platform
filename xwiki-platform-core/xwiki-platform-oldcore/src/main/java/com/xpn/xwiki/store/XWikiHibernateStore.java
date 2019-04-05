@@ -1771,18 +1771,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 attachment.setComment(StringUtils.abbreviate(comment, 1023));
             }
 
-            // The version number must be increased and the date must be set before the attachment meta data is saved.
-            // Changing the version and date after calling session.save()/session.update() "worked" (the altered version
-            // was what Hibernate saved) but only if everything is done in the same transaction and as far as I know it
-            // depended on undefined behavior.
-            // Note that the second condition is required because there are cases when we want the attachment content to
-            // be saved (see below) but we don't want the version to be increased (e.g. restore a document from recycle
-            // bin, copy or import a document).
-            // See XWIKI-9421: Attachment version is incremented when a document is restored from recycle bin
-            if (attachment.isContentDirty() && !attachment.getDoc().isNew()) {
-                attachment.updateContentArchive(context);
-            }
-
             Session session = getSession(context);
 
             Query query = session.createQuery("select attach.id from XWikiAttachment as attach where attach.id = :id");
@@ -1790,6 +1778,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             boolean exist = query.uniqueResult() != null;
 
             if (exist) {
+                // Don't update the attachment version if document metadata dirty is forced false (any modification to
+                // the attachment automatically set document metadata dirty to false)
+                if ((attachment.isContentDirty() || attachment.isMetaDataDirty())
+                    && attachment.getDoc().isMetaDataDirty()) {
+                    attachment.updateContentArchive(context);
+                }
+
                 session.update(attachment);
             } else {
                 if (attachment.getContentStore() == null) {
@@ -1816,7 +1811,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Mark the attachment content and metadata as not dirty.
             // Ideally this would only happen if the transaction is committed successfully but since an unsuccessful
             // transaction will most likely be accompanied by an exception, the cache will not have a chance to save
-            // the copy of the document with erronious information. If this is not set here, the cache will return
+            // the copy of the document with erroneous information. If this is not set here, the cache will return
             // a copy of the attachment which claims to be dirty although it isn't.
             attachment.setMetaDataDirty(false);
             if (attachment.isContentDirty()) {

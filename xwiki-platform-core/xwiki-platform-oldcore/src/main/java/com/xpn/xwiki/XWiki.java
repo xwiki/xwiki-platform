@@ -184,6 +184,7 @@ import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
@@ -1870,6 +1871,8 @@ public class XWiki implements EventListener
                 if (hasAttachmentRecycleBin(context)) {
                     for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
                         if (attachment.isToRecycleBin()) {
+                            // Make sure the attachment will be deleted with its history
+                            attachment.getAttachment().loadArchive(context);
                             getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(),
                                 context.getUser(), new Date(), context, true);
                         }
@@ -2965,7 +2968,7 @@ public class XWiki implements EventListener
             userdoc = getDocument(user, context);
             if (userdoc != null) {
                 String language =
-                        Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
+                    Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
                 if (StringUtils.isNotEmpty(language)) {
                     locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
                     if (LocaleUtils.isAvailableLocale(locale)) {
@@ -2979,8 +2982,7 @@ public class XWiki implements EventListener
         // If the default language is preferred, and since the user didn't explicitly ask for a
         // language already, then use the default wiki language.
         if (getConfiguration().getProperty("xwiki.language.preferDefault", "0").equals("1")
-                || getSpacePreference("preferDefaultLanguage", "0", context).equals("1"))
-        {
+            || getSpacePreference("preferDefaultLanguage", "0", context).equals("1")) {
             locale = defaultLocale;
             context.setLocale(locale);
             return locale;
@@ -6910,179 +6912,145 @@ public class XWiki implements EventListener
         return rollback(tdoc, rev, true, context);
     }
 
+    private void restoreDeletedAttachment(XWikiAttachment rolledbackAttachment, XWikiContext context)
+        throws XWikiException
+    {
+        // Restore deleted attachments from the trash
+        if (getAttachmentRecycleBinStore() != null) {
+            // There might be multiple versions of the attachment in the trash, search for the right one
+            List<DeletedAttachment> deletedVariants =
+                getAttachmentRecycleBinStore().getAllDeletedAttachments(rolledbackAttachment, context, true);
+
+            DeletedAttachment correctVariant = null;
+            for (DeletedAttachment variant : deletedVariants) { // Reverse chronological order
+                if (variant.getDate().before(rolledbackAttachment.getDate())) {
+                    break;
+                }
+
+                correctVariant = variant;
+            }
+
+            if (correctVariant != null) {
+                XWikiAttachment restoredAttachment = correctVariant.restoreAttachment();
+
+                boolean updateArchive = false;
+
+                if (!restoredAttachment.getVersion().equals(rolledbackAttachment.getVersion())) {
+                    XWikiAttachment restoredAttachmentRevision =
+                        restoredAttachment.getAttachmentRevision(rolledbackAttachment.getVersion(), context);
+
+                    if (restoredAttachmentRevision != null) {
+                        // Update the archive since it won't be done by the store (it's a new attachment)
+                        // TODO: Remove from the archive the versions greater than the rollbacked one instead (they
+                        // would not be lost since they would still be in the recycle bin) ?
+                        rolledbackAttachment.setVersion(restoredAttachment.getVersion());
+                        updateArchive = true;
+
+                        restoredAttachment = restoredAttachmentRevision;
+                    }
+                }
+
+                rolledbackAttachment.apply(restoredAttachment);
+
+                // Restore the deleted archive
+                rolledbackAttachment
+                    .setAttachment_archive((XWikiAttachmentArchive) restoredAttachment.getAttachment_archive().clone());
+                rolledbackAttachment.getAttachment_archive().setAttachment(rolledbackAttachment);
+
+                if (updateArchive) {
+                    rolledbackAttachment.updateContentArchive(context);
+                }
+            } else {
+                // Not found in the trash, set an empty content to avoid errors
+                try {
+                    rolledbackAttachment.setContent(new ByteArrayInputStream(new byte[0]));
+                } catch (IOException e) {
+                    // The content we pass cannot fail
+                }
+            }
+        }
+    }
+
     /**
      * @param tdoc the document to rollback
      * @param rev the revision to rollback to
      * @param addRevision true if a new revision should be created
-     * @param context the XWiki context
+     * @param xcontext the XWiki context
      * @return the new document
      * @throws XWikiException when failing to rollback the document
      * @since 10.7RC1
      * @since 9.11.8
      */
-    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision, XWikiContext context)
+    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision, XWikiContext xcontext)
         throws XWikiException
     {
         LOGGER.debug("Rolling back [{}] to version [{}]", tdoc, rev);
 
-        // Let's clone rolledbackDoc since we might modify it
-        XWikiDocument rolledbackDoc = getDocument(tdoc, rev, context).clone();
+        // Clone the document before modifying to avoid concurrency issues
+        XWikiDocument document = tdoc.clone();
 
+        XWikiDocument rolledbackDoc = getDocumentRevisionProvider().getRevision(tdoc, rev);
+
+        // Restore attachments
         if ("1".equals(getConfiguration().getProperty("xwiki.store.rollbackattachmentwithdocuments", "1"))) {
-            // Attachment handling strategy:
-            // - Two lists: Old Attachments, Current Attachments
-            // Goals:
-            // 1. Attachments that are only in OA must be restored from the trash
-            // 2. Attachments that are only in CA must be sent to the trash
-            // 3. Attachments that are in both lists should be reverted to the right version
-            // 4. Gotcha: deleted and re-uploaded attachments should be both trashed and restored.
-            // Plan:
-            // - Construct two lists: to restore, to revert
-            // - Iterate over OA.
-            // -- If the attachment is not in CA, add it to the restore list
-            // -- If it is in CA, but the date of the first version of the current attachment is after the date of the
-            // restored document version, add it the restore & move the current attachment to the recycle bin
-            // -- Otherwise, add it to the revert list
-            // - Iterate over CA
-            // -- If the attachment is not in OA, delete it
-
-            List<XWikiAttachment> oldAttachments = rolledbackDoc.getAttachmentList();
-            List<XWikiAttachment> currentAttachments = tdoc.getAttachmentList();
-            List<XWikiAttachment> toRestore = new ArrayList<>();
-            List<XWikiAttachment> toRevert = new ArrayList<>();
-
-            // First step, determine what to do with each attachment
             LOGGER.debug("Checking attachments");
 
-            for (XWikiAttachment oldAttachment : oldAttachments) {
-                String filename = oldAttachment.getFilename();
-                XWikiAttachment equivalentAttachment = tdoc.getAttachment(filename);
-                if (equivalentAttachment == null) {
-                    // Deleted attachment
+            for (XWikiAttachment rolledbackAttachment : rolledbackDoc.getAttachmentList()) {
+                String filename = rolledbackAttachment.getFilename();
+                XWikiAttachment attachment = document.getAttachment(filename);
+
+                if (attachment == null) {
+                    // The attachment has been deleted, search and restore it
                     LOGGER.debug("Deleted attachment: [{}]", filename);
-                    toRestore.add(oldAttachment);
-                    continue;
-                }
-                XWikiAttachment equivalentAttachmentRevision =
-                    equivalentAttachment.getAttachmentRevision(oldAttachment.getVersion(), context);
-                // We compare the number of milliseconds instead of the date objects directly because Hibernate can
-                // return java.sql.Timestamp for date fields and the JavaDoc says that Timestamp.equals(Object) doesn't
-                // return true if the passed value is a java.util.Date object with the same number of milliseconds
-                // because the nanoseconds component of the passed date is unknown.
-                if (equivalentAttachmentRevision == null
-                    || equivalentAttachmentRevision.getDate().getTime() != oldAttachment.getDate().getTime()) {
-                    // Recreated attachment
-                    LOGGER.debug("Recreated attachment: [{}]", filename);
-                    // If the attachment trash is not available, don't lose the existing attachment
-                    if (getAttachmentRecycleBinStore() != null) {
-                        getAttachmentRecycleBinStore().saveToRecycleBin(equivalentAttachment, context.getUser(),
-                            new Date(), context, true);
-                        toRestore.add(oldAttachment);
-                    }
-                    continue;
-                }
-                if (!StringUtils.equals(oldAttachment.getVersion(), equivalentAttachment.getVersion())) {
-                    // Updated attachment
-                    LOGGER.debug("Updated attachment: [{}]", filename);
-                    toRevert.add(equivalentAttachment);
-                }
-            }
-            for (XWikiAttachment attachment : currentAttachments) {
-                if (rolledbackDoc.getAttachment(attachment.getFilename()) == null) {
-                    LOGGER.debug("New attachment: " + attachment.getFilename());
-                    // XWikiDocument#save() is actually the only way to delete an attachment cleanly
-                    rolledbackDoc.getAttachmentsToRemove().add(new XWikiAttachmentToRemove(attachment, true));
-                }
-            }
 
-            // Second step, treat each affected attachment
+                    // Restore content and archive from the recycle bin
+                    restoreDeletedAttachment(rolledbackAttachment, xcontext);
+                } else {
+                    XWikiAttachment attachmentRevision =
+                        attachment.getAttachmentRevision(rolledbackAttachment.getVersion(), xcontext);
 
-            // Revert updated attachments to the old version
-            for (XWikiAttachment attachmentToRevert : toRevert) {
-                String oldAttachmentVersion =
-                    rolledbackDoc.getAttachment(attachmentToRevert.getFilename()).getVersion();
-                XWikiAttachment oldAttachmentRevision =
-                    attachmentToRevert.getAttachmentRevision(oldAttachmentVersion, context);
-                if (oldAttachmentRevision == null) {
-                    // Previous version is lost, just leave the current version in place
-                    rolledbackDoc.setAttachment(attachmentToRevert);
+                    // We compare the number of milliseconds instead of the date objects directly because Hibernate can
+                    // return java.sql.Timestamp for date fields and the JavaDoc says that Timestamp.equals(Object)
+                    // doesn't return true if the passed value is a java.util.Date object with the same number of
+                    // milliseconds because the nanoseconds component of the passed date is unknown.
+                    if (attachmentRevision == null
+                        || attachmentRevision.getDate().getTime() != rolledbackAttachment.getDate().getTime()) {
+                        // Recreated attachment
+                        LOGGER.debug("Recreated attachment: [{}]", filename);
 
-                    continue;
-                }
-                // We can't just leave the old version in place, since it will break the revision history, given the
-                // current implementation, so we set the attachment version to the most recent version, mark the content
-                // as dirty, and the storage will automatically bump up the version number.
-                // This is a hack, to be fixed once the storage doesn't take care of updating the history and version,
-                // and once the current attachment version can point to an existing version from the history.
-                oldAttachmentRevision.setVersion(attachmentToRevert.getVersion());
-                oldAttachmentRevision.setMetaDataDirty(true);
-                oldAttachmentRevision.getAttachment_content().setContentDirty(true);
+                        // Mark current attachment for deletion to not loose it
+                        document.removeAttachment(attachment);
 
-                rolledbackDoc.setAttachment(oldAttachmentRevision);
-            }
-
-            // Restore deleted attachments from the trash
-            if (getAttachmentRecycleBinStore() != null) {
-                for (XWikiAttachment attachmentToRestore : toRestore) {
-                    // There might be multiple versions of the attachment in the trash, search for the right one
-                    List<DeletedAttachment> deletedVariants =
-                        getAttachmentRecycleBinStore().getAllDeletedAttachments(attachmentToRestore, context, true);
-                    DeletedAttachment correctVariant = null;
-                    for (DeletedAttachment variant : deletedVariants) { // Reverse chronological order
-                        if (variant.getDate().before(rolledbackDoc.getDate())) {
-                            break;
+                        // Search and restore previously deleted one
+                        // If the attachment trash is not available, don't lose the existing attachment
+                        if (getAttachmentRecycleBinStore() != null) {
+                            // Restore in the right version
+                            restoreDeletedAttachment(rolledbackAttachment, xcontext);
                         }
-                        correctVariant = variant;
-                    }
-                    if (correctVariant == null) {
-                        // Not found in the trash, nothing left to do
-                        continue;
-                    }
-                    XWikiAttachment restoredAttachment = correctVariant.restoreAttachment();
-                    XWikiAttachment restoredAttachmentRevision =
-                        restoredAttachment.getAttachmentRevision(attachmentToRestore.getVersion(), context);
-
-                    if (restoredAttachmentRevision != null) {
-                        restoredAttachmentRevision.setAttachment_archive(restoredAttachment.getAttachment_archive());
-                        restoredAttachmentRevision.getAttachment_archive().setAttachment(restoredAttachmentRevision);
-                        restoredAttachmentRevision.setVersion(restoredAttachment.getVersion());
-                        restoredAttachmentRevision.setMetaDataDirty(true);
-                        restoredAttachmentRevision.getAttachment_content().setContentDirty(true);
-
-                        rolledbackDoc.setAttachment(restoredAttachmentRevision);
                     } else {
-                        // This particular version is lost, update to the one available
-                        rolledbackDoc.setAttachment(restoredAttachment);
+                        // Restore content and archive from the recycle bin
+                        rolledbackAttachment.apply(attachmentRevision);
                     }
-                }
-            } else {
-                // No trash, can't restore. Remove the attachment references, so that the document is not broken
-                for (XWikiAttachment attachmentToRestore : toRestore) {
-                    rolledbackDoc.getAttachmentList().remove(attachmentToRestore);
                 }
             }
         }
 
-        // Special treatment for deleted objects
-        rolledbackDoc.addXObjectsToRemoveFromVersion(tdoc);
+        document.apply(rolledbackDoc);
 
         // Prepare the XWikiDocument before save
-        rolledbackDoc.setNew(false);
-        rolledbackDoc.setOriginalDocument(tdoc);
-        rolledbackDoc.setAuthorReference(context.getUserReference());
-        rolledbackDoc.setContentAuthorReference(context.getUserReference());
+        document.setAuthorReference(xcontext.getUserReference());
+        document.setContentAuthorReference(xcontext.getUserReference());
 
         // Make sure the history is not modified if addRevision is disabled
         String message;
         if (!addRevision) {
-            rolledbackDoc.setMetaDataDirty(false);
-            rolledbackDoc.setContentDirty(false);
-            rolledbackDoc.setRCSVersion(tdoc.getDocumentArchive().getLatestVersion());
-            message = rolledbackDoc.getComment();
+            document.setVersion(rev);
+            document.setMetaDataDirty(false);
+            document.setContentDirty(false);
+            message = document.getComment();
         } else {
-            rolledbackDoc.setMetaDataDirty(true);
-            rolledbackDoc.setDocumentArchive(tdoc.getDocumentArchive());
-            rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
+            // Make sure to save a new version even if nothing changed
+            document.setMetaDataDirty(true);
             message = localizePlainOrKey("core.comment.rollback", rev);
         }
 
@@ -7091,28 +7059,30 @@ public class XWiki implements EventListener
             // Notify listeners about the document that is going to be rolled back.
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            om.notify(new DocumentRollingBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc, context);
+            om.notify(new DocumentRollingBackEvent(document.getDocumentReference(), rev), document, xcontext);
         }
 
-        saveDocument(rolledbackDoc, message, context);
+        XWikiDocument originalDocument = document.getOriginalDocument();
 
-        // Since the the store resets the original document, we need to temporarily put it back to send notifications.
-        XWikiDocument newOriginalDocument = rolledbackDoc.getOriginalDocument();
-        rolledbackDoc.setOriginalDocument(tdoc);
+        saveDocument(document, message, xcontext);
+
+        // Since XWiki#saveDocument resets the original document, we need to temporarily put it back to send
+        // notifications.
+        XWikiDocument newOriginalDocument = document.getOriginalDocument();
+        document.setOriginalDocument(originalDocument);
 
         try {
             if (om != null) {
                 // Notify listeners about the document that was rolled back.
                 // Note that for the moment the event being send is a bridge event, as we are still passing around an
                 // XWikiDocument as source and an XWikiContext as data.
-                om.notify(new DocumentRolledBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc,
-                    context);
+                om.notify(new DocumentRolledBackEvent(document.getDocumentReference(), rev), document, xcontext);
             }
         } finally {
-            rolledbackDoc.setOriginalDocument(newOriginalDocument);
+            document.setOriginalDocument(newOriginalDocument);
         }
 
-        return rolledbackDoc;
+        return document;
     }
 
     /**

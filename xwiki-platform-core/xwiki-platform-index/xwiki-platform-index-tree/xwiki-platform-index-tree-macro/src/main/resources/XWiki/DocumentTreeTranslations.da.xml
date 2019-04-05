@@ -90,6 +90,5 @@ rendering.macro.documentTree.parameter.hierarchyMode.description=Angiver hvilket
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Vis underdokumenter
-rendering.macro.documentTree.parameter.showChildDocuments.description=Om underdokumenter ("child") skal vises, baseret på dokumentets "parent"-felt.
-</content>
+rendering.macro.documentTree.parameter.showChildDocuments.description=Om underdokumenter ("child") skal vises, baseret på dokumentets "parent"-felt.</content>
 </xwikidoc>

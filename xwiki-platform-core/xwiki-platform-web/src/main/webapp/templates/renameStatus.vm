@@ -46,7 +46,7 @@
     'renameId': $renameJobRequest.id.get($mathtool.sub($renameJobRequest.id.size(), 1))
   })))
   <div class="xcontent job-status" data-url="$jobStatusURL">
-    <h2>$services.localization.render('core.rename.status.label')</h2>
+    <div id="document-title"><h1>$services.localization.render('core.rename.status.label')</h1></div>
     <p class="text-muted small">$services.localization.render('core.rename.status.hint',
       [$xwiki.getUserName($renameJobRequest.userReference), $xwiki.formatDate($renameJobStatus.startDate)])</p>
     #displayRenameJobRequest($renameJobRequest)

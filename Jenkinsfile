@@ -279,9 +279,30 @@ def buildInsideNode(map)
     // Note that the user used to run the job on the agent must have the permission to create these directories
     def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
     sh "mkdir -p \"${oomPath}\""
+
+    // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
+    // take time to execute and thus we cannot run them all the time.
+    // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
+    // we run the standard builds or the docker ones.
+    // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
+    // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
+    // found a way to merge properties and calling the properties() step will override any pre-existing properties.
+    def customJobProperties = [
+      parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
+      pipelineTriggers([
+        parameterizedCron('''
+@midnight %type=docker-latest
+@weekly %type=docker-all
+@monthly %type=docker-unsupported
+'''),
+        cron("@monthly")
+      ])
+    ]
+
     xwikiBuild(map.name) {
       // Note: we want to get a memory dump on OOM errors.
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
+      jobProperties = customJobProperties
       if (map.goals) {
         goals = map.goals
       }
@@ -309,24 +330,6 @@ def buildInsideNode(map)
       if (map.skipMail) {
         skipMail = map.skipMail
       }
-      // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
-      // take time to execute and thus we cannot run them all the time.
-      // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
-      // we run the standard builds or the docker ones.
-      // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
-      // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
-      // found a way to merge properties and calling the properties() step will override any pre-existing properties.
-      jobProperties = [
-        parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
-        pipelineTriggers([
-          parameterizedCron('''
-  @midnight %type=docker-latest
-  @weekly %type=docker-all
-  @monthly %type=docker-unsupported
-  '''),
-          cron("@monthly")
-        ])
-      ]
     }
 }
 

@@ -290,11 +290,9 @@ def buildInsideNode(map)
     def customJobProperties = [
       parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
       pipelineTriggers([
-        parameterizedCron('''
-@midnight %type=docker-latest
+        parameterizedCron('''@midnight %type=docker-latest
 @weekly %type=docker-all
-@monthly %type=docker-unsupported
-'''),
+@monthly %type=docker-unsupported'''),
         cron("@monthly")
       ])
     ]

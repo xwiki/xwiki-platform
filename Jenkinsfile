@@ -231,7 +231,7 @@ def buildDocker(type)
     // if we don't build it here, we have to wait for the full xwiki-platform to be built before being able to run
     // the docker tests again. It can also lead to build failures since this method is called during scheduled jobs
     // which could be triggered before xwiki-platform-docker has been rebuilt.
-    build(
+    buildInsideNode(
       name: 'Docker Test Framework',
       profiles: 'docker,integration-tests',
       mavenFlags: '--projects org.xwiki.platform:xwiki-platform-test-docker -U -e',
@@ -247,7 +247,7 @@ def buildDocker(type)
     // Note 2: Since the previous build will have checked out xwiki-platform, we need to set the current dir inside the
     //         checkout for the build.
     dir('xwiki-platform') {
-      build(
+      buildInsideNode(
         name: 'Minimal WAR Dependencies',
         mavenFlags: '--projects org.xwiki.platform:xwiki-platform-minimaldependencies -U -e',
         skipCheckout: true,
@@ -268,59 +268,66 @@ def buildDocker(type)
 
 def build(map)
 {
-  // Make sure the memory dump directory exists (see below)
-  // Note that the user used to run the job on the agent must have the permission to create these directories
-  def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
-  sh "mkdir -p \"${oomPath}\""
-  xwikiBuild(map.name) {
-    // Note: we want to get a memory dump on OOM errors.
-    mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
-    if (map.goals) {
-      goals = map.goals
-    }
-    if (map.profiles) {
-      profiles = map.profiles
-    }
-    if (map.properties) {
-      properties = map.properties
-    }
-    if (map.pom) {
-      pom = map.pom
-    }
-    if (map.mavenFlags) {
-      mavenFlags = map.mavenFlags
-    }
-    if (map.sonar) {
-      sonar = map.sonar
-    }
-    if (map.skipCheckout) {
-      skipCheckout = map.skipCheckout
-    }
-    if (map.xvnc) {
-      xvnc = map.xvnc
-    }
-    if (map.skipMail) {
-      skipMail = map.skipMail
-    }
-    // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
-    // take time to execute and thus we cannot run them all the time.
-    // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
-    // we run the standard builds or the docker ones.
-    // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
-    // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
-    // found a way to merge properties and calling the properties() step will override any pre-existing properties.
-    jobProperties = [
-      parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
-      pipelineTriggers([
-        parameterizedCron('''
-@midnight %type=docker-latest
-@weekly %type=docker-all
-@monthly %type=docker-unsupported
-'''),
-        cron("@monthly")
-      ])
-    ]
+  node(map.node ?: '') {
+    buildInsideNode(map)
   }
+}
+
+def buildInsideNode(map)
+{
+    // Make sure the memory dump directory exists (see below)
+    // Note that the user used to run the job on the agent must have the permission to create these directories
+    def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
+    sh "mkdir -p \"${oomPath}\""
+    xwikiBuild(map.name) {
+      // Note: we want to get a memory dump on OOM errors.
+      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
+      if (map.goals) {
+        goals = map.goals
+      }
+      if (map.profiles) {
+        profiles = map.profiles
+      }
+      if (map.properties) {
+        properties = map.properties
+      }
+      if (map.pom) {
+        pom = map.pom
+      }
+      if (map.mavenFlags) {
+        mavenFlags = map.mavenFlags
+      }
+      if (map.sonar) {
+        sonar = map.sonar
+      }
+      if (map.skipCheckout) {
+        skipCheckout = map.skipCheckout
+      }
+      if (map.xvnc) {
+        xvnc = map.xvnc
+      }
+      if (map.skipMail) {
+        skipMail = map.skipMail
+      }
+      // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
+      // take time to execute and thus we cannot run them all the time.
+      // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
+      // we run the standard builds or the docker ones.
+      // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
+      // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
+      // found a way to merge properties and calling the properties() step will override any pre-existing properties.
+      jobProperties = [
+        parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
+        pipelineTriggers([
+          parameterizedCron('''
+  @midnight %type=docker-latest
+  @weekly %type=docker-all
+  @monthly %type=docker-unsupported
+  '''),
+          cron("@monthly")
+        ])
+      ]
+    }
 }
 
 def buildFunctionalTest(map)
@@ -336,3 +343,4 @@ def buildFunctionalTest(map)
     properties: map.properties
   )
 }
+

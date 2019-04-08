@@ -1233,30 +1233,88 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return getRenderedContent(getOutputSyntax(), transformationContextIsolated, context);
     }
 
+    /**
+     * Execute and render the current document in the current context.
+     * The code is executed with right of this document content author.
+     *
+     * @param context  the XWiki Context object
+     * @return  the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public String displayDocument(XWikiContext context) throws XWikiException
+    {
+        return displayDocument(getOutputSyntax(),context);
+    }
+
+    /**
+     * Execute and render the current document in the current context.
+     * The code is executed with right of this document content author.
+     *
+     * @param targetSyntax  the syntax to use to render the document
+     * @param context  the XWiki Context object
+     * @return  the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public String displayDocument(Syntax targetSyntax, XWikiContext context) throws XWikiException
+    {
+        return getRenderedContent(targetSyntax, true, context, false);
+    }
+
+    /**
+     * Execute and render the document or its translation in the current context.
+     * The code is executed with right of this document (or the translation) content author.
+     * The translations are retrieved if they exist and based on XWiki preferences
+     * (see {@link #getTranslatedDocument(XWikiContext)}).
+     *
+     * @param targetSyntax  the syntax to use to render the document
+     * @param transformationContextIsolated see {@link DocumentDisplayerParameters#isTransformationContextIsolated()}
+     * @param context  the XWiki Context object
+     * @return  the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     */
     public String getRenderedContent(Syntax targetSyntax, boolean transformationContextIsolated, XWikiContext context)
+        throws XWikiException
+    {
+        return getRenderedContent(targetSyntax, transformationContextIsolated, context, true);
+    }
+
+    /**
+     * Execute and render the document or its translation in the current context.
+     * The code is executed with right of this document (or the translation) content author.
+     *
+     * @param targetSyntax the syntax to use to render the document
+     * @param transformationContextIsolated see {@link DocumentDisplayerParameters#isTransformationContextIsolated()}
+     * @param context the XWiki Context object
+     * @param retrieveTranslation if true retrieve the translation of the document according to the preferences (see
+     *  {@link #getTranslatedDocument(XWikiContext)}). If false, render the current document.
+     * @return the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     * @since 11.3RC1
+     */
+    public String getRenderedContent(Syntax targetSyntax, boolean transformationContextIsolated, XWikiContext context,
+        boolean retrieveTranslation)
         throws XWikiException
     {
         // Make sure the context secure document is the current document so that it's executed with its own
         // rights
-        Object currrentSdoc = context.get("sdoc");
+        Object currentSdoc = context.get("sdoc");
         try {
             XWikiDocument sdoc;
-            boolean translate;
 
-            if (this.locale != Locale.ROOT) {
-                // If the locale is not specified, get the translated document from the context.
+            if (retrieveTranslation) {
                 sdoc = getTranslatedDocument(context);
-                translate = true;
             } else {
-                // If the locale is ROOT then we want the current document.
                 sdoc = this;
-                translate = false;
             }
             context.put("sdoc", sdoc);
 
-            return display(targetSyntax, false, transformationContextIsolated, false, translate);
+            return display(targetSyntax, false, transformationContextIsolated, false, retrieveTranslation);
         } finally {
-            context.put("sdoc", currrentSdoc);
+            context.put("sdoc", currentSdoc);
         }
     }
 

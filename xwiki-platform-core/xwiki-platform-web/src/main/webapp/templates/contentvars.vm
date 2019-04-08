@@ -12,12 +12,12 @@
     ## get.vm in order to get proper XML).
     #set($syntaxType = $outputSyntax.type.toIdString())
     #if (($syntaxType == "xhtml") || ($syntaxType == "html") || !$escapeContent)
-      #set ($renderedContent = $tdoc.getRenderedContent($outputSyntax))
+      #set ($renderedContent = $tdoc.displayDocument($outputSyntax))
     #else
       ## Make sure to print correctly the result when it's not HTML,
-      #set ($renderedContent = "<pre>$escapetool.html($tdoc.getRenderedContent($outputSyntax))</pre>")
+      #set ($renderedContent = "<pre>$escapetool.html($tdoc.displayDocument($outputSyntax))</pre>")
     #end
   #else
-    #set ($renderedContent = $tdoc.getRenderedContent())
+    #set ($renderedContent = $tdoc.displayDocument())
   #end
 #end

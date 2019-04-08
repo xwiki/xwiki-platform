@@ -2760,3 +2760,31 @@ Recursive title display detected!##
     </optgroup>
   #end
 #end
+
+#**
+ * Used in livetable for "link": "editor" property. Displays a Bootstrap modal that will contain the requested field
+ * in edit mode.
+ *#
+#macro(editorModal)
+  <div class='modal fade' tabindex='-1' role='dialog' aria-hidden='true' id='propEditor'>
+    <div class='modal-dialog modal-sm modal-dialog-centered'>
+      <div class='modal-content'>
+        <div class='modal-header'>
+          <h3 class="modal-title">$services.localization.render('platform.livetable.propEditor.modalTitle')</h3>
+          <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
+            <span aria-hidden='true'>&times;</span>
+          </button>
+        </div>
+        <div class='modal-body'>
+          <form id='propEditorForm' method='get'></form>
+        </div>
+        <div class='modal-footer'>
+          <input type='button' class='btn btn-primary' data-dismiss='modal' id='propEditorSave'
+            value="$escapetool.xml($services.localization.render('save'))"/>
+          <input type='button' class='btn btn-secondary' data-dismiss='modal'
+            value="$escapetool.xml($services.localization.render('cancel'))"/>
+        </div>
+      </div>
+    </div>
+  </div>
+#end

@@ -1239,3 +1239,54 @@ function init() {
 // End XWiki augmentation.
 return XWiki;
 }(XWiki || {}));
+
+
+// Used for "link": "editor" property.
+// TODO: move the entire definition of the class in jquery when #livetablecallback
+// from macros.vm will also be moved.
+var editProperty = function(fullname, classname, fieldname, cb) {
+  require(['jquery'], function($) {
+    let doc = new XWiki.Document('LiveTableResults', 'XWiki');
+    let durl = doc.getURL('view', 'xpage=plain&page=' + fullname + '&classname=' + classname + '&fieldname='
+      + fieldname);
+    let editorModal = (`#editorModal`);
+    $('.xwiki-livetable').children().append(editorModal);
+    $('#propEditor').modal('show');
+    $.ajax({
+      url : durl,
+      complete : function(e) {
+        $('#propEditor').on('shown.bs.modal', function () {
+          $('#propEditorForm').html(e.responseText);
+        })
+        $('#propEditorSave').one('click', function() {
+          let value = getValue($('#propEditorForm'), fieldname);
+          let surl = doc.getURL('view', 'xpage=plain&page=' + fullname + '&classname=' + classname + '&fieldname='
+            + fieldname + '&value=' + value);
+          $.ajax({
+            url : surl,
+            complete : function(e) {
+              if(e.responseText.search('SAVED') != -1) {
+                cb(value);
+              } else {
+                alert("$services.localization.render('platform.livetable.propEditor.failed')");
+              }
+            }
+          });
+        });
+      }
+    })
+
+    // Used in editProperty for getting the new value of a field.
+    var getValue = function(element, fieldname) {
+      let value;
+      let descendants = element.find('*');
+      descendants.each(function(e) {
+        if(descendants[e].id.search(fieldname) != -1) {
+          value = descendants[e].value;
+          return false;
+        }
+      });
+      return value;
+    }
+  });
+}

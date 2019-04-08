@@ -246,21 +246,19 @@ def buildDocker(type)
     // Note 1: skipCheckout is true since the previous build will have checked out xwiki-platform
     // Note 2: Since the previous build will have checked out xwiki-platform, we need to set the current dir inside the
     //         checkout for the build.
-    dir('xwiki-platform') {
-      buildInsideNode(
-        name: 'Minimal WAR Dependencies',
-        mavenFlags: '--projects org.xwiki.platform:xwiki-platform-minimaldependencies -U -e',
-        skipCheckout: true,
-        xvnc: false,
-        goals: 'clean install',
-        skipMail: true
-      )
+    buildInsideNode(
+      name: 'Minimal WAR Dependencies',
+      mavenFlags: '--projects org.xwiki.platform:xwiki-platform-minimaldependencies -U -e',
+      skipCheckout: true,
+      xvnc: false,
+      goals: 'clean install',
+      skipMail: true
+    )
 
-      xwikiDockerBuild {
-        configurations = dockerConfigurations(type, env.BRANCH_NAME)
-        if (type != 'docker-latest') {
-          modules = 'xwiki-platform-core/xwiki-platform-menu'
-        }
+    xwikiDockerBuild {
+      configurations = dockerConfigurations(type, env.BRANCH_NAME)
+      if (type != 'docker-latest') {
+        modules = 'xwiki-platform-core/xwiki-platform-menu'
       }
     }
   }

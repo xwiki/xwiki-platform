@@ -42,5 +42,6 @@ dashboard.gadgetSelector.title=Выбрать гаджет
 dashboard.gadgetEditor.title=Редактировать гаджет
 dashboard.gadgetEditor.changeGadget.label=Изменить гаджет
 dashboard.gadgetEditor.gadgetTitle.label=Заголовок гаджета
-dashboard.gadgetEditor.gadgetTitle.hint=Название этого гаджета отображается в верхней части панели гаджетов на панели инструментов (может содержать код).</content>
+dashboard.gadgetEditor.gadgetTitle.hint=Название этого гаджета отображается в верхней части панели гаджетов на панели инструментов (может содержать код).
+### Missing: dashboard.initialization.saveMessage=Initialize default dashboard user setup</content>
 </xwikidoc>

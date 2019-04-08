@@ -595,6 +595,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         String xwikidb, XWikiContext context)
     {
         XWikiAttachment attachment = null;
+        URL attachmentURL = null;
+
+        // If we are viewing a specific revision, then we need to get the attachment for this specific revision.
         if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null
             && isContextDoc(xwikidb, spaces, name, context)) {
             try {
@@ -605,7 +608,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     action = "viewattachrev";
                 } else {
                     long arbId = findDeletedAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);
-                    return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(), arbId,
+                    attachmentURL = createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(), arbId,
                         querystring, xwikidb, context);
                 }
             } catch (XWikiException e) {
@@ -615,10 +618,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        // The doc is in the current context, we directly get the attachment from the context doc.
-        if (isContextDoc(xwikidb, spaces, name, context)) {
+        // If we are getting an attachment from the context doc, we can directly load its version from it.
+        else if (isContextDoc(xwikidb, spaces, name, context)) {
             attachment = context.getDoc().getAttachment(filename);
-        // If the doc is not in the current context, we need to load it first.
+
+        // We are getting an attachment from another doc: we can try to load it to retrieve its version
+        // in order to avoid cache issues.
         } else {
             // The doc might be in a different wiki.
             WikiReference originalWikiReference = context.getWikiReference();
@@ -636,12 +641,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        if (attachment != null) {
-            return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
+        if (attachmentURL == null && attachment != null) {
+            attachmentURL = createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
                 querystring, xwikidb, context);
+        } else if (attachmentURL == null){
+            attachmentURL = this.internalCreateAttachmentURL(filename, spaces, name, action, querystring, xwikidb,
+                context);
         }
-
-        return this.internalCreateAttachmentURL(filename, spaces, name, action, querystring, xwikidb, context);
+        return attachmentURL;
     }
 
     /**

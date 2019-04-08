@@ -21,9 +21,11 @@ package org.xwiki.test.ui.po.editor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
@@ -281,9 +283,9 @@ public class EditPage extends BasePage
                 + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
     }
 
-    protected List<Locale> getExistingLocales(List<WebElement> elements)
+    protected Set<Locale> getExistingLocales(List<WebElement> elements)
     {
-        List<Locale> locales = new ArrayList<>(elements.size());
+        Set<Locale> locales = new HashSet<>(elements.size());
         for (WebElement element : elements) {
             locales.add(LocaleUtils.toLocale(element.getText()));
         }
@@ -295,7 +297,7 @@ public class EditPage extends BasePage
      * @return a list of the locales already translated for this document
      * @since 9.0RC1
      */
-    public List<Locale> getExistingLocales()
+    public Set<Locale> getExistingLocales()
     {
         List<WebElement> elements =
             getDriver().findElementsWithoutWaiting(By.xpath("//p[starts-with(text(), 'Existing translations:')]//a"));
@@ -307,7 +309,7 @@ public class EditPage extends BasePage
      * @return a list of the supported locales not yet translated for this document
      * @since 9.0RC1
      */
-    public List<Locale> getNotExistingLocales()
+    public Set<Locale> getNotExistingLocales()
     {
         List<WebElement> elements =
             getDriver().findElementsWithoutWaiting(By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a"));

@@ -20,6 +20,7 @@
 package org.xwiki.flamingo.test.ui;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 
@@ -96,8 +97,8 @@ public class EditTranslationIT
 
         // First edition in multilingual is the edition of default document.
         assertEquals("", editPage.getMetaDataValue("locale"));
-        assertEquals(Arrays.asList(Locale.FRENCH), editPage.getNotExistingLocales());
-        assertEquals(Arrays.asList(), editPage.getExistingLocales());
+        assertEquals(new HashSet<>(Collections.singleton(Locale.FRENCH)), editPage.getNotExistingLocales());
+        assertEquals(new HashSet<>(), editPage.getExistingLocales());
 
         // set the default language to blank: it should relies on the original document
         assertEquals("en", editPage.getDefaultLanguage());
@@ -174,8 +175,8 @@ public class EditTranslationIT
         editPage = new WikiEditPage();
         editPage.waitUntilPageJSIsLoaded();
 
-        assertEquals(Arrays.asList(), editPage.getNotExistingLocales());
-        assertEquals(Arrays.asList(Locale.ENGLISH, Locale.FRENCH), editPage.getExistingLocales());
+        assertEquals(new HashSet<>(), editPage.getNotExistingLocales());
+        assertEquals(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH)), editPage.getExistingLocales());
     }
 
     @Test

@@ -2770,10 +2770,10 @@ Recursive title display detected!##
     <div class='modal-dialog modal-sm modal-dialog-centered'>
       <div class='modal-content'>
         <div class='modal-header'>
-          <h3 class="modal-title">$services.localization.render('platform.livetable.propEditor.modalTitle')</h3>
           <button type='button' class='close' data-dismiss='modal' aria-label='Close'>
             <span aria-hidden='true'>&times;</span>
           </button>
+          <h4 class='modal-title'>$services.localization.render('platform.livetable.propEditor.modalTitle')</h4>
         </div>
         <div class='modal-body'>
           <form id='propEditorForm' method='get'></form>

@@ -85,7 +85,7 @@ platform.wiki.create.button=Создать Вики
 platform.wiki.create.title=Создать новую Вики
 platform.wiki.create.members=УЧАСТНИКИ
 platform.wiki.create.prettyname.empty=Краткое название не может быть пустым
-platform.wiki.create.error=Ошибка создания wiki "{0}": {1}.
+platform.wiki.create.error=Ошибка создания вики "{0}": {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=База данных с таким идентификатором уже есть
 platform.wiki.create.error.wikiname.wikialreadyexists=Такой идентификатор уже есть
 platform.wiki.create.error.wikiname.empty=Идентификатор не может быть пустым
@@ -141,7 +141,7 @@ platform.wiki.users.join.request.send.label=Отправить запрос
 platform.wiki.users.join.request.cancel.label=Назад
 
 ## User profile
-platform.wiki.users.profile.joinedwikis.label=Присоединенные wiki
+platform.wiki.users.profile.joinedwikis.label=Присоединенные вики
 platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Вы еще не являетесь участником вики.
 platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=Пользователь еще не состоит ни в одной вики.
 platform.wiki.users.profile.activity.title=Активность вики {0}
@@ -157,12 +157,12 @@ platform.wiki.delete.success=Пользователь {0}{1}{2} успешно �
 
 ## Wiki macro
 platform.wiki.macro.noWikis=В настоящее время вики не созданы (кроме основного).
-rendering.macro.wikis.name=Управление Wiki
-rendering.macro.wikis.description=Список доступных
+rendering.macro.wikis.name=Вики
+rendering.macro.wikis.description=Список всех вики
 
 ## LegacyWorkspaces macro
-rendering.macro.workspaces.name=Рабочие пространства
-rendering.macro.workspaces.description=Устаревший макрос, который не следует использовать здесь по соображениям совместимости. Пожалуйста, используйте макрос "Вики".
+rendering.macro.workspaces.name=Рабочие пространства (устаревшее)
+rendering.macro.workspaces.description=Устаревший макрос, который не следует использовать здесь из соображений совместимости. Пожалуйста, используйте вместо этого макрос "Вики".
 
 ## Browse
 platform.wiki.browse=Обзор всех Вики
@@ -183,12 +183,12 @@ platform.wiki.browse._actions.delete=Удалить
 ## Classes
 WikiManager.WikiUserClass_membershipType_open=Открыто для вступления
 WikiManager.WikiUserClass_membershipType_request=Любой глобальный пользователь может запросить присоединение(одобрение администратором)
-WikiManager.WikiUserClass_membershipType_invite=Только администратор может отправлять приглашения в эту вики
+WikiManager.WikiUserClass_membershipType_invite=Только администратор может отправлять приглашения присоединиться к этой вики
 WikiManager.WikiUserClass_userScope_local_only=Только локальные пользователи доступны в вики
 WikiManager.WikiUserClass_userScope_global_only=Только глобальные пользователи доступны в вики
 WikiManager.WikiUserClass_userScope_local_and_global=Как глобальные, так и локальные пользователи доступны в вики
 platform.wiki.prop.wikiname=Идентификатор вики
-platform.wiki.prop.wikiprettyname=Название
+platform.wiki.prop.wikiprettyname=Отображаемое название
 platform.wiki.prop.wikialias=Псевдоним
 platform.wiki.prop.description=Описание
 platform.wiki.prop.owner=Владелец
@@ -235,17 +235,17 @@ platform.wiki.create.wizard.step.creation.error=Вики {0} была созда
 platform.wiki.create.wizard.step.creation.go=Перейти к вики
 
 ## Admin
-admin.wikis.description=Управление Wiki.
-admin.wikis.templates=Шаблоны Wiki
-admin.wikis.templates.description=Управление wiki шаблонами
+admin.wikis.description=Управление вики.
+admin.wikis.templates=Шаблоны вики
+admin.wikis.templates.description=Управление шаблонами вики
 admin.wikis.templates.hint=Шаблон - это вики, которая будет рассматриваться как модель для создания новых вики. Когда пользователь выбирает шаблон для создания новой вики, все содержимое шаблона копируется в новую вики.
 admin.wikis.rights=Право на создание
 
 ## XWikiServer Sheet
-platform.wiki.sheet.title=Дескриптор wiki "{0}"
+platform.wiki.sheet.title=Дескриптор вики "{0}"
 platform.wiki.sheet.erroraliasalreadynotexists=Псевдоним вики "{0}" уже существует.
 platform.wiki.sheet.erroraliasdoesnotexists=Псевдоним вики "{0}" не существует.
-platform.wiki.sheet.title.settings=Свойства Wiki
+platform.wiki.sheet.title.settings=Свойства вики
 platform.wiki.sheet.title.createnewalias=Создать новые альтернативные имена (алиасы)
 platform.wiki.sheet.title.viewaliases=Просмотр псевдонимов
 platform.wiki.sheet.desc.wikiprettyname=Отображаемое имя вики.

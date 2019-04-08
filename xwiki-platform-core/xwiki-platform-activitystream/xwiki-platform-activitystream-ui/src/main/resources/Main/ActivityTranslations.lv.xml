@@ -50,6 +50,5 @@ activity.rss.feed.tagsAndSpaces.description=RSS barotne ar tagu "{0}" vietā(s) 
 activity.link.title=Atrodas {0} » {1} » {2}
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

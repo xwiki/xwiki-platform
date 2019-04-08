@@ -50,6 +50,5 @@ activity.rss.feed.description=Î¨∏ÏÑúÎ•º ÏúÑÌïú RSS Í∏âÏã�
 ### Missing: activity.link.title=Located in {0} » {1} » {2}
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

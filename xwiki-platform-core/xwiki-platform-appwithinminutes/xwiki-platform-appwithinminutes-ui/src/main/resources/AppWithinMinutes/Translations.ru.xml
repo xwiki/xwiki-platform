@@ -45,10 +45,10 @@ platform.appwithinminutes.appsLiveTable.doc.title=Приложение
 platform.appwithinminutes.appsLiveTable.doc.author=Последний автор
 platform.appwithinminutes.appsLiveTable.doc.date=Дата изменения
 platform.appwithinminutes.appsLiveTable._actions=Действия
-platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Предоставить права на администрирование раздела.
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Предоставить права на администрирование пространства.
 
 ### AWM Applications panel entry
-platform.appwithinminutes.appPanelCreateEntry=Создайте свое собственное!
+platform.appwithinminutes.appPanelCreateEntry=Создайте свое собственное приложение!
 
 ### Wizard step
 platform.appwithinminutes.wizardStepHeading=Шаг {0} — {1}
@@ -190,7 +190,7 @@ platform.appwithinminutes.liveTableEditorTitleHint=Название прилож
 platform.appwithinminutes.liveTableEditorDescriptionHint=Содержимое, которое будет отображаться над таблицей LiveTable с данными приложения. Используйте это для описания приложения.
 platform.appwithinminutes.liveTableEditorColumnsHint=Выберите колонки, которые вы хотите включить в интерактивную таблицу LiveTable на домашней странице вашего приложения.
 platform.appwithinminutes.liveTableEditorSaveComment=Обновить LiveTable
-platform.appwithinminutes.liveTableEditorMoveColumnHint=Для изменения порядка перемещайте мышью
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Для изменения порядка используйте перетаскивание мышью
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Удалить
 platform.appwithinminutes.liveTableEditorAddColumnHint=Добавить выбранный столбец
 platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некоторые колонки не могут быть выведены, так как, возможно, соответствующие поля класса были удалены. Вы хотите удалить их? &lt;a href=""&gt;Да&lt;/a&gt; / &lt;a href=""&gt;Нет&lt;/a&gt;

@@ -39,10 +39,10 @@
   <content>invitation.applicationsPanelEntryLabel=Приглашение
 
 # Invitation Administration Section
-Invitation.WebHome_from_address.hint=Адрес электронной почты, используемый для отправки электронных писем с приглашением.
-Invitation.WebHome_smtp_server_password.hint=Пароль для подключения к SMTP-серверу, только если требуется аутентификация.
-Invitation.WebHome_smtp_server_username.hint=Имя пользователя для подключения к SMTP-серверу, только когда требуется аутентификация.
-Invitation.WebHome_smtp_port.hint=Порт SMTP-сервера для использования.
+Invitation.WebHome_from_address.hint=Адрес электронной почты, с которого будут отправляться приглашения.
+Invitation.WebHome_smtp_server_password.hint=Пароль для подключения к SMTP-серверу, если требуется аутентификация.
+Invitation.WebHome_smtp_server_username.hint=Имя пользователя для подключения к SMTP-серверу, если требуется аутентификация.
+Invitation.WebHome_smtp_port.hint=Порт SMTP-сервера.
 Invitation.WebHome_smtp_server.hint=SMTP-сервер для отправки.
-Invitation.WebHome_javamail_extra_props.hint=Список дополнительных свойств JavaMail для использования.</content>
+Invitation.WebHome_javamail_extra_props.hint=Список дополнительных свойств JavaMail.</content>
 </xwikidoc>

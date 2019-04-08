@@ -1242,8 +1242,8 @@ return XWiki;
 
 
 // Used for "link": "editor" property.
-// TODO: move the entire definition of the class in jquery when #livetablecallback
-// from macros.vm will also be moved.
+// TODO: move the entire definition of the function in jquery when #livetablecallback
+// from macros.vm, where it is called, will also be moved.
 var editProperty = function(fullname, classname, fieldname, cb) {
   require(['jquery'], function($) {
     let doc = new XWiki.Document('LiveTableResults', 'XWiki');

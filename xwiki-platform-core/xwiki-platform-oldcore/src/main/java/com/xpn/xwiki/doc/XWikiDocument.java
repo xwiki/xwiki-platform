@@ -1240,12 +1240,21 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         // rights
         Object currrentSdoc = context.get("sdoc");
         try {
-            // If we execute a translation use translated document as secure document
-            XWikiDocument tdoc = getTranslatedDocument(context);
+            XWikiDocument sdoc;
+            boolean translate;
 
-            context.put("sdoc", tdoc);
+            if (this.locale != Locale.ROOT) {
+                // If the locale is not specified, get the translated document from the context.
+                sdoc = getTranslatedDocument(context);
+                translate = true;
+            } else {
+                // If the locale is ROOT then we want the current document.
+                sdoc = this;
+                translate = false;
+            }
+            context.put("sdoc", sdoc);
 
-            return display(targetSyntax, false, transformationContextIsolated, false, true);
+            return display(targetSyntax, false, transformationContextIsolated, false, translate);
         } finally {
             context.put("sdoc", currrentSdoc);
         }

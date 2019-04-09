@@ -72,10 +72,9 @@ public class AttachmentIT
         attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, "SmallAttachment2.txt"));
         attachmentsPane.waitForUploadToFinish("SmallAttachment2.txt");
         assertEquals(2, attachmentsPane.getNumberOfAttachments());
-        // TODO: to be uncommented when XWIKI-16316 is fixed
-        //String attachmentURL = String.format("%sdownloadrev/%s/SmallAttachment.txt?rev=1.1", setup.getBaseBinURL(),
-        //    testPageName.replace('.', '/'));
-        //assertEquals(attachmentURL, attachmentsPane.getAttachmentLink("SmallAttachment.txt").getAttribute("href"));
+        String attachmentURL = String.format("%sdownloadrev/%s/SmallAttachment.txt?rev=1.1", setup.getBaseBinURL(),
+            testPageName.replace('.', '/'));
+        assertEquals(attachmentURL, attachmentsPane.getAttachmentLink("SmallAttachment.txt").getAttribute("href"));
         attachmentsPane.deleteAttachmentByFileByName("SmallAttachment.txt");
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
         assertTrue(attachmentsPane.attachmentExistsByFileName("SmallAttachment2.txt"));
@@ -84,9 +83,8 @@ public class AttachmentIT
         viewPage = setup.gotoPage(testReference);
         attachmentsPane = viewPage.openAttachmentsDocExtraPane();
         assertEquals(1, attachmentsPane.getNumberOfAttachments());
-        // TODO: to be uncommented when XWIKI-16316 is fixed
-        //attachmentURL = String.format("%sdownloadrev/%s/SmallAttachment2.txt?rev=1.1", setup.getBaseBinURL(),
-        //    testPageName.replace('.', '/'));
-        //assertEquals(attachmentURL, attachmentsPane.getAttachmentLink("SmallAttachment2.txt").getAttribute("href"));
+        attachmentURL = String.format("%sdownloadrev/%s/SmallAttachment2.txt?rev=1.1", setup.getBaseBinURL(),
+            testPageName.replace('.', '/'));
+        assertEquals(attachmentURL, attachmentsPane.getAttachmentLink("SmallAttachment2.txt").getAttribute("href"));
     }
 }

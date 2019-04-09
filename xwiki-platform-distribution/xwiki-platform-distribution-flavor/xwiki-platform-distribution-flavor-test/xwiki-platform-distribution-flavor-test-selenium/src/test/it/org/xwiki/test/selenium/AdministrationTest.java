@@ -230,59 +230,6 @@ public class AdministrationTest extends AbstractXWikiTestCase
     }
 
     /*
-     * If CodeToExecute is defined in a configurable app, then it should be evaluated.
-     * Also header should be evaluated and not just printed.
-     * If XWiki.ConfigurableClass is saved with programming rights, it should resave itself so that it doesn't have them.
-     */
-    @Test
-    public void testCodeToExecutionAndAutoSandboxing() throws Exception
-    {
-        String space = "Main";
-        String page = "TestConfigurable";
-        String codeToExecute = "#set($code = 's sh')"
-                             + "Thi${code}ould be displayed."
-                             + "#if($xcontext.hasProgrammingRights())"
-                             + "This should not be displayed."
-                             + "#end";
-        String heading = "#set($code = 'his sho')"
-                       + "T${code}uld also be displayed.";
-        createConfigurableApplication(space, page, "TestSection6", true);
-        open(space, page, "edit", "editor=object");
-        expandObject("XWiki.ConfigurableClass", 0);
-        setFieldValue("XWiki.ConfigurableClass_0_codeToExecute", codeToExecute);
-        setFieldValue("XWiki.ConfigurableClass_0_heading", heading);
-        SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
-            .findElementById("XWiki.ConfigurableClass_0_configurationClass"));
-        configurationSuggest.clear();
-        clickEditSaveAndView();
-
-        Page restPage = getUtil().rest().get(new LocalDocumentReference("XWiki", "ConfigurableClass"));
-        String standardContent = restPage.getContent();
-        try {
-            // Modify content
-            restPage.setContent(standardContent + "\n\n{{velocity}}Has Programming permission: $xcontext.hasProgrammingRights(){{/velocity}}");
-            // Our admin will foolishly save XWiki.ConfigurableClass, giving it programming rights.
-            getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
-            getUtil().rest().save(restPage);
-
-            // Now we look at the section for our configurable.
-            open("XWiki", "ConfigurableClass", "view", "editor=globaladmin&section=TestSection6");
-
-            assertTextPresent("This should be displayed.");
-            assertTextPresent("This should also be displayed.");
-            assertTextNotPresent("This should not be displayed.");
-            assertTextPresent("Has Programming permission: false");
-            // Make sure javascript has not added a Save button.
-            assertElementNotPresent("//div/div/p/span/input[@type='submit'][@value='Save']");
-        } finally {
-            // Restore initial content
-            restPage.setContent(standardContent);
-            // Save
-            getUtil().rest().save(restPage);
-        }
-    }
-
-    /*
      * Proves that ConfigurationClass#codeToExecute is not rendered inline even if there is no
      * custom configuration class and the on;y content is custom content.
      * Tests: XWiki.ConfigurableClass

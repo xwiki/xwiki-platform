@@ -1779,9 +1779,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             if (exist) {
                 // Don't update the attachment version if document metadata dirty is forced false (any modification to
-                // the attachment automatically set document metadata dirty to false)
-                if ((attachment.isContentDirty() || attachment.isMetaDataDirty())
-                    && attachment.getDoc().isMetaDataDirty()) {
+                // the attachment automatically set document metadata dirty to true)
+                if (attachment.isContentDirty() && attachment.getDoc().isMetaDataDirty()) {
                     attachment.updateContentArchive(context);
                 }
 

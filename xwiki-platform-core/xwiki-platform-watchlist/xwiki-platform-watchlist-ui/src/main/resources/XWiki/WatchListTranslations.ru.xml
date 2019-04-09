@@ -37,8 +37,8 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Macro "watchlist"
-rendering.macro.watchlist.name=Список наблюдений
-rendering.macro.watchlist.description=Показать содержание вашего текущего списка наблюдения.
+rendering.macro.watchlist.name=Список наблюдения
+rendering.macro.watchlist.description=Показывает содержимое вашего текущего списка наблюдения.
 
 ### XWiki.WatchListClass
 XWiki.WatchListClass_interval_realtime=Непрерывно

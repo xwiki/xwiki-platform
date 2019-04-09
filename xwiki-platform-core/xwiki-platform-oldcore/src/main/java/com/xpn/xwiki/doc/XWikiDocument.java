@@ -1295,7 +1295,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @throws XWikiException in case of error during the rendering.
      * @since 11.3RC1
      */
-    public String getRenderedContent(Syntax targetSyntax, boolean transformationContextIsolated, XWikiContext context,
+    private String getRenderedContent(Syntax targetSyntax, boolean transformationContextIsolated, XWikiContext context,
         boolean retrieveTranslation)
         throws XWikiException
     {

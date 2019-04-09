@@ -256,9 +256,8 @@ def buildDocker(type)
     )
 
     xwikiDockerBuild {
-      // Note env.BRANCH_NAME is not available in "GitHub Organization" job types, only for "Multibranch Pipelines"
-      // types. See https://issues.jenkins-ci.org/browse/JENKINS-43418
-      configurations = dockerConfigurations(type, env.CHANGE_BRANCH)
+      def pom = readMavenPom file: 'pom.xml'
+      configurations = dockerConfigurations(type, pom.version)
       if (type != 'docker-latest') {
         modules = 'xwiki-platform-core/xwiki-platform-menu'
       }

@@ -161,14 +161,13 @@ public class EditTranslationIT
         viewPage = new ViewPage();
         assertEquals(englishTitle, viewPage.getDocumentTitle());
         assertEquals(englishContent, viewPage.getContent());
-        // TODO: this is currently failing because of XWIKI-16307
-//        setup.gotoPage(referenceDEFAULT, "view", "language=");
-//        viewPage = new ViewPage();
-//        assertEquals(originalTitle, viewPage.getDocumentTitle());
-//        assertEquals(originalContent, viewPage.getContent());
+        setup.gotoPage(referenceDEFAULT, "view", "language=");
+        viewPage = new ViewPage();
+        assertEquals(originalTitle, viewPage.getDocumentTitle());
+        assertEquals(originalContent, viewPage.getContent());
 
-        // Make sure two locales are listed for this page in the UI
-        assertEquals(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH)), new HashSet<>(viewPage.getLocales()));
+        // Make sure three locales are listed for this page in the UI
+        assertEquals(new HashSet<>(Arrays.asList(Locale.ROOT, Locale.ENGLISH, Locale.FRENCH)), new HashSet<>(viewPage.getLocales()));
 
         // Verify edit mode informations in edit page
         setup.gotoPage(referenceDEFAULT, "edit", "language=");

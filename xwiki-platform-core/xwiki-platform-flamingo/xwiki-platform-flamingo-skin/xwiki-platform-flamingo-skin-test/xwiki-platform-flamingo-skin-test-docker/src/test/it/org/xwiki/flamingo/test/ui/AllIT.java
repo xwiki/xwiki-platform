@@ -44,4 +44,10 @@ public class AllIT
     class NestedEditTranslationIT extends EditTranslationIT
     {
     }
+
+    @Nested
+    @DisplayName("Attachment Tests")
+    class NestedAttachmentIT extends AttachmentIT
+    {
+    }
 }

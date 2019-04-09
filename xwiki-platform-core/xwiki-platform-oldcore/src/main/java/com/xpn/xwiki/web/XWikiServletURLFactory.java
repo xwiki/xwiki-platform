@@ -619,12 +619,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         // If we are getting an attachment from the context doc, we can directly load its version from it.
-        else if (isContextDoc(xwikidb, spaces, name, context)) {
+        else if (action.equals("download") && isContextDoc(xwikidb, spaces, name, context)) {
             attachment = context.getDoc().getAttachment(filename);
 
         // We are getting an attachment from another doc: we can try to load it to retrieve its version
         // in order to avoid cache issues.
-        } else {
+        } else if (action.equals("download")) {
             // The doc might be in a different wiki.
             WikiReference originalWikiReference = context.getWikiReference();
             context.setWikiId(xwikidb);

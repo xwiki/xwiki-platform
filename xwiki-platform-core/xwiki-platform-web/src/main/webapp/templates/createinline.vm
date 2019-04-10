@@ -67,6 +67,17 @@
       )
   </div>
 #end
+## check if the exception is about the document having a path too long
+#if("$!exception" != '' && $exception.code == 11017)
+  <div class='box errormessage'>
+      $services.localization.render('core.create.page.error.docpathtoolong',
+        ["<p><small>${tooLongPath}</small></p>",
+          $doc.getNameMaxLength(),
+          $tooLongPath.length()
+        ]
+      )
+  </div>
+#end
 
 ## ---------------------------------------------------------------------------------------------------------
 ## Determine if we need to do extra checks for a deprecated, pre-NestedSpaces request to create a space.

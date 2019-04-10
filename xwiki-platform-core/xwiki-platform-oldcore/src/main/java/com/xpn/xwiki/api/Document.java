@@ -3158,4 +3158,14 @@ public class Document extends Api
     {
         return 1 == this.getDoc().getTranslation();
     }
+
+    /**
+     * @return the maximum authorized length for a document full name (see {@link #getFullName()}).
+     * @since 11.3RC1
+     */
+    @Unstable
+    public int getNameMaxLength()
+    {
+        return this.doc.getNameMaxLength();
+    }
 }

@@ -187,10 +187,12 @@ public class XWikiMockitoTest
         when(target.isNew()).thenReturn(true);
         when(target.getDocumentReference()).thenReturn(targetReference);
         when(target.getDocumentReferenceWithLocale()).thenReturn(targetReferenceWithLocale);
+        when(target.getNameMaxLength()).thenReturn(255);
 
         DocumentReference sourceReference = new DocumentReference("foo", "Space", "Source");
         XWikiDocument source = mock(XWikiDocument.class);
         when(source.copyDocument(targetReference, context)).thenReturn(target);
+        when(source.getNameMaxLength()).thenReturn(255);
 
         when(xwiki.getStore().loadXWikiDoc(any(XWikiDocument.class), same(context))).thenReturn(source, target);
 

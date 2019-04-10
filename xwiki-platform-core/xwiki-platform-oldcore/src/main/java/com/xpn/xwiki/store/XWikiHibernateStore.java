@@ -57,6 +57,7 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.Settings;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.slf4j.Logger;
@@ -3253,5 +3254,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
 
         return this.attachmentContentStore;
+    }
+
+    @Override
+    public int getLimitSize(Class<?> entityType, String propertyName)
+    {
+        PersistentClass persistentClass = getConfiguration().getClassMapping(entityType.getName());
+        Property property = persistentClass.getProperty(propertyName);
+        int length = ((Column) property.getColumnIterator().next()).getLength();
+
+        return length;
     }
 }

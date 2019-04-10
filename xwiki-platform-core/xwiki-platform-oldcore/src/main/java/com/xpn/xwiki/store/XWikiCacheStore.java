@@ -772,4 +772,10 @@ public class XWikiCacheStore extends AbstractXWikiStore
     {
         return getStore().getQueryManager();
     }
+
+    @Override
+    public int getLimitSize(Class<?> entityType, String propertyName)
+    {
+        return this.store.getLimitSize(entityType, propertyName);
+    }
 }

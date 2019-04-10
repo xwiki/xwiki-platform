@@ -45,6 +45,7 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
@@ -163,11 +164,6 @@ public class CreateActionRequestHandler
      */
     private static final String CURRENT_MIXED_RESOLVER_HINT = "currentmixed";
 
-    /**
-     * Local entity reference serializer hint.
-     */
-    private static final String LOCAL_SERIALIZER_HINT = "local";
-
     private static final String TP_TERMINAL_PROPERTY = TOCREATE_TERMINAL;
 
     private static final String TP_TYPE_PROPERTY = TYPE;
@@ -207,6 +203,11 @@ public class CreateActionRequestHandler
     private List<Document> recommendedTemplateProviders;
 
     private String type;
+
+    /**
+     * Used to convert a proper Document Reference to a string but without the wiki name.
+     */
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     /**
      * @param context the XWikiContext for which to handle the request.
@@ -467,8 +468,7 @@ public class CreateActionRequestHandler
                 }
             }
 
-            EntityReferenceSerializer<String> localSerializer =
-                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
+            EntityReferenceSerializer<String> localSerializer = getLocalEntityReferenceSerializer();
             String spaceStringReference = localSerializer.serialize(spaceReference);
 
             // Sort the recommended providers and promote the most specific ones.
@@ -520,8 +520,7 @@ public class CreateActionRequestHandler
         // Check the allowed spaces list.
         List<String> restrictions = getTemplateProviderRestrictions(templateObject, restrictionsProperty);
         if (restrictions.size() > 0) {
-            EntityReferenceSerializer<String> localSerializer =
-                Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, LOCAL_SERIALIZER_HINT);
+            EntityReferenceSerializer<String> localSerializer = getLocalEntityReferenceSerializer();
             String spaceStringReference = localSerializer.serialize(spaceReference);
 
             for (String allowedSpace : restrictions) {
@@ -685,6 +684,42 @@ public class CreateActionRequestHandler
         }
 
         return false;
+    }
+
+    /**
+     * @param reference the new document reference to check
+     * @return true if the serialized document path is too long according to the limitation provided by
+     *              {@link XWikiDocument#getNameMaxLength()}.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public boolean isDocumentPathTooLong(DocumentReference reference)
+    {
+        int maxLength = document.getNameMaxLength();
+        String serializedDocumentName = getLocalEntityReferenceSerializer().serialize(reference);
+        boolean isTooLong = serializedDocumentName.length() > maxLength;
+
+        if (isTooLong) {
+            Object[] args = { serializedDocumentName, maxLength, serializedDocumentName.length() };
+            XWikiException documentPathIsTooLong = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG,
+                "Cannot create document {0} because its full path is too long: only {1} characters are allowed and "
+                    + "current length is {2}.", null, args);
+            ScriptContext scontext = getCurrentScriptContext();
+            scontext.setAttribute(EXCEPTION, documentPathIsTooLong, ScriptContext.ENGINE_SCOPE);
+            // Expose to the template the path of the document that is too long in order to understand the problem.
+            scontext.setAttribute("tooLongPath", serializedDocumentName, ScriptContext.ENGINE_SCOPE);
+        }
+        return isTooLong;
+    }
+
+    private EntityReferenceSerializer<String> getLocalEntityReferenceSerializer()
+    {
+        if (this.localEntityReferenceSerializer == null) {
+            this.localEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        }
+
+        return this.localEntityReferenceSerializer;
     }
 
     /**

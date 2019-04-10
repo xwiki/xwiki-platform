@@ -24,6 +24,7 @@ import java.util.List;
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -519,4 +520,14 @@ public interface XWikiStoreInterface
      *         is more abstract from store implementation and support multiple query languages.
      */
     QueryManager getQueryManager();
+
+    /**
+     * Get the limit size of a property.
+     * @param entityType the entityType where the property is located.
+     * @param property the property on which we want the limit size.
+     * @return an integer representing the limit size.
+     * @since 11.3RC1
+     */
+    @Unstable
+    int getLimitSize(Class<?> entityType, String property);
 }

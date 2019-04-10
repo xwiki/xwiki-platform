@@ -415,7 +415,7 @@ public class EditIT
     {
         String name1 = "Company Presentation Events";
         String name2 = "Presentation from 10 december 2015 at the Fourth edition of the International Conference for "
-            + "the Environmental Responsibility (ICER 2015).";
+            + "the Environmental Responsibility (ICER 2015)";
         String name3 = "Intervention from the President of the Interdisciplinary Commission for Responsible Development"
             + " of Alternative Fuels (ICRDA)";
 

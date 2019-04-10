@@ -48,6 +48,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.query.QueryManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -101,6 +102,11 @@ public class XWikiCacheStore extends AbstractXWikiStore
     private Cache<XWikiDocument> cache;
 
     private Cache<Boolean> pageExistCache;
+
+    /**
+     * Used to cache the values asked by {@link #getLimitSize(Class, String)}.
+     */
+    private Cache<Integer> limitSizePropertyCache;
 
     /**
      * Default constructor generally used by the Component Manager.
@@ -168,6 +174,11 @@ public class XWikiCacheStore extends AbstractXWikiStore
         int pageExistCacheCapacity = this.configuration.getProperty("xwiki.store.cache.pageexistcapacity", 10000);
         this.pageExistCache = this.cacheManager
             .createNewCache(new LRUCacheConfiguration("xwiki.store.pageexistcache", pageExistCacheCapacity));
+
+        // There won't be many values in this cache, but they will be accessed a lot.
+        int limitSizePropertyCacheCapacity = 10;
+        this.limitSizePropertyCache = this.cacheManager.createNewCache(
+            new LRUCacheConfiguration("xwiki.store.limitsizepropertycache", limitSizePropertyCacheCapacity));
     }
 
     @Deprecated
@@ -239,6 +250,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     {
         getCache().removeAll();
         getPageExistCache().removeAll();
+        getLimitSizePropertyCache().removeAll();
     }
 
     @Override
@@ -743,6 +755,16 @@ public class XWikiCacheStore extends AbstractXWikiStore
         this.pageExistCache = pageExistCache;
     }
 
+    /**
+     * @return the cache that handle the limit size properties.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public Cache<Integer> getLimitSizePropertyCache()
+    {
+        return this.limitSizePropertyCache;
+    }
+
     @Override
     public List<String> getCustomMappingPropertyList(BaseClass bclass)
     {
@@ -774,8 +796,14 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    public int getLimitSize(Class<?> entityType, String propertyName)
+    public int getLimitSize(XWikiContext context, Class<?> entityType, String propertyName)
     {
-        return this.store.getLimitSize(entityType, propertyName);
+        String cacheKey = String.format("%s.%s.%s", context.getWikiId(), entityType.getName(), propertyName);
+        Integer limitSize = this.getLimitSizePropertyCache().get(cacheKey);
+        if (limitSize == null) {
+            limitSize = this.store.getLimitSize(context, entityType, propertyName);
+            this.getLimitSizePropertyCache().set(cacheKey, limitSize);
+        }
+        return limitSize;
     }
 }

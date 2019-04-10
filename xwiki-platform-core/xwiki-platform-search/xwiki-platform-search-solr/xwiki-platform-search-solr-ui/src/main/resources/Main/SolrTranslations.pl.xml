@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: solr.admin.title=Solr Search Administration
+  <content>solr.admin.title=Administracja Solr Search
 solr.admin.submit=Zastosuj
 solr.admin.error.action={0} nie powiodło się:
 solr.admin.error.notallowed=Nie możesz wykonać tej czynności.
@@ -44,24 +44,24 @@ solr.admin.error.norights=Aby uzyskać dostęp do tej sekcji, wymagane są prawa
 solr.admin.success.action={0} uruchomiono pomyślnie.
 
 solr.admin.status.title=Status
-solr.admin.status.queueSize.label=Długość oczekiwania
+solr.admin.status.queueSize.label=Rozmiar kolejki
 solr.admin.status.queueSize.hint=Liczba obiektów, które pozostały do indeksowania, ponownego indeksowania lub usunięcia z indeksu (w zależności od wykonanej akcji).
 
 solr.admin.indexing.title=Indeksowanie
-solr.admin.indexing.action.label=Operacja
+solr.admin.indexing.action.label=Czynność
 solr.admin.indexing.action.hint=Operacja do wykonania w indeksie.
 solr.admin.indexing.action.select_index=Dodaj do indeksu
 solr.admin.indexing.action.select_delete=Usuń z indeksu
-solr.admin.indexing.action.select_reindex=Reindeks
+solr.admin.indexing.action.select_reindex=Przeindeksowanie
 solr.admin.indexing.wiki.label=Wiki
-solr.admin.indexing.wiki.hint=Wiki, na którą będą miały wpływ wybrane dokumenty.
+solr.admin.indexing.wiki.hint=Wiki, na którą będą miały wpływ wszystkie dokumenty wybrane przez czynność.
 solr.admin.indexing.wiki.select_farm=Cały obszar
 solr.admin.indexing.query.label=Niestandardowe zapytanie
 solr.admin.indexing.query.hint=Opcjonalne zapytanie ograniczające dokumenty, na które ma wpływ wybrana akcja w indeksie.
 
-solr.admin.info.affectedDocuments=Dokumenty poruszone w indeksie:
+solr.admin.info.affectedDocuments=Dotyczy dokumentów w indeksie:
 
-solr.sortBy=Sortuj po:
+solr.sortBy=Sortuj według:
 solr.sortBy.score=Związek z tematem
 solr.sortBy.title_sort=Tytuł
 solr.sortBy.date=Data ostatniej modyfikacji
@@ -103,8 +103,8 @@ solr.filterBy.fileType.image=Obraz
 solr.filterBy.fileType.audio=Audio
 solr.filterBy.fileType.video=Video
 solr.filterBy.fileType.text=Tekst
-solr.filterBy.fileType.office=Biuro
-solr.filterBy.fileType.word=Słowo
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.word=Word
 solr.filterBy.fileType.presentation=Prezentacja
 solr.filterBy.fileType.spreadsheet=Arkusz
 solr.filterBy.fileType.archive=Archiwum
@@ -130,7 +130,7 @@ solr.facet.date.applyCustomInterval=Zastosuj
 solr.facet.date.between=Od {0} do {1}
 solr.facet.date.after=Po {0}
 solr.facet.date.before=Przed {0}
-solr.facet.date.any=Wszystkie daty
+solr.facet.date.any=Dowolna data
 
 solr.facet.size.tiny=Malutki
 solr.facet.size.small=Mały

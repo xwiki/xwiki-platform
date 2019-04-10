@@ -50,6 +50,7 @@ public class AttachmentsPane extends BaseElement
     public void setFileToUpload(final String filePath)
     {
         final List<WebElement> inputs = this.pane.findElements(By.className("uploadFileInput"));
+        inputs.get(inputs.size() - 1).clear();
         inputs.get(inputs.size() - 1).sendKeys(filePath);
     }
 

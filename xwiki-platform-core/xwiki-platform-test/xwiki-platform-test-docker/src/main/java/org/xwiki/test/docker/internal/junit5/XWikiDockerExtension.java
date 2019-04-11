@@ -186,21 +186,20 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     {
         LOGGER.info("(*) Stopping test [{}]", extensionContext.getTestMethod().get().getName());
 
+        // If running locally then save the screenshot and the video by default for easier debugging. For the moment
+        // we consider we're running locally if we're not running inside a Docker container. To be improved.
+        if (!loadServletContainerExecutor(extensionContext).isInAContainer()) {
+            saveScreenshotAndVideo(extensionContext);
+        }
+
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
             VncRecordingContainer vnc = loadVNC(extensionContext);
-            // TODO: Record the video only if the test has failed, when Junit5 add support for extensions to know the
-            // test result status... See https://github.com/junit-team/junit5/issues/542
-            File recordingDir = DockerTestUtils.getScreenshotsDirectory(testConfiguration);
-            File recordingFile = new File(recordingDir, String.format("%s-%s.flv",
-                extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName()));
-            vnc.saveRecordingToFile(recordingFile);
             vnc.stop();
 
             // Note: We don't need to stop the BrowserWebDriverContainer since that's done automatically by
             // TestContainers. This allows the test to finish faster and thus provide faster results (because stopping
             // the container takes a bit of time).
-            LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
         }
     }
 
@@ -208,8 +207,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        DockerTestUtils.takeScreenshot(extensionContext, loadTestConfiguration(extensionContext),
-            loadXWikiWebDriver(extensionContext));
+        // Only take screenshot & save video if not executing locally as otherwise they're always taken and saved!
+        if (loadServletContainerExecutor(extensionContext).isInAContainer()) {
+            saveScreenshotAndVideo(extensionContext);
+        }
         throw throwable;
     }
 
@@ -392,5 +393,26 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     private boolean isServletEngineForbidden(TestConfiguration testConfiguration)
     {
         return testConfiguration.getForbiddenServletEngines().contains(testConfiguration.getServletEngine());
+    }
+
+    private void saveScreenshotAndVideo(ExtensionContext extensionContext)
+    {
+        // Take screenshot
+        DockerTestUtils.takeScreenshot(extensionContext, loadTestConfiguration(extensionContext),
+            loadXWikiWebDriver(extensionContext));
+
+        // Save the video
+        saveVideo(extensionContext);
+    }
+
+    private void saveVideo(ExtensionContext extensionContext)
+    {
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        if (testConfiguration.vnc()) {
+            VncRecordingContainer vnc = loadVNC(extensionContext);
+            File recordingFile = DockerTestUtils.getResultFileLocation("flv", testConfiguration, extensionContext);
+            vnc.saveRecordingToFile(recordingFile);
+            LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
+        }
     }
 }

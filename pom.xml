@@ -53,7 +53,7 @@
 
     <!-- Dependencies versions -->
     <ckeditor.version>1.32</ckeditor.version>
-    <bootstrap.version>3.3.7-1</bootstrap.version>
+    <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.11</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>1.20</tika.version>

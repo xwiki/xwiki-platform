@@ -122,11 +122,6 @@ import com.xpn.xwiki.util.Util;
 @Singleton
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface
 {
-    /**
-     * Default limit size of a property in case of error in {@link #getLimitSize(XWikiContext, Class, String)}.
-     */
-    private static int DEFAULT_PROPERTY_LIMIT_SIZE = 255;
-
     @Inject
     private Logger logger;
 
@@ -3267,30 +3262,38 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public int getLimitSize(XWikiContext context, Class<?> entityType, String propertyName)
     {
-        PersistentClass persistentClass = getConfiguration().getClassMapping(entityType.getName());
-        String tableName = persistentClass.getTable().getName();
+        int result = -1;
 
+        // retrieve the schema from the context
+        String schema = getSchemaFromWikiName(context);
+
+        // retrieve the table and column name from entityType and propertyName
+        PersistentClass persistentClass = getConfiguration().getClassMapping(entityType.getName());
+        Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
+        String tableName = persistentClass.getTable().getName();
+        String columnName = column.getName();
+
+        // HSQLDB needs to use uppercase table name to retrieve the value.
         if (getDatabaseProductName() == DatabaseProduct.HSQLDB) {
             tableName = tableName.toUpperCase();
         }
-        String columnName = ((Column) persistentClass.getProperty(propertyName).getColumnIterator().next()).getName();
-        String schema = getSchemaFromWikiName(context);
-        DatabaseMetaData databaseMetaData;
+
         Connection connection = null;
         // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
         // See http://bit.ly/QAJXlr
-        ConnectionProvider connectionProvider =
-            ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
+        ConnectionProvider connectionProvider = ((SessionFactoryImplementor) getSessionFactory())
+            .getConnectionProvider();
         try {
             connection = connectionProvider.getConnection();
-            databaseMetaData = connection.getMetaData();
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
             ResultSet resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
-            resultSet.first();
-            return resultSet.getInt("COLUMN_SIZE");
+            // first will return false if the resultSet is empty.
+            if (resultSet.first()) {
+                result = resultSet.getInt("COLUMN_SIZE");
+            }
         } catch (SQLException e) {
             logger.error("Error while looking the size limit for schema [{}], table [{}] and column [{}].", schema,
                 tableName, columnName, e);
-            return DEFAULT_PROPERTY_LIMIT_SIZE;
         } finally {
             if (connection != null) {
                 try {
@@ -3300,5 +3303,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
         }
+
+        if (result == -1) {
+            result = column.getLength();
+            logger.warn("Error while getting the size limit for entity [{}] and propertyName [{}]. "
+                + "The length value set by hibernate [{}] will be used.", entityType.getName(), propertyName, result);
+        }
+
+        return result;
     }
 }

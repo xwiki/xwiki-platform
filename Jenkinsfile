@@ -275,10 +275,17 @@ def build(map)
 
 def buildInsideNode(map)
 {
+    // We want to get a memory dump on OOM errors.
     // Make sure the memory dump directory exists (see below)
     // Note that the user used to run the job on the agent must have the permission to create these directories
-    def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
-    sh "mkdir -p \"${oomPath}\""
+    // Verify existence of /home/hudsonagent/jenkins_root so that we only set the oomPath if it does
+    def heapDumpPath = ''
+    def exists = fileExists '/home/hudsonagent/jenkins_root'
+    if (exists) {
+        def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
+        sh "mkdir -p \"${oomPath}\""
+        heapDumpPath = "-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
+    }
 
     // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
     // take time to execute and thus we cannot run them all the time.
@@ -298,8 +305,7 @@ def buildInsideNode(map)
     ]
 
     xwikiBuild(map.name) {
-      // Note: we want to get a memory dump on OOM errors.
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
+      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError ${heapDumpPath}"
       jobProperties = customJobProperties
       if (map.goals) {
         goals = map.goals

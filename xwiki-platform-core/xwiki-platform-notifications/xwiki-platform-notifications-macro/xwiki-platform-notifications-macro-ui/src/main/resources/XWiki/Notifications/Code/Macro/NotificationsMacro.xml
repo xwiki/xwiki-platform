@@ -53,6 +53,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -156,6 +157,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -462,6 +464,7 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -702,6 +705,44 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>11</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>12</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>10</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <code>
         <disabled>0</disabled>
         <editor>Text</editor>
@@ -807,6 +848,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
     <property>
       <code>{{velocity}}
 #set ($displayMacro = true)
@@ -954,6 +1004,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>10</defaultValue>
@@ -966,6 +1025,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>count</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1020,6 +1082,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -1032,6 +1103,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>useUserPreferences</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1086,6 +1160,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -1098,6 +1181,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>displayOwnEvents</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1152,6 +1238,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -1164,6 +1259,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>displayMinorEvents</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1218,6 +1316,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -1230,6 +1337,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>displaySystemEvents</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1284,6 +1394,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>true</defaultValue>
@@ -1296,6 +1415,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>displayReadEvents</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1350,6 +1472,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>true</defaultValue>
@@ -1362,6 +1493,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>displayReadStatus</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1416,6 +1550,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1428,6 +1571,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>wikis</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1482,6 +1628,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1494,6 +1649,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>spaces</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1548,6 +1706,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1560,6 +1727,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>pages</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1614,6 +1784,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1626,6 +1805,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>users</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1680,6 +1862,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -1692,6 +1883,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>displayWatchedUsersOnly</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1746,6 +1940,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>true</defaultValue>
@@ -1758,6 +1961,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>displayRSSLink</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1812,6 +2018,15 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1824,6 +2039,9 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
     </property>
     <property>
       <name>tags</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
 </xwikidoc>

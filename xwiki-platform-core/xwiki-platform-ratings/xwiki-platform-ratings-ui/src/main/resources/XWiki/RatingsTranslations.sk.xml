@@ -47,6 +47,5 @@ admin.ratings.activateratings=Aktivovať hodnotenia na tejto wiki.
 rating.rate=Hodnotiť
 ### Missing: rating.yourvote=Your vote
 ### Missing: rating.logintorate=Login to rate
-rating.novotes=Zatiaľ nehodnotené
-</content>
+rating.novotes=Zatiaľ nehodnotené</content>
 </xwikidoc>

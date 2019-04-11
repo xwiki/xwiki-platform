@@ -47,6 +47,5 @@ admin.ratings.illegalrequest=Requête interdite
 rating.rate=Votez !
 rating.yourvote=Votre vote
 rating.logintorate=Connectez-vous pour voter
-rating.novotes=Aucun vote
-</content>
+rating.novotes=Aucun vote</content>
 </xwikidoc>

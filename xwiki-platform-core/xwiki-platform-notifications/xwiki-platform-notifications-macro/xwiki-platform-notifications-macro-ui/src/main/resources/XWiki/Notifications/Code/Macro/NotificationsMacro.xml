@@ -317,7 +317,8 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
               break;
             case 202:
               // 202 means that the background search is still running, we wait 1 second and ask again if it's done this time
-              setTimeout(self.doLoad, 1000, {asyncId: data.asyncId}, untilDate, promise);
+              params.asyncId = data.asyncId
+              setTimeout(self.doLoad, 1000, params, untilDate, promise);
               break;
         }
       });

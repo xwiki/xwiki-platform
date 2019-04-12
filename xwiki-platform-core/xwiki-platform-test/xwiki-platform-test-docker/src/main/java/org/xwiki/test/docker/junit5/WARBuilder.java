@@ -265,6 +265,11 @@ public class WARBuilder
                     ? this.testConfiguration.getJDBCDriverVersion() : "2.4.1";
                 artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, hsqldbDriverVersion);
                 break;
+            case ORACLE:
+                String oracleDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                    ? this.testConfiguration.getJDBCDriverVersion() : "12.2.0.1";
+                artifact = new DefaultArtifact("com.oracle.jdbc", "ojdbc8", JAR, oracleDriverVersion);
+                break;
             default:
                 throw new RuntimeException(
                     String.format("Failed to get JDBC driver. Database [%s] not supported yet!", database));

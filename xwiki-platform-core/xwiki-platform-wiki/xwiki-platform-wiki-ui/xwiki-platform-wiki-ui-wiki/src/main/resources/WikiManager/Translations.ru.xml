@@ -40,32 +40,32 @@
 
 ## MENU
 core.menu.type.wiki=Вики
-core.menu.watchlist.add.wiki=Следить за Вики
-core.menu.watchlist.remove.wiki=Отменить слежение за Wiki
+core.menu.watchlist.add.wiki=Следить за вики
+core.menu.watchlist.remove.wiki=Отменить слежение за вики
 core.menu.admin.wiki=Управление Вики
 
 # WIKI INFORMATION PANEL
-platform.wiki.panel.title=Wiki информация
+platform.wiki.panel.title=Информация о вики
 
 # MESSAGES
-platform.wiki.currentwiki.welcome=Добро пожаловать в {0}{1}{2} wiki.
-platform.wiki.currentwiki.currentUserIsOwner=Вы владелец этой wiki.
-platform.wiki.currentwiki.currentUserIsAdmin=Вы администратор этой wiki.
-platform.wiki.currentwiki.joinNeedToLogin=Чтобы присоединиться к этой wiki, нужно войти в систему.
-platform.wiki.currentwiki.currentUserNotMember=Вы не участник этой wiki.
-platform.wiki.currentwiki.currentuserCanJoin=Если хотите, вы можете {0}присоединиться к этой wiki{1}.
-platform.wiki.currentwiki.currentUserIsMember=Вы участник этой вики wiki.
-platform.wiki.currentwiki.currentUserCanLeave=Если хотите, вы можете {0}покинуть эту wiki{1}.
-platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Чтобы увидеть полный список участников вики, см. {0} Каталог пользователей {1}.
+platform.wiki.currentwiki.welcome=Добро пожаловать в вики {0}{1}{2}.
+platform.wiki.currentwiki.currentUserIsOwner=Вы владелец этой вики.
+platform.wiki.currentwiki.currentUserIsAdmin=Вы администратор этой вики.
+platform.wiki.currentwiki.joinNeedToLogin=Чтобы присоединиться к этой вики, нужно войти в систему.
+platform.wiki.currentwiki.currentUserNotMember=Вы не участник этой вики.
+platform.wiki.currentwiki.currentuserCanJoin=Если хотите, вы можете {0}присоединиться к этой вики{1}.
+platform.wiki.currentwiki.currentUserIsMember=Вы участник этой вики.
+platform.wiki.currentwiki.currentUserCanLeave=Если хотите, вы можете {0}покинуть эту вики{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Чтобы увидеть полный список участников вики, см. {0}Каталог пользователей{1}.
 platform.wiki.currentwiki.invitationPendingForCurrentWiki=Вы были приглашены присоединиться к этой вики.
-platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Вы просили присоединиться к этой вики.
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Вы отправили запрос на присоединение к этой вики.
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Ваш запрос на присоединение к вики ''{0}'' был принят.
 platform.wiki.currentwiki.joinRequestRejectedNotification=Ваш запрос на присоединение к вики ''{0}'' был отклонен.
 platform.wiki.currentwiki.candidateHandledSaveComment=Обработанный кандидат {0} ({1})
 platform.wiki.currentwiki.candidateHandledComment=Комментарий:
 platform.wiki.currentwiki.candidateAcceptedSuccess=Запрос принят.
 platform.wiki.currentwiki.candidateRejectedSuccess=Запрос отклонен.
-platform.wiki.currentwiki.inviteUserAlreadyMember={0} уже является участником этой wiki.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} уже является участником этой вики.
 platform.wiki.currentwiki.inviteRequestAlreadyExists={0} уже имеет ожидающий запрос. Пожалуйста, ответьте на этот запрос.
 platform.wiki.currentwiki.inviteUserAlreadyInvited={0} уже получил ожидающее приглашение.
 platform.wiki.currentwiki.inviteSaveComment=Пользователь ''{0}'' был приглашен присоединиться к вики.
@@ -78,13 +78,13 @@ platform.wiki.currentwiki.invitationCancelFailure=Ошибка, вы не мож
 platform.wiki.currentwiki.candidateReviewFailure=Ошибка, вы не можете отменить это приглашение.
 
 # LABELS
-platform.wiki.currentwiki.prop.wikiprettyname.label=Красивое название
+platform.wiki.currentwiki.prop.wikiprettyname.label=Отображаемое имя
 platform.wiki.currentwiki.prop.description.label=Описание
 platform.wiki.currentwiki.prop.owner.label=Владелец
 platform.wiki.currentwiki.prop.membershipType.label=Тип членства
 platform.wiki.currentwiki.prop.secure.label=Безопасность (SSL)
-platform.wiki.currentwiki.member.add=Добавьте или пригласите пользователей в wiki
-platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki информация
+platform.wiki.currentwiki.member.add=Добавьте или пригласите пользователей в вики
+platform.wiki.currentwiki.gadget.wikiInformation.label=Информация о вики
 platform.wiki.currentwiki.gadget.topActiveUsers.label=ТОП активных участников
 platform.wiki.currentwiki.panel.information.name.label=Название
 platform.wiki.currentwiki.panel.information.description.label=Описание
@@ -93,7 +93,7 @@ platform.wiki.currentwiki.invitation.view.label=Посмотреть пригл�
 platform.wiki.currentwiki.joinrequest.cancel.label=Отменить запрос
 platform.wiki.currentwiki.joinreques.request.label=Запрос присоединения
 platform.wiki.currentwiki.join.label=Присоединиться
-platform.wiki.currentwiki.leave.label=Покинуть Wiki
+platform.wiki.currentwiki.leave.label=Покинуть вики
 platform.wiki.currentwiki.invite.username.label=Имя пользователя
 platform.wiki.currentwiki.invite.message.label=Сообщение
 platform.wiki.currentwiki.invite.button.label=Приглашение
@@ -106,11 +106,11 @@ platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Частный
 platform.wiki.currentwiki.candidates.accept.label=Принять
 platform.wiki.currentwiki.candidates.reject.label=Отклонить
 platform.wiki.currentwiki.candidates.invitation.cancel.label=Отменить приглашение
-platform.wiki.currentwiki.wikiusers.title=Wiki пользователи
+platform.wiki.currentwiki.wikiusers.title=Пользователи вики
 platform.wiki.currentwiki.managewikis.title=Вики
-WikiManager.WikiCandidateMemberClass_status_pending=Ожидание
-WikiManager.WikiCandidateMemberClass_status_accepted=Принято
-WikiManager.WikiCandidateMemberClass_status_rejected=Отклонено
+WikiManager.WikiCandidateMemberClass_status_pending=Ожидающий
+WikiManager.WikiCandidateMemberClass_status_accepted=Принятый
+WikiManager.WikiCandidateMemberClass_status_rejected=Отклоненный
 WikiManager.WikiCandidateMemberClass_type_request=Запрос
 WikiManager.WikiCandidateMemberClass_type_invitation=Приглашение
 
@@ -119,11 +119,11 @@ platform.wiki.currentwiki.prop.wikiprettyname.hint=Отображаемое им
 platform.wiki.currentwiki.prop.description.hint=Краткое описание вики и ее назначение.
 platform.wiki.currentwiki.prop.owner.hint=Пользователь, у которого есть все права на вики.
 platform.wiki.currentwiki.prop.membershipType.hint=Как пользователи могут присоединиться к этой вики.
-platform.wiki.currentwiki.prop.secure.hint=Если включено, все внешние URL этой вики будут начинаться с {0} https: ~/~/{1}.
+platform.wiki.currentwiki.prop.secure.hint=Если включено, все внешние URL, сгенерированные этой вики, будут начинаться с {0}https:~/~/{1}.
 platform.wiki.currentwiki.invite.username.hint=Имя пользователя для добавления в вики.
 platform.wiki.currentwiki.invite.message.hint=Сообщение для отправки пользователю.
-platform.wiki.currentwiki.candidates.hint=Пользователи, которые запросили или были приглашены присоединиться к вики.
-platform.wiki.currentwiki.candidates.empty=Ни один пользователь не запросил или не был приглашен присоединиться к вики.
+platform.wiki.currentwiki.candidates.hint=Пользователи, которые подали запрос или были приглашены, чтобы присоединиться к вики.
+platform.wiki.currentwiki.candidates.empty=Ни один пользователь не подал запрос или не был приглашен, чтобы присоединиться к вики.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Управляйте настройками, такими как имя вики, описание, владелец и тип членства.

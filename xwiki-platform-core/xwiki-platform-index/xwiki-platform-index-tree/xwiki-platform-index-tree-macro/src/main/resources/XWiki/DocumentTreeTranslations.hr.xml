@@ -90,6 +90,5 @@ index.documentTree.more=Još {0}...
 
 ## Until 7.2M2
 rendering.macro.documentTree.parameter.showChildDocuments.name=Prikaži dokumente djecu
-rendering.macro.documentTree.parameter.showChildDocuments.description=Prikazati dokumente djecu prema polju dokumenta roditelja.
-</content>
+rendering.macro.documentTree.parameter.showChildDocuments.description=Prikazati dokumente djecu prema polju dokumenta roditelja.</content>
 </xwikidoc>

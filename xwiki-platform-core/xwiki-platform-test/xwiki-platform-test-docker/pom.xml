@@ -208,6 +208,11 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc8</artifactId>
+      <version>12.2.0.1</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -230,44 +235,4 @@
       </plugin>
     </plugins>
   </build>
-  <profiles>
-    <profile>
-      <!-- Profile used to get access to OracleDB in docker test. Please follow the instruction here:
-      https://blogs.oracle.com/dev2dev/get-oracle-jdbc-drivers-and-ucp-from-oracle-maven-repository-without-ides
-      to get access to Maven Oracle repository before activating this profile.
-      -->
-      <id>oracle</id>
-      <repositories>
-        <repository>
-          <id>maven.oracle.com</id>
-          <name>oracle-maven-repo</name>
-          <url>https://maven.oracle.com</url>
-          <layout>default</layout>
-          <releases>
-            <!-- The repository is really slow because it needs to check authorization for each artifact to download
-            and apparently there is no way to activate it only for a specific dependency. Disabled it by default for now
-            the easiest way to get the missing artifact is by calling the following command line:
-
-            mvn dependency:get -DrepoUrl=https://maven.oracle.com -DrepoId=maven.oracle.com
-            -Dartifact=com.oracle.jdbc:ojdbc8:12.2.0.1
-
-            -->
-            <enabled>false</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-      <dependencies>
-        <!-- Needed by TestContainers, apparently to verify the the Oracle DB is started -->
-        <dependency>
-          <groupId>com.oracle.jdbc</groupId>
-          <artifactId>ojdbc8</artifactId>
-          <version>12.2.0.1</version>
-        </dependency>
-      </dependencies>
-    </profile>
-  </profiles>
 </project>

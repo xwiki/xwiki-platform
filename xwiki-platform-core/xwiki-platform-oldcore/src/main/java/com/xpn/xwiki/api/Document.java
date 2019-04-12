@@ -3166,6 +3166,6 @@ public class Document extends Api
     @Unstable
     public int getNameMaxLength()
     {
-        return this.doc.getNameMaxLength();
+        return this.doc.getFullNameMaxLength();
     }
 }

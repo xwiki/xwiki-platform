@@ -125,7 +125,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Run the action
@@ -148,7 +148,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Pass the tocreate=nonterminal request parameter
@@ -177,7 +177,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Run the action
@@ -197,7 +197,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Run the action
@@ -221,7 +221,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Run the action
@@ -246,7 +246,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Pass the tocreate=terminal request parameter
@@ -273,7 +273,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Pass the tocreate=terminal request parameter
@@ -303,7 +303,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Just landed on the create page or submitted with no values (no name) specified.
@@ -329,7 +329,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y
@@ -357,7 +357,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X.Y&name=Z
@@ -385,7 +385,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&tocreate=terminal
@@ -414,7 +414,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X.Y&name=Z&tocreate=termina
@@ -443,7 +443,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
         // Mock it as existing in the DB as well with non-empty content
         oldcore.getDocuments().put(new DocumentReference(documentReference, Locale.ROOT), document);
@@ -482,7 +482,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(10);
+        when(document.getFullNameMaxLength()).thenReturn(10);
         context.setDoc(document);
 
         when(mockRequest.getParameter("spaceReference")).thenReturn("Main");
@@ -514,7 +514,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(10);
+        when(document.getFullNameMaxLength()).thenReturn(10);
         context.setDoc(document);
 
         when(mockRequest.getParameter("spaceReference")).thenReturn("1.3.5.7.9.11");
@@ -546,7 +546,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI name=Y
@@ -577,7 +577,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI space=X&page=Y
@@ -605,7 +605,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI space=X.Y&page=Z
@@ -634,7 +634,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI space=X&tocreate=space
@@ -662,7 +662,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI space=X&page=Y&tocreate=space
@@ -692,7 +692,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI space=X.Y&tocreate=space
@@ -725,7 +725,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y
@@ -835,7 +835,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
@@ -869,7 +869,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
@@ -905,7 +905,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X.Y.Z&name=W&templateProvider=XWiki.MyTemplateProvider
@@ -943,7 +943,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
@@ -984,7 +984,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
@@ -1022,7 +1022,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
@@ -1060,7 +1060,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
@@ -1094,7 +1094,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
@@ -1128,7 +1128,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
@@ -1162,7 +1162,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
@@ -1197,7 +1197,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
 
         context.setDoc(document);
 
@@ -1233,7 +1233,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
@@ -1269,7 +1269,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
@@ -1306,7 +1306,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
@@ -1343,7 +1343,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
@@ -1381,7 +1381,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
@@ -1417,7 +1417,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(true);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Specifying a template provider in the URL: templateprovider=XWiki.MyTemplateProvider
@@ -1453,7 +1453,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider
@@ -1491,7 +1491,7 @@ public class CreateActionTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(documentReference);
         when(document.isNew()).thenReturn(false);
-        when(document.getNameMaxLength()).thenReturn(255);
+        when(document.getFullNameMaxLength()).thenReturn(255);
         context.setDoc(document);
 
         // Submit from the UI spaceReference=X&name=Y&templateProvider=XWiki.MyTemplateProvider

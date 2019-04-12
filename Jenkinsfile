@@ -307,31 +307,31 @@ def buildInsideNode(map)
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
       jobProperties = customJobProperties
-      if (map.goals) {
+      if (map.goals != null) {
         goals = map.goals
       }
-      if (map.profiles) {
+      if (map.profiles != null) {
         profiles = map.profiles
       }
-      if (map.properties) {
+      if (map.propertie != null) {
         properties = map.properties
       }
-      if (map.pom) {
+      if (map.pom != null) {
         pom = map.pom
       }
-      if (map.mavenFlags) {
+      if (map.mavenFlags != null) {
         mavenFlags = map.mavenFlags
       }
-      if (map.sonar) {
+      if (map.sonar != null) {
         sonar = map.sonar
       }
-      if (map.skipCheckout) {
+      if (map.skipCheckout != null) {
         skipCheckout = map.skipCheckout
       }
-      if (map.xvnc) {
+      if (map.xvnc != null) {
         xvnc = map.xvnc
       }
-      if (map.skipMail) {
+      if (map.skipMail != null) {
         skipMail = map.skipMail
       }
     }

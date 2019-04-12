@@ -27,11 +27,11 @@
     <artifactId>xwiki-platform-distribution-debian-tomcat</artifactId>
     <version>11.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-debian-tomcat8-pgsql</artifactId>
-  <name>XWiki Platform - Distribution - Debian - Tomcat 8 - Postgres SQL</name>
+  <artifactId>xwiki-platform-distribution-debian-tomcat9-mysql</artifactId>
+  <name>XWiki Platform - Distribution - Debian - Tomcat 9 - MySQL</name>
   <packaging>deb</packaging>
-  <description>XWiki Tomcat8/PostgreSQL</description>
+  <description>XWiki Tomcat9/MySQL based package</description>
   <properties>
-    <debian.package>xwiki-tomcat8-pgsql</debian.package>
+    <debian.package>xwiki-tomcat9-mysql</debian.package>
   </properties>
 </project>

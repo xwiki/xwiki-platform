@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-distribution-debian-tomcat8-mysql</artifactId>
   <name>XWiki Platform - Distribution - Debian - Tomcat 8 - MySQL</name>
   <packaging>deb</packaging>
-  <description>XWiki Tomcat/MySQL based package</description>
+  <description>XWiki Tomcat8/MySQL based package</description>
   <properties>
     <debian.package>xwiki-tomcat8-mysql</debian.package>
   </properties>

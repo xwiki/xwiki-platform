@@ -1,0 +1,14 @@
+Package: xwiki-tomcat9-pgsql
+Version: [[version]]
+Section: java
+Priority: optional
+Architecture: all
+Depends: xwiki-pgsql-common (= [[version]]), xwiki-tomcat8-common (= [[version]])
+Provides: xwiki-tomcat-database
+Replaces: xwiki-tomcat-database, xwiki-enterprise-tomcat7-mysql, xwiki-enterprise-tomcat8-mysql, xwiki-enterprise-tomcat7-pgsql, xwiki-enterprise-tomcat8-pgsql, xwiki-tomcat8-mysql, xwiki-tomcat8-mysql, xwiki-tomcat8-pgsql, xwiki-tomcat7-mysql, xwiki-tomcat7-pgsql
+Conflicts: xwiki-tomcat-database, xwiki-enterprise-tomcat7-mysql, xwiki-enterprise-tomcat8-mysql, xwiki-enterprise-tomcat7-pgsql, xwiki-enterprise-tomcat8-pgsql, xwiki-tomcat8-mysql, xwiki-tomcat8-mysql, xwiki-tomcat8-pgsql, xwiki-tomcat7-mysql, xwiki-tomcat7-pgsql
+Maintainer: [[debian.maintainer]]
+License: [[debian.license]]
+Description: [[debian.description]]
+Bugs: [[debian.bugs]]
+Homepage: [[debian.homepage]]

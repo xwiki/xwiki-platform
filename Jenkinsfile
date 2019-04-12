@@ -305,7 +305,7 @@ def buildInsideNode(map)
     ]
 
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError ${heapDumpPath}"
+      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
       jobProperties = customJobProperties
       if (map.goals) {
         goals = map.goals

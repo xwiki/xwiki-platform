@@ -1264,12 +1264,11 @@ var editProperty = function(fullname, classname, fieldname, cb) {
             + fieldname + '&value=' + value);
           $.ajax({
             url : surl,
-            complete : function(e) {
-              if(e.responseText.search('SAVED') != -1) {
-                cb(value);
-              } else {
-                alert("$services.localization.render('platform.livetable.propEditor.failed')");
-              }
+            success : function() {
+              cb(value);
+            },
+            error : function() {
+              alert("$services.localization.render('platform.livetable.propEditor.failed')");
             }
           });
         });

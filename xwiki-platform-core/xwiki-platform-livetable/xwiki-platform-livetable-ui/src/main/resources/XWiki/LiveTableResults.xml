@@ -38,25 +38,23 @@
   <hidden>true</hidden>
   <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
 
-{{velocity wiki="false"}}
-## the $extra variable is passed to the call to #gridresultwithfilter below and is used to perform some default
-## filtering on the LiveTable data even when the user has not performed any column filtering yet.
-## When users start using column filtering, the generated DB query will combine both the default filtering and what the
-## user has entered in the column filters.
+{{velocity}}
+## Used in editProperty for getting the field when "link": "editor" property is used.
 #if($request.value)
   #set($itemdoc = $xwiki.getDocument($request.page))
   #set($discard = $itemdoc.use($request.classname))
   #set($discard = $itemdoc.set($request.fieldname, $request.value))
-  #set($ok = $itemdoc.save("Field ${request.fieldname} updated"))
-  #if($ok)
-    SAVED
-  #end
+  #set($discard = $itemdoc.save("Field ${request.fieldname} updated"))
 #elseif($request.fieldname)
   #set($itemdoc = $xwiki.getDocument($request.page))
   #set($discard = $itemdoc.use($request.classname))
   #set($obj = $itemdoc.getObject($request.classname))
   $!itemdoc.display($request.fieldname, "edit", $obj)
 #else
+## the $extra variable is passed to the call to #gridresultwithfilter below and is used to perform some default
+## filtering on the LiveTable data even when the user has not performed any column filtering yet.
+## When users start using column filtering, the generated DB query will combine both the default filtering and what the
+## user has entered in the column filters.
   #set ($extra = '')
   #set ($params = [])
   #if ("$!request.space" != '')

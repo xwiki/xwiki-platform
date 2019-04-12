@@ -3265,7 +3265,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         int result = -1;
 
         // retrieve the schema from the context
-        String schema = getSchemaFromWikiName(context);
+        String schema = null;
+        // apparently no schema should be used for oracle DB
+        if (getDatabaseProductName() != DatabaseProduct.ORACLE) {
+            schema = getSchemaFromWikiName(context);
+        }
 
         // retrieve the table and column name from entityType and propertyName
         PersistentClass persistentClass = getConfiguration().getClassMapping(entityType.getName());
@@ -3273,8 +3277,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         String tableName = persistentClass.getTable().getName();
         String columnName = column.getName();
 
-        // HSQLDB needs to use uppercase table name to retrieve the value.
-        if (getDatabaseProductName() == DatabaseProduct.HSQLDB) {
+        // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
+        if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
             tableName = tableName.toUpperCase();
         }
 
@@ -3287,8 +3291,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             connection = connectionProvider.getConnection();
             DatabaseMetaData databaseMetaData = connection.getMetaData();
             ResultSet resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
-            // first will return false if the resultSet is empty.
-            if (resultSet.first()) {
+            // next will return false if the resultSet is empty.
+            if (resultSet.next()) {
                 result = resultSet.getInt("COLUMN_SIZE");
             }
         } catch (SQLException e) {

@@ -39,5 +39,5 @@
   <content>admin.syntaxes=Настройки синтаксисов
 admin.syntaxes.description=Выберите синтаксис страницы по умолчанию и настройте доступные синтаксисы разметки.
 Rendering.RenderingConfigClass_disabledSyntaxes=Отключенные синтаксисы разметки
-Rendering.RenderingConfigClass_disabledSyntaxes.hint=Список отключенных синтаксисов разметки, не доступны при создании страниц</content>
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Список синтаксисов разметки, которые будут недоступны при создании страниц</content>
 </xwikidoc>

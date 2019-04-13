@@ -100,8 +100,7 @@ def builds = [
       name: 'TestRelease',
       goals: 'clean install',
       profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
-      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true',
-      xvnc: false
+      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
     )
   },
   'Quality' : {
@@ -113,8 +112,7 @@ def builds = [
       // Note: When we do so, also add:
       //   sonar: true
       goals: 'clean install jacoco:report',
-      profiles: 'quality,legacy',
-      xvnc: false
+      profiles: 'quality,legacy'
     )
   }
 ]

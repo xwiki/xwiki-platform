@@ -253,10 +253,8 @@ def buildDocker(type)
       skipMail: true
     )
 
-    def pom = readMavenPom file: 'pom.xml'
-    def version = pom.version
     xwikiDockerBuild {
-      configurations = dockerConfigurations(type, version)
+      configurations = dockerConfigurations(type)
       if (type != 'docker-latest') {
         modules = 'xwiki-platform-core/xwiki-platform-menu'
       }

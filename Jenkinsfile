@@ -253,8 +253,9 @@ def buildDocker(type)
       skipMail: true
     )
 
+    def dockerConfigurations = dockerConfigurations(type)
     xwikiDockerBuild {
-      configurations = dockerConfigurations(type)
+      configurations = dockerConfigurations
       if (type != 'docker-latest') {
         modules = 'xwiki-platform-core/xwiki-platform-menu'
       }

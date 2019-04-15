@@ -136,6 +136,12 @@
               <artifactId>xwiki-platform-store-filesystem-oldcore</artifactId>
               <version>${project.version}</version>
             </dependency>
+            <!-- Notification Notifiers Default module has a migrator to clean watchlist leftovers -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
+              <version>${project.version}</version>
+            </dependency>
             <!-- We need the Servlet API dep since it's used by the Packager and since it has
                  a provided scope in XWiki core it's not inherited as part of transitive deps -->
             <dependency>

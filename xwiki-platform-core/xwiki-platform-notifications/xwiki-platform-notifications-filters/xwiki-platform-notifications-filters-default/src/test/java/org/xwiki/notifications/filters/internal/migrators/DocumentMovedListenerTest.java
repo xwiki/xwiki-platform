@@ -43,7 +43,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import javax.inject.Provider;
 
-import static org.mockito.ArgumentMatchers.anyObject;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -156,8 +156,7 @@ public class DocumentMovedListenerTest
         verify(query).setString("newPage", "xwiki:PageB");
         verify(query).setString("oldPage", "xwiki:PageA");
         verify(query).executeUpdate();
-        verify(namespaceContextExecutor).execute(eq(new WikiNamespace("mainWiki")),
-                anyObject());
+        verify(namespaceContextExecutor).execute(eq(new WikiNamespace("mainWiki")), any());
     }
 
     @Test

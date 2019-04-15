@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - Filters - Default implementation</name>
   <description>Default bridge to oldcore for the notifications filters API module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.37</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.38</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>16</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>

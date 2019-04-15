@@ -134,12 +134,13 @@ public class DocumentMovedListener extends AbstractEventListener
                     .setString(NEW_PAGE, serializer.serialize(targetLocation.getLastSpaceReference()))
                     .setString(OLD_PAGE, serializer.serialize(sourceLocation.getLastSpaceReference()))
                     .executeUpdate();
+        } else {
+            session.createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage "
+                    + "where p.pageOnly = :oldPage")
+                    .setString(NEW_PAGE, serializer.serialize(targetLocation))
+                    .setString(OLD_PAGE, serializer.serialize(sourceLocation))
+                    .executeUpdate();
         }
-        session.createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage "
-                + "where p.pageOnly = :oldPage")
-                .setString(NEW_PAGE, serializer.serialize(targetLocation))
-                .setString(OLD_PAGE, serializer.serialize(sourceLocation))
-                .executeUpdate();
 
         hibernateStore.endTransaction(context, true);
     }

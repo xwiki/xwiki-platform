@@ -155,9 +155,9 @@ public final class DockerTestUtils
             File screenshotFile = DockerTestUtils.getResultFileLocation("png", testConfiguration, extensionContext);
             screenshotFile.getParentFile().mkdirs();
             FileUtils.copyFile(sourceFile, screenshotFile);
-            LOGGER.info("Screenshot for failing test [{}] saved at [{}].", testName, screenshotFile.getAbsolutePath());
+            LOGGER.info("Screenshot for test [{}] saved at [{}].", testName, screenshotFile.getAbsolutePath());
         } catch (Exception e) {
-            LOGGER.error("Failed to take screenshot for failing test [{}].", testName, e);
+            LOGGER.error("Failed to take screenshot for test [{}].", testName, e);
         }
     }
 

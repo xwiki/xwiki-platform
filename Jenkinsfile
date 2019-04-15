@@ -331,6 +331,10 @@ def buildInsideNode(map)
       if (map.skipMail != null) {
         skipMail = map.skipMail
       }
+      // Avoid duplicate changelogs in jenkins job execution UI page
+      if (map.name != 'Main') {
+        skipChangeLog = true
+      }
     }
 }
 

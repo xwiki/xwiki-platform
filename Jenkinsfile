@@ -310,7 +310,7 @@ def buildInsideNode(map)
       if (map.profiles != null) {
         profiles = map.profiles
       }
-      if (map.propertie != null) {
+      if (map.properties != null) {
         properties = map.properties
       }
       if (map.pom != null) {

@@ -72,6 +72,9 @@ public class WatchlistLeftoversCleaner extends AbstractHibernateDataMigration
             XWiki xwiki = context.getWiki();
             for (LocalDocumentReference documentToRemove : DOCUMENTS_TO_REMOVE) {
                 XWikiDocument document = xwiki.getDocument(documentToRemove, context);
+                if (document.isNew()) {
+                    continue;
+                }
                 xwiki.deleteDocument(document, context);
             }
         } catch (Exception e) {

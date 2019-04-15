@@ -22,6 +22,7 @@ package org.xwiki.test.docker.internal.junit5.servletengine;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -34,9 +35,11 @@ import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
+import org.xwiki.text.StringUtils;
 
 import com.github.dockerjava.api.model.Image;
 
@@ -101,10 +104,22 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/usr/local/tomcat/webapps/xwiki");
 
-                this.servletContainer.withEnv("CATALINA_OPTS", "-Xmx1024m "
-                    + "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true "
-                    + "-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true "
-                    + "-Dsecurerandom.source=file:/dev/urandom");
+                List<String> catalinaOpts = new ArrayList<>();
+                catalinaOpts.add("-Xmx1024m");
+                catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
+                catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
+                catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
+
+                // When executing on the Oracle database, we get the following timezone error unless we pass a system
+                // property to the Oracle JDBC driver:
+                //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
+                //   recursive SQL level 1
+                //   ORA-01882: timezone region not found
+                if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
+                    catalinaOpts.add("-Doracle.jdbc.timezoneAsRegion=false");
+                }
+
+                this.servletContainer.withEnv("CATALINA_OPTS", StringUtils.join(catalinaOpts, ' '));
 
                 break;
             case JETTY:

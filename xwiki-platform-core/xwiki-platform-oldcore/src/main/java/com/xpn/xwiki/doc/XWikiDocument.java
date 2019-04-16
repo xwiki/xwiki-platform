@@ -184,6 +184,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateAttachmentStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -6651,9 +6652,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         for (XWikiAttachment origAttach : fromDoc.getAttachmentList()) {
             String fileName = origAttach.getFilename();
             XWikiAttachment newAttach = toDoc.getAttachment(fileName);
+            origAttach = retrieveDeletedAttachment(fromDoc, origAttach, context);
             if (newAttach == null) {
                 difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.DELETE, origAttach, newAttach));
             } else {
+                newAttach = retrieveDeletedAttachment(toDoc, newAttach, context);
                 try {
                     if (!origAttach.equalsData(newAttach, context)) {
                         difflist
@@ -6669,12 +6672,60 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         for (XWikiAttachment newAttach : toDoc.getAttachmentList()) {
             String fileName = newAttach.getFilename();
             XWikiAttachment origAttach = fromDoc.getAttachment(fileName);
+            newAttach = retrieveDeletedAttachment(toDoc, newAttach, context);
             if (origAttach == null) {
                 difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.INSERT, origAttach, newAttach));
             }
         }
 
         return difflist;
+    }
+
+    private XWikiAttachment retrieveDeletedAttachment(XWikiDocument doc, XWikiAttachment attachment,
+        XWikiContext context)
+    {
+        XWikiAttachment result = null;
+
+        InputStream is = null;
+        try {
+            is = attachment.getContentInputStream(context);
+            if (is == null) {
+                AttachmentRecycleBinStore attachmentRecycleBinStore = context.getWiki().getAttachmentRecycleBinStore();
+                List<DeletedAttachment> allDeletedAttachments =
+                    attachmentRecycleBinStore.getAllDeletedAttachments(this, context, true);
+
+                for (DeletedAttachment deletedAttachment : allDeletedAttachments) {
+                    XWikiAttachment restoredAttachment = deletedAttachment.restoreAttachment();
+                    if (restoredAttachment.getDate().before(attachment.getDate())) {
+                        break;
+                    }
+                    result = restoredAttachment;
+                }
+
+                if (result != null) {
+                    if (!Objects.equals(attachment.getVersion(), result.getVersion())) {
+                        result = result.getAttachmentRevision(attachment.getVersion(), context);
+                    }
+                }
+            }
+        } catch (XWikiException e) {
+            LOGGER.error("Error while trying to load deleted attachment [{}] for doc [{}]", attachment, doc, e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException ex) {
+
+                }
+            }
+        }
+
+        if (result == null) {
+            result = attachment;
+        } else {
+            result.setDoc(doc);
+        }
+        return result;
     }
 
     /**

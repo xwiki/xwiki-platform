@@ -901,9 +901,6 @@ public class XWikiAttachment implements Cloneable
                 archivedVersion != null ? archivedVersion.getAttachment_content() : null;
             if (archivedContent != null) {
                 setAttachment_content(archivedContent);
-            } else {
-                // Fall back on the version of the content stored in the xwikiattachment_content table.
-                loadAttachmentContent(xcontext);
             }
         }
     }
@@ -1300,17 +1297,20 @@ public class XWikiAttachment implements Cloneable
         try {
             if (getContentLongSize(xcontext) == otherAttachment.getContentLongSize(xcontext)) {
                 InputStream is = getContentInputStream(xcontext);
-
-                try {
-                    InputStream otherIS = otherAttachment.getContentInputStream(xcontext);
-
+                if (is != null) {
                     try {
-                        return IOUtils.contentEquals(is, otherIS);
+                        InputStream otherIS = otherAttachment.getContentInputStream(xcontext);
+
+                        if (otherIS != null) {
+                            try {
+                                return IOUtils.contentEquals(is, otherIS);
+                            } finally {
+                                otherIS.close();
+                            }
+                        }
                     } finally {
-                        otherIS.close();
+                        is.close();
                     }
-                } finally {
-                    is.close();
                 }
             }
         } catch (Exception e) {

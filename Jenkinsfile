@@ -254,11 +254,14 @@ def buildDocker(type)
     )
 
     def dockerConfigurations = dockerConfigurations(type)
+    def customJobProperties = getCustomJobProperties()
     xwikiDockerBuild {
       configurations = dockerConfigurations
       if (type != 'docker-latest') {
         modules = 'xwiki-platform-core/xwiki-platform-menu'
       }
+      // Make sure that we don't reset the job properties!
+      jobProperties = customJobProperties
     }
   }
 }
@@ -284,26 +287,9 @@ def buildInsideNode(map)
         heapDumpPath = "-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
     }
 
-    // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
-    // take time to execute and thus we cannot run them all the time.
-    // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
-    // we run the standard builds or the docker ones.
-    // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
-    // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
-    // found a way to merge properties and calling the properties() step will override any pre-existing properties.
-    def customJobProperties = [
-      parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
-      pipelineTriggers([
-        parameterizedCron('''@midnight %type=docker-latest
-@weekly %type=docker-all
-@monthly %type=docker-unsupported'''),
-        cron("@monthly")
-      ])
-    ]
-
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
-      jobProperties = customJobProperties
+      jobProperties = getCustomJobProperties()
       if (map.goals != null) {
         goals = map.goals
       }
@@ -350,5 +336,25 @@ def buildFunctionalTest(map)
     pom: "${sharedPOMPrefix}/${map.pom}",
     properties: map.properties
   )
+}
+
+def getCustomJobProperties()
+{
+  // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
+  // take time to execute and thus we cannot run them all the time.
+  // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
+  // we run the standard builds or the docker ones.
+  // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
+  // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
+  // found a way to merge properties and calling the properties() step will override any pre-existing properties.
+  return [
+    parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
+    pipelineTriggers([
+      parameterizedCron('''@midnight %type=docker-latest
+@weekly %type=docker-all
+@monthly %type=docker-unsupported'''),
+      cron("@monthly")
+    ])
+  ]
 }
 

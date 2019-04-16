@@ -20,6 +20,8 @@
 package org.xwiki.flamingo.test.ui;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
@@ -30,7 +32,12 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
+import org.xwiki.test.ui.po.ChangesPane;
+import org.xwiki.test.ui.po.ComparePage;
+import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.diff.DocumentDiffSummary;
+import org.xwiki.test.ui.po.diff.EntityDiff;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,10 +64,9 @@ public class AttachmentIT
         setup.loginAsSuperAdmin();
     }
 
-    private String getFileToUpload(TestConfiguration testConfiguration, String filename)
+    private File getFileToUpload(TestConfiguration testConfiguration, String filename)
     {
-        return new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/" + filename)
-            .getAbsolutePath();
+        return new File(testConfiguration.getBrowser().getTestResourcesPath(), "AttachmentIT/" + filename);
     }
 
     /**
@@ -72,14 +78,13 @@ public class AttachmentIT
     {
         String testPageName = setup.serializeReference(testReference).split(":")[1];
         ViewPage viewPage = setup.createPage(testReference, "", "");
-
         AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
 
         // Upload two attachments and check them
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, firstAttachment));
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, firstAttachment).getAbsolutePath());
         attachmentsPane.waitForUploadToFinish(firstAttachment);
         attachmentsPane.clickHideProgress();
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, secondAttachment));
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, secondAttachment).getAbsolutePath());
         attachmentsPane.waitForUploadToFinish(secondAttachment);
         attachmentsPane.clickHideProgress();
         assertEquals(2, attachmentsPane.getNumberOfAttachments());
@@ -111,7 +116,7 @@ public class AttachmentIT
         viewPage.waitForDocExtraPaneActive("attachments");
 
         // Upload another version of the first attachment
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, "v2/" + firstAttachment));
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, "v2/" + firstAttachment).getAbsolutePath());
         attachmentsPane.waitForUploadToFinish(firstAttachment);
         attachmentsPane.clickHideProgress();
         assertTrue(attachmentsPane.attachmentExistsByFileName(firstAttachment));
@@ -150,8 +155,79 @@ public class AttachmentIT
 
         // Attach the GIF image.
         AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
-        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, imageAttachment));
+        attachmentsPane.setFileToUpload(getFileToUpload(testConfiguration, imageAttachment).getAbsolutePath());
         attachmentsPane.waitForUploadToFinish(imageAttachment);
         assertTrue(attachmentsPane.attachmentExistsByFileName(imageAttachment));
+    }
+
+    @Test
+    @Order(3)
+    public void diffWithDeletedAttachments(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        // v1.1
+        setup.createPage(testReference, "", "");
+        // v2.1
+        setup.attachFile(testReference, "toto.txt",
+            getClass().getResourceAsStream("/AttachmentIT/testDiff/v1.1/toto.txt"), true);
+        // v3.1
+        setup.deleteAttachement(testReference, "toto.txt");
+        // Milliseconds are dropped from attachment date: if we create them too fast
+        // we cannot rely on date to compare them. So make sure to wait at least 1 sec before continue the work.
+        Thread.sleep(1000);
+        // v4.1
+        setup.attachFile(testReference, "toto.txt",
+            getClass().getResourceAsStream("/AttachmentIT/testDiff/v2.1/toto.txt"), true);
+        // v5.1
+        setup.attachFile(testReference, "toto.txt",
+            getClass().getResourceAsStream("/AttachmentIT/testDiff/v2.2/toto.txt"), false);
+        // v6.1
+        setup.attachFile(testReference, "toto.txt",
+            getClass().getResourceAsStream("/AttachmentIT/testDiff/v2.3/toto.txt"), false);
+        // v7.1
+        setup.deleteAttachement(testReference, "toto.txt");
+
+        ViewPage viewPage = setup.gotoPage(testReference);
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        ComparePage compare = historyPane.compare("1.1", "2.1");
+
+        ChangesPane changesPane = compare.getChangesPane();
+        DocumentDiffSummary diffSummary = changesPane.getDiffSummary();
+        assertEquals(Collections.singletonList("toto.txt"),
+            diffSummary.toggleAttachmentsDetails().getAddedAttachments());
+        EntityDiff content = changesPane.getEntityDiff("toto.txt");
+        assertEquals(Arrays.asList("@@ -1,0 +1,1 @@", "+v1.1"), content.getDiff("Content"));
+
+        viewPage = setup.gotoPage(testReference);
+        historyPane = viewPage.openHistoryDocExtraPane();
+        compare = historyPane.compare("2.1", "3.1");
+        changesPane = compare.getChangesPane();
+        diffSummary = changesPane.getDiffSummary();
+        assertEquals(Collections.singletonList("toto.txt"),
+            diffSummary.toggleAttachmentsDetails().getRemovedAttachments());
+        content = changesPane.getEntityDiff("toto.txt");
+        assertEquals(Arrays.asList("@@ -1,1 +1,0 @@", "-v1.1"), content.getDiff("Content"));
+
+        viewPage = setup.gotoPage(testReference);
+        historyPane = viewPage.openHistoryDocExtraPane();
+        compare = historyPane.compare("5.1", "7.1");
+        changesPane = compare.getChangesPane();
+        diffSummary = changesPane.getDiffSummary();
+        assertEquals(Collections.singletonList("toto.txt"),
+            diffSummary.toggleAttachmentsDetails().getRemovedAttachments());
+        content = changesPane.getEntityDiff("toto.txt");
+        assertEquals(Arrays.asList("@@ -1,1 +1,0 @@", "-v2.2"), content.getDiff("Content"));
+
+        viewPage = setup.gotoPage(testReference);
+        historyPane = viewPage.openHistoryDocExtraPane();
+        compare = historyPane.compare("2.1", "6.1");
+        changesPane = compare.getChangesPane();
+        diffSummary = changesPane.getDiffSummary();
+        assertEquals(Collections.singletonList("toto.txt"),
+            diffSummary.toggleAttachmentsDetails().getModifiedAttachments());
+        content = changesPane.getEntityDiff("toto.txt");
+        assertEquals(Arrays.asList("@@ -1,1 +1,1 @@", "-v<del>1</del>.<del>1</del>", "+v<ins>2</ins>.<ins>3</ins>"),
+            content.getDiff("Content"));
+
     }
 }

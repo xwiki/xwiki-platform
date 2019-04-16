@@ -111,11 +111,16 @@
       <artifactId>oracle-xe</artifactId>
       <version>${testcontainers.version}</version>
     </dependency>
-    <!-- Needed by TestContainers, apparently to verify the the MySQL DB is started -->
+    <!-- Needed by TestContainers, to verify that the DBs are started -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>5.1.24</version>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc8</artifactId>
+      <version>12.2.0.1</version>
     </dependency>
     <!-- Dependencies for WARBuilder -->
     <dependency>
@@ -207,11 +212,6 @@
       <artifactId>xwiki-platform-tool-configuration-resources</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc8</artifactId>
-      <version>12.2.0.1</version>
     </dependency>
   </dependencies>
   <build>

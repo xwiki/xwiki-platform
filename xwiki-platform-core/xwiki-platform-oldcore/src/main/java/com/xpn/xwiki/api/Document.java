@@ -3164,8 +3164,8 @@ public class Document extends Api
      * @since 11.3RC1
      */
     @Unstable
-    public int getNameMaxLength()
+    public int getLocalReferenceMaxLength()
     {
-        return this.doc.getFullNameMaxLength();
+        return this.doc.getLocalReferenceMaxLength();
     }
 }

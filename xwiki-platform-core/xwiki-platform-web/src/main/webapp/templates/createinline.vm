@@ -72,7 +72,7 @@
   <div class='box errormessage'>
       $services.localization.render('core.create.page.error.docpathtoolong',
         ["<p><small>${tooLongPath}</small></p>",
-          $doc.getNameMaxLength(),
+          $doc.getLocalReferenceMaxLength(),
           $tooLongPath.length()
         ]
       )

@@ -689,13 +689,13 @@ public class CreateActionRequestHandler
     /**
      * @param reference the new document reference to check
      * @return true if the serialized document path is too long according to the limitation provided by
-     *              {@link XWikiDocument#getFullNameMaxLength()}.
+     *              {@link XWikiDocument#getLocalReferenceMaxLength()}.
      * @since 11.3RC1
      */
     @Unstable
     public boolean isDocumentPathTooLong(DocumentReference reference)
     {
-        int maxLength = document.getFullNameMaxLength();
+        int maxLength = document.getLocalReferenceMaxLength();
         String serializedDocumentName = getLocalEntityReferenceSerializer().serialize(reference);
         boolean isTooLong = serializedDocumentName.length() > maxLength;
 

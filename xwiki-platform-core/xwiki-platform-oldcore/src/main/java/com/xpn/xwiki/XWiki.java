@@ -1819,8 +1819,8 @@ public class XWiki implements EventListener
             }
             String fullName = getLocalStringEntityReferenceSerializer().serialize(document.getDocumentReference());
             // If it's a new doc we check its name length to avoid a nasty SQL error.
-            if (document.isNew() && fullName.length() > document.getFullNameMaxLength()) {
-                java.lang.Object[] args = { fullName, document.getFullNameMaxLength(), fullName.length() };
+            if (document.isNew() && fullName.length() > document.getLocalReferenceMaxLength()) {
+                java.lang.Object[] args = { fullName, document.getLocalReferenceMaxLength(), fullName.length() };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG,
                     "Cannot create document {0} because its full path is too long: only {1} characters are allowed and "

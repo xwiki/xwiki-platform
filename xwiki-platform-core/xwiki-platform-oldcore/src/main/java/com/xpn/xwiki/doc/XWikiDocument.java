@@ -9297,7 +9297,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @since 11.3RC1
      */
     @Unstable
-    public int getFullNameMaxLength()
+    public int getLocalReferenceMaxLength()
     {
         return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");
     }

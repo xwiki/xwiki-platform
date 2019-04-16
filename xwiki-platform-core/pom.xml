@@ -288,5 +288,33 @@
         <module>xwiki-platform-legacy</module>
       </modules>
     </profile>
+    <profile>
+      <id>docker</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-failsafe-plugin</artifactId>
+              <configuration>
+                <systemProperties combine.children="append">
+                  <!-- This is required by the Oracle JDBC driver when running configuration tests on Oracle, as
+                       otherwise it fails with:
+                         SQLException: ORA-00604: error occurred at recursive SQL level 1
+                         ORA-01882: timezone region not found
+                       It's required at this level since TestContainers used JDBC to verify that the Oracle database is
+                       started.
+                  -->
+                  <property>
+                    <name>oracle.jdbc.timezoneAsRegion</name>
+                    <value>false</value>
+                  </property>
+                </systemProperties>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
   </profiles>
 </project>

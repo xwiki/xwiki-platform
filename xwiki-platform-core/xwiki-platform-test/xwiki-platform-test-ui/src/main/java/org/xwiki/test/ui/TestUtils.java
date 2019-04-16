@@ -1549,6 +1549,17 @@ public class TestUtils
         rest().attachFile(reference, is, failIfExists);
     }
 
+    public void deleteAttachement(EntityReference pageReference, String filename) throws Exception
+    {
+        EntityReference reference = new EntityReference(filename, EntityType.ATTACHMENT, pageReference);
+        deleteAttachement(reference);
+    }
+
+    public void deleteAttachement(EntityReference reference) throws Exception
+    {
+        rest().deleteAttachement(reference);
+    }
+
     // FIXME: improve that with a REST API to directly import a XAR
     public void importXar(File file) throws Exception
     {
@@ -2427,6 +2438,11 @@ public class TestUtils
                 assertStatusCodes(executePut(AttachmentResource.class, is, toElements(reference)), true,
                     STATUS_CREATED_ACCEPTED);
             }
+        }
+
+        public void deleteAttachement(EntityReference reference) throws Exception
+        {
+            assertStatusCodes(executeDelete(AttachmentResource.class, toElements(reference)), true, STATUS_NO_CONTENT);
         }
 
         public boolean exists(EntityReference reference) throws Exception

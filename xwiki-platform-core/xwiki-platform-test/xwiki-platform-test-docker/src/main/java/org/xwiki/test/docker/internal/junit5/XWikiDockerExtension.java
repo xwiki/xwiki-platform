@@ -150,7 +150,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             LOGGER.info("(*) Provision extensions for test...");
             provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
-            LOGGER.info("XWiki is already started, using running instance at [%s] to execute the tests...",
+            LOGGER.info("XWiki is already started, using running instance at [{}] to execute the tests...",
                 loadXWikiURL(extensionContext));
 
             // Note: Provisioning is not done in this case, you're supposed to have an XWiki instance that contains

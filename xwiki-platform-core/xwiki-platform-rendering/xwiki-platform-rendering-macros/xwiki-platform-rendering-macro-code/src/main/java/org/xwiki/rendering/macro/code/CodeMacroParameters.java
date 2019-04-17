@@ -34,6 +34,10 @@ public class CodeMacroParameters extends BoxMacroParameters
      * The language identifier.
      */
     private String language;
+    /**
+     * The layout format (plain or with line numbers)
+     */
+    private CodeMacroLayout layout = CodeMacroLayout.PLAIN;
 
     /**
      * @param language the language identifier.
@@ -51,4 +55,19 @@ public class CodeMacroParameters extends BoxMacroParameters
     {
         return this.language;
     }
+
+	/**
+	 * @param layout the layout format
+	 */
+    @PropertyDescription("the language format (plain or with line numbers)")
+	public void setLayout(CodeMacroLayout layout) {
+		this.layout = layout;
+	}
+	
+	/**
+	 * @return the layout format
+	 */
+	public CodeMacroLayout getLayout() {
+		return layout;
+	}
 }

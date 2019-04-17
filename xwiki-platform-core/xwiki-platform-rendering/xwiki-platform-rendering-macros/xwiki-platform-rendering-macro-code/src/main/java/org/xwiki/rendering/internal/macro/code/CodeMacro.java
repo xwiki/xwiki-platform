@@ -38,6 +38,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
+import org.xwiki.rendering.code.layout.CodeLayoutHandler;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;
@@ -127,6 +128,14 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         if (context.isInline()) {
             result = Arrays.<Block> asList(new FormatBlock(result, Format.NONE, formatParameters));
         } else {
+        	try {
+				CodeLayoutHandler layoutHandler = this.componentManager.getInstance(CodeLayoutHandler.class, 
+						parameters.getLayout().getHint());
+				result = layoutHandler.layout(result, content);
+			} catch (ComponentLookupException e) {
+                this.logger.error("Failed to load code layout handler for layout type [{}], no layout will be applied", 
+                		parameters.getLayout().name(), e);
+            }
             result = Arrays.<Block> asList(new GroupBlock(result, formatParameters));
         }
 

@@ -49,14 +49,17 @@
     <staticList>
       <cache>0</cache>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
       <displayType>checkbox</displayType>
+      <freeText/>
+      <hint/>
       <multiSelect>0</multiSelect>
       <name>staticList</name>
       <number>1</number>
-      <picker>0</picker>
+      <picker>1</picker>
       <prettyName>Static List</prettyName>
-      <relationalStorage>0</relationalStorage>
+      <relationalStorage>1</relationalStorage>
       <separator> </separator>
       <separators> ,|</separators>
       <size>1</size>
@@ -156,7 +159,7 @@
       <priority>4</priority>
     </property>
     <property>
-      <properties>displayType size values sort multiSelect</properties>
+      <properties>displayType picker size values sort multiSelect relationalStorage</properties>
     </property>
   </object>
   <object>
@@ -322,11 +325,7 @@ XWiki.StaticListManager = Class.create({
     this._saveClassHandler = this._onSaveClass.bind(this);
     document.observe('xwiki:class:save', this._saveClassHandler);
 
-    this.getDisplayType().observe('change', this._onChangeDisplayType.bind(this));
-    this.getMultiSelect().observe('click', this._onChangeMultiSelect.bind(this));
-
     this._enhanceValuesInput();
-    this._onChangeDisplayType();
   },
   getDisplayType : function() {
     return $(this.field.getPropertyId('displayType'));
@@ -339,40 +338,6 @@ XWiki.StaticListManager = Class.create({
   },
   getValues : function() {
     return $(this.field.getPropertyId('values'));
-  },
-  _onChangeDisplayType : function() {
-    var displayType = this.getDisplayType().value;
-
-    // The size meta property makes sense only when display type is select.
-    var size = this.getSize();
-    size.readOnly = displayType != 'select';
-    if (!size.readOnly) {
-      size.removeClassName('readOnly');
-      this._onChangeMultiSelect();
-    } else {
-      size.addClassName('readOnly');
-    }
-
-    // Radio display type doesn't support multiple selection.
-    if (displayType == 'radio') {
-      this.getMultiSelect().checked = false;
-    }
-  },
-  _onChangeMultiSelect : function() {
-    if (this.getMultiSelect().checked) {
-      var displayType = this.getDisplayType();
-      if (displayType.value == 'radio') {
-        // Radio display type doesn't support multiple selection.
-        displayType.value = 'checkbox';
-      } else if (displayType.value == 'select') {
-        var size = this.getSize();
-        // Select box with multiple selection enabled should be displayed as an expanded list box
-        // so we have to adjust the size (size 1 means drop down list box).
-        if (parseInt(size.value) &lt; 2) {
-          size.value = Math.min(Math.max(this.valuesEditor.size(), 1), 5);
-        }
-      }
-    }
   },
   _enhanceValuesInput : function() {
     var valuesInput = this.getValues();
@@ -404,33 +369,33 @@ XWiki.StaticListManager = Class.create({
   }
 });
 
-function maybeEnhanceField(field) {
-  if (!field.getContainer()._enhanced &amp;&amp; $('template-' + field.getName()).value == '$escapetool.javascript($doc.fullName)') {
-    field.getContainer()._enhanced = true;
-    new XWiki.StaticListManager(field);
-  }
-}
-function init() {
-  document.observe('xwiki:class:displayField', function(event) {
-    maybeEnhanceField(event.memo.field);
-  });
-  // This is needed in case this script is loaded asynchronously.
-  var fields = $('fields');
-  if (fields) {
-    fields.childElements().each(function(item) {
-      var field = new XWiki.FormField(item);
-      if (field.getConfig()) {
-        maybeEnhanceField(field);
-      }
-    });
-  }
-  return true;
-}
-(XWiki.domIsLoaded &amp;&amp; init()) || document.observe('xwiki:dom:loaded', init);
-
 // End XWiki augmentation.
 return XWiki;
-}(XWiki || {}));</code>
+}(XWiki || {}));
+
+require.config({
+  paths: {
+    'xwiki-awm-class-field-enhancer': "$xwiki.getURL('AppWithinMinutes.DBList', 'jsx', 'r=1')",
+    'xwiki-awm-list-enhancer': "$xwiki.getURL('AppWithinMinutes.DBList', 'jsx', 'r=1')"
+  }
+});
+
+// Static List Class Field Enhancer
+require(['jquery', 'xwiki-awm-class-field-enhancer', 'xwiki-awm-list-enhancer'], function($, classFieldEnhancer, listEnhancer) {
+  var fieldTemplate = $jsontool.serialize($doc.fullName);
+
+  // Generic list enhancements.
+  listEnhancer(fieldTemplate);
+
+  // Enhancements specific to static lists.
+  classFieldEnhancer({
+    id: 'StaticList',
+    fieldTemplate: fieldTemplate,
+    enhance: function(field) {
+      new XWiki.StaticListManager(field);
+    }
+  });
+});</code>
     </property>
     <property>
       <name>StaticListManager</name>

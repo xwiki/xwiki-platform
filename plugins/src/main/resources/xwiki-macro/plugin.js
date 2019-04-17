@@ -222,19 +222,21 @@
           // macro widget (in-line widgets and block widgets are handled differently by the editor).
           this.showMacroWizard(this.data);
         },
-        insert: function() {
-          var selectedText = (editor.getSelection().getSelectedText() || '').trim();
+        insert: function(options) {
+          var selectedText = (options.editor.getSelection().getSelectedText() || '').trim();
           // Macros that produce block level content shouldn't be inserted inline. But since the user hasn't picked the
           // macro yet we can only assume that if he selected multiple lines of text then he probably wants to insert a
           // block level macro. This is a temporary solution until we fix the rendering to stop generating invalid HTML.
           // See XRENDERING-517: Invalid HTML generated when a macro that is called inline produces block level content
           var inline = selectedText.indexOf('\n') > 0 ? false : this.inline;
-          this.showMacroWizard({
+          // The default macro call can be extended / overwritten by passing a macro call when executing the
+          // 'xwiki-macro' editor command (this happens for instance when we execute a dedicated insert macro command).
+          this.showMacroWizard($.extend({
             parameters: {},
             // Prefill the macro content text area with the selected text.
             content: selectedText,
             inline: inline
-          });
+          }, options.commandData));
         },
         showMacroWizard: function(macroCall) {
           var widget = this;
@@ -381,17 +383,8 @@
     registerDedicatedInsertMacroButton: function(editor, definition) {
       var macroPlugin = this;
       editor.addCommand(definition.commandId, {
-        async: true,
-        modes: {wysiwyg: 1},
         exec: function(editor) {
-          var command = this;
-          require(['macroWizard'], function(macroWizard) {
-            macroWizard(definition.macroCall).done(function(data) {
-              macroPlugin.insertOrUpdateMacroWidget(editor, data);
-            }).always(function() {
-              editor.fire('afterCommandExec', {name: command.name, command: command});
-            });
-          });
+          editor.execCommand('xwiki-macro', definition.macroCall);
         }
       });
       editor.ui.addButton(definition.commandId, {

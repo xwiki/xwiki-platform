@@ -85,9 +85,13 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
     public Response doGetAnnotatedContent(@PathParam("spaceName") String space, @PathParam("pageName") String page,
         @PathParam("wikiName") String wiki) throws XWikiRestException
     {
-        try {
-            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
+        DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
+        return getAnnotatedContent(documentReference);
+    }
 
+    protected Response getAnnotatedContent(DocumentReference documentReference)
+    {
+        try {
             // Initialize the context with the correct value.
             updateContext(documentReference);
 
@@ -127,10 +131,7 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
             // make this content expire now because cacheControl is not implemented in this version of restlet
             return Response.ok(response).expires(new Date()).build();
-        } catch (AnnotationServiceException e) {
-            getLogger().error(e.getMessage(), e);
-            return Response.ok(getErrorResponse(e)).build();
-        } catch (XWikiException e) {
+        } catch (AnnotationServiceException | XWikiException e) {
             getLogger().error(e.getMessage(), e);
             return Response.ok(getErrorResponse(e)).build();
         }
@@ -151,9 +152,13 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
         @PathParam("spaceName") String space, @PathParam("pageName") String page, AnnotationAddRequest request)
         throws XWikiRestException
     {
-        try {
-            DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
+        DocumentReference documentReference = new DocumentReference(wiki, parseSpaceSegments(space), page);
+        return postAnnotation(documentReference, request);
+    }
 
+    protected AnnotationResponse postAnnotation(DocumentReference documentReference, AnnotationAddRequest request)
+    {
+        try {
             // Initialize the context with the correct value.
             updateContext(documentReference);
 
@@ -171,10 +176,7 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             // and then return the annotated content, as specified by the annotation request
             AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
             return response;
-        } catch (AnnotationServiceException e) {
-            getLogger().error(e.getMessage(), e);
-            return getErrorResponse(e);
-        } catch (XWikiException e) {
+        } catch (AnnotationServiceException | XWikiException e) {
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
         }

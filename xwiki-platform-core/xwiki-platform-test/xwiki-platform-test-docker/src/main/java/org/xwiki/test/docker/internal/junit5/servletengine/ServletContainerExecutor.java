@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -58,6 +59,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String LATEST = "latest";
 
     private static final String CLOVER_DATABASE = System.getProperty("maven.clover.cloverDatabase");
+
+    private static final String ORACLE_TZ_WORKAROUND = "-Doracle.jdbc.timezoneAsRegion=false";
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -116,7 +119,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 //   recursive SQL level 1
                 //   ORA-01882: timezone region not found
                 if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
-                    catalinaOpts.add("-Doracle.jdbc.timezoneAsRegion=false");
+                    catalinaOpts.add(ORACLE_TZ_WORKAROUND);
                 }
 
                 this.servletContainer.withEnv("CATALINA_OPTS", StringUtils.join(catalinaOpts, ' '));
@@ -126,6 +129,18 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 this.servletContainer = createServletContainer();
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/var/lib/jetty/webapps/xwiki");
+
+                // When executing on the Oracle database, we get the following timezone error unless we pass a system
+                // property to the Oracle JDBC driver:
+                //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
+                //   recursive SQL level 1
+                //   ORA-01882: timezone region not found
+                if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
+                    List<String> commandPartList =
+                        new ArrayList<>(Arrays.asList(this.servletContainer.getCommandParts()));
+                    commandPartList.add(ORACLE_TZ_WORKAROUND);
+                    this.servletContainer.setCommandParts(commandPartList.toArray(new String[0]));
+                }
 
                 break;
             case WILDFLY:

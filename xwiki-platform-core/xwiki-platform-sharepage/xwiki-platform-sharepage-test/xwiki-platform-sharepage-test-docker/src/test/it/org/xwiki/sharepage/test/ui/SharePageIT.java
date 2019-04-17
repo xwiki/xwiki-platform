@@ -30,7 +30,9 @@ import org.junit.jupiter.api.TestInfo;
 import org.xwiki.sharepage.test.po.ShareDialog;
 import org.xwiki.sharepage.test.po.ShareResultDialog;
 import org.xwiki.sharepage.test.po.ShareableViewPage;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 
 import com.icegreen.greenmail.util.GreenMail;
@@ -44,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 7.0RC1
  */
-@UITest(
+@UITest(servletEngine = ServletEngine.TOMCAT,
     sshPorts = {
         // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
         // by GreenMail running on the host.
@@ -105,19 +107,26 @@ public class SharePageIT
      */
     @Test
     @Order(1)
-    public void shareByEmailWhenNoFromAddress(TestUtils setup) throws Exception
+    public void shareByEmailWhenNoFromAddress(TestUtils setup, TestConfiguration configuration) throws Exception
     {
-        setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host", "localhost", "port",
-            "3025", "sendWaitTime", "0");
-        shareByEmail("=?UTF-8?Q?superadmin?= <noreply@host.testcontainers.internal>", setup);
+        setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0,
+            "host", configuration.getServletEngine().getHostIP(),
+            "port", "3025",
+            "sendWaitTime", "0",
+            "from", "");
+        shareByEmail(String.format("=?UTF-8?Q?superadmin?= <noreply@%s>",
+            configuration.getServletEngine().getInternalIP()), setup);
     }
 
     @Test
     @Order(2)
-    public void shareByEmailWhenFromAddressSpecified(TestUtils setup) throws Exception
+    public void shareByEmailWhenFromAddressSpecified(TestUtils setup, TestConfiguration configuration) throws Exception
     {
-        setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host", "localhost", "port",
-            "3025", "sendWaitTime", "0", "from", "noreply@localhost");
+        setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0,
+            "host", configuration.getServletEngine().getHostIP(),
+            "port", "3025",
+            "sendWaitTime", "0",
+            "from", "noreply@localhost");
         shareByEmail("noreply@localhost", setup);
     }
 

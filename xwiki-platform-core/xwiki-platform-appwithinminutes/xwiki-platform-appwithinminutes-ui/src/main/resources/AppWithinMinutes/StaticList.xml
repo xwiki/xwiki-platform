@@ -178,6 +178,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -423,6 +424,7 @@ require(['jquery', 'xwiki-awm-class-field-enhancer', 'xwiki-awm-list-enhancer'],
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -571,6 +573,9 @@ require(['jquery', 'xwiki-awm-class-field-enhancer', 'xwiki-awm-list-enhancer'],
   position: absolute;
   right: 0;
 }</code>
+    </property>
+    <property>
+      <contentType/>
     </property>
     <property>
       <name>StaticListManager</name>

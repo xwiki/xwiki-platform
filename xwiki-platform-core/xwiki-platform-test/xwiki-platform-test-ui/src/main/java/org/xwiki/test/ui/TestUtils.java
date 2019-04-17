@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -905,6 +906,10 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString, String fragment)
     {
+        Serializable locale = reference.getParameters().get("locale");
+        if (locale != null) {
+            queryString += "&language=" + locale;
+        }
         return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment);
     }
 

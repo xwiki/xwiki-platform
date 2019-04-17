@@ -41,4 +41,12 @@
     <module>xwiki-platform-annotation-test-pageobjects</module>
     <module>xwiki-platform-annotation-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-annotation-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

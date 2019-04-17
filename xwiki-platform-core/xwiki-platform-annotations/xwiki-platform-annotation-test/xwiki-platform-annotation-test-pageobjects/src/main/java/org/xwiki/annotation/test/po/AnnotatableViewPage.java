@@ -105,11 +105,19 @@ public class AnnotatableViewPage extends BaseElement
 
     public void addAnnotation(String annotatedText, String annotationText)
     {
+        addAnnotation(annotatedText, annotationText, true);
+    }
+
+    public void addAnnotation(String annotatedText, String annotationText, boolean wait)
+    {
         selectText(annotatedText);
         simulateCTRL_M();
         annotationsWindow.addAnnotation(annotationText);
-        // check is the saved successfully message is displayed
-        waitForNotificationSuccessMessage(XWIKI_ANNOTATION_ADD_SUCCESS);
+
+        if (wait) {
+            // check is the saved successfully message is displayed
+            waitForNotificationSuccessMessage(XWIKI_ANNOTATION_ADD_SUCCESS);
+        }
     }
 
     public void deleteAnnotationByID(String id)

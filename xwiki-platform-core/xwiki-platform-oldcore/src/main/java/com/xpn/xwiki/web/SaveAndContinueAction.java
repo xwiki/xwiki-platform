@@ -55,25 +55,6 @@ public class SaveAndContinueAction extends XWikiAction
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
 
     /**
-     * Write an error response to an ajax request.
-     *
-     * @param httpStatusCode The status code to set on the response.
-     * @param message The message that should be displayed.
-     * @param context the context.
-     */
-    private void writeAjaxErrorResponse(int httpStatusCode, String message, XWikiContext context)
-    {
-        try {
-            context.getResponse().setContentType("text/plain");
-            context.getResponse().setStatus(httpStatusCode);
-            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
-            context.getResponse().getWriter().print(message);
-        } catch (IOException e) {
-            LOGGER.error("Failed to send error response to AJAX save and continue request.", e);
-        }
-    }
-
-    /**
      * Perform the internal action implied by the save and continue request. If the request is an ajax request,
      * writeAjaxErrorResponse will be called. The return value will be that of the wrapped action.
      *
@@ -128,26 +109,6 @@ public class SaveAndContinueAction extends XWikiAction
 
     /**
      * @param isAjaxRequest Indicate if this is an ajax request.
-     * @param context The XWiki context.
-     * @throws XWikiException unless it is an ajax request.
-     */
-    private void handleCSRFValidationFailure(boolean isAjaxRequest, XWikiContext context)
-        throws XWikiException
-    {
-        final String csrfCheckFailedMessage = localizePlainOrKey("core.editors.saveandcontinue.csrfCheckFailed");
-        if (isAjaxRequest) {
-            writeAjaxErrorResponse(HttpServletResponse.SC_FORBIDDEN,
-                csrfCheckFailedMessage,
-                context);
-        } else {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_ACCESS_TOKEN_INVALID,
-                csrfCheckFailedMessage);
-        }
-    }
-
-    /**
-     * @param isAjaxRequest Indicate if this is an ajax request.
      * @param exception The exception to handle.
      * @param context The XWiki context.
      * @throws XWikiException unless it is an ajax request.
@@ -192,8 +153,7 @@ public class SaveAndContinueAction extends XWikiAction
 
         final boolean isAjaxRequest = Utils.isAjaxRequest(context);
 
-        if (!csrf.isTokenValid(token)) {
-            handleCSRFValidationFailure(isAjaxRequest, context);
+        if (!this.csrfTokenCheck(context, true)) {
             return false;
         }
 

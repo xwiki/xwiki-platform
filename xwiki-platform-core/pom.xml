@@ -166,7 +166,7 @@
     <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-alerts</module>
-    <module>xwiki-platform-annotations</module>
+    <module>xwiki-platform-annotation</module>
     <module>xwiki-platform-application</module>
     <module>xwiki-platform-appwithinminutes</module>
     <module>xwiki-platform-attachment</module>
@@ -177,7 +177,7 @@
     <module>xwiki-platform-classloader</module>
     <module>xwiki-platform-component</module>
     <module>xwiki-platform-configuration</module>
-    <module>xwiki-platform-containers</module>
+    <module>xwiki-platform-container</module>
     <module>xwiki-platform-crypto</module>
     <module>xwiki-platform-csrf</module>
     <module>xwiki-platform-dashboard</module>

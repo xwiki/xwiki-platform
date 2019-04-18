@@ -1,0 +1,21 @@
+#template("startpage.vm")
+<div class="main layoutsubsection">
+  <div id="mainContentArea">
+    ## ---------------------------------------------------------------------------------------------------------
+    ## Since this template can be used for creating a Page or a Space, compute its title based on the passed
+    ## "tocreate" parameter which can be either "page" or "space". If no "tocreate" parameter is passed then we
+    ## default to creating a Page. 
+    ## ---------------------------------------------------------------------------------------------------------
+    #set($tocreate = $request.getParameter('tocreate'))
+    #if("$!tocreate" != 'space')
+      #set ($stepTitle = $services.localization.render('core.create.pageTitle'))
+    #else
+      #set ($stepTitle = $services.localization.render('core.create.spaceTitle'))
+    #end
+    <div class="xcontent">
+      #stepsHeader($stepTitle)
+      #template("createinline.vm")
+    </div>## xcontent
+  </div>## mainContentArea
+</div>## main
+#template("endpage.vm")

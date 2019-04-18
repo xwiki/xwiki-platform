@@ -384,22 +384,6 @@
                       <class>org.w3c.dom.events.UIEvent</class>
                     </classes>
                   </exception>
-                  <!-- None of these should bundle org.w3c classes... Hoping that they are compatible... -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>jaxen</groupId>
-                        <artifactId>jaxen</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>org.w3c.dom.UserDataHandler</class>
-                    </classes>
-                  </exception>
                   <!-- This is a PITA. The classes are actually incompatible! We should do something about it but I
                        don't see a solution ATM... -->
                   <exception>

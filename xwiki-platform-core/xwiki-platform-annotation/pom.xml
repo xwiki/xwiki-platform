@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
+<?xml version="1.0" encoding="UTF-8" ?>
 <!--
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -19,33 +18,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-annotations</artifactId>
+    <artifactId>xwiki-platform-core</artifactId>
     <version>11.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-annotation-test</artifactId>
-  <name>XWiki Platform - Annotations - Tests - Parent POM</name>
+  <artifactId>xwiki-platform-annotation</artifactId>
+  <name>XWiki Platform - Annotations - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Annotations - Tests - Parent POM</description>
-  <properties>
-    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
-    <xwiki.revapi.skip>true</xwiki.revapi.skip>
-    <!-- Don't run Checkstyle in test modules -->
-    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
-  </properties>
   <modules>
-    <module>xwiki-platform-annotation-test-pageobjects</module>
-    <module>xwiki-platform-annotation-test-tests</module>
+    <module>xwiki-platform-annotation-core</module>
+    <module>xwiki-platform-annotation-io</module>
+    <module>xwiki-platform-annotation-maintainer</module>
+    <module>xwiki-platform-annotation-reference</module>
+    <module>xwiki-platform-annotation-rest</module>
+    <module>xwiki-platform-annotation-scripting</module>
+    <module>xwiki-platform-annotation-ui</module>
   </modules>
   <profiles>
     <profile>
-      <id>docker</id>
+      <id>integration-tests</id>
       <modules>
-        <module>xwiki-platform-annotation-test-docker</module>
+        <module>xwiki-platform-annotation-test</module>
       </modules>
     </profile>
   </profiles>

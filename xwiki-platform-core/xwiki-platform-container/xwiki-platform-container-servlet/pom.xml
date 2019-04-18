@@ -24,18 +24,23 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-containers</artifactId>
+    <artifactId>xwiki-platform-container</artifactId>
     <version>11.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-container-portlet</artifactId>
-  <name>XWiki Platform - Containers - Portlet</name>
+  <artifactId>xwiki-platform-container-servlet</artifactId>
+  <name>XWiki Platform - Containers - Servlet</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Containers - Portlet</description>
+  <description>XWiki Platform - Containers - Servlet</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>20</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.15</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>27</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-default</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-container-api</artifactId>
@@ -47,10 +52,28 @@
       <version>${commons.version}</version>
     </dependency>
     <dependency>
-      <groupId>portlet-api</groupId>
-      <artifactId>portlet-api</artifactId>
-      <version>1.0</version>
-      <scope>provided</scope>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-configuration-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-environment-servlet</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-extension-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-url-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
     </dependency>
 
     <!-- Test Dependencies -->
@@ -72,12 +95,14 @@
             <id>default</id>
             <configuration>
               <excludes>
-                **/container/portlet/PortletApplicationContext.java,
-                **/container/portlet/PortletContainerInitializer.java,
-                **/container/portlet/PortletRequest.java,
-                **/container/portlet/PortletResponse.java,
-                **/container/portlet/PortletSession.java,
-                **/container/portlet/internal/DefaultPortletContainerInitializer.java
+                **/servlet/ServletApplicationContext.java,
+                **/servlet/ServletContainerException.java,
+                **/servlet/ServletContainerInitializer.java,
+                **/servlet/ServletRequest.java,
+                **/servlet/ServletResponse.java,
+                **/servlet/ServletSession.java,
+                **/servlet/filters/internal/SetCharacterEncodingFilter.java,
+                **/servlet/internal/DefaultServletContainerInitializer.java
               </excludes>
             </configuration>
           </execution>

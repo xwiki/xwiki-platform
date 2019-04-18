@@ -24,17 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-annotations</artifactId>
+    <artifactId>xwiki-platform-annotation</artifactId>
     <version>11.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-annotation-maintainer</artifactId>
-  <name>XWiki Platform - Annotations - Maintainer</name>
+  <artifactId>xwiki-platform-annotation-io</artifactId>
+  <name>XWiki Platform - Annotations - XWiki Storage Implementation</name>
   <packaging>jar</packaging>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.88</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>94</xwiki.pitest.mutationThreshold>
-    <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
-    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <xwiki.jacoco.instructionRatio>0.04</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>17</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>
@@ -44,14 +42,12 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-annotation-core</artifactId>
+      <artifactId>xwiki-platform-annotation-reference</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-bridge</artifactId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -59,52 +55,28 @@
       <artifactId>xwiki-commons-context</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!--
-      Even if this is already included by the xwiki-core dependency, we include it again here to make sure that, if
-      xwiki-core stops using observation, we still have it.
-    -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-component-api</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-observation-api</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.incava</groupId>
-      <artifactId>java-diff</artifactId>
-      <version>1.1.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-api</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-syntax-xwiki21</artifactId>
-      <version>${rendering.version}</version>
-    </dependency>
 
-    <!-- Test Dependencies -->
+    <!-- Test dependencies -->
+    <!-- For some tests we need to have the Servlet API JAR available -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-transformation-macro</artifactId>
-      <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -119,7 +91,7 @@
             <id>default</id>
             <configuration>
               <excludes>
-                org/xwiki/annotation/maintainer/AbstractAnnotationMaintainer.java
+                org/xwiki/annotation/io/internal/DefaultIOService.java
               </excludes>
             </configuration>
           </execution>

@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-annotations</artifactId>
+    <artifactId>xwiki-platform-annotation</artifactId>
     <version>11.3-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-annotation-rest</artifactId>

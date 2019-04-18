@@ -257,7 +257,7 @@ def buildDocker(type)
     def customJobProperties = getCustomJobProperties()
     xwikiDockerBuild {
       configurations = dockerConfigurations
-      if (type != 'docker-latest') {
+      if (type == 'docker-unsupported') {
         modules = 'xwiki-platform-core/xwiki-platform-menu'
       }
       // Make sure that we don't reset the job properties!

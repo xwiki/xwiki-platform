@@ -43,6 +43,10 @@ import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
 import org.xwiki.tool.extension.util.ExtensionMojoHelper;
 
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.copyFile;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.createDirectory;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.unzip;
+
 /**
  * Generates a minimal XWiki WAR that is expanded in the passed target directory.
  *
@@ -175,7 +179,7 @@ public class WARBuilder
         if (this.testConfiguration.isVerbose()) {
             LOGGER.info("... JDBC driver file: " + jdbcDriverFile);
         }
-        DockerTestUtils.copyFile(jdbcDriverFile, libDirectory);
+        copyFile(jdbcDriverFile, libDirectory);
     }
 
     private List<Artifact> computeExtraArtifacts(TestConfiguration testConfiguration) throws Exception
@@ -212,7 +216,7 @@ public class WARBuilder
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Unzipping WAR: " + file);
             }
-            DockerTestUtils.unzip(file, targetWARDirectory);
+            unzip(file, targetWARDirectory);
         }
     }
 
@@ -220,12 +224,12 @@ public class WARBuilder
         throws Exception
     {
         LOGGER.info("Copying JAR dependencies ...");
-        DockerTestUtils.createDirectory(libDirectory);
+        createDirectory(libDirectory);
         for (Artifact artifact : jarDependencies) {
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Copying JAR: " + artifact.getFile());
             }
-            DockerTestUtils.copyFile(artifact.getFile(), libDirectory);
+            copyFile(artifact.getFile(), libDirectory);
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Generating XED file for: " + artifact.getFile());
             }
@@ -242,7 +246,7 @@ public class WARBuilder
             if (testConfiguration.isVerbose()) {
                 LOGGER.info("... Unzipping skin: " + file);
             }
-            DockerTestUtils.unzip(file, skinsDirectory);
+            unzip(file, skinsDirectory);
         }
     }
 

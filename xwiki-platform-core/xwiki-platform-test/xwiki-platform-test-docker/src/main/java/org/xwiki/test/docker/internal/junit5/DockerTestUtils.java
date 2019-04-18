@@ -55,6 +55,8 @@ public final class DockerTestUtils
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerTestUtils.class);
 
+    private static final boolean IN_A_CONTAINER = new File("/.dockerenv").exists();
+
     private static final String DEFAULT = "default";
 
     private static final char DASH = '-';
@@ -235,5 +237,23 @@ public final class DockerTestUtils
             extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName(),
             fileSuffix));
         return newFile;
+    }
+
+    /**
+     * @return true if the test framework is running inside a Docker container (DOOD pattern)
+     * @since 11.3RC1
+     */
+    public static boolean isInAContainer()
+    {
+        return IN_A_CONTAINER;
+    }
+
+    /**
+     * @return true if the test framework is executing locally on developer's machines
+     * @since 11.3RC1
+     */
+    public static boolean isLocal()
+    {
+        return DockerTestUtils.isInAContainer();
     }
 }

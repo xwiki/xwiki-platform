@@ -45,6 +45,7 @@ import org.xwiki.text.StringUtils;
 import com.github.dockerjava.api.model.Image;
 
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isInAContainer;
 
 /**
  * Create and execute the Docker Servlet engine container for the tests.

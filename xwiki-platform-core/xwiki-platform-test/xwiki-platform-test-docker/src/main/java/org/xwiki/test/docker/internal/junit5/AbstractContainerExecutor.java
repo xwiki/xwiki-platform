@@ -19,7 +19,6 @@
  */
 package org.xwiki.test.docker.internal.junit5;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -32,6 +31,10 @@ import org.testcontainers.utility.MountableFile;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.text.StringUtils;
 
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isInAContainer;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
+
 /**
  * Common code for container execution.
  *
@@ -40,8 +43,6 @@ import org.xwiki.text.StringUtils;
  */
 public abstract class AbstractContainerExecutor
 {
-    private static final boolean IN_A_CONTAINER = new File("/.dockerenv").exists();
-
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractContainerExecutor.class);
 
     protected void start(GenericContainer container, TestConfiguration testConfiguration)
@@ -56,10 +57,10 @@ public abstract class AbstractContainerExecutor
             container.getDockerClient().pullImageCmd(container.getDockerImageName());
         }
 
-        DockerTestUtils.startContainer(container);
+        startContainer(container);
 
         // Display logs after the container has been started so that we can see problems happening in the containers
-        DockerTestUtils.followOutput(container, getClass());
+        followOutput(container, getClass());
     }
 
     /**
@@ -109,14 +110,5 @@ public abstract class AbstractContainerExecutor
         }
 
         return StringUtils.join(commands, ' ');
-    }
-
-    /**
-     * @return true if the test framework is running inside a Docker container (DOOD pattern)
-     * @since 11.3RC1
-     */
-    protected boolean isInAContainer()
-    {
-        return IN_A_CONTAINER;
     }
 }

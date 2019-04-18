@@ -37,11 +37,12 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
+
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.unzip;
 
 /**
  * Create a Jetty Standalone packaging on the file system and start/stop Jetty.
@@ -95,7 +96,7 @@ public class JettyStandaloneExecutor
             File jettyArtifactFile = this.artifactResolver.resolveArtifact(jettyArtifact).getArtifact().getFile();
 
             // Step: Unzip
-            DockerTestUtils.unzip(jettyArtifactFile, jettyDirectory);
+            unzip(jettyArtifactFile, jettyDirectory);
 
             // Step: Replace properties in start shell scripts
             Collection<File> startFiles = org.apache.commons.io.FileUtils.listFiles(jettyDirectory,

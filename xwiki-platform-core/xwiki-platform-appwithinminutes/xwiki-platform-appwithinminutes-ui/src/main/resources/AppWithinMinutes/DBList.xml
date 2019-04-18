@@ -281,6 +281,19 @@ define('xwiki-awm-list-enhancer', ['jquery', 'xwiki-awm-class-field-enhancer'], 
     enhanceDisplayType(field);
   };
 
+  var maybeUpdateListSize = function(field) {
+    var multiSelectField = $('#' + field.getPropertyId('multiSelect'));
+    var displayTypeField = $('#' + field.getPropertyId('displayType'));
+    if (multiSelectField.prop('checked') &amp;&amp; displayTypeField.val() === 'select') {
+      // Select box with multiple selection enabled should be displayed as an expanded list box so we have to adjust the
+      // size (size 1 means drop down list box).
+      var sizeField = $('#' + field.getPropertyId('size'));
+      if (parseInt(sizeField.val()) &lt; 2) {
+        sizeField.val(5);
+      }
+    }
+  };
+
   var enhanceMultiSelect = function(field) {
     var relationalStorageField = $('#' + field.getPropertyId('relationalStorage'));
 
@@ -293,21 +306,15 @@ define('xwiki-awm-list-enhancer', ['jquery', 'xwiki-awm-class-field-enhancer'], 
         // Enable relational storage whenever multiple selection is enabled.
         relationalStorageField.prop('checked', true);
 
-        // Synchronize multiple selection with display type and size.
+        // Synchronize multiple selection with display type.
         var displayTypeField = $('#' + field.getPropertyId('displayType'));
-        var displayType = displayTypeField.val();
-        if (displayType === 'radio') {
+        if (displayTypeField.val() === 'radio') {
           // Radio display type doesn't support multiple selection.
           displayTypeField.val('checkbox');
-        } else if (displayType === 'select') {
-          // Select box with multiple selection enabled should be displayed as an expanded list box
-          // so we have to adjust the size (size 1 means drop down list box).
-          var sizeField = $('#' + field.getPropertyId('size'));
-          if (parseInt(sizeField.val()) &lt; 2) {
-            sizeField.val(5);
-          }
         }
       }
+
+      maybeUpdateListSize(field);
     });
   };
 
@@ -333,6 +340,8 @@ define('xwiki-awm-list-enhancer', ['jquery', 'xwiki-awm-class-field-enhancer'], 
       if ($(this).val() === 'radio') {
         $('#' + field.getPropertyId('multiSelect')).prop('checked', false);
       }
+
+      maybeUpdateListSize(field);
     });
   }
 

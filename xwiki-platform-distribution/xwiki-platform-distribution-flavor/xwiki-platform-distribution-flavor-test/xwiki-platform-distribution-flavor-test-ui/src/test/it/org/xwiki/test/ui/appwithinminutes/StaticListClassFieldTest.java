@@ -114,7 +114,7 @@ public class StaticListClassFieldTest extends AbstractClassEditorTest
         // 'select' display type supports properly multiple selection only if size is greater than 1.
         Assert.assertEquals("1", staticListField.getSizeInput().getAttribute("value"));
         staticListField.getDisplayTypeSelect().selectByVisibleText("select");
-        Assert.assertEquals("3", staticListField.getSizeInput().getAttribute("value"));
+        Assert.assertEquals("5", staticListField.getSizeInput().getAttribute("value"));
     }
 
     /**
@@ -154,7 +154,7 @@ public class StaticListClassFieldTest extends AbstractClassEditorTest
         // Enable multiple selection and change display type to 'select' to check the value of the size property.
         staticListField.getDisplayTypeSelect().selectByVisibleText("select");
         staticListField.getMultipleSelectionCheckBox().click();
-        Assert.assertEquals("4", staticListField.getSizeInput().getAttribute("value"));
+        Assert.assertEquals("5", staticListField.getSizeInput().getAttribute("value"));
 
         // Apply configuration changes and assert the result.
         staticListField.closeConfigPanel();

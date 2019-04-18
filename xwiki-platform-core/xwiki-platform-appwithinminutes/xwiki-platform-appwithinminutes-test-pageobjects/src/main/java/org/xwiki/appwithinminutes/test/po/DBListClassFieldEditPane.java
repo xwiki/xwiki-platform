@@ -19,32 +19,16 @@
  */
 package org.xwiki.appwithinminutes.test.po;
 
-import org.openqa.selenium.By;
-
 /**
- * Represents the pane used to edit a 'Static List' class field.
+ * Represents the pane used to edit a 'Database List' class field.
  * 
  * @version $Id$
- * @since 4.2M1
+ * @since 11.3RC1
  */
-public class StaticListClassFieldEditPane extends ListClassFieldEditPane
+public class DBListClassFieldEditPane extends ListClassFieldEditPane
 {
-    /**
-     * Creates a new instance.
-     * 
-     * @param fieldName the name of the date field
-     */
-    public StaticListClassFieldEditPane(String fieldName)
+    public DBListClassFieldEditPane(String fieldName)
     {
         super(fieldName);
-    }
-
-    /**
-     * @return the static list items editor
-     */
-    public StaticListItemsEditor getItemsEditor()
-    {
-        return new StaticListItemsEditor(
-            getDriver().findElementWithoutWaiting(getContainer(), By.className("staticListEditor")));
     }
 }

@@ -12,15 +12,8 @@
     #else
       #set ($title = $services.localization.render('core.create.spaceTitle'))
     #end
-    <div class="xcontent">
-      <div class="row document-header">
-        <div class="document-info col-xs-12">
-          <div id="document-title"><h1>$title</h1></div>
-        </div>
-      </div>
-      <hr/>
-      #template("createinline.vm")
-    </div>## xcontent
+    <div id="document-title"><h1>$title</h1></div>
+    #template("createinline.vm")
   </div>## mainContentArea
 </div>## main
 #template("endpage.vm")

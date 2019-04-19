@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -195,7 +195,7 @@ public class EditIT
      */
     @Test
     @Order(6)
-    public void saveAndFormManipulation(TestUtils setup, TestReference reference, TestConfiguration testConfiguration)
+    public void saveAndFormManipulation(TestUtils setup, TestReference reference)
     {
         setup.deletePage(reference);
         ViewPage viewPage = setup.gotoPage(reference);
@@ -229,5 +229,56 @@ public class EditIT
 
         // Ensure the reload lead to the right page
         assertEquals(setup.getURL(reference, "view", ""), setup.getDriver().getCurrentUrl() + "WebHome");
+    }
+
+    @Test
+    @Order(7)
+    public void allowForceSaveWhenCSRFIssue(TestUtils setup, TestReference testReference)
+    {
+        DocumentReference invalidateCSRF = new DocumentReference("InvalidateCSRF",
+            testReference.getLastSpaceReference());
+        String invalidateCSRFContent = "{{velocity}}$services.csrf.clearToken(){{/velocity}}";
+        setup.createPage(invalidateCSRF, invalidateCSRFContent, "InvalidateCSRF");
+        setup.createPage(testReference, "", "");
+
+        WikiEditPage editWiki = setup.gotoPage(testReference).editWiki();
+
+        // we clear the token and navigate back to the editor
+        setup.gotoPage(invalidateCSRF);
+        setup.getDriver().navigate().back();
+
+        editWiki.setContent("Some content 42");
+        editWiki.clickSaveAndContinue(false);
+        assertTrue(editWiki.isCSRFWarningDisplayed());
+
+        // check that after a cancel we can still edit
+        editWiki.clickCancelCSRFWarningButton();
+        editWiki.setContent("Another content 42");
+        editWiki.clickSaveAndContinue(false);
+
+        // check that the warning is still displayed after a cancel
+        assertTrue(editWiki.isCSRFWarningDisplayed());
+        editWiki.clickForceSaveCSRFButton();
+        editWiki.waitForNotificationSuccessMessage("Saved");
+
+        // reload the editor and check the change have been saved
+        editWiki = setup.gotoPage(testReference).editWiki();
+        assertEquals("Another content 42", editWiki.getContent());
+
+        // we clear the token and navigate back to the editor
+        setup.gotoPage(invalidateCSRF);
+        setup.getDriver().navigate().back();
+
+        editWiki.setContent("Foo bar");
+
+        // check with save and view
+        editWiki.clickSaveAndView(false);
+        assertTrue(editWiki.isCSRFWarningDisplayed());
+        editWiki.clickForceSaveCSRFButton();
+
+        // Ensure the page is properly loaded after a save and view
+        ViewPage viewPage = new ViewPage();
+        viewPage.waitUntilPageJSIsLoaded();
+        assertEquals("Foo bar", viewPage.getContent());
     }
 }

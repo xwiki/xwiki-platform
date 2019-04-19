@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -79,6 +80,15 @@ public class EditPage extends BasePage
      */
     @FindBy(id = "tmCurrentEditor")
     private WebElement currentEditorMenu;
+
+    @FindBy(id = "csrf-warning-modal")
+    private WebElement csrfWarningModal;
+
+    @FindBy(id = "cancel-save-csrf")
+    private WebElement cancelCSRFWarningButton;
+
+    @FindBy(id = "force-save-csrf")
+    private WebElement forceSaveCSRFButton;
 
     /**
      * Enumerates the available editors.
@@ -351,5 +361,24 @@ public class EditPage extends BasePage
     public String getDefaultLanguage()
     {
         return defaultLanguageField.getAttribute("value");
+    }
+
+    public boolean isCSRFWarningDisplayed()
+    {
+        try {
+            return this.csrfWarningModal.isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    public void clickCancelCSRFWarningButton()
+    {
+        this.cancelCSRFWarningButton.click();
+    }
+
+    public void clickForceSaveCSRFButton()
+    {
+        this.forceSaveCSRFButton.click();
     }
 }

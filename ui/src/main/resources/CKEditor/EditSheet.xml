@@ -62,7 +62,7 @@
     &lt;/div&gt;
   &lt;/div&gt;
   ## The xwikieditcontent id is needed for the auto-save feature.
-  &lt;div id="xwikieditcontent"&gt;
+  &lt;div id="xwikieditcontent" data-autosave="true"&gt;
     #set ($parameters = {
       'content': $tdoc.content,
       'attributes': {
@@ -698,13 +698,26 @@ require(['jquery'], function($) {
   // Move the content menu before the editMeta element so that they are displayed on the same row.
   ckeEditMeta.attr('id', 'editMeta').addClass('col-md-pull-5')
     .before($('#contentmenu').parent('.col-md-5').addClass('col-md-push-7'));
+});
+
+// Activate the auto-save feature on XWiki versions older than 8.2RC1 (XE-1562), where CKEditor is not the default
+// WYSIWYG editor and thus it is loaded with a sheet (CKEditor.EditSheet). Note that for XWiki 8.2RC1 and 8.2 (where
+// CKEditor is the default WYSIWYG editor) the auto-save feature is not activated because the WYSIWYG edit mode doesn't
+// active it. This has been fixed in 8.2.1 and 8.3M1 (XWIKI-8614).
+// Note that we can't enable auto-save by loading autosave.js from the editing sheet (CKEditor.EditSheet) because on
+// older versions of XWiki (XWIKI-8614) autosave.js needs to be loaded after actionbuttons.js, which is loaded after the
+// editing sheet is rendered.
+require(['jquery'], function($) {
+  if ($('#xwikieditcontent').data('autosave')) {
+    require(["$xwiki.getSkinFile('js/xwiki/editors/autosave.js', true)"]);
+  }
 });</code>
     </property>
     <property>
       <name>Various fixes and polyfills</name>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>onDemand</use>
@@ -792,14 +805,7 @@ require(['jquery'], function($) {
       <cache>long</cache>
     </property>
     <property>
-      <code>require.config({
-  paths: {
-    'autosave': "$xwiki.getSkinFile('js/xwiki/editors/autosave', true)"
-  }
-});
-
-// Activate the auto-save feature.
-require(['jquery', 'xwiki-ckeditor', 'xwiki-events-bridge', 'autosave'], function($, ckeditorPromise) {
+      <code>require(['jquery', 'xwiki-ckeditor', 'xwiki-events-bridge'], function($, ckeditorPromise) {
   ckeditorPromise.done(function(ckeditor) {
     var createEditors = function(container) {
       container.find('.ckeditor-textarea').each(function() {

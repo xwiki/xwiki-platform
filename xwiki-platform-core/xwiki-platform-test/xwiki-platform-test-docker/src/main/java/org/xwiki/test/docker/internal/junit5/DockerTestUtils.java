@@ -254,6 +254,6 @@ public final class DockerTestUtils
      */
     public static boolean isLocal()
     {
-        return DockerTestUtils.isInAContainer();
+        return !DockerTestUtils.isInAContainer();
     }
 }

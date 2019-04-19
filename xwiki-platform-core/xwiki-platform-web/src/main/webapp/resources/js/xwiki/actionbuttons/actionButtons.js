@@ -476,18 +476,18 @@ var XWiki = (function(XWiki) {
             modal.closeDialog();
           };
 
-          var content =  new Element('div', {'class': 'modal-popup'});
+          var content =  new Element('div', {'class': 'modal-popup', 'id': 'csrf-warning-modal'});
           var buttonsDiv =  new Element('div');
 
           // the confirmation message contains some double quotes that should be escaped.
           content.insert("$escapetool.json($services.localization.render('csrf.confirmation'))");
           content.insert(new Element('br'));
-          var buttonCreate = new Element('button', {'class': 'btn btn-default'});
+          var buttonCreate = new Element('button', {'class': 'btn btn-default', 'id': 'force-save-csrf'});
           buttonCreate.insert("$services.localization.render('yes')");
           buttonsDiv.insert(buttonCreate);
           buttonCreate.on("click", resubmit);
 
-          buttonCreate = new Element('button', {'class': 'btn btn-primary'});
+          buttonCreate = new Element('button', {'class': 'btn btn-primary', 'id': 'cancel-save-csrf'});
           buttonCreate.insert("$services.localization.render('no')");
           buttonsDiv.insert(buttonCreate);
           buttonCreate.on("click", function () {

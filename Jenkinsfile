@@ -115,7 +115,8 @@ def builds = [
 ]
 
 stage ('Platform Builds') {
-  def selection = askUser(builds)
+  def choices = builds.collect { k,v -> "$k" }.join('\n')
+  def selection = askUser(choices)
   if (selection == 'All') {
     buildAll(builds)
   } else {

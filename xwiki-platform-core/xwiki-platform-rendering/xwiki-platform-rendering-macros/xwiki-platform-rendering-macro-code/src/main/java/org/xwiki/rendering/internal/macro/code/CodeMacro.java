@@ -126,17 +126,17 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
         formatParameters.put("class", "code");
 
         if (context.isInline()) {
-            result = Arrays.<Block> asList(new FormatBlock(result, Format.NONE, formatParameters));
+            result = Arrays.<Block>asList(new FormatBlock(result, Format.NONE, formatParameters));
         } else {
-        	try {
-				CodeLayoutHandler layoutHandler = this.componentManager.getInstance(CodeLayoutHandler.class, 
-						parameters.getLayout().getHint());
-				result = layoutHandler.layout(result, content);
-			} catch (ComponentLookupException e) {
-                this.logger.error("Failed to load code layout handler for layout type [{}], no layout will be applied", 
-                		parameters.getLayout().name(), e);
+            try {
+                CodeLayoutHandler layoutHandler =
+                    this.componentManager.getInstance(CodeLayoutHandler.class, parameters.getLayout().getHint());
+                result = layoutHandler.layout(result, content);
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to load code layout handler for layout type [{}], no layout will be applied",
+                    parameters.getLayout().name(), e);
             }
-            result = Arrays.<Block> asList(new GroupBlock(result, formatParameters));
+            result = Arrays.<Block>asList(new GroupBlock(result, formatParameters));
         }
 
         return result;
@@ -151,8 +151,8 @@ public class CodeMacro extends AbstractBoxMacro<CodeMacroParameters>
      * @throws ParseException the highlight parser failed.
      * @throws ComponentLookupException failed to find highlight parser for provided language.
      */
-    protected List<Block> highlight(CodeMacroParameters parameters, String content) throws ParseException,
-        ComponentLookupException
+    protected List<Block> highlight(CodeMacroParameters parameters, String content)
+        throws ParseException, ComponentLookupException
     {
         HighlightParser parser;
 

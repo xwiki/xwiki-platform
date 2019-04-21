@@ -75,18 +75,19 @@ pre { /* Resetting values from bootstrap/code.less and bootstrap/normalize.less,
 }
 
 // Line numbers in code
-.code > .linenoswrapper {
+
+.linenoswrapper {
   display: flex;
   flex-direction: row;
   
   .linenos {
     text-align: right;
-    color: lightgray;
+    color: lighten(@text-color, 50%);
     margin-right: 1em;
-  }
   
-  > .linenos + div {
-    flex-grow: 1;
+    + div {
+      flex-grow: 1;
+    }
   }
 }
 

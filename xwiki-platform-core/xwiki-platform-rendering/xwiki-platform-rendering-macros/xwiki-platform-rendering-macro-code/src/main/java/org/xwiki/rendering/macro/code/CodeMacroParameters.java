@@ -29,13 +29,14 @@ import org.xwiki.rendering.macro.box.BoxMacroParameters;
  * @since 1.7RC1
  */
 public class CodeMacroParameters extends BoxMacroParameters
-{    
+{
     /**
      * The language identifier.
      */
     private String language;
+
     /**
-     * The layout format (plain or with line numbers)
+     * The layout format (e.g. plain or with line numbers)
      */
     private CodeMacroLayout layout = CodeMacroLayout.PLAIN;
 
@@ -56,18 +57,20 @@ public class CodeMacroParameters extends BoxMacroParameters
         return this.language;
     }
 
-	/**
-	 * @param layout the layout format
-	 */
-    @PropertyDescription("the language format (plain or with line numbers)")
-	public void setLayout(CodeMacroLayout layout) {
-		this.layout = layout;
-	}
-	
-	/**
-	 * @return the layout format
-	 */
-	public CodeMacroLayout getLayout() {
-		return layout;
-	}
+    /**
+     * @param layout the layout to apply to the code.
+     */
+    @PropertyDescription("the layout format (plain or with line numbers)")
+    public void setLayout(CodeMacroLayout layout)
+    {
+        this.layout = layout;
+    }
+
+    /**
+     * @return the layout to apply to the code.
+     */
+    public CodeMacroLayout getLayout()
+    {
+        return layout;
+    }
 }

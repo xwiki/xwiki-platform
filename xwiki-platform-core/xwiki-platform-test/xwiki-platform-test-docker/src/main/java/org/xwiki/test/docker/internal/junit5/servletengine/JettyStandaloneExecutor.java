@@ -126,8 +126,16 @@ public class JettyStandaloneExecutor
         FileUtils.deleteDirectory(new File(jettyDirectory, DATA_SUBDIR));
 
         // Step: Start Jetty
+
         // Don't check if XWiki is started since this is done already in XWikiDockerExtension
         System.setProperty("xwiki.test.verifyRunningXWikiAtStart", "false");
+
+        // If we're on debug mode, start XWiki in debug mode too so that we can attach a remote debugger to it in order
+        // to debug.
+        if (this.testConfiguration.isDebug()) {
+            System.setProperty("debug", "true");
+        }
+
         getExecutor().start();
     }
 

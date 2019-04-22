@@ -525,7 +525,7 @@
 #macro(glyphicon $iconName)
 #if("$!iconName"!='')<span class="glyphicon glyphicon-${iconName}"></span>#end
 #end
-#macro(refactoringStatusHeader $stepTitle $titleHint)
+#macro(displayDocumentTitle $stepTitle $titleHint)
 <div class="row document-header">
   <div class="document-info col-xs-12">
     <div id="document-title"><h1>$stepTitle</h1></div>

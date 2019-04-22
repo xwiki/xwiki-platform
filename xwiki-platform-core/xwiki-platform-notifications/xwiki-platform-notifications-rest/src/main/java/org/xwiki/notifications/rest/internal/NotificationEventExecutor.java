@@ -147,11 +147,20 @@ public class NotificationEventExecutor implements Initializable, Disposable
                     longEventCache.set(this.cacheKey, events);
                 }
 
-                onFinish(result);
+                // Avoid race condition where an async id is added after the result is put in the cache
+                synchronized (queue) {
+                    // Notify the waiting client that the execution is done
+                    for (String asyncId : this.asyncIds) {
+                        shortCache.set(asyncId, result);
+                    }
+
+                    // Remove from the queue map
+                    queue.remove(this.cacheKey, this);
+                }
 
                 return result;
             } catch (Exception e) {
-                onFinish(e);
+                this.asyncIds.stream().forEach(asyncId -> shortCache.set(asyncId, e));
 
                 throw e;
             } finally {
@@ -160,18 +169,6 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
                 // Restore the thread name
                 Thread.currentThread().setName(threadName);
-            }
-        }
-
-        private void onFinish(Object result)
-        {
-            // Avoid race condition where an async id is added after the result is put in the cache
-            synchronized (queue) {
-                // Notify the waiting client that the execution is done
-                this.asyncIds.stream().forEach(asyncId -> shortCache.set(asyncId, result));
-
-                // Remove from the queue map
-                queue.remove(this.cacheKey, this);
             }
         }
 

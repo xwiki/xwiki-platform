@@ -269,7 +269,7 @@ public class CreatePagePage extends ViewPage
 
     /**
      * Wait for the location preview to display the passed path string and throw an exception if the timeout is reached.
-     * Note that we need to wait since the Breadcrumb is udated live and asserting its content without waiting would
+     * Note that we need to wait since the Breadcrumb is updated live and asserting its content without waiting would
      * lead to false positives.
      * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces

@@ -1211,7 +1211,8 @@ public class XWikiAttachment implements Cloneable
                 // detector reads it so the next detector fails to read it.
                 mediaType = TikaUtils.detect(new BufferedInputStream(getContentInputStream(xcontext)));
             } catch (Exception e) {
-                LOGGER.warn("Failed to read the content of [{}] in order to detect its mime type.", getReference());
+                LOGGER.warn("Failed to read the content of [{}] in order to detect its mime type. Root cause: [{}]",
+                    getReference(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

@@ -146,6 +146,8 @@ public class UsersGroupsRightsManagementIT
         assertFalse(editGroupModal.getMembersTable().hasRow("Member", TESTER2), "anotherTester is part of bigGroup!");
         editGroupModal.addMember(TESTER2, true);
         editGroupModal.close();
+        // Wait for the groups live table to be reloaded.
+        groupsPage.getGroupsTable().waitUntilReady();
         editGroupModal = groupsPage.clickEditGroup(BIG_GROUP);
         assertTrue(editGroupModal.getMembersTable().hasRow("Member", TESTER2), "anotherTester is not part of bigGroup!");
     }

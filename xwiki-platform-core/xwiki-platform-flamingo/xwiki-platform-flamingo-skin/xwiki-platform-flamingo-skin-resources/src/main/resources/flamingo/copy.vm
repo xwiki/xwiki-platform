@@ -247,7 +247,7 @@
     'copyId': $copyJobRequest.id.get($mathtool.sub($copyJobRequest.id.size(), 1))
   })))
   <div class="xcontent job-status" data-url="$jobStatusURL">
-    #refactoringStatusHeader($services.localization.render('core.copy.status.label'), $services.localization.render('core.copy.status.hint', [$xwiki.getUserName($copyJobRequest.userReference), $xwiki.formatDate($copyJobStatus.startDate)]))
+    #displayDocumentTitle($services.localization.render('core.copy.status.label'), $services.localization.render('core.copy.status.hint', [$xwiki.getUserName($copyJobRequest.userReference), $xwiki.formatDate($copyJobStatus.startDate)]))
     #displayCopyJobRequest($copyJobRequest)
     #if (!$finished)
       #displayJobProgressBar($copyJobStatus)

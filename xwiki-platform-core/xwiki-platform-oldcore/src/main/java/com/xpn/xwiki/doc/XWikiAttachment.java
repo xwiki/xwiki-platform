@@ -1280,8 +1280,7 @@ public class XWikiAttachment implements Cloneable
         }
 
         try {
-            if (this.content == null
-                || !IOUtils.contentEquals(getContentInputStream(null), attachment.getContentInputStream(null))) {
+            if (isContentDifferentButNotNull(attachment)) {
                 setContent(attachment.getContentInputStream(null));
                 modified = true;
             }
@@ -1290,6 +1289,24 @@ public class XWikiAttachment implements Cloneable
         }
 
         return modified;
+    }
+
+    private boolean isContentDifferentButNotNull(XWikiAttachment attachment) throws Exception
+    {
+        boolean isDifferent = false;
+        InputStream attachmentIs = attachment.getContentInputStream(null);
+        if (attachmentIs != null) {
+            if (this.content == null) {
+                isDifferent = true;
+            } else {
+                InputStream is = getContentInputStream(null);
+                if (is != null && !IOUtils.contentEquals(is, attachmentIs)) {
+                    isDifferent = true;
+                }
+            }
+
+        }
+        return isDifferent;
     }
 
     public boolean equalsData(XWikiAttachment otherAttachment, XWikiContext xcontext) throws XWikiException

@@ -13,7 +13,7 @@
       #set ($stepTitle = $services.localization.render('core.create.spaceTitle'))
     #end
     <div class="xcontent">
-      #refactoringStatusHeader($stepTitle)
+      #displayDocumentTitle($stepTitle)
       #template("createinline.vm")
     </div>## xcontent
   </div>## mainContentArea

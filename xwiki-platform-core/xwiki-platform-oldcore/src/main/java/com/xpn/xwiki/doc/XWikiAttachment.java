@@ -32,6 +32,7 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MediaType;
@@ -59,6 +60,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.tika.internal.TikaUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -1287,7 +1289,7 @@ public class XWikiAttachment implements Cloneable
                 modified = true;
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to compare content of attachments", e);
+            LOGGER.error("Failed to set content of attachment [{}] onto [{}]", this, attachment, e);
         }
 
         return modified;
@@ -1458,5 +1460,15 @@ public class XWikiAttachment implements Cloneable
         if (this.container != null) {
             this.container.onAttachmentNameModified(previousAttachmentName, attachment);
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("parentReference", getDoc().getDocumentReference());
+        builder.append("filename", getFilename());
+        builder.append("version", getVersion());
+        return builder.toString();
     }
 }

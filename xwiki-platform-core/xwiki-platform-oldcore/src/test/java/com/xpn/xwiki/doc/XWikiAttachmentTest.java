@@ -431,4 +431,15 @@ public class XWikiAttachmentTest
 
         assertSame(content.getContentInputStream(), attachment.getContentInputStream(this.oldCore.getXWikiContext()));
     }
+
+    @Test
+    public void testToString()
+    {
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "space", "page"));
+        XWikiAttachment attachment1 = new XWikiAttachment(document, "filename");
+
+        assertEquals("parentReference = [wiki:space.page], filename = [filename], version = [1.1]",
+            attachment1.toString());
+    }
 }

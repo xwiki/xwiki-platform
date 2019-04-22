@@ -1280,6 +1280,7 @@ public class XWikiAttachment implements Cloneable
         }
 
         try {
+            // Note: If the attachment from which to copy data from has a null content, don't copy the content.
             if (isContentDifferentButNotNull(attachment)) {
                 setContent(attachment.getContentInputStream(null));
                 modified = true;

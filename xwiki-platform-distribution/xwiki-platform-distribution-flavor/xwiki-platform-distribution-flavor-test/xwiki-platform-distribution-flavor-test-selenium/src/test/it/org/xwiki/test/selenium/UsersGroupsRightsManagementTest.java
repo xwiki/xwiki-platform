@@ -20,8 +20,6 @@
 package org.xwiki.test.selenium;
 
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.xwiki.administration.test.po.AdministrationMenu;
 import org.xwiki.administration.test.po.CreateGroupModal;
 import org.xwiki.administration.test.po.EditGroupModal;
@@ -31,7 +29,6 @@ import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.administration.test.po.UsersAdministrationSectionPage;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
 import org.xwiki.test.ui.po.ConfirmationModal;
-import org.xwiki.test.ui.po.SuggestInputElement;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -254,8 +251,7 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         if (!deleteOnlyIfExists || (deleteOnlyIfExists && isExistingPage("XWiki", login))) {
             UsersAdministrationSectionPage usersPage = openUsersPage();
             ConfirmationModal confirmation = usersPage.clickDeleteUser(login);
-            assertEquals("The user XWiki." + login + " will be deleted and removed from all groups he belongs to. "
-                + "Are you sure you want to proceed?", confirmation.getMessage());
+            assertTrue(confirmation.getMessage().contains("Are you sure you want to proceed?"));
             confirmation.clickOk();
             usersPage.getUsersLiveTable().waitUntilReady();
             assertFalse(usersPage.getUsersLiveTable().hasRow("User", login));
@@ -273,13 +269,6 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         open("XWiki", group);
         waitForGroupUsersLiveTable();
         assertTextPresent(user);
-    }
-
-    private void setSuggestInputValue(String id, String value)
-    {
-        SuggestInputElement suggester = new SuggestInputElement(getDriver().findElementWithoutWaiting(By.id(id)));
-        suggester.clearSelectedSuggestions().sendKeys(value).waitForSuggestions().sendKeys(Keys.ENTER)
-            .hideSuggestions();
     }
 
     private void clickGroupsRadioButton()

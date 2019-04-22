@@ -20,6 +20,8 @@
 package org.xwiki.administration.test.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.ConfirmationModal;
 
 /**
@@ -33,6 +35,9 @@ public class DeleteUserConfirmationModal extends ConfirmationModal
     public DeleteUserConfirmationModal()
     {
         super(By.id("deleteUserModal"));
+
+        // Wait for the modal content to be loaded.
+        waitUntilReady();
     }
 
     @Override
@@ -40,5 +45,25 @@ public class DeleteUserConfirmationModal extends ConfirmationModal
     {
         super.clickOk();
         waitForNotificationSuccessMessage("User deleted");
+    }
+
+    /**
+     * The modal content is loaded asynchronously so we must wait for it.
+     * 
+     * @return this modal
+     */
+    private DeleteUserConfirmationModal waitUntilReady()
+    {
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public Boolean apply(WebDriver driver)
+            {
+                // The delete user button is enabled as soon as the modal content is loaded.
+                return getDriver().findElementWithoutWaiting(DeleteUserConfirmationModal.this.container,
+                    By.cssSelector(".modal-footer .btn-danger")).isEnabled();
+            }
+        });
+        return this;
     }
 }

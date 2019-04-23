@@ -141,12 +141,12 @@ if (!params.type || params.type == 'standard') {
   buildDocker(params.type)
 }
 
-def buildStandardSingle(build)
+private void buildStandardSingle(build)
 {
   build.call()
 }
 
-def buildStandardAll(builds)
+private void buildStandardAll(builds)
 {
   parallel(
     'main': {
@@ -222,58 +222,39 @@ def buildStandardAll(builds)
   )
 }
 
-def buildDocker(type)
+private void buildDocker(type)
 {
-  node('docker') {
-    // Build xwiki-platform-docker test framework since we use it and we happen to make changes to it often and thus
-    // if we don't build it here, we have to wait for the full xwiki-platform to be built before being able to run
-    // the docker tests again. It can also lead to build failures since this method is called during scheduled jobs
-    // which could be triggered before xwiki-platform-docker has been rebuilt.
-    buildInsideNode(
-      name: 'Docker Test Framework',
-      profiles: 'docker,integration-tests',
-      mavenFlags: '--projects org.xwiki.platform:xwiki-platform-test-docker -U -e',
-      xvnc: false,
-      goals: 'clean install',
-      skipMail: true
-    )
+  def dockerConfigurations = dockerConfigurations(type)
+  def customJobProperties = getCustomJobProperties()
 
-    // Build the minimal war module to make sure we have the latest dependencies present in the local maven repo
-    // before we run the docker tests. By default the Docker-based tests resolve the minimal war deps from the local
-    // repo only without going online.
-    // Note 1: skipCheckout is true since the previous build will have checked out xwiki-platform
-    // Note 2: Since the previous build will have checked out xwiki-platform, we need to set the current dir inside the
-    //         checkout for the build.
-    buildInsideNode(
-      name: 'Minimal WAR Dependencies',
-      mavenFlags: '--projects org.xwiki.platform:xwiki-platform-minimaldependencies -U -e',
-      skipCheckout: true,
-      xvnc: false,
-      goals: 'clean install',
-      skipMail: true
-    )
-
-    def dockerConfigurations = dockerConfigurations(type)
-    def customJobProperties = getCustomJobProperties()
-    xwikiDockerBuild {
-      configurations = dockerConfigurations
-      if (type == 'docker-unsupported') {
-        modules = 'xwiki-platform-core/xwiki-platform-menu'
-      }
-      // Make sure that we don't reset the job properties!
-      jobProperties = customJobProperties
+  def dockerModuleList
+  if (type == 'docker-unsupported') {
+    dockerModules = 'xwiki-platform-core/xwiki-platform-menu'
+  } else {
+    // Checkout platform to find all docker test modules so that we can then parallelize executions of configs and
+    // modules across Jenkins agents.
+    node() {
+      checkout skipChangeLog: true, scm: scm
+      dockerModuleList = dockerModules()
     }
+  }
+
+  xwikiDockerBuild {
+    configurations = dockerConfigurations
+    modules = dockerModuleList
+    // Make sure that we don't reset the job properties!
+    jobProperties = customJobProperties
   }
 }
 
-def build(map)
+private void build(map)
 {
   node(map.node ?: '') {
     buildInsideNode(map)
   }
 }
 
-def buildInsideNode(map)
+private void buildInsideNode(map)
 {
     // We want to get a memory dump on OOM errors.
     // Make sure the memory dump directory exists (see below)
@@ -324,7 +305,7 @@ def buildInsideNode(map)
     }
 }
 
-def buildFunctionalTest(map)
+private void buildFunctionalTest(map)
 {
   def sharedPOMPrefix =
     'xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-test'
@@ -338,7 +319,7 @@ def buildFunctionalTest(map)
   )
 }
 
-def getCustomJobProperties()
+private def getCustomJobProperties()
 {
   // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
   // take time to execute and thus we cannot run them all the time.

@@ -19,56 +19,42 @@
  */
 package org.xwiki.csrf;
 
-import java.util.List;
+import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.bridge.event.ActionExecutingEvent;
-import org.xwiki.csrf.internal.CSRFTokenInvalidator;
-import org.xwiki.observation.event.Event;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.csrf.internal.DefaultCSRFTokenConfiguration;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
- * Tests for the {@link CSRFTokenInvalidator} component.
- * 
+ * Test for the {@link DefaultCSRFTokenConfiguration}.
+ *
+ * @since 11.3
  * @version $Id$
- * @since 4.0M1
  */
 @ComponentTest
-public class CSRFTokenInvalidatorTest
+public class DefaultCSRFTokenConfigurationTest
 {
-    /** Tested component. */
     @InjectMockComponents
-    private CSRFTokenInvalidator invalidator;
+    private DefaultCSRFTokenConfiguration defaultCSRFTokenConfiguration;
 
     @MockComponent
-    private CSRFToken mockCSRFTokenManager;
+    @Named("xwikiproperties")
+    private ConfigurationSource configuration;
 
-    /**
-     * Test that the list of monitored events contains an ActionExecutingEvent for the /logout/ action.
-     */
     @Test
-    public void testEvents()
+    public void isEnabled()
     {
-        List<Event> events = this.invalidator.getEvents();
-        assertTrue(events.contains(new ActionExecutingEvent("logout")),
-            "Invalidator doesn't listen to /logout/ events");
-    }
-
-    /**
-     * Tests that the token will get invalidated when a logout event occurs.
-     * 
-     * @throws Exception
-     */
-    @Test
-    public void testInvalidationOnLogout()
-    {
-        this.invalidator.onEvent(new ActionExecutingEvent("logout"), null, null);
-        verify(mockCSRFTokenManager, atLeastOnce()).clearToken();
+        String propertyName = "csrf.enabled";
+        when(configuration.getProperty(propertyName, Boolean.TRUE)).thenReturn(true);
+        assertTrue(this.defaultCSRFTokenConfiguration.isEnabled());
+        verify(configuration, atLeastOnce()).getProperty(propertyName, Boolean.TRUE);
     }
 }

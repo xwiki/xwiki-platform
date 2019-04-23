@@ -102,12 +102,12 @@ public class DefaultValidationTest extends AbstractValidationTest
         System.err.print(errput);
 
         // Detect server-side error/warning messages from the stdout
-        assertFalse("Errors found in the stdout output", hasLogErrors(output));
-        assertFalse("Warnings found in the stdout output", hasLogWarnings(output));
+        assertFalse(String.format("Errors found in the stdout output: [%s]", output), hasLogErrors(output));
+        assertFalse(String.format("Warnings found in the stdout output: [%s]", output), hasLogWarnings(output));
 
         // Detect server-side error/warning messages from the stderr
-        assertFalse("Errors found in the stderr output", hasLogErrors(errput));
-        assertFalse("Warnings found in the stderr output", hasLogWarnings(errput));
+        assertFalse(String.format("Errors found in the stderr output: [%s]", errput), hasLogErrors(errput));
+        assertFalse(String.format("Warnings found in the stderr output: [%s]", errput), hasLogWarnings(errput));
 
         super.tearDown();
     }

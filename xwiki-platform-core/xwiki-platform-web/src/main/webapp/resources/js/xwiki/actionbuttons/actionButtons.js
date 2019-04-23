@@ -337,7 +337,7 @@ var XWiki = (function(XWiki) {
         onSuccess : this.onSuccess.bindAsEventListener(this, isContinue, isCreateFromTemplate),
         on1223 : this.on1223.bindAsEventListener(this),
         on0 : this.on0.bindAsEventListener(this),
-        on409 : this.on409.bindAsEventListener(this),
+        on409 : this.on409.bindAsEventListener(this, isContinue),
         on401 : this.on401.bindAsEventListener(this),
         on403 : this.on403.bindAsEventListener(this, isContinue, isCreateFromTemplate),
         onFailure : this.onFailure.bind(this)
@@ -356,6 +356,11 @@ var XWiki = (function(XWiki) {
       if (this.form && this.form.template) {
         this.form.template.disabled = true;
         this.form.template.value = "";
+      }
+
+      // don't force save twice
+      if ($('forceSave')) {
+        $('forceSave').remove();
       }
 
       if (isCreateFromTemplate) {
@@ -468,7 +473,7 @@ var XWiki = (function(XWiki) {
               onSuccess : self.onSuccess.bindAsEventListener(self, isContinue, isCreateFromTemplate),
               on1223 : self.on1223.bindAsEventListener(self),
               on0 : self.on0.bindAsEventListener(self),
-              on409 : self.on409.bindAsEventListener(self),
+              on409 : self.on409.bindAsEventListener(self, isContinue),
               on401 : self.on401.bindAsEventListener(self),
               on403 : self.on403.bindAsEventListener(self, isContinue, isCreateFromTemplate),
               onFailure : self.onFailure.bind(self)
@@ -506,58 +511,101 @@ var XWiki = (function(XWiki) {
       document.fire("xwiki:document:saveFailed", {'response' : response});
     },
     // 409 happens when the document is in conflict: i.e. someone's else edited it at the same time
-    on409 : function(response) {
+    on409 : function(response, isContinue) {
+      var self = this;
       this.progressBox.hide();
       this.savingBox.hide();
       this.savedBox.hide();
       this.failedBox.hide();
 
-      var jsonAnswer = response.responseJSON;
+      // Prepare all the callback we need for the preview diff modal.
 
-      var createContent = function (data, modal) {
-        var content =  new Element('div', {'class': 'modal-popup'});
-        var buttonsDiv =  new Element('div');
-
-        content.insert("$services.localization.render('core.editors.save.conflictversion.rollbackmessage')");
-
-        content.insert(new Element('br'));
-        content.insert(new Element('br'));
-        content.insert("$services.localization.render('core.editors.save.conflictversion.previousVersion')");
-        content.insert(" " + jsonAnswer.previousVersion);
-        content.insert(" (" + new Date(jsonAnswer.previousVersionDate).toLocaleString() + ")");
-        content.insert(new Element('br'));
-        content.insert("$services.localization.render('core.editors.save.conflictversion.latestVersion')");
-        content.insert(" " + jsonAnswer.latestVersion);
-        content.insert(" (" + new Date(jsonAnswer.latestVersionDate).toLocaleString() + ")");
-        content.insert(new Element('br'));
-        content.insert(new Element('br'));
-
-        // versions are different so we can output a link for a diff
-        if (jsonAnswer.previousVersion < jsonAnswer.latestVersion) {
-          var docVariant = XWiki.docvariant;
-          var diffURL = XWiki.currentDocument.getURL('view', "viewer=changes&rev1=__rev1__&rev2=__rev2__&" + docVariant)
-            .replace('__rev1__', jsonAnswer.previousVersion)
-            .replace('__rev2__', jsonAnswer.latestVersion);
-          var link = new Element('a', {'href': diffURL, 'target': '_new'});
-          link.insert("$services.localization.render('core.editors.save.conflictversion.diffLink')");
-          content.insert(link);
-        }
-
-        content.insert(buttonsDiv);
-
-        var br = new Element('br');
-        var buttonCreate = new Element('button', {'class': 'btn btn-primary'});
-        buttonCreate.insert("OK");
-        buttonsDiv.insert(br);
-        buttonsDiv.insert(buttonCreate);
-        buttonCreate.on("click", function () {
-          modal.closeDialog();
-        });
-        return content;
+      // Reload the editors in case the user want to loose his change.
+      var reloadEditors = function () {
+        self.disableEditors();
+        window.location.reload();
       };
-      this.displayErrorModal(createContent);
 
-      this.disableEditors();
+      // Force save the change: submit the form with a forceSave input.
+      var forceSave = function () {
+        require(['jquery'], function ($) {
+          $('#previewDiffModal').modal('hide');
+          self.form.insert(new Element("input", {
+            type: "hidden",
+            name: "forceSave",
+            id: "forceSave",
+            value: "1"
+          }));
+          if (isContinue) {
+            $('input[name=action_saveandcontinue]').click();
+          } else {
+            $('input[name=action_save]').click();
+          }
+        });
+      };
+
+      // We chose what to do depending on the radio button selection.
+      var submitDiffButton = function () {
+        require(['jquery'], function ($) {
+          if ($('#actionReloadRadio').is(':checked')) {
+            reloadEditors();
+          }
+
+          if ($('#actionForceSaveRadio').is(':checked')) {
+            forceSave();
+          }
+        });
+      };
+
+      // Toggle the class of the div depending on the selected radio button.
+      var radioSelect = function () {
+        require(['jquery'], function ($) {
+          var reloadDiv = $('#headingReloadEditor').parent();
+          var forceSaveDiv = $('#headingForceSave').parent();
+
+          var reloadRadio = $('#actionReloadRadio');
+          var forceSaveRadio = $('#actionForceSaveRadio');
+
+          reloadDiv.toggleClass('panel-primary', reloadRadio.is(':checked'));
+          reloadDiv.toggleClass('panel-default', forceSaveRadio.is(':checked'));
+
+          forceSaveDiv.toggleClass('panel-primary', forceSaveRadio.is(':checked'));
+          forceSaveDiv.toggleClass('panel-default', reloadRadio.is(':checked'));
+        });
+      };
+
+      // Prepare the modal
+      var displayModal = function (response) {
+        require(['jquery'], function ($) {
+          $(response.responseText).appendTo('body');
+          $('#previewDiffModal').modal('show');
+
+          // We want to remove the html of the modal and the backdrop when the modal is closed.
+          $('#previewDiffModal').on('hidden.bs.modal', function (e) {
+            $('#previewDiffModal').remove();
+            $('div.modal-backdrop').remove();
+          });
+
+          // Callback on the buttons.
+          $('input[name=warningConflictAction]').on('click', radioSelect);
+          $('#submitDiffButton').on('click', submitDiffButton);
+        });
+      };
+
+      this.enableEditors();
+      var formData = new Hash(this.form.serialize({hash: true, submit: 'preview'}));
+
+      var jsonAnswer = response.responseJSON;
+      var queryString = "diff=1&version=" + jsonAnswer.latestVersion;
+      var previewUrl = new XWiki.Document().getURL("preview", queryString);
+
+      new Ajax.Request(previewUrl, {
+        method : 'post',
+        parameters : formData.toQueryString(),
+        onSuccess : displayModal,
+        onFailure : this.onFailure.bind(this)
+      });
+
       // Announce that a document save attempt has failed
       document.fire("xwiki:document:saveFailed", {'response' : response});
     },

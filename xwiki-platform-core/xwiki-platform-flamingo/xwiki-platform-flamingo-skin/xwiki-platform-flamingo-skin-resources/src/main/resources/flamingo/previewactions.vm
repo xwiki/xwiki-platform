@@ -3,6 +3,9 @@
 #if("$!showactions" != '0')
   $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
   $xwiki.ssfx.use('js/xwiki/actionbuttons/actionButtons.css', true)
+  ## In case of conflict issue we want to display the diff properly
+  #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
   #set($backToEditAction = "$!{request.xeditaction}")
   #if($backToEditAction == '')
     #set($backToEditAction = 'edit')

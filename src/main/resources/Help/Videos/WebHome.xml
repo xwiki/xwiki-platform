@@ -34,7 +34,7 @@
   <date>1486484551000</date>
   <contentUpdateDate>1486484438000</contentUpdateDate>
   <version>1.1</version>
-  <title>Videos</title>
+  <title>$services.localization.render('help.videos.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -43,52 +43,52 @@
 #set ($docextras = [])
 
 #set ($videoCards = [{
-  'title': 'Homepage Overview',
+  'title': $services.localization.render('help.videos.videoCard1.title'),
   'topics': [
-    'Discover the elements displayed on your homepage',
-    'Start browsing your wiki'
+    $services.localization.render('help.videos.videoCard1.topic1'),
+    $services.localization.render('help.videos.videoCard1.topic2')
   ],
   'url': 'https://www.youtube.com/embed/p5g6aDGOqWY',
   'duration': '4 min'
 }, {
-  'title': 'Homepage Customization',
+  'title': $services.localization.render('help.videos.videoCard2.title'),
   'topics': [
-    'Learn how to change your wiki color theme',
-    'Learn how to add panels and columns to your wiki look',
-    'Learn how to add widgets to a wiki'
+    $services.localization.render('help.videos.videoCard2.topic1'),
+    $services.localization.render('help.videos.videoCard2.topic2'),
+    $services.localization.render('help.videos.videoCard2.topic3')
   ],
   'url': 'https://www.youtube.com/embed/zX1Itoh3E68',
   'duration': '5 min'
 }, {
-  'title': 'Page and Content Creation',
+  'title': $services.localization.render('help.videos.videoCard3.title'),
   'topics': [
-    'Discover how to create a page',
-    'Learn how to use the WYSIWYG editor',
-    'Discover the view and edit modes'
+    $services.localization.render('help.videos.videoCard3.topic1'),
+    $services.localization.render('help.videos.videoCard3.topic2'),
+    $services.localization.render('help.videos.videoCard3.topic3')
   ],
   'url': 'https://www.youtube.com/embed/onenEu21FIk',
   'duration': '6 min'
 }, {
-  'title': 'Importing Office Documents to XWiki',
+  'title': $services.localization.render('help.videos.videoCard4.title'),
   'topics': [
-    'Discover how to import Office Documents to your wiki',
-    'Learn how to use a "Table of content" macro'
+    $services.localization.render('help.videos.videoCard4.topic1'),
+    $services.localization.render('help.videos.videoCard4.topic2')
   ],
   'url': 'https://www.youtube.com/embed/csQVSRMVclM',
   'duration': '4 min'
 }, {
-  'title': 'App Within Minutes',
+  'title': $services.localization.render('help.videos.videoCard5.title'),
   'topics': [
-    'Discover how to create an application',
-    'Learn how to use your application'
+    $services.localization.render('help.videos.videoCard5.topic1'),
+    $services.localization.render('help.videos.videoCard5.topic2')
   ],
   'url': 'https://www.youtube.com/embed/Pv4jPCaU99g',
   'duration': '7 min'
 }, {
-  'title': 'Add / Remove Extensions',
+  'title': $services.localization.render('help.videos.videoCard6.title'),
   'topics': [
-    'Discover how to add/remove extensions using the Extension Manager',
-    'Discover the XWiki Administration UI'
+    $services.localization.render('help.videos.videoCard6.topic1'),
+    $services.localization.render('help.videos.videoCard6.topic2')
   ],
   'url': 'https://www.youtube.com/embed/Q4NHu6J5pX4',
   'duration': '3 min'
@@ -109,7 +109,7 @@
     &lt;/div&gt;
     &lt;div class="videoCard-footer"&gt;
       $services.icon.renderHTML('play')
-      &lt;a href="$data.url"&gt;Watch&lt;/a&gt;
+      &lt;a href="$data.url"&gt;$services.localization.render('help.videos.watch')&lt;/a&gt;
       &lt;span class="videoCard-duration"&gt;
         $escapetool.xml($data.duration)
       &lt;/span&gt;
@@ -137,7 +137,7 @@
 &lt;/div&gt;
 {{/html}}
 
-[[View more videos&gt;&gt;https://www.youtube.com/playlist?list=PLhe7KI1rstRQeLSHxcTozZ0HJSk-mIYzt]]
+[[$services.localization.render('help.videos.more')&gt;&gt;https://www.youtube.com/playlist?list=PLhe7KI1rstRQeLSHxcTozZ0HJSk-mIYzt]]
 {{/velocity}}</content>
   <object>
     <name>Help.Videos.WebHome</name>

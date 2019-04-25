@@ -34,7 +34,7 @@
   <date>1487346237000</date>
   <contentUpdateDate>1487346162000</contentUpdateDate>
   <version>1.1</version>
-  <title>Movies</title>
+  <title>$services.localization.render('help.applications.movie.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>

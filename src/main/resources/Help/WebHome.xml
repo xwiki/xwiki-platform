@@ -64,13 +64,13 @@
 
 #set ($howToCards = [{
   'icon': 'fa fa-support',
-  'title': 'Getting Started',
-  'description': 'Easy steps to get you started with XWiki.',
+  'title': $services.localization.render('help.start.title'),
+  'description': $services.localization.render('help.start.description'),
   'documentation': "http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/WebHome?version=$escapetool.url($xwiki.version)"
 }, {
   'icon': 'fa fa-play-circle',
-  'title': 'Videos',
-  'description': 'View our collection of video tutorials.',
+  'title': $services.localization.render('help.videos.title'),
+  'description': $services.localization.render('help.videos.description'),
   'documentation': 'Help.Videos.WebHome'
 }])
 
@@ -104,60 +104,60 @@
 
 #set ($featureCards = [{
   'icon': 'fa fa-pencil',
-  'title': 'Page Editing',
-  'description': "Use a powerful &lt;a href=""http://platform.xwiki.org/xwiki/bin/view/Features/PageEditing"" class=""wikiexternallink""&gt;WYSIWYG&lt;/a&gt; content editor or &lt;a href=""$xwiki.getURL('XWiki.XWikiSyntax')""&gt;syntax&lt;/a&gt; to create rich wiki pages.",
+  'title': $services.localization.render('help.edit.title'),
+  'description': $services.localization.render('help.edit.description',["&lt;a href='http://platform.xwiki.org/xwiki/bin/view/Features/PageEditing' class='wikiexternallink'&gt;",'&lt;/a&gt;',"&lt;a href='$xwiki.getURL('XWiki.XWikiSyntax')'&gt;"]),
   'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/PageEditing',
   'examples': $xwiki.getURL('Sandbox.WebHome', 'edit', 'editor=wysiwyg')
 }, {
   'icon': 'fa fa-file-text-o',
-  'title': 'Templates',
-  'description': 'Templates are predefined pages that are copied when creating a new page.',
+  'title': $services.localization.render('help.templates.title'),
+  'description':  $services.localization.render('help.templates.description'),
   'documentation': 'Help.Templates.WebHome',
   'examples': $xwiki.getURL('Help.Templates.WebHome', 'view', $NULL, 'HExamples')
 }, {
   'icon': 'fa fa-file-excel-o',
-  'title': 'Macros',
-  'description': 'Macros are reusable functionality that can be integrated inside a page.',
+  'title': $services.localization.render('help.macros.title'),
+  'description':  $services.localization.render('help.macros.description'),
   'documentation': 'Help.Macros.WebHome',
   'examples': $xwiki.getURL('Help.Macros.WebHome', 'view', $NULL, 'HExamples')
 }, {
   'icon': 'fa fa-files-o',
-  'title': 'Applications',
-  'description': 'Applications allow to group related structured pages together.',
+  'title': $services.localization.render('help.applications.title'),
+  'description':  $services.localization.render('help.applications.description'),
   'documentation': 'Help.Applications.WebHome',
   'examples': $xwiki.getURL('Help.Applications.WebHome', 'view', $NULL, 'HExamples')
 }, {
   'icon': 'fa fa-sitemap',
-  'title': 'Content Organization',
-  'description': 'Organize your content in hierarchical pages, grouped in several (sub)wikis.',
+  'title': $services.localization.render('help.organization.title'),
+  'description':  $services.localization.render('help.organization.description'),
   'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/ContentOrganization/',
   'examples': $xwiki.getURL('Main.AllDocs', 'view', 'view=tree')
 }, {
   'icon': 'fa fa-history',
-  'title': 'Version Control',
-  'description': 'View previous versions of a page, compare different versions or rollback to any past version.',
+  'title': $services.localization.render('help.history.title'),
+  'description':  $services.localization.render('help.history.description'),
   'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/VersionControl',
   'examples': $historyURL
 }, {
   'icon': 'fa fa-download',
-  'title': 'Import / Export',
-  'description': 'Import content from various sources and export it in an open format (XML, HTML, PDF, ODT).',
+  'title': $services.localization.render('help.import.title'),
+  'description':  $services.localization.render('help.import.description'),
   'documentation': 'http://platform.xwiki.org/xwiki/bin/view/Features/Imports'
 }])
 {{/velocity}}
 
 {{velocity}}
-= How to use XWiki? =
+= $services.localization.render('help.title1') =
 
-XWiki offers a wide range of powerful features that will enable you to create, organize and find content. This section will show you how to use the basic features of XWiki.
+$services.localization.render('help.description1')
 
 {{html clean="false"}}
 #display4Cards($howToCards)
 {{/html}}
 
-= Main XWiki features =
+= $services.localization.render('help.title2') =
 
-Congratulations for acquiring your XWiki instance. XWiki is very versatile and can be used to create knowledge bases, intranets or any type of business application you want. This is achievable because of XWiki's customization power, that starts at page level, from a simple to a more advanced usage.
+$services.localization.render('help.description2')
 
 {{html clean="false"}}
 #display4Cards($featureCards)

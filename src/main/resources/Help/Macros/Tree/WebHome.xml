@@ -43,27 +43,36 @@
 {{toc start="2" /}}
 {{/box}}
 
-**Page Tree Macro** displays the hierarchy of pages. [[Learn more&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Document+Tree+Macro]]
+{{velocity}}
+$services.localization.render('help.macros.tree.pageDescription', ['**']) [[$services.localization.render('help.more.label')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Document+Tree+Macro]]
 
-== Page Hierarchy Tree ==
+== $services.localization.render('help.macros.tree.header1') ==
+{{/velocity}}
 
 {{example}}
 {{documentTree /}}
 {{/example}}
 
-=== Compact Page Hierarchy Tree ===
+{{velocity}}
+=== $services.localization.render('help.macros.tree.header2') ===
+{{/velocity}}
+
 
 {{example}}
 {{documentTree compact="true" /}}
 {{/example}}
 
-== Wiki &gt; Space &gt; Page Tree ==
+{{velocity}}
+== $services.localization.render('help.macros.tree.header3',['&gt;']) ==
+{{/velocity}}
 
 {{example}}
 {{documentTree showWikis="true" showSpaces="true" showTranslations="false" showAttachments="false" showChildDocuments="false" /}}
 {{/example}}
 
-== Full Entity Tree ==
+{{velocity}}
+== $services.localization.render('help.macros.tree.header4') ==
+{{/velocity}}
 
 {{example}}
 {{documentTree showWikis="true" showWikiPrettyName="false" showSpaces="true" showDocumentTitle="false"

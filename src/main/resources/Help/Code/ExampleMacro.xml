@@ -143,7 +143,7 @@
 .macroexample {
   margin-top: 1em;
 }
-.macroexample > .tab-content {
+.macroexample &gt; .tab-content {
   border: 1px solid #DDD;
   border-top: 0 none;
   border-radius: 0 0 4px 4px;

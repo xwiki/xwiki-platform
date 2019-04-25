@@ -34,7 +34,7 @@
   <date>1486475080000</date>
   <contentUpdateDate>1486398996000</contentUpdateDate>
   <version>1.1</version>
-  <title>Chart</title>
+  <title>$services.localization.render('help.macros.chart.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -43,11 +43,14 @@
 {{toc start="2" /}}
 {{/box}}
 
-**Chart Macro** displays graphical charts generated from miscellaneous data sources. [[Learn more&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Chart+Macro]]
+{{velocity}}
+$services.localization.render('help.macros.chart', ['**', '**']) [[$services.localization.render('help.more.label')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/Chart+Macro]]
 
-== Pie Chart ==
+== $services.localization.render('help.macros.chart.pie') ==
 
-=== Example 1 ===
+=== $services.localization.render('help.macros.example') 1 ===
+{{/velocity}}
+
 {{example}}
 {{chart type="pie" source="inline" params="range:B2-D5;series:columns;" title="Pie Chart" width="320" height="240"}}
 |=|=X|=Y|=Z
@@ -58,7 +61,10 @@
 {{/chart}}
 {{/example}}
 
-=== Example 2 ===
+{{velocity}}
+=== $services.localization.render('help.macros.example') 2 ===
+{{/velocity}}
+
 {{example}}
 {{chart type="pie" source="inline" params="range:B2-D5;series:columns;colors:d9534f,f0ad4e,337ab7,5cb85c;backgroundColor:FFFFFF;" title="Pie Chart"}}
 |=|=X|=Y|=Z
@@ -69,7 +75,9 @@
 {{/chart}}
 {{/example}}
 
-== Bar Chart ==
+{{velocity}}
+== $services.localization.render('help.macros.chart.bar') ==
+{{/velocity}}
 
 {{example}}
 {{chart type="bar" source="inline" params="range:B2-D5;series:columns;colors:C3E3F7,1D9FF5,015891,012A45;backgroundColor:FFFFFF;" title="Bar Chart"}}
@@ -82,7 +90,9 @@
 
 {{/example}}
 
-== Time Series Chart ==
+{{velocity}}
+== $services.localization.render('help.macros.chart.time') ==
+{{/velocity}}
 
 {{example}}
 {{chart type="xy_line_and_shape" params="range:B2-C19;dataset:timetable_xy;domain_axis_type:date;domain_axis_date_format:MMM-yyyy;date_format:yyyy-MM;time_period:month;range_axis_lower:100;range_axis_upper:190" title="Time Series Chart"}}

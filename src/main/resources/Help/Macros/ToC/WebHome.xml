@@ -34,34 +34,38 @@
   <date>1486475024000</date>
   <contentUpdateDate>1486398839000</contentUpdateDate>
   <version>1.1</version>
-  <title>Table of Contents</title>
+  <title>$services.localization.render('help.macros.toc.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>**Table of Contents Macro** generates a table of contents for the page headings. [[Learn more&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/TOC+Macro]]
+  <content>{{velocity}}
+$services.localization.render('help.macros.toc',['**']) [[$services.localization.render('help.more.label')&gt;&gt;http://extensions.xwiki.org/xwiki/bin/view/Extension/TOC+Macro]]
 
-= Description =
+= $services.localization.render('help.macros.toc.description.title') =
 
-The following examples use the current page structure constituted by two sections and three subsections.
+$services.localization.render('help.macros.toc.description.content', ['[[','&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/?syntax=2.1&amp;section=Headings]]'])
 
-Learn more about structuring a page with headings [[on the syntax page.&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/XWikiSyntax/?syntax=2.1&amp;section=Headings]]
+= $services.localization.render('help.macros.toc.examples.title') =
 
-= Macro Table of Contents Examples =
-
-== Simple Table of Contents ==
+== $services.localization.render('help.macros.toc.simple') ==
+{{/velocity}}
 
 {{example}}
 {{toc/}}
 {{/example}}
 
-== Table of Contents with a starting point ==
+{{velocity}}
+== $services.localization.render('help.macros.toc.startingPoint') ==
+{{/velocity}}
 
 {{example}}
 {{toc start="2"/}}
 {{/example}}
 
-== Table of Contents inside a box ==
+{{velocity}}
+== $services.localization.render('help.macros.toc.insideBox') ==
+{{/velocity}}
 
 {{example}}
 {{box cssClass="floatinginfobox"}}

@@ -34,7 +34,7 @@
   <date>1486474842000</date>
   <contentUpdateDate>1486473824000</contentUpdateDate>
   <version>1.1</version>
-  <title>Applications</title>
+  <title>$services.localization.render('help.applications.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -54,62 +54,62 @@
 #end
 
 #set ($actionCards = [{
-  'title': 'Create your application',
-  'description': 'Define the structure of your data, customize it and create the application you want.',
-  'tip': "&lt;a href=""http://extensions.xwiki.org/xwiki/bin/view/Extension/App+Within+Minutes+Application"" class=""wikiexternallink""&gt;App Within Minutes&lt;/a&gt; helps you build applications without having technical knowledge.",
+  'title': $services.localization.render('help.applications.create.title'),
+  'description': $services.localization.render('help.applications.create.description'),
+  'tip': $services.localization.render('help.applications.create.tip', ["&lt;a href='http://extensions.xwiki.org/xwiki/bin/view/Extension/App+Within+Minutes+Application' class='wikiexternallink'&gt;", '&lt;/a&gt;']),
   'thumbnail': 'AWM',
   'actions': [{
-    'label': 'Try it!',
+    'label': $services.localization.render('help.try.label'),
     'type': 'success',
     'url': $xwiki.getURL('AppWithinMinutes.CreateApplication')
   }, {
-    'label': 'Demo',
+    'label': $services.localization.render('help.applications.create.demo.label'),
     'url': $xwiki.getURL('Help.Applications.Movies')
   }]
 }, {
-  'title': 'Browse applications',
-  'description': 'Choose from community contributed applications and install them inside your wiki.',
-  'tip': "&lt;a href=""http://extensions.xwiki.org/xwiki/bin/view/Extension/Extension+Manager+Application"" class=""wikiexternallink""&gt;Extension Manager&lt;/a&gt; helps you manage (install, update, uninstall) your applications.",
+  'title': $services.localization.render('help.applications.browse.title'),
+  'description': $services.localization.render('help.applications.browse.description'),
+  'tip': $services.localization.render('help.applications.browse.tip', ["&lt;a href='http://extensions.xwiki.org/xwiki/bin/view/Extension/Extension+Manager+Application' class='wikiexternallink'&gt;", '&lt;/a&gt;']),
   'thumbnail': 'EM',
   'actions': [{
-    'label': 'Browse',
+    'label': $services.localization.render('help.browse.label'),
     'url': $browseAppsURL
   }]
 }])
 
 #set ($exampleCards = [{
-  'title': 'Blog',
-  'description': 'Blog Application allows you to publish your information and share it to the world.',
+  'title': $services.localization.render('help.applications.blog.title'),
+  'description': $services.localization.render('help.applications.blog.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Blog+Application',
   'icon': 'fa fa-rss', 
   'thumbnail': 'Help.Applications.WebHome@blog.png'
 }, {
-  'title': 'Forum',
-  'description': 'Forum Application allows you to create new categories and discuss topics within them.',
+  'title': $services.localization.render('help.applications.forum.title'),
+  'description': $services.localization.render('help.applications.forum.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/ForumApplication',
   'icon': 'fa fa-comments',
   'thumbnail': 'Help.Applications.WebHome@forum.png'
 }, {
-  'title': 'Menu',
-  'description': 'Menu Application helps you create navigation menus and displayed them in your instance.',
+  'title': $services.localization.render('help.applications.menu.title'),
+  'description': $services.localization.render('help.applications.menu.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Menu+Application',
   'icon': 'fa fa-list-ul',
   'thumbnail': 'Help.Applications.WebHome@menu.png'
 }, {
-  'title': 'Ideas',
-  'description': 'Ideas Application encourage you to submit ideas that can be voted by your team. ',
+  'title': $services.localization.render('help.applications.ideas.title'),
+  'description': $services.localization.render('help.applications.ideas.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Ideas',
   'icon': 'fa fa-lightbulb-o',
   'thumbnail': 'Help.Applications.WebHome@ideas.png'
 }, {
-  'title': 'Meetings',
-  'description': 'Meetings Application manages your meetings mentioning the date, location, participants, etc. ',
+  'title': $services.localization.render('help.applications.meetings.title'),
+  'description': $services.localization.render('help.applications.meetings.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Meeting+Application',
   'icon': 'fa fa-calendar',
   'thumbnail': 'Help.Applications.WebHome@meeting.png'
 }, {
-  'title': 'File Manager',
-  'description': 'File Manager manages your files, providing a viewer of supported files, tag cloud and allowing filtering.',
+  'title': $services.localization.render('help.applications.fileManager.title'),
+  'description': $services.localization.render('help.applications.fileManager.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/File+Manager+Application',
   'icon': 'fa fa-folder',
   'thumbnail': 'Help.Applications.WebHome@filemanager.png'
@@ -129,8 +129,8 @@
     &lt;/div&gt;
   #end
 &lt;/div&gt;
-&lt;h2 id="HExamples"&gt;Examples&lt;/h2&gt;
-&lt;p&gt;Need help or confused with some of our applications? Check out their documentation and find out more about their functionality.&lt;/p&gt;
+&lt;h2 id="HExamples"&gt;$services.localization.render('help.applications.title1')&lt;/h2&gt;
+&lt;p&gt;$services.localization.render('help.applications.description1')&lt;/p&gt;
 &lt;div class="row"&gt;
   #foreach ($card in $exampleCards)
     ## See http://getbootstrap.com/css/#grid-responsive-resets .
@@ -145,7 +145,7 @@
     &lt;/div&gt;
   #end
 &lt;/div&gt;
-&lt;p&gt;&lt;a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application" class="wikiexternallink"&gt;View more applications&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://extensions.xwiki.org/xwiki/bin/view/Extension/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=application" class="wikiexternallink"&gt;$services.localization.render('help.applications.link')&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

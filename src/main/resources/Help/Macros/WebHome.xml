@@ -34,7 +34,7 @@
   <date>1486472067000</date>
   <contentUpdateDate>1486470461000</contentUpdateDate>
   <version>1.1</version>
-  <title>Macros</title>
+  <title>$services.localization.render('help.macros.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -54,62 +54,62 @@
 #end
 
 #set ($actionCards = [{
-  'title': 'Use Macros',
-  'description': 'Macros are reusable pieces of functionality that can be integrated inside pages.',
-  'tip': "The &lt;a href=""http://extensions.xwiki.org/xwiki/bin/view/Extension/CKEditor+Integration"" class=""wikiexternallink""&gt;WYSIWYG Editor&lt;/a&gt; allows you to insert macros and to customize their parameters when editing pages. Look for the $services.icon.renderHTML('cog') button on the tool bar.",
+  'title': $services.localization.render('help.macros.useMacros.title'),
+  'description': $services.localization.render('help.macros.useMacros.description'),
+  'tip':$services.localization.render('help.macros.useMacros.tip', ["&lt;a href='http://extensions.xwiki.org/xwiki/bin/view/Extension/CKEditor+Integration' class='wikiexternallink'&gt;",'&lt;/a&gt;', $services.icon.renderHTML('cog')]),
   'thumbnail': 'Macro',
   'actions': [{
-    'label': 'Try it!',
+    'label':  $services.localization.render('help.try.label'),
     'type': 'success',
     'url': $xwiki.getURL('Sandbox.TestPage1', 'edit', 'editor=wysiwyg')
   }]
 }, {
-  'title': 'Browse Macros',
-  'description': 'Choose from community contributed macros and install them inside your wiki.',
-  'tip': "The &lt;a href=""#if($xwiki.exists('XWiki.XWikiSyntaxMacrosList'))$xwiki.getURL('XWiki.XWikiSyntaxMacrosList')#{else}$xwiki.getURL('XWiki.WikiMacros')#end""&gt;Macro Index&lt;/a&gt; lists the macros that are already installed and ready to be used inside your pages.",
+  'title': $services.localization.render('help.macros.browseMacros.title'),
+  'description': $services.localization.render('help.macros.browseMacros.description'),
+  'tip': $services.localization.render('help.macros.browseMacros.tip', ["&lt;a href='#if($xwiki.exists('XWiki.XWikiSyntaxMacrosList'))$xwiki.getURL('XWiki.XWikiSyntaxMacrosList')#{else}$xwiki.getURL('XWiki.WikiMacros')#end'&gt;",'&lt;/a&gt;']),
   'thumbnail': 'EM',
   'actions': [{
-    'label': 'Browse',
+    'label':  $services.localization.render('help.browse.label'),
     'url': $browseMacrosURL
   }, {
-    'label': 'Learn more',
+    'label': $services.localization.render('help.more.label'),
     'url': 'http://platform.xwiki.org/xwiki/bin/view/DevGuide/WikiMacroTutorial'
   }]
 }])
 
 #set ($exampleCards = [{
-  'title': 'Box',
-  'description': 'Displays a message in a styled box.',
+  'title': $services.localization.render('help.macros.box.title'),
+  'description': $services.localization.render('help.macros.box.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Box+Macro',
   'examples': 'Help.Macros.Box.WebHome',
   'thumbnail': 'Help.Macros.Box.WebHome@box.png'
 }, {
-  'title': 'Table of Contents',
-  'description': 'Generates a table of contents for the page headings.',
+  'title': $services.localization.render('help.macros.toc.title'),
+  'description': $services.localization.render('help.macros.toc.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/TOC+Macro',
   'examples': 'Help.Macros.ToC.WebHome',
   'thumbnail': 'Help.Macros.ToC.WebHome@toc.png'
 }, {
-  'title': 'Gallery',
-  'description': 'Displays a list of images in a slide-show gallery.',
+  'title': $services.localization.render('help.macros.gallery.title'),
+  'description': $services.localization.render('help.macros.gallery.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Gallery+Macro',
   'examples': 'Help.Macros.Gallery.WebHome',
   'thumbnail': 'Help.Macros.Gallery.WebHome@gallery.png'
 }, {
-  'title': 'Chart',
-  'description': 'Generates graphical charts from data sources.',
+  'title': $services.localization.render('help.macros.chart.title') ,
+  'description': $services.localization.render('help.macros.chart.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Chart+Macro',
   'examples': 'Help.Macros.Chart.WebHome',
   'thumbnail': 'Help.Macros.Chart.WebHome@chart.png'
 }, {
-  'title': 'Page Tree',
-  'description': 'Displays the hierarchy of pages.',
+  'title': $services.localization.render('help.macros.tree.title') ,
+  'description': $services.localization.render('help.macros.tree.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Document+Tree+Macro',
   'examples': 'Help.Macros.Tree.WebHome',
   'thumbnail': 'Help.Macros.Tree.WebHome@tree.png'
 }, {
-  'title': 'Notifications',
-  'description': 'Displays recent activities done on pages by the users.',
+  'title': $services.localization.render('help.macros.notifications.title') ,
+  'description': $services.localization.render('help.macros.notifications.description'),
   'documentation': 'http://extensions.xwiki.org/xwiki/bin/view/Extension/Notifications%20Application/#HNotificationsMacro',
   'examples': 'Help.Macros.Notifications.WebHome',
   'thumbnail': 'Help.Macros.Notifications.WebHome@notifications.png'
@@ -145,7 +145,7 @@
     &lt;/div&gt;
   #end
 &lt;/div&gt;
-&lt;p&gt;&lt;a href="http://extensions.xwiki.org/xwiki/bin/view/Main/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=macro" class="wikiexternallink"&gt;View more macros&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href="http://extensions.xwiki.org/xwiki/bin/view/Main/#%7Ct=extensions&amp;p=1&amp;l=30&amp;s=doc.creationDate&amp;d=desc&amp;category=macro" class="wikiexternallink"&gt;$services.localization.render('help.macros.more')&lt;/a&gt;&lt;/p&gt;
 {{/html}}
 {{/velocity}}</content>
 </xwikidoc>

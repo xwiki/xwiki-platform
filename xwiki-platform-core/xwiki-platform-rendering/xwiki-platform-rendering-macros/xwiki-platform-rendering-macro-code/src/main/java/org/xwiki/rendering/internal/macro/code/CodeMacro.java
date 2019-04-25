@@ -38,7 +38,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.block.GroupBlock;
-import org.xwiki.rendering.code.layout.CodeLayoutHandler;
+import org.xwiki.rendering.internal.code.layout.CodeLayoutHandler;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.box.AbstractBoxMacro;

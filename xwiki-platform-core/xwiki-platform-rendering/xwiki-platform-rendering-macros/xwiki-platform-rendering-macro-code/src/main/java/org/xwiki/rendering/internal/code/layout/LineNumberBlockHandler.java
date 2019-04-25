@@ -33,7 +33,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.NewLineBlock;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.code.layout.CodeLayoutHandler;
 import org.xwiki.rendering.macro.code.CodeMacroLayout;
 
 /**
@@ -41,7 +40,7 @@ import org.xwiki.rendering.macro.code.CodeMacroLayout;
  * numbers in a {@link GroupBlock} and wrapping the code into its own <code>GroupBlock</code>.
  * 
  * @version $Id$
- * @since 11.3
+ * @since 11.4RC1
  */
 @Component
 @Singleton

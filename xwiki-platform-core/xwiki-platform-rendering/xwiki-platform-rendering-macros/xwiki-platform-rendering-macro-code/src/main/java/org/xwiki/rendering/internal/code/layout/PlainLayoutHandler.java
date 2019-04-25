@@ -26,14 +26,13 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.code.layout.CodeLayoutHandler;
 import org.xwiki.rendering.macro.code.CodeMacroLayout;
 
 /**
  * A {@link CodeLayoutHandler} that applies no transformation to the rendered blocks.
  * 
  * @version $Id$
- * @since 11.3
+ * @since 11.4RC1
  */
 @Component
 @Singleton

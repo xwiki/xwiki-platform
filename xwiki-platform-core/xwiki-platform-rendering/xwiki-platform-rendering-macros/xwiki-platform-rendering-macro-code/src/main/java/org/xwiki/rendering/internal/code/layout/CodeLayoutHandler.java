@@ -17,20 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.code.layout;
+package org.xwiki.rendering.internal.code.layout;
 
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.stability.Unstable;
 
 /**
  * Arranges a list of code rendering blocks into a specific layout.
  * 
  * @version $Id$
- * @since 11.3
+ * @since 11.4RC1
  */
 @Role
+@Unstable
 public interface CodeLayoutHandler
 {
     /**

@@ -19,13 +19,13 @@
  */
 package org.xwiki.rendering.macro.code;
 
-import org.xwiki.rendering.code.layout.CodeLayoutHandler;
+import org.xwiki.rendering.internal.code.layout.CodeLayoutHandler;
 
 /**
  * Values allowed in the <code>layout</code> parameter of the code macro.
  * 
  * @version $Id$
- * @since 11.3
+ * @since 11.4RC1
  */
 public enum CodeMacroLayout
 {

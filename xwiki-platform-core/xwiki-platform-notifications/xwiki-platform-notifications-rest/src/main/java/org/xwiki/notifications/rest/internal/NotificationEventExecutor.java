@@ -35,6 +35,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
@@ -49,6 +50,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.NotificationException;
 
 /**
  * Cache notification request results and limit the number of threads allowed to retrieve notification events.
@@ -72,6 +74,9 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
     @Inject
     private Execution execution;
+
+    @Inject
+    private Logger logger;
 
     private final AtomicLong counter = new AtomicLong();
 
@@ -127,9 +132,10 @@ public class NotificationEventExecutor implements Initializable, Disposable
             // Make the thread name match what its currently doing
             Thread.currentThread().setName(toString());
 
+            Object result = null;
             try {
                 // Check if the result is not already in the event cache
-                Object result = getFromCache(this.cacheKey, this.count);
+                result = getFromCache(this.cacheKey, this.count);
                 if (result != null) {
                     return result;
                 }
@@ -147,14 +153,19 @@ public class NotificationEventExecutor implements Initializable, Disposable
                     longEventCache.set(this.cacheKey, events);
                 }
 
-                onFinish(result);
-
                 return result;
-            } catch (Exception e) {
-                onFinish(e);
+            } catch (Throwable e) {
+                result = e;
+
+                // Log the exception since it's really not expected
+                logger.error("Failed to retrieve notifications for cache key [{}]", this.cacheKey, e);
 
                 throw e;
             } finally {
+                // Clean the queue
+                // result should never by null but just in case...
+                onFinish(result != null ? result : new NotificationException("No result"));
+
                 // Get rid of the execution context
                 execution.removeContext();
 
@@ -301,9 +312,9 @@ public class NotificationEventExecutor implements Initializable, Disposable
      * 
      * @param asyncId the identifier of the asynchronous execution
      * @return the result of the asynchronous execution
-     * @throws Exception if an exception was thrown by the asynchronous execution
+     * @throws NotificationException if an exception was thrown by the asynchronous execution
      */
-    public Object popAsync(String asyncId) throws Exception
+    public Object popAsync(String asyncId) throws NotificationException
     {
         Object result = this.shortCache.get(asyncId);
 
@@ -312,8 +323,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
             this.shortCache.remove(asyncId);
         }
 
-        if (result instanceof Exception) {
-            throw (Exception) result;
+        if (result instanceof Throwable) {
+            throw new NotificationException("Asynchronous notifications gathering failed", (Throwable) result);
         }
 
         return result;

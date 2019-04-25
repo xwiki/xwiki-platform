@@ -57,18 +57,18 @@ public class PageWithTour extends ViewPage
     
     public boolean hasPreviousStep()
     {
-        return getUtil().hasElementWithoutWaiting(By.xpath("//button[@data-role='prev']"));
+        return getUtil().hasElementWithoutWaiting(By.xpath("//a[@id='bootstrap_tour_prev']"));
     }
 
     public boolean hasNextStep()
     {
-        return getUtil().hasElementWithoutWaiting(By.xpath("//button[@data-role='next']"));
+        return getUtil().hasElementWithoutWaiting(By.xpath("//a[@id='bootstrap_tour_next']"));
     }
 
     public boolean hasEndButton()
     {
         return getUtil().hasElementWithoutWaiting(
-                By.xpath("//div[contains(@class, 'popover-navigation')]//button[@data-role='end']"));
+                By.xpath("//div[contains(@class, 'popover-navigation')]//a[@id='bootstrap_tour_end']"));
     }
     
     private String getStepId()
@@ -81,7 +81,7 @@ public class PageWithTour extends ViewPage
         // Get the current step id
         String stepId = getStepId();
         // Click
-        getDriver().findElement(By.xpath("//button[@data-role='prev']")).click();
+        getDriver().findElement(By.xpath("//a[@id='bootstrap_tour_prev']")).click();
         // Wait until current state disappears
         getUtil().waitUntilCondition(
                 ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(stepId))));
@@ -94,7 +94,7 @@ public class PageWithTour extends ViewPage
         // Get the current step id
         String stepId = getStepId();
         // Click
-        getDriver().findElement(By.xpath("//button[@data-role='next']")).click();
+        getDriver().findElement(By.xpath("//a[@id='bootstrap_tour_next']")).click();
         // Wait until current state disappears
         getUtil().waitUntilCondition(
                 ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.id(stepId))));
@@ -105,7 +105,7 @@ public class PageWithTour extends ViewPage
     public void end()
     {
         getDriver().findElement(
-                By.xpath("//div[contains(@class, 'popover-navigation')]//button[@data-role='end']")).click();
+                By.xpath("//div[contains(@class, 'popover-navigation')]//a[@id='bootstrap_tour_end']")).click();
         getUtil().waitUntilCondition(
                 ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("tour"))));
     }
@@ -113,7 +113,7 @@ public class PageWithTour extends ViewPage
     public void close()
     {
         getDriver().findElement(
-                By.xpath("//button[@data-role='end' and contains(@class, 'btn-default')]")).click();
+                By.xpath("//a[@id='bootstrap_tour_close']")).click();
         getUtil().waitUntilCondition(
                 ExpectedConditions.not(ExpectedConditions.presenceOfAllElementsLocatedBy(By.className("tour"))));
     }

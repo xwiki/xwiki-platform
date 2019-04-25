@@ -207,38 +207,53 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
   }
   
   /**
-   * Add a close button on the top right of the tour popover.
-   */
-  var addCloseButton = function (tour) {
-    var button = $('&lt;button class="btn btn-xs btn-default" data-role="end" style="position: absolute; top: 3px; right: 5px;"&gt;$escapetool.javascript($services.icon.renderHTML("cross"))&lt;/button&gt;').appendTo($('.tour'));
-    // Avoid having the close button on top of the title
-    $('.tour .popover-title').css('padding-right', button.outerWidth() + 10 + 'px');
-  }
-  
-  /**
    * The template to display a step.
    */
   var getTemplate = function (index, step) {
+    var idPrefix = 'bootstrap_tour';
     var template = '&lt;div class="popover tour" style="min-width: 300px;"&gt;\n'
+                 + ' &lt;a class="btn btn-xs btn-default" id="'+idPrefix+'_close"&gt;$escapetool.javascript($services.icon.renderHTML("cross"))&lt;/a&gt;\n'
                  + '  &lt;div class="arrow"&gt;&lt;/div&gt;\n'
                  + '  &lt;h3 class="popover-title"&gt;&lt;/h3&gt;\n'
                  + '  &lt;div class="popover-content"&gt;&lt;/div&gt;\n'
                  + '  &lt;div class="popover-navigation row"&gt;\n'
                  + '    &lt;div class="col-xs-6 text-left"&gt;\n';
     if (step.prev &gt; -1) {
-      template  += '      &lt;button class="btn btn-default btn-sm" data-role="prev"&gt;#tr("tour.popover.previous")&lt;/button&gt;\n';
+      template  += '      &lt;a class="btn btn-default btn-sm" id="'+idPrefix+'_prev"&gt;#tr("tour.popover.previous")&lt;/a&gt;\n';
     }
     template    += '    &lt;/div&gt;\n'
                  + '    &lt;div class="col-xs-6 text-right"&gt;\n';
     if (step.next &gt; -1) {
-      template  += '      &lt;button class="btn btn-primary btn-sm" data-role="next"&gt;#tr("tour.popover.next")&lt;/button&gt;\n';
+      template  += '      &lt;a class="btn btn-primary btn-sm" id="'+idPrefix+'_next"&gt;#tr("tour.popover.next")&lt;/a&gt;\n';
     } else {
-      template  += '      &lt;button class="btn btn-success btn-sm" data-role="end"&gt;#tr("tour.popover.end")&lt;/button&gt;\n'
+      template  += '      &lt;a class="btn btn-success btn-sm" id="'+idPrefix+'_end"&gt;#tr("tour.popover.end")&lt;/a&gt;\n'
     }
     template    += '    &lt;/div&gt;\n'
                  + '  &lt;/div&gt;'
                  + '&lt;/div&gt;';
     return template;
+  }
+
+  /**
+   * Associate the template buttons to their actions on the tour
+   */
+  var onShown = function (tour) {
+      var idPrefix = 'bootstrap_tour';
+      var closeButtonSelector = '#' + idPrefix + '_close';
+      var endButtonSelector = '#' + idPrefix + '_end';
+      var prevButtonSelector = '#' + idPrefix + '_prev';
+      var nextButtonSelector = '#' + idPrefix + '_next';
+
+      $(closeButtonSelector).on('click', function () { tour.end() });
+      $(endButtonSelector).on('click', function () { tour.end() });
+      $(prevButtonSelector).on('click', function () { tour.prev() });
+      $(nextButtonSelector).on('click', function () { tour.next() });
+
+      $(closeButtonSelector).css('position','absolute');
+      $(closeButtonSelector).css('top','3px');
+      $(closeButtonSelector).css('right','5px');
+      // Avoid having the close button on top of the title
+      $('.tour .popover-title').css('padding-right',  $(closeButtonSelector).outerWidth() + 10 + 'px');
   }
       
   /**
@@ -258,7 +273,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
         name    : tourName,
         storage : window.localStorage,
         onEnd   : function() { createResumeButton(tour, true) },
-        onShown : addCloseButton,
+        onShown : onShown,
         orphan  : false,
         template: getTemplate
       });

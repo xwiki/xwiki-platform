@@ -189,7 +189,11 @@ public class NotificationEventExecutor implements Initializable, Disposable
             // Avoid race condition where an async id is added after the result is put in the cache
             synchronized (queue) {
                 // Remove from the queue map
-                queue.remove(this.cacheKey, this);
+                if (queue.remove(this.cacheKey, this)) {
+                    logger.debug("Removed [{}] from the queue", this);
+                } else {
+                    logger.debug("Tried to remove [{}] from the queue but it could not be found", this);
+                }
 
                 // Notify the waiting client that the execution is done
                 this.asyncIds.stream().forEach(asyncId -> shortCache.set(asyncId, result));
@@ -321,6 +325,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
             if (entry == null) {
                 entry = new CallableEntry(longCacheKey, callable, count, asyncId);
                 this.queue.put(longCacheKey, entry);
+
+                this.logger.debug("Added [{}] in the queue", entry);
 
                 this.executor.submit(entry);
             } else {

@@ -133,6 +133,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
         @Override
         public Object call() throws Exception
         {
+            logger.debug("Starting execution [{}]", this);
+
             // Remember the thread name
             String threadName = Thread.currentThread().getName();
 
@@ -152,6 +154,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
                 throw e;
             } finally {
+                logger.debug("Finishing execution [{}]", this);
+
                 // Clean the queue
                 // "result" should never by null but just in case...
                 onFinish(result != null ? result : new NotificationException("No result"));

@@ -335,7 +335,9 @@
       // Don't load the notifications if the menu has already be opened before.
       if (!notificationsMenusHasBeenOpened) {
         macro.load(0).done(function (notifications) {
-          createCleanButton(notifications[0].date);
+          if (notifications.length &gt; 0) {
+            createCleanButton(notifications[0].date);
+          }
         });
       }
       notificationsMenusHasBeenOpened = true;

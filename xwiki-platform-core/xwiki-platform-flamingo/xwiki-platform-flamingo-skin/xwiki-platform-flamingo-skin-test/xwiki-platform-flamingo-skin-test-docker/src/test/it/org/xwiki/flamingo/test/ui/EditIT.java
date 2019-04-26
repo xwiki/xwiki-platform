@@ -33,6 +33,7 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.Assert.assertTrue;
@@ -402,5 +403,49 @@ public class EditIT
         // close second tab and switch back to first for other tests.
         setup.getDriver().close();
         setup.getDriver().switchTo().window(firstTab);
+    }
+
+    /**
+     * Test that a user who leave the editor by clicking on a link and come back won't have a conflict modal.
+     */
+    @Test
+    @Order(9)
+    public void editLeaveAndBack(TestUtils setup, TestReference testReference) throws InterruptedException
+    {
+        WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
+        wikiEditPage.setContent("First edit");
+        wikiEditPage.clickSaveAndContinue();
+
+        // Simple way, just by going to the view page and going back to edit
+        setup.gotoPage(testReference);
+        setup.getDriver().navigate().back();
+        wikiEditPage = new WikiEditPage();
+        wikiEditPage.setContent("Second edit");
+        ViewPage viewPage = wikiEditPage.clickSaveAndView();
+        assertEquals("Second edit", viewPage.getContent());
+
+        // Complex way: continue to another editor, make other changes, and then get back to the editor.
+        wikiEditPage = viewPage.editWiki();
+        wikiEditPage.setContent("third edit");
+        wikiEditPage.clickSaveAndContinue();
+        // the page will be reloaded next time we go on it.
+        setup.getDriver().addPageNotYetReloadedMarker();
+
+        WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(testReference).editWYSIWYG();
+        wysiwygEditPage.setContent("fourth edit");
+        wysiwygEditPage.clickSaveAndContinue();
+
+        // object editor -> view page
+        setup.getDriver().navigate().back();
+        // view page -> wysiwyg editor
+        setup.getDriver().navigate().back();
+
+        wikiEditPage = new WikiEditPage();
+
+        setup.getDriver().waitUntilPageIsReloaded();
+        assertEquals("fourth edit", wikiEditPage.getContent());
+        wikiEditPage.setContent("fifth edit");
+        viewPage = wikiEditPage.clickSaveAndView();
+        assertEquals("fifth edit", viewPage.getContent());
     }
 }

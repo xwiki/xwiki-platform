@@ -109,6 +109,22 @@ public class WikiDescriptor implements Cloneable
     }
 
     /**
+     * Constructor.
+     *
+     * @param id Unique Id of the wiki
+     * @param defaultAlias Default alias of the wiki
+     * @param ownerId the identifier of the owner of the wiki (generally a serialized user reference)
+     * @since 11.3
+     * @since 10.11.8
+     */
+    public WikiDescriptor(String id, String defaultAlias, String ownerId)
+    {
+        this(id, defaultAlias);
+
+        setOwnerId(ownerId);
+    }
+
+    /**
      * @return the unique Id of the wiki.
      */
     public String getId()

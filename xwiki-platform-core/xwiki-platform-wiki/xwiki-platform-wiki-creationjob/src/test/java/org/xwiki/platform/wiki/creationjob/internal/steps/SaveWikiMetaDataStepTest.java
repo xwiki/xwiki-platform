@@ -89,7 +89,6 @@ public class SaveWikiMetaDataStepTest
         // Verify
         assertEquals("description", descriptor.getDescription());
         assertEquals("pretty name", descriptor.getPrettyName());
-        assertEquals("ownerId", descriptor.getOwnerId());
         verify(wikiDescriptorManager).saveDescriptor(descriptor);
         verify(wikiTemplateManager).setTemplate("wikiId", false);
         verify(wikiUserManager).setUserScope("wikiId", UserScope.GLOBAL_ONLY);

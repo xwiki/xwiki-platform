@@ -43,6 +43,7 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * Default implementation for {@link WikiManager}.
+ * 
  * @version $Id$
  * @since 5.3M2
  */
@@ -71,10 +72,17 @@ public class DefaultWikiManager implements WikiManager
     @Override
     public WikiDescriptor create(String wikiId, String wikiAlias, boolean failOnExist) throws WikiManagerException
     {
+        return create(wikiId, wikiAlias, null, failOnExist);
+    }
+
+    @Override
+    public WikiDescriptor create(String wikiId, String wikiAlias, String ownerId, boolean failOnExist)
+        throws WikiManagerException
+    {
         // Check that the wiki Id is available
         if (failOnExist && !idAvailable(wikiId)) {
-            throw new WikiManagerException(String.format("wiki id [%s] is already used and is thus not available",
-                wikiId));
+            throw new WikiManagerException(
+                String.format("wiki id [%s] is already used and is thus not available", wikiId));
         }
 
         XWikiContext context = xcontextProvider.get();
@@ -85,7 +93,7 @@ public class DefaultWikiManager implements WikiManager
             observationManager.notify(new WikiCreatingEvent(wikiId), wikiId, context);
 
             // Create the wiki
-            descriptor = wikiCreator.create(wikiId, wikiAlias);
+            descriptor = wikiCreator.create(wikiId, wikiAlias, ownerId);
 
             // Send the end event
             observationManager.notify(new WikiCreatedEvent(wikiId), wikiId, context);
@@ -103,7 +111,7 @@ public class DefaultWikiManager implements WikiManager
 
     @Override
     public WikiDescriptor copy(String fromWikiId, String newWikiId, String newWikiAlias, boolean copyHistory,
-            boolean copyRecycleBin, boolean failOnExist) throws WikiManagerException
+        boolean copyRecycleBin, boolean failOnExist) throws WikiManagerException
     {
         WikiDescriptor newWiki = create(newWikiId, newWikiAlias, failOnExist);
         wikiCopier.copyDocuments(fromWikiId, newWikiId, copyHistory);
@@ -131,7 +139,8 @@ public class DefaultWikiManager implements WikiManager
     }
 
     @Override
-    public boolean idAvailable(String wikiId) throws WikiManagerException {
+    public boolean idAvailable(String wikiId) throws WikiManagerException
+    {
         // Get the store
         XWikiContext xcontext = xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
@@ -139,7 +148,7 @@ public class DefaultWikiManager implements WikiManager
         String wikiForbiddenList = xcontextProvider.get().getWiki().Param("xwiki.virtual.reserved_wikis");
         try {
             return !wikiDescriptorManager.exists(wikiId) && !Util.contains(wikiId, wikiForbiddenList, ", ")
-                    && xwiki.getStore().isWikiNameAvailable(wikiId, xcontext);
+                && xwiki.getStore().isWikiNameAvailable(wikiId, xcontext);
         } catch (XWikiException e) {
             throw new WikiManagerException("Fail to look at the databases.");
         }

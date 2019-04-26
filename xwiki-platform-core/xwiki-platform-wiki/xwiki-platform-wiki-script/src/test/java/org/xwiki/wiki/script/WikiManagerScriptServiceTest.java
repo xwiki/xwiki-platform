@@ -193,13 +193,11 @@ public class WikiManagerScriptServiceTest
     @Test
     public void createWiki() throws Exception
     {
-        WikiDescriptor descriptor = new WikiDescriptor("newiki", "alias");
-        when(wikiManager.create("newwiki", "alias", true)).thenReturn(descriptor);
+        WikiDescriptor descriptor = new WikiDescriptor("newiki", "alias", "userA");
+        when(wikiManager.create("newwiki", "alias", "userA", true)).thenReturn(descriptor);
 
         WikiDescriptor result = mocker.getComponentUnderTest().createWiki("newwiki", "alias", "userA", true);
         assertEquals(descriptor, result);
-        assertEquals("userA", result.getOwnerId());
-        verify(wikiDescriptorManager).saveDescriptor(result);
     }
 
     @Test
@@ -236,7 +234,7 @@ public class WikiManagerScriptServiceTest
     public void createWikiError() throws Exception
     {
         Exception exception = new WikiManagerException("error on create");
-        when(wikiManager.create("newwiki", "alias", true)).thenThrow(exception);
+        when(wikiManager.create("newwiki", "alias", "userA", true)).thenThrow(exception);
         WikiDescriptor result = mocker.getComponentUnderTest().createWiki("newwiki", "alias", "userA", true);
         assertNull(result);
         assertEquals(exception, mocker.getComponentUnderTest().getLastError());

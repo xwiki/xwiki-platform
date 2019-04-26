@@ -26,20 +26,23 @@ var XWiki = (function(XWiki) {
   var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
   // we need to handle the creation of document
-  var currentDocument, currentVersion, isNew;
+  var currentDocument, currentVersion, isNew, buttonsInitialized;
   var editingVersionDate = new Date();
-
-  require(['xwiki-meta'], function (xm) {
-    currentDocument = xm.documentReference;
-    currentVersion = xm.version;
-    isNew = xm.isNew;
-  });
 
   var getCurrentVersion = function (event) {
     if (currentDocument.equals(event.memo.documentReference)) {
+      // We are certainly coming from a back button navigation: the content of the editor might not reflect the real
+      // content, let's reload the editor.
+      if (!buttonsInitialized && currentVersion != event.memo.version) {
+        window.location.reload();
+      }
       currentVersion = event.memo.version;
       editingVersionDate = new Date();
       isNew = "false";
+
+      if (!buttonsInitialized) {
+        buttonsInitialized = initButtons();
+      }
     }
   };
 
@@ -663,9 +666,29 @@ var XWiki = (function(XWiki) {
     }
   });
 
-  function init() {
+  function initButtons() {
+    if ($('content')) {
+      // ensure that the shown value is the true value in case of reload.
+      $('content').value = $('content').defaultValue;
+    }
+
     new actionButtons.EditActions();
     new actionButtons.AjaxSaveAndContinue();
+    return true;
+  }
+
+  function init() {
+    require(['xwiki-meta'], function (xm) {
+      currentDocument = xm.documentReference;
+      isNew = xm.isNew;
+      currentVersion = xm.version;
+
+      // in case of 404 the document is new
+      xm.refreshVersion(function () {
+        isNew = true;
+        buttonsInitialized = initButtons();
+      });
+    });
     return true;
   }
 

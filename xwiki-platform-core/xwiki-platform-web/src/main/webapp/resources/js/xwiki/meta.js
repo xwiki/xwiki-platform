@@ -70,13 +70,22 @@ define(['jquery'], function($) {
       document.fire('xwiki:document:changeVersion', {'version': self.version, 'documentReference': documentReference});
     };
 
-    self.refreshVersion = function () {
+    /**
+     * Refresh the version of a document from a REST endpoint. It fires a xwiki:document:changeVersion event.
+     * In case of 404 this certainly means that the document is new.
+     * @param handle404 function to choose how to handle when the document is new.
+     */
+    self.refreshVersion = function (handle404) {
       var pageInfoUrl = self.restURL;
       pageInfoUrl += "?media=json";
       $.getJSON(pageInfoUrl).done(function (data) {
         self.setVersion(data.version);
       }).fail(function (err) {
-        console.error("Error while refreshing the version from URL "+pageInfoUrl, err);
+        if (err.status === 404 && typeof(handle404) === "function") {
+          handle404(err);
+        } else {
+          console.error("Error while refreshing the version from URL "+pageInfoUrl, err);
+        }
       });
     };
 

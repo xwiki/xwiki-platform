@@ -32,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @since 11.4RC1
  */
 @Role
-@Unstable
 public interface CodeLayoutHandler
 {
     /**

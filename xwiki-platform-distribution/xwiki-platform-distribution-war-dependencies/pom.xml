@@ -650,6 +650,13 @@
       <version>${project.version}</version>
       <type>pom</type>
       <scope>runtime</scope>
+      <exclusions>
+        <!-- Make sure to not package contrib extensions since they need to remain upgradeable -->
+        <exclusion>
+          <groupId>org.xwiki.contrib</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

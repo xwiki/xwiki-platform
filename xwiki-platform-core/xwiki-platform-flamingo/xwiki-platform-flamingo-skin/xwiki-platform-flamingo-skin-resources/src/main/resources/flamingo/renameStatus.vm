@@ -1,0 +1,81 @@
+#template('refactoringStatus_macros.vm')
+
+#macro (displayRenameJobRequest $renameJobRequest)
+  <div class="refactoring-job-request row xform">
+    <div class="col-xs-12 col-lg-6">
+      <dl>
+        #displayLocations('core.rename.source.label' 'core.rename.source.hint' $renameJobRequest.entityReferences)
+        #displayBooleanConfigParam('core.rename.children.label', 'core.rename.children.hintWithoutParams'
+          $renameJobRequest.isDeep())
+        #if ($isAdvancedUser || $isSuperAdmin)
+          #displayBooleanConfigParam('core.rename.links.label', 'core.rename.links.hintWithoutParams'
+            $renameJobRequest.isUpdateLinks())
+        #end
+        #displayBooleanConfigParam('core.rename.autoRedirect.label', 'core.rename.autoRedirect.hint'
+          $renameJobRequest.isAutoRedirect())
+      </dl>
+    </div>
+    <div class="col-xs-12 col-lg-6">
+      <dl>
+        #displayLocations('core.rename.target.location.label' 'core.rename.target.location.hint'
+          [$renameJobRequest.destination])
+        #if ($isAdvancedUser || $isSuperAdmin)
+          #set ($defaultDocumentName = $services.model.getEntityReference('DOCUMENT', 'default').name)
+          #set ($terminal = $renameJobRequest.destination.type == 'DOCUMENT'
+            && $renameJobRequest.destination.name != $defaultDocumentName)
+          #displayBooleanConfigParam('core.rename.target.terminal.label', 'core.rename.target.terminal.hint' $terminal)
+        #end
+      </dl>
+    </div>
+  </div>
+#end
+
+#macro (displayRenameJobStatus $renameJobStatus)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  ## TODO: allows question templates to inject the web resources they need
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.css',
+    {'evaluate': true}), {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.jsfx.use("uicomponents/job/question/ExtensionBreakingQuestion.js", true))
+  #set ($discard = $xwiki.jsfx.use("uicomponents/job/question/XClassBreakingQuestion.js", true))
+  #set ($renameJobState = $renameJobStatus.state)
+  #set ($finished = $renameJobState == 'FINISHED')
+  #set ($renameJobRequest = $renameJobStatus.request)
+  #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
+    'xpage': 'rename',
+    'outputSyntax': 'plain',
+    'renameId': $renameJobRequest.id.get($mathtool.sub($renameJobRequest.id.size(), 1))
+  })))
+  <div class="xcontent job-status" data-url="$jobStatusURL">
+    #displayDocumentTitle($services.localization.render('core.rename.status.label'), $services.localization.render('core.rename.status.hint', [$xwiki.getUserName($renameJobRequest.userReference), $xwiki.formatDate($renameJobStatus.startDate)]))
+    #displayRenameJobRequest($renameJobRequest)
+    #if (!$finished)
+      #displayJobProgressBar($renameJobStatus)
+      #displayJobQuestion($renameJobStatus)
+    #else
+      #displayJobFinishedMessage($renameJobStatus)
+    #end
+    #if ($isAdvancedUser || $isSuperAdmin)
+      #displayJobStatusLog($renameJobStatus true)
+    #end
+  </div>
+#end
+
+#macro (outputRenameJobStatusJSON $renameJobStatus)
+  #getJobStatusJSON($renameJobStatus $json)
+  $response.setContentType('application/json')
+  $jsontool.serialize($json)
+#end
+
+#set ($renameJobStatus = $services.job.getJobStatus(['refactoring', 'rename', $request.renameId]))
+#if ($renameJobStatus)
+  #if ($xcontext.action == 'get')
+    #outputRenameJobStatusJSON($renameJobStatus)
+  #else
+    #displayRenameJobStatus($renameJobStatus)
+  #end
+#else
+  $response.setStatus(404)
+  <div class="box errormessage">
+    $services.localization.render('core.rename.status.notFound')
+  </div>
+#end

@@ -29,8 +29,8 @@
   <session-factory>
 
     <!-- Please refer to the installation guide on
-         http://platform.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
-         database. You'll need to do 2 things:
+         https://www.xwiki.org/xwiki/bin/view/Documentation/AdminGuide/Installation/ for configuring your database.
+         You'll need to do 2 things:
          1) Copy your database driver JAR in WEB-INF/lib or in some shared lib directory
          2) Uncomment the properties below for your specific DB (and comment the default
             database configuration if it doesn't match your DB)
@@ -45,7 +45,7 @@
     <property name="jdbc.use_scrollable_resultset">false</property>
 
     <!-- DBCP Connection Pooling configuration. Only some properties are shown. All available properties can be found
-         at http://commons.apache.org/proper/commons-dbcp/configuration.html
+         at https://commons.apache.org/proper/commons-dbcp/configuration.html
     -->
     <property name="dbcp.defaultAutoCommit">false</property>
     <property name="dbcp.maxTotal">50</property>

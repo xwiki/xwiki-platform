@@ -190,10 +190,7 @@ public class WikiManagerScriptService implements ScriptService
             }
 
             // Create the wiki
-            descriptor = wikiManager.create(wikiId, wikiAlias, failOnExist);
-            // Set the owner
-            descriptor.setOwnerId(ownerId);
-            wikiDescriptorManager.saveDescriptor(descriptor);
+            descriptor = wikiManager.create(wikiId, wikiAlias, ownerId, failOnExist);
         } catch (Exception e) {
             error(e);
         }

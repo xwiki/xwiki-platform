@@ -36,12 +36,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>userdirectory.userScopeFilter=Пользовательская область:
+  <content>userdirectory.userScopeFilter=Область пользователя:
 userdirectory.userScopeFilter.hint=Выберите категорию пользователей, которых вы хотите отобразить.
 userdirectory.userScopeFilter.local=Локальные пользователи
 userdirectory.userScopeFilter.global=Глобальные пользователи, которые являются членами этой вики
 platform.userdirectory.customizeNotAllowed=Вам не разрешено настраивать этот каталог пользователей.
-platform.userdirectory.configTitle=Конфигурация каталога пользователя
-platform.userdirectory.configSheetTitle=Лист конфигурации каталога пользователя
-platform.userdirectory.configSheetApplyOnConfiguration=Этот лист должен быть применен к документу конфигурации UserDirectory.</content>
+platform.userdirectory.configTitle=Настройки каталога пользователя
+platform.userdirectory.configSheetTitle=Лист настроек каталога пользователя
+platform.userdirectory.configSheetApplyOnConfiguration=Этот лист должен быть применен к документу Настройки каталога пользователей.</content>
 </xwikidoc>

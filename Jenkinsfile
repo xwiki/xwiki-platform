@@ -224,17 +224,16 @@ private void buildStandardAll(builds)
 
 private void buildDocker(type)
 {
-  def dockerConfigurations
-  def customJobProperties
+  def dockerConfigurations = dockerConfigurations(type)
+  def customJobProperties = getCustomJobProperties()
+
   def dockerModuleList
-  node() {
-    dockerConfigurations = dockerConfigurations(type)
-    customJobProperties = getCustomJobProperties()
-    if (type == 'docker-unsupported') {
-      dockerModuleList = 'xwiki-platform-core/xwiki-platform-menu'
-    } else {
-      // Checkout platform to find all docker test modules so that we can then parallelize executions of configs and
-      // modules across Jenkins agents.
+  if (type == 'docker-unsupported') {
+    dockerModules = 'xwiki-platform-core/xwiki-platform-menu'
+  } else {
+    // Checkout platform to find all docker test modules so that we can then parallelize executions of configs and
+    // modules across Jenkins agents.
+    node() {
       checkout skipChangeLog: true, scm: scm
       dockerModuleList = dockerModules()
     }

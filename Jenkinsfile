@@ -224,11 +224,12 @@ private void buildStandardAll(builds)
 
 private void buildDocker(type)
 {
-  def dockerConfigurationList
-  def dockerModuleList
+  def dockerConfigurations
   def customJobProperties
+  def dockerModuleList
   node() {
-    dockerConfigurationList = dockerConfigurations(type)
+    dockerConfigurations = dockerConfigurations(type)
+    customJobProperties = getCustomJobProperties()
     if (type == 'docker-unsupported') {
       dockerModuleList = 'xwiki-platform-core/xwiki-platform-menu'
     } else {
@@ -237,11 +238,10 @@ private void buildDocker(type)
       checkout skipChangeLog: true, scm: scm
       dockerModuleList = dockerModules()
     }
-    customJobProperties = getCustomJobProperties()
   }
 
   xwikiDockerBuild {
-    configurations = dockerConfigurationList
+    configurations = dockerConfigurations
     modules = dockerModuleList
     // Make sure that we don't reset the job properties!
     jobProperties = customJobProperties

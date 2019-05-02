@@ -522,7 +522,6 @@ var XWiki = (function(XWiki) {
 
       // Reload the editors in case the user want to loose his change.
       var reloadEditors = function () {
-        self.disableEditors();
         window.location.reload();
       };
 
@@ -567,7 +566,7 @@ var XWiki = (function(XWiki) {
           var forceSaveRadio = $('#actionForceSaveRadio');
 
           reloadDiv.toggleClass('panel-primary', reloadRadio.is(':checked'));
-          reloadDiv.toggleClass('panel-default', forceSaveRadio.is(':checked'));
+          reloadDiv.toggleClass('panel-danger', forceSaveRadio.is(':checked'));
 
           forceSaveDiv.toggleClass('panel-primary', forceSaveRadio.is(':checked'));
           forceSaveDiv.toggleClass('panel-default', reloadRadio.is(':checked'));

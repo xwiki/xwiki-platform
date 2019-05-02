@@ -32,22 +32,6 @@
       </div>
       <div class="modal-footer">
         <div class="panel-group accordionInModalFooter" id="accordion" role="tablist" aria-multiselectable="false">
-          <div class="panel panel-primary">
-            <div class="panel-heading active" role="tab" id="headingReloadEditor">
-              <label class="panel-title">
-                <input type="radio" id="actionReloadRadio" name="warningConflictAction" checked="checked" />
-                $services.localization.render('core.editors.save.previewDiff.reload.action')
-              </label>
-              <span class="openDetails" data-toggle="collapse" data-parent="#accordion" href="#collapseReloadEditor" aria-expanded="true" aria-controls="collapseReloadEditor">
-                $services.icon.renderHTML('caret-down')
-              </span>
-            </div>
-            <div id="collapseReloadEditor" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingReloadEditor">
-              <div class="panel-body">
-                $services.localization.render('core.editors.save.previewDiff.reload.hint')
-              </div>
-            </div>
-          </div>
           <div class="panel panel-default">
             <div class="panel-heading" role="tab" id="headingForceSave">
               <label class="panel-title">
@@ -59,6 +43,22 @@
             <div id="collapseForceSave" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingForceSave">
               <div class="panel-body">
                 $services.localization.render('core.editors.save.previewDiff.forceSave.hint')
+              </div>
+            </div>
+          </div>
+          <div class="panel panel-danger">
+            <div class="panel-heading active" role="tab" id="headingReloadEditor">
+              <label class="panel-title">
+                <input type="radio" id="actionReloadRadio" name="warningConflictAction" />
+                $services.localization.render('core.editors.save.previewDiff.reload.action')
+              </label>
+              <span class="openDetails" data-toggle="collapse" data-parent="#accordion" href="#collapseReloadEditor" aria-expanded="true" aria-controls="collapseReloadEditor">
+                $services.icon.renderHTML('caret-down')
+              </span>
+            </div>
+            <div id="collapseReloadEditor" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingReloadEditor">
+              <div class="panel-body">
+                $services.localization.render('core.editors.save.previewDiff.reload.hint')
               </div>
             </div>
           </div>

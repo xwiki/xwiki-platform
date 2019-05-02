@@ -320,6 +320,7 @@ public class EditIT
         wikiEditPageTab2.clickSaveAndContinue();
 
         setup.getDriver().switchTo().window(firstTab);
+        wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A second edit from another tab");
         wikiEditPageTab1.clickSaveAndContinue(false);
 
@@ -338,6 +339,7 @@ public class EditIT
 
         // Go back on the other tab: the editor is still open, so we can create another conflict
         setup.getDriver().switchTo().window(secondTab);
+        wikiEditPageTab2.waitUntilPageJSIsLoaded();
         wikiEditPageTab2.setContent("A third edit.");
         wikiEditPageTab2.clickSaveAndView(false);
 
@@ -386,6 +388,7 @@ public class EditIT
 
         // check that after a reload we obtain the last saved content in the editor and we can save normally.
         setup.getDriver().switchTo().window(secondTab);
+        wikiEditPageTab2.waitUntilPageJSIsLoaded();
         wikiEditPageTab2.setContent("sixth content");
         wikiEditPageTab2.clickSaveAndContinue(false);
         editConflictModal = new EditConflictModal();

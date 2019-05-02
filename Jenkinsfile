@@ -100,31 +100,53 @@ def builds = [
       name: 'TestRelease',
       goals: 'clean install',
       profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
-      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true',
-      xvnc: false
+      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
     )
   },
   'Quality' : {
     build(
       name: 'Quality',
+      // TODO call sonar:sonar when we fix the memory issue of executing that goal on platform. Right now we don't have
+      // enough memory on Jenkins Master for that.
+      //   goals: 'clean install jacoco:report',
+      // Note: When we do so, also add:
+      //   sonar: true
       goals: 'clean install jacoco:report',
-      profiles: 'quality,legacy',
-      xvnc: false
+      profiles: 'quality,legacy'
     )
   }
 ]
 
-stage ('Platform Builds') {
-  def choices = builds.collect { k,v -> "$k" }.join('\n')
-  def selection = askUser(choices)
-  if (selection == 'All') {
-    buildAll(builds)
-  } else {
-    builds[selection].call()
+// Decide whether to execute the standard builds or the Docker ones.
+// See the build() method below and the definition of the "type" job parameter.
+if (!params.type || params.type == 'standard') {
+  stage('Platform Builds') {
+    def choices = builds.collect { k,v -> "$k" }.join('\n')
+    // Add the docker scheduled jobs so that we can trigger them manually too
+    choices = "${choices}\nDocker Latest\nDocker All\nDocker Unsupported"
+    def selection = askUser(choices)
+    if (selection == 'All') {
+      buildStandardAll(builds)
+    } else if (selection == 'Docker Latest') {
+      buildDocker('docker-latest')
+    } else if (selection == 'Docker All') {
+      buildDocker('docker-all')
+    } else if (selection == 'Docker Unsupported') {
+      buildDocker('docker-unsupported')
+    } else {
+      buildStandardSingle(builds[selection])
+    }
   }
+} else {
+  buildDocker(params.type)
 }
 
-def buildAll(builds)
+private void buildStandardSingle(build)
+{
+  build.call()
+}
+
+private void buildStandardAll(builds)
 {
   parallel(
     'main': {
@@ -200,11 +222,56 @@ def buildAll(builds)
   )
 }
 
-def build(map)
+private void buildDocker(type)
+{
+  def dockerConfigurationList
+  def dockerModuleList
+  def customJobProperties
+  node() {
+    // Checkout platform to find all docker configurations and test modules so that we can then parallelize executions
+    // of configs and modules across Jenkins agents.
+    checkout skipChangeLog: true, scm: scm
+    dockerConfigurationList = dockerConfigurations(type)
+    if (type == 'docker-unsupported') {
+      dockerModuleList = 'xwiki-platform-core/xwiki-platform-menu'
+    } else {
+      dockerModuleList = dockerModules()
+    }
+    customJobProperties = getCustomJobProperties()
+  }
+
+  xwikiDockerBuild {
+    configurations = dockerConfigurationList
+    modules = dockerModuleList
+    // Make sure that we don't reset the job properties!
+    jobProperties = customJobProperties
+  }
+}
+
+private void build(map)
 {
   node(map.node ?: '') {
+    buildInsideNode(map)
+  }
+}
+
+private void buildInsideNode(map)
+{
+    // We want to get a memory dump on OOM errors.
+    // Make sure the memory dump directory exists (see below)
+    // Note that the user used to run the job on the agent must have the permission to create these directories
+    // Verify existence of /home/hudsonagent/jenkins_root so that we only set the oomPath if it does
+    def heapDumpPath = ''
+    def exists = fileExists '/home/hudsonagent/jenkins_root'
+    if (exists) {
+        def oomPath = "/home/hudsonagent/jenkins_root/oom/maven/${env.JOB_NAME}-${currentBuild.id}"
+        sh "mkdir -p \"${oomPath}\""
+        heapDumpPath = "-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
+    }
+
     xwikiBuild(map.name) {
-      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m"
+      mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
+      jobProperties = getCustomJobProperties()
       if (map.goals != null) {
         goals = map.goals
       }
@@ -220,11 +287,26 @@ def build(map)
       if (map.mavenFlags != null) {
         mavenFlags = map.mavenFlags
       }
+      if (map.sonar != null) {
+        sonar = map.sonar
+      }
+      if (map.skipCheckout != null) {
+        skipCheckout = map.skipCheckout
+      }
+      if (map.xvnc != null) {
+        xvnc = map.xvnc
+      }
+      if (map.skipMail != null) {
+        skipMail = map.skipMail
+      }
+      // Avoid duplicate changelogs in jenkins job execution UI page
+      if (map.name != 'Main') {
+        skipChangeLog = true
+      }
     }
-  }
 }
 
-def buildFunctionalTest(map)
+private void buildFunctionalTest(map)
 {
   def sharedPOMPrefix =
     'xwiki-platform-distribution/xwiki-platform-distribution-flavor/xwiki-platform-distribution-flavor-test'
@@ -237,3 +319,24 @@ def buildFunctionalTest(map)
     properties: map.properties
   )
 }
+
+private def getCustomJobProperties()
+{
+  // Define a scheduler job to execute the Docker-based functional tests at regular intervals. We do this since they
+  // take time to execute and thus we cannot run them all the time.
+  // This scheduler job will pass the "type" parameter to this Jenkinsfile when it executes, allowing us to decide if
+  // we run the standard builds or the docker ones.
+  // Note: it's the xwikiBuild() calls from the standard builds that will set the jobProperties and thus set up the
+  // job parameter + the crons. It would be better to set the properties directly in this Jenkinsfile but we haven't
+  // found a way to merge properties and calling the properties() step will override any pre-existing properties.
+  return [
+    parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
+    pipelineTriggers([
+      parameterizedCron('''@midnight %type=docker-latest
+@weekly %type=docker-all
+@monthly %type=docker-unsupported'''),
+      cron("@monthly")
+    ])
+  ]
+}
+

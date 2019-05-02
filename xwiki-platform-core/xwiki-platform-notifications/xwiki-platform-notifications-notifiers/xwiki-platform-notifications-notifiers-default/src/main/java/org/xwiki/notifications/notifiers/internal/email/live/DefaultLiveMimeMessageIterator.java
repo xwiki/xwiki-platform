@@ -34,6 +34,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -41,6 +42,8 @@ import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
+import org.xwiki.notifications.filters.NotificationFilterType;
+import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.notifiers.internal.email.AbstractMimeMessageIterator;
 import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -69,6 +72,9 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
     @Inject
     private NotificationPreferenceManager notificationPreferenceManager;
 
+    @Inject
+    private DocumentReferenceResolver<String> referenceResolver;
+
     @Override
     public void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
             CompositeEvent event, DocumentReference templateReference)
@@ -91,7 +97,10 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
 
         // TODO: handle followed user for who we don't cate about the notification preference, we just want to receive
         // all actions the person is doing
-        if (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)) {
+
+
+        if (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)
+                || this.isTriggeredByAFollowedUser(user, resultCompositeEvent)) {
             // Apply the filters that the user has defined in its notification preferences
             // If one of the events present in the composite event does not match a user filter, remove the event
             List<NotificationFilter> filters
@@ -160,5 +169,65 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
         }
 
         return false;
+    }
+
+    private boolean isTriggeredByAFollowedUser(DocumentReference user, CompositeEvent compositeEvent)
+    {
+        try {
+            return notificationFilterPreferenceManager.getFilterPreferences(user).stream().anyMatch(
+                fp -> isUserFilterPreference(fp) && matchUser(fp, compositeEvent)
+            );
+        } catch (NotificationException e) {
+            return false;
+        }
+    }
+
+    /**
+     * @param filterPreference a notification filter preference
+     * @return either or not it is a preference about following a user
+     */
+    private boolean isUserFilterPreference(NotificationFilterPreference filterPreference)
+    {
+        return matchFilter(filterPreference)
+                && matchFormat(filterPreference, NotificationFormat.EMAIL)
+                && matchFilterType(filterPreference, NotificationFilterType.INCLUSIVE)
+                && matchAllEvents(filterPreference);
+    }
+
+    /**
+     * @param filterPreference a filter preference
+     * @param event a composite event
+     * @return either or not the given preference is about following a user that have generated the given composite
+     * event
+     */
+    private boolean matchUser(NotificationFilterPreference filterPreference, CompositeEvent event)
+    {
+        return event.getUsers().contains(referenceResolver.resolve(filterPreference.getUser()));
+    }
+
+    private boolean matchFormat(NotificationFilterPreference filterPreference, NotificationFormat format)
+    {
+        return format == null || filterPreference.getNotificationFormats().contains(format);
+    }
+
+    private boolean matchFilter(NotificationFilterPreference pref)
+    {
+        return pref.isEnabled() && EventUserFilter.FILTER_NAME.equals(pref.getFilterName());
+    }
+
+    private boolean matchFilterType(NotificationFilterPreference pref, NotificationFilterType filterType)
+    {
+        return pref.getFilterType() == filterType;
+    }
+
+    /**
+     * @param filterPreference a filter preference
+     * @return either or not the preference concern all event types
+     */
+    private boolean matchAllEvents(NotificationFilterPreference filterPreference)
+    {
+        // When the list of event types concerned by the filter is empty, we consider that the filter concerns
+        // all events.
+        return filterPreference.getEventTypes().isEmpty();
     }
 }

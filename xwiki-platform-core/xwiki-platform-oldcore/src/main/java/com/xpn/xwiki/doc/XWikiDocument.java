@@ -9294,7 +9294,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * document) based on the current store limitation.
      *
      * @return the maximum authorized length for a document full name.
-     * @since 11.3RC1
+     * @since 11.4RC1
      */
     @Unstable
     public int getLocalReferenceMaxLength()

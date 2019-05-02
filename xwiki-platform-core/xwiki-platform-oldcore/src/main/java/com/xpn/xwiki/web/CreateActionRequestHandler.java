@@ -690,7 +690,7 @@ public class CreateActionRequestHandler
      * @param reference the new document reference to check
      * @return true if the serialized document path is too long according to the limitation provided by
      *              {@link XWikiDocument#getLocalReferenceMaxLength()}.
-     * @since 11.3RC1
+     * @since 11.4RC1
      */
     @Unstable
     public boolean isDocumentPathTooLong(DocumentReference reference)

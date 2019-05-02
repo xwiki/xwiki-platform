@@ -104,7 +104,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
     private Cache<Boolean> pageExistCache;
 
     /**
-     * Used to cache the values asked by {@link #getLimitSize(Class, String)}.
+     * Used to cache the values asked by {@link #getLimitSize(XWikiContext, Class, String)}.
      */
     private Cache<Integer> limitSizePropertyCache;
 
@@ -757,7 +757,7 @@ public class XWikiCacheStore extends AbstractXWikiStore
 
     /**
      * @return the cache that handle the limit size properties.
-     * @since 11.3RC1
+     * @since 11.4RC1
      */
     @Unstable
     public Cache<Integer> getLimitSizePropertyCache()

@@ -527,7 +527,7 @@ public interface XWikiStoreInterface
      * @param property the property on which we want the limit size.
      * @param context the context of the wiki to retrieve the property
      * @return an integer representing the limit size.
-     * @since 11.3RC1
+     * @since 11.4RC1
      */
     @Unstable
     int getLimitSize(XWikiContext context, Class<?> entityType, String property);

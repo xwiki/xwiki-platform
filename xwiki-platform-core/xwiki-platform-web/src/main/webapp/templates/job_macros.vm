@@ -115,5 +115,9 @@ $services.template.execute('logging_macros.vm')
     <div class="box $messageClass">
       $services.localization.render($messageKeys)
     </div>
+    #if ($status.error)
+      <h4>$services.localization.render('detailedinformation')</h4>
+      #printStatusLog($status)
+    #end
   #end
 #end

@@ -186,6 +186,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             });
         this.mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
         this.mockXWikiStore.stubs().method("exists").will(returnValue(true));
+        this.mockXWikiStore.stubs().method("getLimitSize").will(returnValue(255));
 
         this.mockXWikiVersioningStore =
             mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
@@ -578,6 +579,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     {
         Mock mockStore = registerMockComponent(XWikiStoreInterface.class);
         this.xwiki.setStore((XWikiStoreInterface) mockStore.proxy());
+        mockStore.stubs().method("getLimitSize").will(returnValue(255));
 
         XWikiDocument prefsDoc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "XWikiPreferences"));
         final Map<DocumentReference, XWikiDocument> documents = new HashMap<DocumentReference, XWikiDocument>();

@@ -29,9 +29,11 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -409,10 +411,36 @@ public class EditIT
     }
 
     /**
-     * Test that a user who leave the editor by clicking on a link and come back won't have a conflict modal.
+     * Ensure that document can be created with very long titles with more than 255 characters.
      */
     @Test
     @Order(9)
+    public void createDocumentLongTitle(TestUtils setup, TestReference reference)
+    {
+        String name1 = "Company Presentation Events";
+        String name2 = "Presentation from 10 december 2015 at the Fourth edition of the International Conference for "
+            + "the Environmental Responsibility (ICER 2015)";
+        String name3 = "Intervention from the President of the Interdisciplinary Commission for Responsible Development"
+            + " of Alternative Fuels (ICRDA)";
+
+        SpaceReference spaceReference = new SpaceReference(reference.getWikiReference().getName(),
+            Arrays.asList(name1, name2));
+        DocumentReference documentReference = new DocumentReference(name3, spaceReference);
+        setup.gotoPage(documentReference, "create");
+        CreatePagePage createPagePage = new CreatePagePage();
+        String currentUrl = setup.getDriver().getCurrentUrl();
+        createPagePage.clickCreate();
+
+        // Ensure that we get an error message for path too long and that we remain on the same URL.
+        createPagePage.waitForErrorMessage();
+        assertEquals(currentUrl, setup.getDriver().getCurrentUrl());
+    }
+
+    /*
+     * Test that a user who leave the editor by clicking on a link and come back won't have a conflict modal.
+     */
+    @Test
+    @Order(10)
     public void editLeaveAndBack(TestUtils setup, TestReference testReference) throws InterruptedException
     {
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();

@@ -245,6 +245,10 @@ private void buildDocker(type)
     modules = dockerModuleList
     // Make sure that we don't reset the job properties!
     jobProperties = customJobProperties
+    // XWiki 10.11.x branch doesn't work for the Docker Outside Of Docker setup (DOOD). Thus we force the tests
+    // to execute on agent 4 directly by specifying its label.
+    // See https://ci.xwiki.org/computer/agent-4/configure
+    label = 'docker-outside-docker'
   }
 }
 

@@ -36,6 +36,8 @@
     <!-- Exclude the ExtensionTest.Service page created by the test so that the PR checker doesn't check it since
          the test creates this page with Groovy code and thus requires PR FTM -->
     <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:ExtensionTest\.Service</xwikiPropertiesAdditionalProperties>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>

@@ -3282,6 +3282,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             tableName = tableName.toUpperCase();
         }
 
+        if  (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+            columnName = columnName.toLowerCase();
+        }
+
         Connection connection = null;
         // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
         // See http://bit.ly/QAJXlr

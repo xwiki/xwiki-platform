@@ -427,12 +427,10 @@ public class EditIT
         DocumentReference documentReference = new DocumentReference(name3, spaceReference);
         setup.gotoPage(documentReference, "create");
         CreatePagePage createPagePage = new CreatePagePage();
-        String currentUrl = setup.getDriver().getCurrentUrl();
         createPagePage.clickCreate();
-
-        // Ensure that we get an error message for path too long and that we remain on the same URL.
         createPagePage.waitForErrorMessage();
-        assertEquals(currentUrl, setup.getDriver().getCurrentUrl());
+        assertTrue(createPagePage.getErrorMessage()
+            .contains("The full path of the page you want to create is too long"));
     }
 
     /*

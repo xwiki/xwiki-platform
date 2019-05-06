@@ -39,6 +39,8 @@ import org.xwiki.test.ui.po.editor.EditPage;
  */
 public class CreatePagePage extends ViewPage
 {
+    private static final By errorMessageLocator = By.className("errormessage");
+
     /**
      * The element that contains the document picker used to select the target document.
      */
@@ -224,7 +226,16 @@ public class CreatePagePage extends ViewPage
      */
     public void waitForErrorMessage()
     {
-        getDriver().waitUntilElementIsVisible(By.className("errormessage"));
+        getDriver().waitUntilElementIsVisible(errorMessageLocator);
+    }
+
+    /**
+     * @return the content of the error message.
+     * @since 11.4RC1
+     */
+    public String getErrorMessage()
+    {
+        return getDriver().findElement(errorMessageLocator).getText();
     }
 
     /**

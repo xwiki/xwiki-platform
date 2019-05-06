@@ -38,6 +38,11 @@
     <upgradetest.previousflavor.version>8.4.6</upgradetest.previousflavor.version>
     <upgradetest.previousdata.artifactId>xwiki-enterprise-data-hsqldb</upgradetest.previousdata.artifactId>
     <upgradetest.previousdata.classifier>custom-filestore-2</upgradetest.previousdata.classifier>
+    <!-- Expected warnings or errors in the logs. -->
+    <xwiki.surefire.validateconsole.excludes>
+      <!-- Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses -->
+      "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]"
+    </xwiki.surefire.validateconsole.excludes>
   </properties>
   <dependencies>
     <dependency>

@@ -24,6 +24,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.EnumSet;
@@ -50,6 +51,8 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.jdbc.Work;
+import org.hibernate.mapping.Column;
+import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
@@ -375,6 +378,7 @@ public class HibernateStore implements Disposable, Integrator
     }
 
     /**
+     * @return the {@link Metadata} corresponding to the configuration
      * @since 11.1RC1
      */
     public Metadata getMetadata()
@@ -813,5 +817,59 @@ public class HibernateStore implements Disposable, Integrator
         } finally {
             this.logger.info("Schema update for wiki [{}] done", wikiId);
         }
+    }
+
+    public int getLimitSize(Class<?> entityType, String propertyName)
+    {
+        int result = -1;
+
+        // retrieve the schema from the context
+        String schema = null;
+        // apparently no schema should be used for oracle DB
+        if (getDatabaseProductName() != DatabaseProduct.ORACLE) {
+            schema = getSchemaFromWikiName();
+        }
+
+        // retrieve the table and column name from entityType and propertyName
+        PersistentClass persistentClass = getMetadata().getEntityBinding(entityType.getName());
+        Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
+        String tableName = persistentClass.getTable().getName();
+        String columnName = column.getName();
+
+        // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
+        if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
+            tableName = tableName.toUpperCase();
+        }
+
+        if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+            columnName = columnName.toLowerCase();
+        }
+
+        try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
+            JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
+
+            try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
+                DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+                ResultSet resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
+                // next will return false if the resultSet is empty.
+                if (resultSet.next()) {
+                    result = resultSet.getInt("COLUMN_SIZE");
+                }
+            }
+        } catch (SQLException e) {
+            this.logger.error("Error while looking the size limit for schema [{}], table [{}] and column [{}].", schema,
+                tableName, columnName, e);
+        }
+
+        if (result == -1) {
+            result = column.getLength();
+            this.logger.warn(
+                "Error while getting the size limit for entity [{}] and propertyName [{}]. "
+                    + "The length value set by hibernate [{}] will be used.",
+                entityType.getName(), propertyName, result);
+        }
+
+        return result;
     }
 }

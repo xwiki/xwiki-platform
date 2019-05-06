@@ -332,7 +332,7 @@ public class EditIT
         assertEquals("1.2", editConflictModal.getVersionDiff());
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@", "-A <del>fir</del>s<del>t</del> edit from a tab<del>.</del>",
             "+A s<ins>econd</ins> edit from a<ins>nother</ins> tab"), editConflictModal.getDiff().getDiff("Content"));
-        editConflictModal.forceSave();
+        editConflictModal.forceSave(true);
 
         // Check that the force save indeed save the content
         viewPage = setup.gotoPage(testReference);
@@ -365,7 +365,7 @@ public class EditIT
         assertTrue(editConflictModal.isDisplayed());
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@", "-A <del>secon</del>d edit<del> from another tab</del>",
             "+A <ins>thir</ins>d edit<ins>.</ins>"), editConflictModal.getDiff().getDiff("Content"));
-        editConflictModal.forceSave();
+        editConflictModal.forceSave(false);
         viewPage = new ViewPage();
         assertEquals("A third edit.", viewPage.getContent());
 
@@ -381,8 +381,7 @@ public class EditIT
         assertEquals("2.1", editConflictModal.getVersionDiff());
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@", "-<del>A </del>th<del>ird</del> e<del>di</del>t<del>.</del>",
             "+<ins>for</ins>th <ins>cont</ins>e<ins>n</ins>t"), editConflictModal.getDiff().getDiff("Content"));
-        editConflictModal.forceSave();
-        wikiEditPageTab1.waitForNotificationSuccessMessage("Saved");
+        editConflictModal.forceSave(true);
         wikiEditPageTab1.setContent("fifth content");
         wikiEditPageTab1.clickSaveAndContinue();
         viewPage = setup.gotoPage(testReference);

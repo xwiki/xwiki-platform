@@ -25,6 +25,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BaseModal;
 import org.xwiki.test.ui.po.diff.EntityDiff;
+import org.xwiki.test.ui.po.editor.EditPage;
 
 /**
  * Represent the modal displayed in case of edit conflict.
@@ -78,13 +79,18 @@ public class EditConflictModal extends BaseModal
 
     /**
      * Choose the force save option and submit it. Wait for the modal to be closed.
+     * @param waitSuccess if true, waits for notification success message.
      */
-    public void forceSave()
+    public void forceSave(boolean waitSuccess)
     {
         this.forceSaveChoice.click();
         this.submitButton.click();
         try {
             this.waitForClosed();
+
+            if (waitSuccess) {
+                new EditPage().waitForNotificationSuccessMessage("Saved");
+            }
         } catch (StaleElementReferenceException e) {
             // the JS remove the modal so the element might be stale
         }

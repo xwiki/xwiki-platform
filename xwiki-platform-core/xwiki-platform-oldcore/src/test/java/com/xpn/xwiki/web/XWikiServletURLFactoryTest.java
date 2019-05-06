@@ -331,7 +331,6 @@ public class XWikiServletURLFactoryTest
         // Reinitialize the URL factory to take into account the new HTTP headers.
         urlFactory.init(this.oldcore.getXWikiContext());
 
-        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
@@ -340,6 +339,20 @@ public class XWikiServletURLFactoryTest
             url.toString());
         assertEquals("/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor",
             urlFactory.getURL(url, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    public void createURLOnMainWikiInPathModeWithForcedProtocol()
+    {
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.url.protocol", "https");
+        // Reinitialize the URL factory to take into account the configuration
+        this.urlFactory.init(this.oldcore.getXWikiContext());
+
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
+
+        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki",
+            this.oldcore.getXWikiContext());
+        assertEquals("https://127.0.0.1/xwiki/bin/view/Space/Page?param1=1#anchor", url.toString());
     }
 
     /**
@@ -384,7 +397,6 @@ public class XWikiServletURLFactoryTest
         this.oldcore.getXWikiContext().setOriginalWikiId("subwiki");
 
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
-        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
         this.oldcore.getXWikiContext().setWikiId("subwiki");
 
         initRequest("virtual1.mywiki.tld", -1);
@@ -406,7 +418,6 @@ public class XWikiServletURLFactoryTest
         this.oldcore.getXWikiContext().setOriginalWikiId("subwiki");
 
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
-        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
 
         initRequest("virtual1.mywiki.tld", -1);
 

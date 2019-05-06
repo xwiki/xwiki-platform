@@ -59,7 +59,7 @@
         #foreach ($followedUser in $followedUsers)
           #set ($userDocument = $xwiki.getDocument($followedUser))
           &lt;li class="vcard"&gt;
-            #set ($userID = $userDocument.name)
+            #set ($userID = $userDocument.documentReference.name)
             #smallUserAvatar($followedUser)
             &lt;span class="user-info"&gt;&lt;span class="fn"&gt;$xwiki.getUserName($followedUser)&lt;/span&gt; &lt;span class="user-id"&gt;($userID)&lt;/span&gt;&lt;/span&gt;
             &lt;a class="btn btn-xs btn-danger userstatus-follow" data-userid="$escapetool.xml($followedUser)"&gt;$services.icon.renderHTML('cross') $escapetool.xml($services.localization.render('xe.activity.messages.unfollow'))&lt;/a&gt;
@@ -104,7 +104,7 @@
             #set ($authorsParam = "$!{authorsParam},${userDocument.prefixedFullName}")
             ## Display the user info
             &lt;li class="vcard"&gt;
-            #set ($userID = $userDocument.name)
+            #set ($userID = $userDocument.documentReference.name)
             #smallUserAvatar($followedUser)
             &lt;span class="user-info"&gt;&lt;span class="fn"&gt;$xwiki.getUserName($followedUser)&lt;/span&gt; &lt;span class="user-id"&gt;($userID)&lt;/span&gt;&lt;/span&gt;
             &lt;span class="userstatus-follow"&gt;

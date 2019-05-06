@@ -291,13 +291,13 @@ public final class HqlQueryUtils
     }
 
     /**
-     * Hibernate 5.3 removed support for "legacy HQL-style positional parameters (?)" but it's too much a breackage for
-     * XWiki extension so we try to limit the damages as much as possible by convrting the statements. See
+     * Hibernate 5.3 removed support for "legacy HQL-style positional parameters (?)" but it's too much a breakage for
+     * XWiki extension so we try to limit the damages as much as possible by converting the statements. See
      * https://hibernate.atlassian.net/browse/HHH-12101.
      * 
      * @param queryString the statement to convert
      * @return the converted statement
-     * @since 11.2RC1
+     * @since 11.4RC1
      */
     public static String replaceLegacyQueryParameters(String queryString)
     {

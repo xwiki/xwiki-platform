@@ -26,8 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.query.NativeQuery;
@@ -54,6 +52,7 @@ import com.xpn.xwiki.objects.StringProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -341,7 +340,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         when(this.hibernateStore.beginTransaction()).thenReturn(true);
         Query query = mock(Query.class);
-        when(this.session.createQuery(any())).thenReturn(query);
+        when(this.session.createQuery(anyString())).thenReturn(query);
         when(query.list()).thenReturn(resultList);
         DocumentReference expectedBacklink = new DocumentReference("xwiki", Arrays.asList("A"), "WebHome");
         when(this.currentMixedDocumentReferenceResolver.resolve("A.WebHome")).thenReturn(expectedBacklink);
@@ -368,7 +367,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         when(this.hibernateStore.beginTransaction()).thenReturn(true);
         Query query = mock(Query.class);
-        when(this.session.createQuery(any())).thenReturn(query);
+        when(this.session.createQuery(anyString())).thenReturn(query);
         when(query.list()).thenReturn(resultList);
         DocumentReference expectedBacklink = new DocumentReference("xwiki", Arrays.asList("Foo"), "WebHome");
         when(this.currentMixedDocumentReferenceResolver.resolve("Foo.WebHome")).thenReturn(expectedBacklink);

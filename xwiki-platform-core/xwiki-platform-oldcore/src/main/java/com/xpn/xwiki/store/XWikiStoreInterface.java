@@ -511,7 +511,7 @@ public interface XWikiStoreInterface
     boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException;
 
     /**
-     * @since 11.1RC1
+     * @since 11.4RC1
      */
     default boolean isCustomMappingValid(BaseClass bclass, String custommapping1)
     {
@@ -519,13 +519,13 @@ public interface XWikiStoreInterface
     }
 
     /**
-     * @deprecated since 11.1RC1, use {@link #injectCustomMapping(BaseClass)} instead
+     * @deprecated since 11.4RC1, use {@link #injectCustomMapping(BaseClass)} instead
      */
     @Deprecated
     boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException;
 
     /**
-     * @since 11.1RC1
+     * @since 11.4RC1
      */
     default boolean injectCustomMapping(BaseClass doc1class) throws XWikiException
     {

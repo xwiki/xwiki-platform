@@ -19,11 +19,10 @@
  */
 package org.xwiki.notifications.filters.internal.migrators;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import org.hibernate.Query;
+import javax.inject.Provider;
+
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +40,9 @@ import org.xwiki.refactoring.event.DocumentRenamedEvent;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import javax.inject.Provider;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -59,16 +60,22 @@ public class DocumentMovedListenerTest
 {
     @Rule
     public final MockitoComponentMockingRule<DocumentMovedListener> mocker =
-            new MockitoComponentMockingRule<>(DocumentMovedListener.class);
+        new MockitoComponentMockingRule<>(DocumentMovedListener.class);
 
     private Provider<XWikiContext> contextProvider;
+
     private WikiDescriptorManager wikiDescriptorManager;
+
     private XWikiContext xwikicontext;
+
     private XWiki xwiki;
 
     private EntityReferenceSerializer<String> serializer;
+
     private LegacyEventStreamStoreConfiguration legacyEventStreamStoreConfiguration;
+
     private NamespaceContextExecutor namespaceContextExecutor;
+
     private CachedModelBridge cachedModelBridge;
 
     @Before
@@ -107,8 +114,9 @@ public class DocumentMovedListenerTest
         Session session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
         Query query = mock(Query.class);
-        when(session.createQuery("update DefaultNotificationFilterPreference p set p.page = :newPage " +
-                "where p.page = :oldPage")).thenReturn(query);
+        when(session.createQuery(
+            "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage"))
+                .thenReturn(query);
         when(query.setString(anyString(), anyString())).thenReturn(query);
 
         // Test
@@ -143,8 +151,9 @@ public class DocumentMovedListenerTest
         Session session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
         Query query = mock(Query.class);
-        when(session.createQuery("update DefaultNotificationFilterPreference p set p.page = :newPage " +
-                "where p.page = :oldPage")).thenReturn(query);
+        when(session.createQuery(
+            "update DefaultNotificationFilterPreference p set p.page = :newPage " + "where p.page = :oldPage"))
+                .thenReturn(query);
         when(query.setString(anyString(), anyString())).thenReturn(query);
 
         // Test
@@ -178,8 +187,9 @@ public class DocumentMovedListenerTest
         Session session = mock(Session.class);
         when(hibernateStore.getSession(eq(xwikicontext))).thenReturn(session);
         Query query = mock(Query.class);
-        when(session.createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " +
-                "where p.pageOnly = :oldPage")).thenReturn(query);
+        when(session.createQuery(
+            "update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " + "where p.pageOnly = :oldPage"))
+                .thenReturn(query);
         when(query.setString(anyString(), anyString())).thenReturn(query);
 
         // Test

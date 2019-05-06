@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.2</version>
+    <version>11.3</version>
     <!-- By using an empty value we force Maven to resolve the parent from the Maven repositories,
       see http://maven.apache.org/ref/3.2.3/maven-model/maven.html#class_parent -->
     <relativePath />
@@ -53,8 +53,6 @@
     <url>https://jira.xwiki.org/browse/CKEDITOR</url>
   </issueManagement>
   <properties>
-    <!-- Use a more recent version of Selenium. -->
-    <selenium.version>3.141.59</selenium.version>
     <!-- Skip the ValidateDependencyVersion enforcer rule because we can't use ${project.version} for platform
       dependencies) -->
     <xwiki.enforcer.skip>true</xwiki.enforcer.skip>

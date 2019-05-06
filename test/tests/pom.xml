@@ -47,10 +47,10 @@
     <guava.version>25.0-jre</guava.version>
     <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </properties>
-  <!-- Force recent versions for the ckeditor-ui dependencies so that we don't have 'duplicated' jars in the WAR built by
-    the packager plugin. -->
   <dependencyManagement>
     <dependencies>
+      <!-- CKEditor UI module depends on an older version of XWiki so we need to make sure we're using the latest version
+        while running the tests. -->
       <dependency>
         <groupId>org.xwiki.rendering</groupId>
         <artifactId>xwiki-rendering-macro-html</artifactId>

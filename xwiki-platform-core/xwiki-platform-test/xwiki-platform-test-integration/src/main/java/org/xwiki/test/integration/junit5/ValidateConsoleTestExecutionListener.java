@@ -23,9 +23,7 @@ import java.io.BufferedReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.Stack;
 import java.util.stream.Collectors;
 
 import org.xwiki.test.junit5.AbstractConsoleTestExecutionListener;
@@ -51,6 +49,10 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
 
     private static final List<String> SEARCH_STRINGS = Arrays.asList(
         "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
+
+    private static final List<String> GLOBAL_EXCLUDES = Arrays.asList(
+        // See https://jira.xwiki.org/browse/XWIKI-16386
+        "Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory].");
 
     @Override
     protected String getSkipSystemPropertyKey()
@@ -89,12 +91,11 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
 
     private List<String> getExcludeList()
     {
-        List<String> result;
+        List<String> result = new ArrayList<>();
+        result.addAll(GLOBAL_EXCLUDES);
         String excludesString = getPropertyValue(EXCLUDE_PROPERTY);
         if (excludesString != null) {
-            result = parseCommaSeparatedQuotedString(excludesString);
-        } else {
-            result = Collections.emptyList();
+            result.addAll(parseCommaSeparatedQuotedString(excludesString));
         }
         return result;
     }

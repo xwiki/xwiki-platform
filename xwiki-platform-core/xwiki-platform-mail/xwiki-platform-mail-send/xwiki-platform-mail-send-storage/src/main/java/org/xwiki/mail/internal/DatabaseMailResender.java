@@ -113,9 +113,9 @@ public class DatabaseMailResender implements MailResender
                 results.add(new ImmutablePair<>(status,
                     resendAsynchronously(status.getBatchId(), status.getMessageId())));
             } catch (MailStoreException e) {
-                // Failed to load the message from the content store and thus the mail couldn't be resent
+                // Failed to resend the message.
                 // Log a warning but continue to try to send the other mails...
-                this.logger.warn("Failed to load mail content for batchId [{}], messageId [{}]. Root cause [{}]",
+                this.logger.warn("Failed to resend mail message for batchId [{}], messageId [{}]. Root cause [{}]",
                     status.getBatchId(), status.getMessageId(), ExceptionUtils.getRootCauseMessage(e));
             }
         }

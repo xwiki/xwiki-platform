@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -114,8 +115,8 @@ public class DatabaseMailResender implements MailResender
             } catch (MailStoreException e) {
                 // Failed to load the message from the content store and thus the mail couldn't be resent
                 // Log a warning but continue to try to send the other mails...
-                this.logger.warn("Failed to load mail content for batchId [{}], messageId [{}]", status.getBatchId(),
-                    status.getMessageId());
+                this.logger.warn("Failed to load mail content for batchId [{}], messageId [{}]. Root cause [{}]",
+                    status.getBatchId(), status.getMessageId(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
 

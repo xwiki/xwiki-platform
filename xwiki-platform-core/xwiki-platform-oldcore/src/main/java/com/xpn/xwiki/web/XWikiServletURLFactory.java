@@ -114,27 +114,28 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         } else {
             // Remember the request base URL for last resort
             this.originalURL = HttpServletUtils.getSourceBaseURL(context.getRequest());
-
-            // If protocol is forced in the configuration witch to it
-            String protocolConfiguration = context.getWiki().Param("xwiki.url.protocol");
-            if (StringUtils.isNoneEmpty(protocolConfiguration)) {
-                try {
-                    this.defaultURL =
-                        new URL(protocolConfiguration, this.originalURL.getHost(), this.originalURL.getPort(), "")
-                            .toString();
-                } catch (MalformedURLException e) {
-                    LOGGER.warn("The configured protocol [{}] produce an invalid URL: {}", protocolConfiguration,
-                        ExceptionUtils.getRootCauseMessage(e));
-                }
-            }
         }
 
         // Only take into account initial request if it's meant to be
         XWikiRequest request = context.getRequest();
         if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)
             || !((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon()) {
-            this.defaultURL = this.originalURL.toString();
-            setDefaultURL(context.getOriginalWikiId(), this.originalURL);
+            URL defaultWikiURL = this.originalURL;
+
+            // If protocol is forced in the configuration switch to it
+            String protocolConfiguration = context.getWiki().Param("xwiki.url.protocol");
+            if (StringUtils.isNotEmpty(protocolConfiguration)) {
+                try {
+                    defaultWikiURL =
+                        new URL(protocolConfiguration, this.originalURL.getHost(), this.originalURL.getPort(), "");
+                } catch (MalformedURLException e) {
+                    LOGGER.warn("The configured protocol [{}] produce an invalid URL: {}", protocolConfiguration,
+                        ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+
+            this.defaultURL = defaultWikiURL.toString();
+            setDefaultURL(context.getOriginalWikiId(), defaultWikiURL);
         }
     }
 

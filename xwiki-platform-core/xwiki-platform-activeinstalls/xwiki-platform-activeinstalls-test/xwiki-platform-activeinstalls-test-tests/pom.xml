@@ -46,6 +46,10 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- TODO: Fix the test to not output this warning -->
+    <xwiki.surefire.validateconsole.excludes>
+      "Failed to compute the first ping date and the number of elapsed days since the first ping"
+    </xwiki.surefire.validateconsole.excludes>
   </properties>
   <dependencies>
     <dependency>

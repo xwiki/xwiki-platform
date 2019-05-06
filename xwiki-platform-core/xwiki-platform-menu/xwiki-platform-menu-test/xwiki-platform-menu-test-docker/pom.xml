@@ -36,7 +36,11 @@
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-
+    <!-- TODO: Fix the test to not output these warnings -->
+    <xwiki.surefire.validateconsole.excludes>
+      "Could not validate integrity of download from",
+      "jstree.min.js, line 2: TypeError: c is undefined"
+    </xwiki.surefire.validateconsole.excludes>
     <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
     <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
       details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava

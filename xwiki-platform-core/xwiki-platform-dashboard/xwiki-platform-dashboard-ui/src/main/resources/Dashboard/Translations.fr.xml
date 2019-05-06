@@ -43,5 +43,5 @@ dashboard.gadgetEditor.title=Modifier le gadget
 dashboard.gadgetEditor.changeGadget.label=Changer de gadget
 dashboard.gadgetEditor.gadgetTitle.label=Titre du gadget
 dashboard.gadgetEditor.gadgetTitle.hint=Le titre du gadget apparaît en haut du panneau gadget sur le tableau de bord (il peut contenir du code velocity).
-### Missing: dashboard.initialization.saveMessage=Initialize default dashboard user setup</content>
+dashboard.initialization.saveMessage=Initialiser le tableau de bord utilisateur par défaut</content>
 </xwikidoc>

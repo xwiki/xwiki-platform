@@ -277,12 +277,10 @@
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm</artifactId>
-      <version>${asm.version}</version>
     </dependency>
     <dependency>
       <groupId>org.ow2.asm</groupId>
       <artifactId>asm-commons</artifactId>
-      <version>${asm.version}</version>
     </dependency>
 
     <!-- Some optional Maven dependencies that we don't want the Extension Manager to resolve/install. This is

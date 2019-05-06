@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -905,6 +906,10 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString, String fragment)
     {
+        Serializable locale = reference.getParameters().get("locale");
+        if (locale != null) {
+            queryString += "&language=" + locale;
+        }
         return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment);
     }
 
@@ -1542,6 +1547,17 @@ public class TestUtils
     public void attachFile(EntityReference reference, Object is, boolean failIfExists) throws Exception
     {
         rest().attachFile(reference, is, failIfExists);
+    }
+
+    public void deleteAttachement(EntityReference pageReference, String filename) throws Exception
+    {
+        EntityReference reference = new EntityReference(filename, EntityType.ATTACHMENT, pageReference);
+        deleteAttachement(reference);
+    }
+
+    public void deleteAttachement(EntityReference reference) throws Exception
+    {
+        rest().deleteAttachement(reference);
     }
 
     // FIXME: improve that with a REST API to directly import a XAR
@@ -2422,6 +2438,11 @@ public class TestUtils
                 assertStatusCodes(executePut(AttachmentResource.class, is, toElements(reference)), true,
                     STATUS_CREATED_ACCEPTED);
             }
+        }
+
+        public void deleteAttachement(EntityReference reference) throws Exception
+        {
+            assertStatusCodes(executeDelete(AttachmentResource.class, toElements(reference)), true, STATUS_NO_CONTENT);
         }
 
         public boolean exists(EntityReference reference) throws Exception

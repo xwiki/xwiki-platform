@@ -59,6 +59,7 @@ public class DefaultPeriodicMimeMessageIterator extends AbstractMimeMessageItera
         super.initialize(userIterator, factoryParameters, templateReference);
     }
 
+    @Override
     protected List<CompositeEvent> retrieveCompositeEventList(DocumentReference user) throws NotificationException
     {
         return notificationManager.getEvents(serializer.serialize(user),

@@ -499,9 +499,13 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         properties.put("mail.host", "localhost");
         properties.put("mail.debug", "false");
 
-        if (mailConfiguration.getFrom() != null) {
-            properties.put("mail.smtp.from", mailConfiguration.getFrom());
-        }
+        // Important: We don't set the "mail.smtp.from" property because the default behavior of JavaMail is to get
+        // it from the MimeMessage's FROM field  when it's not set (see
+        // https://javaee.github.io/javamail/docs/api/com/sun/mail/smtp/package-summary.html), which is the behavior
+        // we want.
+        // This also avoids setting a bad email address. Indeed, must not have any pretty name or "<" and ">" characters
+        // as that wouldn't obey the RFC5321 (see section 4.1.2 from https://tools.ietf.org/html/rfc5321). Thus if
+        // we were setting the address we would need to get internal address and not the full "pretty" one.
 
         if (mailConfiguration.usesAuthentication()) {
             properties.put("mail.smtp.auth", "true");

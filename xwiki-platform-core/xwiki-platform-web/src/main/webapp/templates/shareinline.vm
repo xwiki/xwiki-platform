@@ -9,7 +9,15 @@
   #set ($serverName = $request.serverName)
   #set ($from = $services.mailsender.configuration.fromAddress)
   #if ("$!from" != '')
-    #set ($sender = "$!{escapetool.q($sender)} <$from>")
+    ## Since the from can be specified as full address of the type "John Doe<john@doe.net", we need to get the address
+    ## only (i.e. the part inside the "<" and ">" characters)
+    #set ($address = $stringtool.substringBefore($stringtool.substringAfter($from, "<"), ">"))
+    ## If empty it means that the address wasn't specified using "<" and ">", thus we use what the user has entered
+    #if ($stringtool.isEmpty($address))
+      #set ($sender = $from)
+    #else
+      #set ($sender = "$!{escapetool.q($sender)} <$address>")
+    #end
   #else
     #if ($serverName.matches('\[.*\]|(\d{1,3}+\.){3}+\d{1,3}+'))
       #set ($sender = "$!{escapetool.q($sender)} <noreply@domain.net>")

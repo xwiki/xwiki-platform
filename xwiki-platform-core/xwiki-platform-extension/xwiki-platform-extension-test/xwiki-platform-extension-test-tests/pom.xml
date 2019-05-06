@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-extension-test</artifactId>
-    <version>11.3-SNAPSHOT</version>
+    <version>11.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-extension-test-tests</artifactId>
   <name>XWiki Platform - Extension - Tests - Functional Tests</name>
@@ -36,6 +36,8 @@
     <!-- Exclude the ExtensionTest.Service page created by the test so that the PR checker doesn't check it since
          the test creates this page with Groovy code and thus requires PR FTM -->
     <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:ExtensionTest\.Service</xwikiPropertiesAdditionalProperties>
+    <!-- Functional tests are allowed to output content to the console -->
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>

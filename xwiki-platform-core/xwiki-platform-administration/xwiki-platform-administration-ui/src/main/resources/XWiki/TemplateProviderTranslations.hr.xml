@@ -44,6 +44,5 @@ administration.templateProvider.creationRestrictions=Restrikcije izrade
 administration.templateProvider.creationRestrictions.hint=Lista lokacija (uključujući njihovu djecu) na kojima je ovom predlošku dozvoljeno izrađivati stranice
 administration.templateProvider.creationRestrictions.none=Ovaj predložak može izrađivati stranice bilo gdje
 administration.templateProvider.creationRestrictionsAreSuggestions=Restrikcije izrade kao prijedlozi
-administration.templateProvider.creationRestrictionsAreSuggestions.hint=Omogućava korisniku odabir bilo koje lokacije za izradu stranice s ovim predloškom, koristeći prvu restrikciju izrade kao predpopunjenu pretpostavljenu lokaciju kada se predložak odabere s liste.
-</content>
+administration.templateProvider.creationRestrictionsAreSuggestions.hint=Omogućava korisniku odabir bilo koje lokacije za izradu stranice s ovim predloškom, koristeći prvu restrikciju izrade kao predpopunjenu pretpostavljenu lokaciju kada se predložak odabere s liste.</content>
 </xwikidoc>

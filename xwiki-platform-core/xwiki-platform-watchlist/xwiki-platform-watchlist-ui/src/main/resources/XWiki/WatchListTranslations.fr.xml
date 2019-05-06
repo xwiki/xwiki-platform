@@ -61,6 +61,5 @@ watchlist.table.scope.wiki=Toutes les pages du wiki
 watchlist.table.scope.pageandchildren=Page + Enfants
 watchlist.table.scope.pageonly=Cette page uniquement
 watchlist.table.location=Emplacement
-watchlist.table.scope=Étendue
-</content>
+watchlist.table.scope=Étendue</content>
 </xwikidoc>

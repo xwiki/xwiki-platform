@@ -198,16 +198,17 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     {
         JdbcDatabaseContainer databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
-            databaseContainer = new OracleContainer(testConfiguration.getDatabaseTag());
+            databaseContainer = new OracleContainer(String.format("oracleinanutshell/oracle-xe-11g:%s",
+                testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new OracleContainer();
+            databaseContainer = new OracleContainer("oracleinanutshell/oracle-xe-11g");
         }
         databaseContainer
-            .withDatabaseName(DBNAME)
-            .withUsername(DBUSERNAME)
-            .withPassword(DBPASSWORD);
+            .withUsername("system")
+            .withPassword("oracle")
+            .withInitScript("oracle_init.sql");
 
-        startDatabaseContainer(databaseContainer, -1, testConfiguration);
+        startDatabaseContainer(databaseContainer, 1521, testConfiguration);
     }
 
     private void startDatabaseContainer(JdbcDatabaseContainer databaseContainer, int port,

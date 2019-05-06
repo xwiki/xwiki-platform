@@ -66,6 +66,7 @@ import org.xwiki.text.StringUtils;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.rometools.rome.io.SyndFeedOutput;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**
@@ -134,6 +135,11 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             response = Response.status(Status.ACCEPTED);
             response.entity(Collections.singletonMap("asyncId", result));
         } else {
+            // Make sure URLs will be rendered like in any other display (by default REST API forces absolute URLs)
+            XWikiContext xcontext = getXWikiContext();
+            xcontext.setURLFactory(
+                xcontext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, xcontext));
+
             Notifications notifications = new Notifications(this.notificationsRenderer
                 .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
 

@@ -61,8 +61,7 @@ watchlist.table.scope.wiki=All pages of the wiki
 watchlist.table.scope.pageandchildren=Page + Children
 watchlist.table.scope.pageonly=Page Only
 watchlist.table.location=Location
-watchlist.table.scope=Scope
-  </content>
+watchlist.table.scope=Scope</content>
   <object>
     <name>XWiki.WatchListTranslations</name>
     <number>0</number>

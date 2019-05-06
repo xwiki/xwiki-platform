@@ -35,7 +35,7 @@
   #end
   ## Deprecated properties kept for backward compatibility with XWiki versions older than 10.9
   #set ($row = {
-    'username': $group.name,
+    'username': $group.documentReference.name,
     'fullname': $group.fullName,
     'wikiname': $wikiName,
     'userurl': $group.getURL(),
@@ -59,7 +59,7 @@
     'doc_hasdelete': $services.security.authorization.hasAccess('delete', $group.documentReference),
     'doc_delete_url': $group.getURL('delete'),
     'name': "#displayGroup($group.documentReference {'wrapAvatar': true})",
-    'members': $xwiki.rightsmanager.countAllMembersNamesForGroup($group.documentReference),
+    'members': $services.user.group.getMembers($group.documentReference, false).size(),
     'scope': $services.localization.render("xe.admin.groups.$scope")
   }))
   #set ($discard = $data.rows.add($row))

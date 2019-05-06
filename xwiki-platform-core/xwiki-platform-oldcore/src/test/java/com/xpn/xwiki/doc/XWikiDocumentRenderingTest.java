@@ -392,6 +392,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
             ANYTHING).will(returnValue(this.translatedDocument));
 
         assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
+        assertEquals("<p><strong>bold</strong></p>", this.document.displayDocument(getContext()));
     }
 
     public void testGetRenderedContentRights() throws XWikiException

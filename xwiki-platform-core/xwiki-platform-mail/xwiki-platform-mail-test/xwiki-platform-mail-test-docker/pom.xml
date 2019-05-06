@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-mail-test</artifactId>
-    <version>11.3-SNAPSHOT</version>
+    <version>11.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mail-test-docker</artifactId>
   <name>XWiki Platform - Mail - Tests - Functional Tests</name>
@@ -36,6 +36,12 @@
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!-- TODO: Fix the test to not output these warnings -->
+    <xwiki.surefire.validateconsole.excludes>
+      "Could not validate integrity of download from",
+      "meta.js?cache-version=",
+      "require.min.js?r=1, line 7: Error: Script error for \"selectize\", needed by: xwiki-selectize"
+    </xwiki.surefire.validateconsole.excludes>
 
     <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
     <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more

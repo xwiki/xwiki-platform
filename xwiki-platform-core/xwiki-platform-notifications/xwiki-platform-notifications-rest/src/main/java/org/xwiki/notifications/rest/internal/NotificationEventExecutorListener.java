@@ -28,6 +28,7 @@ import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
+import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceAddOrUpdatedEvent;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceDeletedEvent;
 import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceAddedEvent;
@@ -41,7 +42,7 @@ import org.xwiki.observation.event.Event;
  * 
  * @version $Id$
  * @since 10.11.4
- * @since 11.3RC1
+ * @since 11.2
  */
 @Component
 @Singleton
@@ -64,7 +65,8 @@ public class NotificationEventExecutorListener extends AbstractEventListener
         super(NAME, new WikiCreatedEvent(), new WikiDeletedEvent(), new EventStreamAddedEvent(),
             new EventStreamDeletedEvent(), new NotificationPreferenceAddedEvent(),
             new NotificationPreferenceUpdatedEvent(), new NotificationPreferenceDeletedEvent(),
-            new NotificationFilterPreferenceAddOrUpdatedEvent(), new NotificationFilterPreferenceDeletedEvent());
+            new NotificationFilterPreferenceAddOrUpdatedEvent(), new NotificationFilterPreferenceDeletedEvent(),
+            new EventStatusAddOrUpdatedEvent());
     }
 
     @Override

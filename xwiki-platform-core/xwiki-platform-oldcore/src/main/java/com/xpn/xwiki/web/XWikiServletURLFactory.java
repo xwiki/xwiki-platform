@@ -42,6 +42,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 
 import com.xpn.xwiki.XWiki;
@@ -593,26 +594,80 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public URL createAttachmentURL(String filename, String spaces, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
     {
+        XWikiAttachment attachment = null;
+        URL attachmentURL = null;
+
+        // If we are viewing a specific revision, then we need to get the attachment for this specific revision.
         if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null
             && isContextDoc(xwikidb, spaces, name, context)) {
             try {
                 String docRevision = context.get("rev").toString();
-                XWikiAttachment attachment =
+                attachment =
                     findAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);
                 if (attachment == null) {
                     action = "viewattachrev";
                 } else {
                     long arbId = findDeletedAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);
-                    return createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(), arbId,
+                    attachmentURL = createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(), arbId,
                         querystring, xwikidb, context);
                 }
             } catch (XWikiException e) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Exception while trying to get attachment version !", e);
-                }
+                LOGGER.error("Failed to create attachment URL for filename [{}] in spaces [{}], page [{}], "
+                    + "action [{}], query string [{}] and wiki [{}]", filename, spaces, name, action, querystring,
+                    xwikidb, e);
             }
         }
 
+        // If we are getting an attachment from the context doc, we can directly load its version from it.
+        else if (action.equals("download") && isContextDoc(xwikidb, spaces, name, context)) {
+            attachment = context.getDoc().getAttachment(filename);
+
+        // We are getting an attachment from another doc: we can try to load it to retrieve its version
+        // in order to avoid cache issues.
+        } else if (action.equals("download")) {
+            // The doc might be in a different wiki.
+            WikiReference originalWikiReference = context.getWikiReference();
+            context.setWikiId(xwikidb);
+
+            DocumentReference documentReference = new DocumentReference(xwikidb, spaces, name);
+            try {
+                XWikiDocument document = context.getWiki().getDocument(documentReference, context);
+                attachment = document.getAttachment(filename);
+            } catch (XWikiException e) {
+                LOGGER.error("Exception while loading doc from wiki [{}] space [{}] and page [{}]", xwikidb,
+                    spaces, name, e);
+            } finally {
+                context.setWikiReference(originalWikiReference);
+            }
+        }
+
+        if (attachmentURL == null && attachment != null) {
+            attachmentURL = createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
+                querystring, xwikidb, context);
+        } else if (attachmentURL == null){
+            attachmentURL = this.internalCreateAttachmentURL(filename, spaces, name, action, querystring, xwikidb,
+                context);
+        }
+        return attachmentURL;
+    }
+
+    /**
+     * Internal call to create an attachment URL used both in
+     * {@link #createAttachmentURL(String, String, String, String, String, String, XWikiContext)} and
+     * {@link #createAttachmentRevisionURL(String, String, String, String, long, String, String, XWikiContext)}
+     *
+     * @param filename Name of the attachment file.
+     * @param spaces Spaces of the document.
+     * @param name Name of the document.
+     * @param action Action use for URL creation.
+     * @param querystring querystring to append at the end of the URL.
+     * @param xwikidb db where the document is stored.
+     * @param context current context.
+     * @return URL of the attachment.
+     */
+    private URL internalCreateAttachmentURL(String filename, String spaces, String name, String action,
+        String querystring, String xwikidb, XWikiContext context)
+    {
         StringBuilder path = new StringBuilder(this.contextPath);
         addServletPath(path, xwikidb, context);
 
@@ -674,16 +729,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         String querystring, String xwikidb, XWikiContext context)
     {
         String action = "downloadrev";
-        StringBuilder path = new StringBuilder(this.contextPath);
-        addServletPath(path, xwikidb, context);
-
-        // Parse the spaces list into Space References
-        EntityReference spaceReference = getRelativeEntityReferenceResolver().resolve(spaces, EntityType.SPACE);
-
-        addAction(path, spaceReference, action, context);
-        addSpaces(path, spaceReference);
-        addName(path, name, action, context);
-        addFileName(path, filename, context);
 
         String qstring = "rev=" + revision;
         if (recycleId >= 0) {
@@ -692,15 +737,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (!StringUtils.isEmpty(querystring)) {
             qstring += "&" + querystring;
         }
-        path.append("?");
-        path.append(StringUtils.removeEnd(StringUtils.removeEnd(qstring, "&"), "&amp;"));
-
-        try {
-            return normalizeURL(new URL(getServerURL(xwikidb, context), path.toString()), context);
-        } catch (MalformedURLException e) {
-            // This should not happen
-            return null;
-        }
+        return this.internalCreateAttachmentURL(filename, spaces, name, action, qstring, xwikidb, context);
     }
 
     /**

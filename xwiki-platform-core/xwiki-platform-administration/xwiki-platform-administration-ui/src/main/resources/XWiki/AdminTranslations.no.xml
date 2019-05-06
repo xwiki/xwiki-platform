@@ -54,69 +54,68 @@ XWiki.XWikiPreferences_validation_email_content.hint=E-postmalen som sendes til 
 XWiki.XWikiPreferences_confirmation_email_content.hint=E-postmalen som tilsvarer posten som sendes etter at brukeren har godkjent sin konto ved å klikke på valideringslenken i den første e-posten han mottar.
 XWiki.XWikiPreferences_invitation_email_content.hint=E-postmalen som sendes til brukere som er invitert til å registrere seg.
 
-### Missing: XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
-### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
+XWiki.Registration_heading.hint=Dette er linjen øverst på siden som vises til de som registrerer seg og når de nettopp har registrert seg. Velocity og wiki syntaks kan brukes.
+XWiki.Registration_welcomeMessage.hint=Dette vises bare når noen fyller ut skjemaet. Velocity og wiki-syntakskode kan brukes.
 XWiki.Registration_liveValidation_enabled.hint=Sett dette til false for å deaktivere JavaScript-koden for live validering (feltene vil fortsatt bli validert på serveren).
-### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
-### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
-### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
-### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
-### Missing: XWiki.Registration_requireCaptcha.hint=Set this true to require the user to solve a CAPTCHA in order to register.
-### Missing: XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validering viser en melding som indikerer til brukere at de har fylt ut feltet tilfredsstillende. Dette er meldingen de vil få hvis det ikke er overstyrt for et bestemt felt. Velocitykode kan brukes.
+XWiki.Registration_loginButton_enabled.hint=Når brukeren har registrert, tilbyr vi en knapp brukeren kan klikke for å legge inn brukernavn og passord til påloggingshandlingen og få dem logget inn med en gang. Dette fører imidlertid til at brukernavnet og passordet sendes tilbake i HTML-en, noe som kan være uakseptabelt avhengig av sikkerhetsbehovene dine.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Hvis innloggingsknappen er aktivert, kan du få et stykke JavaScript til å trykke på innloggingsknappen for brukeren.
+XWiki.Registration_defaultRedirect.hint=Dette er nettadressen som brukeren blir omdirigert til etter å ha trykket på innloggingsknappen hvis xredirect-parameteren ikke er spesifisert. Velocitykode kan brukes.
+XWiki.Registration_requireCaptcha.hint=Velg dette for å kreve at brukeren løser en CAPTCHA for å kunne registrere seg.
+XWiki.Registration_registrationSuccessMessage.hint=Dette vises til brukeren når de har registrert seg. Velocity og wiki-syntakskode kan brukes.
 
 # Look &amp; Feel Sections
 admin.themes=Temaer
-### Missing: admin.themes.description=Customize the color and icon themes, skin and logo.
+admin.themes.description=Tilpass farge og ikon-temaer, drakt og logo.
 admin.colorthemes.local=Lokal
 admin.colorthemes.global=Global
-### Missing: XWiki.XWikiPreferences_showannotations.hint=Display the annotations section in the page layout.
-### Missing: XWiki.XWikiPreferences_showcomments.hint=Display the comments section in the page layout.
-### Missing: XWiki.XWikiPreferences_showattachments.hint=Display the attachments section in the page layout.
-### Missing: XWiki.XWikiPreferences_showhistory.hint=Display the history section in the page layout.
-### Missing: XWiki.XWikiPreferences_showinformation.hint=Display the information section in the page layout.
-### Missing: XWiki.XWikiPreferences_title.hint=Define the page title format as seen by browsers.
-### Missing: XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
-### Missing: XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
-### Missing: XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
-### Missing: XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_showannotations.hint=Vis annotasjonsseksjonen i sidelayouten.
+XWiki.XWikiPreferences_showcomments.hint=Vis kommentar-delen i sidelayouten.
+XWiki.XWikiPreferences_showattachments.hint=Vis vedleggsdelen i sidelayouten.
+XWiki.XWikiPreferences_showhistory.hint=Vis historikk-delen i sidelayouten.
+XWiki.XWikiPreferences_showinformation.hint=Vis informasjonsseksjonen i sidelayouten.
+XWiki.XWikiPreferences_title.hint=Definer sidetittelformatet som nettleserne ser.
+XWiki.XWikiPreferences_meta.hint=Definer metadataene lagt til hver side, angi sidebeskrivelse, forfatter, nøkkelord osv.
+XWiki.XWikiPreferences_webcopyright.hint=Definer informasjonen som vises i opphavsrett-seksjonen av bunnteksten.
+XWiki.XWikiPreferences_version.hint=Definer informasjonen som vises i versjonseksjonen av bunnteksten.
+XWiki.XWikiPreferences_skin.hint=Angi standard drakt brukt. Det kan være filsystemdrakt, eksempel "flamingo" eller en tilpasset sidedrakt, eksempel "XWiki.DefaultSkin"
 XWiki.XWikiPreferences_iconTheme.hint=Angi ikontema som skal brukes som standard.
 XWiki.XWikiPreferences_colorTheme.hint=Angi fargetemaet som skal brukes som standard.
 
 # Editing Sections
 admin.edit=Redigering
-### Missing: admin.edit.description=Configure the edit mode, the WYSIWYG editor and the available syntaxes.
+admin.edit.description=Konfigurer redigeringsmodus, WYSIWYG-editoren og de tilgjengelige syntaksene.
 admin.title=Tittel
 XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Forhindre at brukere oppretter wiki-sider uten tittel.
-### Missing: XWiki.XWikiPreferences_editor.hint=Select the type of editor to use by default for editing the page content.
-### Missing: XWiki.XWikiPreferences_editcomment.hint=Allow entering a message when creating a new page version.
-### Missing: XWiki.XWikiPreferences_editcomment_mandatory.hint=For each change made, the page will not be saved until a version summary message is given.
-### Missing: XWiki.XWikiPreferences_minoredit.hint=Allow pages to have major (x.1) and minor (1.x) versions. The minor versions can be seen using the "Show Minor Edits" button from the page History.
-### Missing: admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
-### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
+XWiki.XWikiPreferences_editor.hint=Velg hvilken type editor som skal brukes som standard for redigering av sidens innhold.
+XWiki.XWikiPreferences_editcomment.hint=Tillat å legge inn en melding når du oppretter en ny sideversjon.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=For hver endring gjort blir siden ikke lagret før en endringsmelding er oppgitt.
+XWiki.XWikiPreferences_minoredit.hint=Tillat at sider har store (x.1) og mindre (1.x) versjoner. De mindre versjonene kan ses ved hjelp av knappen "Vis mindre endringer" fra historikksiden.
+admin.wysiwyg.description=Velg standard WYSIWYG editor og konfigurer den.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Sidesyntaks som brukes som standard for sidens innhold når du oppretter en ny wikiside.
 
 # Localization Section
-### Missing: XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
-### Missing: XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
-### Missing: XWiki.XWikiPreferences_default_language.hint=Select the default language of the wiki
-### Missing: XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
-### Missing: XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates
+XWiki.XWikiPreferences_multilingual.hint=Aktiver flerspråkmodus hvis wikien har innhold på flere språk. Dette gjør det mulig for brukere å oversette wikisider og vise grensesnittet på sitt foretrukne språk.
+XWiki.XWikiPreferences_languages.hint=Velg språkene som vil være tilgjengelige i grensesnittet. Brukerne vil kunne oversette sidene på wikien til et av disse språkene (hvis flerspråkmodus er aktivert).
+XWiki.XWikiPreferences_default_language.hint=Velg standard språk for wikien
+XWiki.XWikiPreferences_dateformat.hint=Angi formatet som brukes til å vise datoer (for eksempel opprettelsedato for sider)
+XWiki.XWikiPreferences_timezone.hint=Sett tidssone brukt på datoer globalt
 
 # Import Section
-### Missing: administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+administration.section.import.hint=Begynn med å laste opp en ny pakke eller ved å velge en fra listen over tilgjengelige pakker. Innholdet i den valgte pakken vil bli vist til høyre sammen med importalternativene.
 
 # Export Section
-### Missing: administration.section.export.packageName.hint=The file name used when generating the archive with the exported content.
-### Missing: administration.section.export.description.hint=The package description, displayed when importing the package.
-### Missing: administration.section.export.licence.hint=The content licence. E.g.: LGPL, GPLV2, etc.
-### Missing: administration.section.export.author.hint=The package author.
-### Missing: administration.section.export.version.hint=The package version.
-### Missing: administration.section.export.withHistory.hint=Include the page history in the export. Only the latest version of a page is exported otherwise.
-### Missing: administration.section.export.backupPack.hint=Specify if the package will be used as a backup. This option doesn't affect the exported content. The only effect is that the "Import as backup package" option will be preselected when your import the package. The difference between a backup package and a normal package is that in the first case the page last author is preserved during the import, while in the second case the user performing the import becomes the last author of each imported page.
+administration.section.export.packageName.hint=Filnavnet som brukes når du genererer arkivet med det eksporterte innholdet.
+administration.section.export.description.hint=Pakkebeskrivelsen, som vises når du importerer pakken.
+administration.section.export.licence.hint=Lisensiering av innholdet. F.eks.: LGPL, GPLV2, osv.
+administration.section.export.author.hint=Pakkeforfatteren.
+administration.section.export.version.hint=Pakkeversjonen.
+administration.section.export.withHistory.hint=Inkluder sidehistorikken i eksporten. Bare den nyeste versjonen av en side blir eksportert ellers.
+administration.section.export.backupPack.hint=Angi om pakken skal brukes som sikkerhetskopi. Dette alternativet påvirker ikke det eksporterte innholdet. Den eneste effekten er at alternativet "Importer som sikkerhetskopi" vil bli forhåndsvalgt når du importerer pakken. Forskjellen mellom en sikkerhetskopipakke og en vanlig pakke er at i det første tilfellet blir sideforfatteren bevart under importen, mens i det andre tilfelle blir brukeren som utfører importen den forrige forfatteren til hver importerte side.
 
 # Other Category
 admin.other=Annet
-### Missing: admin.other.description=Various configurations for extensions.
+admin.other.description=Ulike konfigurasjoner for utvidelser.
 administration.section.analytics.status=Status
 administration.section.analytics.status.hint=Bestem om sporing i Google Analytics™ er aktiv eller ikke</content>
-  
 </xwikidoc>

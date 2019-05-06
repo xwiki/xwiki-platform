@@ -476,7 +476,7 @@ xwiki.plugin.image.cache.capacity=30
 
 #-# Note that this plugin is in charge of storing stats in the database, and offering some API to query them.
 #-# It doesn't provide any UI. If you wish to install a UI, please check the Statistics Application at
-#-# http://extensions.xwiki.org/xwiki/bin/view/Extension/Statistics+Application
+#-# https://extensions.xwiki.org/xwiki/bin/view/Extension/Statistics+Application
 #-# (this application is no longer bundled in XWiki starting with 8.0)
 
 #-# Stats configuration allows to globally activate/deactivate stats module (launch storage thread, register events...).

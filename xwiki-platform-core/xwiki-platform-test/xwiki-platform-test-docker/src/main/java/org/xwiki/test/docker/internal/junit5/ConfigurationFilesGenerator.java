@@ -228,6 +228,17 @@ public class ConfigurationFilesGenerator
                 null,
                 null,
                 null)));
+        } else if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
+            props.putAll(getDBProperties(Arrays.asList(
+                "oracle",
+                String.format("jdbc:oracle:thin:@%s:%s:XE", ipAddress, port),
+                DB_USERNAME,
+                DB_PASSWORD,
+                "oracle.jdbc.driver.OracleDriver",
+                "org.hibernate.dialect.Oracle10gDialect",
+                null,
+                "xwiki.oracle.hbm.xml",
+                "feeds.oracle.hbm.xml")));
         } else {
             throw new RuntimeException(
                 String.format("Failed to generate Hibernate config. Database [%s] not supported yet!",

@@ -98,7 +98,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
                     localEvent.setEvent((Event) remoteEvent.getEvent());
 
                     if (remoteEvent.getEvent() instanceof DocumentDeletedEvent) {
-                        localEvent.setSource(unserializeDeletdDocument(remoteEvent.getSource(), xcontext));
+                        localEvent.setSource(unserializeDeletedDocument(remoteEvent.getSource(), xcontext));
                     } else {
                         localEvent.setSource(unserializeDocument(remoteEvent.getSource()));
                     }
@@ -113,7 +113,7 @@ public class DocumentEventConverter extends AbstractXWikiEventConverter
         return false;
     }
 
-    private XWikiDocument unserializeDeletdDocument(Serializable remoteData, XWikiContext xcontext)
+    private XWikiDocument unserializeDeletedDocument(Serializable remoteData, XWikiContext xcontext)
         throws XWikiException
     {
         Map<String, Serializable> remoteDataMap = (Map<String, Serializable>) remoteData;

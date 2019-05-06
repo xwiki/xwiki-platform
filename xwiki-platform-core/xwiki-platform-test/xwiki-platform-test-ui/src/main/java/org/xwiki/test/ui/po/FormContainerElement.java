@@ -83,6 +83,11 @@ public class FormContainerElement extends BaseElement
         setFieldValue(getFormContainer().findElement(findElementBy), value);
     }
 
+    public boolean hasField(By findFieldBy)
+    {
+        return getDriver().hasElementWithoutWaiting(this.formContainer, findFieldBy);
+    }
+
     public void setFieldValue(WebElement fieldElement, String value)
     {
         if ("checkbox".equals(fieldElement.getAttribute("type"))) {
@@ -113,6 +118,11 @@ public class FormContainerElement extends BaseElement
             }
             x++;
         }
+    }
+
+    public String getFormAction()
+    {
+        return getDriver().findElementWithoutWaiting(this.formContainer, By.tagName("form")).getAttribute("action");
     }
 
     public SelectElement getSelectElement(By by)

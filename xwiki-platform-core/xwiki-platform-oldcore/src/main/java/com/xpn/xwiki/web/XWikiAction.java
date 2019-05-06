@@ -22,6 +22,7 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -46,6 +47,7 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
@@ -75,6 +77,7 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
@@ -217,6 +220,25 @@ public abstract class XWikiAction extends Action
         }
 
         return actionForward;
+    }
+
+    /**
+     * Write an error response to an ajax request.
+     *
+     * @param httpStatusCode The status code to set on the response.
+     * @param message The message that should be displayed.
+     * @param context the context.
+     */
+    protected void writeAjaxErrorResponse(int httpStatusCode, String message, XWikiContext context)
+    {
+        try {
+            context.getResponse().setContentType("text/plain");
+            context.getResponse().setStatus(httpStatusCode);
+            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
+            context.getResponse().getWriter().print(message);
+        } catch (IOException e) {
+            LOGGER.error("Failed to send error response to AJAX save and continue request.", e);
+        }
     }
 
     public ActionForward execute(XWikiContext context) throws Exception
@@ -883,11 +905,42 @@ public abstract class XWikiAction extends Action
      */
     protected boolean csrfTokenCheck(XWikiContext context) throws XWikiException
     {
+        return csrfTokenCheck(context, false);
+    }
+
+    /**
+     * Perform CSRF check and redirect to the resubmission page if needed. Throws an exception if the access should be
+     * denied, returns false if the check failed and the user will be redirected to a resubmission page.
+     *
+     * @param context current xwiki context containing the request
+     * @param jsonAnswer if true, returns a JSON answer in case of AJAX request: allow to process it properly on client.
+     * @return true if the check succeeded, false if resubmission is needed
+     * @throws XWikiException if the check fails
+     * @since 11.3RC1
+     */
+    @Unstable
+    protected boolean csrfTokenCheck(XWikiContext context, boolean jsonAnswer) throws XWikiException
+    {
+        final boolean isAjaxRequest = Utils.isAjaxRequest(context);
         CSRFToken csrf = Utils.getComponent(CSRFToken.class);
         try {
             String token = context.getRequest().getParameter("form_token");
             if (!csrf.isTokenValid(token)) {
-                sendRedirect(context.getResponse(), csrf.getResubmissionURL());
+                if (isAjaxRequest) {
+                    if (jsonAnswer) {
+                        Map<String, String> jsonObject = new LinkedHashMap<>();
+                        jsonObject.put("errorType", "CSRF");
+                        jsonObject.put("resubmissionURI", csrf.getRequestURI());
+                        jsonObject.put("newToken", csrf.getToken());
+                        this.answerJSON(context, HttpServletResponse.SC_FORBIDDEN, jsonObject);
+                    } else {
+                        final String csrfCheckFailedMessage = localizePlainOrKey("core.editors.csrfCheckFailed");
+                        writeAjaxErrorResponse(HttpServletResponse.SC_FORBIDDEN, csrfCheckFailedMessage, context);
+                    }
+                } else {
+                    sendRedirect(context.getResponse(), csrf.getResubmissionURL());
+                }
+
                 return false;
             }
         } catch (XWikiException exception) {

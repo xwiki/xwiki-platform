@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>11.3-SNAPSHOT</version>
+    <version>11.4-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>11.3-SNAPSHOT</version>
+  <version>11.4-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -52,12 +52,12 @@
     <hsqldb.version>2.4.1</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.32</ckeditor.version>
-    <bootstrap.version>3.3.7-1</bootstrap.version>
+    <ckeditor.version>1.33</ckeditor.version>
+    <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.11</batik.version>
     <restlet.version>2.3.12</restlet.version>
     <tika.version>1.20</tika.version>
-    <pdfbox.version>2.0.14</pdfbox.version>
+    <pdfbox.version>2.0.15</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
@@ -78,6 +78,9 @@
     <xwiki.nexus.skipLocalStaging>true</xwiki.nexus.skipLocalStaging>
 
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
+
+    <!-- By default check the console output of functional tests for problems -->
+    <xwiki.surefire.validateconsole.skip>false</xwiki.surefire.validateconsole.skip>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>
@@ -105,7 +108,7 @@
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
-        <version>0.9.5.3</version>
+        <version>0.9.5.4</version>
       </dependency>
       <!-- Jython engine -->
       <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->
@@ -332,13 +335,13 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.2.0</version>
+        <version>5.3.1</version>
       </dependency>
 
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
-        <version>2.3.0</version>
+        <version>2.3.1</version>
       </dependency>
 
       <dependency>

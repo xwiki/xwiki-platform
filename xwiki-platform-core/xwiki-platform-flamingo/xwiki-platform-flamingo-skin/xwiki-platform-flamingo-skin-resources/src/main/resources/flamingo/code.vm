@@ -22,6 +22,14 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
 #end
 <div class="wiki-code">
   <table class="revision">
+    <thead class="hidden">
+      <tr>
+        <th scope="col">author</th>
+        <th scope="col">version</th>
+        <th scope="col">line-number</th>
+        <th scope="col">content</th>
+      </tr>
+    </thead>
     <tbody class="group">
 #if ($showLastAuthors)
   ## Initialiaze the annotated content with the latest content of the document

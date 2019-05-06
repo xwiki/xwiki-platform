@@ -42,7 +42,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * 
  * @version $Id$
  * @since 10.11.4
- * @since 11.3RC1
+ * @since 11.2
  */
 @Component
 @Singleton

@@ -147,75 +147,7 @@ public class AdministrationTest extends AbstractXWikiTestCase
         open("XWiki", "XWikiPreferences", "admin", "editor=globaladmin&section=" + nonExistingSection);
         assertConfigurationNotEditable("Main", "testConfigurableCreatedByUnauthorizedWillNotExecute");
     }
-
-    /*
-     * Creates a document with 2 configurable objects, one gets configured globally in one section and displays
-     * 2 configuration fields, the other is configured in the space in another section and displays the other 2
-     * fields. Fails if they are not displayed as they should be.
-     *
-     * Tests: XWiki.ConfigurableClass
-     */
-    @Test
-    public void testApplicationConfiguredInMultipleSections()
-    {
-        String space = "Main";
-        String page = "TestConfigurable";
-
-        createConfigurableApplication(space, page, "TestSection1", true);
-        open(space, page, "edit", "editor=object");
-        // Add a second configurable object.
-        new ObjectEditPage().addObject("XWiki.ConfigurableClass");
-        setFieldValue("XWiki.ConfigurableClass_1_displayInSection", "TestSection2");
-        setFieldValue("XWiki.ConfigurableClass_1_heading", "Some Other Heading");
-        SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
-            .findElementById("XWiki.ConfigurableClass_1_configurationClass"));
-        configurationSuggest.sendKeys(space + "." + page).waitForSuggestions().sendKeys(Keys.ENTER);
-        getSelenium().uncheck("XWiki.ConfigurableClass_1_configureGlobally");
-        // Set propertiesToShow so that each config only shows half of the properties.
-        setFieldValue("XWiki.ConfigurableClass_1_propertiesToShow", "TextArea, Select");
-        setFieldValue("XWiki.ConfigurableClass_0_propertiesToShow", "String, Boolean");
-        clickEditSaveAndView();
-
-        // Assert that half of the configuration shows up but not the other half.
-        open("XWiki", "XWikiPreferences", "admin", "editor=globaladmin&section=TestSection1");
-        assertElementPresent("//div[@id='admin-page-content']/h2[@id='HSomeHeading']/span");
-        // Fields
-        String fullName = space + "." + page;
-        String form = "//div[@id='admin-page-content']/form[@action='/xwiki/bin/save/" + space + "/" + page + "']";
-        assertElementPresent(form + "/fieldset//label['String']");
-        assertElementPresent(form + "/fieldset//input[@name='" + fullName + "_0_String']");
-        assertElementPresent(form + "/fieldset//label['Boolean']");
-        assertElementPresent(form + "/fieldset//select[@name='" + fullName + "_0_Boolean']");
-        assertElementPresent(form + "/fieldset/input[@id='" + fullName + "_redirect']");
-        // xredirect
-        assertElementPresent(form + "/fieldset/input[@value='" + getSelenium().getLocation() + "'][@name='xredirect']");
-        // Save button
-        // assertElementPresent(form + "/div/p/span/input[@type='submit']");
-        // Javascript injects a save button outside of the form and removes the default save button.
-        waitForElement("//div/div/p/span/input[@type='submit'][@value='Save']");
-        // Should not be here
-        assertElementNotPresent(form + "/fieldset//textarea[@name='" + fullName + "_0_TextArea']");
-        assertElementNotPresent(form + "/fieldset//select[@name='" + fullName + "_0_Select']");
-
-        // Now we go to where the other half of the configuration should be.
-        open("Main", "WebPreferences", "admin", "editor=spaceadmin&section=TestSection2");
-        assertElementPresent("//h2[@id='HSomeOtherHeading']/span");
-        // Fields
-        assertElementPresent(form + "/fieldset//label");
-        assertElementPresent(form + "/fieldset//textarea[@name='" + fullName + "_0_TextArea']");
-        assertElementPresent(form + "/fieldset//select[@name='" + fullName + "_0_Select']");
-        assertElementPresent(form + "/fieldset/input[@id='" + fullName + "_redirect']");
-        // xredirect
-        assertElementPresent(form + "/fieldset/input[@value='" + getSelenium().getLocation() + "'][@name='xredirect']");
-        // Save button
-        // assertElementPresent(form + "/div/p/span/input[@type='submit']");
-        // Javascript injects a save button outside of the form and removes the default save button.
-        waitForElement("//div/div/p/span/input[@type='submit'][@value='Save']");
-        // Should not be here
-        assertElementNotPresent(form + "/fieldset//input[@name='" + fullName + "_0_String']");
-        assertElementNotPresent(form + "/fieldset//select[@name='" + fullName + "_0_Boolean']");
-    }
-
+    
     /*
      * Make sure html macros and pre tags are not being stripped 
      * @see: https://jira.xwiki.org/browse/XAADMINISTRATION-141
@@ -294,59 +226,6 @@ public class AdministrationTest extends AbstractXWikiTestCase
             getSelenium().close();
         } finally {
             getSelenium().selectWindow(null);
-        }
-    }
-
-    /*
-     * If CodeToExecute is defined in a configurable app, then it should be evaluated.
-     * Also header should be evaluated and not just printed.
-     * If XWiki.ConfigurableClass is saved with programming rights, it should resave itself so that it doesn't have them.
-     */
-    @Test
-    public void testCodeToExecutionAndAutoSandboxing() throws Exception
-    {
-        String space = "Main";
-        String page = "TestConfigurable";
-        String codeToExecute = "#set($code = 's sh')"
-                             + "Thi${code}ould be displayed."
-                             + "#if($xcontext.hasProgrammingRights())"
-                             + "This should not be displayed."
-                             + "#end";
-        String heading = "#set($code = 'his sho')"
-                       + "T${code}uld also be displayed.";
-        createConfigurableApplication(space, page, "TestSection6", true);
-        open(space, page, "edit", "editor=object");
-        expandObject("XWiki.ConfigurableClass", 0);
-        setFieldValue("XWiki.ConfigurableClass_0_codeToExecute", codeToExecute);
-        setFieldValue("XWiki.ConfigurableClass_0_heading", heading);
-        SuggestInputElement configurationSuggest = new SuggestInputElement(getDriver()
-            .findElementById("XWiki.ConfigurableClass_0_configurationClass"));
-        configurationSuggest.clear();
-        clickEditSaveAndView();
-
-        Page restPage = getUtil().rest().get(new LocalDocumentReference("XWiki", "ConfigurableClass"));
-        String standardContent = restPage.getContent();
-        try {
-            // Modify content
-            restPage.setContent(standardContent + "\n\n{{velocity}}Has Programming permission: $xcontext.hasProgrammingRights(){{/velocity}}");
-            // Our admin will foolishly save XWiki.ConfigurableClass, giving it programming rights.
-            getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
-            getUtil().rest().save(restPage);
-
-            // Now we look at the section for our configurable.
-            open("XWiki", "ConfigurableClass", "view", "editor=globaladmin&section=TestSection6");
-
-            assertTextPresent("This should be displayed.");
-            assertTextPresent("This should also be displayed.");
-            assertTextNotPresent("This should not be displayed.");
-            assertTextPresent("Has Programming permission: false");
-            // Make sure javascript has not added a Save button.
-            assertElementNotPresent("//div/div/p/span/input[@type='submit'][@value='Save']");
-        } finally {
-            // Restore initial content
-            restPage.setContent(standardContent);
-            // Save
-            getUtil().rest().save(restPage);
         }
     }
 

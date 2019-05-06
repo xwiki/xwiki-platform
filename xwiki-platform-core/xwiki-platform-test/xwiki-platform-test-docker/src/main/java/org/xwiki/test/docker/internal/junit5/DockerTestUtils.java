@@ -55,6 +55,12 @@ public final class DockerTestUtils
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(DockerTestUtils.class);
 
+    private static final boolean IN_A_CONTAINER = new File("/.dockerenv").exists();
+
+    private static final String DEFAULT = "default";
+
+    private static final char DASH = '-';
+
     private DockerTestUtils()
     {
         // Prevents instantiation.
@@ -93,7 +99,7 @@ public final class DockerTestUtils
 
     /**
      * @param source the file to copy into the target directory, but only if the file is not already there or if it's
-     *        been modified
+     * been modified
      * @param targetDirectory the directory into which to copy the file
      * @throws Exception when an error occurs during the copy
      */
@@ -144,19 +150,16 @@ public final class DockerTestUtils
             return;
         }
 
-        String testSimpleClass = extensionContext.getTestClass().get().getSimpleName();
-        String testName =  extensionContext.getTestMethod().get().getName();
+        String testName = extensionContext.getTestMethod().get().getName();
 
         try {
             File sourceFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-            File screenshotFile;
-            File screenshotDir = DockerTestUtils.getScreenshotsDirectory(testConfiguration);
-            screenshotDir.mkdirs();
-            screenshotFile = new File(screenshotDir, String.format("%s-%s.png", testSimpleClass, testName));
+            File screenshotFile = DockerTestUtils.getResultFileLocation("png", testConfiguration, extensionContext);
+            screenshotFile.getParentFile().mkdirs();
             FileUtils.copyFile(sourceFile, screenshotFile);
-            LOGGER.info("Screenshot for failing test [{}] saved at [{}].", testName, screenshotFile.getAbsolutePath());
+            LOGGER.info("Screenshot for test [{}] saved at [{}].", testName, screenshotFile.getAbsolutePath());
         } catch (Exception e) {
-            LOGGER.error("Failed to take screenshot for failing test [{}].", testName, e);
+            LOGGER.error("Failed to take screenshot for test [{}].", testName, e);
         }
     }
 
@@ -188,5 +191,69 @@ public final class DockerTestUtils
         File directory = new File(String.format("%s/screenshots", testConfiguration.getOutputDirectory()));
         directory.mkdirs();
         return directory;
+    }
+
+    /**
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @return the string representation identifying the current configuration
+     */
+    public static String getTestConfigurationName(TestConfiguration testConfiguration)
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append(testConfiguration.getDatabase().name());
+        builder.append(DASH);
+        builder.append(testConfiguration.getDatabaseTag() != null ? testConfiguration.getDatabaseTag() : DEFAULT);
+        builder.append(DASH);
+        builder.append(testConfiguration.getJDBCDriverVersion() != null
+            ? testConfiguration.getJDBCDriverVersion() : DEFAULT);
+        builder.append(DASH);
+        builder.append(testConfiguration.getServletEngine().name());
+        builder.append(DASH);
+        builder.append(testConfiguration.getServletEngineTag() != null
+            ? testConfiguration.getServletEngineTag() : DEFAULT);
+        builder.append(DASH);
+        builder.append(testConfiguration.getBrowser().name());
+        return builder.toString().toLowerCase();
+    }
+
+    /**
+     * @param fileSuffix the suffix of the file to create
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @param extensionContext the test execution context from which to extract the test class and test name used to
+     *        compute the name of the new file
+     * @return the file object in which to save a result
+     */
+    public static File getResultFileLocation(String fileSuffix,
+        TestConfiguration testConfiguration, ExtensionContext extensionContext)
+    {
+        // Note: There's currently a limitation in Jenkins when archiving artifacts: they are copied without caring
+        // about their locations. And since we run the same test several times but with different configurations,
+        // the test name is not enough to uniquely point to a given test in a given configuration. Thus we also
+        // need to save the configuration name, even though the directory in which we're saving the screenshot
+        // is already named after the executing configuration name.
+        File newDir = DockerTestUtils.getScreenshotsDirectory(testConfiguration);
+        File newFile = new File(newDir, String.format("%s-%s-%s.%s",
+            DockerTestUtils.getTestConfigurationName(testConfiguration),
+            extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName(),
+            fileSuffix));
+        return newFile;
+    }
+
+    /**
+     * @return true if the test framework is running inside a Docker container (DOOD pattern)
+     * @since 11.3RC1
+     */
+    public static boolean isInAContainer()
+    {
+        return IN_A_CONTAINER;
+    }
+
+    /**
+     * @return true if the test framework is executing locally on developer's machines
+     * @since 11.3RC1
+     */
+    public static boolean isLocal()
+    {
+        return !DockerTestUtils.isInAContainer();
     }
 }

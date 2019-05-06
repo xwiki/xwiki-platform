@@ -1,0 +1,15 @@
+Package: xwiki-tomcat9-common
+Version: [[version]]
+Section: java
+Priority: optional
+Architecture: all
+Depends: xwiki-common (= [[version]]), tomcat8
+Provides: xwiki-tomcat-common
+Replaces: xwiki-tomcat-common, xwiki-enterprise-tomcat-common
+Conflicts: xwiki-tomcat-common, xwiki-enterprise-tomcat-common
+Suggests: xwiki-tomcat9-mysql | xwiki-tomcat9-pgsql
+Maintainer: [[debian.maintainer]]
+License: [[debian.license]]
+Description: [[debian.description]]
+Bugs: [[debian.bugs]]
+Homepage: [[debian.homepage]]

@@ -184,6 +184,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
+import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateAttachmentStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -1233,21 +1234,88 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         return getRenderedContent(getOutputSyntax(), transformationContextIsolated, context);
     }
 
+    /**
+     * Execute and render the current document in the current context.
+     * The code is executed with right of this document content author.
+     *
+     * @param context  the XWiki Context object
+     * @return  the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public String displayDocument(XWikiContext context) throws XWikiException
+    {
+        return displayDocument(getOutputSyntax(),context);
+    }
+
+    /**
+     * Execute and render the current document in the current context.
+     * The code is executed with right of this document content author.
+     *
+     * @param targetSyntax  the syntax to use to render the document
+     * @param context  the XWiki Context object
+     * @return  the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public String displayDocument(Syntax targetSyntax, XWikiContext context) throws XWikiException
+    {
+        return getRenderedContent(targetSyntax, true, context, false);
+    }
+
+    /**
+     * Execute and render the document or its translation in the current context.
+     * The code is executed with right of this document (or the translation) content author.
+     * The translations are retrieved if they exist and based on XWiki preferences
+     * (see {@link #getTranslatedDocument(XWikiContext)}).
+     *
+     * @param targetSyntax  the syntax to use to render the document
+     * @param transformationContextIsolated see {@link DocumentDisplayerParameters#isTransformationContextIsolated()}
+     * @param context  the XWiki Context object
+     * @return  the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     */
     public String getRenderedContent(Syntax targetSyntax, boolean transformationContextIsolated, XWikiContext context)
+        throws XWikiException
+    {
+        return getRenderedContent(targetSyntax, transformationContextIsolated, context, true);
+    }
+
+    /**
+     * Execute and render the document or its translation in the current context.
+     * The code is executed with right of this document (or the translation) content author.
+     *
+     * @param targetSyntax the syntax to use to render the document
+     * @param transformationContextIsolated see {@link DocumentDisplayerParameters#isTransformationContextIsolated()}
+     * @param context the XWiki Context object
+     * @param retrieveTranslation if true retrieve the translation of the document according to the preferences (see
+     *  {@link #getTranslatedDocument(XWikiContext)}). If false, render the current document.
+     * @return the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     * @since 11.3RC1
+     */
+    private String getRenderedContent(Syntax targetSyntax, boolean transformationContextIsolated, XWikiContext context,
+        boolean retrieveTranslation)
         throws XWikiException
     {
         // Make sure the context secure document is the current document so that it's executed with its own
         // rights
-        Object currrentSdoc = context.get("sdoc");
+        Object currentSdoc = context.get("sdoc");
         try {
-            // If we execute a translation use translated document as secure document
-            XWikiDocument tdoc = getTranslatedDocument(context);
+            XWikiDocument sdoc;
 
-            context.put("sdoc", tdoc);
+            if (retrieveTranslation) {
+                sdoc = getTranslatedDocument(context);
+            } else {
+                sdoc = this;
+            }
+            context.put("sdoc", sdoc);
 
-            return display(targetSyntax, false, transformationContextIsolated, false, true);
+            return display(targetSyntax, false, transformationContextIsolated, false, retrieveTranslation);
         } finally {
-            context.put("sdoc", currrentSdoc);
+            context.put("sdoc", currentSdoc);
         }
     }
 
@@ -6584,9 +6652,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         for (XWikiAttachment origAttach : fromDoc.getAttachmentList()) {
             String fileName = origAttach.getFilename();
             XWikiAttachment newAttach = toDoc.getAttachment(fileName);
+            origAttach = retrieveDeletedAttachment(fromDoc, origAttach, context);
             if (newAttach == null) {
                 difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.DELETE, origAttach, newAttach));
             } else {
+                newAttach = retrieveDeletedAttachment(toDoc, newAttach, context);
                 try {
                     if (!origAttach.equalsData(newAttach, context)) {
                         difflist
@@ -6602,12 +6672,60 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         for (XWikiAttachment newAttach : toDoc.getAttachmentList()) {
             String fileName = newAttach.getFilename();
             XWikiAttachment origAttach = fromDoc.getAttachment(fileName);
+            newAttach = retrieveDeletedAttachment(toDoc, newAttach, context);
             if (origAttach == null) {
                 difflist.add(new AttachmentDiff(fileName, org.xwiki.diff.Delta.Type.INSERT, origAttach, newAttach));
             }
         }
 
         return difflist;
+    }
+
+    private XWikiAttachment retrieveDeletedAttachment(XWikiDocument doc, XWikiAttachment attachment,
+        XWikiContext context)
+    {
+        XWikiAttachment result = null;
+
+        InputStream is = null;
+        try {
+            is = attachment.getContentInputStream(context);
+            if (is == null) {
+                AttachmentRecycleBinStore attachmentRecycleBinStore = context.getWiki().getAttachmentRecycleBinStore();
+                List<DeletedAttachment> allDeletedAttachments =
+                    attachmentRecycleBinStore.getAllDeletedAttachments(this, context, true);
+
+                for (DeletedAttachment deletedAttachment : allDeletedAttachments) {
+                    XWikiAttachment restoredAttachment = deletedAttachment.restoreAttachment();
+                    if (restoredAttachment.getDate().before(attachment.getDate())) {
+                        break;
+                    }
+                    result = restoredAttachment;
+                }
+
+                if (result != null) {
+                    if (!Objects.equals(attachment.getVersion(), result.getVersion())) {
+                        result = result.getAttachmentRevision(attachment.getVersion(), context);
+                    }
+                }
+            }
+        } catch (XWikiException e) {
+            LOGGER.error("Error while trying to load deleted attachment [{}] for doc [{}]", attachment, doc, e);
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException ex) {
+
+                }
+            }
+        }
+
+        if (result == null) {
+            result = attachment;
+        } else {
+            result.setDoc(doc);
+        }
+        return result;
     }
 
     /**
@@ -9169,5 +9287,18 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         }
 
         return null;
+    }
+
+    /**
+     * Compute and return the maximum authorized length for the full name (i.e. the serialized reference of the
+     * document) based on the current store limitation.
+     *
+     * @return the maximum authorized length for a document full name.
+     * @since 11.4RC1
+     */
+    @Unstable
+    public int getLocalReferenceMaxLength()
+    {
+        return getStore().getLimitSize(this.getXWikiContext(), this.getClass(), "fullName");
     }
 }

@@ -169,12 +169,12 @@ public class DefaultMailSenderConfigurationTest
 
         Properties returnedProperties = this.configuration.getAllProperties();
 
-        assertEquals(5, returnedProperties.size());
+        assertEquals(4, returnedProperties.size());
         assertEquals("true", returnedProperties.getProperty("mail.smtp.starttls.enable"));
         assertEquals("server", returnedProperties.getProperty("mail.smtp.host"));
         assertEquals("25", returnedProperties.getProperty("mail.smtp.port"));
         assertEquals("smtp", returnedProperties.getProperty("mail.transport.protocol"));
-        assertEquals("john@doe.com", returnedProperties.getProperty("mail.smtp.from"));
+        assertNull(returnedProperties.getProperty("mail.smtp.from"));
         assertNull(returnedProperties.getProperty("mail.smtp.user"));
     }
 

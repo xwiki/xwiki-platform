@@ -152,10 +152,7 @@
             $escapetool.xml($services.localization.render('xe.admin.users.deleteUser'))
           &lt;/div&gt;
         &lt;/div&gt;
-        &lt;div class="modal-body"&gt;
-          #set ($message = $escapetool.xml($services.localization.render('rightsmanager.confirmdeleteuser')))
-          &lt;p&gt;$message.replace('__name__', '&lt;span class="userName"&gt;&lt;/span&gt;')&lt;/p&gt;
-        &lt;/div&gt;
+        &lt;div class="modal-body loading"&gt;&lt;/div&gt;
         &lt;div class="modal-footer"&gt;
           &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
             $escapetool.xml($services.localization.render('cancel'))
@@ -168,32 +165,94 @@
     &lt;/div&gt;
   &lt;/div&gt;
 #end
+
+#macro (deleteUserModalContent $userReference)
+  {{html clean="false"}}
+  #set ($userReference = $services.model.resolveDocument($userReference, 'user'))
+  &lt;p&gt;$services.localization.render('administration.section.users.deleteUser.confirmationMessage', [
+    "#displayUser($userReference {'useInlineHTML': true})",
+    "&lt;a href='$xwiki.getURL($userReference, 'view', 'category=groups')'&gt;",
+    '&lt;/a&gt;'
+  ])&lt;/p&gt;
+  ## Check if the user we're about to delete has programming or script rights because in this case deleting the user may
+  ## break the pages where this user was the last (content) author.
+  #set ($mainWikiPrefsRef = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki',
+    'XWikiPreferences'))
+  #if ($services.security.authorization.hasAccess('programming', $userReference, $mainWikiPrefsRef))
+    #maybeShowDeleteUserWarning($userReference 'administration.section.users.deleteUser.programmingRightsWarning')
+  #elseif ($services.security.authorization.hasAccess('script', $userReference, $mainWikiPrefsRef))
+    #maybeShowDeleteUserWarning($userReference 'administration.section.users.deleteUser.scriptRightsWarning')
+  #end
+  ## Make sure the administrator knows that he can use the "active" user profile property instead of deleting the user.
+  &lt;div class="box infomessage"&gt;
+    $services.localization.render('administration.section.users.deleteUser.markInactiveMessage')
+  &lt;/div&gt;
+  {{/html}}
+#end
+
+#macro (maybeShowDeleteUserWarning $userReference $translationKey)
+  #countPagesLastModifiedBy($userReference)
+  #if ($pageCount &gt; 0)
+    &lt;div class="box errormessage"&gt;
+      #set ($pageIndexURL = $xwiki.getURL('Main.AllDocs') + '#|t=alldocs&amp;doc.author=' +
+        $escapetool.url($services.model.serialize($userReference, 'local')))
+      $services.localization.render($translationKey, ["&lt;a href='$pageIndexURL'&gt;", $pageCount, '&lt;/a&gt;'])
+    &lt;/div&gt;
+  #end
+#end
+
+#macro (countPagesLastModifiedBy $userReference)
+  #if ($userReference.wikiReference.name == $xcontext.mainWikiName)
+    #set ($wikis = $services.wiki.allIds)
+  #else
+    #set ($wikis = $userReference.wikiReference.name)
+  #end
+  #set ($pageCount = 0)
+  #set ($statement = 'where doc.author = :user or doc.contentAuthor = :user')
+  #foreach ($wiki in $wikis)
+    #if ($userReference.wikiReference.name == $wiki)
+      #set ($userReferenceString = $services.model.serialize($userReference, 'local'))
+    #else
+      #set ($userReferenceString = $services.model.serialize($userReference, 'default'))
+    #end
+    #set ($pageCount = $pageCount + $services.query.xwql($statement).setWiki($wiki).addFilter('unique'
+      ).bindValue('user', $userReferenceString).count())
+  #end
+#end
+
+#macro (doView)
+  ## We include new settings from the Wiki Manager (only if it is not the main wiki).
+  #set ($wikiManagerUserRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUsers'))
+  #if (!$xcontext.isMainWiki() &amp;&amp; $xwiki.exists($wikiManagerUserRef))
+    {{include reference="WikiManager.WikiUsers" /}}
+  #end
+  ## The Users management is enabled:
+  ## - on the main wiki
+  ## - on a subwiki where local users are enabled
+  ## - on a subwiki if there is no service "$services.wiki.user"
+  #if ($xcontext.isMainWiki() || "$!services.wiki.user" == '' || "$!services.wiki.user.userScope" != 'GLOBAL_ONLY')
+    ##
+    ## Inject needed JS and CSS files
+    ##
+    #set ($discard = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
+    #set ($discard = $xwiki.ssx.use("XWiki.AdminUsersSheet"))
+    #set ($discard = $xwiki.jsx.use("XWiki.AdminUsersSheet"))
+
+    {{html clean="false"}}
+    #displayUsersLiveTable
+    #createUserModal
+    #editUserModal
+    #deleteUserModal
+    {{/html}}
+  #end
+#end
 {{/velocity}}
 
 {{velocity}}
-## We include new settings from the Wiki Manager (only if it is not the main wiki).
-#set ($wikiManagerUserRef = $services.model.createDocumentReference('', 'WikiManager', 'WikiUsers'))
-#if (!$xcontext.isMainWiki() &amp;&amp; $xwiki.exists($wikiManagerUserRef))
-  {{include reference="WikiManager.WikiUsers" /}}
-#end
-## The Users management is enabled:
-## - on the main wiki
-## - on a subwiki where local users are enabled
-## - on a subwiki if there is no service "$services.wiki.user"
-#if ($xcontext.isMainWiki() || "$!services.wiki.user" == '' || "$!services.wiki.user.userScope" != 'GLOBAL_ONLY')
-  ##
-  ## Inject needed JS and CSS files
-  ##
-  #set ($discard = $xwiki.ssx.use("XWiki.XWikiUserSheet"))
-  #set ($discard = $xwiki.ssx.use("XWiki.AdminUsersSheet"))
-  #set ($discard = $xwiki.jsx.use("XWiki.AdminUsersSheet"))
-
-  {{html clean="false"}}
-  #displayUsersLiveTable
-  #createUserModal
-  #editUserModal
-  #deleteUserModal
-  {{/html}}
+#if ($request.data == 'deleteUserModalContent' &amp;&amp; "$!request.userReference" != '')
+  #deleteUserModalContent($request.userReference)
+#else
+  #doView
 #end
 {{/velocity}}</content>
   <object>
@@ -212,6 +271,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -413,6 +473,30 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
   // User Deletion
   //
   var deleteUserModal = $('#deleteUserModal');
+  var deleteUserModalBody = deleteUserModal.find('.modal-body');
+  var deleteUserButton = deleteUserModal.find('.btn-danger');
+
+  var deleteUserModalContentRequest;
+  var deleteUserModalContentURL = new XWiki.Document('AdminUsersSheet', 'XWiki').getURL('get',
+    'data=deleteUserModalContent');
+
+  var loadDeleteUserModalContent = function(userReference) {
+    // Abort any pending request (the user can close the modal before the response is received).
+    if (deleteUserModalContentRequest) {
+      deleteUserModalContentRequest.abort();
+    }
+    deleteUserButton.prop('disabled', true);
+    deleteUserModalBody.empty().addClass('loading');
+    deleteUserModalContentRequest = $.get(deleteUserModalContentURL, {
+      'userReference': userReference
+    }, function(html) {
+      deleteUserModalBody.html(html);
+    }, 'html').always(function() {
+      deleteUserModalBody.removeClass('loading');
+      deleteUserButton.prop('disabled', false);
+    });
+  };
+
   deleteUserModal.on('show.bs.modal', function() {
     var rowData = deleteUserModal.data('rowData');
     var userReference = rowData.doc_fullName;
@@ -420,13 +504,16 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       userReference = XWiki.Model.resolve(userReference, XWiki.EntityType.DOCUMENT, [rowData.doc_wiki]);
       userReference = XWiki.Model.serialize(userReference);
     }
-    deleteUserModal.find('.userName').text(userReference);
-  }).find('.btn-danger').click(function() {
+    deleteUserModal.data('userReference', userReference);
+    loadDeleteUserModalContent(userReference);
+  });
+
+  deleteUserButton.click(function() {
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.users.delete.inProgress')),
       'inprogress'
     );
-    var userReference = deleteUserModal.find('.userName').text();
+    var userReference = deleteUserModal.data('userReference');
     $.post('', {
       xpage: 'deleteuorg',
       docname: userReference,
@@ -473,6 +560,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>

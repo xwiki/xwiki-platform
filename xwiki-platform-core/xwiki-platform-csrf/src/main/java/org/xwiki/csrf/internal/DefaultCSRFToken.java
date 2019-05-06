@@ -189,11 +189,7 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
     @Override
     public String getResubmissionURL()
     {
-        // request URL is the one that performs the modification
-        String srid = SavedRequestManager.saveRequest(getRequest());
-        String resubmitUrl = getRequest().getRequestURI();
-        resubmitUrl += '?' + SavedRequestManager.getSavedRequestIdentifier() + "=" + srid;
-        String query = "resubmit=" + urlEncode(resubmitUrl);
+        String query = "resubmit=" + urlEncode(getRequestURI());
 
         // back URL is the URL of the document that was about to be modified, so in most
         // cases we can redirect back to the correct document (if the user clicks "no")
@@ -203,6 +199,16 @@ public class DefaultCSRFToken implements CSRFToken, Initializable
         // redirect to the resubmission template
         query += "&xpage=" + RESUBMIT_TEMPLATE;
         return backUrl + "?" + query;
+    }
+
+    @Override
+    public String getRequestURI()
+    {
+        // request URL is the one that performs the modification
+        String srid = SavedRequestManager.saveRequest(getRequest());
+        String resubmitUrl = getRequest().getRequestURI();
+        resubmitUrl += '?' + SavedRequestManager.getSavedRequestIdentifier() + "=" + srid;
+        return resubmitUrl;
     }
 
     /**

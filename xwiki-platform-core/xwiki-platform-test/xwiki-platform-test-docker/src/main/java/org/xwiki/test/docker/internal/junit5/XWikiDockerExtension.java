@@ -53,6 +53,13 @@ import com.google.common.primitives.Ints;
 
 import ch.qos.logback.classic.Level;
 
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getResultFileLocation;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isLocal;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.setLogbackLoggerLevel;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreenshot;
+
 /**
  * JUnit5 Extension to inject {@link TestUtils} and {@link XWikiWebDriver} instances in tests and that peforms the
  * following tasks.
@@ -107,8 +114,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
         // of debugging information.
         if (testConfiguration.isDebug()) {
-            DockerTestUtils.setLogbackLoggerLevel("org.testcontainers", Level.DEBUG);
-            DockerTestUtils.setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
+            setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
+            setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
         }
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the
@@ -150,7 +157,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             LOGGER.info("(*) Provision extensions for test...");
             provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
-            LOGGER.info("XWiki is already started, using running instance at [%s] to execute the tests...",
+            LOGGER.info("XWiki is already started, using running instance at [{}] to execute the tests...",
                 loadXWikiURL(extensionContext));
 
             // Note: Provisioning is not done in this case, you're supposed to have an XWiki instance that contains
@@ -175,32 +182,31 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             webDriverContainer.getWebDriver().manage().window().maximize();
             VncRecordingContainer vnc = new VncRecordingContainer(webDriverContainer);
             saveVNC(extensionContext, vnc);
-            DockerTestUtils.startContainer(vnc);
+            startContainer(vnc);
         }
 
-        LOGGER.info("(*) Starting test...");
+        LOGGER.info("(*) Starting test [{}]", extensionContext.getTestMethod().get().getName());
     }
 
     @Override
     public void afterEach(ExtensionContext extensionContext)
     {
-        LOGGER.info("(*) Stopping test...");
+        LOGGER.info("(*) Stopping test [{}]", extensionContext.getTestMethod().get().getName());
+
+        // If running locally then save the screenshot and the video by default for easier debugging. For the moment
+        // we consider we're running locally if we're not running inside a Docker container. To be improved.
+        if (isLocal()) {
+            saveScreenshotAndVideo(extensionContext);
+        }
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
             VncRecordingContainer vnc = loadVNC(extensionContext);
-            // TODO: Record the video only if the test has failed, when Junit5 add support for extensions to know the
-            // test result status... See https://github.com/junit-team/junit5/issues/542
-            File recordingDir = DockerTestUtils.getScreenshotsDirectory(testConfiguration);
-            File recordingFile = new File(recordingDir, String.format("%s-%s.flv",
-                extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName()));
-            vnc.saveRecordingToFile(recordingFile);
             vnc.stop();
 
             // Note: We don't need to stop the BrowserWebDriverContainer since that's done automatically by
             // TestContainers. This allows the test to finish faster and thus provide faster results (because stopping
             // the container takes a bit of time).
-            LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
         }
     }
 
@@ -208,8 +214,10 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     public void handleTestExecutionException(ExtensionContext extensionContext, Throwable throwable)
         throws Throwable
     {
-        DockerTestUtils.takeScreenshot(extensionContext, loadTestConfiguration(extensionContext),
-            loadXWikiWebDriver(extensionContext));
+        // Only take screenshot & save video if not executing locally as otherwise they're always taken and saved!
+        if (!isLocal()) {
+            saveScreenshotAndVideo(extensionContext);
+        }
         throw throwable;
     }
 
@@ -326,7 +334,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         testContext.getUtil().rest().setURLPrefix(loadXWikiURL(extensionContext));
 
         // Display logs after the container has been started so that we can see problems happening in the containers
-        DockerTestUtils.followOutput(webDriverContainer, getClass());
+        followOutput(webDriverContainer, getClass());
 
         // Cache the initial CSRF token since that token needs to be passed to all forms (this is done automatically
         // in TestUtils), including the login form. Whenever a new user logs in we need to recache.
@@ -392,5 +400,26 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     private boolean isServletEngineForbidden(TestConfiguration testConfiguration)
     {
         return testConfiguration.getForbiddenServletEngines().contains(testConfiguration.getServletEngine());
+    }
+
+    private void saveScreenshotAndVideo(ExtensionContext extensionContext)
+    {
+        // Take screenshot
+        takeScreenshot(extensionContext, loadTestConfiguration(extensionContext),
+            loadXWikiWebDriver(extensionContext));
+
+        // Save the video
+        saveVideo(extensionContext);
+    }
+
+    private void saveVideo(ExtensionContext extensionContext)
+    {
+        TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
+        if (testConfiguration.vnc()) {
+            VncRecordingContainer vnc = loadVNC(extensionContext);
+            File recordingFile = getResultFileLocation("flv", testConfiguration, extensionContext);
+            vnc.saveRecordingToFile(recordingFile);
+            LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
+        }
     }
 }

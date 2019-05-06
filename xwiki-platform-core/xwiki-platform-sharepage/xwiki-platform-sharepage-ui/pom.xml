@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-sharepage</artifactId>
-    <version>11.3-SNAPSHOT</version>
+    <version>11.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-sharepage-ui</artifactId>
   <name>XWiki Platform - Share Page - UI</name>
@@ -39,6 +39,14 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mailsender</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- Needed to have an implementation for MailSenderConfiguration -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-send-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
 </project>

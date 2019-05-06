@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -59,11 +60,23 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
 
     private Cache<AsyncRendererJobStatus> longCache;
 
-    private Map<EntityReference, Set<String>> referenceMapping = new ConcurrentHashMap<>();
+    private final Map<EntityReference, Set<String>> referenceMapping = new ConcurrentHashMap<>();
 
-    private Map<Type, Set<String>> roleTypeMapping = new ConcurrentHashMap<>();
+    private final Map<Type, Set<String>> roleTypeMapping = new ConcurrentHashMap<>();
 
-    private Map<ComponentRole<?>, Set<String>> roleMapping = new ConcurrentHashMap<>();
+    private final Map<ComponentRole<?>, Set<String>> roleMapping = new ConcurrentHashMap<>();
+
+    private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+
+    /**
+     * @return the lock the lock
+     * @since 10.11.5
+     * @since 11.3RC1
+     */
+    public ReentrantReadWriteLock getLock()
+    {
+        return this.lock;
+    }
 
     /**
      * @param jobId the job identifier
@@ -86,12 +99,12 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         try {
             // Standard cache (long lived but small by default)
             this.longCache =
-                this.cacheManager.createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer", 100, 86400));
+                this.cacheManager.createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer.long", 100, 86400));
 
             // Cache to store asynchronous result kept only for the small period between which the job is finished
             // but it was not been asked yet by the client (short live but big size)
             this.asyncCache = this.cacheManager
-                .createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer.nocache", 10000, 600));
+                .createNewCache(new LRUCacheConfiguration("rendering.asyncrenderer.async", 10000, 600));
         } catch (CacheException e) {
             throw new InitializationException("Failed to initialize cache", e);
         }
@@ -111,28 +124,22 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     }
 
     /**
-     * @param id the identifier of the job.
      * @param clientId the client associated with the status
      * @return the status associated with the provided key and client, or {@code null} if there is no value.
-     * @since 10.11RC1
+     * @since 10.11.5
+     * @since 11.3RC1
      */
-    public AsyncRendererJobStatus getAsync(List<String> id, long clientId)
+    public AsyncRendererJobStatus getAsync(String clientId)
     {
-        String cacheKey = toCacheKey(id);
-
         // Try async cache
-        AsyncRendererJobStatus status = this.asyncCache.get(cacheKey);
+        AsyncRendererJobStatus status = this.asyncCache.get(clientId);
 
-        if (status != null && status.removeClient(clientId)) {
-            // If there is no asynchronous client associated with the status get rid of it
-            if (!status.hasClients()) {
-                this.asyncCache.remove(cacheKey);
-            }
-
-            return status;
+        if (status != null) {
+            // Remove from the cache since we don't need it anymore
+            this.asyncCache.remove(clientId);
         }
 
-        return null;
+        return status;
     }
 
     /**
@@ -140,22 +147,29 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
      */
     public void put(AsyncRendererJobStatus status)
     {
-        boolean cacheAllowed = status.getRequest().getRenderer().isCacheAllowed();
+        this.lock.writeLock().lock();
 
-        // Avoid storing useless stuff in the RAM
-        status.dispose();
+        try {
+            boolean cacheAllowed = status.getRequest().getRenderer().isCacheAllowed();
 
-        String cacheKey = toCacheKey(status.getRequest().getId());
+            // Avoid storing useless stuff in the RAM
+            status.dispose();
 
-        // If cache is enabled, store the status in the long cache
-        if (cacheAllowed) {
-            this.longCache.set(cacheKey, status);
-        }
+            String cacheKey = toCacheKey(status.getRequest().getId());
 
-        // Asynchronous statuses are stored in the big cache to avoid race condition (result invalidated before it get a
-        // chance of being requested)
-        if (status.isAsync()) {
-            this.asyncCache.set(cacheKey, status);
+            // If cache is enabled, store the status in the long cache
+            if (cacheAllowed) {
+                this.longCache.set(cacheKey, status);
+            }
+
+            // Asynchronous statuses are stored in a short lived cache to avoid race condition (result invalidated
+            // before it
+            // get a chance of being received for the first time)
+            for (String clientId : status.getClients()) {
+                this.asyncCache.set(clientId, status);
+            }
+        } finally {
+            this.lock.writeLock().unlock();
         }
     }
 

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-flamingo-skin-test</artifactId>
-    <version>11.3-SNAPSHOT</version>
+    <version>11.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-flamingo-skin-test-docker</artifactId>
   <name>XWiki Platform - Flamingo - Skin - Test - Functional Docker Tests</name>
@@ -55,12 +55,35 @@
       <type>pom</type>
       <version>${project.version}</version>
     </dependency>
+    <!-- Needed for a test with Panel translation. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-panels-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-diff-script</artifactId>
+      <version>${commons.version}</version>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-docker</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-flamingo-skin-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

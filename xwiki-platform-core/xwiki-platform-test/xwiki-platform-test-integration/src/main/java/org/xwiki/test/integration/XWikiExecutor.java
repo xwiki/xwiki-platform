@@ -268,8 +268,7 @@ public class XWikiExecutor
         DefaultExecuteResultHandler resultHandler = new DefaultExecuteResultHandler();
 
         // Send Process output and error streams to our logger.
-        PumpStreamHandler streamHandler = new PumpStreamHandler(new XWikiLogOutputStream(XWikiLogOutputStream.STDOUT),
-            new XWikiLogOutputStream(XWikiLogOutputStream.STDERR));
+        PumpStreamHandler streamHandler = new PumpStreamHandler(new XWikiLogOutputStream());
 
         // Make sure we end the process when the JVM exits
         ShutdownHookProcessDestroyer processDestroyer = new ShutdownHookProcessDestroyer();
@@ -514,7 +513,8 @@ public class XWikiExecutor
             if (SystemUtils.IS_OS_WINDOWS) {
                 startCommand = String.format("cmd /c %s.bat %s %s", scriptNamePrefix, port, stopPort);
             } else {
-                startCommand = String.format("bash %s.sh -p %s -sp %s", scriptNamePrefix, port, stopPort);
+                String suspend = DEBUG ? "--suspend" : "";
+                startCommand = String.format("bash %s.sh -p %s -sp %s %s", scriptNamePrefix, port, stopPort, suspend);
             }
         } else {
             startCommand = startCommand.replaceFirst(DEFAULT_PORT, String.valueOf(port));

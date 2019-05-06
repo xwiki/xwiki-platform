@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Main</web>
+  <name>SolrTranslations</name>
+  <language>pl</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.SolrSearch</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Solr Search Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>solr.admin.title=Administracja Solr Search
+solr.admin.submit=Zastosuj
+solr.admin.error.action={0} nie powiodło się:
+solr.admin.error.notallowed=Nie możesz wykonać tej czynności.
+solr.admin.error.norights=Aby uzyskać dostęp do tej sekcji, wymagane są prawa administracyjne.
+solr.admin.success.action={0} uruchomiono pomyślnie.
+
+solr.admin.status.title=Status
+solr.admin.status.queueSize.label=Rozmiar kolejki
+solr.admin.status.queueSize.hint=Liczba obiektów, które pozostały do indeksowania, ponownego indeksowania lub usunięcia z indeksu (w zależności od wykonanej akcji).
+
+solr.admin.indexing.title=Indeksowanie
+solr.admin.indexing.action.label=Czynność
+solr.admin.indexing.action.hint=Operacja do wykonania w indeksie.
+solr.admin.indexing.action.select_index=Dodaj do indeksu
+solr.admin.indexing.action.select_delete=Usuń z indeksu
+solr.admin.indexing.action.select_reindex=Przeindeksowanie
+solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.wiki.hint=Wiki, na którą będą miały wpływ wszystkie dokumenty wybrane przez czynność.
+solr.admin.indexing.wiki.select_farm=Cały obszar
+solr.admin.indexing.query.label=Niestandardowe zapytanie
+solr.admin.indexing.query.hint=Opcjonalne zapytanie ograniczające dokumenty, na które ma wpływ wybrana akcja w indeksie.
+
+solr.admin.info.affectedDocuments=Dotyczy dokumentów w indeksie:
+
+solr.sortBy=Sortuj według:
+solr.sortBy.score=Związek z tematem
+solr.sortBy.title_sort=Tytuł
+solr.sortBy.date=Data ostatniej modyfikacji
+solr.sortBy.author_display_sort=Ostatni autor
+solr.sortBy.filename_sort=Nazwa pliku
+solr.sortBy.attsize_sort=Rozmiar pliku
+solr.sortBy.attdate_sort=Data przesłania
+solr.sortBy.attauthor_display_sort=Przesłane przez
+solr.sortOrder.asc=Rosnąco
+solr.sortOrder.desc=Malejąco
+
+solr.options=Pokaż:
+solr.options.highlight=Zaznaczenie
+solr.options.highlight.title=Wyświetl wyciąg z tego, co zostało dopasowane w każdym wyniku
+solr.options.facet=Aspekty
+solr.options.facet.title=Pozwól na dodatkowe filtrowanie wyniku
+
+solr.result.language=Język
+solr.result.locatedIn=Położony w
+solr.result.author=Zmodyfikowany przez {0} w dniu {1}
+solr.result.mediaType=Typ pliku {0}
+solr.result.uploadedBy=Przesłane przez {0} w dniu {1} ({2})
+solr.result.highlightAll=Zaznacz wszystko
+
+solr.facets.title=Zawęź wyszukiwanie
+solr.facets.hint=Wybierz kategorię i włącz filtry na bieżących wynikach
+solr.facets.resetAll=Wyczyść wszystko
+solr.facets.expandAll=Rozwiń wszystko
+solr.facets.collapseAll=Zwiń wszystko
+solr.facets.emptyValue=Pusta wartość
+solr.facets.moreValues={0} więcej
+
+solr.filterBy.type.document=Dokument
+solr.filterBy.type.attachment=Załącznik
+solr.filterBy.type.object=Obiekt
+solr.filterBy.type.object_property=Właściwość obiektu
+
+solr.filterBy.fileType.image=Obraz
+solr.filterBy.fileType.audio=Audio
+solr.filterBy.fileType.video=Video
+solr.filterBy.fileType.text=Tekst
+solr.filterBy.fileType.office=Office
+solr.filterBy.fileType.word=Word
+solr.filterBy.fileType.presentation=Prezentacja
+solr.filterBy.fileType.spreadsheet=Arkusz
+solr.filterBy.fileType.archive=Archiwum
+solr.filterBy.fileType.font=Czcionka
+solr.filterBy.fileType.other=Inne
+solr.facet.fileType.text.plain=Zwykły tekst
+solr.facet.fileType.text.javascript=JavaScript
+solr.facet.fileType.text.java-source=Źródło Java
+solr.facet.fileType.text.sh=Skrypt powłoki
+solr.facet.fileType.image.icon=Ikona
+solr.facet.fileType.archive.java-archive=JAR
+solr.facet.fileType.archive.xara=XAR
+solr.facet.fileType.other.octet-stream=Dane binarne
+
+solr.facet.date.today=Dzisiaj
+solr.facet.date.last7Days=Ostatnie 7 dni
+solr.facet.date.last30Days=Ostatnie 30 dni
+solr.facet.date.olderThan30Days=Starsze niż 30 dni
+solr.facet.date.customInterval=Niestandardowa data i przedział czasu
+solr.facet.date.start=Data i godzina rozpoczęcia
+solr.facet.date.end=Data i godzina zakończenia
+solr.facet.date.applyCustomInterval=Zastosuj
+solr.facet.date.between=Od {0} do {1}
+solr.facet.date.after=Po {0}
+solr.facet.date.before=Przed {0}
+solr.facet.date.any=Dowolna data
+
+solr.facet.size.tiny=Malutki
+solr.facet.size.small=Mały
+solr.facet.size.medium=Średni
+solr.facet.size.large=Duży
+solr.facet.size.between=Pomiędzy {0} a {1}
+solr.facet.size.lessThan=Mniej niż {0}
+solr.facet.size.moreThan=Więcej niż {0}
+solr.facet.size.any=Wszystkie rozmiary
+
+solr.field.type=Typ wyniku
+solr.field.locale=Język
+solr.field.locale.emptyValue=Brak języka
+solr.field.locale.emptyValue.hint=Niektóre dokumenty nie mają zestawu językowego, ponieważ zawierają skrypty (które nie są napisane w języku naturalnym) lub składają się na interfejs użytkownika, który jest wyświetlany w bieżącym języku (jak ta strona).
+solr.field.wiki=Wiki
+solr.field.spaces=Położenie
+solr.field.space_exact=Położenie
+solr.field.space_facet=Położenie
+solr.field.name=Strona
+solr.field.name_exact=Strona
+solr.field.title=Tytuł
+solr.field.author=Ostatni autor
+solr.field.author_display=Ostatni autor
+solr.field.creator=Twórca
+solr.field.creator_display=Twórca
+solr.field.date=Data ostatniej modyfikacji
+solr.field.creationdate=Data stworzenia
+solr.field.doccontent=Odtworzona część dokumentu
+solr.field.doccontentraw=Surowa treść dokumentu
+solr.field.class=Typ obiektu
+solr.field.class.definedBy=Zdefiniowane przez {0} » {1}
+solr.field.propertyname=Nazwa właściwości
+solr.field.propertyvalue=Wartość właściwości
+solr.field.filename=Nazwa załącznika
+solr.field.attcontent=Zawartość załącznika
+solr.field.comment=Komentarze
+solr.field.objcontent=Obiekty
+solr.field.mimetype=Typ pliku
+solr.field.attauthor=Przesłane przez
+solr.field.attauthor_display=Przesłane przez
+solr.field.attdate=Data załadowania
+solr.field.attsize=Rozmiar pliku
+
+solr.uix.docdoesnotexist.title=Czy zamiast tego szukałeś jednej z następujących stron?
+solr.uix.attachmentdoesnotexist.title=Czy szukasz zamiast tego jednego z następujących załączników?
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+## until 7.2M3
+### Missing: solr.result.location=Located in {0} \u00BB {1} \u00BB {2}
+
+## until 7.2RC1
+### Missing: solr.field.space=Location
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
+  
+</xwikidoc>

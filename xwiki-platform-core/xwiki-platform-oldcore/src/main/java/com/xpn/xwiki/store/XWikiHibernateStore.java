@@ -22,6 +22,10 @@ package com.xpn.xwiki.store;
 import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -55,6 +59,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Settings;
+import org.hibernate.connection.ConnectionProvider;
+import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.impl.SessionFactoryImpl;
+import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.slf4j.Logger;
@@ -1777,18 +1786,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 attachment.setComment(StringUtils.abbreviate(comment, 1023));
             }
 
-            // The version number must be increased and the date must be set before the attachment meta data is saved.
-            // Changing the version and date after calling session.save()/session.update() "worked" (the altered version
-            // was what Hibernate saved) but only if everything is done in the same transaction and as far as I know it
-            // depended on undefined behavior.
-            // Note that the second condition is required because there are cases when we want the attachment content to
-            // be saved (see below) but we don't want the version to be increased (e.g. restore a document from recycle
-            // bin, copy or import a document).
-            // See XWIKI-9421: Attachment version is incremented when a document is restored from recycle bin
-            if (attachment.isContentDirty() && !attachment.getDoc().isNew()) {
-                attachment.updateContentArchive(context);
-            }
-
             Session session = getSession(context);
 
             org.hibernate.query.Query<Long> query = session
@@ -1797,6 +1794,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             boolean exist = query.uniqueResult() != null;
 
             if (exist) {
+                // Don't update the attachment version if document metadata dirty is forced false (any modification to
+                // the attachment automatically set document metadata dirty to true)
+                if (attachment.isContentDirty() && attachment.getDoc().isMetaDataDirty()) {
+                    attachment.updateContentArchive(context);
+                }
+
                 session.update(attachment);
             } else {
                 if (attachment.getContentStore() == null) {
@@ -1823,7 +1826,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             // Mark the attachment content and metadata as not dirty.
             // Ideally this would only happen if the transaction is committed successfully but since an unsuccessful
             // transaction will most likely be accompanied by an exception, the cache will not have a chance to save
-            // the copy of the document with erronious information. If this is not set here, the cache will return
+            // the copy of the document with erroneous information. If this is not set here, the cache will return
             // a copy of the attachment which claims to be dirty although it isn't.
             attachment.setMetaDataDirty(false);
             if (attachment.isContentDirty()) {
@@ -3250,5 +3253,67 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
 
         return this.attachmentContentStore;
+    }
+
+    @Override
+    public int getLimitSize(XWikiContext context, Class<?> entityType, String propertyName)
+    {
+        int result = -1;
+
+        // retrieve the schema from the context
+        String schema = null;
+        // apparently no schema should be used for oracle DB
+        if (getDatabaseProductName() != DatabaseProduct.ORACLE) {
+            schema = getSchemaFromWikiName(context);
+        }
+
+        // retrieve the table and column name from entityType and propertyName
+        PersistentClass persistentClass = getConfiguration().getClassMapping(entityType.getName());
+        Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
+        String tableName = persistentClass.getTable().getName();
+        String columnName = column.getName();
+
+        // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
+        if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
+            tableName = tableName.toUpperCase();
+        }
+
+        if  (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+            columnName = columnName.toLowerCase();
+        }
+
+        Connection connection = null;
+        // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
+        // See http://bit.ly/QAJXlr
+        ConnectionProvider connectionProvider = ((SessionFactoryImplementor) getSessionFactory())
+            .getConnectionProvider();
+        try {
+            connection = connectionProvider.getConnection();
+            DatabaseMetaData databaseMetaData = connection.getMetaData();
+            ResultSet resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
+            // next will return false if the resultSet is empty.
+            if (resultSet.next()) {
+                result = resultSet.getInt("COLUMN_SIZE");
+            }
+        } catch (SQLException e) {
+            logger.error("Error while looking the size limit for schema [{}], table [{}] and column [{}].", schema,
+                tableName, columnName, e);
+        } finally {
+            if (connection != null) {
+                try {
+                    connectionProvider.closeConnection(connection);
+                } catch (SQLException ignored) {
+                    // Ignore
+                }
+            }
+        }
+
+        if (result == -1) {
+            result = column.getLength();
+            logger.warn("Error while getting the size limit for entity [{}] and propertyName [{}]. "
+                + "The length value set by hibernate [{}] will be used.", entityType.getName(), propertyName, result);
+        }
+
+        return result;
     }
 }

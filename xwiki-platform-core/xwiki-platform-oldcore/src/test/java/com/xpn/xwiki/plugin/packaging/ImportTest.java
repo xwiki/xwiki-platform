@@ -161,6 +161,7 @@ public class ImportTest extends AbstractPackageTest
                 }
             });
         this.mockXWikiStore.stubs().method("injectCustomMapping").will(returnValue(false));
+        this.mockXWikiStore.stubs().method("getLimitSize").will(returnValue(255));
 
         this.mockRecycleBinStore =
             mock(XWikiHibernateRecycleBinStore.class, new Class[] {XWikiContext.class}, new Object[] {getContext()});

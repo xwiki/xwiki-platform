@@ -25,16 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>11.3-SNAPSHOT</version>
+    <version>11.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-docker</artifactId>
   <name>XWiki Platform - Test - Docker UI Test Framework</name>
   <packaging>jar</packaging>
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.10</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>7</xwiki.pitest.mutationThreshold>
-    <testcontainers.version>1.11.0</testcontainers.version>
+    <xwiki.jacoco.instructionRatio>0.19</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>27</xwiki.pitest.mutationThreshold>
+    <testcontainers.version>1.11.2</testcontainers.version>
 
     <!-- Force a version of Selenium more recent than the one coming from xwiki-platform-test-ui -->
     <!-- FIXME: upgrade it in xwiki-platform-test-ui to avoid this hack -->
@@ -111,11 +111,16 @@
       <artifactId>oracle-xe</artifactId>
       <version>${testcontainers.version}</version>
     </dependency>
-    <!-- Needed by TestContainers, apparently to verify the the MySQL DB is started -->
+    <!-- Needed by TestContainers, to verify that the DBs are started -->
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>5.1.24</version>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc8</artifactId>
+      <version>12.2.0.1</version>
     </dependency>
     <!-- Dependencies for WARBuilder -->
     <dependency>
@@ -209,4 +214,25 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
+            <id>default</id>
+            <configuration>
+              <excludes>
+                <!-- Cyclomatic complexity > 10 -->
+                **/WARBuilder.java
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

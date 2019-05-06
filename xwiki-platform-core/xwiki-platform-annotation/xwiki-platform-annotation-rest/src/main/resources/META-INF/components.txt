@@ -1,0 +1,6 @@
+org.xwiki.annotation.rest.internal.AnnotationsRESTResource
+org.xwiki.annotation.rest.internal.AnnotationsTranslationRESTResource
+org.xwiki.annotation.rest.internal.SingleAnnotationRESTResource
+org.xwiki.annotation.rest.internal.representations.FormUrlEncodedAnnotationRequestReader
+org.xwiki.annotation.rest.internal.representations.FormUrlEncodedAnnotationUpdateRequestReader
+org.xwiki.annotation.rest.internal.representations.FormUrlEncodedAnnotationAddRequestReader

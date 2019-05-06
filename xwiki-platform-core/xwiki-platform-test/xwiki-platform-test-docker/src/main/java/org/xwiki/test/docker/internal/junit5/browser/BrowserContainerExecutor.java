@@ -26,9 +26,10 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.SeleniumUtils;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
-import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.browser.Browser;
+
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
 
 /**
  * Create and execute the browser docker container for driving the tests.
@@ -96,7 +97,7 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
-        DockerTestUtils.startContainer(webDriverContainer);
+        startContainer(webDriverContainer);
 
         if (this.testConfiguration.vnc()) {
             LOGGER.info("VNC server address = " + webDriverContainer.getVncAddress());

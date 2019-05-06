@@ -27,9 +27,9 @@
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
-  <parent>XWiki.Notifications.Code.WebHome</parent>
   <version>1.1</version>
   <title/>
   <comment/>
@@ -113,6 +113,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -301,7 +302,7 @@
             break;
           case 202:
             // 202 means that the background search is still running, we wait 1 second and ask again if it's done this time
-            setTimeout(getUnreadNotificationsCount, 1000, {asyncId: data.asyncId});
+            setTimeout(getUnreadNotificationsCount, 1000, data.asyncId);
             break;
       }
     });
@@ -334,7 +335,9 @@
       // Don't load the notifications if the menu has already be opened before.
       if (!notificationsMenusHasBeenOpened) {
         macro.load(0).done(function (notifications) {
-          createCleanButton(notifications[0].date);
+          if (notifications.length &gt; 0) {
+            createCleanButton(notifications[0].date);
+          }
         });
       }
       notificationsMenusHasBeenOpened = true;
@@ -370,6 +373,7 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -587,6 +591,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -753,21 +758,59 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <content>
         <disabled>0</disabled>
         <editor>Text</editor>
         <name>content</name>
-        <number>3</number>
-        <prettyName>Extension Content</prettyName>
-        <rows>10</rows>
-        <size>40</size>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </content>
       <extensionPointId>
         <disabled>0</disabled>
         <name>extensionPointId</name>
-        <number>1</number>
+        <number>5</number>
         <prettyName>Extension Point ID</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -776,7 +819,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>6</number>
         <prettyName>Extension ID</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -787,7 +830,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>parameters</name>
-        <number>4</number>
+        <number>7</number>
         <prettyName>Extension Parameters</prettyName>
         <rows>10</rows>
         <size>40</size>
@@ -800,7 +843,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
         <name>scope</name>
-        <number>5</number>
+        <number>8</number>
         <prettyName>Extension Scope</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -811,6 +854,15 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </scope>
     </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
     <property>
       <content>{{velocity}}
 #macro (generateNotificationInput $id $reference $label)

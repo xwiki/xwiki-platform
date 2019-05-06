@@ -113,6 +113,11 @@ public class PreviewAction extends EditAction
         // requiring programming rights is executed in preview mode if the current user has programming rights.
         editedDocument.setContentAuthorReference(context.getUserReference());
 
-        return "preview";
+        if ("1".equals(context.getRequest().getParameter("diff"))
+            && StringUtils.isNotEmpty(context.getRequest().getParameter("version"))) {
+            return "previewdiff";
+        } else {
+            return "preview";
+        }
     }
 }

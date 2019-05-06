@@ -48,17 +48,20 @@
     <validationScript/>
     <databaseList>
       <cache>0</cache>
-      <classname>Blog.BlogPostClass</classname>
+      <classname>AppWithinMinutes.FormFieldClass</classname>
       <customDisplay/>
+      <defaultValue/>
       <disabled>0</disabled>
-      <displayType>select</displayType>
-      <idField/>
+      <displayType>input</displayType>
+      <freeText/>
+      <hint/>
+      <idField>doc.fullName</idField>
       <multiSelect>0</multiSelect>
       <name>databaseList</name>
       <number>1</number>
-      <picker>0</picker>
+      <picker>1</picker>
       <prettyName>Database List</prettyName>
-      <relationalStorage>0</relationalStorage>
+      <relationalStorage>1</relationalStorage>
       <separator> </separator>
       <separators/>
       <size>1</size>
@@ -67,7 +70,7 @@
       <unmodifiable>0</unmodifiable>
       <validationMessage/>
       <validationRegExp/>
-      <valueField/>
+      <valueField>doc.name</valueField>
       <classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
     </databaseList>
   </class>
@@ -159,7 +162,211 @@
       <priority>0</priority>
     </property>
     <property>
-      <properties>displayType multiSelect sql classname idField valueField</properties>
+      <properties>displayType picker size multiSelect relationalStorage classname idField valueField sql</properties>
+    </property>
+  </object>
+  <object>
+    <name>AppWithinMinutes.DBList</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>489cd8ec-d480-441d-8104-4cfb53a163c6</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>define('xwiki-awm-class-field-enhancer', ['jquery', 'xwiki-events-bridge'], function($) {
+  var maybeEnhanceClassField = function(field, fieldEnhancer) {
+    var fieldContainer = field.getContainer();
+    var enhancedFlag = '_enhanced' + fieldEnhancer.id;
+    // Enhance the field if it's not already enhanced and if it matches the template.
+    if (!fieldContainer[enhancedFlag] &amp;&amp; $('#' + 'template-' + field.getName()).val() === fieldEnhancer.fieldTemplate) {
+      fieldContainer[enhancedFlag] = true;
+      fieldEnhancer.enhance(field);
+    }
+  };
+
+  return function(fieldEnhancer) {
+    // Enhance the class fields right after they are displayed.
+    $(document).on('xwiki:class:displayField', function(event, data) {
+      maybeEnhanceClassField(data.field, fieldEnhancer);
+    });
+
+    // Enhance the class fields that have been already displayed.
+    $('#fields').children().each(function() {
+      var field = new XWiki.FormField(this);
+      if (field.getConfig()) {
+        maybeEnhanceClassField(field, fieldEnhancer);
+      }
+    });
+  };
+});
+
+define('xwiki-awm-list-enhancer', ['jquery', 'xwiki-awm-class-field-enhancer'], function($, classFieldEnhancer) {
+  var enhance = function(field) {
+    enhanceMultiSelect(field);
+    enhanceDisplayType(field);
+  };
+
+  var maybeUpdateListSize = function(field) {
+    var multiSelectField = $('#' + field.getPropertyId('multiSelect'));
+    var displayTypeField = $('#' + field.getPropertyId('displayType'));
+    if (multiSelectField.prop('checked') &amp;&amp; displayTypeField.val() === 'select') {
+      // Select box with multiple selection enabled should be displayed as an expanded list box so we have to adjust the
+      // size (size 1 means drop down list box).
+      var sizeField = $('#' + field.getPropertyId('size'));
+      if (parseInt(sizeField.val()) &lt; 2) {
+        sizeField.val(5);
+      }
+    }
+  };
+
+  var enhanceMultiSelect = function(field) {
+    var relationalStorageField = $('#' + field.getPropertyId('relationalStorage'));
+
+    // Hide the "relational storage" meta property because it's too technical and because the recommendation is to use
+    // relational storage if multiple selection is on.
+    relationalStorageField.closest('dt').hide();
+
+    $('#' + field.getPropertyId('multiSelect')).click(function(event) {
+      if ($(this).prop('checked')) {
+        // Enable relational storage whenever multiple selection is enabled.
+        relationalStorageField.prop('checked', true);
+
+        // Synchronize multiple selection with display type.
+        var displayTypeField = $('#' + field.getPropertyId('displayType'));
+        if (displayTypeField.val() === 'radio') {
+          // Radio display type doesn't support multiple selection.
+          displayTypeField.val('checkbox');
+        }
+      }
+
+      maybeUpdateListSize(field);
+    });
+  };
+
+  var enhanceDisplayType = function(field) {
+    var displayTypeField = $('#' + field.getPropertyId('displayType'));
+    var useSuggestField = $('#' + field.getPropertyId('picker'));
+    var sizeField = $('#' + field.getPropertyId('size'));
+
+    // Hide the "Use suggest" meta property because it makes sense only for the input display type.
+    useSuggestField.closest('dt').hide();
+
+    // Initialize the state of the size meta property.
+    sizeField.prop('readOnly', displayTypeField.val() !== 'select');
+
+    displayTypeField.change(function(event) {
+      // Use suggest picker whenever input display type is selected.
+      useSuggestField.prop('checked', $(this).val() === 'input');
+
+      // The size meta property makes sense only when display type is select.
+      sizeField.prop('readOnly', $(this).val() !== 'select');
+
+      // Radio display type doesn't support multiple selection.
+      if ($(this).val() === 'radio') {
+        $('#' + field.getPropertyId('multiSelect')).prop('checked', false);
+      }
+
+      maybeUpdateListSize(field);
+    });
+  }
+
+  return function(fieldTemplate) {
+    classFieldEnhancer({
+      id: 'List',
+      fieldTemplate: fieldTemplate,
+      enhance: enhance
+    });
+  };
+});
+
+// Database List Class Field Enhancer
+require(['jquery', 'xwiki-awm-list-enhancer'], function($, listEnhancer) {
+  listEnhancer($jsontool.serialize($doc.fullName));
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
     </property>
   </object>
 </xwikidoc>

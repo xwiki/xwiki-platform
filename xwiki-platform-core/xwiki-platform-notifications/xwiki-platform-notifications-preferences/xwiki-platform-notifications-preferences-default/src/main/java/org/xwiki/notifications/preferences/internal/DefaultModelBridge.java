@@ -38,6 +38,7 @@ import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceCategory;
+import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
 import org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder;
 import org.xwiki.text.StringUtils;
@@ -97,10 +98,13 @@ public class DefaultModelBridge implements ModelBridge
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private TargetableNotificationPreferenceBuilder notificationPreferenceBuilder;
+    private Provider<TargetableNotificationPreferenceBuilder> notificationPreferenceBuilderProvider;
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private Provider<NotificationPreferenceManager> notificationPreferenceManager;
 
     @Override
     public List<NotificationPreference> getNotificationsPreferences(DocumentReference userReference)
@@ -130,6 +134,9 @@ public class DefaultModelBridge implements ModelBridge
         XWiki xwiki = context.getWiki();
 
         List<NotificationPreference> preferences = new ArrayList<>();
+        // Get a new instance of the thread-unsafe TargetableNotificationPreferenceBuilder
+        TargetableNotificationPreferenceBuilder notificationPreferenceBuilder
+                = notificationPreferenceBuilderProvider.get();
 
         try {
             XWikiDocument doc = xwiki.getDocument(document, context);
@@ -185,27 +192,41 @@ public class DefaultModelBridge implements ModelBridge
     public void setStartDateForUser(DocumentReference userReference, Date startDate)
             throws NotificationException
     {
-        try {
-            XWikiContext context = contextProvider.get();
-            XWiki xwiki = context.getWiki();
-            XWikiDocument document =  xwiki.getDocument(userReference, context);
+        // Here, we used to update the "startingDate" of all the NotificationPreferenceClass objects that the user page
+        // has. But this does not affect the preferences coming from other providers! For example, this does not
+        // update the notification settings stored in the wiki's administration page. As a result, most users were
+        // unable to clean their notifications when some preferences were inherited from the wiki.
+        // To fix this problem, we need to get all preferences and to store them in the user profile, duplicating
+        // inherited preferences, but with the new starting date.
 
-            List<BaseObject> objects = document.getXObjects(NOTIFICATION_PREFERENCE_CLASS);
-            if (objects != null) {
-                for (BaseObject object : objects) {
-                    if (object != null) {
-                        object.setDateValue(START_DATE_FIELD, startDate);
-                    }
-                }
+        List<NotificationPreference> preferences = notificationPreferenceManager.get().getAllPreferences(userReference);
+
+        // Get a new instance of the thread-unsafe TargetableNotificationPreferenceBuilder
+        TargetableNotificationPreferenceBuilder notificationPreferenceBuilder
+                = notificationPreferenceBuilderProvider.get();
+
+        List<NotificationPreference> toSave = new ArrayList<>(preferences.size());
+        for (NotificationPreference preference : preferences) {
+            // We do not handle preferences for the emails, because they have their own starting date mechanism
+            if (preference.getFormat() == NotificationFormat.EMAIL) {
+                continue;
             }
-
-            // Make this change a minor edit so it's not displayed, by default, in notifications
-            xwiki.saveDocument(document, NOTIFICATION_START_DATE_UPDATE_COMMENT, true, context);
-
-        } catch (Exception e) {
-            throw new NotificationException(
-                    String.format(SET_USER_START_DATE_ERROR_MESSAGE, userReference), e);
+            // Duplicate the preference to be able to change its content
+            notificationPreferenceBuilder.prepare();
+            notificationPreferenceBuilder.setCategory(preference.getCategory());
+            notificationPreferenceBuilder.setEnabled(true);
+            notificationPreferenceBuilder.setFormat(NotificationFormat.ALERT);
+            notificationPreferenceBuilder.setProperties(preference.getProperties());
+            notificationPreferenceBuilder.setProviderHint(preference.getProviderHint());
+            notificationPreferenceBuilder.setTarget(userReference);
+            // Change the field we are interested in
+            notificationPreferenceBuilder.setStartDate(startDate);
+            // Save it
+            toSave.add(notificationPreferenceBuilder.build());
         }
+
+        // Now that we have a list of updated preferences to save, we need to save them!
+        this.saveNotificationsPreferences(userReference, toSave);
     }
 
     /**

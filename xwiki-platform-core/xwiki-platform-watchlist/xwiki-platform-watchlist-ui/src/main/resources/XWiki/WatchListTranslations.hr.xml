@@ -61,6 +61,5 @@ watchlist.table.scope.wiki=Sve stranice wikija
 watchlist.table.scope.pageandchildren=Stranica + djeca
 watchlist.table.scope.pageonly=Samo stranica
 watchlist.table.location=Lokacija
-watchlist.table.scope=Doseg
-</content>
+watchlist.table.scope=Doseg</content>
 </xwikidoc>

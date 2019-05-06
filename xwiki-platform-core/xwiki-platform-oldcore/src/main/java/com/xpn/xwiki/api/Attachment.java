@@ -155,11 +155,15 @@ public class Attachment extends Api
     public byte[] getContentAsBytes() throws XWikiException
     {
         try {
-            return IOUtils.toByteArray(this.attachment.getContentInputStream(getXWikiContext()));
+            // the input stream can be null if the attachment has been deleted for example.
+            InputStream contentInputStream = this.attachment.getContentInputStream(getXWikiContext());
+            if (contentInputStream != null) {
+                return IOUtils.toByteArray(contentInputStream);
+            }
         } catch (IOException ex) {
-            // This really shouldn't happen, but it's not nice to throw exceptions from scriptable APIs
-            return new byte[0];
+            // This really shouldn't happen.
         }
+        return new byte[0];
     }
 
     public InputStream getContentInputStream()

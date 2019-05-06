@@ -26,20 +26,20 @@ var XWiki = (function(XWiki) {
   var actionButtons = XWiki.actionButtons = XWiki.actionButtons || {};
 
   // we need to handle the creation of document
-  var currentDocument, currentVersion, isNew;
+  var currentDocument, currentVersion, isNew, versionRefreshed;
   var editingVersionDate = new Date();
-
-  require(['xwiki-meta'], function (xm) {
-    currentDocument = xm.documentReference;
-    currentVersion = xm.version;
-    isNew = xm.isNew;
-  });
 
   var getCurrentVersion = function (event) {
     if (currentDocument.equals(event.memo.documentReference)) {
+      // We are certainly coming from a back button navigation: the content of the editor might not reflect the real
+      // content, let's reload the editor.
+      if (!versionRefreshed && currentVersion != event.memo.version) {
+        window.location.reload();
+      }
       currentVersion = event.memo.version;
       editingVersionDate = new Date();
       isNew = "false";
+      versionRefreshed = true;
     }
   };
 
@@ -204,6 +204,41 @@ var XWiki = (function(XWiki) {
     addListeners : function() {
       document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));
     },
+    // Allow to disable the editors (form, WikiEditor or CKEditor) while a save&view is performed.
+    disableEditors : function () {
+      if (this.form) {
+        this.form.disable();
+      }
+
+      if ($$('.CodeMirror')[0]) {
+        try {
+          $$('.CodeMirror')[0].CodeMirror.setOption('readOnly', true);
+        } catch (e) {}
+      } else if (window.CKEDITOR) {
+        try {
+
+          // FIXME: This still allows to switch CKEditor from source mode to WYSIWYG and back
+          // and doing that would disable the readOnly and activate back the warning about leaving page
+          CKEDITOR.instances.content.resetDirty();
+          CKEDITOR.instances.content.setReadOnly();
+        } catch (e) {}
+      }
+    },
+    // Allow to enable back the editors (form, WikiEditor or CKEditor) in case of 401 for example.
+    enableEditors : function () {
+      if (this.form) {
+        this.form.enable();
+      }
+      if ($$('.CodeMirror')[0]) {
+        try {
+          $$('.CodeMirror')[0].CodeMirror.setOption('readOnly', false);
+        } catch (e) {}
+      } else if (window.CKEDITOR) {
+        try {
+          CKEDITOR.instances.content.setReadOnly(false);
+        } catch (e) {}
+      }
+    },
     onSave : function(event) {
       // Don't continue if the event has been stopped already
       if (event.stopped) {
@@ -276,7 +311,7 @@ var XWiki = (function(XWiki) {
       // Show the right notification message.
       if (isCreateFromTemplate) {
         this.progressBox.show();
-      } else if (isContinue) {
+      } else {
         this.savingBox.show();
       }
 
@@ -293,14 +328,18 @@ var XWiki = (function(XWiki) {
         // Opera can't handle properly 204 responses.
         formData.set('ajax', 'true');
       }
+      if (!isContinue) {
+        this.disableEditors();
+      }
       new Ajax.Request(this.form.action, {
         method : 'post',
         parameters : formData.toQueryString(),
         onSuccess : this.onSuccess.bindAsEventListener(this, isContinue, isCreateFromTemplate),
         on1223 : this.on1223.bindAsEventListener(this),
         on0 : this.on0.bindAsEventListener(this),
-        on409 : this.on409.bindAsEventListener(this),
+        on409 : this.on409.bindAsEventListener(this, isContinue),
         on401 : this.on401.bindAsEventListener(this),
+        on403 : this.on403.bindAsEventListener(this, isContinue, isCreateFromTemplate),
         onFailure : this.onFailure.bind(this)
       });
     },
@@ -319,11 +358,12 @@ var XWiki = (function(XWiki) {
         this.form.template.value = "";
       }
 
+      // don't force save twice
+      if ($('forceSave')) {
+        $('forceSave').remove();
+      }
+
       if (isCreateFromTemplate) {
-        if (!isContinue) {
-          // Disable the form while waiting for the save&view operation to finish.
-          this.form.disable();
-        }
         if (response.responseJSON) {
           // Start the progress display.
           this.getStatus(response.responseJSON.links[0].href, isContinue);
@@ -331,17 +371,7 @@ var XWiki = (function(XWiki) {
           this.progressBox.hide();
           this.savingBox.replace(this.savedBox);
         }
-        // Save & View with no template specified needs no special handling.
-        // Same for Save & Continue with no template specified in preview mode.
       } else if (!isCreateFromTemplate && (!isContinue  || $('body').hasClassName('previewbody'))) {
-        // Disable the form while waiting for the save&view operation to finish.
-        this.form.disable();
-        // prevent the page to display a warning for leaving page.
-        if (window.CKEDITOR) {
-          try {
-            CKEDITOR.instances.content.resetDirty();
-          } catch (e) {}
-        }
         this.maybeRedirect(isContinue);
       } else {
         this.progressBox.hide();
@@ -359,161 +389,222 @@ var XWiki = (function(XWiki) {
       // TODO: We should send the new version as a memo field
       document.fire("xwiki:document:saved");
     },
+    displayErrorModal : function (createContent) {
+      XWiki.widgets.ErrorModalPopup = Class.create(XWiki.widgets.ModalPopup, {
+        /** Default parameters can be added to the custom class. */
+        defaultInteractionParameters : {},
+        /** Constructor. Registers the key listener that pops up the dialog. */
+        initialize : function($super, interactionParameters) {
+          this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
+          // call constructor from ModalPopup with params content, shortcuts, options
+          $super(
+            createContent(this.interactionParameters, this),
+            {
+              "show"  : { method : this.showDialog,  keys : [] },
+              //"close" : { method : this.closeDialog, keys : ['Esc'] }
+            },
+            {
+              displayCloseButton : false,
+              verticalPosition : "center",
+              backgroundColor : "#FFF",
+              removeOnClose : true
+            }
+          );
+          this.showDialog();
+        }
+      });
+      return new XWiki.widgets.ErrorModalPopup();
+    },
+    // 401 happens when the user is not authorized to do that: can be a logout or a change in perm
     on401 : function (response) {
       this.progressBox.hide();
       this.savingBox.hide();
       this.savedBox.hide();
       this.failedBox.hide();
 
-      var displayAuthorizationErrorModal = function (jsonAnswer) {
-        XWiki.widgets.EditModalPopup = Class.create(XWiki.widgets.ModalPopup, {
-          /** Default parameters can be added to the custom class. */
-          defaultInteractionParameters : {},
-          /** Constructor. Registers the key listener that pops up the dialog. */
-          initialize : function($super, interactionParameters) {
-            this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
-            // call constructor from ModalPopup with params content, shortcuts, options
-            $super(
-              this.createContent(this.interactionParameters, this),
-              {
-                "show"  : { method : this.showDialog,  keys : [] },
-                //"close" : { method : this.closeDialog, keys : ['Esc'] }
-              },
-              {
-                displayCloseButton : false,
-                verticalPosition : "center",
-                backgroundColor : "#FFF",
-                removeOnClose : true
-              }
-            );
-            this.showDialog();
-          },
-          /** Get the content of the modal dialog using ajax */
-          createContent : function (data, modal) {
-            var content =  new Element('div', {'class': 'modal-popup'});
-            var buttonsDiv =  new Element('div');
+      var createContent = function (data, modal) {
+        var content =  new Element('div', {'class': 'modal-popup'});
+        var buttonsDiv =  new Element('div');
 
-            content.insert("$services.localization.render('core.editors.save.authorizationError.message')");
-            content.insert(new Element('br'));
-            content.insert(new Element('br'));
-            var loginUrl = XWiki.currentDocument.getURL("login");
+        content.insert("$services.localization.render('core.editors.save.authorizationError.message')");
+        content.insert(new Element('br'));
+        content.insert(new Element('br'));
+        var loginUrl = XWiki.currentDocument.getURL("login");
 
-            var link = new Element('a', {'title': 'login', 'href': loginUrl, 'target': '_new'});
-            link.insert("$services.localization.render('core.editors.save.authorizationError.followLink')");
-            content.insert(link);
-            content.insert(buttonsDiv);
+        var link = new Element('a', {'title': 'login', 'href': loginUrl, 'target': '_new'});
+        link.insert("$services.localization.render('core.editors.save.authorizationError.followLink')");
+        content.insert(link);
+        content.insert(buttonsDiv);
 
-            var br = new Element('br');
-            var buttonCreate = new Element('button', {'class': 'btn btn-primary'});
-            buttonCreate.insert("OK");
-            buttonsDiv.insert(br);
-            buttonsDiv.insert(buttonCreate);
-            buttonCreate.on("click", function () {
-              modal.closeDialog();
-            });
-            return content;
-          }
+        var br = new Element('br');
+        var buttonCreate = new Element('button', {'class': 'btn btn-primary'});
+        buttonCreate.insert("OK");
+        buttonsDiv.insert(br);
+        buttonsDiv.insert(buttonCreate);
+        buttonCreate.on("click", function () {
+          modal.closeDialog();
         });
-        return new XWiki.widgets.EditModalPopup();
+        return content;
       };
 
-      displayAuthorizationErrorModal(response.responseJSON);
+      this.displayErrorModal(createContent);
+      this.enableEditors();
+      // Announce that a document save attempt has failed
+      document.fire("xwiki:document:saveFailed", {'response' : response});
     },
-    // 409 happens when the document is in conflict: i.e. someone's else edited it at the same time
-    on409 : function(response) {
+    // 403 happens in case of CSRF issue
+    on403 : function (response, isContinue, isCreateFromTemplate) {
       this.progressBox.hide();
       this.savingBox.hide();
       this.savedBox.hide();
       this.failedBox.hide();
 
-      var displayConflictModal = function (jsonAnswer) {
-        XWiki.widgets.EditModalPopup = Class.create(XWiki.widgets.ModalPopup, {
-          /** Default parameters can be added to the custom class. */
-          defaultInteractionParameters : {},
-          /** Constructor. Registers the key listener that pops up the dialog. */
-          initialize : function($super, interactionParameters) {
-            this.interactionParameters = Object.extend(Object.clone(this.defaultInteractionParameters), interactionParameters || {});
-            // call constructor from ModalPopup with params content, shortcuts, options
-            $super(
-              this.createContent(this.interactionParameters, this),
-              {
-                "show"  : { method : this.showDialog,  keys : [] },
-                //"close" : { method : this.closeDialog, keys : ['Esc'] }
-              },
-              {
-                displayCloseButton : false,
-                verticalPosition : "center",
-                backgroundColor : "#FFF",
-                removeOnClose : true
-              }
-            );
-            this.showDialog();
-          },
-          /** Get the content of the modal dialog using ajax */
-          createContent : function (data, modal) {
-            var content =  new Element('div', {'class': 'modal-popup'});
-            var buttonsDiv =  new Element('div');
-
-            content.insert("$services.localization.render('core.editors.save.conflictversion.rollbackmessage')");
-
-            content.insert(new Element('br'));
-            content.insert(new Element('br'));
-            content.insert("$services.localization.render('core.editors.save.conflictversion.previousVersion')");
-            content.insert(" " + jsonAnswer.previousVersion);
-            content.insert(" (" + new Date(jsonAnswer.previousVersionDate).toLocaleString() + ")");
-            content.insert(new Element('br'));
-            content.insert("$services.localization.render('core.editors.save.conflictversion.latestVersion')");
-            content.insert(" " + jsonAnswer.latestVersion);
-            content.insert(" (" + new Date(jsonAnswer.latestVersionDate).toLocaleString() + ")");
-            content.insert(new Element('br'));
-            content.insert(new Element('br'));
-
-            // versions are different so we can output a link for a diff
-            if (jsonAnswer.previousVersion < jsonAnswer.latestVersion) {
-              var docVariant = XWiki.docvariant;
-              var diffURL = XWiki.currentDocument.getURL('view', "viewer=changes&rev1=__rev1__&rev2=__rev2__&" + docVariant)
-                .replace('__rev1__', jsonAnswer.previousVersion)
-                .replace('__rev2__', jsonAnswer.latestVersion);
-              var link = new Element('a', {'href': diffURL, 'target': '_new'});
-              link.insert("$services.localization.render('core.editors.save.conflictversion.diffLink')");
-              content.insert(link);
-            }
-
-            content.insert(buttonsDiv);
-
-            var br = new Element('br');
-            var buttonCreate = new Element('button', {'class': 'btn btn-primary'});
-            buttonCreate.insert("OK");
-            buttonsDiv.insert(br);
-            buttonsDiv.insert(buttonCreate);
-            buttonCreate.on("click", function () {
-              modal.closeDialog();
+      if (response.responseJSON && response.responseJSON.errorType === "CSRF") {
+        var answerJson = response.responseJSON;
+        var self = this;
+        var createContent = function (data, modal) {
+          var resubmit = function () {
+            $$('input[name=form_token]').each(function (item) {
+              item.value = answerJson.newToken;
             });
-            return content;
-          }
-        });
-        return new XWiki.widgets.EditModalPopup();
+            new Ajax.Request(answerJson.resubmissionURI, {
+              method : 'post',
+              parameters : "form_token=" + answerJson.newToken,
+              onSuccess : self.onSuccess.bindAsEventListener(self, isContinue, isCreateFromTemplate),
+              on1223 : self.on1223.bindAsEventListener(self),
+              on0 : self.on0.bindAsEventListener(self),
+              on409 : self.on409.bindAsEventListener(self, isContinue),
+              on401 : self.on401.bindAsEventListener(self),
+              on403 : self.on403.bindAsEventListener(self, isContinue, isCreateFromTemplate),
+              onFailure : self.onFailure.bind(self)
+            });
+            modal.closeDialog();
+          };
+
+          var content =  new Element('div', {'class': 'modal-popup', 'id': 'csrf-warning-modal'});
+          var buttonsDiv =  new Element('div');
+
+          // the confirmation message contains some double quotes that should be escaped.
+          content.insert("$escapetool.json($services.localization.render('csrf.confirmation'))");
+          content.insert(new Element('br'));
+          var buttonCreate = new Element('button', {'class': 'btn btn-default', 'id': 'force-save-csrf'});
+          buttonCreate.insert("$services.localization.render('yes')");
+          buttonsDiv.insert(buttonCreate);
+          buttonCreate.on("click", resubmit);
+
+          buttonCreate = new Element('button', {'class': 'btn btn-primary', 'id': 'cancel-save-csrf'});
+          buttonCreate.insert("$services.localization.render('no')");
+          buttonsDiv.insert(buttonCreate);
+          buttonCreate.on("click", function () {
+            modal.closeDialog();
+          });
+          content.insert(buttonsDiv);
+          return content;
+        };
+        this.enableEditors();
+        this.displayErrorModal(createContent);
+      } else {
+        this.on401(response);
+      }
+
+      // Announce that a document save attempt has failed
+      document.fire("xwiki:document:saveFailed", {'response' : response});
+    },
+    // 409 happens when the document is in conflict: i.e. someone's else edited it at the same time
+    on409 : function(response, isContinue) {
+      var self = this;
+      this.progressBox.hide();
+      this.savingBox.hide();
+      this.savedBox.hide();
+      this.failedBox.hide();
+
+      // Prepare all the callback we need for the preview diff modal.
+
+      // Reload the editors in case the user want to loose his change.
+      var reloadEditors = function () {
+        window.location.reload();
       };
 
-      displayConflictModal(response.responseJSON);
+      // Force save the change: submit the form with a forceSave input.
+      var forceSave = function () {
+        require(['jquery'], function ($) {
+          $('#previewDiffModal').modal('hide');
+          self.form.insert(new Element("input", {
+            type: "hidden",
+            name: "forceSave",
+            id: "forceSave",
+            value: "1"
+          }));
+          if (isContinue) {
+            $('input[name=action_saveandcontinue]').click();
+          } else {
+            $('input[name=action_save]').click();
+          }
+        });
+      };
 
-      // CkEditor tries to block the user from leaving the page with unsaved content.
-      // Our save mechanism doesn't update the flag about unsaved content, so we have
-      // to do it manually
-      if ($$('.CodeMirror')[0]) {
-        try {
-          $$('.CodeMirror')[0].CodeMirror.setOption('readOnly', true);
-        } catch (e) {}
-      } else if (window.CKEDITOR) {
-        try {
+      // We chose what to do depending on the radio button selection.
+      var submitDiffButton = function () {
+        require(['jquery'], function ($) {
+          if ($('#actionReloadRadio').is(':checked')) {
+            reloadEditors();
+          }
 
-          // FIXME: This still allows to switch CKEditor from source mode to WYSIWYG and back
-          // and doing that would disable the readOnly and activate back the warning about leaving page
-          CKEDITOR.instances.content.resetDirty();
-          CKEDITOR.instances.content.setReadOnly();
-        } catch (e) {}
-      }
-      this.form.disable();
+          if ($('#actionForceSaveRadio').is(':checked')) {
+            forceSave();
+          }
+        });
+      };
+
+      // Toggle the class of the div depending on the selected radio button.
+      var radioSelect = function () {
+        require(['jquery'], function ($) {
+          var reloadDiv = $('#headingReloadEditor').parent();
+          var forceSaveDiv = $('#headingForceSave').parent();
+
+          var reloadRadio = $('#actionReloadRadio');
+          var forceSaveRadio = $('#actionForceSaveRadio');
+
+          reloadDiv.toggleClass('panel-primary', reloadRadio.is(':checked'));
+          reloadDiv.toggleClass('panel-danger', forceSaveRadio.is(':checked'));
+
+          forceSaveDiv.toggleClass('panel-primary', forceSaveRadio.is(':checked'));
+          forceSaveDiv.toggleClass('panel-default', reloadRadio.is(':checked'));
+        });
+      };
+
+      // Prepare the modal
+      var displayModal = function (response) {
+        require(['jquery'], function ($) {
+          $(response.responseText).appendTo('body');
+          $('#previewDiffModal').modal('show');
+
+          // We want to remove the html of the modal and the backdrop when the modal is closed.
+          $('#previewDiffModal').on('hidden.bs.modal', function (e) {
+            $('#previewDiffModal').remove();
+            $('div.modal-backdrop').remove();
+          });
+
+          // Callback on the buttons.
+          $('input[name=warningConflictAction]').on('click', radioSelect);
+          $('#submitDiffButton').on('click', submitDiffButton);
+        });
+      };
+
+      this.enableEditors();
+      var formData = new Hash(this.form.serialize({hash: true, submit: 'preview'}));
+
+      var jsonAnswer = response.responseJSON;
+      var queryString = "diff=1&version=" + jsonAnswer.latestVersion;
+      var previewUrl = new XWiki.Document().getURL("preview", queryString);
+
+      new Ajax.Request(previewUrl, {
+        method : 'post',
+        parameters : formData.toQueryString(),
+        onSuccess : displayModal,
+        onFailure : this.onFailure.bind(this)
+      });
+
       // Announce that a document save attempt has failed
       document.fire("xwiki:document:saveFailed", {'response' : response});
     },
@@ -595,6 +686,22 @@ var XWiki = (function(XWiki) {
   });
 
   function init() {
+    require(['xwiki-meta'], function (xm) {
+      currentDocument = xm.documentReference;
+      isNew = xm.isNew;
+      currentVersion = xm.version;
+
+      // in case of 404 the document is new
+      xm.refreshVersion(function () {
+        isNew = true;
+        versionRefreshed = true;
+      });
+    });
+    if ($('content')) {
+      // ensure that the shown value is the true value in case of reload.
+      $('content').value = $('content').defaultValue;
+    }
+
     new actionButtons.EditActions();
     new actionButtons.AjaxSaveAndContinue();
     return true;

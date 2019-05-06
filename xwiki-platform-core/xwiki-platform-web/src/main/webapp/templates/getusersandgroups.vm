@@ -143,7 +143,7 @@ $response.setContentType("application/json")
     #end
   #end ## foreach rights object
   #set($row = {})
-  #set($discard = $row.put("username", $user.name))
+  #set($discard = $row.put("username", $user.documentReference.name))
   #set($discard = $row.put("fullname", $username))
   #set($discard = $row.put("wikiname", $wikiname))
   #set($discard = $row.put("userurl" , $xwiki.getURL($user.fullName)))

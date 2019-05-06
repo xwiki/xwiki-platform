@@ -28,9 +28,9 @@ import java.util.Date;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
@@ -40,19 +40,24 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.LogRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import com.xpn.xwiki.store.AttachmentVersioningStore;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.component.XWikiDocumentFilterUtilsComponentList;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -60,55 +65,25 @@ import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link XWikiAttachment}.
- * 
+ *
  * @version $Id$
  */
+@OldcoreTest
 @XWikiDocumentFilterUtilsComponentList
 public class XWikiAttachmentTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
-    @Rule
-    public LogRule logger = new LogRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldCore;
 
-    @Before
-    public void configure() throws Exception
-    {
-        this.logger.recordLoggingForType(XWikiAttachment.class);
-
-        this.oldcore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
-        this.oldcore.getMocker().registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
-        this.oldcore.getMocker().registerMockComponent(Environment.class);
-    }
+    @MockComponent
+    private Environment environment;
 
     /**
-     * Unit test for <a href="https://jira.xwiki.org/browse/XWIKI-9075">XWIKI-9075</a> to prove that calling
-     * {@code fromXML} doesn't set the metadata dirty flag.
-     * <p>
-     * Note: I think there's a bug in that fromXML should return a new instance of XWikiAttachment and not modify the
-     * current one as this would mean changing its identity...
+     * An InputStream which will return a stream of random bytes of length given in the constructor.
      */
-    @Test
-    public void fromXML() throws Exception
-    {
-        XWikiAttachment attachment = new XWikiAttachment();
-        attachment.fromXML("<attachment>\n" + "<filename>XWikiLogo.png</filename>\n" + "<filesize>1390</filesize>\n"
-            + "<mimetype>image/png2</mimetype>\n" + "<author>xwiki:XWiki.Admin</author>\n"
-            + "<date>1252454400000</date>\n" + "<version>1.1</version>\n" + "<comment/>\n"
-            + "<content>MDEyMzQ1Njc4OQ==</content>\n" + "</attachment>");
-
-        assertEquals("XWikiLogo.png", attachment.getFilename());
-        assertEquals(new Date(1252454400000L), attachment.getDate());
-        assertEquals("1.1", attachment.getVersion());
-        assertEquals("0123456789", IOUtils.toString(attachment.getContentInputStream(null)));
-        assertEquals("image/png2", attachment.getMimeType());
-        assertEquals("image/png2", attachment.getMimeType(null));
-
-        assertFalse(attachment.isMetaDataDirty());
-    }
-
-    /** An InputStream which will return a stream of random bytes of length given in the constructor. */
     private static class RandomInputStream extends InputStream
     {
         private int bytes;
@@ -139,38 +114,67 @@ public class XWikiAttachmentTest
         }
     }
 
+    @BeforeEach
+    public void setUp(MockitoComponentManager componentManager) throws Exception
+    {
+        componentManager.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+        componentManager.registerMockComponent(AttachmentReferenceResolver.TYPE_STRING, "current");
+    }
+
     // Tests
 
+    /**
+     * Unit test for <a href="https://jira.xwiki.org/browse/XWIKI-9075">XWIKI-9075</a> to prove that calling {@code
+     * fromXML} doesn't set the metadata dirty flag.
+     * <p>
+     * Note: I think there's a bug in that fromXML should return a new instance of XWikiAttachment and not modify the
+     * current one as this would mean changing its identity...
+     */
     @Test
-    public void testGetSize() throws IOException
+    public void fromXML() throws Exception
     {
         XWikiAttachment attachment = new XWikiAttachment();
+        attachment.fromXML("<attachment>\n" + "<filename>XWikiLogo.png</filename>\n" + "<filesize>1390</filesize>\n"
+            + "<mimetype>image/png2</mimetype>\n" + "<author>xwiki:XWiki.Admin</author>\n"
+            + "<date>1252454400000</date>\n" + "<version>1.1</version>\n" + "<comment/>\n"
+            + "<content>MDEyMzQ1Njc4OQ==</content>\n" + "</attachment>");
 
+        assertEquals("XWikiLogo.png", attachment.getFilename());
+        assertEquals(new Date(1252454400000L), attachment.getDate());
+        assertEquals("1.1", attachment.getVersion());
+        assertEquals("0123456789", IOUtils.toString(attachment.getContentInputStream(null)));
+        assertEquals("image/png2", attachment.getMimeType());
+        assertEquals("image/png2", attachment.getMimeType(null));
+
+        assertFalse(attachment.isMetaDataDirty());
+    }
+
+    @Test
+    public void getSize() throws IOException
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
         assertEquals(-1, attachment.getLongSize());
 
         attachment.setLongSize(42);
-
         assertEquals(42, attachment.getLongSize());
 
-        attachment.setContent(new ByteArrayInputStream(new byte[] { 1, 2, 3, 4 }));
-
+        attachment.setContent(new ByteArrayInputStream(new byte[]{ 1, 2, 3, 4 }));
         assertEquals(4, attachment.getLongSize());
 
         attachment.setLongSize(42);
-
         assertEquals(4, attachment.getLongSize());
     }
 
     @Test
-    public void testGetVersionList() throws Exception
+    public void getVersionList() throws Exception
     {
         final XWikiAttachment attach = new XWikiAttachment();
         attach.setVersion("1.1");
-        assertEquals("Version list was not one element long for version 1.1", 1, attach.getVersionList().size());
+        assertEquals(1, attach.getVersionList().size(), "Version list was not one element long for version 1.1");
         attach.setVersion("1.2");
-        assertEquals("Version list was not two elements long for version 1.2.", 2, attach.getVersionList().size());
+        assertEquals(2, attach.getVersionList().size(), "Version list was not two elements long for version 1.2.");
         attach.setVersion("1.3");
-        assertEquals("Version list was not two elements long for version 1.3.", 3, attach.getVersionList().size());
+        assertEquals(3, attach.getVersionList().size(), "Version list was not two elements long for version 1.3.");
     }
 
     /**
@@ -178,7 +182,7 @@ public class XWikiAttachmentTest
      * it's the same.
      */
     @Test
-    public void testStoreContentInDiskCache() throws Exception
+    public void storeContentInDiskCache() throws Exception
     {
         int attachLength = 20000;
         // Check for data dependent errors.
@@ -186,13 +190,13 @@ public class XWikiAttachmentTest
         final XWikiAttachment attach = new XWikiAttachment();
         final InputStream ris = new RandomInputStream(attachLength, seed);
         attach.setContent(ris);
-        assertEquals("Not all of the stream was read", 0, ris.available());
+        assertEquals(0, ris.available(), "Not all of the stream was read");
         assertTrue(IOUtils.contentEquals(new RandomInputStream(attachLength, seed),
             attach.getAttachment_content().getContentInputStream()));
     }
 
     @Test
-    public void testSetContentViaOutputStream() throws Exception
+    public void setContentViaOutputStream() throws Exception
     {
         int attachLength = 20;
         int seed = (int) System.currentTimeMillis();
@@ -221,23 +225,21 @@ public class XWikiAttachmentTest
     }
 
     @Test
-    public void testSetContentWithMaxSize() throws Exception
+    public void setContentWithMaxSize() throws Exception
     {
         XWikiAttachment attachment = new XWikiAttachment();
-
         attachment.setContent(new ReaderInputStream(new StringReader("123456789")), 5);
-
         assertEquals("12345", IOUtils.toString(attachment.getContentInputStream(null)));
     }
 
     @Test
-    public void testGetMime() throws Exception
+    public void getMime() throws Exception
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
         attachment.setFilename("image.jpg");
 
-        assertNull("image/jpeg", attachment.getMimeType());
+        assertNull(attachment.getMimeType(), "image/jpeg");
         assertEquals("image/jpeg", attachment.getMimeType(null));
 
         attachment.setFilename("xml.xml");
@@ -250,10 +252,10 @@ public class XWikiAttachmentTest
 
         attachment.setFilename("unknown");
         attachment.setDoc(new XWikiDocument(new DocumentReference("wiki", "Space", "Page")));
-        assertEquals(0, this.logger.size());
+        assertEquals(0, this.logCapture.size());
         assertEquals("application/octet-stream", attachment.getMimeType(null));
-        assertTrue(this.logger.contains("Failed to read the content of "
-            + "[Attachment wiki:Space.Page@unknown] in order to detect its mime type."));
+        assertEquals("Failed to read the content of [Attachment wiki:Space.Page@unknown] in order to detect its mime "
+            + "type. Root cause: [IOException: Stream closed]", this.logCapture.getMessage(0));
 
         // Test content-based detection.
         attachment.setFilename("unknown");
@@ -262,7 +264,7 @@ public class XWikiAttachmentTest
     }
 
     @Test
-    public void testSetMimeType()
+    public void setMimeType()
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
@@ -273,10 +275,13 @@ public class XWikiAttachmentTest
 
         assertEquals("image/jpeg", attachment.getMimeType());
         assertEquals("image/jpeg", attachment.getMimeType(null));
+
+        assertEquals("Failed to read the content of [null] in order to detect its mime type. "
+            + "Root cause: [IOException: Stream closed]", this.logCapture.getMessage(0));
     }
 
     @Test
-    public void testResetMimeType()
+    public void resetMimeType()
     {
         XWikiAttachment attachment = new XWikiAttachment();
 
@@ -287,17 +292,22 @@ public class XWikiAttachmentTest
 
         assertEquals("application/octet-stream", attachment.getMimeType());
         assertEquals("application/octet-stream", attachment.getMimeType(null));
+
+        assertEquals("Failed to read the content of [null] in order to detect its mime type. "
+            + "Root cause: [IOException: Stream closed]", this.logCapture.getMessage(0));
+        assertEquals("Failed to read the content of [null] in order to detect its mime type. "
+            + "Root cause: [IOException: Stream closed]", this.logCapture.getMessage(1));
     }
 
     @Test
-    public void testAuthorWithDocument() throws Exception
+    public void authorWithDocument(MockitoComponentManager componentManager) throws Exception
     {
         EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-            this.oldcore.getMocker().getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+            componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         DocumentReferenceResolver<EntityReference> explicitDocumentReferenceResolver =
-            this.oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+            componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
         EntityReferenceResolver<String> xclassEntityReferenceResolver =
-            this.oldcore.getMocker().registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
+            componentManager.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
 
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
         XWikiAttachment attachment = new XWikiAttachment(document, "filename");
@@ -332,16 +342,16 @@ public class XWikiAttachmentTest
     }
 
     @Test
-    public void testAuthorWithoutDocument() throws Exception
+    public void authorWithoutDocument(MockitoComponentManager componentManager) throws Exception
     {
         EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
-            this.oldcore.getMocker().getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+            componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         AttachmentReferenceResolver<String> currentAttachmentReferenceResolver =
-            this.oldcore.getMocker().getInstance(AttachmentReferenceResolver.TYPE_STRING, "current");
+            componentManager.getInstance(AttachmentReferenceResolver.TYPE_STRING, "current");
         DocumentReferenceResolver<EntityReference> explicitDocumentReferenceResolver =
-            this.oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
+            componentManager.registerMockComponent(DocumentReferenceResolver.TYPE_REFERENCE, "explicit");
         EntityReferenceResolver<String> xclassEntityReferenceResolver =
-            this.oldcore.getMocker().registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
+            componentManager.registerMockComponent(EntityReferenceResolver.TYPE_STRING, "xclass");
 
         XWikiAttachment attachment = new XWikiAttachment(null, "filename");
         DocumentReference currentDocumentReference =
@@ -370,25 +380,23 @@ public class XWikiAttachmentTest
     }
 
     @Test
-    public void getContentInputStreamForLatestVersion() throws Exception
+    public void getContentInputStreamForLatestVersion(MockitoComponentManager componentManager) throws Exception
     {
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
 
-        when(this.oldcore.getXWikiContext().getWiki().getDocument(document.getDocumentReference(),
-            this.oldcore.getXWikiContext())).thenReturn(document);
+        when(this.oldCore.getXWikiContext().getWiki().getDocument(document.getDocumentReference(),
+            this.oldCore.getXWikiContext())).thenReturn(document);
 
         XWikiAttachment attachment = new XWikiAttachment(document, "file.txt");
         when(document.getAttachment(attachment.getFilename())).thenReturn(attachment);
         attachment.setVersion("3.5");
 
-        try {
-            attachment.getContentInputStream(this.oldcore.getXWikiContext());
-            fail();
-        } catch (NullPointerException e) {
+        Throwable exception = assertThrows(NullPointerException.class, () -> {
             // Expected because the attachment content is not set. The attachment content is normally set by the
             // loadAttachmentContent call we verify below.
-        }
+            attachment.getContentInputStream(this.oldCore.getXWikiContext());
+        });
     }
 
     @Test
@@ -397,8 +405,8 @@ public class XWikiAttachmentTest
         XWikiDocument document = mock(XWikiDocument.class);
         when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
 
-        when(this.oldcore.getXWikiContext().getWiki().getDocument(document.getDocumentReference(),
-            this.oldcore.getXWikiContext())).thenReturn(document);
+        when(this.oldCore.getXWikiContext().getWiki().getDocument(document.getDocumentReference(),
+            this.oldCore.getXWikiContext())).thenReturn(document);
 
         XWikiAttachment attachment = new XWikiAttachment(document, "file.txt");
         attachment.setVersion("3.5");
@@ -414,13 +422,24 @@ public class XWikiAttachmentTest
         archivedAttachment.setAttachment_content(content);
 
         XWikiAttachmentArchive archive = mock(XWikiAttachmentArchive.class);
-        when(archive.getRevision(attachment, attachment.getVersion(), this.oldcore.getXWikiContext()))
+        when(archive.getRevision(attachment, attachment.getVersion(), this.oldCore.getXWikiContext()))
             .thenReturn(archivedAttachment);
 
         AttachmentVersioningStore store = mock(AttachmentVersioningStore.class);
-        when(this.oldcore.getXWikiContext().getWiki().getDefaultAttachmentArchiveStore()).thenReturn(store);
-        when(store.loadArchive(attachment, this.oldcore.getXWikiContext(), true)).thenReturn(archive);
+        when(this.oldCore.getXWikiContext().getWiki().getDefaultAttachmentArchiveStore()).thenReturn(store);
+        when(store.loadArchive(attachment, this.oldCore.getXWikiContext(), true)).thenReturn(archive);
 
-        assertSame(content.getContentInputStream(), attachment.getContentInputStream(this.oldcore.getXWikiContext()));
+        assertSame(content.getContentInputStream(), attachment.getContentInputStream(this.oldCore.getXWikiContext()));
+    }
+
+    @Test
+    public void testToString()
+    {
+        XWikiDocument document = mock(XWikiDocument.class);
+        when(document.getDocumentReference()).thenReturn(new DocumentReference("wiki", "space", "page"));
+        XWikiAttachment attachment1 = new XWikiAttachment(document, "filename");
+
+        assertEquals("parentReference = [wiki:space.page], filename = [filename], version = [1.1]",
+            attachment1.toString());
     }
 }

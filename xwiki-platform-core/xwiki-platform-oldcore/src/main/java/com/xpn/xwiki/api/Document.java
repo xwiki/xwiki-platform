@@ -731,7 +731,28 @@ public class Document extends Api
     }
 
     /**
-     * @return the content of the document rendered.
+     * @param targetSyntax the syntax in which to render the document content
+     * @return the content of the current document rendered.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public String displayDocument(Syntax targetSyntax) throws XWikiException
+    {
+        return this.doc.displayDocument(targetSyntax, getXWikiContext());
+    }
+
+    /**
+     * @return the content of the current document rendered.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public String displayDocument() throws XWikiException
+    {
+        return this.doc.displayDocument(getXWikiContext());
+    }
+
+    /**
+     * @return the content of the document or its translations rendered.
      */
     public String getRenderedContent() throws XWikiException
     {
@@ -3136,5 +3157,15 @@ public class Document extends Api
     public boolean isTranslation()
     {
         return 1 == this.getDoc().getTranslation();
+    }
+
+    /**
+     * @return the maximum authorized length for a document full name (see {@link #getFullName()}).
+     * @since 11.4RC1
+     */
+    @Unstable
+    public int getLocalReferenceMaxLength()
+    {
+        return this.doc.getLocalReferenceMaxLength();
     }
 }

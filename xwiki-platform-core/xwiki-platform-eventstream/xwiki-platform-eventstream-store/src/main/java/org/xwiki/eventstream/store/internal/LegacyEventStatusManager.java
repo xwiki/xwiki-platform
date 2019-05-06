@@ -29,6 +29,8 @@ import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
+import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.text.StringUtils;
@@ -65,6 +67,9 @@ public class LegacyEventStatusManager implements EventStatusManager
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private ObservationManager observation;
 
     @Override
     public List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception
@@ -141,6 +146,9 @@ public class LegacyEventStatusManager implements EventStatusManager
 
         if (configuration.useLocalStore()) {
             saveEventStatusInStore(status);
+
+            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
+
             isSavedOnMainStore = wikiDescriptorManager.isMainWiki(eventStatus.getEvent().getWiki().getName());
         }
 
@@ -156,6 +164,8 @@ public class LegacyEventStatusManager implements EventStatusManager
             } finally {
                 context.setWikiId(oriDatabase);
             }
+
+            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
         }
     }
 

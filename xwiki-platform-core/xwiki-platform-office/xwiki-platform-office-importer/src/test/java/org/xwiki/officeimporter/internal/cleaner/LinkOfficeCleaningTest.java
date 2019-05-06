@@ -59,11 +59,13 @@ public class LinkOfficeCleaningTest extends AbstractHTMLCleaningTest
     @Test
     public void testDuplicateAnchorRemoving()
     {
-        String html = header + "<a name=\"table1\"/><h1><a name=\"table1\">Sheet 1: <em>Hello</em></a></h1>" + footer;
+        String html = header + "<div><a href=\"www.xwiki.org\">xwiki</a></div>"
+            + "<a name=\"table1\"/><h1><a name=\"table1\">Sheet 1: <em>Hello</em></a></h1>"
+            + "<div><a href=\"www.xwiki.org\">xwiki</a></div>" + footer;
         Document doc = officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("a");
-        Assert.assertEquals(1, nodes.getLength());
-        Element parent = (Element) nodes.item(0).getParentNode();
+        Assert.assertEquals(3, nodes.getLength());
+        Element parent = (Element) nodes.item(1).getParentNode();
         Assert.assertEquals("p", parent.getNodeName());
     }
 

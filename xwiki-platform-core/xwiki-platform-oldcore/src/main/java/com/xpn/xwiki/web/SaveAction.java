@@ -272,6 +272,11 @@ public class SaveAction extends PreviewAction
     {
         XWikiRequest request = context.getRequest();
 
+        // in case of force save we skip the check.
+        if ("1".equals(request.getParameter("forceSave"))) {
+            return false;
+        }
+
         // the document is new we don't have to check the version date or anything
         if ("true".equals(request.getParameter("isNew")) && originalDoc.isNew()) {
             return false;
@@ -329,7 +334,7 @@ public class SaveAction extends PreviewAction
     public boolean action(XWikiContext context) throws XWikiException
     {
         // CSRF prevention
-        if (!csrfTokenCheck(context)) {
+        if (!csrfTokenCheck(context, true)) {
             return false;
         }
 

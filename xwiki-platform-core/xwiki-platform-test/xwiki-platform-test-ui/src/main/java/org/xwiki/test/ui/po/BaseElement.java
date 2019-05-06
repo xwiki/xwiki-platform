@@ -88,6 +88,14 @@ public class BaseElement
     }
 
     /**
+     * @since 11.3RC1
+     */
+    public void waitForNotificationInProgressMessage(String message)
+    {
+        waitForNotificationMessage("inprogress", message);
+    }
+
+    /**
      * Waits for a notification message of the specified type with the given message to be displayed.
      * 
      * @param level the notification type (one of error, warning, done)

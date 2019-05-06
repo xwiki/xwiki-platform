@@ -22,6 +22,8 @@ package org.xwiki.administration.test.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.ViewPage;
 
@@ -57,6 +59,16 @@ public class AdministrationSectionPage extends ViewPage
     }
 
     /**
+     * Go to the administration section of a given space reference.
+     * @since 11.3RC1
+     */
+    public static AdministrationSectionPage gotoSpaceAdministration(SpaceReference spaceReference, String section)
+    {
+        getUtil().gotoPage(getURL(section, spaceReference));
+        return new AdministrationSectionPage(section);
+    }
+
+    /**
      * @param section the section ID
      * @return the URL of the administration section corresponding to the current {@link AdministrationSectionPage}
      *         instance
@@ -64,7 +76,27 @@ public class AdministrationSectionPage extends ViewPage
      */
     public static String getURL(String section)
     {
-        return getUtil().getURL("XWiki", "XWikiPreferences", "admin", "section=" + section);
+        return getURL(section, null);
+    }
+
+    /**
+     * @param section the section ID
+     * @param spaceReference the space where we want to get the admin page
+     * @return the URL of the administration section corresponding to the current {@link AdministrationSectionPage}
+     *         instance
+     * @since 11.3RC1
+     */
+    public static String getURL(String section, SpaceReference spaceReference)
+    {
+        String url;
+        if (spaceReference == null) {
+            url = getUtil().getURL("XWiki", "XWikiPreferences", "admin", String.format("section=%s", section));
+        } else {
+            DocumentReference documentReference = new DocumentReference("WebPreferences", spaceReference);
+            url = getUtil().getURL(documentReference, "admin", String.format("editor=spaceadmin&section=%s", section));
+        }
+
+        return url;
     }
 
     public String getURL()
@@ -86,5 +118,11 @@ public class AdministrationSectionPage extends ViewPage
     {
         String xPathSelector = String.format("//form/fieldset//a[@href='%s']", linkName);
         return getDriver().hasElementWithoutWaiting(By.xpath(xPathSelector));
+    }
+
+    public boolean hasHeading(int level, String headingId)
+    {
+        String xPath = String.format("//div[@id='admin-page-content']/h%s[@id='%s']/span", level, headingId);
+        return getDriver().hasElementWithoutWaiting(By.xpath(xPath));
     }
 }

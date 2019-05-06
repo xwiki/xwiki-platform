@@ -358,7 +358,9 @@ public class XWikiWebDriver extends RemoteWebDriver
                             // Use the locator from the root.
                             element = driver.findElement(locator);
                         }
-                    } catch (NotFoundException e) {
+                    // We might obtain a StaleElementReferenceException in some edge cases when looking
+                    // for the same notifications several times for example.
+                    } catch (NotFoundException|StaleElementReferenceException e) {
                         // This exception is caught by WebDriverWait
                         // but it returns null which is not necessarily what we want.
                         if (all) {

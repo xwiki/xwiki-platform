@@ -162,6 +162,9 @@
       ## Force the display of the diff header.
       #set ($newContent = '')
     #end
+    #if ($oldContent.length() == 0 || $newContent.length() == 0)
+      #set ($obfuscate = 'web.history.changes.attachment.notAvailable')
+    #end
     #set ($contentLabel = $services.localization.render('web.history.changes.attachment.content'))
     #maybeDisplayPropertyDiff($contentLabel $oldContent $newContent $obfuscate)
   </dl>

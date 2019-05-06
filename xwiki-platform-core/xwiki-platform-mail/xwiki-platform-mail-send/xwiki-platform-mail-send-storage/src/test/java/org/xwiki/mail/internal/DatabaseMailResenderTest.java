@@ -159,8 +159,9 @@ public class DatabaseMailResenderTest
         this.mocker.getComponentUnderTest().resendAsynchronously(filterMap, 0, 0);
 
         // The test is here
-        verify(this.mocker.getMockedLogger()).warn("Failed to load mail content for batchId [{}], messageId [{}]",
-            "batch1", "message1");
+        verify(this.mocker.getMockedLogger()).warn(
+            "Failed to resend mail message for batchId [{}], messageId [{}]. Root cause [{}]",
+            "batch1", "message1", "MailStoreException: error1");
         verify(sender).sendAsynchronously(eq(Arrays.asList(message2)), any(), any(MailListener.class));
     }
 }

@@ -71,6 +71,7 @@ public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
         getContext().setWiki(this.xwiki);
 
         Mock mockStore = mock(XWikiStoreInterface.class);
+        mockStore.stubs().method("getLimitSize").will(returnValue(255));
         mockStore.expects(atLeastOnce()).method("saveXWikiDoc");
         mockStore.stubs().method("loadXWikiDoc").will(new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
         {

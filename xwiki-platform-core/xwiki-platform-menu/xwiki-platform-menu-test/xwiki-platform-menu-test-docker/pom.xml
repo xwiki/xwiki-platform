@@ -38,7 +38,6 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- TODO: Fix the test to not output these warnings -->
     <xwiki.surefire.validateconsole.excludes>
-      "Could not validate integrity of download from",
       "jstree.min.js, line 2: TypeError: c is undefined"
     </xwiki.surefire.validateconsole.excludes>
     <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->

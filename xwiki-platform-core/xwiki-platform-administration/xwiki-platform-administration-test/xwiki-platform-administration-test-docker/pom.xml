@@ -38,7 +38,6 @@
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
     <!-- TODO: Fix the test to not output these warnings -->
     <xwiki.surefire.validateconsole.excludes>
-      "Could not validate integrity of download from",
       "require.min.js?r=1, line 7: Error: Script error for \"jsTree\", needed by: tree",
       "require.min.js?r=1, line 7: Error: Script error for \"JobRunner\", needed by: tree",
       "require.min.js?r=1, line 7: Error: Script error for \"selectize\", needed by: xwiki-selectize",

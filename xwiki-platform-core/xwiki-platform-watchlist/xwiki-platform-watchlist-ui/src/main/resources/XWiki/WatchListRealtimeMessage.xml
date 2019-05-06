@@ -112,7 +112,7 @@
   #if ($sheets &amp;&amp; $sheets.size() &gt; 0)
     ## Determine the class pretty name
     ## Note: Code taken from "Main.SolrClassFacet"
-    #set ($classPrettyName = $stringtool.removeEnd($classDocument.name, 'Class'))
+    #set ($classPrettyName = $stringtool.removeEnd($classDocument.documentReference.name, 'Class'))
     #set ($translationKey = "solr.field.class.$classPrettyName")
     #if ($services.localization.get($translationKey))
       #set ($classPrettyName = $services.localization.render('$translationKey'))
@@ -185,9 +185,9 @@
   &lt;/tr&gt;
   ## Action
 #if ($event.type == 'create')
-  &lt;tr&gt;&lt;td&gt;created the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;created the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 #elseif ($event.type == 'delete')
-  &lt;tr&gt;&lt;td&gt;deleted the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;deleted the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
 #elseif ($event.type == 'update')
   #set ($originalDocument = $xwiki.getDocument($eventDocument, $event.previousVersion))
   ##
@@ -209,7 +209,7 @@
     #end
     #if ($metadataDiffsToDisplay.size() &gt; 0)
       &lt;tr&gt;&lt;td&gt;
-        &lt;p&gt;updated the metadata of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/p&gt;
+        &lt;p&gt;updated the metadata of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/p&gt;
         &lt;ul&gt;
         #foreach ($metadataDiffToDisplay in $metadataDiffsToDisplay)
           &lt;li&gt;$metadataDiffToDisplay&lt;/li&gt;
@@ -222,13 +222,13 @@
   #end
   ## Content
   #if ($contentDiff.size() &gt; 0)
-    &lt;tr&gt;&lt;td&gt;updated the content of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;updated the content of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
     ## Mark displayed
     #set ($displayed = true)
   #end
   ## Class
   #if ($classDiff.size() &gt; 0)
-    &lt;tr&gt;&lt;td&gt;updated $classDiff.size() properties of the class &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;updated $classDiff.size() properties of the class &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
     &lt;tr&gt;&lt;td&gt;
       &lt;ul&gt;
       #foreach ($classDiffItems in $classDiff)
@@ -256,15 +256,15 @@
       #end
     #end
     #if ($newAttachments.size() &gt; 0)
-      &lt;tr&gt;&lt;td&gt;added $newAttachments.size() attachment(s) to the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;added $newAttachments.size() attachment(s) to the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
       &lt;tr&gt;&lt;td&gt;#displayAttachments($newAttachments)&lt;/td&gt;&lt;/tr&gt;
     #end
     #if ($updatedAttachments.size() &gt; 0)
-      &lt;tr&gt;&lt;td&gt;updated $updatedAttachments.size() attachment(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;updated $updatedAttachments.size() attachment(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
       &lt;tr&gt;&lt;td&gt;#displayAttachments($updatedAttachments)&lt;/td&gt;&lt;/tr&gt;
     #end
     #if ($deletedAttachments.size() &gt; 0)
-      &lt;tr&gt;&lt;td&gt;deleted $deletedAttachments.size() attachment(s) from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;deleted $deletedAttachments.size() attachment(s) from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
       &lt;tr&gt;&lt;td&gt;#displayAttachments($deletedAttachments)&lt;/td&gt;&lt;/tr&gt;
     #end
     ## Mark displayed
@@ -275,7 +275,7 @@
     ## How many objects?
     #if ($objectDiff.size() &gt; 1)
       ## Many, don`t bother displaying here.
-      &lt;tr&gt;&lt;td&gt;updated $objectDiff.size() object(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+      &lt;tr&gt;&lt;td&gt;updated $objectDiff.size() object(s) of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
       &lt;tr&gt;&lt;td&gt;
         &lt;ul&gt;
           #foreach ($objectDiffItems in $objectDiff)
@@ -320,13 +320,13 @@
             #else
               #set ($replyToOutput = """${replyToAuthor}""")
             #end
-            &lt;tr&gt;&lt;td&gt;added a $commentType in reply to $replyToOutput on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;added a $commentType in reply to $replyToOutput on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #else
             ## A regular new comment.
             #if ("$!event.authorReference" == '')
               #set ($asGuestNamedOutput = "as ""$object.getValue('author')"" ")
             #end
-            &lt;tr&gt;&lt;td&gt;added a $commentType $!{asGuestNamedOutput}on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;added a $commentType $!{asGuestNamedOutput}on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #end
           &lt;tr&gt;&lt;td style='padding-left: 2em'&gt;
             #if ($commentType == 'annotation')
@@ -342,9 +342,9 @@
           ## Existing comment modified (property added or property modified)
           ## Their own comment?
           #if ($event.authorReference == $commentAuthorReference)
-            &lt;tr&gt;&lt;td&gt;updated their $commentType on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;updated their $commentType on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #else
-            &lt;tr&gt;&lt;td&gt;updated a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;updated a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; on the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #end
           #if ($objectDiffItem.propName == 'comment')
             &lt;tr&gt;&lt;td&gt;from: &lt;blockquote&gt;$objectDiffItem.prevValue&lt;/blockquote&gt;&lt;/td&gt;&lt;/tr&gt;
@@ -352,9 +352,9 @@
           #end
         #elseif ($objectDiffItem.action == 'object-removed')
           #if ($event.authorReference == $commentAuthorReference)
-            &lt;tr&gt;&lt;td&gt;removed their $commentType from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;removed their $commentType from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #else
-            &lt;tr&gt;&lt;td&gt;removed a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;removed a $commentType made by &lt;a href="$commentAuthorURL"&gt;$xwiki.getUserName($commentAuthorSerialized, false)&lt;/a&gt; from the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
           #end
         #end
         ## View all comments link
@@ -364,7 +364,7 @@
         ## Mark object displayed
         #set ($objectDisplayed = true)
       #elseif ($objectClass == 'XWiki.XWikiRights')
-        &lt;tr&gt;&lt;td&gt;updated the rights of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;updated the rights of the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
         ## Mark object displayed
         #set ($objectDisplayed = true)
       #elseif ($objectClass == 'Blog.BlogPostClass')
@@ -373,7 +373,7 @@
           #set ($originalPublished = $originalObject.getValue('published'))
           #set ($newPublished = $object.getValue('published'))
           #if ($newPublished == '1' &amp;&amp; $originalPublished != '1')
-            &lt;tr&gt;&lt;td&gt;published the blog post &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+            &lt;tr&gt;&lt;td&gt;published the blog post &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
             ## Mark object displayed
             #set ($objectDisplayed = true)
           #end
@@ -388,7 +388,7 @@
         #else
           #set ($objectAction = 'updated')
         #end
-        &lt;tr&gt;&lt;td&gt;$objectAction an object of type "$objectClass" #if($objectAction != 'removed')on#{else}from#end the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr&gt;&lt;td&gt;$objectAction an object of type "$objectClass" #if($objectAction != 'removed')on#{else}from#end the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
         ## Mark displayed
         #set ($displayed = true)
       #end
@@ -396,7 +396,7 @@
   #end
   ## Generic update event fallback for when no output was produced by the current displayers (content, metadata, objects, etc.).
   #if (!$displayed &amp;&amp; !$objectDisplayed)
-    &lt;tr&gt;&lt;td&gt;updated the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;updated the $documentType &lt;a href="$document.getExternalURL()"&gt;$document.documentReference.name&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
   #end
 #end
 
@@ -418,7 +418,7 @@ FIXME: we need a way for an admin/script to check the watchlist of a user.
 #if ($services.watchlist.isWatched($services.model.serialize($document.documentReference), "DOCUMENT"))
   #set ($watchType = 'document')
   #set ($watchedEntityReference = $services.model.serialize($document.documentReference))
-  #set ($watchedEntity = "$document.name (${watchedEntityReference})")
+  #set ($watchedEntity = "$document.documentReference.name (${watchedEntityReference})")
 #elseif ($services.watchlist.isWatched($services.model.serialize($document.documentReference.lastSpaceReference), "SPACE"))
 #elseif ($services.watchlist.isWatched($services.model.serialize($document.documentReference.wikiReference.name), "WIKI"))
 #elseif ($services.watchlist.isWatched($services.model.serialize($event.authorReference), "USER"))
@@ -436,7 +436,7 @@ FIXME: we need a way for an admin/script to check the watchlist of a user.
       <language>en</language>
     </property>
     <property>
-      <subject>Watchlist for document "$xwiki.getDocument($events[0].documentReference).name" ($events[0].documentReference)</subject>
+      <subject>Watchlist for document "$xwiki.getDocument($events[0].documentReference).documentReference.name" ($events[0].documentReference)</subject>
     </property>
     <property>
       <text>## Note: ASCII formatting applies here since no whitespace cleaning is performed.
@@ -463,7 +463,7 @@ FIXME: we need a way for an admin/script to check the watchlist of a user.
 #**##if ($sheets &amp;&amp; $sheets.size() &gt; 0)
 #****### Determine the class pretty name
 #****### Note: Code taken from "Main.SolrClassFacet"
-#****##set ($classPrettyName = $stringtool.removeEnd($classDocument.name, 'Class'))
+#****##set ($classPrettyName = $stringtool.removeEnd($classDocument.documentReference.name, 'Class'))
 #****##set ($translationKey = "solr.field.class.$classPrettyName")
 #****##if ($services.localization.get($translationKey))
 #******##set ($classPrettyName = $services.localization.render('$translationKey'))
@@ -489,11 +489,11 @@ FIXME: we need a way for an admin/script to check the watchlist of a user.
 #end
 ##
 #if ($event.type == 'create')
-#**##set ($output = "$output created the $documentType ""$document.name"" ($document.prefixedFullName) $document.getExternalURL()")
+#**##set ($output = "$output created the $documentType ""$document.documentReference.name"" ($document.prefixedFullName) $document.getExternalURL()")
 #elseif ($event.type == 'delete')
-#**##set ($output = "$output deleted the $documentType ""$document.name"" ($document.prefixedFullName) $document.getExternalURL()")
+#**##set ($output = "$output deleted the $documentType ""$document.documentReference.name"" ($document.prefixedFullName) $document.getExternalURL()")
 #elseif ($event.type == 'update')
-#**##set ($output = "$output updated the $documentType ""$document.name"" ($document.prefixedFullName) $document.getExternalURL()")
+#**##set ($output = "$output updated the $documentType ""$document.documentReference.name"" ($document.prefixedFullName) $document.getExternalURL()")
 #end
 
 $output

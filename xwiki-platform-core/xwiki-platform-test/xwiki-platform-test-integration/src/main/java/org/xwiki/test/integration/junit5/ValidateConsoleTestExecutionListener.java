@@ -52,7 +52,9 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
 
     private static final List<String> GLOBAL_EXCLUDES = Arrays.asList(
         // See https://jira.xwiki.org/browse/XWIKI-16386
-        "Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory].");
+        "Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory].",
+        // See https://jira.xwiki.org/browse/XCOMMONS-1627
+        "Could not validate integrity of download from file");
 
     @Override
     protected String getSkipSystemPropertyKey()

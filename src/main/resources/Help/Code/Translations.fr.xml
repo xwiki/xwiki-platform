@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Code.Translations" locale="fr">
+  <web>Help.Code</web>
+  <name>Translations</name>
+  <language>fr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1554808978000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1555071300000</date>
+  <contentUpdateDate>1555070216000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>help.applications.blog.description=L'application Blog vous permet de publier et de partager vos informations.
+help.applications.blog.title=Blog
+help.applications.browse.description=Choisissez parmi les applications offertes par la communauté et installez les dans votre wiki.
+help.applications.browse.tip={0}Le Gestionnaire d''extensions{1} vous aide à administrer (installer, mettre à jour, désinstaller) vos applications.
+help.applications.browse.title=Parcourir les applications
+help.applications.create.demo.label=Démonstration
+help.applications.create.description=Définissez la structure de vos données, personnalisez-la et créez l'application que vous souhaitez.
+help.applications.create.tip={0}App Within Minute{1} vous aide à créer des applications sans avoir besoin de connaissances techniques.
+help.applications.create.title=Créer votre application
+help.applications.description=Les applications permettent de regrouper les pages structurées liées ensemble.
+help.applications.description1=Vous avez besoin d'aide ou vous avez des problèmes avec certaines de nos applications ? Consultez leur documentation et apprenez-en plus sur leur fonctionnement.
+help.applications.fileManager.description=Le gestionnaire de fichiers (File Manager en anglais) gère vos fichiers, fournit un visualiseur des fichiers supportés, mots-clés et permet leur filtrage.
+help.applications.fileManager.title=Gestionnaire de fichiers
+help.applications.forum.description=L'application Forum vous permet de créer de nouvelles catégories et des sujets de discussion.
+help.applications.forum.title=Forum
+help.applications.ideas.description=L'application Idées vous encourage à soumettre des idées qui peuvent être votées par votre équipe.
+help.applications.ideas.title=Idées
+help.applications.link=Voir plus d'applications
+help.applications.meetings.description=L'application Réunions gère vos réunions en définissant la date, le lieu, les participants, etc.
+help.applications.meetings.title=Réunions
+help.applications.menu.description=L'application Menu vous aide à créer des menus de navigation et à les afficher sur votre wiki.
+help.applications.menu.title=Menu
+help.applications.movie.title=Films
+help.applications.title=Applications
+help.applications.title1=Exemples
+help.browse.label=Parcourir
+help.description1=Wiki offre de nombreuses fonctionnalités puissantes qui vous permettront de créer, organiser et trouver du contenu. Cette section vous montrera comment utiliser les fonctionnalités de base d'XWiki.
+help.description2=Félicitations pour l'acquisition de votre instance. XWiki est très flexible et peut être utilisé pour créer des bases de connaissances, des intranets ou tout autre type d'application métier. Ceci est possible grâce à ses grandes capacités de personnalisation, qui commencent par les pages, de manière simple ou plus avancée.
+help.edit.description=Utilisez un éditeur de texte {0}WYSIWYG{1} ou la {2}syntaxe{3} pour créer des pages wiki enrichies.
+help.edit.title=Modification de page
+help.example.label=Voir des exemples
+help.history.description=Voir les versions précédentes d'une page, comparer différentes versions ou revenir à une version antérieure.
+help.history.description1=Vérifiez l''onglet {0}historique{0}.
+help.history.description2=Comparez les versions.
+help.history.title1=Historique
+help.history.title=Gestion des versions
+help.import.description=Importez le contenu venant de différentes sources et exportez le dans un format ouvert (XML, HTML, PDF, ODT).
+help.import.title=Importez / Exportez
+help.macros.box=Macro Boîte
+help.macros.box.description=Affiche un message dans une boîte stylisée.
+help.macros.box.description1=Le macro {0}Boîte{1} affiche un message dans une boîte stylisée.
+help.macros.box.description2=Il existe différentes macros de boîtes spécialisées :
+help.macros.box.message=Ceci est un message dans une boîte
+help.macros.box.subtitle=Titre de la boîte
+help.macros.box.title=Boîte
+help.macros.browseMacros.description=Choisissez parmi les macros issues des contributions de la communauté et installez-les dans votre wiki.
+help.macros.browseMacros.tip={0}L''index des macros{1} liste les macros qui sont déjà installées et prêtes à être utilisées dans vos pages.
+help.macros.browseMacros.title=Explorer les macros
+help.macros.chart={0}La macro Graphique{1} affiche des graphiques générés à partir de diverses sources de données.
+help.macros.chart.bar=Diagramme en barres
+help.macros.chart.description=Génère des graphiques à partir de sources de données.
+help.macros.chart.pie=Diagramme circulaire
+help.macros.chart.time=Graphique de série chronologique
+help.macros.chart.title=Graphique
+help.macros.description=Les macros sont des fonctions réutilisables qui peuvent être intégrées dans une page.
+help.macros.error=Macro d'erreur
+help.macros.error.message=Ceci est un message d'erreur
+help.macros.example=Exemple
+help.macros.examples.description=Besoin d'aide, ou des difficultés avec certaines de nos macros ? Consultez leur documentation et découvrez leurs fonctionnalités.
+help.macros.examples.title=Exemples
+help.macros.gallery={0}La macro Galerie{1} affiche une liste d''images dans un diaporama.
+help.macros.gallery.description=Affiche une liste d'images dans une galerie de diaporamas.
+help.macros.gallery.title=Galerie
+help.macros.header=Section
+help.macros.header1=Sous-section
+help.macros.info=Macro d'information
+help.macros.info.message=Ceci est un message d'information
+help.macros.more=Voir plus de macros
+help.macros.notifications.activity.title1=Activité du wiki
+help.macros.notifications.activity.title2=Activité en temps réel des utilisateurs
+help.macros.notifications.content={0}La macro Notifications{0} fournit des informations sur les activités récentes réalisées par les utilisateurs.
+help.macros.notifications.description=Affiche les activités récentes réalisées par les utilisateurs sur les pages.
+help.macros.notifications.title=Notifications
+help.macros.success=Macro Succès
+help.macros.success.message=Ceci est un message de succès
+help.macros.title=Macros
+help.macros.toc={0}La macro Table des Matières{1} génère une table des matières à partir des titres de la page.
+help.macros.toc.description.content=Les exemples suivants utilisent la structure actuelle de la page constituée de deux sections et de trois sous-sections. En savoir plus sur la structuration d''une page avec des titres {0}sur la page de syntaxe.{1}
+help.macros.toc.description=Génère une table des matières des titres de page.
+help.macros.toc.description.title=Description
+help.macros.toc.examples.title=Exemple de macro Table des Matières
+help.macros.toc.insideBox=Table des Matières dans une boîte
+help.macros.toc.simple=Table des Matières simple
+help.macros.toc.startingPoint=Table des Matières avec un niveau de début
+help.macros.toc.title=Table des Matières
+help.macros.tree.description=Affiche la hiérarchie des pages.
+help.macros.tree.subtitle=Arbre
+help.macros.tree.pageDescription={0}La macro Arborescence{0} affiche l''arborescence des pages.
+help.macros.tree.title=Arborescence des pages
+help.macros.tree.header1=Arbre de hiérarchie des pages
+help.macros.tree.header2=Arbre de hiérarchie des pages compact
+help.macros.tree.header3=Arborescence des pages du wiki {0} sur l''espace {0}
+help.macros.tree.header4=Arborescence complète des entités
+help.macros.useMacros.description=Les macros sont des fonctions réutilisables qui peuvent être intégrées dans le contenu des pages.
+help.macros.useMacros.tip={0}L''éditeur de texte WYSIWYG{1} vous permet d''insérer et personnaliser des macros quand vous éditez une page. Recherchez le bouton {2} sur la barre d''outils.
+help.macros.useMacros.title=Utiliser les macros
+help.macros.warning=Macro Message d'avertissement
+help.macros.warning.message=Ceci est un message d'avertissement
+help.more.label=En savoir plus
+help.organization.description=Organisez votre contenu en pages hiérarchisées, groupées en plusieurs wikis.
+help.organization.title=Organisation du contenu
+help.start.description=Quelques étapes faciles pour commencer à utiliser XWiki.
+help.start.title=Pour commencer
+help.templates.article.description=Page d'article
+help.templates.article.title=Article
+help.templates.create.description=Intégrer la structure et les macros dans une page existante, et la transformer en modèle.
+help.templates.create.tip=Les {0}fournisseurs de modèles{1} présentent les modèles à la création d''une page, afin que les utilisateurs puissent les utiliser.
+help.templates.create.title=Créez votre modèle
+help.templates.description=Les modèles sont des pages prédéfinies qui sont copiées lors de la création d'une nouvelle page.
+help.templates.encyclopedia.description=Page Encyclopédie
+help.templates.encyclopedia.title=Encyclopédie
+help.templates.examples.description=Vous voulez commencer à partir d'un modèle prédéfini ? Voici quelques exemples de modèles disponibles dans XWiki
+help.templates.examples.title=Exemples
+help.templates.meeting.title=Compte-rendu de réunion
+help.templates.meeting.description=Agenda et notes
+help.templates.simple.description=Avec table des matières
+help.templates.simple.title=Page simple
+help.templates.more=Voir plus de modèles
+help.templates.title=Modèles
+help.templates.useTemplates.description=Les modèles sont des pages prédéfinies qui sont copiées lors de la création d'une nouvelle page.
+help.templates.useTemplates.tip={0}Créer des pages{1} à partir de modèles permet d''adapter rapidement un contenu prédéfini à vos besoins.
+help.templates.useTemplates.title=Utiliser les modèles
+help.title=Page d'aide
+help.title1=Comment utiliser XWiki ?
+help.title2=Principales fonctionnalités d'XWiki
+help.try.label=Essayez !
+help.videos.description=Voir nos tutoriels vidéos.
+help.videos.more=Voir plus de vidéos
+help.videos.title=Vidéos
+help.videos.videoCard1.title=Présentation de la page d'accueil
+help.videos.videoCard1.topic1=Découvrez les éléments affichés sur votre page d'accueil
+help.videos.videoCard1.topic2=Commencez à parcourir votre wiki
+help.videos.videoCard2.title=Personnalisation de la page d'accueil
+help.videos.videoCard2.topic1=Apprenez comment modifier le thème de couleur de votre wiki
+help.videos.videoCard2.topic2=Apprenez à ajouter des panels et des colonnes sur votre wiki
+help.videos.videoCard2.topic3=Apprenez comment ajouter des gadgets à votre wiki
+help.videos.videoCard3.title=Création de page et de contenu
+help.videos.videoCard3.topic1=Découvrez comment créer une page
+help.videos.videoCard3.topic2=Apprenez comment utiliser l'éditeur de texte WYSIWYG
+help.videos.videoCard3.topic3=Découvrez les modes vue et édition
+help.videos.videoCard4.title=Importer des documents Office dans XWiki
+help.videos.videoCard4.topic1=Découvrez comment importer des documents Office dans votre wiki
+help.videos.videoCard4.topic2=Apprenez à utiliser la macro "Table des Matières"
+help.videos.videoCard5.title=App Within Minutes
+help.videos.videoCard5.topic1=Découvrez comment créer une application web
+help.videos.videoCard5.topic2=Apprenez à utiliser votre application
+help.videos.videoCard6.title=Ajout / Suppression d'extensions
+help.videos.videoCard6.topic1=Découvrez comment gérer vos extensions avec le Gestionnaire d'extensions
+help.videos.videoCard6.topic2=Découvrez l'interface d'Administration XWiki
+help.videos.watch=Voir</content>
+  
+</xwikidoc>

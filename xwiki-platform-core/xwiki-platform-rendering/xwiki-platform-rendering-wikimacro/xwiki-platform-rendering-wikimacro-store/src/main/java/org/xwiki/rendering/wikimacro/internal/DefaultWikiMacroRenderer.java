@@ -44,6 +44,7 @@ import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionFinishedEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
@@ -55,6 +56,7 @@ import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.wikimacro.macro.wikimacrocontent.WikiMacroContentMacro;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -179,8 +181,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     /**
      * Removes any top level paragraph since for example for the following use case we don't want an extra paragraph
      * block: <code>= hello {{velocity}}world{{/velocity}}</code>.
-     * 
-     * @param blocks the blocks to check and convert
+     *
+     * @param block the blocks to check and convert
      */
     private Block removeTopLevelParagraph(Block block)
     {
@@ -226,8 +228,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     /**
      * Clone and filter wiki macro content depending of the context.
-     * 
-     * @param context the macro execution context
+     *
      * @return the cleaned wiki macro content
      */
     private XDOM prepareWikiMacroContent()
@@ -387,7 +388,38 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             }
         }
 
+        cleanMacroMarkers(block);
         return block;
+    }
+
+    /**
+     * Clean the rendered macro to remove macro markers, except those inside a wikimacrocontent macro.
+     * @param block the block to clean.
+     */
+    private void cleanMacroMarkers(Block block)
+    {
+        // Matcher to find all MacroMarkerBlock about wikimacrocontent macro.
+        BlockMatcher wikiContentMacroBlock =
+            testedBlock -> (testedBlock instanceof MacroMarkerBlock)
+                && WikiMacroContentMacro.WIKIMACRO_CONTENT_MACRO.equals(((MacroMarkerBlock) testedBlock).getId());
+
+        // Matcher to find all MacroMarkerBlocks
+        BlockMatcher marcoMarkerBlocks =
+            testedBlock -> (testedBlock instanceof MacroMarkerBlock);
+
+        List<Block> allMacroMarkerBlocks = block.getBlocks(marcoMarkerBlocks, Block.Axes.DESCENDANT);
+        List<Block> allWikiMacroContentMarkerBlocks = block.getBlocks(wikiContentMacroBlock, Block.Axes.DESCENDANT);
+
+        // We remove from the list of all macro marker blocks, the blocks that are inside a wikimacrocontent block.
+        for (Block allWikiMacroContentMarkerBlock : allWikiMacroContentMarkerBlocks) {
+            allMacroMarkerBlocks.removeAll(
+                allWikiMacroContentMarkerBlock.getBlocks(marcoMarkerBlocks, Block.Axes.DESCENDANT));
+        }
+
+        // Remove all macromarker blocks that remains (outside the wikimacrocontent block).
+        for (Block markerBlock : allMacroMarkerBlocks) {
+            markerBlock.getParent().replaceChild(markerBlock.getChildren(), markerBlock);
+        }
     }
 
     private Block transform(Block block, XDOM xdom, Map<String, Object> macroBinding, boolean async)

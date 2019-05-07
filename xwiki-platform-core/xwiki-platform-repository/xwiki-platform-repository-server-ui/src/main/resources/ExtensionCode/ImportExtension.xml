@@ -68,8 +68,8 @@ Example of extension id: ##org.xwiki.contrib:application-filemanager##
       &lt;input class="withTip" type="text" name="extensionId" value="extension id..."  size="25" id="importExtensionIdInput"/&gt;
       &lt;select name="repositoryId" id="importRepositoryIdInput"&gt;
         #foreach($repository in $extensionManager.repositories)
-          #if ($repository.id.type != 'xwiki')
-            &lt;option value="$escapetool.xml($repository.id.id)"&gt;$escapetool.html($repository.id.id)&lt;/option&gt;
+          #if ($repository.descriptor.type != 'xwiki')
+            &lt;option value="$escapetool.xml($repository.descriptor.id)"&gt;$escapetool.html($repository.descriptor.id)&lt;/option&gt;
           #end
         #end
       &lt;/select&gt;

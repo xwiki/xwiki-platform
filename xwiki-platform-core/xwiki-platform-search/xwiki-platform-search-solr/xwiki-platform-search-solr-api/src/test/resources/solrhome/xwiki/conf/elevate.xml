@@ -16,15 +16,27 @@
  limitations under the License.
 -->
 
-<schema name="xwiki" version="1.6">
-  <field name="_version_" type="plong" indexed="true" stored="true" />
-  <field name="id" type="string" indexed="true" stored="true" required="true" />
+<!-- If this file is found in the config directory, it will only be
+     loaded once at startup.  If it is found in Solr's data
+     directory, it will be re-loaded every commit.
 
-  <dynamicField name="*" type="ignored" multiValued="true" />
+   See http://wiki.apache.org/solr/QueryElevationComponent for more info
 
-  <uniqueKey>id</uniqueKey>
+-->
+<elevate>
+ <!-- Query elevation examples
+  <query text="foo bar">
+    <doc id="1" />
+    <doc id="2" />
+    <doc id="3" />
+  </query>
 
-  <fieldType name="string" class="solr.StrField" sortMissingLast="true" />
-  <fieldType name="plong" class="solr.LongPointField" docValues="true"/>
-  <fieldtype name="ignored" stored="false" indexed="false" multiValued="true" class="solr.StrField" />
-</schema>
+for use with techproducts example
+ 
+  <query text="ipod">
+    <doc id="MA147LL/A" />  put the actual ipod at the top 
+    <doc id="IW-02" exclude="true" /> exclude this cable
+  </query>
+-->
+
+</elevate>

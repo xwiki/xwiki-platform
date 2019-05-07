@@ -51,8 +51,6 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
         "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
 
     private static final List<String> GLOBAL_EXCLUDES = Arrays.asList(
-        // See https://jira.xwiki.org/browse/XWIKI-16386
-        "Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory].",
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
         "Could not validate integrity of download from file");
 

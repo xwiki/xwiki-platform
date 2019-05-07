@@ -124,9 +124,9 @@ public class MenuIT
         AdministrationPage administrationPage = AdministrationPage.gotoPage();
 
         // check that the look & feel category contains a Menu section
-        assertTrue(administrationPage.hasSection("Look & Feel", "Menu"));
+        assertTrue(administrationPage.hasSection("Look & Feel", "Menus"));
 
-        administrationPage.clickSection("Look & Feel", "Menu");
+        administrationPage.clickSection("Look & Feel", "Menus");
 
         // after having clicked on the menu section, we are in the menu home page
         MenuHomePage menuPage = new MenuHomePage();

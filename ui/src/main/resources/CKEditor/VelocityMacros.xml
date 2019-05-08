@@ -127,7 +127,21 @@
     'content': $parameters.content
   })
   #set ($content = "#renderContentSheet")
-  #set ($officeImporterSupported = $services.officemanager.serverState == 'Connected')
+  ## Verify if the office import feature is supported.
+  ##
+  ## It's not enough to check if the Office server is connected because the 'importOfficeAttachment' API is available
+  ## only since XWiki 9.8 (see XWIKI-14739) while the CKEditor Integration extension can be installed on older versions
+  ## of XWiki where the users won't be able to import office documents from the CKEditor even if the Office server is
+  ## connected. On these older versions the users will have to use the Create Page dialog with the Page from Office
+  ## option.
+  ##
+  ## We check if the 'importOfficeAttachment' API is available by trying to import an attachment that doesn't exist
+  ## using the Office Viewer macro, which should output an error message saying that the attachment doesn't exist. This
+  ## way the Office server is not actually called so there's no risk of slowing down or blocking the CKEditor load (see
+  ## CKEDITOR-294).
+  #set ($missingAttachmentReference = $services.model.resolveAttachment('CKEditor.OfficeImporter@doesNotExist.txt'))
+  #set ($officeImporterSupported = $services.officemanager.serverState == 'Connected' &amp;&amp;
+    "$!services.wysiwyg.importOfficeAttachment($missingAttachmentReference, {'useOfficeViewer': true})" != '')
   #set ($discard = $parameters.attributes.putAll({
     'class': "$!parameters.attributes.get('class') ckeditor-textarea loading",
     'spellcheck': false,

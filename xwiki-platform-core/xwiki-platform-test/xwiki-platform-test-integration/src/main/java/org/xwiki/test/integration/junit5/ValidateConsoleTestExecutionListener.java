@@ -54,7 +54,14 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
         // Broken pipes can happen when the browser moves away from the current page and there are unfinished
         // queries happening on the server side. These are normal errors that can happen for normal users too and
         // we shouldn't consider them faults.
-        "Caused by: java.io.IOException: Broken pipe");
+        "Caused by: java.io.IOException: Broken pipe",
+        // Warning coming from the XWikiDockerExtension when in verbose mode (which is our default on the CI)
+        "Failure when attempting to lookup auth config",
+        // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.
+        // TODO: fix this so that it doesn't happen. It could mean that we're not using the right secure random
+        // implementation and we're using a too slow one.
+        "Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took"
+    );
 
     private static final StackTraceLogParser LOG_PARSER = new StackTraceLogParser();
 

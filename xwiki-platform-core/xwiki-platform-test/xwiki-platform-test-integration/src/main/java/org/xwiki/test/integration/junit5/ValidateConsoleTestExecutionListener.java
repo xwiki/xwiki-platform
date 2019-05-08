@@ -19,8 +19,6 @@
  */
 package org.xwiki.test.integration.junit5;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +50,13 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
 
     private static final List<String> GLOBAL_EXCLUDES = Arrays.asList(
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
-        "Could not validate integrity of download from file");
+        "Could not validate integrity of download from file",
+        // Broken pipes can happen when the browser moves away from the current page and there are unfinished
+        // queries happening on the server side. These are normal errors that can happen for normal users too and
+        // we shouldn't consider them faults.
+        "Caused by: java.io.IOException: Broken pipe");
+
+    private static final StackTraceLogParser LOG_PARSER = new StackTraceLogParser();
 
     @Override
     protected String getSkipSystemPropertyKey()
@@ -64,7 +68,7 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
     protected void validateOutputForTest(String outputContent)
     {
         List<String> excludeList = getExcludeList();
-        List<String> matchingLines = new BufferedReader(new StringReader(outputContent)).lines()
+        List<String> matchingLines = LOG_PARSER.parse(outputContent).stream()
             .filter(p -> {
                 for (String searchString : SEARCH_STRINGS) {
                     if (p.contains(searchString)) {

@@ -106,7 +106,7 @@ public class StackTraceLogParser
             String line;
             while ((line = reader.readLine()) != null) {
                 int currentDashPosition = line.indexOf(" - ");
-                if ((results.size() > 1 || inStackTrace) && currentDashPosition == dashPosition) {
+                if (isStackTracePossible(results, inStackTrace, currentDashPosition, dashPosition)) {
                     if (isMatchingAtPattern(currentDashPosition, line)) {
                         // If we're already reading a stack trace then discard, otherwise consider that the previously
                         // saved 2 lines at part of the same stack trace and remove them from the array list to store
@@ -140,6 +140,12 @@ public class StackTraceLogParser
             }
         }
         return results;
+    }
+
+    private boolean isStackTracePossible(List<String> results, boolean inStackTrace, int currentDashPosition,
+        int dashPosition)
+    {
+        return (results.size() > 1 || inStackTrace) && currentDashPosition == dashPosition;
     }
 
     private StringBuilder constructNewBuffer(int currentDashPosition, List<String> results)

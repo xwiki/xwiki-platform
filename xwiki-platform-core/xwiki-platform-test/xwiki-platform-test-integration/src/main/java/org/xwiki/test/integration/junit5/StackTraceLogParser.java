@@ -164,19 +164,26 @@ public class StackTraceLogParser
 
     private boolean isMatchingAtPattern(int currentDashPosition, String line)
     {
-        String substring = line.substring(currentDashPosition + 2, currentDashPosition + 7);
-        return substring.equals(" \tat ");
+        return isMatchingPattern(" \tat ", currentDashPosition, line);
     }
 
     private boolean isMatchingCausedByPattern(int currentDashPosition, String line)
     {
-        String substring = line.substring(currentDashPosition + 2, currentDashPosition + 14);
-        return substring.equals(" Caused by: ");
+        return isMatchingPattern(" Caused by: ", currentDashPosition, line);
     }
 
     private boolean isMatchingOmittedFramesPattern(int currentDashPosition, String line)
     {
-        String substring = line.substring(currentDashPosition + 2, currentDashPosition + 8);
-        return substring.equals(" \t... ");
+        return isMatchingPattern(" \t... ", currentDashPosition, line);
+    }
+
+    private boolean isMatchingPattern(String pattern, int currentDashPosition, String line)
+    {
+        if (line.length() > currentDashPosition + pattern.length() + 2) {
+            String substring = line.substring(currentDashPosition + 2, currentDashPosition + pattern.length() + 2);
+            return substring.equals(pattern);
+        } else {
+            return false;
+        }
     }
 }

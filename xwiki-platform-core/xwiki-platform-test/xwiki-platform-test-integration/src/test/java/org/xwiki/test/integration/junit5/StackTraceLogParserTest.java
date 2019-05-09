@@ -49,4 +49,19 @@ public class StackTraceLogParserTest
             + "Caused by: org.eclipse.jetty.io.EofException: null\n"
             + "Caused by: java.io.IOException: Broken pipe", results.get(45));
     }
+
+    @Test
+    public void parseWithEdgeCases()
+    {
+        // Verify that it works if the third line is shorter or equal to the searched patterns.
+        String log = "date - line1\n"
+            + "date - line2\n"
+            + "date - Caused by: \n"
+            + "date - test";
+        StackTraceLogParser parser = new StackTraceLogParser();
+        List<String> results = parser.parse(log);
+
+        // We validate we didn't recognize a stack trace (otherwise it would be 3 lines and not 4).
+        assertEquals(4, results.size());
+    }
 }

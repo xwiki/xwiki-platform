@@ -51,17 +51,39 @@ public class StackTraceLogParserTest
     }
 
     @Test
-    public void parseWithEdgeCases()
+    public void parseWithInvalidStacktrace()
     {
         // Verify that it works if the third line is shorter or equal to the searched patterns.
         String log = "date - line1\n"
             + "date - line2\n"
+            + "date - \tat \n"
             + "date - Caused by: \n"
             + "date - test";
         StackTraceLogParser parser = new StackTraceLogParser();
         List<String> results = parser.parse(log);
 
-        // We validate we didn't recognize a stack trace (otherwise it would be 3 lines and not 4).
-        assertEquals(4, results.size());
+        // We validate we didn't recognize a stack trace (otherwise it would be 3 lines and not 5).
+        assertEquals(5, results.size());
+        assertEquals("date - line1", results.get(0));
+        assertEquals("date - line2", results.get(1));
+        assertEquals("date - \tat ", results.get(2));
+        assertEquals("date - Caused by: ", results.get(3));
+        assertEquals("date - test", results.get(4));
+    }
+
+    @Test
+    public void parseWithLeadingStacktrace()
+    {
+        String log = "date - line1\n"
+            + "date - line2\n"
+            + "date - \tat x\n"
+            + "date - Caused by: x\n"
+            + "date - test";
+        StackTraceLogParser parser = new StackTraceLogParser();
+        List<String> results = parser.parse(log);
+
+        assertEquals(2, results.size());
+        assertEquals("date - line1\nline2\nCaused by: x", results.get(0));
+        assertEquals("date - test", results.get(1));
     }
 }

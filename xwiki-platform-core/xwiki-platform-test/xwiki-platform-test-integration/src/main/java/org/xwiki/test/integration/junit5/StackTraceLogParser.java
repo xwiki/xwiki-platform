@@ -106,7 +106,7 @@ public class StackTraceLogParser
             String line;
             while ((line = reader.readLine()) != null) {
                 int currentDashPosition = line.indexOf(" - ");
-                if (results.size() > 1 && currentDashPosition == dashPosition) {
+                if ((results.size() > 1 || inStackTrace) && currentDashPosition == dashPosition) {
                     if (isMatchingAtPattern(currentDashPosition, line)) {
                         // If we're already reading a stack trace then discard, otherwise consider that the previously
                         // saved 2 lines at part of the same stack trace and remove them from the array list to store

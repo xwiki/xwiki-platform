@@ -29,7 +29,7 @@ import org.xwiki.text.StringUtils;
 
 /**
  * Parses XWiki log formats and aggregates stack traces. For example the following:
- * <code><pre>
+ * <pre><code>
  * 2019-05-06 20:02:37,331 [Exec Stream Pumper] - 2019-05-06 20:02:37,330
  *   [http://localhost:8080/xwiki/webjars/wiki%3Axwiki/jstree/3.3.7/jstree.min.js]
  *     ERROR ebJarsResourceReferenceHandler - Failed to read resource [jstree/3.3.7/jstree.min.js]
@@ -41,17 +41,17 @@ import org.xwiki.text.StringUtils;
  * 2019-05-06 20:02:37,352 [Exec Stream Pumper] - Caused by: org.eclipse.jetty.io.EofException: null
  * ...
  * 2019-05-06 20:02:37,359 [Exec Stream Pumper] -  ... 75 common frames omitted
- * </pre></code>
+ * </code></pre>
  *
  * Will return a line of:
  *
- * <code><pre>
+ * <pre><code>
  * 2019-05-06 20:02:37,331 [Exec Stream Pumper] - 2019-05-06 20:02:37,330
  *   [http://localhost:8080/xwiki/webjars/wiki%3Axwiki/jstree/3.3.7/jstree.min.js]
  *     ERROR ebJarsResourceReferenceHandler - Failed to read resource [jstree/3.3.7/jstree.min.js]
  * org.xwiki.resource.ResourceReferenceHandlerException: Failed to read resource [jstree/3.3.7/jstree.min.js]
  * Caused by: org.eclipse.jetty.io.EofException: null
- * </pre></code>
+ * </code></pre>
  *
  * @version $Id$
  * @since 11.4RC1

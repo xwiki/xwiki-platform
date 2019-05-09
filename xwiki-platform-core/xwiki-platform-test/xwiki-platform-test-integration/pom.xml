@@ -142,7 +142,8 @@
                 org/xwiki/test/integration/AntBuildListener.java,
                 org/xwiki/test/integration/XWikiExecutor.java,
                 org/xwiki/test/integration/XWikiTestSetup.java,
-                org/xwiki/test/integration/XWikiExecutorSuite.java
+                org/xwiki/test/integration/XWikiExecutorSuite.java,
+                org/xwiki/test/integration/junit5/StackTraceLogParser.java <!-- Cyclomatic complexity -->
               </excludes>
             </configuration>
           </execution>

@@ -209,34 +209,11 @@ var XWiki = (function(XWiki) {
       if (this.form) {
         this.form.disable();
       }
-
-      if ($$('.CodeMirror')[0]) {
-        try {
-          $$('.CodeMirror')[0].CodeMirror.setOption('readOnly', true);
-        } catch (e) {}
-      } else if (window.CKEDITOR) {
-        try {
-
-          // FIXME: This still allows to switch CKEditor from source mode to WYSIWYG and back
-          // and doing that would disable the readOnly and activate back the warning about leaving page
-          CKEDITOR.instances.content.resetDirty();
-          CKEDITOR.instances.content.setReadOnly();
-        } catch (e) {}
-      }
     },
     // Allow to enable back the editors (form, WikiEditor or CKEditor) in case of 401 for example.
     enableEditors : function () {
       if (this.form) {
         this.form.enable();
-      }
-      if ($$('.CodeMirror')[0]) {
-        try {
-          $$('.CodeMirror')[0].CodeMirror.setOption('readOnly', false);
-        } catch (e) {}
-      } else if (window.CKEDITOR) {
-        try {
-          CKEDITOR.instances.content.setReadOnly(false);
-        } catch (e) {}
       }
     },
     onSave : function(event) {
@@ -367,6 +344,7 @@ var XWiki = (function(XWiki) {
           this.savingBox.replace(this.savedBox);
         }
       } else if (!isCreateFromTemplate && (!isContinue  || $('body').hasClassName('previewbody'))) {
+        document.fire("xwiki:document:saved");
         this.maybeRedirect(isContinue);
       } else {
         this.progressBox.hide();

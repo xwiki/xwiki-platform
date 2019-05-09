@@ -93,7 +93,7 @@ public class AttachmentIT
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment(firstAttachment));
         assertEquals("1.1", attachmentsPane.getLatestVersionOfAttachment(secondAttachment));
 
-        String attachmentURLScheme = String.format("%sdownloadrev/%s/%%s?rev=1.1", setup.getBaseBinURL(),
+        String attachmentURLScheme = String.format("%sdownload/%s/%%s?rev=1.1", setup.getBaseBinURL(),
             testPageName.replace('.', '/'));
         assertEquals(String.format(attachmentURLScheme, firstAttachment),
             attachmentsPane.getAttachmentLink(firstAttachment).getAttribute("href"));
@@ -121,7 +121,7 @@ public class AttachmentIT
         attachmentsPane.clickHideProgress();
         assertTrue(attachmentsPane.attachmentExistsByFileName(firstAttachment));
         assertEquals("1.2", attachmentsPane.getLatestVersionOfAttachment(firstAttachment));
-        String attachmentURL = String.format("%sdownloadrev/%s/%s?rev=1.2", setup.getBaseBinURL(),
+        String attachmentURL = String.format("%sdownload/%s/%s?rev=1.2", setup.getBaseBinURL(),
             testPageName.replace('.', '/'), firstAttachment);
         assertEquals(attachmentURL, attachmentsPane.getAttachmentLink(firstAttachment).getAttribute("href"));
         attachmentsPane.getAttachmentLink(firstAttachment).click();

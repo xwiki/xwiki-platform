@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +43,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 
@@ -57,6 +59,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiServletURLFactory.class);
 
     private EntityReferenceResolver<String> relativeEntityReferenceResolver;
+
+    private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
     private EntityResourceActionLister actionLister;
 
@@ -630,7 +634,15 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             WikiReference originalWikiReference = context.getWikiReference();
             context.setWikiId(xwikidb);
 
-            DocumentReference documentReference = new DocumentReference(xwikidb, spaces, name);
+            DocumentReference documentReference = new DocumentReference(
+                name,
+                new SpaceReference(getCurrentEntityReferenceResolver().resolve(
+                    spaces,
+                    EntityType.SPACE,
+                    context.getWikiReference()
+                ))
+            );
+
             try {
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);
                 attachment = document.getAttachment(filename);
@@ -642,10 +654,15 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             }
         }
 
-        if (attachmentURL == null && attachment != null) {
-            attachmentURL = createAttachmentRevisionURL(filename, spaces, name, attachment.getVersion(),
-                querystring, xwikidb, context);
-        } else if (attachmentURL == null){
+        if (attachment != null) {
+            if (!StringUtils.isEmpty(querystring)) {
+                querystring += "&rev=" + attachment.getVersion();
+            } else {
+                querystring = "rev=" + attachment.getVersion();
+            }
+        }
+
+        if (attachmentURL == null) {
             attachmentURL = this.internalCreateAttachmentURL(filename, spaces, name, action, querystring, xwikidb,
                 context);
         }
@@ -716,6 +733,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         DocumentReference currentDocumentReference = context.getDoc().getDocumentReference();
         return serializer.serialize(currentDocumentReference.getLastSpaceReference()).equals(spaces)
             && currentDocumentReference.getName().equals(name)
+            &&  Locale.ROOT.equals(context.getDoc().getLocale())
             && (wiki == null || currentDocumentReference.getWikiReference().getName().equals(wiki));
     }
 
@@ -921,6 +939,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             this.relativeEntityReferenceResolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
         }
         return this.relativeEntityReferenceResolver;
+    }
+
+    private EntityReferenceResolver<String> getCurrentEntityReferenceResolver()
+    {
+        if (this.currentEntityReferenceResolver == null) {
+            this.currentEntityReferenceResolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "current");
+        }
+        return this.currentEntityReferenceResolver;
     }
 
     private EntityResourceActionLister getActionLister()

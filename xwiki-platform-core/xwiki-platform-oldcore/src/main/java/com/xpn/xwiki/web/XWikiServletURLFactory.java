@@ -604,7 +604,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         // If we are viewing a specific revision, then we need to get the attachment for this specific revision.
         if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null
-            && isContextDoc(xwikidb, spaces, name, context)) {
+            && isContextDoc(xwikidb, spaces, name, context) &&  Locale.ROOT.equals(context.getDoc().getLocale())) {
             try {
                 String docRevision = context.get("rev").toString();
                 attachment =
@@ -624,7 +624,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         // If we are getting an attachment from the context doc, we can directly load its version from it.
-        else if (action.equals("download") && isContextDoc(xwikidb, spaces, name, context)) {
+        else if (action.equals("download") && isContextDoc(xwikidb, spaces, name, context)
+            &&  Locale.ROOT.equals(context.getDoc().getLocale())) {
             attachment = context.getDoc().getAttachment(filename);
 
         // We are getting an attachment from another doc: we can try to load it to retrieve its version
@@ -733,7 +734,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         DocumentReference currentDocumentReference = context.getDoc().getDocumentReference();
         return serializer.serialize(currentDocumentReference.getLastSpaceReference()).equals(spaces)
             && currentDocumentReference.getName().equals(name)
-            &&  Locale.ROOT.equals(context.getDoc().getLocale())
             && (wiki == null || currentDocumentReference.getWikiReference().getName().equals(wiki));
     }
 

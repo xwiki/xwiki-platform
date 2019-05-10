@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui;
+package org.xwiki.repository.test.ui;
 
 import java.io.File;
 import java.util.List;
@@ -33,6 +33,8 @@ import org.xwiki.repository.test.RepositoryTestUtils;
 import org.xwiki.repository.test.SolrTestUtils;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.XWikiExecutorSuite;
+import org.xwiki.test.ui.PageObjectSuite;
+import org.xwiki.test.ui.PersistentTestContext;
 
 /**
  * Runs all functional tests found in the classpath.

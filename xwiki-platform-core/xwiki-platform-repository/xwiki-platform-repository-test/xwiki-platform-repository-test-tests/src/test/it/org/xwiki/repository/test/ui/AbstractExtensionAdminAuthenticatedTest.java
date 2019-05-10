@@ -17,12 +17,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.ui;
+package org.xwiki.repository.test.ui;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.xwiki.repository.test.RepositoryTestUtils;
+import org.xwiki.test.ui.AbstractTest;
+import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.ui.TestUtils;
 
 /**
  * Base class for admin tests that need to manipulate a repository of extensions.

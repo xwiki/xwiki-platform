@@ -79,9 +79,9 @@ public class LanguageTest extends AbstractTest
     public void testChangeLanguageInMonolingualModeUsingTheAdministrationPreference()
     {
         WikiEditPage edit = WikiEditPage.gotoPage("Test", "LanguageTest");
-        edit.setContent("{{velocity}}context = ($xcontext.language), doc = ($doc.language), "
-            + "default = ($doc.defaultLanguage), tdoc = ($tdoc.language), "
-            + "tdocdefault = ($tdoc.defaultLanguage){{/velocity}}");
+        edit.setContent("{{velocity}}context = ($xcontext.locale), doc = ($doc.locale), "
+            + "default = ($doc.defaultLocale), tdoc = ($tdoc.locale), "
+            + "tdocdefault = ($tdoc.defaultLocale){{/velocity}}");
         ViewPage vp = edit.clickSaveAndView();
 
         // Current language must be "en"

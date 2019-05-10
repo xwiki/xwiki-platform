@@ -38,7 +38,7 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed when viewing individual tags -->
+    <!-- Needed when viewing individual tags for the Activity Stream for the tag -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-notifications-ui</artifactId>

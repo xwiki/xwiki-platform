@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,11 @@ public class EditTranslationIT
     public void setup(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
+    }
+
+    @AfterAll
+    public void tearDown(TestUtils setup) throws Exception
+    {
         setup.setWikiPreference("multilingual", "false");
         setup.setWikiPreference("default_language", "en");
     }

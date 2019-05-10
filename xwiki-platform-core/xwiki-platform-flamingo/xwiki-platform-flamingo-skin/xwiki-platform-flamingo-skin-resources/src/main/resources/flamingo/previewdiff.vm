@@ -1,0 +1,71 @@
+#template("diff_macros.vm")
+#set ($origdoc = $xwiki.getDocument($tdoc.getDocumentReference()))
+#set($newdoc = $tdoc)
+
+#createDocumentDiff($origdoc $newdoc $docDiff)
+#createDocumentDiffSummary($docDiff $summary)
+
+<div class="modal fade text-left" id="previewDiffModal" tabindex="-1" role="dialog" aria-hidden="true"
+     data-backdrop="static">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <div class="modal-title" id="previewDiffModalTitle">$services.localization.render('core.editors.save.previewDiff.title')</div>
+        <hr />
+        <div class="xhint">
+          $services.localization.render('core.editors.save.previewDiff.description')
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="list-group-item">
+          <span class="badge">$origdoc.getVersion()</span>
+          <h4 class="list-group-item-heading">$services.localization.render('core.editors.save.previewDiff.latestVersion')</h4>
+          <p class="list-group-item-text">$services.localization.render('core.editors.save.previewDiff.modified', [
+            $origdoc.getAuthorReference().name,
+            $xwiki.formatDate($origdoc.date)
+          ])</p>
+        </div>
+        <div class="diff">
+          #displayDocumentDiff($docDiff)
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="panel-group accordionInModalFooter" id="accordion" role="tablist" aria-multiselectable="false">
+          <div class="panel panel-default">
+            <div class="panel-heading" role="tab" id="headingForceSave">
+              <label class="panel-title">
+                <input type="radio" id="actionForceSaveRadio" name="warningConflictAction" />
+                $services.localization.render('core.editors.save.previewDiff.forceSave.action')
+              </label>
+              <span class="openDetails" data-toggle="collapse" data-parent="#accordion" href="#collapseForceSave" aria-expanded="true" aria-controls="collapseForceSave">$services.icon.renderHTML('caret-down')</span>
+            </div>
+            <div id="collapseForceSave" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingForceSave">
+              <div class="panel-body">
+                $services.localization.render('core.editors.save.previewDiff.forceSave.hint')
+              </div>
+            </div>
+          </div>
+          <div class="panel panel-danger">
+            <div class="panel-heading active" role="tab" id="headingReloadEditor">
+              <label class="panel-title">
+                <input type="radio" id="actionReloadRadio" name="warningConflictAction" />
+                $services.localization.render('core.editors.save.previewDiff.reload.action')
+              </label>
+              <span class="openDetails" data-toggle="collapse" data-parent="#accordion" href="#collapseReloadEditor" aria-expanded="true" aria-controls="collapseReloadEditor">
+                $services.icon.renderHTML('caret-down')
+              </span>
+            </div>
+            <div id="collapseReloadEditor" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingReloadEditor">
+              <div class="panel-body">
+                $services.localization.render('core.editors.save.previewDiff.reload.hint')
+              </div>
+            </div>
+          </div>
+        </div>
+        <input type="button" id="submitDiffButton" class="btn btn-primary" value="$services.localization.render('save')" />
+        <input type="button" id="cancelDiffButton" class="btn btn-default" value="$services.localization.render('cancel')" data-dismiss="modal" aria-hidden="true" />
+      </div>
+    </div>
+  </div>
+</div>

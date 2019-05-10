@@ -88,7 +88,7 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- We need a Log4j 2.x iomplementation since Solr uses Log4j 2.x -->
+    <!-- We need a Log4j 2.x implementation since Solr uses Log4j 2.x -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-to-slf4j</artifactId>

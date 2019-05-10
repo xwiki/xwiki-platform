@@ -62,6 +62,15 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
           </exclusion>
+          <!-- Don't provide a Log4j 2.x implementation since we want to use SLF4J and Logback -->
+          <exclusion>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+          </exclusion>
           <!-- Exclude the dependencies that are needed by Solr when it runs as a separate webapp because we use
             solr-core to embed Solr in the same webapp as XWiki. This doesn't mean we cannot communicate with a remote
             Solr instance. This part is handled by solr-solrj jar. -->

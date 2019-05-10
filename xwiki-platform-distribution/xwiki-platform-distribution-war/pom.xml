@@ -124,8 +124,10 @@
               <filtering>false</filtering>
             </resource>
           </webResources>
-          <!-- - Exclude JCL and LOG4J since we want all logging to go through SLF4J. Note that we're excluding
+          <!-- - Exclude JCL and Log4j 1.x since we want all logging to go through SLF4J. Note that we're excluding
                  log4j-<version>.jar but keeping log4j-over-slf4j-<version>.jar
+               - Also exclude Log4J 2.x since we want all logging to go through SLF4J. We need to exclude 2 artifacts:
+                 log4j-core-*.jar and log4j-slf4j-impl-*.jar
                - Exclude legacy modules if the legacy profile is not enabled so that we don't have both aspectified JAR
                  and non aspectified ones
                - Exclude STAX API since it's included in Java SE 6
@@ -140,6 +142,8 @@
           <packagingExcludes>
             WEB-INF/lib/commons-logging-*.jar,
             %regex[WEB-INF/lib/log4j-(?!over-slf4j).*.jar],
+            WEB-INF/lib/log4j-core-*.jar,
+            WEB-INF/lib/log4j-slf4j-impl-*.jar,
             WEB-INF/lib/stax-api-*.jar,
             WEB-INF/extensions/*.xar,
             */**/META-INF/**

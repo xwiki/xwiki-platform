@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.cluster.framework;
+package org.xwiki.cluster.test.framework;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import org.junit.BeforeClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.extension.test.ExtensionTestUtils;
-import org.xwiki.test.cluster.AllTests;
+import org.xwiki.cluster.test.AllTests;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.ui.AbstractTest;
 

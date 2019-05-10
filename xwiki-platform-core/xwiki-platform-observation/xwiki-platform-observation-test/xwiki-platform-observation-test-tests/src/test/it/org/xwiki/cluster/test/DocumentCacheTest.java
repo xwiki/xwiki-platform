@@ -17,10 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.cluster;
+package org.xwiki.cluster.test;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.xwiki.cluster.test.framework.AbstractClusterHttpTest;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -28,7 +29,7 @@ import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
-import org.xwiki.test.cluster.framework.AbstractClusterHttpTest;
+import org.xwiki.test.ui.AbstractTest;
 
 /**
  * Verify the document cache update based on distributed events.
@@ -49,24 +50,24 @@ public class DocumentCacheTest extends AbstractClusterHttpTest
         LocalDocumentReference documentReference = new LocalDocumentReference(page.getSpace(), page.getName());
 
         // 1) Edit a page on XWiki 0
-        getUtil().switchExecutor(0);
+        AbstractTest.getUtil().switchExecutor(0);
         page.setContent("content");
-        getUtil().rest().save(page);
-        Assert.assertEquals("content", getUtil().rest().<Page>get(documentReference).getContent());
+        AbstractTest.getUtil().rest().save(page);
+        Assert.assertEquals("content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
 
         // 2) Modify content of the page on XWiki 1
-        getUtil().switchExecutor(1);
+        AbstractTest.getUtil().switchExecutor(1);
         page.setContent("modified content");
-        getUtil().rest().save(page);
-        Assert.assertEquals("modified content", getUtil().rest().<Page>get(documentReference).getContent());
+        AbstractTest.getUtil().rest().save(page);
+        Assert.assertEquals("modified content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
 
         // ASSERT) The content in XWiki 0 should be the one set than in XWiki 1
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
-        getUtil().switchExecutor(0);
+        AbstractTest.getUtil().switchExecutor(0);
         long t1 = System.currentTimeMillis();
         long t2;
         String result;
-        while (!(result = getUtil().rest().<Page>get(documentReference).getContent())
+        while (!(result = AbstractTest.getUtil().rest().<Page>get(documentReference).getContent())
             .equalsIgnoreCase("modified content")) {
             t2 = System.currentTimeMillis();
             if (t2 - t1 > 10000L) {
@@ -86,24 +87,24 @@ public class DocumentCacheTest extends AbstractClusterHttpTest
         LocalDocumentReference documentReference = new LocalDocumentReference(page.getSpace(), page.getName());
 
         // 1) Make sure page exist on XWiki 0
-        getUtil().switchExecutor(0);
+        AbstractTest.getUtil().switchExecutor(0);
         page.setContent("content");
-        getUtil().rest().save(page);
-        Assert.assertEquals("content", getUtil().rest().<Page>get(documentReference).getContent());
+        AbstractTest.getUtil().rest().save(page);
+        Assert.assertEquals("content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
 
         // 2) Delete page on XWiki 1
-        getUtil().switchExecutor(1);
+        AbstractTest.getUtil().switchExecutor(1);
         // Need superadmin to delete document
-        getUtil().loginAsSuperAdmin();
-        getUtil().rest().delete(documentReference);
-        Assert.assertFalse(getUtil().rest().exists(documentReference));
+        AbstractTest.getUtil().loginAsSuperAdmin();
+        AbstractTest.getUtil().rest().delete(documentReference);
+        Assert.assertFalse(AbstractTest.getUtil().rest().exists(documentReference));
 
         // ASSERT) The document should be deleted on XWiki 0
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
-        getUtil().switchExecutor(0);
+        AbstractTest.getUtil().switchExecutor(0);
         long t1 = System.currentTimeMillis();
         long t2;
-        while (getUtil().rest().exists(documentReference)) {
+        while (AbstractTest.getUtil().rest().exists(documentReference)) {
             t2 = System.currentTimeMillis();
             if (t2 - t1 > 10000L) {
                 Assert.fail("Document shoud not exist anymore");
@@ -120,20 +121,20 @@ public class DocumentCacheTest extends AbstractClusterHttpTest
         page.setName("AttachementCacheSync");
 
         AttachmentReference attachmentReference = new AttachmentReference("file.ext",
-            new DocumentReference(getUtil().getCurrentWiki(), page.getSpace(), page.getName()));
+            new DocumentReference(AbstractTest.getUtil().getCurrentWiki(), page.getSpace(), page.getName()));
 
         // 1) Edit a page on XWiki 0
-        getUtil().switchExecutor(0);
+        AbstractTest.getUtil().switchExecutor(0);
         page.setContent("content");
-        getUtil().rest().save(page);
+        AbstractTest.getUtil().rest().save(page);
 
         // 2) Add attachment to the page on XWiki 1
-        getUtil().switchExecutor(1);
-        getUtil().rest().attachFile(attachmentReference, "content".getBytes(), true);
+        AbstractTest.getUtil().switchExecutor(1);
+        AbstractTest.getUtil().rest().attachFile(attachmentReference, "content".getBytes(), true);
 
         // ASSERT) The content in XWiki 0 should be the one set than in XWiki 1
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
-        getUtil().switchExecutor(0);
+        AbstractTest.getUtil().switchExecutor(0);
         long t1 = System.currentTimeMillis();
         long t2;
         while (!hasAttachment(attachmentReference)) {
@@ -148,7 +149,7 @@ public class DocumentCacheTest extends AbstractClusterHttpTest
     private boolean hasAttachment(AttachmentReference attachmentReference) throws Exception
     {
         Attachments attachments =
-            getUtil().rest().get(AttachmentsResource.class, attachmentReference.getDocumentReference());
+            AbstractTest.getUtil().rest().get(AttachmentsResource.class, attachmentReference.getDocumentReference());
         for (Attachment attachment : attachments.getAttachments()) {
             System.out.println(attachment.getName());
             if (attachment.getName().equals(attachmentReference.getName())) {

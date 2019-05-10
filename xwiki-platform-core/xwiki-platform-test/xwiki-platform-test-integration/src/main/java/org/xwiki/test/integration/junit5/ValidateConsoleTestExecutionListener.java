@@ -60,7 +60,10 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
         // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.
         // TODO: fix this so that it doesn't happen. It could mean that we're not using the right secure random
         // implementation and we're using a too slow one.
-        "Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took"
+        "Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took",
+        // TODO: Fix this by moving to non-deprecated plugins
+        "Solr loaded a deprecated plugin/analysis class [solr.LatLonType].",
+        "Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]"
     );
 
     private static final StackTraceLogParser LOG_PARSER = new StackTraceLogParser();

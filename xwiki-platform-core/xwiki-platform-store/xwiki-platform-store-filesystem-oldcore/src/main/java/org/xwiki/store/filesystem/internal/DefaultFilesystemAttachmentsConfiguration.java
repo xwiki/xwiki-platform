@@ -19,12 +19,14 @@
  */
 package org.xwiki.store.filesystem.internal;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import java.io.File;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
  * All configuration options for Filesystem Attachment Store.
@@ -39,14 +41,14 @@ public class DefaultFilesystemAttachmentsConfiguration implements FilesystemAtta
     /**
      * Prefix for configuration keys for the Filesystem Attachment Store.
      */
-    private static final String PREFIX = "store.fsattach.";
+    private static final String OLDPREFIX = "store.fsattach.";
+
+    private static final String PREFIX = "store.file.";
 
     /**
-     * Configuration source from where to read configuration data from.
-     *
-     * This configuration is loaded when the FilesystemAttachment Store is initialized, so we cannot use the
-     * default implementation for ConfigurationSource because it looks at the main store which might be not initialized
-     * yet.
+     * Configuration source from where to read configuration data from. This configuration is loaded when the
+     * FilesystemAttachment Store is initialized, so we cannot use the default implementation for ConfigurationSource
+     * because it looks at the main store which might be not initialized yet.
      */
     @Inject
     @Named("xwikiproperties")
@@ -55,6 +57,14 @@ public class DefaultFilesystemAttachmentsConfiguration implements FilesystemAtta
     @Override
     public boolean cleanOnStartup()
     {
-        return this.configuration.getProperty(PREFIX + "cleanOnStartup", Boolean.TRUE);
+        return this.configuration.getProperty(OLDPREFIX + "cleanOnStartup", Boolean.TRUE);
+    }
+
+    @Override
+    public File getDirectory()
+    {
+        String directory = this.configuration.getProperty(PREFIX + "directory");
+
+        return directory != null ? new File(directory) : null;
     }
 }

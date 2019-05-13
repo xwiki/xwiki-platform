@@ -30,6 +30,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -104,6 +105,9 @@ public class FilesystemStoreTools implements Initializable
     @Named("dummy")
     private LockProvider lockProvider;
 
+    @Inject
+    private Logger logger;
+
     /**
      * Used to get store directory.
      */
@@ -137,16 +141,22 @@ public class FilesystemStoreTools implements Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        // General location when filesystem based stored put data
-        File storeDirectory = new File(this.environment.getPermanentDirectory(), "store");
-        // Specific location for file component
-        File fileStorageDirectory = new File(storeDirectory, FileSystemStoreUtils.HINT);
+        File fileStorageDirectory = this.config.getDirectory();
+
+        if (fileStorageDirectory == null) {
+            // General location when filesystem based stored put data
+            File storeDirectory = new File(this.environment.getPermanentDirectory(), "store");
+            // Specific location for file component
+            fileStorageDirectory = new File(storeDirectory, FileSystemStoreUtils.HINT);
+        }
 
         try {
             this.storeRootDirectory = fileStorageDirectory.getCanonicalFile();
         } catch (IOException e) {
             throw new InitializationException("Invalid permanent directory", e);
         }
+
+        this.logger.info("Using filesystem store directory [{}]", this.storeRootDirectory);
 
         // TODO: make this useless (by cleaning empty directories as soon as they appear)
         if (this.config.cleanOnStartup()) {

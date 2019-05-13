@@ -91,7 +91,7 @@
 #if ($xwikiPropertiesEnvironmentPermanentDirectory)
 environment.permanentDirectory=$xwikiPropertiesEnvironmentPermanentDirectory
 #else
-# environment.permanentDirectory=/var/local/xwiki/
+# environment.permanentDirectory=/var/lib/xwiki/data/
 #end
 
 #-------------------------------------------------------------------------------------
@@ -729,6 +729,16 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# Note that if you disable this feature, empty directories will accumulate and you are responsible
 #-# for cleaning them up.
 # store.fsattach.cleanOnStartup=true
+
+#-# [Since 11.4RC1]
+#-# The root directory used by the various "file" stores implementation (attachment, deleted document, etc.).
+#-# 
+#-# The default is ${environment.permanentDirectory}/store/file.
+#if ($xwikiPropertiesStoreFileDirectory)
+store.file.directory=$xwikiPropertiesStoreFileDirectory
+#else
+# store.file.directory=/var/lib/xwiki/data/store/file/
+#end
 
 #-------------------------------------------------------------------------------------
 # Mail

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.rest;
+package org.xwiki.rest.test;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
@@ -31,7 +31,7 @@ import org.xwiki.rest.model.jaxb.Spaces;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.model.jaxb.Wikis;
 import org.xwiki.rest.resources.wikis.WikisResource;
-import org.xwiki.test.rest.framework.AbstractHttpTest;
+import org.xwiki.rest.test.framework.AbstractHttpTest;
 
 public class PagesResourceTest extends AbstractHttpTest
 {

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.rest;
+package org.xwiki.rest.test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,8 +56,8 @@ import org.xwiki.rest.resources.pages.PageHistoryResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
-import org.xwiki.test.rest.framework.AbstractHttpTest;
-import org.xwiki.test.rest.framework.TestConstants;
+import org.xwiki.rest.test.framework.AbstractHttpTest;
+import org.xwiki.rest.test.framework.TestConstants;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.hamcrest.Matchers.isIn;

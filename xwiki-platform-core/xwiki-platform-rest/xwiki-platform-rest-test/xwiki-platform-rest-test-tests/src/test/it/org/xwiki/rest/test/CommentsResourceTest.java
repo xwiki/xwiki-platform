@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.rest;
+package org.xwiki.rest.test;
 
 import java.util.Arrays;
 import java.util.List;
@@ -40,7 +40,7 @@ import org.xwiki.rest.model.jaxb.HistorySummary;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.rest.resources.comments.CommentsResource;
 import org.xwiki.rest.resources.pages.PageHistoryResource;
-import org.xwiki.test.rest.framework.AbstractHttpTest;
+import org.xwiki.rest.test.framework.AbstractHttpTest;
 import org.xwiki.test.ui.TestUtils;
 
 public class CommentsResourceTest extends AbstractHttpTest

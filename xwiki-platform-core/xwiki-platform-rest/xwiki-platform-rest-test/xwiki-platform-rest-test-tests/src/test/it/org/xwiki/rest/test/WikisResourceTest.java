@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.rest;
+package org.xwiki.rest.test;
 
 import java.io.InputStream;
 import java.io.StringReader;
@@ -53,7 +53,7 @@ import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
 import org.xwiki.rest.resources.wikis.WikisSearchQueryResource;
-import org.xwiki.test.rest.framework.AbstractHttpTest;
+import org.xwiki.rest.test.framework.AbstractHttpTest;
 import org.xwiki.test.ui.TestUtils;
 
 import static org.junit.Assert.assertEquals;

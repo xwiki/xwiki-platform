@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.rest;
+package org.xwiki.rest.test;
 
 import java.util.UUID;
 
@@ -41,8 +41,8 @@ import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTagsResource;
 import org.xwiki.rest.resources.tags.PagesForTagsResource;
 import org.xwiki.rest.resources.tags.TagsResource;
-import org.xwiki.test.rest.framework.AbstractHttpTest;
-import org.xwiki.test.rest.framework.TestConstants;
+import org.xwiki.rest.test.framework.AbstractHttpTest;
+import org.xwiki.rest.test.framework.TestConstants;
 import org.xwiki.test.ui.TestUtils;
 
 /**

@@ -17,35 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.rest;
+package org.xwiki.rest.test;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.junit.Assert;
 import org.junit.Test;
-import org.xwiki.rest.model.jaxb.Class;
-import org.xwiki.rest.model.jaxb.Classes;
-import org.xwiki.rest.model.jaxb.Property;
-import org.xwiki.rest.resources.classes.ClassesResource;
-import org.xwiki.test.rest.framework.AbstractHttpTest;
+import org.xwiki.rest.Relations;
+import org.xwiki.rest.model.jaxb.Link;
+import org.xwiki.rest.model.jaxb.Xwiki;
+import org.xwiki.rest.resources.RootResource;
+import org.xwiki.rest.test.framework.AbstractHttpTest;
 
-public class ClassesResourceTest extends AbstractHttpTest
+public class RootResourceTest extends AbstractHttpTest
 {
     @Override
     @Test
     public void testRepresentation() throws Exception
     {
-        GetMethod getMethod = executeGet(buildURI(ClassesResource.class, getWiki()).toString());
+        GetMethod getMethod = executeGet(getFullUri(RootResource.class));
         Assert.assertEquals(getHttpMethodInfo(getMethod), HttpStatus.SC_OK, getMethod.getStatusCode());
 
-        Classes classes = (Classes) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
+        Xwiki xwiki = (Xwiki) unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
 
-        for (Class clazz : classes.getClazzs()) {
-            checkLinks(clazz);
+        Link link = getFirstLinkByRelation(xwiki, Relations.WIKIS);
+        Assert.assertNotNull(link);
 
-            for (Property property : clazz.getProperties()) {
-                checkLinks(property);
-            }
-        }
+        link = getFirstLinkByRelation(xwiki, Relations.SYNTAXES);
+        Assert.assertNotNull(link);
+
+        // link = xwikiRoot.getFirstLinkByRelation(Relations.WADL);
+        // Assert.assertNotNull(link);
+
+        checkLinks(xwiki);
     }
 }

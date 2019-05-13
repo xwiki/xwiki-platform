@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.rest;
+package org.xwiki.rest.test;
 
 import java.io.StringReader;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ import org.xwiki.rest.model.jaxb.Wikis;
 import org.xwiki.rest.resources.spaces.SpaceAttachmentsResource;
 import org.xwiki.rest.resources.spaces.SpaceSearchResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
-import org.xwiki.test.rest.framework.AbstractHttpTest;
+import org.xwiki.rest.test.framework.AbstractHttpTest;
 
 public class SpacesResourceTest extends AbstractHttpTest
 {

@@ -32,9 +32,14 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - UI</description>
   <properties>
-    <!-- CSRF Warning is expected in LoginTest#testDataIsPreservedAfterLogin -->
+    <!--
+      CSRF Warning is expected in LoginTest#testDataIsPreservedAfterLogin
+      Possible break-in attempt and error getting resource are expected in TemplateTest
+      -->
     <xwiki.surefire.validateconsole.expected>
-      "CSRFToken: Secret token verification failed"
+      "CSRFToken: Secret token verification failed",
+      "Possible break-in attempt!",
+      "Error getting resource [null]"
     </xwiki.surefire.validateconsole.expected>
   </properties>
   <dependencies>

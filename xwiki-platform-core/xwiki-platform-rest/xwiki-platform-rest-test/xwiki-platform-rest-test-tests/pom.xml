@@ -47,9 +47,11 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!--
+       PageResourceTest#testPUTWithInvalidRepresentation is testing with invalid representation.
+       -->
     <xwiki.surefire.validateconsole.excludes>
-      <!-- TODO: Fix the test to not output this error -->
-      "[FATAL_ERROR]: unexpected element (uri:"", local:"invalidPage"). Expected elements are"
+      "unexpected element (uri:\"\", local:\"invalidPage\"). Expected elements are"
     </xwiki.surefire.validateconsole.excludes>
   </properties>
   <dependencies>

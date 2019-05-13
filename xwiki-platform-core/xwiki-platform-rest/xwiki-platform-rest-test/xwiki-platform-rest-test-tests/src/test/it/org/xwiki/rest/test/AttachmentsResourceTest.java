@@ -112,6 +112,17 @@ public class AttachmentsResourceTest extends AbstractHttpTest
 
         Attachments attachments = (Attachments) this.unmarshaller.unmarshal(getMethod.getResponseBodyAsStream());
         Assert.assertEquals(8, attachments.getAttachments().size());
+
+        // Clean the wiki for further tests: WikisResourceTest use a list of attachments and might fail
+        // if we don't clean here.
+        DocumentReference documentReference = new DocumentReference(this.wikiName, this.spaces, this.pageName);
+        this.testUtils.deleteAttachement(documentReference, "my attach.txt");
+        this.testUtils.deleteAttachement(documentReference, "^caret.txt");
+        this.testUtils.deleteAttachement(documentReference, "#pound.txt");
+        this.testUtils.deleteAttachement(documentReference, "%percent.txt");
+        this.testUtils.deleteAttachement(documentReference, "{brace}.txt");
+        this.testUtils.deleteAttachement(documentReference, "[bracket].txt");
+        this.testUtils.deleteAttachement(documentReference, "plus+plus.txt");
     }
 
     protected void putAttachmentFilename(String attachmentName, String type) throws Exception

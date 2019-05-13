@@ -64,6 +64,8 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
         "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
 
     private static final List<String> GLOBAL_EXCLUDES = Arrays.asList(
+        // Exclude the log produced by this class.
+        "The following lines were matching excluded patterns and need to be fixed",
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
         "Could not validate integrity of download from file",
         // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.

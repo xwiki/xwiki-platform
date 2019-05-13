@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.platform.launcher.TestIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,6 +89,8 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
 
     private static final StackTraceLogParser LOG_PARSER = new StackTraceLogParser();
 
+    private static final ValidationParser VALIDATION_PARSER = new ValidationParser();
+
     @Override
     protected String getSkipSystemPropertyKey()
     {
@@ -96,9 +100,30 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
     @Override
     protected void validateOutputForTest(String outputContent, TestIdentifier testIdentifier)
     {
-        List<String> excludeList = getExcludeList();
-        List<String> expectedList = getExpectedList();
+        List<ValidationLine> excludeList = getExcludeList();
+        List<ValidationLine> expectedList = getExpectedList();
 
+        Pair<List<String>, List<String>> matching =
+            getMatchingLines(outputContent, excludeList, expectedList, testIdentifier);
+        List<String> matchingLines = matching.getLeft();
+        List<String> matchingExcludes = matching.getRight();
+
+        if (testIdentifier.isTest()) {
+            if (!matchingLines.isEmpty()) {
+                throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
+                    matchingLines.stream().collect(Collectors.joining(NL))));
+            }
+        } else if (!testIdentifier.getParentId().isPresent() && !matchingExcludes.isEmpty()) {
+            // At the end of the tests, output warnings for matching excluded lines so that developers can see that
+            // there  are excludes that need to be fixed.
+            LOGGER.warn("The following lines were matching excluded patterns and need to be fixed: [\n{}\n]",
+                StringUtils.join(matchingExcludes, NL));
+        }
+    }
+
+    private Pair<List<String>, List<String>> getMatchingLines(String outputContent, List<ValidationLine> excludeList,
+        List<ValidationLine> expectedList, TestIdentifier testIdentifier)
+    {
         List<String> matchingExcludes = new ArrayList<>();
         List<String> matchingLines = LOG_PARSER.parse(outputContent).stream()
             .filter(p -> {
@@ -110,96 +135,57 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
                 return false;
             })
             .filter(p -> {
-                for (String searchExceptionString : excludeList) {
-                    if (p.contains(searchExceptionString)) {
+                for (ValidationLine excludeLine : excludeList) {
+                    String testName = excludeLine.getTestName();
+                    if ((testName == null || testIdentifier.getUniqueId().matches(testName))
+                        && p.contains(excludeLine.getLine()))
+                    {
                         matchingExcludes.add(p);
                         return false;
                     }
                 }
-                for (String searchExceptionString : expectedList) {
-                    if (p.contains(searchExceptionString)) {
-                        return false;
-                    }
-                }
-                return true;
+                return containsForExpectedList(p, expectedList, testIdentifier);
             })
             .collect(Collectors.toList());
 
-        if (testIdentifier.isTest()) {
-            if (!matchingLines.isEmpty()) {
-                throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
-                    matchingLines.stream().collect(Collectors.joining(NL))));
+        return new ImmutablePair(matchingLines, matchingExcludes);
+    }
+
+    private boolean containsForExpectedList(String line, List<ValidationLine> expectedList,
+        TestIdentifier testIdentifier)
+    {
+        boolean result = true;
+        for (ValidationLine expectedLine : expectedList) {
+            String testName = expectedLine.getTestName();
+            if ((testName == null || testIdentifier.getUniqueId().matches(testName))
+                && line.contains(expectedLine.getLine()))
+            {
+                return false;
             }
-        } else if (!testIdentifier.getParentId().isPresent()) {
-            // At the end of the tests, output warnings for matching excluded lines so that developers can see that
-            // there  are excludes that need to be fixed.
-            LOGGER.warn("The following lines were matching excluded patterns and need to be fixed: [\n{}\n]",
-                StringUtils.join(matchingExcludes, NL));
-        }
-    }
-
-    private List<String> getExcludeList()
-    {
-        return getListFromProperty(GLOBAL_EXCLUDES, EXCLUDE_PROPERTY);
-    }
-
-    private List<String> getExpectedList()
-    {
-        return getListFromProperty(GLOBAL_EXPECTED, EXPECTED_PROPERTY);
-    }
-
-    private List<String> getListFromProperty(List<String> globalList, String propertyKey)
-    {
-        List<String> result = new ArrayList<>();
-        result.addAll(globalList);
-        String propertyString = getPropertyValue(propertyKey);
-        if (propertyString != null) {
-            result.addAll(parseCommaSeparatedQuotedString(propertyString));
         }
         return result;
     }
 
-    private List<String> parseCommaSeparatedQuotedString(String content)
+    private List<ValidationLine> getExcludeList()
     {
-        List<String> tokensList = new ArrayList<>();
-        boolean inQuotes = false;
-        boolean inEscape = false;
-        StringBuilder b = new StringBuilder();
-        for (char c : content.toCharArray()) {
-            switch (c) {
-                case ',':
-                    if (inQuotes || inEscape) {
-                        b.append(c);
-                    } else {
-                        tokensList.add(b.toString());
-                        b = new StringBuilder();
-                    }
-                    inEscape = false;
-                    break;
-                case '\"':
-                    if (!inEscape) {
-                        inQuotes = !inQuotes;
-                    } else {
-                        b.append(c);
-                        inEscape = false;
-                    }
-                    break;
-                case '\\':
-                    if (inEscape) {
-                        b.append(c);
-                    }
-                    inEscape = !inEscape;
-                    break;
-                default:
-                    //Ignore characters not in quotes. This allows ignoring new lines and spaces between entries.
-                    if (inQuotes) {
-                        b.append(c);
-                    }
-                    inEscape = false;
-                    break;
-            }
+        return getListFromProperty(GLOBAL_EXCLUDES, EXCLUDE_PROPERTY);
+    }
+
+    private List<ValidationLine> getExpectedList()
+    {
+        return getListFromProperty(GLOBAL_EXPECTED, EXPECTED_PROPERTY);
+    }
+
+    private List<ValidationLine> getListFromProperty(List<String> globalList, String propertyKey)
+    {
+        List<ValidationLine> result = new ArrayList<>();
+        for (String globalListItem : globalList) {
+            result.add(new ValidationLine(globalListItem));
         }
-        tokensList.add(b.toString());
-        return tokensList;
+        String propertyString = getPropertyValue(propertyKey);
+        if (propertyString != null) {
+            result.addAll(VALIDATION_PARSER.parse(propertyString));
+        }
+        return result;
     }
 }

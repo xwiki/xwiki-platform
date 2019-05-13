@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.junit.platform.launcher.TestIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.test.junit5.AbstractConsoleTestExecutionListener;
@@ -64,8 +65,6 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
         "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
 
     private static final List<String> GLOBAL_EXCLUDES = Arrays.asList(
-        // Exclude the log produced by this class.
-        "The following lines were matching excluded patterns and need to be fixed",
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
         "Could not validate integrity of download from file",
         // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.
@@ -95,7 +94,7 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
     }
 
     @Override
-    protected void validateOutputForTest(String outputContent)
+    protected void validateOutputForTest(String outputContent, TestIdentifier testIdentifier)
     {
         List<String> excludeList = getExcludeList();
         List<String> expectedList = getExpectedList();
@@ -126,14 +125,16 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
             })
             .collect(Collectors.toList());
 
-        if (!matchingExcludes.isEmpty()) {
+        if (testIdentifier.isTest()) {
+            if (!matchingLines.isEmpty()) {
+                throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
+                    matchingLines.stream().collect(Collectors.joining(NL))));
+            }
+        } else if (!testIdentifier.getParentId().isPresent()) {
+            // At the end of the tests, output warnings for matching excluded lines so that developers can see that
+            // there  are excludes that need to be fixed.
             LOGGER.warn("The following lines were matching excluded patterns and need to be fixed: [\n{}\n]",
                 StringUtils.join(matchingExcludes, NL));
-        }
-
-        if (!matchingLines.isEmpty()) {
-            throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
-                matchingLines.stream().collect(Collectors.joining(NL))));
         }
     }
 

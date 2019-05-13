@@ -62,25 +62,25 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
     private static final List<String> SEARCH_STRINGS = Arrays.asList(
         "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
 
-    private static final List<String> GLOBAL_EXCLUDES = Arrays.asList(
+    private static final List<Line> GLOBAL_EXCLUDES = Arrays.asList(
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
-        "Could not validate integrity of download from file",
+        new Line("Could not validate integrity of download from file"),
         // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.
         // TODO: fix this so that it doesn't happen. It could mean that we're not using the right secure random
         // implementation and we're using a too slow one.
-        "Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took",
+        new Line("Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took"),
         // TODO: Fix this by moving to non-deprecated plugins
-        "Solr loaded a deprecated plugin/analysis class [solr.LatLonType].",
-        "Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]"
+        new Line("Solr loaded a deprecated plugin/analysis class [solr.LatLonType]."),
+        new Line("Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]")
     );
 
-    private static final List<String> GLOBAL_EXPECTED = Arrays.asList(
+    private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(
         // Broken pipes can happen when the browser moves away from the current page and there are unfinished
         // queries happening on the server side. These are normal errors that can happen for normal users too and
         // we shouldn't consider them faults.
-        "Caused by: java.io.IOException: Broken pipe",
+        new Line("Caused by: java.io.IOException: Broken pipe"),
         // Warning coming from the XWikiDockerExtension when in verbose mode (which is our default on the CI)
-        "Failure when attempting to lookup auth config"
+        new Line("Failure when attempting to lookup auth config")
     );
 
     private static final StackTraceLogParser LOG_PARSER = new StackTraceLogParser();
@@ -110,11 +110,11 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
 
     private void validate(String logContent, LogCaptureConfiguration configuration)
     {
-        List<String> allExcludes = new ArrayList<>();
+        List<Line> allExcludes = new ArrayList<>();
         allExcludes.addAll(GLOBAL_EXCLUDES);
         allExcludes.addAll(configuration.getExcludedLines());
 
-        List<String> allExpected = new ArrayList<>();
+        List<Line> allExpected = new ArrayList<>();
         allExpected.addAll(GLOBAL_EXPECTED);
         allExpected.addAll(configuration.getExpectedLines());
 
@@ -129,14 +129,14 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
                 return false;
             })
             .filter(p -> {
-                for (String excludedLine : allExcludes) {
-                    if (p.contains(excludedLine)) {
+                for (Line excludedLine : allExcludes) {
+                    if (isMatching(p, excludedLine)) {
                         matchingExcludes.add(p);
                         return false;
                     }
                 }
-                for (String expectedLine : allExpected) {
-                    if (p.contains(expectedLine)) {
+                for (Line expectedLine : allExpected) {
+                    if (isMatching(p, expectedLine)) {
                         return false;
                     }
                 }
@@ -170,6 +170,12 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
         throws ParameterResolutionException
     {
         return loadLogCaptureConfiguration(extensionContext);
+    }
+
+    private boolean isMatching(String lineToMatch, Line line)
+    {
+        return (line.isRegex() && lineToMatch.matches(line.getContent()))
+            || (!line.isRegex() && lineToMatch.contains(line.getContent()));
     }
 
     private static ExtensionContext.Store getStore(ExtensionContext context)

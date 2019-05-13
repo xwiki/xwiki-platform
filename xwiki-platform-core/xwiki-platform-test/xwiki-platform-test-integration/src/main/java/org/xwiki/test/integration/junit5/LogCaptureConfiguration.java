@@ -20,7 +20,6 @@
 package org.xwiki.test.integration.junit5;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -31,16 +30,28 @@ import java.util.List;
  */
 public class LogCaptureConfiguration
 {
-    private List<String> excludedLines = new ArrayList<>();
+    private List<Line> excludedLines = new ArrayList<>();
 
-    private List<String> expectedLines = new ArrayList<>();
+    private List<Line> expectedLines = new ArrayList<>();
 
     /**
      * @param excludeLines the lines to exclude from failing the test
      */
     public void registerExcludes(String... excludeLines)
     {
-        this.excludedLines.addAll(Arrays.asList(excludeLines));
+        for (String excludeLine : excludeLines) {
+            this.excludedLines.add(new Line(excludeLine));
+        }
+    }
+
+    /**
+     * @param excludeLineRegexes the lines to exclude from failing the test (defined as regexes)
+     */
+    public void registerExcludeRegexes(String... excludeLineRegexes)
+    {
+        for (String line : excludeLineRegexes) {
+            this.excludedLines.add(new Line(line, true));
+        }
     }
 
     /**
@@ -48,14 +59,26 @@ public class LogCaptureConfiguration
      */
     public void registerExpected(String... expectedLines)
     {
-        this.excludedLines.addAll(Arrays.asList(expectedLines));
+        for (String line : expectedLines) {
+            this.expectedLines.add(new Line(line));
+        }
+    }
+
+    /**
+     * @param expectedLineRegexes the failing lines to expect (defined as regexes)
+     */
+    public void registerExpectedRegexes(String... expectedLineRegexes)
+    {
+        for (String line : expectedLineRegexes) {
+            this.expectedLines.add(new Line(line, true));
+        }
     }
 
     /**
      * @return the list of excluded lines (i.e. lines that should fail the test but that are excluded for now till the
-     *         test or code is fixed)
+     * test or code is fixed)
      */
-    public List<String> getExcludedLines()
+    public List<Line> getExcludedLines()
     {
         return this.excludedLines;
     }
@@ -63,7 +86,7 @@ public class LogCaptureConfiguration
     /**
      * @return the list of expected lines (i.e. lines for which it's normal that they don't fail the test)
      */
-    public List<String> getExpectedLines()
+    public List<Line> getExpectedLines()
     {
         return this.expectedLines;
     }

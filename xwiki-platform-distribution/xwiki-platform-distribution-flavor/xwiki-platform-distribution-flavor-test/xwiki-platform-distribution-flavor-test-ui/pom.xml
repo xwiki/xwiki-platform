@@ -35,11 +35,13 @@
     <!--
       CSRF Warning is expected in LoginTest#testDataIsPreservedAfterLogin
       Possible break-in attempt and error getting resource are expected in TemplateTest
+      XWikiComponentException is expected in AppsLiveTableTest and WizardTest
       -->
     <xwiki.surefire.validateconsole.expected>
       "CSRFToken: Secret token verification failed",
       "Possible break-in attempt!",
-      "Error getting resource [null]"
+      "Error getting resource [null]",
+      "WikiComponentException: Registering UI extensions at wiki level requires wiki administration rights"
     </xwiki.surefire.validateconsole.expected>
   </properties>
   <dependencies>

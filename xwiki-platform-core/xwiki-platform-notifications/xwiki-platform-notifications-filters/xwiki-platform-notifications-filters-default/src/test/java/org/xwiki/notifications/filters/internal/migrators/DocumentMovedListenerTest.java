@@ -95,6 +95,8 @@ public class DocumentMovedListenerTest
         DocumentReference target = new DocumentReference("xwiki", "PageB", "WebHome");
         when(serializer.serialize(new SpaceReference("PageA", new WikiReference("xwiki")))).thenReturn("xwiki:PageA");
         when(serializer.serialize(new SpaceReference("PageB", new WikiReference("xwiki")))).thenReturn("xwiki:PageB");
+        when(serializer.serialize(source)).thenReturn("xwiki:PageA.WebHome");
+        when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
 
         // Mock
         when(legacyEventStreamStoreConfiguration.useLocalStore()).thenReturn(true);
@@ -110,6 +112,10 @@ public class DocumentMovedListenerTest
         when(session.createQuery("update DefaultNotificationFilterPreference p set p.page = :newPage " +
                 "where p.page = :oldPage")).thenReturn(query);
         when(query.setString(anyString(), anyString())).thenReturn(query);
+        Query query2 = mock(Query.class);
+        when(session.createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " +
+                "where p.pageOnly = :oldPage")).thenReturn(query2);
+        when(query2.setString(anyString(), anyString())).thenReturn(query2);
 
         // Test
         DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
@@ -120,6 +126,9 @@ public class DocumentMovedListenerTest
         verify(query).setString("newPage", "xwiki:PageB");
         verify(query).setString("oldPage", "xwiki:PageA");
         verify(query).executeUpdate();
+        verify(query2).setString("newPage", "xwiki:PageB.WebHome");
+        verify(query2).setString("oldPage", "xwiki:PageA.WebHome");
+        verify(query2).executeUpdate();
         verifyZeroInteractions(namespaceContextExecutor);
     }
 
@@ -130,6 +139,8 @@ public class DocumentMovedListenerTest
         DocumentReference target = new DocumentReference("xwiki", "PageB", "WebHome");
         when(serializer.serialize(new SpaceReference("PageA", new WikiReference("xwiki")))).thenReturn("xwiki:PageA");
         when(serializer.serialize(new SpaceReference("PageB", new WikiReference("xwiki")))).thenReturn("xwiki:PageB");
+        when(serializer.serialize(source)).thenReturn("xwiki:PageA.WebHome");
+        when(serializer.serialize(target)).thenReturn("xwiki:PageB.WebHome");
 
         // Mock
         when(legacyEventStreamStoreConfiguration.useLocalStore()).thenReturn(true);
@@ -146,6 +157,10 @@ public class DocumentMovedListenerTest
         when(session.createQuery("update DefaultNotificationFilterPreference p set p.page = :newPage " +
                 "where p.page = :oldPage")).thenReturn(query);
         when(query.setString(anyString(), anyString())).thenReturn(query);
+        Query query2 = mock(Query.class);
+        when(session.createQuery("update DefaultNotificationFilterPreference p set p.pageOnly = :newPage " +
+                "where p.pageOnly = :oldPage")).thenReturn(query2);
+        when(query2.setString(anyString(), anyString())).thenReturn(query2);
 
         // Test
         DocumentRenamedEvent event = new DocumentRenamedEvent(source, target);
@@ -156,6 +171,9 @@ public class DocumentMovedListenerTest
         verify(query).setString("newPage", "xwiki:PageB");
         verify(query).setString("oldPage", "xwiki:PageA");
         verify(query).executeUpdate();
+        verify(query2).setString("newPage", "xwiki:PageB.WebHome");
+        verify(query2).setString("oldPage", "xwiki:PageA.WebHome");
+        verify(query2).executeUpdate();
         verify(namespaceContextExecutor).execute(eq(new WikiNamespace("mainWiki")), any());
     }
 

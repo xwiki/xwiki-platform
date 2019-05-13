@@ -34,14 +34,11 @@
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <!-- TODO: Fix the test to not output these warnings -->
-    <xwiki.surefire.validateconsole.excludes>
-      "com.xpn.xwiki.XWikiException: Error number 2002 in 2: Cannot find any content for the deleted document [Test.CacheSync ()]"
-    </xwiki.surefire.validateconsole.excludes>
 
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <xwiki.database.directory>${project.build.directory}/data/database</xwiki.database.directory>
     <xwiki.instance.directory>${project.build.directory}/xwiki</xwiki.instance.directory>
+    <xwiki.store.file.directory>${xwiki.instance.directory}/data/store/file</xwiki.store.file.directory>
   </properties>
   <dependencies>
     <dependency>
@@ -138,6 +135,8 @@
                 <xwikiDbDialect>org.hibernate.dialect.HSQLDialect</xwikiDbDialect>
                 <xwikiDbHbmXwiki>xwiki.hbm.xml</xwikiDbHbmXwiki>
                 <xwikiDbHbmFeeds>feeds.hbm.xml</xwikiDbHbmFeeds>
+
+                <xwikiPropertiesStoreFileDirectory>${xwiki.store.file.directory}</xwikiPropertiesStoreFileDirectory>
               </properties>
             </configuration>
           </execution>
@@ -214,6 +213,9 @@
                 <!-- Override hibernate configuration -->
                 <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml" todir="${xwiki.instance.directory}/webapps/xwiki/WEB-INF" />
                 <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml" todir="${xwiki.instance.directory}-1/webapps/xwiki/WEB-INF" />
+                <!-- Override xwiki.properties configuration -->
+                <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/xwiki.properties" todir="${xwiki.instance.directory}/webapps/xwiki/WEB-INF" />
+                <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/xwiki.properties" todir="${xwiki.instance.directory}-1/webapps/xwiki/WEB-INF" />
               </tasks>
             </configuration>
             <goals>

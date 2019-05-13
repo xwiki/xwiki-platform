@@ -37,6 +37,11 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <xwiki.surefire.validateconsole.excludes>
+      "Exception in macro #displayCheckedIfWatched called at",
+      "Exception in macro #generateNotificationInput called at",
+      "DefaultNotificationFilterPreference is not mapped"
+    </xwiki.surefire.validateconsole.excludes>
   </properties>
   <dependencies>
     <dependency>

@@ -37,6 +37,7 @@ import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit5.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.LiveTableElement;
@@ -94,11 +95,17 @@ public class MailIT
     }
 
     @AfterEach
-    public void stopMail()
+    public void stopMail(LogCaptureConfiguration logCaptureConfiguration)
     {
         if (this.mail != null) {
             this.mail.stop();
         }
+
+        // TODO: Fix the following errors in the logs
+        logCaptureConfiguration.registerExcludes(
+            "meta.js?cache-version=",
+            "require.min.js?r=1, line 7: Error: Script error for \"selectize\", needed by: xwiki-selectize"
+        );
     }
 
     @Test

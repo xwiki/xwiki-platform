@@ -31,6 +31,12 @@
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - UI</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - UI</description>
+  <properties>
+    <!-- CSRF Warning is expected in LoginTest#testDataIsPreservedAfterLogin -->
+    <xwiki.surefire.validateconsole.expected>
+      "CSRFToken: Secret token verification failed"
+    </xwiki.surefire.validateconsole.expected>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -24,6 +24,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.test.junit5.AbstractConsoleTestExecutionListener;
 
 /**
@@ -41,9 +44,21 @@ import org.xwiki.test.junit5.AbstractConsoleTestExecutionListener;
  */
 public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExecutionListener
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidateConsoleTestExecutionListener.class);
+
+    private static final String NL = "\n";
+
     private static final String SKIP_PROPERTY = "xwiki.surefire.validateconsole.skip";
 
+    /**
+     * Property for the list of validation errors that are ignire for now but that need to be fixed ASAP.
+     */
     private static final String EXCLUDE_PROPERTY = "xwiki.surefire.validateconsole.excludes";
+
+    /**
+     * Property for the list of validation errors that are expected by the test. There's nothing to fix, it's normal!
+     */
+    private static final String EXPECTED_PROPERTY = "xwiki.surefire.validateconsole.expected";
 
     private static final List<String> SEARCH_STRINGS = Arrays.asList(
         "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
@@ -51,12 +66,6 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
     private static final List<String> GLOBAL_EXCLUDES = Arrays.asList(
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
         "Could not validate integrity of download from file",
-        // Broken pipes can happen when the browser moves away from the current page and there are unfinished
-        // queries happening on the server side. These are normal errors that can happen for normal users too and
-        // we shouldn't consider them faults.
-        "Caused by: java.io.IOException: Broken pipe",
-        // Warning coming from the XWikiDockerExtension when in verbose mode (which is our default on the CI)
-        "Failure when attempting to lookup auth config",
         // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.
         // TODO: fix this so that it doesn't happen. It could mean that we're not using the right secure random
         // implementation and we're using a too slow one.
@@ -64,6 +73,15 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
         // TODO: Fix this by moving to non-deprecated plugins
         "Solr loaded a deprecated plugin/analysis class [solr.LatLonType].",
         "Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]"
+    );
+
+    private static final List<String> GLOBAL_EXPECTED = Arrays.asList(
+        // Broken pipes can happen when the browser moves away from the current page and there are unfinished
+        // queries happening on the server side. These are normal errors that can happen for normal users too and
+        // we shouldn't consider them faults.
+        "Caused by: java.io.IOException: Broken pipe",
+        // Warning coming from the XWikiDockerExtension when in verbose mode (which is our default on the CI)
+        "Failure when attempting to lookup auth config"
     );
 
     private static final StackTraceLogParser LOG_PARSER = new StackTraceLogParser();
@@ -78,6 +96,9 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
     protected void validateOutputForTest(String outputContent)
     {
         List<String> excludeList = getExcludeList();
+        List<String> expectedList = getExpectedList();
+
+        List<String> matchingExcludes = new ArrayList<>();
         List<String> matchingLines = LOG_PARSER.parse(outputContent).stream()
             .filter(p -> {
                 for (String searchString : SEARCH_STRINGS) {
@@ -90,6 +111,12 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
             .filter(p -> {
                 for (String searchExceptionString : excludeList) {
                     if (p.contains(searchExceptionString)) {
+                        matchingExcludes.add(p);
+                        return false;
+                    }
+                }
+                for (String searchExceptionString : expectedList) {
+                    if (p.contains(searchExceptionString)) {
                         return false;
                     }
                 }
@@ -97,19 +124,34 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
             })
             .collect(Collectors.toList());
 
+        if (!matchingExcludes.isEmpty()) {
+            LOGGER.warn("The following lines were matching excluded patterns and need to be fixed: [\n{}\n]",
+                StringUtils.join(matchingExcludes, NL));
+        }
+
         if (!matchingLines.isEmpty()) {
-            throw new AssertionError(String.format("The following lines were matching forbidden content:\n%s",
-                matchingLines.stream().collect(Collectors.joining("\n"))));
+            throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
+                matchingLines.stream().collect(Collectors.joining(NL))));
         }
     }
 
     private List<String> getExcludeList()
     {
+        return getListFromProperty(GLOBAL_EXCLUDES, EXCLUDE_PROPERTY);
+    }
+
+    private List<String> getExpectedList()
+    {
+        return getListFromProperty(GLOBAL_EXPECTED, EXPECTED_PROPERTY);
+    }
+
+    private List<String> getListFromProperty(List<String> globalList, String propertyKey)
+    {
         List<String> result = new ArrayList<>();
-        result.addAll(GLOBAL_EXCLUDES);
-        String excludesString = getPropertyValue(EXCLUDE_PROPERTY);
-        if (excludesString != null) {
-            result.addAll(parseCommaSeparatedQuotedString(excludesString));
+        result.addAll(globalList);
+        String propertyString = getPropertyValue(propertyKey);
+        if (propertyString != null) {
+            result.addAll(parseCommaSeparatedQuotedString(propertyString));
         }
         return result;
     }

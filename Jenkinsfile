@@ -233,7 +233,7 @@ private void buildDocker(type)
     checkout skipChangeLog: true, scm: scm
     dockerConfigurationList = dockerConfigurations(type)
     if (type == 'docker-unsupported') {
-      dockerModuleList = 'xwiki-platform-core/xwiki-platform-menu'
+      dockerModuleList = ['xwiki-platform-core/xwiki-platform-menu']
     } else {
       dockerModuleList = dockerModules()
     }

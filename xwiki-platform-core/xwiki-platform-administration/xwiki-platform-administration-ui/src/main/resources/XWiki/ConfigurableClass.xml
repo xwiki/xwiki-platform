@@ -149,7 +149,7 @@ $doc.dropPermissions()##
     #elseif($app.getLocked() &amp;&amp; $app.getLockingUser() != $xcontext.getUser() &amp;&amp; !$request.getParameter('forceEdit'))
       #set($requestURL = "$request.getRequestURL()")
       #if($requestURL.indexOf('?') == -1)
-        #set($requestURL = "${requestURL}?")
+        #set($requestURL = "${requestURL}?$request.queryString")
       #end
       #showHeading($appName, $headingShowing)
 

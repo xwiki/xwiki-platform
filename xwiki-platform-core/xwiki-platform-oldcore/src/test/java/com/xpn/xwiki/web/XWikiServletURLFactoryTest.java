@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -39,6 +41,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
@@ -500,6 +503,113 @@ public class XWikiServletURLFactoryTest
     {
         URL url = this.urlFactory.createURL("Space1.Space2", "Page", this.oldcore.getXWikiContext());
         assertEquals("http://127.0.0.1/xwiki/bin/view/Space1/Space2/Page", url.toString());
+    }
+
+    /**
+     * Check that if the attachment cannot be found a URL is still created with the right schema.
+     */
+    @Test
+    public void createAttachmentURLFileNotAvailable()
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        xwikiContext.setDoc(new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage")));
+        URL url = this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null,
+            xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/currentpage/file", url.toString());
+    }
+
+    /**
+     * Check that the version of the attachment is looked for to create the URL
+     */
+    @Test
+    public void createAttachmentURLFindRev()
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage"));
+        XWikiAttachment attachment = new XWikiAttachment(doc, "file");
+        attachment.setVersion("1.3");
+        doc.setAttachment(attachment);
+        xwikiContext.setDoc(doc);
+        URL url = this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null,
+            xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/currentpage/file?rev=1.3", url.toString());
+    }
+
+    /**
+     * Checked that the nested spaces are correctly resolved for creating the URL
+     */
+    @Test
+    public void createAttachmentURLFindRevNestedSpace()
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki",
+            Arrays.asList("currentspace", "nestedspace"), "currentpage"));
+        XWikiAttachment attachment = new XWikiAttachment(doc, "file");
+        attachment.setVersion("1.3");
+        doc.setAttachment(attachment);
+        xwikiContext.setDoc(doc);
+        URL url = this.urlFactory.createAttachmentURL("file", "currentspace.nestedspace", "currentpage", "download",
+            null, xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/nestedspace/currentpage/file?rev=1.3",
+            url.toString());
+    }
+
+    /**
+     * Checked that the context doc is taken into account for finding the attachment to create the URL
+     */
+    @Test
+    public void createAttachmentURLFindRevAnotherContextDoc() throws XWikiException, WikiManagerException
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        XWikiDocument contextDoc = new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage"));
+        XWikiAttachment attachment = new XWikiAttachment(contextDoc, "file");
+        attachment.setVersion("1.3");
+        contextDoc.setAttachment(attachment);
+        xwikiContext.setDoc(contextDoc);
+
+        DocumentReference documentReference = new DocumentReference("anotherwiki", Arrays.asList("anotherspace",
+            "nestedspace"), "anotherpage");
+        XWikiDocument doc = new XWikiDocument(documentReference);
+        attachment = new XWikiAttachment(doc, "anotherfile");
+        attachment.setVersion("2.1");
+        doc.setAttachment(attachment);
+
+        when(xwikiContext.getWiki().getDocument(documentReference, xwikiContext)).thenReturn(doc);
+        when(this.descriptorManager.getById("anotherwiki")).thenReturn(new WikiDescriptor("anotherwiki", "anotherwiki"));
+
+        URL url = this.urlFactory.createAttachmentURL("anotherfile", "anotherspace.nestedspace", "anotherpage",
+            "download", null,
+            "anotherwiki", xwikiContext);
+
+        assertEquals("http://127.0.0.1/xwiki/wiki/anotherwiki/download/anotherspace/nestedspace/anotherpage/"
+            + "anotherfile?rev=2.1", url.toString());
+        // Ensure the reference is back at the end.
+        assertEquals(new WikiReference("xwiki"), xwikiContext.getWikiReference());
+    }
+
+    /**
+     * Checked that the translation is not mixed up with the document for getting the URL
+     */
+    @Test
+    public void createAttachmentURLFindRevNestedSpaceTranslation() throws XWikiException
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        XWikiDocument contextDoc = new XWikiDocument(
+            new DocumentReference("xwiki", Arrays.asList("currentspace", "nestedspace"), "translatedpage"),
+            Locale.FRENCH);
+        xwikiContext.setDoc(contextDoc);
+
+        DocumentReference documentReference =
+            new DocumentReference("xwiki", Arrays.asList("currentspace", "nestedspace"), "translatedpage");
+        XWikiDocument doc = new XWikiDocument(documentReference);
+        XWikiAttachment attachment = new XWikiAttachment(contextDoc, "file");
+        attachment.setVersion("1.3");
+        doc.setAttachment(attachment);
+        when(xwikiContext.getWiki().getDocument(documentReference, xwikiContext)).thenReturn(doc);
+        URL url = this.urlFactory.createAttachmentURL("file", "currentspace.nestedspace", "translatedpage", "download",
+            null, xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/nestedspace/translatedpage/file?rev=1.3",
+            url.toString());
     }
 
     @Test

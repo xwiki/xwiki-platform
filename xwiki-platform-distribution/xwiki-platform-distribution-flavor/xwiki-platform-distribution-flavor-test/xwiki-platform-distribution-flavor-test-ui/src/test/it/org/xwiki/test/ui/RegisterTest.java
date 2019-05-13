@@ -33,6 +33,8 @@ import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.AbstractRegistrationPage;
 import org.xwiki.test.ui.po.RegistrationPage;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Test the user registration feature.
  * 
@@ -51,8 +53,7 @@ public class RegisterTest extends AbstractTest
         this.registrationPage = this.getRegistrationPage();
 
         // Switch LiveValidation on or off as needed.
-        int x = 0;
-        while (this.registrationPage.isLiveValidationEnabled() != useLiveValidation()) {
+        if (this.registrationPage.isLiveValidationEnabled() != useLiveValidation()) {
             AdministrationSectionPage sectionPage = new AdministrationSectionPage("Registration");
             getDriver().get(getUtil().getURLToLoginAsAdminAndGotoPage(sectionPage.getURL()));
             getUtil().recacheSecretToken();
@@ -61,11 +62,17 @@ public class RegisterTest extends AbstractTest
             sectionPage.getFormContainerElement().setFieldValue(By.name("XWiki.Registration_0_liveValidation_enabled"),
                 Boolean.valueOf(useLiveValidation()).toString());
             sectionPage.clickSave();
-            if (x > 2) {
-                throw new WebDriverException("Unable to set useLiveValidation to " + useLiveValidation());
-            }
-            x++;
+
             this.registrationPage = this.getRegistrationPage();
+            getDriver().waitUntilCondition(driver -> {
+                try {
+                    this.registrationPage.isLiveValidationEnabled();
+                    return true;
+                } catch (Exception e) {
+                    return false;
+                }
+            });
+            assertEquals(this.registrationPage.isLiveValidationEnabled(), useLiveValidation());
         }
 
         // The prepareName javascript function is the cause of endless flickering

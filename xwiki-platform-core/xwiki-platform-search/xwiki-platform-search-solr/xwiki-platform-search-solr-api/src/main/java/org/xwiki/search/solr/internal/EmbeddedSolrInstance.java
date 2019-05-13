@@ -114,7 +114,7 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
                 + "Please check the configuration and log messages.");
         } else if (coreContainer.getCores().size() > 1) {
             this.logger.warn("Multiple Solr cores detected: [{}]. Using the first one.",
-                StringUtils.join(coreContainer.getCoreNames(), ", "));
+                StringUtils.join(coreContainer.getAllCoreNames(), ", "));
         }
         return coreContainer;
     }

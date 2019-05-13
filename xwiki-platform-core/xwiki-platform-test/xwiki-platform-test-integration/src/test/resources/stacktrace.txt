@@ -1,0 +1,134 @@
+19:58:18.910 [main] INFO  org.xwiki.test.ui.AllITs - Adding repository to xwiki.properties
+19:58:19.139 [main] INFO  o.x.test.integration.XWikiExecutor - Stopping any potentially running XWiki server at [http://localhost:8080/xwiki/bin/get/Main/]
+2019-05-06 19:58:19,308 [Exec Stream Pumper] - Lock file [/var/tmp/xwiki-8080.lck] is missing. Aborting stop.
+19:58:19.310 [main] INFO  o.x.test.integration.XWikiExecutor - Starting XWiki server at [http://localhost:8080/xwiki/bin/get/Main/], using stop port [8079] and RMI port [9010]
+19:58:19.311 [main] INFO  o.x.test.integration.XWikiExecutor - Checking that XWiki is up and running...
+2019-05-06 19:58:19,333 [Exec Stream Pumper] - Starting Jetty on port 8080, please wait...
+2019-05-06 19:58:19,475 [Exec Stream Pumper] - Picked up JAVA_TOOL_OPTIONS: -Dmaven.ext.class.path="/home/hudsonagent/jenkins_root/workspace/XWiki_xwiki-platform_master@tmp/withMaven6a6c05d9/pipeline-maven-spy.jar" -Dorg.jenkinsci.plugins.pipeline.maven.reportsFolder="/home/hudsonagent/jenkins_root/workspace/XWiki_xwiki-platform_master@tmp/withMaven6a6c05d9"
+2019-05-06 19:58:20,000 [Exec Stream Pumper] - 2019-05-06 19:58:19.999:INFO::main: Logging initialized @524ms to org.eclipse.jetty.util.log.StdErrLog
+2019-05-06 19:58:20,225 [Exec Stream Pumper] - 2019-05-06 19:58:20.221:INFO:oejs.Server:main: jetty-9.4.8.v20171121, build timestamp: 2017-11-21T22:27:37+01:00, git hash: 82b8fb23f757335bb3329d540ce37a2a2615f0a8
+2019-05-06 19:58:20,250 [Exec Stream Pumper] - 2019-05-06 19:58:20.249:INFO:oejs.AbstractNCSARequestLog:main: Opened /home/hudsonagent/jenkins_root/workspace/XWiki_xwiki-platform_master/xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-test/xwiki-platform-extension-test-tests/target/xwiki/data/logs/2019_05_06.request.log
+2019-05-06 19:58:20,258 [Exec Stream Pumper] - 2019-05-06 19:58:20.255:INFO:oejdp.ScanningAppProvider:main: Deployment monitor [file:///home/hudsonagent/jenkins_root/workspace/XWiki_xwiki-platform_master/xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-test/xwiki-platform-extension-test-tests/target/xwiki/jetty/contexts/] at interval 0
+2019-05-06 19:58:20,421 [Exec Stream Pumper] - 2019-05-06 19:58:20.420:INFO:oejs.session:main: DefaultSessionIdManager workerName=node0
+2019-05-06 19:58:20,421 [Exec Stream Pumper] - 2019-05-06 19:58:20.421:INFO:oejs.session:main: No SessionScavenger set, using defaults
+2019-05-06 19:58:20,423 [Exec Stream Pumper] - 2019-05-06 19:58:20.422:INFO:oejs.session:main: Scavenging every 600000ms
+2019-05-06 19:58:20,446 [Exec Stream Pumper] - 2019-05-06 19:58:20.444:INFO:oejsh.ContextHandler:main: Started o.e.j.w.WebAppContext@31610302{/,file:///home/hudsonagent/jenkins_root/workspace/XWiki_xwiki-platform_master/xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-test/xwiki-platform-extension-test-tests/target/xwiki/webapps/root/,AVAILABLE}{/root}
+2019-05-06 19:58:24,274 [Exec Stream Pumper] - 2019-05-06 19:58:24,267 [main] INFO  iPropertiesConfigurationSource - loading xwiki.properties from file:/home/hudsonagent/jenkins_root/workspace/XWiki_xwiki-platform_master/xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-test/xwiki-platform-extension-test-tests/target/xwiki/webapps/xwiki/WEB-INF/xwiki.properties
+2019-05-06 19:58:24,362 [Exec Stream Pumper] - 2019-05-06 19:58:24,361 [main] INFO  o.x.e.i.ServletEnvironment     - Using permanent directory [data]
+2019-05-06 19:58:28,626 [Exec Stream Pumper] - 2019-05-06 19:58:28,623 [main] INFO  o.x.s.s.i.EmbeddedSolrInstance - Starting embedded Solr server...
+2019-05-06 19:58:28,630 [Exec Stream Pumper] - 2019-05-06 19:58:28,626 [main] INFO  o.x.s.s.i.EmbeddedSolrInstance - Using Solr home directory: [data/solr]
+2019-05-06 19:58:30,313 [Exec Stream Pumper] - 2019-05-06 19:58:30,313 [coreLoadExecutor-6-thread-1] WARN  o.a.s.c.SolrResourceLoader     - Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory]. Please consult documentation how to replace it accordingly.
+2019-05-06 19:58:33,038 [Exec Stream Pumper] - 2019-05-06 19:58:33,036 [main] INFO  o.x.s.s.i.EmbeddedSolrInstance - Started embedded Solr server.
+2019-05-06 19:58:33,546 [Exec Stream Pumper] - 2019-05-06 19:58:33.537:INFO:oejsh.ContextHandler:main: Started o.e.j.w.WebAppContext@1786f9d5{/xwiki,file:///home/hudsonagent/jenkins_root/workspace/XWiki_xwiki-platform_master/xwiki-platform-core/xwiki-platform-extension/xwiki-platform-extension-test/xwiki-platform-extension-test-tests/target/xwiki/webapps/xwiki/,AVAILABLE}{/xwiki}
+2019-05-06 19:58:33,651 [Exec Stream Pumper] - 2019-05-06 19:58:33.651:INFO:oejs.AbstractConnector:main: Started ServerConnector@1805ca5c{HTTP/1.1,[http/1.1]}{0.0.0.0:8080}
+2019-05-06 19:58:33,651 [Exec Stream Pumper] - 2019-05-06 19:58:33.651:INFO:oejs.Server:main: Started @14176ms
+2019-05-06 19:58:33,651 [Exec Stream Pumper] - 2019-05-06 19:58:33.651:INFO:oxtjl.NotifyListener:main: ----------------------------------
+2019-05-06 19:58:33,652 [Exec Stream Pumper] - 2019-05-06 19:58:33.652:INFO:oxtjl.NotifyListener:main: Server started, you can now open http://localhost:8080/ in your browser to access your wiki.
+2019-05-06 19:58:33,652 [Exec Stream Pumper] - 2019-05-06 19:58:33.652:INFO:oxtjl.NotifyListener:main: ----------------------------------
+2019-05-06 19:58:36,971 [Exec Stream Pumper] - 2019-05-06 19:58:36,971 [XWiki initialization] INFO  .HibernateDataMigrationManager - Storage schema updates and data migrations are enabled
+2019-05-06 19:58:37,184 [Exec Stream Pumper] - 2019-05-06 19:58:37,183 [XWiki initialization] INFO  .HibernateDataMigrationManager - No data migration to apply for wiki [xwiki] currently in version [1100000]
+2019-05-06 19:58:37,184 [Exec Stream Pumper] - 2019-05-06 19:58:37,184 [XWiki initialization] INFO  .HibernateDataMigrationManager - Checking Hibernate mapping and updating schema if needed for wiki [xwiki]
+2019-05-06 19:58:40,378 [Exec Stream Pumper] - 2019-05-06 19:58:40,375 [org.xwiki.search.solr.internal.job.IndexerJob@48f1b10c([solr, indexer])] INFO  o.x.s.s.i.j.IndexerJob         - Starting job of type [solr.indexer] with identifier [[solr, indexer]]
+2019-05-06 19:58:42,518 [Exec Stream Pumper] - 2019-05-06 19:58:42,513 [org.xwiki.search.solr.internal.job.IndexerJob@48f1b10c([solr, indexer])] INFO  o.x.s.s.i.j.IndexerJob         - 256 documents added, 0 deleted and 0 updated during the synchronization of the Solr index.
+2019-05-06 19:58:42,518 [Exec Stream Pumper] - 2019-05-06 19:58:42,513 [org.xwiki.search.solr.internal.job.IndexerJob@48f1b10c([solr, indexer])] INFO  o.x.s.s.i.j.IndexerJob         - Finished job of type [solr.indexer] with identifier [[solr, indexer]]
+19:58:43.384 [main] INFO  o.x.test.integration.XWikiExecutor - Server is answering to [http://localhost:8080/xwiki/bin/get/Main/]... cool
+2019-05-06 19:59:01,588 [Exec Stream Pumper] - 2019-05-06 19:59:01.588:INFO:oejshC.xwiki:http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/TestService/pages/Solr: RestletServlet: [Restlet] ServerServlet: component class is null
+2019-05-06 19:59:01,994 [Exec Stream Pumper] - 2019-05-06 19:59:01.990:INFO:oejshC.xwiki:http://localhost:8080/xwiki/rest/wikis/xwiki/spaces/TestService/pages/Solr: RestletServlet: [Restlet] Attaching application: org.xwiki.rest.internal.XWikiRestletJaxRsApplication@605c2aa5 to URI: /xwiki/rest
+19:59:02.992 [main] INFO  org.xwiki.test.ui.TestDebugger - ExtensionIT-testFilterRecommended started
+2019-05-06 19:59:05,190 [Exec Stream Pumper] - 2019-05-06 19:59:05,188 [http://localhost:8080/xwiki/bin/get/ExtensionTest/Service?form_token=TmBtCdhTyWxpgexFD6AHsg&action=finish&outputSyntax=plain&] INFO  rogrammingRightCheckerListener - PRChecker: Skipping check for [xwiki:ExtensionTest.Service] since it's excluded
+2019-05-06 19:59:06,015 [Exec Stream Pumper] - 2019-05-06 19:59:06,014 [http://localhost:8080/xwiki/bin/get/ExtensionTest/Service?form_token=TmBtCdhTyWxpgexFD6AHsg&action=finish&outputSyntax=plain&] INFO  rogrammingRightCheckerListener - PRChecker: Skipping check for [xwiki:ExtensionTest.Service] since it's excluded
+2019-05-06 19:59:06,046 [Exec Stream Pumper] - 2019-05-06 19:59:06,045 [http://localhost:8080/xwiki/bin/get/ExtensionTest/Service?form_token=TmBtCdhTyWxpgexFD6AHsg&keepLocalCache=false&action=uninstall&outputSyntax=plain&extensionId=alice-xar-extension&] INFO  rogrammingRightCheckerListener - PRChecker: Skipping check for [xwiki:ExtensionTest.Service] since it's excluded
+2019-05-06 19:59:06,279 [Exec Stream Pumper] - 2019-05-06 19:59:06,279 [http://localhost:8080/xwiki/bin/get/ExtensionTest/Service?form_token=TmBtCdhTyWxpgexFD6AHsg&keepLocalCache=false&action=uninstall&outputSyntax=plain&extensionId=alice-xar-extension&] INFO  rogrammingRightCheckerListener - PRChecker: Skipping check for [xwiki:ExtensionTest.Service] since it's excluded
+2019-05-06 19:59:06,306 [Exec Stream Pumper] - 2019-05-06 19:59:06,304 [http://localhost:8080/xwiki/bin/get/ExtensionTest/Service?form_token=TmBtCdhTyWxpgexFD6AHsg&keepLocalCache=false&action=uninstall&outputSyntax=plain&extensionId=bob-xar-extension&] INFO  rogrammingRightCheckerListener - PRChecker: Skipping check for [xwiki:ExtensionTest.Service] since it's excluded
+2019-05-06 19:59:06,465 [Exec Stream Pumper] - 2019-05-06 19:59:06,464 [http://localhost:8080/xwiki/bin/get/ExtensionTest/Service?form_token=TmBtCdhTyWxpgexFD6AHsg&keepLocalCache=false&action=uninstall&outputSyntax=plain&extensionId=bob-xar-extension&] INFO  rogrammingRightCheckerListener - PRChecker: Skipping check for [xwiki:ExtensionTest.Service] since it's excluded
+2019-05-06 19:59:06,489 [Exec Stream Pumper] - 2019-05-06 19:59:06,488 [http://localhost:8080/xwiki/bin/get/ExtensionTest/Service?form_token=TmBtCdhTyWxpgexFD6AHsg&keepLocalCache=false&action=uninstall&outputSyntax=plain&extensionId=scriptServiceJarExtension&] INFO  rogrammingRightCheckerListener - PRChecker: Skipping check for [xwiki:ExtensionTest.Service] since it's excluded
+2019-05-06 19:59:06,644 [Exec Stream Pumper] - 2019-05-06 19:59:06,644 [http://localhost:8080/xwiki/bin/get/ExtensionTest/Service?form_token=TmBtCdhTyWxpgexFD6AHsg&keepLocalCache=false&action=uninstall&outputSyntax=plain&extensionId=scriptServiceJarExtension&] INFO  rogrammingRightCheckerListener - PRChecker: Skipping check for [xwiki:ExtensionTest.Service] since it's excluded
+2019-05-06 20:02:37,331 [Exec Stream Pumper] - 2019-05-06 20:02:37,330 [http://localhost:8080/xwiki/webjars/wiki%3Axwiki/jstree/3.3.7/jstree.min.js] ERROR ebJarsResourceReferenceHandler - Failed to read resource [jstree/3.3.7/jstree.min.js]
+2019-05-06 20:02:37,331 [Exec Stream Pumper] - org.xwiki.resource.ResourceReferenceHandlerException: Failed to read resource [jstree/3.3.7/jstree.min.js]
+2019-05-06 20:02:37,331 [Exec Stream Pumper] - 	at org.xwiki.resource.servlet.AbstractServletResourceReferenceHandler.serveResource(AbstractServletResourceReferenceHandler.java:180)
+2019-05-06 20:02:37,331 [Exec Stream Pumper] - 	at org.xwiki.resource.servlet.AbstractServletResourceReferenceHandler.handle(AbstractServletResourceReferenceHandler.java:85)
+2019-05-06 20:02:37,331 [Exec Stream Pumper] - 	at org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain.handleNext(DefaultResourceReferenceHandlerChain.java:79)
+2019-05-06 20:02:37,331 [Exec Stream Pumper] - 	at org.xwiki.resource.internal.AbstractResourceReferenceHandlerManager.handle(AbstractResourceReferenceHandlerManager.java:82)
+2019-05-06 20:02:37,331 [Exec Stream Pumper] - 	at org.xwiki.resource.servlet.ResourceReferenceHandlerServlet.handleResourceReference(ResourceReferenceHandlerServlet.java:159)
+2019-05-06 20:02:37,331 [Exec Stream Pumper] - 	at org.xwiki.resource.servlet.ResourceReferenceHandlerServlet.service(ResourceReferenceHandlerServlet.java:87)
+2019-05-06 20:02:37,338 [Exec Stream Pumper] - 	at javax.servlet.http.HttpServlet.service(HttpServlet.java:790)
+2019-05-06 20:02:37,338 [Exec Stream Pumper] - 	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:860)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1650)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.xwiki.container.servlet.filters.internal.SetHTTPHeaderFilter.doFilter(SetHTTPHeaderFilter.java:63)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1637)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:533)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:143)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:566)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:190)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1595)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:188)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1253)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:168)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:473)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1564)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:166)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1155)
+2019-05-06 20:02:37,350 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.Dispatcher.forward(Dispatcher.java:163)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.Dispatcher.forward(Dispatcher.java:73)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.xwiki.resource.servlet.RoutingFilter.doFilter(RoutingFilter.java:145)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1629)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:533)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:143)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.security.SecurityHandler.handle(SecurityHandler.java:548)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:190)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.session.SessionHandler.doHandle(SessionHandler.java:1595)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.nextHandle(ScopedHandler.java:188)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ContextHandler.doHandle(ContextHandler.java:1253)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:168)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:473)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.session.SessionHandler.doScope(SessionHandler.java:1564)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.nextScope(ScopedHandler.java:166)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ContextHandler.doScope(ContextHandler.java:1155)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:141)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.ContextHandlerCollection.handle(ContextHandlerCollection.java:219)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.HandlerCollection.handle(HandlerCollection.java:126)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:132)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.Server.handle(Server.java:530)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:347)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:256)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.succeeded(AbstractConnection.java:279)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.io.FillInterest.fillable(FillInterest.java:102)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.io.ChannelEndPoint$2.run(ChannelEndPoint.java:124)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.doProduce(EatWhatYouKill.java:247)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.produce(EatWhatYouKill.java:140)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.util.thread.strategy.EatWhatYouKill.run(EatWhatYouKill.java:131)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.util.thread.ReservedThreadExecutor$ReservedThread.run(ReservedThreadExecutor.java:382)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:708)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at org.eclipse.jetty.util.thread.QueuedThreadPool$2.run(QueuedThreadPool.java:626)
+2019-05-06 20:02:37,351 [Exec Stream Pumper] - 	at java.lang.Thread.run(Thread.java:745)
+2019-05-06 20:02:37,352 [Exec Stream Pumper] - Caused by: org.eclipse.jetty.io.EofException: null
+2019-05-06 20:02:37,352 [Exec Stream Pumper] - 	at org.eclipse.jetty.io.ChannelEndPoint.flush(ChannelEndPoint.java:292)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.io.WriteFlusher.flush(WriteFlusher.java:429)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.io.WriteFlusher.write(WriteFlusher.java:322)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.io.AbstractEndPoint.write(AbstractEndPoint.java:372)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.HttpConnection$SendCallback.process(HttpConnection.java:794)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.util.IteratingCallback.processing(IteratingCallback.java:241)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.util.IteratingCallback.iterate(IteratingCallback.java:224)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.HttpConnection.send(HttpConnection.java:528)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.HttpChannel.sendResponse(HttpChannel.java:783)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.HttpChannel.write(HttpChannel.java:834)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.HttpOutput.write(HttpOutput.java:234)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.HttpOutput.write(HttpOutput.java:218)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.eclipse.jetty.server.HttpOutput.write(HttpOutput.java:509)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.apache.commons.io.IOUtils.copyLarge(IOUtils.java:2315)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.apache.commons.io.IOUtils.copy(IOUtils.java:2270)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.apache.commons.io.IOUtils.copyLarge(IOUtils.java:2291)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.apache.commons.io.IOUtils.copy(IOUtils.java:2246)
+2019-05-06 20:02:37,358 [Exec Stream Pumper] - 	at org.xwiki.resource.servlet.AbstractServletResourceReferenceHandler.serveResource(AbstractServletResourceReferenceHandler.java:178)
+2019-05-06 20:02:37,359 [Exec Stream Pumper] - 	... 58 common frames omitted
+2019-05-06 20:02:37,359 [Exec Stream Pumper] - Caused by: java.io.IOException: Broken pipe
+2019-05-06 20:02:37,359 [Exec Stream Pumper] - 	at sun.nio.ch.FileDispatcherImpl.writev0(Native Method)
+2019-05-06 20:02:37,359 [Exec Stream Pumper] - 	at sun.nio.ch.SocketDispatcher.writev(SocketDispatcher.java:51)
+2019-05-06 20:02:37,359 [Exec Stream Pumper] - 	at sun.nio.ch.IOUtil.write(IOUtil.java:148)
+2019-05-06 20:02:37,359 [Exec Stream Pumper] - 	at sun.nio.ch.SocketChannelImpl.write(SocketChannelImpl.java:504)
+2019-05-06 20:02:37,359 [Exec Stream Pumper] - 	at org.eclipse.jetty.io.ChannelEndPoint.flush(ChannelEndPoint.java:272)
+2019-05-06 20:02:37,359 [Exec Stream Pumper] - 	... 75 common frames omitted
+20:02:41.823 [main] INFO  org.xwiki.test.ui.TestDebugger - ExtensionIT-testFilterRecommended passed

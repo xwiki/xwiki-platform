@@ -47,6 +47,12 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
+    <!--
+       PageResourceTest#testPUTWithInvalidRepresentation is testing with invalid representation.
+       -->
+    <xwiki.surefire.validateconsole.excludes>
+      "unexpected element (uri:\"\", local:\"invalidPage\"). Expected elements are"
+    </xwiki.surefire.validateconsole.excludes>
   </properties>
   <dependencies>
     <dependency>
@@ -87,6 +93,12 @@
       <artifactId>xwiki-platform-search-solr-test-utils</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+    </dependency>
+    <!-- We need a Log4j 2.x implementation since Solr uses Log4j 2.x -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-to-slf4j</artifactId>
+      <scope>runtime</scope>
     </dependency>
   </dependencies>
   <build>

@@ -88,7 +88,7 @@ public class RemoteSolrInstance extends AbstractSolrInstance
         // }
 
         // Initialize the remote Solr server.
-        this.server = new HttpSolrClient(remoteURL);
+        this.server = new HttpSolrClient.Builder(remoteURL).build();
     }
 
     /**

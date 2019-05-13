@@ -19,13 +19,17 @@
  */
 package org.xwiki.test.integration.junit5;
 
-import java.io.BufferedReader;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.platform.launcher.TestIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.test.junit5.AbstractConsoleTestExecutionListener;
 
 /**
@@ -43,18 +47,49 @@ import org.xwiki.test.junit5.AbstractConsoleTestExecutionListener;
  */
 public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExecutionListener
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(ValidateConsoleTestExecutionListener.class);
+
+    private static final String NL = "\n";
+
     private static final String SKIP_PROPERTY = "xwiki.surefire.validateconsole.skip";
 
+    /**
+     * Property for the list of validation errors that are ignire for now but that need to be fixed ASAP.
+     */
     private static final String EXCLUDE_PROPERTY = "xwiki.surefire.validateconsole.excludes";
+
+    /**
+     * Property for the list of validation errors that are expected by the test. There's nothing to fix, it's normal!
+     */
+    private static final String EXPECTED_PROPERTY = "xwiki.surefire.validateconsole.expected";
 
     private static final List<String> SEARCH_STRINGS = Arrays.asList(
         "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
 
     private static final List<String> GLOBAL_EXCLUDES = Arrays.asList(
-        // See https://jira.xwiki.org/browse/XWIKI-16386
-        "Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory].",
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
-        "Could not validate integrity of download from file");
+        "Could not validate integrity of download from file",
+        // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.
+        // TODO: fix this so that it doesn't happen. It could mean that we're not using the right secure random
+        // implementation and we're using a too slow one.
+        "Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took",
+        // TODO: Fix this by moving to non-deprecated plugins
+        "Solr loaded a deprecated plugin/analysis class [solr.LatLonType].",
+        "Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]"
+    );
+
+    private static final List<String> GLOBAL_EXPECTED = Arrays.asList(
+        // Broken pipes can happen when the browser moves away from the current page and there are unfinished
+        // queries happening on the server side. These are normal errors that can happen for normal users too and
+        // we shouldn't consider them faults.
+        "Caused by: java.io.IOException: Broken pipe",
+        // Warning coming from the XWikiDockerExtension when in verbose mode (which is our default on the CI)
+        "Failure when attempting to lookup auth config"
+    );
+
+    private static final StackTraceLogParser LOG_PARSER = new StackTraceLogParser();
+
+    private static final ValidationParser VALIDATION_PARSER = new ValidationParser();
 
     @Override
     protected String getSkipSystemPropertyKey()
@@ -63,10 +98,34 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
     }
 
     @Override
-    protected void validateOutputForTest(String outputContent)
+    protected void validateOutputForTest(String outputContent, TestIdentifier testIdentifier)
     {
-        List<String> excludeList = getExcludeList();
-        List<String> matchingLines = new BufferedReader(new StringReader(outputContent)).lines()
+        List<ValidationLine> excludeList = getExcludeList();
+        List<ValidationLine> expectedList = getExpectedList();
+
+        Pair<List<String>, List<String>> matching =
+            getMatchingLines(outputContent, excludeList, expectedList, testIdentifier);
+        List<String> matchingLines = matching.getLeft();
+        List<String> matchingExcludes = matching.getRight();
+
+        if (testIdentifier.isTest()) {
+            if (!matchingLines.isEmpty()) {
+                throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
+                    matchingLines.stream().collect(Collectors.joining(NL))));
+            }
+        } else if (!testIdentifier.getParentId().isPresent() && !matchingExcludes.isEmpty()) {
+            // At the end of the tests, output warnings for matching excluded lines so that developers can see that
+            // there  are excludes that need to be fixed.
+            LOGGER.warn("The following lines were matching excluded patterns and need to be fixed: [\n{}\n]",
+                StringUtils.join(matchingExcludes, NL));
+        }
+    }
+
+    private Pair<List<String>, List<String>> getMatchingLines(String outputContent, List<ValidationLine> excludeList,
+        List<ValidationLine> expectedList, TestIdentifier testIdentifier)
+    {
+        List<String> matchingExcludes = new ArrayList<>();
+        List<String> matchingLines = LOG_PARSER.parse(outputContent).stream()
             .filter(p -> {
                 for (String searchString : SEARCH_STRINGS) {
                     if (p.contains(searchString)) {
@@ -76,73 +135,57 @@ public class ValidateConsoleTestExecutionListener extends AbstractConsoleTestExe
                 return false;
             })
             .filter(p -> {
-                for (String searchExceptionString : excludeList) {
-                    if (p.contains(searchExceptionString)) {
+                for (ValidationLine excludeLine : excludeList) {
+                    String testName = excludeLine.getTestName();
+                    if ((testName == null || testIdentifier.getUniqueId().matches(testName))
+                        && p.contains(excludeLine.getLine()))
+                    {
+                        matchingExcludes.add(p);
                         return false;
                     }
                 }
-                return true;
+                return containsForExpectedList(p, expectedList, testIdentifier);
             })
             .collect(Collectors.toList());
 
-        if (!matchingLines.isEmpty()) {
-            throw new AssertionError(String.format("The following lines were matching forbidden content:\n%s",
-                matchingLines.stream().collect(Collectors.joining("\n"))));
-        }
+        return new ImmutablePair(matchingLines, matchingExcludes);
     }
 
-    private List<String> getExcludeList()
+    private boolean containsForExpectedList(String line, List<ValidationLine> expectedList,
+        TestIdentifier testIdentifier)
     {
-        List<String> result = new ArrayList<>();
-        result.addAll(GLOBAL_EXCLUDES);
-        String excludesString = getPropertyValue(EXCLUDE_PROPERTY);
-        if (excludesString != null) {
-            result.addAll(parseCommaSeparatedQuotedString(excludesString));
+        boolean result = true;
+        for (ValidationLine expectedLine : expectedList) {
+            String testName = expectedLine.getTestName();
+            if ((testName == null || testIdentifier.getUniqueId().matches(testName))
+                && line.contains(expectedLine.getLine()))
+            {
+                return false;
+            }
         }
         return result;
     }
 
-    private List<String> parseCommaSeparatedQuotedString(String content)
+    private List<ValidationLine> getExcludeList()
     {
-        List<String> tokensList = new ArrayList<>();
-        boolean inQuotes = false;
-        boolean inEscape = false;
-        StringBuilder b = new StringBuilder();
-        for (char c : content.toCharArray()) {
-            switch (c) {
-                case ',':
-                    if (inQuotes || inEscape) {
-                        b.append(c);
-                    } else {
-                        tokensList.add(b.toString());
-                        b = new StringBuilder();
-                    }
-                    inEscape = false;
-                    break;
-                case '\"':
-                    if (!inEscape) {
-                        inQuotes = !inQuotes;
-                    } else {
-                        b.append(c);
-                        inEscape = false;
-                    }
-                    break;
-                case '\\':
-                    if (inEscape) {
-                        b.append(c);
-                    }
-                    inEscape = !inEscape;
-                    break;
-                default:
-                    //Ignore characters not in quotes. This allows ignoring new lines and spaces between entries.
-                    if (inQuotes) {
-                        b.append(c);
-                    }
-                    inEscape = false;
-                    break;
-            }
+        return getListFromProperty(GLOBAL_EXCLUDES, EXCLUDE_PROPERTY);
+    }
+
+    private List<ValidationLine> getExpectedList()
+    {
+        return getListFromProperty(GLOBAL_EXPECTED, EXPECTED_PROPERTY);
+    }
+
+    private List<ValidationLine> getListFromProperty(List<String> globalList, String propertyKey)
+    {
+        List<ValidationLine> result = new ArrayList<>();
+        for (String globalListItem : globalList) {
+            result.add(new ValidationLine(globalListItem));
         }
-        tokensList.add(b.toString());
-        return tokensList;
+        String propertyString = getPropertyValue(propertyKey);
+        if (propertyString != null) {
+            result.addAll(VALIDATION_PARSER.parse(propertyString));
+        }
+        return result;
     }
 }

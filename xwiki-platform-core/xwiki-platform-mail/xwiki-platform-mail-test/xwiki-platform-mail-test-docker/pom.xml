@@ -36,12 +36,6 @@
   <properties>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <!-- TODO: Fix the test to not output these warnings -->
-    <xwiki.surefire.validateconsole.excludes>
-      "meta.js?cache-version=",
-      "require.min.js?r=1, line 7: Error: Script error for \"selectize\", needed by: xwiki-selectize"
-    </xwiki.surefire.validateconsole.excludes>
-
     <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
     <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
       details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava

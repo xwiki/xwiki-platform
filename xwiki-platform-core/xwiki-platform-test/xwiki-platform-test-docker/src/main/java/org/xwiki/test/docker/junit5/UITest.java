@@ -32,6 +32,7 @@ import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -47,6 +48,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
+@ExtendWith(ValidateConsoleExtension.class)
 @ExtendWith(XWikiDockerExtension.class)
 @ExtendWith(TestReferenceParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

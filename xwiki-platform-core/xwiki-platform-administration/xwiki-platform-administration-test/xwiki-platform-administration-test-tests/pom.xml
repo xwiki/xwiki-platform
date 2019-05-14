@@ -47,10 +47,6 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <!-- TODO: Fix the test to not output this warning -->
-    <xwiki.surefire.validateconsole.excludes>
-      "no persistent classes found for query class: from org.xwiki.mail.MailStatus where mail_state like :state"
-    </xwiki.surefire.validateconsole.excludes>
   </properties>
   <dependencies>
     <dependency>

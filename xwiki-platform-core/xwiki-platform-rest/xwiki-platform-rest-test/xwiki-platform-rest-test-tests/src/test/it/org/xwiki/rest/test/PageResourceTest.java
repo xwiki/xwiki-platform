@@ -372,6 +372,10 @@ public class PageResourceTest extends AbstractHttpTest
         PutMethod putMethod = executePut(link.getHref(),
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?><invalidPage><content/></invalidPage>", MediaType.TEXT_XML);
         Assert.assertEquals(getHttpMethodInfo(putMethod), HttpStatus.SC_BAD_REQUEST, putMethod.getStatusCode());
+
+        this.validateConsole.getLogCaptureConfiguration().registerExpected(
+            "unexpected element (uri:\"\", local:\"invalidPage\"). Expected elements are"
+        );
     }
 
     @Test

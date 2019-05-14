@@ -24,6 +24,7 @@ import java.util.HashMap;
 
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.io.IOUtils;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -41,6 +42,15 @@ public class AttachmentTest extends AbstractTest
     private static final String ATTACHMENT_CONTENT = "This is content for a very small attachment.";
 
     private static final String FILENAME = "littleAttachment.txt";
+
+    @After
+    public void verify()
+    {
+        this.validateConsole.getLogCaptureConfiguration().registerExpected(
+            "downloadAttachment failed for plugin [image]: null",
+            "downloadAttachment failed for plugin [zipexplorer]: null"
+        );
+    }
 
     /**
      * Tests that XWIKI-5405 remains fixed.

@@ -33,11 +33,6 @@
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Upgrade - From ${upgradetest.previousflavor.version}</description>
   <properties>
     <upgradetest.previousflavor.version>10.11.1</upgradetest.previousflavor.version>
-    <!-- Expected warnings or errors in the logs. -->
-    <xwiki.surefire.validateconsole.excludes>
-      <!-- Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses -->
-      "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]"
-    </xwiki.surefire.validateconsole.excludes>
   </properties>
   <dependencies>
     <dependency>

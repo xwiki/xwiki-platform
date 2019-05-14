@@ -49,8 +49,8 @@ public class Upgrade84FileStoreTest extends UpgradeTest
         assertURLContent("attachment", attachmentURL);
 
         // Check migrated deleted attachment
-        URL deletedAttachmentURL =
-            new URL(getUtil().getBaseBinURL(wiki) + "downloadrev/Attachments/WebHome/deletedattachment.txt?rev=1.1&rid=1");
+        URL deletedAttachmentURL = new URL(getUtil().getBaseBinURL(wiki)
+            + "downloadrev/Attachments/WebHome/deletedattachment.txt?rev=1.1&rid=1");
 
         assertURLContent("deletedattachment", deletedAttachmentURL);
     }
@@ -63,5 +63,28 @@ public class Upgrade84FileStoreTest extends UpgradeTest
 
         // wiki1
         assertAttachments("wiki1");
+
+        this.validateConsole.getLogCaptureConfiguration().registerExpected(
+            // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
+            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]"
+        );
+        // TODO: Some of these could be expected. Would need someone with knowledge of this test.
+        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-wiki/8.4.6] on namespace [wiki:wiki1] "
+                + "(InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-[8.4.6]] is "
+                + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
+            "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/8.4.6] on namespace [wiki:xwiki] "
+                + "(InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-[8.4.6]] is "
+                + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
+            "Solr loaded a deprecated plugin/analysis class [solr.TrieIntField]",
+            "Solr loaded a deprecated plugin/analysis class [solr.TrieFloatField]",
+            "Solr loaded a deprecated plugin/analysis class [solr.TrieLongField]",
+            "Solr loaded a deprecated plugin/analysis class [solr.TrieDoubleField]",
+            "Solr loaded a deprecated plugin/analysis class [solr.TrieDateField]",
+            "Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory]",
+            "Solr loaded a deprecated plugin/analysis class [solr.CurrencyField]",
+            "does not exist, trying to find the new location",
+            "Could not find the deleted attachment in any other location"
+        );
     }
 }

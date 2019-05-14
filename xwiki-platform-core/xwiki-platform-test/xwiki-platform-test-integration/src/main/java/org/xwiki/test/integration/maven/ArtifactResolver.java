@@ -226,6 +226,11 @@ public class ArtifactResolver
             "zip", xwikiVersion);
         dependentArtifacts.add(skinArtifact);
 
+        // We use the ComponentScriptService in TestUtils#setPropertyInXWikiCfg so we need the dependency for our tests.
+        Artifact componentScript = new DefaultArtifact(PLATFORM_GROUPID, "xwiki-platform-component-script",
+            JAR, xwikiVersion);
+        dependentArtifacts.add(componentScript);
+
         // Add specified extra artifacts
         dependentArtifacts.addAll(extraArtifacts);
 

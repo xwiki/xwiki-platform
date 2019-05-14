@@ -22,6 +22,7 @@ package org.xwiki.flamingo.test.ui;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.ViewPage;
@@ -56,6 +58,14 @@ public class EditIT
     public void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
+    }
+
+    @AfterEach
+    public void tearDown(LogCaptureConfiguration logCaptureConfiguration)
+    {
+        logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed");
+        logCaptureConfiguration.registerExcludes("require.min.js?r=1, line 7: "
+            + "Error: Script error for \"JobRunner\", needed by: tree");
     }
 
     /**

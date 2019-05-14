@@ -34,13 +34,6 @@
 Functional tests to prove that documents, objects, properties and attachments can be loaded and stored
 safely under all foreseeable conditions.
   </description>
-  <properties>
-    <!-- Download of attachments that don't exist are checked in AttachmentTest -->
-    <xwiki.surefire.validateconsole.expected>
-      "downloadAttachment failed for plugin [image]: null",
-      "downloadAttachment failed for plugin [zipexplorer]: null"
-    </xwiki.surefire.validateconsole.expected>
-  </properties>
   <dependencies>
 
     <dependency>

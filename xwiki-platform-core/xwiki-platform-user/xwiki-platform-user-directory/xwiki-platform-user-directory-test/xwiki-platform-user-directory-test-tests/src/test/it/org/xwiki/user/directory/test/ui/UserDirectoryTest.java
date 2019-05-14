@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.directory.test.ui;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.test.ui.AbstractTest;
@@ -39,6 +40,18 @@ public class UserDirectoryTest extends AbstractTest
 {
     @Rule
     public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
+
+    @After
+    public void validate()
+    {
+        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "Exception in macro #displayCheckedIfWatched called at",
+            "Exception in macro #generateNotificationInput called at",
+            "DefaultNotificationFilterPreference is not mapped"/*,
+            "Caused by: org.hibernate.hql.ast.QuerySyntaxException: DefaultNotificationFilterPreference is not mapped "
+                + "[select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner order by nfp.id]"*/
+        );
+    }
 
     @Test
     public void verifyUserIsListed()

@@ -171,6 +171,9 @@ public class AppsLiveTableTest extends AbstractTest
         appsLiveTable.filterApplicationName(appName);
         Assert.assertTrue(appsLiveTable.canEditApplication(appName));
         Assert.assertFalse(appsLiveTable.canDeleteApplication(appName));
+
+        this.validateConsole.getLogCaptureConfiguration().registerExpected("WikiComponentException: Registering UI "
+            + "extensions at wiki level requires wiki administration rights");
     }
 
     /**

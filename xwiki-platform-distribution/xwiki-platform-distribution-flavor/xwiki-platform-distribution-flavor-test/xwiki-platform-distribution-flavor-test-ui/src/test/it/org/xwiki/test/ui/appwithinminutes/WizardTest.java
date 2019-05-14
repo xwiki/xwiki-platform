@@ -255,6 +255,9 @@ public class WizardTest extends AbstractTest
         appsLiveTable = AppWithinMinutesHomePage.gotoPage().getAppsLiveTable();
         appsLiveTable.waitUntilReady();
         Assert.assertFalse(appsLiveTable.isApplicationListed(appName));
+
+        this.validateConsole.getLogCaptureConfiguration().registerExcludes("WikiComponentException: Registering UI "
+            + "extensions at wiki level requires wiki administration rights");
     }
 
     /**

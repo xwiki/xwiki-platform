@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.integration.junit5;
+package org.xwiki.test.integration.junit;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -38,7 +38,10 @@ public class LogCapture
 
     private ByteArrayOutputStream collectingContentStream;
 
-    void startCapture()
+    /**
+     * Start capturing stdout/stderr.
+     */
+    public void startCapture()
     {
         this.savedOut = System.out;
         this.savedErr = System.err;
@@ -51,7 +54,12 @@ public class LogCapture
         System.setErr(new PrintStream(new TeeOutputStream(this.collectingContentStream, this.savedErr)));
     }
 
-    String stopCapture()
+    /**
+     * Stop capturing stdout/stderr.
+     *
+     * @return the captured output
+     */
+    public String stopCapture()
     {
         // Put back stdout
         System.setOut(this.savedOut);

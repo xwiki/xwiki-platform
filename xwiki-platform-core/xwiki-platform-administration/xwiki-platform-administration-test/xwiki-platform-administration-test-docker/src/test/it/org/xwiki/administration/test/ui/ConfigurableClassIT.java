@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration.test.ui;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rest.model.jaxb.Page;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.ViewPage;
@@ -51,6 +53,15 @@ public class ConfigurableClassIT
     {
         setup.loginAsSuperAdmin();
     }
+
+    @AfterEach
+    public void tearDown(LogCaptureConfiguration logCaptureConfiguration)
+    {
+        logCaptureConfiguration.registerExcludes(
+            "require.min.js?r=1, line 7: Error: Script error for \"JobRunner\", needed by: tree"
+        );
+    }
+
     /*
      * Verify that if a value is specified for the {@code linkPrefix} xproperty, then a link is generated with
      * linkPrefix + prettyName of the property from the configuration class.

@@ -40,12 +40,6 @@
     <xwikiDbHbmCommonExtraMappings>notification-filter-preferences.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <xwiki.surefire.validateconsole.excludes>
-      "CSRFToken: Secret token verification failed",
-      "SQL Error: -4850, SQLState: 3F000",
-      "invalid schema name: MYNEWWIKI",
-      "Deprecated usage of getter [org.xwiki.wiki.script.WikiManagerScriptService.getLastException]"
-    </xwiki.surefire.validateconsole.excludes>
   </properties>
   <dependencies>
     <dependency>

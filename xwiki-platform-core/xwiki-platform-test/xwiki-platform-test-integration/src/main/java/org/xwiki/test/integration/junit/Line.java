@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.test.integration.junit5;
+package org.xwiki.test.integration.junit;
 
 /**
  * Defines an expected or excluded line (can be a regex or not).
@@ -25,29 +25,42 @@ package org.xwiki.test.integration.junit5;
  * @version $Id$
  * @since 11.4RC1
  */
-class Line
+public class Line
 {
     private String content;
 
     private boolean isRegex;
 
-    Line(String content)
+    /**
+     * @param content the log line that represents either an expectation or an exclude
+     */
+    public Line(String content)
     {
         this.content = content;
     }
 
-    Line(String content, boolean isRegex)
+    /**
+     * @param content the log line that represents either an expectation or an exclude
+     * @param isRegex if true then the content is specified as a regex
+     */
+    public Line(String content, boolean isRegex)
     {
         this(content);
         this.isRegex = isRegex;
     }
 
-    String getContent()
+    /**
+     * @return the log line that represents either an expectation or an exclude
+     */
+    public String getContent()
     {
         return this.content;
     }
 
-    boolean isRegex()
+    /**
+     * @return true if the content is specified as a regex
+     */
+    public boolean isRegex()
     {
         return this.isRegex;
     }

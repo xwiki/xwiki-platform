@@ -26,6 +26,7 @@ import java.util.List;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
@@ -39,6 +40,7 @@ import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.integration.junit4.ValidateConsoleRule;
 import org.xwiki.test.ui.browser.BrowserTestRule;
 import org.xwiki.test.ui.po.BaseElement;
 
@@ -53,6 +55,12 @@ import com.google.code.tempusfugit.concurrency.IntermittentTestRunner;
 @RunWith(IntermittentTestRunner.class)
 public abstract class AbstractTest
 {
+    /**
+     * Validate stdout/stderr for problems.
+     */
+    @ClassRule
+    public static final ValidateConsoleRule validateConsole = new ValidateConsoleRule();
+
     /**
      * The object used to access the name of the current test.
      */

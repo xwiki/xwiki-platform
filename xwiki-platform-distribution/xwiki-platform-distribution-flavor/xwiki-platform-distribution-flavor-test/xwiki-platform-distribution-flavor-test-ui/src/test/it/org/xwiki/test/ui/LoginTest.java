@@ -210,5 +210,9 @@ public class LoginTest extends AbstractTest
         Assert.assertTrue(getDriver().getCurrentUrl().contains("/xwiki/bin/view/Test/TestData"));
         ViewPage viewPage = new ViewPage();
         Assert.assertEquals("this should be saved instead", viewPage.getContent());
+
+        // Expected logs
+        this.validateConsole.getLogCaptureConfiguration().registerExpected(
+            "CSRFToken: Secret token verification failed, token:");
     }
 }

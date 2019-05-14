@@ -38,6 +38,7 @@ import org.xwiki.administration.test.po.ResetPasswordCompletePage;
 import org.xwiki.administration.test.po.ResetPasswordPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LoginPage;
 
@@ -87,13 +88,14 @@ public class ResetPasswordIT
     }
 
     @AfterEach
-    public void stopMail(TestUtils setup)
+    public void stopMail(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         if (this.mail != null) {
             this.mail.stop();
         }
 
         restoreSettings(setup);
+        logCaptureConfiguration.registerExcludes("CSRFToken: Secret token verification failed, token");
     }
 
     @Test

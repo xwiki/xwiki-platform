@@ -274,6 +274,10 @@ public class UserProfileTest extends AbstractTest
         changePasswordPage.changePassword(DEFAULT_PASSWORD, PASSWORD_1, PASSWORD_2);
         changePasswordPage.submit();
         Assert.assertEquals("The two passwords do not match.", changePasswordPage.getValidationErrorMessage());
+
+        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "java.lang.IllegalStateException: Response is committed"
+        );
     }
 
     @Test

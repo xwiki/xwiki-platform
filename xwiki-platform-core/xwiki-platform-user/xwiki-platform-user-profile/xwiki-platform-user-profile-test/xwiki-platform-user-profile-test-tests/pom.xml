@@ -37,9 +37,6 @@
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <xwiki.surefire.validateconsole.excludes>
-      "Failed to send event [class org.xwiki.bridge.event.ActionExecutedEvent (view)] to listener"
-    </xwiki.surefire.validateconsole.excludes>
   </properties>
   <dependencies>
     <dependency>

@@ -45,6 +45,7 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.restlet.data.MediaType;
@@ -73,11 +74,18 @@ import org.xwiki.rest.model.jaxb.Pages;
 import org.xwiki.rest.model.jaxb.Wikis;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.wikis.WikisResource;
+import org.xwiki.test.integration.junit4.ValidateConsoleRule;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
 
 public abstract class AbstractHttpTest
 {
+    /**
+     * Validate stdout/stderr for problems.
+     */
+    @ClassRule
+    public static final ValidateConsoleRule validateConsole = new ValidateConsoleRule();
+
     /**
      * The object used to access the name of the current test.
      */

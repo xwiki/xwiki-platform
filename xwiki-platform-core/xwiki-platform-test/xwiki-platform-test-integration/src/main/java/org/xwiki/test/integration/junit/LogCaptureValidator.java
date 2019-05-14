@@ -28,6 +28,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Validate logs against default excludes/expected lines and those registered by the tests.
+ *
+ * @version $Id$
+ * @since 11.4RC1
+ */
 public class LogCaptureValidator
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogCaptureValidator.class);
@@ -46,6 +52,10 @@ public class LogCaptureValidator
         new Line("Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took"),
         // Firefox Selenium Driver warning
         new Line("Marionette\tWARN"),
+        new Line("Loading extension 'screenshots@mozilla.org': "
+            + "Reading manifest: Invalid host permission: resource://pdf.js/"),
+        new Line("Loading extension 'screenshots@mozilla.org': "
+            + "Reading manifest: Invalid host permission: about:reader*"),
         // The LibreOffice container outputs this error on startup. We should try to understand why it kills LO before
         // restarting it.
         new Line("Office process died with exit code 81; restarting it"),
@@ -53,7 +63,10 @@ public class LogCaptureValidator
         // XWiki startup
         new Line("relation \"xwikidbversion\" does not exist at character 45"),
         new Line("relation \"xwikidoc\" does not exist at character 29"),
-        new Line("relation \"hibernate_sequence\" already exists")
+        new Line("relation \"hibernate_sequence\" already exists"),
+        // Jetty 9.4.x emits some warning about ASM, see https://github.com/eclipse/jetty.project/issues/2412
+        // Remove once "latest" image of the Jetty container doesn't have the issue anymore
+        new Line("Unknown asm implementation version, assuming version")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

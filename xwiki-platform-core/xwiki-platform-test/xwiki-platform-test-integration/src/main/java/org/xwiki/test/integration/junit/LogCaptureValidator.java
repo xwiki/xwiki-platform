@@ -46,7 +46,9 @@ public class LogCaptureValidator
         new Line("Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took"),
         // TODO: Fix this by moving to non-deprecated plugins
         new Line("Solr loaded a deprecated plugin/analysis class [solr.LatLonType]."),
-        new Line("Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]")
+        new Line("Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]"),
+        // Firefox Selenium Driver warning
+        new Line("Marionette\tWARN")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

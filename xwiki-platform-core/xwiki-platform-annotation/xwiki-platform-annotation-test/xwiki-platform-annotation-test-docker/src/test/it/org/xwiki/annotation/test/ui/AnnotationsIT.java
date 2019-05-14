@@ -27,8 +27,8 @@ import org.xwiki.annotation.test.po.AnnotatableViewPage;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
-import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -36,17 +36,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 11.3RC1
  */
-@UITest
+@UITest()
 public class AnnotationsIT
 {
     @BeforeAll
-    public void setup(TestUtils setup) throws Exception
+    public void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }
 
     @Test
-    public void addAnnotationTranslation(TestUtils setup, TestReference testReference) throws Exception
+    public void addAnnotationTranslation(TestUtils setup, TestReference testReference,
+        LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         setup.setWikiPreference("multilingual", "true");
         setup.setWikiPreference("languages", "en,fr");
@@ -73,5 +74,10 @@ public class AnnotationsIT
         viewPage.showAnnotationsPane();
         viewPage.clickShowAnnotations();
         assertEquals("Un mot français", viewPage.getAnnotationContentByText("peu"));
+
+        logCaptureConfiguration.registerExcludes(
+            // Seems to only happen with the default configuration (Jetty Standalone/HSQLDB)
+            "java.util.zip.ZipException: zip file is empty"
+        );
     }
 }

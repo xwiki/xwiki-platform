@@ -48,7 +48,12 @@ public class LogCaptureValidator
         new Line("Marionette\tWARN"),
         // The LibreOffice container outputs this error on startup. We should try to understand why it kills LO before
         // restarting it.
-        new Line("Office process died with exit code 81; restarting it")
+        new Line("Office process died with exit code 81; restarting it"),
+        // When executing tests on PosgtreSQL we get the following errors when the hibernate upgrade code kicks in at
+        // XWiki startup
+        new Line("relation \"xwikidbversion\" does not exist at character 45"),
+        new Line("relation \"xwikidoc\" does not exist at character 29"),
+        new Line("relation \"hibernate_sequence\" already exists")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

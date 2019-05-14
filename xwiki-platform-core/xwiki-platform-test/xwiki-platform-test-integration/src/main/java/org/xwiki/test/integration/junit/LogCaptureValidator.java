@@ -27,11 +27,10 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.test.integration.junit5.ValidateConsoleTestExecutionListener;
 
 public class LogCaptureValidator
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ValidateConsoleTestExecutionListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogCaptureValidator.class);
 
     private static final String NL = "\n";
 

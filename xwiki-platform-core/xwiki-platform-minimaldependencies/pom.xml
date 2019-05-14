@@ -248,6 +248,11 @@
       <artifactId>log4j-over-slf4j</artifactId>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-to-slf4j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Filesystem store is the default so we want to test it as much as possible -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

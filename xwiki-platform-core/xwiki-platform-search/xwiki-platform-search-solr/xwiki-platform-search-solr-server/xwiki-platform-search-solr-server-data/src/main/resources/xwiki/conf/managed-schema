@@ -749,8 +749,8 @@
      -->
     <fieldType name="point" class="solr.PointType" dimension="2" subFieldSuffix="_d"/>
 
-    <!-- A specialized field for geospatial search. If indexed, this fieldType must not be multivalued. -->
-    <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
+    <!-- A specialized field for geospatial search. -->
+    <fieldType name="location" class="solr.LatLonPointSpatialField" docValues="true"/>
 
     <!-- An alternative geospatial field type new to Solr 4.  It supports multiValued and polygon shapes.
       For more information about this and other Spatial fields new to Solr 4, see:
@@ -1252,7 +1252,7 @@
           * When splitting CamelCase a group of uppercase letters is bound to the following group of lowercase letters
             (e.g. AdminUINew is split in Admin and UINew); on the other hand this is good for "XWiki" which is not split
             in "X" and "Wiki". -->
-        <filter class="solr.WordDelimiterFilterFactory"/>
+        <filter class="solr.WordDelimiterGraphFilterFactory"/>
         <!-- Ignore one-character tokens and long tokens (e.g. words concatenated without delimiters and without
           changing the case) -->
         <filter class="solr.LengthFilterFactory" min="2" max="13"/>
@@ -1262,7 +1262,7 @@
       <analyzer type="query">
         <!-- Same as for index -->
         <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.WordDelimiterFilterFactory"/>
+        <filter class="solr.WordDelimiterGraphFilterFactory"/>
         <filter class="solr.LengthFilterFactory" min="2" max="13"/>
         <filter class="solr.LowerCaseFilterFactory"/>
       </analyzer>

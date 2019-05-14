@@ -740,6 +740,7 @@
        <!-- Faceting defaults. -->
        <str name="facet">false</str>
        <!-- NOTE: The search UI displays the facets in this order so keep the most important facets first. -->
+       <str name="facet.field">type</str>
        <str name="facet.field">wiki</str>
        <str name="facet.field">space_facet</str>
        <str name="facet.field">locale</str>
@@ -747,12 +748,16 @@
        <str name="facet.field">creator</str>
        <str name="facet.field">date</str>
        <str name="facet.field">creationdate</str>
-       <str name="facet.field">type</str>
        <str name="facet.field">class</str>
        <str name="facet.field">mimetype</str>
        <str name="facet.field">attauthor</str>
        <str name="facet.field">attdate</str>
        <str name="facet.field">attsize</str>
+       <!-- Raising facet.mincount from 0 to 1 for Points-based fields. -->
+       <str name="f.date.facet.mincount">1</str>
+       <str name="f.creationdate.facet.mincount">1</str>
+       <str name="f.attdate.facet.mincount">1</str>
+       <str name="f.attsize.facet.mincount">1</str>
 
        <!-- Highlighting defaults -->
        <str name="hl">false</str>

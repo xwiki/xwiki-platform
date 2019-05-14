@@ -44,9 +44,6 @@ public class LogCaptureValidator
         // TODO: fix this so that it doesn't happen. It could mean that we're not using the right secure random
         // implementation and we're using a too slow one.
         new Line("Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took"),
-        // TODO: Fix this by moving to non-deprecated plugins
-        new Line("Solr loaded a deprecated plugin/analysis class [solr.LatLonType]."),
-        new Line("Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]"),
         // Firefox Selenium Driver warning
         new Line("Marionette\tWARN"),
         // The LibreOffice container outputs this error on startup. We should try to understand why it kills LO before

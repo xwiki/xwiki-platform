@@ -87,4 +87,22 @@ public class StackTraceLogParserTest
         assertEquals("date - line1\nline2\nCaused by: x", results.get(0));
         assertEquals("date - test", results.get(1));
     }
+
+    @Test
+    public void parseWithCapturedLogs()
+    {
+        String log = ""
+            + "date [x] INFO  Class - STDOUT: date [main] ERROR OtherClass"
+                + "- Configured permanent directory [/var/local/xwiki] could not be created. \n"
+            + "date [x] INFO  Class - STDOUT: java.nio.file.AccessDeniedException: /var/local/xwiki\n"
+            + "date [x] INFO  Class - STDOUT: \tat translateToIOException(UnixException.java:84)\n";
+        StackTraceLogParser parser = new StackTraceLogParser();
+        List<String> results = parser.parse(log);
+
+        assertEquals(1, results.size());
+        assertEquals("date [x] INFO  Class - STDOUT: date [main] ERROR OtherClass"
+            + "- Configured permanent directory [/var/local/xwiki] could not be created. \n"
+            + "STDOUT: java.nio.file.AccessDeniedException: /var/local/xwiki", results.get(0));
+
+    }
 }

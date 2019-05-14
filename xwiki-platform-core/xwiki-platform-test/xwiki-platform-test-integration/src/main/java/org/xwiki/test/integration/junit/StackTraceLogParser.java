@@ -102,27 +102,25 @@ public class StackTraceLogParser
             // - When we find a "-(space)(tab)...(space)" pattern then keep reading
             StringBuilder buffer = null;
             boolean inStackTrace = false;
-            int dashPosition = -1;
             String line;
             while ((line = reader.readLine()) != null) {
-                int currentDashPosition = line.indexOf(" - ");
-                if (isStackTracePossible(results, inStackTrace, currentDashPosition, dashPosition)) {
-                    if (isMatchingAtPattern(currentDashPosition, line)) {
+                if (isStackTracePossible(results, inStackTrace)) {
+                    if (isMatchingAtPattern(line)) {
                         // If we're already reading a stack trace then discard, otherwise consider that the previously
                         // saved 2 lines at part of the same stack trace and remove them from the array list to store
                         // them in the buffer.
                         if (!inStackTrace) {
-                            buffer = constructNewBuffer(currentDashPosition, results);
+                            buffer = constructNewBuffer(results);
                             inStackTrace = true;
                         }
-                    } else if (isMatchingCausedByPattern(currentDashPosition, line)) {
+                    } else if (isMatchingCausedByPattern(line)) {
                         if (inStackTrace) {
                             // Aggregate to buffer so that it can be later asserted.
-                            buffer.append('\n').append(line.substring(currentDashPosition + 3));
+                            buffer.append('\n').append(removePrefixPart(line));
                         } else {
                             results.add(line);
                         }
-                    } else if (isMatchingOmittedFramesPattern(currentDashPosition, line)) {
+                    } else if (isMatchingOmittedFramesPattern(line)) {
                         if (!inStackTrace) {
                             results.add(line);
                         }
@@ -136,28 +134,31 @@ public class StackTraceLogParser
                     inStackTrace = false;
                     results.add(line);
                 }
-                dashPosition = currentDashPosition;
             }
+            saveBuffer(buffer, results);
         }
         return results;
     }
 
-    private boolean isStackTracePossible(List<String> results, boolean inStackTrace, int currentDashPosition,
-        int dashPosition)
+    private boolean isStackTracePossible(List<String> results, boolean inStackTrace)
     {
-        return (results.size() > 1 || inStackTrace) && currentDashPosition == dashPosition;
+        return (results.size() > 1 || inStackTrace);
     }
 
-    private StringBuilder constructNewBuffer(int currentDashPosition, List<String> results)
+    private StringBuilder constructNewBuffer(List<String> results)
     {
         StringBuilder buffer;
         String line2 = results.remove(results.size() - 1);
         String line1 = results.remove(results.size() - 1);
-        buffer = new StringBuilder(line1);
         // Strip the prefix from line2 to get a nice string to assert.
-        line2 = line2.substring(currentDashPosition + 3);
-        buffer.append('\n').append(line2);
+        buffer = new StringBuilder(line1);
+        buffer.append('\n').append(removePrefixPart(line2));
         return buffer;
+    }
+
+    private String removePrefixPart(String line)
+    {
+        return org.apache.commons.lang3.StringUtils.substringAfterLast(line, " - ");
     }
 
     private StringBuilder saveBuffer(StringBuilder buffer, List<String> results)
@@ -168,28 +169,23 @@ public class StackTraceLogParser
         return null;
     }
 
-    private boolean isMatchingAtPattern(int currentDashPosition, String line)
+    private boolean isMatchingAtPattern(String line)
     {
-        return isMatchingPattern(" \tat ", currentDashPosition, line);
+        return isMatchingPattern(" \tat ", line);
     }
 
-    private boolean isMatchingCausedByPattern(int currentDashPosition, String line)
+    private boolean isMatchingCausedByPattern(String line)
     {
-        return isMatchingPattern(" Caused by: ", currentDashPosition, line);
+        return isMatchingPattern(" Caused by: ", line);
     }
 
-    private boolean isMatchingOmittedFramesPattern(int currentDashPosition, String line)
+    private boolean isMatchingOmittedFramesPattern(String line)
     {
-        return isMatchingPattern(" \t... ", currentDashPosition, line);
+        return isMatchingPattern(" \t... ", line);
     }
 
-    private boolean isMatchingPattern(String pattern, int currentDashPosition, String line)
+    private boolean isMatchingPattern(String pattern, String line)
     {
-        if (line.length() > currentDashPosition + pattern.length() + 2) {
-            String substring = line.substring(currentDashPosition + 2, currentDashPosition + pattern.length() + 2);
-            return substring.equals(pattern);
-        } else {
-            return false;
-        }
+        return line.contains(pattern) && !line.endsWith(pattern);
     }
 }

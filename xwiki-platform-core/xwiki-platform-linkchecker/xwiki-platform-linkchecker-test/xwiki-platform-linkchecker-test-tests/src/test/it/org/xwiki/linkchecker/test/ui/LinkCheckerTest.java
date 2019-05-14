@@ -59,5 +59,10 @@ public class LinkCheckerTest extends AbstractTest
                 }
             }
         });
+
+        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "Link checker Thread was stopped due to some problem",
+            "org.infinispan.IllegalLifecycleStateException: ISPN000323: Cache 'configuration.document.space' is in "
+                + "'TERMINATED' state");
     }
 }

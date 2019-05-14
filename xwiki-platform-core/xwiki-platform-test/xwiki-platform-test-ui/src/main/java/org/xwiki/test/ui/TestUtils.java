@@ -1681,13 +1681,20 @@ public class TestUtils
         properties.load(new ByteArrayInputStream(configuration.getBytes()));
         StringBuilder sb = new StringBuilder();
 
-        // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
+        sb.append("{{velocity}}\n"
+                + "#set($config = $!services.component.getInstance(\"org.xwiki.configuration."
+                + "ConfigurationSource\", \"xwikicfg\"))\n"
+                + "#set($props = $config.getProperties())\n");
+
+            // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
         // with a different xwiki.cfg file for each test that requires a configuration change, we use the following
         // trick: We create a document and we access the XWiki object with a Velocity script inside that document.
         for (Map.Entry<Object, Object> param : properties.entrySet()) {
-            sb.append("{{velocity}}$!xwiki.xWiki.config.setProperty('").append(param.getKey()).append("', '")
-                .append(param.getValue()).append("')").append("\n{{/velocity}}");
+            sb.append("#set($discard = $props.put('").append(param.getKey()).append("', '")
+                .append(param.getValue()).append("'))\n");
         }
+        sb.append("#set($discard = $config.set($props))\n"
+            + "{{/velocity}}");
         createPage("Test", "XWikiConfigurationPageForTest", sb.toString(), "Test page to change xwiki.cfg");
     }
 

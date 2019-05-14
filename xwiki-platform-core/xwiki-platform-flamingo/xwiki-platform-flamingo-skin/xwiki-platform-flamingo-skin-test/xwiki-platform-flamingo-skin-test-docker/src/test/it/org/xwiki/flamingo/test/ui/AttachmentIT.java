@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import org.openqa.selenium.By;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ChangesPane;
@@ -62,6 +64,13 @@ public class AttachmentIT
     public void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
+    }
+
+    @AfterEach
+    public void teardown(LogCaptureConfiguration logCaptureConfiguration)
+    {
+        logCaptureConfiguration.registerExcludes("require.min.js?r=1, line 7: "
+            + "Error: Script error for \"jsTree\", needed by: tree, tree-finder");
     }
 
     private File getFileToUpload(TestConfiguration testConfiguration, String filename)

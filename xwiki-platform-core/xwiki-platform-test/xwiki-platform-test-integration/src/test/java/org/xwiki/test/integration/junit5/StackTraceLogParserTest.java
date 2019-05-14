@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.integration.junit.StackTraceLogParser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

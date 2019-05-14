@@ -30,6 +30,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.platform.launcher.TestIdentifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.test.integration.junit.StackTraceLogParser;
 import org.xwiki.test.junit5.AbstractConsoleTestExecutionListener;
 
 /**

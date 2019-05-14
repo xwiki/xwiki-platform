@@ -19,71 +19,36 @@
  */
 package org.xwiki.test.integration.junit5;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.xwiki.test.integration.junit.LogCapture;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
+import org.xwiki.test.integration.junit.LogCaptureValidator;
 
 /**
  * Captures content sent to stdout/stderr by JUnit5 functional tests and report a failure if the content contains one of
  * the following strings.
  * <ul>
- *   <li>Deprecated method calls from Velocity</li>
- *   <li>Error messages</li>
- *   <li>Warning messages</li>
- *   <li>Javascript errors</li>
+ * <li>Deprecated method calls from Velocity</li>
+ * <li>Error messages</li>
+ * <li>Warning messages</li>
+ * <li>Javascript errors</li>
  * </ul>
  * <p>
- * Tests can register expected failing lines or even exclude failing lines by adding a parameter of type
- * {@link LogCaptureConfiguration} in a test method signature and calling one of the {@code register*()} methods.
+ * Tests can register expected failing lines or even exclude failing lines by adding a parameter of type {@link
+ * LogCaptureConfiguration} in a test method signature and calling one of the {@code register*()} methods.
  *
  * @version $Id$
  * @since 11.4RC1
  */
 public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver
 {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ValidateConsoleTestExecutionListener.class);
-
-    private static final String NL = "\n";
-
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(ValidateConsoleExtension.class);
-
-    private static final List<String> SEARCH_STRINGS = Arrays.asList(
-        "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
-
-    private static final List<Line> GLOBAL_EXCLUDES = Arrays.asList(
-        // See https://jira.xwiki.org/browse/XCOMMONS-1627
-        new Line("Could not validate integrity of download from file"),
-        // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.
-        // TODO: fix this so that it doesn't happen. It could mean that we're not using the right secure random
-        // implementation and we're using a too slow one.
-        new Line("Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took"),
-        // TODO: Fix this by moving to non-deprecated plugins
-        new Line("Solr loaded a deprecated plugin/analysis class [solr.LatLonType]."),
-        new Line("Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]")
-    );
-
-    private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(
-        // Broken pipes can happen when the browser moves away from the current page and there are unfinished
-        // queries happening on the server side. These are normal errors that can happen for normal users too and
-        // we shouldn't consider them faults.
-        new Line("Caused by: java.io.IOException: Broken pipe"),
-        // Warning coming from the XWikiDockerExtension when in verbose mode (which is our default on the CI)
-        new Line("Failure when attempting to lookup auth config")
-    );
-
-    private static final StackTraceLogParser LOG_PARSER = new StackTraceLogParser();
 
     @Override
     public void beforeAll(ExtensionContext extensionContext)
@@ -104,56 +69,8 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
 
         // Validate the captured log content (but only if no test is failing to not confuse the user)
         if (!extensionContext.getExecutionException().isPresent()) {
-            validate(logContent, configuration);
-        }
-    }
-
-    private void validate(String logContent, LogCaptureConfiguration configuration)
-    {
-        List<Line> allExcludes = new ArrayList<>();
-        allExcludes.addAll(GLOBAL_EXCLUDES);
-        allExcludes.addAll(configuration.getExcludedLines());
-
-        List<Line> allExpected = new ArrayList<>();
-        allExpected.addAll(GLOBAL_EXPECTED);
-        allExpected.addAll(configuration.getExpectedLines());
-
-        List<String> matchingExcludes = new ArrayList<>();
-        List<String> matchingLines = LOG_PARSER.parse(logContent).stream()
-            .filter(p -> {
-                for (String searchString : SEARCH_STRINGS) {
-                    if (p.contains(searchString)) {
-                        return true;
-                    }
-                }
-                return false;
-            })
-            .filter(p -> {
-                for (Line excludedLine : allExcludes) {
-                    if (isMatching(p, excludedLine)) {
-                        matchingExcludes.add(p);
-                        return false;
-                    }
-                }
-                for (Line expectedLine : allExpected) {
-                    if (isMatching(p, expectedLine)) {
-                        return false;
-                    }
-                }
-                return true;
-            })
-            .collect(Collectors.toList());
-
-        // At the end of the tests, output warnings for matching excluded lines so that developers can see that
-        // there  are excludes that need to be fixed.
-        if (!matchingExcludes.isEmpty()) {
-            LOGGER.warn("The following lines were matching excluded patterns and need to be fixed: [\n{}\n]",
-                StringUtils.join(matchingExcludes, NL));
-        }
-
-        if (!matchingLines.isEmpty()) {
-            throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
-                matchingLines.stream().collect(Collectors.joining(NL))));
+            LogCaptureValidator validator = new LogCaptureValidator();
+            validator.validate(logContent, configuration);
         }
     }
 
@@ -170,12 +87,6 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
         throws ParameterResolutionException
     {
         return loadLogCaptureConfiguration(extensionContext);
-    }
-
-    private boolean isMatching(String lineToMatch, Line line)
-    {
-        return (line.isRegex() && lineToMatch.matches(line.getContent()))
-            || (!line.isRegex() && lineToMatch.contains(line.getContent()));
     }
 
     private static ExtensionContext.Store getStore(ExtensionContext context)

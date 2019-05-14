@@ -58,6 +58,9 @@ public class PanelsTest extends AbstractXWikiTestCase
         } finally {
             deletePage("Panels", "Thesecondpaneltobecreated");
         }
+        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "Exception in macro #jsonResponse",
+            "Exception in macro #gridresultwithfilter");
     }
 
     /**

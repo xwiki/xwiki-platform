@@ -31,13 +31,6 @@
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Selenium</name>
   <packaging>pom</packaging>
   <description>Deprecated: Tests to be moved to ui-tests</description>
-  <properties>
-    <xwiki.surefire.validateconsole.excludes>
-      <!-- TODO: Fix the test to not output these errors -->
-      "Exception in macro #jsonResponse called at",
-      "Exception in macro #gridresultwithfilter called at"
-    </xwiki.surefire.validateconsole.excludes>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

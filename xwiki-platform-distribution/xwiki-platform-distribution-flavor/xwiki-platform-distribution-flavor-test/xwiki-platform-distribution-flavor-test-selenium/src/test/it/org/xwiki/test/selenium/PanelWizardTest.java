@@ -157,5 +157,9 @@ public class PanelWizardTest extends AbstractXWikiTestCase
         waitForCondition("selenium.isElementPresent(\"//button[normalize-space() = 'Save']\")!=false;");
         clickLinkWithXPath("//button[normalize-space() = 'Save']", false);
         waitForNotificationSuccessMessage("The layout has been saved properly.");
+
+        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "Exception in macro #jsonResponse",
+            "Exception in macro #gridresultwithfilter");
     }
 }

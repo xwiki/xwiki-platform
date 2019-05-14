@@ -49,8 +49,11 @@ public abstract class AbstractContainerExecutor
     {
         if (testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Docker image used: [%s]", container.getDockerImageName()));
-            container.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
+
+        // When not in verbose mode, only print WARN and ERROR coming from the container startup
+        container.withLogConsumer(new XWikiSlf4jLogConsumer(LoggerFactory.getLogger(this.getClass()),
+            testConfiguration.isVerbose()));
 
         // Get the latest image in case the tag has been updated on dockerhub.
         if (!testConfiguration.isOffline()) {

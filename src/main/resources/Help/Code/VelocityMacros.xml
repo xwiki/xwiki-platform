@@ -155,13 +155,13 @@
       &lt;ul class="noitems"&gt;
         #if ($data.examples)
           &lt;li&gt;
-            &lt;a href="$examplesURL"&gt;See examples&lt;/a&gt;
+            &lt;a href="$examplesURL"&gt;$services.localization.render('help.example.label')&lt;/a&gt;
           &lt;/li&gt;
         #end
         #if ($data.documentation)
           &lt;li&gt;
             &lt;a href="$documentationURL"#if ($externalDocumentation) class="wikiexternallink"#end&gt;
-              Learn more
+             $services.localization.render('help.more.label')
             &lt;/a&gt;
           &lt;/li&gt;
         #end

@@ -34,7 +34,7 @@
   <date>1486477904000</date>
   <contentUpdateDate>1486476565000</contentUpdateDate>
   <version>1.1</version>
-  <title/>
+  <title>$services.localization.render('help.title')</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -79,21 +79,21 @@
 #else
   ## We need to generate the page history because the Extension Manager doesn't import it.
   #set ($historyURL = $xwiki.getURL('Help.History.WebHome', 'save', $escapetool.url({
-    'content': 'Check',
-    'comment': 'Initial version',
+    'content': $services.localization.render('help.history.version11.content'),
+    'comment': $services.localization.render('help.history.version11.comment'),
     'form_token': $services.csrf.token,
     'xredirect': $xwiki.getURL('Help.History.WebHome', 'save', $escapetool.url({
-      'title': 'Page History',
-      'content': 'Check mate',
+      'title': $services.localization.render('help.history.version21.title'),
+      'content': $services.localization.render('help.history.version21.content'),
       'form_token': $services.csrf.token,
       'xredirect': $xwiki.getURL('Help.History.WebHome', 'save', $escapetool.url({
-        'title': 'History',
-        'content': 'Check the **history**.',
-        'comment': 'Minor change',
+        'title': $services.localization.render('help.history.version22.title'),
+        'content': $services.localization.render('help.history.version22.content',['**']),
+        'comment': $services.localization.render('help.history.version22.comment'),
         'minorEdit': 1,
         'form_token': $services.csrf.token,
         'xredirect': $xwiki.getURL('Help.History.WebHome', 'save', $escapetool.url({
-          'content': "Check the **history** tab.$util.newline${util.newline}Compare the versions.",
+          'content': "$services.localization.render('help.history.version31.content',['**']) $util.newline${util.newline} $services.localization.render('help.history.version31.content1')",
           'form_token': $services.csrf.token,
           'xredirect': $xwiki.getURL('Help.History.WebHome', 'view', $NULL, 'History')
         }))
@@ -245,7 +245,7 @@ $services.localization.render('help.description2')
       <name>platform.help</name>
     </property>
     <property>
-      <parameters>label=Help
+      <parameters>label=$services.localization.render('help.title')
 target=Help.WebHome
 icon=icon:help</parameters>
     </property>

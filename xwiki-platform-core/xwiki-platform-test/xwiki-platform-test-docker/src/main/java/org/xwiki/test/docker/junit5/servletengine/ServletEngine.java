@@ -52,8 +52,6 @@ public enum ServletEngine
      */
     EXTERNAL;
 
-    private static final String PERMANENT_DIRECTORY = "/var/local/xwiki";
-
     private static final String LOCALHOST = "localhost";
 
     private static final String HOST_INTERNAL = "host.testcontainers.internal";
@@ -163,7 +161,16 @@ public enum ServletEngine
      */
     public String getPermanentDirectory()
     {
-        return PERMANENT_DIRECTORY;
+        // Choose directories that can be created by the default user in the related containers.
+        if (name().equals("JETTY")) {
+            return "/var/lib/jetty/xwiki-data";
+        } else if (name().equals("TOMCAT")) {
+            return "/usr/local/tomcat/xwiki-data";
+        } else if (name().equals("WILDFLY")){
+            return "/opt/jboss/xwiki-data";
+        } else {
+            throw new RuntimeException(String.format("Permanent directory not supported for [%s]", name()));
+        }
     }
 
     /**

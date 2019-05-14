@@ -48,7 +48,10 @@ public class LogCaptureValidator
         new Line("Solr loaded a deprecated plugin/analysis class [solr.LatLonType]."),
         new Line("Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]"),
         // Firefox Selenium Driver warning
-        new Line("Marionette\tWARN")
+        new Line("Marionette\tWARN"),
+        // The LibreOffice container outputs this error on startup. We should try to understand why it kills LO before
+        // restarting it.
+        new Line("Office process died with exit code 81; restarting it")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

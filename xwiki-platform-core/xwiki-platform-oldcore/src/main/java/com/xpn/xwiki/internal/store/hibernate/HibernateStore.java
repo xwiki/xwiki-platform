@@ -688,6 +688,11 @@ public class HibernateStore implements Disposable, Integrator
                 this.logger.debug("Releasing hibernate transaction [{}]", transaction);
 
                 if (commit) {
+                    if (transaction.getRollbackOnly()) {
+                        throw new HibernateException(
+                            "The transaction [" + transaction + "] has been unexpectedly marked as rollback only");
+                    }
+
                     transaction.commit();
                 } else {
                     transaction.rollback();

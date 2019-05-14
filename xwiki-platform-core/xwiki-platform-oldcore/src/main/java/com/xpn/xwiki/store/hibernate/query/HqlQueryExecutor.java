@@ -346,10 +346,10 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
             if (isNative) {
                 hQuery = session.createSQLQuery(filteredQuery.getStatement());
                 // Copy the information about the return column types, if possible.
-                NamedSQLQueryDefinition definition = (NamedSQLQueryDefinition) this.hibernate.getMetadata()
-                    .getNamedQueryDefinition(query.getStatement());
+                NamedSQLQueryDefinition definition =
+                    this.hibernate.getMetadata().getNamedNativeQueryDefinition(query.getStatement());
                 if (!StringUtils.isEmpty(definition.getResultSetRef())) {
-                    ((NativeQuery) hQuery).setResultSetMapping(definition.getResultSetRef());
+                    ((NativeQuery<T>) hQuery).setResultSetMapping(definition.getResultSetRef());
                 }
             } else {
                 hQuery = session.createQuery(filteredQuery.getStatement());

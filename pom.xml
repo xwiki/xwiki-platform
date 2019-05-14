@@ -78,9 +78,6 @@
     <xwiki.nexus.skipLocalStaging>true</xwiki.nexus.skipLocalStaging>
 
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
-
-    <!-- By default check the console output of functional tests for problems -->
-    <xwiki.surefire.validateconsole.skip>false</xwiki.surefire.validateconsole.skip>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

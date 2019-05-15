@@ -113,6 +113,7 @@ public class WikiMacroContentMacroTest
 
         MetaData metaData = new MetaData();
         metaData.addMetaData("non-generated-content", "java.util.List<org.xwiki.rendering.block.Block>");
+        metaData.addMetaData("wikimacrocontent", "true");
         List<Block> expectedBlocks = Collections.singletonList(new MetaDataBlock(
             Collections.singletonList(new WordBlock("foobar")), metaData));
 
@@ -138,6 +139,7 @@ public class WikiMacroContentMacroTest
 
         MetaData metaData = new MetaData();
         metaData.addMetaData("non-generated-content", "java.lang.String");
+        metaData.addMetaData("wikimacrocontent", "true");
         List<Block> expectedBlocks = Collections.singletonList(new MetaDataBlock(
             Collections.singletonList(new WordBlock("foobar")), metaData));
 

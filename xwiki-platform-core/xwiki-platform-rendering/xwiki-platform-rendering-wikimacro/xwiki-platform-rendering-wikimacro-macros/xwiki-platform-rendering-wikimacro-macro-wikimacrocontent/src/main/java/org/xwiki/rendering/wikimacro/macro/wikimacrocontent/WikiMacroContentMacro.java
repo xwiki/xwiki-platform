@@ -49,15 +49,15 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  */
 @Component
-@Named(WikiMacroContentMacro.WIKIMACRO_CONTENT_MACRO)
+@Named("wikimacrocontent")
 @Singleton
 @Unstable
 public class WikiMacroContentMacro extends AbstractNoParameterMacro
 {
     /**
-     * The name of the macro.
+     * The description of the macro.
      */
-    public static final String WIKIMACRO_CONTENT_MACRO = "wikimacrocontent";
+    private static final String DESCRIPTION = "Display editable content of a wikimacro.";
 
     private static final String WIKIMACRO_CONTENT = "content";
 
@@ -77,7 +77,8 @@ public class WikiMacroContentMacro extends AbstractNoParameterMacro
      */
     public WikiMacroContentMacro()
     {
-        super(WIKIMACRO_CONTENT_MACRO);
+        super("WikiMacro Content", DESCRIPTION);
+        setDefaultCategory(DEFAULT_CATEGORY_DEVELOPMENT);
     }
 
     @Override
@@ -128,9 +129,11 @@ public class WikiMacroContentMacro extends AbstractNoParameterMacro
         Map<String, Object> macroInfo = (Map) getContext().get("macro");
         String macroContent = extractMacroContent(macroInfo);
         if (macroContent != null) {
+            MetaData nonGeneratedContentMetaData = this.getNonGeneratedContentMetaData(macroInfo);
+            nonGeneratedContentMetaData.addMetaData("wikimacrocontent", "true");
             XDOM parse = this.contentParser.parse(macroContent, context, true, context.isInline());
             result = Collections.singletonList(new MetaDataBlock(parse.getChildren(),
-                this.getNonGeneratedContentMetaData(macroInfo)));
+                nonGeneratedContentMetaData));
         }
 
         return result;

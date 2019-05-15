@@ -79,9 +79,7 @@ public class AnnotationsIT
         logCaptureConfiguration.registerExcludes(
             // Seems to only happen with the default configuration (Jetty Standalone/HSQLDB)
             "java.util.zip.ZipException: zip file is empty",
-            // Note: Happens when verbose is turned on
-            "Collision between core extension [javax.annotation:javax.annotation-api",
-            "[javax.annotation:javax.annotation-api/"
+            "require.min.js?r=1, line 7: Error: Script error for \"jsTree\", needed by: tree, tree-finder"
         );
     }
 }

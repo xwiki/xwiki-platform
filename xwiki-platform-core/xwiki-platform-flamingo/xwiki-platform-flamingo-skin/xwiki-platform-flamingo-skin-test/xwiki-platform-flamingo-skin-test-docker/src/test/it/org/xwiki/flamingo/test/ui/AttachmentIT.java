@@ -69,8 +69,12 @@ public class AttachmentIT
     @AfterEach
     public void teardown(LogCaptureConfiguration logCaptureConfiguration)
     {
-        logCaptureConfiguration.registerExcludes("require.min.js?r=1, line 7: "
-            + "Error: Script error for \"jsTree\", needed by: tree, tree-finder");
+        logCaptureConfiguration.registerExcludes(
+            "require.min.js?r=1, line 7: Error: Script error for \"jsTree\", needed by: tree, tree-finder",
+            "require.min.js?r=1, line 7: Error: Script error for \"jquery\", needed by: jQueryNoConflict",
+            "require.min.js?r=1, line 7: Error: Script error for \"/xwiki/webjars/wiki%3Axwiki/Keypress/2.1.5/keypress"
+                + ".min.js?r=1\""
+        );
     }
 
     private File getFileToUpload(TestConfiguration testConfiguration, String filename)

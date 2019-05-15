@@ -22,6 +22,7 @@ package org.xwiki.sharepage.test.ui;
 import javax.mail.internet.MimeMessage;
 
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -33,6 +34,7 @@ import org.xwiki.sharepage.test.po.ShareableViewPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 
 import com.icegreen.greenmail.util.GreenMail;
@@ -99,6 +101,16 @@ public class SharePageIT
 
         // Delete any existing test page
         setup.deletePage(this.testClassName, this.testMethodName);
+    }
+
+    @AfterEach
+    public void tearDown(LogCaptureConfiguration logCaptureConfiguration)
+    {
+        logCaptureConfiguration.registerExcludes(
+            "require.min.js?r=1, line 7: Error: Script error for \"xwiki-events-bridge\"",
+            "require.min.js?r=1, line 7: Error: Script error for \"/xwiki/webjars/wiki%3Axwiki/xwiki-platform-tree-"
+                + "webjar/11.4-SNAPSHOT/require-config.min.js?evaluate=true\""
+        );
     }
 
     /**

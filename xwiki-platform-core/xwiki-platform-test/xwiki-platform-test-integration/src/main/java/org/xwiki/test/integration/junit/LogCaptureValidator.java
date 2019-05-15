@@ -66,7 +66,12 @@ public class LogCaptureValidator
         new Line("relation \"hibernate_sequence\" already exists"),
         // Jetty 9.4.x emits some warning about ASM, see https://github.com/eclipse/jetty.project/issues/2412
         // Remove once "latest" image of the Jetty container doesn't have the issue anymore
-        new Line("Unknown asm implementation version, assuming version")
+        new Line("Unknown asm implementation version, assuming version"),
+        // Note: Happens when verbose is turned on
+        new Line("Collision between core extension [javax.annotation:javax.annotation-api"),
+        new Line("[javax.annotation:javax.annotation-api/"),
+        // Appears only for PostgreSQL database.
+        new Line("WARNING: enabling \"trust\" authentication for local connections")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

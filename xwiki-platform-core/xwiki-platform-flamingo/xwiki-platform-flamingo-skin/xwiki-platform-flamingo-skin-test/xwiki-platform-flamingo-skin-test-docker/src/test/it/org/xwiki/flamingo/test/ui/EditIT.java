@@ -64,8 +64,13 @@ public class EditIT
     public void tearDown(LogCaptureConfiguration logCaptureConfiguration)
     {
         logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed");
-        logCaptureConfiguration.registerExcludes("require.min.js?r=1, line 7: "
-            + "Error: Script error for \"JobRunner\", needed by: tree");
+        logCaptureConfiguration.registerExcludes(
+            "require.min.js?r=1, line 7: Error: Script error for \"JobRunner\", needed by: tree",
+            "require.min.js?r=1, line 7: Error: Script error for \"xwiki-events-bridge\"",
+            "require.min.js?r=1, line 7: Error: Script error for \"/xwiki/webjars/wiki%3Axwiki/xwiki-platform-tree-"
+                + "webjar/11.4-SNAPSHOT/require-config.min.js?evaluate=true\"",
+            "require.min.js?r=1, line 7: Error: Script error for \"iscroll\""
+        );
     }
 
     /**

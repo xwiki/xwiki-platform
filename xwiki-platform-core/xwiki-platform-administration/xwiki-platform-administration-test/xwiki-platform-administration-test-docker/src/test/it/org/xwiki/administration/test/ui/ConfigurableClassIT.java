@@ -58,7 +58,8 @@ public class ConfigurableClassIT
     public void tearDown(LogCaptureConfiguration logCaptureConfiguration)
     {
         logCaptureConfiguration.registerExcludes(
-            "require.min.js?r=1, line 7: Error: Script error for \"JobRunner\", needed by: tree"
+            "require.min.js?r=1, line 7: Error: Script error for \"JobRunner\", needed by: tree",
+            "require.min.js?r=1, line 7: Error: Script error for \"jsTree\", needed by: tree, tree-finder"
         );
     }
 

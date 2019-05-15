@@ -166,7 +166,7 @@ public enum ServletEngine
             return "/var/lib/jetty/xwiki-data";
         } else if (name().equals("TOMCAT")) {
             return "/usr/local/tomcat/xwiki-data";
-        } else if (name().equals("WILDFLY")){
+        } else if (name().equals("WILDFLY")) {
             return "/opt/jboss/xwiki-data";
         } else {
             throw new RuntimeException(String.format("Permanent directory not supported for [%s]", name()));

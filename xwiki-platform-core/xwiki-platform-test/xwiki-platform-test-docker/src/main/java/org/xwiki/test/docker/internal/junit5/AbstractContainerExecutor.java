@@ -26,7 +26,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.MountableFile;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.text.StringUtils;

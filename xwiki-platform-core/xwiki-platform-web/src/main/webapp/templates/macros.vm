@@ -2357,7 +2357,7 @@ $string##
   #if ($multiSelect)
     #set ($discard = $parameters.put('multiple', 'multiple'))
   #end
-  #set ($discard = $parameters.putIfAbsent('data-userScope', $services.wiki.user.userScope))
+  #set ($discard = $parameters.putIfAbsent('data-userScope', "$!services.wiki.user.userScope"))
   #suggestInput($parameters)
 #end
 

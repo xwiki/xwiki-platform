@@ -56,6 +56,8 @@ public class LogCaptureValidator
             + "Reading manifest: Invalid host permission: resource://pdf.js/"),
         new Line("Loading extension 'screenshots@mozilla.org': "
             + "Reading manifest: Invalid host permission: about:reader*"),
+        new Line("Loading extension 'screenshots@mozilla.org': "
+            + "Reading manifest: Invalid extension permission: mozillaAddons"),
         // The LibreOffice container outputs this error on startup. We should try to understand why it kills LO before
         // restarting it.
         new Line("Office process died with exit code 81; restarting it"),
@@ -71,7 +73,11 @@ public class LogCaptureValidator
         new Line("Collision between core extension [javax.annotation:javax.annotation-api"),
         new Line("[javax.annotation:javax.annotation-api/"),
         // Appears only for PostgreSQL database.
-        new Line("WARNING: enabling \"trust\" authentication for local connections")
+        new Line("WARNING: enabling \"trust\" authentication for local connections"),
+        // Those errors appears from time to time, mainly on the CI, related to various JS resources such as:
+        // jsTree, jQuery, keypress, xwiki-events-bridge, iScroll, etc.
+        // This seems to be related to actions being performed before all the resources have been correctly loaded.
+        new Line("require.min.js?r=1, line 7")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

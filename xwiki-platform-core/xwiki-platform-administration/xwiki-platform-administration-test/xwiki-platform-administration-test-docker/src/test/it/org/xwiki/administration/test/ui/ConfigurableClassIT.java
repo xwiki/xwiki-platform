@@ -19,7 +19,6 @@
  */
 package org.xwiki.administration.test.ui;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -52,15 +51,6 @@ public class ConfigurableClassIT
     public void setUp(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
-    }
-
-    @AfterEach
-    public void tearDown(LogCaptureConfiguration logCaptureConfiguration)
-    {
-        logCaptureConfiguration.registerExcludes(
-            "require.min.js?r=1, line 7: Error: Script error for \"JobRunner\", needed by: tree",
-            "require.min.js?r=1, line 7: Error: Script error for \"jsTree\", needed by: tree, tree-finder"
-        );
     }
 
     /*

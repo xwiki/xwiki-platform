@@ -223,6 +223,7 @@ public class DefaultHTMLConverter implements HTMLConverter
         TransformationContext txContext = new TransformationContext();
         txContext.setXDOM(xdom);
         txContext.setSyntax(syntax);
+        txContext.setTargetSyntax(Syntax.ANNOTATED_XHTML_1_0);
 
         // It's very important to set a Transformation id as otherwise if any Velocity Macro is executed it'll be
         // executed in isolation (and if you have, say, 2 velocity macros, the second one will not 'see' what's defined

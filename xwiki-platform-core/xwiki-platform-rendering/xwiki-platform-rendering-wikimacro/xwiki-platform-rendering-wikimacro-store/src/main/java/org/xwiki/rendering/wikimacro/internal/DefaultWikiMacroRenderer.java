@@ -45,6 +45,7 @@ import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
+import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionFinishedEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
@@ -108,6 +109,27 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      * The key under which macro can directly return the resulting {@link List} of {@link Block}.
      */
     private static final String MACRO_RESULT_KEY = "result";
+
+    // All the following matchers are used in cleanMacroMarkers. They are defined here for perf reasons.
+
+    /**
+     * Match all the macro marker blocks.
+     */
+    private static final BlockMatcher MACRO_MARKER_MATCHER = testedBlock -> (testedBlock instanceof MacroMarkerBlock);
+
+    /**
+     * Match all the metadata blocks that contains wikimacrocontent=true.
+     */
+    private static final BlockMatcher MACROCONTENT_METADATA_MATCHER =
+        testedBlock -> (testedBlock instanceof MetaDataBlock)
+        && "true".equals(((MetaDataBlock) testedBlock).getMetaData().getMetaData("wikimacrocontent"));
+
+    /**
+     * Match all the metadata blocks that contains a non-generated-content metadata.
+     */
+    private static final BlockMatcher NON_GENERATED_CONTENT_METADATA_MATCHER =
+        testedBlock -> (testedBlock instanceof MetaDataBlock)
+            && ((MetaDataBlock) testedBlock).getMetaData().getMetaData(MetaData.NON_GENERATED_CONTENT) != null;
 
     @Inject
     @Named("context")
@@ -393,32 +415,41 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     }
 
     /**
-     * Clean the rendered macro to remove macro markers, except those inside a wikimacrocontent macro.
+     * Clean the rendered macro to allow inline editing of wikimacro content.
+     * Specifically this method will remove the macro markers that are inside the wikimacro, except those that are used
+     * inside the content of this wikimacro. It will also remove all the non-generated-content metadata blocks that are
+     * defined in the wikimacro except those also used inside the content of the wikimacro content.
+     * This method doesn't return anything but alterate the given block parameter.
      * @param block the block to clean.
+     * @since 11.4RC1
      */
     private void cleanMacroMarkers(Block block)
     {
-        // Matcher to find all MacroMarkerBlock about wikimacrocontent macro.
-        BlockMatcher wikiContentMacroBlock =
-            testedBlock -> (testedBlock instanceof MacroMarkerBlock)
-                && WikiMacroContentMacro.WIKIMACRO_CONTENT_MACRO.equals(((MacroMarkerBlock) testedBlock).getId());
 
-        // Matcher to find all MacroMarkerBlocks
-        BlockMatcher marcoMarkerBlocks =
-            testedBlock -> (testedBlock instanceof MacroMarkerBlock);
+        List<Block> allMacroMarkerBlocks = block.getBlocks(MACRO_MARKER_MATCHER, Block.Axes.DESCENDANT);
+        List<Block> allWikiMacroContentMetadataBlocks =
+            block.getBlocks(MACROCONTENT_METADATA_MATCHER, Block.Axes.DESCENDANT);
+        List<Block> allNonGeneratedContentMetadataBlocks =
+            block.getBlocks(NON_GENERATED_CONTENT_METADATA_MATCHER, Block.Axes.DESCENDANT);
 
-        List<Block> allMacroMarkerBlocks = block.getBlocks(marcoMarkerBlocks, Block.Axes.DESCENDANT);
-        List<Block> allWikiMacroContentMarkerBlocks = block.getBlocks(wikiContentMacroBlock, Block.Axes.DESCENDANT);
-
-        // We remove from the list of all macro marker blocks, the blocks that are inside a wikimacrocontent block.
-        for (Block allWikiMacroContentMarkerBlock : allWikiMacroContentMarkerBlocks) {
+        // Before removing the blocks, we need to remove from the lists all those that are inside a wikimacro content
+        // metadata block, so we don't alterate the wikimacro content itself.
+        for (Block allWikiMacroContentMarkerBlock : allWikiMacroContentMetadataBlocks) {
             allMacroMarkerBlocks.removeAll(
-                allWikiMacroContentMarkerBlock.getBlocks(marcoMarkerBlocks, Block.Axes.DESCENDANT));
+                allWikiMacroContentMarkerBlock.getBlocks(MACRO_MARKER_MATCHER, Block.Axes.DESCENDANT));
+            allNonGeneratedContentMetadataBlocks.removeAll(allWikiMacroContentMarkerBlock.getBlocks(
+                NON_GENERATED_CONTENT_METADATA_MATCHER, Block.Axes.DESCENDANT_OR_SELF));
         }
 
-        // Remove all macromarker blocks that remains (outside the wikimacrocontent block).
+        // Remove all macro marker blocks that remains (outside the wikimacro content block).
         for (Block markerBlock : allMacroMarkerBlocks) {
             markerBlock.getParent().replaceChild(markerBlock.getChildren(), markerBlock);
+        }
+
+        // Remove all non generated content metadata block that remains (outisde the wikimacro content block).
+        for (Block nonGeneratedContentMetadataBlock : allNonGeneratedContentMetadataBlocks) {
+            nonGeneratedContentMetadataBlock.getParent().replaceChild(nonGeneratedContentMetadataBlock.getChildren(),
+                nonGeneratedContentMetadataBlock);
         }
     }
 

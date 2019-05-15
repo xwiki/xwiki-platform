@@ -52,12 +52,7 @@ public class LogCaptureValidator
         new Line("Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took"),
         // Firefox Selenium Driver warning
         new Line("Marionette\tWARN"),
-        new Line("Loading extension 'screenshots@mozilla.org': "
-            + "Reading manifest: Invalid host permission: resource://pdf.js/"),
-        new Line("Loading extension 'screenshots@mozilla.org': "
-            + "Reading manifest: Invalid host permission: about:reader*"),
-        new Line("Loading extension 'screenshots@mozilla.org': "
-            + "Reading manifest: Invalid extension permission: mozillaAddons"),
+        new Line("Loading extension 'screenshots@mozilla.org': "),
         // The LibreOffice container outputs this error on startup. We should try to understand why it kills LO before
         // restarting it.
         new Line("Office process died with exit code 81; restarting it"),

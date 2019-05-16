@@ -237,7 +237,6 @@ public class WizardTest extends AbstractTest
 
         // Assert that the created application is listed in the live table.
         ApplicationsLiveTableElement appsLiveTable = appWithinMinutesHomePage.getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         Assert.assertTrue(appsLiveTable.isApplicationListed(appName));
 
         // Delete the application entries.
@@ -253,7 +252,6 @@ public class WizardTest extends AbstractTest
         homePage.clickDeleteApplication().clickYes();
         // Verify that the application is not listed anymore.
         appsLiveTable = AppWithinMinutesHomePage.gotoPage().getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         Assert.assertFalse(appsLiveTable.isApplicationListed(appName));
 
         this.validateConsole.getLogCaptureConfiguration().registerExcludes("WikiComponentException: Registering UI "

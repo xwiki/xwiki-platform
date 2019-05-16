@@ -74,6 +74,23 @@ public class AppWithinMinutesHomePage extends ViewPage
      */
     public ApplicationsLiveTableElement getAppsLiveTable()
     {
-        return appsLiveTable;
+        this.appsLiveTable.waitUntilReady();
+        return this.appsLiveTable;
+    }
+
+    /**
+     * Delete the specified application.
+     *
+     * @param appName the application name
+     * @return this page
+     */
+    public AppWithinMinutesHomePage deleteApplication(String appName)
+    {
+        this.appsLiveTable.waitUntilReady();
+        this.appsLiveTable.filterApplicationName(appName);
+        if (this.appsLiveTable.isApplicationListed(appName)) {
+            getAppsLiveTable().clickDeleteApplication(appName).clickYes();
+        }
+        return this;
     }
 }

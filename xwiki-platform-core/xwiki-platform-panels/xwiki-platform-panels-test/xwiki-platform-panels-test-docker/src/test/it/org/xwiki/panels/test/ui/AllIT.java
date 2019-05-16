@@ -37,4 +37,10 @@ public class AllIT
     class NestedPanelsAdministrationIT extends PanelsAdministrationIT
     {
     }
+
+    @Nested
+    @DisplayName("Navigation Panel Tests")
+    class NestedNavigationPanelIT extends NavigationPanelIT
+    {
+    }
 }

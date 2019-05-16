@@ -68,6 +68,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- We depend on the App Within Minutes because we want to test the integration with the Navigation Panel. -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->
@@ -86,6 +93,12 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-appwithinminutes-test-pageobjects</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>

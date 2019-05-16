@@ -49,6 +49,9 @@ public class NavigationPanelAdministrationPage extends ViewPage
     @FindBy(css = ".exclusion-filter.topLevelExtensionPages input[type=\"checkbox\"]")
     private WebElement excludeTopLevelExtensionPagesCheckbox;
 
+    @FindBy(css = ".exclusion-filter.topLevelApplicationPages input[type=\"checkbox\"]")
+    private WebElement excludeTopLevelApplicationPagesCheckbox;
+
     @FindBy(name = "action_saveandcontinue")
     private WebElement saveButton;
 
@@ -117,6 +120,19 @@ public class NavigationPanelAdministrationPage extends ViewPage
         boolean excluded = isExcludingTopLevelExtensionPages();
         if (exclude != excluded) {
             this.excludeTopLevelExtensionPagesCheckbox.click();
+        }
+    }
+
+    public boolean isExcludingTopLevelApplicationPages()
+    {
+        return this.excludeTopLevelApplicationPagesCheckbox.isSelected();
+    }
+
+    public void excludeTopLevelApplicationPages(boolean exclude)
+    {
+        boolean excluded = isExcludingTopLevelApplicationPages();
+        if (exclude != excluded) {
+            this.excludeTopLevelApplicationPagesCheckbox.click();
         }
     }
 

@@ -19,7 +19,6 @@
  */
 package org.xwiki.index.test.ui;
 
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 import org.xwiki.index.test.po.AllDocsPage;
@@ -40,8 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 public class AllDocsIT
 {
-    @RepeatedTest(30)
+    @Test
     public void verifyAllDocs(TestUtils setup, TestInfo info)
+    {
+        tableViewTabActions(setup, info);
+    }
+
+    private void tableViewTabActions(TestUtils setup, TestInfo info)
     {
         String testName = info.getTestMethod().get().getName();
         String testClassName = info.getTestClass().get().getSimpleName();

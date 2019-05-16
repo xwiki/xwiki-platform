@@ -67,7 +67,8 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
         String logContent = loadLogCapture(extensionContext).stopCapture();
         LogCaptureConfiguration configuration = loadLogCaptureConfiguration(extensionContext);
 
-        // Validate the captured log content (but only if no test is failing to not confuse the user)
+        // Validate the captured log content (but only if no test is failing so that errors in the console that are due
+        // to the test failure will not appear as forbidden content).
         if (!extensionContext.getExecutionException().isPresent()) {
             LogCaptureValidator validator = new LogCaptureValidator();
             validator.validate(logContent, configuration);

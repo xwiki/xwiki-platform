@@ -101,6 +101,7 @@ public class LogCaptureValidator
         allExpected.addAll(configuration.getExpectedLines());
 
         List<String> matchingExcludes = new ArrayList<>();
+        List<Line> matchingDefinitions = new ArrayList<>();
         List<String> matchingLines = LOG_PARSER.parse(logContent).stream()
             .filter(p -> {
                 for (String searchString : SEARCH_STRINGS) {
@@ -114,11 +115,13 @@ public class LogCaptureValidator
                 for (Line excludedLine : allExcludes) {
                     if (isMatching(p, excludedLine)) {
                         matchingExcludes.add(p);
+                        matchingDefinitions.add(excludedLine);
                         return false;
                     }
                 }
                 for (Line expectedLine : allExpected) {
                     if (isMatching(p, expectedLine)) {
+                        matchingDefinitions.add(expectedLine);
                         return false;
                     }
                 }
@@ -133,9 +136,31 @@ public class LogCaptureValidator
                 StringUtils.join(matchingExcludes, NL));
         }
 
+        // Also display not matching excludes and expected so that developers can notice them and realize that the
+        // issues that existed might have been fixed. Note however that currently we can't have exclude/expetced by
+        // configuration (for Docker-based tests) and thus it's possible that there are non matching excludes/expected
+        // simply because they exist only in a different configuration.
+        displayMissingWarning(configuration.getExcludedLines(), matchingDefinitions, "excludes");
+        displayMissingWarning(configuration.getExpectedLines(), matchingDefinitions, "expected");
+
+        // Fail the test if there are matching lines that have no exclude or no expected.
         if (!matchingLines.isEmpty()) {
             throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
                 matchingLines.stream().collect(Collectors.joining(NL))));
+        }
+    }
+
+    private void displayMissingWarning(List<Line> definitions, List<Line> matchingDefinitions, String missingType)
+    {
+        List<String> notMatchingLines = new ArrayList<>();
+        for (Line line : definitions) {
+            if (!matchingDefinitions.contains(line)) {
+                notMatchingLines.add(line.getContent());
+            }
+        }
+        if (!notMatchingLines.isEmpty()) {
+            LOGGER.warn("The following {} were not matched and could be candidates for removal "
+                + "(beware of configs): [\n{}\n]", missingType, StringUtils.join(notMatchingLines, NL));
         }
     }
 

@@ -19,6 +19,9 @@
  */
 package org.xwiki.test.integration.junit;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Defines an expected or excluded line (can be a regex or not).
  *
@@ -63,5 +66,33 @@ public class Line
     public boolean isRegex()
     {
         return this.isRegex;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(7, 5)
+            .append(getContent())
+            .append(isRegex())
+            .toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == null) {
+            return false;
+        }
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+        Line rhs = (Line) object;
+        return new EqualsBuilder()
+            .append(getContent(), rhs.getContent())
+            .append(isRegex(), rhs.isRegex())
+            .isEquals();
     }
 }

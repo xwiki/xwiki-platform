@@ -1898,7 +1898,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_LOCK, "Exception while locking document", e);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_LOCK,
+                String.format("Exception while locking document for lock [%s]", lock.toString()), e);
         } finally {
             try {
                 if (bTransaction) {

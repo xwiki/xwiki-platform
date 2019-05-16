@@ -116,7 +116,7 @@ public class StackTraceLogParser
                     } else if (isMatchingCausedByPattern(line)) {
                         if (inStackTrace) {
                             // Aggregate to buffer so that it can be later asserted.
-                            buffer.append('\n').append(removePrefixPart(line));
+                            buffer.append('\n').append(line);
                         } else {
                             results.add(line);
                         }
@@ -150,15 +150,9 @@ public class StackTraceLogParser
         StringBuilder buffer;
         String line2 = results.remove(results.size() - 1);
         String line1 = results.remove(results.size() - 1);
-        // Strip the prefix from line2 to get a nice string to assert.
         buffer = new StringBuilder(line1);
-        buffer.append('\n').append(removePrefixPart(line2));
+        buffer.append('\n').append(line2);
         return buffer;
-    }
-
-    private String removePrefixPart(String line)
-    {
-        return org.apache.commons.lang3.StringUtils.substringAfterLast(line, " - ");
     }
 
     private StringBuilder saveBuffer(StringBuilder buffer, List<String> results)
@@ -171,17 +165,17 @@ public class StackTraceLogParser
 
     private boolean isMatchingAtPattern(String line)
     {
-        return isMatchingPattern(" \tat ", line);
+        return isMatchingPattern("\tat ", line);
     }
 
     private boolean isMatchingCausedByPattern(String line)
     {
-        return isMatchingPattern(" Caused by: ", line);
+        return isMatchingPattern("Caused by: ", line);
     }
 
     private boolean isMatchingOmittedFramesPattern(String line)
     {
-        return isMatchingPattern(" \t... ", line);
+        return isMatchingPattern("\t... ", line);
     }
 
     private boolean isMatchingPattern(String pattern, String line)

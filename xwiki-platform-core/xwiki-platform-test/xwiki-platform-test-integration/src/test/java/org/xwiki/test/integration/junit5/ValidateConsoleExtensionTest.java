@@ -86,10 +86,12 @@ public class ValidateConsoleExtensionTest
         void doSomething()
         {
             // "Deprecated usage of" that goes through (not expected or excluded)
-            LOGGER.error("Deprecated usage of something");
+            LOGGER.info("Deprecated usage of something");
 
             // Error that is expected
             LOGGER.error("expected");
+
+            LOGGER.warn("stacktrace", new Exception("exception"));
         }
     }
 
@@ -131,7 +133,9 @@ public class ValidateConsoleExtensionTest
         assertEquals(""
             + "The following lines were matching forbidden content:[\n"
             + "ERROR - in beforeAll\n"
-            + "ERROR - Deprecated usage of something\n"
+            + "INFO  - Deprecated usage of something\n"
+            + "WARN  - stacktrace\n"
+            + "java.lang.Exception: exception\n"
             + "]", summary.getFailures().get(0).getException().getMessage());
         assertEquals(""
             + "WARN  - The following lines were matching excluded patterns and need to be fixed: [\n"

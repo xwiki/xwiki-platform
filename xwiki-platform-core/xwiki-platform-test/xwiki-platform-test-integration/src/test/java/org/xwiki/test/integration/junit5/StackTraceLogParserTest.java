@@ -45,10 +45,11 @@ public class StackTraceLogParserTest
         assertEquals("2019-05-06 20:02:37,331 [Exec Stream Pumper] - 2019-05-06 20:02:37,330 "
                 + "[http://localhost:8080/xwiki/webjars/wiki%3Axwiki/jstree/3.3.7/jstree.min.js] "
                     + "ERROR ebJarsResourceReferenceHandler - Failed to read resource [jstree/3.3.7/jstree.min.js]\n"
-            + "org.xwiki.resource.ResourceReferenceHandlerException: "
+            + "2019-05-06 20:02:37,331 [Exec Stream Pumper] - org.xwiki.resource.ResourceReferenceHandlerException: "
                 + "Failed to read resource [jstree/3.3.7/jstree.min.js]\n"
-            + "Caused by: org.eclipse.jetty.io.EofException: null\n"
-            + "Caused by: java.io.IOException: Broken pipe", results.get(45));
+            + "2019-05-06 20:02:37,352 [Exec Stream Pumper] - Caused by: org.eclipse.jetty.io.EofException: null\n"
+            + "2019-05-06 20:02:37,359 [Exec Stream Pumper] - Caused by: java.io.IOException: Broken pipe",
+            results.get(45));
     }
 
     @Test
@@ -84,7 +85,7 @@ public class StackTraceLogParserTest
         List<String> results = parser.parse(log);
 
         assertEquals(2, results.size());
-        assertEquals("date - line1\nline2\nCaused by: x", results.get(0));
+        assertEquals("date - line1\ndate - line2\ndate - Caused by: x", results.get(0));
         assertEquals("date - test", results.get(1));
     }
 
@@ -102,7 +103,21 @@ public class StackTraceLogParserTest
         assertEquals(1, results.size());
         assertEquals("date [x] INFO  Class - STDOUT: date [main] ERROR OtherClass"
             + "- Configured permanent directory [/var/local/xwiki] could not be created. \n"
-            + "STDOUT: java.nio.file.AccessDeniedException: /var/local/xwiki", results.get(0));
+            + "date [x] INFO  Class - STDOUT: java.nio.file.AccessDeniedException: /var/local/xwiki", results.get(0));
+    }
+
+    @Test
+    public void parseWithNoPrefixedLogs()
+    {
+        String log = ""
+            + "WARN  - stacktrace\n"
+            + "java.lang.Exception: exception\n"
+            + "\tat doSomething(ValidateConsoleExtensionTest.java:94)";
+        StackTraceLogParser parser = new StackTraceLogParser();
+        List<String> results = parser.parse(log);
+
+        assertEquals(1, results.size());
+        assertEquals("WARN  - stacktrace\njava.lang.Exception: exception", results.get(0));
 
     }
 }

@@ -452,6 +452,7 @@ public class EditIT
     @Order(10)
     public void editLeaveAndBack(TestUtils setup, TestReference testReference) throws InterruptedException
     {
+        setup.deletePage(testReference);
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
         wikiEditPage.setContent("First edit");
         wikiEditPage.clickSaveAndContinue();
@@ -471,13 +472,16 @@ public class EditIT
         // the page will be reloaded next time we go on it.
         setup.getDriver().addPageNotYetReloadedMarker();
 
-        WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(testReference).editWYSIWYG();
+        viewPage = setup.gotoPage(testReference);
+        viewPage.waitUntilPageJSIsLoaded();
+
+        WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
         wysiwygEditPage.setContent("fourth edit");
         wysiwygEditPage.clickSaveAndContinue();
 
-        // object editor -> view page
+        // WYSIWYG editor -> view page
         setup.getDriver().navigate().back();
-        // view page -> wysiwyg editor
+        // view page -> wiki editor
         setup.getDriver().navigate().back();
 
         wikiEditPage = new WikiEditPage();

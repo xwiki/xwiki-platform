@@ -54,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @version $Id$
  * @since 11.2RC1
  */
-@UITest(browser = Browser.CHROME, servletEngine = ServletEngine.TOMCAT, servletEngineTag = "8.5", database = Database.MYSQL, databaseTag = "5.7", verbose = true)
+@UITest
 public class EditIT
 {
     @BeforeAll

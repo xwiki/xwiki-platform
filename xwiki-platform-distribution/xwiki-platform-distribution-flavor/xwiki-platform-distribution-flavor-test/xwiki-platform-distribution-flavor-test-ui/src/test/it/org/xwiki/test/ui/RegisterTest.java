@@ -66,13 +66,11 @@ public class RegisterTest extends AbstractTest
             this.registrationPage = this.getRegistrationPage();
             getDriver().waitUntilCondition(driver -> {
                 try {
-                    this.registrationPage.isLiveValidationEnabled();
-                    return true;
+                    return useLiveValidation() == this.registrationPage.isLiveValidationEnabled();
                 } catch (Exception e) {
                     return false;
                 }
             });
-            assertEquals(this.registrationPage.isLiveValidationEnabled(), useLiveValidation());
         }
 
         // The prepareName javascript function is the cause of endless flickering

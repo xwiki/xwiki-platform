@@ -165,9 +165,16 @@ public final class DockerTestUtils
 
     /**
      * @param container the container to start
+     * @param testConfiguration the configuration to build (database, debug mode, etc). Used to verify if we're online
+     *        to pull the image
      */
-    public static void startContainer(GenericContainer container)
+    public static void startContainer(GenericContainer container, TestConfiguration testConfiguration)
     {
+        // Get the latest image in case the tag has been updated on dockerhub.
+        if (!testConfiguration.isOffline()) {
+            container.getDockerClient().pullImageCmd(container.getDockerImageName());
+        }
+
         container.start();
     }
 

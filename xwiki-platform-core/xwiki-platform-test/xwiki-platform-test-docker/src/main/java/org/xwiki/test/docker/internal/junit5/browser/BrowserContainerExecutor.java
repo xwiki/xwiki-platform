@@ -97,7 +97,7 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
             webDriverContainer.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
-        startContainer(webDriverContainer);
+        startContainer(webDriverContainer, this.testConfiguration);
 
         if (this.testConfiguration.vnc()) {
             LOGGER.info("VNC server address = " + webDriverContainer.getVncAddress());

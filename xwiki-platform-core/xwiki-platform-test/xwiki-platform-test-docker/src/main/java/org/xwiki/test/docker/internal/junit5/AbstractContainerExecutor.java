@@ -54,12 +54,7 @@ public abstract class AbstractContainerExecutor
         container.withLogConsumer(new XWikiSlf4jLogConsumer(LoggerFactory.getLogger(this.getClass()),
             testConfiguration.isVerbose()));
 
-        // Get the latest image in case the tag has been updated on dockerhub.
-        if (!testConfiguration.isOffline()) {
-            container.getDockerClient().pullImageCmd(container.getDockerImageName());
-        }
-
-        startContainer(container);
+        startContainer(container, testConfiguration);
 
         // Display logs after the container has been started so that we can see problems happening in the containers
         followOutput(container, getClass());

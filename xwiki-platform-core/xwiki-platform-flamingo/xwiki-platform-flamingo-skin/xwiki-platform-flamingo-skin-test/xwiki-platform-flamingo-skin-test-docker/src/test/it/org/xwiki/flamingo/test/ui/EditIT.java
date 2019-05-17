@@ -33,7 +33,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -340,7 +339,6 @@ public class EditIT
 
         EditConflictModal editConflictModal = new EditConflictModal();
         assertTrue(editConflictModal.isDisplayed());
-        assertEquals("Version conflict", editConflictModal.getTitle());
         assertEquals("1.2", editConflictModal.getVersionDiff());
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@", "-A <del>fir</del>s<del>t</del> edit from a tab<del>.</del>",
             "+A s<ins>econd</ins> edit from a<ins>nother</ins> tab"), editConflictModal.getDiff().getDiff("Content"));

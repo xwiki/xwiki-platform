@@ -37,6 +37,8 @@ public class EditConflictModal extends BaseModal
 {
     private static final String MODAL_ID = "previewDiffModal";
 
+    private static final String MODAL_TITLE = "Version conflict";
+
     @FindBy(id = "actionReloadRadio")
     private WebElement reloadChoice;
 
@@ -62,6 +64,9 @@ public class EditConflictModal extends BaseModal
     {
         super(By.id(MODAL_ID));
         this.getDriver().waitUntilElementIsVisible(By.id(MODAL_ID));
+
+        // Ensure the modal is correctly displayed.
+        getDriver().waitUntilCondition(driver -> this.getTitle().equals(MODAL_TITLE));
     }
 
     /**

@@ -73,6 +73,8 @@ public class LogCaptureValidator
         // jsTree, jQuery, keypress, xwiki-events-bridge, iScroll, etc.
         // This seems to be related to actions being performed before all the resources have been correctly loaded.
         new Line("require.min.js?r=1, line 7"),
+        // Cannot reproduce locally but happened on the CI for MenuIT.
+        new Line("jstree.min.js, line 2: TypeError: c is undefined"),
         // See: https://jira.xwiki.org/browse/XWIKI-13609 comments: this log could still happen from time to time.
         new Line("Failed to save job status")
     );

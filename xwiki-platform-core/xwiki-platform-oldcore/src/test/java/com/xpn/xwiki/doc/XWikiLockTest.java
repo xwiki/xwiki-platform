@@ -41,6 +41,6 @@ public class XWikiLockTest
         assertTrue(lock.toString().matches("userName = \\[user\\], docId = \\[1\\], date = \\[.*\\]"));
 
         lock.setDate(new Date(0L));
-        assertEquals("userName = [user], docId = [1], date = [Thu Jan 01 01:00:00 CET 1970]", lock.toString());
+        assertEquals(String.format("userName = [user], docId = [1], date = [%s]", new Date(0L)), lock.toString());
     }
 }

@@ -25,6 +25,7 @@ import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -33,6 +34,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.browser.Browser;
+import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
@@ -51,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @version $Id$
  * @since 11.2RC1
  */
-@UITest
+@UITest(browser = Browser.CHROME, servletEngine = ServletEngine.TOMCAT, servletEngineTag = "8.5", database = Database.MYSQL, databaseTag = "5.7", verbose = true)
 public class EditIT
 {
     @BeforeAll
@@ -300,11 +304,12 @@ public class EditIT
         setup.recacheSecretToken();
     }
 
-    @Test
+    @RepeatedTest(10)
     @Order(8)
     public void editWithConflict(TestUtils setup, TestReference testReference)
     {
         String testPageName = testReference.getLastSpaceReference().getName();
+        setup.deletePage(testReference);
         setup.createPage(testReference, "", testPageName);
 
         String firstTab = setup.getDriver().getWindowHandle();

@@ -72,7 +72,9 @@ public class LogCaptureValidator
         // Those errors appears from time to time, mainly on the CI, related to various JS resources such as:
         // jsTree, jQuery, keypress, xwiki-events-bridge, iScroll, etc.
         // This seems to be related to actions being performed before all the resources have been correctly loaded.
-        new Line("require.min.js?r=1, line 7")
+        new Line("require.min.js?r=1, line 7"),
+        // See: https://jira.xwiki.org/browse/XWIKI-13609 comments: this log could still happen from time to time.
+        new Line("Failed to save job status")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

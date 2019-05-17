@@ -49,6 +49,11 @@ public class PanelsAdministrationIT
     public void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
+
+        // Reset the panel layout.
+        PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
+        panelsAdminPage.selectPageLayout().selectBothColumnsLayout().setRightPanels("");
+        panelsAdminPage.clickSave();
     }
 
     @Test

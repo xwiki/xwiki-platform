@@ -25,7 +25,6 @@ import java.util.Set;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -168,12 +167,12 @@ public class EditIT
     @Order(5)
     public void testBoldButton(TestUtils setup, TestReference reference)
     {
-        testToolBarButton(setup, reference,"Bold", "**%s**", "Text in Bold");
-        testToolBarButton(setup, reference,"Italics", "//%s//", "Text in Italics");
-        testToolBarButton(setup, reference,"Underline", "__%s__", "Text in Underline");
-        testToolBarButton(setup, reference,"Internal Link", "[[%s]]", "Link Example");
-        testToolBarButton(setup, reference,"Horizontal ruler", "\n----\n", "");
-        testToolBarButton(setup, reference,"Attached Image", "[[image:%s]]", "example.jpg");
+        testToolBarButton(setup, reference, "Bold", "**%s**", "Text in Bold");
+        testToolBarButton(setup, reference, "Italics", "//%s//", "Text in Italics");
+        testToolBarButton(setup, reference, "Underline", "__%s__", "Text in Underline");
+        testToolBarButton(setup, reference, "Internal Link", "[[%s]]", "Link Example");
+        testToolBarButton(setup, reference, "Horizontal ruler", "\n----\n", "");
+        testToolBarButton(setup, reference, "Attached Image", "[[image:%s]]", "example.jpg");
     }
 
     /**
@@ -209,8 +208,8 @@ public class EditIT
     }
 
     /**
-     * Ensure that the Save&View display a "Saving..." message and that the form is disabled before loading the
-     * new page.
+     * Ensure that the Save&View display a "Saving..." message and that the form is disabled before loading the new
+     * page.
      */
     @Test
     @Order(6)
@@ -304,7 +303,7 @@ public class EditIT
         setup.recacheSecretToken();
     }
 
-    @RepeatedTest(10)
+    @Test
     @Order(8)
     public void editWithConflict(TestUtils setup, TestReference testReference)
     {

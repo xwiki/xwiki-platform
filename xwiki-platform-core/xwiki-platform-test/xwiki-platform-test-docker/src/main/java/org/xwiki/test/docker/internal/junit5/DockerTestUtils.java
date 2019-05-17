@@ -22,6 +22,8 @@ package org.xwiki.test.docker.internal.junit5;
 import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
@@ -60,6 +62,8 @@ public final class DockerTestUtils
     private static final String DEFAULT = "default";
 
     private static final char DASH = '-';
+
+    private static final Pattern REPETITION_PATTERN = Pattern.compile("\\[test-template-invocation:#(.*)\\]");
 
     private DockerTestUtils()
     {
@@ -239,10 +243,15 @@ public final class DockerTestUtils
         // need to save the configuration name, even though the directory in which we're saving the screenshot
         // is already named after the executing configuration name.
         File newDir = DockerTestUtils.getScreenshotsDirectory(testConfiguration);
-        File newFile = new File(newDir, String.format("%s-%s-%s.%s",
+        // Tests could be repeated and if they are we need to compute a file name that takes into account the repetition
+        // There seems to be no easy way to get them right now, see https://github.com/junit-team/junit5/issues/1884
+        // Thus we currently extract the repetition index from the display name which is like:
+        //     ...[test-template-invocation:#2]
+        String repetitionIndex = getRepetitionIndex(extensionContext);
+        File newFile = new File(newDir, String.format("%s-%s-%s%s.%s",
             DockerTestUtils.getTestConfigurationName(testConfiguration),
             extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName(),
-            fileSuffix));
+            repetitionIndex, fileSuffix));
         return newFile;
     }
 
@@ -262,5 +271,17 @@ public final class DockerTestUtils
     public static boolean isLocal()
     {
         return !DockerTestUtils.isInAContainer();
+    }
+
+    private static String getRepetitionIndex(ExtensionContext extensionContext)
+    {
+        String repetitionIndex;
+        Matcher matcher = REPETITION_PATTERN.matcher(extensionContext.getUniqueId());
+        if (matcher.find()) {
+            repetitionIndex = matcher.group(1);
+        } else {
+            repetitionIndex = "";
+        }
+        return repetitionIndex;
     }
 }

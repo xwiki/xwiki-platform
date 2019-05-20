@@ -25,25 +25,11 @@ import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
 import com.sun.syndication.io.impl.Base64;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.io.IOUtils;
-import org.apache.http.HeaderElement;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 
-import java.io.ByteArrayInputStream;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -74,14 +60,8 @@ public class NotificationsRSS
             throw new Exception(String.format("Bad status code: [%d].", response.getStatusLine().getStatusCode()));
         }
 
-        String content = IOUtils.toString(response.getEntity().getContent());
-
-
-        System.out.println("============== CONTENT ===============");
-        System.out.println(content);
-
         SyndFeedInput input = new SyndFeedInput();
-        feed = input.build(new XmlReader(new ByteArrayInputStream(content.getBytes())));
+        feed = input.build(new XmlReader(response.getEntity().getContent()));
     }
 
     /**

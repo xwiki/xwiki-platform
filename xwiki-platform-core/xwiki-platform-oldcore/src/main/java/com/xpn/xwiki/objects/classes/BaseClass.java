@@ -880,6 +880,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String values, String displayType, String separators, String defaultValue)
     {
+        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, values,
+            displayType, separators, defaultValue, false);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String values, String displayType, String separators, String defaultValue,
+        boolean allowCustomValues)
+    {
         if (get(fieldName) == null) {
             StaticListClass list_class = new StaticListClass();
             list_class.setName(fieldName);
@@ -897,6 +908,10 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             }
             if (defaultValue != null) {
                 list_class.setDefaultValue(defaultValue);
+            }
+            if (allowCustomValues) {
+                list_class.setAllowCustomValues(true);
+                list_class.setPicker(true);
             }
             list_class.setObject(this);
             put(fieldName, list_class);

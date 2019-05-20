@@ -34,5 +34,13 @@
       <artifactId>xwiki-platform-test-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>rome</groupId>
+      <artifactId>rome</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jdom</groupId>
+      <artifactId>jdom</artifactId>
+    </dependency>
   </dependencies>
 </project>

@@ -45,6 +45,7 @@ import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
@@ -245,6 +246,22 @@ public abstract class ListClass extends PropertyClass
     public void setPicker(boolean picker)
     {
         setIntValue("picker", picker ? 1 : 0);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public boolean isAllowingCustomValues()
+    {
+        return (getIntValue("allowCustomValues") == 1);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void setAllowCustomValues(boolean acceptCustomValues)
+    {
+        setIntValue("allowCustomValues", acceptCustomValues ? 1 : 0);
     }
 
     /**
@@ -471,6 +488,9 @@ public abstract class ListClass extends PropertyClass
             lprop = new DBStringListProperty();
         } else if (isMultiSelect()) {
             lprop = new StringListProperty();
+        // If we allow custom values, they might use a lot of space in DB, so better to put them in a LargeString.
+        } else if (isAllowingCustomValues()) {
+            lprop = new LargeStringProperty();
         } else {
             lprop = new StringProperty();
         }

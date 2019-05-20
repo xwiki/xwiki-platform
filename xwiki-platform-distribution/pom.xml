@@ -159,7 +159,6 @@
     <xwiki.db.connection.username>sa</xwiki.db.connection.username>
     <xwiki.db.connection.password />
     <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
-    <xwiki.db.dialect>org.hibernate.dialect.HSQLDialect</xwiki.db.dialect>
     <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
     <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
 
@@ -566,7 +565,6 @@
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>com.mysql.jdbc.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>
@@ -582,7 +580,6 @@
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>org.postgresql.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.PostgreSQLDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.postgresql.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
         <xwiki.db.hbm.virtualMode>schema</xwiki.db.hbm.virtualMode>
@@ -599,7 +596,6 @@
         <xwiki.db.connection.username />
         <xwiki.db.connection.password />
         <xwiki.db.connection.driver_class>org.apache.derby.jdbc.EmbeddedDriver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.DerbyDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.derby.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>

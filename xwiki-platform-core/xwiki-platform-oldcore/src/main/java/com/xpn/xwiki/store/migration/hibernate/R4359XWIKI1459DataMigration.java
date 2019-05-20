@@ -92,7 +92,7 @@ public class R4359XWIKI1459DataMigration extends AbstractHibernateDataMigration
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
         // migrate data
-        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException

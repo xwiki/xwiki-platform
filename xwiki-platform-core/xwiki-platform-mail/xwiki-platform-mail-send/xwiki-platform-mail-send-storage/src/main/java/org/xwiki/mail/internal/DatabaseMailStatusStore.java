@@ -30,8 +30,8 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.MailStatus;
@@ -102,8 +102,8 @@ public class DatabaseMailStatusStore implements MailStatusStore
     @Override
     public MailStatus load(String uniqueMessageId) throws MailStoreException
     {
-        List<MailStatus> statuses = load(Collections.<String, Object>singletonMap(ID_PARAMETER_NAME, uniqueMessageId),
-            0, 0, null, false);
+        List<MailStatus> statuses =
+            load(Collections.<String, Object>singletonMap(ID_PARAMETER_NAME, uniqueMessageId), 0, 0, null, false);
         if (statuses.isEmpty()) {
             return null;
         }
@@ -112,8 +112,7 @@ public class DatabaseMailStatusStore implements MailStatusStore
 
     @Override
     public List<MailStatus> load(final Map<String, Object> filterMap, final int offset, final int count,
-        String sortField, boolean sortAscending)
-        throws MailStoreException
+        String sortField, boolean sortAscending) throws MailStoreException
     {
         XWikiHibernateBaseStore store = (XWikiHibernateBaseStore) this.hibernateStore;
 
@@ -129,14 +128,13 @@ public class DatabaseMailStatusStore implements MailStatusStore
         logQuery(queryString, filterMap);
 
         try {
-            List<MailStatus> mailStatuses = store.executeRead(xwikiContext,
-                new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
+            List<MailStatus> mailStatuses =
+                store.executeRead(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<List<MailStatus>>()
                 {
                     @Override
-                    public List<MailStatus> doInHibernate(Session session)
-                        throws HibernateException, XWikiException
+                    public List<MailStatus> doInHibernate(Session session) throws HibernateException, XWikiException
                     {
-                        Query query = session.createQuery(queryString);
+                        Query<MailStatus> query = session.createQuery(queryString, MailStatus.class);
                         if (offset > 0) {
                             query.setFirstResult(offset);
                         }
@@ -144,11 +142,10 @@ public class DatabaseMailStatusStore implements MailStatusStore
                             query.setMaxResults(count);
                         }
                         query.setProperties(filterMap);
-                        List<MailStatus> queryResult = (List<MailStatus>) query.list();
-                        return queryResult;
+
+                        return query.list();
                     }
-                }
-            );
+                });
 
             // Log loaded statuses
             if (this.logger.isDebugEnabled()) {
@@ -160,8 +157,9 @@ public class DatabaseMailStatusStore implements MailStatusStore
             return mailStatuses;
 
         } catch (Exception e) {
-            throw new MailStoreException(String.format(
-                "Failed to load mail statuses matching the filter [%s] from the database.", filterMap), e);
+            throw new MailStoreException(
+                String.format("Failed to load mail statuses matching the filter [%s] from the database.", filterMap),
+                e);
         } finally {
             xwikiContext.setWikiId(currentWiki);
         }
@@ -181,22 +179,20 @@ public class DatabaseMailStatusStore implements MailStatusStore
         final String queryString = computeCountQueryString(filterMap);
 
         try {
-            Long count = store.executeRead(xwikiContext,
-                new XWikiHibernateBaseStore.HibernateCallback<Long>()
+            return store.executeRead(xwikiContext, new XWikiHibernateBaseStore.HibernateCallback<Long>()
+            {
+                @Override
+                public Long doInHibernate(Session session) throws HibernateException, XWikiException
                 {
-                    @Override
-                    public Long doInHibernate(Session session)
-                        throws HibernateException, XWikiException
-                    {
-                        Query query = session.createQuery(queryString);
-                        query.setProperties(filterMap);
-                        return (Long) query.uniqueResult();
-                    }
-                });
-            return count;
+                    Query<Long> query = session.createQuery(queryString, Long.class);
+                    query.setProperties(filterMap);
+                    return query.uniqueResult();
+                }
+            });
         } catch (Exception e) {
-            throw new MailStoreException(String.format(
-                "Failed to count mail statuses matching the filter [%s] from the database.", filterMap), e);
+            throw new MailStoreException(
+                String.format("Failed to count mail statuses matching the filter [%s] from the database.", filterMap),
+                e);
         } finally {
             xwikiContext.setWikiId(currentWiki);
         }
@@ -225,15 +221,15 @@ public class DatabaseMailStatusStore implements MailStatusStore
                 }
             });
         } catch (Exception e) {
-            throw new MailStoreException(String.format("Failed to delete mail status (message id [%s]) "
-                + "from the database.", uniqueMessageId), e);
+            throw new MailStoreException(String
+                .format("Failed to delete mail status (message id [%s]) " + "from the database.", uniqueMessageId), e);
         } finally {
             xwikiContext.setWikiId(currentWiki);
         }
     }
 
-    protected String computeQueryString(String prefix,
-        Map<String, Object> filterMap, String sortField, boolean sortAscending)
+    protected String computeQueryString(String prefix, Map<String, Object> filterMap, String sortField,
+        boolean sortAscending)
     {
         StringBuilder queryBuilder = new StringBuilder(prefix);
         if (!filterMap.isEmpty()) {
@@ -259,14 +255,14 @@ public class DatabaseMailStatusStore implements MailStatusStore
 
     protected String computeCountQueryString(Map<String, Object> filterMap)
     {
-        return computeQueryString(String.format("select count(*) from %s", MailStatus.class.getName()),
-            filterMap, null, false);
+        return computeQueryString(String.format("select count(*) from %s", MailStatus.class.getName()), filterMap, null,
+            false);
     }
 
     protected String computeSelectQueryString(Map<String, Object> filterMap, String sortField, boolean sortAscending)
     {
-        return computeQueryString(String.format("from %s", MailStatus.class.getName()),
-            filterMap, sortField, sortAscending);
+        return computeQueryString(String.format("from %s", MailStatus.class.getName()), filterMap, sortField,
+            sortAscending);
     }
 
     private void logQuery(String queryString, Map<String, Object> filterMap)

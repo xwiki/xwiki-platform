@@ -466,7 +466,12 @@ public class HibernateStore implements Disposable, Integrator
     public Dialect getDialect()
     {
         if (this.dialect == null) {
-            this.dialect = Dialect.getDialect(getConfiguration().getProperties());
+            if (this.sessionFactory instanceof SessionFactoryImplementor) {
+                this.dialect = ((SessionFactoryImplementor) this.sessionFactory).getJdbcServices().getDialect();
+            } else {
+                // TODO: there is probably a better fallback
+                this.dialect = Dialect.getDialect(getConfiguration().getProperties());
+            }
         }
 
         return this.dialect;

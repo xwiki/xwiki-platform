@@ -33,8 +33,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.component.annotation.Component;
@@ -74,8 +74,8 @@ import com.xpn.xwiki.store.migration.hibernate.AbstractHibernateDataMigration;
 public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
 {
     /** The comment class reference. */
-    private static final EntityReference XWIKI_COMMENT_CLASS_REFERENCE = new EntityReference("XWikiComments",
-        EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
+    private static final EntityReference XWIKI_COMMENT_CLASS_REFERENCE =
+        new EntityReference("XWikiComments", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     /** The annotation class reference. */
     private static final EntityReference XWIKI_ANNOTATION_CLASS_REFERENCE = new EntityReference("AnnotationClass",
@@ -94,11 +94,10 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
     protected AnnotationConfiguration configuration;
 
     /** Holds the work to be done by grouping datedComments by documents. */
-    protected Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap =
-        new HashMap<DocumentReference, List<Entry<Date, BaseObject>>>();
+    protected Map<DocumentReference, List<Entry<Date, BaseObject>>> documentToDatedObjectsMap = new HashMap<>();
 
     /** Holds the work to be done by grouping properties by the objects to which they belong. */
-    protected Map<BaseObject, List<BaseProperty>> objectToPropertiesMap = new HashMap<BaseObject, List<BaseProperty>>();
+    protected Map<BaseObject, List<BaseProperty>> objectToPropertiesMap = new HashMap<>();
 
     @Override
     public String getDescription()
@@ -133,22 +132,21 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             currentAnnotationClassReference =
                 currentAnnotationClassReference.removeParent(new WikiReference(context.getWikiId()));
             if (!XWIKI_ANNOTATION_CLASS_REFERENCE.equals(currentAnnotationClassReference)) {
-                logger.warn("Skipping database [{}] because it uses a custom annotation class. "
-                    + resultOfSkippingDatabase, context.getWikiId());
+                logger.warn("Skipping database [{}] because it uses a custom annotation class. {}", context.getWikiId(),
+                    resultOfSkippingDatabase);
                 return false;
             }
 
             BaseClass commentsClass = context.getWiki().getCommentsClass(context);
             if (commentsClass.hasCustomMapping()) {
-                logger.warn("Skipping database [{}] because it uses a custom mapping for comments. "
-                    + resultOfSkippingDatabase, context.getWikiId());
+                logger.warn("Skipping database [{}] because it uses a custom mapping for comments. {}",
+                    context.getWikiId(), resultOfSkippingDatabase);
                 return false;
             }
         } catch (Exception e) {
             // Should not happen
-            String message =
-                "Failed to check the current annotation and comments classes for customizations. "
-                    + "Migration will not execute";
+            String message = "Failed to check the current annotation and comments classes for customizations. "
+                + "Migration will not execute";
             logger.error(message, e);
             throw new DataMigrationException(message, e);
         }
@@ -171,7 +169,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         logger.info("Computing the work to be done.");
 
         // 1st step: populate the 2 maps with the work to be done.
-        getStore().executeRead(getXWikiContext(), true, new GetWorkToBeDoneHibernateCallback());
+        getStore().executeRead(getXWikiContext(), new GetWorkToBeDoneHibernateCallback());
 
         logger.info("There is a total of {} documents to migrate.", documentToDatedObjectsMap.keySet().size());
 
@@ -182,7 +180,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             logger.info("Migrating document [{}]", referenceSerializer.serialize(documentReference, (Object[]) null));
 
             doWorkOnDocumentHibernateCallback.setDocumentReference(documentReference);
-            getStore().executeWrite(getXWikiContext(), true, doWorkOnDocumentHibernateCallback);
+            getStore().executeWrite(getXWikiContext(), doWorkOnDocumentHibernateCallback);
         }
     }
 
@@ -199,13 +197,13 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             try {
                 // Get all annotation object and comment object with every property that they have. Do this only for
                 // documents that have annotation objects in them, and thus need to be migrated.
-                Query getExistingAnnotationsAndCommentsQuery =
+                Query<Object[]> getExistingAnnotationsAndCommentsQuery =
                     session.createQuery("SELECT obj, prop FROM BaseObject obj, BaseProperty prop WHERE "
                         + "(obj.className='AnnotationCode.AnnotationClass' OR obj.className='XWiki.XWikiComments') "
                         + "AND prop.id.id=obj.id AND obj.name in "
                         + "(SELECT doc.fullName FROM XWikiDocument doc, BaseObject ann WHERE "
-                        + "ann.name=doc.fullName AND ann.className='AnnotationCode.AnnotationClass')");
-                List<Object[]> queryResults = (List<Object[]>) getExistingAnnotationsAndCommentsQuery.list();
+                        + "ann.name=doc.fullName AND ann.className='AnnotationCode.AnnotationClass')", Object[].class);
+                List<Object[]> queryResults = getExistingAnnotationsAndCommentsQuery.list();
 
                 preProcessResults(queryResults);
             } catch (Exception e) {
@@ -232,18 +230,18 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
                 if (property instanceof DateProperty) {
                     List<Entry<Date, BaseObject>> datedObjects = documentToDatedObjectsMap.get(documentReference);
                     if (datedObjects == null) {
-                        datedObjects = new ArrayList<Map.Entry<Date, BaseObject>>();
+                        datedObjects = new ArrayList<>();
                         documentToDatedObjectsMap.put(documentReference, datedObjects);
                     }
 
                     Date date = (Date) ((DateProperty) property).getValue();
-                    Entry<Date, BaseObject> datedObject = new HashMap.SimpleEntry<Date, BaseObject>(date, object);
+                    Entry<Date, BaseObject> datedObject = new HashMap.SimpleEntry<>(date, object);
                     datedObjects.add(datedObject);
                 }
 
                 List<BaseProperty> properties = objectToPropertiesMap.get(object);
                 if (properties == null) {
-                    properties = new ArrayList<BaseProperty>();
+                    properties = new ArrayList<>();
                     objectToPropertiesMap.put(object, properties);
                 }
                 properties.add(property);
@@ -271,8 +269,8 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
         public void setDocumentReference(DocumentReference documentReference)
         {
             this.documentReference = documentReference;
-            this.oldToNewObjectMap = new HashMap<BaseObject, BaseObject>();
-            this.oldToNewCommentNumberMap = new HashMap<Integer, Integer>();
+            this.oldToNewObjectMap = new HashMap<>();
+            this.oldToNewCommentNumberMap = new HashMap<>();
         }
 
         @Override
@@ -285,7 +283,8 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
                     getName() + " failed to do the work for document "
-                        + referenceSerializer.serialize(documentReference, (Object[]) null), e);
+                        + referenceSerializer.serialize(documentReference, (Object[]) null),
+                    e);
             }
 
             return Boolean.TRUE;
@@ -412,7 +411,7 @@ public class R40001XWIKI7540DataMigration extends AbstractHibernateDataMigration
                 // is null.
                 String deletedPropertyValue = null;
                 List<String> internalListValue = ((StringListProperty) deletedProperty).getList();
-                if (internalListValue.size() != 0) {
+                if (!internalListValue.isEmpty()) {
                     deletedPropertyValue = internalListValue.get(0);
                 }
 

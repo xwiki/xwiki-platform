@@ -26,13 +26,15 @@ import java.util.Locale;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Path;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -79,25 +81,34 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         @Override
         public XWikiDeletedDocument[] doInHibernate(Session session) throws HibernateException, XWikiException
         {
-            Criteria c = session.createCriteria(XWikiDeletedDocument.class);
-            c.add(Restrictions.eq(FULL_NAME_FIELD, this.document.getFullName()));
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<XWikiDeletedDocument> query = builder.createQuery(XWikiDeletedDocument.class);
+            Root<XWikiDeletedDocument> root = query.from(XWikiDeletedDocument.class);
+
+            query.select(root);
+
+            Predicate[] predicates = new Predicate[2];
+
+            predicates[0] = builder.equal(root.get(FULL_NAME_FIELD), this.document.getFullName());
 
             // Note: We need to support databases who treats empty strings as NULL like Oracle. For those checking
             // for equality when the string is empty is not going to work and thus we need to handle the special
             // empty case separately.
             Locale language = this.document.getLocale();
+            Path<String> languageProperty = root.get(LANGUAGE_PROPERTY_NAME);
             if (language.equals(Locale.ROOT)) {
-                c.add(Restrictions.or(Restrictions.eq(LANGUAGE_PROPERTY_NAME, ""),
-                    Restrictions.isNull(LANGUAGE_PROPERTY_NAME)));
+                predicates[1] = builder.or(builder.equal(languageProperty, ""), builder.isNull(languageProperty));
             } else {
-                c.add(Restrictions.eq(LANGUAGE_PROPERTY_NAME, language));
+                predicates[1] = builder.equal(languageProperty, language);
             }
 
-            c.addOrder(Order.desc("date"));
-            @SuppressWarnings("unchecked")
-            List<XWikiDeletedDocument> deletedVersions = c.list();
-            XWikiDeletedDocument[] result = new XWikiDeletedDocument[deletedVersions.size()];
-            return deletedVersions.toArray(result);
+            query.where(predicates);
+
+            query.orderBy(builder.desc(root.get("date")));
+
+            List<XWikiDeletedDocument> deletedVersions = session.createQuery(query).getResultList();
+
+            return deletedVersions.toArray(new XWikiDeletedDocument[deletedVersions.size()]);
         }
     }
 
@@ -122,14 +133,19 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
         @Override
         public XWikiDeletedDocument[] doInHibernate(Session session) throws HibernateException, XWikiException
         {
-            Criteria c = session.createCriteria(XWikiDeletedDocument.class);
-            c.add(Restrictions.eq("batchId", batchId));
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<XWikiDeletedDocument> query = builder.createQuery(XWikiDeletedDocument.class);
+            Root<XWikiDeletedDocument> root = query.from(XWikiDeletedDocument.class);
 
-            c.addOrder(Order.asc(FULL_NAME_FIELD));
-            @SuppressWarnings("unchecked")
-            List<XWikiDeletedDocument> deletedVersions = c.list();
-            XWikiDeletedDocument[] result = new XWikiDeletedDocument[deletedVersions.size()];
-            return deletedVersions.toArray(result);
+            query.select(root);
+
+            query.where(builder.equal(root.get("batchId"), batchId));
+
+            query.orderBy(builder.asc(root.get(FULL_NAME_FIELD)));
+
+            List<XWikiDeletedDocument> deletedVersions = session.createQuery(query).getResultList();
+
+            return deletedVersions.toArray(new XWikiDeletedDocument[deletedVersions.size()]);
         }
     }
 

@@ -48,7 +48,9 @@ public class LogCaptureValidator
         new Line("Marionette\tWARN"),
         // The LibreOffice container outputs this error on startup. We should try to understand why it kills LO before
         // restarting it.
-        new Line("Office process died with exit code 81; restarting it")
+        new Line("Office process died with exit code 81; restarting it"),
+        // FIXME: convert all ? based query to ?<number>
+        new Line("Deprecated usage legacy-style HQL ordinal parameters (`?`)")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

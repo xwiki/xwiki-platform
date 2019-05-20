@@ -839,6 +839,7 @@
                 **/security/XWikiSecurityManager.java,
                 **/store/DBCPConnectionProvider.java,
                 **/store/hibernate/DefaultHibernateSessionFactory.java,
+                **/store/hibernate/HibernateAttachmentRecycleBinStore.java,
                 **/store/hibernate/HibernateSessionFactory.java,
                 <!-- AbstractDataMigrationManager has a fan out complexity of 25 that may needs to be investigated. -->
                 **/store/migration/AbstractDataMigrationManager.java,

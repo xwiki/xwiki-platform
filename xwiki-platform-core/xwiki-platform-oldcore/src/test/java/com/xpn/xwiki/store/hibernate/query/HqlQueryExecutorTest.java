@@ -295,7 +295,7 @@ public class HqlQueryExecutorTest
         when(definition.getName()).thenReturn(query.getStatement());
 
         HibernateStore hibernateStore = this.mocker.getInstance(HibernateStore.class);
-        when(hibernateStore.getMetadata().getNamedQueryDefinition(query.getStatement())).thenReturn(definition);
+        when(hibernateStore.getMetadata().getNamedNativeQueryDefinition(query.getStatement())).thenReturn(definition);
 
         assertSame(finalQuery, this.executor.createHibernateQuery(session, query));
 

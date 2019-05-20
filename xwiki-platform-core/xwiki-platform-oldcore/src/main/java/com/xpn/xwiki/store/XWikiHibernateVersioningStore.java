@@ -26,8 +26,11 @@ import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
@@ -287,11 +290,21 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     {
         return executeRead(context, session -> {
             try {
-                return (List<XWikiRCSNodeInfo>) session.createCriteria(XWikiRCSNodeInfo.class)
-                    .add(Restrictions.eq("id.docId", Long.valueOf(id))).add(Restrictions.isNotNull("diff")).list();
-            } catch (IllegalArgumentException ex) {
+                CriteriaBuilder builder = session.getCriteriaBuilder();
+                CriteriaQuery<XWikiRCSNodeInfo> query = builder.createQuery(XWikiRCSNodeInfo.class);
+                Root<XWikiRCSNodeInfo> root = query.from(XWikiRCSNodeInfo.class);
+
+                query.select(root);
+
+                Predicate[] predicates = new Predicate[2];
+                predicates[0] = builder.equal(root.get("id").get("docId"), id);
+                predicates[1] = builder.isNotNull(root.get("diff"));
+                query.where(predicates);
+
+                return session.createQuery(query).getResultList();
+            } catch (IllegalArgumentException e) {
                 // This happens when the database has wrong values...
-                LOGGER.warn("Invalid history for document [{}]", id);
+                LOGGER.error("Invalid history for document [{}]", id, e);
 
                 return Collections.<XWikiRCSNodeInfo>emptyList();
             }

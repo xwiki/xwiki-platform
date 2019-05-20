@@ -37,6 +37,7 @@ import org.simplejavamail.email.Email;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.platform.notifications.test.po.NotificationsRSS;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
@@ -458,6 +459,16 @@ public class NotificationsIT extends AbstractTest
         assertEquals("Linux as a title", tray.getNotificationPage(1));
         assertEquals("update", tray.getNotificationType(1));
         assertTrue(tray.getNotificationDescription(1).startsWith("edited by user1"));
+
+        NotificationsRSS notificationsRSS = new NotificationsRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        assertEquals(2, notificationsRSS.getEntries().size());
+        assertEquals("A comment has been added to the page \"Linux as a title\"",
+                notificationsRSS.getEntries().get(0).getTitle());
+        assertTrue(notificationsRSS.getEntries().get(0).getDescription().getValue().contains(
+                "<strong>Pages: [addComment]</strong>"));
+        assertEquals("The page \"Linux as a title\" has been modified",
+                notificationsRSS.getEntries().get(1).getTitle());
+
         tray.clearAllNotifications();
     }
 

@@ -1,6 +1,5 @@
 #if ($type == 'edit')
-    #if ($field.getProperty('displayType').value == 'input' && $field.getProperty('picker').value == 1
-    && $field.getProperty('allowCustomValues').value == 1)
+    #if ($field.getProperty('displayType').value == 'input' && $field.getProperty('picker').value == 1)
         #xpropertySuggestInputDisplayer($field $prefix $name $value)
     #else
         $doc.displayEdit($field, $prefix, $object)

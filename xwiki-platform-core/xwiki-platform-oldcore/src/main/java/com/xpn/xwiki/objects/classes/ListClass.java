@@ -251,22 +251,6 @@ public abstract class ListClass extends PropertyClass
     /**
      * @since 11.5RC1
      */
-    public boolean isAllowingCustomValues()
-    {
-        return (getIntValue("allowCustomValues") == 1);
-    }
-
-    /**
-     * @since 11.5RC1
-     */
-    public void setAllowCustomValues(boolean acceptCustomValues)
-    {
-        setIntValue("allowCustomValues", acceptCustomValues ? 1 : 0);
-    }
-
-    /**
-     * @since 11.5RC1
-     */
     public boolean isLargeStorage()
     {
         return (getIntValue("largeStorage") == 1);
@@ -504,7 +488,6 @@ public abstract class ListClass extends PropertyClass
             lprop = new DBStringListProperty();
         } else if (isMultiSelect()) {
             lprop = new StringListProperty();
-        // If we allow custom values, they might use a lot of space in DB, so better to put them in a LargeString.
         } else if (isLargeStorage()) {
             lprop = new LargeStringProperty();
         } else {

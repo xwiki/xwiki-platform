@@ -881,7 +881,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         boolean relationalStorage, String values, String displayType, String separators, String defaultValue)
     {
         return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, values,
-            displayType, separators, defaultValue, false, false);
+            displayType, separators, defaultValue, ListClass.FREE_TEXT_FORBIDDEN, false);
     }
 
     /**
@@ -889,7 +889,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
      */
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String values, String displayType, String separators, String defaultValue,
-        boolean allowCustomValues, boolean largeStorage)
+        String freeText, boolean largeStorage)
     {
         if (get(fieldName) == null) {
             StaticListClass list_class = new StaticListClass();
@@ -909,8 +909,8 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (defaultValue != null) {
                 list_class.setDefaultValue(defaultValue);
             }
-            if (allowCustomValues) {
-                list_class.setAllowCustomValues(true);
+            list_class.setFreeText(freeText);
+            if (!freeText.equals(ListClass.FREE_TEXT_FORBIDDEN)) {
                 list_class.setPicker(true);
             }
             list_class.setLargeStorage(largeStorage);

@@ -40,7 +40,7 @@ import org.xwiki.rendering.macro.code.CodeMacroLayout;
  * numbers in a {@link GroupBlock} and wrapping the code into its own <code>GroupBlock</code>.
  * 
  * @version $Id$
- * @since 11.4RC1
+ * @since 11.5RC1
  */
 @Component
 @Singleton

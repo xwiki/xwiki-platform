@@ -25,7 +25,7 @@ import org.xwiki.rendering.internal.code.layout.CodeLayoutHandler;
  * Values allowed in the <code>layout</code> parameter of the code macro.
  * 
  * @version $Id$
- * @since 11.4RC1
+ * @since 11.5RC1
  */
 public enum CodeMacroLayout
 {

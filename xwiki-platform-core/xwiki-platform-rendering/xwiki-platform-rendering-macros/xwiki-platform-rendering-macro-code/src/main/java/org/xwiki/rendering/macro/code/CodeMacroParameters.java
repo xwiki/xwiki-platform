@@ -59,7 +59,7 @@ public class CodeMacroParameters extends BoxMacroParameters
 
     /**
      * @param layout the layout to apply to the code.
-     * @since 11.4RC1
+     * @since 11.5RC1
      */
     @PropertyDescription("the layout format (plain or with line numbers)")
     public void setLayout(CodeMacroLayout layout)
@@ -69,7 +69,7 @@ public class CodeMacroParameters extends BoxMacroParameters
 
     /**
      * @return the layout to apply to the code.
-     * @since 11.4RC1
+     * @since 11.5RC1
      */
     public CodeMacroLayout getLayout()
     {

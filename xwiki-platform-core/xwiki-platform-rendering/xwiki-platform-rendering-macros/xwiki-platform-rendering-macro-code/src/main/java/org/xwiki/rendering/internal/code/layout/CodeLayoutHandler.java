@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * Arranges a list of code rendering blocks into a specific layout.
  * 
  * @version $Id$
- * @since 11.4RC1
+ * @since 11.5RC1
  */
 @Role
 public interface CodeLayoutHandler

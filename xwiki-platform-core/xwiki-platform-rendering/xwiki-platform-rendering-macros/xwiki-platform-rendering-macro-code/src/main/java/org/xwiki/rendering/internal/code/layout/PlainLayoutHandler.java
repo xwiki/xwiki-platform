@@ -32,7 +32,7 @@ import org.xwiki.rendering.macro.code.CodeMacroLayout;
  * A {@link CodeLayoutHandler} that applies no transformation to the rendered blocks.
  * 
  * @version $Id$
- * @since 11.4RC1
+ * @since 11.5RC1
  */
 @Component
 @Singleton

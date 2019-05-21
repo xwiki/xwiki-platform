@@ -100,4 +100,44 @@ public class PropertyValue
     {
         this.metaData = value;
     }
+
+    @Override
+    public boolean equals(java.lang.Object o)
+    {
+        if (o instanceof PropertyValue) {
+            PropertyValue other = (PropertyValue) o;
+
+            boolean equals;
+            if (this.getMetaData() != null) {
+                equals = this.getMetaData().equals(other.getMetaData());
+            } else {
+                equals = other.getMetaData() == null;
+            }
+
+            if (this.getValue() != null) {
+                equals &= this.getValue().equals(other.getValue());
+            } else {
+                equals &= other.getValue() == null;
+            }
+            return equals;
+        }
+        return false;
+    }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder("PropertyValue[");
+        if (metaData != null) {
+            builder.append("metadata=");
+            builder.append(metaData.toString());
+            builder.append(",");
+        }
+        if (value != null) {
+            builder.append("value=");
+            builder.append(value.toString());
+        }
+        builder.append("]");
+        return builder.toString();
+    }
 }

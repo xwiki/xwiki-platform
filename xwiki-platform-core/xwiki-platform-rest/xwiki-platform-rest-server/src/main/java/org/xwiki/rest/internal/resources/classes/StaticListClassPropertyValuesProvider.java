@@ -54,7 +54,7 @@ public class StaticListClassPropertyValuesProvider extends AbstractListClassProp
         final PropertyValues result = new PropertyValues();
         List<String> allValues = StaticListClass.getListFromString(propertyDefinition.getValues());
 
-        allValues.stream().filter(s -> s.contains(filter)).limit(limit)
+        allValues.stream().filter(s -> s.toLowerCase().contains(filter.toLowerCase())).limit(limit)
             .forEach(item -> result.withPropertyValues(new PropertyValue(item)));
         return result;
     }

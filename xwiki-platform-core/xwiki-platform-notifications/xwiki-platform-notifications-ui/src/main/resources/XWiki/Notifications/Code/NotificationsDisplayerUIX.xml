@@ -887,7 +887,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
           &lt;p&gt;
             &lt;span class="notifications-header-link"&gt;
               &lt;a href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"
-                  class="notifications-header-link" rel="nofollow external"&gt;
+                  class="notifications-header-link notifications-rss-link" rel="nofollow external"&gt;
                 $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
               &lt;/a&gt;
             &lt;/span&gt;

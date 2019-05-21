@@ -85,8 +85,8 @@ public class XWikiWatchdog
                 // Release the connection.
                 method.releaseConnection();
             }
-            Thread.sleep(500L);
             response.timedOut = (System.currentTimeMillis() - startTime > timeout * 1000L);
+            Thread.sleep(500L);
         }
 
         if (response.timedOut) {

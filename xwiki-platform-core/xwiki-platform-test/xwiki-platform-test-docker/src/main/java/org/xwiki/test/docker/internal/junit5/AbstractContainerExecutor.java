@@ -26,7 +26,6 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.utility.MountableFile;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.text.StringUtils;
@@ -49,15 +48,13 @@ public abstract class AbstractContainerExecutor
     {
         if (testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Docker image used: [%s]", container.getDockerImageName()));
-            container.withLogConsumer(new Slf4jLogConsumer(LoggerFactory.getLogger(this.getClass())));
         }
 
-        // Get the latest image in case the tag has been updated on dockerhub.
-        if (!testConfiguration.isOffline()) {
-            container.getDockerClient().pullImageCmd(container.getDockerImageName());
-        }
+        // When not in verbose mode, only print WARN and ERROR coming from the container startup
+        container.withLogConsumer(new XWikiSlf4jLogConsumer(LoggerFactory.getLogger(this.getClass()),
+            testConfiguration.isVerbose()));
 
-        startContainer(container);
+        startContainer(container, testConfiguration);
 
         // Display logs after the container has been started so that we can see problems happening in the containers
         followOutput(container, getClass());

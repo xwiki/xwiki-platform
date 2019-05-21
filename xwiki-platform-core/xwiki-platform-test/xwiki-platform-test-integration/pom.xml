@@ -25,15 +25,16 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>11.4-SNAPSHOT</version>
+    <version>11.5-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-integration</artifactId>
   <name>XWiki Platform - Test - Integration Tests Framework</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Integration Tests Framework</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.06</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>11</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.24</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>32</xwiki.pitest.mutationThreshold>
+    <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>
     <dependency>

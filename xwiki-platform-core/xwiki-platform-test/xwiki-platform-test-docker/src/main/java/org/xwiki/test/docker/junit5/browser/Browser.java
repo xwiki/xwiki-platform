@@ -83,6 +83,13 @@ public enum Browser
             }
             // We want to ensure that those events are taking into account.
             firefoxOptions.getProfile().setPreference("dom.disable_beforeunload", false);
+        } else if (this.capabilities instanceof ChromeOptions) {
+            ChromeOptions chromeOptions = (ChromeOptions) this.capabilities;
+            chromeOptions.addArguments(
+                "--whitelisted-ips",
+                "--no-sandbox",
+                "--disable-extensions"
+            );
         }
     }
 

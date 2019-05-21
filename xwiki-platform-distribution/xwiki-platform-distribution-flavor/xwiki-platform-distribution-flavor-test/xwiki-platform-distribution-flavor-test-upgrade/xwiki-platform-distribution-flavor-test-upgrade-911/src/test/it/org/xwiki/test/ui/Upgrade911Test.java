@@ -36,7 +36,9 @@ public class Upgrade911Test extends UpgradeTest
         this.validateConsole.getLogCaptureConfiguration().registerExcludes(
             "Invalid extension [org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/9.11.8] on namespace "
                 + "[wiki:xwiki] (InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-"
-                + "[9.11.8]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/"
+                + "[9.11.8]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
+            "Failed to save job status",
+            "java.nio.file.NoSuchFileException: data/jobs/status/distribution/status.xml"
         );
     }
 }

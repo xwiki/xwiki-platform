@@ -83,6 +83,8 @@ public class Upgrade84FileStoreTest extends UpgradeTest
             "Solr loaded a deprecated plugin/analysis class [solr.TrieDateField]",
             "Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory]",
             "Solr loaded a deprecated plugin/analysis class [solr.CurrencyField]",
+            "Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]",
+            "Solr loaded a deprecated plugin/analysis class [solr.LatLonType]",
             "does not exist, trying to find the new location",
             "Could not find the deleted attachment in any other location"
         );

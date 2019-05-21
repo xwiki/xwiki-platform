@@ -26,8 +26,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -36,6 +35,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,7 +54,7 @@ public class PDFURIResolverTest
         XWikiContext context = mock(XWikiContext.class);
         PDFURIResolver resolver = new PDFURIResolver(context);
         Source source = resolver.resolve("href", "base");
-        Assert.assertNull(source);
+        assertNull(source);
     }
 
     @Test
@@ -78,7 +79,7 @@ public class PDFURIResolverTest
 
         PDFURIResolver resolver = new PDFURIResolver(context);
         Source source = resolver.resolve(url, "base");
-        Assert.assertEquals(StreamSource.class, source.getClass());
-        Assert.assertEquals("content", IOUtils.readLines(((StreamSource) source).getInputStream()).get(0));
+        assertEquals(StreamSource.class, source.getClass());
+        assertEquals("content", IOUtils.readLines(((StreamSource) source).getInputStream()).get(0));
     }
 }

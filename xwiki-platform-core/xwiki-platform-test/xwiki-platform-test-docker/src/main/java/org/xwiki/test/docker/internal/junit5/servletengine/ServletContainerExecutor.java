@@ -251,6 +251,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 + " libreoffice"
                                 + " unzip"
                                 + " procps")
+                            // Put back the user as jetty since it's a best practice to not execute the container as
+                            // root.
+                            .user("jetty")
                             .build()));
             } else {
                 container = new GenericContainer(imageName);

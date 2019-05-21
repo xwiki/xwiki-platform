@@ -28,6 +28,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Validate logs against default excludes/expected lines and those registered by the tests.
+ *
+ * @version $Id$
+ * @since 11.4RC1
+ */
 public class LogCaptureValidator
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(LogCaptureValidator.class);
@@ -46,10 +52,32 @@ public class LogCaptureValidator
         new Line("Creation of SecureRandom instance for session ID generation using [SHA1PRNG] took"),
         // Firefox Selenium Driver warning
         new Line("Marionette\tWARN"),
+        new Line("Loading extension 'screenshots@mozilla.org': "),
         // The LibreOffice container outputs this error on startup. We should try to understand why it kills LO before
         // restarting it.
         new Line("Office process died with exit code 81; restarting it"),
-        // FIXME: convert all ? based query to ?<number>
+        // When executing tests on PosgtreSQL we get the following errors when the hibernate upgrade code kicks in at
+        // XWiki startup
+        new Line("relation \"xwikidbversion\" does not exist at character 45"),
+        new Line("relation \"xwikidoc\" does not exist at character 29"),
+        new Line("relation \"hibernate_sequence\" already exists"),
+        // Jetty 9.4.x emits some warning about ASM, see https://github.com/eclipse/jetty.project/issues/2412
+        // Remove once "latest" image of the Jetty container doesn't have the issue anymore
+        new Line("Unknown asm implementation version, assuming version"),
+        // Note: Happens when verbose is turned on
+        new Line("Collision between core extension [javax.annotation:javax.annotation-api"),
+        new Line("[javax.annotation:javax.annotation-api/"),
+        // Appears only for PostgreSQL database.
+        new Line("WARNING: enabling \"trust\" authentication for local connections"),
+        // Those errors appears from time to time, mainly on the CI, related to various JS resources such as:
+        // jsTree, jQuery, keypress, xwiki-events-bridge, iScroll, etc.
+        // This seems to be related to actions being performed before all the resources have been correctly loaded.
+        new Line("require.min.js?r=1, line 7"),
+        // Cannot reproduce locally but happened on the CI for MenuIT.
+        new Line("jstree.min.js, line 2: TypeError: c is undefined"),
+        // See: https://jira.xwiki.org/browse/XWIKI-13609 comments: this log could still happen from time to time.
+        new Line("Failed to save job status"),
+        // FIXME: convert all ? based queries to ?<number> or named parameters
         new Line("Deprecated usage legacy-style HQL ordinal parameters (`?`)")
     );
 
@@ -79,6 +107,7 @@ public class LogCaptureValidator
         allExpected.addAll(configuration.getExpectedLines());
 
         List<String> matchingExcludes = new ArrayList<>();
+        List<Line> matchingDefinitions = new ArrayList<>();
         List<String> matchingLines = LOG_PARSER.parse(logContent).stream()
             .filter(p -> {
                 for (String searchString : SEARCH_STRINGS) {
@@ -92,11 +121,13 @@ public class LogCaptureValidator
                 for (Line excludedLine : allExcludes) {
                     if (isMatching(p, excludedLine)) {
                         matchingExcludes.add(p);
+                        matchingDefinitions.add(excludedLine);
                         return false;
                     }
                 }
                 for (Line expectedLine : allExpected) {
                     if (isMatching(p, expectedLine)) {
+                        matchingDefinitions.add(expectedLine);
                         return false;
                     }
                 }
@@ -111,9 +142,31 @@ public class LogCaptureValidator
                 StringUtils.join(matchingExcludes, NL));
         }
 
+        // Also display not matching excludes and expected so that developers can notice them and realize that the
+        // issues that existed might have been fixed. Note however that currently we can't have exclude/expetced by
+        // configuration (for Docker-based tests) and thus it's possible that there are non matching excludes/expected
+        // simply because they exist only in a different configuration.
+        displayMissingWarning(configuration.getExcludedLines(), matchingDefinitions, "excludes");
+        displayMissingWarning(configuration.getExpectedLines(), matchingDefinitions, "expected");
+
+        // Fail the test if there are matching lines that have no exclude or no expected.
         if (!matchingLines.isEmpty()) {
             throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
                 matchingLines.stream().collect(Collectors.joining(NL))));
+        }
+    }
+
+    private void displayMissingWarning(List<Line> definitions, List<Line> matchingDefinitions, String missingType)
+    {
+        List<String> notMatchingLines = new ArrayList<>();
+        for (Line line : definitions) {
+            if (!matchingDefinitions.contains(line)) {
+                notMatchingLines.add(line.getContent());
+            }
+        }
+        if (!notMatchingLines.isEmpty()) {
+            LOGGER.warn("The following {} were not matched and could be candidates for removal "
+                + "(beware of configs): [\n{}\n]", missingType, StringUtils.join(notMatchingLines, NL));
         }
     }
 

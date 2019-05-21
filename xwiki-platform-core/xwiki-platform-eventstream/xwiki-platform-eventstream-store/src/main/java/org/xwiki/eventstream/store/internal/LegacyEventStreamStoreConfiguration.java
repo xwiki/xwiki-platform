@@ -86,11 +86,11 @@ public class LegacyEventStreamStoreConfiguration
     private boolean getProperty(String name, boolean defaultValue)
     {
         if (configurationSource.containsKey(PREFERENCE_PREFIX + name)) {
-            return configurationSource.getProperty(PREFERENCE_PREFIX + name);
+            return configurationSource.getProperty(PREFERENCE_PREFIX + name, defaultValue);
         }
 
         if (legacyConfigurationSource.containsKey(LEGACY_PREFERENCE_PREFIX + name)) {
-            return legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + name).equals(1);
+            return legacyConfigurationSource.getProperty(LEGACY_PREFERENCE_PREFIX + name, defaultValue);
         }
 
         return defaultValue;

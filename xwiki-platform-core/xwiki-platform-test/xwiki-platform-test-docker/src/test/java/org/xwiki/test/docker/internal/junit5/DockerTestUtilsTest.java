@@ -52,10 +52,11 @@ public class DockerTestUtilsTest
         when(extensionContext.getRequiredTestClass()).thenReturn((Class) DockerTestUtilsTest.class);
         when(extensionContext.getRequiredTestMethod()).thenReturn(
             DockerTestUtilsTest.class.getDeclaredMethod("getResultFileLocation"));
+        when(extensionContext.getUniqueId()).thenReturn("...[test-template-invocation:#25]");
 
         assertEquals("./target/mysql-default-default-tomcat-default-chrome/screenshots/"
                 + "mysql-default-default-tomcat-default-chrome-"
-            + "org.xwiki.test.docker.internal.junit5.DockerTestUtilsTest-getResultFileLocation.test",
+            + "org.xwiki.test.docker.internal.junit5.DockerTestUtilsTest-getResultFileLocation25.test",
             DockerTestUtils.getResultFileLocation("test", configuration, extensionContext).toString());
     }
 }

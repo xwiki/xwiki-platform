@@ -182,7 +182,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             webDriverContainer.getWebDriver().manage().window().maximize();
             VncRecordingContainer vnc = new VncRecordingContainer(webDriverContainer);
             saveVNC(extensionContext, vnc);
-            startContainer(vnc);
+            startContainer(vnc, testConfiguration);
         }
 
         LOGGER.info("(*) Starting test [{}]", extensionContext.getTestMethod().get().getName());

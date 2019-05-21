@@ -103,8 +103,7 @@ public class MailIT
 
         // TODO: Fix the following errors in the logs
         logCaptureConfiguration.registerExcludes(
-            "meta.js?cache-version=",
-            "require.min.js?r=1, line 7: Error: Script error for \"selectize\", needed by: xwiki-selectize"
+            "meta.js?cache-version="
         );
     }
 

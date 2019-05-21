@@ -33,6 +33,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
@@ -64,8 +66,6 @@ public class EditIT
     public void tearDown(LogCaptureConfiguration logCaptureConfiguration)
     {
         logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed");
-        logCaptureConfiguration.registerExcludes("require.min.js?r=1, line 7: "
-            + "Error: Script error for \"JobRunner\", needed by: tree");
     }
 
     /**
@@ -166,12 +166,12 @@ public class EditIT
     @Order(5)
     public void testBoldButton(TestUtils setup, TestReference reference)
     {
-        testToolBarButton(setup, reference,"Bold", "**%s**", "Text in Bold");
-        testToolBarButton(setup, reference,"Italics", "//%s//", "Text in Italics");
-        testToolBarButton(setup, reference,"Underline", "__%s__", "Text in Underline");
-        testToolBarButton(setup, reference,"Internal Link", "[[%s]]", "Link Example");
-        testToolBarButton(setup, reference,"Horizontal ruler", "\n----\n", "");
-        testToolBarButton(setup, reference,"Attached Image", "[[image:%s]]", "example.jpg");
+        testToolBarButton(setup, reference, "Bold", "**%s**", "Text in Bold");
+        testToolBarButton(setup, reference, "Italics", "//%s//", "Text in Italics");
+        testToolBarButton(setup, reference, "Underline", "__%s__", "Text in Underline");
+        testToolBarButton(setup, reference, "Internal Link", "[[%s]]", "Link Example");
+        testToolBarButton(setup, reference, "Horizontal ruler", "\n----\n", "");
+        testToolBarButton(setup, reference, "Attached Image", "[[image:%s]]", "example.jpg");
     }
 
     /**
@@ -207,8 +207,8 @@ public class EditIT
     }
 
     /**
-     * Ensure that the Save&View display a "Saving..." message and that the form is disabled before loading the
-     * new page.
+     * Ensure that the Save&View display a "Saving..." message and that the form is disabled before loading the new
+     * page.
      */
     @Test
     @Order(6)
@@ -307,6 +307,7 @@ public class EditIT
     public void editWithConflict(TestUtils setup, TestReference testReference)
     {
         String testPageName = testReference.getLastSpaceReference().getName();
+        setup.deletePage(testReference);
         setup.createPage(testReference, "", testPageName);
 
         String firstTab = setup.getDriver().getWindowHandle();
@@ -338,7 +339,6 @@ public class EditIT
 
         EditConflictModal editConflictModal = new EditConflictModal();
         assertTrue(editConflictModal.isDisplayed());
-        assertEquals("Version conflict", editConflictModal.getTitle());
         assertEquals("1.2", editConflictModal.getVersionDiff());
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@", "-A <del>fir</del>s<del>t</del> edit from a tab<del>.</del>",
             "+A s<ins>econd</ins> edit from a<ins>nother</ins> tab"), editConflictModal.getDiff().getDiff("Content"));
@@ -450,6 +450,7 @@ public class EditIT
     @Order(10)
     public void editLeaveAndBack(TestUtils setup, TestReference testReference) throws InterruptedException
     {
+        setup.deletePage(testReference);
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
         wikiEditPage.setContent("First edit");
         wikiEditPage.clickSaveAndContinue();
@@ -469,13 +470,16 @@ public class EditIT
         // the page will be reloaded next time we go on it.
         setup.getDriver().addPageNotYetReloadedMarker();
 
-        WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(testReference).editWYSIWYG();
+        viewPage = setup.gotoPage(testReference);
+        viewPage.waitUntilPageJSIsLoaded();
+
+        WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
         wysiwygEditPage.setContent("fourth edit");
         wysiwygEditPage.clickSaveAndContinue();
 
-        // object editor -> view page
+        // WYSIWYG editor -> view page
         setup.getDriver().navigate().back();
-        // view page -> wysiwyg editor
+        // view page -> wiki editor
         setup.getDriver().navigate().back();
 
         wikiEditPage = new WikiEditPage();

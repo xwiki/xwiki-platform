@@ -50,9 +50,17 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(ValidateConsoleExtension.class);
 
+    private static final String SKIP_PROPERTY = "xwiki.test.validateconsole.skip";
+
+    private static final boolean SKIP = Boolean.valueOf(System.getProperty(SKIP_PROPERTY, "false"));
+
     @Override
     public void beforeAll(ExtensionContext extensionContext)
     {
+        if (SKIP) {
+            return;
+        }
+
         LogCapture logCapture = new LogCapture();
         logCapture.startCapture();
         saveLogCapture(extensionContext, logCapture);
@@ -64,10 +72,15 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
     @Override
     public void afterAll(ExtensionContext extensionContext)
     {
+        if (SKIP) {
+            return;
+        }
+
         String logContent = loadLogCapture(extensionContext).stopCapture();
         LogCaptureConfiguration configuration = loadLogCaptureConfiguration(extensionContext);
 
-        // Validate the captured log content (but only if no test is failing to not confuse the user)
+        // Validate the captured log content (but only if no test is failing so that errors in the console that are
+        // due to the test failure will not appear as forbidden content).
         if (!extensionContext.getExecutionException().isPresent()) {
             LogCaptureValidator validator = new LogCaptureValidator();
             validator.validate(logContent, configuration);

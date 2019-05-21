@@ -19,21 +19,21 @@
  */
 package com.xpn.xwiki.pdf.impl;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.test.AllLogRule;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.pdf.XSLFORenderer;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,13 +42,11 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@OldcoreTest
 public class PdfExportImplTest
 {
-    @Rule
-    public AllLogRule logRule = new AllLogRule();
-
-    @Rule
-    public MockitoOldcoreRule oldcoreRule = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     /**
      * Verify that PDF Export can apply some CSS on the XHTML when that XHTML already has some style defined and in
@@ -57,14 +55,14 @@ public class PdfExportImplTest
     @Test
     public void applyCSSWhenExistingStyleDefinedUsingShorthandNotation() throws Exception
     {
-        this.oldcoreRule.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        this.oldcoreRule.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
-        this.oldcoreRule.getMocker().registerMockComponent(DocumentAccessBridge.class);
-        this.oldcoreRule.getMocker().registerMockComponent(DocumentAccessBridge.class);
-        this.oldcoreRule.getMocker().registerMockComponent(PDFResourceResolver.class);
-        this.oldcoreRule.getMocker().registerMockComponent(Environment.class);
-        this.oldcoreRule.getMocker().registerMockComponent(VelocityManager.class);
-        this.oldcoreRule.getMocker().registerMockComponent(XSLFORenderer.class, "fop");
+        this.oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        this.oldcore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING);
+        this.oldcore.getMocker().registerMockComponent(DocumentAccessBridge.class);
+        this.oldcore.getMocker().registerMockComponent(DocumentAccessBridge.class);
+        this.oldcore.getMocker().registerMockComponent(PDFResourceResolver.class);
+        this.oldcore.getMocker().registerMockComponent(Environment.class);
+        this.oldcore.getMocker().registerMockComponent(VelocityManager.class);
+        this.oldcore.getMocker().registerMockComponent(XSLFORenderer.class, "fop");
 
         PdfExportImpl pdfExport = new PdfExportImpl();
 
@@ -98,7 +96,7 @@ public class PdfExportImplTest
 
         String css = "span { color:red; }";
 
-        XWikiContext xcontext = this.oldcoreRule.getXWikiContext();
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
         XWikiDocument doc = mock(XWikiDocument.class);
         when(doc.getExternalURL("view", xcontext)).thenReturn("http://localhost:8080/export");
         xcontext.setDoc(doc);

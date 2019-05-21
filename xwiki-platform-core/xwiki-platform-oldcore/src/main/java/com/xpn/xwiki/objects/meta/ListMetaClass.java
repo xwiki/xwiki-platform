@@ -69,7 +69,6 @@ public class ListMetaClass extends PropertyMetaClass
 
         addBooleanProperty("multiSelect", "Multiple Select", false);
         addBooleanProperty("picker", "Use Suggest", true);
-        addBooleanProperty("allowCustomValues", "Allow Custom Values", false);
         addBooleanProperty("largeStorage", "Allow large strings", false);
 
         NumberClass sizeClass = new NumberClass(this);

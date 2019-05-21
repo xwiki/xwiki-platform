@@ -138,6 +138,18 @@ XWiki.EntityReference = Class.create({
     return this;
   },
 
+  hasParent: function(expectedParent) {
+    var actualParent = this.parent;
+    // Handle the case when both the expectedParent and the actualParent are null.
+    if (actualParent == expectedParent) {
+      return true;
+    }
+    while (actualParent && !actualParent.equals(expectedParent)) {
+      actualParent = actualParent.parent;
+    }
+    return actualParent != null;
+  },
+
   equals: function(reference) {
       if (reference == null) {
           return false;

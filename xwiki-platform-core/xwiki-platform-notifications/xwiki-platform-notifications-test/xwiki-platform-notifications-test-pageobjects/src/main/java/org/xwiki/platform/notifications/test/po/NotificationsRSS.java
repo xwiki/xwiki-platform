@@ -36,6 +36,8 @@ import java.util.List;
  * Used to parse the notification RSS feed.
  *
  * @since 11.5RC1
+ * @since 11.4
+ * @since 11.3.1
  * @version $Id$
  */
 public class NotificationsRSS
@@ -43,16 +45,16 @@ public class NotificationsRSS
     private SyndFeed feed;
 
     /**
+     * @param url URL of the RSS feed
      * @param user username to use to connect
      * @param password password of the user
      * @throws Exception if an error happens while fetching and parsing RSS
      */
-    public NotificationsRSS(String user, String password) throws Exception
+    public NotificationsRSS(String url, String user, String password) throws Exception
     {
         HttpClient client = HttpClientBuilder.create().build();
 
-        HttpGet request = new HttpGet("http://localhost:8080/xwiki/bin/get/XWiki/Notifications/Code/"
-                + "NotificationRSSService?outputSyntax=plain");
+        HttpGet request = new HttpGet(url);
         request.addHeader("Authorization", "Basic " + Base64.encode(user + ":" + password));
 
         HttpResponse response = client.execute(request);

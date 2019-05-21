@@ -460,7 +460,7 @@ public class NotificationsIT extends AbstractTest
         assertEquals("update", tray.getNotificationType(1));
         assertTrue(tray.getNotificationDescription(1).startsWith("edited by user1"));
 
-        NotificationsRSS notificationsRSS = new NotificationsRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         assertEquals(2, notificationsRSS.getEntries().size());
         assertEquals("A comment has been added to the page \"Linux as a title\"",
                 notificationsRSS.getEntries().get(0).getTitle());

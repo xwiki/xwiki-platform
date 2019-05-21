@@ -68,10 +68,13 @@
   </div>
 #end
 ## check if the exception is about the document having a path too long
+#template('hierarchy_macros.vm')
 #if("$!exception" != '' && $exception.code == 11017)
+  #set ($options = {})
+  #set ($documentReference = $services.model.resolveDocument($tooLongPath))
   <div class='box errormessage'>
       $services.localization.render('core.create.page.error.docpathtoolong',
-        ["<p><small>${tooLongPath}</small></p>",
+        ["<p>#hierarchy($documentReference, $options)</p>",
           $doc.getLocalReferenceMaxLength(),
           $tooLongPath.length()
         ]

@@ -265,6 +265,22 @@ public abstract class ListClass extends PropertyClass
     }
 
     /**
+     * @since 11.5RC1
+     */
+    public boolean isLargeStorage()
+    {
+        return (getIntValue("largeStorage") == 1);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void setLargeStorage(boolean largeStorage)
+    {
+        setIntValue("largeStorage", largeStorage ? 1 : 0);
+    }
+
+    /**
      * @return a string (usually just 1 character long) used to join this list's items when displaying it in the UI in
      *         view mode.
      * @see #displayView(StringBuffer, String, String, BaseCollection, XWikiContext)
@@ -489,7 +505,7 @@ public abstract class ListClass extends PropertyClass
         } else if (isMultiSelect()) {
             lprop = new StringListProperty();
         // If we allow custom values, they might use a lot of space in DB, so better to put them in a LargeString.
-        } else if (isAllowingCustomValues()) {
+        } else if (isLargeStorage()) {
             lprop = new LargeStringProperty();
         } else {
             lprop = new StringProperty();

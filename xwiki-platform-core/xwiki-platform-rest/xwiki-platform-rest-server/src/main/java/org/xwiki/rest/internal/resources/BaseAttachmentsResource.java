@@ -36,6 +36,7 @@ import javax.inject.Named;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -92,6 +93,10 @@ public class BaseAttachmentsResource extends XWikiResource
 
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @Inject
+    @Named("hidden/document")
+    private QueryFilter hiddenDocumentFilter;
 
     /**
      * Retrieves the attachments by filtering them.
@@ -164,7 +169,7 @@ public class BaseAttachmentsResource extends XWikiResource
                 for (String param : filters.keySet()) {
                     query.bindValue(param, String.format("%%%s%%", filters.get(param).toUpperCase()));
                 }
-
+                query.addFilter(this.hiddenDocumentFilter);
                 queryResult = query.execute();
             } catch (QueryException e) {
                 throw new XWikiRestException(e);

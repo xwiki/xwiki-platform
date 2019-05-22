@@ -74,6 +74,24 @@ pre { /* Resetting values from bootstrap/code.less and bootstrap/normalize.less,
   white-space: pre;
 }
 
+// Line numbers in code
+
+.linenoswrapper {
+  display: flex;
+  flex-direction: row;
+  
+  .linenos {
+    text-align: right;
+    color: lighten(@text-color, 50%);
+    margin-right: 1em;
+    user-select: none;
+  
+    + div {
+      flex-grow: 1;
+    }
+  }
+}
+
 // Responsive Images ==========================================================
 
 img {

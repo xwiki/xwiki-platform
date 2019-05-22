@@ -23,10 +23,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.dom4j.Element;
-import org.dom4j.dom.DOMElement;
+import org.hibernate.collection.internal.PersistentList;
 import org.hibernate.collection.spi.PersistentCollection;
-import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
@@ -204,17 +202,17 @@ public class ListProperty extends BaseProperty implements Cloneable
             return;
         }
 
-        if (this.list instanceof ListPropertyPersistentList) {
-            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) this.list;
+        if (this.list instanceof PersistentList) {
+            PersistentList persistentList = (PersistentList) this.list;
             if (persistentList.isWrapper(list)) {
                 // Accept a caller that sets the already existing list instance.
                 return;
             }
         }
 
-        if (list instanceof ListPropertyPersistentList) {
+        if (list instanceof PersistentList) {
             // This is the list wrapper we are using for hibernate.
-            ListPropertyPersistentList persistentList = (ListPropertyPersistentList) list;
+            PersistentList persistentList = (PersistentList) list;
             this.list = persistentList;
             persistentList.setOwner(this);
             return;
@@ -222,7 +220,7 @@ public class ListProperty extends BaseProperty implements Cloneable
 
         if (list == null) {
             setValueDirty(true);
-            this.actualList = new ArrayList();
+            this.actualList = new ArrayList<>();
             this.list = new NotifyList(this.actualList, this);
         } else {
             this.list.clear();

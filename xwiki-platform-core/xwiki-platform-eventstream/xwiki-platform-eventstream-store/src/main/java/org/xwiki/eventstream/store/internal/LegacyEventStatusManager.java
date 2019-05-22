@@ -76,9 +76,6 @@ public class LegacyEventStatusManager implements EventStatusManager
     @Inject
     private NamespaceContextExecutor namespaceContextExecutor;
 
-    @Inject
-    private LegacyEventLoader legacyEventLoader;
-
     @Override
     public List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception
     {

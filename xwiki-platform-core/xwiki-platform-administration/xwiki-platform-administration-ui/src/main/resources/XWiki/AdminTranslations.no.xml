@@ -58,7 +58,7 @@ XWiki.Registration_heading.hint=Dette er linjen øverst på siden som vises til 
 XWiki.Registration_welcomeMessage.hint=Dette vises bare når noen fyller ut skjemaet. Velocity og wiki-syntakskode kan brukes.
 XWiki.Registration_liveValidation_enabled.hint=Sett dette til false for å deaktivere JavaScript-koden for live validering (feltene vil fortsatt bli validert på serveren).
 XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validering viser en melding som indikerer til brukere at de har fylt ut feltet tilfredsstillende. Dette er meldingen de vil få hvis det ikke er overstyrt for et bestemt felt. Velocitykode kan brukes.
-XWiki.Registration_loginButton_enabled.hint=Når brukeren har registrert, tilbyr vi en knapp brukeren kan klikke for å legge inn brukernavn og passord til påloggingshandlingen og få dem logget inn med en gang. Dette fører imidlertid til at brukernavnet og passordet sendes tilbake i HTML-en, noe som kan være uakseptabelt avhengig av sikkerhetsbehovene dine.
+XWiki.Registration_loginButton_enabled.hint=Når brukeren har registrert seg, tilbyr vi en knapp brukeren kan klikke for å legge inn brukernavn og passord til påloggingshandlingen og få dem logget inn med en gang. Dette fører imidlertid til at brukernavnet og passordet sendes tilbake i HTML-en, noe som kan være uakseptabelt avhengig av sikkerhetsbehovene dine.
 XWiki.Registration_loginButton_autoLogin_enabled.hint=Hvis innloggingsknappen er aktivert, kan du få et stykke JavaScript til å trykke på innloggingsknappen for brukeren.
 XWiki.Registration_defaultRedirect.hint=Dette er nettadressen som brukeren blir omdirigert til etter å ha trykket på innloggingsknappen hvis xredirect-parameteren ikke er spesifisert. Velocitykode kan brukes.
 XWiki.Registration_requireCaptcha.hint=Velg dette for å kreve at brukeren løser en CAPTCHA for å kunne registrere seg.
@@ -112,6 +112,12 @@ administration.section.export.author.hint=Pakkeforfatteren.
 administration.section.export.version.hint=Pakkeversjonen.
 administration.section.export.withHistory.hint=Inkluder sidehistorikken i eksporten. Bare den nyeste versjonen av en side blir eksportert ellers.
 administration.section.export.backupPack.hint=Angi om pakken skal brukes som sikkerhetskopi. Dette alternativet påvirker ikke det eksporterte innholdet. Den eneste effekten er at alternativet "Importer som sikkerhetskopi" vil bli forhåndsvalgt når du importerer pakken. Forskjellen mellom en sikkerhetskopipakke og en vanlig pakke er at i det første tilfellet blir sideforfatteren bevart under importen, mens i det andre tilfelle blir brukeren som utfører importen den forrige forfatteren til hver importerte side.
+
+# Users Section
+### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
+### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
+### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
+### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
 
 # Other Category
 admin.other=Annet

@@ -27,6 +27,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Holds the value of a class property and its associated meta data (e.g. label, icon, count).
  * <p>
@@ -102,26 +105,31 @@ public class PropertyValue
     }
 
     @Override
-    public boolean equals(java.lang.Object o)
+    public boolean equals(java.lang.Object object)
     {
-        if (o instanceof PropertyValue) {
-            PropertyValue other = (PropertyValue) o;
-
-            boolean equals;
-            if (this.getMetaData() != null) {
-                equals = this.getMetaData().equals(other.getMetaData());
-            } else {
-                equals = other.getMetaData() == null;
-            }
-
-            if (this.getValue() != null) {
-                equals &= this.getValue().equals(other.getValue());
-            } else {
-                equals &= other.getValue() == null;
-            }
-            return equals;
+        if (object == null) {
+            return false;
         }
-        return false;
+        if (object == this) {
+            return true;
+        }
+        if (object.getClass() != getClass()) {
+            return false;
+        }
+        PropertyValue other = (PropertyValue) object;
+        return new EqualsBuilder()
+            .append(getMetaData(), other.getMetaData())
+            .append(getValue(), other.getValue())
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(3, 17)
+            .append(getMetaData())
+            .append(getValue())
+            .toHashCode();
     }
 
     @Override

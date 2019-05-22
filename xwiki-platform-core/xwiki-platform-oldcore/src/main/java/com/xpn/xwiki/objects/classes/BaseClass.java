@@ -910,7 +910,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
                 list_class.setDefaultValue(defaultValue);
             }
             list_class.setFreeText(freeText);
-            if (!freeText.equals(ListClass.FREE_TEXT_FORBIDDEN)) {
+            if (!ListClass.FREE_TEXT_FORBIDDEN.equals(freeText)) {
                 list_class.setPicker(true);
             }
             list_class.setLargeStorage(largeStorage);

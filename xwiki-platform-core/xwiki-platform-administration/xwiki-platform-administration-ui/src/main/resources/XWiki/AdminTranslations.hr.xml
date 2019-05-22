@@ -113,6 +113,12 @@ administration.section.export.version.hint=Verzija paketa.
 administration.section.export.withHistory.hint=U izvoz uključi povijest stranice. U protivnome će biti izvezena samo najnovija verzija stranice.
 administration.section.export.backupPack.hint=Naznačite hoće li paket biti korišten kao rezervna kopija. Ova opcija ne utječe na izvezeni sadržaj. Jedini učinak je taj da će kod uvoza paketa biti predodabrana opcija "Uvezi kao paket rezervne kopije". Razlika između paketa rezervne kopije i običnog paketa je ta da se u prvom slučaju prilikom uvoza čuva posljednji autor stranice, dok u drugom slučaju posljednji autor svake uvezene stranice postaje onaj korisnik koji obavlja uvoz.
 
+# Users Section
+### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
+### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
+### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
+### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
 # Other Category
 admin.other=Ostalo
 admin.other.description=Razna podešenja za ekstenzije.

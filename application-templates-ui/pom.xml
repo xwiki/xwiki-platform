@@ -36,14 +36,4 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Templates Application</xwiki.extension.name>
   </properties>
-  <build>
-    <!-- Needed to add support for the XAR packaging -->
-    <extensions>
-      <extension>
-        <groupId>org.xwiki.commons</groupId>
-        <artifactId>xwiki-commons-tool-xar-handlers</artifactId>
-        <version>${commons.version}</version>
-      </extension>
-    </extensions>
-  </build>
 </project>

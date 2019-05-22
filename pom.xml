@@ -25,9 +25,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.xwiki.commons</groupId>
-    <artifactId>xwiki-commons-pom</artifactId>
-    <version>7.4.4</version>
+    <groupId>org.xwiki.contrib</groupId>
+    <artifactId>parent-platform</artifactId>
+    <version>7.4-15</version>
   </parent>
   <groupId>org.xwiki.contrib.templates</groupId>
   <artifactId>application-templates</artifactId>
@@ -36,7 +36,8 @@
   <name>Templates Application - Parent POM</name>
   <description>A collection of content templates</description>
   <properties>
-    <platform.version>${commons.version}</platform.version>
+    <xwiki.release.jira.skip>false</xwiki.release.jira.skip>
+    <xwiki.issueManagement.jira.id>TEMPLATES</xwiki.issueManagement.jira.id>
   </properties>
   <developers>
     <developer>
@@ -51,13 +52,6 @@
     <url>https://github.com/xwiki-contrib/application-templates/tree/master</url>
     <tag>HEAD</tag>
   </scm>
-  <distributionManagement>
-    <repository>
-      <id>xwiki-staging</id>
-      <name>XWiki Staging Repository</name>
-      <url>http://nexus.xwiki.org/nexus/service/local/staging/deploy/maven2/</url>
-    </repository>
-  </distributionManagement>
   <modules>
     <module>application-templates-ui</module>
   </modules>

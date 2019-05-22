@@ -37,6 +37,7 @@ import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
@@ -239,7 +240,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
                 // at the end of the test container execution.
                 container = new GenericContainer(new ImageFromDockerfile(imageName, false)
-                    .withDockerfileFromBuilder(builder ->
+                    .withDockerfileFromBuilder(builder -> {
                         builder
                             .from(baseImageName)
                             .user("root")
@@ -250,11 +251,17 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 + " curl"
                                 + " libreoffice"
                                 + " unzip"
-                                + " procps")
-                            // Put back the user as jetty since it's a best practice to not execute the container as
-                            // root.
-                            .user("jetty")
-                            .build()));
+                                + " procps");
+                        if (this.testConfiguration.getServletEngine() == ServletEngine.JETTY) {
+                            // Create the right jetty user directory since it doesn't exist
+                            builder.run("mkdir -p /home/jetty && chown jetty:jetty /home/jetty")
+                                // Put back the user as jetty since it's a best practice to not execute the container as
+                                // root.
+                                .user("jetty");
+                        }
+
+                        builder.build();
+                    }));
             } else {
                 container = new GenericContainer(imageName);
             }

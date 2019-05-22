@@ -1,0 +1,17 @@
+#if ($type == 'edit')
+    #if ($field.getProperty('displayType').value == 'input' && $field.getProperty('picker').value == 1)
+        #xpropertySuggestInputDisplayer($field $prefix $name $value)
+    #else
+        $doc.displayEdit($field, $prefix, $object)
+    #end
+#elseif ($type == 'view')
+    $doc.displayView($field, $prefix, $object)##
+#elseif ($type == 'rendered')
+    $doc.displayRendered($field, $prefix, $object)##
+#elseif ($type == 'hidden')
+    $doc.displayHidden($field, $prefix, $object)
+#else
+## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+## mode must not be empty. Let's output something.
+Unknown display mode.
+#end

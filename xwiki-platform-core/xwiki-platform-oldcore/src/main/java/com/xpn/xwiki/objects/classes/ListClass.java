@@ -45,6 +45,7 @@ import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
@@ -245,6 +246,22 @@ public abstract class ListClass extends PropertyClass
     public void setPicker(boolean picker)
     {
         setIntValue("picker", picker ? 1 : 0);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public boolean isLargeStorage()
+    {
+        return (getIntValue("largeStorage") == 1);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void setLargeStorage(boolean largeStorage)
+    {
+        setIntValue("largeStorage", largeStorage ? 1 : 0);
     }
 
     /**
@@ -471,6 +488,8 @@ public abstract class ListClass extends PropertyClass
             lprop = new DBStringListProperty();
         } else if (isMultiSelect()) {
             lprop = new StringListProperty();
+        } else if (isLargeStorage()) {
+            lprop = new LargeStringProperty();
         } else {
             lprop = new StringProperty();
         }

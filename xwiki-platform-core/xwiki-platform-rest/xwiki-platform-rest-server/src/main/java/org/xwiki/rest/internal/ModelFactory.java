@@ -144,6 +144,9 @@ public class ModelFactory
 
     @Inject
     private Logger logger;
+    
+    @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     public ModelFactory()
     {
@@ -832,22 +835,33 @@ public class ModelFactory
     }
 
     public Attachment toRestAttachment(URI baseUri, com.xpn.xwiki.api.Attachment xwikiAttachment,
+        Boolean withPrettyNames, boolean versionURL)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        String relativeURL = xcontext.getWiki().getURL(xwikiAttachment.getReference(), xcontext);
+        String absoluteURL = xcontext.getWiki().getExternalAttachmentURL(xwikiAttachment.getDocument().getFullName(),
+            xwikiAttachment.getFilename(), xcontext);
+        return toRestAttachment(baseUri, xwikiAttachment, relativeURL, absoluteURL, withPrettyNames, versionURL);
+    }
+
+    public Attachment toRestAttachment(URI baseUri, com.xpn.xwiki.api.Attachment xwikiAttachment,
         String xwikiRelativeUrl, String xwikiAbsoluteUrl, Boolean withPrettyNames, boolean versionURL)
     {
         Attachment attachment = this.objectFactory.createAttachment();
 
-        Document doc = xwikiAttachment.getDocument();
+        DocumentReference documentReference = xwikiAttachment.getReference().getDocumentReference();
+        attachment.setPageId(this.defaultEntityReferenceSerializer.serialize(documentReference));
+        attachment.setPageVersion(xwikiAttachment.getDocument().getVersion());
 
-        attachment.setId(String.format("%s@%s", doc.getPrefixedFullName(), xwikiAttachment.getFilename()));
+        attachment.setId(this.defaultEntityReferenceSerializer.serialize(xwikiAttachment.getReference()));
         attachment.setName(xwikiAttachment.getFilename());
-        attachment.setSize(xwikiAttachment.getFilesize());
+        attachment.setLongSize(xwikiAttachment.getLongSize());
+        attachment.setSize((int) xwikiAttachment.getLongSize());
         attachment.setVersion(xwikiAttachment.getVersion());
-        attachment.setPageId(doc.getPrefixedFullName());
-        attachment.setPageVersion(doc.getVersion());
         attachment.setMimeType(xwikiAttachment.getMimeType());
         attachment.setAuthor(xwikiAttachment.getAuthor());
         if (withPrettyNames) {
-            XWikiContext xcontext = xcontextProvider.get();
+            XWikiContext xcontext = this.xcontextProvider.get();
             attachment
                 .setAuthorName(xcontext.getWiki().getUserName(xwikiAttachment.getAuthor(), null, false, xcontext));
         }
@@ -859,25 +873,26 @@ public class ModelFactory
         attachment.setXwikiRelativeUrl(xwikiRelativeUrl);
         attachment.setXwikiAbsoluteUrl(xwikiAbsoluteUrl);
 
-        String pageUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(),
-            Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName()).toString();
-        Link pageLink = objectFactory.createLink();
+        String wiki = documentReference.getWikiReference().getName();
+        List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
+
+        String pageUri =
+            Utils.createURI(baseUri, PageResource.class, wiki, spaces, documentReference.getName()).toString();
+        Link pageLink = this.objectFactory.createLink();
         pageLink.setHref(pageUri);
         pageLink.setRel(Relations.PAGE);
         attachment.getLinks().add(pageLink);
 
         String attachmentUri;
         if (versionURL) {
-            attachmentUri = Utils.createURI(baseUri, AttachmentVersionResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
-                xwikiAttachment.getFilename(), xwikiAttachment.getVersion()).toString();
+            attachmentUri = Utils.createURI(baseUri, AttachmentVersionResource.class, wiki, spaces,
+                documentReference.getName(), xwikiAttachment.getFilename(), xwikiAttachment.getVersion()).toString();
         } else {
-            attachmentUri = Utils.createURI(baseUri, AttachmentResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
-                xwikiAttachment.getFilename()).toString();
+            attachmentUri = Utils.createURI(baseUri, AttachmentResource.class, wiki, spaces,
+                documentReference.getName(), xwikiAttachment.getFilename()).toString();
         }
 
-        Link attachmentLink = objectFactory.createLink();
+        Link attachmentLink = this.objectFactory.createLink();
         attachmentLink.setHref(attachmentUri);
         attachmentLink.setRel(Relations.ATTACHMENT_DATA);
         attachment.getLinks().add(attachmentLink);

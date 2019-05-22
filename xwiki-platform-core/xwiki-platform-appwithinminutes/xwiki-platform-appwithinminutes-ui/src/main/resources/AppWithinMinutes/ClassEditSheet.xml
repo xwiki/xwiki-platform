@@ -329,12 +329,18 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
 #**
  * Displays the input used to edit the specified property of the given object. The given object can be either an
  * instance of an XWiki class or a class field. In the first case the property represents an object field and in the
- * second case the property represents a field meta property.
+ * second case the property represents a field meta property. We currently don't use custom display for metaproperty,
+ * so in that case we fallback on displayEdit.
  *#
 #macro (displayPropertyEditInput $property $prefix $object)
   #set ($wrappedProperty = $property.propertyClass)
   #if ($wrappedProperty.isCustomDisplayed($xcontext.context))
-    $xcontext.get('propertyCustomDisplayer').display($property, $prefix, $object)
+    #set ($customDisplayer = $!xcontext.get('propertyCustomDisplayer').display($property, $prefix, $object))
+    #if ((! $customDisplayer) &amp;&amp; ("$!customDisplayer" == ""))
+      $doc.displayEdit($property, $prefix, $object)
+    #else
+      $customDisplayer
+    #end
   #else
     $doc.displayEdit($property, $prefix, $object)
   #end

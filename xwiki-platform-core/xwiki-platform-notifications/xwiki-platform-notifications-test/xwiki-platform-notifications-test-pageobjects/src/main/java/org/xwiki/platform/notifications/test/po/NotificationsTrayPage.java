@@ -54,6 +54,9 @@ public class NotificationsTrayPage extends ViewPage
     @FindBy(className = "notifications-toggles")
     private WebElement toggles;
 
+    @FindBy(className = "notifications-rss-link")
+    private WebElement rssLink;
+
     private BootstrapSwitch pageOnlyWatchedSwitch;
 
     private BootstrapSwitch pageAndChildrenWatchedSwitch;
@@ -390,5 +393,21 @@ public class NotificationsTrayPage extends ViewPage
         showNotificationTray();
         wikiWatchedSwitch.setState(watched ? BootstrapSwitch.State.ON : BootstrapSwitch.State.OFF);
         waitUntilWatchedStateAreSaved();
+    }
+
+    /**
+     * @param username name of the current user
+     * @param password password of the current user
+     * @return the rss feed
+     * @throws Exception if an error happens
+     *
+     * @since 11.5RC1
+     * @since 11.4
+     * @since 11.3.1
+     */
+    public NotificationsRSS getNotificationRSS(String username, String password) throws Exception
+    {
+        String url = this.rssLink.getAttribute("href");
+        return new NotificationsRSS(url, username, password);
     }
 }

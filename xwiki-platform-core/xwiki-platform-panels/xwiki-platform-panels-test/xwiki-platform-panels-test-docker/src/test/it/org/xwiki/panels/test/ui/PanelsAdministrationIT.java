@@ -46,14 +46,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class PanelsAdministrationIT
 {
     @BeforeAll
-    public void setup(TestUtils setup)
+    public void setup(TestUtils setup) throws Exception
     {
         setup.loginAsSuperAdmin();
 
-        // Reset the panel layout.
-        PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
-        panelsAdminPage.selectPageLayout().selectBothColumnsLayout().setRightPanels("");
-        panelsAdminPage.clickSave();
+        // Reset the right and left panels.
+        setup.setWikiPreference("rightPanels", "");
+        setup.setWikiPreference("leftPanels", "");
     }
 
     @Test

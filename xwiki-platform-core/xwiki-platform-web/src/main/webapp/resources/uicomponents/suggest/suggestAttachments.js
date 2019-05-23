@@ -109,7 +109,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     } else {
       path.push('attachments');
     }
-    return path.join('/');
+    return path.join('/') + '?prettyNames=true';
   };
 
   var loadAttachment = function(value, options) {

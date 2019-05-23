@@ -135,7 +135,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       value: getAttachmentValueFromReference(attachmentReference, options),
       url: attachment.xwikiRelativeUrl,
       icon: getAttachmentIcon(attachment),
-      hint: attachment.pageBreadcrumb && attachment.pageBreadcrumb.join(' / '),
+      hint: getAttachmentHint(attachment),
       data: attachment
     };
   };
@@ -209,6 +209,14 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
         return mimeTypeMap['attachment'][0];
       }
     }
+  };
+
+  var getAttachmentHint = function(attachment) {
+    return attachment.hierarchy.items.filter(function(item) {
+      return item.type === 'space' || (item.type === 'document' && item.name !== 'WebHome');
+    }).map(function(item) {
+      return item.label;
+    }).join(' / ');
   };
 
   $.fn.suggestAttachments = function(options) {

@@ -20,7 +20,6 @@
 package org.xwiki.rest.internal.resources;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Formatter;
 import java.util.HashSet;
@@ -35,18 +34,15 @@ import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.localization.LocalizationContext;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.search.SearchSource;
-import org.xwiki.rest.model.jaxb.Hierarchy;
-import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.SearchResult;
 import org.xwiki.rest.resources.objects.ObjectResource;
@@ -90,6 +86,9 @@ public class BaseSearchResult extends XWikiResource
 
     @Inject
     private LocalizationContext localizationContext;
+    
+    @Inject
+    private ModelFactory modelFactory;
 
     /**
      * Search for keyword in the given scopes. See {@link SearchScope} for more information.
@@ -341,22 +340,7 @@ public class BaseSearchResult extends XWikiResource
                 pageLink.setRel(Relations.PAGE);
                 searchResult.getLinks().add(pageLink);
 
-                Hierarchy hierarchy = new Hierarchy();
-                for (EntityReference entityReference : doc.getDocumentReference().getReversedReferenceChain()) {
-                    HierarchyItem hierarchyItem = new HierarchyItem();
-                    if (Arrays.asList(EntityType.SPACE, EntityType.DOCUMENT).contains(entityReference.getType())) {
-                        Document document = xwikiApi.getDocument(entityReference).getTranslatedDocument();
-                        hierarchyItem.setLabel(document.getPlainTitle());
-                        hierarchyItem.setUrl(xwikiApi.getURL(document.getDocumentReferenceWithLocale()));
-                    } else {
-                        hierarchyItem.setLabel(entityReference.getName());
-                        hierarchyItem.setUrl(xwikiApi.getURL(entityReference));
-                    }
-                    hierarchyItem.setName(entityReference.getName());
-                    hierarchyItem.setType(entityReference.getType().getLowerCase());
-                    hierarchy.withItems(hierarchyItem);
-                }
-                searchResult.setHierarchy(hierarchy);
+                searchResult.setHierarchy(this.modelFactory.toRestHierarchy(doc.getDocumentReference(), true));
 
                 result.add(searchResult);
             }

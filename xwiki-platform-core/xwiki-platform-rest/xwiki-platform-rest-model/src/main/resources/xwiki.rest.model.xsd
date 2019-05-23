@@ -181,6 +181,7 @@
           <element name="date" type="dateTime"></element>
           <element name="xwikiRelativeUrl" type="string"></element>
           <element name="xwikiAbsoluteUrl" type="string"></element>
+          <element name="hierarchy" type="xwiki:Hierarchy" minOccurs="0"></element>
         </sequence>
       </extension>
     </complexContent>

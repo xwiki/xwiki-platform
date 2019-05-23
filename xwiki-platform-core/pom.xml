@@ -151,6 +151,16 @@
                   }
                 },
                 "ignore" : [
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class org.xwiki.rest.model.jaxb.Attachment",
+                    "new": "class org.xwiki.rest.model.jaxb.Attachment",
+                    "annotationType": "javax.xml.bind.annotation.XmlType",
+                    "attribute": "propOrder",
+                    "oldValue": "{\"id\", \"name\", \"size\", \"longSize\", \"version\", \"pageId\", \"pageVersion\", \"mimeType\", \"author\", \"authorName\", \"date\", \"xwikiRelativeUrl\", \"xwikiAbsoluteUrl\"}",
+                    "newValue": "{\"id\", \"name\", \"size\", \"longSize\", \"version\", \"pageId\", \"pageVersion\", \"mimeType\", \"author\", \"authorName\", \"date\", \"xwikiRelativeUrl\", \"xwikiAbsoluteUrl\", \"hierarchy\"}",
+                    "justification": "Add the hierarchy property in order to be able to show the location of an attachment in the UI"
+                  }
                   // Add more ignores below...
                 ]
               }

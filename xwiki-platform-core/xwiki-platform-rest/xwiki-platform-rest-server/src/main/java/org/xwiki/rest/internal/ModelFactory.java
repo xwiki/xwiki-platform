@@ -44,14 +44,19 @@ import org.xwiki.job.Request;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attribute;
 import org.xwiki.rest.model.jaxb.Class;
+import org.xwiki.rest.model.jaxb.Hierarchy;
+import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.JobId;
 import org.xwiki.rest.model.jaxb.JobLog;
 import org.xwiki.rest.model.jaxb.JobProgress;
@@ -104,7 +109,10 @@ import org.xwiki.rest.resources.wikis.WikiSearchQueryResource;
 import org.xwiki.rest.resources.wikis.WikiSearchResource;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -144,9 +152,12 @@ public class ModelFactory
 
     @Inject
     private Logger logger;
-    
+
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     public ModelFactory()
     {
@@ -872,6 +883,7 @@ public class ModelFactory
 
         attachment.setXwikiRelativeUrl(xwikiRelativeUrl);
         attachment.setXwikiAbsoluteUrl(xwikiAbsoluteUrl);
+        attachment.setHierarchy(toRestHierarchy(xwikiAttachment.getReference(), withPrettyNames));
 
         String wiki = documentReference.getWikiReference().getName();
         List<String> spaces = Utils.getSpacesHierarchy(documentReference.getLastSpaceReference());
@@ -898,6 +910,42 @@ public class ModelFactory
         attachment.getLinks().add(attachmentLink);
 
         return attachment;
+    }
+
+    public Hierarchy toRestHierarchy(EntityReference targetEntityReference, Boolean withPrettyNames)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWiki xwiki = xcontext.getWiki();
+        Hierarchy hierarchy = new Hierarchy();
+        for (EntityReference entityReference : targetEntityReference.getReversedReferenceChain()) {
+            HierarchyItem hierarchyItem = new HierarchyItem();
+            hierarchyItem.setName(entityReference.getName());
+            hierarchyItem.setLabel(entityReference.getName());
+            hierarchyItem.setType(entityReference.getType().getLowerCase());
+            hierarchyItem.setUrl(xwiki.getURL(entityReference, xcontext));
+            if (withPrettyNames) {
+                try {
+                    if (entityReference.getType() == EntityType.SPACE
+                        || entityReference.getType() == EntityType.DOCUMENT) {
+                        XWikiDocument document =
+                            xwiki.getDocument(entityReference, xcontext).getTranslatedDocument(xcontext);
+                        hierarchyItem.setLabel(document.getRenderedTitle(Syntax.PLAIN_1_0, xcontext));
+                        hierarchyItem.setUrl(xwiki.getURL(document.getDocumentReferenceWithLocale(), xcontext));
+                    } else if (entityReference.getType() == EntityType.WIKI) {
+                        WikiDescriptor wikiDescriptor = this.wikiDescriptorManager.getById(entityReference.getName());
+                        if (wikiDescriptor != null) {
+                            hierarchyItem.setLabel(wikiDescriptor.getPrettyName());
+                        }
+                    }
+                } catch (Exception e) {
+                    this.logger.warn(
+                        "Failed to get the pretty name of entity [{}]. Continue using the entity name. Root cause is [{}].",
+                        entityReference, ExceptionUtils.getRootCauseMessage(e));
+                }
+            }
+            hierarchy.withItems(hierarchyItem);
+        }
+        return hierarchy;
     }
 
     /**

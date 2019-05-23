@@ -76,6 +76,7 @@ import org.xwiki.rest.model.jaxb.Translations;
 import org.xwiki.rest.model.jaxb.Wiki;
 import org.xwiki.rest.resources.ModificationsResource;
 import org.xwiki.rest.resources.SyntaxesResource;
+import org.xwiki.rest.resources.attachments.AttachmentMetadataResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentVersionResource;
 import org.xwiki.rest.resources.attachments.AttachmentsAtPageVersionResource;
@@ -908,6 +909,12 @@ public class ModelFactory
         attachmentLink.setHref(attachmentUri);
         attachmentLink.setRel(Relations.ATTACHMENT_DATA);
         attachment.getLinks().add(attachmentLink);
+
+        Link attachmentMetadataLink = this.objectFactory.createLink();
+        attachmentMetadataLink.setHref(Utils.createURI(baseUri, AttachmentMetadataResource.class, wiki, spaces,
+            documentReference.getName(), xwikiAttachment.getFilename()).toString());
+        attachmentMetadataLink.setRel(Relations.ATTACHMENT_METADATA);
+        attachment.getLinks().add(attachmentMetadataLink);
 
         return attachment;
     }

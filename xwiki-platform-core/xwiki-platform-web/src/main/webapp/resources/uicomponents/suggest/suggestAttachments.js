@@ -114,7 +114,12 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
 
   var loadAttachment = function(value, options) {
     var attachmentReference = getAttachmentReferenceFromValue(value, options);
-    return $.getJSON(getAttachmentsRestURL(attachmentReference)).then($.proxy(processAttachment, null, options));
+    return $.getJSON(getAttachmentsRestURL(attachmentReference))
+      .then($.proxy(processAttachment, null, options))
+      .then(function(attachment) {
+        // An array is expected in xwiki.selectize.js
+        return [attachment];
+      });
   };
 
   /**

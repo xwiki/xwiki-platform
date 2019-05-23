@@ -125,17 +125,6 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <!-- Make sure we use the right version of Restlet. -->
-      <dependency>
-        <groupId>org.restlet.jse</groupId>
-        <artifactId>org.restlet</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <!-- Explicit dependency on dom4j since we're excluding it above -->
-      <dependency>
-        <groupId>org.dom4j</groupId>
-        <artifactId>dom4j</artifactId>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   <modules>

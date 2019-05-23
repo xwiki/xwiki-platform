@@ -90,6 +90,8 @@ public class AnnotationXHTMLRendererTest extends AbstractComponentTestCase
         addFileToTest("renderer/specialchars/SpecialChars1.test");
         addFileToTest("renderer/specialchars/SpecialChars2.test");
         addFileToTest("renderer/specialchars/SpecialChars3.test");
+        addFileToTest("renderer/specialchars/SpecialChars4.test");
+        addFileToTest("renderer/specialchars/SpecialChars5.test");
 
         // tests for which the selection of the annotation appears more than once in the document content
         addFileToTest("renderer/ambiguous/Ambiguous1.test");

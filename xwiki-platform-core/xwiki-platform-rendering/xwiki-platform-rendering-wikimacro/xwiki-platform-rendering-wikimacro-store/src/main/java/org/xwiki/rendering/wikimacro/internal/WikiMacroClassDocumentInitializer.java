@@ -19,9 +19,12 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import java.util.Arrays;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.wiki.internal.AbstractAsyncClassDocumentInitializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -64,8 +67,12 @@ public class WikiMacroClassDocumentInitializer extends AbstractAsyncClassDocumen
         xclass.addBooleanField(MACRO_INLINE_PROPERTY, "Supports inline mode", "yesno");
         xclass.addStaticListField(MACRO_VISIBILITY_PROPERTY, "Macro visibility", 1, false,
             "Current User|Current Wiki|Global", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
-        xclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content type", 1, false,
+        xclass.addStaticListField(MACRO_CONTENT_TYPE_PROPERTY, "Macro content availability", 1, false,
             "Optional|Mandatory|No content", ListClass.DISPLAYTYPE_SELECT, PROPERTY_PIPE);
+
+        xclass.addStaticListField(MACRO_CONTENT_JAVA_TYPE_PROPERTY, "Macro content type", 1, false, false,
+            StringUtils.join(Arrays.asList(MACRO_CONTENT_TYPE_UNKNOWN, MACRO_CONTENT_TYPE_WIKI), PROPERTY_PIPE),
+            ListClass.DISPLAYTYPE_INPUT, PROPERTY_PIPE, MACRO_CONTENT_TYPE_UNKNOWN, ListClass.FREE_TEXT_ALLOWED, true);
         // The Macro content description is using plain text (same as for Java Macros).
         xclass.addTextAreaField(MACRO_CONTENT_DESCRIPTION_PROPERTY,
             "Content description (Not applicable for \"No content\" type)", 40, 5, TextAreaClass.ContentType.PURE_TEXT);

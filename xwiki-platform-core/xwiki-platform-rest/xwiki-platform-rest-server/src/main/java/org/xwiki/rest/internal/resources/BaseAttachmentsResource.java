@@ -22,17 +22,24 @@ package org.xwiki.rest.internal.resources;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
+import org.apache.commons.lang.StringUtils;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryFilter;
@@ -84,6 +91,17 @@ public class BaseAttachmentsResource extends XWikiResource
         }
     }
 
+    private static final Pattern COMMA = Pattern.compile("\\s*,\\s*");
+
+    private static final Map<String, String> FILTER_TO_QUERY = new HashMap<>();
+
+    static {
+        FILTER_TO_QUERY.put("space", "doc.space");
+        FILTER_TO_QUERY.put("page", "doc.fullName");
+        FILTER_TO_QUERY.put("name", "attachment.filename");
+        FILTER_TO_QUERY.put("author", "attachment.author");
+    }
+
     @Inject
     private ModelFactory modelFactory;
 
@@ -94,91 +112,36 @@ public class BaseAttachmentsResource extends XWikiResource
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
     /**
-     * Retrieves the attachments by filtering them.
-     *
-     * @param wikiName The virtual wiki.
-     * @param name Name filter (include only attachments that matches this name)
-     * @param page Page filter (include only attachments are attached to a page matches this string)
-     * @param space Space filter (include only attachments are attached to a page in a space matching this string)
-     * @param author Author filter (include only attachments from an author who matches this string)
-     * @param types A comma separated list of string that will be matched against the actual mime type of the
-     *            attachments.
-     * @return The list of the retrieved attachments.
+     * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
+     * @param filters the filters used to restrict the set of attachments (you can filter by space name, document name,
+     *            attachment name, author and mime type)
+     * @param offset defines the start of the range
+     * @param limit the maximum number of attachments to include in the range
+     * @param withPrettyNames whether to include pretty names (like author full name and document title) in the returned
+     *            attachment metadata
+     * @return the list of attachments from the specified scope that match the given filters and that are within the
+     *         specified range
+     * @throws XWikiRestException if we fail to retrieve the attachments
      */
-    public Attachments getAttachments(String wikiName, String name, String page, String space, String author,
-        String types, Integer start, Integer number, Boolean withPrettyNames) throws XWikiRestException
+    protected Attachments getAttachments(EntityReference scope, Map<String, String> filters, Integer offset,
+        Integer limit, Boolean withPrettyNames) throws XWikiRestException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         String database = xcontext.getWikiId();
 
         Attachments attachments = objectFactory.createAttachments();
 
-        /* This try is just needed for executing the finally clause. */
         try {
-            xcontext.setWikiId(wikiName);
+            xcontext.setWikiId(scope.extractReference(EntityType.WIKI).getName());
 
-            Map<String, String> filters = new HashMap<String, String>();
-            if (!name.equals("")) {
-                filters.put("name", name);
-            }
-            if (!page.equals("")) {
-                filters.put("page", name);
-            }
-            if (!space.equals("")) {
-                filters.put("space", Utils.getLocalSpaceId(parseSpaceSegments(space)));
-            }
-            if (!author.equals("")) {
-                filters.put("author", author);
-            }
+            List<Object> queryResult = getAttachmentsQuery(scope, filters).setLimit(limit).setOffset(offset).execute();
 
-            /* Build the query */
-            StringBuilder statement = new StringBuilder().append("select doc.space, doc.name, doc.version, attachment")
-                .append(" from XWikiDocument as doc, XWikiAttachment as attachment")
-                .append(" where (attachment.docId = doc.id");
-
-            if (filters.keySet().size() > 0) {
-                for (String param : filters.keySet()) {
-                    if (param.equals("name")) {
-                        statement.append(" and upper(attachment.filename) like :name ");
-                    }
-                    if (param.equals("page")) {
-                        statement.append(" and upper(doc.fullName) like :page ");
-                    }
-                    if (param.equals("space")) {
-                        statement.append(" and upper(doc.space) like :space ");
-                    }
-
-                    if (param.equals("author")) {
-                        statement.append(" and upper(attachment.author) like :author ");
-                    }
-                }
-            }
-
-            statement.append(")");
-
-            String queryString = statement.toString();
-
-            /* Execute the query by filling the parameters */
-            List<Object> queryResult = null;
-            try {
-                Query query = queryManager.createQuery(queryString, Query.XWQL).setLimit(number).setOffset(start);
-                for (Map.Entry<String, String> entry : filters.entrySet()) {
-                    query.bindValue(entry.getKey()).literal(entry.getValue().toUpperCase()).anyChars();
-                }
-                query.addFilter(this.hiddenDocumentFilter);
-                queryResult = query.execute();
-            } catch (QueryException e) {
-                throw new XWikiRestException(e);
-            }
-
-            Set<String> acceptedMimeTypes = new HashSet<String>();
-            if (!types.equals("")) {
-                String[] acceptedMimetypesArray = types.split(",");
-                for (String type : acceptedMimetypesArray) {
-                    acceptedMimeTypes.add(type);
-                }
-            }
+            Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault("mediaTypes", ""));
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
@@ -187,24 +150,16 @@ public class BaseAttachmentsResource extends XWikiResource
                 String pageVersion = (String) fields[2];
                 XWikiAttachment xwikiAttachment = (XWikiAttachment) fields[3];
 
-                String mimeType = xwikiAttachment.getMimeType(xcontext);
+                // Not all the attachments have their media type stored in the database so we can't rely only on the
+                // query-level filtering. We need to also detect the media type after the query is executed and filter
+                // out the attachments that don't match the accepted media types.
+                String mediaType = xwikiAttachment.getMimeType(xcontext).toUpperCase();
+                boolean hasAcceptedMediaType = acceptedMediaTypes.isEmpty()
+                    || acceptedMediaTypes.stream().anyMatch(acceptedMediaType -> mediaType.contains(acceptedMediaType));
 
-                boolean add = true;
-
-                /* Check the mime type filter */
-                if (acceptedMimeTypes.size() > 0) {
-                    add = false;
-
-                    for (String type : acceptedMimeTypes) {
-                        if (mimeType.toUpperCase().contains(type.toUpperCase())) {
-                            add = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (add) {
-                    DocumentReference documentReference = new DocumentReference(wikiName, pageSpaces, pageName);
+                if (hasAcceptedMediaType) {
+                    DocumentReference documentReference =
+                        new DocumentReference(xcontext.getWikiId(), pageSpaces, pageName);
                     XWikiDocument document = new XWikiDocument(documentReference);
                     document.setVersion(pageVersion);
                     xwikiAttachment.setDoc(document, false);
@@ -214,11 +169,86 @@ public class BaseAttachmentsResource extends XWikiResource
                         apiAttachment, withPrettyNames, false));
                 }
             }
+        } catch (QueryException e) {
+            throw new XWikiRestException(e);
         } finally {
             xcontext.setWikiId(database);
         }
 
         return attachments;
+    }
+
+    private Query getAttachmentsQuery(EntityReference scope, Map<String, String> filters) throws QueryException
+    {
+        StringBuilder statement = new StringBuilder().append("select doc.space, doc.name, doc.version, attachment")
+            .append(" from XWikiDocument as doc, XWikiAttachment as attachment");
+
+        Map<String, String> exactParams = new HashMap<>();
+        Map<String, String> prefixParams = new HashMap<>();
+        Map<String, String> containsParams = new HashMap<>();
+
+        List<String> whereClause = new ArrayList<>();
+        whereClause.add("attachment.docId = doc.id");
+
+        // Apply the specified scope.
+        if (scope.getType() == EntityType.DOCUMENT) {
+            whereClause.add("doc.fullName = :localDocumentReference");
+            exactParams.put("localDocumentReference", this.localEntityReferenceSerializer.serialize(scope));
+        } else if (scope.getType() == EntityType.SPACE) {
+            whereClause.add("(doc.space = :localSpaceReference or doc.space like :localSpaceReferencePrefix)");
+            String localSpaceReference = this.localEntityReferenceSerializer.serialize(scope);
+            exactParams.put("localSpaceReference", localSpaceReference);
+            prefixParams.put("localSpaceReferencePrefix", localSpaceReference + '.');
+        }
+
+        // Apply the specified filters.
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            String column = FILTER_TO_QUERY.get(entry.getKey());
+            if (!StringUtils.isEmpty(entry.getValue()) && column != null) {
+                whereClause.add(String.format("upper(%s) like :%s", column, entry.getKey()));
+                containsParams.put(entry.getKey(), entry.getValue().toUpperCase());
+            }
+        }
+        Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault("mediaTypes", ""));
+        if (!acceptedMediaTypes.isEmpty()) {
+            List<String> mediaTypeConstraints = new ArrayList<>();
+            // Not all the attachments have their media type saved in the database. We will filter out these attachments
+            // afterwards.
+            mediaTypeConstraints.add("attachment.mimeType is null");
+            mediaTypeConstraints.add("attachment.mimeType = ''");
+            int index = 0;
+            for (String mediaType : acceptedMediaTypes) {
+                String parameterName = "mediaType" + index++;
+                mediaTypeConstraints.add("upper(attachment.mimeType) like :" + parameterName);
+                containsParams.put(parameterName, mediaType);
+            }
+            whereClause.add("(" + StringUtils.join(mediaTypeConstraints, " or ") + ")");
+        }
+
+        statement.append(" where ").append(StringUtils.join(whereClause, " and "));
+
+        Query query = queryManager.createQuery(statement.toString(), Query.XWQL);
+
+        // Bind the query parameter values.
+        for (Map.Entry<String, String> entry : exactParams.entrySet()) {
+            query.bindValue(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, String> entry : prefixParams.entrySet()) {
+            query.bindValue(entry.getKey()).literal(entry.getValue()).anyChars();
+        }
+        for (Map.Entry<String, String> entry : containsParams.entrySet()) {
+            query.bindValue(entry.getKey()).anyChars().literal(entry.getValue()).anyChars();
+        }
+
+        query.addFilter(this.hiddenDocumentFilter);
+
+        return query;
+    }
+
+    private Set<String> getAcceptedMediaTypes(String mediaTypesFilter)
+    {
+        return Arrays.asList(COMMA.split(mediaTypesFilter)).stream().filter(s -> !s.isEmpty()).map(String::toUpperCase)
+            .collect(Collectors.toSet());
     }
 
     protected Attachments getAttachmentsForDocument(Document doc, int start, int number, Boolean withPrettyNames)

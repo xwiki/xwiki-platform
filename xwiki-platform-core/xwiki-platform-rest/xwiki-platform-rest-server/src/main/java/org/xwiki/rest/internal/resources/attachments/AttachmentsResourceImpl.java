@@ -22,18 +22,20 @@ package org.xwiki.rest.internal.resources.attachments;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.Multipart;
-import javax.ws.rs.Encoded;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
@@ -41,7 +43,6 @@ import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
 
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 
 /**
@@ -54,17 +55,16 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
     private static String FORM_FILENAME_FIELD = "filename";
 
     @Override
-    public Attachments getAttachments(String wikiName, String spaceName, String pageName, Integer start, Integer number,
-            Boolean withPrettyNames) throws XWikiRestException
+    public Attachments getAttachments(String wiki, String spaces, String page, Integer offset, Integer limit,
+        Boolean withPrettyNames, String name, String author, String mediaTypes) throws XWikiRestException
     {
-        try {
-            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
-            Document doc = documentInfo.getDocument();
+        Map<String, String> filters = new HashMap<>();
+        filters.put("name", name);
+        filters.put("author", author);
+        filters.put("mediaTypes", mediaTypes);
 
-            return getAttachmentsForDocument(doc, start, number, withPrettyNames);
-        } catch (XWikiException e) {
-            throw new XWikiRestException(e);
-        }
+        return super.getAttachments(new DocumentReference(wiki, parseSpaceSegments(spaces), page), filters, offset,
+            limit, withPrettyNames);
     }
 
     @Override

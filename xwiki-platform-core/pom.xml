@@ -160,6 +160,12 @@
                     "oldValue": "{\"id\", \"name\", \"size\", \"longSize\", \"version\", \"pageId\", \"pageVersion\", \"mimeType\", \"author\", \"authorName\", \"date\", \"xwikiRelativeUrl\", \"xwikiAbsoluteUrl\"}",
                     "newValue": "{\"id\", \"name\", \"size\", \"longSize\", \"version\", \"pageId\", \"pageVersion\", \"mimeType\", \"author\", \"authorName\", \"date\", \"xwikiRelativeUrl\", \"xwikiAbsoluteUrl\", \"hierarchy\"}",
                     "justification": "Add the hierarchy property in order to be able to show the location of an attachment in the UI"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentsResource::getAttachments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentsResource::getAttachments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException",
+                    "justification": "Add support for filtering the attachments by file name, author and mime type even when they are stored on the same page"
                   }
                   // Add more ignores below...
                 ]

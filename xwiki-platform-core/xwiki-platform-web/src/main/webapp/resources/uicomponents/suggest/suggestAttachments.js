@@ -71,7 +71,8 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       var separatorIndex = typeAndReference.indexOf(':');
       if (separatorIndex > 0) {
         var entityType = XWiki.EntityType.byName(typeAndReference.substr(0, separatorIndex));
-        return XWiki.Model.resolve(typeAndReference.substr(separatorIndex + 1), entityType);
+        return XWiki.Model.resolve(typeAndReference.substr(separatorIndex + 1), entityType,
+          XWiki.currentDocument.documentReference);
       } else {
         return null;
       }

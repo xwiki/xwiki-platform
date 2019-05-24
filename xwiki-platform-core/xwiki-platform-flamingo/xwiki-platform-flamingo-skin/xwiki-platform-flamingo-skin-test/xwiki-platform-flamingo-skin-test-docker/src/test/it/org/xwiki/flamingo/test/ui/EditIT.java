@@ -450,4 +450,49 @@ public class EditIT
         viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("fifth edit", viewPage.getContent());
     }
+
+    @Test
+    @Order(11)
+    public void editTitle255Characters(TestUtils setup, TestReference testReference,
+        LogCaptureConfiguration logCaptureConfiguration)
+    {
+        setup.deletePage(testReference);
+
+        // Title of 300 characters.
+        String veryLongTitle = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin viverra, erat et "
+            + "placerat hendrerit, tellus eros fermentum tellus, vel laoreet orci ligula sodales augue. Aenean "
+            + "fermentum suscipit magna. Donec erat orci, mollis at ligula molestie, ornare consequat mi. Duis "
+            + "ultrices sed elit ac nullam.";
+
+        // Right now error messages from the server are different if we are using Save&View or Save&Continue.
+        // This needs to be fixed as part of XWIKI-16425.
+        String saveContinueErrorMessage = "Failed to save the page. Reason: An error occured while saving: Error number"
+            + " 3201 in 3: Exception while saving document " + setup.serializeReference(testReference) +".";
+
+        String saveViewErrorMessage = "Failed to save the page. Reason: Server Error";
+        // try with save and continue
+        WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
+        wikiEditPage.setTitle(veryLongTitle);
+        wikiEditPage.clickSaveAndContinue(false);
+        wikiEditPage.waitForNotificationErrorMessage(saveContinueErrorMessage);
+        wikiEditPage.setTitle("Lorem Ipsum");
+        wikiEditPage.clickSaveAndContinue();
+
+        // try with save and view
+        wikiEditPage.setTitle(veryLongTitle);
+        wikiEditPage.clickSaveAndView(false);
+        wikiEditPage.waitForNotificationErrorMessage(saveViewErrorMessage);
+        wikiEditPage.setTitle("Lorem Ipsum version 2");
+        ViewPage viewPage = wikiEditPage.clickSaveAndView();
+        assertEquals("Lorem Ipsum version 2", viewPage.getDocumentTitle());
+
+        // Logs generated because of the >255 characters title error.
+        logCaptureConfiguration.registerExpected(
+            "JDBCExceptionReporter",
+            "Error number 3201 in 3",
+            "org.hibernate.HibernateException",
+            "org.hibernate.exception.DataException",
+            "java.sql.BatchUpdateException: data exception: string data, right truncation"
+        );
+    }
 }

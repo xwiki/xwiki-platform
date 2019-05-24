@@ -587,6 +587,7 @@ var XWiki = (function(XWiki) {
       document.fire("xwiki:document:saveFailed", {'response' : response});
     },
     onFailure : function(response) {
+      this.enableEditors();
       this.savingBox.replace(this.failedBox);
       this.progressBox.replace(this.failedBox);
       if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {

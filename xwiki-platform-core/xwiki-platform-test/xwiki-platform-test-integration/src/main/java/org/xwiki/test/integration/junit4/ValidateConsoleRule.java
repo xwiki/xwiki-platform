@@ -35,6 +35,10 @@ import org.xwiki.test.integration.junit.LogCaptureValidator;
  */
 public class ValidateConsoleRule implements TestRule
 {
+    private static final String SKIP_PROPERTY = "xwiki.test.validateconsole.skip";
+
+    private static final boolean SKIP = Boolean.valueOf(System.getProperty(SKIP_PROPERTY, "false"));
+
     private LogCaptureConfiguration logCaptureConfiguration = new LogCaptureConfiguration();
 
     /**
@@ -96,7 +100,11 @@ public class ValidateConsoleRule implements TestRule
     @Override
     public Statement apply(Statement statement, Description description)
     {
-        return new ValidateConsoleStatement(statement);
+        if (SKIP) {
+            return statement;
+        } else {
+            return new ValidateConsoleStatement(statement);
+        }
     }
 
     /**

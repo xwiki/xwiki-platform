@@ -43,7 +43,7 @@ public class PageChildrenResourceImpl extends XWikiResource implements PageChild
 {
     @Override
     public Pages getPageChildren(String wikiName, String spaceName, String pageName, Integer start, Integer number,
-            Boolean withPrettyNames) throws XWikiRestException
+        Boolean withPrettyNames) throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -53,11 +53,10 @@ public class PageChildrenResourceImpl extends XWikiResource implements PageChild
             Pages pages = objectFactory.createPages();
 
             /* Use an explicit query to improve performance */
-            String queryString =
-                    "select distinct doc.fullName from XWikiDocument as doc where doc.parent = :parent order by doc.fullName asc";
-            List<String> childPageFullNames =
-                    queryManager.createQuery(queryString, Query.XWQL).bindValue("parent", doc.getFullName()).setOffset(
-                            start).setLimit(number).execute();
+            String queryString = "select distinct doc.fullName from XWikiDocument as doc "
+                + "where doc.parent = :parent order by doc.fullName asc";
+            List<String> childPageFullNames = queryManager.createQuery(queryString, Query.XWQL)
+                .bindValue("parent", doc.getFullName()).setOffset(start).setLimit(number).execute();
 
             for (String childPageFullName : childPageFullNames) {
                 String pageId = Utils.getPageId(wikiName, childPageFullName);
@@ -71,7 +70,7 @@ public class PageChildrenResourceImpl extends XWikiResource implements PageChild
                     /* We only add pages we have the right to access */
                     if (childDoc != null) {
                         pages.getPageSummaries().add(DomainObjectFactory.createPageSummary(objectFactory,
-                                uriInfo.getBaseUri(), childDoc, Utils.getXWikiApi(componentManager), withPrettyNames));
+                            uriInfo.getBaseUri(), childDoc, Utils.getXWikiApi(componentManager), withPrettyNames));
                     }
                 }
             }

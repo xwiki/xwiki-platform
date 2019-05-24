@@ -19,6 +19,7 @@
  */
 package org.xwiki.rest.internal.resources.attachments;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -29,6 +30,8 @@ import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -42,6 +45,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Named("org.xwiki.rest.internal.resources.attachments.AttachmentResourceImpl")
 public class AttachmentResourceImpl extends BaseAttachmentsResource implements AttachmentResource
 {
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
     @Override
     public Response getAttachment(String wikiName, String spaceName, String pageName, String attachmentName)
         throws XWikiRestException
@@ -70,7 +76,7 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
 
             Document doc = documentInfo.getDocument();
 
-            if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
+            if (!this.authorization.hasAccess(Right.EDIT, doc.getDocumentReference())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
@@ -96,7 +102,7 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
 
             Document doc = documentInfo.getDocument();
 
-            if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
+            if (!this.authorization.hasAccess(Right.EDIT, doc.getDocumentReference())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
@@ -105,9 +111,8 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
                 throw new WebApplicationException(Status.NOT_FOUND);
             }
 
-            XWikiDocument xwikiDocument =
-                Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
-                    Utils.getXWikiContext(componentManager));
+            XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
+                Utils.getXWikiContext(componentManager));
             XWikiAttachment baseXWikiAttachment = xwikiDocument.getAttachment(attachmentName);
 
             xwikiDocument.removeAttachment(baseXWikiAttachment);

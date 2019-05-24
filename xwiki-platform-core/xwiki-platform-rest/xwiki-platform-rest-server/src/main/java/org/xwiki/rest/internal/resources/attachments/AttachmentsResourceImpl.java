@@ -52,7 +52,7 @@ import com.xpn.xwiki.api.Document;
 @Named("org.xwiki.rest.internal.resources.attachments.AttachmentsResourceImpl")
 public class AttachmentsResourceImpl extends BaseAttachmentsResource implements AttachmentsResource
 {
-    private static String FORM_FILENAME_FIELD = "filename";
+    private static final String FORM_FILENAME_FIELD = "filename";
 
     @Override
     public Attachments getAttachments(String wiki, String spaces, String page, Integer offset, Integer limit,
@@ -113,7 +113,7 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
                                     if (FORM_FILENAME_FIELD.equals(value)) {
                                         overriddenFileName = bodyPart.getContent().toString();
                                     }
-                                } else if ("filename".equals(key)) {
+                                } else if (FORM_FILENAME_FIELD.equals(key)) {
                                     actualFileName = value;
                                     contentType = bodyPart.getContentType();
                                     inputStream = bodyPart.getInputStream();

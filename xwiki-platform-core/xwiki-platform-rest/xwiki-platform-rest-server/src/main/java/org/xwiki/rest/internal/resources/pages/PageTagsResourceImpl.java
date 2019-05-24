@@ -51,6 +51,10 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 @Named("org.xwiki.rest.internal.resources.pages.PageTagsResourceImpl")
 public class PageTagsResourceImpl extends ModifiablePageResource implements PageTagsResource
 {
+    private static final String PROPERTY_TAGS = "tags";
+
+    private static final String TAG_CLASS = "XWiki.TagClass";
+
     @Override
     public Tags getPageTags(String wikiName, String spaceName, String pageName) throws XWikiRestException
     {
@@ -81,7 +85,7 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
 
     @Override
     public Response setTags(String wikiName, String spaceName, String pageName, Boolean minorRevision, Tags tags)
-            throws XWikiRestException
+        throws XWikiRestException
     {
         try {
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaceName, pageName, null, null, true, false);
@@ -97,29 +101,27 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
                 tagNames.add(tag.getName());
             }
 
-            XWikiDocument xwikiDocument =
-                    Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
-                            Utils.getXWikiContext(componentManager));
-            BaseObject xwikiObject = xwikiDocument.getObject("XWiki.TagClass", 0);
+            XWikiDocument xwikiDocument = Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(),
+                Utils.getXWikiContext(componentManager));
+            BaseObject xwikiObject = xwikiDocument.getObject(TAG_CLASS, 0);
 
             if (xwikiObject == null) {
-                int objectNumber =
-                        xwikiDocument.createNewObject("XWiki.TagClass", Utils.getXWikiContext(componentManager));
-                xwikiObject = xwikiDocument.getObject("XWiki.TagClass", objectNumber);
+                int objectNumber = xwikiDocument.createNewObject(TAG_CLASS, Utils.getXWikiContext(componentManager));
+                xwikiObject = xwikiDocument.getObject(TAG_CLASS, objectNumber);
                 if (xwikiObject == null) {
                     throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
                 }
 
                 // We must initialize all the fields to an empty value in order to correctly create the object
-                BaseClass xwikiClass = Utils.getXWiki(componentManager)
-                        .getClass(xwikiObject.getClassName(), Utils.getXWikiContext(componentManager));
+                BaseClass xwikiClass = Utils.getXWiki(componentManager).getClass(xwikiObject.getClassName(),
+                    Utils.getXWikiContext(componentManager));
                 for (Object propertyNameObject : xwikiClass.getPropertyNames()) {
                     String propertyName = (String) propertyNameObject;
                     xwikiObject.set(propertyName, "", Utils.getXWikiContext(componentManager));
                 }
             }
 
-            xwikiObject.set("tags", tagNames, Utils.getXWikiContext(componentManager));
+            xwikiObject.set(PROPERTY_TAGS, tagNames, Utils.getXWikiContext(componentManager));
 
             doc.save("", Boolean.TRUE.equals(minorRevision));
 
@@ -132,10 +134,10 @@ public class PageTagsResourceImpl extends ModifiablePageResource implements Page
     private List<String> getTagsFromDocument(String documentId) throws XWikiException
     {
         XWikiDocument document =
-                Utils.getXWiki(componentManager).getDocument(documentId, Utils.getXWikiContext(componentManager));
-        BaseObject object = document.getObject("XWiki.TagClass");
+            Utils.getXWiki(componentManager).getDocument(documentId, Utils.getXWikiContext(componentManager));
+        BaseObject object = document.getObject(TAG_CLASS);
         if (object != null) {
-            BaseProperty prop = (BaseProperty) object.safeget("tags");
+            BaseProperty prop = (BaseProperty) object.safeget(PROPERTY_TAGS);
             if (prop != null) {
                 List<String> tags = (List<String>) prop.getValue();
                 if (tags != null) {

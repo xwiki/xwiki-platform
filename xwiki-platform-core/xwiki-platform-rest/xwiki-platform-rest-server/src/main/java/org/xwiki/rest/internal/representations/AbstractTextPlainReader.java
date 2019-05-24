@@ -29,8 +29,9 @@ import org.xwiki.rest.XWikiRestComponent;
 
 /**
  * @version $Id$
+ * @param <T> the type of data returned by the read method
  */
-public abstract class TextPlainReader<T> implements MessageBodyReader<T>, XWikiRestComponent
+public abstract class AbstractTextPlainReader<T> implements MessageBodyReader<T>, XWikiRestComponent
 {
     protected String getEntityAsString(InputStream entityStream) throws IOException
     {

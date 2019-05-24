@@ -33,7 +33,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rest.internal.representations.TextPlainReader;
+import org.xwiki.rest.internal.representations.AbstractTextPlainReader;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 import org.xwiki.rest.model.jaxb.Property;
 
@@ -45,7 +45,7 @@ import org.xwiki.rest.model.jaxb.Property;
 @Provider
 @Consumes(MediaType.TEXT_PLAIN)
 @Singleton
-public class TextPlainPropertyReader extends TextPlainReader<Property>
+public class TextPlainPropertyReader extends AbstractTextPlainReader<Property>
 {
     @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)

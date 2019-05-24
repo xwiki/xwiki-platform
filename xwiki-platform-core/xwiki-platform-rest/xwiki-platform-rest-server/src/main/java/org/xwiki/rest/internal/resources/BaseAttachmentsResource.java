@@ -91,6 +91,8 @@ public class BaseAttachmentsResource extends XWikiResource
         }
     }
 
+    private static final String FILTER_MEDIA_TYPES = "mediaTypes";
+
     private static final Pattern COMMA = Pattern.compile("\\s*,\\s*");
 
     private static final Map<String, String> FILTER_TO_QUERY = new HashMap<>();
@@ -141,7 +143,7 @@ public class BaseAttachmentsResource extends XWikiResource
 
             List<Object> queryResult = getAttachmentsQuery(scope, filters).setLimit(limit).setOffset(offset).execute();
 
-            Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault("mediaTypes", ""));
+            Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault(FILTER_MEDIA_TYPES, ""));
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
@@ -202,28 +204,10 @@ public class BaseAttachmentsResource extends XWikiResource
         }
 
         // Apply the specified filters.
-        for (Map.Entry<String, String> entry : filters.entrySet()) {
-            String column = FILTER_TO_QUERY.get(entry.getKey());
-            if (!StringUtils.isEmpty(entry.getValue()) && column != null) {
-                whereClause.add(String.format("upper(%s) like :%s", column, entry.getKey()));
-                containsParams.put(entry.getKey(), entry.getValue().toUpperCase());
-            }
-        }
-        Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault("mediaTypes", ""));
-        if (!acceptedMediaTypes.isEmpty()) {
-            List<String> mediaTypeConstraints = new ArrayList<>();
-            // Not all the attachments have their media type saved in the database. We will filter out these attachments
-            // afterwards.
-            mediaTypeConstraints.add("attachment.mimeType is null");
-            mediaTypeConstraints.add("attachment.mimeType = ''");
-            int index = 0;
-            for (String mediaType : acceptedMediaTypes) {
-                String parameterName = "mediaType" + index++;
-                mediaTypeConstraints.add("upper(attachment.mimeType) like :" + parameterName);
-                containsParams.put(parameterName, mediaType);
-            }
-            whereClause.add("(" + StringUtils.join(mediaTypeConstraints, " or ") + ")");
-        }
+        applyFilters(filters, whereClause, containsParams);
+
+        // We need to handle the media type filter separately.
+        applyMediaTypeFilter(filters, whereClause, containsParams);
 
         statement.append(" where ").append(StringUtils.join(whereClause, " and "));
 
@@ -243,6 +227,37 @@ public class BaseAttachmentsResource extends XWikiResource
         query.addFilter(this.hiddenDocumentFilter);
 
         return query;
+    }
+
+    private void applyFilters(Map<String, String> filters, List<String> constraints, Map<String, String> parameters)
+    {
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            String column = FILTER_TO_QUERY.get(entry.getKey());
+            if (!StringUtils.isEmpty(entry.getValue()) && column != null) {
+                constraints.add(String.format("upper(%s) like :%s", column, entry.getKey()));
+                parameters.put(entry.getKey(), entry.getValue().toUpperCase());
+            }
+        }
+    }
+
+    private void applyMediaTypeFilter(Map<String, String> filters, List<String> constraints,
+        Map<String, String> parameters)
+    {
+        Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault(FILTER_MEDIA_TYPES, ""));
+        if (!acceptedMediaTypes.isEmpty()) {
+            List<String> mediaTypeConstraints = new ArrayList<>();
+            // Not all the attachments have their media type saved in the database. We will filter out these attachments
+            // afterwards.
+            mediaTypeConstraints.add("attachment.mimeType is null");
+            mediaTypeConstraints.add("attachment.mimeType = ''");
+            int index = 0;
+            for (String mediaType : acceptedMediaTypes) {
+                String parameterName = "mediaType" + index++;
+                mediaTypeConstraints.add("upper(attachment.mimeType) like :" + parameterName);
+                parameters.put(parameterName, mediaType);
+            }
+            constraints.add("(" + StringUtils.join(mediaTypeConstraints, " or ") + ")");
+        }
     }
 
     private Set<String> getAcceptedMediaTypes(String mediaTypesFilter)

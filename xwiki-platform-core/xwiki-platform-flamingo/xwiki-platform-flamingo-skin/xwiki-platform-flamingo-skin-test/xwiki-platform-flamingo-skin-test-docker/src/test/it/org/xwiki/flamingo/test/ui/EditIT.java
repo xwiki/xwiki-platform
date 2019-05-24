@@ -453,8 +453,7 @@ public class EditIT
 
     @Test
     @Order(11)
-    public void editTitle255Characters(TestUtils setup, TestReference testReference,
-        LogCaptureConfiguration logCaptureConfiguration)
+    public void editTitle255Characters(TestUtils setup, TestReference testReference)
     {
         setup.deletePage(testReference);
 
@@ -485,14 +484,5 @@ public class EditIT
         wikiEditPage.setTitle("Lorem Ipsum version 2");
         ViewPage viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("Lorem Ipsum version 2", viewPage.getDocumentTitle());
-
-        // Logs generated because of the >255 characters title error.
-        logCaptureConfiguration.registerExpected(
-            "JDBCExceptionReporter",
-            "Error number 3201 in 3",
-            "org.hibernate.HibernateException",
-            "org.hibernate.exception.DataException",
-            "java.sql.BatchUpdateException: data exception: string data, right truncation"
-        );
     }
 }

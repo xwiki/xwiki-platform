@@ -4,10 +4,12 @@
     #else
         $doc.displayEdit($field, $prefix, $object)
     #end
+## The following need to be kept not indented so we don't have any issue with the scripts: if we indent the spaces
+## will be added in the retrieved values.
 #elseif ($type == 'view')
-    $doc.displayView($field, $prefix, $object)##
+$doc.displayView($field, $prefix, $object)##
 #elseif ($type == 'rendered')
-    $doc.displayRendered($field, $prefix, $object)##
+$doc.displayRendered($field, $prefix, $object)##
 #elseif ($type == 'hidden')
     $doc.displayHidden($field, $prefix, $object)
 #else

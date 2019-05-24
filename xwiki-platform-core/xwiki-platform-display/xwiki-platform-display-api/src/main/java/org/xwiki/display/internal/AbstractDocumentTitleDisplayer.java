@@ -230,9 +230,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         DocumentDisplayerParameters parameters)
     {
         StringWriter writer = new StringWriter();
-        String namespace =
-            defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated() ? documentReference
-                : documentAccessBridge.getCurrentDocumentReference());
+        String namespace = defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated()
+            ? documentReference : documentAccessBridge.getCurrentDocumentReference());
 
         // Get the velocity engine
         VelocityEngine velocityEngine;
@@ -256,8 +255,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 // Make sure to synchronize the context wiki with the context document's wiki.
                 modelContext.setCurrentEntityReference(documentReference.getWikiReference());
             }
-            velocityEngine
-                .evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
+            velocityEngine.evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {

@@ -43,6 +43,9 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       // limited to a specific document (if all the attachments are from the same document then the attachment name is
       // enough to identify an attachment, and there's no need to escape it as an entity reference).
       useAttachmentName: false,
+      // Indicates the type of attachments to look for. If nothing is specified then no restriction is applied. You can
+      // use partial media types such as "image/" to limit the search to image attachments.
+      mediaTypes: select.data('mediaTypes'),
       load: function(text, callback) {
         loadAttachments(text, this.settings).done(callback).fail(callback);
       },
@@ -90,6 +93,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     var attachmentsRestURL = getAttachmentsRestURL(searchScope);
     return $.getJSON(attachmentsRestURL, {
       name: text,
+      types: options.mediaTypes,
       number: options.maxOptions
     }).then($.proxy(processAttachments, null, options));
   };

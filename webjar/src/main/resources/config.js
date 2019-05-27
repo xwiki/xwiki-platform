@@ -111,11 +111,13 @@ CKEDITOR.editorConfig = function(config) {
       {name: 'about'}
     ],
     'xwiki-macro': {
-      // List here the macro parameter / content types that support in-line editing using nested editables.
+      // You can restrict here the type of content the users can input when editing the macro content / parameters
+      // in-line using nested editables, depending on the macro content / parameter type.
       // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_plugins_widget_nestedEditable.html
       // See also https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_plugins_widget_nestedEditable_definition.html
       // on how to configure a nested editable.
       nestedEditableTypes: {
+        // The type used when the macro content / parameter supports any wiki syntax (no restrictions).
         'java.util.List<org.xwiki.rendering.block.Block>': {}
       }
     },

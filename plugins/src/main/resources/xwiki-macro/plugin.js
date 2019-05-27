@@ -203,7 +203,7 @@
         },
         scrollIntoViewAndFocus: function() {
           this.wrapper.scrollIntoView();
-          (this.editables.content || this).focus();
+          (this.editables.$content || this).focus();
         },
         data: function(event) {
           this.element.setAttribute('data-macro', macroPlugin.serializeMacroCall(this.data));
@@ -240,10 +240,9 @@
         },
         showMacroWizard: function(macroCall) {
           var widget = this;
-          var nestedEditableTypes = (editor.config['xwiki-macro'] || {}).nestedEditableTypes || {};
           var input = {
             macroCall: macroCall,
-            hiddenMacroParameterTypes: Object.keys(nestedEditableTypes)
+            hiddenMacroParameters: Object.keys(widget.editables || {})
           };
           // Show our custom insert/edit dialog.
           require(['macroWizard'], function(macroWizard) {
@@ -407,7 +406,7 @@
         if (!widget.element.equals(nestedEditableOwner)) {
           continue;
         }
-        var nestedEditableName = 'content';
+        var nestedEditableName = '$content';
         var nestedEditableSelector = 'div[' + nestedEditableTypeAttribute + ']:not([' +
           nestedEditableNameAttribute + '])';
         if (nestedEditable.hasAttribute(nestedEditableNameAttribute)) {

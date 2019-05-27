@@ -138,9 +138,9 @@ describe('XWiki Macro Plugin for CKEditor', function() {
         var wikiMacroWidgets = getWikiMacroWidgets(editor);
         expect(wikiMacroWidgets.length).toBe(2);
 
-        expect(wikiMacroWidgets[1].editables.content.getData()).toBe('<p>test</p>');
+        expect(wikiMacroWidgets[1].editables.$content.getData()).toBe('<p>test</p>');
 
-        expect(wikiMacroWidgets[0].editables.content.getData()).toBe([
+        expect(wikiMacroWidgets[0].editables.$content.getData()).toBe([
           '<p>before</p>',
           '<!--startmacro:error|-|-->',
           '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
@@ -238,7 +238,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
         expect(wikiMacroWidgets.length).toBe(1);
 
         expect(wikiMacroWidgets[0].editables.title.getData()).toBe('<p>Title</p>');
-        expect(wikiMacroWidgets[0].editables.content.getData()).toBe('<p>Content</p>');
+        expect(wikiMacroWidgets[0].editables.$content.getData()).toBe('<p>Content</p>');
 
         wikiMacroWidgets[0].data.descriptor = {
           contentDescriptor: {

@@ -223,7 +223,7 @@ define('macroParameterTreeBuilder', ['jquery', 'l10n!macroEditor'], function($, 
 define('macroParameterTreeSorter', ['jquery'], function($) {
   'use strict';
 
-  var sortMacroParameterTree = function(parentNode, macroCall, hiddenMacroParameterTypes) {
+  var sortMacroParameterTree = function(parentNode, macroCall, hiddenMacroParameters) {
     if (parentNode.children) {
       // We need to be able to compare parameters and groups.
       parentNode.data = $.extend({
@@ -234,7 +234,7 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
         index: Infinity
       }, parentNode.data);
       parentNode.children.forEach(function(childNode) {
-        sortMacroParameterTree(childNode, macroCall, hiddenMacroParameterTypes);
+        sortMacroParameterTree(childNode, macroCall, hiddenMacroParameters);
         // The parent is hidden if all the children are hidden.
         parentNode.data.hidden = parentNode.data.hidden && childNode.data.hidden === true;
         // The parent is mandatory if at least one child is mandatory.
@@ -253,7 +253,7 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
       addParameterSeparator(parentNode.children);
     } else if (parentNode.type === 'parameter') {
       maybeSetParameterValue(parentNode.data, macroCall);
-      maybeHideParameter(parentNode.data, macroCall, hiddenMacroParameterTypes);
+      maybeHideParameter(parentNode.data, macroCall, hiddenMacroParameters);
     }
   },
 
@@ -280,12 +280,10 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
    * - deprecated parameters that don't have a value set
    * - parameters that can be edited in-place (as long as they are not mandatory and without a value set)
    */
-  maybeHideParameter = function(parameter, macroCall, hiddenMacroParameterTypes) {
+  maybeHideParameter = function(parameter, macroCall, hiddenMacroParameters) {
     // We can't hide mandatory parameters that don't have a value set.
-    // We can't hide macro parameters when the macro call is in-line because in-line nested editables are not well
-    // supported. See https://github.com/ckeditor/ckeditor-dev/issues/1091
-    parameter.hidden = isDeprecatedParameterUnset(parameter) || (macroCall.inline === false &&
-      hiddenMacroParameterTypes.indexOf(parameter.type) >= 0 && !isMandatoryParameterEmpty(parameter));
+    parameter.hidden = isDeprecatedParameterUnset(parameter) || (hiddenMacroParameters.indexOf(parameter.id) >= 0 &&
+      !isMandatoryParameterEmpty(parameter));
   },
 
   isDeprecatedParameterUnset = function(macroParameter) {
@@ -555,7 +553,7 @@ define(
     macroEditor.find('.macro-name').text(macroDescriptor.name);
     macroEditor.find('.macro-description').text(macroDescriptor.description);
     var macroParameterTree = macroParameterTreeBuilder.build(macroDescriptor);
-    macroParameterTreeSorter.sort(macroParameterTree, macroCall, this.data('hiddenMacroParameterTypes'));
+    macroParameterTreeSorter.sort(macroParameterTree, macroCall, this.data('hiddenMacroParameters'));
     macroEditor.find('.macro-parameters').append(macroParameterTreeDisplayer.display(macroParameterTree,
       macroDescriptor.requiredSkinExtensions));
     this.removeClass('loading').data('macroDescriptor', macroDescriptor).append(macroEditor.children());
@@ -685,7 +683,7 @@ define(
         var macroEditor = modal.find('.macro-editor');
         var macroEditorAPI = macroEditor.data('macroEditorAPI');
         var input = modal.data('input');
-        macroEditor.data('hiddenMacroParameterTypes', input.hiddenMacroParameterTypes || []);
+        macroEditor.data('hiddenMacroParameters', input.hiddenMacroParameters || []);
         var macroCall = input.macroCall || {
           name: input.macroId,
           parameters: {}

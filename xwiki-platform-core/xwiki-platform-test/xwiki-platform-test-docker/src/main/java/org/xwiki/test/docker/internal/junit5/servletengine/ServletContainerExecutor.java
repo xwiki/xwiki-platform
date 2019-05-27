@@ -24,6 +24,7 @@ import java.io.FileWriter;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -63,6 +64,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final String CLOVER_DATABASE = System.getProperty("maven.clover.cloverDatabase");
 
     private static final String ORACLE_TZ_WORKAROUND = "-Doracle.jdbc.timezoneAsRegion=false";
+
+    private static final String OFFICE_IMAGE_VERSION_LABEL = "image-version";
+
+    /**
+     *  Increment the image version whenever a change is brought to the image so that it can be reconstructed on all
+     *  machines needing it.
+     */
+    private static final String OFFICE_IMAGE_VERSION_LABEL_VALUE = "1";
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -233,7 +242,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 this.testConfiguration.getServletEngine().name().toLowerCase(), getDockerImageTag(testConfiguration));
 
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
-                .withImageNameFilter(imageName).exec();
+                .withImageNameFilter(imageName)
+                .withLabelFilter(Collections.singletonMap(OFFICE_IMAGE_VERSION_LABEL, OFFICE_IMAGE_VERSION_LABEL_VALUE))
+                .exec();
 
             if (imageSearchResults.isEmpty()) {
                 LOGGER.info("(*) Build a dedicated image embedding LibreOffice...");
@@ -251,7 +262,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                                 + " curl"
                                 + " libreoffice"
                                 + " unzip"
-                                + " procps");
+                                + " procps")
+                            // Increment the image version whenever a change is brought to the image so that it can
+                            // reconstructed on all machines needing it.
+                            .label(OFFICE_IMAGE_VERSION_LABEL, OFFICE_IMAGE_VERSION_LABEL_VALUE);
                         if (this.testConfiguration.getServletEngine() == ServletEngine.JETTY) {
                             // Create the right jetty user directory since it doesn't exist
                             builder.run("mkdir -p /home/jetty && chown jetty:jetty /home/jetty")

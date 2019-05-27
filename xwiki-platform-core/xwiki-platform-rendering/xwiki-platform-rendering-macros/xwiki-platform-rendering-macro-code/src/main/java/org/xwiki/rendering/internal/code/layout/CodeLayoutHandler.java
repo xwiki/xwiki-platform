@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Arranges a list of code rendering blocks into a specific layout.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 11.5RC1
  */
 @Role
-@Unstable
 public interface CodeLayoutHandler
 {
     /**

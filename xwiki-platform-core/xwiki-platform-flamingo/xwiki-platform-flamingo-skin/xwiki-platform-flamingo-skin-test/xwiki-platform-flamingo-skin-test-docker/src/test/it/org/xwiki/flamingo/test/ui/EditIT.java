@@ -29,8 +29,10 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
@@ -453,7 +455,8 @@ public class EditIT
 
     @Test
     @Order(11)
-    public void editTitle255Characters(TestUtils setup, TestReference testReference)
+    public void editTitle255Characters(TestUtils setup, TestConfiguration testConfiguration,
+        TestReference testReference)
     {
         setup.deletePage(testReference);
 
@@ -469,10 +472,19 @@ public class EditIT
             + " 3201 in 3: Exception while saving document " + setup.serializeReference(testReference) +".";
 
         String saveViewErrorMessage = "Failed to save the page. Reason: Server Error";
+        String errorServerNotRespondingMessage = "Failed to save the page. Reason: Server not responding";
+
+        // Apparently for MYSQL and Oracle the error message are also different.
+        if (testConfiguration.getDatabase() == Database.MYSQL || testConfiguration.getDatabase() == Database.ORACLE) {
+            saveContinueErrorMessage = errorServerNotRespondingMessage;
+            saveViewErrorMessage = errorServerNotRespondingMessage;
+        }
+
         // try with save and continue
         WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
         wikiEditPage.setTitle(veryLongTitle);
         wikiEditPage.clickSaveAndContinue(false);
+
         wikiEditPage.waitForNotificationErrorMessage(saveContinueErrorMessage);
         wikiEditPage.setTitle("Lorem Ipsum");
         wikiEditPage.clickSaveAndContinue();

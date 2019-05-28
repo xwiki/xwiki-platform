@@ -463,8 +463,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
                 return;
             }
 
-            Metadata metadata = this.store.getMetadata(bclass.getName(), custommapping);
-            this.store.updateSchema(metadata, context.getWikiId());
+            Metadata metadata = this.store.getMetadata(bclass.getName(), custommapping, context.getWikiId());
+            this.store.updateSchema(metadata);
         } finally {
             restoreExecutionXContext();
         }

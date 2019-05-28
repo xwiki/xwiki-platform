@@ -28,7 +28,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;

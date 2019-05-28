@@ -2863,7 +2863,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1)
     {
         try {
-            Metadata metadata = this.store.getMetadata(bclass.getName(), custommapping1);
+            Metadata metadata = this.store.getMetadata(bclass.getName(), custommapping1, null);
 
             return isValidCustomMapping(bclass, metadata);
         } catch (Exception e) {
@@ -3062,7 +3062,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         List<String> list = new ArrayList<>();
         Metadata metadata;
         if (bclass.hasExternalCustomMapping()) {
-            metadata = this.store.getMetadata(bclass.getName(), bclass.getCustomMapping());
+            metadata = this.store.getMetadata(bclass.getName(), bclass.getCustomMapping(), null);
         } else {
             metadata = this.store.getMetadata();
         }

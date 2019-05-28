@@ -41,9 +41,11 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
@@ -129,6 +131,8 @@ public class HibernateStore implements Disposable, Integrator
 
     private final Configuration configuration = new Configuration(this.metadataSources);
 
+    private StandardServiceRegistry standardServiceRegistry;
+
     private Dialect dialect;
 
     private DatabaseProduct databaseProductCache = DatabaseProduct.UNKNOWN;
@@ -211,8 +215,11 @@ public class HibernateStore implements Disposable, Integrator
         // Get rid of existing session factory
         disposeInternal();
 
+        this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
+        this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+
         // Create a new session factory
-        this.sessionFactory = this.configuration.buildSessionFactory();
+        this.sessionFactory = this.configuration.buildSessionFactory(standardServiceRegistry);
     }
 
     private void disposeInternal()
@@ -386,14 +393,39 @@ public class HibernateStore implements Disposable, Integrator
         return this.metadata;
     }
 
-    public Metadata getMetadata(String className, String customMapping)
+    /**
+     * @since 11.5RC1
+     */
+    public void setWiki(MetadataBuilder builder, String wikiId)
+    {
+        String schemaName = getSchemaFromWikiName(wikiId);
+
+        DatabaseProduct product = getDatabaseProductName();
+        if (DatabaseProduct.ORACLE == product || (DatabaseProduct.POSTGRESQL == product && isInSchemaMode())) {
+            builder.applyImplicitSchemaName(schemaName);
+        } else {
+            if (getDialect().canCreateCatalog()) {
+                builder.applyImplicitSchemaName(schemaName);
+            } else {
+                builder.applyImplicitCatalogName(wikiId);
+            }
+        }
+    }
+
+    public Metadata getMetadata(String className, String customMapping, String wikiId)
     {
         MetadataSources builder = new MetadataSources();
 
         builder.addInputStream(
             new ByteArrayInputStream(makeMapping(className, customMapping).getBytes(StandardCharsets.UTF_8)));
 
-        return builder.buildMetadata();
+        MetadataBuilder metadataBuilder = builder.getMetadataBuilder();
+
+        if (wikiId != null) {
+            setWiki(metadataBuilder, wikiId);
+        }
+
+        return metadataBuilder.build();
     }
 
     /**
@@ -787,20 +819,24 @@ public class HibernateStore implements Disposable, Integrator
     /**
      * Automatically update the current database schema to contains what's defined in standard metadata.
      * 
-     * @since 11.2RC1
+     * @since 11.5RC1
      */
     public void updateSchema(String wikiId)
     {
-        updateSchema(getMetadata(), wikiId);
+        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder(this.standardServiceRegistry);
+
+        setWiki(metadataBuilder, wikiId);
+
+        new SchemaUpdate().execute(EnumSet.of(TargetType.DATABASE), metadataBuilder.build());
     }
 
     /**
      * Automatically update the current database schema to contains what's defined in standard metadata.
      * 
      * @param metadata the metadata we want the current database to follow
-     * @since 11.2RC1
+     * @since 11.5RC1
      */
-    public void updateSchema(Metadata metadata, String wikiId)
+    public void updateSchema(Metadata metadata)
     {
         new SchemaUpdate().execute(EnumSet.of(TargetType.DATABASE), metadata);
     }

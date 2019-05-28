@@ -1297,6 +1297,23 @@ public class TestUtils
     }
 
     /**
+     * @since 11.5RC1
+     * @since 11.3.1
+     */
+    public void updateObject(EntityReference entityReference, String className, int objectNumber,
+        Object... properties)
+    {
+        // TODO: would be even quicker using REST
+        Map<String, Object> queryParameters =
+            (Map<String, Object>) toQueryParameters(className, objectNumber, properties);
+
+        // Append the updateOrCreate objectPolicy since we always want this in our tests.
+        queryParameters.put("objectPolicy", "updateOrCreate");
+
+        gotoPage(entityReference, "save", queryParameters);
+    }
+
+    /**
      * @since 8.3RC1
      */
     public void updateObject(List<String> spaces, String page, String className, int objectNumber, Object... properties)

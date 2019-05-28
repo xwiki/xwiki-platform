@@ -38,5 +38,8 @@ $app:
     #set ($lastIndex = $event.events.size() - 1)
     #set ($origdoc = $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
   #end
-  $services.localization.render('notifications.email.seeChanges', [$document.getURL('view', "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}")])
+  #if ($event.type != 'delete')
+    #set ($queryString = "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}")
+  #end
+  $services.localization.render('notifications.email.seeChanges', [$document.getURL('view', $!queryString)])
 #end

@@ -114,6 +114,12 @@ public class AdministrationSectionPage extends ViewPage
         return new FormContainerElement(this.formContainer);
     }
 
+    public FormContainerElement getFormContainerElement(String section, String documentClass)
+    {
+        String formContainerId = String.format("%s_%s", section, documentClass);
+        return new FormContainerElement(By.id(formContainerId));
+    }
+
     public boolean hasLink(String linkName)
     {
         String xPathSelector = String.format("//form/fieldset//a[@href='%s']", linkName);

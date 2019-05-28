@@ -29,9 +29,10 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
+import org.xwiki.stability.Unstable;
 
 /**
- * Represents a container element holding one or several forms and provide utility methods to get/set form data. This
+ * Represents a form element and provide utility methods to get/set form data. This
  * container element can be a FORM element. It can also be some DIV element wrapping several FORM elements.
  * 
  * @version $Id$
@@ -39,16 +40,34 @@ import org.openqa.selenium.support.ui.Select;
  */
 public class FormContainerElement extends BaseElement
 {
-    private final WebElement formContainer;
+    private final WebElement formElement;
 
-    public FormContainerElement(WebElement formContainer)
+    /**
+     * The form element is retrieved through the given selector.
+     * This allow to retrieve a specific form when the container contains multiples.
+     * @param formSelector the selector used to retrieve the form
+     * @since 11.5RC1
+     * @since 11.3.1
+     */
+    @Unstable
+    public FormContainerElement(By formSelector)
     {
-        this.formContainer = formContainer;
+        this.formElement = getDriver().findElementWithoutWaiting(formSelector);
     }
 
-    protected WebElement getFormContainer()
+    /**
+     * The form element is retrieved through its container.
+     * Note that this constructor shouldn't be used in case of several forms.
+     * @param formContainer the container containing the form.
+     */
+    public FormContainerElement(WebElement formContainer)
     {
-        return this.formContainer;
+        this.formElement = getDriver().findElementWithoutWaiting(formContainer, By.tagName("form"));
+    }
+
+    protected WebElement getFormElement()
+    {
+        return this.formElement;
     }
 
     public void fillFieldsByName(Map<String, String> valuesByNames)
@@ -56,7 +75,7 @@ public class FormContainerElement extends BaseElement
         Map<WebElement, String> valuesByElements = new HashMap<>((int) (valuesByNames.size() / 0.75));
 
         for (String name : valuesByNames.keySet()) {
-            valuesByElements.put(getFormContainer().findElement(By.name(name)), valuesByNames.get(name));
+            valuesByElements.put(getFormElement().findElement(By.name(name)), valuesByNames.get(name));
         }
         fillFieldsByElements(valuesByElements);
     }
@@ -75,17 +94,17 @@ public class FormContainerElement extends BaseElement
 
     public String getFieldValue(By findElementBy)
     {
-        return getFormContainer().findElement(findElementBy).getAttribute("value");
+        return getFormElement().findElement(findElementBy).getAttribute("value");
     }
 
     public void setFieldValue(By findElementBy, String value)
     {
-        setFieldValue(getFormContainer().findElement(findElementBy), value);
+        setFieldValue(getFormElement().findElement(findElementBy), value);
     }
 
     public boolean hasField(By findFieldBy)
     {
-        return getDriver().hasElementWithoutWaiting(this.formContainer, findFieldBy);
+        return getDriver().hasElementWithoutWaiting(getFormElement(), findFieldBy);
     }
 
     public void setFieldValue(WebElement fieldElement, String value)
@@ -103,7 +122,7 @@ public class FormContainerElement extends BaseElement
 
     public void setCheckBox(By findElementBy, boolean checked)
     {
-        setCheckBox(getFormContainer().findElement(findElementBy), checked);
+        setCheckBox(getFormElement().findElement(findElementBy), checked);
     }
 
     public void setCheckBox(WebElement checkBoxElement, boolean checked)
@@ -122,12 +141,12 @@ public class FormContainerElement extends BaseElement
 
     public String getFormAction()
     {
-        return getDriver().findElementWithoutWaiting(this.formContainer, By.tagName("form")).getAttribute("action");
+        return this.formElement.getAttribute("action");
     }
 
     public SelectElement getSelectElement(By by)
     {
-        return this.new SelectElement(getFormContainer().findElement(by));
+        return this.new SelectElement(getFormElement().findElement(by));
     }
 
     public class SelectElement extends BaseElement

@@ -66,7 +66,7 @@ public class ObjectEditPane extends FormContainerElement
      */
     public DatePicker openDatePicker(String datePropertyName)
     {
-        getDriver().findElementWithoutWaiting(getFormContainer(), byPropertyName(datePropertyName)).click();
+        getDriver().findElementWithoutWaiting(getFormElement(), byPropertyName(datePropertyName)).click();
         return new DatePicker();
     }
 
@@ -77,7 +77,7 @@ public class ObjectEditPane extends FormContainerElement
     public SuggestInputElement getSuggestInput(String userPropertyName)
     {
         return new SuggestInputElement(
-            getDriver().findElementWithoutWaiting(getFormContainer(), byPropertyName(userPropertyName)));
+            getDriver().findElementWithoutWaiting(getFormElement(), byPropertyName(userPropertyName)));
     }
 
     /**

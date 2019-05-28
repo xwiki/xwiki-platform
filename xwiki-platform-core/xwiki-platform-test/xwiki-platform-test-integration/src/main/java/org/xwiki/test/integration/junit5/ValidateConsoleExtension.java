@@ -128,8 +128,8 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
         LogCaptureConfiguration logCaptureConfiguration =
             store.get(LogCaptureConfiguration.class, LogCaptureConfiguration.class);
         if (logCaptureConfiguration == null) {
-            LogCaptureConfiguration configuration = new LogCaptureConfiguration();
-            saveLogCaptureConfiguration(context, configuration);
+            logCaptureConfiguration = new LogCaptureConfiguration();
+            saveLogCaptureConfiguration(context, logCaptureConfiguration);
         }
         return logCaptureConfiguration;
     }

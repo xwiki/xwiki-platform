@@ -25,7 +25,10 @@ import java.io.PrintStream;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
@@ -45,6 +48,7 @@ import ch.qos.logback.core.ConsoleAppender;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass;
+import static org.xwiki.test.integration.junit5.ValidateConsoleExtension.SKIP_PROPERTY;
 
 /**
  * Unit tests for {@link ValidateConsoleExtension}.
@@ -54,6 +58,27 @@ import static org.junit.platform.engine.discovery.DiscoverySelectors.selectClass
  */
 public class ValidateConsoleExtensionTest
 {
+    private static class ValidateConsoleExtensionTestSetup implements BeforeAllCallback, AfterAllCallback
+    {
+        private static String skipValue;
+
+        @Override
+        public void beforeAll(ExtensionContext extensionContext) throws Exception
+        {
+            // Ensure that the validator is enabled so that the test can pass and can have the right coverage and
+            // mutation score
+            skipValue = System.getProperty(SKIP_PROPERTY);
+            System.setProperty(SKIP_PROPERTY, "false");
+        }
+
+        @Override
+        public void afterAll(ExtensionContext extensionContext) throws Exception
+        {
+            System.setProperty(SKIP_PROPERTY, skipValue);
+        }
+    }
+
+    @ExtendWith(ValidateConsoleExtensionTestSetup.class)
     @ExtendWith(ValidateConsoleExtension.class)
     public static class SampleTestCase
     {

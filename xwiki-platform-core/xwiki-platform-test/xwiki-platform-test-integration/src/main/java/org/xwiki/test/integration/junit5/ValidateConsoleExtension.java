@@ -47,17 +47,15 @@ import org.xwiki.test.integration.junit.LogCaptureValidator;
  */
 public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver
 {
+    static final String SKIP_PROPERTY = "xwiki.test.validateconsole.skip";
+
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(ValidateConsoleExtension.class);
-
-    private static final String SKIP_PROPERTY = "xwiki.test.validateconsole.skip";
-
-    private static final boolean SKIP = Boolean.valueOf(System.getProperty(SKIP_PROPERTY, "false"));
 
     @Override
     public void beforeAll(ExtensionContext extensionContext)
     {
-        if (SKIP) {
+        if (isSkipped()) {
             return;
         }
 
@@ -69,7 +67,7 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
     @Override
     public void afterAll(ExtensionContext extensionContext)
     {
-        if (SKIP) {
+        if (isSkipped()) {
             return;
         }
 
@@ -132,5 +130,10 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
             saveLogCaptureConfiguration(context, logCaptureConfiguration);
         }
         return logCaptureConfiguration;
+    }
+
+    private boolean isSkipped()
+    {
+        return Boolean.valueOf(System.getProperty(SKIP_PROPERTY, "false"));
     }
 }

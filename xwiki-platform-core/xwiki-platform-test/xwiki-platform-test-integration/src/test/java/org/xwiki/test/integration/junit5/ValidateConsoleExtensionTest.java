@@ -78,6 +78,8 @@ public class ValidateConsoleExtensionTest
         }
     }
 
+    // Note: the order is important so that we can override the skip system property by executing our code before the
+    // ValidateConsoleExtension code.
     @ExtendWith(ValidateConsoleExtensionTestSetup.class)
     @ExtendWith(ValidateConsoleExtension.class)
     public static class SampleTestCase

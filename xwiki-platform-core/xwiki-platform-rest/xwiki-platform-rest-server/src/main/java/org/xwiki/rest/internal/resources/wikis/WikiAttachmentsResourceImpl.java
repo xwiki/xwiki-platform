@@ -40,14 +40,14 @@ public class WikiAttachmentsResourceImpl extends BaseAttachmentsResource impleme
 {
     @Override
     public Attachments getAttachments(String wiki, String name, String page, String space, String author,
-        String mediaTypes, Integer offset, Integer limit, Boolean withPrettyNames) throws XWikiRestException
+        String fileTypes, Integer offset, Integer limit, Boolean withPrettyNames) throws XWikiRestException
     {
         Map<String, String> filters = new HashMap<>();
         filters.put("space", space);
         filters.put("page", page);
         filters.put("name", name);
         filters.put("author", author);
-        filters.put("mediaTypes", mediaTypes);
+        filters.put("fileTypes", fileTypes);
 
         return super.getAttachments(new WikiReference(wiki), filters, offset, limit, withPrettyNames);
     }

@@ -40,13 +40,13 @@ public class SpaceAttachmentsResourceImpl extends BaseAttachmentsResource implem
 {
     @Override
     public Attachments getAttachments(String wiki, String spaces, String name, String page, String author,
-        String mediaTypes, Integer offset, Integer limit, Boolean withPrettyNames) throws XWikiRestException
+        String fileTypes, Integer offset, Integer limit, Boolean withPrettyNames) throws XWikiRestException
     {
         Map<String, String> filters = new HashMap<>();
         filters.put("page", page);
         filters.put("name", name);
         filters.put("author", author);
-        filters.put("mediaTypes", mediaTypes);
+        filters.put("fileTypes", fileTypes);
 
         return super.getAttachments(new SpaceReference(wiki, parseSpaceSegments(spaces)), filters, offset, limit,
             withPrettyNames);

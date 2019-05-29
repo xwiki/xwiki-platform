@@ -91,7 +91,7 @@ public class BaseAttachmentsResource extends XWikiResource
         }
     }
 
-    private static final String FILTER_MEDIA_TYPES = "mediaTypes";
+    private static final String FILTER_FILE_TYPES = "fileTypes";
 
     private static final Pattern COMMA = Pattern.compile("\\s*,\\s*");
 
@@ -121,7 +121,7 @@ public class BaseAttachmentsResource extends XWikiResource
     /**
      * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
      * @param filters the filters used to restrict the set of attachments (you can filter by space name, document name,
-     *            attachment name, author and mime type)
+     *            attachment name, author and type)
      * @param offset defines the start of the range
      * @param limit the maximum number of attachments to include in the range
      * @param withPrettyNames whether to include pretty names (like author full name and document title) in the returned
@@ -143,7 +143,7 @@ public class BaseAttachmentsResource extends XWikiResource
 
             List<Object> queryResult = getAttachmentsQuery(scope, filters).setLimit(limit).setOffset(offset).execute();
 
-            Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault(FILTER_MEDIA_TYPES, ""));
+            Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault(FILTER_FILE_TYPES, ""));
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
@@ -156,7 +156,12 @@ public class BaseAttachmentsResource extends XWikiResource
                 // query-level filtering. We need to also detect the media type after the query is executed and filter
                 // out the attachments that don't match the accepted media types.
                 String mediaType = xwikiAttachment.getMimeType(xcontext).toUpperCase();
+                // We accept the media type if:
+                // * there's no media type filtering
+                // * the media type is stored (which means it was already filtered at the query level)
+                // * the computed media type matches the filter
                 boolean hasAcceptedMediaType = acceptedMediaTypes.isEmpty()
+                    || !StringUtils.isEmpty(xwikiAttachment.getMimeType())
                     || acceptedMediaTypes.stream().anyMatch(acceptedMediaType -> mediaType.contains(acceptedMediaType));
 
                 if (hasAcceptedMediaType) {
@@ -187,6 +192,7 @@ public class BaseAttachmentsResource extends XWikiResource
 
         Map<String, String> exactParams = new HashMap<>();
         Map<String, String> prefixParams = new HashMap<>();
+        Map<String, String> suffixParams = new HashMap<>();
         Map<String, String> containsParams = new HashMap<>();
 
         List<String> whereClause = new ArrayList<>();
@@ -206,8 +212,8 @@ public class BaseAttachmentsResource extends XWikiResource
         // Apply the specified filters.
         applyFilters(filters, whereClause, containsParams);
 
-        // We need to handle the media type filter separately.
-        applyMediaTypeFilter(filters, whereClause, containsParams);
+        // We need to handle the file type filter separately.
+        applyFileTypeFilter(filters, whereClause, suffixParams, containsParams);
 
         statement.append(" where ").append(StringUtils.join(whereClause, " and "));
 
@@ -219,6 +225,9 @@ public class BaseAttachmentsResource extends XWikiResource
         }
         for (Map.Entry<String, String> entry : prefixParams.entrySet()) {
             query.bindValue(entry.getKey()).literal(entry.getValue()).anyChars();
+        }
+        for (Map.Entry<String, String> entry : suffixParams.entrySet()) {
+            query.bindValue(entry.getKey()).anyChars().literal(entry.getValue());
         }
         for (Map.Entry<String, String> entry : containsParams.entrySet()) {
             query.bindValue(entry.getKey()).anyChars().literal(entry.getValue()).anyChars();
@@ -240,30 +249,61 @@ public class BaseAttachmentsResource extends XWikiResource
         }
     }
 
-    private void applyMediaTypeFilter(Map<String, String> filters, List<String> constraints,
-        Map<String, String> parameters)
+    private void applyFileTypeFilter(Map<String, String> filters, List<String> constraints,
+        Map<String, String> suffixParams, Map<String, String> containsParams)
     {
-        Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault(FILTER_MEDIA_TYPES, ""));
-        if (!acceptedMediaTypes.isEmpty()) {
-            List<String> mediaTypeConstraints = new ArrayList<>();
-            // Not all the attachments have their media type saved in the database. We will filter out these attachments
-            // afterwards.
-            mediaTypeConstraints.add("attachment.mimeType is null");
-            mediaTypeConstraints.add("attachment.mimeType = ''");
-            int index = 0;
-            for (String mediaType : acceptedMediaTypes) {
-                String parameterName = "mediaType" + index++;
-                mediaTypeConstraints.add("upper(attachment.mimeType) like :" + parameterName);
-                parameters.put(parameterName, mediaType);
-            }
-            constraints.add("(" + StringUtils.join(mediaTypeConstraints, " or ") + ")");
+        List<String> fileTypeConstraints = new ArrayList<>();
+        applyMediaTypeFilter(filters, fileTypeConstraints, containsParams);
+        applyFileNameExtensionFilter(filters, fileTypeConstraints, suffixParams);
+        if (!fileTypeConstraints.isEmpty()) {
+            constraints.add("(" + StringUtils.join(fileTypeConstraints, " or ") + ")");
         }
     }
 
-    private Set<String> getAcceptedMediaTypes(String mediaTypesFilter)
+    private void applyMediaTypeFilter(Map<String, String> filters, List<String> constraints,
+        Map<String, String> parameters)
     {
-        return Arrays.asList(COMMA.split(mediaTypesFilter)).stream().filter(s -> !s.isEmpty()).map(String::toUpperCase)
-            .collect(Collectors.toSet());
+        Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault(FILTER_FILE_TYPES, ""));
+        if (!acceptedMediaTypes.isEmpty()) {
+            // Not all the attachments have their media type saved in the database. We will filter out these attachments
+            // afterwards.
+            constraints.add("attachment.mimeType is null");
+            constraints.add("attachment.mimeType = ''");
+            int index = 0;
+            for (String mediaType : acceptedMediaTypes) {
+                String parameterName = "mediaType" + index++;
+                constraints.add("upper(attachment.mimeType) like :" + parameterName);
+                parameters.put(parameterName, mediaType);
+            }
+        }
+    }
+
+    private Set<String> getAcceptedMediaTypes(String fileTypesFilter)
+    {
+        // Filter out empty values and file name extensions (starting with dot) because we handle them separately.
+        return Arrays.asList(COMMA.split(fileTypesFilter)).stream().filter(s -> !s.isEmpty() && !s.startsWith("."))
+            .map(String::toUpperCase).collect(Collectors.toSet());
+    }
+
+    private void applyFileNameExtensionFilter(Map<String, String> filters, List<String> constraints,
+        Map<String, String> parameters)
+    {
+        Set<String> acceptedFileNameExtensions =
+            getAcceptedFileNameExtensions(filters.getOrDefault(FILTER_FILE_TYPES, ""));
+        if (!acceptedFileNameExtensions.isEmpty()) {
+            int index = 0;
+            for (String extension : acceptedFileNameExtensions) {
+                String parameterName = "extension" + index++;
+                constraints.add("upper(attachment.filename) like :" + parameterName);
+                parameters.put(parameterName, extension);
+            }
+        }
+    }
+
+    private Set<String> getAcceptedFileNameExtensions(String fileTypesFilter)
+    {
+        return Arrays.asList(COMMA.split(fileTypesFilter)).stream().filter(s -> s.startsWith("."))
+            .map(String::toUpperCase).collect(Collectors.toSet());
     }
 
     protected Attachments getAttachmentsForDocument(Document doc, int start, int number, Boolean withPrettyNames)

@@ -56,12 +56,12 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
 
     @Override
     public Attachments getAttachments(String wiki, String spaces, String page, Integer offset, Integer limit,
-        Boolean withPrettyNames, String name, String author, String mediaTypes) throws XWikiRestException
+        Boolean withPrettyNames, String name, String author, String fileTypes) throws XWikiRestException
     {
         Map<String, String> filters = new HashMap<>();
         filters.put("name", name);
         filters.put("author", author);
-        filters.put("mediaTypes", mediaTypes);
+        filters.put("fileTypes", fileTypes);
 
         return super.getAttachments(new DocumentReference(wiki, parseSpaceSegments(spaces), page), filters, offset,
             limit, withPrettyNames);

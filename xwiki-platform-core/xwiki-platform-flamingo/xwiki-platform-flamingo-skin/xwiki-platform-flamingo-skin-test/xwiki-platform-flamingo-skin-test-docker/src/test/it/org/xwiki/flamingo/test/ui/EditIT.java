@@ -438,7 +438,6 @@ public class EditIT
         DocumentReference documentReference = new DocumentReference(name3, spaceReference);
         setup.gotoPage(documentReference, "create");
         CreatePagePage createPagePage = new CreatePagePage();
-        createPagePage.clickCreate();
         createPagePage.waitForErrorMessage();
         assertTrue(createPagePage.getErrorMessage()
             .contains("The full path of the page you want to create is too long"));

@@ -77,7 +77,8 @@ define(['jquery'], function($) {
      */
     self.refreshVersion = function (handle404) {
       var pageInfoUrl = self.restURL;
-      pageInfoUrl += "?media=json";
+      // We put a timestamp in the JSON URL to avoid getting it from cache.
+      pageInfoUrl += "?media=json&timestamp=" + new Date().getTime();
       $.getJSON(pageInfoUrl).done(function (data) {
         self.setVersion(data.version);
       }).fail(function (err) {

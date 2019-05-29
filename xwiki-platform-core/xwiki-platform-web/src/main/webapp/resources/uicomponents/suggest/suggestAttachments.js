@@ -29,7 +29,6 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
 
   var getSelectizeOptions = function(select) {
     return {
-      create: true,
       maxOptions: 10,
       // The document where the selected values are saved and where new files are being uploaded. Stored attachment
       // references will be relative this document.
@@ -43,14 +42,28 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       // limited to a specific document (if all the attachments are from the same document then the attachment name is
       // enough to identify an attachment, and there's no need to escape it as an entity reference).
       useAttachmentName: false,
-      // Indicates the type of attachments to look for. If nothing is specified then no restriction is applied. You can
-      // use partial media types such as "image/" to limit the search to image attachments.
-      mediaTypes: select.data('mediaTypes'),
+      // Indicates the type of files that can be selected or uploaded. The value is a comma separated list of:
+      // * file name extensions (e.g. .png,.pdf)
+      // * complete or partial media types (e.g. image/,video/mpeg)
+      // If nothing is specified then no restriction is applied.
+      accept: select.data('accept'),
       load: function(text, callback) {
         loadAttachments(text, this.settings).done(callback).fail(callback);
       },
       loadSelected: function(text, callback) {
         loadAttachment(text, this.settings).done(callback).fail(callback);
+      },
+      create: function(input, callback) {
+        if (input.length > 0) {
+          // Select the typed text.
+          var data = {};
+          data[this.settings.labelField] = input;
+          data[this.settings.valueField] = input;
+          return data;
+        } else {
+          // Allow the user to select local files and upload them.
+          selectLocalFile(this.settings).then($.proxy(uploadFiles, null, this.settings)).done(callback).fail(callback);
+        }
       }
     };
   };
@@ -93,7 +106,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     var attachmentsRestURL = getAttachmentsRestURL(searchScope);
     return $.getJSON(attachmentsRestURL, {
       name: text,
-      types: options.mediaTypes,
+      types: options.accept,
       number: options.maxOptions
     }).then($.proxy(processAttachments, null, options));
   };
@@ -229,10 +242,70 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     }).join(' / ');
   };
 
+  /**
+   * Allow the user to upload a file when the input is empty. Otherwise, allow the user to select the typed value.
+   */
+  var addFileUploadSupport = function(selectize) {
+    // Show the Create option even when the input is empty in order to allow the user to upload files.
+    var oldCanCreate = selectize.canCreate;
+    selectize.canCreate = function(input) {
+      return input.length === 0 || oldCanCreate.apply(this, arguments);
+    };
+
+    var oldCreate = selectize.settings.render.option_create;
+    selectize.settings.render.option_create = function(data, escapeHTML) {
+      if (data.input.length > 0) {
+        // Allow the user to select the typed text.
+        return oldCreate.apply(this, arguments);
+      } else {
+        // Allow the user to upload a file.
+        // TODO: Use translation key.
+        var text = 'Upload ...';
+        return $('<div class="create upload option"/>').text(text);
+      }
+    };
+  };
+
+  var selectLocalFile = function(options) {
+    var deferred = $.Deferred();
+
+    // There's no clean way to detect when the file browser dialog is canceled so we must rely on a hack: catch
+    // when the current window gets back the focus after the file browser dialog is closed, making sure the
+    // listener is removed in case some files were selected.
+    $(window).one('focus.suggestAttachments', function(event) {
+      // The file browser dialog was canceled.
+      deferred.reject();
+    });
+
+    var fileInput = $('<input type="file"/>').prop('multiple', options.maxItems !== 1);
+    if (typeof options.accept === 'string') {
+      // We have to replace image/ with image/* in order to meet the file input expectations.
+      fileInput.attr('accept', options.accept.replace(/\/(\s*(,|$))/g, '/*$1'));
+    }
+
+    fileInput.change(function(event) {
+      // The user has selected some files to upload.
+      $(window).off('focus.suggestAttachments');
+      deferred.resolve(this.files);
+    // Open the file browser dialog.
+    }).click();
+
+    return deferred.promise();
+  };
+
+  var uploadFiles = function(options, files) {
+    var deferred = $.Deferred();
+    // TODO
+    console.log(files);
+    deferred.resolve();
+    return deferred.promise();
+  };
+
   $.fn.suggestAttachments = function(options) {
     return this.each(function() {
       var actualOptions = $.extend(getSelectizeOptions($(this)), options);
       $(this).xwikiSelectize(processOptions(actualOptions));
+      addFileUploadSupport(this.selectize);
     });
   };
 });

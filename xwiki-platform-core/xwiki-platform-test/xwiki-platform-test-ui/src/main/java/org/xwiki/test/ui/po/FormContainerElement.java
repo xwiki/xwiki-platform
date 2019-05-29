@@ -112,8 +112,28 @@ public class FormContainerElement extends BaseElement
         if ("checkbox".equals(fieldElement.getAttribute("type"))) {
             setCheckBox(fieldElement, value.equals("true"));
         } else if ("select".equals(fieldElement.getTagName())) {
-            Select select = new Select(fieldElement);
-            select.selectByValue(value);
+            // if a select uses selectized then we should use a SuggestInputElement.
+            if (fieldElement.getAttribute("class").contains("selectized")) {
+                SuggestInputElement suggestInputElement = new SuggestInputElement(fieldElement);
+                suggestInputElement.clearSelectedSuggestions();
+
+                // If the select accepts multiple values and the value contains "|" to separate multiple values,
+                // we split the values and add them all.
+                // We reuse the multiple check from selenium.support.ui.Select.
+                if (fieldElement.getAttribute("multiple") != null
+                    && !"false".equals(fieldElement.getAttribute("multiple"))
+                    && value.contains("|")) {
+                    for (String singleValue : value.split("\\|")) {
+                        suggestInputElement.sendKeys(singleValue).waitForSuggestions().selectTypedText();
+                    }
+                } else {
+                    suggestInputElement.sendKeys(value).waitForSuggestions().selectTypedText();
+                }
+
+            } else {
+                Select select = new Select(fieldElement);
+                select.selectByValue(value);
+            }
         } else {
             fieldElement.clear();
             fieldElement.sendKeys(value);

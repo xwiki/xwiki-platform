@@ -117,7 +117,7 @@ public class InvitationSenderPage extends BasePage
     public FormContainerElement getForm()
     {
         if (this.formElement == null) {
-            this.formElement = new FormContainerElement(this.form);
+            this.formElement = new FormContainerElement(By.id("invitation-sender-form"));
         }
         return this.formElement;
     }

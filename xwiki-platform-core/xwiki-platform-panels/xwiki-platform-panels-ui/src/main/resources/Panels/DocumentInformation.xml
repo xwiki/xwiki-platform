@@ -399,7 +399,7 @@ XWiki.SyntaxConverter = Class.create({
     } else {
       if (XWiki.editor=='wysiwyg') {
         // Conversion in WYSIWYG mode does not yet support conversion of the current content
-        if (XWiki.docisnew || confirm("Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will reset the syntax to the previous one and do nothing. Note that if you choose 'ok' you will loose modifications and this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.")) {
+        if (XWiki.docisnew || confirm("$services.localization.render('panels.documentInformation.confirmChangeSyntaxWysiwyg')")) {
           this.disableEditingArea();
           new Ajax.Request(
             "$doc.getURL('get')",
@@ -423,7 +423,7 @@ XWiki.SyntaxConverter = Class.create({
           this.syntaxField.value = this.originalSyntax;
         }
       } else if (!this.contentField.value.blank()) {
-        if (confirm("Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.")) {
+        if (confirm("$services.localization.render('panels.documentInformation.confirmChangeSyntax')")) {
           this.disableEditingArea();
           new Ajax.Request(
             "$doc.getURL('get')",
@@ -464,8 +464,9 @@ XWiki.SyntaxConverter = Class.create({
     // Trigger the 'change' event so that the editor can display changes on the content field.
     // Note: The only way apparently possible for this triggering to work in 2017 is to trigger it with jQuery.
     //       Neither PrototypeJS nor standard JavaScript events triggering works from this location (even if it works from the browser's console).
-    require(['jquery'], function ($) {
+    require(['jquery', 'xwiki-meta'], function ($, xm) {
       $(contentField).trigger('change');
+      xm.refreshVersion();
     })
   },
 
@@ -490,7 +491,7 @@ XWiki.SyntaxConverter = Class.create({
    *     what exactly prevented the conversion.
    */
   failedConversion : function(response) {
-    alert('Failed to convert to the selected syntax. If you want to use this syntax anyway, you can select it again and choose not to perform the conversion.');
+    alert("$services.localization.render('panels.documentInformation.failedSyntaxConversion')");
     this.syntaxField.selectedIndex = this.originalSyntaxIndex;
   },
 

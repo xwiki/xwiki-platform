@@ -38,6 +38,7 @@ $app:
     #set ($lastIndex = $event.events.size() - 1)
     #set ($origdoc = $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
   #end
+  #set ($queryString = '')
   #if ($event.type != 'delete')
     #set ($queryString = "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}")
   #end

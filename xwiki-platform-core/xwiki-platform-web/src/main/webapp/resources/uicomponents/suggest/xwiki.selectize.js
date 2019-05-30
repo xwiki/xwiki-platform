@@ -128,10 +128,10 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     },
     searchField: ['value', 'label'],
     onType: function(value) {
-      if (!this.loadedSearches.hasOwnProperty(value) && typeof this.settings.load === 'function') {
-        var wrapper = this.$wrapper;
-        wrapper.addClass(this.settings.loadingClass);
-      }
+      // Mark the picker as loading if the suggestions are retrieved asynchronously and there's no cached result for the
+      // given value.
+      var loading = typeof this.settings.load === 'function' && !this.loadedSearches.hasOwnProperty(value);
+      (this.$wrapper).toggleClass(this.settings.loadingClass, loading);
     },
     onInitialize: function() {
       var control = this.$control;

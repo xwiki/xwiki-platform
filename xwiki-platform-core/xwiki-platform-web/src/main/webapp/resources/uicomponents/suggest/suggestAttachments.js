@@ -61,8 +61,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
           data[this.settings.valueField] = input;
           return data;
         } else {
-          // Allow the user to select local files and upload them.
-          selectLocalFile(this.settings).then($.proxy(uploadFiles, null, this.settings)).done(callback).fail(callback);
+          createFromLocalFiles(this).done(callback).fail(callback);
         }
       }
     };
@@ -195,10 +194,23 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
 
   var getAttachmentIcon = function(attachment) {
     if (typeof attachment.mimeType === 'string' && attachment.mimeType.substr(0, 6) === 'image/') {
-      return {
+      var url = attachment.xwikiRelativeUrl;
+      // If the image URL is relative to the current page or is absolute (HTTP) then we can pass the icon width as a
+      // query string parameter to allow the image to be resized on the server side.
+      if (url.substr(0, 1) === '/' || url.substr(0, 7) === 'http://') {
+        url += (url.indexOf('?') < 0 ? '?' : '&') + 'width=48';
+      }
+      var icon = {
         iconSetType: 'IMAGE',
-        url: attachment.xwikiRelativeUrl + 'width=48'
+        url: url
       };
+      if (attachment.file) {
+        // Show the icon using the local file while the file is being uploaded.
+        icon.promise = readAsDataURL(attachment.file).done(function(dataURL) {
+          icon.url = dataURL;
+        });
+      }
+      return icon;
     } else {
       return getIcon(attachment.mimeType, attachment.name);
     }
@@ -266,6 +278,35 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     };
   };
 
+  /**
+   * Allow the user to select local files and upload them as attachments.
+   */
+  var createFromLocalFiles = function(selectize) {
+    var deferred = $.Deferred();
+    selectLocalFile(selectize.settings)
+      .then($.proxy(convertFilesToAttachments, null, selectize.settings))
+      .then($.proxy(processAttachments, null, selectize.settings))
+      .done(function(attachments) {
+        // The create callback doesn't support creating multiple suggestions at once so we need to hack it.
+        // Add the suggestions first (as an array) in order to persist them.
+        selectize.addOption(attachments);
+        // Call the create callback passing the first suggestion.
+        deferred.resolve(attachments[0]);
+        // Select the rest of the suggestions.
+        attachments.slice(1).forEach(function(attachment) {
+          selectize.addItem(attachment.value);
+        });
+        // Use the local file as icon while the file is being uploaded.
+        attachments.forEach(function(attachment) {
+          //attachment.icon.promise && attachment.icon.promise.done($.proxy(selectize, 'refreshItems'));
+          attachment.icon.promise && attachment.icon.promise.done(function() {
+            selectize.updateOption(attachment.value, attachment);
+          });
+        });
+      }).fail($.proxy(deferred, 'reject'));
+    return deferred.promise();
+  };
+
   var selectLocalFile = function(options) {
     var deferred = $.Deferred();
 
@@ -293,10 +334,55 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     return deferred.promise();
   };
 
+  var convertFilesToAttachments = function(options, files) {
+    var attachments = [];
+    for (var i = 0; i < files.length; i++) {
+      attachments.push(convertFileToAttachment(files.item(i), options));
+    }
+    return {
+      attachments: attachments
+    };
+  };
+
+  var convertFileToAttachment = function(file, options) {
+    var attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
+      options.documentReference);
+    var attachmentURL = new XWiki.Document(options.documentReference).getURL('download') + '/' +
+      encodeURIComponent(file.name);
+    var hierarchyItems = attachmentReference.getReversedReferenceChain().map(function(entityReference) {
+      return {
+        type: XWiki.EntityType.getName(entityReference.type),
+        name: entityReference.name,
+        label: entityReference.name
+      };
+    });
+    return {
+      id: XWiki.Model.serialize(attachmentReference),
+      name: file.name,
+      mimeType: file.type,
+      xwikiRelativeUrl: attachmentURL,
+      hierarchy: {
+        items: hierarchyItems
+      },
+      file: file
+    }
+  };
+
+  var readAsDataURL = function(file) {
+    var deferred = $.Deferred();
+    if (typeof FileReader !== 'undefined') {
+      var fileReader = new FileReader();
+      fileReader.onload = function (event) {
+        deferred.resolve(event.target.result);
+      };
+      fileReader.readAsDataURL(file);
+    }
+    return deferred.promise();
+  };
+
   var uploadFiles = function(options, files) {
     var deferred = $.Deferred();
     // TODO
-    console.log(files);
     deferred.resolve();
     return deferred.promise();
   };

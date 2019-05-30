@@ -272,7 +272,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       } else {
         // Allow the user to upload a file.
         // TODO: Use translation key.
-        var text = 'Upload ...';
+        var text = 'Upload a file ...';
         return $('<div class="create upload option"/>').text(text);
       }
     };
@@ -298,7 +298,6 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
         });
         // Use the local file as icon while the file is being uploaded.
         attachments.forEach(function(attachment) {
-          //attachment.icon.promise && attachment.icon.promise.done($.proxy(selectize, 'refreshItems'));
           attachment.icon.promise && attachment.icon.promise.done(function() {
             selectize.updateOption(attachment.value, attachment);
           });

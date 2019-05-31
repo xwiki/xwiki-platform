@@ -76,6 +76,11 @@ a.xwiki-selectize-option-label {
   font-size: smaller;
 }
 
+/* Upload status */
+.xwiki-selectize-option.upload.upload-failed {
+  background-color: #f2dede;
+}
+
 /* Live Table Filter */
 .xwiki-livetable-display-header-filter .selectize-input {
   display: block;

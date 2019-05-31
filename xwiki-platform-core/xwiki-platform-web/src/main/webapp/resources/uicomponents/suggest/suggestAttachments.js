@@ -276,6 +276,20 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
         return $('<div class="create upload option"/>').text(text);
       }
     };
+
+    // Overwrite the way the selected items are displayed in order to show the upload progress.
+    var oldRenderItem = selectize.settings.render.item;
+    selectize.settings.render.item = function(attachment) {
+      var output = oldRenderItem.apply(this, arguments);
+      if (attachment.data && attachment.data.upload) {
+        output.addClass('upload upload-' + attachment.data.upload.status);
+        if (attachment.data.upload.status === 'running') {
+          output.css('background', 'linear-gradient(90deg, #dff0d8 ' +
+            attachment.data.upload.progress.percent + '%, #efefef 0)');
+        }
+      }
+      return output;
+    };
   };
 
   /**
@@ -296,11 +310,12 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
         attachments.slice(1).forEach(function(attachment) {
           selectize.addItem(attachment.value);
         });
-        // Use the local file as icon while the file is being uploaded.
         attachments.forEach(function(attachment) {
+          // Use the local file as icon while the file is being uploaded.
           attachment.icon.promise && attachment.icon.promise.done(function() {
             selectize.updateOption(attachment.value, attachment);
           });
+          uploadFileAndShowProgress(attachment, selectize);
         });
       }).fail($.proxy(deferred, 'reject'));
     return deferred.promise();
@@ -379,10 +394,59 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     return deferred.promise();
   };
 
-  var uploadFiles = function(options, files) {
+  var uploadFileAndShowProgress = function(attachment, selectize) {
+    attachment.data.upload = {
+      status: 'pending',
+      progress: {
+        loaded: 0,
+        total: attachment.data.file.size,
+        percent: 0
+      }
+    };
+    uploadFile(attachment.data, selectize.settings)
+    .then($.proxy(processAttachment, null, selectize.settings))
+    .progress(function(data) {
+      attachment.data.upload.status = 'running';
+      attachment.data.upload.progress = data;
+      selectize.updateOption(attachment.value, attachment);
+    }).done(function(attachment) {
+      attachment.data.upload = {status: 'done'};
+      selectize.updateOption(attachment.value, attachment);
+    }).fail(function() {
+      attachment.data.upload.status = 'failed';
+      selectize.updateOption(attachment.value, attachment);
+    });
+  };
+
+  var uploadFile = function(attachment) {
+    var attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
+    var uploadURL = getAttachmentsRestURL(attachmentReference.parent);
+    var formData = new FormData();
+    formData.append(attachment.name, attachment.file);
     var deferred = $.Deferred();
-    // TODO
-    deferred.resolve();
+    $.post({
+      url: uploadURL,
+      data: formData,
+      // Needed in order to be able to submit FormData directly
+      processData: false,
+      // jQuery defaults to application/x-www-form-urlencoded
+      contentType: 'multipart/form-data',
+      // REST calls return XML by default
+      dataType: 'json',
+      xhr: function() {
+        var xhr = $.ajaxSettings.xhr();
+        xhr.upload && xhr.upload.addEventListener('progress', function(event) {
+          if (event.lengthComputable) {
+            deferred.notify({
+              loaded: event.loaded,
+              total: event.total,
+              percent: Math.round(event.loaded * 100 / event.total)
+            });
+          }
+        }, false);
+        return xhr;
+      }
+    }).done($.proxy(deferred, 'resolve')).fail($.proxy(deferred, 'reject'));
     return deferred.promise();
   };
 

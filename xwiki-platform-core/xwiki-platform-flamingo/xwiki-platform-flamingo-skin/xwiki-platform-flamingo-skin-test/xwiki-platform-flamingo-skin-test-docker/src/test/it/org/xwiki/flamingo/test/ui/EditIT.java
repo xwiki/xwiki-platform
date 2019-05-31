@@ -543,7 +543,7 @@ public class EditIT
             "org.hibernate.exception.DataException",
             "java.sql.BatchUpdateException: data exception: string data, right truncation",
             // PostgreSQL specific log
-            "ERROR:  value too long for type character varying(255)"
+            "value too long for type character varying(255)"
         );
     }
 }

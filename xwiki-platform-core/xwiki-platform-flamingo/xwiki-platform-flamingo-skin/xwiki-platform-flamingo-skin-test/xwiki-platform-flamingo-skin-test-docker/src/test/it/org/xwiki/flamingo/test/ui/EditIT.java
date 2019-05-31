@@ -26,16 +26,18 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.panels.test.po.DocumentInformationPanel;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
@@ -44,6 +46,7 @@ import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -545,5 +548,110 @@ public class EditIT
             // PostgreSQL specific log
             "value too long for type character varying(255)"
         );
+    }
+
+    @Test
+    @Order(12)
+    public void switchSyntax(TestUtils setup, TestReference testReference) throws Exception
+    {
+        // Fixture: enable xhtml syntax
+        setup.addObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass",
+            "disabledSyntaxes", "plain/1.0,xdom+xml/current,xwiki/2.0");
+        setup.deletePage(testReference);
+
+        String pageContent = "= First heading =\n"
+            + "\n"
+            + "Paragraph containing some **bold content**.";
+        setup.createPage(testReference, pageContent, "Test page");
+
+        try {
+            // Test that we can switch with wiki editor without loosing change not saved
+            WikiEditPage wikiEditPage = setup.gotoPage(testReference).editWiki();
+            final String newContent = pageContent + "\n\nA new paragraph with some new content.";
+            wikiEditPage.setContent(newContent);
+
+            DocumentInformationPanel documentInformationPanel = new DocumentInformationPanel();
+            assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentInformationPanel.getAvailableSyntaxes());
+            assertEquals("xwiki/2.1", documentInformationPanel.getSelectedSyntax());
+            try {
+                documentInformationPanel.selectSyntax("xhtml/1.0");
+                fail("A confirm alert should be triggered");
+            } catch (UnhandledAlertException e) {
+                Alert alert = setup.getDriver().switchTo().alert();
+                assertTrue(alert.getText().contains("Do you want to also convert the document's content and "
+                    + "objects to the selected syntax?"));
+                // in wiki edit mode, we shouldn't loose any content.
+                assertFalse(alert.getText().contains("you will loose modifications"));
+                alert.accept();
+            }
+            final WikiEditPage reloadedWikiEdit = new WikiEditPage();
+
+            String expectedContent = "<h1 id=\"HFirstheading\" class=\"wikigeneratedid\">"
+                + "<span>First heading</span>"
+                + "</h1>"
+                + "<p>Paragraph containing some <strong>bold content</strong>.</p>"
+                + "<p>A new paragraph with some new content.</p>";
+
+            // The editor content is changed by triggering a JS event, we wait for a new content so we can do a proper
+            // assertEquals afterwards that is easier to read in case of failure.
+            setup.getDriver().waitUntilCondition(item -> !reloadedWikiEdit.getExactContent().equals(newContent));
+            assertEquals(expectedContent, reloadedWikiEdit.getExactContent());
+            // Ensure there's no edit conflict.
+            wikiEditPage.clickSaveAndContinue();
+
+            // We set back the syntax to XWiki 2.1, dismissing the alert should only change the syntax and save it
+            // without processing the content.
+            documentInformationPanel = new DocumentInformationPanel();
+            assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentInformationPanel.getAvailableSyntaxes());
+            assertEquals("xhtml/1.0", documentInformationPanel.getSelectedSyntax());
+            try {
+                documentInformationPanel.selectSyntax("xwiki/2.1");
+                fail("A confirm alert should be triggered");
+            } catch (UnhandledAlertException e) {
+                Alert alert = setup.getDriver().switchTo().alert();
+                alert.dismiss();
+            }
+
+            wikiEditPage.clickSaveAndContinue();
+
+            // Ensure that only the syntax has changed, not the content.
+            wikiEditPage = setup.gotoPage(testReference).editWiki();
+            documentInformationPanel = new DocumentInformationPanel();
+            assertEquals("xwiki/2.1", documentInformationPanel.getSelectedSyntax());
+            assertEquals(expectedContent, wikiEditPage.getContent());
+            wikiEditPage.setContent(pageContent);
+            ViewPage viewPage = wikiEditPage.clickSaveAndView();
+
+            // Test that we can switch the syntax with the wysiwyg editor
+            WYSIWYGEditPage wysiwygEditPage = viewPage.editWYSIWYG();
+
+            // With WYSIWYG editor the page is actually reloaded.
+            setup.getDriver().addPageNotYetReloadedMarker();
+            documentInformationPanel = new DocumentInformationPanel();
+            assertEquals(Arrays.asList("xwiki/2.1", "xhtml/1.0"), documentInformationPanel.getAvailableSyntaxes());
+            assertEquals("xwiki/2.1", documentInformationPanel.getSelectedSyntax());
+
+            try {
+                documentInformationPanel.selectSyntax("xhtml/1.0");
+                fail("A confirm alert should be triggered.");
+            } catch (UnhandledAlertException e) {
+                Alert alert = setup.getDriver().switchTo().alert();
+                assertTrue(alert.getText().contains("Do you want to also convert the document's content and "
+                    + "objects to the selected syntax?"));
+                assertTrue(alert.getText().contains("you will loose modifications"));
+                alert.accept();
+            }
+
+            setup.getDriver().waitUntilPageIsReloaded();
+            wikiEditPage = new WikiEditPage();
+            expectedContent = "<h1 id=\"HFirstheading\" class=\"wikigeneratedid\"><span>First heading</span></h1>"
+                + "<p>Paragraph containing some <strong>bold content</strong>.</p>";
+            assertEquals(expectedContent, wikiEditPage.getContent());
+            // Ensure there's no edit conflict
+            wikiEditPage.clickSaveAndContinue();
+        } finally {
+            // disable back xhtml syntax
+            setup.deleteObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass", 0);
+        }
     }
 }

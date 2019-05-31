@@ -92,7 +92,7 @@ public class ClassEditPage extends EditPage
     private FormContainerElement getForm()
     {
         if (this.form == null) {
-            this.form = new FormContainerElement(this.propertyForm);
+            this.form = new FormContainerElement(By.id("propupdate"));
         }
         return this.form;
     }

@@ -177,7 +177,7 @@ public class ObjectEditPage extends EditPage
                 titles.get(i).click();
             }
             int objectNumber = Integer.parseInt(element.getAttribute("id").split("_")[2]);
-            objects.add(new ObjectEditPane(element, className, objectNumber));
+            objects.add(new ObjectEditPane(By.id(element.getAttribute("id")), className, objectNumber));
         }
         return objects;
     }

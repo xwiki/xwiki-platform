@@ -45,6 +45,22 @@ public class ObjectEditPane extends FormContainerElement
     /**
      * Creates a new edit pane for an object of the specified type. The form fields from the given container should
      * correspond to properties of the specified type.
+     *
+     * @param containerLocator the element that locates the form fields used to edit the object
+     * @param className the object type
+     * @param objectNumber the object number (identifies the object in the set of objects of the same type)
+     */
+    public ObjectEditPane(By containerLocator, String className, int objectNumber)
+    {
+        super(containerLocator);
+
+        this.className = className;
+        this.objectNumber = objectNumber;
+    }
+
+    /**
+     * Creates a new edit pane for an object of the specified type. The form fields from the given container should
+     * correspond to properties of the specified type.
      * 
      * @param container the element that wraps the form fields used to edit the object
      * @param className the object type
@@ -66,7 +82,7 @@ public class ObjectEditPane extends FormContainerElement
      */
     public DatePicker openDatePicker(String datePropertyName)
     {
-        getDriver().findElementWithoutWaiting(getFormContainer(), byPropertyName(datePropertyName)).click();
+        getDriver().findElementWithoutWaiting(getFormElement(), byPropertyName(datePropertyName)).click();
         return new DatePicker();
     }
 
@@ -77,7 +93,7 @@ public class ObjectEditPane extends FormContainerElement
     public SuggestInputElement getSuggestInput(String userPropertyName)
     {
         return new SuggestInputElement(
-            getDriver().findElementWithoutWaiting(getFormContainer(), byPropertyName(userPropertyName)));
+            getDriver().findElementWithoutWaiting(getFormElement(), byPropertyName(userPropertyName)));
     }
 
     /**

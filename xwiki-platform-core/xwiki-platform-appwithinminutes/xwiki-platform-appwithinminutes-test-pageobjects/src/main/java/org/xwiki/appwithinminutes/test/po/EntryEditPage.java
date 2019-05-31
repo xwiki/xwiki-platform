@@ -79,7 +79,7 @@ public class EntryEditPage extends InlinePage
      */
     public void setTitle(String title)
     {
-        new FormContainerElement(getForm()).setFieldValue(By.name("title"), title);
+        new FormContainerElement(getFormLocator()).setFieldValue(By.name("title"), title);
     }
 
     /**
@@ -97,7 +97,7 @@ public class EntryEditPage extends InlinePage
      */
     public void setContent(String content)
     {
-        new FormContainerElement(getForm()).setFieldValue(By.name("content"), content);
+        new FormContainerElement(getFormLocator()).setFieldValue(By.name("content"), content);
     }
 
     /**

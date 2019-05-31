@@ -83,7 +83,7 @@ public abstract class AbstractRegistrationPage extends BasePage
     private FormContainerElement getForm()
     {
         if (this.form == null) {
-            this.form = new FormContainerElement(this.registerFormElement);
+            this.form = new FormContainerElement(By.id("register"));
         }
         return this.form;
     }

@@ -24,10 +24,7 @@ var getDocument = function(document) {
     return XWiki.currentDocument;
   } else if (typeof document == 'string') {
     var reference = XWiki.Model.resolve(document, XWiki.EntityType.DOCUMENT);
-    var pageName = reference.name;
-    var spaceName = reference.extractReferenceValue(XWiki.EntityType.SPACE);
-    var wikiName = reference.extractReferenceValue(XWiki.EntityType.WIKI);
-    return new XWiki.Document(pageName, spaceName, wikiName);
+    return new XWiki.Document(reference);
   }
   return document;
 };
@@ -51,8 +48,7 @@ XWiki.DocumentLock = Class.create({
       form.observe('submit', markUnlocked);
     });
 
-    var reference = new XWiki.DocumentReference(this._document.wiki, this._document.space, this._document.page);
-    XWiki.DocumentLock._instances[XWiki.Model.serialize(reference)] = this;
+    XWiki.DocumentLock._instances[XWiki.Model.serialize(this._document.documentReference)] = this;
   },
 
   lock: function() {

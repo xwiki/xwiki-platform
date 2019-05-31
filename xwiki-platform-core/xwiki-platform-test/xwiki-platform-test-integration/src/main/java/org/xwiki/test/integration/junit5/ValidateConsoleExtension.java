@@ -47,32 +47,27 @@ import org.xwiki.test.integration.junit.LogCaptureValidator;
  */
 public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCallback, ParameterResolver
 {
+    static final String SKIP_PROPERTY = "xwiki.test.validateconsole.skip";
+
     private static final ExtensionContext.Namespace NAMESPACE =
         ExtensionContext.Namespace.create(ValidateConsoleExtension.class);
-
-    private static final String SKIP_PROPERTY = "xwiki.test.validateconsole.skip";
-
-    private static final boolean SKIP = Boolean.valueOf(System.getProperty(SKIP_PROPERTY, "false"));
 
     @Override
     public void beforeAll(ExtensionContext extensionContext)
     {
-        if (SKIP) {
+        if (isSkipped()) {
             return;
         }
 
         LogCapture logCapture = new LogCapture();
         logCapture.startCapture();
         saveLogCapture(extensionContext, logCapture);
-
-        LogCaptureConfiguration configuration = new LogCaptureConfiguration();
-        saveLogCaptureConfiguration(extensionContext, configuration);
     }
 
     @Override
     public void afterAll(ExtensionContext extensionContext)
     {
-        if (SKIP) {
+        if (isSkipped()) {
             return;
         }
 
@@ -128,6 +123,17 @@ public class ValidateConsoleExtension implements BeforeAllCallback, AfterAllCall
     private LogCaptureConfiguration loadLogCaptureConfiguration(ExtensionContext context)
     {
         ExtensionContext.Store store = getStore(context);
-        return store.get(LogCaptureConfiguration.class, LogCaptureConfiguration.class);
+        LogCaptureConfiguration logCaptureConfiguration =
+            store.get(LogCaptureConfiguration.class, LogCaptureConfiguration.class);
+        if (logCaptureConfiguration == null) {
+            logCaptureConfiguration = new LogCaptureConfiguration();
+            saveLogCaptureConfiguration(context, logCaptureConfiguration);
+        }
+        return logCaptureConfiguration;
+    }
+
+    private boolean isSkipped()
+    {
+        return Boolean.valueOf(System.getProperty(SKIP_PROPERTY, "false"));
     }
 }

@@ -405,9 +405,9 @@ public class HibernateStore implements Disposable, Integrator
             builder.applyImplicitSchemaName(schemaName);
         } else {
             if (getDialect().canCreateCatalog()) {
-                builder.applyImplicitSchemaName(schemaName);
-            } else {
                 builder.applyImplicitCatalogName(wikiId);
+            } else {
+                builder.applyImplicitSchemaName(schemaName);
             }
         }
     }

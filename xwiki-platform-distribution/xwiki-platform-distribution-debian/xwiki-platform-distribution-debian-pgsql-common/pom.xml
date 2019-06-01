@@ -65,13 +65,6 @@
                 <prefix>/usr/share/xwiki/templates/pgsql</prefix>
               </mapper>
             </data>
-            <!-- PostgreSQL connector -->
-            <data>
-              <type>link</type>
-              <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/lib/postgresql.jar</linkName>
-              <linkTarget>/usr/share/java/postgresql-jdbc4.jar</linkTarget>
-            </data>
           </dataSet>
         </configuration>
       </plugin>

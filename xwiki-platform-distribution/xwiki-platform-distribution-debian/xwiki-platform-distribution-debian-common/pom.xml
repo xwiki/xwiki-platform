@@ -51,12 +51,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>${hsqldb.groupId}</groupId>
-      <artifactId>${hsqldb.artifactId}</artifactId>
-      <version>${hsqldb.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>${mysql.groupId}</groupId>
       <artifactId>${mysql.artifactId}</artifactId>
       <version>${mysql.version}</version>
@@ -105,24 +99,6 @@
                   </artifactItem>
                 </artifactItems>
                 <outputDirectory>${war.path}</outputDirectory>
-              </configuration>
-            </execution>
-            <!-- Copy HSQLDB JDBC connector -->
-            <execution>
-              <id>copy-hsqldb</id>
-              <phase>process-resources</phase>
-              <goals>
-                <goal>copy</goal>
-              </goals>
-              <configuration>
-                <artifactItems>
-                  <artifactItem>
-                    <groupId>${hsqldb.groupId}</groupId>
-                    <artifactId>${hsqldb.artifactId}</artifactId>
-                    <version>${hsqldb.version}</version>
-                  </artifactItem>
-                </artifactItems>
-                <outputDirectory>${war.path}/WEB-INF/lib</outputDirectory>
               </configuration>
             </execution>
             <!-- Copy MySQL JDBC connector -->

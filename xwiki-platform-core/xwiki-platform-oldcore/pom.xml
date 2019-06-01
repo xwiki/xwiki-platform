@@ -148,7 +148,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>5.4.2.Final</version>
+      <version>5.4.3.Final</version>
       <exclusions>
         <exclusion>
           <groupId>org.jboss.spec.javax.transaction</groupId>
@@ -188,7 +188,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-c3p0</artifactId>
-      <version>5.4.2.Final</version>
+      <version>5.4.3.Final</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

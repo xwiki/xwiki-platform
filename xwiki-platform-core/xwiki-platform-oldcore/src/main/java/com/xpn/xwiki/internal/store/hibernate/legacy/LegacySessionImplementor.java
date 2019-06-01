@@ -41,7 +41,7 @@ import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
  * </ul>
  * 
  * @version $Id$
- * @since 11.4RC1
+ * @since 11.5RC1
  * @deprecated
  */
 @Deprecated

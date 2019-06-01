@@ -330,7 +330,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param config
      * @param inputxcontext
      * @throws HibernateException
-     * @deprecated do nothing since 11.2RC1
+     * @deprecated do nothing since 11.5RC1
      */
     @Deprecated
     public String[] getSchemaUpdateScript(Configuration config, XWikiContext inputxcontext) throws HibernateException
@@ -355,7 +355,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param schemaName the schema name corresponding to the subwiki being updated
      * @param session the Hibernate session, used to get the Dialect object
      * @since 5.2RC1
-     * @deprecated since 11.2RC1
+     * @deprecated since 11.5RC1
      */
     @Deprecated
     protected void createHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
@@ -401,7 +401,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      *
      * @param createSQL
      * @param inputxcontext
-     * @deprecated since 11.2RC1
+     * @deprecated since 11.5RC1
      */
     @Deprecated
     public void updateSchema(String[] createSQL, XWikiContext inputxcontext) throws HibernateException
@@ -629,7 +629,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     }
 
     /**
-     * @deprecated does not do anything since 11.1RC1
+     * @deprecated does not do anything since 11.5RC1
      */
     @Deprecated
     public void setSessionFactory(SessionFactory sessionFactory)
@@ -643,7 +643,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     }
 
     /**
-     * @since 11.1RC1
+     * @since 11.5RC1
      */
     public Metadata getMetadata()
     {
@@ -697,7 +697,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      * @param customMapping the custom mapping
      * @return a new {@link Configuration} containing this mapping alone.
      * @since 4.0M1
-     * @deprecated since 11.1RC1
+     * @deprecated since 11.5RC1
      */
     @Deprecated
     protected Configuration getMapping(String className, String customMapping)

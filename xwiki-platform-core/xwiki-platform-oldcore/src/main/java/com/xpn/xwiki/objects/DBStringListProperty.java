@@ -24,8 +24,4 @@ package com.xpn.xwiki.objects;
 // mecanism from Hibernate
 public class DBStringListProperty extends ListProperty
 {
-    public DBStringListProperty()
-    {
-        // TODO Auto-generated constructor stub
-    }
 }

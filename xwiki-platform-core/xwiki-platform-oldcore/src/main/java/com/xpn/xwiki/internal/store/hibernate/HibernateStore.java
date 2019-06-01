@@ -151,7 +151,7 @@ public class HibernateStore implements Disposable, Integrator
     }
 
     /**
-     * @since 11.2RC1
+     * @since 11.5RC1
      */
     public void initHibernate()
     {
@@ -208,7 +208,7 @@ public class HibernateStore implements Disposable, Integrator
     }
 
     /**
-     * @since 11.1RC1
+     * @since 11.5RC1
      */
     public void build()
     {
@@ -386,7 +386,7 @@ public class HibernateStore implements Disposable, Integrator
 
     /**
      * @return the {@link Metadata} corresponding to the configuration
-     * @since 11.1RC1
+     * @since 11.5RC1
      */
     public Metadata getMetadata()
     {
@@ -412,6 +412,9 @@ public class HibernateStore implements Disposable, Integrator
         }
     }
 
+    /**
+     * @since 11.5RC1
+     */
     public Metadata getMetadata(String className, String customMapping, String wikiId)
     {
         MetadataSources builder = new MetadataSources();
@@ -435,7 +438,7 @@ public class HibernateStore implements Disposable, Integrator
      * @param className the name of the class to map.
      * @param customMapping the custom mapping
      * @return a XML definition for the given mapping, using XWO_ID column for the object id.
-     * @since 11.1RC1
+     * @since 11.5RC1
      */
     public String makeMapping(String className, String customMapping)
     {
@@ -458,7 +461,7 @@ public class HibernateStore implements Disposable, Integrator
      *
      * @param className the classname of the object.
      * @return a name in the form xwikicustom_space_class
-     * @since 11.1RC1
+     * @since 11.5RC1
      */
     public String toDynamicMappingTableName(String className)
     {
@@ -700,7 +703,7 @@ public class HibernateStore implements Disposable, Integrator
     }
 
     /**
-     * @since 11.1RC1
+     * @since 11.5RC1
      */
     public SessionFactory getSessionFactory()
     {
@@ -827,7 +830,7 @@ public class HibernateStore implements Disposable, Integrator
 
         setWiki(metadataBuilder, wikiId);
 
-        new SchemaUpdate().execute(EnumSet.of(TargetType.DATABASE), metadataBuilder.build());
+        updateSchema(metadataBuilder.build());
     }
 
     /**
@@ -846,7 +849,7 @@ public class HibernateStore implements Disposable, Integrator
      *
      * @param wikiId the identifier of the wiki to update
      * @param force defines whether or not to force the update despite the xwiki.cfg settings
-     * @since 11.2RC1
+     * @since 11.5RC1
      */
     public synchronized void updateSchema(String wikiId, boolean force)
     {

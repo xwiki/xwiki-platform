@@ -61,7 +61,7 @@ import org.hibernate.type.Type;
  * 
  * @param <R> query result type
  * @version $Id$
- * @since 11.2RC1
+ * @since 11.5RC1
  */
 public class QueryImplementorDelegate<R> implements QueryImplementor<R>
 {

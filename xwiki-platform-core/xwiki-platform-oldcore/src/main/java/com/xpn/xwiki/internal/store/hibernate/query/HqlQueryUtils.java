@@ -297,7 +297,7 @@ public final class HqlQueryUtils
      * 
      * @param queryString the statement to convert
      * @return the converted statement
-     * @since 11.4RC1
+     * @since 11.5RC1
      */
     public static String replaceLegacyQueryParameters(String queryString)
     {

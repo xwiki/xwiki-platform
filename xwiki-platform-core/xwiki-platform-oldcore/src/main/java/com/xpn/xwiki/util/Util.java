@@ -829,7 +829,7 @@ public class Util
      *
      * @param resource resource path to load
      * @return InputStream of resource or null if not found
-     * @since 11.4RC1
+     * @since 11.5RC1
      */
     public static URL getResource(String resource)
     {

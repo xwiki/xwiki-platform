@@ -34,10 +34,10 @@ import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
  *
  * @version $Id$
  * @since 2.0M1
+ * @deprecated since 11.5RC1
  */
 @Component
 @Singleton
-@DisposePriority(10000)
 @Deprecated
 public class DefaultHibernateSessionFactory implements HibernateSessionFactory
 {

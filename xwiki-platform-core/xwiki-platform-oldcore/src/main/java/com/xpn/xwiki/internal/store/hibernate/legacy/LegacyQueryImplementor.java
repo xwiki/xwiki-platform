@@ -46,8 +46,10 @@ import com.xpn.xwiki.internal.store.hibernate.QueryImplementorDelegate;
  * 
  * @param <R> query result type
  * @version $Id$
- * @since 11.4RC1
+ * @since 11.5RC1
+ * @deprecated
  */
+@Deprecated
 public class LegacyQueryImplementor<R> extends QueryImplementorDelegate<R>
 {
     /**

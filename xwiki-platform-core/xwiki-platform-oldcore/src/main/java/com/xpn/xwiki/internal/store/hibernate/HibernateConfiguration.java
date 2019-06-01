@@ -36,7 +36,7 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  * Expose various Hibernate related configurations.
  * 
  * @version $Id$
- * @since 11.4RC1
+ * @since 11.5RC1
  */
 @Component(roles = HibernateConfiguration.class)
 @Singleton

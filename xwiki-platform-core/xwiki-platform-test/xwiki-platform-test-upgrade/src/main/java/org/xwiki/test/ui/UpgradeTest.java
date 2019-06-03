@@ -47,6 +47,7 @@ import org.xwiki.extension.test.po.flavor.FlavorPicker;
 import org.xwiki.extension.test.po.flavor.FlavorPickerInstallStep;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.po.ViewPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -330,9 +331,14 @@ public class UpgradeTest extends AbstractTest
     {
         List<LogItemPane> logs = progress.getJobLog(LogLevel.WARN, LogLevel.ERROR);
 
-        if (!logs.isEmpty()) {
-            fail("First one is [" + logs.get(0).getMessage() + "]");
+        StringBuilder builder = new StringBuilder();
+        for (LogItemPane log : logs) {
+            builder.append(log.getMessage());
+            builder.append('\n');
         }
+
+        LogCaptureValidator validator = new LogCaptureValidator();
+        validator.validate(builder.toString(), validateConsole.getLogCaptureConfiguration());
     }
 
     private void extensionsStep()

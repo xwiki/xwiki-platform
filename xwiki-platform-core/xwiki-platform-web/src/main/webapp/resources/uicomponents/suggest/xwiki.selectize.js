@@ -118,8 +118,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       item: renderItem,
       option: renderOption,
       option_create: function(data, escapeHTML) {
-        // TODO: Use translation key here.
-        var text = 'Select {0} ...';
+        var text = $jsontool.serialize($services.localization.render('web.uicomponents.suggest.selectTypedText',
+          ['{0}']));
         // The 'option' class is needed starting with v0.12.5 in order to have proper styling.
         var output = $('<div class="create option"/>').html(escapeHTML(text).replace('{0}', '<em/>'));
         output.find('em').text(data.input);

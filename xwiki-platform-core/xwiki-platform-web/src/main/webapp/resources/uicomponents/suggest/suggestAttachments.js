@@ -332,7 +332,8 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       deferred.reject();
     });
 
-    var fileInput = $('<input type="file"/>').prop('multiple', options.maxItems !== 1);
+    // Chrome doesn't fire the change event all the time if the file input is not attached to the DOM tree.
+    var fileInput = $('<input type="file" class="hidden"/>').prop('multiple', options.maxItems !== 1).appendTo('body');
     if (typeof options.accept === 'string') {
       // We have to replace image/ with image/* in order to meet the file input expectations.
       fileInput.attr('accept', options.accept.replace(/\/(\s*(,|$))/g, '/*$1'));
@@ -342,6 +343,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       // The user has selected some files to upload.
       $(window).off('focus.suggestAttachments');
       deferred.resolve(this.files);
+      fileInput.remove();
     // Open the file browser dialog.
     }).click();
 

@@ -50,8 +50,8 @@ public interface XWikiStoreInterface
      * API allowing to count the total number of documents that would be returned by a query.
      *
      * @param wheresql Query to use, similar to the ones accepted by {@link #searchDocuments(String, XWikiContext)}. It
-     *            should not contain {@code order by} or {@code group} clauses, since this kind of queries are
-     *            not portable.
+     *            should not contain {@code order by} or {@code group} clauses, since this kind of queries are not
+     *            portable.
      * @param context The current request context.
      * @return The number of documents that matched the query.
      * @throws XWikiException if there was a problem executing the query.
@@ -101,11 +101,14 @@ public interface XWikiStoreInterface
      * do the encoding/escaping yourself before calling them.
      * <p>
      * Example:
-     * <pre>{@code
+     * 
+     * <pre>
+     * {@code
      * #set($orphans = $xwiki.searchDocuments(" where doc.fullName <> ? and (doc.parent = ? or "
      *     + "(doc.parent = ? and doc.space = ?))",
      *     ["${doc.fullName}as", ${doc.fullName}, ${doc.name}, ${doc.space}]))
-     * }</pre>
+     * }
+     * </pre>
      *
      * @param parametrizedSqlClause the HQL where clause. For example: {@code where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
@@ -437,8 +440,8 @@ public interface XWikiStoreInterface
      * @param sql the HQL request.
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
-     * @param whereParams if not null add to {@code sql} a where clause based on a table of table containing field
-     *            name, field value and compared symbol ({@code =}, {@code >}, etc.).
+     * @param whereParams if not null add to {@code sql} a where clause based on a table of table containing field name,
+     *            field value and compared symbol ({@code =}, {@code >}, etc.).
      * @param context the XWiki context required for getting information about the execution context.
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
@@ -457,8 +460,8 @@ public interface XWikiStoreInterface
      * @param sql the HQL request.
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
-     * @param whereParams if not null add to {@code sql} a where clause based on a table of table containing field
-     *            name, field value and compared symbol ({@code =}, {@code >}, etc.).
+     * @param whereParams if not null add to {@code sql} a where clause based on a table of table containing field name,
+     *            field value and compared symbol ({@code =}, {@code >}, etc.).
      * @param parameterValues the where clause values that replace the question marks (?).
      * @param context the XWiki context required for getting information about the execution context.
      * @return a list of XWikiDocument.
@@ -501,9 +504,33 @@ public interface XWikiStoreInterface
 
     boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
+    /**
+     * @deprecated since 11.5RC1, use {@link #isCustomMappingValid(BaseClass, String)}
+     */
+    @Deprecated
     boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException;
 
+    /**
+     * @since 11.5RC1
+     */
+    default boolean isCustomMappingValid(BaseClass bclass, String custommapping1)
+    {
+        return isCustomMappingValid(bclass, custommapping1);
+    }
+
+    /**
+     * @deprecated since 11.5RC1, use {@link #injectCustomMapping(BaseClass)} instead
+     */
+    @Deprecated
     boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException;
+
+    /**
+     * @since 11.5RC1
+     */
+    default boolean injectCustomMapping(BaseClass doc1class) throws XWikiException
+    {
+        return injectCustomMapping(doc1class, null);
+    }
 
     boolean injectCustomMappings(XWikiDocument doc, XWikiContext context) throws XWikiException;
 

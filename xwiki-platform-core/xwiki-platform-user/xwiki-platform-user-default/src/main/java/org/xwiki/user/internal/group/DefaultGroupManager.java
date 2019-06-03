@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
@@ -76,6 +77,9 @@ public class DefaultGroupManager implements GroupManager
 
     @Inject
     private EntityReferenceFactory referenceFactory;
+
+    @Inject
+    private Logger logger;
 
     private Collection<String> getSearchWikis(DocumentReference reference, WikiTarget wikiTarget, boolean resolve)
         throws GroupException
@@ -267,8 +271,7 @@ public class DefaultGroupManager implements GroupManager
                     groups.add(this.referenceFactory.getReference(groupReference));
                 }
             } catch (XWikiException e) {
-                throw new GroupException(
-                    "Failed to get all groups for member [" + reference + "] in wiki [" + wiki + "]", e);
+                this.logger.error("Failed to get all groups for member [{}] in wiki [{}]", reference, wiki, e);
             } finally {
                 xcontext.setWikiReference(currrentWiki);
             }

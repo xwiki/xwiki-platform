@@ -31,17 +31,14 @@ import org.xwiki.extension.InstallException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.extension.repository.internal.core.CoreExtensionScanner;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.observation.EventListener;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.mockito.MockitoComponentManagerRule;
 
@@ -50,7 +47,6 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -79,6 +75,8 @@ public class ExtensionManagerScriptServiceTest
         // mock
 
         this.mockXWiki = mock(XWiki.class);
+
+        this.xwikiBridge.mockQueryManager();
 
         this.xwikiBridge.getXWikiContext().setWiki(this.mockXWiki);
         this.xwikiBridge.getXWikiContext().setWikiId("xwiki");

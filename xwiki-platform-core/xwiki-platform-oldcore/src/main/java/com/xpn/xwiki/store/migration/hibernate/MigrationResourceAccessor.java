@@ -24,6 +24,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.util.Collections;
+import java.util.Set;
 
 import liquibase.resource.ClassLoaderResourceAccessor;
 
@@ -57,12 +59,12 @@ public class MigrationResourceAccessor extends ClassLoaderResourceAccessor
     }
 
     @Override
-    public InputStream getResourceAsStream(String file) throws IOException
+    public Set<InputStream> getResourcesAsStream(String file) throws IOException
     {
         if (CHANGELOG_NAME.equals(file)) {
-            return new ByteArrayInputStream(this.changeLog);
+            return Collections.singleton(new ByteArrayInputStream(this.changeLog));
         } else {
-            return super.getResourceAsStream(file);
+            return super.getResourcesAsStream(file);
         }
     }
 }

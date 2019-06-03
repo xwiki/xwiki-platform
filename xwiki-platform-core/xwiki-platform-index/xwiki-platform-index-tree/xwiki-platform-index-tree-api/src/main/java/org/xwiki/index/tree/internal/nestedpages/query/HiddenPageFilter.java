@@ -24,10 +24,9 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
 import org.xwiki.component.annotation.Component;
 
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 
 /**
  * Filters hidden pages. This filter works with the named <strong>native SQL</strong> queries declared in the
@@ -43,7 +42,7 @@ import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 public class HiddenPageFilter extends AbstractNestedPageFilter
 {
     @Inject
-    private HibernateSessionFactory sessionFactory;
+    private HibernateStore hibernateStore;
 
     @Override
     protected String filterNestedPagesStatement(String statement)
@@ -77,7 +76,7 @@ public class HiddenPageFilter extends AbstractNestedPageFilter
 
     private String toBooleanValueString(boolean value)
     {
-        Dialect dialect = ((SessionFactoryImplementor) this.sessionFactory.getSessionFactory()).getDialect();
+        Dialect dialect = this.hibernateStore.getDialect();
         return dialect.toBooleanValueString(value);
     }
 }

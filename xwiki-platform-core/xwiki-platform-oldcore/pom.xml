@@ -148,12 +148,24 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>3.6.9.Final</version>
+      <version>5.4.3.Final</version>
       <exclusions>
-        <!-- XWiki is using org.dom4j:dom4j:2.0.0+. Previous versions of dom4j were using dom4j:dom4j
-             and thus we need to exclude them so that they don't end up in the XWiki WAR -->
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>javax.activation-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+        <!--  Let's hope Hibernate is fine with Dom4J 2.1.0.
+              Remove when https://jira.xwiki.org/browse/XCOMMONS-1585 is fixed. -->
+        <exclusion>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
         <!-- Use javax.transaction:javax.transaction-api instead to not have duplicate JARs in generated WARs -->
@@ -163,6 +175,11 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- Hibernate use an older id -->
+    <dependency>
+        <groupId>jakarta.xml.bind</groupId>
+        <artifactId>jakarta.xml.bind-api</artifactId>
+      </dependency>
     <!-- Use javax.transaction:javax.transaction-api instead to not have duplicate JARs in generated WARs -->
     <dependency>
       <groupId>javax.transaction</groupId>
@@ -171,22 +188,9 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-c3p0</artifactId>
-      <version>3.6.9.Final</version>
+      <version>5.4.3.Final</version>
       <scope>runtime</scope>
-      <exclusions>
-        <!-- XWiki is using com.mchange:c3p0. Previous versions of c3p0 were using c3p0:c3p0
-             and thus we need to exclude them so that they don't end up in the XWiki WAR -->
-        <exclusion>
-          <groupId>c3p0</groupId>
-          <artifactId>c3p0</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
-    <dependency>
-        <groupId>com.mchange</groupId>
-        <artifactId>c3p0</artifactId>
-        <scope>runtime</scope>
-      </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
@@ -195,7 +199,7 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>2.0.5</version>
+      <version>3.6.3</version>
     </dependency>
     <dependency>
       <groupId>com.github.jsqlparser</groupId>
@@ -224,10 +228,6 @@
     </dependency>
 
     <!-- XML processing -->
-    <dependency>
-      <groupId>org.dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-    </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
@@ -758,6 +758,7 @@
                 **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
                 **/internal/script/DebugScriptService.java,
                 **/internal/store/hibernate/HibernateStore.java,
+                **/internal/store/hibernate/QueryImplementorDelegate.java,
                 **/internal/skin/*.java,
                 **/internal/template/InternalTemplateManager.java,
                 **/internal/template/TemplateEnvironmentResource.java,
@@ -838,6 +839,7 @@
                 **/security/XWikiSecurityManager.java,
                 **/store/DBCPConnectionProvider.java,
                 **/store/hibernate/DefaultHibernateSessionFactory.java,
+                **/store/hibernate/HibernateAttachmentRecycleBinStore.java,
                 **/store/hibernate/HibernateSessionFactory.java,
                 <!-- AbstractDataMigrationManager has a fan out complexity of 25 that may needs to be investigated. -->
                 **/store/migration/AbstractDataMigrationManager.java,

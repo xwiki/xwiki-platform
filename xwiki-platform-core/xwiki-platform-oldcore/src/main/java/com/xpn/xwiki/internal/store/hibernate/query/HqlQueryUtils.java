@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -91,15 +92,7 @@ public final class HqlQueryUtils
 
     private static final String DELETEDOCUMENT_FIELD_LANGUAGE = DOCUMENT_FIELD_LANGUAGE;
 
-    private static final String FROM_REPLACEMENT = "$1";
-
-    private static final Pattern FROM_DOC = Pattern.compile("com\\.xpn\\.xwiki\\.doc\\.([^ ]+)");
-
-    private static final Pattern FROM_OBJECT = Pattern.compile("com\\.xpn\\.xwiki\\.objects\\.([^ ]+)");
-
-    private static final Pattern FROM_RCS = Pattern.compile("com\\.xpn\\.xwiki\\.doc\\.rcs\\.([^ ]+)");
-
-    private static final Pattern FROM_VERSION = Pattern.compile("com\\.xpn\\.xwiki\\.store\\.migration\\.([^ ]+)");
+    private static final Pattern LEGACY_ORDINAL_PARAMS_PATTERN = Pattern.compile("([=\\s,\\(<>])\\?([=\\s,\\)<>]|$)");
 
     private static final Map<String, Set<String>> ALLOWED_FIELDS;
 
@@ -295,5 +288,36 @@ public final class HqlQueryUtils
         }
 
         return tableName;
+    }
+
+    /**
+     * Hibernate 5.3 removed support for "legacy HQL-style positional parameters (?)" but it's too much a breakage for
+     * XWiki extension so we try to limit the damages as much as possible by converting the statements. See
+     * https://hibernate.atlassian.net/browse/HHH-12101.
+     * 
+     * @param queryString the statement to convert
+     * @return the converted statement
+     * @since 11.5RC1
+     */
+    public static String replaceLegacyQueryParameters(String queryString)
+    {
+        String convertedString = queryString;
+
+        for (int index = 1;; ++index) {
+            Matcher matcher = LEGACY_ORDINAL_PARAMS_PATTERN.matcher(convertedString);
+
+            if (!matcher.find()) {
+                return convertedString;
+            }
+
+            StringBuilder builder = new StringBuilder();
+
+            builder.append(convertedString, 0, matcher.end(1));
+            builder.append('?');
+            builder.append(index);
+            builder.append(convertedString, matcher.start(2), convertedString.length());
+
+            convertedString = builder.toString();
+        }
     }
 }

@@ -28,7 +28,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -130,19 +129,19 @@ public class R70000XWIKI7339DataMigration extends AbstractHibernateDataMigration
 
             // Migrate existing objects.
 
-            Query q =
+            org.hibernate.query.Query q =
                 session.createQuery("SELECT ls FROM BaseObject o, LargeStringProperty ls"
                     + " WHERE o.className='XWiki.WatchListClass' AND o.id=ls.id");
 
             @SuppressWarnings("unchecked")
             List<LargeStringProperty> oldProperties = q.list();
-            if (oldProperties.size() == 0) {
+            if (oldProperties.isEmpty()) {
                 // No watched elements exist that need migrating.
                 return null;
             }
 
             // Create a migrated equivalent for each old property.
-            List<DBStringListProperty> newProperties = new ArrayList<DBStringListProperty>(oldProperties.size());
+            List<DBStringListProperty> newProperties = new ArrayList<>(oldProperties.size());
             for (LargeStringProperty oldProperty : oldProperties) {
                 DBStringListProperty newProperty = new DBStringListProperty();
                 newProperty.setId(oldProperty.getId());

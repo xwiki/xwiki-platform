@@ -19,13 +19,19 @@
  */
 package com.xpn.xwiki.internal.store.hibernate;
 
+import java.io.ByteArrayInputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.EnumSet;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -34,24 +40,40 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
+import org.hibernate.boot.MetadataBuilder;
+import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.registry.BootstrapServiceRegistry;
+import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
+import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
+import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.jdbc.Work;
+import org.hibernate.mapping.Column;
+import org.hibernate.mapping.PersistentClass;
+import org.hibernate.service.spi.SessionFactoryServiceRegistry;
+import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.hibernate.tool.schema.TargetType;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.component.annotation.DisposePriority;
+import org.xwiki.component.manager.ComponentLifecycleException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.environment.Environment;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
+import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
+import com.xpn.xwiki.util.Util;
 
 /**
  * Instance shared by all hibernate based stores.
@@ -61,7 +83,8 @@ import com.xpn.xwiki.store.migration.DataMigrationManager;
  */
 @Component(roles = HibernateStore.class)
 @Singleton
-public class HibernateStore
+@DisposePriority(10000)
+public class HibernateStore implements Disposable, Integrator
 {
     /**
      * @see #isInSchemaMode()
@@ -72,15 +95,20 @@ public class HibernateStore
 
     private static final String CONTEXT_TRANSACTION = "hibtransaction";
 
+    /**
+     * The name of the property for configuring the environment permanent directory.
+     */
+    private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
+
     @Inject
     private Logger logger;
 
-    @Inject
-    private HibernateSessionFactory sessionFactory;
-
+    /**
+     * Initialize migration manager lazily to avoid cross dependency issue.
+     */
     @Inject
     @Named(XWikiHibernateBaseStore.HINT)
-    private DataMigrationManager dataMigrationManager;
+    private Provider<DataMigrationManager> dataMigrationManagerProvider;
 
     @Inject
     private Execution execution;
@@ -89,19 +117,133 @@ public class HibernateStore
     private WikiDescriptorManager wikis;
 
     @Inject
-    @Named(XWikiCfgConfigurationSource.ROLEHINT)
-    private ConfigurationSource xwikiConfiguration;
+    private HibernateConfiguration hibernateConfiguration;
+
+    @Inject
+    private Environment environment;
+
+    private DataMigrationManager dataMigrationManager;
+
+    private final BootstrapServiceRegistry bootstrapServiceRegistry =
+        new BootstrapServiceRegistryBuilder().applyIntegrator(this).build();
+
+    private final MetadataSources metadataSources = new MetadataSources(this.bootstrapServiceRegistry);
+
+    private final Configuration configuration = new Configuration(this.metadataSources);
+
+    private StandardServiceRegistry standardServiceRegistry;
 
     private Dialect dialect;
 
     private DatabaseProduct databaseProductCache = DatabaseProduct.UNKNOWN;
+
+    private SessionFactory sessionFactory;
+
+    private Metadata metadata;
+
+    private DataMigrationManager getDataMigrationManager()
+    {
+        if (this.dataMigrationManager == null) {
+            this.dataMigrationManager = this.dataMigrationManagerProvider.get();
+        }
+
+        return this.dataMigrationManager;
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void initHibernate()
+    {
+        String path = this.hibernateConfiguration.getPath();
+        URL url = Util.getResource(path);
+        if (url == null) {
+            this.logger.error("Failed to find hibernate configuration file corresponding to path [{}]", path);
+        } else {
+            this.configuration.configure(url);
+
+            // Resolve some variables
+            replaceVariables(this.configuration);
+        }
+
+        build();
+    }
+
+    @Override
+    public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
+        SessionFactoryServiceRegistry serviceRegistry)
+    {
+        this.metadata = metadata;
+    }
+
+    @Override
+    public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry)
+    {
+        this.metadata = null;
+    }
+
+    /**
+     * Replace variables defined in Hibernate properties using the <code>${variable}</code> notation. Note that right
+     * now the only variable being replaced is {@link #PROPERTY_PERMANENTDIRECTORY} and replaced with the value coming
+     * from the XWiki configuration.
+     *
+     * @param hibernateConfiguration the Hibernate Configuration object that we're evaluating
+     */
+    private void replaceVariables(Configuration hibernateConfiguration)
+    {
+        String url = hibernateConfiguration.getProperty(org.hibernate.cfg.Environment.URL);
+        if (StringUtils.isEmpty(url)) {
+            return;
+        }
+
+        // Replace variables
+        if (url.matches(".*\\$\\{.*\\}.*")) {
+            String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
+                this.environment.getPermanentDirectory().getAbsolutePath());
+
+            // Set the new URL
+            hibernateConfiguration.setProperty(org.hibernate.cfg.Environment.URL, newURL);
+            this.logger.debug("Resolved Hibernate URL [{}] to [{}]", url, newURL);
+        }
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void build()
+    {
+        // Get rid of existing session factory
+        disposeInternal();
+
+        this.configuration.getStandardServiceRegistryBuilder().applySettings(this.configuration.getProperties());
+        this.standardServiceRegistry = this.configuration.getStandardServiceRegistryBuilder().build();
+
+        // Create a new session factory
+        this.sessionFactory = this.configuration.buildSessionFactory(standardServiceRegistry);
+    }
+
+    private void disposeInternal()
+    {
+        Session session = getCurrentSession();
+        closeSession(session);
+
+        if (this.sessionFactory != null) {
+            this.sessionFactory.close();
+        }
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        disposeInternal();
+    }
 
     /**
      * @return the Hibernate configuration
      */
     public Configuration getConfiguration()
     {
-        return this.sessionFactory.getConfiguration();
+        return this.configuration;
     }
 
     /**
@@ -133,7 +275,7 @@ public class HibernateStore
 
         String schema;
         if (StringUtils.equalsIgnoreCase(wikiId, mainWikiId)) {
-            schema = this.xwikiConfiguration.getProperty("xwiki.db");
+            schema = this.hibernateConfiguration.getDB();
             if (schema == null) {
                 if (product == DatabaseProduct.DERBY) {
                     schema = "APP";
@@ -157,7 +299,7 @@ public class HibernateStore
         }
 
         // Apply prefix
-        String prefix = this.xwikiConfiguration.getProperty("xwiki.db.prefix", "");
+        String prefix = this.hibernateConfiguration.getDBPrefix();
         schema = prefix + schema;
 
         return schema;
@@ -229,28 +371,101 @@ public class HibernateStore
      */
     public DatabaseMetaData getDatabaseMetaData()
     {
-        DatabaseMetaData result;
-        Connection connection = null;
-        // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
-        // See http://bit.ly/QAJXlr
-        ConnectionProvider connectionProvider =
-            ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
-        try {
-            connection = connectionProvider.getConnection();
-            result = connection.getMetaData();
-        } catch (SQLException ignored) {
-            result = null;
-        } finally {
-            if (connection != null) {
-                try {
-                    connectionProvider.closeConnection(connection);
-                } catch (SQLException ignored) {
-                    // Ignore
-                }
+        try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
+            JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
+
+            try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
+                return connection.getMetaData();
+            } catch (SQLException e) {
+                // Log something ?
             }
         }
 
-        return result;
+        return null;
+    }
+
+    /**
+     * @return the {@link Metadata} corresponding to the configuration
+     * @since 11.5RC1
+     */
+    public Metadata getMetadata()
+    {
+        return this.metadata;
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void setWiki(MetadataBuilder builder, String wikiId)
+    {
+        String schemaName = getSchemaFromWikiName(wikiId);
+
+        DatabaseProduct product = getDatabaseProductName();
+        if (DatabaseProduct.ORACLE == product || (DatabaseProduct.POSTGRESQL == product && isInSchemaMode())) {
+            builder.applyImplicitSchemaName(schemaName);
+        } else {
+            if (getDialect().canCreateCatalog()) {
+                builder.applyImplicitCatalogName(wikiId);
+            } else {
+                builder.applyImplicitSchemaName(schemaName);
+            }
+        }
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public Metadata getMetadata(String className, String customMapping, String wikiId)
+    {
+        MetadataSources builder = new MetadataSources();
+
+        builder.addInputStream(
+            new ByteArrayInputStream(makeMapping(className, customMapping).getBytes(StandardCharsets.UTF_8)));
+
+        MetadataBuilder metadataBuilder = builder.getMetadataBuilder();
+
+        if (wikiId != null) {
+            setWiki(metadataBuilder, wikiId);
+        }
+
+        return metadataBuilder.build();
+    }
+
+    /**
+     * Build a new XML string to define the provided mapping. Since 4.0M1, the ids are longs, and a conditional mapping
+     * is made for Oracle.
+     *
+     * @param className the name of the class to map.
+     * @param customMapping the custom mapping
+     * @return a XML definition for the given mapping, using XWO_ID column for the object id.
+     * @since 11.5RC1
+     */
+    public String makeMapping(String className, String customMapping)
+    {
+        DatabaseProduct databaseProduct = getDatabaseProductName();
+
+        return new StringBuilder(2000).append("<?xml version=\"1.1\" encoding=\"UTF-8\"?>\n")
+            .append("<!DOCTYPE hibernate-mapping PUBLIC\n").append("\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n")
+            .append("\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
+            .append("<class entity-name=\"").append(className).append("\" table=\"")
+            .append(toDynamicMappingTableName(className)).append("\">\n")
+            .append(" <id name=\"id\" type=\"long\" unsaved-value=\"any\">\n")
+            .append("   <column name=\"XWO_ID\" not-null=\"true\" ")
+            .append((databaseProduct == DatabaseProduct.ORACLE) ? "sql-type=\"integer\" " : "")
+            .append("/>\n   <generator class=\"assigned\" />\n").append(" </id>\n").append(customMapping)
+            .append("</class>\n</hibernate-mapping>").toString();
+    }
+
+    /**
+     * Return the name generated for a dynamic mapped object.
+     *
+     * @param className the classname of the object.
+     * @return a name in the form xwikicustom_space_class
+     * @since 11.5RC1
+     */
+    public String toDynamicMappingTableName(String className)
+    {
+        return "xwikicustom_" + className.replaceAll("\\.", "_");
     }
 
     /**
@@ -265,7 +480,8 @@ public class HibernateStore
 
         // - Oracle converts user names in uppercase when no quotes is used.
         // For example: "create user xwiki identified by xwiki;" creates a user named XWIKI (uppercase)
-        // - In Hibernate.cfg.xml we just specify: <property name="connection.username">xwiki</property> and Hibernate
+        // - In Hibernate.cfg.xml we just specify: <property name="hibernate.connection.username">xwiki</property> and
+        // Hibernate
         // seems to be passing this username as is to Oracle which converts it to uppercase.
         //
         // Thus for Oracle we don't escape the schema.
@@ -285,7 +501,12 @@ public class HibernateStore
     public Dialect getDialect()
     {
         if (this.dialect == null) {
-            this.dialect = Dialect.getDialect(getConfiguration().getProperties());
+            if (this.sessionFactory instanceof SessionFactoryImplementor) {
+                this.dialect = ((SessionFactoryImplementor) this.sessionFactory).getJdbcServices().getDialect();
+            } else {
+                // TODO: there is probably a better fallback
+                this.dialect = Dialect.getDialect(getConfiguration().getProperties());
+            }
         }
 
         return this.dialect;
@@ -328,15 +549,17 @@ public class HibernateStore
                 } else if (DatabaseProduct.POSTGRESQL == product && isInSchemaMode()) {
                     executeSQL("SET search_path TO " + escapedSchemaName, session);
                 } else {
-                    String catalog = session.connection().getCatalog();
-                    catalog = (catalog == null) ? null : catalog.replace('_', '-');
-                    if (!schemaName.equals(catalog)) {
-                        session.connection().setCatalog(schemaName);
-                    }
+                    session.doWork(connection -> {
+                        String catalog = connection.getCatalog();
+                        catalog = (catalog == null) ? null : catalog.replace('_', '-');
+                        if (!schemaName.equals(catalog)) {
+                            connection.setCatalog(schemaName);
+                        }
+                    });
                 }
             }
 
-            this.dataMigrationManager.checkDatabase();
+            getDataMigrationManager().checkDatabase();
         } catch (Exception e) {
             // close session with rollback to avoid further usage
             endTransaction(false);
@@ -361,7 +584,7 @@ public class HibernateStore
             // Make sure we are in this mode
             try {
                 if (session != null) {
-                    session.setFlushMode(FlushMode.COMMIT);
+                    session.setHibernateFlushMode(FlushMode.COMMIT);
                 }
             } catch (org.hibernate.SessionException ex) {
                 session = null;
@@ -460,6 +683,11 @@ public class HibernateStore
 
         this.logger.debug("Taken session from pool [{}]", session);
 
+        // Put back legacy feature to the Hibernate session
+        if (session instanceof SessionImplementor) {
+            session = new LegacySessionImplementor((SessionImplementor) session);
+        }
+
         setCurrentSession(session);
 
         this.logger.debug("Trying to open transaction");
@@ -474,9 +702,12 @@ public class HibernateStore
         return true;
     }
 
-    private SessionFactory getSessionFactory()
+    /**
+     * @since 11.5RC1
+     */
+    public SessionFactory getSessionFactory()
     {
-        return this.sessionFactory.getSessionFactory();
+        return this.sessionFactory;
     }
 
     /**
@@ -497,6 +728,11 @@ public class HibernateStore
                 this.logger.debug("Releasing hibernate transaction [{}]", transaction);
 
                 if (commit) {
+                    if (transaction.getRollbackOnly()) {
+                        throw new HibernateException(
+                            "The transaction [" + transaction + "] has been unexpectedly marked as rollback only");
+                    }
+
                     transaction.commit();
                 } else {
                     transaction.rollback();
@@ -540,20 +776,14 @@ public class HibernateStore
 
     /**
      * Allows to shut down the hibernate configuration Closing all pools and connections.
+     * 
+     * @deprecated automatically done when the component is disposed
      */
+    @Deprecated
     public void shutdownHibernate()
     {
-        Session session = getCurrentSession();
-        closeSession(session);
-
         // Close all connections
-        if (getSessionFactory() != null) {
-            // Note that we need to do the cast because this is how Hibernate suggests to get the Connection Provider.
-            // See http://bit.ly/QAJXlr
-            ConnectionProvider connectionProvider =
-                ((SessionFactoryImplementor) getSessionFactory()).getConnectionProvider();
-            connectionProvider.close();
-        }
+        disposeInternal();
     }
 
     /**
@@ -582,19 +812,113 @@ public class HibernateStore
             @Override
             public void execute(Connection connection) throws SQLException
             {
-                Statement stmt = null;
-                try {
-                    stmt = connection.createStatement();
+                try (Statement stmt = connection.createStatement()) {
                     stmt.execute(sql);
-                } finally {
-                    try {
-                        if (stmt != null) {
-                            stmt.close();
-                        }
-                    } catch (Exception e) {
-                    }
                 }
             }
         });
+    }
+
+    /**
+     * Automatically update the current database schema to contains what's defined in standard metadata.
+     * 
+     * @since 11.5RC1
+     */
+    public void updateSchema(String wikiId)
+    {
+        MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder(this.standardServiceRegistry);
+
+        setWiki(metadataBuilder, wikiId);
+
+        updateSchema(metadataBuilder.build());
+    }
+
+    /**
+     * Automatically update the current database schema to contains what's defined in standard metadata.
+     * 
+     * @param metadata the metadata we want the current database to follow
+     * @since 11.5RC1
+     */
+    public void updateSchema(Metadata metadata)
+    {
+        new SchemaUpdate().execute(EnumSet.of(TargetType.DATABASE), metadata);
+    }
+
+    /**
+     * Allows to update the schema to match the hibernate mapping
+     *
+     * @param wikiId the identifier of the wiki to update
+     * @param force defines whether or not to force the update despite the xwiki.cfg settings
+     * @since 11.5RC1
+     */
+    public synchronized void updateSchema(String wikiId, boolean force)
+    {
+        // We don't update the schema if the XWiki hibernate config parameter says not to update
+        if (!force && !this.hibernateConfiguration.isUpdateSchema()) {
+            this.logger.debug("Schema update deactivated for wiki [{}]", wikiId);
+            return;
+        }
+
+        this.logger.info("Updating schema for wiki [{}]...", wikiId);
+
+        try {
+            updateSchema(wikiId);
+        } finally {
+            this.logger.info("Schema update for wiki [{}] done", wikiId);
+        }
+    }
+
+    public int getLimitSize(Class<?> entityType, String propertyName)
+    {
+        int result = -1;
+
+        // retrieve the schema from the context
+        String schema = null;
+        // apparently no schema should be used for oracle DB
+        if (getDatabaseProductName() != DatabaseProduct.ORACLE) {
+            schema = getSchemaFromWikiName();
+        }
+
+        // retrieve the table and column name from entityType and propertyName
+        PersistentClass persistentClass = getMetadata().getEntityBinding(entityType.getName());
+        Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
+        String tableName = persistentClass.getTable().getName();
+        String columnName = column.getName();
+
+        // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
+        if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
+            tableName = tableName.toUpperCase();
+        }
+
+        if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+            columnName = columnName.toLowerCase();
+        }
+
+        try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
+            JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
+
+            try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
+                DatabaseMetaData databaseMetaData = connection.getMetaData();
+
+                ResultSet resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
+                // next will return false if the resultSet is empty.
+                if (resultSet.next()) {
+                    result = resultSet.getInt("COLUMN_SIZE");
+                }
+            }
+        } catch (SQLException e) {
+            this.logger.error("Error while looking the size limit for schema [{}], table [{}] and column [{}].", schema,
+                tableName, columnName, e);
+        }
+
+        if (result == -1) {
+            result = column.getLength();
+            this.logger.warn(
+                "Error while getting the size limit for entity [{}] and propertyName [{}]. "
+                    + "The length value set by hibernate [{}] will be used.",
+                entityType.getName(), propertyName, result);
+        }
+
+        return result;
     }
 }

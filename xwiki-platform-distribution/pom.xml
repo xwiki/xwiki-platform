@@ -140,9 +140,15 @@
     <!-- Version of JDBC connectors we want to use in our distribution and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <mysql.version>5.1.45</mysql.version>
-    <derby.version>10.14.1.0</derby.version>
-    <pgsql.version>42.1.4</pgsql.version>
+    <mysql.groupId>mysql</mysql.groupId>
+    <mysql.artifactId>mysql-connector-java</mysql.artifactId>
+    <mysql.version>5.1.47</mysql.version>
+    <derby.groupId>org.apache.derby</derby.groupId>
+    <derby.artifactId>derby</derby.artifactId>
+    <derby.version>10.14.2.0</derby.version>
+    <pgsql.groupId>org.postgresql</pgsql.groupId>
+    <pgsql.artifactId>postgresql</pgsql.artifactId>
+    <pgsql.version>42.2.5</pgsql.version>
 
     <!-- Set HSQLDB by default -->
     <xwiki.db>hsqldb</xwiki.db>
@@ -153,7 +159,6 @@
     <xwiki.db.connection.username>sa</xwiki.db.connection.username>
     <xwiki.db.connection.password />
     <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
-    <xwiki.db.dialect>org.hibernate.dialect.HSQLDialect</xwiki.db.dialect>
     <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
     <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
 
@@ -528,6 +533,7 @@
                 <ignoredClassPatterns>
                   <!-- Java 9 modules descriptor (should probably be fixed in the plugin) -->
                   <ignoredClassPattern>module-info</ignoredClassPattern>
+                  <ignoredClassPattern>META-INF.versions.9.module-info</ignoredClassPattern>
                 </ignoredClassPatterns>
               </configuration>
             </execution>
@@ -553,14 +559,13 @@
       <id>mysql</id>
       <properties>
         <xwiki.db>mysql</xwiki.db>
-        <xwiki.db.jdbc.groupId>mysql</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>mysql-connector-java</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.groupId>${mysql.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${mysql.artifactId}</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${mysql.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:mysql://localhost/xwiki?useSSL=false</xwiki.db.connection.url>
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>com.mysql.jdbc.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>
@@ -569,14 +574,13 @@
       <id>pgsql</id>
       <properties>
         <xwiki.db>pgsql</xwiki.db>
-        <xwiki.db.jdbc.groupId>org.postgresql</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>postgresql</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.groupId>${pgsql.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${pgsql.artifactId}</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${pgsql.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:postgresql:xwiki</xwiki.db.connection.url>
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>org.postgresql.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.PostgreSQLDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.postgresql.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
         <xwiki.db.hbm.virtualMode>schema</xwiki.db.hbm.virtualMode>
@@ -586,14 +590,13 @@
       <id>derby</id>
       <properties>
         <xwiki.db>derby</xwiki.db>
-        <xwiki.db.jdbc.groupId>org.apache.derby</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>derby</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.groupId>${derby.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${derby.artifactId}</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${derby.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:derby:database;create=true</xwiki.db.connection.url>
         <xwiki.db.connection.username />
         <xwiki.db.connection.password />
         <xwiki.db.connection.driver_class>org.apache.derby.jdbc.EmbeddedDriver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.DerbyDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.derby.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>

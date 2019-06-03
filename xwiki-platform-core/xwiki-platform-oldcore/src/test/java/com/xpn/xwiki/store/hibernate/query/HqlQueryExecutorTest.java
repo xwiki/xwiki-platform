@@ -26,19 +26,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Provider;
-
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.engine.NamedSQLQueryDefinition;
+import org.hibernate.engine.spi.NamedSQLQueryDefinition;
+import org.hibernate.query.NativeQuery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.query.Query;
@@ -52,9 +50,9 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -64,7 +62,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -75,8 +72,8 @@ import static org.mockito.Mockito.when;
 public class HqlQueryExecutorTest
 {
     @Rule
-    public MockitoComponentMockingRule<HqlQueryExecutor> mocker = new MockitoComponentMockingRule<>(
-        HqlQueryExecutor.class);
+    public MockitoComponentMockingRule<HqlQueryExecutor> mocker =
+        new MockitoComponentMockingRule<>(HqlQueryExecutor.class);
 
     private ContextualAuthorizationManager authorization;
 
@@ -92,8 +89,10 @@ public class HqlQueryExecutorTest
     @Before
     public void before() throws Exception
     {
-        HibernateSessionFactory sessionFactory = this.mocker.getInstance(HibernateSessionFactory.class);
-        when(sessionFactory.getConfiguration()).thenReturn(new Configuration());
+        HibernateStore hibernateStore = this.mocker.getInstance(HibernateStore.class);
+        when(hibernateStore.getConfiguration()).thenReturn(new Configuration());
+        Metadata metadata = mock(Metadata.class);
+        when(hibernateStore.getMetadata()).thenReturn(metadata);
 
         this.executor = this.mocker.getComponentUnderTest();
         this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
@@ -166,9 +165,11 @@ public class HqlQueryExecutorTest
     @Test
     public void completeShortStatementStartingWithFrom()
     {
-        assertEquals("select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
-            + "and obj.className='XWiki.MyClass'", this.executor.completeShortFormStatement(", BaseObject obj where "
-            + "doc.fullName=obj.name and obj.className='XWiki.MyClass'"));
+        assertEquals(
+            "select doc.fullName from XWikiDocument doc , BaseObject obj where doc.fullName=obj.name "
+                + "and obj.className='XWiki.MyClass'",
+            this.executor.completeShortFormStatement(
+                ", BaseObject obj where " + "doc.fullName=obj.name and obj.className='XWiki.MyClass'"));
     }
 
     @Test
@@ -181,9 +182,8 @@ public class HqlQueryExecutorTest
     @Test
     public void completeShortStatementPassingAnAlreadyCompleteQuery()
     {
-        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc",
-            this.executor
-                .completeShortFormStatement("select doc.fullName from XWikiDocument doc order by doc.date desc"));
+        assertEquals("select doc.fullName from XWikiDocument doc order by doc.date desc", this.executor
+            .completeShortFormStatement("select doc.fullName from XWikiDocument doc order by doc.date desc"));
     }
 
     @Test
@@ -196,7 +196,7 @@ public class HqlQueryExecutorTest
     @Test
     public void setNamedParameter()
     {
-        org.hibernate.Query query = mock(org.hibernate.Query.class);
+        org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "abc";
         Date value = new Date();
         this.executor.setNamedParameter(query, name, value);
@@ -207,7 +207,7 @@ public class HqlQueryExecutorTest
     @Test
     public void setNamedParameterList()
     {
-        org.hibernate.Query query = mock(org.hibernate.Query.class);
+        org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "foo";
         List<String> value = Arrays.asList("one", "two", "three");
         this.executor.setNamedParameter(query, name, value);
@@ -218,7 +218,7 @@ public class HqlQueryExecutorTest
     @Test
     public void setNamedParameterArray()
     {
-        org.hibernate.Query query = mock(org.hibernate.Query.class);
+        org.hibernate.query.Query query = mock(org.hibernate.query.Query.class);
         String name = "bar";
         Integer[] value = new Integer[] { 1, 2, 3 };
         this.executor.setNamedParameter(query, name, value);
@@ -229,7 +229,7 @@ public class HqlQueryExecutorTest
     @Test
     public void populateParameters()
     {
-        org.hibernate.Query hquery = mock(org.hibernate.Query.class);
+        org.hibernate.query.Query hquery = mock(org.hibernate.query.Query.class);
         Query query = mock(Query.class);
 
         int offset = 13;
@@ -272,13 +272,12 @@ public class HqlQueryExecutorTest
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     public void createNamedNativeHibernateQuery() throws Exception
     {
         DefaultQuery query = new DefaultQuery("queryName", this.executor);
 
         Session session = mock(Session.class);
-        SQLQuery sqlQuery = mock(SQLQuery.class);
+        NativeQuery sqlQuery = mock(NativeQuery.class);
         when(session.getNamedQuery(query.getStatement())).thenReturn(sqlQuery);
         when(sqlQuery.getQueryString()).thenReturn("foo");
 
@@ -288,14 +287,15 @@ public class HqlQueryExecutorTest
         when(filter.filterStatement("foo", "sql")).thenReturn("bar");
         when(filter.filterQuery(any(Query.class))).then(returnsFirstArg());
 
-        SQLQuery finalQuery = mock(SQLQuery.class);
+        NativeQuery finalQuery = mock(NativeQuery.class);
         when(session.createSQLQuery("bar")).thenReturn(finalQuery);
 
         NamedSQLQueryDefinition definition = mock(NamedSQLQueryDefinition.class);
         when(definition.getResultSetRef()).thenReturn("someResultSet");
+        when(definition.getName()).thenReturn(query.getStatement());
 
-        HibernateSessionFactory sessionFactory = this.mocker.getInstance(HibernateSessionFactory.class);
-        sessionFactory.getConfiguration().getNamedSQLQueries().put(query.getStatement(), definition);
+        HibernateStore hibernateStore = this.mocker.getInstance(HibernateStore.class);
+        when(hibernateStore.getMetadata().getNamedNativeQueryDefinition(query.getStatement())).thenReturn(definition);
 
         assertSame(finalQuery, this.executor.createHibernateQuery(session, query));
 
@@ -313,10 +313,12 @@ public class HqlQueryExecutorTest
         // We also verify that QueryFilter#filterStatement() is called before QueryFilter#filterQuery()
         QueryFilter filter = mock(QueryFilter.class);
         query.addFilter(filter);
-        when(filter.filterStatement("select doc.fullName from XWikiDocument doc where doc.space='Main'",
-            Query.HQL)).thenReturn("select doc.fullName from XWikiDocument doc where doc.space='Main2'");
-        when(filter.filterQuery(any(Query.class))).thenReturn(new WrappingQuery(query) {
-            @Override public String getStatement()
+        when(filter.filterStatement("select doc.fullName from XWikiDocument doc where doc.space='Main'", Query.HQL))
+            .thenReturn("select doc.fullName from XWikiDocument doc where doc.space='Main2'");
+        when(filter.filterQuery(any(Query.class))).thenReturn(new WrappingQuery(query)
+        {
+            @Override
+            public String getStatement()
             {
                 return "select doc.fullName from XWikiDocument doc where doc.space='Main3'";
             }
@@ -342,7 +344,7 @@ public class HqlQueryExecutorTest
         ComponentManager cm = this.mocker.getInstance(ComponentManager.class, "context");
         when(cm.getInstance(QueryFilter.class, "escapeLikeParameters")).thenReturn(filter);
 
-        when(session.createQuery(anyString())).thenReturn(mock(org.hibernate.Query.class));
+        when(session.createQuery(anyString())).thenReturn(mock(org.hibernate.query.Query.class));
 
         this.executor.createHibernateQuery(session, query);
 
@@ -397,8 +399,10 @@ public class HqlQueryExecutorTest
             execute("select notallowed.name from NotAllowedTable notallowed", false);
             fail("Should have thrown an exception here");
         } catch (QueryException expected) {
-            assertEquals("The query requires programming right."
-                + " Query statement = [select notallowed.name from NotAllowedTable notallowed]", expected.getMessage());
+            assertEquals(
+                "The query requires programming right."
+                    + " Query statement = [select notallowed.name from NotAllowedTable notallowed]",
+                expected.getMessage());
         }
     }
 

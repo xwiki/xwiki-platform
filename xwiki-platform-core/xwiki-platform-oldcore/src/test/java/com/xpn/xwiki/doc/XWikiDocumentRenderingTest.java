@@ -44,6 +44,7 @@ import org.xwiki.velocity.internal.jmx.JMXVelocityEngineMBean;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -123,6 +124,9 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         this.mockXWikiStoreInterface = mock(XWikiStoreInterface.class);
         this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
+        
+        Mock hibernateStore = registerMockComponent(HibernateStore.class);
+        hibernateStore.stubs().method("dispose").isVoid();
 
         this.document.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 

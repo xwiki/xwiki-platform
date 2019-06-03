@@ -42,7 +42,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.io.FileUtils;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -209,16 +208,16 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
 
             // We need to make sure the deleted attachment is not already in the database with a different id (left
             // there by the attachment porter script for example)
-            Query selectQuery =
+            org.hibernate.query.Query selectQuery =
                 session.createQuery("SELECT id FROM DeletedAttachment WHERE docId=? AND filename=? AND date=?");
-            selectQuery.setLong(0, docId);
-            selectQuery.setString(1, filename);
-            selectQuery.setTimestamp(2, new java.sql.Timestamp(deleteDate.getTime()));
+            selectQuery.setParameter(0, docId);
+            selectQuery.setParameter(1, filename);
+            selectQuery.setParameter(2, new java.sql.Timestamp(deleteDate.getTime()));
             Long databaseId = (Long) selectQuery.uniqueResult();
 
             if (databaseId == null) {
                 // Try without the milliseconds since most versions of MySQL don't support them
-                selectQuery.setTimestamp(2, new java.sql.Timestamp(deleteDate.toInstant().getEpochSecond() * 1000));
+                selectQuery.setParameter(2, new java.sql.Timestamp(deleteDate.toInstant().getEpochSecond() * 1000));
                 databaseId = (Long) selectQuery.uniqueResult();
             }
 

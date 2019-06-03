@@ -405,6 +405,8 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     };
     uploadFile(attachment.data, selectize.settings)
     .then($.proxy(processAttachment, null, selectize.settings))
+    // Load the attachment icon before updating the display in order to reduce the flickering.
+    .then(loadAttachmentIcon)
     .progress(function(data) {
       attachment.data.upload.status = 'running';
       attachment.data.upload.progress = data;
@@ -447,6 +449,21 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
         return xhr;
       }
     }).done($.proxy(deferred, 'resolve')).fail($.proxy(deferred, 'reject'));
+    return deferred.promise();
+  };
+
+  var loadAttachmentIcon = function(attachment) {
+    var deferred = $.Deferred();
+    if (attachment.icon.iconSetType === 'IMAGE') {
+      var image = new Image();
+      image.onload = function() {
+        deferred.resolve(attachment);
+      };
+      image.src = attachment.icon.url;
+    } else {
+      // Nothing to load.
+      deferred.resolve(attachment);
+    }
     return deferred.promise();
   };
 

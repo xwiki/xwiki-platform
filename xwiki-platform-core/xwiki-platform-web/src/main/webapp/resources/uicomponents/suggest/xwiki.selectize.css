@@ -76,9 +76,21 @@ a.xwiki-selectize-option-label {
   font-size: smaller;
 }
 
-/* Upload status */
-.xwiki-selectize-option.upload.upload-failed {
+/* Attachment picker */
+.suggest-attachments > .selectize-input > div.xwiki-selectize-option {
+  background-image: none;
+  border-left: 2px solid transparent;
+  border-radius: 3px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+.suggest-attachments > .selectize-input > div.xwiki-selectize-option.upload-pending,
+.suggest-attachments > .selectize-input > div.xwiki-selectize-option.upload-running {
+  border-left: 2px solid $theme.notificationSuccessColor;
+}
+.suggest-attachments > .selectize-input > div.xwiki-selectize-option.upload-failed {
   background-color: #f2dede;
+  border-left: 2px solid $theme.notificationErrorColor;
 }
 
 /* Live Table Filter */

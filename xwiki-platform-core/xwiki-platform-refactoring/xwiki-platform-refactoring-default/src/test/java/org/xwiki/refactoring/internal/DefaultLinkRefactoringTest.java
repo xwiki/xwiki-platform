@@ -175,7 +175,9 @@ public class DefaultLinkRefactoringTest
     public void updateRelativeLinks() throws Exception
     {
         DocumentReference oldReference = new DocumentReference("wiki", "A", "B");
+        AttachmentReference oldImageTargetAttachment = new AttachmentReference("attachment.txt", oldReference);
         DocumentReference newReference = new DocumentReference("wiki", "X", "Y");
+        AttachmentReference newImageTargetAttachment = new AttachmentReference("attachment.txt", newReference);
 
         XWikiDocument newDocument = mock(XWikiDocument.class);
         when(this.xcontext.getWiki().getDocument(newReference, this.xcontext)).thenReturn(newDocument);
@@ -187,7 +189,10 @@ public class DefaultLinkRefactoringTest
         LinkBlock docLinkBlock = new LinkBlock(Collections.<Block>emptyList(), docLinkReference, false);
         ResourceReference spaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
         LinkBlock spaceLinkBlock = new LinkBlock(Collections.<Block>emptyList(), spaceLinkReference, false);
-        when(newDocument.getXDOM()).thenReturn(new XDOM(Arrays.<Block>asList(docLinkBlock, spaceLinkBlock)));
+        ResourceReference imageReference = new AttachmentResourceReference("attachment.txt");
+        ImageBlock imageBlock = new ImageBlock(imageReference, false);
+        when(newDocument.getXDOM())
+            .thenReturn(new XDOM(Arrays.<Block>asList(docLinkBlock, spaceLinkBlock, imageBlock)));
 
         // Setup object content
         ResourceReference xobjectDocLinkReference = new ResourceReference("C", ResourceType.DOCUMENT);
@@ -195,18 +200,25 @@ public class DefaultLinkRefactoringTest
         ResourceReference xobjectSpaceLinkReference = new ResourceReference("Z", ResourceType.SPACE);
         LinkBlock xobjectSpaceLinkBlock =
             new LinkBlock(Collections.<Block>emptyList(), xobjectSpaceLinkReference, false);
-        setTextarea(newDocument, new XDOM(Arrays.<Block>asList(xobjectDocLinkBlock, xobjectSpaceLinkBlock)));
+        ResourceReference xobjectImageReference = new AttachmentResourceReference("attachment.txt");
+        ImageBlock xobjectImageBlock = new ImageBlock(imageReference, false);
+        setTextarea(newDocument,
+            new XDOM(Arrays.<Block>asList(xobjectDocLinkBlock, xobjectSpaceLinkBlock, xobjectImageBlock)));
 
         DocumentReference originalDocLinkReference = new DocumentReference("C", oldReference.getLastSpaceReference());
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, oldReference))
             .thenReturn(originalDocLinkReference);
         when(this.resourceReferenceResolver.resolve(xobjectDocLinkReference, null, oldReference))
             .thenReturn(originalDocLinkReference);
+        when(this.resourceReferenceResolver.resolve(imageReference, null, oldReference))
+            .thenReturn(oldImageTargetAttachment);
         DocumentReference newDocLinkReference = new DocumentReference("C", newReference.getLastSpaceReference());
         when(this.resourceReferenceResolver.resolve(docLinkReference, null, newReference))
             .thenReturn(newDocLinkReference);
         when(this.resourceReferenceResolver.resolve(xobjectDocLinkReference, null, newReference))
             .thenReturn(newDocLinkReference);
+        when(this.resourceReferenceResolver.resolve(imageReference, null, newReference))
+            .thenReturn(newImageTargetAttachment);
 
         SpaceReference originalSpaceReference = new SpaceReference("wiki", "Z");
         when(this.resourceReferenceResolver.resolve(spaceLinkReference, null, oldReference))
@@ -228,6 +240,8 @@ public class DefaultLinkRefactoringTest
         // Space link block stays the same, since they were on the same wiki.
         assertEquals("Z", spaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.SPACE, spaceLinkBlock.getReference().getType());
+        // Image link relative to the document stay the same
+        assertEquals("attachment.txt", imageBlock.getReference().getReference());
 
         // XObject Document link block is updated.
         assertEquals("A.C", xobjectDocLinkBlock.getReference().getReference());
@@ -235,6 +249,8 @@ public class DefaultLinkRefactoringTest
         // XObject Space link block stays the same, since they were on the same wiki.
         assertEquals("Z", xobjectSpaceLinkBlock.getReference().getReference());
         assertEquals(ResourceType.SPACE, xobjectSpaceLinkBlock.getReference().getType());
+        // Image link relative to the document stay the same
+        assertEquals("attachment.txt", xobjectImageBlock.getReference().getReference());
 
         verifyDocumentSave(newDocument, "Updated the relative links.", true, true);
     }

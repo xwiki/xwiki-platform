@@ -198,12 +198,18 @@ public class ReferenceRenamer
             return false;
         }
 
-        // current link, use the old document's reference to fill in blanks.
-        EntityReference oldLinkReference =
-            this.resourceReferenceResolver.resolve(resourceReference, null, oldDocumentReference);
         // new link, use the new document's reference to fill in blanks.
         EntityReference newLinkReference =
             this.resourceReferenceResolver.resolve(resourceReference, null, newDocumentReference);
+
+        if (newDocumentReference.equals(newLinkReference.extractReference(EntityType.DOCUMENT))) {
+            // If the link is relative to the containing document we don't modify it
+            return false;
+        }
+
+        // current link, use the old document's reference to fill in blanks.
+        EntityReference oldLinkReference =
+            this.resourceReferenceResolver.resolve(resourceReference, null, oldDocumentReference);
 
         // If the new and old link references don`t match, then we must update the relative link.
         if (!newLinkReference.equals(oldLinkReference)) {

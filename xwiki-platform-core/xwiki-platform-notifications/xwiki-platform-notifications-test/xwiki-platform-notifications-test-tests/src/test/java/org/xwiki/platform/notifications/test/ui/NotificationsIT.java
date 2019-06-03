@@ -368,8 +368,8 @@ public class NotificationsIT extends AbstractTest
         SchedulerHomePage schedulerHomePage = SchedulerHomePage.gotoPage();
         schedulerHomePage.clickJobActionTrigger("Notifications daily email");
 
-        // Wait 10s instead of the default 5s to make sure the mail has enough time to arrive.
-        mail.waitForIncomingEmail(10000L, 1);
+        // Wait 30s instead of the default 5s to make sure the mail has enough time to arrive, even if the CI is slow.
+        mail.waitForIncomingEmail(30000L, 1);
 
         assertEquals(1, mail.getReceivedMessages().length);
         MimeMessage message = mail.getReceivedMessages()[0];

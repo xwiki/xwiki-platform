@@ -23,6 +23,9 @@ import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -37,6 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class SkinActionTest
 {
     private SkinAction action;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setUp()
@@ -88,21 +94,29 @@ public class SkinActionTest
         });
         assertEquals("Invalid filename: '../../resources/js/xwiki/xwiki.js' for skin 'colibri'",
             exception.getMessage());
+        assertEquals("Illegal access, tried to use file [/resources/js/xwiki/xwiki.js] as a skin. "
+            + "Possible break-in attempt!", logCapture.getMessage(0));
 
         exception = assertThrows(IOException.class, () -> {
             this.action.getSkinFilePath("../../../", "colibri");
         });
         assertEquals("Invalid filename: '../../../' for skin 'colibri'", exception.getMessage());
+        assertEquals("Illegal access, tried to use file [/../] as a skin. Possible break-in attempt!",
+            logCapture.getMessage(1));
 
         exception = assertThrows(IOException.class, () -> {
             this.action.getSkinFilePath("resources/js/xwiki/xwiki.js", "..");
         });
         assertEquals("Invalid filename: 'resources/js/xwiki/xwiki.js' for skin '..'", exception.getMessage());
+        assertEquals("Illegal access, tried to use file [/resources/js/xwiki/xwiki.js] as a skin. "
+            + "Possible break-in attempt!", logCapture.getMessage(2));
 
         exception = assertThrows(IOException.class, () -> {
             this.action.getSkinFilePath("../resources/js/xwiki/xwiki.js", ".");
         });
         assertEquals("Invalid filename: '../resources/js/xwiki/xwiki.js' for skin '.'", exception.getMessage());
+        assertEquals("Illegal access, tried to use file [/resources/js/xwiki/xwiki.js] as a skin. "
+            + "Possible break-in attempt!", logCapture.getMessage(3));
     }
 
     @Test
@@ -112,15 +126,21 @@ public class SkinActionTest
             this.action.getResourceFilePath("../../skins/js/xwiki/xwiki.js");
         });
         assertEquals("Invalid filename: '../../skins/js/xwiki/xwiki.js'", exception.getMessage());
+        assertEquals("Illegal access, tried to use file [/../skins/js/xwiki/xwiki.js] as a resource. "
+            + "Possible break-in attempt!", logCapture.getMessage(0));
 
         exception = assertThrows(IOException.class, () -> {
             this.action.getResourceFilePath("../../../");
         });
         assertEquals("Invalid filename: '../../../'", exception.getMessage());
+        assertEquals("Illegal access, tried to use file [/../../] as a resource. Possible break-in attempt!",
+            logCapture.getMessage(1));
 
         exception = assertThrows(IOException.class, () -> {
             this.action.getResourceFilePath("../../redirect");
         });
         assertEquals("Invalid filename: '../../redirect'", exception.getMessage());
+        assertEquals("Illegal access, tried to use file [/../redirect] as a resource. Possible break-in attempt!",
+            logCapture.getMessage(2));
     }
 }

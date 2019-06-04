@@ -19,7 +19,10 @@
  */
 package org.xwiki.cluster.test;
 
-import org.junit.Assert;
+import java.util.function.BooleanSupplier;
+import java.util.function.Supplier;
+
+import static org.junit.Assert.*;
 import org.junit.Test;
 import org.xwiki.cluster.test.framework.AbstractClusterHttpTest;
 import org.xwiki.model.reference.AttachmentReference;
@@ -41,7 +44,7 @@ public class DocumentCacheTest extends AbstractClusterHttpTest
     private final static String TEST_SPACE = "Test";
 
     @Test
-    public void testDocumentModifiedCacheSync() throws Exception
+    public void documentModifiedCacheSync() throws Exception
     {
         Page page = new Page();
         page.setSpace(TEST_SPACE);
@@ -53,32 +56,28 @@ public class DocumentCacheTest extends AbstractClusterHttpTest
         AbstractTest.getUtil().switchExecutor(0);
         page.setContent("content");
         AbstractTest.getUtil().rest().save(page);
-        Assert.assertEquals("content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
+        assertEquals("content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
 
         // 2) Modify content of the page on XWiki 1
         AbstractTest.getUtil().switchExecutor(1);
         page.setContent("modified content");
         AbstractTest.getUtil().rest().save(page);
-        Assert.assertEquals("modified content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
+        assertEquals("modified content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
 
         // ASSERT) The content in XWiki 0 should be the one set than in XWiki 1
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
         AbstractTest.getUtil().switchExecutor(0);
-        long t1 = System.currentTimeMillis();
-        long t2;
-        String result;
-        while (!(result = AbstractTest.getUtil().rest().<Page>get(documentReference).getContent())
-            .equalsIgnoreCase("modified content")) {
-            t2 = System.currentTimeMillis();
-            if (t2 - t1 > 10000L) {
-                Assert.fail("Content should have been [modified content] but was [" + result + "]");
+        assertEqualsWithTimeout("modified content", () -> {
+            try {
+                return AbstractTest.getUtil().rest().<Page>get(documentReference).getContent();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            Thread.sleep(100);
-        }
+        });
     }
 
     @Test
-    public void testDocumentDeletedCacheSync() throws Exception
+    public void documentDeletedCacheSync() throws Exception
     {
         Page page = new Page();
         page.setSpace(TEST_SPACE);
@@ -90,31 +89,29 @@ public class DocumentCacheTest extends AbstractClusterHttpTest
         AbstractTest.getUtil().switchExecutor(0);
         page.setContent("content");
         AbstractTest.getUtil().rest().save(page);
-        Assert.assertEquals("content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
+        assertEquals("content", AbstractTest.getUtil().rest().<Page>get(documentReference).getContent());
 
         // 2) Delete page on XWiki 1
         AbstractTest.getUtil().switchExecutor(1);
         // Need superadmin to delete document
         AbstractTest.getUtil().loginAsSuperAdmin();
         AbstractTest.getUtil().rest().delete(documentReference);
-        Assert.assertFalse(AbstractTest.getUtil().rest().exists(documentReference));
+        assertFalse(AbstractTest.getUtil().rest().exists(documentReference));
 
         // ASSERT) The document should be deleted on XWiki 0
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
         AbstractTest.getUtil().switchExecutor(0);
-        long t1 = System.currentTimeMillis();
-        long t2;
-        while (AbstractTest.getUtil().rest().exists(documentReference)) {
-            t2 = System.currentTimeMillis();
-            if (t2 - t1 > 10000L) {
-                Assert.fail("Document shoud not exist anymore");
+        assertTrueWithTimeout("Document should not exist anymore", () -> {
+            try {
+                return AbstractTest.getUtil().rest().exists(documentReference);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            Thread.sleep(100);
-        }
+        });
     }
 
     @Test
-    public void testDocumentCacheSyncForAttachments() throws Exception
+    public void documentCacheSyncForAttachments() throws Exception
     {
         Page page = new Page();
         page.setSpace(TEST_SPACE);
@@ -135,15 +132,13 @@ public class DocumentCacheTest extends AbstractClusterHttpTest
         // ASSERT) The content in XWiki 0 should be the one set than in XWiki 1
         // Since it can take time for the Cluster to propagate the change, we need to wait and set up a timeout.
         AbstractTest.getUtil().switchExecutor(0);
-        long t1 = System.currentTimeMillis();
-        long t2;
-        while (!hasAttachment(attachmentReference)) {
-            t2 = System.currentTimeMillis();
-            if (t2 - t1 > 10000L) {
-                Assert.fail("Failed to find attachment");
+        assertTrueWithTimeout("Failed to find attachment", () -> {
+            try {
+                return !hasAttachment(attachmentReference);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
             }
-            Thread.sleep(100);
-        }
+        });
     }
 
     private boolean hasAttachment(AttachmentReference attachmentReference) throws Exception
@@ -158,5 +153,33 @@ public class DocumentCacheTest extends AbstractClusterHttpTest
         }
 
         return false;
+    }
+
+    private void assertTrueWithTimeout(String failMessage, BooleanSupplier booleanSupplier)
+        throws InterruptedException
+    {
+        long t2;
+        long t1 = System.currentTimeMillis();
+        while (booleanSupplier.getAsBoolean()) {
+            t2 = System.currentTimeMillis();
+            if (t2 - t1 > 10000L) {
+                fail(failMessage);
+            }
+            Thread.sleep(100L);
+        }
+    }
+
+    private void assertEqualsWithTimeout(String expected, Supplier<String> supplier) throws InterruptedException
+    {
+        long t2;
+        long t1 = System.currentTimeMillis();
+        String result;
+        while (!(result = supplier.get()).equalsIgnoreCase(expected)) {
+            t2 = System.currentTimeMillis();
+            if (t2 - t1 > 10000L) {
+                fail(String.format("Content should have been [%s] but was [%s]", expected, result));
+            }
+            Thread.sleep(100L);
+        }
     }
 }

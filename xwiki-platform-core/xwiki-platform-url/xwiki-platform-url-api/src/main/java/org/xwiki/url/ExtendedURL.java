@@ -106,8 +106,8 @@ public class ExtendedURL implements Cloneable
      * @param url the URL being wrapped
      * @param ignorePrefix the ignore prefix must start with "/" (eg "/xwiki"). It can be empty or null too in which
      *        case it's not used
-     * @throws org.xwiki.resource.CreateResourceReferenceException if the passed URL is invalid which can happen if it
-     *         has incorrect encoding
+     * @throws CreateResourceReferenceException if the passed URL is invalid which can happen if it has incorrect
+     *         encoding
      */
     public ExtendedURL(URL url, String ignorePrefix) throws CreateResourceReferenceException
     {

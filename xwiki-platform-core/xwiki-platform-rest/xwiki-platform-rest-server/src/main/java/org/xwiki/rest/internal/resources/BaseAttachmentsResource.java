@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -95,6 +96,8 @@ public class BaseAttachmentsResource extends XWikiResource
 
     private static final Pattern COMMA = Pattern.compile("\\s*,\\s*");
 
+    private static final String DOT = ".";
+
     private static final Map<String, String> FILTER_TO_QUERY = new HashMap<>();
 
     static {
@@ -141,41 +144,11 @@ public class BaseAttachmentsResource extends XWikiResource
         try {
             xcontext.setWikiId(scope.extractReference(EntityType.WIKI).getName());
 
-            List<Object> queryResult = getAttachmentsQuery(scope, filters).setLimit(limit).setOffset(offset).execute();
-
-            Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault(FILTER_FILE_TYPES, ""));
-
-            for (Object object : queryResult) {
-                Object[] fields = (Object[]) object;
-                List<String> pageSpaces = Utils.getSpacesFromSpaceId((String) fields[0]);
-                String pageName = (String) fields[1];
-                String pageVersion = (String) fields[2];
-                XWikiAttachment xwikiAttachment = (XWikiAttachment) fields[3];
-
-                // Not all the attachments have their media type stored in the database so we can't rely only on the
-                // query-level filtering. We need to also detect the media type after the query is executed and filter
-                // out the attachments that don't match the accepted media types.
-                String mediaType = xwikiAttachment.getMimeType(xcontext).toUpperCase();
-                // We accept the media type if:
-                // * there's no media type filtering
-                // * the media type is stored (which means it was already filtered at the query level)
-                // * the computed media type matches the filter
-                boolean hasAcceptedMediaType = acceptedMediaTypes.isEmpty()
-                    || !StringUtils.isEmpty(xwikiAttachment.getMimeType())
-                    || acceptedMediaTypes.stream().anyMatch(acceptedMediaType -> mediaType.contains(acceptedMediaType));
-
-                if (hasAcceptedMediaType) {
-                    DocumentReference documentReference =
-                        new DocumentReference(xcontext.getWikiId(), pageSpaces, pageName);
-                    XWikiDocument document = new XWikiDocument(documentReference);
-                    document.setVersion(pageVersion);
-                    xwikiAttachment.setDoc(document, false);
-                    com.xpn.xwiki.api.Attachment apiAttachment =
-                        new com.xpn.xwiki.api.Attachment(new Document(document, xcontext), xwikiAttachment, xcontext);
-                    attachments.getAttachments().add(this.modelFactory.toRestAttachment(this.uriInfo.getBaseUri(),
-                        apiAttachment, withPrettyNames, false));
-                }
-            }
+            List<Object> queryResults = getAttachmentsQuery(scope, filters).setLimit(limit).setOffset(offset).execute();
+            attachments.withAttachments(queryResults.stream().map(this::processAttachmentsQueryResult)
+                .filter(getFileTypeFilter(filters.getOrDefault(FILTER_FILE_TYPES, "")))
+                .map(xwikiAttachment -> toRestAttachment(xwikiAttachment, withPrettyNames))
+                .collect(Collectors.toList()));
         } catch (QueryException e) {
             throw new XWikiRestException(e);
         } finally {
@@ -281,7 +254,7 @@ public class BaseAttachmentsResource extends XWikiResource
     private Set<String> getAcceptedMediaTypes(String fileTypesFilter)
     {
         // Filter out empty values and file name extensions (starting with dot) because we handle them separately.
-        return Arrays.asList(COMMA.split(fileTypesFilter)).stream().filter(s -> !s.isEmpty() && !s.startsWith("."))
+        return Arrays.asList(COMMA.split(fileTypesFilter)).stream().filter(s -> !s.isEmpty() && !s.startsWith(DOT))
             .map(String::toUpperCase).collect(Collectors.toSet());
     }
 
@@ -302,8 +275,66 @@ public class BaseAttachmentsResource extends XWikiResource
 
     private Set<String> getAcceptedFileNameExtensions(String fileTypesFilter)
     {
-        return Arrays.asList(COMMA.split(fileTypesFilter)).stream().filter(s -> s.startsWith("."))
+        // File types that start with dot are considered file name extension filters.
+        return Arrays.asList(COMMA.split(fileTypesFilter)).stream().filter(s -> s.startsWith(DOT))
             .map(String::toUpperCase).collect(Collectors.toSet());
+    }
+
+    private XWikiAttachment processAttachmentsQueryResult(Object queryResult)
+    {
+        Object[] fields = (Object[]) queryResult;
+        List<String> pageSpaces = Utils.getSpacesFromSpaceId((String) fields[0]);
+        String pageName = (String) fields[1];
+        String pageVersion = (String) fields[2];
+        XWikiAttachment attachment = (XWikiAttachment) fields[3];
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference documentReference = new DocumentReference(xcontext.getWikiId(), pageSpaces, pageName);
+        XWikiDocument document = new XWikiDocument(documentReference);
+        document.setVersion(pageVersion);
+        attachment.setDoc(document, false);
+
+        return attachment;
+    }
+
+    private Predicate<XWikiAttachment> getFileTypeFilter(String acceptedFileTypes)
+    {
+        // Not all the attachments have their media type stored in the database so we can't rely only on the
+        // query-level filtering. We need to also detect the media type after the query is executed and filter
+        // out the attachments that don't match the accepted media types.
+        Set<String> acceptedMediaTypes = getAcceptedMediaTypes(acceptedFileTypes);
+        Set<String> acceptedFileNameExtensions = getAcceptedFileNameExtensions(acceptedFileTypes);
+
+        // We accept the attachment if:
+        // * there's no media type filtering or
+        // * the media type is stored (which means it was already filtered at the query level) or
+        // * the file name matches the filter or
+        // * the computed media type matches the filter
+        return (attachment) -> acceptedMediaTypes.isEmpty() || !StringUtils.isEmpty(attachment.getMimeType())
+            || hasAcceptedFileNameExtension(attachment, acceptedFileNameExtensions)
+            || hasAcceptedMediaType(attachment, acceptedMediaTypes);
+    }
+
+    private boolean hasAcceptedFileNameExtension(XWikiAttachment attachment, Set<String> acceptedFileNameExtensions)
+    {
+        String fileName = attachment.getFilename().toUpperCase();
+        return acceptedFileNameExtensions.stream()
+            .anyMatch(acceptedFileNamedExtension -> fileName.endsWith(acceptedFileNamedExtension));
+    }
+
+    private boolean hasAcceptedMediaType(XWikiAttachment attachment, Set<String> acceptedMediaTypes)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        String detectedMediaType = attachment.getMimeType(xcontext).toUpperCase();
+        return acceptedMediaTypes.stream().anyMatch(acceptedMediaType -> detectedMediaType.contains(acceptedMediaType));
+    }
+
+    private Attachment toRestAttachment(XWikiAttachment xwikiAttachment, Boolean withPrettyNames)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        com.xpn.xwiki.api.Attachment apiAttachment = new com.xpn.xwiki.api.Attachment(
+            new Document(xwikiAttachment.getDoc(), xcontext), xwikiAttachment, xcontext);
+        return this.modelFactory.toRestAttachment(this.uriInfo.getBaseUri(), apiAttachment, withPrettyNames, false);
     }
 
     protected Attachments getAttachmentsForDocument(Document doc, int start, int number, Boolean withPrettyNames)

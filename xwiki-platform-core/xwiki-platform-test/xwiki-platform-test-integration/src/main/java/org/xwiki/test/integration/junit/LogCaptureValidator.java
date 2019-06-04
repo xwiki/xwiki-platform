@@ -147,7 +147,7 @@ public class LogCaptureValidator
         }
 
         // Also display not matching excludes and expected so that developers can notice them and realize that the
-        // issues that existed might have been fixed. Note however that currently we can't have exclude/expetced by
+        // issues that existed might have been fixed. Note however that currently we can't have exclude/expected by
         // configuration (for Docker-based tests) and thus it's possible that there are non matching excludes/expected
         // simply because they exist only in a different configuration.
         displayMissingWarning(configuration.getExcludedLines(), matchingDefinitions, "excludes");

@@ -30,7 +30,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
-import org.xwiki.csrf.CSRFToken;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,6 +49,16 @@ public class SaveAndContinueAction extends XWikiAction
      * The key to retrieve the saved object version from the context.
      */
     private static final String SAVED_OBJECT_VERSION_KEY = "SaveAction.savedObjectVersion";
+
+    /**
+     * The context key to know if a document has been merged for saving it.
+     */
+    private static final String MERGED_DOCUMENTS = "SaveAction.mergedDocuments";
+
+    /**
+     * The default context value to put with {@link #MERGED_DOCUMENTS} key.
+     */
+    private static final String MERGED_DOCUMENTS_VALUE = "true";
 
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(SaveAndContinueAction.class);
@@ -141,9 +150,6 @@ public class SaveAndContinueAction extends XWikiAction
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
-        CSRFToken csrf = Utils.getComponent(CSRFToken.class);
-        String token = context.getRequest().getParameter("form_token");
-
         // If the request is an ajax request, we will:
         //
         // 1) _not_ send a redirect response
@@ -177,6 +183,9 @@ public class SaveAndContinueAction extends XWikiAction
             if (newVersion != null) {
                 Map<String, String> jsonAnswer = new LinkedHashMap<>();
                 jsonAnswer.put("newVersion", newVersion.toString());
+                if (MERGED_DOCUMENTS_VALUE.equals(context.get(MERGED_DOCUMENTS))) {
+                    jsonAnswer.put("mergedDocument", MERGED_DOCUMENTS_VALUE);
+                }
                 answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
             } else {
                 context.getResponse().setStatus(HttpServletResponse.SC_NO_CONTENT);

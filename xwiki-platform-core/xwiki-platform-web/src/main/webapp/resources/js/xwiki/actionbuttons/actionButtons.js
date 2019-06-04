@@ -200,6 +200,7 @@ var XWiki = (function(XWiki) {
       this.failedBox = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render("core.editors.saveandcontinue.notification.error", ["<span id=""ajaxRequestFailureReason""/>"]))', "error", {inactive: true});
       this.progressMessageTemplate = "$escapetool.javascript($services.localization.render('core.editors.savewithprogress.notification'))";
       this.progressBox = new XWiki.widgets.Notification(this.progressMessageTemplate.replace('__PROGRESS__', '0'), "inprogress", {inactive: true});
+      this.savedWithMergeBox = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('core.editors.saveandcontinue.notification.doneWithMerge'))", "done", {inactive: true});
     },
     addListeners : function() {
       document.observe("xwiki:actions:save", this.onSave.bindAsEventListener(this));
@@ -350,10 +351,16 @@ var XWiki = (function(XWiki) {
         }
       } else if (!isCreateFromTemplate && (!isContinue  || $('body').hasClassName('previewbody'))) {
         document.fire("xwiki:document:saved");
-        this.maybeRedirect(isContinue);
+        if (this.maybeRedirect(isContinue)) {
+          return;
+        }
       } else {
         this.progressBox.hide();
-        this.savingBox.replace(this.savedBox);
+        if (response.responseJSON && response.responseJSON.mergedDocument) {
+          this.savingBox.replace(this.savedWithMergeBox);
+        } else {
+          this.savingBox.replace(this.savedBox);
+        }
       }
 
       if (response.responseJSON && response.responseJSON.newVersion) {
@@ -366,6 +373,11 @@ var XWiki = (function(XWiki) {
       // Announce that the document has been saved
       // TODO: We should send the new version as a memo field
       document.fire("xwiki:document:saved");
+
+      // If documents have been merged we need to reload to get latest saved version.
+      if (response.responseJSON && response.responseJSON.mergedDocument) {
+        this.reloadEditor();
+      }
     },
     displayErrorModal : function (createContent) {
       XWiki.widgets.ErrorModalPopup = Class.create(XWiki.widgets.ModalPopup, {
@@ -392,6 +404,10 @@ var XWiki = (function(XWiki) {
         }
       });
       return new XWiki.widgets.ErrorModalPopup();
+    },
+    // Reload the editors in case the user want to loose his change.
+    reloadEditor : function () {
+      window.location.reload();
     },
     // 401 happens when the user is not authorized to do that: can be a logout or a change in perm
     on401 : function (response) {
@@ -495,66 +511,130 @@ var XWiki = (function(XWiki) {
       this.savingBox.hide();
       this.savedBox.hide();
       this.failedBox.hide();
+      this.enableEditors();
 
-      // Prepare all the callback we need for the preview diff modal.
+      var jsonAnswer = response.responseJSON;
+      var formData = new Hash(this.form.serialize({hash: true, submit: 'preview'}));
 
-      // Reload the editors in case the user want to loose his change.
-      var reloadEditors = function () {
-        window.location.reload();
+      var displayModal;
+
+      /**
+       * Display the previewdiff modal with the appropriate diff version.
+       * If no argument is given, the version chosen in the select is used.
+       */
+      var previewDiff = function (previousVersion, nextVersion) {
+        var queryString = "diff=1&version=" + jsonAnswer.latestVersion;
+        if ($$('input[name=warningConflictAction]').length > 0) {
+          queryString += "&warningConflictAction=" + $$('input[name=warningConflictAction]:checked')[0].value;
+        }
+        var original, revised;
+
+        if (previousVersion && nextVersion) {
+          original = previousVersion;
+          revised = nextVersion;
+        } else if ($$('select[name=original]').length > 0 && $$('select[name=revised]').length > 0) {
+          original = $$('select[name=original]')[0].value;
+          revised = $$('select[name=revised]')[0].value;
+        }
+
+        if (original && revised) {
+          queryString +=
+            "&original=" + original + "&revised=" + revised;
+        }
+
+        var previewUrl = new XWiki.Document().getURL("preview", queryString);
+        new Ajax.Request(previewUrl, {
+          method : 'post',
+          parameters : formData.toQueryString(),
+          onSuccess : displayModal,
+          onFailure : self.onFailure.bind(self)
+        });
       };
 
-      // Force save the change: submit the form with a forceSave input.
-      var forceSave = function () {
+      // Submit the choice made: if it's reload, reload the editors,
+      // else submit the save with the right forceSave input.
+      var submitAction = function () {
         require(['jquery'], function ($) {
+          var action = $('input[name=warningConflictAction]:checked').val();
           $('#previewDiffModal').modal('hide');
-          self.form.insert(new Element("input", {
-            type: "hidden",
-            name: "forceSave",
-            id: "forceSave",
-            value: "1"
-          }));
-          if (isContinue) {
-            $('input[name=action_saveandcontinue]').click();
+          if (action === "reload") {
+            self.reloadEditor();
           } else {
-            $('input[name=action_save]').click();
+            self.form.insert(new Element("input", {
+              type: "hidden",
+              name: "forceSave",
+              id: "forceSave",
+              value: action
+            }));
+            if (isContinue) {
+              $('input[name=action_saveandcontinue]').click();
+            } else {
+              $('input[name=action_save]').click();
+            }
           }
         });
       };
 
-      // We chose what to do depending on the radio button selection.
-      var submitDiffButton = function () {
-        require(['jquery'], function ($) {
-          if ($('#actionReloadRadio').is(':checked')) {
-            reloadEditors();
-          }
-
-          if ($('#actionForceSaveRadio').is(':checked')) {
-            forceSave();
-          }
-        });
-      };
-
-      // Toggle the class of the div depending on the selected radio button.
-      var radioSelect = function () {
+      var radioToogleClass = function () {
         require(['jquery'], function ($) {
           var reloadDiv = $('#headingReloadEditor').parent();
           var forceSaveDiv = $('#headingForceSave').parent();
+          var mergeDiv = $('#headingMerge').parent();
 
           var reloadRadio = $('#actionReloadRadio');
           var forceSaveRadio = $('#actionForceSaveRadio');
+          var mergeRadio = $('#actionMergeRadio');
 
-          reloadDiv.toggleClass('panel-primary', reloadRadio.is(':checked'));
-          reloadDiv.toggleClass('panel-danger', forceSaveRadio.is(':checked'));
+          reloadDiv.toggleClass(function () {
+            if (reloadRadio.is(':checked')) {
+              return "panel-primary";
+            } else {
+              return "panel-danger";
+            }
+          });
 
-          forceSaveDiv.toggleClass('panel-primary', forceSaveRadio.is(':checked'));
-          forceSaveDiv.toggleClass('panel-default', reloadRadio.is(':checked'));
+          forceSaveDiv.toggleClass(function () {
+            if (forceSaveRadio.is(':checked')) {
+              return "panel-primary";
+            } else {
+              return "panel-default";
+            }
+          });
+
+          mergeDiv.toggleClass(function () {
+            if (mergeRadio.is(':checked')) {
+              return "panel-primary";
+            } else {
+              return "panel-default";
+            }
+          });
         });
       };
 
+      // Change the diff based on the action chosen.
+      var radioSelect = function () {
+        var selectedValue = $$('input[name=warningConflictAction]:checked')[0].value;
+        if (selectedValue == "merge") {
+          previewDiff("NEXT", "MERGED");
+        } else if (selectedValue == "override") {
+          previewDiff("NEXT", "CURRENT");
+        } else if (selectedValue == "reload") {
+          previewDiff("CURRENT", "NEXT");
+        }
+      };
+
       // Prepare the modal
-      var displayModal = function (response) {
+      displayModal = function (response) {
         require(['jquery'], function ($) {
+          if ($('#previewDiffModal')) {
+            $('#previewDiffChangeDiff').off('click');
+            $('input[name=warningConflictAction]').off('click');
+            $('#submitDiffButton').off('click');
+            $('#previewDiffModal').remove();
+            $('div.modal-backdrop').remove();
+          }
           $(response.responseText).appendTo('body');
+          radioToogleClass();
           $('#previewDiffModal').modal('show');
 
           // We want to remove the html of the modal and the backdrop when the modal is closed.
@@ -563,26 +643,13 @@ var XWiki = (function(XWiki) {
             $('div.modal-backdrop').remove();
           });
 
-          // Callback on the buttons.
           $('input[name=warningConflictAction]').on('click', radioSelect);
-          $('#submitDiffButton').on('click', submitDiffButton);
+          $('#previewDiffChangeDiff').on('click', previewDiff);
+          $('#submitDiffButton').on('click', submitAction);
         });
       };
 
-      this.enableEditors();
-      var formData = new Hash(this.form.serialize({hash: true, submit: 'preview'}));
-
-      var jsonAnswer = response.responseJSON;
-      var queryString = "diff=1&version=" + jsonAnswer.latestVersion;
-      var previewUrl = new XWiki.Document().getURL("preview", queryString);
-
-      new Ajax.Request(previewUrl, {
-        method : 'post',
-        parameters : formData.toQueryString(),
-        onSuccess : displayModal,
-        onFailure : this.onFailure.bind(this)
-      });
-
+      previewDiff();
       // Announce that a document save attempt has failed
       document.fire("xwiki:document:saveFailed", {'response' : response});
     },
@@ -654,13 +721,14 @@ var XWiki = (function(XWiki) {
         }
       } else {
         // No redirect needed.
-        return;
+        return false;
       }
 
       // Do the redirect.
       if (url) {
         window.location = url;
       }
+      return true;
     }
   });
 

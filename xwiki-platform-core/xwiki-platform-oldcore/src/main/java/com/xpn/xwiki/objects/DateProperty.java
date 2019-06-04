@@ -58,9 +58,7 @@ public class DateProperty extends BaseProperty implements Cloneable
     @Override
     public String toText()
     {
-        // FIXME: The value of a date property should be serialized using the date timestamp or the date format
-        // specified in the XClass the date property belongs to.
-        return getValue() == null ? "" : DateXarObjectPropertySerializer.DEFAULT_FORMAT.format(getValue());
+        return DateXarObjectPropertySerializer.serializeDate(getValue());
     }
 
     @Override

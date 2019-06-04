@@ -35,6 +35,7 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -47,6 +48,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.ObjectDiff;
 
 /**
@@ -67,6 +70,22 @@ public class SaveAction extends PreviewAction
      * The key to retrieve the saved object version from the context.
      */
     private static final String SAVED_OBJECT_VERSION_KEY = "SaveAction.savedObjectVersion";
+
+    /**
+     * The context key to know if a document has been merged for saving it.
+     */
+    private static final String MERGED_DOCUMENTS = "SaveAction.mergedDocuments";
+
+    /**
+     * Parameter value used with forceSave to specify that the merge should be performed even if there is conflicts.
+     */
+    private static final String FORCE_SAVE_MERGE = "merge";
+
+    /**
+     * Parameter value used with forceSave to specify that no merge should be done but the current document should
+     * override the previous one.
+     */
+    private static final String FORCE_SAVE_OVERRIDE = "override";
 
     private DocumentRevisionProvider documentRevisionProvider;
 
@@ -205,7 +224,7 @@ public class SaveAction extends PreviewAction
         // This can be improved later by displaying a nice UI with some merge options in a sync request.
         // For now we don't want our user to loose their changes.
         if (Utils.isAjaxRequest(context) && request.getParameter("previousVersion") != null) {
-            if (isConflictingWithVersion(context, originalDoc)) {
+            if (isConflictingWithVersion(context, originalDoc, tdoc)) {
                 return true;
             }
         }
@@ -268,12 +287,13 @@ public class SaveAction extends PreviewAction
      *                      content changes). We don't retrieve it through context since it can be a translation.
      * @return true in case of conflict. If it's true, the answer is immediately sent to the client.
      */
-    private boolean isConflictingWithVersion(XWikiContext context, XWikiDocument originalDoc) throws XWikiException
+    private boolean isConflictingWithVersion(XWikiContext context, XWikiDocument originalDoc, XWikiDocument modifiedDoc)
+        throws XWikiException
     {
         XWikiRequest request = context.getRequest();
 
         // in case of force save we skip the check.
-        if ("1".equals(request.getParameter("forceSave"))) {
+        if (FORCE_SAVE_OVERRIDE.equals(request.getParameter("forceSave"))) {
             return false;
         }
 
@@ -310,6 +330,14 @@ public class SaveAction extends PreviewAction
                             context);
                     if (contentDiff.isEmpty() && objectDiff.isEmpty()) {
                         return false;
+                    } else {
+                        MergeResult mergeResult = modifiedDoc.merge(previousDoc, originalDoc, new MergeConfiguration(),
+                            context);
+                        if (FORCE_SAVE_MERGE.equals(request.getParameter("forceSave"))
+                            || mergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+                            context.put(MERGED_DOCUMENTS, "true");
+                            return false;
+                        }
                     }
                 }
 
@@ -347,6 +375,9 @@ public class SaveAction extends PreviewAction
             Map<String, String> jsonAnswer = new LinkedHashMap<>();
             Version newVersion = (Version) context.get(SAVED_OBJECT_VERSION_KEY);
             jsonAnswer.put("newVersion", newVersion.toString());
+            if ("true".equals(context.get(MERGED_DOCUMENTS))) {
+                jsonAnswer.put("mergedDocument", "true");
+            }
             answerJSON(context, HttpStatus.SC_OK, jsonAnswer);
         } else {
             sendRedirect(context.getResponse(), Utils.getRedirect("view", context));

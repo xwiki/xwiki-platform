@@ -224,24 +224,8 @@ public class DateClass extends PropertyClass
             return property;
         }
 
-        // FIXME: The value of a date property should be serialized using the date timestamp or the date format
-        // specified in the XClass the date property belongs to.
-        SimpleDateFormat sdf = DateXarObjectPropertySerializer.DEFAULT_FORMAT;
-        try {
-            property.setValue(sdf.parse(value));
-        } catch (ParseException e) {
-            // I suppose this is a date format used a long time ago. DateProperty is using the above date format now.
-            SimpleDateFormat sdfOld = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
-            LOGGER.warn("Failed to parse date [{}] using format [{}]. Trying again with format [{}].", value,
-                sdf.toString(), sdfOld.toString());
-            try {
-                property.setValue(sdfOld.parse(value));
-            } catch (ParseException exception) {
-                LOGGER.warn("Failed to parse date [{}] using format [{}]. Defaulting to the current date.", value,
-                    sdfOld.toString());
-                property.setValue(new Date());
-            }
-        }
+        property.setValue(DateXarObjectPropertySerializer.parseDate(value));
+
         return property;
     }
 

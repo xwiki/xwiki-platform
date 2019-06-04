@@ -21,100 +21,106 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
-import org.jmock.cglib.MockObjectTestCase;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.web.SkinAction} class.
  * 
  * @version $Id$
  */
-public class SkinActionTest extends MockObjectTestCase
+public class SkinActionTest
 {
     private SkinAction action;
 
-    @Override
-    protected void setUp()
+    @BeforeEach
+    void setUp()
     {
         this.action = new SkinAction();
     }
 
-    public void testIsTextJavascriptJavaScriptMimetype()
+    @Test
+    public void isTextJavascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("text/javascript"));
     }
 
-    public void testIsApplicationJavascriptJavaScriptMimetype()
+    @Test
+    public void isApplicationJavascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("application/javascript"));
     }
 
-    public void testIsApplicationXJavascriptJavaScriptMimetype()
+    @Test
+    public void isApplicationXJavascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("application/x-javascript"));
     }
 
-    public void testIsTextEcmascriptJavaScriptMimetype()
+    @Test
+    public void isTextEcmascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("text/ecmascript"));
     }
 
-    public void testIsApplicationEcmascriptJavaScriptMimetype()
+    @Test
+    public void isApplicationEcmascriptJavaScriptMimetype()
     {
         assertTrue(this.action.isJavascriptMimeType("application/ecmascript"));
     }
 
-    public void testNPEJavascriptMimetype()
+    @Test
+    public void npeJavascriptMimetype()
     {
         assertFalse(this.action.isJavascriptMimeType(null));
     }
 
-    public void testIncorrectSkinFile()
+    @Test
+    public void incorrectSkinFile()
     {
-        try {
+        Throwable exception = assertThrows(IOException.class, () -> {
             this.action.getSkinFilePath("../../resources/js/xwiki/xwiki.js", "colibri");
-            assertTrue("should fail", false);
-        } catch (IOException e) {
-            // good
-        }
-        try {
+        });
+        assertEquals("Invalid filename: '../../resources/js/xwiki/xwiki.js' for skin 'colibri'",
+            exception.getMessage());
+
+        exception = assertThrows(IOException.class, () -> {
             this.action.getSkinFilePath("../../../", "colibri");
-            assertTrue("should fail", false);
-        } catch (IOException e) {
-            // good
-        }
-        try {
+        });
+        assertEquals("Invalid filename: '../../../' for skin 'colibri'", exception.getMessage());
+
+        exception = assertThrows(IOException.class, () -> {
             this.action.getSkinFilePath("resources/js/xwiki/xwiki.js", "..");
-            assertTrue("should fail", false);
-        } catch (IOException e) {
-            // good
-        }
-        try {
+        });
+        assertEquals("Invalid filename: 'resources/js/xwiki/xwiki.js' for skin '..'", exception.getMessage());
+
+        exception = assertThrows(IOException.class, () -> {
             this.action.getSkinFilePath("../resources/js/xwiki/xwiki.js", ".");
-            assertTrue("should fail", false);
-        } catch (IOException e) {
-            // good
-        }
+        });
+        assertEquals("Invalid filename: '../resources/js/xwiki/xwiki.js' for skin '.'", exception.getMessage());
     }
 
-    public void testIncorrectResourceFile()
+    @Test
+    public void incorrectResourceFile()
     {
-        try {
+        Throwable exception = assertThrows(IOException.class, () -> {
             this.action.getResourceFilePath("../../skins/js/xwiki/xwiki.js");
-            assertTrue("should fail", false);
-        } catch (IOException e) {
-            // good
-        }
-        try {
+        });
+        assertEquals("Invalid filename: '../../skins/js/xwiki/xwiki.js'", exception.getMessage());
+
+        exception = assertThrows(IOException.class, () -> {
             this.action.getResourceFilePath("../../../");
-            assertTrue("should fail", false);
-        } catch (IOException e) {
-            // good
-        }
-        try {
+        });
+        assertEquals("Invalid filename: '../../../'", exception.getMessage());
+
+        exception = assertThrows(IOException.class, () -> {
             this.action.getResourceFilePath("../../redirect");
-            assertTrue("should fail", false);
-        } catch (IOException e) {
-            // good
-        }
+        });
+        assertEquals("Invalid filename: '../../redirect'", exception.getMessage());
     }
 }

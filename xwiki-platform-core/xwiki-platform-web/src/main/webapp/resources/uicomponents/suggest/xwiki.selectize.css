@@ -92,6 +92,9 @@ a.xwiki-selectize-option-label {
   background-color: #f2dede;
   border-left: 2px solid $theme.notificationErrorColor;
 }
+.suggest-attachments.is-dragover > .selectize-input {
+  border: 1px dashed $theme.notificationSuccessColor;
+}
 
 /* Live Table Filter */
 .xwiki-livetable-display-header-filter .selectize-input {

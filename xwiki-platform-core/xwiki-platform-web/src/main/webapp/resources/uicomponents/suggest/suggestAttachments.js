@@ -85,8 +85,8 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     if (typeof typeAndReference === 'string') {
       var separatorIndex = typeAndReference.indexOf(':');
       if (separatorIndex > 0) {
-        var entityType = XWiki.EntityType.byName(typeAndReference.substr(0, separatorIndex));
-        return XWiki.Model.resolve(typeAndReference.substr(separatorIndex + 1), entityType,
+        var entityType = XWiki.EntityType.byName(typeAndReference.substring(0, separatorIndex));
+        return XWiki.Model.resolve(typeAndReference.substring(separatorIndex + 1), entityType,
           XWiki.currentDocument.documentReference);
       } else {
         return null;
@@ -193,11 +193,11 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
   };
 
   var getAttachmentIcon = function(attachment) {
-    if (typeof attachment.mimeType === 'string' && attachment.mimeType.substr(0, 6) === 'image/') {
+    if (typeof attachment.mimeType === 'string' && attachment.mimeType.substring(0, 6) === 'image/') {
       var url = attachment.xwikiRelativeUrl;
       // If the image URL is relative to the current page or is absolute (HTTP) then we can pass the icon width as a
       // query string parameter to allow the image to be resized on the server side.
-      if (url.substr(0, 1) === '/' || url.substr(0, 7) === 'http://') {
+      if (url.substring(0, 1) === '/' || url.substring(0, 7) === 'http://') {
         url += (url.indexOf('?') < 0 ? '?' : '&') + 'width=48';
       }
       var icon = {
@@ -231,13 +231,13 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
   var extensionMap = $jsontool.serialize($extensionMap);
 
   var getIcon = function(mimeType, fileName) {
-    var extension = fileName.substr(fileName.lastIndexOf('.') + 1);
+    var extension = fileName.substring(fileName.lastIndexOf('.') + 1);
     if (mimeTypeMap.hasOwnProperty(mimeType)) {
       return mimeTypeMap[mimeType][0];
     } else if (extensionMap.hasOwnProperty(extension)) {
       return extensionMap[extension][0];
     } else {
-      var mimeTypePrefix = mimeType.substr(0, mimeType.indexOf('/') + 1);
+      var mimeTypePrefix = mimeType.substring(0, mimeType.indexOf('/') + 1);
       if (mimeTypeMap.hasOwnProperty(mimeTypePrefix)) {
         return mimeTypeMap[mimeTypePrefix][0];
       } else {
@@ -289,38 +289,18 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       }
       return output;
     };
+
+    acceptDroppedFiles(selectize);
   };
 
   /**
    * Allow the user to select local files and upload them as attachments.
    */
   var createFromLocalFiles = function(selectize) {
-    var deferred = $.Deferred();
-    selectLocalFile(selectize.settings)
-      .then($.proxy(convertFilesToAttachments, null, selectize.settings))
-      .then($.proxy(processAttachments, null, selectize.settings))
-      .done(function(attachments) {
-        // The create callback doesn't support creating multiple suggestions at once so we need to hack it.
-        // Add the suggestions first (as an array) in order to persist them.
-        selectize.addOption(attachments);
-        // Call the create callback passing the first suggestion.
-        deferred.resolve(attachments[0]);
-        // Select the rest of the suggestions.
-        attachments.slice(1).forEach(function(attachment) {
-          selectize.addItem(attachment.value);
-        });
-        attachments.forEach(function(attachment) {
-          // Use the local file as icon while the file is being uploaded.
-          attachment.icon.promise && attachment.icon.promise.done(function() {
-            selectize.updateOption(attachment.value, attachment);
-          });
-          uploadFileAndShowProgress(attachment, selectize);
-        });
-      }).fail($.proxy(deferred, 'reject'));
-    return deferred.promise();
+    return pickLocalFiles(selectize.settings).then($.proxy(selectAndUploadFiles, null, selectize));
   };
 
-  var selectLocalFile = function(options) {
+  var pickLocalFiles = function(options) {
     var deferred = $.Deferred();
 
     // There's no clean way to detect when the file browser dialog is canceled so we must rely on a hack: catch
@@ -349,17 +329,31 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     return deferred.promise();
   };
 
-  var convertFilesToAttachments = function(options, files) {
-    var attachments = [];
-    for (var i = 0; i < files.length; i++) {
-      attachments.push(convertFileToAttachment(files.item(i), options));
-    }
+  var selectAndUploadFiles = function(selectize, files) {
+    var allowedFiles = filterFiles(files, selectize.settings);
+    var attachments = processAttachments(selectize.settings, convertFilesToAttachments(allowedFiles,
+      selectize.settings));
+    // Add the attachments to the list of suggestions in order to be able to select them.
+    selectize.addOption(attachments);
+    attachments.forEach(function(attachment) {
+      // Select the attachments.
+      selectize.addItem(attachment.value);
+      // Use the local file as icon while the file is being uploaded.
+      attachment.icon.promise && attachment.icon.promise.done(function() {
+        selectize.updateOption(attachment.value, attachment);
+      });
+      uploadFileAndShowProgress(attachment, selectize);
+    });
+    return attachments;
+  };
+
+  var convertFilesToAttachments = function(files, options) {
     return {
-      attachments: attachments
+      attachments: files.map($.proxy(convertFileToAttachment, null, options))
     };
   };
 
-  var convertFileToAttachment = function(file, options) {
+  var convertFileToAttachment = function(options, file) {
     var attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
       options.documentReference);
     var attachmentURL = new XWiki.Document(options.documentReference).getURL('download') + '/' +
@@ -482,6 +476,60 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       deferred.resolve(attachment);
     }
     return deferred.promise();
+  };
+
+  var acceptDroppedFiles = function(selectize) {
+    // Prevent any unwanted behaviors for the drag & drop events across browsers.
+    (selectize.$wrapper).on('drag dragstart dragend dragover dragenter dragleave drop', function(event) {
+      event.preventDefault();
+      event.stopPropagation();
+    // Indicate visually that the user can drop the files.
+    }).on('dragover dragenter', function() {
+      $(this).addClass('is-dragover');
+    }).on('dragleave dragend drop', function() {
+      $(this).removeClass('is-dragover');
+    // Filter the files based on their type and then upload them.
+    }).on('drop', function(event) {
+      selectAndUploadFiles(selectize, event.originalEvent.dataTransfer.files);
+    });
+  };
+
+  var filterFiles = function(files, settings) {
+    var allowedFiles = [];
+    var allowedFileTypes = [];
+    if (typeof settings.accept === 'string') {
+      allowedFileTypes = settings.accept.split(/\s*,\s*/).filter(function(type) {
+        return type.length > 0;
+      });
+    }
+    // Filter the files by type.
+    for (var i = 0; i < files.length; i++) {
+      var file = files.item(i);
+      if (isFileAllowed(file, allowedFileTypes)) {
+        allowedFiles.push(file);
+      }
+    }
+    if (settings.maxItems === 1) {
+      // Upload only a single file if single selecion is on.
+      allowedFiles = allowedFiles.slice(0, 1);
+    }
+    return allowedFiles;
+  };
+
+  var isFileAllowed = function(file, allowedFileTypes) {
+    for (var i = 0; i < allowedFileTypes.length; i++) {
+      var type = allowedFileTypes[i];
+      if (type.substring(0, 1) === '.') {
+        // Verify if the file name matches the allowed file name extension.
+        if (file.name.substring(file.name.length - type.length) === type) {
+          return true;
+        }
+      // Verify if the file media type contains the allowed media type.
+      } else if (file.type.indexOf(type) >= 0) {
+        return true;
+      }
+    }
+    return allowedFileTypes.length === 0;
   };
 
   $.fn.suggestAttachments = function(options) {

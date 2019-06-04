@@ -72,7 +72,7 @@ public class AllTests
     public static void setupExecutor(XWikiExecutor executor)
     {
         // Force bind_addr since tcp jgroups configuration expect cluster members to listen localhost by default
-        executor.setXWikiOpts("-Djgroups.bind_addr=localhost -Xmx512m -XX:MaxPermSize=128m");
+        executor.setXWikiOpts("-Djgroups.bind_addr=localhost -Xmx512m");
     }
 
     private void setupRepositories(XWikiExecutor executor) throws Exception

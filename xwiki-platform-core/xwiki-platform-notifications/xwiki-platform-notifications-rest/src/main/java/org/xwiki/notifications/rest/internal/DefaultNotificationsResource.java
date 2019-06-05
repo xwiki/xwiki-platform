@@ -349,7 +349,6 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         parameters.filters = notificationFilterManager.getAllFilters(true).stream()
             .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toList());
 
-        parameters.filterPreferences = new ArrayList<>(parameters.filterPreferences);
         enableAllEventTypes(parameters);
         handlePagesParameter(pages, parameters);
         handleSpacesParameter(spaces, parameters);
@@ -436,7 +435,7 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     private void enableAllEventTypes(NotificationParameters parameters) throws EventStreamException
     {
-        parameters.preferences = new ArrayList<>();
+        parameters.preferences.clear();
         for (RecordableEventDescriptor descriptor : recordableEventDescriptorManager
             .getRecordableEventDescriptors(true)) {
             parameters.preferences.add(new InternalNotificationPreference(descriptor));

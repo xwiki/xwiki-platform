@@ -25,8 +25,9 @@
   "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping auto-import="true">
 
-    <!-- This file is a copy of xwiki.hbm.xml with the following modifications:
-         - Redefine materialized_clob as StringClobType
+    <!-- This file is a copy of xwiki.hbm.xml.
+         It does not have any modification anymore but it's kept for retro compatibility reasons.
+         TODO: remove it and move to an automatic injection when we don't need to list files explicitly in hibernate.cfg.xml anymore.
     -->
 
     <!--
@@ -40,10 +41,6 @@
           entering content differing only by trailing spaces).
     -->
 
-    <!-- The PostgreSQL JDBC driver wrongly calls the method getAsciiStream() whenever dealing with Clobs,
-         which causes all the non-ASCII chars to be discarded. This is a workaround for the issue. -->
-    <typedef name="materialized_clob" class="org.hibernate.type.StringClobType" />
-
     <!-- com.xpn.xwiki.doc.XWikiDocument root -->
     <class name="com.xpn.xwiki.doc.XWikiDocument" table="xwikidoc">
         <id name="id" type="long" unsaved-value="undefined">
@@ -55,7 +52,7 @@
         <property name="title" type="string" column="XWD_TITLE" length="255" index="DOC_TITLE" not-null="true" />
         <property name="language" type="string" column="XWD_LANGUAGE" index="DOC_LANGUAGE" length="5" />
         <property name="defaultLanguage" type="string" column="XWD_DEFAULT_LANGUAGE" index="DOC_DEFAULT_LANGUAGE" length="5" />
-        <property name="translation" type="integer" column="XWD_TRANSLATION" not-null="true" />
+        <property name="translation" type="integer" column="XWD_TRANSLATION" index="DOC_TRANSLATION" not-null="true" />
         <property name="date" type="timestamp" column="XWD_DATE" index="DOC_DATE" not-null="true" />
         <property name="contentUpdateDate" type="timestamp" column="XWD_CONTENT_UPDATE_DATE" index="DOC_CONTENT_UPDATE_DATE" not-null="true" />
         <property name="creationDate" type="timestamp" column="XWD_CREATION_DATE" index="DOC_CREATION_DATE" not-null="true" />
@@ -85,7 +82,7 @@
             <column name="XWS_ID" not-null="true" />
             <generator class="assigned" />
         </id>
-        <property name="reference" type="string" column="XWS_REFERENCE" length="255" index="SPACE_REFERENCE" not-null="true" />
+        <property name="reference" update="false" type="string" column="XWS_REFERENCE" length="255" index="SPACE_REFERENCE" not-null="true" />
         <property name="name" type="string" column="XWS_NAME" length="255" index="SPACE_NAME" not-null="true" />
         <property name="parent" type="string" column="XWS_PARENT" length="255" index="SPACE_PARENT" />
         <property name="hidden" type="boolean" column="XWS_HIDDEN" index="SPACE_HIDDEN" not-null="true" />
@@ -341,7 +338,7 @@
              name is empty ("") or null. Thus this column can now contain both "internal" (old stats) and ""
              (new stats) -->
         <property name="className" type="string" column="XWR_CLASSNAME" length="255" />
-        <property name="referer" type="string" column="XWR_REFERER" not-null="true" length="8192" />
+        <property name="referer" type="text" column="XWR_REFERER" not-null="true" length="8192" />
         <property name="pageViews" type="integer" column="XWR_PAGE_VIEWS" index="XWRS_PAGE_VIEWS" not-null="false" />
         <property name="period" type="integer" column="XWR_PERIOD" index="XWRS_PERIOD" not-null="false" />
     </class>
@@ -359,8 +356,8 @@
              (new stats) -->
         <property name="className" type="string" column="XWV_CLASSNAME" length="255" />
         <property name="IP" type="string" column="XWV_IP" not-null="true" length="255" index="XWVS_IP" />
-        <property name="userAgent" type="string" column="XWV_USER_AGENT" not-null="true" length="8192" />
-        <property name="cookie" type="string" column="XWV_COOKIE" not-null="true" length="8192" />
+        <property name="userAgent" type="text" column="XWV_USER_AGENT" not-null="true" length="8192" />
+        <property name="cookie" type="text" column="XWV_COOKIE" not-null="true" length="8192" />
         <property name="uniqueID" type="string" column="XWV_UNIQUE_ID" index="XWVS_UNIQUE_ID" not-null="true" length="255" />
         <property name="pageViews" type="integer" column="XWV_PAGE_VIEWS" index="XWVS_PAGE_VIEWS" not-null="false" />
         <property name="pageSaves" type="integer" column="XWV_PAGE_SAVES" index="XWVS_PAGE_SAVES" not-null="false" />
@@ -396,8 +393,8 @@
         <property name="validation_email_content" type="text" column="XWP_VALIDATION_EMAIL_CONTENT" length="30000" />
         <property name="confirmation_email_content" type="text" column="XWP_CONFIRMATION_EMAIL_CONTENT" length="30000" />
         <property name="invitation_email_content" type="text" column="XWP_INVITATION_EMAIL_CONTENT" length="30000" />
-        <property name="leftPanels" type="string" column="XWP_LEFT_PANELS" length="2000" />
-        <property name="rightPanels" type="string" column="XWP_RIGHT_PANELS" length="2000" />
+        <property name="leftPanels" type="text" column="XWP_LEFT_PANELS" length="2000" />
+        <property name="rightPanels" type="text" column="XWP_RIGHT_PANELS" length="2000" />
         <property name="showLeftPanels" type="integer" column="XWP_SHOW_LEFT_PANELS" />
         <property name="showRightPanels" type="integer" column="XWP_SHOW_RIGHT_PANELS" />
         <property name="languages" type="string" column="XWP_LANGUAGES" length="255" />
@@ -407,7 +404,7 @@
         <property name="edit_registered" type="string" column="XWP_EDIT_REGISTERED" length="255" />
         <property name="comment_anonymous" type="string" column="XWP_COMMENT_ANONYMOUS" length="255" />
         <property name="comment_registered" type="string" column="XWP_COMMENT_REGISTERED" length="255" />
-        <property name="documentBundles" type="string" column="XWP_DOCUMENT_BUNDLES" length="2000" />
+        <property name="documentBundles" type="text" column="XWP_DOCUMENT_BUNDLES" length="2000" />
     </class>
 
     <!-- XWikiComments custom mapping -->

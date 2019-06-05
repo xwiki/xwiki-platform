@@ -115,10 +115,8 @@ public class AnnotationGeneratorChainingListener extends QueueListener implement
     {
         // queue this event
         super.onWord(word);
-        // put it in the buffer
-        plainTextContent.append(word);
-        // store the mapping of the range to the just added event
-        eventsMapping.put(plainTextContent.length() - 1, getLast());
+
+        this.handleRawText(word);
     }
 
     @Override

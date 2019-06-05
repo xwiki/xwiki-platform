@@ -19,9 +19,8 @@
  */
 package org.xwiki.rest.internal.resources;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URL;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,6 +37,7 @@ import javax.inject.Provider;
 
 import org.apache.commons.lang.StringUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -351,37 +351,47 @@ public class BaseAttachmentsResource extends XWikiResource
         return attachments;
     }
 
-    protected AttachmentInfo storeAttachment(Document doc, String attachmentName, byte[] content) throws XWikiException
+    protected AttachmentInfo storeAndRetrieveAttachment(Document document, String attachmentName, InputStream content,
+        Boolean withPrettyNames) throws XWikiException
+    {
+        boolean alreadyExisting = document.getAttachment(attachmentName) != null;
+
+        XWikiAttachment xwikiAttachment =
+            createOrUpdateAttachment(new AttachmentReference(attachmentName, document.getDocumentReference()), content);
+        Attachment attachment = this.modelFactory.toRestAttachment(uriInfo.getBaseUri(),
+            new com.xpn.xwiki.api.Attachment(document, xwikiAttachment, this.xcontextProvider.get()), withPrettyNames,
+            false);
+
+        return new AttachmentInfo(attachment, alreadyExisting);
+    }
+
+    protected XWikiAttachment createOrUpdateAttachment(AttachmentReference attachmentReference, InputStream content)
+        throws XWikiException
     {
         XWikiContext xcontext = this.xcontextProvider.get();
         XWiki xwiki = xcontext.getWiki();
+        // We clone the document because we're going to modify it and we shouldn't modify the cached instance.
+        XWikiDocument document = xwiki.getDocument(attachmentReference, xcontext).clone();
 
-        XWikiDocument xwikiDocument = xwiki.getDocument(doc.getDocumentReference(), xcontext);
-
-        boolean alreadyExisting = xwikiDocument.getAttachment(attachmentName) != null;
-
-        XWikiAttachment xwikiAttachment;
+        XWikiAttachment attachment;
         try {
-            xwikiAttachment = xwikiDocument.setAttachment(attachmentName,
-                new ByteArrayInputStream(content != null ? content : new byte[0]), xcontext);
+            attachment = document.setAttachment(attachmentReference.getName(), content, xcontext);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
-                String.format("Failed to store the content of attachment [%s] in document [%s].", attachmentName,
-                    doc.getPrefixedFullName()),
-                e);
+                String.format("Failed to create or update the attachment [%s].", attachmentReference), e);
         }
 
-        xwiki.saveDocument(xwikiDocument, xcontext);
+        // Set the document author.
+        document.setAuthorReference(xcontext.getUserReference());
 
-        URL url = xcontext.getURLFactory().createAttachmentURL(attachmentName, doc.getSpace(),
-            doc.getDocumentReference().getName(), "download", null, doc.getWiki(), xcontext);
-        String attachmentXWikiAbsoluteUrl = url.toString();
-        String attachmentXWikiRelativeUrl = xcontext.getURLFactory().getURL(url, xcontext);
+        // Calculate and store the attachment media type.
+        attachment.resetMimeType(xcontext);
 
-        Attachment attachment = this.modelFactory.toRestAttachment(uriInfo.getBaseUri(),
-            new com.xpn.xwiki.api.Attachment(doc, xwikiAttachment, xcontext), attachmentXWikiRelativeUrl,
-            attachmentXWikiAbsoluteUrl, false, false);
+        // Remember the character encoding.
+        attachment.setCharset(xcontext.getRequest().getCharacterEncoding());
 
-        return new AttachmentInfo(attachment, alreadyExisting);
+        xwiki.saveDocument(document, xcontext);
+
+        return attachment;
     }
 }

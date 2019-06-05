@@ -19,21 +19,23 @@
  */
 package org.xwiki.rest.internal.resources.attachments;
 
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.mail.BodyPart;
-import javax.mail.Header;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.internet.ContentDisposition;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestException;
@@ -42,6 +44,8 @@ import org.xwiki.rest.internal.resources.BaseAttachmentsResource;
 import org.xwiki.rest.model.jaxb.Attachments;
 import org.xwiki.rest.resources.attachments.AttachmentResource;
 import org.xwiki.rest.resources.attachments.AttachmentsResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.api.Document;
 
@@ -52,14 +56,17 @@ import com.xpn.xwiki.api.Document;
 @Named("org.xwiki.rest.internal.resources.attachments.AttachmentsResourceImpl")
 public class AttachmentsResourceImpl extends BaseAttachmentsResource implements AttachmentsResource
 {
-    private static final String FORM_FILENAME_FIELD = "filename";
+    private static final String NAME = "name";
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Override
     public Attachments getAttachments(String wiki, String spaces, String page, Integer offset, Integer limit,
         Boolean withPrettyNames, String name, String author, String fileTypes) throws XWikiRestException
     {
         Map<String, String> filters = new HashMap<>();
-        filters.put("name", name);
+        filters.put(NAME, name);
         filters.put("author", author);
         filters.put("fileTypes", fileTypes);
 
@@ -69,98 +76,66 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
 
     @Override
     public Response addAttachment(String wikiName, String spaceName, String pageName, Multipart multipart)
-            throws XWikiRestException
+        throws XWikiRestException
     {
         try {
             List<String> spaces = parseSpaceSegments(spaceName);
             DocumentInfo documentInfo = getDocumentInfo(wikiName, spaces, pageName, null, null, true, true);
-
             Document doc = documentInfo.getDocument();
 
-            if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
+            if (!this.authorization.hasAccess(Right.EDIT, doc.getDocumentReference())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            /* The name to be used */
-            String attachmentName = null;
-
-            /* The actual filename of the sent file */
-            String actualFileName = null;
-
-            /* The specified file name using a form field */
-            String overriddenFileName = null;
-            String contentType = null;
-            InputStream inputStream = null;
-
-            for (int i = 0; i < multipart.getCount(); i++) {
-                BodyPart bodyPart = multipart.getBodyPart(i);
-
-                /* Get the content disposition headers */
-                Enumeration e = bodyPart.getMatchingHeaders(new String[]{ "Content-disposition" });
-                while (e.hasMoreElements()) {
-                    Header h = (Header) e.nextElement();
-
-                    /* Parse header data. Normally headers are in the form form-data; key="value"; ... */
-                    if (h.getValue().startsWith("form-data")) {
-                        String[] fieldData = h.getValue().split(";");
-                        for (String s : fieldData) {
-                            String[] pair = s.split("=");
-                            if (pair.length == 2) {
-                                String key = pair[0].trim();
-                                String value = pair[1].replace("\"", "").trim();
-
-                                if ("name".equals(key)) {
-                                    if (FORM_FILENAME_FIELD.equals(value)) {
-                                        overriddenFileName = bodyPart.getContent().toString();
-                                    }
-                                } else if (FORM_FILENAME_FIELD.equals(key)) {
-                                    actualFileName = value;
-                                    contentType = bodyPart.getContentType();
-                                    inputStream = bodyPart.getInputStream();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (overriddenFileName != null) {
-                attachmentName = overriddenFileName;
-            } else {
-                attachmentName = actualFileName;
-            }
-
-            if (attachmentName == null) {
+            ImmutablePair<String, InputStream> file = getFile(multipart);
+            if (file.getKey() == null || file.getValue() == null) {
                 throw new WebApplicationException(Status.BAD_REQUEST);
             }
 
-            byte[] buffer = new byte[4096];
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            while (true) {
-                int read = inputStream.read(buffer);
-                if (read != 4096) {
-                    if (read != -1) {
-                        baos.write(buffer, 0, read);
-                    }
+            // Attach the file and retrieve the attachment information.
 
-                    break;
-                } else {
-                    baos.write(buffer);
-                }
-            }
-            baos.flush();
-
-            /* Attach the file */
-            AttachmentInfo attachmentInfo = storeAttachment(doc, attachmentName, baos.toByteArray());
+            AttachmentInfo attachmentInfo = storeAndRetrieveAttachment(doc, file.getKey(), file.getValue(), false);
 
             if (attachmentInfo.isAlreadyExisting()) {
                 return Response.status(Status.ACCEPTED).entity(attachmentInfo.getAttachment()).build();
             } else {
-                return Response.created(Utils.createURI(uriInfo.getBaseUri(), AttachmentResource.class, wikiName,
-                    spaces, pageName, attachmentName)).entity(attachmentInfo.getAttachment()).build();
+                return Response.created(Utils.createURI(this.uriInfo.getBaseUri(), AttachmentResource.class, wikiName,
+                    spaces, pageName, file.getKey())).entity(attachmentInfo.getAttachment()).build();
             }
         } catch (Exception e) {
             throw new XWikiRestException(e);
         }
+    }
+
+    private ImmutablePair<String, InputStream> getFile(Multipart multipart) throws MessagingException, IOException
+    {
+        // The actual file name of the sent file.
+        String actualFileName = null;
+        InputStream inputStream = null;
+
+        // The specified file name using a form field.
+        String overriddenFileName = null;
+
+        for (int i = 0; i < multipart.getCount(); i++) {
+            BodyPart bodyPart = multipart.getBodyPart(i);
+            if ("form-data".equalsIgnoreCase(bodyPart.getDisposition())) {
+                if (bodyPart.getFileName() != null) {
+                    // This body part represents the file itself.
+                    actualFileName = bodyPart.getFileName();
+                    inputStream = bodyPart.getInputStream();
+                } else {
+                    // This body part represents a plain form field.
+                    ContentDisposition contentDisposition =
+                        new ContentDisposition(bodyPart.getHeader("Content-Disposition")[0]);
+                    String fieldName = contentDisposition.getParameter(NAME);
+                    if ("filename".equals(fieldName)) {
+                        overriddenFileName = bodyPart.getContent().toString();
+                    }
+                }
+            }
+        }
+
+        String attachmentName = overriddenFileName != null ? overriddenFileName : actualFileName;
+        return new ImmutablePair<>(attachmentName, inputStream);
     }
 }

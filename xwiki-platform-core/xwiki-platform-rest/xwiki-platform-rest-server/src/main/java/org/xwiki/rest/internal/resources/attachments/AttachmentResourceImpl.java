@@ -19,6 +19,9 @@
  */
 package org.xwiki.rest.internal.resources.attachments;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
@@ -80,8 +83,9 @@ public class AttachmentResourceImpl extends BaseAttachmentsResource implements A
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
-            /* Attach the file */
-            AttachmentInfo attachmentInfo = storeAttachment(doc, attachmentName, content);
+            // Attach the file.
+            InputStream inputStream = new ByteArrayInputStream(content != null ? content : new byte[0]);
+            AttachmentInfo attachmentInfo = storeAndRetrieveAttachment(doc, attachmentName, inputStream, false);
 
             if (attachmentInfo.isAlreadyExisting()) {
                 return Response.status(Status.ACCEPTED).entity(attachmentInfo.getAttachment()).build();

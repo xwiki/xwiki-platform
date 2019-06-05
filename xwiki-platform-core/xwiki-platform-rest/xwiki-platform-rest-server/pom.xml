@@ -216,7 +216,6 @@
                 org/xwiki/rest/internal/resources/BaseAttachmentsResource.java,
                 org/xwiki/rest/internal/resources/BaseSearchResult.java,
                 org/xwiki/rest/internal/resources/BrowserAuthenticationResource.java,
-                org/xwiki/rest/internal/resources/attachments/AttachmentsResourceImpl.java,
                 org/xwiki/rest/internal/resources/pages/PagesResourceImpl.java,
                 org/xwiki/rest/internal/resources/search/AbstractDatabaseSearchSource.java,
                 org/xwiki/rest/internal/resources/search/SearchSource.java,

@@ -335,6 +335,10 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       selectize.settings));
     // Add the attachments to the list of suggestions in order to be able to select them.
     selectize.addOption(attachments);
+    // Uploading the files in parallel can cause problems, at least until XWIKI-13473 (Exception when the same document
+    // is saved at the same time in 2 different threads) is fixed. Let's upload them sequentially for now.
+    var deferred = $.Deferred();
+    var uploadQueue = deferred;
     attachments.forEach(function(attachment) {
       // Select the attachments.
       selectize.addItem(attachment.value);
@@ -342,8 +346,11 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       attachment.icon.promise && attachment.icon.promise.done(function() {
         selectize.updateOption(attachment.value, attachment);
       });
-      uploadFileAndShowProgress(attachment, selectize);
+      var uploadNextFile = $.proxy(uploadFileAndShowProgress, null, attachment, selectize);
+      uploadQueue = uploadQueue.then(uploadNextFile, uploadNextFile);
     });
+    // Start the upload.
+    deferred.resolve();
     return attachments;
   };
 
@@ -404,7 +411,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
         percent: 0
       }
     };
-    uploadFile(attachment.data, selectize.settings)
+    return uploadFile(attachment.data, selectize.settings)
     .then($.proxy(processAttachment, null, selectize.settings))
     // Load the attachment icon before updating the display in order to reduce the flickering.
     .then(loadAttachmentIcon)

@@ -545,6 +545,8 @@ public class EditIT
             "org.hibernate.HibernateException",
             "org.hibernate.exception.DataException",
             "java.sql.BatchUpdateException: data exception: string data, right truncation",
+            "SQL Error: 1406, SQLState: 22001",
+            "Data truncation: Data too long for column 'XWD_TITLE' at row 1",
             // PostgreSQL specific log
             "value too long for type character varying(255)"
         );

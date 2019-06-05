@@ -21,7 +21,6 @@ package org.xwiki.notifications.sources;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 
 import org.xwiki.model.reference.DocumentReference;
@@ -76,15 +75,15 @@ public class NotificationParameters
     /**
      * List of preferences to apply.
      */
-    public Collection<NotificationPreference> preferences = Collections.emptyList();
+    public Collection<NotificationPreference> preferences = new ArrayList<>();
 
     /**
      * List of filter preferences to apply.
      */
-    public Collection<NotificationFilterPreference> filterPreferences = Collections.emptyList();
+    public Collection<NotificationFilterPreference> filterPreferences = new ArrayList<>();
 
     /**
      * List of filters to apply.
      */
-    public Collection<NotificationFilter> filters = Collections.emptyList();
+    public Collection<NotificationFilter> filters = new ArrayList<>();
 }

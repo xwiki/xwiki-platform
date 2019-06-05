@@ -2978,7 +2978,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * @param className the name of the class to map
-     * @param custommapping the custom mapping to inject for this class
+     * @param customMapping the custom mapping to inject for this class
      * @param inputxcontext the current XWikiContext
      * @return a boolean indicating if the mapping has been added to the current hibernate configuration, and a reload
      *         of the factory is required.

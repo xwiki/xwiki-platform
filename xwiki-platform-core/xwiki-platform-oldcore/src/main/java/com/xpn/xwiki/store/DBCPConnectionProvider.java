@@ -86,7 +86,7 @@ import org.slf4j.LoggerFactory;
  * lists, issue tracking and other support facilities
  * </p>
  *
- * @see org.hibernate.service.jdbc.connections.spi.ConnectionProvider
+ * @see org.hibernate.engine.jdbc.connections.spi.ConnectionProvider
  * @author Dirk Verbeeck
  */
 public class DBCPConnectionProvider implements ConnectionProvider, Configurable, Stoppable

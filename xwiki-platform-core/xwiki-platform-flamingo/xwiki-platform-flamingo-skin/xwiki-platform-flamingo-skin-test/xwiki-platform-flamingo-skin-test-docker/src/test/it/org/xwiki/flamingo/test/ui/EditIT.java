@@ -645,7 +645,8 @@ public class EditIT
             "SQL Error: 1406, SQLState: 22001",
             "Data truncation: Data too long for column 'XWD_TITLE' at row 1",
             "SQL Error: 3401, SQLState: 22001",
-            "data exception: string data, right truncation;  table: XWIKIDOC column: XWD_TITLE",
+            "SQL Error: -3401, SQLState: 22001",
+            "data exception: string data, right truncation",
             // PostgreSQL specific log
             "value too long for type character varying(255)"
         );

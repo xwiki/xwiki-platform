@@ -79,6 +79,8 @@ import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.AuthorExecutor;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
@@ -161,6 +163,9 @@ public class InternalTemplateManager implements Initializable
 
     @Inject
     private InternalSkinManager skins;
+
+    @Inject
+    private AuthorizationManager authorization;
 
     @Inject
     private JobProgressManager progress;
@@ -849,6 +854,11 @@ public class InternalTemplateManager implements Initializable
 
     private void evaluateContent(Template template, TemplateContent content, Writer writer) throws Exception
     {
+        // Make sure the author of the template has script right (required to execute Velocity)
+        if (content.isAuthorProvided()) {
+            this.authorization.checkAccess(Right.SCRIPT, content.getAuthorReference(), content.getDocumentReference());
+        }
+
         // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
         // by Velocity as a cache index key for caching macros.
         String namespace = this.renderingContext.getTransformationId();

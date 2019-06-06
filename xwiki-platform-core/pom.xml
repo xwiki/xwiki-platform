@@ -166,6 +166,12 @@
                     "old": "method org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentsResource::getAttachments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
                     "new": "method org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentsResource::getAttachments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException",
                     "justification": "Add support for filtering the attachments by file name, author and mime type even when they are stored on the same page"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, javax.mail.Multipart) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, javax.mail.Multipart, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
+                    "justification": "All resources that return attachments should take into account the prettyNames query string parameter"
                   }
                   // Add more ignores below...
                 ]

@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.resources.attachments;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -75,8 +77,8 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
     }
 
     @Override
-    public Response addAttachment(String wikiName, String spaceName, String pageName, Multipart multipart)
-        throws XWikiRestException
+    public Response addAttachment(String wikiName, String spaceName, String pageName, Multipart multipart,
+        Boolean withPrettyNames) throws XWikiRestException
     {
         try {
             List<String> spaces = parseSpaceSegments(spaceName);
@@ -93,8 +95,8 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
             }
 
             // Attach the file and retrieve the attachment information.
-
-            AttachmentInfo attachmentInfo = storeAndRetrieveAttachment(doc, file.getKey(), file.getValue(), false);
+            AttachmentInfo attachmentInfo =
+                storeAndRetrieveAttachment(doc, file.getKey(), file.getValue(), withPrettyNames);
 
             if (attachmentInfo.isAlreadyExisting()) {
                 return Response.status(Status.ACCEPTED).entity(attachmentInfo.getAttachment()).build();
@@ -109,19 +111,20 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
 
     private ImmutablePair<String, InputStream> getFile(Multipart multipart) throws MessagingException, IOException
     {
-        // The actual file name of the sent file.
-        String actualFileName = null;
+        // The original file name that was sent along with the file content. The value is read from the
+        // Content-Disposition header.
+        String originalFileName = null;
         InputStream inputStream = null;
 
-        // The specified file name using a form field.
-        String overriddenFileName = null;
+        // The file name submitted as a separate form field. When present, it overwrites the original file name.
+        String overwritingFileName = null;
 
         for (int i = 0; i < multipart.getCount(); i++) {
             BodyPart bodyPart = multipart.getBodyPart(i);
             if ("form-data".equalsIgnoreCase(bodyPart.getDisposition())) {
                 if (bodyPart.getFileName() != null) {
                     // This body part represents the file itself.
-                    actualFileName = bodyPart.getFileName();
+                    originalFileName = bodyPart.getFileName();
                     inputStream = bodyPart.getInputStream();
                 } else {
                     // This body part represents a plain form field.
@@ -129,13 +132,15 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
                         new ContentDisposition(bodyPart.getHeader("Content-Disposition")[0]);
                     String fieldName = contentDisposition.getParameter(NAME);
                     if ("filename".equals(fieldName)) {
-                        overriddenFileName = bodyPart.getContent().toString();
+                        // This body part represents the form field used to overwrite the original file name.
+                        // We don't use bodyPart.getContent() because it doesn't use UTF-8 to read the input stream.
+                        overwritingFileName = IOUtils.toString(bodyPart.getInputStream(), StandardCharsets.UTF_8);
                     }
                 }
             }
         }
 
-        String attachmentName = overriddenFileName != null ? overriddenFileName : actualFileName;
+        String attachmentName = overwritingFileName != null ? overwritingFileName : originalFileName;
         return new ImmutablePair<>(attachmentName, inputStream);
     }
 }

@@ -442,15 +442,19 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     var attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
     var uploadURL = getAttachmentsRestURL(attachmentReference.parent);
     var formData = new FormData();
-    formData.append(attachment.name, attachment.file);
+    formData.append('file', attachment.file);
+    // We also send the file name as a separate field because parsing it from the Content-Disposition HTTP multipart
+    // header is tricky when the file name contains special characters (unicode using UTF-8).
+    formData.append('filename', attachment.name);
     var deferred = $.Deferred();
     $.post({
       url: uploadURL,
       data: formData,
       // Needed in order to be able to submit FormData directly
       processData: false,
-      // jQuery defaults to application/x-www-form-urlencoded
-      contentType: 'multipart/form-data',
+      // Let the browser handle the Content-Type header because it needs to add the boundary string to the
+      // 'multipart/form-data' value so that the server knows how to parse the request body.
+      contentType: false,
       // REST calls return XML by default
       dataType: 'json',
       xhr: function() {

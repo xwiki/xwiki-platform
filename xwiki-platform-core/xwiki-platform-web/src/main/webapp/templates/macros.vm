@@ -2653,6 +2653,9 @@ Recursive title display detected!##
     #set ($values = [])
   #end
   <select $stringtool.join($attributes, ' ')>
+    #if ("$!parameters.placeholder" != '')
+      <option value="">$escapetool.xml($parameters.placeholder)</option>
+    #end
     #if ("$!optionsDisplayerMacroName" != '')
       #evaluate("${escapetool.h}${optionsDisplayerMacroName}(${escapetool.d}values)")
     #else
@@ -2707,9 +2710,6 @@ Recursive title display detected!##
 #end
 
 #macro (classPicker_displayOptions $selectedValues)
-  #if ("$!parameters.placeholder" != '')
-    <option value="">$escapetool.xml($parameters.placeholder)</option>
-  #end
   #set ($selectedClassReferences = $collectionstool.set)
   #foreach ($selectedValue in $selectedValues)
     #set ($discard = $selectedClassReferences.add($services.model.resolveDocument($selectedValue)))

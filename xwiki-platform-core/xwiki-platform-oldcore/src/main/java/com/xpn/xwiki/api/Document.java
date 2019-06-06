@@ -742,6 +742,18 @@ public class Document extends Api
     }
 
     /**
+     * @param targetSyntax the syntax in which to render the document content
+     * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @return the content of the current document rendered.
+     * @since 11.5RC1
+     */
+    @Unstable
+    public String displayDocument(Syntax targetSyntax, boolean restricted) throws XWikiException
+    {
+        return this.doc.displayDocument(targetSyntax, restricted, getXWikiContext());
+    }
+
+    /**
      * @return the content of the current document rendered.
      * @since 11.3RC1
      */
@@ -749,6 +761,17 @@ public class Document extends Api
     public String displayDocument() throws XWikiException
     {
         return this.doc.displayDocument(getXWikiContext());
+    }
+
+    /**
+     * @return the content of the current document rendered.
+     * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @since 11.5RC1
+     */
+    @Unstable
+    public String displayDocument(boolean restricted) throws XWikiException
+    {
+        return this.doc.displayDocument(restricted, getXWikiContext());
     }
 
     /**
@@ -814,7 +837,7 @@ public class Document extends Api
      *
      * @param text the text to render
      * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
-     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @return the given text rendered in the context of this document using the passed Syntax
      */
     private String getRenderedContent(String text, String syntaxId, boolean restricted) throws XWikiException

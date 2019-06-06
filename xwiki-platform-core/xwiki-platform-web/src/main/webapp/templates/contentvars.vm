@@ -3,6 +3,7 @@
 ## -------------------------------
 ## Honor the syntax if it's passed in the request.
 #try("contentvmexception")
+  #set ($restrictedContent = ($request.restricted == "true"))
   #set($outputSyntax = $xwiki.getAvailableRendererSyntax($request.outputSyntax, $request.outputSyntaxVersion))
   #if ($outputSyntax)
     ## If the passed syntax is not an HTML-compatible syntax we need to HTML-escape it so that it can be
@@ -12,12 +13,12 @@
     ## get.vm in order to get proper XML).
     #set($syntaxType = $outputSyntax.type.toIdString())
     #if (($syntaxType == "xhtml") || ($syntaxType == "html") || !$escapeContent)
-      #set ($renderedContent = $tdoc.displayDocument($outputSyntax))
+      #set ($renderedContent = $tdoc.displayDocument($outputSyntax, $restrictedContent))
     #else
       ## Make sure to print correctly the result when it's not HTML,
-      #set ($renderedContent = "<pre>$escapetool.html($tdoc.displayDocument($outputSyntax))</pre>")
+      #set ($renderedContent = "<pre>$escapetool.html($tdoc.displayDocument($outputSyntax, $restrictedContent))</pre>")
     #end
   #else
-    #set ($renderedContent = $tdoc.displayDocument())
+    #set ($renderedContent = $tdoc.displayDocument($restrictedContent))
   #end
 #end

@@ -1246,7 +1246,23 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Unstable
     public String displayDocument(XWikiContext context) throws XWikiException
     {
-        return displayDocument(getOutputSyntax(),context);
+        return displayDocument(getOutputSyntax(), context);
+    }
+
+    /**
+     * Execute and render the current document in the current context.
+     * The code is executed with right of this document content author.
+     *
+     * @param context  the XWiki Context object
+     * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @return  the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     * @since 11.5RC1
+     */
+    @Unstable
+    public String displayDocument(boolean restricted, XWikiContext context) throws XWikiException
+    {
+        return displayDocument(getOutputSyntax(), restricted, context);
     }
 
     /**
@@ -1262,7 +1278,24 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Unstable
     public String displayDocument(Syntax targetSyntax, XWikiContext context) throws XWikiException
     {
-        return getRenderedContent(targetSyntax, true, context, false);
+        return getRenderedContent(targetSyntax, true, false, context, false);
+    }
+
+    /**
+     * Execute and render the current document in the current context.
+     * The code is executed with right of this document content author.
+     *
+     * @param targetSyntax  the syntax to use to render the document
+     * @param context  the XWiki Context object
+     * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @return  the rendered content of the document or its translation.
+     * @throws XWikiException in case of error during the rendering.
+     * @since 11.5RC1
+     */
+    @Unstable
+    public String displayDocument(Syntax targetSyntax, boolean restricted, XWikiContext context) throws XWikiException
+    {
+        return getRenderedContent(targetSyntax, true, restricted, context, false);
     }
 
     /**
@@ -1280,7 +1313,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(Syntax targetSyntax, boolean transformationContextIsolated, XWikiContext context)
         throws XWikiException
     {
-        return getRenderedContent(targetSyntax, transformationContextIsolated, context, true);
+        return getRenderedContent(targetSyntax, transformationContextIsolated, false, context, true);
     }
 
     /**
@@ -1289,15 +1322,15 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      *
      * @param targetSyntax the syntax to use to render the document
      * @param transformationContextIsolated see {@link DocumentDisplayerParameters#isTransformationContextIsolated()}
+     * @param transformationContextRestricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @param context the XWiki Context object
      * @param retrieveTranslation if true retrieve the translation of the document according to the preferences (see
      *  {@link #getTranslatedDocument(XWikiContext)}). If false, render the current document.
      * @return the rendered content of the document or its translation.
      * @throws XWikiException in case of error during the rendering.
-     * @since 11.3RC1
      */
-    private String getRenderedContent(Syntax targetSyntax, boolean transformationContextIsolated, XWikiContext context,
-        boolean retrieveTranslation)
+    private String getRenderedContent(Syntax targetSyntax, boolean transformationContextIsolated,
+        boolean transformationContextRestricted, XWikiContext context, boolean retrieveTranslation)
         throws XWikiException
     {
         // Make sure the context secure document is the current document so that it's executed with its own
@@ -1313,7 +1346,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             }
             context.put("sdoc", sdoc);
 
-            return display(targetSyntax, false, transformationContextIsolated, false, retrieveTranslation);
+            return display(targetSyntax, false, transformationContextIsolated, transformationContextRestricted,
+                retrieveTranslation);
         } finally {
             context.put("sdoc", currentSdoc);
         }

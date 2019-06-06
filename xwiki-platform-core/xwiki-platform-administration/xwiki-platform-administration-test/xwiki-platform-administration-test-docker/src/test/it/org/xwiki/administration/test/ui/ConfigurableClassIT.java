@@ -237,7 +237,7 @@ public class ConfigurableClassIT
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section);
         assertTrue(asp.hasHeading(2, "HSomeHeading"));
 
-        FormContainerElement formContainerElement = asp.getFormContainerElement(section, fullName);
+        FormContainerElement formContainerElement = asp.getFormContainerElementForClass(fullName);
         assertEquals(String.format("%ssave/%s", setup.getBaseBinURL(), fullName.replace('.', '/')),
             formContainerElement.getFormAction());
         assertEquals(setup.getDriver().getCurrentUrl(),
@@ -259,7 +259,7 @@ public class ConfigurableClassIT
         // Check that it is available in space section.
         asp = AdministrationSectionPage.gotoSpaceAdministration(testReference.getLastSpaceReference(), section);
         assertTrue(asp.hasHeading(2, "HSomeHeading"));
-        formContainerElement = asp.getFormContainerElement(section, fullName);
+        formContainerElement = asp.getFormContainerElementForClass(fullName);
         assertEquals(String.format("%ssave/%s", setup.getBaseBinURL(), fullName.replace('.', '/')),
             formContainerElement.getFormAction());
         assertEquals(setup.getDriver().getCurrentUrl(),

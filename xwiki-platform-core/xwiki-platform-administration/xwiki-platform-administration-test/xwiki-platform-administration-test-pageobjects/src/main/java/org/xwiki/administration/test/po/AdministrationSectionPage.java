@@ -109,15 +109,38 @@ public class AdministrationSectionPage extends ViewPage
         this.saveButton.click();
     }
 
+    /**
+     * @return the first form contained in this section.
+     * @deprecated this method can be ambiguous since an administration section page might contain several forms.
+     *              The method {@link #getFormContainerElement(String)} should be used instead.
+     */
+    @Deprecated
     public FormContainerElement getFormContainerElement()
     {
         return new FormContainerElement(this.formContainer);
     }
 
-    public FormContainerElement getFormContainerElement(String section, String documentClass)
+    /**
+     * @param formId ID of the form to reach.
+     * @return the form identified by its id.
+     * @since 11.5RC1
+     * @since 11.3.1
+     */
+    public FormContainerElement getFormContainerElement(String formId)
     {
-        String formContainerId = String.format("%s_%s", section, documentClass);
-        return new FormContainerElement(By.id(formContainerId));
+        return new FormContainerElement(By.id(formId));
+    }
+
+    /**
+     * @param documentClass the class name for which we want the dedicated form.
+     * @return the form dedicated to the given class.
+     * @since 11.5RC1
+     * @since 11.3.1
+     */
+    public FormContainerElement getFormContainerElementForClass(String documentClass)
+    {
+        String formContainerId = String.format("%s_%s", this.section, documentClass);
+        return getFormContainerElement(formContainerId);
     }
 
     public boolean hasLink(String linkName)

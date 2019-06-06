@@ -13,7 +13,7 @@
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
         <div class="modal-title" id="previewDiffModalTitle">$services.localization.render('core.editors.save.previewDiff.title')</div>
         <hr />
-        <div class="xhint">
+        <div class="xHint">
           $services.localization.render('core.editors.save.previewDiff.description')
         </div>
       </div>

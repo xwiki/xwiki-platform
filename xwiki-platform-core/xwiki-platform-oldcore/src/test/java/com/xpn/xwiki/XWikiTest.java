@@ -48,6 +48,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -89,6 +90,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     private Mock mockWikiDescriptorManager;
 
+    private Mock mockAuthorizationManager;
+
     private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
     @Override
@@ -100,12 +103,15 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         getContext().setRequest(new XWikiServletRequestStub());
         getContext().setURL(new URL("http://localhost:8080/xwiki/bin/view/MilkyWay/Fidis"));
 
+        this.mockAuthorizationManager = registerMockComponent(AuthorizationManager.class);
+        this.mockAuthorizationManager.stubs().method("checkAccess");
+
         Mock mockLocalizationContext = registerMockComponent(LocalizationContext.class);
         mockLocalizationContext.stubs().method("getCurrentLocale").will(returnValue(Locale.ROOT));
 
         this.mockWikiDescriptorManager = registerMockComponent(WikiDescriptorManager.class);
-        this.mockWikiDescriptorManager.stubs().method("getCurrentWikiId").will(
-            new CustomStub("Implements WikiDescriptorManager.getCurrentWikiId")
+        this.mockWikiDescriptorManager.stubs().method("getCurrentWikiId")
+            .will(new CustomStub("Implements WikiDescriptorManager.getCurrentWikiId")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -134,11 +140,10 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         // not providing it in our unit test resources).
         getConfigurationSource().setProperty("xwiki.render.velocity.macrolist", "");
 
-        this.mockXWikiStore =
-            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
-            getContext()});
-        this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
+        this.mockXWikiStore = mock(XWikiHibernateStore.class, new Class[] { XWiki.class, XWikiContext.class },
+            new Object[] { this.xwiki, getContext() });
+        this.mockXWikiStore.stubs().method("loadXWikiDoc")
+            .will(new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -151,8 +156,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                     }
                 }
             });
-        this.mockXWikiStore.stubs().method("saveXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
+        this.mockXWikiStore.stubs().method("saveXWikiDoc")
+            .will(new CustomStub("Implements XWikiStoreInterface.saveXWikiDoc")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -164,8 +169,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                     return null;
                 }
             });
-        this.mockXWikiStore.stubs().method("deleteXWikiDoc").will(
-            new CustomStub("Implements XWikiStoreInterface.deleteXWikiDoc")
+        this.mockXWikiStore.stubs().method("deleteXWikiDoc")
+            .will(new CustomStub("Implements XWikiStoreInterface.deleteXWikiDoc")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -175,8 +180,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
                     return null;
                 }
             });
-        this.mockXWikiStore.stubs().method("executeRead").will(
-            new CustomStub("Implements XWikiStoreInterface.executeRead")
+        this.mockXWikiStore.stubs().method("executeRead")
+            .will(new CustomStub("Implements XWikiStoreInterface.executeRead")
             {
                 @Override
                 public Object invoke(Invocation invocation) throws Throwable
@@ -188,9 +193,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.mockXWikiStore.stubs().method("exists").will(returnValue(true));
         this.mockXWikiStore.stubs().method("getLimitSize").will(returnValue(255));
 
-        this.mockXWikiVersioningStore =
-            mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
-            this.xwiki, getContext()});
+        this.mockXWikiVersioningStore = mock(XWikiHibernateVersioningStore.class,
+            new Class[] { XWiki.class, XWikiContext.class }, new Object[] { this.xwiki, getContext() });
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
         this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
 
@@ -206,7 +210,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testUserNotAddedByDefaultToXWikiAllGroupWhenThisGroupImplicit() throws Exception
     {
-        //given
+        // given
         getConfigurationSource().setProperty("xwiki.authentication.group.allgroupimplicit", "1");
 
         XWikiGroupServiceImpl xWikiGroupService = new XWikiGroupServiceImpl();
@@ -214,16 +218,17 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         XWiki spyXWiki = Mockito.spy(xwiki);
 
-        //when
+        // when
         spyXWiki.setUserDefaultGroup("XWiki.user1", getContext());
 
-        //then
+        // then
         Mockito.verify(spyXWiki, times(0)).addUserToGroup(anyString(), anyString(), any(XWikiContext.class));
     }
 
-    public void testUserAddedToXWikiAllGroupWhenItsSpecifiedByConfigurationRegardlessXWikiAllGroupIsImplicit() throws Exception
+    public void testUserAddedToXWikiAllGroupWhenItsSpecifiedByConfigurationRegardlessXWikiAllGroupIsImplicit()
+        throws Exception
     {
-        //given
+        // given
         getConfigurationSource().setProperty("xwiki.authentication.group.allgroupimplicit", "1");
         getConfigurationSource().setProperty("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
 
@@ -232,10 +237,10 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         XWiki spyXWiki = Mockito.spy(xwiki);
 
-        //when
+        // when
         spyXWiki.setUserDefaultGroup("XWiki.user1", getContext());
 
-        //then
+        // then
         Mockito.verify(spyXWiki, times(1)).addUserToGroup("XWiki.user1", "XWiki.XWikiAllGroup", getContext());
     }
 
@@ -265,9 +270,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     {
         Date sourceCreationDate = this.document.getCreationDate();
         Thread.sleep(1000);
-        DocumentReference copyReference =
-            new DocumentReference(this.document.getDocumentReference().getName() + "Copy", this.document
-                .getDocumentReference().getLastSpaceReference());
+        DocumentReference copyReference = new DocumentReference(this.document.getDocumentReference().getName() + "Copy",
+            this.document.getDocumentReference().getLastSpaceReference());
         this.xwiki.copyDocument(this.document.getDocumentReference(), copyReference, getContext());
         XWikiDocument copy = this.xwiki.getDocument(copyReference, getContext());
 
@@ -409,10 +413,10 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
         this.xwiki.saveDocument(document, getContext());
 
         // Ensure that the onEvent method has been called before and after the deletion
-        mockListener.expects(once()).method("onEvent")
-        .with(isA(DocumentDeletingEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
-        mockListener.expects(once()).method("onEvent")
-            .with(isA(DocumentDeletedEvent.class), isA(XWikiDocument.class), isA(XWikiContext.class));
+        mockListener.expects(once()).method("onEvent").with(isA(DocumentDeletingEvent.class), isA(XWikiDocument.class),
+            isA(XWikiContext.class));
+        mockListener.expects(once()).method("onEvent").with(isA(DocumentDeletedEvent.class), isA(XWikiDocument.class),
+            isA(XWikiContext.class));
 
         this.xwiki.deleteDocument(document, false, getContext());
     }
@@ -612,9 +616,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
     public void testSkinResourcesAreAlwaysAllowed() throws XWikiException
     {
         // /skin/resources/icons/xwiki/noavatar.png
-        XWikiDocument doc1 =
-            new XWikiDocument(new DocumentReference("xwiki", Arrays.asList("resources", "icons", "xwiki"),
-                "noavatar.png"));
+        XWikiDocument doc1 = new XWikiDocument(
+            new DocumentReference("xwiki", Arrays.asList("resources", "icons", "xwiki"), "noavatar.png"));
         // /skin/skins/flamingo/style.css
         XWikiDocument doc2 =
             new XWikiDocument(new DocumentReference("xwiki", Arrays.asList("skins", "flamingo", "xwiki"), "style.css"));
@@ -626,9 +629,8 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
         // Register a mock rights service and make sure it is never called to validate the test's results.
         Mock mockRightService = mock(XWikiRightService.class);
-        mockRightService.expects(
-            never("Skin action resources inside the 'skins' and 'resources' folders"
-                + " should never be checked for rights.")).method("checkAccess");
+        mockRightService.expects(never("Skin action resources inside the 'skins' and 'resources' folders"
+            + " should never be checked for rights.")).method("checkAccess");
         this.xwiki.setRightService((XWikiRightService) mockRightService.proxy());
 
         // Verify the results.
@@ -771,7 +773,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             @Override
             public Cookie[] getCookies()
             {
-                return new Cookie[]{ new Cookie("language", "fr_CA") };
+                return new Cookie[] { new Cookie("language", "fr_CA") };
             }
         });
 
@@ -791,7 +793,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             @Override
             public Cookie[] getCookies()
             {
-                return new Cookie[]{ new Cookie("language", "fr_CA") };
+                return new Cookie[] { new Cookie("language", "fr_CA") };
             }
         });
 
@@ -809,7 +811,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             @Override
             public Cookie[] getCookies()
             {
-                return new Cookie[]{ new Cookie("language", "fr_CA") };
+                return new Cookie[] { new Cookie("language", "fr_CA") };
             }
         });
 
@@ -827,7 +829,7 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
             @Override
             public Cookie[] getCookies()
             {
-                return new Cookie[]{ new Cookie("language", "fr_CA") };
+                return new Cookie[] { new Cookie("language", "fr_CA") };
             }
         });
 

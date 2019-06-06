@@ -305,10 +305,15 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
 
     // There's no clean way to detect when the file browser dialog is canceled so we must rely on a hack: catch
     // when the current window gets back the focus after the file browser dialog is closed, making sure the
-    // listener is removed in case some files were selected.
+    // listener is removed in case some files were selected. In some cases (e.g. Chrome on MacOS) the file browser
+    // dialog is closed before the change event is fired so we need to wait a bit before notifying the cancel.
+    var rejectTimeout;
     $(window).one('focus.suggestAttachments', function(event) {
-      // The file browser dialog was canceled.
-      deferred.reject();
+      // The file browser dialog was canceled. Wait a bit before rejecting the promise, in case the change event hasn't
+      // been fired yet (1 second seems to do the job).
+      rejectTimeout = setTimeout(function() {
+        deferred.reject();
+      }, 1000)
     });
 
     // Chrome doesn't fire the change event all the time if the file input is not attached to the DOM tree.
@@ -319,8 +324,9 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     }
 
     fileInput.change(function(event) {
-      // The user has selected some files to upload.
+      // The user has selected some files to upload. Make sure the promise is not rejected.
       $(window).off('focus.suggestAttachments');
+      clearTimeout(rejectTimeout);
       deferred.resolve(this.files);
       fileInput.remove();
     // Open the file browser dialog.

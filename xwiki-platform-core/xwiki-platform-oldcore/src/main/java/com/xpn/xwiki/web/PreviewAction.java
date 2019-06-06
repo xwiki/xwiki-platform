@@ -93,10 +93,6 @@ public class PreviewAction extends EditAction
             }
             return false;
         }
-        // CSRF prevention
-        if (!csrfTokenCheck(context, true)) {
-            return false;
-        }
         return true;
     }
 

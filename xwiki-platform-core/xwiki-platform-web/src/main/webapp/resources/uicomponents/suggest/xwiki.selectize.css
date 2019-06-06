@@ -96,6 +96,24 @@ a.xwiki-selectize-option-label {
   border: 1px dashed $theme.notificationSuccessColor;
 }
 
+/* Styles for bigger option icons */
+.xwiki-selectize-option-icon-wrapper.pull-left {
+  height: 36px;
+  line-height: 36px;
+  margin-right: .6em;
+  margin-top: 2px;
+  width: 36px;
+}
+.xwiki-selectize-option-icon-wrapper.pull-left .xwiki-selectize-option-icon {
+  color: $theme.textSecondaryColor;
+  font-size: 32px;
+  vertical-align: middle;
+}
+.xwiki-selectize-option-icon-wrapper.pull-left img.xwiki-selectize-option-icon {
+  max-height: 36px;
+  max-width: 36px;
+}
+
 /* Live Table Filter */
 .xwiki-livetable-display-header-filter .selectize-input {
   display: block;

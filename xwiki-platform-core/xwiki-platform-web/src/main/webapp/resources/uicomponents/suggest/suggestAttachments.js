@@ -549,11 +549,32 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     return allowedFileTypes.length === 0;
   };
 
+  /**
+   * We want to show a bigger icon when there's a hint available. This is especially useful for image attachments
+   * because their icon is a thumbnail.
+   */
+  var overwriteOptionRendering = function(selectize) {
+    var oldRenderOption = selectize.settings.render.option;
+    selectize.settings.render.option = function(attachment) {
+      var output = oldRenderOption.apply(this, arguments);
+      var hint = output.find('.xwiki-selectize-option-hint');
+      if (hint.length === 1) {
+        $('<div class="xwiki-selectize-option-label-wrapper"/>')
+          .append(output.find('.xwiki-selectize-option-label'))
+          .append(hint)
+          .appendTo(output);
+        output.find('.xwiki-selectize-option-icon-wrapper').addClass('pull-left');
+      }
+      return output;
+    };
+  };
+
   $.fn.suggestAttachments = function(options) {
     return this.each(function() {
       var actualOptions = $.extend(getSelectizeOptions($(this)), options);
       $(this).xwikiSelectize(processOptions(actualOptions));
       addFileUploadSupport(this.selectize);
+      overwriteOptionRendering(this.selectize);
     });
   };
 });

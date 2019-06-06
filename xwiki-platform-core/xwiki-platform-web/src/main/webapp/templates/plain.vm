@@ -3,6 +3,9 @@
 #elseif ("$!request.getParameter('raw')" == '2')
 $response.setContentType('text/plain')##
 $cdoc.getTranslatedContent()
+#elseif ("$!request.getParameter('raw')" == '3')
+$response.setContentType('text/plain')##
+$cdoc.getRenderedContentRestricted($cdoc.getContent(), $cdoc.getSyntax().toIdString())
 #else
 #template('xwikivars.vm')
 #template('displaycontent.vm')

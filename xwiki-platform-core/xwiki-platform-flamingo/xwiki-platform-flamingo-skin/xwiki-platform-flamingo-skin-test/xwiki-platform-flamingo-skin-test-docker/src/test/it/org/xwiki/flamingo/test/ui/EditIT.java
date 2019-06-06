@@ -37,7 +37,9 @@ import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.ResubmissionPage;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.PreviewEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 
@@ -250,7 +252,7 @@ public class EditIT
             testReference.getLastSpaceReference());
         String invalidateCSRFContent = "{{velocity}}$services.csrf.clearToken(){{/velocity}}";
         setup.createPage(invalidateCSRF, invalidateCSRFContent, "InvalidateCSRF");
-        setup.createPage(testReference, "", "");
+        setup.createPage(testReference, "", testReference.getLastSpaceReference().getName());
 
         WikiEditPage editWiki = setup.gotoPage(testReference).editWiki();
 
@@ -291,6 +293,76 @@ public class EditIT
         ViewPage viewPage = new ViewPage();
         viewPage.waitUntilPageJSIsLoaded();
         assertEquals("Foo bar", viewPage.getContent());
+
+        // check with preview
+        editWiki = setup.gotoPage(testReference).editWiki();
+        // we clear the token and navigate back to the editor
+        setup.gotoPage(invalidateCSRF);
+        setup.getDriver().navigate().back();
+        editWiki.setContent("Preview test & cancel");
+        editWiki.getPreviewButton().click();
+        ResubmissionPage resubmissionPage = new ResubmissionPage();
+        assertTrue(resubmissionPage.isOnResubmissionPage());
+
+        // check cancelling: it leads back to the page in view mode without any change
+        resubmissionPage.cancel();
+        viewPage = new ViewPage();
+        assertEquals(testReference.getLastSpaceReference().getName(), viewPage.getDocumentTitle());
+        assertEquals("Foo bar", viewPage.getContent());
+
+        editWiki = setup.gotoPage(testReference).editWiki();
+        // we clear the token and navigate back to the editor
+        setup.gotoPage(invalidateCSRF);
+        setup.getDriver().navigate().back();
+        editWiki.setContent("Preview test & back to editor");
+        editWiki.getPreviewButton().click();
+        resubmissionPage = new ResubmissionPage();
+        assertTrue(resubmissionPage.isOnResubmissionPage());
+        // check resubmit and go back to editor
+        resubmissionPage.resubmit();
+        PreviewEditPage previewEditPage = new PreviewEditPage(editWiki);
+        assertEquals("Preview test & back to editor", previewEditPage.getContent());
+        editWiki = (WikiEditPage) previewEditPage.clickBackToEdit();
+        assertEquals("Preview test & back to editor", editWiki.getContent());
+        editWiki.setContent("Foo bar 2");
+        // Ensure we can now save.
+        viewPage = editWiki.clickSaveAndView();
+        assertEquals("Foo bar 2", viewPage.getContent());
+
+        editWiki = setup.gotoPage(testReference).editWiki();
+        // we clear the token and navigate back to the editor
+        setup.gotoPage(invalidateCSRF);
+        setup.getDriver().navigate().back();
+        editWiki.setContent("Preview test & save&continue");
+        editWiki.getPreviewButton().click();
+        resubmissionPage = new ResubmissionPage();
+        assertTrue(resubmissionPage.isOnResubmissionPage());
+        // check resubmit and save and continue: it should led back to the editor with the saved changes
+        resubmissionPage.resubmit();
+        previewEditPage = new PreviewEditPage(editWiki);
+        assertEquals("Preview test & save&continue", previewEditPage.getContent());
+        setup.getDriver().addPageNotYetReloadedMarker();
+        previewEditPage.clickSaveAndContinue(false);
+        setup.getDriver().waitUntilPageIsReloaded();
+        editWiki = new WikiEditPage();
+        assertEquals("Preview test & save&continue", editWiki.getContent());
+        viewPage = setup.gotoPage(testReference);
+        assertEquals("Preview test & save&continue", viewPage.getContent());
+
+        editWiki = setup.gotoPage(testReference).editWiki();
+        // we clear the token and navigate back to the editor
+        setup.gotoPage(invalidateCSRF);
+        setup.getDriver().navigate().back();
+        editWiki.setContent("Preview test & save&view");
+        editWiki.getPreviewButton().click();
+        resubmissionPage = new ResubmissionPage();
+        assertTrue(resubmissionPage.isOnResubmissionPage());
+        // check resubmit and save and view
+        resubmissionPage.resubmit();
+        previewEditPage = new PreviewEditPage(editWiki);
+        assertEquals("Preview test & save&view", previewEditPage.getContent());
+        viewPage = previewEditPage.clickSaveAndView();
+        assertEquals("Preview test & save&view", viewPage.getContent());
 
         // Ensure to have the proper secret token for further tests.
         setup.recacheSecretToken();

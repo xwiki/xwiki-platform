@@ -34,6 +34,14 @@ public class PreviewableEditPage extends EditPage
     private WebElement preview;
 
     /**
+     * @return the preview button.
+     */
+    public WebElement getPreviewButton()
+    {
+        return this.preview;
+    }
+
+    /**
      * Clicks on the preview button.
      * 
      * @return the preview edit page

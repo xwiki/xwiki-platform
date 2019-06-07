@@ -42,6 +42,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       // limited to a specific document (if all the attachments are from the same document then the attachment name is
       // enough to identify an attachment, and there's no need to escape it as an entity reference).
       useAttachmentName: false,
+      uploadAllowed: select.data('uploadAllowed') === 'true' || select.data('uploadAllowed') === true,
       // Indicates the type of files that can be selected or uploaded. The value is a comma separated list of:
       // * file name extensions (e.g. .png,.pdf)
       // * complete or partial media types (e.g. image/,video/mpeg)
@@ -573,7 +574,9 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
     return this.each(function() {
       var actualOptions = $.extend(getSelectizeOptions($(this)), options);
       $(this).xwikiSelectize(processOptions(actualOptions));
-      addFileUploadSupport(this.selectize);
+      if (this.selectize.settings.uploadAllowed) {
+        addFileUploadSupport(this.selectize);
+      }
       overwriteOptionRendering(this.selectize);
     });
   };

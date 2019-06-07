@@ -84,9 +84,32 @@ define('xwiki-attachments-store', ['jquery'], function($) {
     return deferred.promise();
   };
 
+  var convertFileToAttachment = function(file, documentReference) {
+    var attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT, documentReference);
+    var attachmentURL = new XWiki.Document(documentReference).getURL('download') + '/' + encodeURIComponent(file.name);
+    var hierarchyItems = attachmentReference.getReversedReferenceChain().map(function(entityReference) {
+      return {
+        type: XWiki.EntityType.getName(entityReference.type),
+        name: entityReference.name,
+        label: entityReference.name
+      };
+    });
+    return {
+      id: XWiki.Model.serialize(attachmentReference),
+      name: file.name,
+      mimeType: file.type,
+      xwikiRelativeUrl: attachmentURL,
+      hierarchy: {
+        items: hierarchyItems
+      },
+      file: file
+    }
+  };
+
   return {
     get: getAttachments,
-    upload: attachFile
+    upload: attachFile,
+    convertFileToAttachment: convertFileToAttachment
   };
 });
 
@@ -450,32 +473,10 @@ define('xwiki-suggestAttachments', [
 
   var convertFilesToAttachments = function(files, options) {
     return {
-      attachments: files.map($.proxy(convertFileToAttachment, null, options))
+      attachments: files.map(function(file) {
+        return attachmentsStore.convertFileToAttachment(file, options.documentReference);
+      })
     };
-  };
-
-  var convertFileToAttachment = function(options, file) {
-    var attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
-      options.documentReference);
-    var attachmentURL = new XWiki.Document(options.documentReference).getURL('download') + '/' +
-      encodeURIComponent(file.name);
-    var hierarchyItems = attachmentReference.getReversedReferenceChain().map(function(entityReference) {
-      return {
-        type: XWiki.EntityType.getName(entityReference.type),
-        name: entityReference.name,
-        label: entityReference.name
-      };
-    });
-    return {
-      id: XWiki.Model.serialize(attachmentReference),
-      name: file.name,
-      mimeType: file.type,
-      xwikiRelativeUrl: attachmentURL,
-      hierarchy: {
-        items: hierarchyItems
-      },
-      file: file
-    }
   };
 
   var uploadFileAndShowProgress = function(attachment, selectize) {

@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>Model API to represent the XAR format</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.37</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>52</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.40</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>56</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>API to represent the XAR format</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->

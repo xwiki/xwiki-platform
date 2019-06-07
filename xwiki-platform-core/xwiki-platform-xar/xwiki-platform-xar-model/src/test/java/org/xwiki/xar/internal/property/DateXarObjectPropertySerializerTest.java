@@ -43,7 +43,7 @@ public class DateXarObjectPropertySerializerTest
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @Test
-    public void parse() throws ParseException
+    public void parseDate() throws ParseException
     {
         Date newDate = new Date();
         DateFormat format = new SimpleDateFormat(DateXarObjectPropertySerializer.DEFAULT_FORMAT);
@@ -54,7 +54,7 @@ public class DateXarObjectPropertySerializerTest
     }
 
     @Test
-    public void parseOld() throws ParseException
+    public void parseDateOld() throws ParseException
     {
         Date newDate = new Date();
         DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy");
@@ -70,7 +70,7 @@ public class DateXarObjectPropertySerializerTest
     }
 
     @Test
-    public void parseInvalid()
+    public void parseDateInvalid()
     {
         Date newDate = new Date();
         assertTrue(DateXarObjectPropertySerializer.parseDate("not date").after(newDate));
@@ -81,5 +81,21 @@ public class DateXarObjectPropertySerializerTest
             this.logCapture.getLogEvent(0).getFormattedMessage());
         assertEquals("Failed to parse date [not date] using format [EEE MMM d HH:mm:ss z yyyy]."
             + " Defaulting to the current date.", this.logCapture.getLogEvent(1).getFormattedMessage());
+    }
+
+    @Test
+    public void serializeDate()
+    {
+        Date date = new Date();
+        DateFormat format = new SimpleDateFormat(DateXarObjectPropertySerializer.DEFAULT_FORMAT);
+        String string = format.format(date);
+
+        assertEquals(string, DateXarObjectPropertySerializer.serializeDate(date));
+    }
+
+    @Test
+    public void serializeDateNull()
+    {
+        assertEquals("", DateXarObjectPropertySerializer.serializeDate(null));
     }
 }

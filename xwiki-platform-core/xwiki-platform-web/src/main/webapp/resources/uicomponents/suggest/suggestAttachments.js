@@ -159,8 +159,24 @@ define('xwiki-attachments-icon', ['jquery'], function($) {
     }
   };
 
+  var loadAttachmentIcon = function(attachment) {
+    var deferred = $.Deferred();
+    if (attachment.icon.iconSetType === 'IMAGE') {
+      var image = new Image();
+      image.onload = function() {
+        deferred.resolve(attachment);
+      };
+      image.src = attachment.icon.url;
+    } else {
+      // Nothing to load.
+      deferred.resolve(attachment);
+    }
+    return deferred.promise();
+  };
+
   return {
-    getIcon: getAttachmentIcon
+    getIcon: getAttachmentIcon,
+    loadIcon: loadAttachmentIcon
   };
 });
 
@@ -480,7 +496,7 @@ define('xwiki-suggestAttachments', [
     return uploadFile(attachment.data, selectize.settings)
     .then($.proxy(processAttachment, null, selectize.settings))
     // Load the attachment icon before updating the display in order to reduce the flickering.
-    .then(loadAttachmentIcon)
+    .then(attachmentsIcon.loadIcon)
     .progress(function(data) {
       attachment.data.upload.status = 'running';
       attachment.data.upload.progress = data;
@@ -507,21 +523,6 @@ define('xwiki-suggestAttachments', [
   var uploadFile = function(attachment) {
     var attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
     return attachmentsStore.upload(attachmentReference, attachment.file);
-  };
-
-  var loadAttachmentIcon = function(attachment) {
-    var deferred = $.Deferred();
-    if (attachment.icon.iconSetType === 'IMAGE') {
-      var image = new Image();
-      image.onload = function() {
-        deferred.resolve(attachment);
-      };
-      image.src = attachment.icon.url;
-    } else {
-      // Nothing to load.
-      deferred.resolve(attachment);
-    }
-    return deferred.promise();
   };
 
   var acceptDroppedFiles = function(selectize) {

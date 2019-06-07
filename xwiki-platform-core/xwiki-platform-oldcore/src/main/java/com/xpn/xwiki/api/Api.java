@@ -27,6 +27,7 @@ import javax.inject.Provider;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -158,6 +159,22 @@ public class Api
     {
         com.xpn.xwiki.XWiki xwiki = this.context.getWiki();
         return xwiki.getRightService().hasAccessLevel(right, this.context.getUser(), docname, this.context);
+    }
+
+    /**
+     * Verifies if the context user has the access identified by {@code right} on the entity identified by
+     * {@code entityReference}. Note that some rights may be checked higher in hierarchy of the provided entity if such
+     * right is not enabled at lowest hierarchy level provided. This function should be used for interface matters, use
+     * {@link #checkAccess} at security checkpoints.
+     * 
+     * @param right the right to check
+     * @param entityReference the entity on which to check the right
+     * @return {@code true} if the user has the specified right on the entity, {@code false} otherwise
+     * @since 11.5RC1
+     */
+    protected boolean hasAccess(Right right, DocumentReference entityReference)
+    {
+        return getAuthorizationManager().hasAccess(right, this.context.getUserReference(), entityReference);
     }
 
     /**

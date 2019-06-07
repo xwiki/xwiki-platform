@@ -84,9 +84,9 @@ define('xwiki-attachments-store', ['jquery'], function($) {
     return deferred.promise();
   };
 
-  var convertFileToAttachment = function(file, documentReference) {
-    var attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT, documentReference);
-    var attachmentURL = new XWiki.Document(documentReference).getURL('download') + '/' + encodeURIComponent(file.name);
+  var createAttachment = function(attachmentReference, file) {
+    var attachmentURL = new XWiki.Document(attachmentReference.parent).getURL('download') + '/' +
+      encodeURIComponent(attachmentReference.name);
     var hierarchyItems = attachmentReference.getReversedReferenceChain().map(function(entityReference) {
       return {
         type: XWiki.EntityType.getName(entityReference.type),
@@ -94,22 +94,27 @@ define('xwiki-attachments-store', ['jquery'], function($) {
         label: entityReference.name
       };
     });
-    return {
+    var attachment = {
       id: XWiki.Model.serialize(attachmentReference),
-      name: file.name,
-      mimeType: file.type,
+      name: attachmentReference.name,
       xwikiRelativeUrl: attachmentURL,
       hierarchy: {
         items: hierarchyItems
-      },
-      file: file
+      }
+    };
+    if (file) {
+      $.extend(attachment, {
+        mimeType: file.type,
+        file: file
+      });
     }
+    return attachment;
   };
 
   return {
     get: getAttachments,
     upload: attachFile,
-    convertFileToAttachment: convertFileToAttachment
+    create: createAttachment
   };
 });
 
@@ -486,7 +491,9 @@ define('xwiki-suggestAttachments', [
   var convertFilesToAttachments = function(files, options) {
     return {
       attachments: files.map(function(file) {
-        return attachmentsStore.convertFileToAttachment(file, options.documentReference);
+        var attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
+          options.documentReference);
+        return attachmentsStore.create(attachmentReference, file);
       })
     };
   };

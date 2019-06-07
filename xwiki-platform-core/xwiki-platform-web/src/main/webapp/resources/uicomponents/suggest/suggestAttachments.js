@@ -208,6 +208,43 @@ define('xwiki-attachments-icon', ['jquery'], function($) {
   };
 });
 
+define('xwiki-attachments-filter', ['jquery'], function($) {
+  'use strict';
+
+  var filterAttachments = function(attachments, accept) {
+    var allowedFileTypes = [];
+    if (typeof accept === 'string') {
+      allowedFileTypes = accept.split(/\s*,\s*/).filter(function(type) {
+        return type.length > 0;
+      });
+    }
+    // Filter the attachments by type.
+    return attachments.filter(function(attachment) {
+      return isAttachmentAllowed(attachment, allowedFileTypes);
+    });
+  };
+
+  var isAttachmentAllowed = function(attachment, allowedFileTypes) {
+    for (var i = 0; i < allowedFileTypes.length; i++) {
+      var type = allowedFileTypes[i];
+      if (type.substring(0, 1) === '.') {
+        // Verify if the file name matches the allowed file name extension.
+        if (attachment.name.substring(attachment.name.length - type.length) === type) {
+          return true;
+        }
+      // Verify if the file media type contains the allowed media type.
+      } else if (typeof attachment.mimeType === 'string' && attachment.mimeType.indexOf(type) >= 0) {
+        return true;
+      }
+    }
+    return allowedFileTypes.length === 0;
+  };
+
+  return {
+    filter: filterAttachments
+  };
+});
+
 define('xwiki-file-picker', ['jquery'], function($) {
   'use strict';
 
@@ -255,9 +292,10 @@ define('xwiki-suggestAttachments', [
   'jquery',
   'xwiki-attachments-store',
   'xwiki-attachments-icon',
+  'xwiki-attachments-filter',
   'xwiki-file-picker',
   'xwiki-selectize'
-], function($, attachmentsStore, attachmentsIcon, filePicker) {
+], function($, attachmentsStore, attachmentsIcon, attachmentsFilter, filePicker) {
   'use strict';
 
   var getSelectizeOptions = function(select) {
@@ -464,9 +502,13 @@ define('xwiki-suggestAttachments', [
   };
 
   var selectAndUploadFiles = function(selectize, files) {
-    var allowedFiles = filterFiles(files, selectize.settings);
-    var attachments = processAttachments(selectize.settings, convertFilesToAttachments(allowedFiles,
-      selectize.settings));
+    var attachments = convertFilesToAttachments(files, selectize.settings);
+    attachments = attachmentsFilter.filter(attachments, selectize.settings.accept);
+    if (selectize.settings.maxItems === 1) {
+      // Upload only a single file if single selecion is on.
+      attachments = attachments.slice(0, 1);
+    }
+    attachments = processAttachments(selectize.settings, {attachments: attachments});
     // Add the attachments to the list of suggestions in order to be able to select them.
     selectize.addOption(attachments);
     // Uploading the files in parallel can cause problems, at least until XWIKI-13473 (Exception when the same document
@@ -489,13 +531,14 @@ define('xwiki-suggestAttachments', [
   };
 
   var convertFilesToAttachments = function(files, options) {
-    return {
-      attachments: files.map(function(file) {
-        var attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
-          options.documentReference);
-        return attachmentsStore.create(attachmentReference, file);
-      })
-    };
+    var attachments = [];
+    for (var i = 0; i < files.length; i++) {
+      var file = files.item(i);
+      var attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
+        options.documentReference);
+      attachments.push(attachmentsStore.create(attachmentReference, file));
+    }
+    return attachments;
   };
 
   var uploadFileAndShowProgress = function(attachment, selectize) {
@@ -559,44 +602,6 @@ define('xwiki-suggestAttachments', [
     }).on('drop', function(event) {
       selectAndUploadFiles(selectize, event.originalEvent.dataTransfer.files);
     });
-  };
-
-  var filterFiles = function(files, settings) {
-    var allowedFiles = [];
-    var allowedFileTypes = [];
-    if (typeof settings.accept === 'string') {
-      allowedFileTypes = settings.accept.split(/\s*,\s*/).filter(function(type) {
-        return type.length > 0;
-      });
-    }
-    // Filter the files by type.
-    for (var i = 0; i < files.length; i++) {
-      var file = files.item(i);
-      if (isFileAllowed(file, allowedFileTypes)) {
-        allowedFiles.push(file);
-      }
-    }
-    if (settings.maxItems === 1) {
-      // Upload only a single file if single selecion is on.
-      allowedFiles = allowedFiles.slice(0, 1);
-    }
-    return allowedFiles;
-  };
-
-  var isFileAllowed = function(file, allowedFileTypes) {
-    for (var i = 0; i < allowedFileTypes.length; i++) {
-      var type = allowedFileTypes[i];
-      if (type.substring(0, 1) === '.') {
-        // Verify if the file name matches the allowed file name extension.
-        if (file.name.substring(file.name.length - type.length) === type) {
-          return true;
-        }
-      // Verify if the file media type contains the allowed media type.
-      } else if (file.type.indexOf(type) >= 0) {
-        return true;
-      }
-    }
-    return allowedFileTypes.length === 0;
   };
 
   /**

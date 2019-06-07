@@ -105,8 +105,8 @@
     and has no dependence on any type of underlying transactional storage engine.
   </description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>75</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.84</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>78</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <!-- Test Dependencies -->

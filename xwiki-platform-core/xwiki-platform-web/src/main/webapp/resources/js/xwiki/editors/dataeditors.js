@@ -484,7 +484,7 @@ editors.XDataEditors = Class.create({
     });
     property.select('.xproperty-content dt label').each(function(item) {
       item.observe('click', function(event) {
-        if(item.up('dt').down('span').hasClassName('collapsed')) {
+        if(!item.up('dt').hasClassName('uncollapsable') && item.up('dt').down('span').hasClassName('collapsed')) {
           item.up('dt').next('dd').toggle();
           item.up('dt').down('span').toggleClassName('collapsed');
         }

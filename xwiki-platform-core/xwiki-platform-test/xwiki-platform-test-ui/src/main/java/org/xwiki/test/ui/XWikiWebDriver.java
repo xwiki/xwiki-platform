@@ -669,7 +669,7 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     // Make sure the element is visible by scrolling it into view. Otherwise it's possible for example  that the
     // visible floating save bar would hide the element.
-    private WebElement scrollTo(WebElement element)
+    public WebElement scrollTo(WebElement element)
     {
         executeScript("arguments[0].scrollIntoView();", element);
         return element;

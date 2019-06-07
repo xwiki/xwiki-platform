@@ -94,12 +94,12 @@ public class FormContainerElement extends BaseElement
 
     public String getFieldValue(By findElementBy)
     {
-        return getFormElement().findElement(findElementBy).getAttribute("value");
+        return getDriver().scrollTo(getFormElement().findElement(findElementBy)).getAttribute("value");
     }
 
     public void setFieldValue(By findElementBy, String value)
     {
-        setFieldValue(getFormElement().findElement(findElementBy), value);
+        setFieldValue(getDriver().scrollTo(getFormElement().findElement(findElementBy)), value);
     }
 
     public boolean hasField(By findFieldBy)

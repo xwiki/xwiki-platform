@@ -581,37 +581,16 @@ var XWiki = (function(XWiki) {
 
       var radioToogleClass = function () {
         require(['jquery'], function ($) {
-          var reloadDiv = $('#headingReloadEditor').parent();
-          var forceSaveDiv = $('#headingForceSave').parent();
-          var mergeDiv = $('#headingMerge').parent();
+          $('input[name=warningConflictAction]').parents(".panel").removeClass('panel-primary');
+          $('input[name=warningConflictAction]').parents(".panel").addClass('panel-default');
+          $('input[name=warningConflictAction]:checked').parents(".panel").addClass('panel-primary');
+        });
+      };
 
-          var reloadRadio = $('#actionReloadRadio');
-          var forceSaveRadio = $('#actionForceSaveRadio');
-          var mergeRadio = $('#actionMergeRadio');
-
-          reloadDiv.toggleClass(function () {
-            if (reloadRadio.is(':checked')) {
-              return "panel-primary";
-            } else {
-              return "panel-danger";
-            }
-          });
-
-          forceSaveDiv.toggleClass(function () {
-            if (forceSaveRadio.is(':checked')) {
-              return "panel-primary";
-            } else {
-              return "panel-default";
-            }
-          });
-
-          mergeDiv.toggleClass(function () {
-            if (mergeRadio.is(':checked')) {
-              return "panel-primary";
-            } else {
-              return "panel-default";
-            }
-          });
+      // Allow to select a button radio by clicking anywhere on the panel.
+      var selectChoice = function (event) {
+        require(['jquery'], function ($) {
+          $(event.currentTarget).find('input[name=warningConflictAction]').click();
         });
       };
 
@@ -647,7 +626,8 @@ var XWiki = (function(XWiki) {
             $('div.modal-backdrop').remove();
           });
 
-          $('input[name=warningConflictAction]').on('click', radioSelect);
+          $('#previewDiffChoices .panel').on('click', selectChoice);
+          $('input[name=warningConflictAction]').on('change', radioSelect);
           $('#previewDiffChangeDiff').on('click', previewDiff);
           $('#submitDiffButton').on('click', submitAction);
         });

@@ -42,102 +42,107 @@
         </div>
       </div>
       <div class="modal-body">
-        <div class="panel-group" id="accordion" role="tablist" aria-multiselectable="false">
+        <div class="panel-group" id="previewDiffChoices" role="tablist" aria-multiselectable="false">
           <div class="panel">
-            <div class="panel-heading" role="tab" id="headingMerge">
-              <label class="panel-title">
-                <input type="radio" id="actionMergeRadio" name="warningConflictAction" value="merge"#if ($warningConflictAction == "merge") checked="checked"#end />
-                $services.localization.render('core.editors.save.previewDiff.merge.action')
-              </label>
-              <span class="openDetails" data-toggle="collapse" data-parent="#accordion" href="#collapseMerge" aria-expanded="true" aria-controls="collapseMerge">
-                $services.icon.renderHTML('caret-down')
-              </span>
+            <div class="panel-radio">
+              <input type="radio" id="actionMergeRadio" name="warningConflictAction" value="merge"#if ($warningConflictAction == "merge") checked="checked"#end />
             </div>
-            <div id="collapseMerge" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingMerge">
-              <div class="panel-body">
+            <div class="panel-heading">
+              <label class="panel-title">
+                $services.localization.render('core.editors.save.previewDiff.merge.action')
+                <span class="label label-success">$services.localization.render('core.editors.save.previewDiff.merge.label')</span>
+              </label>
+              <div class="xHint">
                 $services.localization.render('core.editors.save.previewDiff.merge.hint')
               </div>
             </div>
           </div>
           <div class="panel">
-            <div class="panel-heading" role="tab" id="headingForceSave">
+            <div class="panel-radio">
+              <input type="radio" id="actionForceSaveRadio" name="warningConflictAction" value="override"#if ($warningConflictAction == "override") checked="checked"#end />
+            </div>
+            <div class="panel-heading">
               <label class="panel-title">
-                <input type="radio" id="actionForceSaveRadio" name="warningConflictAction" value="override"#if ($warningConflictAction == "override") checked="checked"#end />
                 $services.localization.render('core.editors.save.previewDiff.forceSave.action')
               </label>
-              <span class="openDetails" data-toggle="collapse" data-parent="#accordion" href="#collapseForceSave" aria-expanded="true" aria-controls="collapseForceSave">$services.icon.renderHTML('caret-down')</span>
-            </div>
-            <div id="collapseForceSave" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingForceSave">
-              <div class="panel-body">
+              <div class="xHint">
                 $services.localization.render('core.editors.save.previewDiff.forceSave.hint')
               </div>
             </div>
           </div>
           <div class="panel">
-            <div class="panel-heading" role="tab" id="headingReloadEditor">
-              <label class="panel-title">
-                <input type="radio" id="actionReloadRadio" name="warningConflictAction" value="reload"#if ($warningConflictAction == "reload") checked="checked"#end />
-                $services.localization.render('core.editors.save.previewDiff.reload.action')
-              </label>
-              <span class="openDetails" data-toggle="collapse" data-parent="#accordion" href="#collapseReloadEditor" aria-expanded="true" aria-controls="collapseReloadEditor">
-                $services.icon.renderHTML('caret-down')
-              </span>
+            <div class="panel-radio">
+              <input type="radio" id="actionReloadRadio" name="warningConflictAction" value="reload"#if ($warningConflictAction == "reload") checked="checked"#end />
             </div>
-            <div id="collapseReloadEditor" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingReloadEditor">
-              <div class="panel-body">
+            <div class="panel-heading">
+              <label class="panel-title">
+                $services.localization.render('core.editors.save.previewDiff.reload.action')
+                <span class="label label-danger">$services.localization.render('core.editors.save.previewDiff.reload.label')</span>
+              </label>
+              <div class="xHint">
                 $services.localization.render('core.editors.save.previewDiff.reload.hint')
               </div>
             </div>
           </div>
         </div>
-        <div class="previewdiff-diff-options">
-          <span class="label">$services.localization.render('extensions.upgrade.mergeConflict.changes.original')</span>
-          <select name="original">
-            #foreach($entry in $versions.entrySet())
-              #if ($entry.value)
-                <option value="$entry.key"#if ($entry.key == $originalVersion) selected="selected"#end>
-                  $services.localization.render("core.editors.save.previewDiff.versionToCompare.${entry.key.toLowerCase()}")
-                </option>
+        <div class="panel">
+          <div class="panel-heading" id="headingDiffChanges">
+            <label class="panel-title">$services.localization.render('core.editors.save.previewDiff.viewChanges')</label>
+            <span class="openDetails" data-toggle="collapse" href="#collapsePreviewDiffDiff" aria-expanded="true" aria-controls="collapsePreviewDiffDiff">$services.icon.renderHTML('caret-down')</span>
+          </div>
+          <div id="collapsePreviewDiffDiff" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingDiffChanges">
+            <div class="panel-body">
+              <div class="previewdiff-diff-options">
+                <span class="label">$services.localization.render('extensions.upgrade.mergeConflict.changes.original')</span>
+                <select name="original">
+                  #foreach($entry in $versions.entrySet())
+                    #if ($entry.value)
+                      <option value="$entry.key"#if ($entry.key == $originalVersion) selected="selected"#end>
+                        $services.localization.render("core.editors.save.previewDiff.versionToCompare.${entry.key.toLowerCase()}")
+                      </option>
+                    #end
+                  #end
+                </select>
+                <span class="label">$services.localization.render('extensions.upgrade.mergeConflict.changes.revised')</span>
+                <select name="revised">
+                  #foreach($entry in $versions.entrySet())
+                    #if ($entry.value)
+                      <option value="$entry.key"#if ($entry.key == $revisedVersion) selected="selected"#end>
+                        $services.localization.render("core.editors.save.previewDiff.versionToCompare.${entry.key.toLowerCase()}")
+                      </option>
+                    #end
+                  #end
+                </select>
+                <span class="buttonwrapper">
+                  <button type="button" id="previewDiffChangeDiff" value="diff" class="secondary"
+                          title="$escapetool.xml($services.localization.render('extensions.actions.diff'))">
+                    $escapetool.xml($services.localization.render("extensions.actions.diff"))
+                  </button>
+                </span>
+              </div>
+              <div id="changescontent">
+                #if ($originalVersion == "CURRENT")
+                  #set ($rev1 = "Current")
+                #elseif ($originalVersion == "MERGED")
+                  #set ($rev1 = "Merged")
+                #else
+                  #set ($rev1 = $originalDocument.getVersion())
+                #end
+                #if ($revisedVersion == "CURRENT")
+                #set ($rev2 = "Current")
+              #elseif ($revisedVersion == "MERGED")
+                #set ($rev2 = "Merged")
+              #else
+                #set ($rev2 = $revisedDocument.getVersion())
               #end
-            #end
-          </select>
-          <span class="label">$services.localization.render('extensions.upgrade.mergeConflict.changes.revised')</span>
-          <select name="revised">
-            #foreach($entry in $versions.entrySet())
-              #if ($entry.value)
-                <option value="$entry.key"#if ($entry.key == $revisedVersion) selected="selected"#end>
-                  $services.localization.render("core.editors.save.previewDiff.versionToCompare.${entry.key.toLowerCase()}")
-                </option>
-              #end
-            #end
-          </select>
-          <span class="buttonwrapper">
-            <button type="button" id="previewDiffChangeDiff" value="diff" class="secondary"
-                    title="$escapetool.xml($services.localization.render('extensions.actions.diff'))">
-              $escapetool.xml($services.localization.render("extensions.actions.diff"))
-            </button>
-          </span>
-        </div>
-        <div id="changescontent">
-          #if ($originalVersion == "CURRENT")
-            #set ($rev1 = "Current")
-          #elseif ($originalVersion == "MERGED")
-            #set ($rev1 = "Merged")
-          #else
-            #set ($rev1 = $originalDocument.getVersion())
-          #end
-          #if ($revisedVersion == "CURRENT")
-            #set ($rev2 = "Current")
-          #elseif ($revisedVersion == "MERGED")
-            #set ($rev2 = "Merged")
-          #else
-            #set ($rev2 = $revisedDocument.getVersion())
-          #end
-          #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
-          #set ($origdoc = $wrappedDocs.get(0))
-          #set ($newdoc = $wrappedDocs.get(1))
-          #set ($headingLevel = 4)
-          #template('changesdoc.vm')
+                #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
+                #set ($origdoc = $wrappedDocs.get(0))
+                #set ($newdoc = $wrappedDocs.get(1))
+                #set ($headingLevel = 4)
+                #template('changesdoc.vm')
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-footer">

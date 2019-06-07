@@ -24,7 +24,73 @@ require.config({
   }
 });
 
-define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
+define('xwiki-attachments-store', ['jquery'], function($) {
+  'use strict';
+
+  /**
+   * Returns the REST URL that can be used to search or retrieve the attachments located inside the specified entity.
+   */
+  var getAttachmentsRestURL = function(entityReference) {
+    var path = ['$request.contextPath', 'rest'];
+    entityReference.getReversedReferenceChain().forEach(function(reference) {
+      var restResourceType = reference.type === XWiki.EntityType.DOCUMENT ? 'page' :
+        XWiki.EntityType.getName(reference.type);
+      path.push(restResourceType + 's', encodeURIComponent(reference.name));
+    });
+    // If the specified entity is an attachment then return the URL to retrieve the attachment metadata.
+    if (entityReference.type === XWiki.EntityType.ATTACHMENT) {
+      path.push('metadata');
+    } else {
+      path.push('attachments');
+    }
+    return path.join('/') + '?prettyNames=true';
+  };
+
+  var getAttachments = function(entityReference, options) {
+    return $.getJSON(getAttachmentsRestURL(entityReference), options);
+  };
+
+  var attachFile = function(attachmentReference, file) {
+    var formData = new FormData();
+    formData.append('file', file);
+    // We also send the file name as a separate field because parsing it from the Content-Disposition HTTP multipart
+    // header is tricky when the file name contains special characters (unicode using UTF-8).
+    formData.append('filename', attachmentReference.name);
+    var deferred = $.Deferred();
+    $.post({
+      url: getAttachmentsRestURL(attachmentReference.parent),
+      data: formData,
+      // Needed in order to be able to submit FormData directly
+      processData: false,
+      // Let the browser handle the Content-Type header because it needs to add the boundary string to the
+      // 'multipart/form-data' value so that the server knows how to parse the request body.
+      contentType: false,
+      // REST calls return XML by default
+      dataType: 'json',
+      xhr: function() {
+        var xhr = $.ajaxSettings.xhr();
+        xhr.upload && xhr.upload.addEventListener('progress', function(event) {
+          if (event.lengthComputable) {
+            deferred.notify({
+              loaded: event.loaded,
+              total: event.total,
+              percent: Math.round(event.loaded * 100 / event.total)
+            });
+          }
+        }, false);
+        return xhr;
+      }
+    }).done($.proxy(deferred, 'resolve')).fail($.proxy(deferred, 'reject'));
+    return deferred.promise();
+  };
+
+  return {
+    get: getAttachments,
+    upload: attachFile
+  };
+});
+
+define('xwiki-suggestAttachments', ['jquery', 'xwiki-attachments-store', 'xwiki-selectize'], function($, attachmentsStore) {
   'use strict';
 
   var getSelectizeOptions = function(select) {
@@ -103,36 +169,16 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
       // ..take the default list of suggestions from the specified document (usually the current document).
       searchScope = options.documentReference;
     }
-    var attachmentsRestURL = getAttachmentsRestURL(searchScope);
-    return $.getJSON(attachmentsRestURL, {
+    return attachmentsStore.get(searchScope, {
       name: text,
       types: options.accept,
       number: options.maxOptions
     }).then($.proxy(processAttachments, null, options));
   };
 
-  /**
-   * Returns the REST URL that can be used to search or retrieve the attachments located inside the specified entity.
-   */
-  var getAttachmentsRestURL = function(entityReference) {
-    var path = ['$request.contextPath', 'rest'];
-    entityReference.getReversedReferenceChain().forEach(function(reference) {
-      var restResourceType = reference.type === XWiki.EntityType.DOCUMENT ? 'page' :
-        XWiki.EntityType.getName(reference.type);
-      path.push(restResourceType + 's', encodeURIComponent(reference.name));
-    });
-    // If the specified entity is an attachment then return the URL to retrieve the attachment metadata.
-    if (entityReference.type === XWiki.EntityType.ATTACHMENT) {
-      path.push('metadata');
-    } else {
-      path.push('attachments');
-    }
-    return path.join('/') + '?prettyNames=true';
-  };
-
   var loadAttachment = function(value, options) {
     var attachmentReference = getAttachmentReferenceFromValue(value, options);
-    return $.getJSON(getAttachmentsRestURL(attachmentReference))
+    return attachmentsStore.get(attachmentReference)
       .then($.proxy(processAttachment, null, options))
       .then(function(attachment) {
         // An array is expected in xwiki.selectize.js
@@ -447,38 +493,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-selectize'], function($) {
 
   var uploadFile = function(attachment) {
     var attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
-    var uploadURL = getAttachmentsRestURL(attachmentReference.parent);
-    var formData = new FormData();
-    formData.append('file', attachment.file);
-    // We also send the file name as a separate field because parsing it from the Content-Disposition HTTP multipart
-    // header is tricky when the file name contains special characters (unicode using UTF-8).
-    formData.append('filename', attachment.name);
-    var deferred = $.Deferred();
-    $.post({
-      url: uploadURL,
-      data: formData,
-      // Needed in order to be able to submit FormData directly
-      processData: false,
-      // Let the browser handle the Content-Type header because it needs to add the boundary string to the
-      // 'multipart/form-data' value so that the server knows how to parse the request body.
-      contentType: false,
-      // REST calls return XML by default
-      dataType: 'json',
-      xhr: function() {
-        var xhr = $.ajaxSettings.xhr();
-        xhr.upload && xhr.upload.addEventListener('progress', function(event) {
-          if (event.lengthComputable) {
-            deferred.notify({
-              loaded: event.loaded,
-              total: event.total,
-              percent: Math.round(event.loaded * 100 / event.total)
-            });
-          }
-        }, false);
-        return xhr;
-      }
-    }).done($.proxy(deferred, 'resolve')).fail($.proxy(deferred, 'reject'));
-    return deferred.promise();
+    return attachmentsStore.upload(attachmentReference, attachment.file);
   };
 
   var loadAttachmentIcon = function(attachment) {

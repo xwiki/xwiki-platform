@@ -164,8 +164,7 @@ public class Api
     /**
      * Verifies if the context user has the access identified by {@code right} on the entity identified by
      * {@code entityReference}. Note that some rights may be checked higher in hierarchy of the provided entity if such
-     * right is not enabled at lowest hierarchy level provided. This function should be used for interface matters, use
-     * {@link #checkAccess} at security checkpoints.
+     * right is not enabled at lowest hierarchy level provided.
      * 
      * @param right the right to check
      * @param entityReference the entity on which to check the right

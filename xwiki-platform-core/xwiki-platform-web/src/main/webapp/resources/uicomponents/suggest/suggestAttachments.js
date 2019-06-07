@@ -600,7 +600,29 @@ define('xwiki-suggestAttachments', [
       $(this).removeClass('is-dragover');
     // Filter the files based on their type and then upload them.
     }).on('drop', function(event) {
-      selectAndUploadFiles(selectize, event.originalEvent.dataTransfer.files);
+      var dataTransfer = event.originalEvent.dataTransfer;
+      if (dataTransfer.files.length > 0) {
+        selectAndUploadFiles(selectize, dataTransfer.files);
+      } else {
+        onDropHTML(selectize, dataTransfer.getData('text/html'));
+      }
+    });
+  };
+
+  var onDropHTML = function(selectize, html) {
+    $(html).find('[data-entity-type="attachment"][data-entity-reference]').each(function() {
+      var attachmentReference = XWiki.Model.resolve($(this).data('entityReference'), XWiki.EntityType.ATTACHMENT);
+      attachmentsStore.get(attachmentReference).done(function(attachment) {
+        var attachments = processAttachments(selectize.settings, {
+          attachments: attachmentsFilter.filter([attachment], selectize.settings.accept)
+        });
+        // Add the attachments to the list of suggestions in order to be able to select them.
+        selectize.addOption(attachments);
+        // Select the attachments.
+        attachments.forEach(function(attachment) {
+          selectize.addItem(attachment.value);
+        });
+      });
     });
   };
 

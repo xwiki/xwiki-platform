@@ -203,12 +203,56 @@ define('xwiki-attachments-icon', ['jquery'], function($) {
   };
 });
 
+define('xwiki-file-picker', ['jquery'], function($) {
+  'use strict';
+
+  var pickLocalFiles = function(options) {
+    var deferred = $.Deferred();
+
+    // There's no clean way to detect when the file browser dialog is canceled so we must rely on a hack: catch
+    // when the current window gets back the focus after the file browser dialog is closed, making sure the
+    // listener is removed in case some files were selected. In some cases (e.g. Chrome on MacOS) the file browser
+    // dialog is closed before the change event is fired so we need to wait a bit before notifying the cancel.
+    var rejectTimeout;
+    $(window).one('focus.filePicker', function(event) {
+      // The file browser dialog was canceled. Wait a bit before rejecting the promise, in case the change event hasn't
+      // been fired yet (1 second seems to do the job).
+      rejectTimeout = setTimeout(function() {
+        deferred.reject();
+      }, 1000)
+    });
+
+    // Chrome doesn't fire the change event all the time if the file input is not attached to the DOM tree.
+    var fileInput = $('<input type="file" class="hidden"/>').prop('multiple', !!options.multiple).appendTo('body');
+    if (typeof options.accept === 'string') {
+      // We have to replace image/ with image/* in order to meet the file input expectations.
+      fileInput.attr('accept', options.accept.replace(/\/(\s*(,|$))/g, '/*$1'));
+    }
+
+    fileInput.change(function(event) {
+      // The user has selected some files to upload. Make sure the promise is not rejected.
+      $(window).off('focus.filePicker');
+      clearTimeout(rejectTimeout);
+      deferred.resolve(this.files);
+      fileInput.remove();
+    // Open the file browser dialog.
+    }).click();
+
+    return deferred.promise();
+  };
+
+  return {
+    pickLocalFiles: pickLocalFiles
+  };
+});
+
 define('xwiki-suggestAttachments', [
   'jquery',
   'xwiki-attachments-store',
   'xwiki-attachments-icon',
+  'xwiki-file-picker',
   'xwiki-selectize'
-], function($, attachmentsStore, attachmentsIcon) {
+], function($, attachmentsStore, attachmentsIcon, filePicker) {
   'use strict';
 
   var getSelectizeOptions = function(select) {
@@ -408,42 +452,10 @@ define('xwiki-suggestAttachments', [
    * Allow the user to select local files and upload them as attachments.
    */
   var createFromLocalFiles = function(selectize) {
-    return pickLocalFiles(selectize.settings).then($.proxy(selectAndUploadFiles, null, selectize));
-  };
-
-  var pickLocalFiles = function(options) {
-    var deferred = $.Deferred();
-
-    // There's no clean way to detect when the file browser dialog is canceled so we must rely on a hack: catch
-    // when the current window gets back the focus after the file browser dialog is closed, making sure the
-    // listener is removed in case some files were selected. In some cases (e.g. Chrome on MacOS) the file browser
-    // dialog is closed before the change event is fired so we need to wait a bit before notifying the cancel.
-    var rejectTimeout;
-    $(window).one('focus.suggestAttachments', function(event) {
-      // The file browser dialog was canceled. Wait a bit before rejecting the promise, in case the change event hasn't
-      // been fired yet (1 second seems to do the job).
-      rejectTimeout = setTimeout(function() {
-        deferred.reject();
-      }, 1000)
-    });
-
-    // Chrome doesn't fire the change event all the time if the file input is not attached to the DOM tree.
-    var fileInput = $('<input type="file" class="hidden"/>').prop('multiple', options.maxItems !== 1).appendTo('body');
-    if (typeof options.accept === 'string') {
-      // We have to replace image/ with image/* in order to meet the file input expectations.
-      fileInput.attr('accept', options.accept.replace(/\/(\s*(,|$))/g, '/*$1'));
-    }
-
-    fileInput.change(function(event) {
-      // The user has selected some files to upload. Make sure the promise is not rejected.
-      $(window).off('focus.suggestAttachments');
-      clearTimeout(rejectTimeout);
-      deferred.resolve(this.files);
-      fileInput.remove();
-    // Open the file browser dialog.
-    }).click();
-
-    return deferred.promise();
+    return filePicker.pickLocalFiles({
+      accept: selectize.settings.accept,
+      multiple: selectize.settings.maxItems !== 1
+    }).then($.proxy(selectAndUploadFiles, null, selectize));
   };
 
   var selectAndUploadFiles = function(selectize, files) {

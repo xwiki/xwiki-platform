@@ -90,7 +90,86 @@ define('xwiki-attachments-store', ['jquery'], function($) {
   };
 });
 
-define('xwiki-suggestAttachments', ['jquery', 'xwiki-attachments-store', 'xwiki-selectize'], function($, attachmentsStore) {
+define('xwiki-attachments-icon', ['jquery'], function($) {
+  'use strict';
+
+  var getAttachmentIcon = function(attachment) {
+    if (typeof attachment.mimeType === 'string' && attachment.mimeType.substring(0, 6) === 'image/') {
+      var url = attachment.xwikiRelativeUrl;
+      // If the image URL is relative to the current page or is absolute (HTTP) then we can pass the icon width as a
+      // query string parameter to allow the image to be resized on the server side.
+      if (url.substring(0, 1) === '/' || url.substring(0, 7) === 'http://') {
+        url += (url.indexOf('?') < 0 ? '?' : '&') + 'width=48';
+      }
+      var icon = {
+        iconSetType: 'IMAGE',
+        url: url
+      };
+      if (attachment.file) {
+        // Show the icon using the local file while the file is being uploaded.
+        icon.promise = readAsDataURL(attachment.file).done(function(dataURL) {
+          icon.url = dataURL;
+        });
+      }
+      return icon;
+    } else {
+      return getIcon(attachment.mimeType, attachment.name);
+    }
+  };
+
+  var readAsDataURL = function(file) {
+    var deferred = $.Deferred();
+    if (typeof FileReader !== 'undefined') {
+      var fileReader = new FileReader();
+      fileReader.onload = function (event) {
+        deferred.resolve(event.target.result);
+      };
+      fileReader.readAsDataURL(file);
+    }
+    return deferred.promise();
+  };
+
+  /**!
+   * #set ($discard = "#mimetypeimg('' '')")
+   * #set ($discard = $mimetypeMap.put('attachment', ['attach', 'attachment']))
+   * #foreach ($map in [$mimetypeMap, $extensionMap])
+   *   #foreach ($entry in $map.entrySet())
+   *     #set ($discard = $entry.value.set(0, $services.icon.getMetaData($entry.value.get(0))))
+   *     #set ($translationKey = "core.viewers.attachments.mime.$entry.value.get(1)")
+   *     #set ($discard = $entry.value.set(1, $services.localization.render($translationKey)))
+   *   #end
+   * #end
+   */
+  var mimeTypeMap = $jsontool.serialize($mimetypeMap);
+  var extensionMap = $jsontool.serialize($extensionMap);
+
+  var getIcon = function(mimeType, fileName) {
+    var extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+    if (mimeTypeMap.hasOwnProperty(mimeType)) {
+      return mimeTypeMap[mimeType][0];
+    } else if (extensionMap.hasOwnProperty(extension)) {
+      return extensionMap[extension][0];
+    } else {
+      var mimeTypePrefix = mimeType.substring(0, mimeType.indexOf('/') + 1);
+      if (mimeTypeMap.hasOwnProperty(mimeTypePrefix)) {
+        return mimeTypeMap[mimeTypePrefix][0];
+      } else {
+        return mimeTypeMap['attachment'][0];
+      }
+    }
+  };
+
+  return {
+    getIcon: getAttachmentIcon
+  };
+});
+
+define('xwiki-suggestAttachments', [
+  'jquery',
+  'xwiki-attachments-store',
+  'xwiki-attachments-icon',
+  'xwiki-selectize'
+], function($, attachmentsStore, attachmentsIcon) {
   'use strict';
 
   var getSelectizeOptions = function(select) {
@@ -203,7 +282,7 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-attachments-store', 'xwiki-
       label: attachment.name,
       value: getAttachmentValueFromReference(attachmentReference, options),
       url: attachment.xwikiRelativeUrl,
-      icon: getAttachmentIcon(attachment),
+      icon: attachmentsIcon.getIcon(attachment),
       hint: getAttachmentHint(attachment),
       data: attachment
     };
@@ -236,60 +315,6 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-attachments-store', 'xwiki-
     } else {
       // Relative to the root wiki.
       return XWiki.Model.serialize(attachmentReference.relativeTo(options.documentReference.getRoot()));
-    }
-  };
-
-  var getAttachmentIcon = function(attachment) {
-    if (typeof attachment.mimeType === 'string' && attachment.mimeType.substring(0, 6) === 'image/') {
-      var url = attachment.xwikiRelativeUrl;
-      // If the image URL is relative to the current page or is absolute (HTTP) then we can pass the icon width as a
-      // query string parameter to allow the image to be resized on the server side.
-      if (url.substring(0, 1) === '/' || url.substring(0, 7) === 'http://') {
-        url += (url.indexOf('?') < 0 ? '?' : '&') + 'width=48';
-      }
-      var icon = {
-        iconSetType: 'IMAGE',
-        url: url
-      };
-      if (attachment.file) {
-        // Show the icon using the local file while the file is being uploaded.
-        icon.promise = readAsDataURL(attachment.file).done(function(dataURL) {
-          icon.url = dataURL;
-        });
-      }
-      return icon;
-    } else {
-      return getIcon(attachment.mimeType, attachment.name);
-    }
-  };
-
-  /**!
-   * #set ($discard = "#mimetypeimg('' '')")
-   * #set ($discard = $mimetypeMap.put('attachment', ['attach', 'attachment']))
-   * #foreach ($map in [$mimetypeMap, $extensionMap])
-   *   #foreach ($entry in $map.entrySet())
-   *     #set ($discard = $entry.value.set(0, $services.icon.getMetaData($entry.value.get(0))))
-   *     #set ($translationKey = "core.viewers.attachments.mime.$entry.value.get(1)")
-   *     #set ($discard = $entry.value.set(1, $services.localization.render($translationKey)))
-   *   #end
-   * #end
-   */
-  var mimeTypeMap = $jsontool.serialize($mimetypeMap);
-  var extensionMap = $jsontool.serialize($extensionMap);
-
-  var getIcon = function(mimeType, fileName) {
-    var extension = fileName.substring(fileName.lastIndexOf('.') + 1);
-    if (mimeTypeMap.hasOwnProperty(mimeType)) {
-      return mimeTypeMap[mimeType][0];
-    } else if (extensionMap.hasOwnProperty(extension)) {
-      return extensionMap[extension][0];
-    } else {
-      var mimeTypePrefix = mimeType.substring(0, mimeType.indexOf('/') + 1);
-      if (mimeTypeMap.hasOwnProperty(mimeTypePrefix)) {
-        return mimeTypeMap[mimeTypePrefix][0];
-      } else {
-        return mimeTypeMap['attachment'][0];
-      }
     }
   };
 
@@ -435,18 +460,6 @@ define('xwiki-suggestAttachments', ['jquery', 'xwiki-attachments-store', 'xwiki-
       },
       file: file
     }
-  };
-
-  var readAsDataURL = function(file) {
-    var deferred = $.Deferred();
-    if (typeof FileReader !== 'undefined') {
-      var fileReader = new FileReader();
-      fileReader.onload = function (event) {
-        deferred.resolve(event.target.result);
-      };
-      fileReader.readAsDataURL(file);
-    }
-    return deferred.promise();
   };
 
   var uploadFileAndShowProgress = function(attachment, selectize) {

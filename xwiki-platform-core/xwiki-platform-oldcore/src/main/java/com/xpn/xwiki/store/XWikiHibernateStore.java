@@ -2313,6 +2313,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -2320,6 +2321,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -2327,6 +2329,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
@@ -2335,6 +2338,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -2349,12 +2353,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
     {
         return searchDocumentsNames(wheresql, 0, 0, "", context);
     }
 
     @Override
+    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -2362,6 +2368,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -2377,6 +2384,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
@@ -2391,6 +2399,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public <T> List<T> search(String sql, int nb, int start, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
@@ -2405,6 +2414,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues,
         XWikiContext inputxcontext) throws XWikiException
     {
@@ -2567,6 +2577,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public int countDocuments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
@@ -2591,7 +2602,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * @since 2.2M1
+     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
+    @Deprecated
     private List<DocumentReference> searchDocumentReferencesInternal(String sql, int nb, int start,
         List<?> parameterValues, XWikiContext inputxcontext) throws XWikiException
     {
@@ -2628,7 +2641,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * @since 2.2M1
+     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
+    @Deprecated
     private <T> List<T> searchGenericInternal(String sql, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -2686,6 +2701,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    @Deprecated
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext inputxcontext)
         throws XWikiException

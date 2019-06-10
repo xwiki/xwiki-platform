@@ -635,7 +635,11 @@ define('xwiki-suggestAttachments', [
     selectize.settings.render.option = function(attachment) {
       var output = oldRenderOption.apply(this, arguments);
       var hint = output.find('.xwiki-selectize-option-hint');
-      if (hint.length === 1) {
+      if (selectize.settings.searchScope.type === XWiki.EntityType.DOCUMENT) {
+        // The hint (attachment location) is redundant if all the attachments are from the same document.
+        hint.remove();
+      } else if (hint.length === 1) {
+        // Show a bigger attachment icon.
         $('<div class="xwiki-selectize-option-label-wrapper"/>')
           .append(output.find('.xwiki-selectize-option-label'))
           .append(hint)

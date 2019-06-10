@@ -610,7 +610,7 @@ define('xwiki-suggestAttachments', [
   };
 
   var onDropHTML = function(selectize, html) {
-    $(html).find('[data-entity-type="attachment"][data-entity-reference]').each(function() {
+    $(html).find('[data-entity-type="ATTACHMENT"][data-entity-reference]').each(function() {
       var attachmentReference = XWiki.Model.resolve($(this).data('entityReference'), XWiki.EntityType.ATTACHMENT);
       attachmentsStore.get(attachmentReference).done(function(attachment) {
         var attachments = processAttachments(selectize.settings, {

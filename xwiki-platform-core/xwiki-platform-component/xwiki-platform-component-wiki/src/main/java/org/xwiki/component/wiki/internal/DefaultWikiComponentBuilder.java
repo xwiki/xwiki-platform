@@ -80,8 +80,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
     {
         List<DocumentReference> results = new ArrayList<>();
         // Note that the query is made to work with Oracle which treats empty strings as null.
-        String query = ", BaseObject as obj, StringProperty as role where obj.className=? and obj.name=doc.fullName "
-            + "and role.id.id=obj.id and role.id.name=? "
+        String query = ", BaseObject as obj, StringProperty as role where obj.className=?1 and obj.name=doc.fullName "
+            + "and role.id.id=obj.id and role.id.name=?2 "
             + "and  (role.value <> '' or (role.value is not null and '' is null))";
         List<String> parameters = new ArrayList<>();
         parameters.add(COMPONENT_CLASS);

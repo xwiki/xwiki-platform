@@ -718,6 +718,7 @@ public class EditIT
             "Data truncation: Data too long for column 'XWD_TITLE' at row 1",
             "SQL Error: 3401, SQLState: 22001",
             "SQL Error: -3401, SQLState: 22001",
+            "SQL Error: 0, SQLState: 22001",
             "data exception: string data, right truncation",
             "SQL Error: 12899, SQLState: 72000",
             "ORA-12899: value too large for column \"XWIKI\".\"XWIKIDOC\".\"XWD_TITLE\" (actual: 300, maximum: 255)",

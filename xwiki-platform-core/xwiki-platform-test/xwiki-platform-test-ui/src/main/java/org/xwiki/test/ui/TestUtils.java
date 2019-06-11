@@ -2806,7 +2806,7 @@ public class TestUtils
         getDriver().findElement(by).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
 
         // It might take a bit of time for the driver to know there's another window.
-        getDriver().waitUntilCondition(input -> input.getWindowHandles().size() == 2);
+        getDriver().waitUntilCondition(input -> input.getWindowHandles().size() == existingTabHandles.length + 1);
         Set<String> windowHandles = getDriver().getWrappedDriver().getWindowHandles();
         String newTabHandle = null;
         List<String> tabHandles = Arrays.asList(existingTabHandles);

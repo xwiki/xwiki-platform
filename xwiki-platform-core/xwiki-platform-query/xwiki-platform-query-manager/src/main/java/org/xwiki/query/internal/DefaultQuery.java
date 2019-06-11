@@ -192,7 +192,7 @@ public class DefaultQuery implements SecureQuery
             //
             // FIXME: a better solution would be to replace the current DefaultQuery with distinct implementations:
             // XWQLQuery, HQLQuery, NamedQuery.
-            if (Query.HQL.equals(getLanguage()) && !LEGACY_HQL_MATCHER.matcher(this.statement).find()) {
+            if (Query.HQL.equals(getLanguage()) && LEGACY_HQL_MATCHER.matcher(this.statement).find()) {
                 bindValue(i, values.get(i));
             } else {
                 bindValue(i + 1, values.get(i));

@@ -59,6 +59,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     /** Logger. */
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiHibernateVersioningStore.class);
 
+    private static final String FIELD_DOCID = "docId";
+
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
      * in the WEB-INF directory.
@@ -297,7 +299,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                 query.select(root);
 
                 Predicate[] predicates = new Predicate[2];
-                predicates[0] = builder.equal(root.get("id").get("docId"), id);
+                predicates[0] = builder.equal(root.get("id").get(FIELD_DOCID), id);
                 predicates[1] = builder.isNotNull(root.get("diff"));
                 query.where(predicates);
 
@@ -327,8 +329,10 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException
     {
         executeWrite(context, session -> {
-            session.createQuery("delete from " + XWikiRCSNodeInfo.class.getName() + " where id.docId=?")
-                .setParameter(0, doc.getId()).executeUpdate();
+            session
+                .createQuery(
+                    "delete from " + XWikiRCSNodeInfo.class.getName() + " where id." + FIELD_DOCID + '=' + FIELD_DOCID)
+                .setParameter(FIELD_DOCID, doc.getId()).executeUpdate();
             return null;
         });
     }

@@ -118,7 +118,11 @@ public interface Query
      * @since 11.5RC1
      */
     @Unstable
-    Query bindValues(Map<String, ?> values);
+    default Query bindValues(Map<String, ?> values)
+    {
+        values.forEach(this::bindValue);
+        return this;
+    }
 
     /**
      * Bind named parameter var with a value that will be constructed using calls to

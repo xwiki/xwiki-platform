@@ -185,8 +185,8 @@ public class ExportActionTest
         // Query Manager-related mocking
         QueryManager queryManager = oldcore.getMocker().registerMockComponent(QueryManager.class);
         Query query = mock(Query.class);
-        String where = "where ( doc.fullName like ? and doc.fullName not like ? and doc.fullName not like ? ) or "
-            + "( doc.fullName like ? ) or ( doc.fullName like ? and doc.fullName not like ? ) ";
+        String where = "where ( doc.fullName like ?1 and doc.fullName not like ?2 and doc.fullName not like ?3 ) or "
+            + "( doc.fullName like ?4 ) or ( doc.fullName like ?5 and doc.fullName not like ?6 ) ";
         when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
         when(query.setWiki("xwiki")).thenReturn(query);
 

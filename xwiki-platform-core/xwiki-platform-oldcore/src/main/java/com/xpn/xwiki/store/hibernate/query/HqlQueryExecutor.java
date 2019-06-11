@@ -20,7 +20,6 @@
 package com.xpn.xwiki.store.hibernate.query;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -376,19 +375,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
         }
         Map<Integer, Object> positionalParameters = query.getPositionalParameters();
         if (positionalParameters.size() > 0) {
-            int start = Collections.min(positionalParameters.keySet());
-            if (start == 0) {
-                // jdbc-style positional parameters. "?"
-                for (Entry<Integer, Object> e : positionalParameters.entrySet()) {
-                    hquery.setParameter(e.getKey(), e.getValue());
-                }
-            } else {
-                // jpql-style. "?index"
-                for (Entry<Integer, Object> e : positionalParameters.entrySet()) {
-                    // hack. hibernate assume "?1" is named parameter, so use string "1".
-                    setNamedParameter(hquery, String.valueOf(e.getKey()), e.getValue());
-                }
-            }
+            positionalParameters.forEach(hquery::setParameter);
         }
     }
 

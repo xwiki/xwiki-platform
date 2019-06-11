@@ -164,6 +164,7 @@ public class LoginTest extends AbstractTest
         String mainWindow = getDriver().getWindowHandle();
         loginPage = editPage.clickModalLoginLink();
         loginPage.loginAsAdmin();
+        getDriver().close();
         getDriver().switchTo().window(mainWindow);
         editPage = new WikiEditPage();
         editPage.closeLoginModal();

@@ -20,13 +20,13 @@
 package org.xwiki.flamingo.test.ui;
 
 import java.util.Arrays;
-import java.util.Set;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -37,7 +37,9 @@ import org.xwiki.panels.test.po.DocumentInformationPanel;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
@@ -59,7 +61,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @version $Id$
  * @since 11.2RC1
  */
-@UITest
+@UITest(database = Database.MYSQL, databaseTag = "5.7", servletEngine = ServletEngine.TOMCAT, servletEngineTag = "8.5", browser = Browser.CHROME)
 public class EditIT
 {
     @BeforeAll
@@ -379,7 +381,7 @@ public class EditIT
     }
 
     /**
-     * This test a complete scenario of edit with conflicts, manipulating the merging conflict window.
+     * This tests a complete scenario of edit with conflicts, manipulating the merging conflict window.
      * The following scenario is performed by doing edition of the same document in two tabs:
      *   1. Edit same line, save&continue, ensure the merge conflict window appears,
      *      Save with fixing merge conflict by merging and using current changes
@@ -396,35 +398,23 @@ public class EditIT
     public void editWithConflict(TestUtils setup, TestReference testReference)
     {
         // Fixture
-        String testPageName = testReference.getLastSpaceReference().getName();
+        String title = testReference.getLastSpaceReference().getName();
         setup.deletePage(testReference);
-        setup.createPage(testReference, "", testPageName);
+        ViewPage vp = setup.createPage(testReference, "", title);
 
         // Prepare the two tabs
-        String firstTab = setup.getDriver().getWindowHandle();
-        WikiEditPage wikiEditPageTab1 = setup.gotoPage(testReference).editWiki();
-
-        // Open link in a new window
-        setup.getDriver().findElementByLinkText(testPageName).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
-
-        // It might take a bit of time for the driver to know there's another window.
-        setup.getDriver().waitUntilCondition(input -> input.getWindowHandles().size() == 2);
-        Set<String> windowHandles = setup.getDriver().getWrappedDriver().getWindowHandles();
-        String secondTab = null;
-        for (String handle : windowHandles) {
-            if (!handle.equals(firstTab)) {
-                secondTab = handle;
-            }
-        }
+        String firstTabHandle = setup.getCurrentTabHandle();
+        WikiEditPage wikiEditPageTab1 = vp.editWiki();
+        String secondTabHandle = setup.openLinkInTab(By.linkText(title), firstTabHandle);
 
         // Step 1: Edit same lines and fix conflict by merging
-        setup.getDriver().switchTo().window(secondTab);
+        setup.switchTab(secondTabHandle);
         ViewPage viewPage = new ViewPage();
         WikiEditPage wikiEditPageTab2 = viewPage.editWiki();
         wikiEditPageTab2.setContent("A first edit from a tab.");
         wikiEditPageTab2.clickSaveAndContinue();
 
-        setup.getDriver().switchTo().window(firstTab);
+        setup.switchTab(firstTabHandle);
         wikiEditPageTab1.waitUntilPageJSIsLoaded();
         setup.getDriver().addPageNotYetReloadedMarker();
         wikiEditPageTab1.setContent("A second edit from another tab.");
@@ -448,7 +438,7 @@ public class EditIT
 
         // Step 2: Edit another line and save&view, an automatic merge should occur
         // We cannot directly make the changes since the
-        setup.getDriver().switchTo().window(secondTab);
+        setup.switchTab(secondTabHandle);
         wikiEditPageTab2 = new WikiEditPage();
         assertEquals("A first edit from a tab.", wikiEditPageTab2.getExactContent());
         // We only add a new line from the content displayed in the editor.
@@ -460,12 +450,12 @@ public class EditIT
         wikiEditPageTab2 = viewPage.editWiki();
 
         // Step 3: Create another conflict, check the different diffs and discard changes (reload the editor)
-        setup.getDriver().switchTo().window(firstTab);
+        setup.switchTab(firstTabHandle);
         wikiEditPageTab1 = setup.gotoPage(testReference).editWiki();
         wikiEditPageTab1.setContent("A third edit from another tab.\nAnother line.\nYet another line.");
         wikiEditPageTab1.clickSaveAndContinue();
 
-        setup.getDriver().switchTo().window(secondTab);
+        setup.switchTab(secondTabHandle);
         wikiEditPageTab2.waitUntilPageJSIsLoaded();
         // the page will be reloaded by choice
         setup.getDriver().addPageNotYetReloadedMarker();
@@ -531,13 +521,13 @@ public class EditIT
             wikiEditPageTab2.getContent());
 
         // Step 4: Edit different places, ensure the automatic merge is performed and the editor refreshed
-        setup.getDriver().switchTo().window(firstTab);
+        setup.switchTab(firstTabHandle);
         wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A third edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.");
         wikiEditPageTab1.clickSaveAndContinue();
 
-        setup.getDriver().switchTo().window(secondTab);
+        setup.switchTab(secondTabHandle);
         wikiEditPageTab2.waitUntilPageJSIsLoaded();
         // The editor will be reloaded because of the merge
         setup.getDriver().addPageNotYetReloadedMarker();
@@ -552,7 +542,7 @@ public class EditIT
         wikiEditPageTab2.setContent("A fourth edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.\nAnd again a new line");
         wikiEditPageTab2.clickSaveAndContinue();
-        setup.getDriver().switchTo().window(firstTab);
+        setup.switchTab(firstTabHandle);
         wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A fifth edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.");
@@ -718,10 +708,7 @@ public class EditIT
             "Data truncation: Data too long for column 'XWD_TITLE' at row 1",
             "SQL Error: 3401, SQLState: 22001",
             "SQL Error: -3401, SQLState: 22001",
-            "SQL Error: 0, SQLState: 22001",
             "data exception: string data, right truncation",
-            "SQL Error: 12899, SQLState: 72000",
-            "ORA-12899: value too large for column \"XWIKI\".\"XWIKIDOC\".\"XWD_TITLE\" (actual: 300, maximum: 255)",
             // PostgreSQL specific log
             "value too long for type character varying(255)"
         );

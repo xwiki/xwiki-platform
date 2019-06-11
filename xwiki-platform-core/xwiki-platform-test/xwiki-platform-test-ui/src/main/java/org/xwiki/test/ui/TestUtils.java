@@ -66,6 +66,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -2779,5 +2780,42 @@ public class TestUtils
         TestUtils.assertStatusCodes(
             rest().executePut(ObjectPropertyResource.class, property, rest().toElements(enabledPropertyReference)),
             true, STATUS_ACCEPTED);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void switchTab(String tabHandle)
+    {
+        getDriver().switchTo().window(tabHandle);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public String getCurrentTabHandle()
+    {
+        return getDriver().getWindowHandle();
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public String openLinkInTab(By by, String... existingTabHandles)
+    {
+        getDriver().findElement(by).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
+
+        // It might take a bit of time for the driver to know there's another window.
+        getDriver().waitUntilCondition(input -> input.getWindowHandles().size() == 2);
+        Set<String> windowHandles = getDriver().getWrappedDriver().getWindowHandles();
+        String newTabHandle = null;
+        List<String> tabHandles = Arrays.asList(existingTabHandles);
+        for (String handle : windowHandles) {
+            if (!tabHandles.contains(handle)) {
+                newTabHandle = handle;
+                break;
+            }
+        }
+        return newTabHandle;
     }
 }

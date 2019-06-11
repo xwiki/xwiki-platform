@@ -32,7 +32,7 @@
          - When size > 4000 Hibernates maps it to LONG. However LONG is deprecated in Oracle and shouldn't be used
            since Oracle imposes a limitation on it: there can be only be one LONG column per table. Thus when
            size > 4000 chars we must use a "materialized_clob" type
-           See https://hibernate.onjira.com/browse/HHH-5569
+           See https://hibernate.atlassian.net/browse/HHH-5569
        - Thus, use the following strategy: use the "string" type when size<4000 and materialized_clob when size>40000
   -->
 

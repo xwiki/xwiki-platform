@@ -119,9 +119,7 @@ public interface XWikiStoreInterface
      * @return a list of document references
      * @throws XWikiException in case of error while performing the query
      * @since 2.2M1
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException;
 
@@ -137,9 +135,7 @@ public interface XWikiStoreInterface
      *
      * @see #searchDocumentReferences(String, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
      * @since 2.2M2
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
@@ -160,9 +156,7 @@ public interface XWikiStoreInterface
      * @return The number of documents that matched the query.
      * @param context The current request context.
      * @throws XWikiException if there was a problem executing the query.
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     int countDocuments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
@@ -239,9 +233,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since 1.1.2
      * @since 1.2M2
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException;
 
@@ -307,9 +299,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since 1.1.2
      * @since 1.2M2
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     List<XWikiDocument> searchDocuments(String wheresql, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
@@ -334,9 +324,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since 1.1.2
      * @since 1.2M2
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping, int nb,
         int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
 
@@ -358,9 +346,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since 1.1.2
      * @since 1.2M2
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 
@@ -386,9 +372,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since 1.1.2
      * @since 1.2M2
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException;
 
@@ -446,9 +430,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since 1.1.2
      * @since 1.2M2
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     <T> List<T> search(String sql, int nb, int start, List<?> parameterValues, XWikiContext context)
         throws XWikiException;
 
@@ -486,9 +468,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since 1.1.2
      * @since 1.2M2
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues,
         XWikiContext context) throws XWikiException;
 

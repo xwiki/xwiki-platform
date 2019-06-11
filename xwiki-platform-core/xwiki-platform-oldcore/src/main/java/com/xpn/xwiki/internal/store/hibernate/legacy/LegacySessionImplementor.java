@@ -62,6 +62,15 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
         super(delegate);
     }
 
+    /**
+     * @param statement the statement to parse
+     * @return true if the statement contains legacy-style positional parameters" (`?`)
+     */
+    public static boolean containsLegacyOrdinalStatement(String statement)
+    {
+        return LEGACY_MATCHER.matcher(statement).find();
+    }
+
     private String replaceLegacyQueryParameters(String queryString)
     {
         String convertedQueryString = HqlQueryUtils.replaceLegacyQueryParameters(queryString);
@@ -78,7 +87,7 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
     {
         // Check if the statement might (it's not using the real hql parser to limit the number of fully parser
         // statements) contain legacy HQL ordinal parameters
-        if (LEGACY_MATCHER.matcher(statement).find()) {
+        if (containsLegacyOrdinalStatement(statement)) {
             // Check if the statement is valid and if not translate it
             // FIXME: find a more efficient way (we currently parse and validate the statement twice, plus the if which
             // is parsing the statement String...). The problem is that when createQuery fail it's too late and the

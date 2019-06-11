@@ -428,14 +428,12 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
     {
         return this.store.searchDocumentsNames(wheresql, context);
     }
 
     @Override
-    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -443,7 +441,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -451,7 +448,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
@@ -459,7 +455,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
@@ -467,7 +462,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
@@ -475,7 +469,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -483,7 +476,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -491,7 +483,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -499,7 +490,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context)
         throws XWikiException
     {
@@ -507,7 +497,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public boolean injectCustomMapping(BaseClass doc1class, XWikiContext context) throws XWikiException
     {
         return this.store.injectCustomMapping(doc1class, context);
@@ -568,7 +557,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
@@ -576,7 +564,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<XWikiDocument> searchDocuments(String wheresql, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
@@ -584,7 +571,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException
     {
@@ -593,7 +579,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -601,7 +586,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext context) throws XWikiException
     {
@@ -610,7 +594,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public int countDocuments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
@@ -649,7 +632,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public List<String> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         return this.store.loadBacklinks(fullName, context, bTransaction);
@@ -681,7 +663,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public <T> List<T> search(String sql, int nb, int start, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
@@ -689,7 +670,6 @@ public class XWikiCacheStore extends AbstractXWikiStore
     }
 
     @Override
-    @Deprecated
     public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {

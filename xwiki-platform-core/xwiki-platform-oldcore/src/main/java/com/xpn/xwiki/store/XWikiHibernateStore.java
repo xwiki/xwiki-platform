@@ -84,6 +84,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
+import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.XWikiSpace;
@@ -2313,7 +2314,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -2321,7 +2321,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String parametrizedSqlClause, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -2329,7 +2328,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String parametrizedSqlClause, int nb, int start,
         List<?> parameterValues, XWikiContext context) throws XWikiException
     {
@@ -2338,7 +2336,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -2353,14 +2350,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException
     {
         return searchDocumentsNames(wheresql, 0, 0, "", context);
     }
 
     @Override
-    @Deprecated
     public List<DocumentReference> searchDocumentReferences(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -2368,7 +2363,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
@@ -2384,7 +2378,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
@@ -2399,7 +2392,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public <T> List<T> search(String sql, int nb, int start, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
@@ -2414,7 +2406,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public <T> List<T> search(String sql, int nb, int start, Object[][] whereParams, List<?> parameterValues,
         XWikiContext inputxcontext) throws XWikiException
     {
@@ -2440,11 +2431,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 sql += generateWhereStatement(whereParams);
             }
 
-            Query query = session.createQuery(filterSQL(sql));
+            String statement = filterSQL(sql);
+            Query query = session.createQuery(statement);
 
-            // Add values for provided HQL request containing "?" characters where to insert real
-            // values.
-            int parameterId = injectParameterListToQuery(0, query, parameterValues);
+            // Add values for provided HQL request ordinal parameters
+            int parameterId = injectParameterListToQuery(
+                LegacySessionImplementor.containsLegacyOrdinalStatement(statement) ? 0 : 1, query, parameterValues);
 
             if (whereParams != null) {
                 for (Object[] whereParam : whereParams) {
@@ -2577,7 +2569,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public int countDocuments(String parametrizedSqlClause, List<?> parameterValues, XWikiContext context)
         throws XWikiException
     {
@@ -2602,9 +2593,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * @since 2.2M1
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     private List<DocumentReference> searchDocumentReferencesInternal(String sql, int nb, int start,
         List<?> parameterValues, XWikiContext inputxcontext) throws XWikiException
     {
@@ -2701,7 +2690,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
-    @Deprecated
     public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, boolean customMapping,
         boolean checkRight, int nb, int start, List<?> parameterValues, XWikiContext inputxcontext)
         throws XWikiException

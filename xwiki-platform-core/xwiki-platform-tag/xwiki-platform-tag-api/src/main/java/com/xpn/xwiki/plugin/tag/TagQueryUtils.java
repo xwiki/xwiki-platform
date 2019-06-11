@@ -102,7 +102,7 @@ public final class TagQueryUtils
             XWikiContext context) throws XWikiException
     {
         List<String> results = null;
-        Map<String, Integer> tagCount = new TreeMap<String, Integer>(String.CASE_INSENSITIVE_ORDER);
+        Map<String, Integer> tagCount = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         String from = "select elements(prop.list) from XWikiDocument as doc, BaseObject as tagobject, "
             + "DBStringListProperty as prop";
@@ -119,7 +119,7 @@ public final class TagQueryUtils
 
         List<?> params = parameterValues;
         if (params == null) {
-            params = new ArrayList<String>();
+            params = new ArrayList<>();
         }
         String hql = from + where;
 
@@ -135,7 +135,7 @@ public final class TagQueryUtils
         }
 
         Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
-        Map<String, String> processedTags = new HashMap<String, String>();
+        Map<String, String> processedTags = new HashMap<>();
 
         // We have to manually build a cardinality map since we have to ignore tags case.
         for (String result : results) {

@@ -330,8 +330,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     {
         executeWrite(context, session -> {
             session
-                .createQuery(
-                    "delete from " + XWikiRCSNodeInfo.class.getName() + " where id." + FIELD_DOCID + '=' + FIELD_DOCID)
+                .createQuery("delete from " + XWikiRCSNodeInfo.class.getName() + " where id." + FIELD_DOCID + '=' + ':'
+                    + FIELD_DOCID)
                 .setParameter(FIELD_DOCID, doc.getId()).executeUpdate();
             return null;
         });

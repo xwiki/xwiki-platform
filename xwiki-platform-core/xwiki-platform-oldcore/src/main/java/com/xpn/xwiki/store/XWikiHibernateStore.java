@@ -43,6 +43,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.FlushMode;
@@ -2280,6 +2281,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
+    private <T> Query<T> createQuery(Session session, String statement, Collection<?> parameterValues)
+    {
+        Query<T> query = session.createQuery(statement);
+
+        injectParameterListToQuery(LegacySessionImplementor.containsLegacyOrdinalStatement(statement) ? 0 : 1, query,
+            parameterValues);
+
+        return query;
+    }
+
     /**
      * Add values into named query.
      *
@@ -2432,15 +2443,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             String statement = filterSQL(sql);
-            Query query = session.createQuery(statement);
+            boolean legacyOrdinal = LegacySessionImplementor.containsLegacyOrdinalStatement(statement);
+            Query<T> query = session.createQuery(statement);
 
-            // Add values for provided HQL request ordinal parameters
-            int parameterId = injectParameterListToQuery(
-                LegacySessionImplementor.containsLegacyOrdinalStatement(statement) ? 0 : 1, query, parameterValues);
+            injectParameterListToQuery(legacyOrdinal ? 0 : 1, query, parameterValues);
 
             if (whereParams != null) {
+                int parameterIndex = CollectionUtils.size(parameterValues);
+                if (legacyOrdinal) {
+                    ++parameterIndex;
+                }
                 for (Object[] whereParam : whereParams) {
-                    query.setString(parameterId++, (String) whereParam[1]);
+                    query.setParameter(parameterIndex++, (String) whereParam[1]);
                 }
             }
 
@@ -2630,9 +2644,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     /**
      * @since 2.2M1
-     * @deprecated since 11.5RC1, 0 based HQL parameters are not allowed anymore, use {@link QueryManager} instead
      */
-    @Deprecated
     private <T> List<T> searchGenericInternal(String sql, int nb, int start, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -2647,9 +2659,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             checkHibernate(context);
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
-            Query query = session.createQuery(filterSQL(sql));
-
-            injectParameterListToQuery(0, query, parameterValues);
+            Query query = createQuery(session, filterSQL(sql), parameterValues);
 
             if (start != 0) {
                 query.setFirstResult(start);
@@ -2722,9 +2732,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             Session session = getSession(context);
 
-            Query query = session.createQuery(filterSQL(sql));
-
-            injectParameterListToQuery(0, query, parameterValues);
+            Query query = createQuery(session, filterSQL(sql), parameterValues);
 
             if (start != 0) {
                 query.setFirstResult(start);

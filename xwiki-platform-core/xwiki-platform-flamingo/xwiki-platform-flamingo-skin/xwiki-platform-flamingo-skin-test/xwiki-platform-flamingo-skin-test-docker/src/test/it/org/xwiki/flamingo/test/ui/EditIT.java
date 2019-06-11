@@ -37,9 +37,7 @@ import org.xwiki.panels.test.po.DocumentInformationPanel;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
@@ -61,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * @version $Id$
  * @since 11.2RC1
  */
-@UITest(database = Database.MYSQL, databaseTag = "5.7", servletEngine = ServletEngine.TOMCAT, servletEngineTag = "8.5", browser = Browser.CHROME)
+@UITest
 public class EditIT
 {
     @BeforeAll
@@ -381,7 +379,7 @@ public class EditIT
     }
 
     /**
-     * This tests a complete scenario of edit with conflicts, manipulating the merging conflict window.
+     * A complete scenario of edit with conflicts, manipulating the merging conflict window.
      * The following scenario is performed by doing edition of the same document in two tabs:
      *   1. Edit same line, save&continue, ensure the merge conflict window appears,
      *      Save with fixing merge conflict by merging and using current changes
@@ -708,7 +706,10 @@ public class EditIT
             "Data truncation: Data too long for column 'XWD_TITLE' at row 1",
             "SQL Error: 3401, SQLState: 22001",
             "SQL Error: -3401, SQLState: 22001",
+            "SQL Error: 0, SQLState: 22001",
             "data exception: string data, right truncation",
+            "SQL Error: 12899, SQLState: 72000",
+            "ORA-12899: value too large for column \"XWIKI\".\"XWIKIDOC\".\"XWD_TITLE\" (actual: 300, maximum: 255)",
             // PostgreSQL specific log
             "value too long for type character varying(255)"
         );

@@ -30,6 +30,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
@@ -91,7 +92,8 @@ public class DefaultWikiComponentBuilder implements WikiComponentBuilder, WikiCo
             XWikiContext xcontext = xcontextProvider.get();
             results.addAll(xcontext.getWiki().getStore().searchDocumentReferences(query, parameters, xcontext));
         } catch (XWikiException e) {
-            this.logger.error("Failed to search for existing wiki components [{}]", e.getMessage());
+            this.logger.warn("Failed to get document references for existing wiki components. Considering there's no "
+                + "wiki component. Root cause: [{}]", ExceptionUtils.getRootCauseMessage(e));
         }
 
         return results;

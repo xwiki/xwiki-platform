@@ -410,7 +410,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.2.18</version>
+        <version>1.2.19</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>

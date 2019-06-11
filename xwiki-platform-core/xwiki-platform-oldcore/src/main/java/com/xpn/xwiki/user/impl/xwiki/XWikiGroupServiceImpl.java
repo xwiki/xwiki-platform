@@ -415,7 +415,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         StringBuilder where = new StringBuilder(" where doc.fullName=obj.name");
         parameterValues.add(classtemplate);
-        parameterValues.add(" and doc.fullName<>?" + parameterValues.size());
+        where.append(" and doc.fullName<>?" + parameterValues.size());
         parameterValues.add("XWiki." + documentClass);
         where.append(" and obj.className=?" + parameterValues.size());
 

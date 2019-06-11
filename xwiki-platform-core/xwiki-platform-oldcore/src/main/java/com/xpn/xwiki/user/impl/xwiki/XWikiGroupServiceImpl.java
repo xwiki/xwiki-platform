@@ -413,11 +413,13 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         StringBuilder from = new StringBuilder(", BaseObject as obj");
 
-        StringBuilder where = new StringBuilder(" where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
+        StringBuilder where = new StringBuilder(" where doc.fullName=obj.name");
         parameterValues.add(classtemplate);
+        parameterValues.add(" and doc.fullName<>?" + parameterValues.size());
         parameterValues.add("XWiki." + documentClass);
+        where.append(" and obj.className=?" + parameterValues.size());
 
-        Map<String, String> fieldMap = new HashMap<String, String>();
+        Map<String, String> fieldMap = new HashMap<>();
         int fieldIndex = 0;
 
         // Manage object match strings
@@ -435,20 +437,20 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                         from.append(", " + type + " as " + fieldPrefix);
 
                         where.append(" and obj.id=" + fieldPrefix + ".id.id");
-                        where.append(" and " + fieldPrefix + ".name=?");
                         parameterValues.add(fieldName);
+                        where.append(" and " + fieldPrefix + ".name=?" + parameterValues.size());
                         ++fieldIndex;
                     } else {
                         fieldPrefix = fieldMap.get(fieldName);
                     }
 
-                    where.append(" and lower(" + fieldPrefix + ".value) like ?");
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+                    where.append(" and lower(" + fieldPrefix + ".value) like ?" + parameterValues.size());
 
                     fieldMap.put(fieldName, fieldPrefix);
                 } else {
-                    where.append(" and lower(doc." + fieldName + ") like ?");
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+                    where.append(" and lower(doc." + fieldName + ") like ?" + parameterValues.size());
                 }
             }
         }
@@ -476,8 +478,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                         from.append(", " + type + " as " + fieldPrefix);
 
                         where.append(" and obj.id=" + fieldPrefix + ".id.id");
-                        where.append(" and " + fieldPrefix + ".name=?");
+
                         parameterValues.add(fieldName);
+                        where.append(" and " + fieldPrefix + ".name=?" + parameterValues.size());
+
                         ++fieldIndex;
                     } else {
                         fieldPrefix = fieldMap.get(fieldName);

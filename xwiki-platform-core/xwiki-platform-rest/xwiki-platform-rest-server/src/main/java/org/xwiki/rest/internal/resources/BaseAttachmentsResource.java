@@ -190,7 +190,7 @@ public class BaseAttachmentsResource extends XWikiResource
 
         statement.append(" where ").append(StringUtils.join(whereClause, " and "));
 
-        Query query = queryManager.createQuery(statement.toString(), Query.XWQL);
+        Query query = queryManager.createQuery(statement.toString(), Query.HQL);
 
         // Bind the query parameter values.
         for (Map.Entry<String, String> entry : exactParams.entrySet()) {

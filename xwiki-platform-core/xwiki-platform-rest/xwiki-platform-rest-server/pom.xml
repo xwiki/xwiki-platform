@@ -32,8 +32,8 @@
   <name>XWiki Platform - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.09</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>20</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>29</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

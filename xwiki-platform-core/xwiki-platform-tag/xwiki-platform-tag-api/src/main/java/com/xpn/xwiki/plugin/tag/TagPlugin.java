@@ -203,9 +203,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         if (!StringUtils.isBlank(spaceReference)) {
             StringBuilder where = new StringBuilder();
             where.append('(');
-            where.append("doc.space = ?");
+            where.append("doc.space = ?1");
             where.append(" OR ");
-            where.append("doc.space LIKE ?");
+            where.append("doc.space LIKE ?2");
             where.append(')');
 
             // Make sure to escape the LIKE syntax
@@ -234,20 +234,20 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     {
         List<String> spaceRefList = TagParamUtils.spacesParameterToList(spaces);
 
-        List<Object> queryParameter = new ArrayList<>();
+        List<Object> queryParameters = new ArrayList<>();
         StringBuilder where = new StringBuilder();
         boolean first = true;
         for (String spaceReference : spaceRefList) {
             if (first) {
-                where.append("(doc.space = ? ");
+                where.append("(doc.space = ?1 ");
                 first = false;
             } else {
-                where.append(" OR doc.space = ? ");
+                where.append(" OR doc.space = ?1 ");
             }
-            queryParameter.add(spaceReference);
-            where.append("OR doc.space LIKE ?");
+            queryParameters.add(spaceReference);
+            where.append("OR doc.space LIKE ?2");
             String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll(LIKE_REPLACEMENT);
-            queryParameter.add(escapedSpaceReference + LIKE_APPEND);
+            queryParameters.add(escapedSpaceReference + LIKE_APPEND);
         }
         // if first is true the "for" loop never ran, and spaces is empty
         // so only close brace if first is false
@@ -255,7 +255,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             where.append(')');
         }
 
-        return getTagCountForQuery("", where.toString(), queryParameter, context);
+        return getTagCountForQuery("", where.toString(), queryParameters, context);
     }
 
     /**

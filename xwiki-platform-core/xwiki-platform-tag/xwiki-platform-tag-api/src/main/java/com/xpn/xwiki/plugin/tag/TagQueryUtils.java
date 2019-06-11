@@ -186,20 +186,20 @@ public final class TagQueryUtils
         throws XWikiException
     {
         List<String> results;
-        List<Object> parameters = new ArrayList<>();
-        parameters.add(TagPlugin.TAG_CLASS);
-        parameters.add(tag);
-        String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item where obj.className=? and "
-            + "obj.name=doc.fullName and obj.id=prop.id.id and prop.id.name='tags' and lower(item)=lower(?) order by "
-            + "doc.fullName";
+
+        String hql = ", BaseObject as obj, DBStringListProperty as prop join prop.list item"
+            + " where obj.className=:className and obj.name=doc.fullName and obj.id=prop.id.id and prop.id.name='tags'"
+            + " and lower(item)=lower(:item) order by doc.fullName";
 
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            query.bindValues(parameters);
+            query.bindValue("className", TagPlugin.TAG_CLASS);
+            query.bindValue("item", tag);
             query.addFilter(Utils.getComponent(QueryFilter.class, UniqueDocumentFilter.HINT));
             if (!includeHiddenDocuments) {
                 query.addFilter(Utils.getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             }
+
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,

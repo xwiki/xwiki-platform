@@ -70,8 +70,8 @@ public class LegacyEventLoader
         EventGroup result = new EventGroup();
 
         try {
-            Query query = queryManager.createQuery("where event.requestId = ?", Query.HQL);
-            query.bindValue(0, event.getGroupId());
+            Query query = queryManager.createQuery("where event.requestId = :requestId", Query.HQL);
+            query.bindValue("requestId", event.getGroupId());
             List<Event> events = searchEvents(query);
             result.addEvents(events.toArray(new Event[0]));
         } catch (Exception e) {

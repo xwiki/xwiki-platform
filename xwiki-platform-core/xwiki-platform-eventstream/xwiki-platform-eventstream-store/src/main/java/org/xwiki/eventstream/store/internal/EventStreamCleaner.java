@@ -62,8 +62,8 @@ public class EventStreamCleaner
         int days = configuration.getNumberOfDaysToKeep();
         if (days > 0) {
             try {
-                Query query = queryManager.createQuery("where event.date < ?", Query.HQL);
-                query.bindValue(0, DateUtils.addDays(new Date(), -days));
+                Query query = queryManager.createQuery("where event.date < :date", Query.HQL);
+                query.bindValue("date", DateUtils.addDays(new Date(), -days));
                 for (Event event : eventStream.searchEvents(query)) {
                     eventStream.deleteEvent(event);
                 }

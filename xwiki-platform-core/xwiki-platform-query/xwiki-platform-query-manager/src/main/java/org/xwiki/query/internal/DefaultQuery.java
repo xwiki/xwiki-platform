@@ -199,6 +199,14 @@ public class DefaultQuery implements SecureQuery
     }
 
     @Override
+    public Query bindValues(Map<String, ?> values)
+    {
+        values.forEach(this::bindValue);
+
+        return this;
+    }
+
+    @Override
     public QueryParameter bindValue(String var)
     {
         QueryParameter parameter = new DefaultQueryParameter(this);

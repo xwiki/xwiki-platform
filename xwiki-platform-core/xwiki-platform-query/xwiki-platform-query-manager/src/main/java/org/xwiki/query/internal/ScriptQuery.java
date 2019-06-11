@@ -182,6 +182,13 @@ public class ScriptQuery implements SecureQuery
     }
 
     @Override
+    public Query bindValues(Map<String, ?> values)
+    {
+        this.query.bindValues(values);
+        return this;
+    }
+
+    @Override
     public QueryParameter bindValue(String var)
     {
         QueryParameter parameter = this.query.bindValue(var);

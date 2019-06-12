@@ -1022,16 +1022,16 @@ public final class RightsManager
 
         StringBuilder where =
             new StringBuilder(", BaseObject as obj" + ", " + fieldTypeName + " as prop where doc.fullName=obj.name"
-                + " and (obj.className=? or obj.className=?)");
+                + " and (obj.className=?1 or obj.className=?2)");
         parameterValues.add(rightClass.getName());
         parameterValues.add(globalRightClass.getName());
 
         where.append(" and obj.id=prop.id.id");
 
-        where.append(" and prop.name=?");
+        where.append(" and prop.name=?3");
         parameterValues.add(fieldName);
 
-        where.append(" and prop.value like ?");
+        where.append(" and prop.value like ?4");
 
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(userOrGroupWiki)) {
             if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {

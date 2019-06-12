@@ -1,4 +1,5 @@
 org.xwiki.legacy.internal.oldcore.notification.LegacyNotificationDispatcher
+com.xpn.xwiki.internal.mandatory.SheetClassDocumentInitializer
 com.xpn.xwiki.internal.model.reference.DeprecatedCompactStringEntityReferenceSerializer
 com.xpn.xwiki.internal.model.reference.DeprecatedCompactWikiStringEntityReferenceSerializer
 com.xpn.xwiki.internal.model.reference.DeprecatedCurrentMixedReferenceDocumentReferenceResolver

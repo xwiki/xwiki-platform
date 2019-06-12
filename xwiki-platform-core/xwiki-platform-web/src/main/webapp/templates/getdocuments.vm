@@ -20,7 +20,7 @@ $response.setContentType("application/json")
   #set ($discard = $queryParams.add($services.query.parameter().literal("$!{request.childrenOf}.").anyChars()))
   #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName LIKE ?${queryParams.size()}")
   #set ($discard = $queryParams.add("${request.childrenOf}.WebHome"))
-  #set ($whereQueryPart = "${whereQueryPart} doc.fullName <> ?${queryParams.size()}")
+  #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?${queryParams.size()}")
 #end
 ## Exclude some documents
 #set ($excludes = $request.getParameterValues('exclude'))

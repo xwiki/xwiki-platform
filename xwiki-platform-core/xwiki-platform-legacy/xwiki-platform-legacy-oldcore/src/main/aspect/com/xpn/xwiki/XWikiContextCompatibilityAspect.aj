@@ -124,6 +124,30 @@ public privileged aspect XWikiContextCompatibilityAspect
     }
 
     /**
+     * @deprecated never made any sense since the context wiki can change any time
+     */
+    @Deprecated
+    public void XWikiContext.setWikiOwner(String wikiOwner)
+    {
+        // Cannot do anything
+    }
+
+    /**
+     * @deprecated use {@link XWiki#getWikiOwner(String, XWikiContext)} instead
+     */
+    @Deprecated
+    public String XWikiContext.getWikiOwner()
+    {
+        try {
+            return getWiki().getWikiOwner(getWikiId(), this);
+        } catch (XWikiException e) {
+            LOGGER.error("Failed to get owner for wiki [{}]", getWikiId(), e);
+        }
+
+        return null;
+    }
+
+    /**
      * @deprecated since 6.0M1, use {@link #setInterfaceLocale(Locale)} instead
      */
     @Deprecated

@@ -746,30 +746,6 @@ public class XWikiContext extends Hashtable<Object, Object>
         this.finished = finished;
     }
 
-    /**
-     * @deprecated never made any sense since the context wiki can change any time
-     */
-    @Deprecated
-    public void setWikiOwner(String wikiOwner)
-    {
-        // Cannot do anything
-    }
-
-    /**
-     * @deprecated use {@link XWiki#getWikiOwner(String, XWikiContext)} instead
-     */
-    @Deprecated
-    public String getWikiOwner()
-    {
-        try {
-            return getWiki().getWikiOwner(getWikiId(), this);
-        } catch (XWikiException e) {
-            LOGGER.error("Failed to get owner for wiki [{}]", getWikiId(), e);
-        }
-
-        return null;
-    }
-
     public XWikiDocument getWikiServer()
     {
         String currentWiki = getWikiId();

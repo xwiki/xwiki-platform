@@ -85,10 +85,10 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
-import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.XWikiSpace;
+import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseElement;
@@ -825,10 +825,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     private long countAllDocuments(SpaceReference spaceReference, Session session, String extraWhere,
-        Object... extraParameters)
+        Map<String, ?> parameters)
     {
-        StringBuilder builder =
-            new StringBuilder("select count(*) from XWikiDocument as xwikidoc where (space = ? OR space LIKE ?)");
+        StringBuilder builder = new StringBuilder(
+            "select count(*) from XWikiDocument as xwikidoc where (space = :space OR space LIKE :like)");
 
         if (StringUtils.isNotEmpty(extraWhere)) {
             builder.append(" AND ");
@@ -841,15 +841,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
         String localSpaceReference = this.localEntityReferenceSerializer.serialize(spaceReference);
 
-        int index = 0;
+        query.setParameter("space", localSpaceReference);
+        query.setParameter("like", localSpaceReference + ".%");
 
-        query.setParameter(index++, localSpaceReference);
-        query.setParameter(index++, localSpaceReference + ".%");
-
-        if (extraParameters != null) {
-            for (Object parameter : extraParameters) {
-                query.setParameter(index++, parameter);
-            }
+        if (parameters != null) {
+            parameters.forEach(query::setParameter);
         }
 
         return query.uniqueResult();
@@ -863,10 +859,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         // If there is at least one visible document then the space is visible
         StringBuilder builder = new StringBuilder("(hidden = false OR hidden IS NULL)");
 
-        Object[] parameters;
+        Map<String, ?> parameters;
         if (documentToIngore != null) {
-            builder.append(" AND fullName <> ?");
-            parameters = new Object[] { documentToIngore };
+            builder.append(" AND fullName <> :documentToIngore");
+            parameters = Collections.singletonMap("documentToIngore", documentToIngore);
         } else {
             parameters = null;
         }
@@ -1166,8 +1162,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private void maybeDeleteXWikiSpace(SpaceReference spaceReference, String deletedDocument, Session session)
     {
-        if (countAllDocuments(spaceReference, session, "fullName <> ? AND (language IS NULL OR language = '')",
-            deletedDocument) == 0) {
+        if (countAllDocuments(spaceReference, session,
+            "fullName <> :deletedDocument AND (language IS NULL OR language = '')",
+            Collections.singletonMap("deletedDocument", deletedDocument)) == 0) {
             // The document was the last document in the space
             XWikiSpace space = new XWikiSpace(spaceReference, this);
 

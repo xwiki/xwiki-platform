@@ -128,15 +128,15 @@ public class EscapeLikeParametersFilterTest
         when(query.getStatement()).thenReturn("select a from b where doc.space=?2 and ref like ?1");
 
         Map<Integer, Object> parameters = new LinkedHashMap<>();
-        parameters.put(0,
+        parameters.put(1,
             new DefaultQueryParameter(query).literal("wiki:space1.space\\.2.space!3.WebHome"));
-        parameters.put(1, "wiki:space1.space\\.2.space!3.WebHome");
+        parameters.put(2, "wiki:space1.space\\.2.space!3.WebHome");
         when(query.getPositionalParameters()).thenReturn(parameters);
 
         Query filteredQuery = this.filter.filterQuery(query);
         assertEquals("SELECT a FROM b WHERE doc.space = ?2 AND ref LIKE ?1 ESCAPE '!'", filteredQuery.getStatement());
-        assertEquals("wiki:space1.space\\.2.space!!3.WebHome", filteredQuery.getPositionalParameters().get(0));
-        assertEquals("wiki:space1.space\\.2.space!3.WebHome", filteredQuery.getPositionalParameters().get(1));
+        assertEquals("wiki:space1.space\\.2.space!!3.WebHome", filteredQuery.getPositionalParameters().get(1));
+        assertEquals("wiki:space1.space\\.2.space!3.WebHome", filteredQuery.getPositionalParameters().get(2));
     }
 
     @Test

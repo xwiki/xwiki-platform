@@ -23,6 +23,7 @@ import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.rendering.listener.reference.ResourceReference;
+import org.xwiki.rendering.listener.reference.ResourceType;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.office.OfficeMacro}.
@@ -37,8 +38,18 @@ public class OfficeMacroParameters
      *
      * @see OfficeMacroParameters#setReference(ResourceReference)
      */
-    public interface OfficeResourceReference
+    public static class OfficeResourceReference extends ResourceReference
     {
+        /**
+         * Creates a new office resource reference.
+         * 
+         * @param reference the resource reference
+         * @param type the resource type
+         */
+        public OfficeResourceReference(String reference, ResourceType type)
+        {
+            super(reference, type);
+        }
     }
 
     /**

@@ -1977,8 +1977,8 @@ public class XWiki extends Api
     /**
      * API to retrieve the URL of an a Wiki Document in any mode. The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
-     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment).
-     * It is important to always use the URL functions to generate URL and never hardcode URLs.
+     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment). It
+     * is important to always use the URL functions to generate URL and never hardcode URLs.
      *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible.

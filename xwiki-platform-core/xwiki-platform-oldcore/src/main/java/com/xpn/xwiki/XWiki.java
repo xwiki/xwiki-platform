@@ -1836,7 +1836,8 @@ public class XWiki implements EventListener
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG,
                     "Cannot create document {0} because its full path is too long: only {1} characters are allowed and "
-                        + "current length is {2}.", null, args);
+                        + "current length is {2}.",
+                    null, args);
             }
 
             // Setting comment & minor edit before saving
@@ -4700,7 +4701,7 @@ public class XWiki implements EventListener
         // side effect of hidding hidden documents and no other workaround exists than directly using
         // XWikiStoreInterface#search directly
         String sql = "select distinct doc.fullName from XWikiDocument as doc";
-        List<String> parameters = new ArrayList<String>();
+        List<String> parameters = new ArrayList<>();
         if (space != null) {
             parameters.add(space);
             sql += " where doc.space = ?" + parameters.size();
@@ -4710,9 +4711,8 @@ public class XWiki implements EventListener
             try {
                 context.setWikiId(targetWiki);
                 List<String> list = getStore().search(sql, 0, 0, parameters, context);
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("Deleting " + list.size() + " documents from wiki " + targetWiki);
-                }
+
+                LOGGER.info("Deleting [{}] documents from wiki [{}]", list.size(), targetWiki);
 
                 for (String docname : list) {
                     XWikiDocument doc = getDocument(docname, context);
@@ -4726,9 +4726,8 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(sourceWiki);
             List<String> list = getStore().search(sql, 0, 0, parameters, context);
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Copying " + list.size() + " documents from wiki " + sourceWiki + " to wiki " + targetWiki);
-            }
+
+            LOGGER.info("Copying [{}] documents from wiki [{}] to wiki [{}]", list.size(), sourceWiki, targetWiki);
 
             WikiReference sourceWikiReference = new WikiReference(sourceWiki);
             WikiReference targetWikiReference = new WikiReference(targetWiki);
@@ -7394,7 +7393,7 @@ public class XWiki implements EventListener
                 + parametrizedSqlClause,
             nb, start, parameterValues, context);
 
-        HashMap<String, List<String>> filenamesByDocFullName = new HashMap<String, List<String>>();
+        HashMap<String, List<String>> filenamesByDocFullName = new HashMap<>();
 
         // Put each attachment name with the document name it belongs to
         for (int i = 0; i < results.size(); i++) {
@@ -7406,7 +7405,7 @@ public class XWiki implements EventListener
             filenamesByDocFullName.get(docFullName).add(filename);
         }
 
-        List<XWikiAttachment> out = new ArrayList<XWikiAttachment>();
+        List<XWikiAttachment> out = new ArrayList<>();
 
         // Index through the document names, get relivent attachments
         for (Map.Entry<String, List<String>> entry : filenamesByDocFullName.entrySet()) {

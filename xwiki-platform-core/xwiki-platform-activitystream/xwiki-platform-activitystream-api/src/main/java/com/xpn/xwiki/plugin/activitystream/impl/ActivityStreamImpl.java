@@ -701,7 +701,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         throws ActivityStreamException
     {
         List<Object> parameterValues = Arrays.<Object>asList(space, String.format(NESTED_SPACE_FORMAT, space));
-        return searchEvents("act.space=? OR act.space LIKE ?", filter, false, nb, start, parameterValues, context);
+        return searchEvents("act.space=?1 OR act.space LIKE ?2", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
@@ -709,7 +709,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         throws ActivityStreamException
     {
         List<Object> parameterValues = Arrays.<Object>asList(user);
-        return searchEvents("act.user=?", filter, false, nb, start, parameterValues, context);
+        return searchEvents("act.user=?1", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
@@ -717,7 +717,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         throws ActivityStreamException
     {
         List<Object> parameterValues = Arrays.<Object>asList(stream);
-        return searchEvents("act.stream=?", filter, false, nb, start, parameterValues, context);
+        return searchEvents("act.stream=?1", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
@@ -725,7 +725,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         XWikiContext context) throws ActivityStreamException
     {
         List<Object> parameterValues = Arrays.<Object>asList(stream, space, String.format(NESTED_SPACE_FORMAT, space));
-        return searchEvents("act.stream=? AND (act.space=? OR act.space LIKE ?)", filter, false, nb, start,
+        return searchEvents("act.stream=?1 AND (act.space=?2 OR act.space LIKE ?3)", filter, false, nb, start,
             parameterValues, context);
     }
 
@@ -734,7 +734,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         XWikiContext context) throws ActivityStreamException
     {
         List<Object> parameterValues = Arrays.<Object>asList(stream, user);
-        return searchEvents("act.stream=? AND act.user=?", filter, false, nb, start, parameterValues, context);
+        return searchEvents("act.stream=?1 AND act.user=?2", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
@@ -968,7 +968,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         List<Object> params = new ArrayList<>();
         params.add(event.getRequestId());
 
-        return this.searchEvents("", "act.requestId= ? ", false, false, 0, 0, params, context);
+        return this.searchEvents("", "act.requestId= ?1 ", false, false, 0, 0, params, context);
     }
 
     @Override

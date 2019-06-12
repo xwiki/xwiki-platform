@@ -188,9 +188,15 @@ public class SuggestInputElement extends BaseElement
     public SuggestInputElement waitForSuggestions()
     {
         // Wait for the suggestions to be fetched from the server and for the suggestion drop down list to be visible.
-        getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading")
-            && !driver.findElements(By.cssSelector(".selectize-dropdown.active")).isEmpty());
-
+        // Use a different timeout since it might take a bit more time on the CI.
+        int originalTimeout = getDriver().getTimeout();
+        try {
+            getDriver().setTimeout(20);
+            getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading")
+                && !driver.findElements(By.cssSelector(".selectize-dropdown.active")).isEmpty());
+        } finally {
+            getDriver().setTimeout(originalTimeout);
+        }
         return this;
     }
 

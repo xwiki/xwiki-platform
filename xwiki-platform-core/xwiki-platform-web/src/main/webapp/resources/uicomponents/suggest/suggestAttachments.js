@@ -662,10 +662,79 @@ define('xwiki-suggestAttachments', [
   };
 });
 
-require(['jquery', 'xwiki-suggestAttachments', 'xwiki-events-bridge'], function($) {
+define('xwiki-attachmentResourcePicker', ['jquery', 'xwiki-suggestAttachments'], function($) {
+  'use strict';
+
+  // Load the selected values only if they represent attachment resources.
+  var overwriteLoadSelected = function() {
+    adjustOptions(this.selectize);
+    var oldLoadSelected = this.selectize.settings.loadSelected;
+    this.selectize.settings.loadSelected = function(value, callback) {
+      var option = this.options[value];
+      if (!option || !option.data) {
+        // Load attachment information.
+        oldLoadSelected.apply(this, arguments);
+      } else {
+        // Nothing to load.
+        callback(value);
+      }
+    }
+  };
+
+  // We need to remove the 'attach:' prefix from the selected values that represent attachment resources (before they
+  // are loaded) because the attachment picker expects an attachment reference.
+  var adjustOptions = function(selectize) {
+    // Iterate the keys because we're going to modify the options map.
+    Object.keys(selectize.options).forEach(function(value) {
+      var option = selectize.options[value];
+      var resourceReference = getResourceReference(value, selectize.settings.supportedResourceTypes);
+      if (resourceReference.type === 'attach') {
+        if (value !== resourceReference.reference) {
+          // Update the option value to discard the 'attach:' prefix.
+          option[selectize.settings.valueField] = resourceReference.reference;
+          selectize.updateOption(value, option);
+        }
+      } else if (!option.data) {
+        // Mark this option so that we don't load it from the server.
+        option.data.resourceReference = resourceReference;
+      }
+    });
+  };
+
+  var getResourceReference = function(value, supportedResourceTypes) {
+    var separatorIndex = value.indexOf(':');
+    if (separatorIndex >= 0) {
+      var type = value.substring(0, separatorIndex).toLowerCase();
+      if (supportedResourceTypes.indexOf(type) >= 0) {
+        return {type: type, reference: value.substring(separatorIndex + 1)};
+      }
+    }
+    return {type: 'attach', reference: value};
+  };
+
+  $.fn.pickAttachmentResource = function(settings) {
+    return this.on('initialize', overwriteLoadSelected).each(function() {
+      var actualSettings = $.extend({
+        supportedResourceTypes: $(this).data('supportedResourceTypes') || 'attach, data, url, path, unc'
+      }, settings);
+      if (typeof actualSettings.supportedResourceTypes === 'string') {
+        actualSettings.supportedResourceTypes = actualSettings.supportedResourceTypes.split(/\s*,\s*/)
+          .filter(function(type) {
+            return type.length > 0;
+          }).map(function(type) {
+            return type.toLowerCase();
+          });
+      }
+      $(this).suggestAttachments(actualSettings);
+    });
+  };
+});
+
+require(['jquery', 'xwiki-suggestAttachments', 'xwiki-attachmentResourcePicker', 'xwiki-events-bridge'], function($) {
   var init = function(event, data) {
     var container = $((data && data.elements) || document);
     container.find('.suggest-attachments').suggestAttachments();
+    container.find('.pick-attachment-resource').pickAttachmentResource();
   };
 
   $(document).on('xwiki:dom:updated', init);

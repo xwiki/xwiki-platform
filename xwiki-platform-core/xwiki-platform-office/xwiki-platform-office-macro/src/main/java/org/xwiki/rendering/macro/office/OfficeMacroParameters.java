@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.macro.office;
 
+import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 
 /**
@@ -30,6 +32,15 @@ import org.xwiki.rendering.listener.reference.ResourceReference;
  */
 public class OfficeMacroParameters
 {
+    /**
+     * The type used to associate a picker to the {@code reference} parameter.
+     *
+     * @see OfficeMacroParameters#setReference(ResourceReference)
+     */
+    public interface OfficeResourceReference
+    {
+    }
+
     /**
      * The office attachment to be viewed. Use an attachment string reference to specify which office file should be
      * viewed: {@code file.ppt}, {@code Page@file.doc}, {@code Space.Page@file.xls} or {@code wiki:Space.Page@file.odt}.
@@ -68,6 +79,7 @@ public class OfficeMacroParameters
      */
     @PropertyDescription("The office attachment to be viewed. Use an attachment string reference to specify which "
         + "office file should be viewed: file.ppt, Page@file.doc, Space.Page@file.xls or wiki:Space.Page@file.odt.")
+    @PropertyDisplayType(AttachmentReference.class)
     @Deprecated
     public void setAttachment(String attachment)
     {
@@ -95,6 +107,7 @@ public class OfficeMacroParameters
         + " office file should be viewed:"
         + " attach:file.ppt, attach:Page@file.doc, attach:Space.Page@file.xls, attach:wiki:Space.Page@file.odt,"
         + " url:http://some/remote/file.ppt.")
+    @PropertyDisplayType(OfficeResourceReference.class)
     public void setReference(ResourceReference reference)
     {
         this.reference = reference;

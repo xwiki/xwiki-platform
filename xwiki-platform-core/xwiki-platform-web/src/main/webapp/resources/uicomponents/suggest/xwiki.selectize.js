@@ -143,15 +143,11 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   };
 
   var loadSelectedValues = function() {
-    var values = $(this).val();
-    if (!$.isArray(values)) {
-      values = [values]
-    }
     var selectize = this.selectize;
     var wrapper = selectize.$wrapper;
     wrapper.addClass(selectize.settings.loadingClass);
     selectize.loading++;
-    values.reduce(function(deferred, value) {
+    selectize.items.reduce(function(deferred, value) {
       return deferred.then(function() {
         return loadSelectedValue(selectize, value);
       });
@@ -235,16 +231,24 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
 
   $.fn.xwikiSelectize = function(settings) {
     // Save the width before the input is hidden.
-    this.data('initialWidth', this.width());
+    // Each input in the current collection might have a different initial width.
+    this.each(function() {
+      $(this).data('initialWidth', $(this).width());
+    });
     return this.not('.selectized, .selectize-control')
-      .selectize(getSettings(this, settings))
-      .each(customize).each(loadSelectedValues)
+      .on('initialize', customize)
       .on('change', function(event) {
         // Update the live table if the widget is used as a live table filter.
         var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
           .closest('.xwiki-livetable').attr('id');
         liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
-      });
+      })
+      // Each input in the current collection might have different in-line settings.
+      .each(function() {
+        $(this).selectize(getSettings($(this), settings));
+      })
+      .trigger('initialize')
+      .each(loadSelectedValues);
   };
 });
 

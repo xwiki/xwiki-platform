@@ -29,6 +29,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -63,7 +64,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         "ratingsSpacePerSpace";
 
     @Inject
-    private Logger LOGGER;
+    private Logger logger;
 
     @Inject
     @Named("user/current")
@@ -105,9 +106,8 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     public boolean hasRatingsSpaceForeachSpace(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.separatepagemanager.ratingsspaceforeachspace", "0");
-        result =
-            getXWiki().getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", result,
-                getXWikiContext());
+        result = getXWiki().getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", result,
+            getXWikiContext());
         return (getRatingsConfiguration().getConfigurationParameter(documentRef,
             RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, result).equals("1"));
     }
@@ -170,8 +170,8 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     public List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
         throws RatingsException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Calling separate page manager code for ratings");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Calling separate page manager code for ratings");
         }
 
         String sql =
@@ -245,7 +245,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     public Rating getRating(String ratingId) throws RatingsException
     {
         try {
-            int i1 = ratingId.indexOf(".");
+            int i1 = StringUtils.indexOf(ratingId, '.');
             if (i1 == -1) {
                 throw new RatingsException(RatingsException.MODULE_PLUGIN_RATINGS,
                     RatingsException.ERROR_RATINGS_INVALID_RATING_ID, "Invalid rating ID, cannot parse rating id");

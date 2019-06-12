@@ -127,14 +127,14 @@ public final class RightsManager
     /**
      * Used to resolve document reference based on another reference.
      */
-    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "explicit");
+    private DocumentReferenceResolver<String> explicitDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "explicit");
 
     /**
      * Used to resolve reference based on context.
      */
-    private DocumentReferenceResolver<String> currentDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "current");
+    private DocumentReferenceResolver<String> currentDocumentReferenceResolver =
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
 
     /**
      * Hidden constructor of RightsManager only access via getInstance().
@@ -293,7 +293,7 @@ public final class RightsManager
             return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
         }
 
-        List<Object> userOrGroupList = new ArrayList<Object>();
+        List<Object> userOrGroupList = new ArrayList<>();
 
         int nbGlobalUsersOrGroups = countAllGlobalUsersOrGroups(user, null, context);
 
@@ -301,8 +301,8 @@ public final class RightsManager
 
         // Get global groups
         if (newstart < nbGlobalUsersOrGroups) {
-            userOrGroupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields, withdetails, new RequestLimit(
-                limit.getNb(), newstart), order, context));
+            userOrGroupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields, withdetails,
+                new RequestLimit(limit.getNb(), newstart), order, context));
             newstart = 0;
         } else {
             newstart = newstart - nbGlobalUsersOrGroups;
@@ -310,11 +310,11 @@ public final class RightsManager
 
         // Get local groups
         if (limit.getNb() > userOrGroupList.size()) {
-            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, new RequestLimit(
-                limit.getNb() - userOrGroupList.size(), newstart), order, context));
+            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
+                new RequestLimit(limit.getNb() - userOrGroupList.size(), newstart), order, context));
         } else if (limit.getNb() <= 0) {
-            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, new RequestLimit(0,
-                newstart), order, context));
+            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
+                new RequestLimit(0, newstart), order, context));
         }
 
         return userOrGroupList;
@@ -394,7 +394,7 @@ public final class RightsManager
                 getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
 
             if (localGroupList != null && !withdetails) {
-                List<String> wikiGroupList = new ArrayList<String>(localGroupList.size());
+                List<String> wikiGroupList = new ArrayList<>(localGroupList.size());
                 for (Object groupName : localGroupList) {
                     wikiGroupList.add(wikiName + WIKIFULLNAME_SEP + groupName);
                 }
@@ -435,11 +435,11 @@ public final class RightsManager
         RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (user) {
-            return context.getWiki().getGroupService(context)
-                .getAllMatchedUsers(matchFields, withdetails, limit.getNb(), limit.getStart(), order, context);
+            return context.getWiki().getGroupService(context).getAllMatchedUsers(matchFields, withdetails,
+                limit.getNb(), limit.getStart(), order, context);
         } else {
-            return context.getWiki().getGroupService(context)
-                .getAllMatchedGroups(matchFields, withdetails, limit.getNb(), limit.getStart(), order, context);
+            return context.getWiki().getGroupService(context).getAllMatchedGroups(matchFields, withdetails,
+                limit.getNb(), limit.getStart(), order, context);
         }
     }
 
@@ -495,8 +495,8 @@ public final class RightsManager
     public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
         Boolean orderAsc, XWikiContext context) throws XWikiException
     {
-        return context.getWiki().getGroupService(context)
-            .getAllMatchedMembersNamesForGroup(group, matchField, nb, start, orderAsc, context);
+        return context.getWiki().getGroupService(context).getAllMatchedMembersNamesForGroup(group, matchField, nb,
+            start, orderAsc, context);
     }
 
     /**
@@ -562,7 +562,7 @@ public final class RightsManager
     private Map<String, LevelTree> getLevelTreeMap(XWikiDocument preferences, List<String> levelsToMatch,
         boolean global, XWikiContext context) throws XWikiException
     {
-        Map<String, LevelTree> rightsMap = new HashMap<String, LevelTree>();
+        Map<String, LevelTree> rightsMap = new HashMap<>();
 
         fillLevelTreeMap(rightsMap, preferences, levelsToMatch, global, true, context);
 
@@ -665,7 +665,7 @@ public final class RightsManager
         if (parentPreferences != null) {
             // Fill levels where to find inheritance
             if (levelInherited == null) {
-                levelInherited = new ArrayList<String>();
+                levelInherited = new ArrayList<>();
             }
 
             for (String levelName : levelsToMatch) {
@@ -697,13 +697,12 @@ public final class RightsManager
     {
         List<String> levelInherited = null;
         if (levelsToMatch == null) {
-            levelInherited = new ArrayList<String>();
+            levelInherited = new ArrayList<>();
         }
 
         if (!preferences.isNew()) {
             EntityReference rightClassReference =
-                global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE
-                    : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
+                global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
             List<BaseObject> rightObjects = preferences.getXObjects(rightClassReference);
             if (rightObjects != null) {
                 for (BaseObject bobj : rightObjects) {
@@ -732,9 +731,8 @@ public final class RightsManager
         if (currentGlobal) {
             if (currentPreference.getFullName().equals(WIKI_PREFERENCES)) {
                 if (!context.isMainWiki()) {
-                    parentPreferences =
-                        context.getWiki().getDocument(context.getMainXWiki() + WIKIFULLNAME_SEP + WIKI_PREFERENCES,
-                            context);
+                    parentPreferences = context.getWiki()
+                        .getDocument(context.getMainXWiki() + WIKIFULLNAME_SEP + WIKI_PREFERENCES, context);
                 }
             } else if (currentPreference.getName().equals(SPACE_PREFERENCES)) {
                 String parentspace = currentPreference.getStringValue(WIKI_PREFERENCES, "parent");
@@ -750,9 +748,8 @@ public final class RightsManager
                 }
             }
         } else {
-            parentPreferences =
-                context.getWiki().getDocument(currentPreference.getSpace() + SPACEPAGENAME_SEP + SPACE_PREFERENCES,
-                    context);
+            parentPreferences = context.getWiki()
+                .getDocument(currentPreference.getSpace() + SPACEPAGENAME_SEP + SPACE_PREFERENCES, context);
         }
 
         return parentPreferences;
@@ -792,7 +789,7 @@ public final class RightsManager
             return null;
         }
 
-        List<String> rights = new ArrayList<String>();
+        List<String> rights = new ArrayList<>();
         rights.add(levelName);
 
         Map<String, LevelTree> rightsMap = getLevelTreeMap(doc, rights, global, context);
@@ -1006,7 +1003,7 @@ public final class RightsManager
     public void removeUserOrGroupFromAllRights(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
         boolean user, XWikiContext context) throws XWikiException
     {
-        List<String> parameterValues = new ArrayList<String>();
+        List<String> parameterValues = new ArrayList<>();
 
         String fieldName;
         if (user) {
@@ -1020,9 +1017,8 @@ public final class RightsManager
 
         String fieldTypeName = ((PropertyClass) rightClass.get(fieldName)).newProperty().getClass().getSimpleName();
 
-        StringBuilder where =
-            new StringBuilder(", BaseObject as obj" + ", " + fieldTypeName + " as prop where doc.fullName=obj.name"
-                + " and (obj.className=?1 or obj.className=?2)");
+        StringBuilder where = new StringBuilder(", BaseObject as obj, " + fieldTypeName
+            + " as prop where doc.fullName=obj.name" + " and (obj.className=?1 or obj.className=?2)");
         parameterValues.add(rightClass.getName());
         parameterValues.add(globalRightClass.getName());
 
@@ -1037,12 +1033,12 @@ public final class RightsManager
             if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
                 parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupName + HQLLIKE_ALL_SYMBOL);
             } else {
-                parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName
-                    + HQLLIKE_ALL_SYMBOL);
+                parameterValues.add(
+                    HQLLIKE_ALL_SYMBOL + userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName + HQLLIKE_ALL_SYMBOL);
             }
         } else {
-            parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName
-                + HQLLIKE_ALL_SYMBOL);
+            parameterValues
+                .add(HQLLIKE_ALL_SYMBOL + userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName + HQLLIKE_ALL_SYMBOL);
         }
 
         List<XWikiDocument> documentList =
@@ -1099,7 +1095,7 @@ public final class RightsManager
 
         Map<String, Collection<String>> groupCache = groupCacheIn;
         if (groupCache == null) {
-            groupCache = new HashMap<String, Collection<String>>();
+            groupCache = new HashMap<>();
         }
 
         Collection<String> memberList = groupCache.get(groupName);

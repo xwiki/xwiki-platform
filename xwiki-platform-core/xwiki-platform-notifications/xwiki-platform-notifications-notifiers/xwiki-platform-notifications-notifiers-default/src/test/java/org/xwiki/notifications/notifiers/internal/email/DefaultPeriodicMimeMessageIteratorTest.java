@@ -160,6 +160,7 @@ public class DefaultPeriodicMimeMessageIteratorTest
 
         // Count the number of attachments
         assertEquals(2, ((List)factoryParameters.get("attachments")).size());
+        assertTrue(((List)factoryParameters.get("attachments")).contains(userBAvatar));
 
         // Second iteration
         assertTrue(iterator.hasNext());
@@ -174,6 +175,7 @@ public class DefaultPeriodicMimeMessageIteratorTest
 
         // Make sure there is no duplicated attachments
         assertEquals(2, ((List)factoryParameters.get("attachments")).size());
+        assertTrue(((List)factoryParameters.get("attachments")).contains(userBAvatar));
 
         // End
         assertFalse(iterator.hasNext());

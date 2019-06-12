@@ -12,12 +12,12 @@ $response.setContentType("application/json")
 ## Display all documents in an exact given space (doesn't support Nested Spaces). Can be useful for backward
 ## compatibility for example or if there's a need to list exactly the content of a given space.
 #if ("$!request.space" != '')
-  #set ($whereQueryPart = "${whereQueryPart} AND doc.space = ?")
+  #set ($whereQueryPart = "${whereQueryPart} AND doc.space = ?1")
   #set ($discard = $queryParams.add($request.space))
 #end
 ## Display all documents in a space, including Nested Spaces
 #if ("$!request.childrenOf" != '')
-  #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName LIKE ? AND doc.fullName <> ?")
+  #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName LIKE ?2 AND doc.fullName <> ?3")
   #set ($discard = $queryParams.add($services.query.parameter().literal("$!{request.childrenOf}.").anyChars()))
   #set ($discard = $queryParams.add("${request.childrenOf}.WebHome"))
 #end
@@ -25,8 +25,8 @@ $response.setContentType("application/json")
 #set ($excludes = $request.getParameterValues('exclude'))
 #if ("$!excludes" != '')
   #foreach ($exclude in $excludes)
-    #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?")
     #set ($discard = $queryParams.add($exclude))
+    #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?${queryParams.size}")
   #end
 #end
 #addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.location'))

@@ -104,14 +104,14 @@ public interface XWikiStoreInterface
      * 
      * <pre>
      * {@code
-     * #set($orphans = $xwiki.searchDocuments(" where doc.fullName <> ? and (doc.parent = ? or "
-     *     + "(doc.parent = ? and doc.space = ?))",
+     * #set($orphans = $xwiki.searchDocuments(" where doc.fullName <> ?1 and (doc.parent = ?2 or "
+     *     + "(doc.parent = ?3 and doc.space = ?4))",
      *     ["${doc.fullName}as", ${doc.fullName}, ${doc.name}, ${doc.space}]))
      * }
      * </pre>
      *
      * @param parametrizedSqlClause the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)

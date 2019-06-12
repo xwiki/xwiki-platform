@@ -813,17 +813,17 @@ public class XWiki extends Api
      *
      * <pre>
      * &lt;code&gt;
-     * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ? and (doc.parent = ? or &quot;
-     *     + &quot;(doc.parent = ? and doc.space = ?))&quot;,
+     * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ?1 and (doc.parent = ?2 or &quot;
+     *     + &quot;(doc.parent = ?3 and doc.space = ?4))&quot;,
      *     [&quot;${doc.fullName}as&quot;, ${doc.fullName}, ${doc.name}, ${doc.space}]))
      * &lt;/code&gt;
      * </pre>
      *
      * @param parameterizedWhereClause the HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
-     * @param parameterValues the where clause values that replace the question marks (?)
+     * @param parameterValues the where clause values that replace the question marks (?1, ?2, etc.)
      * @return a list of document names
      * @throws XWikiException in case of error while performing the query
      * @deprecated use query service instead

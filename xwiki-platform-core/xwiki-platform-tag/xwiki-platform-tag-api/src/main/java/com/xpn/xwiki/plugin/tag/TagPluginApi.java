@@ -140,7 +140,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * <ul>
      * <li>
      * <code>
-     * $xwiki.tag.getTagCountForQuery("", "doc.creator = ?", ["$!{request.creator}"])
+     * $xwiki.tag.getTagCountForQuery("", "doc.creator = ?1", ["$!{request.creator}"])
      * </code> will return the cardinality map of tags for documents created by user-provided creator name</li>
      * </ul>
      * 

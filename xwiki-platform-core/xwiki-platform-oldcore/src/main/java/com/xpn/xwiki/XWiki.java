@@ -4702,8 +4702,8 @@ public class XWiki implements EventListener
         String sql = "select distinct doc.fullName from XWikiDocument as doc";
         List<String> parameters = new ArrayList<String>();
         if (space != null) {
-            sql += " where doc.space = ?";
             parameters.add(space);
+            sql += " where doc.space = ?" + parameters.size();
         }
 
         if (clean) {
@@ -7370,7 +7370,7 @@ public class XWiki implements EventListener
      * (the attachment) or "doc" (the document it is attached to)
      *
      * @param parametrizedSqlClause The HQL where clause. For example {@code where doc.fullName
-     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))}
+     *        <> ?1 and (attach.author = ?2 or (attach.filename = ?3 and doc.space = ?4))}
      * @param checkRight if true, only return attachments in documents which the "current user" has permission to view.
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.

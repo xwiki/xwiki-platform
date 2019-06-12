@@ -3268,7 +3268,7 @@ public class XWiki implements EventListener
 
         if (!context.getWiki().isMultiLingual(context)) {
             language = Util.normalizeLanguage(context.getWiki().getXWikiPreference("default_language", "", context));
-            context.setInterfaceLanguage(language);
+            context.setInterfaceLocale(LocaleUtils.toLocale(language));
             return language;
         }
 

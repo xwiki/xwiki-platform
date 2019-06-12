@@ -688,15 +688,6 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 6.0M1, use {@link #setInterfaceLocale(Locale)} instead
-     */
-    @Deprecated
-    public void setInterfaceLanguage(String interfaceLanguage)
-    {
-        setInterfaceLocale(LocaleUtils.toLocale(Util.normalizeLanguage(interfaceLanguage)));
-    }
-
-    /**
      * @param interfaceLocale the {@link Locale} to use to display the content
      * @since 6.0M1
      */

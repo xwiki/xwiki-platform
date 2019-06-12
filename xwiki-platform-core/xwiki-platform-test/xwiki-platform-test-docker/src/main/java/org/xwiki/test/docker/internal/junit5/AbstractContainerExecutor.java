@@ -55,9 +55,6 @@ public abstract class AbstractContainerExecutor
             testConfiguration.isVerbose()));
 
         startContainer(container, testConfiguration);
-
-        // Display logs after the container has been started so that we can see problems happening in the containers
-        followOutput(container, getClass());
     }
 
     /**

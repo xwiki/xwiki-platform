@@ -106,9 +106,10 @@ Thus it is forbidden to depend on the HTML Macro.
     <module>xwiki-platform-rendering-macro-groovy</module>
     <module>xwiki-platform-rendering-macro-include</module>
     <module>xwiki-platform-rendering-macro-python</module>
-    <module>xwiki-platform-rendering-macro-script</module>
-    <module>xwiki-platform-rendering-macro-velocity</module>
     <module>xwiki-platform-rendering-macro-rss</module>
+    <module>xwiki-platform-rendering-macro-script</module>
+    <module>xwiki-platform-rendering-macro-toc</module>
     <module>xwiki-platform-rendering-macro-useravatar</module>
+    <module>xwiki-platform-rendering-macro-velocity</module>
   </modules>
 </project>

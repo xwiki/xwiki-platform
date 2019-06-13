@@ -26,6 +26,10 @@ import java.util.List;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Root;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -36,6 +40,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
@@ -100,8 +105,11 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             @Override
             public XWikiDBVersion doInHibernate(Session session) throws HibernateException
             {
-                // Retrieve the version from the database
-                return (XWikiDBVersion) session.createCriteria(XWikiDBVersion.class).uniqueResult();
+                CriteriaBuilder builder = session.getCriteriaBuilder();
+                CriteriaQuery<XWikiDBVersion> query = builder.createQuery(XWikiDBVersion.class);
+                Root<XWikiDBVersion> root = query.from(XWikiDBVersion.class);
+                query.select(root);
+                return session.createQuery(query).getSingleResult();
             }
         });
 
@@ -112,10 +120,15 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
                 @Override
                 public XWikiDBVersion doInHibernate(Session session) throws HibernateException
                 {
-                    if (((Number) session.createCriteria(XWikiDocument.class).setProjection(Projections.rowCount())
-                        .uniqueResult()).longValue() > 0) {
+                    CriteriaBuilder builder = session.getCriteriaBuilder();
+                    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+                    Root<XWikiDBVersion> root = query.from(XWikiDBVersion.class);
+                    Expression<Long> count = builder.count(root);
+                    query.select(count);
+                    if (session.createQuery(query).getSingleResult() > 0) {
                         return new XWikiDBVersion(0);
                     }
+
                     return null;
                 }
             });

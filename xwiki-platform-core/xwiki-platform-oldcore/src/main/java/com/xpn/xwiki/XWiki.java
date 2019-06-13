@@ -6590,15 +6590,32 @@ public class XWiki implements EventListener
         }
     }
 
-    public Object parseGroovyFromPage(String fullname, XWikiContext context) throws XWikiException
+    public Object parseGroovyFromPage(String fullName, XWikiContext context) throws XWikiException
     {
-        return parseGroovyFromString(context.getWiki().getDocument(fullname, context).getContent(), context);
+        XWikiDocument groovyDocument = context.getWiki().getDocument(fullName, context);
+
+        Object sdoc = context.get(XWikiDocument.CKEY_SDOC);
+        context.put(XWikiDocument.CKEY_SDOC, groovyDocument);
+
+        try {
+            return parseGroovyFromString(groovyDocument.getContent(), context);
+        } finally {
+            context.put(XWikiDocument.CKEY_SDOC, sdoc);
+        }
     }
 
     public Object parseGroovyFromPage(String fullName, String jarWikiPage, XWikiContext context) throws XWikiException
     {
-        return parseGroovyFromString(context.getWiki().getDocument(fullName, context).getContent(), jarWikiPage,
-            context);
+        XWikiDocument groovyDocument = context.getWiki().getDocument(fullName, context);
+
+        Object sdoc = context.get(XWikiDocument.CKEY_SDOC);
+        context.put(XWikiDocument.CKEY_SDOC, groovyDocument);
+
+        try {
+            return parseGroovyFromString(groovyDocument.getContent(), jarWikiPage, context);
+        } finally {
+            context.put(XWikiDocument.CKEY_SDOC, sdoc);
+        }
     }
 
     public String getMacroList(XWikiContext context)

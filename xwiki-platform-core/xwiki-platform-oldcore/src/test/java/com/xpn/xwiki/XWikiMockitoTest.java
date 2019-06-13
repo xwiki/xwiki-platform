@@ -66,6 +66,8 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.ReadOnlyXWikiContextProvider;
+import com.xpn.xwiki.internal.render.groovy.ParseGroovyFromString;
 import com.xpn.xwiki.internal.store.StoreConfiguration;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
@@ -76,6 +78,7 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -94,7 +97,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
-@ComponentList({ DefaultBatchOperationExecutor.class, DefaultExecution.class })
+@ComponentList({ DefaultBatchOperationExecutor.class, DefaultExecution.class, ReadOnlyXWikiContextProvider.class })
 @ReferenceComponentList
 public class XWikiMockitoTest
 {
@@ -148,6 +151,7 @@ public class XWikiMockitoTest
 
         Execution execution = this.componentManager.getInstance(Execution.class);
         ExecutionContext executionContext = new ExecutionContext();
+        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.context);
         execution.setContext(executionContext);
 
         when(this.store.loadXWikiDoc(any(XWikiDocument.class), any(XWikiContext.class)))
@@ -506,5 +510,33 @@ public class XWikiMockitoTest
             this.xwiki.getDocument(pageReference, this.context).getDocumentReference());
         assertEquals(webhomeDocumentReference,
             this.xwiki.getDocument(pageObjectReference, this.context).getDocumentReference());
+    }
+
+    @Test
+    public void parseGroovyFromPage() throws Exception
+    {
+        ParseGroovyFromString parser = this.componentManager.registerMockComponent(ParseGroovyFromString.class);
+
+        this.context.setWikiId("wiki");
+        XWikiDocument document = new XWikiDocument(new DocumentReference(this.context.getWikiId(), "Space", "Document"));
+        document.setContent("source");
+
+        this.documents.put(document.getDocumentReference(), document);
+
+        String result = "result";
+
+        when(parser.parseGroovyFromString(document.getContent(), this.context)).then(new Answer<Object>()
+        {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable
+            {
+                assertSame(document, ((XWikiContext)invocation.getArgument(1)).get(XWikiDocument.CKEY_SDOC));
+
+                return result;
+            }
+        });
+
+        assertEquals(result, this.xwiki.parseGroovyFromPage("Space.Document", this.context));
+        assertEquals(result, this.xwiki.parseGroovyFromPage("Space.Document", "page", this.context));
     }
 }

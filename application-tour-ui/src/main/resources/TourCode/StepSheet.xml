@@ -204,7 +204,7 @@ var messages   = {  deleting: "${escapetool.javascript($services.localization.re
                     deleteDone: "${escapetool.javascript($services.localization.render('tour.steps.delete_done'))}"
                  }
 
-require(['jquery'], function ($) {
+require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
 
   // Initialize add new step button
@@ -253,6 +253,9 @@ require(['jquery'], function ($) {
       data: step,
       success: function(rep) {
         $('#stepsContainer').html(rep);
+        if (xm.refreshVersion) {
+          xm.refreshVersion();
+        }
       },
       complete: function() {
         // Close dialog box
@@ -285,6 +288,9 @@ require(['jquery'], function ($) {
           type: 'POST',
           success: function(rep) {
             $('#stepsContainer').html(rep);
+            if (xm.refreshVersion) {
+              xm.refreshVersion();
+            }
           },
           complete: function() {
             notif.replace(new XWiki.widgets.Notification(messages.deleteDone, 'done'));

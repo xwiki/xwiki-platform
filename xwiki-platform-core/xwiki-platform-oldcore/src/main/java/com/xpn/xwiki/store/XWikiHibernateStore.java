@@ -2435,12 +2435,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             bTransaction = beginTransaction(context);
             Session session = getSession(context);
 
+            boolean legacyOrdinal = LegacySessionImplementor.containsLegacyOrdinalStatement(sql);
+
             if (whereParams != null) {
-                sql += generateWhereStatement(whereParams);
+                sql += generateWhereStatement(whereParams,
+                    legacyOrdinal ? -1 : CollectionUtils.size(parameterValues.size()));
             }
 
             String statement = filterSQL(sql);
-            boolean legacyOrdinal = LegacySessionImplementor.containsLegacyOrdinalStatement(statement);
             Query<T> query = session.createQuery(statement);
 
             injectParameterListToQuery(legacyOrdinal ? 0 : 1, query, parameterValues);
@@ -2486,9 +2488,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private String generateWhereStatement(Object[][] whereParams)
+    private String generateWhereStatement(Object[][] whereParams, int previousIndex)
     {
         StringBuilder str = new StringBuilder();
+
+        int index = previousIndex;
 
         str.append(" where ");
         for (int i = 0; i < whereParams.length; i++) {
@@ -2510,7 +2514,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 str.append(" = ");
             }
             str.append(" ?");
+            if (index > -1) {
+                str.append(++index);
+            }
         }
+
         return str.toString();
     }
 

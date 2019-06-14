@@ -1,0 +1,12 @@
+## If the entity type field is part of a property group then the group might also include a reference field which we can
+## enhance with pickers based on the selected entity type value.
+#if ($displayer.parameters.containsKey('data-property-group'))
+  ## Load resources required by known entity pickers.
+  #pagePicker_import
+  #attachmentPicker_import
+  ## Load the JavaScript code that switches the picker based on the entity type value.
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestEntities.js', true))
+  ## Add the CSS class that activates the entity type switch.
+  #set ($discard = $displayer.parameters.put('class', "$!displayer.parameters.get('class') entityType"))
+#end
+#template('html_displayer/enum/edit.vm')

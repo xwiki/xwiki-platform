@@ -88,7 +88,7 @@ public class XWikiStatsReader
      */
     public Collection<Object> getRecentActions(String action, int size, XWikiContext context)
     {
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
 
         if ((action.equals(ViewAction.VIEW_ACTION) || (action.equals(SaveAction.ACTION_NAME)))) {
             Collection<?> actions = StatsUtil.getRecentActionFromSessions(context, action);
@@ -182,17 +182,16 @@ public class XWikiStatsReader
         org.joda.time.Period stepDuration =
             new org.joda.time.Period(step.getYears(), step.getMonths(), step.getWeeks(), step.getDays(), 0, 0, 0, 0);
 
-        Map<DateTime, Integer> activity = new HashMap<DateTime, Integer>();
+        Map<DateTime, Integer> activity = new HashMap<>();
         while (stepStart.compareTo(periodEnd) < 0) {
             DateTime stepEnd = stepStart.plus(stepDuration);
             if (stepEnd.compareTo(periodEnd) > 0) {
                 stepEnd = periodEnd;
             }
-            List<DocumentStats> stats =
-                getDocumentStatistics(action, scope, new Period(stepStart.getMillis(), stepEnd.getMillis()),
-                    RangeFactory.FIRST, context);
+            List<DocumentStats> stats = getDocumentStatistics(action, scope,
+                new Period(stepStart.getMillis(), stepEnd.getMillis()), RangeFactory.FIRST, context);
             int actionCount = 0;
-            if (stats.size() > 0) {
+            if (!stats.isEmpty()) {
                 actionCount = stats.get(0).getPageViews();
             }
             activity.put(stepStart, actionCount);
@@ -258,7 +257,7 @@ public class XWikiStatsReader
      */
     private List<DocumentStats> getDocumentStatistics(List<?> resultSet, String action)
     {
-        List<DocumentStats> documentStatsList = new ArrayList<DocumentStats>(resultSet.size());
+        List<DocumentStats> documentStatsList = new ArrayList<>(resultSet.size());
 
         Date now = new Date();
 
@@ -382,7 +381,7 @@ public class XWikiStatsReader
     private List<RefererStats> getRefererStatistics(List<?> resultSet)
     {
         Date now = new Date();
-        List<RefererStats> stats = new ArrayList<RefererStats>(resultSet.size());
+        List<RefererStats> stats = new ArrayList<>(resultSet.size());
 
         for (Object name : resultSet) {
             Object[] result = (Object[]) name;
@@ -459,8 +458,8 @@ public class XWikiStatsReader
         } else if (action.equals(DownloadAction.ACTION_NAME)) {
             query.append("order by sum(downloads) " + sortOrder);
         } else {
-            query.append(MessageFormat.format("order by sum(pageSaves) {0}, sum(pageViews) {0}, sum(downloads) {0}",
-                sortOrder));
+            query.append(
+                MessageFormat.format("order by sum(pageSaves) {0}, sum(pageViews) {0}, sum(downloads) {0}", sortOrder));
         }
 
         return query.toString();
@@ -480,14 +479,13 @@ public class XWikiStatsReader
     {
         List<VisitStats> visiStatList;
 
-        List<Object> paramList = new ArrayList<Object>(2);
+        List<Object> paramList = new ArrayList<>(2);
 
         String query = createVisitStatisticsQuery(action, period, range, paramList, context);
 
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
         try {
-            List<?> solist =
-                store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
+            List<?> solist = store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
 
             visiStatList = getVisitStatistics(solist, new DateTime(period.getStart()), new DateTime(period.getEnd()));
             if (range.getSize() < 0) {
@@ -513,7 +511,7 @@ public class XWikiStatsReader
      */
     private List<VisitStats> getVisitStatistics(List<?> resultSet, DateTime startDate, DateTime endDate)
     {
-        List<VisitStats> stats = new ArrayList<VisitStats>(resultSet.size());
+        List<VisitStats> stats = new ArrayList<>(resultSet.size());
 
         for (Object name2 : resultSet) {
             Object[] result = (Object[]) name2;
@@ -587,7 +585,7 @@ public class XWikiStatsReader
 
         List<?> solist;
         if (store != null) {
-            List<Object> paramList = new ArrayList<Object>(1);
+            List<Object> paramList = new ArrayList<>(1);
             paramList.add(docName);
             solist = store.search("from RefererStats as obj where obj.name=?", 0, 0, paramList, context);
         } else {

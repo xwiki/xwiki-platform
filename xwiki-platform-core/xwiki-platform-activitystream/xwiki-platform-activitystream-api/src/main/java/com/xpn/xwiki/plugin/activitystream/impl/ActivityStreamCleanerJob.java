@@ -45,7 +45,7 @@ public class ActivityStreamCleanerJob extends AbstractJob implements Job
     {
         ActivityStreamPlugin plugin = (ActivityStreamPlugin) getXWikiContext().getWiki()
             .getPlugin(ActivityStreamPlugin.PLUGIN_NAME, getXWikiContext());
-        List<Object> parameters = new ArrayList<Object>();
+        List<Object> parameters = new ArrayList<>();
         int days = ActivityStreamCleaner.getNumberOfDaysToKeep(getXWikiContext());
 
         if (days > 0) {

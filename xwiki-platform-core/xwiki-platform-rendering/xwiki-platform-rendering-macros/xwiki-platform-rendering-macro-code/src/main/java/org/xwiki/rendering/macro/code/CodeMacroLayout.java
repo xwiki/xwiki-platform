@@ -71,6 +71,6 @@ public enum CodeMacroLayout
         /**
          * @see CodeMacroLayout#LINE_NUM
          */
-        public static final String LINE_NUM_HINT = "line_num";
+        public static final String LINE_NUM_HINT = "linenumbers";
     }
 }

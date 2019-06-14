@@ -854,7 +854,7 @@ public class XWiki extends Api
      *
      * @param wikiName the name of the wiki where to search.
      * @param parameterizedWhereClause the HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -883,7 +883,7 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
      *
      * @param parametrizedSqlClause the HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -903,7 +903,7 @@ public class XWiki extends Api
      * properties of attach (the attachment) or doc (the document it is attached to)
      *
      * @param parametrizedSqlClause The HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)

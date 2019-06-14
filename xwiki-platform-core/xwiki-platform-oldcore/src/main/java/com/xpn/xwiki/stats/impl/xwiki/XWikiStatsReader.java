@@ -224,7 +224,7 @@ public class XWikiStatsReader
         try {
             String query =
                 MessageFormat.format("select name, sum(pageViews) from DocumentStats"
-                    + " where ({0}) and action=? and ? <= period and period < ? group by name order"
+                    + " where ({0}) and action=?1 and ?2 <= period and period < ?3 group by name order"
                     + " by sum(pageViews) {1}", nameFilter, sortOrder);
 
             paramList.add(action);
@@ -286,7 +286,7 @@ public class XWikiStatsReader
     {
         List<DocumentStats> documentStatsList;
 
-        List<Object> paramList = new ArrayList<Object>(4);
+        List<Object> paramList = new ArrayList<>(4);
 
         String nameFilter = getHqlNameFilterFromScope(scope, paramList);
 
@@ -296,7 +296,7 @@ public class XWikiStatsReader
         try {
             String query =
                 MessageFormat.format("select name, sum(pageViews) from RefererStats"
-                    + " where ({0}) and referer like ? and ? <= period and period < ? group by name"
+                    + " where ({0}) and referer like ?1 and ?2 <= period and period < ?3 group by name"
                     + " order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             paramList.add(getHqlValidDomain(domain));
@@ -333,7 +333,7 @@ public class XWikiStatsReader
     {
         List<RefererStats> refererList;
 
-        List<Object> paramList = new ArrayList<Object>(4);
+        List<Object> paramList = new ArrayList<>(4);
 
         String nameFilter = getHqlNameFilterFromScope(scope, paramList);
 
@@ -343,7 +343,7 @@ public class XWikiStatsReader
         try {
             String query =
                 MessageFormat.format("select referer, sum(pageViews) from RefererStats"
-                    + " where ({0}) and referer like ? and ? <= period and period < ?"
+                    + " where ({0}) and referer like ?1 and ?2 <= period and period < ?3"
                     + " group by referer order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             paramList.add(getHqlValidDomain(domain));

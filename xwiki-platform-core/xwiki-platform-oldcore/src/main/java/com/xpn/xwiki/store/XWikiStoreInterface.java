@@ -164,7 +164,7 @@ public interface XWikiStoreInterface
      * Search documents in the storing system.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
      *            language.
      * @param context the XWiki context required for getting information about the execution context.
@@ -178,7 +178,7 @@ public interface XWikiStoreInterface
      * Search documents in the storing system.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
      * @param context the XWiki context required for getting information about the execution context.
@@ -191,7 +191,7 @@ public interface XWikiStoreInterface
      * Search documents in the storing system.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
      *            language.
      * @param customMapping inject custom mapping in session.
@@ -206,7 +206,7 @@ public interface XWikiStoreInterface
      * Search documents in the storing system.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
      *            language.
      * @param nb the number of rows to return. If 0 then all rows are returned.
@@ -222,7 +222,7 @@ public interface XWikiStoreInterface
      * Search documents in the storing system.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
      *            language.
      * @param nb the number of rows to return. If 0 then all rows are returned.
@@ -241,7 +241,7 @@ public interface XWikiStoreInterface
      * Search documents in the storing system.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
      *            language.
      * @param customMapping inject custom mapping in session.
@@ -258,7 +258,7 @@ public interface XWikiStoreInterface
      * Search documents in the storing system.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param context the XWiki context required for getting information about the execution context.
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
@@ -269,7 +269,7 @@ public interface XWikiStoreInterface
      * Search documents in the storing system.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
      *            language.
      * @param customMapping inject custom mapping in session.
@@ -292,7 +292,7 @@ public interface XWikiStoreInterface
      * do the encoding/escpaing yourself before calling them.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param parameterValues the where clause values that replace the question marks (?).
      * @param context the XWiki context required for getting information about the execution context.
      * @return a list of XWikiDocument.
@@ -312,7 +312,7 @@ public interface XWikiStoreInterface
      * do the encoding/escpaing yourself before calling them.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
      *            language.
      * @param customMapping inject custom mapping in session.
@@ -337,7 +337,7 @@ public interface XWikiStoreInterface
      * do the encoding/escpaing yourself before calling them.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
      * @param parameterValues the where clause values that replace the question marks (?).
@@ -359,7 +359,7 @@ public interface XWikiStoreInterface
      * do the encoding/escpaing yourself before calling them.
      *
      * @param wheresql the HQL where clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
      *            language.
      * @param customMapping inject custom mapping in session.
@@ -404,7 +404,7 @@ public interface XWikiStoreInterface
      * Execute a reading request and return result.
      *
      * @param sql the HQL request clause. For example: {@code where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *        <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb the number of rows to return. If 0 then all rows are returned.
      * @param start the number of rows to skip. If 0 don't skip any row.
      * @param context the XWiki context required for getting information about the execution context.

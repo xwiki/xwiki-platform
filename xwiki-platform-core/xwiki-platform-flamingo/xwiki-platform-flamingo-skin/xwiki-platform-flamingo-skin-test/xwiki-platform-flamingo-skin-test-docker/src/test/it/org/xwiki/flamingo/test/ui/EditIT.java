@@ -41,6 +41,7 @@ import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
+import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ResubmissionPage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.PreviewEditPage;
@@ -821,5 +822,43 @@ public class EditIT
             // disable back xhtml syntax
             setup.deleteObject("Rendering", "RenderingConfig", "Rendering.RenderingConfigClass", 0);
         }
+    }
+
+    @Test
+    @Order(13)
+    public void saveActionValidatesWhenXValidateIsPresent(TestUtils setup, TestReference testReference)
+    {
+        String content = "{{velocity}}"
+            + "value: $doc.display('prop')\n\n"
+            + "#foreach($e in $xcontext.validationStatus.errors)"
+            + "$e "
+            + "#end"
+            + "{{/velocity}}";
+
+        setup.deletePage(testReference);
+        setup.createPage(testReference, content, "");
+        setup.addClassProperty(testReference, "prop", "String");
+        setup.updateClassProperty(testReference,
+            "prop_validationRegExp", "/^[0-4][0-2]$/",
+            "prop_validationMessage", "invalid value for prop");
+
+        String className = setup.serializeReference(testReference).split(":")[1];
+        setup.addObject(testReference, className, "prop", "22");
+        setup.gotoPage(testReference, "save", "xvalidate=1");
+        ViewPage viewPage = new ViewPage();
+        assertEquals("value: 22", viewPage.getContent());
+
+
+        setup.updateObject(testReference, className, 0, "prop", "44");
+        setup.gotoPage(testReference, "save", "xvalidate=1");
+        InlinePage inlinePage = new InlinePage();
+        assertTrue(inlinePage.getForm().isDisplayed());
+        assertEquals("44", inlinePage.getValue("prop"));
+        assertTrue(inlinePage.getForm().getText().contains("invalid value for prop"));
+
+        String queryString = String.format("xvalidate=1&%s_0_prop=11", className);
+        setup.gotoPage(testReference, "save", queryString);
+        viewPage = new ViewPage();
+        assertEquals("value: 11", viewPage.getContent());
     }
 }

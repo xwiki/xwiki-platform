@@ -395,7 +395,7 @@ public class HibernateStore implements Disposable, Integrator
      * @return the {@link Metadata} corresponding to the configuration
      * @since 11.5RC1
      */
-    public Metadata getMetadata()
+    public Metadata getConfigurationMetadata()
     {
         return this.metadata;
     }
@@ -875,9 +875,21 @@ public class HibernateStore implements Disposable, Integrator
         }
     }
 
-    public int getLimitSize(Class<?> entityType, String propertyName)
+    /**
+     * Execute the passed function with the {@link DatabaseMetaData} {@link ResultSet} corresponding to the passed
+     * entity and property.
+     * 
+     * @param <R> the type of the return
+     * @param entityType the mapping
+     * @param propertyName the name of the property in the class (can be null to get a {@link ResultSet} of the table)
+     * @param def the default value to return
+     * @param function the function to execute
+     * @return the result of the function execution
+     * @since 11.5RC1
+     */
+    public <R> R metadata(Class<?> entityType, String propertyName, R def, ResultSetFunction<R> function)
     {
-        int result = -1;
+        R result = def;
 
         // retrieve the schema from the context
         String schema = null;
@@ -887,18 +899,24 @@ public class HibernateStore implements Disposable, Integrator
         }
 
         // retrieve the table and column name from entityType and propertyName
-        PersistentClass persistentClass = getMetadata().getEntityBinding(entityType.getName());
-        Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
-        String tableName = persistentClass.getTable().getName();
-        String columnName = column.getName();
+        PersistentClass persistentClass = getConfigurationMetadata().getEntityBinding(entityType.getName());
 
+        String tableName = persistentClass.getTable().getName();
         // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
         if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
             tableName = tableName.toUpperCase();
         }
 
-        if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
-            columnName = columnName.toLowerCase();
+        String columnName;
+        if (propertyName != null) {
+            Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
+            columnName = column.getName();
+
+            if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+                columnName = columnName.toLowerCase();
+            }
+        } else {
+            columnName = null;
         }
 
         try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
@@ -907,10 +925,17 @@ public class HibernateStore implements Disposable, Integrator
             try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
                 DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-                ResultSet resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
+                ResultSet resultSet;
+
+                if (columnName != null) {
+                    resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
+                } else {
+                    resultSet = databaseMetaData.getTables(null, schema, tableName, null);
+                }
+
                 // next will return false if the resultSet is empty.
                 if (resultSet.next()) {
-                    result = resultSet.getInt("COLUMN_SIZE");
+                    result = function.apply(resultSet);
                 }
             }
         } catch (SQLException e) {
@@ -918,8 +943,17 @@ public class HibernateStore implements Disposable, Integrator
                 tableName, columnName, e);
         }
 
+        return result;
+    }
+
+    public int getLimitSize(Class<?> entityType, String propertyName)
+    {
+        int result = metadata(entityType, propertyName, -1, resultSet -> resultSet.getInt("COLUMN_SIZE"));
+
         if (result == -1) {
-            result = column.getLength();
+            PersistentClass persistentClass2 = getConfigurationMetadata().getEntityBinding(entityType.getName());
+            Column column2 = (Column) persistentClass2.getProperty(propertyName).getColumnIterator().next();
+            result = column2.getLength();
             this.logger.warn(
                 "Error while getting the size limit for entity [{}] and propertyName [{}]. "
                     + "The length value set by hibernate [{}] will be used.",
@@ -927,5 +961,13 @@ public class HibernateStore implements Disposable, Integrator
         }
 
         return result;
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public boolean tableExists(Class<?> entityClass)
+    {
+        return metadata(entityClass, null, false, resultSet -> true);
     }
 }

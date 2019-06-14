@@ -92,7 +92,7 @@ public class HqlQueryExecutorTest
         HibernateStore hibernateStore = this.mocker.getInstance(HibernateStore.class);
         when(hibernateStore.getConfiguration()).thenReturn(new Configuration());
         Metadata metadata = mock(Metadata.class);
-        when(hibernateStore.getMetadata()).thenReturn(metadata);
+        when(hibernateStore.getConfigurationMetadata()).thenReturn(metadata);
 
         this.executor = this.mocker.getComponentUnderTest();
         this.authorization = this.mocker.getInstance(ContextualAuthorizationManager.class);
@@ -295,7 +295,8 @@ public class HqlQueryExecutorTest
         when(definition.getName()).thenReturn(query.getStatement());
 
         HibernateStore hibernateStore = this.mocker.getInstance(HibernateStore.class);
-        when(hibernateStore.getMetadata().getNamedNativeQueryDefinition(query.getStatement())).thenReturn(definition);
+        when(hibernateStore.getConfigurationMetadata().getNamedNativeQueryDefinition(query.getStatement()))
+            .thenReturn(definition);
 
         assertSame(finalQuery, this.executor.createHibernateQuery(session, query));
 

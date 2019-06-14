@@ -647,7 +647,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      */
     public Metadata getMetadata()
     {
-        return this.store.getMetadata();
+        return this.store.getConfigurationMetadata();
     }
 
     /**
@@ -726,6 +726,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
     /**
      * Callback (closure) interface for operations in hibernate. spring like.
      */
+    @FunctionalInterface
     public interface HibernateCallback<T>
     {
         /**

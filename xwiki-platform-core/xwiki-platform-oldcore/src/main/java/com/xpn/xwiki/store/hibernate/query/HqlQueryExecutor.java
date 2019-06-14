@@ -117,7 +117,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
 
                     // Gather the list of allowed named queries
                     Collection<NamedQueryDefinition> namedQueries =
-                        this.hibernate.getMetadata().getNamedQueryDefinitions();
+                        this.hibernate.getConfigurationMetadata().getNamedQueryDefinitions();
                     for (NamedQueryDefinition definition : namedQueries) {
                         if (HqlQueryUtils.isSafe(definition.getQuery())) {
                             this.allowedNamedQueries.add(definition.getName());
@@ -346,7 +346,7 @@ public class HqlQueryExecutor implements QueryExecutor, Initializable
                 hQuery = session.createSQLQuery(filteredQuery.getStatement());
                 // Copy the information about the return column types, if possible.
                 NamedSQLQueryDefinition definition =
-                    this.hibernate.getMetadata().getNamedNativeQueryDefinition(query.getStatement());
+                    this.hibernate.getConfigurationMetadata().getNamedNativeQueryDefinition(query.getStatement());
                 if (!StringUtils.isEmpty(definition.getResultSetRef())) {
                     ((NativeQuery<T>) hQuery).setResultSetMapping(definition.getResultSetRef());
                 }

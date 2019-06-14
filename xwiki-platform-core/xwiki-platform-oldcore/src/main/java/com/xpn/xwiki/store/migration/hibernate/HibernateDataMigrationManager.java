@@ -28,20 +28,18 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -78,13 +76,21 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
      * @return store system for execute store-specific actions.
      * @throws DataMigrationException if the store could not be reached
      */
-    public XWikiHibernateBaseStore getStore() throws DataMigrationException
+    public XWikiHibernateBaseStore getBaseStore() throws DataMigrationException
     {
         try {
             return this.componentManager.getInstance(XWikiStoreInterface.class, XWikiHibernateBaseStore.HINT);
         } catch (ComponentLookupException e) {
-            throw new DataMigrationException(
-                String.format("Unable to reach the store for database %s", getXWikiContext().getWikiId()), e);
+            throw new DataMigrationException("Unable to reach the base store", e);
+        }
+    }
+
+    private HibernateStore getStore() throws DataMigrationException
+    {
+        try {
+            return this.componentManager.getInstance(HibernateStore.class);
+        } catch (ComponentLookupException e) {
+            throw new DataMigrationException("Unable to reach the store", e);
         }
     }
 
@@ -97,41 +103,40 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         }
 
         final XWikiContext context = getXWikiContext();
-        final XWikiHibernateBaseStore store = getStore();
+        final HibernateStore store = getStore();
+
+        // Check if the document table exist
+        if (!store.tableExists(XWikiDocument.class)) {
+            // The database does not seems to be initialized
+            return null;
+        }
+
+        // Check if the version table exist
+        if (!store.tableExists(XWikiDBVersion.class)) {
+            // The database seems older than the introduction of the version table
+            return new XWikiDBVersion(0);
+        }
+
+        XWikiHibernateBaseStore baseStore = getBaseStore();
 
         // Try retrieving a version from the database
-        ver = store.failSafeExecuteRead(context, new HibernateCallback<XWikiDBVersion>()
-        {
-            @Override
-            public XWikiDBVersion doInHibernate(Session session) throws HibernateException
-            {
-                CriteriaBuilder builder = session.getCriteriaBuilder();
-                CriteriaQuery<XWikiDBVersion> query = builder.createQuery(XWikiDBVersion.class);
-                Root<XWikiDBVersion> root = query.from(XWikiDBVersion.class);
-                query.select(root);
-                return session.createQuery(query).getSingleResult();
-            }
-        });
-
-        // if it fails, return version 0 if there is some documents in the database, else null (empty db?)
-        if (ver == null) {
-            ver = store.failSafeExecuteRead(getXWikiContext(), new HibernateCallback<XWikiDBVersion>()
+        try {
+            ver = baseStore.executeRead(context, new HibernateCallback<XWikiDBVersion>()
             {
                 @Override
                 public XWikiDBVersion doInHibernate(Session session) throws HibernateException
                 {
                     CriteriaBuilder builder = session.getCriteriaBuilder();
-                    CriteriaQuery<Long> query = builder.createQuery(Long.class);
+                    CriteriaQuery<XWikiDBVersion> query = builder.createQuery(XWikiDBVersion.class);
                     Root<XWikiDBVersion> root = query.from(XWikiDBVersion.class);
-                    Expression<Long> count = builder.count(root);
-                    query.select(count);
-                    if (session.createQuery(query).getSingleResult() > 0) {
-                        return new XWikiDBVersion(0);
-                    }
+                    query.select(root);
+                    List<XWikiDBVersion> versions = session.createQuery(query).getResultList();
 
-                    return null;
+                    return versions.isEmpty() ? new XWikiDBVersion(0) : versions.get(0);
                 }
             });
+        } catch (XWikiException e) {
+            throw new DataMigrationException("Failed to get the database version", e);
         }
 
         return ver;
@@ -141,7 +146,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     protected void initializeEmptyDB() throws DataMigrationException
     {
         final XWikiContext context = getXWikiContext();
-        final XWikiHibernateBaseStore store = getStore();
+        final XWikiHibernateBaseStore store = getBaseStore();
 
         final Session originalSession = store.getSession(context);
         final Transaction originalTransaction = store.getTransaction(context);
@@ -163,7 +168,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         final XWikiContext context = getXWikiContext();
 
         try {
-            getStore().executeWrite(context, session -> {
+            getBaseStore().executeWrite(context, session -> {
                 session.createQuery("delete from " + XWikiDBVersion.class.getName()).executeUpdate();
                 session.save(version);
 
@@ -199,7 +204,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
             this.logger.info("Checking Hibernate mapping and updating schema if needed for wiki [{}]",
                 getXWikiContext().getWikiId());
         }
-        getStore().updateSchema(getXWikiContext(), true);
+        getBaseStore().updateSchema(getXWikiContext(), true);
     }
 
     /**
@@ -278,7 +283,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         changeLogs.append(liquibaseChangeLogs);
         changeLogs.append(getLiquibaseChangeLogFooter());
 
-        final XWikiHibernateBaseStore store = getStore();
+        final XWikiHibernateBaseStore store = getBaseStore();
 
         store.executeRead(getXWikiContext(), new HibernateCallback<Object>()
         {
@@ -345,7 +350,7 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
     protected void startMigrations() throws DataMigrationException
     {
         XWikiContext context = getXWikiContext();
-        XWikiHibernateBaseStore store = getStore();
+        XWikiHibernateBaseStore store = getBaseStore();
 
         Session originalSession = store.getSession(context);
         Transaction originalTransaction = store.getTransaction(context);

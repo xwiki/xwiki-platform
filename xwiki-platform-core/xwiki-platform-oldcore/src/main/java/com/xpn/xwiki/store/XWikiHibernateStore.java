@@ -3011,7 +3011,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
 
         // Don't add a mapping that's already there
-        if (this.store.getMetadata() != null && this.store.getMetadata().getEntityBinding(className) != null) {
+        if (this.store.getConfigurationMetadata() != null
+            && this.store.getConfigurationMetadata().getEntityBinding(className) != null) {
             return false;
         }
 
@@ -3081,7 +3082,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         if (bclass.hasExternalCustomMapping()) {
             metadata = this.store.getMetadata(bclass.getName(), bclass.getCustomMapping(), null);
         } else {
-            metadata = this.store.getMetadata();
+            metadata = this.store.getConfigurationMetadata();
         }
         PersistentClass mapping = metadata.getEntityBinding(bclass.getName());
         if (mapping == null) {

@@ -199,9 +199,14 @@
       #set ($translatedParameterDescriptor.defaultValue = $parameterDescriptor.defaultValue == 'true')
       #set ($translatedParameterDescriptor.type = $translatedParameterDescriptor.defaultValue.getClass())
     #end
+    #set ($htmlDisplayerParameters = {'name': $parameterDescriptor.id})
+    #if ($translatedParameterDescriptor.group)
+      #set ($discard = $htmlDisplayerParameters.put('data-property-group',
+        $stringtool.join($translatedParameterDescriptor.group, '/')))
+    #end
     #set ($translatedParameterDescriptor.editTemplate = $services.display.html.display(
-      $translatedParameterDescriptor.type, $translatedParameterDescriptor.defaultValue,
-      {'name': $parameterDescriptor.id}, 'edit'))
+      $translatedParameterDescriptor.type, $translatedParameterDescriptor.defaultValue, $htmlDisplayerParameters, 'edit'
+    ))
     #if ("$!translatedParameterDescriptor.editTemplate" == '')
       #set ($translatedParameterDescriptor.editTemplate = "#getMacroParameterEditTemplate(
         $translatedParameterDescriptor)")

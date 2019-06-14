@@ -40,15 +40,15 @@
     <property name="space" type="string" column="ase_space" length="255" index="EVENT_SPACE" />
     <property name="page" type="string" column="ase_page" length="255" index="EVENT_PAGE" />
     <property name="hidden" type="boolean" column="ase_hidden" index="EVENT_HIDDEN" />
-    <property name="url" type="string" column="ase_url" length="2000" />
-    <property name="title" type="string" column="ase_title" length="2000" />
-    <property name="body" type="string" column="ase_body" length="2000" />
+    <property name="url" type="materialized_clob" column="ase_url" length="2000" />
+    <property name="title" type="materialized_clob" column="ase_title" length="2000" />
+    <property name="body" type="materialized_clob" column="ase_body" length="2000" />
     <property name="version" type="string" column="ase_version" length="30" />
-    <property name="param1" type="string" column="ase_param1" length="2000" />
-    <property name="param2" type="string" column="ase_param2" length="2000" />
-    <property name="param3" type="string" column="ase_param3" length="2000" />
-    <property name="param4" type="string" column="ase_param4" length="2000" />
-    <property name="param5" type="string" column="ase_param5" length="2000" />
+    <property name="param1" type="materialized_clob" column="ase_param1" length="2000" />
+    <property name="param2" type="materialized_clob" column="ase_param2" length="2000" />
+    <property name="param3" type="materialized_clob" column="ase_param3" length="2000" />
+    <property name="param4" type="materialized_clob" column="ase_param4" length="2000" />
+    <property name="param5" type="materialized_clob" column="ase_param5" length="2000" />
     <!-- The map mapping below was a feature introduced in https://jira.xwiki.org/browse/XWIKI-6839 to add support for
          named parameters. However it's currently causing serious performance issues (see
          https://jira.xwiki.org/browse/XWIKI-7520) and has had to be disabled for now.

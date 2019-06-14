@@ -505,6 +505,9 @@ public class EditIT
             + "\nYet another line with other few changes.", wikiEditPageTab1.getExactContent());
         // It should have been saved.
         viewPage = setup.gotoPage(testReference);
+        // mitigate the flicker: this should be removed when XWIKI-16406 is fixed.
+        setup.getDriver().navigate().refresh();
+        viewPage = new ViewPage();
         assertEquals("A fifth edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.", viewPage.getContent());
     }

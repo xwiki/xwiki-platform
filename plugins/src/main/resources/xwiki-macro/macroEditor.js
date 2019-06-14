@@ -440,10 +440,16 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor'], function($
     var tabPanels = output.find('.tab-content');
     var tabPanelTemplate = tabPanels.children().remove();
     groupNode.children.forEach(function(childNode, index) {
-      var tab = tabTemplate.clone().toggleClass('active', index === 0).appendTo(tabs);
-      var tabPanel = tabPanelTemplate.clone().toggleClass('active', index === 0).appendTo(tabPanels);
+      var tab = tabTemplate.clone().appendTo(tabs);
+      var tabPanel = tabPanelTemplate.clone().appendTo(tabPanels);
+      // Some of the child nodes might be hidden so we will activate the first visible tab at the end.
+      tab.add(tabPanel).removeClass('active').toggleClass('hidden', !!childNode.data.hidden);
       fillNodeTab(childNode, tab.children().first(), tabPanel);
     });
+    // Activate the first visible tab.
+    var activeTab = tabs.children().not('.hidden').first();
+    var activeTabPanel = tabPanels.children().not('.hidden').first();
+    activeTab.add(activeTabPanel).addClass('active');
     return output;
   },
 

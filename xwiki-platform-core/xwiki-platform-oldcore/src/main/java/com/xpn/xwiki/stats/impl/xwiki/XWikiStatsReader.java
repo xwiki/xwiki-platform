@@ -234,6 +234,9 @@ public class XWikiStatsReader
 
             Query query = this.queryManager.createQuery(statement, Query.HQL);
             query.bindValues(params);
+            query.setLimit(range.getAbsoluteSize());
+            query.setOffset(range.getAbsoluteStart());
+
             List<?> solist = query.execute();
 
             documentStatsList = getDocumentStatistics(solist, action);

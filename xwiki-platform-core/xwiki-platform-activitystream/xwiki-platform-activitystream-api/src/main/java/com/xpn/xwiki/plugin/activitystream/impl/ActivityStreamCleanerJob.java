@@ -51,7 +51,7 @@ public class ActivityStreamCleanerJob extends AbstractJob implements Job
         if (days > 0) {
             parameters.add(DateUtils.addDays(new Date(), days * -1));
             try {
-                List<ActivityEvent> events = plugin.getActivityStream().searchEvents("date < ?", false, true, 0, 0,
+                List<ActivityEvent> events = plugin.getActivityStream().searchEvents("date < ?1", false, true, 0, 0,
                     parameters, getXWikiContext());
                 for (ActivityEvent event : events) {
                     plugin.getActivityStream().deleteActivityEvent(event, getXWikiContext());

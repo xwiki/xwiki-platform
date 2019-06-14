@@ -121,7 +121,7 @@ public class DefaultWatchListEventMatcher implements WatchListEventMatcher
         try {
             // FIXME: Watch out for memory usage here, since the list of events could be huge in some cases.
             List<ActivityEvent> rawEvents = actStream.searchEvents(
-                "act.date > ?:1 and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','") + "')", false, true,
+                "act.date > ?1 and act.type in ('" + StringUtils.join(MATCHING_EVENT_TYPES, "','") + "')", false, true,
                 0, 0, parameters, context);
 
             // If the page has been modified several times we want to display only one diff, if the page has been

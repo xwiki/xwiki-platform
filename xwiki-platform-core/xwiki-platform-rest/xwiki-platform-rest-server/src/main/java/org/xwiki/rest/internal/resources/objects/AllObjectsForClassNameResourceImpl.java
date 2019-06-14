@@ -55,8 +55,8 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
 
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
-            String query =
-                    "select doc, obj from BaseObject as obj, XWikiDocument as doc where obj.name=doc.fullName and obj.className=:className";
+            String query = "select doc, obj from BaseObject as obj, XWikiDocument as doc "
+                + "where obj.name=doc.fullName and obj.className=:className";
             if ("date".equals(order)) {
                 query += " order by doc.date desc";
             }

@@ -1,0 +1,11 @@
+## If this field is part of a property group then the group might also include an entity type field which we can use to
+## enhance this field with pickers based on the selected entity type value.
+#if ($displayer.parameters.containsKey('data-property-group'))
+  ## Add the CSS class that activates the entity type switch.
+  ## Also configure single selection (only one entity can be selected).
+  #set ($discard = $displayer.parameters.putAll({
+    'class': "$!displayer.parameters.get('class') entityReferenceString",
+    'data-xwiki-selectize': '{"maxItems": 1}'
+  }))
+#end
+#template('html_displayer/default.vm')

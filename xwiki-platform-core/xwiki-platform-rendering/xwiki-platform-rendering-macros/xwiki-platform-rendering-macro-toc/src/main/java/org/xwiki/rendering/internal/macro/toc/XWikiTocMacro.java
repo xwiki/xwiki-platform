@@ -17,26 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rest.internal.representations;
+package org.xwiki.rendering.internal.macro.toc;
 
-import java.io.IOException;
-import java.io.InputStream;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import javax.ws.rs.ext.MessageBodyReader;
-
-import org.apache.commons.io.IOUtils;
-import org.xwiki.rest.XWikiRestComponent;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.rendering.macro.toc.XWikiTocMacroParameters;
 
 /**
+ * Generate a Table Of Contents based on the document sections.
+ * <p>
+ * We override the default Table of Contents macro because we want to associate a {@code DocumentReference} picker to
+ * the {@code reference} parameter (using the {@code PropertyDisplayType} annotation).
+ * 
  * @version $Id$
+ * @since 11.5RC1
  */
-public abstract class TextPlainReader<T> implements MessageBodyReader<T>, XWikiRestComponent
+@Component
+@Named("toc")
+@Singleton
+public class XWikiTocMacro extends AbstractTocMacro<XWikiTocMacroParameters>
 {
-    protected String getEntityAsString(InputStream entityStream) throws IOException
+    /**
+     * Create and initialize the descriptor of the macro.
+     */
+    public XWikiTocMacro()
     {
-        if (entityStream == null) {
-            return "";
-        }
-        return IOUtils.toString(entityStream);
+        super(XWikiTocMacroParameters.class);
     }
 }

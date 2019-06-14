@@ -33,6 +33,9 @@ import org.xwiki.component.annotation.Component;
 @Singleton
 public class HQLSearchSource extends AbstractDatabaseSearchSource
 {
+    /**
+     * Default constructor.
+     */
     public HQLSearchSource()
     {
         super("hql");

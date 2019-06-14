@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="XWiki.AttachmentSelector" locale="">
   <web>XWiki</web>
   <name>AttachmentSelector</name>
   <language/>
@@ -354,6 +354,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -369,7 +370,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -746,6 +749,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -761,7 +765,9 @@ $xwiki.jsx.use($attachmentPickerDocName)
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -871,6 +877,7 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
         <multiSelect>0</multiSelect>
@@ -886,7 +893,9 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -1148,6 +1157,9 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
 }</code>
     </property>
     <property>
+      <contentType/>
+    </property>
+    <property>
       <name>Attachment galery styling</name>
     </property>
     <property>
@@ -1171,8 +1183,47 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
       <defaultWeb/>
       <nameField/>
       <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>11</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>12</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>10</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
       <code>
         <disabled>0</disabled>
+        <editor>Text</editor>
         <name>code</name>
         <number>9</number>
         <prettyName>Macro code</prettyName>
@@ -1182,7 +1233,9 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </code>
       <contentDescription>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>contentDescription</name>
         <number>8</number>
         <prettyName>Content description (Not applicable for "No content" type)</prettyName>
@@ -1217,7 +1270,9 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultCategory>
       <description>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>description</name>
         <number>3</number>
         <prettyName>Macro description</prettyName>
@@ -1271,6 +1326,15 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </visibility>
     </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
     <property>
       <code>{{velocity output="false"}}
 $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
@@ -1508,6 +1572,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1520,6 +1593,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>classname</name>
+    </property>
+    <property>
+      <type>org.xwiki.model.reference.DocumentReference</type>
     </property>
   </object>
   <object>
@@ -1574,6 +1650,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1586,6 +1671,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>property</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1640,6 +1728,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1652,6 +1749,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>object</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1706,6 +1806,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1718,6 +1827,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>cssClass</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1772,6 +1884,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>form</defaultValue>
@@ -1784,6 +1905,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>savemode</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1838,6 +1962,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1850,6 +1983,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>buttontext</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -1904,6 +2040,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1916,6 +2061,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>defaultValue</name>
+    </property>
+    <property>
+      <type>org.xwiki.model.reference.AttachmentReference</type>
     </property>
   </object>
   <object>
@@ -1970,6 +2118,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -1982,6 +2139,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>filter</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2036,6 +2196,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -2048,6 +2217,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>displayImage</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2102,6 +2274,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -2114,6 +2295,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>width</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2168,6 +2352,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -2180,6 +2373,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>height</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2234,6 +2430,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -2246,6 +2451,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>alternateText</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2300,6 +2508,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -2312,6 +2529,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>link</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
   <object>
@@ -2366,6 +2586,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue/>
@@ -2378,6 +2607,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>targetdocname</name>
+    </property>
+    <property>
+      <type>org.xwiki.model.reference.DocumentReference</type>
     </property>
   </object>
   <object>
@@ -2432,6 +2664,15 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </name>
+      <type>
+        <disabled>0</disabled>
+        <name>type</name>
+        <number>5</number>
+        <prettyName>Parameter type</prettyName>
+        <size>60</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </type>
     </class>
     <property>
       <defaultValue>false</defaultValue>
@@ -2444,6 +2685,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     </property>
     <property>
       <name>versionSummary</name>
+    </property>
+    <property>
+      <type/>
     </property>
   </object>
 </xwikidoc>

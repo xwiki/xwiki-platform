@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.regex.Pattern;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -58,6 +59,8 @@ public class FormUrlEncodedTagsReader implements MessageBodyReader<Tags>, XWikiR
     private static final String TAGS_FIELD_NAME = "tags";
 
     private static final String TAG_FIELD_NAME = "tag";
+    
+    private static final Pattern TAG_SEPARATORS = Pattern.compile(" |,|\\|");
 
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mediaType)
@@ -86,7 +89,7 @@ public class FormUrlEncodedTagsReader implements MessageBodyReader<Tags>, XWikiR
 
             String text = httpServletRequest.getParameter(TAGS_FIELD_NAME);
             if (text != null) {
-                String[] tagNames = text.split(" |,|\\|");
+                String[] tagNames = TAG_SEPARATORS.split(text);
 
                 for (String tagName : tagNames) {
                     Tag tag = objectFactory.createTag();
@@ -106,7 +109,7 @@ public class FormUrlEncodedTagsReader implements MessageBodyReader<Tags>, XWikiR
         } else {
             String text = form.getFirstValue(TAGS_FIELD_NAME);
             if (text != null) {
-                String[] tagNames = text.split(" |,|\\|");
+                String[] tagNames = TAG_SEPARATORS.split(text);
 
                 for (String tagName : tagNames) {
                     Tag tag = objectFactory.createTag();

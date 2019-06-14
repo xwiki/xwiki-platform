@@ -28,9 +28,10 @@ import javax.ws.rs.core.Response.Status;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.ModelFactory;
-import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.resources.objects.ObjectResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -45,6 +46,9 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 {
     @Inject
     private ModelFactory factory;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Override
     public Object getObject(String wikiName, String spaceName, String pageName, String className, Integer objectNumber,
@@ -75,7 +79,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 
             Document doc = documentInfo.getDocument();
 
-            if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
+            if (!this.authorization.hasAccess(Right.EDIT, doc.getDocumentReference())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
@@ -106,7 +110,7 @@ public class ObjectResourceImpl extends BaseObjectsResource implements ObjectRes
 
             Document doc = documentInfo.getDocument();
 
-            if (!doc.hasAccessLevel("edit", Utils.getXWikiUser(componentManager))) {
+            if (!this.authorization.hasAccess(Right.EDIT, doc.getDocumentReference())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 

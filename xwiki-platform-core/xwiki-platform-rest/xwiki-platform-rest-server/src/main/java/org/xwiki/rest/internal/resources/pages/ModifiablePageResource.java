@@ -38,22 +38,30 @@ public class ModifiablePageResource extends XWikiResource
     @Inject
     protected ModelFactory factory;
 
+    /**
+     * Creates or updates the specified page.
+     * 
+     * @param documentInfo identifies the page to be updated or created
+     * @param page the submitted page data
+     * @param minorRevision whether to create a minor revision or not
+     * @return page data if the operation was successful
+     * @throws XWikiException if creating or updating the page fails
+     */
     public Response putPage(DocumentInfo documentInfo, Page page, Boolean minorRevision) throws XWikiException
     {
         Document doc = documentInfo.getDocument();
 
-        // Save the document only if there is actually something to do if if the document does not exist
+        // Save the document only if there is actually something to do if the document does not exist
         if (this.factory.toDocument(doc, page) || doc.isNew()) {
             doc.save(page.getComment(), Boolean.TRUE.equals(minorRevision));
 
-            page =
-                this.factory.toRestPage(uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false, false, false, false,
-                    false);
+            Page returnedPage = this.factory.toRestPage(uriInfo.getBaseUri(), uriInfo.getAbsolutePath(), doc, false,
+                false, false, false, false);
 
             if (documentInfo.isCreated()) {
-                return Response.created(uriInfo.getAbsolutePath()).entity(page).build();
+                return Response.created(uriInfo.getAbsolutePath()).entity(returnedPage).build();
             } else {
-                return Response.status(Status.ACCEPTED).entity(page).build();
+                return Response.status(Status.ACCEPTED).entity(returnedPage).build();
             }
         } else {
             return Response.status(Status.NOT_MODIFIED).build();

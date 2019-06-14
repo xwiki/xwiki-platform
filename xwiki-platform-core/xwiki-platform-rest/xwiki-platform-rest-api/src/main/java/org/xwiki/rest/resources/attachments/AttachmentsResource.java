@@ -45,7 +45,10 @@ public interface AttachmentsResource
             @PathParam("pageName") String pageName,
             @QueryParam("start") @DefaultValue("0") Integer start,
             @QueryParam("number") @DefaultValue("-1") Integer number,
-            @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
+            @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
+            @QueryParam("name") @DefaultValue("") String name,
+            @QueryParam("author") @DefaultValue("") String author,
+            @QueryParam("types") @DefaultValue("") String types
     ) throws XWikiRestException;
 
     @POST
@@ -53,6 +56,7 @@ public interface AttachmentsResource
             @PathParam("wikiName") String wikiName,
             @PathParam("spaceName") String spaceName,
             @PathParam("pageName") String pageName,
-            Multipart multipart
+            Multipart multipart,
+            @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames
     ) throws XWikiRestException;
 }

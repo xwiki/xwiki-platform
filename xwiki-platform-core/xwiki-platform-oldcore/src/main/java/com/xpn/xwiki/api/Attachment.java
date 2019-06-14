@@ -29,6 +29,7 @@ import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.model.reference.AttachmentReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -265,5 +266,14 @@ public class Attachment extends Api
     {
         XWikiAttachment att = this.attachment.getAttachmentRevision(rev, getXWikiContext());
         return att == null ? null : new Attachment(getDocument(), att, this.context);
+    }
+
+    /**
+     * @return the reference of this attachment
+     * @since 11.5RC1
+     */
+    public AttachmentReference getReference()
+    {
+        return this.attachment.getReference();
     }
 }

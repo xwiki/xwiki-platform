@@ -2393,6 +2393,26 @@ $string##
 #end
 
 #**
+* Pulls all the JavaScript and CSS resources needed by the attachment picker.
+*#
+#macro (attachmentPicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestAttachments.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  ## Pull the resources required by the configured icon set in order to display attachment icons.
+  #set ($discard = $services.icon.use())
+#end
+
+#macro (attachmentPicker $parameters)
+  #attachmentPicker_import
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-attachments"))
+  #suggestInput($parameters)
+#end
+
+#**
  * Displays the given title (i.e. the title of the sheet) if the condition is true. Otherwise displays the title of the
  * current document (i.e. the document the sheet is applied to). If the condition is not specified then it checks if the
  * current document is a sheet by looking for an object of type 'XWiki.SheetDescriptorClass'. You can pass a traslation
@@ -2633,6 +2653,9 @@ Recursive title display detected!##
     #set ($values = [])
   #end
   <select $stringtool.join($attributes, ' ')>
+    #if ("$!parameters.placeholder" != '')
+      <option value="">$escapetool.xml($parameters.placeholder)</option>
+    #end
     #if ("$!optionsDisplayerMacroName" != '')
       #evaluate("${escapetool.h}${optionsDisplayerMacroName}(${escapetool.d}values)")
     #else
@@ -2687,9 +2710,6 @@ Recursive title display detected!##
 #end
 
 #macro (classPicker_displayOptions $selectedValues)
-  #if ("$!parameters.placeholder" != '')
-    <option value="">$escapetool.xml($parameters.placeholder)</option>
-  #end
   #set ($selectedClassReferences = $collectionstool.set)
   #foreach ($selectedValue in $selectedValues)
     #set ($discard = $selectedClassReferences.add($services.model.resolveDocument($selectedValue)))

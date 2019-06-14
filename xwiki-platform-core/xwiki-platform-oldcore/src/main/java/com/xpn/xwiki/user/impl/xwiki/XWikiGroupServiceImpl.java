@@ -263,18 +263,17 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     public void removeUserOrGroupFromAllGroups(String memberWiki, String memberSpace, String memberName,
         XWikiContext context) throws XWikiException
     {
-        List<Object> parameterValues = new ArrayList<Object>();
+        List<Object> parameterValues = new ArrayList<>();
 
-        StringBuilder where = new StringBuilder(
-            ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?");
         parameterValues.add(CLASS_XWIKIGROUPS);
+        StringBuilder where = new StringBuilder(
+            ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?"
+                + parameterValues.size());
 
         where.append(" and obj.id=prop.id.id");
 
-        where.append(" and prop.name=?");
         parameterValues.add(FIELD_XWIKIGROUPS_MEMBER);
-
-        where.append(" and prop.value like ?");
+        where.append(" and prop.name=?" + parameterValues.size());
 
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
@@ -287,6 +286,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             parameterValues.add(HQLLIKE_ALL_SYMBOL + memberWiki + WIKI_FULLNAME_SEP + memberSpace + SPACE_NAME_SEP
                 + memberName + HQLLIKE_ALL_SYMBOL);
         }
+        where.append(" and prop.value like ?" + parameterValues.size());
 
         List<XWikiDocument> documentList =
             context.getWiki().getStore().searchDocuments(where.toString(), parameterValues, context);

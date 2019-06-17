@@ -217,7 +217,8 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
 
             if (databaseId == null) {
                 // Try without the milliseconds since most versions of MySQL don't support them
-                selectQuery.setParameter(2, new java.sql.Timestamp(deleteDate.toInstant().getEpochSecond() * 1000));
+                selectQuery.setParameter("date",
+                    new java.sql.Timestamp(deleteDate.toInstant().getEpochSecond() * 1000));
                 databaseId = selectQuery.uniqueResult();
             }
 

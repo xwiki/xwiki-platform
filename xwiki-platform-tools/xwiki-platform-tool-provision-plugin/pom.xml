@@ -92,6 +92,10 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Required to override the Servlet Environment which is used otherwise and for which a Servlet Context is not
+         initialized and thus it won't work. Another option would be to mock the ModelFactory implementation and
+         remove the wiki-default and commons-environment-standard dependencies but then the test would be less an
+         integration test. -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-standard</artifactId>

@@ -202,4 +202,14 @@ public class ViewPage extends BasePage
             }
         });
     }
+
+    /**
+     * @param elementLocator the element to locate in the content of the page.
+     * @return true if the content of the page contains the element
+     * @since 11.5RC1
+     */
+    public boolean contentContainsElement(By elementLocator)
+    {
+        return getDriver().hasElementWithoutWaiting(this.content, elementLocator);
+    }
 }

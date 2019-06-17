@@ -50,4 +50,10 @@ public class AllIT
     class NestedAttachmentIT extends AttachmentIT
     {
     }
+
+    @Nested
+    @DisplayName("Velocity Macro Tests")
+    class NestedVelocityIT extends VelocityIT
+    {
+    }
 }

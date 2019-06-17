@@ -361,7 +361,7 @@ public class BaseAttachmentsResource extends XWikiResource
             createOrUpdateAttachment(new AttachmentReference(attachmentName, document.getDocumentReference()), content);
         // The doc has been updated during the creation of the attachment, so we need to ensure we answer with the
         // updated version.
-        Document updatedDoc = new Document(xwikiAttachment.getDoc(), xcontext);
+        Document updatedDoc = xwikiAttachment.getDoc().newDocument(xcontext);
         Attachment attachment = this.modelFactory.toRestAttachment(uriInfo.getBaseUri(),
             new com.xpn.xwiki.api.Attachment(updatedDoc, xwikiAttachment, this.xcontextProvider.get()), withPrettyNames,
             false);

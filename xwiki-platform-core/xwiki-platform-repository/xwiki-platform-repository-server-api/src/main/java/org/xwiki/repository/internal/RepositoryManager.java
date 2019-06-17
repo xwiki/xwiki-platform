@@ -459,8 +459,12 @@ public class RepositoryManager implements Initializable, Disposable
 
                 XWikiDocument attachmentDocument;
                 try {
-                    attachmentDocument =
-                        context.getWiki().getDocument(attachmentReference.getDocumentReference(), context);
+                    if (attachmentReference.getDocumentReference().equals(document.getDocumentReference())) {
+                        attachmentDocument = document;
+                    } else {
+                        attachmentDocument =
+                            context.getWiki().getDocument(attachmentReference.getDocumentReference(), context);
+                    }
 
                     valid = attachmentDocument.getAttachment(attachmentReference.getName()) != null;
                 } catch (XWikiException e) {

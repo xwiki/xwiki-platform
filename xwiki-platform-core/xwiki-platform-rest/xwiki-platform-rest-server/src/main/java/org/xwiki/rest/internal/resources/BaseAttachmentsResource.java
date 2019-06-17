@@ -354,12 +354,16 @@ public class BaseAttachmentsResource extends XWikiResource
     protected AttachmentInfo storeAndRetrieveAttachment(Document document, String attachmentName, InputStream content,
         Boolean withPrettyNames) throws XWikiException
     {
+        XWikiContext xcontext = this.xcontextProvider.get();
         boolean alreadyExisting = document.getAttachment(attachmentName) != null;
 
         XWikiAttachment xwikiAttachment =
             createOrUpdateAttachment(new AttachmentReference(attachmentName, document.getDocumentReference()), content);
+        // The doc has been updated during the creation of the attachment, so we need to ensure we answer with the
+        // updated version.
+        Document updatedDoc = new Document(xwikiAttachment.getDoc(), xcontext);
         Attachment attachment = this.modelFactory.toRestAttachment(uriInfo.getBaseUri(),
-            new com.xpn.xwiki.api.Attachment(document, xwikiAttachment, this.xcontextProvider.get()), withPrettyNames,
+            new com.xpn.xwiki.api.Attachment(updatedDoc, xwikiAttachment, this.xcontextProvider.get()), withPrettyNames,
             false);
 
         return new AttachmentInfo(attachment, alreadyExisting);

@@ -242,6 +242,20 @@
                     "new": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
                     "annotation": "@org.xwiki.properties.annotation.PropertyGroup({\"stringReference\"})",
                     "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setAttachment(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setAttachment(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.model.reference.AttachmentReference.class})",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setReference(org.xwiki.rendering.listener.reference.ResourceReference)",
+                    "new": "method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setReference(org.xwiki.rendering.listener.reference.ResourceReference)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.rendering.macro.office.OfficeMacroParameters.OfficeResourceReference.class})",
+                    "justification": "Not an API breakage"
                   }
                   // Add more ignores below...
                 ]

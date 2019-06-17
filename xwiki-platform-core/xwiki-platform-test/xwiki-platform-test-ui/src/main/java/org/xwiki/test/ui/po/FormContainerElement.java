@@ -124,10 +124,10 @@ public class FormContainerElement extends BaseElement
                     && !"false".equals(fieldElement.getAttribute("multiple"))
                     && value.contains("|")) {
                     for (String singleValue : value.split("\\|")) {
-                        suggestInputElement.sendKeys(singleValue).waitForSuggestions().selectTypedText();
+                        suggestInputElement.sendKeys(singleValue).selectTypedText();
                     }
                 } else {
-                    suggestInputElement.sendKeys(value).waitForSuggestions().selectTypedText();
+                    suggestInputElement.sendKeys(value).selectTypedText();
                 }
 
             } else {

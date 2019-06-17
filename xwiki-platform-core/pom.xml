@@ -193,6 +193,13 @@
                     "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setPage(java.lang.String)",
                     "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.model.reference.PageReference.class})",
                     "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.dashboard.DashboardMacroParameters::setSource(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.dashboard.DashboardMacroParameters::setSource(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.model.reference.DocumentReference.class})",
+                    "justification": "Not an API breakage"
                   }
                   // Add more ignores below...
                 ]

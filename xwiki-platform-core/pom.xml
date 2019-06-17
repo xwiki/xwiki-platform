@@ -200,6 +200,48 @@
                     "new": "method void org.xwiki.rendering.macro.dashboard.DashboardMacroParameters::setSource(java.lang.String)",
                     "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.model.reference.DocumentReference.class})",
                     "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method org.xwiki.model.EntityType org.xwiki.rendering.macro.display.DisplayMacroParameters::getType()",
+                    "new": "method org.xwiki.model.EntityType org.xwiki.rendering.macro.display.DisplayMacroParameters::getType()",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyGroup({\"stringReference\"})",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setPage(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setPage(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.model.reference.PageReference.class})",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setPage(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setPage(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyFeature(\"reference\")",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.model.reference.EntityReferenceString.class})",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyFeature(\"reference\")",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.display.DisplayMacroParameters::setReference(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyGroup({\"stringReference\"})",
+                    "justification": "Not an API breakage"
                   }
                   // Add more ignores below...
                 ]

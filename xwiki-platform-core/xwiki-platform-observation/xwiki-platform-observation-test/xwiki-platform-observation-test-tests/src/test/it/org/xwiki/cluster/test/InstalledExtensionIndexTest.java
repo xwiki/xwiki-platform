@@ -26,10 +26,14 @@ import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.xwiki.cache.infinispan.internal.InfinispanCacheFactory;
+import org.xwiki.cache.internal.DefaultCacheManager;
+import org.xwiki.cache.internal.DefaultCacheManagerConfiguration;
 import org.xwiki.cluster.test.framework.AbstractClusterHttpTest;
 import org.xwiki.component.annotation.ComponentAnnotationLoader;
 import org.xwiki.component.annotation.ComponentDeclaration;
 import org.xwiki.component.namespace.Namespace;
+import org.xwiki.configuration.internal.DefaultConfigurationSourceProvider;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.job.ExtensionRequest;
 import org.xwiki.extension.job.InstallRequest;
@@ -41,6 +45,8 @@ import org.xwiki.rest.model.jaxb.JobRequest;
 import org.xwiki.rest.resources.job.JobsResource;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptorManager;
+import org.xwiki.wiki.internal.manager.WikiDescriptorCache;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -58,6 +64,15 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
         ComponentAnnotationLoader loader = new ComponentAnnotationLoader();
         List<ComponentDeclaration> componentDeclarations = new ArrayList<>();
         componentDeclarations.add(new ComponentDeclaration(ModelFactory.class.getName()));
+
+        // All deps required by ModelFactory
+        componentDeclarations.add(new ComponentDeclaration(DefaultWikiDescriptorManager.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(WikiDescriptorCache.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DefaultCacheManager.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DefaultCacheManagerConfiguration.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(DefaultConfigurationSourceProvider.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(InfinispanCacheFactory.class.getName()));
+
         componentDeclarations.add(new ComponentDeclaration(JAXBConverter.class.getName()));
         loader.initialize(AbstractTest.componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);
 

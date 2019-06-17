@@ -108,6 +108,14 @@
       <version>${hsqldb.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- We need an implementation for wiki-api for the default ModelFactory implementation -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-wiki-default</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
   <build>
     <testSourceDirectory>src/test/it</testSourceDirectory>

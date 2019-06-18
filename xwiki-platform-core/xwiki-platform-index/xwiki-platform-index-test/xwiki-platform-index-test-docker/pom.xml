@@ -54,6 +54,13 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+    <!-- Needed to test rights actions -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+    </dependency>
     <!-- ================================
          Test only dependencies
          ================================ -->

@@ -462,6 +462,9 @@ define('xwiki-suggestAttachments', [
    * Allow the user to upload a file when the input is empty. Otherwise, allow the user to select the typed value.
    */
   var addFileUploadSupport = function(selectize) {
+    // Activate the styles needed to show the upload progress.
+    (selectize.$wrapper).addClass('async-create');
+
     // Show the Create option even when the input is empty in order to allow the user to upload files.
     var oldCanCreate = selectize.canCreate;
     selectize.canCreate = function(input) {
@@ -485,7 +488,7 @@ define('xwiki-suggestAttachments', [
     selectize.settings.render.item = function(attachment) {
       var output = oldRenderItem.apply(this, arguments);
       if (attachment.data && attachment.data.upload) {
-        output.addClass('upload upload-' + attachment.data.upload.status);
+        output.addClass('upload create-' + attachment.data.upload.status);
         if (attachment.data.upload.status === 'running') {
           output.css('background', 'linear-gradient(90deg, #dff0d8 ' +
             attachment.data.upload.progress.percent + '%, #efefef 0)');

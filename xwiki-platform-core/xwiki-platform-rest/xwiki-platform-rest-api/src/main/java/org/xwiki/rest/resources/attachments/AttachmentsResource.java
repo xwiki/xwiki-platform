@@ -58,6 +58,6 @@ public interface AttachmentsResource
             @PathParam("pageName") String pageName,
             Multipart multipart,
             @QueryParam("prettyNames") @DefaultValue("false") Boolean withPrettyNames,
-            @QueryParam("createDocument") @DefaultValue("false") Boolean createDocument
+            @QueryParam("createPage") @DefaultValue("false") Boolean createPage
     ) throws XWikiRestException;
 }

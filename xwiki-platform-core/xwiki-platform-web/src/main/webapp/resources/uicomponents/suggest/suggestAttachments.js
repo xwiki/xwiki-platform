@@ -62,8 +62,8 @@ define('xwiki-attachments-store', ['jquery'], function($) {
     var deferred = $.Deferred();
     $.post({
       url: getAttachmentsRestURL(attachmentReference.parent, {
-        // Create the document if it doesn't exist (it happens when editing a new document).
-        createDocument: true
+        // Create the page if it doesn't exist (it happens when editing a new page).
+        createPage: true
       }),
       data: formData,
       // Needed in order to be able to submit FormData directly

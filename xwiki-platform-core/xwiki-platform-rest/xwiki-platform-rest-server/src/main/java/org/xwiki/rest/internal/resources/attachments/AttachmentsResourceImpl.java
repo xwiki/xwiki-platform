@@ -78,11 +78,11 @@ public class AttachmentsResourceImpl extends BaseAttachmentsResource implements 
 
     @Override
     public Response addAttachment(String wikiName, String spaceName, String pageName, Multipart multipart,
-        Boolean withPrettyNames, Boolean createDocument) throws XWikiRestException
+        Boolean withPrettyNames, Boolean createPage) throws XWikiRestException
     {
         try {
             List<String> spaces = parseSpaceSegments(spaceName);
-            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaces, pageName, null, null, !createDocument, true);
+            DocumentInfo documentInfo = getDocumentInfo(wikiName, spaces, pageName, null, null, !createPage, true);
             Document doc = documentInfo.getDocument();
 
             if (!this.authorization.hasAccess(Right.EDIT, doc.getDocumentReference())) {

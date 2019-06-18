@@ -899,6 +899,33 @@ $xwiki.getDocument('MenuTemplate').content
     padding-left: 15px;
     &amp; .icon-bar {
       background-color: @navbar-default-link-color;
+      transition: .3s ease all;
+      &amp;:nth-of-type(2) {
+        opacity: 0;
+      }
+      &amp;:nth-of-type(3) {
+        transform: rotate(45deg);
+      }
+      &amp;:nth-of-type(4) {
+        transform: rotate(-45deg);
+        margin-top: -2px;
+        margin-bottom: 6px;
+      }
+    }
+    &amp;.collapsed {
+      .icon-bar {
+        &amp;:nth-of-type(2) {
+          opacity: 1;
+        }
+        &amp;:nth-of-type(3) {
+          transform: rotate(0);
+        }
+        &amp;:nth-of-type(4) {
+          transform: rotate(0);
+          margin-top: 4px;
+          margin-bottom: 0;
+        }
+      }
     }
   }
 }</code>
@@ -1100,13 +1127,13 @@ $xwiki.getDocument('MenuTemplate').content
       </visibility>
     </class>
     <property>
-      <async_cached/>
+      <async_cached>0</async_cached>
     </property>
     <property>
       <async_context/>
     </property>
     <property>
-      <async_enabled/>
+      <async_enabled>0</async_enabled>
     </property>
     <property>
       <code>{{velocity}}

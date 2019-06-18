@@ -159,19 +159,19 @@
                     "attribute": "propOrder",
                     "oldValue": "{\"id\", \"name\", \"size\", \"longSize\", \"version\", \"pageId\", \"pageVersion\", \"mimeType\", \"author\", \"authorName\", \"date\", \"xwikiRelativeUrl\", \"xwikiAbsoluteUrl\"}",
                     "newValue": "{\"id\", \"name\", \"size\", \"longSize\", \"version\", \"pageId\", \"pageVersion\", \"mimeType\", \"author\", \"authorName\", \"date\", \"xwikiRelativeUrl\", \"xwikiAbsoluteUrl\", \"hierarchy\"}",
-                    "justification": "Add the hierarchy property in order to be able to show the location of an attachment in the UI"
+                    "justification": "Not an API breakage (Added a new property to a REST entity)"
                   },
                   {
                     "code": "java.method.numberOfParametersChanged",
                     "old": "method org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentsResource::getAttachments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
                     "new": "method org.xwiki.rest.model.jaxb.Attachments org.xwiki.rest.resources.attachments.AttachmentsResource::getAttachments(java.lang.String, java.lang.String, java.lang.String, java.lang.Integer, java.lang.Integer, java.lang.Boolean, java.lang.String, java.lang.String, java.lang.String) throws org.xwiki.rest.XWikiRestException",
-                    "justification": "Add support for filtering the attachments by file name, author and mime type even when they are stored on the same page"
+                    "justification": "Not an API breakage (Added a new query string parameter to a REST resource that shouldn't be called directly from Java)"
                   },
                   {
                     "code": "java.method.numberOfParametersChanged",
                     "old": "method javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, javax.mail.Multipart) throws org.xwiki.rest.XWikiRestException",
                     "new": "method javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, javax.mail.Multipart, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
-                    "justification": "All resources that return attachments should take into account the prettyNames query string parameter"
+                    "justification": "Not an API breakage (Added a new query string parameter to a REST resource that shouldn't be called directly from Java)"
                   },
                   {
                     "code": "java.annotation.added",
@@ -284,6 +284,12 @@
                     "new": "method void org.xwiki.rendering.macro.office.OfficeMacroParameters::setReference(org.xwiki.rendering.listener.reference.ResourceReference)",
                     "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.rendering.macro.office.OfficeMacroParameters.OfficeResourceReference.class})",
                     "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.method.numberOfParametersChanged",
+                    "old": "method javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, javax.mail.Multipart) throws org.xwiki.rest.XWikiRestException",
+                    "new": "method javax.ws.rs.core.Response org.xwiki.rest.resources.attachments.AttachmentsResource::addAttachment(java.lang.String, java.lang.String, java.lang.String, javax.mail.Multipart, java.lang.Boolean, java.lang.Boolean) throws org.xwiki.rest.XWikiRestException",
+                    "justification": "Not an API breakage (Added a new query string parameter to a REST resource that shouldn't be called directly from Java)"
                   }
                   // Add more ignores below...
                 ]

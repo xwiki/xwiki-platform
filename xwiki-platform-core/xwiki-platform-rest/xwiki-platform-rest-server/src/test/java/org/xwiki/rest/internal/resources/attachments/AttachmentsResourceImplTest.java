@@ -154,7 +154,7 @@ public class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
     public void createAttachment() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("test", Arrays.asList("Path", "To"), "Page");
-        XWikiDocument document = createXWikiDocument(documentReference, "test:Path.To.Page", true, true);
+        XWikiDocument cachedDocument = prepareXWikiDocument(documentReference, "test:Path.To.Page", true, true, false);
 
         AttachmentReference attachmentReference = new AttachmentReference("myBio.txt", documentReference);
         when(this.currentGetDocumentReferenceResolver.resolve(attachmentReference)).thenReturn(documentReference);
@@ -165,13 +165,14 @@ public class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
             eq(false), eq(false))).thenReturn(attachment);
 
-        Response response = this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", multipart, false);
+        Response response =
+            this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", multipart, false, true);
 
         assertEquals(Status.CREATED.getStatusCode(), response.getStatus());
         assertEquals(attachment, response.getEntity());
 
         // The cached document should not have been modified.
-        assertNull(document.getAttachment("myBio.txt"));
+        assertNull(cachedDocument.getAttachment("myBio.txt"));
 
         XWikiAttachment xwikiAttachment =
             this.xwiki.getDocument(documentReference, this.xcontext).getAttachment("myBio.txt");
@@ -184,7 +185,7 @@ public class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
     public void updateAttachment() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("test", Arrays.asList("Path", "To"), "Page");
-        XWikiDocument document = createXWikiDocument(documentReference, "test:Path.To.Page", true, true);
+        XWikiDocument document = prepareXWikiDocument(documentReference, "test:Path.To.Page", true, true, true);
 
         document.setAttachment("pom.xml", new ByteArrayInputStream("<pom/>".getBytes()), this.xcontext);
         this.xwiki.saveDocument(document, this.xcontext);
@@ -198,7 +199,8 @@ public class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         when(this.modelFactory.toRestAttachment(eq(this.uriInfo.getBaseUri()), any(com.xpn.xwiki.api.Attachment.class),
             eq(true), eq(false))).thenReturn(attachment);
 
-        Response response = this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", multipart, true);
+        Response response =
+            this.attachmentsResource.addAttachment("test", "Path/spaces/To", "Page", multipart, true, false);
 
         assertEquals(Status.ACCEPTED.getStatusCode(), response.getStatus());
         assertEquals(attachment, response.getEntity());
@@ -233,16 +235,18 @@ public class AttachmentsResourceImplTest extends AbstractAttachmentsResourceTest
         return multipart;
     }
 
-    private XWikiDocument createXWikiDocument(DocumentReference documentReference, String serializedDocumentReference,
-        boolean hasView, boolean hasEdit) throws Exception
+    private XWikiDocument prepareXWikiDocument(DocumentReference documentReference, String serializedDocumentReference,
+        boolean hasView, boolean hasEdit, boolean save) throws Exception
     {
         when(this.defaultEntityReferenceSerializer.serialize(documentReference))
             .thenReturn(serializedDocumentReference);
 
-        XWikiDocument document = new XWikiDocument(documentReference);
-        this.xwiki.saveDocument(document, this.xcontext);
+        if (save) {
+            XWikiDocument document = new XWikiDocument(documentReference);
+            this.xwiki.saveDocument(document, this.xcontext);
+        }
 
-        when(this.oldCore.getMockRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "test:Path.To.Page",
+        when(this.oldCore.getMockRightService().hasAccessLevel("view", "XWiki.XWikiGuest", serializedDocumentReference,
             this.xcontext)).thenReturn(hasView);
         when(this.authorization.hasAccess(Right.EDIT, documentReference)).thenReturn(hasEdit);
 

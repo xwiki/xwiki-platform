@@ -30,7 +30,7 @@ define('xwiki-attachments-store', ['jquery'], function($) {
   /**
    * Returns the REST URL that can be used to search or retrieve the attachments located inside the specified entity.
    */
-  var getAttachmentsRestURL = function(entityReference) {
+  var getAttachmentsRestURL = function(entityReference, parameters) {
     var path = ['$request.contextPath', 'rest'];
     entityReference.getReversedReferenceChain().forEach(function(reference) {
       var restResourceType = reference.type === XWiki.EntityType.DOCUMENT ? 'page' :
@@ -43,7 +43,10 @@ define('xwiki-attachments-store', ['jquery'], function($) {
     } else {
       path.push('attachments');
     }
-    return path.join('/') + '?prettyNames=true';
+    var queryString = $.param($.extend({
+      prettyNames: true
+    }, parameters), true);
+    return path.join('/') + '?' + queryString;
   };
 
   var getAttachments = function(entityReference, options) {
@@ -58,7 +61,10 @@ define('xwiki-attachments-store', ['jquery'], function($) {
     formData.append('filename', attachmentReference.name);
     var deferred = $.Deferred();
     $.post({
-      url: getAttachmentsRestURL(attachmentReference.parent),
+      url: getAttachmentsRestURL(attachmentReference.parent, {
+        // Create the document if it doesn't exist (it happens when editing a new document).
+        createDocument: true
+      }),
       data: formData,
       // Needed in order to be able to submit FormData directly
       processData: false,

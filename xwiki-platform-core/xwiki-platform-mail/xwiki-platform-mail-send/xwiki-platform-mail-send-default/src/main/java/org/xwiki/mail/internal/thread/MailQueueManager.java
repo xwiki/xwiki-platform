@@ -19,6 +19,8 @@
  */
 package org.xwiki.mail.internal.thread;
 
+import java.util.concurrent.TimeUnit;
+
 import org.xwiki.component.annotation.Role;
 
 /**
@@ -37,6 +39,21 @@ public interface MailQueueManager<T extends MailQueueItem>
      * @param mailQueueItem the object representing the mail item to add to the queue
      */
     void addToQueue(T mailQueueItem);
+
+    /**
+     * Add a mail on the queue for processing, waiting a max of timeout.
+     *
+     * @param mailQueueItem the object representing the mail item to add to the queue
+     * @param timeout how long to wait before giving up, in units of {@code unit}
+     * @param unit a {@code TimeUnit} determining how to interpret the {@code timeout} parameter
+     * @throws InterruptedException if it times out i.e if the queue doesn't have any empty slot freed in the specified
+     *         timeout time
+     * @since 11.6RC1
+     */
+    default void addMessage(T mailQueueItem, long timeout, TimeUnit unit) throws InterruptedException
+    {
+        addToQueue(mailQueueItem);
+    }
 
     /**
      * @return true if the queue has messages waiting for processing

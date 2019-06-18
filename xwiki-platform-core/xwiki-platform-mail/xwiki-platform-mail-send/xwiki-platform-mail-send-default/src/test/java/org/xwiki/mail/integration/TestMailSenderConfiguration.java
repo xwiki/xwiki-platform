@@ -104,6 +104,18 @@ public class TestMailSenderConfiguration extends DefaultMailSenderConfiguration
         return 0;
     }
 
+    @Override
+    public int getPrepareQueueCapacity()
+    {
+        return 10;
+    }
+
+    @Override
+    public int getSendQueueCapacity()
+    {
+        return 10;
+    }
+
     public void setBCCAddresses(List<String> addresses)
     {
         this.bccAddresses = addresses;

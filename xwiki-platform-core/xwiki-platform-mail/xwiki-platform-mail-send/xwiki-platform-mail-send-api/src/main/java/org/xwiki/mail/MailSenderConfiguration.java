@@ -34,6 +34,16 @@ import org.xwiki.component.annotation.Role;
 public interface MailSenderConfiguration
 {
     /**
+     * The default size of the prepare queue.
+     */
+    int PREPARE_QUEUE_CAPACITY_DEFAULT = 1000;
+
+    /**
+     * The default size of the send queue.
+     */
+    int SEND_QUEUE_CAPACITY_DEFAULT = 1000;
+
+    /**
      * @return the SMTP server
      */
     String getHost();
@@ -101,4 +111,24 @@ public interface MailSenderConfiguration
      * @since 6.4RC1
      */
     long getSendWaitTime();
+
+    /**
+     * @return the max size of the prepare queue. When this size is reached calls to put new elements on the queue will
+     *         block
+     * @since 11.6RC1
+     */
+    default int getPrepareQueueCapacity()
+    {
+        return PREPARE_QUEUE_CAPACITY_DEFAULT;
+    }
+
+    /**
+     * @return the max size of the send queue. When this size is reached calls to put new elements on the queue will
+     *         block
+     * @since 11.6RC1
+     */
+    default int getSendQueueCapacity()
+    {
+        return SEND_QUEUE_CAPACITY_DEFAULT;
+    }
 }

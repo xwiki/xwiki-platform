@@ -73,11 +73,6 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public static final String JAVAMAIL_SMTP_USERNAME = "mail.smtp.user";
 
     /**
-     * Java Mail SMTP property for the from email address.
-     */
-    public static final String JAVAMAIL_SMTP_FROM = "mail.smtp.from";
-
-    /**
      * Java Mail SMTP property for specifying that we are authenticating.
      */
     public static final String JAVAMAIL_SMTP_AUTH = "mail.smtp.auth";
@@ -103,6 +98,9 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     private static final String PASSWORD_PROPERTY = "password";
     private static final String PROPERTIES_PROPERTY = "properties";
     private static final String SEND_WAIT_TIME = "sendWaitTime";
+
+    private static final String PREPARE_QUEUE_CAPACITY_PROPERTY = "prepareQueueCapacity";
+    private static final String SEND_QUEUE_CAPACITY_PROPERTY = "sendQueueCapacity";
 
     @Inject
     private Logger logger;
@@ -324,5 +322,19 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
         }
 
         return waitTime;
+    }
+
+    @Override
+    public int getPrepareQueueCapacity()
+    {
+        return this.xwikiPropertiesSource.getProperty(PREFIX + PREPARE_QUEUE_CAPACITY_PROPERTY,
+            MailSenderConfiguration.PREPARE_QUEUE_CAPACITY_DEFAULT);
+    }
+
+    @Override
+    public int getSendQueueCapacity()
+    {
+        return this.xwikiPropertiesSource.getProperty(PREFIX + SEND_QUEUE_CAPACITY_PROPERTY,
+            MailSenderConfiguration.SEND_QUEUE_CAPACITY_DEFAULT);
     }
 }

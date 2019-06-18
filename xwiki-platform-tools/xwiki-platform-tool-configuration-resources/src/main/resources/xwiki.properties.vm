@@ -810,6 +810,16 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 #-# The default is:
 # mail.sender.database.discardSuccessStatuses = true
 
+#-# [Since 11.6RC1]
+#-# Max queue size for the prepare mail thread. When the max size is reached, asynchronously sending a mail will block
+#-# till the first mail item in the prepare queue has been processed.
+# mail.sender.prepareQueueCapacity = 1000
+
+#-# [Since 11.6RC1]
+#-# Max queue size for the send mail thread. When the max size is reached, the prepare queue will block till the first
+# mail item in the send queue has been sent.
+# mail.sender.sendQueueCapacity = 1000
+
 #-------------------------------------------------------------------------------------
 # WatchList
 #-------------------------------------------------------------------------------------

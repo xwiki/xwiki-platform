@@ -93,7 +93,12 @@ public class LiveTableElement extends BaseElement
 
         WebElement element = getDriver().findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {
-            new Select(element).selectByVisibleText(filterValue);
+            if (element.getAttribute("class").contains("selectized")) {
+                SuggestInputElement suggestInputElement = new SuggestInputElement(element);
+                suggestInputElement.sendKeys(filterValue).selectTypedText();
+            } else {
+                new Select(element).selectByVisibleText(filterValue);
+            }
         } else {
             element.clear();
             element.sendKeys(filterValue);
@@ -207,6 +212,14 @@ public class LiveTableElement extends BaseElement
     public WebElement getCell(WebElement rowElement, int columnNumber)
     {
         return getDriver().findElementWithoutWaiting(rowElement, By.xpath("td[" + columnNumber + "]"));
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public WebElement getCell(int rowNumber, int columnNumber)
+    {
+        return getCell(getRow(rowNumber), columnNumber);
     }
 
     /**

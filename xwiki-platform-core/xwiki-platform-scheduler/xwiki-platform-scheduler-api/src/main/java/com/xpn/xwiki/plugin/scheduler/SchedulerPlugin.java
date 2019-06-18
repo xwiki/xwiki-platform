@@ -70,6 +70,7 @@ import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * See {@link com.xpn.xwiki.plugin.scheduler.SchedulerPluginApi} for documentation.
@@ -256,11 +257,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             }
         }
 
-        com.xpn.xwiki.web.XWikiURLFactory xurf = context.getURLFactory();
-        if (xurf == null) {
-            xurf = context.getWiki().getURLFactoryService().createURLFactory(context.getMode(), context);
-        }
-        scontext.setURLFactory(xurf);
+        // Each context is supposed to have a dedicated URL factory
+        XWikiURLFactory urlf = scontext.getWiki().getURLFactoryService().createURLFactory(context.getMode(), scontext);
+        scontext.setURLFactory(urlf);
 
         try {
             XWikiDocument cDoc = context.getWiki().getDocument(job.getDocumentReference(), context);

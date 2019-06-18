@@ -91,11 +91,27 @@ public class TemplateProviderInlinePage extends InlinePage
         return values.get(0);
     }
 
-    public void setTemplate(String value)
+    /**
+     * Set the template value.
+     * @param value the value to fill.
+     * @param waitForSuggestion if true, it will wait for suggestion before choosing a value: it will avoid
+     * a StaleElementReferenceException if the suggestion takes a bit of time. If false, directly takes the typed text:
+     * this should be used if there is no suggestion.
+     * @since 11.5RC1
+     */
+    public void setTemplate(String value, boolean waitForSuggestion)
     {
         this.templateSuggestInput.clearSelectedSuggestions();
         this.templateSuggestInput.sendKeys(value);
+        if (waitForSuggestion) {
+            this.templateSuggestInput.waitForSuggestions();
+        }
         this.templateSuggestInput.selectTypedText();
+    }
+
+    public void setTemplate(String value)
+    {
+        setTemplate(value, true);
     }
 
     public boolean isPageTemplate()

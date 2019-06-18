@@ -82,7 +82,14 @@ public class LogCaptureValidator
         // When updating a collection Hibernate start by deleting the existing elements and HSQLDB complains when there
         // is actually nothing to delete it seems
         new Line("SQL Warning Code: -1100, SQLState: 02000"),
-        new Line("no data")
+        new Line("no data"),
+
+        // See https://jira.xwiki.org/browse/XWIKI-16484
+        new Line("SQL Error: -104, SQLState: 23505"),
+        new Line("integrity constraint violation: unique constraint or index violation; SYS_PK_10260 table: XWIKILOCK"),
+        new Line("Exception while setting up lock"),
+        new Line("javax.persistence.PersistenceException: org.hibernate.exception.ConstraintViolationException:"
+            + " could not execute statement")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

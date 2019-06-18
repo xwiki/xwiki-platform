@@ -196,6 +196,34 @@
                   },
                   {
                     "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setDocument(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setDocument(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.model.reference.DocumentReference.class})",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setDocument(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setDocument(java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyFeature(\"reference\")",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParametersCompatibilityAspect::ajc$interMethod$org_xwiki_rendering_macro_include_IncludeMacroParametersCompatibilityAspect$org_xwiki_rendering_macro_include_IncludeMacroParameters$setDocument(org.xwiki.rendering.macro.include.IncludeMacroParameters, java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParametersCompatibilityAspect::ajc$interMethod$org_xwiki_rendering_macro_include_IncludeMacroParametersCompatibilityAspect$org_xwiki_rendering_macro_include_IncludeMacroParameters$setDocument(org.xwiki.rendering.macro.include.IncludeMacroParameters, java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.model.reference.DocumentReference.class})",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParametersCompatibilityAspect::ajc$interMethod$org_xwiki_rendering_macro_include_IncludeMacroParametersCompatibilityAspect$org_xwiki_rendering_macro_include_IncludeMacroParameters$setDocument(org.xwiki.rendering.macro.include.IncludeMacroParameters, java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParametersCompatibilityAspect::ajc$interMethod$org_xwiki_rendering_macro_include_IncludeMacroParametersCompatibilityAspect$org_xwiki_rendering_macro_include_IncludeMacroParameters$setDocument(org.xwiki.rendering.macro.include.IncludeMacroParameters, java.lang.String)",
+                    "annotation": "@org.xwiki.properties.annotation.PropertyFeature(\"reference\")",
+                    "justification": "Not an API breakage"
+                  },
+                  {
+                    "code": "java.annotation.added",
                     "old": "method void org.xwiki.rendering.macro.dashboard.DashboardMacroParameters::setSource(java.lang.String)",
                     "new": "method void org.xwiki.rendering.macro.dashboard.DashboardMacroParameters::setSource(java.lang.String)",
                     "annotation": "@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.model.reference.DocumentReference.class})",

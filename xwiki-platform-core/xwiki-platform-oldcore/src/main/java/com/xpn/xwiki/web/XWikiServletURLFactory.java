@@ -520,7 +520,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 resultUrl = new URL(stringBuilder.toString());
             }
             return normalizeURL(resultUrl, context);
-        } catch (MalformedURLException|UnsupportedEncodingException e) {
+        } catch (MalformedURLException | UnsupportedEncodingException e) {
             // should not happen
             return null;
         }
@@ -604,11 +604,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         // If we are viewing a specific revision, then we need to get the attachment for this specific revision.
         if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null
-            && isContextDoc(xwikidb, spaces, name, context) &&  Locale.ROOT.equals(context.getDoc().getLocale())) {
+            && isContextDoc(xwikidb, spaces, name, context) && Locale.ROOT.equals(context.getDoc().getLocale())) {
             try {
                 String docRevision = context.get("rev").toString();
-                attachment =
-                    findAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);
+                attachment = findAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);
                 if (attachment == null) {
                     action = "viewattachrev";
                 } else {
@@ -625,7 +624,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         // If we are getting an attachment from the context doc, we can directly load its version from it.
         else if (action.equals("download") && isContextDoc(xwikidb, spaces, name, context)
-            &&  Locale.ROOT.equals(context.getDoc().getLocale())) {
+            && Locale.ROOT.equals(context.getDoc().getLocale())) {
             attachment = context.getDoc().getAttachment(filename);
 
         // We are getting an attachment from another doc: we can try to load it to retrieve its version
@@ -648,8 +647,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);
                 attachment = document.getAttachment(filename);
             } catch (XWikiException e) {
-                LOGGER.error("Exception while loading doc from wiki [{}] space [{}] and page [{}]", xwikidb,
-                    spaces, name, e);
+                LOGGER.error("Exception while loading doc from wiki [{}] space [{}] and page [{}]", xwikidb, spaces,
+                    name, e);
             } finally {
                 context.setWikiReference(originalWikiReference);
             }
@@ -664,8 +663,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         if (attachmentURL == null) {
-            attachmentURL = this.internalCreateAttachmentURL(filename, spaces, name, action, querystring, xwikidb,
-                context);
+            attachmentURL =
+                this.internalCreateAttachmentURL(filename, spaces, name, action, querystring, xwikidb, context);
         }
         return attachmentURL;
     }

@@ -513,8 +513,8 @@ public class XWikiServletURLFactoryTest
     {
         XWikiContext xwikiContext = this.oldcore.getXWikiContext();
         xwikiContext.setDoc(new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage")));
-        URL url = this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null,
-            xwikiContext);
+        URL url =
+            this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null, xwikiContext);
         assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/currentpage/file", url.toString());
     }
 
@@ -530,8 +530,8 @@ public class XWikiServletURLFactoryTest
         attachment.setVersion("1.3");
         doc.setAttachment(attachment);
         xwikiContext.setDoc(doc);
-        URL url = this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null,
-            xwikiContext);
+        URL url =
+            this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null, xwikiContext);
         assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/currentpage/file?rev=1.3", url.toString());
     }
 
@@ -542,8 +542,8 @@ public class XWikiServletURLFactoryTest
     public void createAttachmentURLFindRevNestedSpace()
     {
         XWikiContext xwikiContext = this.oldcore.getXWikiContext();
-        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki",
-            Arrays.asList("currentspace", "nestedspace"), "currentpage"));
+        XWikiDocument doc = new XWikiDocument(
+            new DocumentReference("xwiki", Arrays.asList("currentspace", "nestedspace"), "currentpage"));
         XWikiAttachment attachment = new XWikiAttachment(doc, "file");
         attachment.setVersion("1.3");
         doc.setAttachment(attachment);
@@ -567,19 +567,19 @@ public class XWikiServletURLFactoryTest
         contextDoc.setAttachment(attachment);
         xwikiContext.setDoc(contextDoc);
 
-        DocumentReference documentReference = new DocumentReference("anotherwiki", Arrays.asList("anotherspace",
-            "nestedspace"), "anotherpage");
+        DocumentReference documentReference =
+            new DocumentReference("anotherwiki", Arrays.asList("anotherspace", "nestedspace"), "anotherpage");
         XWikiDocument doc = new XWikiDocument(documentReference);
         attachment = new XWikiAttachment(doc, "anotherfile");
         attachment.setVersion("2.1");
         doc.setAttachment(attachment);
 
         when(xwikiContext.getWiki().getDocument(documentReference, xwikiContext)).thenReturn(doc);
-        when(this.descriptorManager.getById("anotherwiki")).thenReturn(new WikiDescriptor("anotherwiki", "anotherwiki"));
+        when(this.descriptorManager.getById("anotherwiki"))
+            .thenReturn(new WikiDescriptor("anotherwiki", "anotherwiki"));
 
         URL url = this.urlFactory.createAttachmentURL("anotherfile", "anotherspace.nestedspace", "anotherpage",
-            "download", null,
-            "anotherwiki", xwikiContext);
+            "download", null, "anotherwiki", xwikiContext);
 
         assertEquals("http://127.0.0.1/xwiki/wiki/anotherwiki/download/anotherspace/nestedspace/anotherpage/"
             + "anotherfile?rev=2.1", url.toString());
@@ -671,13 +671,15 @@ public class XWikiServletURLFactoryTest
         queryParametersMap.put("cache-version", "11.1-SNAPSHOT#");
         queryParametersMap.put("anArrayOfInt", new int[] { 42, 56 });
         queryParametersMap.put("aListWithStringToEncode", Arrays.asList("épervier", "androïde"));
-        queryParametersMap.put("aCustomObject", new Object() {
+        queryParametersMap.put("aCustomObject", new Object()
+        {
             @Override
-            public String toString() {
+            public String toString()
+            {
                 return "foo";
             }
         });
-        queryParametersMap.put("paramètre", new String[] { "foo", "bâr"});
+        queryParametersMap.put("paramètre", new String[] { "foo", "bâr" });
 
         url = this.urlFactory.createResourceURL("o;ne/t?w&o/t=hr#e e", false, this.oldcore.getXWikiContext(),
             queryParametersMap);

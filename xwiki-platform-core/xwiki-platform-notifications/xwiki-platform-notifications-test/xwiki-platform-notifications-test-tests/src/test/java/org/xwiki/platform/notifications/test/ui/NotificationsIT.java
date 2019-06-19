@@ -153,6 +153,14 @@ public class NotificationsIT extends AbstractTest
         mail.start();
     }
 
+    @Before
+    public void setUpDomain()
+    {
+        // Set a custom main wiki domain:port to make sure it's actually used in mails
+        getUtil().updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0, "server", "externaldomain",
+            "port", "4242", "secure", "1");
+    }
+
     @AfterClass
     public static void stopMail()
     {

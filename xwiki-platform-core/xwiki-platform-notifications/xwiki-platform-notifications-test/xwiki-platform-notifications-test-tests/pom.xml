@@ -41,6 +41,8 @@
     <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml,notification-filter-preferences.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <!-- TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed -->
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
+    <!-- Switch to domain based URL -->
+    <xwikiCfgVirtualUsepath>0</xwikiCfgVirtualUsepath>
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>

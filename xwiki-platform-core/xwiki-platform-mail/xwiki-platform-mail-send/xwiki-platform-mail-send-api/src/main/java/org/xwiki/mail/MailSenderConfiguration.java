@@ -34,16 +34,6 @@ import org.xwiki.component.annotation.Role;
 public interface MailSenderConfiguration
 {
     /**
-     * The default size of the prepare queue.
-     */
-    int PREPARE_QUEUE_CAPACITY_DEFAULT = 1000;
-
-    /**
-     * The default size of the send queue.
-     */
-    int SEND_QUEUE_CAPACITY_DEFAULT = 1000;
-
-    /**
      * @return the SMTP server
      */
     String getHost();
@@ -119,7 +109,7 @@ public interface MailSenderConfiguration
      */
     default int getPrepareQueueCapacity()
     {
-        return PREPARE_QUEUE_CAPACITY_DEFAULT;
+        return 1000;
     }
 
     /**
@@ -129,6 +119,6 @@ public interface MailSenderConfiguration
      */
     default int getSendQueueCapacity()
     {
-        return SEND_QUEUE_CAPACITY_DEFAULT;
+        return 1000;
     }
 }

@@ -102,6 +102,16 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     private static final String PREPARE_QUEUE_CAPACITY_PROPERTY = "prepareQueueCapacity";
     private static final String SEND_QUEUE_CAPACITY_PROPERTY = "sendQueueCapacity";
 
+    /**
+     * The default size of the prepare queue.
+     */
+    private int PREPARE_QUEUE_CAPACITY_DEFAULT = 1000;
+
+    /**
+     * The default size of the send queue.
+     */
+    private int SEND_QUEUE_CAPACITY_DEFAULT = 1000;
+
     @Inject
     private Logger logger;
 
@@ -328,13 +338,13 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     public int getPrepareQueueCapacity()
     {
         return this.xwikiPropertiesSource.getProperty(PREFIX + PREPARE_QUEUE_CAPACITY_PROPERTY,
-            MailSenderConfiguration.PREPARE_QUEUE_CAPACITY_DEFAULT);
+            PREPARE_QUEUE_CAPACITY_DEFAULT);
     }
 
     @Override
     public int getSendQueueCapacity()
     {
         return this.xwikiPropertiesSource.getProperty(PREFIX + SEND_QUEUE_CAPACITY_PROPERTY,
-            MailSenderConfiguration.SEND_QUEUE_CAPACITY_DEFAULT);
+            SEND_QUEUE_CAPACITY_DEFAULT);
     }
 }

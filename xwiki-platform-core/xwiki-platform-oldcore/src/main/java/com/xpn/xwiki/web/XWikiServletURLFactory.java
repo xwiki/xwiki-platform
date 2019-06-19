@@ -58,6 +58,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     protected URL originalURL;
 
+    /**
+     * @deprecated since 10.3, use #defaultURLs instead
+     * @see #defaultURLs
+     */
+    @Deprecated
     protected String defaultURL;
 
     /**
@@ -660,7 +665,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             if (url != null) {
                 String surl = url.toString();
 
-                if (this.defaultURL == null || !surl.startsWith(this.defaultURL)) {
+                if (this.originalURL == null || !surl.startsWith(this.originalURL.toString())) {
                     // External URL: leave it as is.
                     relativeURL = surl;
                 } else {

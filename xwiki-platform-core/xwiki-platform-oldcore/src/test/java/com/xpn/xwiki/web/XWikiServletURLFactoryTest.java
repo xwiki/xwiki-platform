@@ -98,28 +98,7 @@ public class XWikiServletURLFactoryTest
 
         // Request
         this.mockXWikiRequest = mock(XWikiRequest.class);
-        when(this.mockXWikiRequest.getScheme()).thenReturn("http");
-        when(this.mockXWikiRequest.getServerName()).thenReturn("127.0.0.1");
-        when(this.mockXWikiRequest.getServerPort()).thenReturn(-1);
-        when(this.mockXWikiRequest.isSecure()).then(new Answer<Boolean>()
-        {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
-            {
-                return secure;
-            }
-        });
-        when(this.mockXWikiRequest.getServletPath()).thenReturn("");
-        when(this.mockXWikiRequest.getContextPath()).thenReturn("/xwiki");
-        when(this.mockXWikiRequest.getHeader(any())).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return httpHeaders.get(invocation.getArgument(0));
-            }
-        });
-        this.oldcore.getXWikiContext().setRequest(mockXWikiRequest);
+        prepareMockRequest("127.0.0.1", -1);
 
         // Response
         XWikiResponse xwikiResponse = mock(XWikiResponse.class);
@@ -154,13 +133,46 @@ public class XWikiServletURLFactoryTest
         when(this.descriptorManager.getById(wikiName)).thenReturn(wikidescriptor);
     }
 
-    private void initRequest(String host, int port)
+    private void prepareMockRequest(String host, int port)
     {
+        when(this.mockXWikiRequest.getScheme()).thenReturn("http");
         when(this.mockXWikiRequest.getServerName()).thenReturn(host);
         when(this.mockXWikiRequest.getServerPort()).thenReturn(port);
+        when(this.mockXWikiRequest.isSecure()).then(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
+            {
+                return secure;
+            }
+        });
+        when(this.mockXWikiRequest.getServletPath()).thenReturn("");
+        when(this.mockXWikiRequest.getContextPath()).thenReturn("/xwiki");
+        when(this.mockXWikiRequest.getHeader(any())).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return httpHeaders.get(invocation.getArgument(0));
+            }
+        });
+        this.oldcore.getXWikiContext().setRequest(mockXWikiRequest);
+    }
+
+    private void initRequest(String host, int port)
+    {
+        prepareMockRequest(host, port);
 
         // Reinitialize the URL factory to take into account the new request URL.
         urlFactory.init(this.oldcore.getXWikiContext());
+    }
+
+    private void initDaemonRequest(String host, int port)
+    {
+        this.mockXWikiRequest = mock(XWikiServletRequestStub.class);
+        when(((XWikiServletRequestStub) this.mockXWikiRequest).isDaemon()).thenReturn(true);
+
+        initRequest(host, port);
     }
 
     // Tests
@@ -383,6 +395,25 @@ public class XWikiServletURLFactoryTest
 
         String url = this.urlFactory.getURL(new URL("http://wiki1server/"), this.oldcore.getXWikiContext());
         assertEquals("/", url);
+    }
+
+    /**
+     * Tests how URLs are serialized when the default URL is not set.
+     */
+    @Test
+    public void getURLWhenDeamonRequest() throws MalformedURLException
+    {
+        initDaemonRequest("wiki1server", -1);
+
+        this.oldcore.getXWikiContext().setWikiId("wiki2");
+
+        String url =
+            urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
+        assertEquals("/xwiki/bin/view/Space/Page", url);
+
+        url =
+            urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
+        assertEquals("http://wiki2server/xwiki/bin/view/Space/Page", url);
     }
 
     /**

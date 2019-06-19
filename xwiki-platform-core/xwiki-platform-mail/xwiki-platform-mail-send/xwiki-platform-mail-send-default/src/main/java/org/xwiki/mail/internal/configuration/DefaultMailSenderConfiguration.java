@@ -105,12 +105,12 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
     /**
      * The default size of the prepare queue.
      */
-    private int PREPARE_QUEUE_CAPACITY_DEFAULT = 1000;
+    private static final int PREPARE_QUEUE_CAPACITY_DEFAULT = 1000;
 
     /**
      * The default size of the send queue.
      */
-    private int SEND_QUEUE_CAPACITY_DEFAULT = 1000;
+    private static final int SEND_QUEUE_CAPACITY_DEFAULT = 1000;
 
     @Inject
     private Logger logger;

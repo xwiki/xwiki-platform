@@ -30,7 +30,6 @@ import org.testcontainers.utility.MountableFile;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.text.StringUtils;
 
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isInAContainer;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.startContainer;
 

@@ -44,7 +44,7 @@ import org.xwiki.rendering.macro.code.CodeMacroLayout;
  */
 @Component
 @Singleton
-@Named(CodeMacroLayout.Constants.LINE_NUM_HINT)
+@Named(CodeMacroLayout.Constants.LINENUMBERS_HINT)
 public class LineNumberBlockHandler implements CodeLayoutHandler
 {
     private Pattern linePattern = Pattern.compile("\r?\n");

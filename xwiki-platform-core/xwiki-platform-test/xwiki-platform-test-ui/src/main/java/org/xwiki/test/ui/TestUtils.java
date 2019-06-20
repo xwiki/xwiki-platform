@@ -2826,4 +2826,16 @@ public class TestUtils
         }
         return newTabHandle;
     }
+
+    /**
+     * @since 11.5
+     * @since 11.6RC1
+     */
+    public void closeTab(String secondTabHandle)
+    {
+        String currentTab = getCurrentTabHandle();
+        switchTab(secondTabHandle);
+        getDriver().close();
+        switchTab(currentTab);
+    }
 }

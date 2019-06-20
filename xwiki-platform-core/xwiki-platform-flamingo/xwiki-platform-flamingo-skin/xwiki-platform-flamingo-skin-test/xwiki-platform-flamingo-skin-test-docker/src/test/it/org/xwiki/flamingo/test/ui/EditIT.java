@@ -582,6 +582,7 @@ public class EditIT
         viewPage = new ViewPage();
         assertEquals("A fifth edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.", viewPage.getContent());
+        setup.closeTab(secondTabHandle);
     }
 
     /**

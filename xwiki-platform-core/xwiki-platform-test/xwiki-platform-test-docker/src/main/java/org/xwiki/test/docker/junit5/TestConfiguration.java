@@ -22,12 +22,15 @@ package org.xwiki.test.docker.junit5;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import org.xwiki.extension.Extension;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.text.StringUtils;
+import org.xwiki.tool.extension.ExtensionOverride;
 
 /**
  * Configuration options for the test.
@@ -95,6 +98,8 @@ public class TestConfiguration
 
     private Properties properties;
 
+    private List<ExtensionOverride> extensionOverrides;
+
     private List<ArtifactCoordinate> extraJARs;
 
     private List<Integer> sshPorts;
@@ -126,6 +131,7 @@ public class TestConfiguration
         resolveVNC();
         resolveProperties();
         resolveExtraJARs();
+        resolveExtensionOverrides();
         resolveSSHPorts();
         resolveProfiles();
         resolveOffice();
@@ -261,6 +267,11 @@ public class TestConfiguration
             DATABASE_PREFIX_COMMAND);
     }
 
+    private Properties resolveGenericProperties(String[] propertiesAsArray)
+    {
+        return resolveGenericProperties(propertiesAsArray, null);
+    }
+
     private Properties resolveGenericProperties(String[] propertiesAsArray, String prefix)
     {
         Properties newProperties = new Properties();
@@ -270,12 +281,16 @@ public class TestConfiguration
                 newProperties.setProperty(propertyAsString.substring(0, pos), propertyAsString.substring(pos + 1));
             }
         }
-        for (String key : System.getProperties().stringPropertyNames()) {
-            if (key.startsWith(prefix)) {
-                String propertyAsString = StringUtils.substringAfter(key, prefix);
-                newProperties.setProperty(propertyAsString, System.getProperty(key));
+
+        if (prefix != null) {
+            for (String key : System.getProperties().stringPropertyNames()) {
+                if (key.startsWith(prefix)) {
+                    String propertyAsString = StringUtils.substringAfter(key, prefix);
+                    newProperties.setProperty(propertyAsString, System.getProperty(key));
+                }
             }
         }
+
         return newProperties;
     }
 
@@ -286,6 +301,18 @@ public class TestConfiguration
             artifactCoordinates.add(ArtifactCoordinate.parseArtifacts(coordinate));
         }
         this.extraJARs = artifactCoordinates;
+    }
+
+    private void resolveExtensionOverrides()
+    {
+        List<ExtensionOverride> overrides = new ArrayList<>();
+        for (org.xwiki.test.docker.junit5.ExtensionOverride overrideAnnotation : this.uiTestAnnotation
+            .extensionOverrides()) {
+            ExtensionOverride override = new ExtensionOverride();
+            override.put(Extension.FIELD_ID, overrideAnnotation.extensionId());
+            override.putAll((Map) resolveGenericProperties(overrideAnnotation.overrides()));
+        }
+        this.extensionOverrides = overrides;
     }
 
     private void resolveSSHPorts()
@@ -444,6 +471,15 @@ public class TestConfiguration
     public List<ArtifactCoordinate> getExtraJARs()
     {
         return this.extraJARs;
+    }
+
+    /**
+     * @return the overrides of the extensions descriptors
+     * @since 11.6RC1
+     */
+    public List<ExtensionOverride> getExtensionOverrides()
+    {
+        return this.extensionOverrides;
     }
 
     /**

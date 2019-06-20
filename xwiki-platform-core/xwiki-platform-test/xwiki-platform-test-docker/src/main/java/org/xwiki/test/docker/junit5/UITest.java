@@ -132,6 +132,12 @@ public @interface UITest
     String[] properties() default {};
 
     /**
+     * @return the properties to overwrite in the generated extensions descriptors
+     * @since 11.6RC1
+     */
+    ExtensionOverride[] extensionOverrides() default {};
+
+    /**
      * @return the optional list of JARs (specified as artifact coordinates {@code groupId:artifactId}) that should be
      *         added to {@code WEB-INF/lib}. For example this is useful for artifacts containing Hibernate mapping files
      *         since those cannot currently be loaded as extensions.

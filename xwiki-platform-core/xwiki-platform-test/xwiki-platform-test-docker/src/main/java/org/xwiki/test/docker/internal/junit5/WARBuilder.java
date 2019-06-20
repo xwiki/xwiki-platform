@@ -95,6 +95,8 @@ public class WARBuilder
             try {
                 this.extensionHelper = ExtensionMojoHelper.create(null,
                     new File(String.format("%s/xwiki-data/", testConfiguration.getOutputDirectory())));
+
+                LOGGER.info("Using the following extension overrides: {}", testConfiguration.getExtensionOverrides());
                 this.extensionHelper.setExtensionOverrides(testConfiguration.getExtensionOverrides());
             } catch (MojoExecutionException e) {
                 throw new RuntimeException("Failed to initialize resolver", e);

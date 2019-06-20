@@ -311,6 +311,7 @@ public class TestConfiguration
             ExtensionOverride override = new ExtensionOverride();
             override.put(Extension.FIELD_ID, overrideAnnotation.extensionId());
             override.putAll((Map) resolveGenericProperties(overrideAnnotation.overrides()));
+            overrides.add(override);
         }
         this.extensionOverrides = overrides;
     }

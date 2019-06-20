@@ -39,6 +39,13 @@
   </properties>
   <modules>
     <module>xwiki-platform-wiki-test-pageobjects</module>
-    <module>xwiki-platform-wiki-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-wiki-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

@@ -19,10 +19,12 @@
  */
 package org.xwiki.wiki.test.ui;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
 import org.xwiki.wiki.test.po.CreateWikiPage;
 import org.xwiki.wiki.test.po.CreateWikiPageStepUser;
@@ -41,22 +43,26 @@ import static org.junit.Assert.assertTrue;
  * UI tests for the wiki templates feature of the Wiki application.
  *
  * @version $Id$
- * @since 6.0M1
  */
-public class WikiTemplateTest extends AbstractTest
+@UITest
+public class WikiTemplateIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     private static final String TEMPLATE_WIKI_ID = "mynewtemplate";
+
     private static final String TEMPLATE_CONTENT = "Content of the template";
+
+    @BeforeAll
+    public void setup(TestUtils setup) throws Exception
+    {
+        setup.loginAsSuperAdmin();
+    }
 
     private void createTemplateWiki() throws Exception
     {
         // Go to the wiki creation wizard
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
-        
+
         // Full the first step
         createWikiPage.setPrettyName("My new template");
         String wikiName = createWikiPage.getComputedName();
@@ -67,7 +73,7 @@ public class WikiTemplateTest extends AbstractTest
 
         // Second step
         CreateWikiPageStepUser createWikiPageStepUser = createWikiPage.goUserStep();
-        
+
         // Creation step
         // Creation step + click Finalize button
         WikiHomePage wikiHomePage = executeCreationStepAndFinalize(createWikiPageStepUser);
@@ -107,7 +113,7 @@ public class WikiTemplateTest extends AbstractTest
         wikiIndexPage = WikiIndexPage.gotoPage().waitUntilPageIsLoaded();
         assertNull(wikiIndexPage.getWikiLink("My new template"));
     }
-    
+
     private void createWikiFromTemplate()
     {
         // Go to the wiki creation wizard
@@ -158,7 +164,7 @@ public class WikiTemplateTest extends AbstractTest
         // Note that the whole flavor defined in the pom.xml (i.e. org.xwiki.platform:xwiki-platform-wiki-ui-wiki) will
         // be copied and that's a lot of pages (over 800+), and this takes time. If the CI agent is busy with other
         // jobs running in parallel it'll take even more time. Thus we put a large value to be safe.
-        wikiCreationPage.waitForFinalizeButton(60*3);
+        wikiCreationPage.waitForFinalizeButton(60 * 3);
         // Ensure there is no error in the log
         assertFalse(wikiCreationPage.hasLogError());
 
@@ -168,11 +174,11 @@ public class WikiTemplateTest extends AbstractTest
     }
 
     @Test
-    public void createWikiFromTemplateTest() throws Exception
+    public void createWikiFromTemplateTest(LogCaptureConfiguration logCaptureConfiguration) throws Exception
     {
         // Create the template
         createTemplateWiki();
-        
+
         // Create the wiki from the template
         createWikiFromTemplate();
         // Do it twice to check if we can create a wiki with the name of a deleted one
@@ -181,12 +187,11 @@ public class WikiTemplateTest extends AbstractTest
         // Delete the template wiki
         deleteTemplateWiki();
 
-        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+        logCaptureConfiguration.registerExcludes(
             "CSRFToken: Secret token verification failed",
             "SQL Error: -4850, SQLState: 3F000",
             "invalid schema name: MYNEWWIKI",
             "invalid schema name: MYNEWTEMPLATE",
-            "Deprecated usage of getter [org.xwiki.wiki.script.WikiManagerScriptService.getLastException]"
-        );
+            "Deprecated usage of getter [org.xwiki.wiki.script.WikiManagerScriptService.getLastException]");
     }
 }

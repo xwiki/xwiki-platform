@@ -28,7 +28,6 @@ import org.xwiki.panels.test.po.PageWithPanels;
 import org.xwiki.panels.test.po.PanelsAdministrationPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -42,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 11.3RC1
  */
-@UITest(browser = Browser.CHROME)
+@UITest
 public class PanelsAdministrationIT
 {
     @BeforeAll

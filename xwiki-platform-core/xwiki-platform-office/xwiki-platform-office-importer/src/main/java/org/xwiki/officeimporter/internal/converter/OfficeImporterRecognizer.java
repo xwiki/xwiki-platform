@@ -26,6 +26,7 @@ import org.xwiki.component.annotation.Role;
  *
  * @version $Id$
  * @since 11.0
+ * @since 10.11.9
  */
 @Role
 public interface OfficeImporterRecognizer

@@ -33,6 +33,7 @@ import org.xwiki.officeimporter.server.OfficeServer;
  *
  * @version $Id$
  * @since 11.0
+ * @since 10.11.9
  */
 @Component
 @Singleton

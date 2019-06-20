@@ -38,7 +38,7 @@ public enum CodeMacroLayout
     /**
      * Display line numbers beside the rendered code.
      */
-    LINE_NUM(Constants.LINE_NUM_HINT);
+    LINENUMBERS(Constants.LINENUMBERS_HINT);
 
     private String hint;
 
@@ -69,8 +69,8 @@ public enum CodeMacroLayout
         public static final String PLAIN_HINT = "plain";
 
         /**
-         * @see CodeMacroLayout#LINE_NUM
+         * @see CodeMacroLayout#LINENUMBERS
          */
-        public static final String LINE_NUM_HINT = "linenumbers";
+        public static final String LINENUMBERS_HINT = "linenumbers";
     }
 }

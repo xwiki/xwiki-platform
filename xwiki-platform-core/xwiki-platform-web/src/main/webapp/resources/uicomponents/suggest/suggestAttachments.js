@@ -163,7 +163,7 @@ define('xwiki-attachments-icon', ['jquery'], function($) {
     return deferred.promise();
   };
 
-  /**!
+  /*!
    * #set ($discard = "#mimetypeimg('' '')")
    * #set ($discard = $mimetypeMap.put('attachment', ['attach', 'attachment']))
    * #foreach ($map in [$mimetypeMap, $extensionMap])

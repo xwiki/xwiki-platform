@@ -139,7 +139,7 @@ public class HibernateStore implements Disposable, Integrator
 
     private SessionFactory sessionFactory;
 
-    private Metadata metadata;
+    private Metadata configurationMetadata;
 
     private DataMigrationManager getDataMigrationManager()
     {
@@ -173,13 +173,13 @@ public class HibernateStore implements Disposable, Integrator
     public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory,
         SessionFactoryServiceRegistry serviceRegistry)
     {
-        this.metadata = metadata;
+        this.configurationMetadata = metadata;
     }
 
     @Override
     public void disintegrate(SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry)
     {
-        this.metadata = null;
+        this.configurationMetadata = null;
     }
 
     /**
@@ -390,7 +390,22 @@ public class HibernateStore implements Disposable, Integrator
      */
     public Metadata getConfigurationMetadata()
     {
-        return this.metadata;
+        return this.configurationMetadata;
+    }
+
+    /**
+     * @return true if the current database product is catalog based, false for a schema based databases
+     * @since 11.6RC1
+     */
+    public boolean isCatalog()
+    {
+        DatabaseProduct product = getDatabaseProductName();
+        if (DatabaseProduct.ORACLE == product || (DatabaseProduct.POSTGRESQL == product && isInSchemaMode())) {
+            return false;
+        } else {
+            return getDialect().canCreateCatalog();
+        }
+
     }
 
     /**
@@ -400,15 +415,10 @@ public class HibernateStore implements Disposable, Integrator
     {
         String schemaName = getSchemaFromWikiName(wikiId);
 
-        DatabaseProduct product = getDatabaseProductName();
-        if (DatabaseProduct.ORACLE == product || (DatabaseProduct.POSTGRESQL == product && isInSchemaMode())) {
-            builder.applyImplicitSchemaName(schemaName);
+        if (isCatalog()) {
+            builder.applyImplicitCatalogName(schemaName);
         } else {
-            if (getDialect().canCreateCatalog()) {
-                builder.applyImplicitCatalogName(wikiId);
-            } else {
-                builder.applyImplicitSchemaName(schemaName);
-            }
+            builder.applyImplicitSchemaName(schemaName);
         }
     }
 
@@ -533,7 +543,7 @@ public class HibernateStore implements Disposable, Integrator
     public void setWiki(Session session, String wikiId) throws XWikiException
     {
         try {
-            this.logger.debug("Set the right catalog/schema in teh session [{}]", wikiId);
+            this.logger.debug("Set the right catalog/schema in the session [{}]", wikiId);
 
             // Switch the database only if we did not switched on it last time
             if (wikiId != null) {
@@ -921,9 +931,17 @@ public class HibernateStore implements Disposable, Integrator
                 ResultSet resultSet;
 
                 if (columnName != null) {
-                    resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
+                    if (isCatalog()) {
+                        resultSet = databaseMetaData.getColumns(schema, null, tableName, columnName);
+                    } else {
+                        resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
+                    }
                 } else {
-                    resultSet = databaseMetaData.getTables(null, schema, tableName, null);
+                    if (isCatalog()) {
+                        resultSet = databaseMetaData.getTables(schema, null, tableName, null);
+                    } else {
+                        resultSet = databaseMetaData.getTables(null, schema, tableName, null);
+                    }
                 }
 
                 // next will return false if the resultSet is empty.

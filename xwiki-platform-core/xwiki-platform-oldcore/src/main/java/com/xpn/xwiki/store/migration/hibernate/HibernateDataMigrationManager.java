@@ -105,14 +105,14 @@ public class HibernateDataMigrationManager extends AbstractDataMigrationManager
         final XWikiContext context = getXWikiContext();
         final HibernateStore store = getStore();
 
-        // Check if the document table exist
-        if (!store.tableExists(XWikiDocument.class)) {
-            // The database does not seems to be initialized
-            return null;
-        }
-
         // Check if the version table exist
         if (!store.tableExists(XWikiDBVersion.class)) {
+            // Check if the document table exist
+            if (!store.tableExists(XWikiDocument.class)) {
+                // The database does not seems to be initialized at all
+                return null;
+            }
+
             // The database seems older than the introduction of the version table
             return new XWikiDBVersion(0);
         }

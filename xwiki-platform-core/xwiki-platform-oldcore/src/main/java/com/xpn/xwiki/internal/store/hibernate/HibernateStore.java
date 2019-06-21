@@ -46,7 +46,6 @@ import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
@@ -165,12 +164,6 @@ public class HibernateStore implements Disposable, Integrator
 
             // Resolve some variables
             replaceVariables(this.configuration);
-
-            // Enable schema creation by default
-            if (this.configuration.getProperty(AvailableSettings.HBM2DLL_CREATE_SCHEMAS) == null
-                && this.configuration.getProperty(AvailableSettings.HBM2DLL_CREATE_NAMESPACES) == null) {
-                this.configuration.setProperty(AvailableSettings.HBM2DLL_CREATE_SCHEMAS, "true");
-            }
         }
 
         build();

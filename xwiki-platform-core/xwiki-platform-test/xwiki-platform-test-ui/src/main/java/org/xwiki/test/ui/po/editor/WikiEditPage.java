@@ -27,7 +27,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.LoginPage;
 
 /**
@@ -175,22 +174,14 @@ public class WikiEditPage extends PreviewableEditPage
     public void closeLoginModal()
     {
         this.modal.findElement(By.cssSelector("button.btn-primary")).click();
-        getDriver().waitUntilCondition(driver -> {
-            XWikiWebDriver webDriver = (XWikiWebDriver) driver;
-            return !webDriver.hasElementWithoutWaiting(By.className("modal-popup"));
-        });
+        getDriver().waitUntilElementDisappears(By.className("modal-popup"));
     }
 
     public LoginPage clickModalLoginLink()
     {
-        String currentWindow = getDriver().getWindowHandle();
-        this.modal.findElement(By.cssSelector("a[title=login]")).click();
-        for (String handle : getDriver().getWindowHandles()) {
-            if (!handle.equals(currentWindow)) {
-                getDriver().switchTo().window(handle);
-            }
-        }
-
+        String currentWindow = getUtil().getCurrentTabHandle();
+        String newWindow = getUtil().openLinkInTab(By.cssSelector("a[title=login]"), currentWindow);
+        getUtil().switchTab(newWindow);
         getDriver().waitUntilElementIsVisible(By.id("j_username"));
         return new LoginPage();
     }

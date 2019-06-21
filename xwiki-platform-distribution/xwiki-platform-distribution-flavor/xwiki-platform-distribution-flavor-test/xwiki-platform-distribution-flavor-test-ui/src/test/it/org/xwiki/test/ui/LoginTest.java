@@ -28,7 +28,6 @@ import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.LoginPage;
 import org.xwiki.test.ui.po.ResubmissionPage;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Test the Login feature.
@@ -138,40 +137,6 @@ public class LoginTest extends AbstractTest
             }
             grasp.unforceAuthenticatedView();
         }
-    }
-
-    @Test
-    @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
-    public void testLogoutDuringEditDisplayLoginModal()
-    {
-        String test = "Test string " + System.currentTimeMillis();
-        final String space = "Main";
-        final String page = "POSTTest";
-        LoginPage loginPage = this.vp.login();
-        loginPage.loginAsAdmin();
-        // start editing a page
-        WikiEditPage editPage = WikiEditPage.gotoPage(space, page);
-        editPage.setTitle(test);
-        editPage.setContent(test);
-        // emulate expired session: delete the cookies
-        getDriver().manage().deleteAllCookies();
-        // try to save
-        editPage.clickSaveAndView(false);
-        Assert.assertTrue(editPage.loginModalDisplayed());
-        String mainWindow = getDriver().getWindowHandle();
-        loginPage = editPage.clickModalLoginLink();
-        loginPage.loginAsAdmin();
-        getDriver().close();
-        getDriver().switchTo().window(mainWindow);
-        editPage = new WikiEditPage();
-        editPage.closeLoginModal();
-        ViewPage viewPage = editPage.clickSaveAndView();
-
-        Assert.assertEquals(test, viewPage.getDocumentTitle());
-        Assert.assertEquals(test, viewPage.getContent());
     }
 
     @Test

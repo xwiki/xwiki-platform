@@ -42,6 +42,7 @@ import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.InlinePage;
+import org.xwiki.test.ui.po.LoginPage;
 import org.xwiki.test.ui.po.ResubmissionPage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.PreviewEditPage;
@@ -861,5 +862,48 @@ public class EditIT
         setup.gotoPage(testReference, "save", queryString);
         viewPage = new ViewPage();
         assertEquals("value: 11", viewPage.getContent());
+    }
+
+    @Test
+    @Order(14)
+    public void logoutDuringEdit(TestUtils setup, TestReference testReference)
+    {
+        // fixture: deny right edit to the guest user on the page, since we want to get a 401 as in XWiki Standard
+        setup.createPage(testReference, "", "");
+        setup.addObject(testReference, "XWiki.XWikiRights",
+            "levels", "edit",
+            "users", "XWiki.XWikiGuest",
+            "allow", "Deny");
+
+        String test = "Test string " + System.currentTimeMillis();
+
+        // start editing a page
+        WikiEditPage editPage = setup.gotoPage(testReference).editWiki();
+        editPage.setTitle(test);
+        editPage.setContent(test);
+        // emulate expired session: delete the cookies
+        // We cannot use forceGuestUser since it also recache the secret token and reload the page
+        // here we really want to remain on the same page.
+        setup.getDriver().manage().deleteAllCookies();
+        // try to save
+        editPage.clickSaveAndView(false);
+        assertTrue(editPage.loginModalDisplayed());
+        String mainWindow = setup.getCurrentTabHandle();
+        // this will switch the tab
+         LoginPage loginPage = editPage.clickModalLoginLink();
+
+        String newTabHandle = setup.getCurrentTabHandle();
+        loginPage.loginAs(TestUtils.SUPER_ADMIN_CREDENTIALS.getUserName(),
+            TestUtils.SUPER_ADMIN_CREDENTIALS.getPassword());
+
+        // Don't forget to properly close the new tab
+        setup.switchTab(mainWindow);
+        setup.closeTab(newTabHandle);
+        editPage = new WikiEditPage();
+        editPage.closeLoginModal();
+        ViewPage viewPage = editPage.clickSaveAndView();
+
+        assertEquals(test, viewPage.getDocumentTitle());
+        assertEquals(test, viewPage.getContent());
     }
 }

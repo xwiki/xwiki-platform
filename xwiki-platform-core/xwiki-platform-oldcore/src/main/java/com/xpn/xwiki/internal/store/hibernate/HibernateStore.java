@@ -951,8 +951,8 @@ public class HibernateStore implements Disposable, Integrator
         int result = metadata(entityType, propertyName, -1, resultSet -> resultSet.getInt("COLUMN_SIZE"));
 
         if (result == -1) {
-            PersistentClass persistentClass2 = getConfigurationMetadata().getEntityBinding(entityType.getName());
-            Column column2 = (Column) persistentClass2.getProperty(propertyName).getColumnIterator().next();
+            PersistentClass persistentClass = getConfigurationMetadata().getEntityBinding(entityType.getName());
+            Column column2 = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
             result = column2.getLength();
             this.logger.warn(
                 "Error while getting the size limit for entity [{}] and propertyName [{}]. "

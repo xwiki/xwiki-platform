@@ -88,8 +88,8 @@ public class AdministrationMenu extends BaseElement
     private AdministrationMenu expandCategory(WebElement categoryLink)
     {
         if (categoryLink.getAttribute("class").contains("collapsed")) {
-            categoryLink.click();
             By categoryContent = By.cssSelector(categoryLink.getAttribute("data-target") + ".collapse.in");
+            categoryLink.click();
             getDriver().waitUntilElementIsVisible(categoryContent);
         }
         return this;

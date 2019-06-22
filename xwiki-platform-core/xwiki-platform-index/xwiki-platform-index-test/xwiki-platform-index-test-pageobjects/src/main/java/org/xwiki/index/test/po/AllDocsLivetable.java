@@ -27,6 +27,7 @@ import org.xwiki.test.ui.po.LiveTableElement;
  * Represents the livetable for index all docs.
  *
  * @since 11.6RC1
+ * @since 11.5
  * @version $Id$
  */
 public class AllDocsLivetable extends LiveTableElement

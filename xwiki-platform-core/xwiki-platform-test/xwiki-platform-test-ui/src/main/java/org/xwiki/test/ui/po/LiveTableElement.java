@@ -216,6 +216,7 @@ public class LiveTableElement extends BaseElement
 
     /**
      * @since 11.6RC1
+     * @since 11.5
      */
     public WebElement getCell(int rowNumber, int columnNumber)
     {

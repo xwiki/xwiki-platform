@@ -133,7 +133,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
                 String.format("mysql -u root -e \"grant all privileges on *.* to %s@localhost identified by '%s'\"",
                     DBUSERNAME, DBPASSWORD));
         } catch (Exception e) {
-            throw new RuntimeException(String.format("Failed to grant all priviledges to use [%s]", DBUSERNAME), e);
+            throw new RuntimeException(String.format("Failed to grant all privileges to user [%s]", DBUSERNAME), e);
         }
     }
 

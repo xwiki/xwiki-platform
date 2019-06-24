@@ -541,12 +541,8 @@ public class InvitationTest extends AbstractTest
         TestUtils.Session admin = getUtil().getSession();
         try {
             // First we ban anon from registering.
-            ObjectEditPage oep = ObjectEditPage.gotoPage("XWiki", "XWikiPreferences");
-
-            oep.getObjectsOfClass("XWiki.XWikiGlobalRights").get(0)
-                .getSelectElement(By.name("XWiki.XWikiGlobalRights_0_levels")).select("register");
-
-            oep.clickSaveAndContinue();
+            getUtil().updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiGlobalRights", 0,
+                "levels", "edit,delete,comment,script,admin,register,createwiki,programming");
             // now prove anon cannot register
             getUtil().forceGuestUser();
             RegistrationPage.gotoPage();
@@ -584,14 +580,8 @@ public class InvitationTest extends AbstractTest
         } finally {
             stopGreenMail();
             getUtil().setSession(admin);
-
-            // Better open the wiki back up again.
-            ObjectEditPage oep = ObjectEditPage.gotoPage("XWiki", "XWikiPreferences");
-
-            oep.getObjectsOfClass("XWiki.XWikiGlobalRights").get(0)
-                .getSelectElement(By.name("XWiki.XWikiGlobalRights_0_levels")).unSelect("register");
-
-            oep.clickSaveAndContinue();
+            getUtil().updateObject("XWiki", "XWikiPreferences", "XWiki.XWikiGlobalRights", 0,
+                "levels", "edit,delete,comment,script,admin,createwiki,programming");
         }
     }
 

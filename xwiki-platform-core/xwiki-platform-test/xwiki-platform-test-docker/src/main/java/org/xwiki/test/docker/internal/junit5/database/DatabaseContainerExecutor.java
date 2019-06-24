@@ -126,6 +126,15 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         databaseContainer.withCommand(mergeCommands(commands, testConfiguration.getDatabaseCommands()));
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
+
+        // Allow the XWiki user to create databases
+        try {
+            databaseContainer.execInContainer(
+                String.format("mysql -u root -e \"grant all privileges on *.* to %s@localhost identified by '%s'\"",
+                    DBUSERNAME, DBPASSWORD));
+        } catch (Exception e) {
+            throw new RuntimeException(String.format("Failed to grant all priviledges to use [%s]", DBUSERNAME), e);
+        }
     }
 
     private boolean isMySQL55x(TestConfiguration testConfiguration)

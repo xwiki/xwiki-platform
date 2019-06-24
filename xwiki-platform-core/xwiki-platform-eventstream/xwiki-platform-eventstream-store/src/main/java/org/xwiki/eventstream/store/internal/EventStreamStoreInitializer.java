@@ -19,18 +19,21 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
-import com.xpn.xwiki.util.Util;
+import java.util.Collections;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.List;
+import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
+import com.xpn.xwiki.util.Util;
 
 /**
  * Register the event stream store mapping.
@@ -62,12 +65,16 @@ public class EventStreamStoreInitializer implements EventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        loadMappingFile("eventstream.hbm.xml");
-    }
-
-    protected void loadMappingFile(String path)
-    {
         // This only adds the mappings to a queue. The mappings will be available after the session factory is created.
-        this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream(path));
+        // We need to use a different mapping for Oracle
+        String driverClass = StringUtils.defaultString(
+            this.sessionFactory.getConfiguration().getProperty("hibernate.connection.driver_class"),
+            this.sessionFactory.getConfiguration().getProperty("connection.driver_class"));
+        if (StringUtils.containsIgnoreCase(driverClass, "oracle")) {
+            this.sessionFactory.getConfiguration()
+                .addInputStream(Util.getResourceAsStream("eventstream.oracle.hbm.xml"));
+        } else {
+            this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream("eventstream.hbm.xml"));
+        }
     }
 }

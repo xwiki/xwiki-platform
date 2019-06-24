@@ -24,6 +24,17 @@
 "-//Hibernate/Hibernate Mapping DTD//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
+  <!-- This file is a copy of legacy-activitystream.hbm.xml with the following modification:
+       - When using "text" or "string" types:
+         - When size <= 2000 Hibernate maps it to CHAR
+         - When size > 2000 and <= 4000 Hibernates maps it to VARCHAR2
+         - When size > 4000 Hibernates maps it to LONG. However LONG is deprecated in Oracle and shouldn't be used
+           since Oracle imposes a limitation on it: there can be only be one LONG column per table. Thus when
+           size > 4000 chars we must use a "materialized_clob" type
+           See https://hibernate.atlassian.net/browse/HHH-5569
+       - Thus, use the following strategy: use the "string" type when size<4000 and materialized_clob when size>40000
+  -->
+
   <class name="org.xwiki.eventstream.store.internal.LegacyEvent" table="activitystream_events">
     <id name="eventId" type="string" unsaved-value="undefined">
       <column name="ase_eventid" length="48" not-null="true" />
@@ -40,15 +51,15 @@
     <property name="space" type="string" column="ase_space" length="255" index="EVENT_SPACE" />
     <property name="page" type="string" column="ase_page" length="255" index="EVENT_PAGE" />
     <property name="hidden" type="boolean" column="ase_hidden" index="EVENT_HIDDEN" />
-    <property name="url" type="text" column="ase_url" length="2000" />
-    <property name="title" type="text" column="ase_title" length="2000" />
-    <property name="body" type="text" column="ase_body" length="2000" />
+    <property name="url" type="materialized_clob" column="ase_url" length="2000" />
+    <property name="title" type="materialized_clob" column="ase_title" length="2000" />
+    <property name="body" type="materialized_clob" column="ase_body" length="2000" />
     <property name="version" type="string" column="ase_version" length="30" />
-    <property name="param1" type="text" column="ase_param1" length="2000" />
-    <property name="param2" type="text" column="ase_param2" length="2000" />
-    <property name="param3" type="text" column="ase_param3" length="2000" />
-    <property name="param4" type="text" column="ase_param4" length="2000" />
-    <property name="param5" type="text" column="ase_param5" length="2000" />
+    <property name="param1" type="string" column="ase_param1" length="2000" />
+    <property name="param2" type="string" column="ase_param2" length="2000" />
+    <property name="param3" type="string" column="ase_param3" length="2000" />
+    <property name="param4" type="string" column="ase_param4" length="2000" />
+    <property name="param5" type="string" column="ase_param5" length="2000" />
     <!-- The map mapping below was a feature introduced in https://jira.xwiki.org/browse/XWIKI-6839 to add support for
          named parameters. However it's currently causing serious performance issues (see
          https://jira.xwiki.org/browse/XWIKI-7520) and has had to be disabled for now.

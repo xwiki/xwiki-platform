@@ -35,6 +35,10 @@
         <xwiki.pitest.mutationThreshold>8</xwiki.pitest.mutationThreshold>
         <!-- Name to display by the Extension Manager -->
         <xwiki.extension.name>Event Stream Store</xwiki.extension.name>
+
+        <!-- Impossible to have both xwiki-platform-eventstream and xwiki-platform-activitystream-api
+             because they use the same table name (activitystream_events) -->
+        <xwiki.extension.features>org.xwiki.platform:xwiki-platform-activitystream-api</xwiki.extension.features>
     </properties>
     <dependencies>
         <dependency>

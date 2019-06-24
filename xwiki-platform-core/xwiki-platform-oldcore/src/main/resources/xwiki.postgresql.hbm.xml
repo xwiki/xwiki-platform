@@ -26,8 +26,7 @@
 <hibernate-mapping auto-import="true">
 
     <!-- This file is a copy of xwiki.hbm.xml.
-         It does not have any modification anymore but it's kept for retro compatibility reasons.
-         TODO: remove it and move to an automatic injection when we don't need to list files explicitly in hibernate.cfg.xml anymore.
+         - Redefine materialized_clob as TextType
     -->
 
     <!--
@@ -40,6 +39,11 @@
           (by default most DBs ignore trailing spaces in comparisons and thus the uniqueness constraint prevents
           entering content differing only by trailing spaces).
     -->
+
+    <!-- Redefine materialized_clob as TextType for historical reason
+         (used to be mapped to StringClobType which was no a log at all despite its name),
+         getting rid of that hack means converting all materialized_clob fields in PostgreSQL -->
+    <typedef name="materialized_clob" class="org.hibernate.type.TextType" />
 
     <!-- com.xpn.xwiki.doc.XWikiDocument root -->
     <class name="com.xpn.xwiki.doc.XWikiDocument" table="xwikidoc">

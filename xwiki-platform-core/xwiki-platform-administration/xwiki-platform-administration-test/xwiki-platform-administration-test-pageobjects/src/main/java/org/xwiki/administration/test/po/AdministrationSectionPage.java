@@ -154,4 +154,20 @@ public class AdministrationSectionPage extends ViewPage
         String xPath = String.format("//div[@id='admin-page-content']/h%s[@id='%s']/span", level, headingId);
         return getDriver().hasElementWithoutWaiting(By.xpath(xPath));
     }
+
+    /**
+     * @since 11.6RC1
+     */
+    @Override
+    public void waitUntilPageJSIsLoaded()
+    {
+        super.waitUntilPageJSIsLoaded();
+
+        // If save button is present wait the action button js to be loaded.
+        if (getDriver().hasElementWithoutWaiting(By.xpath("//input[@type='submit'][@name='formactionsac']"))) {
+            getDriver().waitUntilJavascriptCondition(
+                "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "
+                    + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
+        }
+    }
 }

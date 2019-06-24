@@ -21,6 +21,7 @@ package org.xwiki.test.docker.internal.junit5.database;
 
 import java.util.Properties;
 
+import org.testcontainers.containers.Container;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.MySQLContainer;
@@ -129,9 +130,15 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
         // Allow the XWiki user to create databases
         try {
-            databaseContainer.execInContainer(
-                String.format("mysql -u root -e \"grant all privileges on *.* to %s@localhost identified by '%s'\"",
-                    DBUSERNAME, DBPASSWORD));
+            Container.ExecResult result =
+                databaseContainer.execInContainer("mysql", "-u", "root", "-p" + DBPASSWORD, "-e", String
+                    .format("grant all privileges on *.* to %s@localhost identified by '%s'", DBUSERNAME, DBPASSWORD));
+
+            if (result.getExitCode() != 0) {
+                throw new RuntimeException(
+                    String.format("Failed to grant all privileges to user [%s] with return code [%d] and message [%s]",
+                        DBUSERNAME, result.getExitCode(), result.getStderr()));
+            }
         } catch (Exception e) {
             throw new RuntimeException(String.format("Failed to grant all privileges to user [%s]", DBUSERNAME), e);
         }

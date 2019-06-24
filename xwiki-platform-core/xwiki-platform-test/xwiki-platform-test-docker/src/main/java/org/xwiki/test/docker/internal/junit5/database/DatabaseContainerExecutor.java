@@ -130,9 +130,9 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
         // Allow the XWiki user to create databases
         try {
-            Container.ExecResult result =
-                databaseContainer.execInContainer("mysql", "-u", "root", "-p" + DBPASSWORD, "-e", String
-                    .format("grant all privileges on *.* to %s@localhost identified by '%s'", DBUSERNAME, DBPASSWORD));
+            Container.ExecResult result = databaseContainer.execInContainer("mysql", "-u", "root", "-p" + DBPASSWORD,
+                "-e",
+                String.format("grant all privileges on *.* to '%s'@'%%' identified by '%s'", DBUSERNAME, DBPASSWORD));
 
             if (result.getExitCode() != 0) {
                 throw new RuntimeException(

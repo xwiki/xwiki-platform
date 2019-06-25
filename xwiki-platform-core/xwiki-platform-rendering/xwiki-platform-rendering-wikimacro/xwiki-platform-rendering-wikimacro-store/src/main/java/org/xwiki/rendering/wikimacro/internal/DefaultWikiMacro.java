@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.wiki.WikiComponentException;
 import org.xwiki.component.wiki.internal.AbstractAsyncContentBaseObjectWikiComponent;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
@@ -83,19 +85,19 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     }
 
     @Override
-    public List<Block> execute(WikiMacroParameters parameters, String macroContent, MacroTransformationContext context)
-        throws MacroExecutionException
+    public List<Block> execute(WikiMacroParameters originalParameters, String macroContent,
+        MacroTransformationContext context) throws MacroExecutionException
     {
-        validate(parameters, macroContent);
-
         // Create renderer
         DefaultWikiMacroRenderer renderer;
+        WikiMacroParameters parameters;
         try {
+            parameters = convertParameters(originalParameters);
             renderer = this.componentManager.getInstance(DefaultWikiMacroRenderer.class);
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Failed to create wiki macro rendeder", e);
         }
-
+        validate(parameters, macroContent);
         // Initialize the renderer
         renderer.initialize(this, parameters, macroContent, context);
 
@@ -112,6 +114,29 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         }
 
         return result instanceof CompositeBlock ? result.getChildren() : Arrays.asList(result);
+    }
+
+    private WikiMacroParameters convertParameters(WikiMacroParameters originalParameters)
+        throws ComponentLookupException
+    {
+        ConverterManager converterManager = this.componentManager.getInstance(ConverterManager.class);
+        Map<String, ParameterDescriptor> parameterDescriptorMap = this.descriptor.getParameterDescriptorMap();
+        WikiMacroParameters result = new WikiMacroParameters();
+        for (String parameterName : originalParameters.getParameterNames()) {
+            Object value = originalParameters.get(parameterName);
+
+            if (parameterDescriptorMap.containsKey(parameterName.toLowerCase())) {
+                ParameterDescriptor parameterDescriptor = parameterDescriptorMap
+                    .get(parameterName.toLowerCase());
+                Type parameterType = parameterDescriptor.getParameterType();
+
+                value = converterManager.convert(parameterType, value);
+            }
+
+            result.set(parameterName, value);
+        }
+
+        return result;
     }
 
     /**

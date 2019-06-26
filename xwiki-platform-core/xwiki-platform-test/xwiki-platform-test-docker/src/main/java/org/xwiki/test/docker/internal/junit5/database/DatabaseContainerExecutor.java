@@ -135,12 +135,14 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
                 String.format("grant all privileges on *.* to '%s'@'%%' identified by '%s'", DBUSERNAME, DBPASSWORD));
 
             if (result.getExitCode() != 0) {
-                throw new RuntimeException(
-                    String.format("Failed to grant all privileges to user [%s] with return code [%d] and message [%s]",
-                        DBUSERNAME, result.getExitCode(), result.getStderr()));
+                throw new RuntimeException(String.format(
+                    "Failed to grant all privileges to user [%s] on MySQL with return code [%d] and message [%s]",
+                    DBUSERNAME, result.getExitCode(),
+                    (result.getStderr().isEmpty() ? result.getStdout() : result.getStderr())));
             }
         } catch (Exception e) {
-            throw new RuntimeException(String.format("Failed to grant all privileges to user [%s]", DBUSERNAME), e);
+            throw new RuntimeException(
+                String.format("Failed to grant all privileges to user [%s] on MySQL", DBUSERNAME), e);
         }
     }
 

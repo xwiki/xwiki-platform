@@ -937,21 +937,15 @@ public class HibernateStore implements Disposable, Integrator
                 ignoreError = true;
             }
 
-            // Ideally we would need to check if the sequence exists for the current schema.
-            // Since there's no way to do that in a generic way that would work on all DBs and since calling
-            // dialect.getQuerySequencesString() will get the native SQL query to find out all sequences BUT
-            // only for the default schema, we need to find another way. The solution we're implementing is to
-            // try to create the sequence and if it fails then we consider it already exists.
             try (Session session = getSessionFactory().openSession()) {
-                // this.loggerManager.pushLogListener(null);
                 Transaction transaction = session.beginTransaction();
                 session.createSQLQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
                     .executeUpdate();
                 transaction.commit();
             } catch (Exception e) {
-                this.logger.error("Failed to create the hibernate_sequence", e);
-            } finally {
-                // this.loggerManager.popLogListener();
+                if (!ignoreError) {
+                    this.logger.error("Failed to create the hibernate_sequence", e);
+                }
             }
         }
     }

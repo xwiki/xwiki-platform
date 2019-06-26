@@ -19,27 +19,27 @@
  */
 package com.xpn.xwiki.internal.store.hibernate;
 
-import java.sql.ResultSet;
+import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.function.Function;
 
 /**
- * A functional interface used to manipulate a {@link ResultSet}.
+ * A functional interface used to manipulate a {@link DatabaseMetaData}.
  * 
  * @param <R> the type of the result of the function
  * @see Function
  * @version $Id$
- * @since 11.5RC1
+ * @since 11.6RC1
  */
 @FunctionalInterface
-public interface ResultSetFunction<R>
+public interface DatabaseMetaDataFunction<R>
 {
     /**
      * Applies this function to the given argument.
      *
-     * @param resultSet the result of the query
+     * @param metadata the metadata
      * @return the function result
      * @throws SQLException when failing
      */
-    R apply(ResultSet resultSet) throws SQLException;
+    R apply(DatabaseMetaData metadata) throws SQLException;
 }

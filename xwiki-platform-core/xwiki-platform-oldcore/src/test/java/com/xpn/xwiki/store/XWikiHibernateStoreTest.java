@@ -134,7 +134,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     @Test
     public void executeDeleteWikiStatementForPostgreSQLWhenInDatabaseMode() throws Exception
     {
-        when(this.hibernateStore.isInSchemaMode()).thenReturn(false);
+        when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(false);
 
         Statement statement = mock(Statement.class);
         DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;

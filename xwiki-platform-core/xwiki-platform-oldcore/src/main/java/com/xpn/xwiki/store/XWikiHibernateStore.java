@@ -104,7 +104,6 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.stats.impl.XWikiStats;
-import com.xpn.xwiki.store.migration.MigrationRequiredException;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -249,52 +248,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public boolean isWikiNameAvailable(String wikiName, XWikiContext inputxcontext) throws XWikiException
     {
-        XWikiContext context = getExecutionXContext(inputxcontext, false);
-
-        boolean available;
-
-        boolean bTransaction = true;
-        String database = context.getWikiId();
-
         try {
-            bTransaction = beginTransaction(context);
-            Session session = getSession(context);
-
-            // Capture Logs since we voluntarily generate storage errors to check if the wiki already exists and
-            // we don't want to pollute application logs with "normal errors"...
-            if (!this.logger.isDebugEnabled()) {
-                this.loggerManager.pushLogListener(null);
-            }
-
-            context.setWikiId(wikiName);
-            try {
-                setDatabase(session, context);
-                available = false;
-            } catch (XWikiException e) {
-                // Failed to switch to database. Assume it means database does not exists.
-                available = !(e.getCause() instanceof MigrationRequiredException);
-            }
+            return !this.store.isWikiDatabaseExist(wikiName);
         } catch (Exception e) {
             Object[] args = { wikiName };
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DATABASE,
                 "Exception while listing databases to search for {0}", e, args);
-        } finally {
-            context.setWikiId(database);
-            try {
-                if (bTransaction) {
-                    endTransaction(context, false);
-                }
-            } catch (Exception e) {
-            }
-
-            // Restore proper logging
-            if (!this.logger.isDebugEnabled()) {
-                this.loggerManager.popLogListener();
-            }
         }
-
-        return available;
     }
 
     @Override

@@ -71,7 +71,6 @@ import org.xwiki.component.phase.Disposable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
-import org.xwiki.logging.LoggerManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
@@ -93,7 +92,7 @@ import com.xpn.xwiki.util.Util;
 public class HibernateStore implements Disposable, Integrator
 {
     /**
-     * @see #isInSchemaMode()
+     * @see #isConfiguredInSchemaMode()
      */
     private static final String VIRTUAL_MODE_SCHEMA = "schema";
 
@@ -128,9 +127,6 @@ public class HibernateStore implements Disposable, Integrator
     @Inject
     private Environment environment;
 
-    @Inject
-    private LoggerManager loggerManager;
-
     private DataMigrationManager dataMigrationManager;
 
     private final BootstrapServiceRegistry bootstrapServiceRegistry =
@@ -149,6 +145,8 @@ public class HibernateStore implements Disposable, Integrator
     private SessionFactory sessionFactory;
 
     private Metadata configurationMetadata;
+
+    private String configurationCatalog;
 
     private DataMigrationManager getDataMigrationManager()
     {
@@ -183,6 +181,9 @@ public class HibernateStore implements Disposable, Integrator
         SessionFactoryServiceRegistry serviceRegistry)
     {
         this.configurationMetadata = metadata;
+
+        this.configurationCatalog =
+            this.configurationMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog().getCanonicalName();
     }
 
     @Override
@@ -257,8 +258,9 @@ public class HibernateStore implements Disposable, Integrator
 
     /**
      * @return true if the user has configured Hibernate to use XWiki in schema mode (vs database mode)
+     * @since 11.6RC1
      */
-    public boolean isInSchemaMode()
+    public boolean isConfiguredInSchemaMode()
     {
         String virtualModePropertyValue = getConfiguration().getProperty("xwiki.virtual_mode");
         if (virtualModePropertyValue == null) {
@@ -274,7 +276,7 @@ public class HibernateStore implements Disposable, Integrator
      * @param product the database engine type.
      * @return the database/schema name.
      */
-    public String getSchemaFromWikiName(String wikiId, DatabaseProduct product)
+    public String getDatabaseFromWikiName(String wikiId, DatabaseProduct product)
     {
         if (wikiId == null) {
             return null;
@@ -282,61 +284,63 @@ public class HibernateStore implements Disposable, Integrator
 
         String mainWikiId = this.wikis.getMainWikiId();
 
-        String schema;
+        String database;
         if (StringUtils.equalsIgnoreCase(wikiId, mainWikiId)) {
-            schema = this.hibernateConfiguration.getDB();
-            if (schema == null) {
+            database = this.hibernateConfiguration.getDB();
+            if (database == null) {
                 if (product == DatabaseProduct.DERBY) {
-                    schema = "APP";
+                    database = "APP";
                 } else if (product == DatabaseProduct.HSQLDB || product == DatabaseProduct.H2) {
-                    schema = "PUBLIC";
-                } else if (product == DatabaseProduct.POSTGRESQL && isInSchemaMode()) {
-                    schema = "public";
+                    database = "PUBLIC";
+                } else if (product == DatabaseProduct.POSTGRESQL && isConfiguredInSchemaMode()) {
+                    database = "public";
                 } else {
-                    schema = wikiId.replace('-', '_');
+                    database = wikiId.replace('-', '_');
                 }
             }
         } else {
             // virtual
-            schema = wikiId.replace('-', '_');
+            database = wikiId.replace('-', '_');
 
             // For HSQLDB/H2 we only support uppercase schema names. This is because Hibernate doesn't properly generate
             // quotes around schema names when it qualifies the table name when it generates the update script.
             if (DatabaseProduct.HSQLDB == product || DatabaseProduct.H2 == product) {
-                schema = StringUtils.upperCase(schema);
+                database = StringUtils.upperCase(database);
             }
         }
 
         // Apply prefix
         String prefix = this.hibernateConfiguration.getDBPrefix();
-        schema = prefix + schema;
+        database = prefix + database;
 
-        return schema;
+        return database;
     }
 
     /**
-     * Convert wiki name in database/schema name.
+     * Convert wiki name in database name.
      * <p>
-     * Need hibernate to be initialized.
+     * Need Hibernate to be initialized.
      *
      * @param wikiId the wiki name to convert.
-     * @return the database/schema name.
+     * @return the database name.
+     * @since 11.6RC1
      */
-    public String getSchemaFromWikiName(String wikiId)
+    public String getDatabaseFromWikiName(String wikiId)
     {
-        return getSchemaFromWikiName(wikiId, getDatabaseProductName());
+        return getDatabaseFromWikiName(wikiId, getDatabaseProductName());
     }
 
     /**
-     * Convert wiki name in database/schema name.
+     * Convert wiki name in database name.
      * <p>
      * Need hibernate to be initialized.
      *
-     * @return the database/schema name.
+     * @return the database name.
+     * @since 11.6RC1
      */
-    public String getSchemaFromWikiName()
+    public String getDatabaseFromWikiName()
     {
-        return getSchemaFromWikiName(this.wikis.getCurrentWikiId());
+        return getDatabaseFromWikiName(this.wikis.getCurrentWikiId());
     }
 
     /**
@@ -409,7 +413,8 @@ public class HibernateStore implements Disposable, Integrator
     public boolean isCatalog()
     {
         DatabaseProduct product = getDatabaseProductName();
-        if (DatabaseProduct.ORACLE == product || (DatabaseProduct.POSTGRESQL == product && isInSchemaMode())) {
+        if (DatabaseProduct.ORACLE == product
+            || (DatabaseProduct.POSTGRESQL == product && isConfiguredInSchemaMode())) {
             return false;
         } else {
             return getDialect().canCreateCatalog();
@@ -422,12 +427,12 @@ public class HibernateStore implements Disposable, Integrator
      */
     public void setWiki(MetadataBuilder builder, String wikiId)
     {
-        String schemaName = getSchemaFromWikiName(wikiId);
+        String databaseName = getDatabaseFromWikiName(wikiId);
 
         if (isCatalog()) {
-            builder.applyImplicitCatalogName(schemaName);
+            builder.applyImplicitCatalogName(databaseName);
         } else {
-            builder.applyImplicitSchemaName(schemaName);
+            builder.applyImplicitSchemaName(databaseName);
         }
     }
 
@@ -488,14 +493,15 @@ public class HibernateStore implements Disposable, Integrator
     }
 
     /**
-     * Escape schema name depending of the database engine.
+     * Escape database name depending of the database engine.
      *
-     * @param schema the schema name to escape
+     * @param databaseName the schema name to escape
      * @return the escaped version
+     * @since 11.6RC1
      */
-    public String escapeSchema(String schema)
+    public String escapeDatabaseName(String databaseName)
     {
-        String escapedSchema;
+        String escapedDatabaseName;
 
         // - Oracle converts user names in uppercase when no quotes is used.
         // For example: "create user xwiki identified by xwiki;" creates a user named XWIKI (uppercase)
@@ -505,13 +511,14 @@ public class HibernateStore implements Disposable, Integrator
         //
         // Thus for Oracle we don't escape the schema.
         if (DatabaseProduct.ORACLE == getDatabaseProductName()) {
-            escapedSchema = schema;
+            escapedDatabaseName = databaseName;
         } else {
             String closeQuote = String.valueOf(getDialect().closeQuote());
-            escapedSchema = getDialect().openQuote() + schema.replace(closeQuote, closeQuote + closeQuote) + closeQuote;
+            escapedDatabaseName =
+                getDialect().openQuote() + databaseName.replace(closeQuote, closeQuote + closeQuote) + closeQuote;
         }
 
-        return escapedSchema;
+        return escapedDatabaseName;
     }
 
     /**
@@ -552,27 +559,27 @@ public class HibernateStore implements Disposable, Integrator
     public void setWiki(Session session, String wikiId) throws XWikiException
     {
         try {
-            this.logger.debug("Set the right catalog/schema in the session [{}]", wikiId);
+            this.logger.debug("Set the right catalog in the session [{}]", wikiId);
 
             // Switch the database only if we did not switched on it last time
             if (wikiId != null) {
-                String schemaName = getSchemaFromWikiName(wikiId);
-                String escapedSchemaName = escapeSchema(schemaName);
+                String databaseName = getDatabaseFromWikiName(wikiId);
+                String escapedDatabaseName = escapeDatabaseName(databaseName);
 
                 DatabaseProduct product = getDatabaseProductName();
                 if (DatabaseProduct.ORACLE == product) {
-                    executeStatement("alter session set current_schema = " + escapedSchemaName, session);
+                    executeStatement("alter session set current_schema = " + escapedDatabaseName, session);
                 } else if (DatabaseProduct.DERBY == product || DatabaseProduct.HSQLDB == product
                     || DatabaseProduct.DB2 == product || DatabaseProduct.H2 == product) {
-                    executeStatement("SET SCHEMA " + escapedSchemaName, session);
-                } else if (DatabaseProduct.POSTGRESQL == product && isInSchemaMode()) {
-                    executeStatement("SET search_path TO " + escapedSchemaName, session);
+                    executeStatement("SET SCHEMA " + escapedDatabaseName, session);
+                } else if (DatabaseProduct.POSTGRESQL == product && isConfiguredInSchemaMode()) {
+                    executeStatement("SET search_path TO " + escapedDatabaseName, session);
                 } else {
                     session.doWork(connection -> {
                         String catalog = connection.getCatalog();
                         catalog = (catalog == null) ? null : catalog.replace('_', '-');
-                        if (!schemaName.equals(catalog)) {
-                            connection.setCatalog(schemaName);
+                        if (!databaseName.equals(catalog)) {
+                            connection.setCatalog(databaseName);
                         }
                     });
                 }
@@ -841,15 +848,15 @@ public class HibernateStore implements Disposable, Integrator
     /**
      * Automatically update the current database schema to contains what's defined in standard metadata.
      * 
-     * @since 11.5RC1
+     * @since 11.6RC1
      */
-    public void updateSchema(String wikiId)
+    public void updateDatabase(String wikiId)
     {
         MetadataBuilder metadataBuilder = this.metadataSources.getMetadataBuilder(this.standardServiceRegistry);
 
         setWiki(metadataBuilder, wikiId);
 
-        updateSchema(metadataBuilder.build());
+        updateDatabase(metadataBuilder.build());
 
         // Workaround Hibernate bug which does not create the required sequence in some databases
         createSequenceIfMissing(wikiId);
@@ -904,7 +911,7 @@ public class HibernateStore implements Disposable, Integrator
     {
         // There's no issue with catalog based databases, only with schemas.
         if (!isCatalog() && this.dialect.getNativeIdentifierGeneratorStrategy().equals("sequence")) {
-            String schemaName = getSchemaFromWikiName(wikiId);
+            String schemaName = getDatabaseFromWikiName(wikiId);
 
             boolean ignoreError = false;
 
@@ -953,35 +960,68 @@ public class HibernateStore implements Disposable, Integrator
      * Automatically update the current database schema to contains what's defined in standard metadata.
      * 
      * @param metadata the metadata we want the current database to follow
-     * @since 11.5RC1
+     * @since 11.6RC1
      */
-    public void updateSchema(Metadata metadata)
+    public void updateDatabase(Metadata metadata)
     {
         new SchemaUpdate().execute(EnumSet.of(TargetType.DATABASE), metadata);
     }
 
     /**
-     * Allows to update the schema to match the hibernate mapping
+     * Allows to update the schema to match the Hibernate mapping
      *
      * @param wikiId the identifier of the wiki to update
      * @param force defines whether or not to force the update despite the xwiki.cfg settings
-     * @since 11.5RC1
+     * @since 11.6RC1
      */
-    public synchronized void updateSchema(String wikiId, boolean force)
+    public synchronized void updateDatabase(String wikiId, boolean force)
     {
-        // We don't update the schema if the XWiki hibernate config parameter says not to update
+        // We don't update the database if the XWiki hibernate config parameter says not to update
         if (!force && !this.hibernateConfiguration.isUpdateSchema()) {
-            this.logger.debug("Schema update deactivated for wiki [{}]", wikiId);
+            this.logger.debug("Database update deactivated for wiki [{}]", wikiId);
             return;
         }
 
-        this.logger.info("Updating schema for wiki [{}]...", wikiId);
+        this.logger.info("Updating database for wiki [{}]...", wikiId);
 
         try {
-            updateSchema(wikiId);
+            updateDatabase(wikiId);
         } finally {
-            this.logger.info("Schema update for wiki [{}] done", wikiId);
+            this.logger.info("Database update for wiki [{}] done", wikiId);
         }
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public String getConfiguredColumnName(PersistentClass persistentClass, String propertyName)
+    {
+        String columnName = null;
+
+        if (propertyName != null) {
+            Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
+            columnName = column.getName();
+
+            if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
+                columnName = columnName.toLowerCase();
+            }
+        }
+
+        return columnName;
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public String getConfiguredTableName(PersistentClass persistentClass)
+    {
+        String tableName = persistentClass.getTable().getName();
+        // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
+        if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
+            tableName = tableName.toUpperCase();
+        }
+
+        return tableName;
     }
 
     /**
@@ -994,39 +1034,57 @@ public class HibernateStore implements Disposable, Integrator
      * @param def the default value to return
      * @param function the function to execute
      * @return the result of the function execution
-     * @since 11.5RC1
+     * @since 11.6RC1
      */
-    public <R> R metadata(Class<?> entityType, String propertyName, R def, ResultSetFunction<R> function)
+    public <R> R metadataTableOrColumn(Class<?> entityType, String propertyName, R def, ResultSetFunction<R> function)
     {
-        R result = def;
+        // retrieve the database name from the context
+        final String databaseName = getDatabaseFromWikiName();
 
-        // retrieve the schema from the context
-        String schema = null;
-        // apparently no schema should be used for oracle DB
-        if (getDatabaseProductName() != DatabaseProduct.ORACLE) {
-            schema = getSchemaFromWikiName();
-        }
-
-        // retrieve the table and column name from entityType and propertyName
         PersistentClass persistentClass = getConfigurationMetadata().getEntityBinding(entityType.getName());
 
-        String tableName = persistentClass.getTable().getName();
-        // HSQLDB and Oracle needs to use uppercase table name to retrieve the value.
-        if (getDatabaseProductName() == DatabaseProduct.HSQLDB || getDatabaseProductName() == DatabaseProduct.ORACLE) {
-            tableName = tableName.toUpperCase();
-        }
+        final String tableName = getConfiguredTableName(persistentClass);
 
-        String columnName;
-        if (propertyName != null) {
-            Column column = (Column) persistentClass.getProperty(propertyName).getColumnIterator().next();
-            columnName = column.getName();
+        final String columnName = getConfiguredColumnName(persistentClass, propertyName);
 
-            if (getDatabaseProductName() == DatabaseProduct.POSTGRESQL) {
-                columnName = columnName.toLowerCase();
+        return metadata(def, databaseMetaData -> {
+            ResultSet resultSet;
+
+            if (columnName != null) {
+                if (isCatalog()) {
+                    resultSet = databaseMetaData.getColumns(databaseName, null, tableName, columnName);
+                } else {
+                    resultSet = databaseMetaData.getColumns(null, databaseName, tableName, columnName);
+                }
+            } else {
+                if (isCatalog()) {
+                    resultSet = databaseMetaData.getTables(databaseName, null, tableName, null);
+                } else {
+                    resultSet = databaseMetaData.getTables(null, databaseName, tableName, null);
+                }
             }
-        } else {
-            columnName = null;
-        }
+
+            // next will return false if the resultSet is empty.
+            if (resultSet.next()) {
+                return function.apply(resultSet);
+            }
+
+            return def;
+        });
+    }
+
+    /**
+     * Execute the passed function with the {@link DatabaseMetaData}.
+     * 
+     * @param <R> the type of the return
+     * @param def the default value to return
+     * @param function the function to execute
+     * @return the result of the function execution
+     * @since 11.6RC1
+     */
+    public <R> R metadata(R def, DatabaseMetaDataFunction<R> function)
+    {
+        R result = def;
 
         try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
             JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
@@ -1034,30 +1092,10 @@ public class HibernateStore implements Disposable, Integrator
             try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
                 DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-                ResultSet resultSet;
-
-                if (columnName != null) {
-                    if (isCatalog()) {
-                        resultSet = databaseMetaData.getColumns(schema, null, tableName, columnName);
-                    } else {
-                        resultSet = databaseMetaData.getColumns(null, schema, tableName, columnName);
-                    }
-                } else {
-                    if (isCatalog()) {
-                        resultSet = databaseMetaData.getTables(schema, null, tableName, null);
-                    } else {
-                        resultSet = databaseMetaData.getTables(null, schema, tableName, null);
-                    }
-                }
-
-                // next will return false if the resultSet is empty.
-                if (resultSet.next()) {
-                    result = function.apply(resultSet);
-                }
+                return function.apply(databaseMetaData);
             }
         } catch (SQLException e) {
-            this.logger.error("Error while looking the size limit for schema [{}], table [{}] and column [{}].", schema,
-                tableName, columnName, e);
+            this.logger.error("Error while extracting metadata", e);
         }
 
         return result;
@@ -1065,7 +1103,7 @@ public class HibernateStore implements Disposable, Integrator
 
     public int getLimitSize(Class<?> entityType, String propertyName)
     {
-        int result = metadata(entityType, propertyName, -1, resultSet -> resultSet.getInt("COLUMN_SIZE"));
+        int result = metadataTableOrColumn(entityType, propertyName, -1, resultSet -> resultSet.getInt("COLUMN_SIZE"));
 
         if (result == -1) {
             PersistentClass persistentClass = getConfigurationMetadata().getEntityBinding(entityType.getName());
@@ -1085,6 +1123,56 @@ public class HibernateStore implements Disposable, Integrator
      */
     public boolean tableExists(Class<?> entityClass)
     {
-        return metadata(entityClass, null, false, resultSet -> true);
+        return metadataTableOrColumn(entityClass, null, false, resultSet -> true);
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public boolean isWikiDatabaseExist(String wikiName)
+    {
+        final String databaseName = getDatabaseFromWikiName(wikiName);
+
+        if (isCatalog()) {
+            return isCatalogExist(databaseName);
+        } else {
+            return isSchemaExist(databaseName);
+        }
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public boolean isCatalogExist(String catalogName)
+    {
+        return metadata(false, metadata -> {
+            ResultSet catalogs = metadata.getCatalogs();
+
+            while (catalogs.next()) {
+                if (catalogName.equalsIgnoreCase(catalogs.getString("TABLE_CATALOG"))) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public boolean isSchemaExist(String schemaName)
+    {
+        return metadata(false, metadata -> {
+            ResultSet schemas = metadata.getSchemas(configurationCatalog, null);
+
+            while (schemas.next()) {
+                if (schemaName.equalsIgnoreCase(schemas.getString("TABLE_SCHEM"))) {
+                    return true;
+                }
+            }
+
+            return false;
+        });
     }
 }

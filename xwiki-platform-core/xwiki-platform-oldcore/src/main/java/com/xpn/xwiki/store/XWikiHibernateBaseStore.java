@@ -271,7 +271,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            this.store.updateSchema(context.getWikiId(), force);
+            this.store.updateDatabase(context.getWikiId(), force);
         } finally {
             restoreExecutionXContext();
         }
@@ -289,7 +289,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      */
     protected String getSchemaFromWikiName(String wikiName, DatabaseProduct databaseProduct, XWikiContext inputxcontext)
     {
-        return this.store.getSchemaFromWikiName(wikiName, databaseProduct);
+        return this.store.getDatabaseFromWikiName(wikiName, databaseProduct);
     }
 
     /**
@@ -305,7 +305,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      */
     protected String getSchemaFromWikiName(String wikiId, XWikiContext inputxcontext)
     {
-        return this.store.getSchemaFromWikiName(wikiId);
+        return this.store.getDatabaseFromWikiName(wikiId);
     }
 
     /**
@@ -320,7 +320,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      */
     public String getSchemaFromWikiName(XWikiContext context)
     {
-        return this.store.getSchemaFromWikiName();
+        return this.store.getDatabaseFromWikiName();
     }
 
     /**
@@ -464,7 +464,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
             }
 
             Metadata metadata = this.store.getMetadata(bclass.getName(), custommapping, context.getWikiId());
-            this.store.updateSchema(metadata);
+            this.store.updateDatabase(metadata);
         } finally {
             restoreExecutionXContext();
         }
@@ -517,7 +517,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      */
     protected String escapeSchema(String schema, XWikiContext context)
     {
-        return this.store.escapeSchema(schema);
+        return this.store.escapeDatabaseName(schema);
     }
 
     /**
@@ -941,7 +941,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore
      */
     protected boolean isInSchemaMode()
     {
-        return this.store.isInSchemaMode();
+        return this.store.isConfiguredInSchemaMode();
     }
 
     /**

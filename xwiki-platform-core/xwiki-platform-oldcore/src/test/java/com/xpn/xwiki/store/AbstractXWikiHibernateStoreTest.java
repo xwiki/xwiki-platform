@@ -106,7 +106,7 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
         when(this.hibernateStore.getCurrentTransaction()).thenReturn(transaction);
 
         // Default is schema mode
-        when(this.hibernateStore.isInSchemaMode()).thenReturn(true);
+        when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(true);
     }
 
     /**

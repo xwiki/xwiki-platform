@@ -43,12 +43,15 @@ import org.hibernate.Transaction;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataBuilder;
 import org.hibernate.boot.MetadataSources;
+import org.hibernate.boot.model.naming.Identifier;
+import org.hibernate.boot.model.relational.QualifiedSequenceName;
 import org.hibernate.boot.registry.BootstrapServiceRegistry;
 import org.hibernate.boot.registry.BootstrapServiceRegistryBuilder;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.engine.jdbc.connections.spi.JdbcConnectionAccess;
+import org.hibernate.engine.jdbc.env.spi.JdbcEnvironment;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.integrator.spi.Integrator;
@@ -58,6 +61,8 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
+import org.hibernate.tool.schema.extract.spi.ExtractionContext;
+import org.hibernate.tool.schema.extract.spi.SequenceInformation;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
@@ -66,6 +71,7 @@ import org.xwiki.component.phase.Disposable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
+import org.xwiki.logging.LoggerManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
@@ -121,6 +127,9 @@ public class HibernateStore implements Disposable, Integrator
 
     @Inject
     private Environment environment;
+
+    @Inject
+    private LoggerManager loggerManager;
 
     private DataMigrationManager dataMigrationManager;
 
@@ -552,12 +561,12 @@ public class HibernateStore implements Disposable, Integrator
 
                 DatabaseProduct product = getDatabaseProductName();
                 if (DatabaseProduct.ORACLE == product) {
-                    executeSQL("alter session set current_schema = " + escapedSchemaName, session);
+                    executeStatement("alter session set current_schema = " + escapedSchemaName, session);
                 } else if (DatabaseProduct.DERBY == product || DatabaseProduct.HSQLDB == product
                     || DatabaseProduct.DB2 == product || DatabaseProduct.H2 == product) {
-                    executeSQL("SET SCHEMA " + escapedSchemaName, session);
+                    executeStatement("SET SCHEMA " + escapedSchemaName, session);
                 } else if (DatabaseProduct.POSTGRESQL == product && isInSchemaMode()) {
-                    executeSQL("SET search_path TO " + escapedSchemaName, session);
+                    executeStatement("SET search_path TO " + escapedSchemaName, session);
                 } else {
                     session.doWork(connection -> {
                         String catalog = connection.getCatalog();
@@ -815,7 +824,7 @@ public class HibernateStore implements Disposable, Integrator
      * @param sql the SQL statement to execute
      * @param session the Hibernate Session in which to execute the statement
      */
-    private void executeSQL(final String sql, Session session)
+    private void executeStatement(final String sql, Session session)
     {
         session.doWork(new Work()
         {
@@ -841,6 +850,103 @@ public class HibernateStore implements Disposable, Integrator
         setWiki(metadataBuilder, wikiId);
 
         updateSchema(metadataBuilder.build());
+
+        // Workaround Hibernate bug which does not create the required sequence in some databases
+        createSequenceIfMissing(wikiId);
+    }
+
+    private Iterable<SequenceInformation> getSchemaSequences(String schemaName) throws SQLException
+    {
+        try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
+            JdbcConnectionAccess jdbcConnectionAccess = session.getJdbcConnectionAccess();
+
+            try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
+                JdbcEnvironment jdbcEnvironment = this.standardServiceRegistry.getService(JdbcEnvironment.class);
+
+                ExtractionContext extractionContext = new ExtractionContext.EmptyExtractionContext()
+                {
+                    @Override
+                    public Connection getJdbcConnection()
+                    {
+                        return connection;
+                    }
+
+                    @Override
+                    public JdbcEnvironment getJdbcEnvironment()
+                    {
+                        return jdbcEnvironment;
+                    }
+
+                    @Override
+                    public Identifier getDefaultSchema()
+                    {
+                        return Identifier.toIdentifier(schemaName);
+                    }
+                };
+
+                return this.dialect.getSequenceInformationExtractor().extractMetadata(extractionContext);
+            }
+        }
+    }
+
+    /**
+     * In the Hibernate mapping file for XWiki we use a "native" generator for some tables (deleted document and deleted
+     * attachments for example - The reason we use generated ids and not custom computed ones is because we don't need
+     * to address rows from these tables). For a lot of databases engines the Dialect uses an Identity Generator (when
+     * the DB supports it). PostgreSQL and Oracle don't support it and Hibernate defaults to a Sequence Generator which
+     * uses a sequence named "hibernate_sequence" by default. Hibernate will normally create such a sequence
+     * automatically when updating the schema (see #getSchemaUpdateScript) but because of
+     * https://hibernate.atlassian.net/browse/HHH-13464 if the sequence exist on any schema it won't create it.
+     * 
+     * @param wikiId the identifier of the wiki
+     */
+    private void createSequenceIfMissing(String wikiId)
+    {
+        // There's no issue with catalog based databases, only with schemas.
+        if (!isCatalog() && this.dialect.getNativeIdentifierGeneratorStrategy().equals("sequence")) {
+            String schemaName = getSchemaFromWikiName(wikiId);
+
+            boolean ignoreError = false;
+
+            // Check if the sequence already exist
+            try {
+                Iterable<SequenceInformation> sequences = getSchemaSequences(schemaName);
+
+                for (SequenceInformation sequence : sequences) {
+                    QualifiedSequenceName sequenceName = sequence.getSequenceName();
+                    if (sequenceName.getSchemaName().getCanonicalName().equals(schemaName)
+                        && sequenceName.getSequenceName().getCanonicalName().equals("hibernate_sequence")) {
+                        // The sequence already exist, no need to create it
+                        return;
+                    }
+                }
+            } catch (SQLException e) {
+                this.logger.warn(
+                    "Failed to get the sequences of the schema [{}]. Trying to create hibernate_sequence anyway.",
+                    schemaName);
+
+                // Ignore errors in the log during the creation of the sequence since we know it can fail and we
+                // don't want to show false positives to the user.
+                ignoreError = true;
+            }
+
+            // Ideally we would need to check if the sequence exists for the current schema.
+            // Since there's no way to do that in a generic way that would work on all DBs and since calling
+            // dialect.getQuerySequencesString() will get the native SQL query to find out all sequences BUT
+            // only for the default schema, we need to find another way. The solution we're implementing is to
+            // try to create the sequence and if it fails then we consider it already exists.
+            try (Session session = getSessionFactory().openSession()) {
+                // this.loggerManager.pushLogListener(null);
+                Transaction transaction = session.beginTransaction();
+                session.createSQLQuery(String.format("create sequence %s.hibernate_sequence", schemaName))
+                    .executeUpdate();
+                transaction.commit();
+            } catch (Exception e) {
+                this.logger.error("Failed to create the hibernate_sequence", e);
+            } finally {
+                // this.loggerManager.popLogListener();
+            }
+        }
     }
 
     /**

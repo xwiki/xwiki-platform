@@ -19,16 +19,23 @@
  */
 package org.xwiki.rest.internal;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.logging.Level;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.restlet.Context;
 import org.restlet.security.SecretVerifier;
+import org.securityfilter.filter.SecurityRequestWrapper;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.XWikiResponse;
 
 /**
  * Secret verifier that authenticates the user against XWiki authentication system.
@@ -66,11 +73,16 @@ public class XWikiSecretVerifier extends SecretVerifier
     {
         XWikiContext xwikiContext = Utils.getXWikiContext(this.componentManager);
         XWiki xwiki = Utils.getXWiki(this.componentManager);
+        SecurityRequestWrapper securityRequestWrapper =
+            new SecurityRequestWrapper(xwikiContext.getRequest(), null, null, "CHALLENGE");
 
         try {
+            AuthenticationFailureManager authenticationFailureManager =
+                this.componentManager.getInstance(AuthenticationFailureManager.class);
             Principal principal = (secret == null) ? null : xwiki.getAuthService().authenticate(identifier,
                     new String(secret), xwikiContext);
-            if (principal != null) {
+            if (principal != null && authenticationFailureManager.validateForm(identifier, securityRequestWrapper)) {
+                authenticationFailureManager.resetAuthenticationFailureCounter(identifier);
                 String xwikiUser = principal.getName();
 
                 xwikiContext.setUser(xwikiUser);
@@ -78,8 +90,16 @@ public class XWikiSecretVerifier extends SecretVerifier
                 this.context.getLogger().log(Level.FINE, String.format("Authenticated as '%s'.", identifier));
 
                 return RESULT_VALID;
+            } else {
+                authenticationFailureManager.recordAuthenticationFailure(identifier);
+                if (principal != null) {
+                    String responseMessage = "Your account may be blocked after too many attempts to login. \n"
+                                                + "Please go to the xwiki login page to get more information.";
+                    XWikiResponse response = xwikiContext.getResponse();
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, responseMessage);
+                }
             }
-        } catch (XWikiException e) {
+        } catch (XWikiException | ComponentLookupException | IOException e) {
             this.context.getLogger().log(Level.WARNING, "Exception occurred while authenticating.", e);
         }
 

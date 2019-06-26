@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.ui.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.TestUtils;
@@ -42,9 +43,6 @@ public class LoginPage extends ViewPage
 
     @FindBy(xpath = "//input[@type='submit' and @value='Log-in']")
     private WebElement submitButton;
-
-    @FindBy(xpath = "//div[@class='errormessage']")
-    private WebElement loginErrorDiv;
 
     public static LoginPage gotoPage()
     {
@@ -77,6 +75,31 @@ public class LoginPage extends ViewPage
 
     public boolean hasInvalidCredentialsErrorMessage()
     {
-        return this.loginErrorDiv.getText().equals("Error: Invalid credentials");
+        return getErrorMessages().contains("Error: Invalid credentials");
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public boolean hasCaptchaErrorMessage()
+    {
+        return getErrorMessages().contains("Error: Please fill the captcha form to login.");
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public String getErrorMessages()
+    {
+        StringBuilder messages = new StringBuilder();
+        for (WebElement element : getDriver().findElements(By.xpath("//div[@class='errormessage']"))) {
+            messages.append(element.getText());
+        }
+        return messages.toString();
+    }
+
+    public boolean hasCaptchaChallenge()
+    {
+        return getDriver().hasElementWithoutWaiting(By.className("captcha-challenge"));
     }
 }

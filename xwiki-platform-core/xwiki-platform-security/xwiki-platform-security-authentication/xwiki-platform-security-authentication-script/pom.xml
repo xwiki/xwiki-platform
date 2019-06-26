@@ -18,34 +18,40 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
+    <artifactId>xwiki-platform-security-authentication</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
     <version>11.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-security</artifactId>
-  <name>XWiki Platform - Security</name>
-  <description>XWiki Platform - Security is a replacement for the old xwiki rights service (experimental)</description>
-  <packaging>pom</packaging>
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>xwiki-platform-security-authentication-script</artifactId>
+  <packaging>jar</packaging>
+  <name>XWiki Platform - Security - Authentication - Script</name>
+  <description>XWiki Platform - Security - Authentication - Script contains the script service related to authentication</description>
+
   <dependencies>
+
     <dependency>
       <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
+      <artifactId>xwiki-commons-script</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Testing dependencies -->
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <scope>test</scope>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-script</artifactId>
+      <version>11.6-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-api</artifactId>
+      <version>11.6-SNAPSHOT</version>
+      <scope>compile</scope>
     </dependency>
   </dependencies>
-  <modules>
-    <module>xwiki-platform-security-api</module>
-    <module>xwiki-platform-security-bridge</module>
-    <module>xwiki-platform-security-script</module>
-    <module>xwiki-platform-security-authentication</module>
-  </modules>
+
 </project>

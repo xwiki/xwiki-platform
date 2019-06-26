@@ -17,49 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo.test.ui;
+package org.xwiki.security.authentication.api;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.observation.event.AbstractFilterableEvent;
+import org.xwiki.stability.Unstable;
 
 /**
- * All UI tests for the Flamingo Skin. Note that XWiki is started/stopped only once during all the tests and thus they
- * must all work as a single ordered scenario.
+ * This event occurs when a login authentication failure reach the level defined in the configuration (e.g. an user
+ * failing his authentication 3 times in less than 5 minutes). See {@link AuthenticationConfiguration}.
  *
  * @version $Id$
- * @since 11.2RC1
+ * @since 11.6RC1
  */
-@UITest
-public class AllIT
+@Unstable
+public class AuthenticationFailureLimitReachedEvent extends AbstractFilterableEvent
 {
-    @Nested
-    @DisplayName("Save Edit Comments Tests")
-    class NestedEditIT extends EditIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Edit Translation Tests")
-    class NestedEditTranslationIT extends EditTranslationIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Attachment Tests")
-    class NestedAttachmentIT extends AttachmentIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Velocity Macro Tests")
-    class NestedVelocityIT extends VelocityIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Login Tests")
-    class NestedLoginIT extends LoginIT
-    {
-    }
 }

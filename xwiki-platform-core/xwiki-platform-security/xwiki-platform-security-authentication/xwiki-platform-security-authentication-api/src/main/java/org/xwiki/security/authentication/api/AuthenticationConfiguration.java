@@ -17,49 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.flamingo.test.ui;
+package org.xwiki.security.authentication.api;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * All UI tests for the Flamingo Skin. Note that XWiki is started/stopped only once during all the tests and thus they
- * must all work as a single ordered scenario.
+ * Configuration of the authentication properties.
  *
+ * @since 11.6RC1
  * @version $Id$
- * @since 11.2RC1
  */
-@UITest
-public class AllIT
+@Role
+@Unstable
+public interface AuthenticationConfiguration
 {
-    @Nested
-    @DisplayName("Save Edit Comments Tests")
-    class NestedEditIT extends EditIT
-    {
-    }
+    /**
+     * @return the number of authorized authentication failure before the strategies are activated.
+     */
+    int getAuthorizedTrialsNumber();
 
-    @Nested
-    @DisplayName("Edit Translation Tests")
-    class NestedEditTranslationIT extends EditTranslationIT
-    {
-    }
+    /**
+     * @return the time window in seconds during which the authentication failures should occur to activate
+     *         the failure strategy.
+     */
+    int getTimeWindow();
 
-    @Nested
-    @DisplayName("Attachment Tests")
-    class NestedAttachmentIT extends AttachmentIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Velocity Macro Tests")
-    class NestedVelocityIT extends VelocityIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Login Tests")
-    class NestedLoginIT extends LoginIT
-    {
-    }
+    /**
+     * @return the names of the {@link AuthenticationFailureStrategy} to activate, each name is a strategy hint.
+     */
+    String[] getFailureStrategies();
 }

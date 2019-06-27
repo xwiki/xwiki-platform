@@ -722,6 +722,12 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-captcha-default", getXWikiPlatformVersion(), null, "jar"));
 
+        // Authentication default component used by oldcore in authenticators and script service used by login.vm
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-security-authentication-default", getXWikiPlatformVersion(), null, "jar"));
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-security-authentication-script", getXWikiPlatformVersion(), null, "jar"));
+
         return mandatoryTopLevelArtifacts;
     }
 

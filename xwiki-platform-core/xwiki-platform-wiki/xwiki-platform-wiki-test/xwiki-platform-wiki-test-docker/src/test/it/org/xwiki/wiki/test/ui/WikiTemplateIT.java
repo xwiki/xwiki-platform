@@ -185,5 +185,8 @@ public class WikiTemplateIT
 
         // Delete the template wiki
         deleteTemplateWiki();
+
+        logCaptureConfiguration.registerExcludes(
+            "CSRFToken: Secret token verification failed");
     }
 }

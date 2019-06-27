@@ -34,6 +34,7 @@ import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ChangesPane;
 import org.xwiki.test.ui.po.ComparePage;
+import org.xwiki.test.ui.po.DeletePageOutcomePage;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.DocumentDiffSummary;
@@ -229,5 +230,46 @@ public class AttachmentIT
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@", "-v<del>1</del>.<del>1</del>", "+v<ins>2</ins>.<ins>3</ins>"),
             content.getDiff("Content"));
 
+    }
+
+    /**
+     * Ensure that an attachment is properly restored after a rollback of a page that has been restored from deletion.
+     */
+    @Test
+    @Order(4)
+    public void rollbackAttachmentFromRestoredPage(TestUtils setup, TestReference testReference) throws Exception
+    {
+        setup.deletePage(testReference);
+
+        // v1.1
+        setup.createPage(testReference, "");
+
+        // v2.1
+        setup.attachFile(testReference, "toto.txt",
+            getClass().getResourceAsStream("/AttachmentIT/testDiff/v1.1/toto.txt"), true);
+        // v3.1
+        setup.attachFile(testReference, "toto.txt",
+            getClass().getResourceAsStream("/AttachmentIT/testDiff/v2.1/toto.txt"), false);
+
+        setup.deletePage(testReference);
+        setup.gotoPage(testReference);
+
+        DeletePageOutcomePage deletePageOutcomePage = new DeletePageOutcomePage();
+        ViewPage viewPage = deletePageOutcomePage.clickRestore();
+
+        AttachmentsPane attachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("toto.txt"));
+        assertEquals("1.2", attachmentsPane.getLatestVersionOfAttachment("toto.txt"));
+        attachmentsPane.getAttachmentLink("toto.txt").click();
+        assertEquals("v2.1", setup.getDriver().findElement(By.tagName("html")).getText());
+
+        viewPage = setup.gotoPage(testReference);
+        HistoryPane historyPane = viewPage.openHistoryDocExtraPane();
+        viewPage = historyPane.rollbackToVersion("2.1");
+        attachmentsPane = viewPage.openAttachmentsDocExtraPane();
+        assertTrue(attachmentsPane.attachmentExistsByFileName("toto.txt"));
+        assertEquals("1.3", attachmentsPane.getLatestVersionOfAttachment("toto.txt"));
+        attachmentsPane.getAttachmentLink("toto.txt").click();
+        assertEquals("v1.1", setup.getDriver().findElement(By.tagName("html")).getText());
     }
 }

@@ -134,7 +134,7 @@ public class WikiTemplateIT
         WikiHomePage wikiHomePage = executeCreationStepAndFinalize(createWikiPageStepUser);
 
         // Go the created subwiki and verify the content of the main page is the same than in the template
-        assertEquals(wikiHomePage.getContent(), TEMPLATE_CONTENT);
+        assertEquals(TEMPLATE_CONTENT, wikiHomePage.getContent());
 
         // Delete the wiki
         DeleteWikiPage deleteWikiPage = wikiHomePage.deleteWiki();
@@ -185,9 +185,5 @@ public class WikiTemplateIT
 
         // Delete the template wiki
         deleteTemplateWiki();
-
-        logCaptureConfiguration.registerExcludes(
-            "CSRFToken: Secret token verification failed",
-            "SQL Error: -4850, SQLState: 3F000");
     }
 }

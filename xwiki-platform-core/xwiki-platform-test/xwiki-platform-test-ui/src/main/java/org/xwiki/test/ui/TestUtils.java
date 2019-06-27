@@ -225,8 +225,8 @@ public class TestUtils
     public TestUtils()
     {
         this.httpClient = new HttpClient();
-        this.httpClient.getState().setCredentials(AuthScope.ANY, SUPER_ADMIN_CREDENTIALS);
-        this.httpClient.getParams().setAuthenticationPreemptive(true);
+
+        setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
 
         this.rest = new RestTestUtils(this);
     }
@@ -312,7 +312,13 @@ public class TestUtils
     {
         UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
 
-        this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
+        if (defaultCredentials != null) {
+            this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
+            this.httpClient.getParams().setAuthenticationPreemptive(true);
+        } else {
+            this.httpClient.getState().clearCredentials();
+            this.httpClient.getParams().setAuthenticationPreemptive(false);
+        }
 
         return currentCredentials;
     }
@@ -2196,6 +2202,10 @@ public class TestUtils
 
         public Object[] toElements(EntityReference reference)
         {
+            if (reference == null) {
+                return ArrayUtils.EMPTY_OBJECT_ARRAY;
+            }
+
             List<EntityReference> references = reference.getReversedReferenceChain();
 
             List<Object> elements = new ArrayList<>(references.size() + 2);
@@ -2547,7 +2557,7 @@ public class TestUtils
                 return null;
             }
 
-            if (reference.getType() == EntityType.ATTACHMENT) {
+            if (reference != null && reference.getType() == EntityType.ATTACHMENT) {
                 return (T) getMethod.getResponseBodyAsStream();
             } else {
                 try {
@@ -2558,6 +2568,11 @@ public class TestUtils
                     getMethod.releaseConnection();
                 }
             }
+        }
+
+        public <T> T get(Object resourceURI, boolean failIfNotFound) throws Exception
+        {
+            return get(resourceURI, null, failIfNotFound);
         }
 
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)

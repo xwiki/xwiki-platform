@@ -1143,7 +1143,7 @@ public class HibernateStore implements Disposable, Integrator
             ResultSet catalogs = metadata.getCatalogs();
 
             while (catalogs.next()) {
-                if (catalogName.equalsIgnoreCase(catalogs.getString("TABLE_CATALOG"))) {
+                if (catalogName.equalsIgnoreCase(catalogs.getString("TABLE_CAT"))) {
                     return true;
                 }
             }

@@ -168,7 +168,11 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     {
         final Version[] versions = this.getVersions();
         Archive rcsArch = null;
-        for (XWikiAttachment rev : this.revisions) {
+
+        // We need to loop backward since the revision are ordered in desc order.
+        int revisionNumber = this.revisions.size();
+        for (int i = revisionNumber - 1; i >= 0; i--) {
+            XWikiAttachment rev = this.revisions.get(i);
             final String sdata = rev.toStringXML(true, false, context);
             final Object[] lines = ToString.stringToArray(sdata);
             if (rcsArch == null) {
@@ -253,7 +257,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
             try {
                 final ByteArrayInputStream is = new ByteArrayInputStream(data);
                 final Archive rcsArchive = new Archive(getAttachment().getFilename(), is);
-                this.setRCSArchive(rcsArchive);
+                super.setRCSArchive(rcsArchive);
             } catch (Exception e) {
                 if (e instanceof XWikiException) {
                     throw (XWikiException) e;
@@ -264,6 +268,21 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
                     GENERIC_EXCEPTION_MESSAGE, e, args);
             }
         }
+    }
+
+    @Override
+    public String getArchiveAsString(XWikiContext context) throws XWikiException
+    {
+        if (super.getRCSArchive() == null) {
+            try {
+                super.setRCSArchive(toRCS(context));
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
+                    GENERIC_EXCEPTION_MESSAGE, e);
+            }
+        }
+        return super.getArchiveAsString();
     }
 
     @Override

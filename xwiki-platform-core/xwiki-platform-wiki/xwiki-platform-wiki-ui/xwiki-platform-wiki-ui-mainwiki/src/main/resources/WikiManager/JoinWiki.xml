@@ -62,8 +62,8 @@
   #end
   ##
   #if ("$!wiki" == '')
-    #if ("$!{services.wiki.lastException}" != '')
-      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
+    #if ("$!{services.wiki.lastError}" != '')
+      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastError.message]){{/error}}
     #else
       {{error}}$services.localization.render('platform.wiki.error.wikidoesnotexist', [$wikiId]){{/error}}
     #end
@@ -215,7 +215,7 @@
             #if ($result)
               {{success}}$services.localization.render('platform.wiki.users.join.request.cancelSuccess',  ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
             #else
-              #printException($services.wiki.user.lastException.message)
+              #printException($services.wiki.user.lastError.message)
             #end
           #end
         #elseif (!$services.csrf.isTokenValid($form_token))
@@ -261,7 +261,7 @@
             #set ($discard = $services.messageStream.postMessageToGroup($notificationMessage, $wikiAdminGroupReference))
             {{success}}$services.localization.render('platform.wiki.users.join.request.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
           #else
-            #printException($services.wiki.user.lastException.message)
+            #printException($services.wiki.user.lastError.message)
           #end
         #end
       #else
@@ -296,7 +296,7 @@
           #if ($result)
             {{success}}$services.localization.render('platform.wiki.users.join.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
           #else
-            #printException($services.wiki.user.lastException.message)
+            #printException($services.wiki.user.lastError.message)
           #end
         #end
       #end

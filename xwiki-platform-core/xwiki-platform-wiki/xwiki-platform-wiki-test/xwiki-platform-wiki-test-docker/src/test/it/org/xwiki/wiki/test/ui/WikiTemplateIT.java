@@ -188,9 +188,6 @@ public class WikiTemplateIT
 
         logCaptureConfiguration.registerExcludes(
             "CSRFToken: Secret token verification failed",
-            "SQL Error: -4850, SQLState: 3F000",
-            "invalid schema name: MYNEWWIKI",
-            "invalid schema name: MYNEWTEMPLATE",
-            "Deprecated usage of getter [org.xwiki.wiki.script.WikiManagerScriptService.getLastException]");
+            "SQL Error: -4850, SQLState: 3F000");
     }
 }

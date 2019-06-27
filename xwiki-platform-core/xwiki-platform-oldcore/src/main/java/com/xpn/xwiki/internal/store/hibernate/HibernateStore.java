@@ -182,8 +182,11 @@ public class HibernateStore implements Disposable, Integrator
     {
         this.configurationMetadata = metadata;
 
-        this.configurationCatalog =
-            this.configurationMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog().getCanonicalName();
+        Identifier catalog = this.configurationMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog();
+        if (catalog != null) {
+            this.configurationCatalog =
+                this.configurationMetadata.getDatabase().getJdbcEnvironment().getCurrentCatalog().getCanonicalName();
+        }
     }
 
     @Override
@@ -1058,9 +1061,13 @@ public class HibernateStore implements Disposable, Integrator
                 }
             }
 
-            // next will return false if the resultSet is empty.
-            if (resultSet.next()) {
-                return function.apply(resultSet);
+            try {
+                // next will return false if the resultSet is empty.
+                if (resultSet.next()) {
+                    return function.apply(resultSet);
+                }
+            } finally {
+                resultSet.close();
             }
 
             return def;
@@ -1140,11 +1147,11 @@ public class HibernateStore implements Disposable, Integrator
     public boolean isCatalogExist(String catalogName)
     {
         return metadata(false, metadata -> {
-            ResultSet catalogs = metadata.getCatalogs();
-
-            while (catalogs.next()) {
-                if (catalogName.equalsIgnoreCase(catalogs.getString("TABLE_CAT"))) {
-                    return true;
+            try (ResultSet catalogs = metadata.getCatalogs()) {
+                while (catalogs.next()) {
+                    if (catalogName.equalsIgnoreCase(catalogs.getString("TABLE_CAT"))) {
+                        return true;
+                    }
                 }
             }
 
@@ -1158,11 +1165,12 @@ public class HibernateStore implements Disposable, Integrator
     public boolean isSchemaExist(String schemaName)
     {
         return metadata(false, metadata -> {
-            ResultSet schemas = metadata.getSchemas(configurationCatalog, null);
-
-            while (schemas.next()) {
-                if (schemaName.equalsIgnoreCase(schemas.getString("TABLE_SCHEM"))) {
-                    return true;
+            try (ResultSet schemas = this.configurationCatalog != null
+                ? metadata.getSchemas(this.configurationCatalog, null) : metadata.getSchemas()) {
+                while (schemas.next()) {
+                    if (schemaName.equalsIgnoreCase(schemas.getString("TABLE_SCHEM"))) {
+                        return true;
+                    }
                 }
             }
 

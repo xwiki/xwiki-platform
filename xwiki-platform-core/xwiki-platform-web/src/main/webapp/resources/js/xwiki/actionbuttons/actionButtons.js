@@ -130,12 +130,16 @@ actionButtons.EditActions = Class.create({
     var xredirectElement = event.element().form.select('input[name="xredirect"]')[0];
     var xredirectParameter = xredirectElement ? '&xredirect=' + escape(xredirectElement.value) : '';
 
+    // Include the language parameter if it exists
+    var language = event.element().form.select('input[name="language"]')[0];
+    var languageParameter = language ? '&language=' + escape(language.value) : '';
+
     // Optimisation: Prevent a redundant request to remove the edit lock when the page unload event is triggered. Both the cancel action
     // and the page unload event would unlock the document, so no point in doing both.
     XWiki.EditLock && XWiki.EditLock.setLocked(false);
 
     // Call the cancel URL directly instead of submitting the form. (optimisation)
-    window.location = location + cancelActionParameter + xredirectParameter + fragmentId;
+    window.location = location + cancelActionParameter + xredirectParameter + languageParameter + fragmentId;
   },
   onSubmit: function(event, action, continueEditing) {
     var beforeAction = 'before' + action.substr(0, 1).toUpperCase() + action.substr(1);

@@ -148,7 +148,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.5</pgsql.version>
+    <pgsql.version>42.2.6</pgsql.version>
 
     <!-- Set HSQLDB by default -->
     <xwiki.db>hsqldb</xwiki.db>

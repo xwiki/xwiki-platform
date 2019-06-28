@@ -114,10 +114,10 @@ administration.section.export.withHistory.hint=Inclure l'historique de la page d
 administration.section.export.backupPack.hint=Définit si le package est une sauvegarde. Cette option n'influe pas sur le contenu des pages mais, lors de l'import, pré-sélectionne l'option "Importer le package comme une sauvegarde". Dans ce cas, l'auteur est conservé. Au contraire lors de l'import d'un package normal, l'utilisateur effectuant l'import devient automatiquement le dernier auteur des pages importées.
 
 # Users Section
-### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
+administration.section.users.deleteUser.confirmationMessage=L''utilisateur {0} va être retiré de tous les {1}groupes{2} auxquels il appartient. Souhaitez-vous continuer ?
 ### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
 ### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
-### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markInactiveMessage=Plutôt que de supprimer l'utilisateur vous pouvez le désactiver. Ainsi il ne pourra plus se connecter et les scripts associés à cet utilisateur continueront à fonctionner.
 
 # Other Category
 admin.other=Divers

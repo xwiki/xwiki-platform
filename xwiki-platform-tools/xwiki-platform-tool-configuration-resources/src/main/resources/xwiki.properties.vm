@@ -600,29 +600,6 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The default is:
 # security.authorization.settler=default
 
-#-# [Since 11.6RC1]
-#-# Define the strategy to use in case an user failed to authenticate repeatedly in a given time window.
-#-#
-#-# The default is:
-# security.authentication.failureStrategy=captcha
-
-#-# [Since 11.6RC1]
-#-# Define the number of repeated failure to consider before activating the failureStrategy defined above. This number
-#-# of failed authentication is only taken into account for a given login, in a given time window, defined below.
-#-# If this parameter is set to 0 the feature to detect repeated authentication failure is entirely disabled.
-#-#
-#-# The default is:
-# security.authentication.maxAuthorizedAttempts=3
-
-#-# [Since 11.6RC1]
-#-# Define the time window in second in which we consider the repeated authentication failures.
-#-# The limit of authentication failures is reached when the number of maxAuthorizedAttempts is reached in the given
-#-# time window. At that point, the failureStrategy is triggered.
-#-# If this parameter is set to 0 the feature to detect repeated authentication failure is entirely disabled.
-#-#
-#-# The default is:
-# security.authentication.timeWindowAttempts=300
-
 #-------------------------------------------------------------------------------------
 # URL
 #-------------------------------------------------------------------------------------

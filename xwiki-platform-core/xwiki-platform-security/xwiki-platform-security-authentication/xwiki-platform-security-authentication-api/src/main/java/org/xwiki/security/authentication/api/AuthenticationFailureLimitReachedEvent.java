@@ -19,7 +19,8 @@
  */
 package org.xwiki.security.authentication.api;
 
-import org.xwiki.observation.event.AbstractFilterableEvent;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.observation.event.Event;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -30,6 +31,21 @@ import org.xwiki.stability.Unstable;
  * @since 11.6RC1
  */
 @Unstable
-public class AuthenticationFailureLimitReachedEvent extends AbstractFilterableEvent
+public class AuthenticationFailureLimitReachedEvent implements Event
 {
+    @Override
+    public boolean matches(Object otherEvent)
+    {
+        return otherEvent instanceof AuthenticationFailureLimitReachedEvent;
+    }
+
+    public boolean equals(Object other)
+    {
+        return other instanceof AuthenticationFailureLimitReachedEvent;
+    }
+
+    public int hashCode()
+    {
+        return new HashCodeBuilder(39, 43).hashCode();
+    }
 }

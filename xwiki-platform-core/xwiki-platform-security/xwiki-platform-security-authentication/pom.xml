@@ -36,5 +36,6 @@
     <module>xwiki-platform-security-authentication-api</module>
     <module>xwiki-platform-security-authentication-default</module>
     <module>xwiki-platform-security-authentication-script</module>
+    <module>xwiki-platform-security-authentication-ui</module>
   </modules>
 </project>

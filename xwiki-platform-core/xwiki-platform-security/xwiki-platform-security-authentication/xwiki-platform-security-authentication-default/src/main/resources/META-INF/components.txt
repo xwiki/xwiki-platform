@@ -2,3 +2,4 @@ org.xwiki.security.authentication.internal.CaptchaAuthenticationFailureStrategy
 org.xwiki.security.authentication.internal.DefaultAuthenticationConfiguration
 org.xwiki.security.authentication.internal.DefaultAuthenticationFailureManager
 org.xwiki.security.authentication.internal.AuthenticationFailureLoggerListener
+org.xwiki.security.authentication.internal.AuthenticationConfigurationSource

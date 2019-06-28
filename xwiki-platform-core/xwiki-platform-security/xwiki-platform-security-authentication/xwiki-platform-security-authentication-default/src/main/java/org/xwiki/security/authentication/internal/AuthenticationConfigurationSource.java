@@ -19,52 +19,52 @@
  */
 package org.xwiki.security.authentication.internal;
 
-import javax.inject.Inject;
+import java.util.Arrays;
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.security.authentication.api.AuthenticationConfiguration;
+import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * Default implementation for {@link AuthenticationConfiguration}.
+ * {@link ConfigurationSource} reading the values from the configuration page.
  *
  * @version $Id$
- * @since 11.6RC1
+ * @since 10.8RC1
  */
 @Component
+@Named("authentication")
 @Singleton
-public class DefaultAuthenticationConfiguration implements AuthenticationConfiguration
+public class AuthenticationConfigurationSource extends AbstractDocumentConfigurationSource
 {
-    /**
-     * Defines from where to read the Resource configuration data.
-     */
-    @Inject
-    @Named("authentication")
-    private ConfigurationSource configuration;
+    private static final List<String> SPACE_NAMES = Arrays.asList("XWiki", "Authentication");
+
+    private static final LocalDocumentReference CLASS_REFERENCE =
+        new LocalDocumentReference(SPACE_NAMES, "ConfigurationClass");
+
+    private static final LocalDocumentReference DOC_REFERENCE =
+        new LocalDocumentReference(SPACE_NAMES, "Configuration");
 
     @Override
-    public int getAuthorizedTrialsNumber()
+    protected DocumentReference getDocumentReference()
     {
-        return configuration.getProperty("maxAuthorizedAttempts", 3);
+        return new DocumentReference(DOC_REFERENCE, getCurrentWikiReference());
     }
 
     @Override
-    public int getTimeWindow()
+    protected LocalDocumentReference getClassReference()
     {
-        return configuration.getProperty("timeWindowAttempts", 300);
+        return CLASS_REFERENCE;
     }
 
     @Override
-    public String[] getFailureStrategies()
+    protected String getCacheId()
     {
-        String strategies = configuration.getProperty("failureStrategy", "");
-        if (!StringUtils.isEmpty(strategies)) {
-            return strategies.split(",");
-        } else {
-            return new String[0];
-        }
+        return "configuration.document.authentication";
     }
 }

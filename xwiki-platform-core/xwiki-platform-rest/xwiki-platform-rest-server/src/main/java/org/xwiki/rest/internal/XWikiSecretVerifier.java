@@ -30,6 +30,7 @@ import org.restlet.security.SecretVerifier;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWiki;
@@ -93,8 +94,10 @@ public class XWikiSecretVerifier extends SecretVerifier
             } else {
                 authenticationFailureManager.recordAuthenticationFailure(identifier);
                 if (principal != null) {
-                    String responseMessage = "Your account may be blocked after too many attempts to login. \n"
-                                                + "Please go to the xwiki login page to get more information.";
+                    ContextualLocalizationManager contextualLocalizationManager =
+                        componentManager.getInstance(ContextualLocalizationManager.class);
+                    String responseMessage = contextualLocalizationManager
+                        .getTranslation("security.authentication.rest.blockedError").toString();
                     XWikiResponse response = xwikiContext.getResponse();
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, responseMessage);
                 }

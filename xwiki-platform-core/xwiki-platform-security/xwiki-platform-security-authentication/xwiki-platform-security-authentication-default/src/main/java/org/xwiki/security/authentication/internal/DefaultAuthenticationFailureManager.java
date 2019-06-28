@@ -98,7 +98,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
                     this.failureStrategyList.add(this.componentManager.getInstance(AuthenticationFailureStrategy.class,
                         failureStrategyName));
                 } catch (ComponentLookupException e) {
-                    logger.error("Error while getting authentication failure strategy [{}]. ", failureStrategyName);
+                    logger.error("Error while getting authentication failure strategy [{}]. ", failureStrategyName, e);
                 }
             }
         }
@@ -114,7 +114,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
 
         // If the config is set to 0 for max attempts or time window, it means the feature is disabled,
         // we can immediately return.
-        if (getMaxNbAttempts() == 0 || getMaxTime() == 0) {
+        if (getMaxNbAttempts() == 0 || getMaxTime() == 0 || getFailureStrategyList().isEmpty()) {
             return false;
         }
 

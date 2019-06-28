@@ -190,7 +190,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         try {
             initializePagesIndex(request);
-            initJobPackageConfiguration(request, true);
+            initJobPackageConfiguration(request);
         } catch (Exception e) {
             throw new InstallException("Failed to initialize extension plan index", e);
         }
@@ -211,7 +211,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
     {
         try {
             initializePagesIndex(request);
-            initJobPackageConfiguration(request, false);
+            initJobPackageConfiguration(request);
         } catch (Exception e) {
             throw new UninstallException("Failed to initialize extension plan index", e);
         }
@@ -252,7 +252,7 @@ public class XarExtensionHandler extends AbstractExtensionHandler
         }
     }
 
-    private void initJobPackageConfiguration(Request request, boolean defaultConflict) throws InterruptedException
+    private void initJobPackageConfiguration(Request request) throws InterruptedException
     {
         ExecutionContext context = this.execution.getContext();
 
@@ -294,8 +294,9 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     request.getProperty(ConflictQuestion.REQUEST_CONFLICT_DEFAULTANSWER_MERGE_FAILURE),
                     configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.MERGED);
 
-                // If user asked to be asked about conflict behavior
-                if (defaultConflict && currentJob.getStatus().getRequest().isInteractive()) {
+                // If user requested to be asked about conflict behavior
+                if (currentJob.getStatus().getRequest().isInteractive() && getXARExtensionPlan() != null
+                    && getXARExtensionPlan().containsNewPages()) {
                     XWikiContext xcontext = xcontextProvider.get();
                     // Make sure the context has the right user
                     xcontext.setUserReference(userReference);

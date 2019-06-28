@@ -267,4 +267,9 @@ public class XarExtensionPlan implements Closeable
     {
         return getNextXarExtension(wikiReference.getName(), localDocumentReference) != null;
     }
+
+    public boolean containsNewPages()
+    {
+        return !this.nextXAREntries.isEmpty();
+    }
 }

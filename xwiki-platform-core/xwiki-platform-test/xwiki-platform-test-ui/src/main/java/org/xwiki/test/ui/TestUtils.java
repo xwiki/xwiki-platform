@@ -645,6 +645,7 @@ public class TestUtils
 
     /**
      * @since 11.5RC1
+     * @since 11.3.1
      */
     public ViewPage createPage(EntityReference reference, String content)
     {

@@ -1289,7 +1289,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
 ##
 ## Keep track for when we have a target document
 #set ($hasTargetDoc = false)
-#set ($targetdoc = "$!{xcontext.macro.params.targetdocname}")
+#set ($targetdoc = $services.model.serialize("$!{xcontext.macro.params.targetdocname}", 'local'))
 ###
 ## Set the targetdoc we want to save to (default to current doc if not set)
 #if ("$!{targetdoc}" != '')
@@ -1304,7 +1304,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
   #set ($targetPermEdit = true)
   #set($targetdoc = $doc)
 #end
-#set ($classname = "$!{xcontext.macro.params.classname}")
+#set ($classname = $services.model.serialize("$!{xcontext.macro.params.classname}", 'local'))
 #set ($property = "$!{xcontext.macro.params.property}")
 #set ($object = $mathtool.toInteger("$!{xcontext.macro.params.object}"))
 #if ("$!{object}" != $!{xcontext.macro.params.object})
@@ -1342,12 +1342,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
 #end
 
 #set ($cssClass = "displayed x-attachment $!{xcontext.macro.params.cssClass}")
-#set ($defaultValue = "$!{xcontext.macro.params.defaultValue}")
-#if ($defaultValue != '')
-  #set ($defaultReference = $services.model.resolveAttachment($defaultValue))
-#else
-  #set ($defaultReference = false)
-#end
+#set ($defaultReference = "$!{xcontext.macro.params.defaultValue}")
 #set ($filter = ${xcontext.macro.params.filter})
 
 #set ($buttontext = "$!{xcontext.macro.params.buttontext}")

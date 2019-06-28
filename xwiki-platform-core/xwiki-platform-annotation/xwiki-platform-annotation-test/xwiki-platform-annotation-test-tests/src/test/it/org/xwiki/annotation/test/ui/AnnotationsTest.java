@@ -77,7 +77,6 @@ public class AnnotationsTest extends AbstractTest
     })
     public void addAndDeleteAnnotations() throws Exception
     {
-        getUtil().loginAsAdmin();
         getUtil().deletePage(getTestClassName(), getTestMethodName());
         getUtil().login(USER_NAME, USER_PASS);
         AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(
@@ -123,7 +122,6 @@ public class AnnotationsTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177")
     public void annotationsShouldNotBeShownInXWiki10Syntax() throws Exception
     {
-        getUtil().loginAsAdmin();
         getUtil().deletePage(getTestClassName(), getTestMethodName());
         // Note: Make sure Annotations and Comments are merged (this is not the default ATM!) by setting the
         // $showannotation velocity variable to false in the page content

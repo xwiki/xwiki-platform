@@ -355,11 +355,25 @@ public class TestUtils
 
     public void loginAndGotoPage(String username, String password, String pageURL)
     {
+        loginAndGotoPage(username, password, pageURL, true);
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public void loginAndGotoPage(String username, String password, String pageURL, boolean checkLoginSuccess)
+    {
         if (!username.equals(getLoggedInUserName())) {
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.
             // Also recache the CSRF token
-            getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
+            String destUrl = getURL("XWiki", "Register", "register");
+            getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
+
+            if (checkLoginSuccess && !destUrl.equals(getDriver().getCurrentUrl())) {
+                throw
+                    new RuntimeException(String.format("Login failed with credentials: %s / %s.", username, password));
+            }
             recacheSecretTokenWhenOnRegisterPage();
             if (pageURL != null) {
                 // Go to the page asked

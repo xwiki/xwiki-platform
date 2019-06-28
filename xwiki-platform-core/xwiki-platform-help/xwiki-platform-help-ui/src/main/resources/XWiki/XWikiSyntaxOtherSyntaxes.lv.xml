@@ -52,6 +52,5 @@ Sākot ar XWiki Enterprise 1.6 ir atbalstītas arī sekojošas sintakses:
 * [[Creole 1.0&gt;&gt;http://www.wikicreole.org/wiki/Creole1.0]]
 * [[XHTML 1.0&gt;&gt;http://www.w3.org/TR/xhtml1/]]
 
-{{warning}}Šīs sintakses pilnībā vēl netiek atbalstītas. Piemēram, pilnībā nestrādā hipersaites. Mums arī ir nepieciešams vienoties, vai mēs vēlamies šajās sintaksēs atbalstīt XWiki specifiskās lietas, piemēram, saiti uz citu subviki.{{/warning}}
-</content>
+{{warning}}Šīs sintakses pilnībā vēl netiek atbalstītas. Piemēram, pilnībā nestrādā hipersaites. Mums arī ir nepieciešams vienoties, vai mēs vēlamies šajās sintaksēs atbalstīt XWiki specifiskās lietas, piemēram, saiti uz citu subviki.{{/warning}}</content>
 </xwikidoc>

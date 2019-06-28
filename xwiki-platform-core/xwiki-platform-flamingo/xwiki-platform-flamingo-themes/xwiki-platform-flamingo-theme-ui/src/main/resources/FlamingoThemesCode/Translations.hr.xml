@@ -84,6 +84,5 @@ platform.flamingo.themes.global=Globalno
 #######################################
 platform.flamingo.themes.lessCode.warning=Nažalost, ovo polje se ne uzima u obzir kod pretpregleda.
 
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

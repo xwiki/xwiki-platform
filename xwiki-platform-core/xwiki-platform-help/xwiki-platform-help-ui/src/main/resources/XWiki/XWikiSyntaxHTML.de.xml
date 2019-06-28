@@ -57,6 +57,5 @@ In XWiki Syntax 1.0 ist es möglich, HTML direkt in den Text einzugeben.
 |{{{{{html}}&lt;b&gt;fett&lt;/b&gt;{{/html}} }}}|{{html}}&lt;b&gt;fett&lt;/b&gt;{{/html}}
 
 
-{{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} versteht das HTML Makro standardmäßig keine XWiki Syntax (andere Makros eingeschlossen, da diese ebenfalls XWiki Syntax sind). Um dies einzuschalten ist {{{{{html wiki="true"}} }}} zu verwenden.{{/info}}
-</content>
+{{info}}In XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} versteht das HTML Makro standardmäßig keine XWiki Syntax (andere Makros eingeschlossen, da diese ebenfalls XWiki Syntax sind). Um dies einzuschalten ist {{{{{html wiki="true"}} }}} zu verwenden.{{/info}}</content>
 </xwikidoc>

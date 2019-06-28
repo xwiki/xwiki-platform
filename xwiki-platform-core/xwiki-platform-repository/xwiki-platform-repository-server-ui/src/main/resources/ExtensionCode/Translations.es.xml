@@ -49,6 +49,5 @@ extension.repository.authors=Autores
 ### Missing: extension.repository.installedCount=Installs
 
 ## Administration UI
-### Missing: admin.repository=Extension Repository
-</content>
+### Missing: admin.repository=Extension Repository</content>
 </xwikidoc>

@@ -94,8 +94,5 @@ XWiki {{velocity}}$crtSyntaxVer{{/velocity}} sintaksē iespējams norādīt para
 = heading =
 }}})))|((({{{
 &lt;h1 class="myClass" style="myStyle" id="myId"&gt;heading&lt;/h1&gt;
-}}}))) 
-
-
-</content>
+}}})))</content>
 </xwikidoc>

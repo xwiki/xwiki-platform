@@ -128,6 +128,5 @@ Pilnais saites formāts ir: **##[nosaukums&gt;&gt;] (saite) [||parametri]##**
 
 * ##nosaukums##: saites nosaukums. Var saturēt viki sintaksi
 * ##saite##: saites mērķis, t.i. vieta, kas tiks atvērta, kad uz saites uzklikšķina. Tās sintakse ir līdzīga XWiki 1.0 sintaksei, un tā var būt arī norāde uz {{{mailto:}}} un {{{attach:}}}, lai attiecīgi norādītu uz e-pasta adresi vai lapas pielikumu.
-* ##parametri##: Neobligāts vietrāža (URL) pieprasījums aiz jautājuma zīmes. Piemēram: ##queryString="parametrs_1=5&amp;parametrs_2=Sveiki" anchor="HTableOfContents" rel="~_~_blank"##.
-</content>
+* ##parametri##: Neobligāts vietrāža (URL) pieprasījums aiz jautājuma zīmes. Piemēram: ##queryString="parametrs_1=5&amp;parametrs_2=Sveiki" anchor="HTableOfContents" rel="~_~_blank"##.</content>
 </xwikidoc>

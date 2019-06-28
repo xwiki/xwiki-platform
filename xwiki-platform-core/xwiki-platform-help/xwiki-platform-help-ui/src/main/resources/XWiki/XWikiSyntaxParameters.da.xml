@@ -61,5 +61,5 @@ Med XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} er det muligt at overfø
 = heading =
 }}})))|((({{{
 &lt;h1 class="myClass" style="myStyle" id="myId"&gt;heading&lt;/h1&gt;
-}}}))) </content>
+}}})))</content>
 </xwikidoc>

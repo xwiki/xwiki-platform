@@ -84,6 +84,5 @@ platform.flamingo.themes.global=Global
 #######################################
 platform.flamingo.themes.lessCode.warning=Malheureusement ce champ n'est pas pris en compte en prévisualisation.
 
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

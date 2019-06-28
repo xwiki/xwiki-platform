@@ -84,6 +84,5 @@ platform.flamingo.themes.defaultvalue=Preddefinovaný
 #######################################
 ### Missing: platform.flamingo.themes.lessCode.warning=Unfortunately, this field is not taken into account in the live preview.
 
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

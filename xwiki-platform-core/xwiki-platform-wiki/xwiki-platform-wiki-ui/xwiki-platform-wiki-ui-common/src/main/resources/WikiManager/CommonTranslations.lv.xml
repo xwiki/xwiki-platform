@@ -59,6 +59,5 @@ platform.wiki.admin.wiki.ownerWarning=Brīdinājums: Kad jūs apstiprināsiet iz
 admin.wiki=Viki
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

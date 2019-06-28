@@ -230,7 +230,7 @@ platform.wiki.create.wizard.step.create=Aanmaken
 platform.wiki.create.wizard.step.creation=Wiki aanmaken
 platform.wiki.create.wizard.step.creation.wait=Een ogenblik geduld, de wiki wordt aangemaakt.
 platform.wiki.create.wizard.step.creation.complete=De wiki {0} is succesvol aangemaakt. U kunt de wiki nu gebruiken.
-### Missing: platform.wiki.create.wizard.step.creation.errorlog=However error(s) have been generated during that process and you might want to review them.
+### Missing: platform.wiki.create.wizard.step.creation.errorlog=However, error(s) have been generated during that process and you might want to review them.
 platform.wiki.create.wizard.step.creation.error=De wiki {0} is aangemaakt, maar de installatie van een aantal pagina''s is mislukt. Het is mogelijk dat de wiki hierdoor niet goed functioneert; u kunt de wiki het best verwijderen.
 platform.wiki.create.wizard.step.creation.go=Ga naar de wiki
 

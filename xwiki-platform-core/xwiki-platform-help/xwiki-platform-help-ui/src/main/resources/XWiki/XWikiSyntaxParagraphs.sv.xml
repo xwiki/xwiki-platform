@@ -69,6 +69,5 @@ I XWiki syntax {{velocity}}$crtSyntaxVer{{/velocity}} är nyradstecken signifika
 |Stycke|Detta är ett stycke|Detta är ett stycke
 |Flerradigt stycke|Stycke med\\flera rader|Stycke med\\flera rader
 |Två stycken|Stycke ett\\\\Stycke två|Stycke ett\\\\Stycke två
-|Parametriserade stycken|{{{(% style="text-align:center;color:blue" %)}}}\\Centrerat stycke med blå text|(% style="text-align:center;color:blue" %)\\Centrerat stycke med blå text
-</content>
+|Parametriserade stycken|{{{(% style="text-align:center;color:blue" %)}}}\\Centrerat stycke med blå text|(% style="text-align:center;color:blue" %)\\Centrerat stycke med blå text</content>
 </xwikidoc>

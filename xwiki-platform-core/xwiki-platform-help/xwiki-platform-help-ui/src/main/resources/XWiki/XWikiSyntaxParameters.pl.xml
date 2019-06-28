@@ -62,5 +62,5 @@ W XWiki wersji {{velocity}}$crtSyntaxVer{{/velocity}} można przekazać parametr
 = nagłówek =
 }}})))|((({{{
 &lt;h1 class="myClass" style="myStyle" id="myId"&gt;nagłówek&lt;/h1&gt;
-}}}))) </content>
+}}})))</content>
 </xwikidoc>

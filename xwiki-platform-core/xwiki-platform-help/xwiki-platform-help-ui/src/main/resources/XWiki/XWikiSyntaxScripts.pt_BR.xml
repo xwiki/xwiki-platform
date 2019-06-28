@@ -68,5 +68,5 @@ def var = "qualquer coisa"
 {{groovy}}
 def var = "qualquer coisa"
 {{/groovy}}
-}}}))) </content>
+}}})))</content>
 </xwikidoc>

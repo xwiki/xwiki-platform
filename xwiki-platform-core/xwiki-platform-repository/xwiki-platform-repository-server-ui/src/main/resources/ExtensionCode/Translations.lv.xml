@@ -49,6 +49,5 @@ extension.repository.rating=Vērtējums
 extension.repository.installedCount=Uzstādījumi
 
 ## Administration UI
-admin.repository=Paplašinājumu krātuve
-</content>
+admin.repository=Paplašinājumu krātuve</content>
 </xwikidoc>

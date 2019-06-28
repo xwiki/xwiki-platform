@@ -637,6 +637,15 @@ public class TestUtils
     }
 
     /**
+     * @since 11.5RC1
+     * @since 11.3.1
+     */
+    public ViewPage createPage(EntityReference reference, String content)
+    {
+        return createPage(reference, content, this.serializeReference(reference), null);
+    }
+
+    /**
      * @since 7.2M2
      */
     public ViewPage createPage(EntityReference reference, String content, String title)

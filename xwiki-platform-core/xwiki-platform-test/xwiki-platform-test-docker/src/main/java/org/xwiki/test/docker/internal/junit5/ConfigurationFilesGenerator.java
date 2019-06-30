@@ -256,7 +256,9 @@ public class ConfigurationFilesGenerator
         props.setProperty("xwikiDbConnectionUsername", dbProperties.get(2));
         props.setProperty("xwikiDbConnectionPassword", dbProperties.get(3));
         props.setProperty("xwikiDbConnectionDriverClass", dbProperties.get(4));
-        props.setProperty("xwikiDbDialect", dbProperties.get(5));
+        if (dbProperties.get(5) != null) {
+          props.setProperty("xwikiDbDialect", dbProperties.get(5));
+        }
         if (dbProperties.get(6) != null) {
             props.setProperty("xwikiDbVirtualMode", dbProperties.get(6));
         }

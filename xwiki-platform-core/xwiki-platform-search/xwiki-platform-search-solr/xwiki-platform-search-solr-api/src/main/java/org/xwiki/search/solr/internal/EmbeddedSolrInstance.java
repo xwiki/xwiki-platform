@@ -31,7 +31,6 @@ import javax.inject.Singleton;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
@@ -109,12 +108,11 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
     {
         CoreContainer coreContainer = new CoreContainer(solrHome);
         coreContainer.load();
-        if (coreContainer.getCores().size() == 0) {
-            throw new SolrServerException("Failed to initialize the Solr core. "
-                + "Please check the configuration and log messages.");
+        if (coreContainer.getCores().isEmpty()) {
+            throw new SolrServerException(
+                "Failed to initialize the Solr core. Please check the configuration and log messages.");
         } else if (coreContainer.getCores().size() > 1) {
-            this.logger.warn("Multiple Solr cores detected: [{}]. Using the first one.",
-                StringUtils.join(coreContainer.getAllCoreNames(), ", "));
+            this.logger.warn("Multiple Solr cores detected: {}. Using the first one.", coreContainer.getAllCoreNames());
         }
         return coreContainer;
     }

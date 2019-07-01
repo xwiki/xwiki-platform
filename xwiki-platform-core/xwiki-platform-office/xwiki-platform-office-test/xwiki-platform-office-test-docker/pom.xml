@@ -34,10 +34,6 @@
          the "officemanager" ScriptService which requires PR and that pages is executed in the context of
          XWiki.XWikiPreferences (which is the current doc) -->
     <xwikiPropertiesAdditionalProperties>test.prchecker.excludePattern=.*:XWiki\.XWikiPreferences</xwikiPropertiesAdditionalProperties>
-    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
-      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
-      here. Note that the version needs to be checked when we change the version of selenium-java -->
-    <guava.version>25.0-jre</guava.version>
   </properties>
   <dependencies>
     <!-- ================================

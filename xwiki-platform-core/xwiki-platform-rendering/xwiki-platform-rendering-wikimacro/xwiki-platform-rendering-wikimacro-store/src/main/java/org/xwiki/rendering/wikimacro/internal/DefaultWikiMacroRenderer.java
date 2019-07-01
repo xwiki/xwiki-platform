@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,11 +29,15 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.block.AbstractBlockAsyncRenderer;
@@ -46,10 +51,13 @@ import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
+import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionFinishedEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
+import org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBinding;
+import org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBindingInitializer;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
@@ -58,6 +66,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.rendering.wikimacro.macro.wikimacrocontent.WikiMacroContentMacro;
+import org.xwiki.script.ScriptContextManager;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -75,6 +84,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      */
     private static final String MACRO_KEY = "macro";
 
+    private static final String MACRO_BINDING = "wikimacro";
+
     /**
      * The key under which macro body will be available inside macro context.
      */
@@ -82,8 +93,15 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     /**
      * The key under which macro parameters will be available inside macro context.
+     * @deprecated this key is used for the old $xcontext.macro
      */
+    @Deprecated
     private static final String MACRO_PARAMS_KEY = "params";
+
+    /**
+     * The key under which macro parameters will be available inside macro context.
+     */
+    private static final String MACRO_PARAMETERS_KEY = "parameters";
 
     /**
      * The key under which macro transformation context will be available inside macro context.
@@ -144,11 +162,19 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     @Inject
     private ObservationManager observation;
 
+    @Inject
+    private ScriptContextManager scriptContextManager;
+
+    @Inject
+    private Logger logger;
+
     private DefaultWikiMacro wikimacro;
 
     private List<String> id;
 
     private WikiMacroParameters parameters;
+
+    private WikiMacroParameters originalParameters;
 
     private String macroContent;
 
@@ -163,7 +189,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     {
         this.wikimacro = wikimacro;
 
-        this.parameters = parameters;
+        this.originalParameters = parameters;
         this.macroContent = macroContent;
         this.inline = syncContext.isInline();
         this.targetSyntax = syncContext.getTransformationContext().getTargetSyntax();
@@ -174,6 +200,11 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         long index = syncContext.getXDOM().indexOf(syncContext.getCurrentMacroBlock());
 
         this.id = Arrays.asList("rendering", "wikimacro", wikimacro.getId(), String.valueOf(index));
+        try {
+            this.parameters = convertParameters(parameters);
+        } catch (ComponentLookupException e) {
+            logger.error("Error while converting wikimacro parameters value.", e);
+        }
     }
 
     @Override
@@ -310,22 +341,29 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         return new BlockAsyncRendererResult(resultString, blockResult);
     }
 
-    private Map<String, Object> createBinding(boolean async)
+    private WikiMacroBinding createBinding(boolean async)
     {
-        Map<String, Object> macroBinding = new HashMap<>();
-        macroBinding.put(MACRO_PARAMS_KEY, this.parameters);
-        macroBinding.put(MACRO_CONTENT_KEY, this.macroContent);
-        macroBinding.put(MACRO_DESCRIPTOR_KEY, this.wikimacro.getDescriptor());
-        macroBinding.put(MACRO_RESULT_KEY, null);
+        // old macro binding for $xcontext.macro
+        Map<String, Object> contextMacroBinding = new HashMap<>();
+        contextMacroBinding.put(MACRO_PARAMS_KEY, this.originalParameters);
+        contextMacroBinding.put(MACRO_CONTENT_KEY, this.macroContent);
+        contextMacroBinding.put(MACRO_DESCRIPTOR_KEY, this.wikimacro.getDescriptor());
+        contextMacroBinding.put(MACRO_RESULT_KEY, null);
 
         if (!async) {
-            macroBinding.put(MACRO_CONTEXT_KEY, this.syncContext);
+            contextMacroBinding.put(MACRO_CONTEXT_KEY, this.syncContext);
         }
 
-        ComponentManager currentComponentManager = this.componentManager.get();
+        // new macro binding for $wikimacro
+        WikiMacroBinding macroBinding = new WikiMacroBinding();
+        macroBinding.setContent(this.macroContent);
+        macroBinding.setParameters(this.parameters);
+        macroBinding.setDescriptor(this.wikimacro.getDescriptor());
 
-        // Extension point to add more wiki macro bindings
         try {
+            ComponentManager currentComponentManager = this.componentManager.get();
+
+            // Extension point to add more wiki macro bindings
             List<WikiMacroBindingInitializer> bindingInitializers =
                 currentComponentManager.getInstanceList(WikiMacroBindingInitializer.class);
 
@@ -333,17 +371,55 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
                 bindingInitializer.initialize(this.wikimacro, this.parameters, this.macroContent,
                     async ? null : this.syncContext, macroBinding);
             }
+
+            List<org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer> oldBindingInitializers =
+                currentComponentManager.getInstanceList(
+                    org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer.class);
+
+            for (org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer bindingInitializer :
+                oldBindingInitializers) {
+                bindingInitializer.initialize(this.wikimacro, this.parameters, this.macroContent,
+                    async ? null : this.syncContext, contextMacroBinding);
+            }
+
+            this.xcontextProvider.get().put(MACRO_KEY, contextMacroBinding);
+            this.scriptContextManager.getCurrentScriptContext().setAttribute(MACRO_BINDING, macroBinding,
+                ScriptContext.ENGINE_SCOPE);
         } catch (ComponentLookupException e) {
-            // TODO: we should probably log something but that should never happen
+            logger.error("Error while performing wikimacro binding.", e);
         }
 
         return macroBinding;
     }
 
+    private WikiMacroParameters convertParameters(WikiMacroParameters parameters)
+        throws ComponentLookupException
+    {
+        ConverterManager converterManager = this.componentManager.get().getInstance(ConverterManager.class);
+        Map<String, ParameterDescriptor> parameterDescriptorMap = this.wikimacro.getDescriptor().
+            getParameterDescriptorMap();
+        WikiMacroParameters result = new WikiMacroParameters();
+        for (String parameterName : parameters.getParameterNames()) {
+            Object value = parameters.get(parameterName);
+
+            if (parameterDescriptorMap.containsKey(parameterName.toLowerCase())) {
+                ParameterDescriptor parameterDescriptor = parameterDescriptorMap
+                    .get(parameterName.toLowerCase());
+                Type parameterType = parameterDescriptor.getParameterType();
+
+                value = converterManager.convert(parameterType, value);
+            }
+
+            result.set(parameterName, value);
+        }
+
+        return result;
+    }
+
     private Block transform(XDOM macroXDOM, boolean async) throws RenderingException
     {
         // Prepare macro context.
-        Map<String, Object> macroBinding = createBinding(async);
+        WikiMacroBinding macroBinding = createBinding(async);
 
         // Get XWiki context
         XWikiContext xwikiContext = this.xcontextProvider.get();
@@ -352,11 +428,6 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         XDOM xdom;
 
         try {
-            if (xwikiContext != null) {
-                // Place macro context inside xwiki context ($xcontext.macro).
-                xwikiContext.put(MACRO_KEY, macroBinding);
-            }
-
             Block syncMetaDataBlock;
 
             if (async) {
@@ -405,6 +476,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         } catch (Exception ex) {
             throw new RenderingException("Error while performing internal macro transformations", ex);
         } finally {
+            // remove old macro binding from the context
             if (xwikiContext != null) {
                 xwikiContext.remove(MACRO_KEY);
             }

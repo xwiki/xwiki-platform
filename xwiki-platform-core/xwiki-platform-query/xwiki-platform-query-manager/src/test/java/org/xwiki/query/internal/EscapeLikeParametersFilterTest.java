@@ -292,7 +292,7 @@ public class EscapeLikeParametersFilterTest
         when(query.getPositionalParameters()).thenReturn(positionalParameters);
 
         Query query1 = this.filter.filterQuery(query);
-        String expectedStatement = "select doc.fullName from XWikiDocument doc where not doc.fullName like ? escape '!'";
+        String expectedStatement = "select doc.fullName from XWikiDocument doc where doc.fullName not like ? escape '!'";
         assertEquals(expectedStatement.toLowerCase(), query1.getStatement().toLowerCase());
 
         statement = "select doc.fullName from XWikiDocument doc where (doc.fullName not like ?)";
@@ -305,7 +305,7 @@ public class EscapeLikeParametersFilterTest
         when(query.getPositionalParameters()).thenReturn(positionalParameters);
 
         query1 = this.filter.filterQuery(query);
-        expectedStatement = "select doc.fullName from XWikiDocument doc where (not doc.fullName like ? escape '!')";
+        expectedStatement = "select doc.fullName from XWikiDocument doc where (doc.fullName not like ? escape '!')";
         assertEquals(expectedStatement.toLowerCase(), query1.getStatement().toLowerCase());
 
         statement = "select doc.fullName from XWikiDocument doc where not (doc.fullName not like ? and "
@@ -319,7 +319,7 @@ public class EscapeLikeParametersFilterTest
         when(query.getPositionalParameters()).thenReturn(positionalParameters);
 
         query1 = this.filter.filterQuery(query);
-        expectedStatement = "select doc.fullName from XWikiDocument doc where not (not doc.fullName like ? escape '!' "
+        expectedStatement = "select doc.fullName from XWikiDocument doc where not (doc.fullName not like ? escape '!' "
             + "and doc.fullName like ? escape '!')";
         assertEquals(expectedStatement.toLowerCase(), query1.getStatement().toLowerCase());
 
@@ -336,8 +336,8 @@ public class EscapeLikeParametersFilterTest
         when(query.getPositionalParameters()).thenReturn(positionalParameters);
 
         query1 = this.filter.filterQuery(query);
-        expectedStatement = "select doc.fullName from XWikiDocument doc where ((not doc.fullName like ? escape '!' "
-            + "and not doc.fullName like ? escape '!') or not doc.fullName like ? escape '!') limit 5";
+        expectedStatement = "select doc.fullName from XWikiDocument doc where ((doc.fullName not like ? escape '!' "
+            + "and doc.fullName not like ? escape '!') or doc.fullName not like ? escape '!') limit 5";
         assertEquals(expectedStatement.toLowerCase(), query1.getStatement().toLowerCase());
     }
 }

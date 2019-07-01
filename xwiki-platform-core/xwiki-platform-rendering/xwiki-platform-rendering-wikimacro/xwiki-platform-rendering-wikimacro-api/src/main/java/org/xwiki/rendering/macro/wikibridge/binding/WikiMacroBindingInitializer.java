@@ -17,11 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.wikibridge;
-
-import java.util.Map;
+package org.xwiki.rendering.macro.wikibridge.binding;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.rendering.macro.wikibridge.WikiMacro;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.stability.Unstable;
 
@@ -29,12 +29,12 @@ import org.xwiki.stability.Unstable;
  * Initialize the binding provided to the script macros. Called before executing each wiki macro is executed.
  *
  * @version $Id$
- * @since 10.6RC1
- * @deprecated Use {@link org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBindingInitializer}.
+ * @since 11.6RC1
+ * @since 11.3.2
+ * @since 10.11.9
  */
 @Role
 @Unstable
-@Deprecated
 public interface WikiMacroBindingInitializer
 {
     /**
@@ -47,5 +47,5 @@ public interface WikiMacroBindingInitializer
      * @param macroBinding the binding map to fill
      */
     void initialize(WikiMacro wikiMacro, WikiMacroParameters parameters, String macroContent,
-        MacroTransformationContext context, Map<String, Object> macroBinding);
+        MacroTransformationContext context, WikiMacroBinding macroBinding);
 }

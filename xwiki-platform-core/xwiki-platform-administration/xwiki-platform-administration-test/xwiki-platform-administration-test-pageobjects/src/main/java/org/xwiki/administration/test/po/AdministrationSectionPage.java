@@ -156,14 +156,11 @@ public class AdministrationSectionPage extends ViewPage
     }
 
     /**
+     * If save button is present wait the action button js to be loaded.
      * @since 11.6RC1
      */
-    @Override
-    public void waitUntilPageJSIsLoaded()
+    public void waitUntilActionButtonIsLoaded()
     {
-        super.waitUntilPageJSIsLoaded();
-
-        // If save button is present wait the action button js to be loaded.
         if (getDriver().hasElementWithoutWaiting(By.xpath("//input[@type='submit'][@name='formactionsac']"))) {
             getDriver().waitUntilJavascriptCondition(
                 "return XWiki.actionButtons != undefined && " + "XWiki.actionButtons.EditActions != undefined && "

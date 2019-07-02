@@ -47,6 +47,7 @@ public class LocalizationAdministrationSectionPage extends AdministrationSection
     public LocalizationAdministrationSectionPage()
     {
         super("Localization");
+        waitUntilActionButtonIsLoaded();
         // Wait for asynchronous widgets to be loaded
         getDriver().waitUntilElementIsVisible(By.cssSelector(".bootstrap-select"));
     }

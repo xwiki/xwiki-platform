@@ -30,7 +30,8 @@ import org.xwiki.stability.Unstable;
  *
  * @version $Id$
  * @since 10.6RC1
- * @deprecated Use {@link org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBindingInitializer}.
+ * @deprecated Since 11.6RC1, 10.11.9, 11.3.2.
+ *              Use {@link org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBindingInitializer} instead.
  */
 @Role
 @Unstable

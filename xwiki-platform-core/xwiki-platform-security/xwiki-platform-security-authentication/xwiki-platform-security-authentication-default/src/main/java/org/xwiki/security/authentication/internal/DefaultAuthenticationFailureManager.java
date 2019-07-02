@@ -82,6 +82,9 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     private long maxTime;
     private int maxNbAttempts;
 
+    /**
+     * Default constructor.
+     */
     public DefaultAuthenticationFailureManager()
     {
         this.maxNbAttempts = -1;

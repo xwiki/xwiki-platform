@@ -43,6 +43,9 @@ public class AuthenticationFailureLoggerListener extends AbstractEventListener
     @Inject
     private Logger logger;
 
+    /**
+     * Default constructor.
+     */
     public AuthenticationFailureLoggerListener()
     {
         super(AuthenticationFailureLoggerListener.class.getName(), new AuthenticationFailureEvent());

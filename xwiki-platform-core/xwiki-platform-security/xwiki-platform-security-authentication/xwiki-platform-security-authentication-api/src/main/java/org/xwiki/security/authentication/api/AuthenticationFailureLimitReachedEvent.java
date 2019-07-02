@@ -39,11 +39,13 @@ public class AuthenticationFailureLimitReachedEvent implements Event
         return otherEvent instanceof AuthenticationFailureLimitReachedEvent;
     }
 
+    @Override
     public boolean equals(Object other)
     {
         return other instanceof AuthenticationFailureLimitReachedEvent;
     }
 
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder(39, 43).hashCode();

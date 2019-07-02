@@ -38,11 +38,13 @@ public class AuthenticationFailureEvent implements Event
         return otherEvent instanceof AuthenticationFailureEvent;
     }
 
+    @Override
     public boolean equals(Object other)
     {
         return other instanceof AuthenticationFailureEvent;
     }
 
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder(39, 41).hashCode();

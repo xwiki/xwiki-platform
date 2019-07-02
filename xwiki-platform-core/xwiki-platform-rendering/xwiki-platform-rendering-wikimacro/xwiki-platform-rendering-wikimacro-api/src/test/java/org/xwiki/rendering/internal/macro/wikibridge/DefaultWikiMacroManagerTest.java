@@ -36,6 +36,7 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.InsufficientPrivilegesException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
+import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroFactory;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroManager;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
@@ -225,6 +226,46 @@ public class DefaultWikiMacroManagerTest
             .thenReturn(false);
 
         this.mocker.getComponentUnderTest().registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
+    }
+
+    @Test(expected = WikiMacroException.class)
+    public void unregisterWikiMacroWhenGlobalVisibilityAndNotAllowed() throws Exception
+    {
+        WikiMacro wikiMacro = generateWikiMacro(WikiMacroVisibility.GLOBAL);
+
+        // Simulate a user who's allowed for the GLOBAL visibility
+        WikiMacroFactory wikiMacroFactory = this.mocker.getInstance(WikiMacroFactory.class);
+        when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.GLOBAL)).thenReturn(true);
+
+        WikiMacroManager wikiMacroManager = this.mocker.getComponentUnderTest();
+        assertFalse(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
+
+        EntityReferenceSerializer<String> serializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        when(serializer.serialize(this.authorReference)).thenReturn("authorwiki:authorspace.authorpage");
+
+        // Indicate current wiki is the main one (otherwise it won't be registered at root level)
+        WikiDescriptorManager wikiDescriptorManager = this.mocker.getInstance(WikiDescriptorManager.class);
+        when(wikiDescriptorManager.isMainWiki(wikiMacro.getDocumentReference().getWikiReference().getName()))
+            .thenReturn(true);
+
+        // Test registration
+        wikiMacroManager.registerWikiMacro(wikiMacro.getDocumentReference(), wikiMacro);
+        assertTrue(wikiMacroManager.hasWikiMacro(wikiMacro.getDocumentReference()));
+
+        // Verify that the WikiMacroManager has registered the macro against the root CM
+        assertTrue(this.mocker.hasComponent(Macro.class, "testwikimacro"));
+
+        // Verify that the user and wiki where the macro is located have been set in the context
+        DocumentAccessBridge bridge = this.mocker.getInstance(DocumentAccessBridge.class);
+        verify(bridge).setCurrentUser("authorwiki:authorspace.authorpage");
+        ModelContext modelContext = this.mocker.getInstance(ModelContext.class);
+        verify(modelContext).setCurrentEntityReference(wikiMacro.getDocumentReference());
+
+        // Simulate a user who's not allowed for the GLOBAL visibility
+        when(wikiMacroFactory.isAllowed(wikiMacro.getDocumentReference(), WikiMacroVisibility.GLOBAL))
+            .thenReturn(false);
+
+        this.mocker.getComponentUnderTest().unregisterWikiMacro(wikiMacro.getDocumentReference());
     }
 
     @Test(expected = InsufficientPrivilegesException.class)

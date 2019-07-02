@@ -23,8 +23,10 @@ import java.util.HashMap;
 
 import javax.script.Bindings;
 
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -44,14 +46,35 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
 
     private static final String DESCRIPTOR = "descriptor";
 
-    public WikiMacroBinding(MacroDescriptor descriptor, WikiMacroParameters parameters, String content)
+    private static final String RESULT = "result";
+
+    private static final String DOCUMENT = "doc";
+
+    private static final String CONTEXT = "context";
+
+    /**
+     * Default constructor.
+     * @param descriptor the macro descriptor to set for the binding.
+     * @param parameters the parameters to set for the binding.
+     * @param content the input macro content to set for the binding.
+     * @param transformationContext the transformation context used for that wikimacro, is null if the
+     *          transformation is done asynchronously.
+     * @param document the document associated to the wikimacro.
+     */
+    public WikiMacroBinding(MacroDescriptor descriptor, WikiMacroParameters parameters, String content,
+        MacroTransformationContext transformationContext, DocumentModelBridge document)
     {
         super();
         setParameters(parameters);
         setDescriptor(descriptor);
         setContent(content);
+        setContext(transformationContext);
+        setDocument(document);
     }
 
+    /**
+     * @return the parameters of the wikimacro.
+     */
     public WikiMacroParameters getParameters()
     {
         return (WikiMacroParameters) this.get(PARAMETERS);
@@ -62,6 +85,9 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
         this.put(PARAMETERS, parameters);
     }
 
+    /**
+     * @return the input content of the wikimacro.
+     */
     public String getContent()
     {
         return (String) this.get(CONTENT);
@@ -72,6 +98,9 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
         this.put(CONTENT, content);
     }
 
+    /**
+     * @return the macro descriptor of the wikimacro.
+     */
     public MacroDescriptor getDescriptor()
     {
         return (MacroDescriptor) this.get(DESCRIPTOR);
@@ -80,5 +109,48 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
     protected void setDescriptor(MacroDescriptor descriptor)
     {
         this.put(DESCRIPTOR, descriptor);
+    }
+
+    /**
+     * @return the result of the wikimacro.
+     */
+    public Object getResult()
+    {
+        return this.get(RESULT);
+    }
+
+    /**
+     * Allows to set a result during the execution of the macro, which can be retrieved with {@link #getResult()}.
+     * @param result the result to set.
+     */
+    public void setResult(Object result)
+    {
+        this.put(RESULT, result);
+    }
+
+    /**
+     * @return the document associated to the wikimacro.
+     */
+    public DocumentModelBridge getDocument()
+    {
+        return (DocumentModelBridge) this.get(DOCUMENT);
+    }
+
+    protected void setDocument(DocumentModelBridge document)
+    {
+        this.put(DOCUMENT, document);
+    }
+
+    /**
+     * @return the transformation context used for this macro, or null in case of asynchronous transformation.
+     */
+    public MacroTransformationContext getContext()
+    {
+        return (MacroTransformationContext) this.get(CONTEXT);
+    }
+
+    protected void setContext(MacroTransformationContext context)
+    {
+        this.put(CONTEXT, context);
     }
 }

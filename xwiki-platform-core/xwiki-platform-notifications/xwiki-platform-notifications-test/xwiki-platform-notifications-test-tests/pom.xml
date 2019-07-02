@@ -105,7 +105,17 @@
       <groupId>org.simplejavamail</groupId>
       <artifactId>simple-java-mail</artifactId>
       <version>4.4.5</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.sun.mail</groupId>
+          <artifactId>javax.mail</artifactId>
+        </exclusion>
+      </exclusions>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>jakarta.mail</artifactId>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

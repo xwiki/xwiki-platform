@@ -139,15 +139,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public InputStream getHomeDirectoryConfiguration()
     {
-        //return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-data.zip");
-        try {
-            return new FileInputStream("/home/tuska/data/projets/xwiki/src/git/xwiki-platform/"
-                + "xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/"
-                + "xwiki-platform-search-solr-server/xwiki-platform-search-solr-server-data/target/"
-                + "xwiki-platform-search-solr-server-data-11.6-SNAPSHOT.jar");
-        } catch (FileNotFoundException e) {
-            return null;
-        }
+        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-data.zip");
     }
 
     @Override

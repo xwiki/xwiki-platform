@@ -44,9 +44,12 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
 
     private static final String DESCRIPTOR = "descriptor";
 
-    public WikiMacroBinding()
+    public WikiMacroBinding(MacroDescriptor descriptor, WikiMacroParameters parameters, String content)
     {
         super();
+        setParameters(parameters);
+        setDescriptor(descriptor);
+        setContent(content);
     }
 
     public WikiMacroParameters getParameters()
@@ -54,7 +57,7 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
         return (WikiMacroParameters) this.get(PARAMETERS);
     }
 
-    public void setParameters(WikiMacroParameters parameters)
+    protected void setParameters(WikiMacroParameters parameters)
     {
         this.put(PARAMETERS, parameters);
     }
@@ -64,7 +67,7 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
         return (String) this.get(CONTENT);
     }
 
-    public void setContent(String content)
+    protected void setContent(String content)
     {
         this.put(CONTENT, content);
     }
@@ -74,7 +77,7 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
         return (MacroDescriptor) this.get(DESCRIPTOR);
     }
 
-    public void setDescriptor(MacroDescriptor descriptor)
+    protected void setDescriptor(MacroDescriptor descriptor)
     {
         this.put(DESCRIPTOR, descriptor);
     }

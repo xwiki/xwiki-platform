@@ -163,6 +163,7 @@
                     <exclude>org.jmock:*</exclude>
                     <exclude>junit:*</exclude>
                     <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
+                    <exclude>jakarta.mail:jakarta.mail-api</exclude>
                   </excludes>
                   <includes>
                     <!-- Allow only JUnit and JMock with scope test because -->

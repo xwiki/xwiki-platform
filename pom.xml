@@ -751,10 +751,11 @@
                 </features>
               </extensionOverride>
               <extensionOverride>
-                <id>jakarta.activation:jakarta.activation-api</id>
+                <id>com.sun.activation:jakarta.activation</id>
                 <features>javax.activation:activation</features>
                 <features>javax.activation:javax.activation-api</features>
                 <features>com.sun.activation:javax.activation</features>
+                <features>jakarta.activation:jakarta.activation-api</features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.google.code.findbugs:jsr305</id>

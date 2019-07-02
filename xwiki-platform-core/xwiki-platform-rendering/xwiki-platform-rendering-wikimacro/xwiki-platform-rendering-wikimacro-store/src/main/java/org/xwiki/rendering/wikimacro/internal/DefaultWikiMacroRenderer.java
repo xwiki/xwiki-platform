@@ -330,10 +330,8 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         }
 
         // new macro binding for $wikimacro
-        WikiMacroBinding macroBinding = new WikiMacroBinding();
-        macroBinding.setContent(this.macroContent);
-        macroBinding.setParameters(this.parameters);
-        macroBinding.setDescriptor(this.wikimacro.getDescriptor());
+        WikiMacroBinding macroBinding = new WikiMacroBinding(this.wikimacro.getDescriptor(), this.parameters,
+            this.macroContent);
 
         try {
             ComponentManager currentComponentManager = this.componentManager.get();

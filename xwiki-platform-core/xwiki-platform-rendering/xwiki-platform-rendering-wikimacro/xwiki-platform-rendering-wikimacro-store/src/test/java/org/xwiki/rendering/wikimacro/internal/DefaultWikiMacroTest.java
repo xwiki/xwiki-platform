@@ -34,6 +34,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.converter.ConversionException;
 import org.xwiki.rendering.converter.Converter;
 import org.xwiki.rendering.listener.reference.DocumentResourceReference;
@@ -309,6 +310,97 @@ public class DefaultWikiMacroTest
         converter.convert(new StringReader("{{wikimacro1/}}"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0, printer);
 
         assertEquals("default_value default_value", printer.toString());
+    }
+
+    /**
+     * Test result value injection.
+     */
+    @Test
+    public void testResultValueFromContext() throws Exception
+    {
+        // Override default velocity manager with a mock
+        VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
+
+        // Initialize velocity engine.
+        final VelocityEngine vEngine = this.componentManager.getInstance(VelocityEngine.class);
+        Properties properties = new Properties();
+        properties.setProperty("resource.loader", "file");
+        vEngine.initialize(properties);
+
+        // Hack into velocity context.
+        final VelocityContext vContext = new VelocityContext();
+        vContext.put("xcontext", this.oldcore.getXWikiContext());
+        vContext.put("wordBlock", new WordBlock("foo"));
+
+        when(mockVelocityManager.getCurrentVelocityContext()).thenReturn(vContext);
+        when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
+            .thenAnswer(new Answer<Boolean>()
+            {
+                @Override
+                public Boolean answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return vEngine.evaluate(vContext, (Writer) invocation.getArgument(0),
+                        (String) invocation.getArgument(1), (Reader) invocation.getArgument(2));
+                }
+            });
+
+        registerWikiMacro("wikimacro1",
+            "{{velocity}}#set ($xcontext.macro.result = $wordBlock)"
+                + "{{/velocity}}", Syntax.XWIKI_2_0, Collections.emptyList());
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro1/}}"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0, printer);
+
+        assertEquals("foo", printer.toString());
+    }
+
+    /**
+     * Test result value injection from new binding.
+     */
+    @Test
+    public void testResultValueFromNewBinding() throws Exception
+    {
+        // Override default velocity manager with a mock
+        VelocityManager mockVelocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
+
+        // Initialize velocity engine.
+        final VelocityEngine vEngine = this.componentManager.getInstance(VelocityEngine.class);
+        Properties properties = new Properties();
+        properties.setProperty("resource.loader", "file");
+        vEngine.initialize(properties);
+
+        // Hack into velocity context.
+        final VelocityContext vContext = new VelocityContext();
+        vContext.put("wordBlock", new WordBlock("foo"));
+
+        when(mockVelocityManager.getCurrentVelocityContext()).then((Answer<VelocityContext>) invocationOnMock -> {
+            ScriptContextManager scriptContextManager = componentManager.getInstance(ScriptContextManager.class);
+            vContext.put("wikimacro", scriptContextManager.getCurrentScriptContext().getAttribute("wikimacro"));
+            return vContext;
+        });
+        when(mockVelocityManager.evaluate(any(Writer.class), any(String.class), any(Reader.class)))
+            .thenAnswer(new Answer<Boolean>()
+            {
+                @Override
+                public Boolean answer(InvocationOnMock invocation) throws Throwable
+                {
+                    return vEngine.evaluate(vContext, (Writer) invocation.getArgument(0),
+                        (String) invocation.getArgument(1), (Reader) invocation.getArgument(2));
+                }
+            });
+
+        registerWikiMacro("wikimacro1",
+            "{{velocity}}#set ($wikimacro.result = $wordBlock)"
+                + "{{/velocity}}", Syntax.XWIKI_2_0, Collections.emptyList());
+
+        Converter converter = this.componentManager.getInstance(Converter.class);
+
+        DefaultWikiPrinter printer = new DefaultWikiPrinter();
+        converter.convert(new StringReader("{{wikimacro1/}}"), Syntax.XWIKI_2_0, Syntax.PLAIN_1_0, printer);
+
+        assertEquals("foo", printer.toString());
     }
 
     /**

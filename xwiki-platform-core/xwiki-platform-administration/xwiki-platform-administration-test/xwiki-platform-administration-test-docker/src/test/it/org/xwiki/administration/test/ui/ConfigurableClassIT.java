@@ -190,7 +190,6 @@ public class ConfigurableClassIT
             restPage.setContent(standardContent +
                 "\n\n{{velocity}}Has Programming permission: $xcontext.hasProgrammingRights(){{/velocity}}");
             // Our admin will foolishly save XWiki.ConfigurableClass, giving it programming rights.
-            setup.setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
             setup.rest().save(restPage);
 
             // Now we look at the section for our configurable.

@@ -44,13 +44,14 @@ public class LoginTest extends AbstractTest
     @Before
     public void setUp()
     {
-        // Force log out (we're using the fast way since this is not part of what we want to test)
-        getUtil().forceGuestUser();
-
         // Go to any page in view mode. We choose to go to a nonexisting page so that it loads as fast as possible
         // Note: since the page doesn't exist, we need to disable the space redirect feature so that we end up on the
         // terminal page and not on WebHome in the space.
         getUtil().gotoPage("NonExistentSpace", "NonExistentPage", "view", "spaceRedirect=false");
+
+        // Force log out (we're using the fast way since this is not part of what we want to test)
+        getUtil().forceGuestUser();
+
         this.vp = new ViewPage();
         this.nonExistentPageURL = getDriver().getCurrentUrl();
     }
@@ -88,6 +89,7 @@ public class LoginTest extends AbstractTest
         LoginPage loginPage = this.vp.login();
         loginPage.loginAs("Admin", "wrong password");
         Assert.assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        validateConsole.getLogCaptureConfiguration().registerExpected("Authentication failure with login [Admin]");
     }
 
     @Test
@@ -100,6 +102,8 @@ public class LoginTest extends AbstractTest
         LoginPage loginPage = this.vp.login();
         loginPage.loginAs("non existent user", "admin");
         Assert.assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        validateConsole.getLogCaptureConfiguration()
+            .registerExpected("Authentication failure with login [non existent user]");
     }
 
     /**

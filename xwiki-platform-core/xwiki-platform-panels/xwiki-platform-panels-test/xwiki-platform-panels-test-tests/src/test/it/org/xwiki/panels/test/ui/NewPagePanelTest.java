@@ -20,11 +20,9 @@
 package org.xwiki.panels.test.ui;
 
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.panels.test.po.NewPagePanel;
 import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.AuthenticationRule;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.CreatePagePage;
@@ -38,9 +36,6 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  */
 public class NewPagePanelTest extends AbstractTest
 {
-    @Rule
-    public AuthenticationRule authenticationRule = new AuthenticationRule("TestUser", "TestPassword", getUtil());
-
     /**
      * Tests if a new page can be created using the create page panel.
      */

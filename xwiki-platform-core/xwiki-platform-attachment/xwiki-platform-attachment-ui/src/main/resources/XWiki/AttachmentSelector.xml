@@ -80,7 +80,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #end
   (% class="gallery" %)(((
   ## Only display the upload form if they have edit permission on targetAttachDocument
-  #if ($xwiki.hasAccessLevel('edit',$xcontext.user,${targetAttachDocument.fullName}))
+  #if ($xwiki.hasAccessLevel('edit',$xcontext.user,$services.model.serialize($targetAttachDocument.documentReference, 'local')))
     #attachmentPicker_displayUploadForm($targetDocument, $targetAttachDocument, $options)
   #end
   #attachmentPicker_displayAttachmentGalleryEmptyValue($targetDocument, $targetAttachDocument, $options, $currentValue)
@@ -201,8 +201,8 @@ $xwiki.jsx.use($attachmentPickerDocName)
       &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render("${translationPrefix}.upload.hint", [${options.rawfilter}]))&lt;/span&gt;
     #end
     &lt;input type="file" name="filepath" id="attachfile" class="noitems" title="$!{escapetool.xml($options.rawfilter)}"/&gt;
-    &lt;input type="hidden" name="xredirect" value="$xwiki.getDocument($attachmentPickerDocName).getURL('get', "xaction=postUpload&amp;amp;docAction=$!{escapetool.url($options.get('docAction'))}&amp;amp;targetdocname=$!{escapetool.url($targetAttachDocument.fullName)}&amp;amp;docname=$!{escapetool.url($targetDocument.fullName)}&amp;amp;fieldname=$!{escapetool.url($options.get('classname'))}_$!{escapetool.url($options.get('object'))}_$!{escapetool.url($options.get('property'))}&amp;amp;form_token=$!{services.csrf.getToken()}")" /&gt;
-    &lt;input type="hidden" name="docname" value="$!{escapetool.xml($targetDocument.fullName)}" /&gt;
+    &lt;input type="hidden" name="xredirect" value="$xwiki.getDocument($attachmentPickerDocName).getURL('get', "xaction=postUpload&amp;amp;docAction=$!{escapetool.url($options.get('docAction'))}&amp;amp;targetdocname=$!{escapetool.url($services.model.serialize($targetAttachDocument.documentReference, 'local'))}&amp;amp;docname=$!{escapetool.url($services.model.serialize($targetDocument.documentReference, 'local'))}&amp;amp;fieldname=$!{escapetool.url($options.get('classname'))}_$!{escapetool.url($options.get('object'))}_$!{escapetool.url($options.get('property'))}&amp;amp;form_token=$!{services.csrf.getToken()}")" /&gt;
+    &lt;input type="hidden" name="docname" value="$!{escapetool.xml($services.model.serialize($targetDocument.documentReference, 'local'))}" /&gt;
     &lt;input type="hidden" name="classname" value="$!{escapetool.xml($options.get('classname'))}" /&gt;
     &lt;input type="hidden" name="object" value="$!{escapetool.xml($options.get('object'))}" /&gt;
     &lt;input type="hidden" name="property" value="$!{escapetool.xml($options.get('property'))}" /&gt;
@@ -254,7 +254,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #if ($docNameLimit &gt; 0)
       #set ($docName = $reference.substring(0, $docNameLimit))
     #else
-      #set ($docName = $targetAttachDocument.fullName)
+      #set ($docName = $services.model.serialize($targetAttachDocument.documentReference, 'local'))
     #end
     #set ($attachmentName = $reference.substring($mathtool.add($docNameLimit, 1)))
     #set ($defaultAttachment = $xwiki.getDocument($docName).getAttachment($attachmentName))
@@ -1339,8 +1339,8 @@ XWiki.widgets.ModalPopup.prototype.closeDialog = function(event) {
       <code>{{velocity output="false"}}
 $xwiki.jsfx.use('js/xwiki/widgets/modalPopup.js', true)##
 $xwiki.ssfx.use('js/xwiki/widgets/modalPopup.css', true)##
-$xwiki.jsx.use($xcontext.macro.doc.fullName)##
-$xwiki.ssx.use($xcontext.macro.doc.fullName)##
+$xwiki.jsx.use($xcontext.macro.doc.documentReference)##
+$xwiki.ssx.use($xcontext.macro.doc.documentReference)##
 $xwiki.jsfx.use('js/scriptaculous/builder.js')##
 ## Integrates the optional Lightbox widget (from http://extensions.xwiki.org/xwiki/bin/view/Extension/Lightbox+Application )
 #if ($xwiki.exists('XWiki.Lightbox'))
@@ -1463,7 +1463,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
 #macro (attachmentPicker_displayButton)
   #if ($hasEdit &amp;&amp; $targetPermView)
     #set ($queryString = {
-      'docname': $doc.fullName,
+      'docname': $services.model.serialize($doc.documentReference, 'local'),
       'classname': $classname,
       'property': $property,
       'object': $object,
@@ -1474,9 +1474,9 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
       'versionSummary': $xcontext.macro.params.versionSummary.equals('true')
     })
     #if ($hasTargetDoc)
-      #set ($queryString.targetdocname = $targetdoc.fullName)
+      #set ($queryString.targetdocname = $services.model.serialize($targetDoc.documentReference, 'local'))
     #end
-    (% class="buttonwrapper" %)[[$buttontext&gt;&gt;$xcontext.macro.doc.fullName||queryString="$escapetool.url($queryString)"
+    (% class="buttonwrapper" %)[[$buttontext&gt;&gt;$services.model.serialize($xcontext.macro.doc.documentReference, 'local')||queryString="$escapetool.url($queryString)"
       class="attachment-picker-start button" title="$buttontext"]](%%)##
   #end
 #end

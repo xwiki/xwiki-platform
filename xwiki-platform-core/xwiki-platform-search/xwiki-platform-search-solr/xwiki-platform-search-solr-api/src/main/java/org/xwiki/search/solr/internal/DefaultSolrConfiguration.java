@@ -19,8 +19,6 @@
  */
 package org.xwiki.search.solr.internal;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStream;
 
 import javax.inject.Inject;

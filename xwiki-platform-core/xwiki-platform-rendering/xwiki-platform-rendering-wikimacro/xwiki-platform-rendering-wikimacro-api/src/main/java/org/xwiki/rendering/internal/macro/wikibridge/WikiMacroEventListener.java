@@ -123,7 +123,7 @@ public class WikiMacroEventListener implements EventListener
                 try {
                     wikiMacro = this.macroFactory.createWikiMacro(documentReference);
                 } catch (WikiMacroException e) {
-                    this.logger.debug(String.format("Failed to create wiki macro [%s]", documentReference), e);
+                    this.logger.error(String.format("Failed to create wiki macro [%s]", documentReference), e);
                     return;
                 }
 

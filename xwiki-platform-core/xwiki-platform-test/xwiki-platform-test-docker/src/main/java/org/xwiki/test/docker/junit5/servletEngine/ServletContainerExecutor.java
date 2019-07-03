@@ -22,9 +22,12 @@ package org.xwiki.test.docker.junit5.servletEngine;
 import java.io.File;
 import java.io.FileWriter;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -37,6 +40,7 @@ import org.xwiki.test.docker.junit5.ArtifactResolver;
 import org.xwiki.test.docker.junit5.MavenResolver;
 import org.xwiki.test.docker.junit5.RepositoryResolver;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.database.Database;
 
 import com.github.dockerjava.api.model.Image;
 
@@ -53,6 +57,8 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     private static final Logger LOGGER = LoggerFactory.getLogger(ServletContainerExecutor.class);
 
     private static final String LATEST = "latest";
+
+    private static final String ORACLE_TZ_WORKAROUND = "-Doracle.jdbc.timezoneAsRegion=false";
 
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
@@ -99,16 +105,39 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/usr/local/tomcat/webapps/xwiki");
 
-                this.servletContainer.withEnv("CATALINA_OPTS", "-Xmx1024m "
-                    + "-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true "
-                    + "-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true "
-                    + "-Dsecurerandom.source=file:/dev/urandom");
+                List<String> catalinaOpts = new ArrayList<>();
+                catalinaOpts.add("-Xmx1024m");
+                catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
+                catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
+                catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
+                // When executing on the Oracle database, we get the following timezone error unless we pass a system
+                // property to the Oracle JDBC driver:
+                //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
+                //   recursive SQL level 1
+                //   ORA-01882: timezone region not found
+                if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
+                    catalinaOpts.add(ORACLE_TZ_WORKAROUND);
+                }
+
+                this.servletContainer.withEnv("CATALINA_OPTS", StringUtils.join(catalinaOpts, ' '));
 
                 break;
             case JETTY:
                 this.servletContainer = createServletContainer();
                 mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
                     "/var/lib/jetty/webapps/xwiki");
+
+                // When executing on the Oracle database, we get the following timezone error unless we pass a system
+                // property to the Oracle JDBC driver:
+                //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
+                //   recursive SQL level 1
+                //   ORA-01882: timezone region not found
+                if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
+                    List<String> commandPartList =
+                        new ArrayList<>(Arrays.asList(this.servletContainer.getCommandParts()));
+                    commandPartList.add(ORACLE_TZ_WORKAROUND);
+                    this.servletContainer.setCommandParts(commandPartList.toArray(new String[0]));
+                }
 
                 break;
             case WILDFLY:

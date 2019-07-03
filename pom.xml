@@ -542,20 +542,6 @@
           </exclusion>
         </exclusions>
       </dependency>
-
-      <!-- Mails -->
-      <dependency>
-        <groupId>com.icegreen</groupId>
-        <artifactId>greenmail</artifactId>
-        <version>1.5.10</version>
-        <exclusions>
-          <!-- Not the right id -->
-          <exclusion>
-            <groupId>com.sun.mail</groupId>
-            <artifactId>javax.mail</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
     </dependencies>
   </dependencyManagement>
   <build>

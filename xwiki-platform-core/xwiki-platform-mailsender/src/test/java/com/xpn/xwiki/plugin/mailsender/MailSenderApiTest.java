@@ -26,6 +26,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -70,6 +71,12 @@ public class MailSenderApiTest
 
         mailserver = new GreenMail(newSetup);
         mailserver.start();
+    }
+
+    @AfterAll
+    public void afterAll()
+    {
+        mailserver.stop();
     }
 
     @BeforeEach

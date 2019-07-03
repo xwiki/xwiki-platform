@@ -32,11 +32,18 @@ public class WikiMacroParameterMacroParameters
 {
     private String name;
 
+    /**
+     * @return the name of the macro.
+     */
     public String getName()
     {
         return name;
     }
 
+    /**
+     * Set the name...
+     * @param name the name to set.
+     */
     public void setName(String name)
     {
         this.name = name;

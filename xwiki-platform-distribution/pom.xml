@@ -340,6 +340,9 @@
               </goals>
               <configuration>
                 <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
+                <!-- All we care about is duplicate in the JARs ending up in the WAR -->
+                <checkCompileClasspath>false</checkCompileClasspath>
+                <checkTestClasspath>false</checkTestClasspath>
                 <exceptions>
                   <!-- Xalan bundles a lot of other projects: org/apache/xml/**, org/apache/bcel/**, JLex/**,
                        java_cup/**, org/apache/regexp/**. In addition, it even has these jars in its source tree without

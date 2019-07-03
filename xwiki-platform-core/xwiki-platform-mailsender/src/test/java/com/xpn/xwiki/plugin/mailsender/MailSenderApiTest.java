@@ -20,79 +20,76 @@
 package com.xpn.xwiki.plugin.mailsender;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Properties;
 
-import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
 
-import org.jmock.Expectations;
-import org.jmock.Mock;
-import org.jmock.Mockery;
-import org.jmock.integration.junit4.JUnit4Mockery;
-import org.jvnet.mock_javamail.Mailbox;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.mail.MailSenderConfiguration;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
+import com.icegreen.greenmail.store.FolderException;
+import com.icegreen.greenmail.util.GreenMail;
+import com.icegreen.greenmail.util.ServerSetup;
+import com.icegreen.greenmail.util.ServerSetupTest;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.when;
 
 /**
- * Integration tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}. The tests start a SMTP server.
+ * Integration tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}.
  */
-public class MailSenderApiTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+public class MailSenderApiTest
 {
-    private Mock mockXWiki;
+    @MockComponent
+    private MailSenderConfiguration mockConfiguration;
 
-    private XWiki xwiki;
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private MailSenderPluginApi api;
 
-    @Override
-    protected void setUp() throws Exception
+    private static GreenMail mailserver;
+
+    @BeforeAll
+    public static void beforeAll()
     {
-        super.setUp();
+        // Increase startup timeout (default is 1s, which can be too fast on slow CI agents).
+        ServerSetup newSetup = ServerSetupTest.SMTP.createCopy();
+        newSetup.setServerStartupTimeout(5000L);
 
-        this.mockXWiki = mock(XWiki.class);
-        this.xwiki = (XWiki) this.mockXWiki.proxy();
-        getContext().setWiki(this.xwiki);
-
-        // The plugin init creates a XWiki.Mail document if it doesn't exist and ensure it has the correct
-        // class properties.
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.Mail"), ANYTHING).will(
-            returnValue(new XWikiDocument()));
-        this.mockXWiki.stubs().method("saveDocument");
-
-        // Register a mock Mail Sender Configuration component since it's used by MailConfiguration
-        Mockery mockery = new JUnit4Mockery();
-        final MailSenderConfiguration mockConfiguration =
-            getComponentManager().registerMockComponent(mockery, MailSenderConfiguration.class);
-        mockery.checking(new Expectations()
-        {
-            {
-                allowing(mockConfiguration).getHost();
-                will(returnValue("myserver"));
-                allowing(mockConfiguration).getPort();
-                will(returnValue(25));
-                allowing(mockConfiguration).getFromAddress();
-                will(returnValue(null));
-                allowing(mockConfiguration).getUsername();
-                will(returnValue(null));
-                allowing(mockConfiguration).getPassword();
-                will(returnValue(null));
-                allowing(mockConfiguration).getAdditionalProperties();
-                will(returnValue(new Properties()));
-            }
-        });
-
-        MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy", getContext());
-        this.api = new MailSenderPluginApi(plugin, getContext());
-
-        // Ensure that there are no messages in inbox
-        Mailbox.clearAll();
+        mailserver = new GreenMail(newSetup);
+        mailserver.start();
     }
 
+    @BeforeEach
+    public void beforeEach() throws Exception
+    {
+        when(this.mockConfiguration.getHost()).thenReturn(mailserver.getSmtp().getBindTo());
+        when(this.mockConfiguration.getPort()).thenReturn(mailserver.getSmtp().getPort());
+        when(this.mockConfiguration.getAdditionalProperties()).thenReturn(new Properties());
+
+        MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy", this.oldcore.getXWikiContext());
+        this.api = new MailSenderPluginApi(plugin, this.oldcore.getXWikiContext());
+    }
+
+    @AfterEach
+    public void afterEach() throws FolderException
+    {
+        mailserver.purgeEmailFromAllMailboxes();
+    }
+
+    @Test
     public void testSendMail() throws Exception
     {
         Mail mail = this.api.createMail();
@@ -105,14 +102,15 @@ public class MailSenderApiTest extends AbstractBridgedXWikiComponentTestCase
         assertEquals(0, this.api.sendMail(mail));
 
         // Verify that the email was received
-        List<Message> inbox = Mailbox.get("peter@acme.org");
-        assertEquals(1, inbox.size());
-        Message message = inbox.get(0);
+        MimeMessage[] receivedEmails = mailserver.getReceivedMessages();
+        assertEquals(1, receivedEmails.length);
+        MimeMessage message = receivedEmails[0];
         assertEquals("Test subject", message.getSubject());
         assertEquals("john@acme.org", ((InternetAddress) message.getFrom()[0]).getAddress());
         assertEquals("value", message.getHeader("header")[0]);
     }
 
+    @Test
     public void testSendMailWithCustomConfiguration() throws Exception
     {
         Mail mail = this.api.createMail();
@@ -121,10 +119,10 @@ public class MailSenderApiTest extends AbstractBridgedXWikiComponentTestCase
         mail.setSubject("Test subject");
         mail.setTextPart("Text content");
 
-        MailConfiguration config =
-            this.api.createMailConfiguration(new com.xpn.xwiki.api.XWiki(this.xwiki, getContext()));
-        assertEquals(25, config.getPort());
-        assertEquals("myserver", config.getHost());
+        MailConfiguration config = this.api.createMailConfiguration(
+            new com.xpn.xwiki.api.XWiki(this.oldcore.getSpyXWiki(), this.oldcore.getXWikiContext()));
+        assertEquals(mailserver.getSmtp().getPort(), config.getPort());
+        assertEquals(mailserver.getSmtp().getBindTo(), config.getHost());
         assertNull(config.getFrom());
 
         // Modify the SMTP From value
@@ -135,19 +133,22 @@ public class MailSenderApiTest extends AbstractBridgedXWikiComponentTestCase
         // TODO: Find a way to ensure that the SMTP From value has been used.
     }
 
+    @Test
     public void testSendRawMessage() throws MessagingException, IOException
     {
         assertEquals(0, this.api.sendRawMessage("john@acme.org", "peter@acme.org",
             "Subject:Test subject\nFrom:steve@acme.org\nCc:adam@acme.org\nheader:value\n\nTest content"));
-        List<Message> inbox = Mailbox.get("peter@acme.org");
-        assertEquals(1, inbox.size());
-        Message message = inbox.get(0);
-        assertEquals("Test subject", message.getSubject());
-        assertEquals("steve@acme.org", message.getFrom()[0].toString());
-        assertEquals("Test content\r\n", message.getContent());
-        assertEquals("value", message.getHeader("header")[0]);
-
-        inbox = Mailbox.get("adam@acme.org");
-        assertEquals(1, inbox.size());
+        MimeMessage[] receivedEmails = mailserver.getReceivedMessages();
+        assertEquals(2, receivedEmails.length);
+        MimeMessage johnMessage = receivedEmails[0];
+        assertEquals("Test subject", johnMessage.getSubject());
+        assertEquals("steve@acme.org", johnMessage.getFrom()[0].toString());
+        assertEquals("Test content\r\n", johnMessage.getContent());
+        assertEquals("value", johnMessage.getHeader("header")[0]);
+        MimeMessage peterMessage = receivedEmails[0];
+        assertEquals("Test subject", peterMessage.getSubject());
+        assertEquals("steve@acme.org", peterMessage.getFrom()[0].toString());
+        assertEquals("Test content\r\n", peterMessage.getContent());
+        assertEquals("value", peterMessage.getHeader("header")[0]);
     }
 }

@@ -46,16 +46,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.jvnet.mock-javamail</groupId>
-      <artifactId>mock-javamail</artifactId>
-      <version>1.9</version>
+      <groupId>com.icegreen</groupId>
+      <artifactId>greenmail</artifactId>
       <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.mail</groupId>
-          <artifactId>mail</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

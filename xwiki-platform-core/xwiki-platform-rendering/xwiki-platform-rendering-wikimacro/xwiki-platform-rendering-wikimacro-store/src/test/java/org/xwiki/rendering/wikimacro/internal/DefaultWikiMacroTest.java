@@ -568,7 +568,12 @@ public class DefaultWikiMacroTest
     @Test
     public void testExecuteWhenWikiMacroBinding() throws Exception
     {
-        registerWikiMacro("wikimacrobindings", "{{groovy}}" + "print xcontext.macro.doc" + "{{/groovy}}");
+        registerWikiMacro("wikimacrobindings", "{{groovy}}"
+            + "println xcontext.macro.doc\n"
+            + "println xcontext.macro.doc.class\n"
+            + "println wikimacro.doc\n"
+            + "println wikimacro.doc.class\n"
+            + "{{/groovy}}");
 
         Converter converter = this.componentManager.getInstance(Converter.class);
 
@@ -577,7 +582,13 @@ public class DefaultWikiMacroTest
             Syntax.XWIKI_2_0, Syntax.XHTML_1_0, printer);
 
         // Note: We're using XHTML as the output syntax just to make it easy for asserting.
-        assertEquals("<p>" + this.wikiMacroDocument.toString() + "</p>", printer.toString());
+        String expectedOutput = "<p>"
+            + this.wikiMacroDocument.toString() + "<br/>"
+            + "class com.xpn.xwiki.api.Document<br/>"
+            + this.wikiMacroDocument.toString() + "<br/>"
+            + "class com.xpn.xwiki.api.Document"
+            + "</p>";
+        assertEquals(expectedOutput, printer.toString());
     }
 
     @Test

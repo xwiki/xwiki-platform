@@ -69,6 +69,7 @@ import org.xwiki.script.ScriptContextManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -373,13 +374,15 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             ComponentManager currentComponentManager = this.componentManager.get();
 
             XWikiContext xWikiContext = this.xcontextProvider.get();
-            XWikiDocument document = xWikiContext.getWiki().getDocument(macroDocumentReference, xWikiContext);
+            Document document = new Document(xWikiContext.getWiki().getDocument(macroDocumentReference, xWikiContext),
+                xWikiContext);
 
             contextMacroBinding.put(MACRO_DOC_KEY, document);
 
             // new macro binding for $wikimacro
             macroBinding = new WikiMacroBinding(this.wikimacro.getDescriptor(), this.parameters,
-                this.macroContent, async ? null : this.syncContext, document);
+                this.macroContent, async ? null : this.syncContext);
+            macroBinding.put(MACRO_DOC_KEY, document);
 
             // Extension point to add more wiki macro bindings
             List<WikiMacroBindingInitializer> bindingInitializers =

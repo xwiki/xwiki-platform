@@ -23,7 +23,6 @@ import java.util.HashMap;
 
 import javax.script.Bindings;
 
-import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -59,17 +58,15 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
      * @param content the input macro content to set for the binding.
      * @param transformationContext the transformation context used for that wikimacro, is null if the
      *          transformation is done asynchronously.
-     * @param document the document associated to the wikimacro.
      */
     public WikiMacroBinding(MacroDescriptor descriptor, WikiMacroParameters parameters, String content,
-        MacroTransformationContext transformationContext, DocumentModelBridge document)
+        MacroTransformationContext transformationContext)
     {
         super();
         setParameters(parameters);
         setDescriptor(descriptor);
         setContent(content);
         setContext(transformationContext);
-        setDocument(document);
     }
 
     /**
@@ -126,19 +123,6 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
     public void setResult(Object result)
     {
         this.put(RESULT, result);
-    }
-
-    /**
-     * @return the document associated to the wikimacro.
-     */
-    public DocumentModelBridge getDocument()
-    {
-        return (DocumentModelBridge) this.get(DOCUMENT);
-    }
-
-    protected void setDocument(DocumentModelBridge document)
-    {
-        this.put(DOCUMENT, document);
     }
 
     /**

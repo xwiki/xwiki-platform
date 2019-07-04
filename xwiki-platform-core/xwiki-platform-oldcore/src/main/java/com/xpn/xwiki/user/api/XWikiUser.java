@@ -57,7 +57,7 @@ public class XWikiUser
         return this.user;
     }
 
-    private DocumentReference getUserReference(XWikiContext context)
+    public DocumentReference getUserReference()
     {
         return this.currentMixedDocumentReferenceResolver.resolve(getUser());
     }
@@ -85,7 +85,7 @@ public class XWikiUser
             DocumentReference groupReference = this.currentMixedDocumentReferenceResolver.resolve(groupName);
 
             Collection<DocumentReference> groups =
-                groupService.getAllGroupsReferencesForMember(getUserReference(context), 0, 0, context);
+                groupService.getAllGroupsReferencesForMember(getUserReference(), 0, 0, context);
 
             if (groups.contains(groupReference)) {
                 return true;

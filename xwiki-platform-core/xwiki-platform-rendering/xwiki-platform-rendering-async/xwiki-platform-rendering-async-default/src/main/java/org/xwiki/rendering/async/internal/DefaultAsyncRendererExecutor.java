@@ -105,7 +105,11 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         Job job = this.executor.getJob(id);
 
         if (job != null) {
-            return (AsyncRendererJobStatus) job.getStatus();
+            AsyncRendererJobStatus status = (AsyncRendererJobStatus) job.getStatus();
+
+            if (status.getClients().contains(clientId)) {
+                return status;
+            }
         }
 
         //////////////////////////////////////////////

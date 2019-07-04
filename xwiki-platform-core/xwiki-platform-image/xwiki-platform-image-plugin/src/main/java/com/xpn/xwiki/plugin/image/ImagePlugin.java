@@ -280,9 +280,8 @@ public class ImagePlugin extends XWikiDefaultPlugin
     private XWikiAttachment downloadImageFromCache(XWikiAttachment image, int width, int height,
         boolean keepAspectRatio, float quality, XWikiContext context) throws Exception
     {
-        String key =
-            String.format("%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), width, height, keepAspectRatio,
-                quality);
+        String key = String.format("%s;%s;%s;%s;%s;%s;%s", image.getId(), image.getVersion(), image.getDate().getTime(),
+            width, height, keepAspectRatio, quality);
 
         XWikiAttachment thumbnail = this.imageCache.get(key);
         if (thumbnail == null) {

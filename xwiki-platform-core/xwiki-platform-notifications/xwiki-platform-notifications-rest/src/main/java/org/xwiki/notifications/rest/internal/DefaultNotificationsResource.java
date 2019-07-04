@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -39,6 +40,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
@@ -67,6 +69,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.rometools.rome.io.SyndFeedOutput;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.XWikiRequest;
 
 /**
@@ -125,31 +128,36 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String displayReadStatus,
         String tags, String currentWiki, String async, String asyncId) throws Exception
     {
-        Object result = getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
-            users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
-            displayReadEvents, tags, currentWiki, async, asyncId, false, false);
-
         // Build the response
         Response.ResponseBuilder response;
-        if (result instanceof String) {
-            response = Response.status(Status.ACCEPTED);
-            response.entity(Collections.singletonMap("asyncId", result));
+        XWikiUser xWikiUser = getXWikiContext().getWiki().getAuthService().checkAuth(getXWikiContext());
+        if (xWikiUser == null) {
+            response = Response.status(Status.UNAUTHORIZED);
         } else {
-            // Make sure URLs will be rendered like in any other display (by default REST API forces absolute URLs)
-            XWikiContext xcontext = getXWikiContext();
-            xcontext.setURLFactory(
-                xcontext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, xcontext));
+            Object result = getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
+                users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
+                displayReadEvents, tags, currentWiki, async, asyncId, false, false);
 
-            Notifications notifications = new Notifications(this.notificationsRenderer
-                .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
+            if (result instanceof String) {
+                response = Response.status(Status.ACCEPTED);
+                response.entity(Collections.singletonMap("asyncId", result));
+            } else {
+                // Make sure URLs will be rendered like in any other display (by default REST API forces absolute URLs)
+                XWikiContext xcontext = getXWikiContext();
+                xcontext.setURLFactory(
+                    xcontext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, xcontext));
 
-            response = Response.ok(notifications);
+                Notifications notifications = new Notifications(this.notificationsRenderer
+                    .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
+
+                response = Response.ok(notifications);
+            }
+
+            // Add the "cache control" header.
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setNoCache(true);
+            response.cacheControl(cacheControl);
         }
-
-        // Add the "cache control" header.
-        CacheControl cacheControl = new CacheControl();
-        cacheControl.setNoCache(true);
-        response.cacheControl(cacheControl);
 
         return response.build();
     }
@@ -199,24 +207,28 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         String displaySystemEvents, String displayReadEvents, String displayReadStatus, String tags, String currentWiki,
         String async, String asyncId) throws Exception
     {
-        Object result = getCompositeEvents(useUserPreferences, userId, null, null, pages, spaces, wikis, users,
-            toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents,
-            tags, currentWiki, async, asyncId, true, true);
-
         // Build the response
         Response.ResponseBuilder response;
-        if (result instanceof String) {
-            response = Response.status(Status.ACCEPTED);
-            response.entity(Collections.singletonMap("asyncId", result));
+        XWikiUser xWikiUser = getXWikiContext().getWiki().getAuthService().checkAuth(getXWikiContext());
+        if (xWikiUser == null) {
+            response = Response.status(Status.UNAUTHORIZED);
         } else {
-            response = Response.ok(Collections.singletonMap("unread", result));
+            Object result = getCompositeEvents(useUserPreferences, userId, null, null, pages, spaces, wikis, users,
+                toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents,
+                tags, currentWiki, async, asyncId, true, true);
+
+            if (result instanceof String) {
+                response = Response.status(Status.ACCEPTED);
+                response.entity(Collections.singletonMap("asyncId", result));
+            } else {
+                response = Response.ok(Collections.singletonMap("unread", result));
+            }
+
+            // Add the "cache control" header.
+            CacheControl cacheControl = new CacheControl();
+            cacheControl.setNoCache(true);
+            response.cacheControl(cacheControl);
         }
-
-        // Add the "cache control" header.
-        CacheControl cacheControl = new CacheControl();
-        cacheControl.setNoCache(true);
-        response.cacheControl(cacheControl);
-
         return response.build();
     }
 
@@ -226,12 +238,22 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String displayReadStatus,
         String tags, String currentWiki) throws Exception
     {
-        List<CompositeEvent> events = (List<CompositeEvent>) getCompositeEvents(useUserPreferences, userId, untilDate,
-            blackList, pages, spaces, wikis, users, toMaxCount(maxCount, 10), displayOwnEvents, displayMinorEvents,
-            displaySystemEvents, displayReadEvents, tags, currentWiki, null, null, false, false);
+        // Build the response
+        XWikiUser xWikiUser = getXWikiContext().getWiki().getAuthService().checkAuth(getXWikiContext());
+        DocumentReference userIdDoc = this.documentReferenceResolver.resolve(userId);
+        if (xWikiUser == null || !userIdDoc.equals(xWikiUser.getUserReference())) {
+            getXWikiContext().getResponse().sendError(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
+        } else {
+            List<CompositeEvent> events =
+                (List<CompositeEvent>) getCompositeEvents(useUserPreferences, userId, untilDate,
+                    blackList, pages, spaces, wikis, users, toMaxCount(maxCount, 10), displayOwnEvents,
+                    displayMinorEvents,
+                    displaySystemEvents, displayReadEvents, tags, currentWiki, null, null, false, false);
 
-        SyndFeedOutput output = new SyndFeedOutput();
-        return output.outputString(notificationRSSManager.renderFeed(events));
+            SyndFeedOutput output = new SyndFeedOutput();
+            return output.outputString(notificationRSSManager.renderFeed(events));
+        }
     }
 
     @Override

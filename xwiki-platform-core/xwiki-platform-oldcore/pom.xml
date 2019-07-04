@@ -175,11 +175,11 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- Hibernate use an older id -->
+    <!-- Replace the one from Hibernate -->
     <dependency>
-        <groupId>jakarta.xml.bind</groupId>
-        <artifactId>jakarta.xml.bind-api</artifactId>
-      </dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
     <!-- Use javax.transaction:javax.transaction-api instead to not have duplicate JARs in generated WARs -->
     <dependency>
       <groupId>javax.transaction</groupId>

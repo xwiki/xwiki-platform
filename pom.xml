@@ -753,7 +753,7 @@
                   javax.mail:mail,
                   javax.mail:mailapi,
                   com.sun.mail:javax.mail,
-                  jakarta.mail:jakarta.mail-api,
+                  jakarta.mail:jakarta.mail-api
                 </features>
               </extensionOverride>
               <extensionOverride>

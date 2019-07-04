@@ -111,18 +111,24 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
         private final boolean count;
 
+        private final String initialAsyncId;
+
         CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count)
         {
-            this.cacheKey = longCacheKey;
-            this.callable = callable;
-            this.count = count;
+            this(longCacheKey, callable, count, null);
         }
 
         CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count, String asyncId)
         {
-            this(longCacheKey, callable, count);
+            this.cacheKey = longCacheKey;
+            this.callable = callable;
+            this.count = count;
 
-            addAsyncId(asyncId);
+            this.initialAsyncId = asyncId;
+
+            if (asyncId != null) {
+                addAsyncId(asyncId);
+            }
         }
 
         public void addAsyncId(String asyncId)
@@ -207,8 +213,16 @@ public class NotificationEventExecutor implements Initializable, Disposable
         @Override
         public String toString()
         {
-            return String.format("Notification event executor: %s : %s : [%s]", this.asyncIds.iterator().next(),
-                (this.count ? "count" : "list"), this.cacheKey);
+            StringBuilder builder = new StringBuilder(
+                String.format("Notification event executor: %s : %s", (this.count ? "count" : "list"), this.cacheKey));
+
+            // The initial async id can be null when async is not enabled in the first request
+            if (this.initialAsyncId != null) {
+                builder.append(" : ");
+                builder.append(this.initialAsyncId);
+            }
+
+            return builder.toString();
         }
     }
 

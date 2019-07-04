@@ -74,7 +74,7 @@ public class MailSenderApiTest
     }
 
     @AfterAll
-    public void afterAll()
+    public static void afterAll()
     {
         mailserver.stop();
     }

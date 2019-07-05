@@ -46,7 +46,7 @@ public class DefaultAuthenticationConfiguration implements AuthenticationConfigu
     private ConfigurationSource configuration;
 
     @Override
-    public int getAuthorizedTrialsNumber()
+    public int getMaxAuthorizedAttempts()
     {
         return configuration.getProperty("maxAuthorizedAttempts", 3);
     }

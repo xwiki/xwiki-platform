@@ -23,15 +23,18 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.securityfilter.filter.SecurityRequestWrapper;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureEvent;
 import org.xwiki.security.authentication.api.AuthenticationFailureLimitReachedEvent;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -70,11 +73,17 @@ public class DefaultAuthenticationFailureManagerTest
 
     private String failingLogin = "foobar";
 
+    @BeforeComponent
+    public void configure(MockitoComponentManager componentManager) throws Exception
+    {
+       componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+    }
+
     @BeforeEach
-    public void setup()
+    public void setup() throws Exception
     {
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy1", "strategy2" });
-        when(configuration.getAuthorizedTrialsNumber()).thenReturn(3);
+        when(configuration.getMaxAuthorizedAttempts()).thenReturn(3);
         when(configuration.getTimeWindow()).thenReturn(5);
     }
 
@@ -133,7 +142,7 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void repeatedAuthenticationFailureDifferentThreshold()
     {
-        when(configuration.getAuthorizedTrialsNumber()).thenReturn(5);
+        when(configuration.getMaxAuthorizedAttempts()).thenReturn(5);
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
@@ -214,7 +223,7 @@ public class DefaultAuthenticationFailureManagerTest
     @Test
     public void deactivateThresholdAuthWithMaxAttempt()
     {
-        when(this.configuration.getAuthorizedTrialsNumber()).thenReturn(0);
+        when(this.configuration.getMaxAuthorizedAttempts()).thenReturn(0);
 
         for (int i = 0; i < 100; i++) {
             assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));

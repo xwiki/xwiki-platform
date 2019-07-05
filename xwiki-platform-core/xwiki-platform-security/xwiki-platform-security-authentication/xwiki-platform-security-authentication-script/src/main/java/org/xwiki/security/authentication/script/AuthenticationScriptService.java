@@ -19,13 +19,21 @@
  */
 package org.xwiki.security.authentication.script;
 
+import java.util.Collections;
+import java.util.Set;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureManager;
+import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -49,6 +57,15 @@ public class AuthenticationScriptService implements ScriptService
     @Inject
     private AuthenticationFailureManager authenticationFailureManager;
 
+    @Inject
+    private AuthenticationConfiguration authenticationConfiguration;
+
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    private Logger logger;
+
     /**
      * @param username the login used in the request for authentication.
      * @return the aggregated form field to validate for the authentication
@@ -67,5 +84,26 @@ public class AuthenticationScriptService implements ScriptService
     public String getErrorMessage(String username)
     {
         return this.authenticationFailureManager.getErrorMessage(username);
+    }
+
+    /**
+     * @return name of all available authentication failure strategies.
+     */
+    public Set<String> getAuthenticationFailureAvailableStrategies()
+    {
+        try {
+            return this.componentManager.getInstanceMap(AuthenticationFailureStrategy.class).keySet();
+        } catch (ComponentLookupException e) {
+            logger.error("Error while getting the list of available authentication strategies.");
+            return Collections.emptySet();
+        }
+    }
+
+    /**
+     * @return the current configuration.
+     */
+    public AuthenticationConfiguration getAuthenticationConfiguration()
+    {
+        return this.authenticationConfiguration;
     }
 }

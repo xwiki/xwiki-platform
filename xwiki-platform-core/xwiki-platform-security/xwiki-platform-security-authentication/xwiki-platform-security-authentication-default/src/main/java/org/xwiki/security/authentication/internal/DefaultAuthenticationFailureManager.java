@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
@@ -64,6 +65,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     private AuthenticationConfiguration configuration;
 
     @Inject
+    @Named("context")
     private ComponentManager componentManager;
 
     @Inject
@@ -217,7 +219,7 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     private int getMaxNbAttempts()
     {
         if (this.maxNbAttempts == -1) {
-            this.maxNbAttempts = configuration.getAuthorizedTrialsNumber();
+            this.maxNbAttempts = configuration.getMaxAuthorizedAttempts();
         }
         return this.maxNbAttempts;
     }

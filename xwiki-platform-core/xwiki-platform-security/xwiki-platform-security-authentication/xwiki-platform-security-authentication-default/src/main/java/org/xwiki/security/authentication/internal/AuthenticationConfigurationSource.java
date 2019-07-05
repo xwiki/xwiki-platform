@@ -35,7 +35,7 @@ import org.xwiki.model.reference.LocalDocumentReference;
  * {@link ConfigurationSource} reading the values from the configuration page.
  *
  * @version $Id$
- * @since 10.8RC1
+ * @since 11.6RC1
  */
 @Component
 @Named("authentication")

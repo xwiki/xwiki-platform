@@ -35,7 +35,7 @@ public interface AuthenticationConfiguration
     /**
      * @return the number of authorized authentication failure before the strategies are activated.
      */
-    int getAuthorizedTrialsNumber();
+    int getMaxAuthorizedAttempts();
 
     /**
      * @return the time window in seconds during which the authentication failures should occur to activate

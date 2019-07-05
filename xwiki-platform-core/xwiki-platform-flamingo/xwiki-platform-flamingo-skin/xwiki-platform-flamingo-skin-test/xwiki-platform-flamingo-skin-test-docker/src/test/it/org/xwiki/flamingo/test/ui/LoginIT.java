@@ -19,8 +19,14 @@
  */
 package org.xwiki.flamingo.test.ui;
 
+import java.util.Arrays;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
@@ -39,14 +45,34 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @UITest
 public class LoginIT
 {
+    private static DocumentReference AUTHENTICATION_CONFIGURATION =
+        new DocumentReference("xwiki", Arrays.asList("XWiki", "Authentication"), "Configuration");
+
+    @BeforeAll
+    public void setup(TestUtils setup)
+    {
+        setup.createPage(AUTHENTICATION_CONFIGURATION, "");
+        setup.addObject(AUTHENTICATION_CONFIGURATION, "XWiki.Authentication.ConfigurationClass",
+            "failureStrategy", "captcha",
+            "maxAuthorizedAttempts", 3,
+            "timeWindowAttempts", 300);
+    }
+
+    @AfterAll
+    public void tearDown(TestUtils setup)
+    {
+        setup.deletePage(AUTHENTICATION_CONFIGURATION);
+    }
+
     /**
      * Ensure that the repeated authentication failure mechanism is triggered.
      */
     @Test
-    public void repeatedAuthenticationFailure(TestUtils setup, TestInfo testInfo,
+    public void repeatedAuthenticationFailure(TestUtils setup, TestInfo testInfo, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration)
     {
-        // fixture: create login and fails login with it: we don't want Admin to be blocked for authentication in
+        // fixture:
+        // create login and fails login with it: we don't want Admin to be blocked for authentication in
         // further tests.
         String username = testInfo.getTestClass().get().getName();
         String password = testInfo.getTestMethod().toString();

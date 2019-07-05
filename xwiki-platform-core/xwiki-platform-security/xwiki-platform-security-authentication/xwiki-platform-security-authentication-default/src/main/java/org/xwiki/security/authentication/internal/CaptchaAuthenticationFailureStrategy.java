@@ -27,8 +27,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
+import org.xwiki.captcha.CaptchaConfiguration;
 import org.xwiki.captcha.CaptchaException;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 
@@ -52,8 +55,11 @@ public class CaptchaAuthenticationFailureStrategy implements AuthenticationFailu
         + "validated captcha";
 
     @Inject
-    @Named("jcaptcha")
-    private Captcha captcha;
+    private CaptchaConfiguration captchaConfiguration;
+
+    @Inject
+    @Named("context")
+    private ComponentManager componentManager;
 
     @Inject
     private ContextualLocalizationManager contextLocalization;
@@ -67,12 +73,17 @@ public class CaptchaAuthenticationFailureStrategy implements AuthenticationFailu
         return contextLocalization.getTranslationPlain("security.authentication.strategy.captcha.errorMessage");
     }
 
+    private Captcha getCaptcha() throws ComponentLookupException
+    {
+        return this.componentManager.getInstance(Captcha.class, this.captchaConfiguration.getDefaultName());
+    }
+
     @Override
     public String getForm(String username)
     {
         try {
-            return this.captcha.display();
-        } catch (CaptchaException e) {
+            return getCaptcha().display();
+        } catch (CaptchaException | ComponentLookupException e) {
             logger.error("Error while displaying the CAPTCHA.", e);
             return "";
         }
@@ -82,8 +93,8 @@ public class CaptchaAuthenticationFailureStrategy implements AuthenticationFailu
     public boolean validateForm(String username, SecurityRequestWrapper request)
     {
         try {
-            return this.captcha.isValid(request.getParameterMap());
-        } catch (CaptchaException e) {
+            return getCaptcha().isValid(request.getParameterMap());
+        } catch (CaptchaException | ComponentLookupException e) {
             // We skip the error log if we did not manage to find the captcha: this might indeed happen in case
             // an user fails to authenticate without using the form.
             if (UNEXISTING_CAPTCHA_EXCEPTION.equals(ExceptionUtils.getRootCause(e).getMessage())) {

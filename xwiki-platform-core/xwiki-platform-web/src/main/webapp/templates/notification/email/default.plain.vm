@@ -31,12 +31,16 @@ $app:
 ### Display a link to the diff
 ###
 #if ($document)
-#set ($newdoc = $xwiki.getDocument($event.document, $event.events[0].documentVersion))
-#if ($event.events.size() == 1)
-#set ($origdoc = $newdoc.previousDocument)
-#else
-#set ($lastIndex = $event.events.size() - 1)
-#set ($origdoc = $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
-#end
-  $services.localization.render('notifications.email.seeChanges', [$document.getURL('view', "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}")])
+  #set ($newdoc = $xwiki.getDocument($event.document, $event.events[0].documentVersion))
+  #if ($event.events.size() == 1)
+    #set ($origdoc = $newdoc.previousDocument)
+  #else
+    #set ($lastIndex = $event.events.size() - 1)
+    #set ($origdoc = $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
+  #end
+  #set ($queryString = '')
+  #if ($event.type != 'delete')
+    #set ($queryString = "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}")
+  #end
+  $services.localization.render('notifications.email.seeChanges', [$document.getURL('view', $!queryString)])
 #end

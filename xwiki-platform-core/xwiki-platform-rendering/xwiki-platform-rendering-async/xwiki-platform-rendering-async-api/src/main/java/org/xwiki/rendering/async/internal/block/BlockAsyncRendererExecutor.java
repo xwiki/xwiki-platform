@@ -25,7 +25,6 @@ import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Start and cache asynchronous {@link Block} based rendering.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.10RC1
  */
 @Role
-@Unstable
 public interface BlockAsyncRendererExecutor
 {
     /**

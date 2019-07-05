@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Start and cache asynchronous rendering.
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.10RC1
  */
 @Role
-@Unstable
 public interface AsyncRendererExecutor
 {
     /**

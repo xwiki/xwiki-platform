@@ -23,6 +23,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -57,7 +58,7 @@ public class DateXarObjectPropertySerializerTest
     public void parseDateOld() throws ParseException
     {
         Date newDate = new Date();
-        DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy");
+        DateFormat format = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
         String string = format.format(newDate);
         Date formattedDate = format.parse(string);
 

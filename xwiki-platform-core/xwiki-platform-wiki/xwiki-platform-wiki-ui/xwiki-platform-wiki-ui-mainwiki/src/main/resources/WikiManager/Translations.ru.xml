@@ -230,8 +230,8 @@ platform.wiki.create.wizard.step.create=Создать
 platform.wiki.create.wizard.step.creation=Создание вики
 platform.wiki.create.wizard.step.creation.wait=Пожалуйста, подождите, пока создается вики.
 platform.wiki.create.wizard.step.creation.complete=Вики {0} успешно создана. Теперь вы можете войти.
-platform.wiki.create.wizard.step.creation.errorlog=Во ходе этого процесса возникли ошибки, вы можете их просмотреть.
-platform.wiki.create.wizard.step.creation.error=Вики {0} была создана, но некоторые страницы не были установлены. Следовательно, вики может вести себя ошибочно, и вам, вероятно, следует удалить его.
+platform.wiki.create.wizard.step.creation.errorlog=В ходе этого процесса возникли ошибки, вы можете их просмотреть.
+platform.wiki.create.wizard.step.creation.error=Возникли ошибки при создании вики {0}. Рекомендуется её удалить.
 platform.wiki.create.wizard.step.creation.go=Перейти к вики
 
 ## Admin

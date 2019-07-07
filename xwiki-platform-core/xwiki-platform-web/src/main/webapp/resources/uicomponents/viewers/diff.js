@@ -18,7 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery', 'xwiki-events-bridge'], function($) {
+  //
   // Collapsible diff summary.
+  //
+
   var enhanceDiffSummaryItem = function() {
     var details = $(this).next('ul');
     if (details.size() > 0) {
@@ -30,13 +33,78 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     }
   };
 
-  var enhanceDiffSummaryItems = function(elements) {
-    $(elements).find('div.diff-summary-item').each(enhanceDiffSummaryItem);
+  var enhanceDiffSummaryItems = function(container) {
+    container.find('div.diff-summary-item').each(enhanceDiffSummaryItem);
+  };
+
+  //
+  // Expandable HTML Diff Context
+  //
+
+  var getPreviousElement = function(element) {
+    var previous = $(element).prev();
+    if (previous.length > 0) {
+      return previous[0];
+    } else {
+      var parent = $(element).parent();
+      if (parent.length > 0) {
+        return getPreviousElement(parent[0]);
+      }
+    }
+  };
+
+  var getNextElement = function(element) {
+    var next = $(element).next();
+    if (next.length > 0) {
+      return next[0];
+    } else {
+      var parent = $(element).parent();
+      if (parent.length > 0) {
+        return getNextElement(parent[0]);
+      }
+    }
+  };
+
+  var maybeMarkEllipsis = function(element, expandUp) {
+    if ($(element).attr('data-xwiki-html-diff-hidden') === 'true') {
+      $(element).attr({
+        'data-xwiki-html-diff-hidden': 'ellipsis',
+        'data-xwiki-html-diff-expand': expandUp ? 'up' : 'down',
+      });
+    }
+  };
+
+  var enhanceHTMLDiff = function(container) {
+    // Show ellipsis before and after diff blocks.
+    container.find('.html-diff [data-xwiki-html-diff-block]').each(function() {
+      maybeMarkEllipsis(getPreviousElement(this), true);
+      maybeMarkEllipsis(getNextElement(this), false);
+    });
+
+    // Show the hidden content when the ellipsis is clicked.
+    container.find('.html-diff').on('click', '[data-xwiki-html-diff-hidden="ellipsis"]', function() {
+      $(this).attr('data-xwiki-html-diff-hidden', 'false');
+      if ($(this).attr('data-xwiki-html-diff-expand') === 'up') {
+        maybeMarkEllipsis(getPreviousElement(this), true);
+      } else {
+        maybeMarkEllipsis(getNextElement(this), false);
+      }
+      $(this).removeAttr('data-xwiki-html-diff-expand');
+    });
+  };
+
+  //
+  // Initialization
+  //
+
+  var init = function(container) {
+    enhanceDiffSummaryItems(container);
+    enhanceHTMLDiff(container);
   }
 
   $(document).on('xwiki:dom:updated', function(event, data) {
-    enhanceDiffSummaryItems(data.elements);
+    init($(data.elements));
   });
 
-  enhanceDiffSummaryItems([document.body]);
+  init($(document.body));
 });

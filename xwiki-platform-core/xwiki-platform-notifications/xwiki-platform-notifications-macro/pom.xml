@@ -27,6 +27,7 @@
     <artifactId>xwiki-platform-notifications</artifactId>
     <version>11.6-SNAPSHOT</version>
   </parent>
+  <name>XWiki Platform - Notifications - Macro - Parent POM</name>
   <artifactId>xwiki-platform-notifications-macro</artifactId>
   <packaging>pom</packaging>
   <modules>

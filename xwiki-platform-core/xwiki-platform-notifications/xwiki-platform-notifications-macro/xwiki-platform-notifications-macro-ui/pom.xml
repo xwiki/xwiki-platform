@@ -27,6 +27,7 @@
     <artifactId>xwiki-platform-notifications-macro</artifactId>
     <version>11.6-SNAPSHOT</version>
   </parent>
+  <name>XWiki Platform - Notifications - Macro - UI</name>
   <artifactId>xwiki-platform-notifications-macro-ui</artifactId>
   <packaging>xar</packaging>
   <description>Provide a macro to embed notifications in any page or to display a stream of events.</description>

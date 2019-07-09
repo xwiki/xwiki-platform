@@ -894,7 +894,7 @@ public class HibernateStore implements Disposable, Integrator
                     }
                 };
 
-                return this.dialect.getSequenceInformationExtractor().extractMetadata(extractionContext);
+                return getDialect().getSequenceInformationExtractor().extractMetadata(extractionContext);
             }
         }
     }
@@ -913,7 +913,7 @@ public class HibernateStore implements Disposable, Integrator
     private void createSequenceIfMissing(String wikiId)
     {
         // There's no issue with catalog based databases, only with schemas.
-        if (!isCatalog() && this.dialect.getNativeIdentifierGeneratorStrategy().equals("sequence")) {
+        if (!isCatalog() && getDialect().getNativeIdentifierGeneratorStrategy().equals("sequence")) {
             String schemaName = getDatabaseFromWikiName(wikiId);
 
             boolean ignoreError = false;

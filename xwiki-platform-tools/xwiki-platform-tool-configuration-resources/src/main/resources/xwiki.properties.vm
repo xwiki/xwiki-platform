@@ -871,6 +871,15 @@ edit.defaultEditor.org.xwiki.rendering.syntax.SyntaxContent#wysiwyg=$xwikiProper
 edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaultWysiwygEditor
 #end
 
+#-# [Since 11.3.2, 11.6RC1]
+#-# Indicate if the mechanism to detect and handle edition conflicts should be enabled or not.
+#-# If disabled, it means that in case of edition conflicts, the latest save will be always take into account, which
+#-# might led to erase previous data (which can always be recovered in the version of the document).
+#-# It is recommended to leave it enabled, unless you have unexpected and recurring merge conflict windows.
+#-#
+#-# The default is:
+# edit.conflictChecking.enabled = true
+
 #-------------------------------------------------------------------------------------
 # Notifications
 #-------------------------------------------------------------------------------------

@@ -33,6 +33,7 @@ import org.joda.time.DateTime;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.logging.LogLevel;
@@ -223,7 +224,7 @@ public class SaveAction extends PreviewAction
         // We only proceed on the check between versions in case of AJAX request, so we currently stay in the edit form
         // This can be improved later by displaying a nice UI with some merge options in a sync request.
         // For now we don't want our user to loose their changes.
-        if (Utils.isAjaxRequest(context) && request.getParameter("previousVersion") != null) {
+        if (isConflictCheckEnabled() && Utils.isAjaxRequest(context) && request.getParameter("previousVersion") != null) {
             if (isConflictingWithVersion(context, originalDoc, tdoc)) {
                 return true;
             }
@@ -266,6 +267,12 @@ public class SaveAction extends PreviewAction
         }
 
         return false;
+    }
+
+    private boolean isConflictCheckEnabled()
+    {
+        ConfigurationSource configurationSource = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
+        return configurationSource.getProperty("edit.conflictChecking.enabled", true);
     }
 
     private DocumentRevisionProvider getDocumentRevisionProvider()

@@ -341,6 +341,9 @@ public class EditIT
         // Check that the force save indeed save the content
         viewPage = setup.gotoPage(testReference);
         assertEquals("A second edit from another tab", viewPage.getContent());
+        // mitigate the flicker: this should be removed when XWIKI-16406 is fixed.
+        setup.getDriver().navigate().refresh();
+        viewPage = new ViewPage();
         wikiEditPageTab1 = viewPage.editWiki();
 
         // Go back on the other tab: the editor is still open, so we can create another conflict

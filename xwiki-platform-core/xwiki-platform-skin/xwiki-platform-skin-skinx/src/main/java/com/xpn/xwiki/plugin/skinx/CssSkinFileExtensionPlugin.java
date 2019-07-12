@@ -71,7 +71,9 @@ public class CssSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
     @Override
     public String getLink(String filename, XWikiContext context)
     {
-        boolean forceSkinAction = (Boolean) getParametersForResource(filename, context).get("forceSkinAction");
+        boolean forceSkinAction = (Boolean) getParametersForResource(filename, context)
+                .getOrDefault("forceSkinAction", true);
+
         StringBuilder result = new StringBuilder("<link rel='stylesheet' type='text/css' href='");
         result.append(context.getWiki().getSkinFile(filename, forceSkinAction, context));
         if (forceSkinAction) {

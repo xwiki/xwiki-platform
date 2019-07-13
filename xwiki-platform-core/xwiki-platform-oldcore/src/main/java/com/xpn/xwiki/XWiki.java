@@ -5206,14 +5206,8 @@ public class XWiki implements EventListener
             || (user.endsWith(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
             return active;
         }
-
-        String checkactivefield = getXWikiPreference("auth_active_check", context);
-        if (checkactivefield.equals("1")) {
-            XWikiDocument userdoc = getDocument(user, context);
-            active = userdoc.getIntValue("XWiki.XWikiUsers", "active");
-        }
-
-        return active;
+        XWikiDocument userdoc = getDocument(user, context);
+        return userdoc.getIntValue("XWiki.XWikiUsers", "active");
     }
 
     /**

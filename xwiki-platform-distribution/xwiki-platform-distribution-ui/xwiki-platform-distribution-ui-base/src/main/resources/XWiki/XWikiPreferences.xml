@@ -74,21 +74,6 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </admin_email>
-    <auth_active_check>
-      <customDisplay/>
-      <defaultValue/>
-      <disabled>0</disabled>
-      <displayFormType>select</displayFormType>
-      <displayType>yesno</displayType>
-      <name>auth_active_check</name>
-      <number>6</number>
-      <prettyName>Authentication Active Check</prettyName>
-      <tooltip/>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-    </auth_active_check>
     <authenticate_edit>
       <customDisplay/>
       <defaultValue/>
@@ -1552,21 +1537,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </admin_email>
-      <auth_active_check>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>auth_active_check</name>
-        <number>6</number>
-        <prettyName>Authentication Active Check</prettyName>
-        <tooltip/>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </auth_active_check>
       <authenticate_edit>
         <customDisplay/>
         <defaultValue/>

@@ -640,10 +640,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 
     public void testCheckActiveSuperadmin() throws Exception
     {
-        // Make sure the check for superadmin stops before looking at the configuration.
-        Mock mockConfiguration = registerMockComponent(ConfigurationSource.class, "wiki");
-        mockConfiguration.expects(never()).method("getProperty").with(eq("auth_active_check"), eq(String.class));
-
         int isUserActive = this.xwiki.checkActive(XWikiRightService.SUPERADMIN_USER_FULLNAME, this.getContext());
 
         Assert.assertEquals(1, isUserActive);
@@ -654,10 +650,6 @@ public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
      */
     public void testCheckActivePrefixedSuperadmin() throws Exception
     {
-        // Make sure the check for superadmin stops before looking at the configuration.
-        Mock mockConfiguration = registerMockComponent(ConfigurationSource.class, "wiki");
-        mockConfiguration.expects(never()).method("getProperty").with(eq("auth_active_check"), eq(String.class));
-
         // In a subwiki, the superadmin always logs in as a global user.
         int isUserActive =
             this.xwiki.checkActive("xwiki:" + XWikiRightService.SUPERADMIN_USER_FULLNAME, this.getContext());

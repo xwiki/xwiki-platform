@@ -49,7 +49,6 @@ administration.menu.search.noResults=No results.
 
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=If set to "Yes" then an email will be sent to the email address provided when filling the registration form.
-XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
 XWiki.XWikiPreferences_validation_email_content.hint=The email template that will be send to users in order to validate their email address.
 XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
 XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
@@ -123,7 +122,16 @@ administration.section.users.deleteUser.markInactiveMessage=Instead of deleting 
 admin.other=Other
 admin.other.description=Various configurations for extensions.
 administration.section.analytics.status=Status
-administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not</content>
+administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
+## Used to indicate where deprecated keys end
+#@deprecatedend
+</content>
   <object>
     <name>XWiki.AdminTranslations</name>
     <number>0</number>

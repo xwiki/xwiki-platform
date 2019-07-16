@@ -101,7 +101,7 @@ public class SkinExtensionAsyncContextHandler implements AsyncContextHandler
             AbstractSkinExtensionPlugin skinPlugin = getPlugin(info.getType(), plugins);
 
             if (skinPlugin != null) {
-                meta.append(skinPlugin.getLink(info.getResource(), xcontext));
+                meta.append(skinPlugin.getLink(info.getResource(), info.getParameters(), xcontext));
             } else {
                 this.logger.warn("Cannot find skin extension plugin for resource type [{}]", info.getType());
             }

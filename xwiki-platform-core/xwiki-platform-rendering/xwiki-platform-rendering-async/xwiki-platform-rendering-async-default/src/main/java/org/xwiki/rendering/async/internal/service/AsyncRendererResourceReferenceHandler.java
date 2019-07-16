@@ -131,16 +131,14 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         StringBuilder head = new StringBuilder();
         Map<String, Collection<Object>> uses = status.getUses();
         for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
-            AsyncContextHandler handler;
             try {
-                handler = this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
-            } catch (ComponentLookupException e) {
-                this.logger.error("Failed to get AsyncContextHandler with type [{}]", entry.getKey(), e);
+                AsyncContextHandler handler =
+                    this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
 
-                continue;
+                handler.addHTMLHead(head, entry.getValue());
+            } catch (Exception e) {
+                this.logger.error("Failed to get HTML head for handler type [{}]", entry.getKey(), e);
             }
-
-            handler.addHTMLHead(head, entry.getValue());
         }
         if (head.length() > 0) {
             if (response instanceof ServletResponse) {

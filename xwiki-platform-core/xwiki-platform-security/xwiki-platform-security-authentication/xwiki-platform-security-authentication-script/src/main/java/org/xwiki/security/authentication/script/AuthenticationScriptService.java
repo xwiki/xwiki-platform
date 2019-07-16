@@ -37,6 +37,8 @@ import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 import org.xwiki.security.script.SecurityScriptService;
 import org.xwiki.stability.Unstable;
 
+import com.xpn.xwiki.util.Programming;
+
 /**
  * Security Authentication Script service.
  *
@@ -105,5 +107,15 @@ public class AuthenticationScriptService implements ScriptService
     public AuthenticationConfiguration getAuthenticationConfiguration()
     {
         return this.authenticationConfiguration;
+    }
+
+    /**
+     * Reset the authentication failure record for the given username.
+     * @param username the username for which to remove the record.
+     */
+    @Programming
+    public void resetAuthenticationFailureCounter(String username)
+    {
+        this.authenticationFailureManager.resetAuthenticationFailureCounter(username);
     }
 }

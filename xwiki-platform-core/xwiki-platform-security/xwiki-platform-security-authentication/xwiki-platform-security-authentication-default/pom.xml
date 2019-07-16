@@ -33,7 +33,7 @@
   <name>XWiki Platform - Security - Authentication - Default</name>
   <description>XWiki Platform - Security - Authentication - Default contains the default implementations related to authentication</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.69</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.62</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>60</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>

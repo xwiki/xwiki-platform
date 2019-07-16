@@ -37,6 +37,10 @@
   <hidden>false</hidden>
   <content>{{velocity}}
 #set ($authConfig = $services.security.authentication.authenticationConfiguration)
+#set ($selectedStrategies = {})
+#foreach ($strategy in $authConfig.getFailureStrategies())
+#set ($discard = $selectedStrategies.put($strategy, true))
+#end
 {{html clean="false"}}
 &lt;form method="post" action="${xwiki.getURL('XWiki.Authentication.Configuration', 'save')}" class='xform'&gt;
   &lt;div class="hidden"&gt;
@@ -45,15 +49,28 @@
   &lt;/div&gt;
   &lt;dl&gt;
     &lt;dt&gt;
-      &lt;label for="XWiki.Authentication.ConfigurationClass_0_maxAuthorizedAttempts"&gt;Maximum number of authorized attempts&lt;/label&gt;
-      &lt;span class='xHint'&gt;This represents the maximum number of authorized login failures before the strategy is activated. This number is taken into account only in the context of the following time window. Please consider that a 0 value means the feature is disabled.&lt;/span&gt;
+      &lt;label for="XWiki.Authentication.ConfigurationClass_0_failureStrategy"&gt;$services.localization.render('authentication.admin.failureStrategy.label')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$services.localization.render('authentication.admin.failureStrategy.hint')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;select name="XWiki.Authentication.ConfigurationClass_0_failureStrategy" id="XWiki.Authentication.ConfigurationClass_0_failureStrategy" multiple="multiple"&gt;
+        #foreach ($failureStrategy in $services.security.authentication.authenticationFailureAvailableStrategies)
+          &lt;option value="${failureStrategy}" #if($selectedStrategies.get($failureStrategy))selected='selected'#end&gt;
+            $services.localization.render("authentication.admin.failureStrategy.${failureStrategy}.name")
+          &lt;/option&gt;
+        #end
+      &lt;/select&gt;
+    &lt;/dd&gt;
+    &lt;dt&gt;
+      &lt;label for="XWiki.Authentication.ConfigurationClass_0_maxAuthorizedAttempts"&gt;$services.localization.render('authentication.admin.maxAttempts.label')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$services.localization.render('authentication.admin.maxAttempts.hint')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
       &lt;input type="number" name="XWiki.Authentication.ConfigurationClass_0_maxAuthorizedAttempts" id="XWiki.Authentication.ConfigurationClass_0_maxAuthorizedAttempts" value="$authConfig.maxAuthorizedAttempts" min="0" class="form-control" /&gt;
     &lt;/dd&gt;
     &lt;dt&gt;
-      &lt;label for="XWiki.Authentication.ConfigurationClass_0_timeWindowAttempts"&gt;Time window for login failures&lt;/label&gt;
-      &lt;span class='xHint'&gt;The time window in seconds during which to consider the failing login attempts for activating the strategy.&lt;/span&gt;
+      &lt;label for="XWiki.Authentication.ConfigurationClass_0_timeWindowAttempts"&gt;$services.localization.render('authentication.admin.timeWindow.label')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$services.localization.render('authentication.admin.timeWindow.hint')&lt;/span&gt;
     &lt;/dt&gt;
     &lt;dd&gt;
       &lt;input type="number" name="XWiki.Authentication.ConfigurationClass_0_timeWindowAttempts" id="XWiki.Authentication.ConfigurationClass_0_timeWindowAttempts" value="$authConfig.timeWindow" min="0" class="form-control" /&gt;
@@ -276,10 +293,10 @@
       <displayBeforeCategory/>
     </property>
     <property>
-      <displayInCategory/>
+      <displayInCategory>usersgroups</displayInCategory>
     </property>
     <property>
-      <displayInSection>Users</displayInSection>
+      <displayInSection>Authentication</displayInSection>
     </property>
     <property>
       <heading>Authentication Security</heading>

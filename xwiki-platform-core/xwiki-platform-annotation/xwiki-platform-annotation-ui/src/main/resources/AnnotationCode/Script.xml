@@ -1630,7 +1630,7 @@ XWiki.Annotation = Class.create({
 return XWiki;
 }(XWiki || {}));
 
-document.observe('xwiki:dom:loaded', function() {
+function init() {
   // Load the annotations only in view mode, if the document content is displayed
   // (the document content is not displayed when viewer=history for instance).
   if (XWiki.contextaction != 'view' || !$('xwikicontent')) {
@@ -1664,7 +1664,8 @@ document.observe('xwiki:dom:loaded', function() {
     // initialize the annotations on the xwikicontent element which is the document content by default
     new XWiki.Annotation(displayHighlight, $('xwikicontent'), displayed);
   }
-});
+}
+(XWiki &amp;&amp; XWiki.domIsLoaded &amp;&amp; init()) || document.observe("xwiki:dom:loaded", init);
 </code>
     </property>
     <property>

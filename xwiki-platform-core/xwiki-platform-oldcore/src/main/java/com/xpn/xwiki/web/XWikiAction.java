@@ -536,7 +536,11 @@ public abstract class XWikiAction extends Action
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
                         Utils.parseTemplate(context.getWiki().Param("xwiki.access_exception", "accessdenied"), context);
                         return null;
-                    } else if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_INACTIVE) {
+                    } else if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_INACTIVE
+                        || xex.getCode() == XWikiException.ERROR_XWIKI_USER_DISABLED) {
+                        if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_DISABLED) {
+                            context.put("cause", "disabled");
+                        }
                         Utils.parseTemplate(context.getWiki().Param("xwiki.user_exception", "userinactive"), context);
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND) {

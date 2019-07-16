@@ -183,9 +183,9 @@
   #elseif ($services.security.authorization.hasAccess('script', $userReference, $mainWikiPrefsRef))
     #maybeShowDeleteUserWarning($userReference 'administration.section.users.deleteUser.scriptRightsWarning')
   #end
-  ## Make sure the administrator knows that he can use the "active" user profile property instead of deleting the user.
+  ## Make sure the administrator knows that he can use the "disabled" user profile property instead of deleting the user.
   &lt;div class="box infomessage"&gt;
-    $services.localization.render('administration.section.users.deleteUser.markInactiveMessage')
+    $services.localization.render('administration.section.users.deleteUser.markDisabledMessage')
   &lt;/div&gt;
   {{/html}}
 #end

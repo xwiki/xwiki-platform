@@ -116,7 +116,7 @@ administration.section.export.backupPack.hint=Specify if the package will be use
 administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
 administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
 administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
-administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
 
 # Other Category
 admin.other=Other
@@ -129,6 +129,7 @@ administration.section.analytics.status.hint=Determine if the tracking in Google
 
 ## Deprecated since 11.6RC1
 XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
+administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
 ## Used to indicate where deprecated keys end
 #@deprecatedend
 </content>

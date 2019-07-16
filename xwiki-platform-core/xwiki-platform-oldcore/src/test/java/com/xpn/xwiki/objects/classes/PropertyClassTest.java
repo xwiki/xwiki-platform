@@ -74,6 +74,7 @@ public class PropertyClassTest
 
         this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         this.oldCore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
     }
 
     /** Test the {@link PropertyClass#compareTo(PropertyClass)} method. */

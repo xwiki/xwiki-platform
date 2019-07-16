@@ -59,12 +59,27 @@
 #set ($sectionsObjectClassName = 'XWiki.UserProfileSectionsClass')
 #set ($sectionObjectClassName = 'XWiki.UserProfileSectionClass')
 ##
+#if ($hasAdmin &amp;&amp; $doc.getValue('disabled') == 1)
+{{warning}}
+$services.localization.render('platform.core.profile.category.profile.disabled')
+{{/warning}}
+#end
+
 {{html clean='false' wiki='true'}}
 #if (!$inEditMode)
   &lt;div class="vcard"&gt;
   &lt;span class="fn hidden"&gt;$xwiki.getUserName($doc.fullName, false)&lt;/span&gt;
 #end
   &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
+    #if ($hasAdmin &amp;&amp; !$inEditMode &amp;&amp; !$isMyProfile)
+      #if ($doc.getValue('disabled') == 1)
+        #set ($queryParam = "classname=XWiki.XWikiUsers&amp;XWiki.XWikiUsers_0_disabled=0&amp;form_token=$!{services.csrf.getToken()}")
+        &lt;a href="$doc.getURL('save', $queryParam)" id="enable" class="btn btn-success"&gt;$services.icon.renderHTML('unlock') $services.localization.render('platform.core.profile.category.profile.enableAccount')&lt;/a&gt;
+      #else
+        #set ($queryParam = "classname=XWiki.XWikiUsers&amp;XWiki.XWikiUsers_0_disabled=1&amp;form_token=$!{services.csrf.getToken()}")
+        &lt;a href="$doc.getURL('save', $queryParam)" id="disable" class="btn btn-warning"&gt;$services.icon.renderHTML('lock') $services.localization.render('platform.core.profile.category.profile.disableAccount')&lt;/a&gt;
+      #end
+    #end
     &lt;div class='userInfo'&gt;
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;

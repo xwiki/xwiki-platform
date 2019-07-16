@@ -5199,15 +5199,8 @@ public class XWiki implements EventListener
 
     public int checkActive(String user, XWikiContext context) throws XWikiException
     {
-        int active = 1;
-
-        // These users are necessarily active. Note that superadmin might be main-wiki-prefixed when in a subwiki.
-        if (user.equals(XWikiRightService.GUEST_USER_FULLNAME)
-            || (user.endsWith(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
-            return active;
-        }
-        XWikiDocument userdoc = getDocument(user, context);
-        return userdoc.getIntValue("XWiki.XWikiUsers", "active");
+        XWikiUser xWikiUser = new XWikiUser(user);
+        return xWikiUser.isActive(context) ? 1 : 0;
     }
 
     /**
@@ -5308,14 +5301,41 @@ public class XWiki implements EventListener
             }
         }
 
+        // the user is set after the access is checked.
+        boolean hasAccess = checkAccess(context.getAction(), doc, context);
+
+        XWikiUser user;
+        if (context.getUserReference() != null) {
+            user = new XWikiUser(context.getUserReference());
+        } else {
+            user = new XWikiUser(context.getUser());
+        }
+
         // We need to check rights before we look for translations
         // Otherwise we don't have the user language
-        if (checkAccess(context.getAction(), doc, context) == false) {
-            Object[] args = { doc.getFullName(), context.getUser() };
+        if (!hasAccess) {
+            Object[] args = { doc.getFullName(), user.getUser() };
             setPhonyDocument(reference, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access to document {0} has been denied to user {1}", null, args);
-        } else if (checkActive(context) == 0) { // if auth_active_check, check if user is inactive
+        } else if (user.isDisabled(context)) {
+            String action = context.getAction();
+            /*
+             * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest. The
+             * rational behind this behaviour is that inactive users should be able to access the same UI that guests
+             * are used to see, including custom icons, panels, and so on...
+             */
+            if (!((action.equals("skin") && (doc.getSpace().equals("skins") || doc.getSpace().equals("resources")))
+                || ((action.equals("skin") || action.equals("download") || action.equals("ssx") || action.equals("jsx"))
+                && getRightService().hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME,
+                doc.getPrefixedFullName(), context))
+                || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation"))))) {
+                Object[] args = { user.getUser() };
+                setPhonyDocument(reference, context, vcontext);
+                throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_DISABLED,
+                    "User {0} account is disabled", null, args);
+            }
+        } else if (!user.isActive(context)) {
             boolean allow = false;
             String action = context.getAction();
             /*

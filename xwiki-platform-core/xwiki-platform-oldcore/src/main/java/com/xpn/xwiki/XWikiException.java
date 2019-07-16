@@ -210,6 +210,8 @@ public class XWikiException extends Exception
 
     public static final int ERROR_XWIKI_USER_INACTIVE = 8003;
 
+    public static final int ERROR_XWIKI_USER_DISABLED = 8004;
+
     public static final int ERROR_XWIKI_ACCESS_DENIED = 9001;
 
     public static final int ERROR_XWIKI_ACCESS_TOKEN_INVALID = 9002;

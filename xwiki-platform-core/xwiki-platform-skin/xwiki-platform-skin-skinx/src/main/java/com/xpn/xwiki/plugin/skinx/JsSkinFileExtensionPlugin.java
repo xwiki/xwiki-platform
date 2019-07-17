@@ -85,7 +85,7 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
             String parameters = StringUtils.removeStart(parametersAsQueryString(filename, context), "&amp;");
             if (!StringUtils.isEmpty(parameters)) {
                 String queryParamDelimiter =
-                    result.toString().contains(QUERY_PARAMETER_DELIMITER) ? "&" : QUERY_PARAMETER_DELIMITER;
+                    StringUtils.contains(result, QUERY_PARAMETER_DELIMITER) ? "&" : QUERY_PARAMETER_DELIMITER;
                 result.append(queryParamDelimiter).append(parameters);
             }
         }

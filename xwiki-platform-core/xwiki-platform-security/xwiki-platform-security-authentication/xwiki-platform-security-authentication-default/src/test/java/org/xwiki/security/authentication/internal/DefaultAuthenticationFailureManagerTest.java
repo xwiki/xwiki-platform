@@ -20,10 +20,15 @@
 package org.xwiki.security.authentication.internal;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureEvent;
@@ -31,15 +36,23 @@ import org.xwiki.security.authentication.api.AuthenticationFailureLimitReachedEv
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
-import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.web.Utils;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -71,12 +84,27 @@ public class DefaultAuthenticationFailureManagerTest
     @MockComponent
     private ObservationManager observationManager;
 
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    @Named("currentmixed")
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
+    @MockComponent
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    @Mock
+    private XWikiContext context;
+
     private String failingLogin = "foobar";
 
     @BeforeComponent
     public void configure(MockitoComponentManager componentManager) throws Exception
     {
-       componentManager.registerComponent(ComponentManager.class, "context", componentManager);
+        Utils.setComponentManager(componentManager);
+        componentManager.registerComponent(ComponentManager.class, "context", componentManager);
     }
 
     @BeforeEach
@@ -85,6 +113,7 @@ public class DefaultAuthenticationFailureManagerTest
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy1", "strategy2" });
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(3);
         when(configuration.getTimeWindow()).thenReturn(5);
+        when(contextProvider.get()).thenReturn(context);
     }
 
     /**
@@ -316,5 +345,74 @@ public class DefaultAuthenticationFailureManagerTest
         when(this.strategy1.validateForm(login2, null)).thenReturn(true);
         when(this.strategy2.validateForm(login2, null)).thenReturn(false);
         assertFalse(this.defaultAuthenticationFailureManager.validateForm(login2, null));
+    }
+
+    /**
+     * Validate that getUser is working properly.
+     */
+    @Test
+    public void getUserNotFound() throws XWikiException
+    {
+        when(context.getMainXWiki()).thenReturn("mainwiki");
+        when(context.getWikiId()).thenReturn("currentwiki");
+        XWiki xwiki = mock(XWiki.class);
+        XWikiDocument xWikiDocument = mock(XWikiDocument.class);
+
+        when(context.getWiki()).thenReturn(xwiki);
+        when(xwiki.getDocument(any(DocumentReference.class), eq(context))).thenReturn(xWikiDocument);
+        when(xWikiDocument.isNew()).thenReturn(true);
+        DocumentReference userReference = this.defaultAuthenticationFailureManager.findUser("foo");
+        assertNull(userReference);
+        DocumentReference globalReference = new DocumentReference("mainwiki", "XWiki", "foo");
+        DocumentReference localReference = new DocumentReference("currentwiki", "XWiki", "foo");
+        verify(xwiki, times(1)).getDocument(eq(globalReference), eq(context));
+        verify(xwiki, times(1)).getDocument(eq(localReference), eq(context));
+    }
+
+    /**
+     * Validate that getUser is working properly.
+     */
+    @Test
+    public void getUserGlobalFound() throws XWikiException
+    {
+        when(context.getMainXWiki()).thenReturn("mainwiki");
+        DocumentReference globalReference = new DocumentReference("mainwiki", "XWiki", "foo");
+        DocumentReference localReference = new DocumentReference("currentwiki", "XWiki", "foo");
+        XWiki xwiki = mock(XWiki.class);
+        XWikiDocument xWikiDocument = mock(XWikiDocument.class);
+
+        when(context.getWiki()).thenReturn(xwiki);
+        when(xwiki.getDocument(eq(globalReference), eq(context))).thenReturn(xWikiDocument);
+        when(xWikiDocument.isNew()).thenReturn(false);
+        DocumentReference userReference = this.defaultAuthenticationFailureManager.findUser("foo");
+        assertEquals(globalReference, userReference);
+
+        verify(xwiki, times(1)).getDocument(eq(globalReference), eq(context));
+        verify(xwiki, never()).getDocument(eq(localReference), eq(context));
+    }
+
+    /**
+     * Validate that getUser is working properly.
+     */
+    @Test
+    public void getUserLocalFound() throws XWikiException
+    {
+        when(context.getMainXWiki()).thenReturn("mainwiki");
+        when(context.getWikiId()).thenReturn("currentwiki");
+        DocumentReference globalReference = new DocumentReference("mainwiki", "XWiki", "foo");
+        DocumentReference localReference = new DocumentReference("currentwiki", "XWiki", "foo");
+        XWiki xwiki = mock(XWiki.class);
+        when(context.getWiki()).thenReturn(xwiki);
+        XWikiDocument xWikiLocalDocument = mock(XWikiDocument.class);
+        XWikiDocument xWikiGlobalDocument = mock(XWikiDocument.class);
+        when(xwiki.getDocument(eq(globalReference), eq(context))).thenReturn(xWikiGlobalDocument);
+        when(xwiki.getDocument(eq(localReference), eq(context))).thenReturn(xWikiLocalDocument);
+        when(xWikiGlobalDocument.isNew()).thenReturn(true);
+        when(xWikiLocalDocument.isNew()).thenReturn(false);
+        DocumentReference userReference = this.defaultAuthenticationFailureManager.findUser("foo");
+        assertEquals(localReference, userReference);
+
+        verify(xwiki, times(1)).getDocument(eq(globalReference), eq(context));
+        verify(xwiki, times(1)).getDocument(eq(localReference), eq(context));
     }
 }

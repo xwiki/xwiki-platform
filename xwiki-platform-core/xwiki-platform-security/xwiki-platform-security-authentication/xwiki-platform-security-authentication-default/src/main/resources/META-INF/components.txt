@@ -3,3 +3,4 @@ org.xwiki.security.authentication.internal.DefaultAuthenticationConfiguration
 org.xwiki.security.authentication.internal.DefaultAuthenticationFailureManager
 org.xwiki.security.authentication.internal.AuthenticationFailureLoggerListener
 org.xwiki.security.authentication.internal.AuthenticationConfigurationSource
+org.xwiki.security.authentication.internal.DisableAccountFailureStrategy

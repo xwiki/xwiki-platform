@@ -250,6 +250,23 @@ public class XWikiUser
         }
     }
 
+    /**
+     * @param context used to retrieve the user document.
+     * @return true if the user exists.
+     * @since 11.6RC1
+     */
+    public boolean exists(XWikiContext context)
+    {
+        boolean exists = false;
+        try {
+            XWikiDocument userdoc = getUserDocument(context);
+            exists = !userdoc.isNew();
+        } catch (XWikiException e) {
+            this.logger.error("Error while checking existing status of user [{}]", getUser(), e);
+        }
+        return exists;
+    }
+
     public void setUser(String user)
     {
         this.fullName = user;

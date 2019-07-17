@@ -21,6 +21,7 @@ package org.xwiki.security.authentication.api;
 
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -76,4 +77,11 @@ public interface AuthenticationFailureManager
      * @return the aggregated error message from the strategies or an empty string.
      */
     String getErrorMessage(String username);
+
+    /**
+     * Find a user document reference based on the given username.
+     * @param username the username from which to query the user document reference.
+     * @return a document reference corresponding to the username or null if it doesn't exist.
+     */
+    DocumentReference findUser(String username);
 }

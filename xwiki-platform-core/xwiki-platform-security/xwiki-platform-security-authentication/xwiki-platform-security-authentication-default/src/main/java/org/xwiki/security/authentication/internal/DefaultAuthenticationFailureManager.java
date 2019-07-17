@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authentication.api.AuthenticationConfiguration;
 import org.xwiki.security.authentication.api.AuthenticationFailureEvent;
@@ -43,6 +44,7 @@ import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * Default implementation for {@link AuthenticationFailureManager}.
@@ -206,6 +208,30 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         }
 
         return builder.toString();
+    }
+
+    private DocumentReference buildUserDocumentReference(String wikiId, String username)
+    {
+        return new DocumentReference(wikiId, "XWiki", username);
+    }
+
+    @Override
+    public DocumentReference findUser(String username)
+    {
+        DocumentReference result = null;
+        XWikiContext context = this.contextProvider.get();
+        String globalWiki = context.getMainXWiki();
+        XWikiUser globalXWikiUser = new XWikiUser(buildUserDocumentReference(globalWiki, username));
+        if (globalXWikiUser.exists(context)) {
+            result = globalXWikiUser.getUserReference();
+        } else {
+            String localWiki = context.getWikiId();
+            XWikiUser localXWikiUser = new XWikiUser(buildUserDocumentReference(localWiki, username));
+            if (localXWikiUser.exists(context)) {
+                result = localXWikiUser.getUserReference();
+            }
+        }
+        return result;
     }
 
     private long getMaxTime()

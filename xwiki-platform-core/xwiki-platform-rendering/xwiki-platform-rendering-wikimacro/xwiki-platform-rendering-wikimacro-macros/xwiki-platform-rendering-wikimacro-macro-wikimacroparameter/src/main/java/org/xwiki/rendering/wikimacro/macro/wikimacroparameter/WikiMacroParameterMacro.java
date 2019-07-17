@@ -38,7 +38,9 @@ import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
+import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.stability.Unstable;
 
@@ -127,6 +129,36 @@ public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMac
         return result;
     }
 
+    private MacroDescriptor getMacroDescriptor(Map<String, Object> macroInfo)
+    {
+        MacroDescriptor result = null;
+        if (macroInfo != null && macroInfo.containsKey(WIKIMACRO_DESCRIPTOR)) {
+            result = (MacroDescriptor) macroInfo.get(WIKIMACRO_DESCRIPTOR);
+        }
+        return result;
+    }
+
+    private XDOM parseParameterValue(String macroParameterContent, String macroParameterName,
+        Map<String, Object> macroInfo, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        MacroDescriptor macroDescriptor = getMacroDescriptor(macroInfo);
+        ParameterDescriptor parameterDescriptor = null;
+        if (macroDescriptor != null) {
+            parameterDescriptor = macroDescriptor.getParameterDescriptorMap().get(macroParameterName);
+        }
+
+        Syntax currentSyntax = context.getSyntax();
+        if (parameterDescriptor == null || !parameterDescriptor.getParameterType().equals(Block.LIST_BLOCK_TYPE)) {
+            context.setSyntax(Syntax.PLAIN_1_0);
+        }
+        try {
+            return this.contentParser.parse(macroParameterContent, context, true, context.isInline());
+        } finally {
+            context.setSyntax(currentSyntax);
+        }
+    }
+
     @Override
     public List<Block> execute(WikiMacroParameterMacroParameters parameters, String content,
         MacroTransformationContext context)
@@ -137,12 +169,12 @@ public class WikiMacroParameterMacro extends AbstractMacro<WikiMacroParameterMac
         }
         List<Block> result = Collections.emptyList();
         Map<String, Object> macroInfo = (Map) getContext().get("macro");
-        String macroContent = extractMacroParameter(macroInfo, parameters.getName());
-        if (macroContent != null) {
+        String parameterValue = extractMacroParameter(macroInfo, parameters.getName());
+        if (parameterValue != null) {
             MetaData nonGeneratedContentMetaData = this.getNonGeneratedParameterMetaData(macroInfo,
                 parameters.getName());
             nonGeneratedContentMetaData.addMetaData("wikimacrocontent", "true");
-            XDOM parse = this.contentParser.parse(macroContent, context, true, context.isInline());
+            XDOM parse = this.parseParameterValue(parameterValue, parameters.getName(), macroInfo, context);
             result = Collections.singletonList(new MetaDataBlock(parse.getChildren(),
                 nonGeneratedContentMetaData));
         }

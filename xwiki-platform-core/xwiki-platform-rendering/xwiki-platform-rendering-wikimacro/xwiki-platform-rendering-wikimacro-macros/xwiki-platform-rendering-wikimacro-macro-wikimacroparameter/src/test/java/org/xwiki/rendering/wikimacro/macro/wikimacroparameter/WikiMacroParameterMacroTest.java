@@ -42,6 +42,7 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -53,6 +54,9 @@ import com.xpn.xwiki.XWikiContext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -146,5 +150,51 @@ public class WikiMacroParameterMacroTest
 
         assertEquals(expectedBlocks, this.wikiMacroParameterMacro.execute(wikiMacroParameterMacroParameters, null,
             this.transformationContext));
+        verify(this.transformationContext, never()).setSyntax(Syntax.PLAIN_1_0);
+    }
+
+    /**
+     * Ensure that the content of the macro in the context is parsed and a proper metadata is put around.
+     */
+    @Test
+    public void executeWithSimpleMacroDefaultType() throws MacroExecutionException
+    {
+        List<WikiMacroParameterDescriptor> parameterDescriptors = new ArrayList<>();
+        parameterDescriptors.add(new WikiMacroParameterDescriptor("bar",  "", true, null));
+        ContentDescriptor contentDescriptor = new DefaultContentDescriptor();
+        WikiMacroDescriptor wikiMacroDescriptor = new WikiMacroDescriptor.Builder()
+            .name("foo")
+            .contentDescriptor(contentDescriptor)
+            .parameterDescriptors(parameterDescriptors)
+            .build();
+        String content = "foobar";
+
+        WikiMacroParameters wikiMacroParameters = new WikiMacroParameters();
+        wikiMacroParameters.set("bar", content);
+
+        Map<String, Object> macroInfo = new HashMap<>();
+        macroInfo.put("descriptor", wikiMacroDescriptor);
+        macroInfo.put("params", wikiMacroParameters);
+        this.xcontext.put("macro", macroInfo);
+        when(this.transformationContext.isInline()).thenReturn(false);
+        when(this.transformationContext.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.contentParser.parse(eq(content), eq(this.transformationContext), eq(true), eq(false))).thenReturn(
+            new XDOM(Collections.singletonList(new WordBlock("foobar")))
+        );
+
+        WikiMacroParameterMacroParameters wikiMacroParameterMacroParameters = new WikiMacroParameterMacroParameters();
+        wikiMacroParameterMacroParameters.setName("bar");
+
+        MetaData metaData = new MetaData();
+        metaData.addMetaData("non-generated-content", "java.lang.String");
+        metaData.addMetaData("parameter-name", "bar");
+        metaData.addMetaData("wikimacrocontent", "true");
+        List<Block> expectedBlocks = Collections.singletonList(new MetaDataBlock(
+            Collections.singletonList(new WordBlock("foobar")), metaData));
+
+        assertEquals(expectedBlocks, this.wikiMacroParameterMacro.execute(wikiMacroParameterMacroParameters, null,
+            this.transformationContext));
+        verify(this.transformationContext, times(1)).setSyntax(Syntax.PLAIN_1_0);
+        verify(this.transformationContext, times(1)).setSyntax(Syntax.XWIKI_2_1);
     }
 }

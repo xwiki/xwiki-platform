@@ -41,6 +41,7 @@ import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -50,7 +51,11 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -118,6 +123,7 @@ public class WikiMacroContentMacroTest
             Collections.singletonList(new WordBlock("foobar")), metaData));
 
         assertEquals(expectedBlocks, this.wikiMacroContentMacro.execute(null, null, this.transformationContext));
+        verify(this.transformationContext, never()).setSyntax(Syntax.PLAIN_1_0);
     }
 
     /**
@@ -144,5 +150,37 @@ public class WikiMacroContentMacroTest
             Collections.singletonList(new WordBlock("foobar")), metaData));
 
         assertEquals(expectedBlocks, this.wikiMacroContentMacro.execute(null, null, this.transformationContext));
+    }
+
+    /**
+     * Ensure that the content of the macro in the context is parsed and a proper metadata is put around.
+     */
+    @Test
+    public void executeWithSimpleMacroDefaultType() throws MacroExecutionException
+    {
+        ContentDescriptor contentDescriptor = new DefaultContentDescriptor("", false);
+        MacroDescriptor macroDescriptor = new DefaultMacroDescriptor(new MacroId("mywikimacro"), "mywikimacro", "",
+            contentDescriptor);
+        String content = "**foobar**";
+
+        Map<String, Object> macroInfo = new HashMap<>();
+        macroInfo.put("content", content);
+        macroInfo.put("descriptor", macroDescriptor);
+        this.xcontext.put("macro", macroInfo);
+        when(this.transformationContext.isInline()).thenReturn(false);
+        when(this.transformationContext.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.contentParser.parse(eq(content), eq(this.transformationContext), eq(true), eq(false))).thenReturn(
+            new XDOM(Collections.singletonList(new WordBlock("foobar")))
+        );
+
+        MetaData metaData = new MetaData();
+        metaData.addMetaData("non-generated-content", "java.lang.String");
+        metaData.addMetaData("wikimacrocontent", "true");
+        List<Block> expectedBlocks = Collections.singletonList(new MetaDataBlock(
+            Collections.singletonList(new WordBlock("foobar")), metaData));
+
+        assertEquals(expectedBlocks, this.wikiMacroContentMacro.execute(null, null, this.transformationContext));
+        verify(this.transformationContext, times(1)).setSyntax(Syntax.PLAIN_1_0);
+        verify(this.transformationContext, times(1)).setSyntax(Syntax.XWIKI_2_1);
     }
 }

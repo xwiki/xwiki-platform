@@ -37,7 +37,9 @@ import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.stability.Unstable;
 
@@ -109,16 +111,33 @@ public class WikiMacroContentMacro extends AbstractNoParameterMacro
 
     private MetaData getNonGeneratedContentMetaData(Map<String, Object> macroInfo)
     {
-        MetaData result;
+        ContentDescriptor contentDescriptor = getMacroContentDescriptor(macroInfo);
+        return AbstractMacro.getNonGeneratedContentMetaData(contentDescriptor);
+    }
 
+    private ContentDescriptor getMacroContentDescriptor(Map<String, Object> macroInfo)
+    {
+        ContentDescriptor result = null;
         if (macroInfo != null && macroInfo.containsKey(WIKIMACRO_DESCRIPTOR)) {
             MacroDescriptor macroDescriptor = (MacroDescriptor) macroInfo.get(WIKIMACRO_DESCRIPTOR);
-            result = AbstractMacro.getNonGeneratedContentMetaData(macroDescriptor.getContentDescriptor());
-        } else {
-            result = AbstractMacro.getNonGeneratedContentMetaData(null);
+            result = macroDescriptor.getContentDescriptor();
         }
-
         return result;
+    }
+
+    private XDOM parseContent(String macroContent, Map<String, Object> macroInfo, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        ContentDescriptor contentDescriptor = getMacroContentDescriptor(macroInfo);
+        Syntax currentSyntax = context.getSyntax();
+        if (contentDescriptor == null || !contentDescriptor.getType().equals(Block.LIST_BLOCK_TYPE)) {
+            context.setSyntax(Syntax.PLAIN_1_0);
+        }
+        try {
+            return this.contentParser.parse(macroContent, context, true, context.isInline());
+        } finally {
+            context.setSyntax(currentSyntax);
+        }
     }
 
     @Override
@@ -131,7 +150,7 @@ public class WikiMacroContentMacro extends AbstractNoParameterMacro
         if (macroContent != null) {
             MetaData nonGeneratedContentMetaData = this.getNonGeneratedContentMetaData(macroInfo);
             nonGeneratedContentMetaData.addMetaData("wikimacrocontent", "true");
-            XDOM parse = this.contentParser.parse(macroContent, context, true, context.isInline());
+            XDOM parse = this.parseContent(macroContent, macroInfo, context);
             result = Collections.singletonList(new MetaDataBlock(parse.getChildren(),
                 nonGeneratedContentMetaData));
         }

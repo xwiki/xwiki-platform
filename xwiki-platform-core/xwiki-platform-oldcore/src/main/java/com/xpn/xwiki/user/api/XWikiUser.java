@@ -54,11 +54,9 @@ public class XWikiUser
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
-    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
-        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
     private Logger logger = LoggerFactory.getLogger(XWikiUser.class);
 
@@ -88,7 +86,7 @@ public class XWikiUser
     public XWikiUser(DocumentReference userReference, boolean main)
     {
         this.userReference = userReference;
-        setUser(localEntityReferenceSerializer.serialize(userReference));
+        setUser(getLocalEntityReferenceSerializer().serialize(userReference));
         setMain(main);
     }
 
@@ -135,17 +133,34 @@ public class XWikiUser
         return this.fullName;
     }
 
+    public DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    {
+        if (currentMixedDocumentReferenceResolver == null) {
+            currentMixedDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        }
+        return currentMixedDocumentReferenceResolver;
+    }
+
+    public EntityReferenceSerializer<String> getLocalEntityReferenceSerializer()
+    {
+        if (localEntityReferenceSerializer == null) {
+            localEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        }
+        return localEntityReferenceSerializer;
+    }
+
     public DocumentReference getUserReference()
     {
         if (this.userReference == null) {
-            this.userReference = this.currentMixedDocumentReferenceResolver.resolve(getUser());
+            this.userReference = getCurrentMixedDocumentReferenceResolver().resolve(getUser());
         }
         return this.userReference;
     }
 
     private DocumentReference getUserClassReference()
     {
-        return this.currentMixedDocumentReferenceResolver.resolve(USER_CLASS);
+        return getCurrentMixedDocumentReferenceResolver().resolve(USER_CLASS);
     }
 
     private boolean isGuest()

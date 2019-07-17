@@ -28,6 +28,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.EnumSet;
+import java.util.List;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -59,6 +61,7 @@ import org.hibernate.integrator.spi.Integrator;
 import org.hibernate.jdbc.Work;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.PersistentClass;
+import org.hibernate.query.NativeQuery;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.tool.schema.TargetType;
@@ -866,6 +869,15 @@ public class HibernateStore implements Disposable, Integrator
         createSequenceIfMissing(wikiId);
     }
 
+    private <T, E> T executeNative(String sqlString, Function<NativeQuery<E>, T> function)
+    {
+        try (Session session = getSessionFactory().openSession()) {
+            NativeQuery<E> query = session.createNativeQuery(sqlString);
+
+            return function.apply(query);
+        }
+    }
+
     private Iterable<SequenceInformation> getSchemaSequences(String schemaName) throws SQLException
     {
         try (SessionImplementor session = (SessionImplementor) getSessionFactory().openSession()) {
@@ -900,6 +912,13 @@ public class HibernateStore implements Disposable, Integrator
         }
     }
 
+    private List<String> getOracleSequences(String schemaName)
+    {
+        return this.<List<String>, String>executeNative(String
+            .format("select SEQUENCE_NAME from all_sequences where SEQUENCE_OWNER = '%s'", schemaName.toUpperCase()),
+            query -> query.getResultList());
+    }
+
     /**
      * In the Hibernate mapping file for XWiki we use a "native" generator for some tables (deleted document and deleted
      * attachments for example - The reason we use generated ids and not custom computed ones is because we don't need
@@ -921,14 +940,28 @@ public class HibernateStore implements Disposable, Integrator
 
             // Check if the sequence already exist
             try {
-                Iterable<SequenceInformation> sequences = getSchemaSequences(schemaName);
+                DatabaseProduct product = getDatabaseProductName();
+                if (product == DatabaseProduct.ORACLE) {
+                    // Oracle does not provide any information about the sequence schema when using standard Hibernate
+                    // API
+                    List<String> sequences = getOracleSequences(schemaName);
 
-                for (SequenceInformation sequence : sequences) {
-                    QualifiedSequenceName sequenceName = sequence.getSequenceName();
-                    if (sequenceName.getSchemaName().getCanonicalName().equals(schemaName)
-                        && sequenceName.getSequenceName().getCanonicalName().equals("hibernate_sequence")) {
+                    if (sequences.contains("HIBERNATE_SEQUENCE")) {
                         // The sequence already exist, no need to create it
                         return;
+                    }
+                } else {
+                    Iterable<SequenceInformation> sequences = getSchemaSequences(schemaName);
+
+                    for (SequenceInformation sequence : sequences) {
+                        QualifiedSequenceName sequenceName = sequence.getSequenceName();
+                        if (sequenceName.getSequenceName().getCanonicalName().equalsIgnoreCase("hibernate_sequence")
+                            && sequenceName.getSchemaName() == null
+                        // || sequenceName.getSchemaName().getCanonicalName().equals(schemaName)
+                        ) {
+                            // The sequence already exist, no need to create it
+                            return;
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -941,6 +974,7 @@ public class HibernateStore implements Disposable, Integrator
                 ignoreError = true;
             }
 
+            // Try to create the Hibernate sequence
             try (Session session = getSessionFactory().openSession()) {
                 Transaction transaction = session.beginTransaction();
                 session.createSQLQuery(String.format("create sequence %s.hibernate_sequence", schemaName))

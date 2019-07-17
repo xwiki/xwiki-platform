@@ -930,7 +930,7 @@ public class HibernateStore implements Disposable, Integrator
                         return;
                     }
                 }
-            } catch (SQLException e) {
+            } catch (Exception e) {
                 this.logger.warn(
                     "Failed to get the sequences of the schema [{}]. Trying to create hibernate_sequence anyway.",
                     schemaName);

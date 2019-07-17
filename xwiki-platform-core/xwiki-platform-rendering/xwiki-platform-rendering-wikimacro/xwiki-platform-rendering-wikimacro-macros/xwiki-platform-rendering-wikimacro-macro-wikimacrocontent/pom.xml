@@ -30,7 +30,7 @@
   <description>XWiki Platform - Rendering - Wiki Macro Bridge - Macro - WikiMacroContent</description>
   <artifactId>xwiki-platform-rendering-wikimacro-macro-wikimacrocontent</artifactId>
   <properties>
-    <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.94</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>1</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wikimacro Content Macro</xwiki.extension.name>

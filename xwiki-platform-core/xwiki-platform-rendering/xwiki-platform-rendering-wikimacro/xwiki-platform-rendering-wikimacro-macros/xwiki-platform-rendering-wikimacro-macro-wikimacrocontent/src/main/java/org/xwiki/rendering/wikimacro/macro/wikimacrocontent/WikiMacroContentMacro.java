@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.wikimacro.macro.wikimacrocontent;
 
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,9 +40,10 @@ import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.stability.Unstable;
+import org.xwiki.rendering.parser.Parser;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -73,6 +75,10 @@ public class WikiMacroContentMacro extends AbstractNoParameterMacro
 
     @Inject
     private MacroContentParser contentParser;
+
+    @Inject
+    @Named("plain/1.0")
+    private Parser plainTextParser;
 
     /**
      * Default constructor.
@@ -129,14 +135,14 @@ public class WikiMacroContentMacro extends AbstractNoParameterMacro
         throws MacroExecutionException
     {
         ContentDescriptor contentDescriptor = getMacroContentDescriptor(macroInfo);
-        Syntax currentSyntax = context.getSyntax();
         if (contentDescriptor == null || !contentDescriptor.getType().equals(Block.LIST_BLOCK_TYPE)) {
-            context.setSyntax(Syntax.PLAIN_1_0);
-        }
-        try {
+            try {
+                return this.plainTextParser.parse(new StringReader(macroContent));
+            } catch (ParseException e) {
+                throw new MacroExecutionException("Error while parsing the macro content in plain.", e);
+            }
+        } else {
             return this.contentParser.parse(macroContent, context, true, context.isInline());
-        } finally {
-            context.setSyntax(currentSyntax);
         }
     }
 

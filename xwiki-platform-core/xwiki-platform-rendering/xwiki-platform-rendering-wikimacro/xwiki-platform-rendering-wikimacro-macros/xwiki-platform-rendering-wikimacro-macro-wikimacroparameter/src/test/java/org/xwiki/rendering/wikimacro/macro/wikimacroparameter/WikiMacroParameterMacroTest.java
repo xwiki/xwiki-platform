@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -42,7 +44,8 @@ import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameterDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -53,6 +56,7 @@ import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -73,6 +77,10 @@ public class WikiMacroParameterMacroTest
 
     @MockComponent
     private MacroContentParser contentParser;
+
+    @MockComponent
+    @Named("plain/1.0")
+    private Parser plainParser;
 
     @Mock
     private MacroTransformationContext transformationContext;
@@ -150,14 +158,13 @@ public class WikiMacroParameterMacroTest
 
         assertEquals(expectedBlocks, this.wikiMacroParameterMacro.execute(wikiMacroParameterMacroParameters, null,
             this.transformationContext));
-        verify(this.transformationContext, never()).setSyntax(Syntax.PLAIN_1_0);
     }
 
     /**
      * Ensure that the content of the macro in the context is parsed and a proper metadata is put around.
      */
     @Test
-    public void executeWithSimpleMacroDefaultType() throws MacroExecutionException
+    public void executeWithSimpleMacroDefaultType() throws MacroExecutionException, ParseException
     {
         List<WikiMacroParameterDescriptor> parameterDescriptors = new ArrayList<>();
         parameterDescriptors.add(new WikiMacroParameterDescriptor("bar",  "", true, null));
@@ -177,8 +184,7 @@ public class WikiMacroParameterMacroTest
         macroInfo.put("params", wikiMacroParameters);
         this.xcontext.put("macro", macroInfo);
         when(this.transformationContext.isInline()).thenReturn(false);
-        when(this.transformationContext.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
-        when(this.contentParser.parse(eq(content), eq(this.transformationContext), eq(true), eq(false))).thenReturn(
+        when(this.plainParser.parse(any())).thenReturn(
             new XDOM(Collections.singletonList(new WordBlock("foobar")))
         );
 
@@ -194,7 +200,5 @@ public class WikiMacroParameterMacroTest
 
         assertEquals(expectedBlocks, this.wikiMacroParameterMacro.execute(wikiMacroParameterMacroParameters, null,
             this.transformationContext));
-        verify(this.transformationContext, times(1)).setSyntax(Syntax.PLAIN_1_0);
-        verify(this.transformationContext, times(1)).setSyntax(Syntax.XWIKI_2_1);
     }
 }

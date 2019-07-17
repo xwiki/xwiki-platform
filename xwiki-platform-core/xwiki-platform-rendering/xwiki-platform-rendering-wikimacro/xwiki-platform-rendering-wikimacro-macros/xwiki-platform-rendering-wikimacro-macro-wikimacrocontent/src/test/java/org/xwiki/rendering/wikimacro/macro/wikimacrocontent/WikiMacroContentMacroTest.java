@@ -19,10 +19,13 @@
  */
 package org.xwiki.rendering.wikimacro.macro.wikimacrocontent;
 
+import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,7 +44,8 @@ import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
-import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -53,9 +57,6 @@ import com.xpn.xwiki.XWikiContext;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -72,6 +73,10 @@ public class WikiMacroContentMacroTest
 
     @MockComponent
     private MacroContentParser contentParser;
+
+    @MockComponent
+    @Named("plain/1.0")
+    private Parser plainParser;
 
     @Mock
     private MacroTransformationContext transformationContext;
@@ -123,7 +128,6 @@ public class WikiMacroContentMacroTest
             Collections.singletonList(new WordBlock("foobar")), metaData));
 
         assertEquals(expectedBlocks, this.wikiMacroContentMacro.execute(null, null, this.transformationContext));
-        verify(this.transformationContext, never()).setSyntax(Syntax.PLAIN_1_0);
     }
 
     /**
@@ -131,7 +135,7 @@ public class WikiMacroContentMacroTest
      * macro descriptor is null.
      */
     @Test
-    public void executeWithMacroDescriptorNull() throws MacroExecutionException
+    public void executeWithMacroDescriptorNull() throws MacroExecutionException, ParseException
     {
         String content = "foobar";
 
@@ -139,7 +143,7 @@ public class WikiMacroContentMacroTest
         macroInfo.put("content", content);
         this.xcontext.put("macro", macroInfo);
         when(this.transformationContext.isInline()).thenReturn(false);
-        when(this.contentParser.parse(eq(content), eq(this.transformationContext), eq(true), eq(false))).thenReturn(
+        when(this.plainParser.parse(any())).thenReturn(
             new XDOM(Collections.singletonList(new WordBlock("foobar")))
         );
 
@@ -156,7 +160,7 @@ public class WikiMacroContentMacroTest
      * Ensure that the content of the macro in the context is parsed and a proper metadata is put around.
      */
     @Test
-    public void executeWithSimpleMacroDefaultType() throws MacroExecutionException
+    public void executeWithSimpleMacroDefaultType() throws MacroExecutionException, ParseException
     {
         ContentDescriptor contentDescriptor = new DefaultContentDescriptor("", false);
         MacroDescriptor macroDescriptor = new DefaultMacroDescriptor(new MacroId("mywikimacro"), "mywikimacro", "",
@@ -168,8 +172,7 @@ public class WikiMacroContentMacroTest
         macroInfo.put("descriptor", macroDescriptor);
         this.xcontext.put("macro", macroInfo);
         when(this.transformationContext.isInline()).thenReturn(false);
-        when(this.transformationContext.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
-        when(this.contentParser.parse(eq(content), eq(this.transformationContext), eq(true), eq(false))).thenReturn(
+        when(this.plainParser.parse(any())).thenReturn(
             new XDOM(Collections.singletonList(new WordBlock("foobar")))
         );
 
@@ -180,7 +183,5 @@ public class WikiMacroContentMacroTest
             Collections.singletonList(new WordBlock("foobar")), metaData));
 
         assertEquals(expectedBlocks, this.wikiMacroContentMacro.execute(null, null, this.transformationContext));
-        verify(this.transformationContext, times(1)).setSyntax(Syntax.PLAIN_1_0);
-        verify(this.transformationContext, times(1)).setSyntax(Syntax.XWIKI_2_1);
     }
 }

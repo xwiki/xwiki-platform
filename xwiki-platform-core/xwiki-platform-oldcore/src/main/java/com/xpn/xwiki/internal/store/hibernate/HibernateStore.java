@@ -35,6 +35,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.FlushMode;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -932,8 +933,8 @@ public class HibernateStore implements Disposable, Integrator
                 }
             } catch (Exception e) {
                 this.logger.warn(
-                    "Failed to get the sequences of the schema [{}]. Trying to create hibernate_sequence anyway.",
-                    schemaName);
+                    "Failed to get the sequences of the schema [{}] ({}). Trying to create hibernate_sequence anyway.",
+                    schemaName, ExceptionUtils.getRootCauseMessage(e));
 
                 // Ignore errors in the log during the creation of the sequence since we know it can fail and we
                 // don't want to show false positives to the user.

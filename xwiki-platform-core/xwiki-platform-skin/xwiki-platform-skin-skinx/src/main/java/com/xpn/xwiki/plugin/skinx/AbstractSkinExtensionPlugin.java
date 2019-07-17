@@ -65,6 +65,11 @@ import com.xpn.xwiki.web.Utils;
 @SuppressWarnings("deprecation")
 public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin implements RenderingCacheAware
 {
+    /**
+     * The URL delimiter part of query parameters.
+     */
+    protected static final String QUERY_PARAMETER_DELIMITER = "?";
+
     /** Log object to log messages in this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkinExtensionPlugin.class);
 

@@ -267,6 +267,11 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
     protected static final String ATTR_CHARSET = "charset";
 
     /**
+     * Source attribute.
+     */
+    protected static final String ATTR_SRC = "src";
+
+    /**
      * Document parsed with JSoup.
      */
     protected Document html5Document;

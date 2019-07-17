@@ -39,6 +39,7 @@ public class XWikiValidator extends AbstractHTML5Validator
     {
         validateFailingMacros();
         validateNotEmptyHeadingId();
+        validateUrlOrResourcesWithoutDoubleInterrogationMark();
     }
 
     /**
@@ -63,6 +64,29 @@ public class XWikiValidator extends AbstractHTML5Validator
             // Verify that no heading contains an empty id.
             assertTrue(Type.ERROR, "A " + element.tagName() + " heading with empty id (\"H\") has been found",
                 id == null || !id.equals("H"));
+        }
+    }
+
+    private void checkQueryParameter(String attribute, String failureMessage)
+    {
+        assertTrue(Type.ERROR, failureMessage, attribute.split("\\?").length < 3);
+    }
+
+    /**
+     * Ensure that no URL or resource link contains two "?".
+     */
+    public void validateUrlOrResourcesWithoutDoubleInterrogationMark()
+    {
+        for (Element link : getHTML5Document().getElementsByAttribute(ATTR_HREF)) {
+            String errorMessage = String.format("A link contain two query parameter delimiter '?' (url: %s)",
+                link.attr(ATTR_HREF));
+            checkQueryParameter(link.attr(ATTR_HREF), errorMessage);
+        }
+
+        for (Element resource : getHTML5Document().getElementsByAttribute(ATTR_SRC)) {
+            String errorMessage = String.format("A resource %s contain two query parameter delimiter '?' (url: %s)",
+                resource.tagName(), resource.attr(ATTR_SRC));
+            checkQueryParameter(resource.attr(ATTR_SRC), errorMessage);
         }
     }
 

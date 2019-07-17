@@ -84,7 +84,9 @@ public class JsSkinFileExtensionPlugin extends AbstractSkinExtensionPlugin
         if (forceSkinAction) {
             String parameters = StringUtils.removeStart(parametersAsQueryString(filename, context), "&amp;");
             if (!StringUtils.isEmpty(parameters)) {
-                result.append("?").append(parameters);
+                String queryParamDelimiter =
+                    result.toString().contains(QUERY_PARAMETER_DELIMITER) ? "&" : QUERY_PARAMETER_DELIMITER;
+                result.append(queryParamDelimiter).append(parameters);
             }
         }
         // check if js should be deferred, defaults to the preference configured in the cfg file, which defaults to true

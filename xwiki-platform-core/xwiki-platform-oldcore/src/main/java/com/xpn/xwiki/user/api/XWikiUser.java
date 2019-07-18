@@ -302,7 +302,7 @@ public class XWikiUser
         if (!StringUtils.isEmpty(getUser())) {
             XWikiGroupService groupService = context.getWiki().getGroupService(context);
 
-            DocumentReference groupReference = getCurrentMixedDocumentReferenceResolver().resolve(xw    );
+            DocumentReference groupReference = getCurrentMixedDocumentReferenceResolver().resolve(groupName);
 
             Collection<DocumentReference> groups =
                 groupService.getAllGroupsReferencesForMember(getUserReference(), 0, 0, context);

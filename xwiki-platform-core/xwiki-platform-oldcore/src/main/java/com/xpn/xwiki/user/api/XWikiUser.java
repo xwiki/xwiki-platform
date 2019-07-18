@@ -133,7 +133,7 @@ public class XWikiUser
         return this.fullName;
     }
 
-    public DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
         if (currentMixedDocumentReferenceResolver == null) {
             currentMixedDocumentReferenceResolver =
@@ -142,7 +142,7 @@ public class XWikiUser
         return currentMixedDocumentReferenceResolver;
     }
 
-    public EntityReferenceSerializer<String> getLocalEntityReferenceSerializer()
+    private EntityReferenceSerializer<String> getLocalEntityReferenceSerializer()
     {
         if (localEntityReferenceSerializer == null) {
             localEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
@@ -302,7 +302,7 @@ public class XWikiUser
         if (!StringUtils.isEmpty(getUser())) {
             XWikiGroupService groupService = context.getWiki().getGroupService(context);
 
-            DocumentReference groupReference = this.currentMixedDocumentReferenceResolver.resolve(groupName);
+            DocumentReference groupReference = getCurrentMixedDocumentReferenceResolver().resolve(xw    );
 
             Collection<DocumentReference> groups =
                 groupService.getAllGroupsReferencesForMember(getUserReference(), 0, 0, context);

@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.store.hibernate;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -28,7 +29,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -72,6 +75,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.DisposePriority;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
@@ -82,7 +87,6 @@ import com.xpn.xwiki.internal.store.hibernate.legacy.LegacySessionImplementor;
 import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
-import com.xpn.xwiki.util.Util;
 
 /**
  * Instance shared by all hibernate based stores.
@@ -93,7 +97,7 @@ import com.xpn.xwiki.util.Util;
 @Component(roles = HibernateStore.class)
 @Singleton
 @DisposePriority(10000)
-public class HibernateStore implements Disposable, Integrator
+public class HibernateStore implements Disposable, Integrator, Initializable
 {
     /**
      * @see #isConfiguredInSchemaMode()
@@ -108,6 +112,15 @@ public class HibernateStore implements Disposable, Integrator
      * The name of the property for configuring the environment permanent directory.
      */
     private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
+
+    private static final Map<String, DatabaseProduct> DRIVER_MAPPING = new HashMap<>();
+
+    static {
+        DRIVER_MAPPING.put("org.postgresql.Driver", DatabaseProduct.POSTGRESQL);
+        DRIVER_MAPPING.put("oracle.jdbc.driver.OracleDriver", DatabaseProduct.ORACLE);
+        DRIVER_MAPPING.put("com.mysql.jdbc.Driver", DatabaseProduct.MYSQL);
+        DRIVER_MAPPING.put("org.hsqldb.jdbcDriver", DatabaseProduct.HSQLDB);
+    }
 
     @Inject
     private Logger logger;
@@ -161,22 +174,59 @@ public class HibernateStore implements Disposable, Integrator
         return this.dataMigrationManager;
     }
 
-    /**
-     * @since 11.5RC1
-     */
-    public void initHibernate()
+    private URL getHibernateConfigurationURL()
     {
         String path = this.hibernateConfiguration.getPath();
-        URL url = Util.getResource(path);
+
+        if (path == null) {
+            return null;
+        }
+
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                return file.toURI().toURL();
+            }
+        } catch (Exception e) {
+            // Probably running under -security, which prevents calling File.exists()
+            this.logger.debug("Failed load resource [{}] using a file path", path);
+        }
+
+        try {
+            URL res = this.environment.getResource(path);
+            if (res != null) {
+                return res;
+            }
+        } catch (Exception e) {
+            this.logger.debug("Failed to load resource [{}] using the application context", path);
+        }
+
+        URL url = Thread.currentThread().getContextClassLoader().getResource(path);
         if (url == null) {
-            this.logger.error("Failed to find hibernate configuration file corresponding to path [{}]", path);
-        } else {
+            this.logger.error("Failed to find hibernate configuration file corresponding to path [{}]",
+                this.hibernateConfiguration.getPath());
+        }
+
+        return url;
+    }
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        URL url = getHibernateConfigurationURL();
+        if (url != null) {
             this.configuration.configure(url);
 
             // Resolve some variables
             replaceVariables(this.configuration);
         }
+    }
 
+    /**
+     * @since 11.5RC1
+     */
+    public void initHibernate()
+    {
         build();
     }
 
@@ -364,15 +414,25 @@ public class HibernateStore implements Disposable, Integrator
         DatabaseProduct product = this.databaseProductCache;
 
         if (product == DatabaseProduct.UNKNOWN) {
-            DatabaseMetaData metaData = getDatabaseMetaData();
-            if (metaData != null) {
-                try {
-                    product = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
-                } catch (SQLException ignored) {
+            if (this.sessionFactory != null) {
+                DatabaseMetaData metaData = getDatabaseMetaData();
+                if (metaData != null) {
+                    try {
+                        product = DatabaseProduct.toProduct(metaData.getDatabaseProductName());
+                    } catch (SQLException ignored) {
+                        // do not care, return UNKNOWN
+                    }
+                } else {
                     // do not care, return UNKNOWN
                 }
             } else {
-                // do not care, return UNKNOWN
+                // Not initialized yet so we can't use the actual database product, try to deduce it from the configured
+                // driver
+                String driver = this.configuration.getProperty("hibernate.connection.driver_class");
+                if (driver == null) {
+                    driver = this.configuration.getProperty("connection.driver_class");
+                }
+                product = DRIVER_MAPPING.getOrDefault(driver, DatabaseProduct.UNKNOWN);
             }
         }
 

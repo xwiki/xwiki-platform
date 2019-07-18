@@ -116,6 +116,7 @@ CKEDITOR.editorConfig = function(config) {
       // See https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_plugins_widget_nestedEditable.html
       // See also https://ckeditor.com/docs/ckeditor4/latest/api/CKEDITOR_plugins_widget_nestedEditable_definition.html
       // on how to configure a nested editable.
+      // See also https://ckeditor.com/docs/ckeditor4/latest/guide/dev_allowed_content_rules.html
       nestedEditableTypes: {
         // The type used when the macro content / parameter supports any wiki syntax (no restrictions).
         'java.util.List<org.xwiki.rendering.block.Block>': {}

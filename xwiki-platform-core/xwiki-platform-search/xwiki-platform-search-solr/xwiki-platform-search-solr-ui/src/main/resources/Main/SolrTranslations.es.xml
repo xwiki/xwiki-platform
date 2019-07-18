@@ -36,32 +36,32 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: solr.admin.title=Solr Search Administration
-### Missing: solr.admin.submit=Apply
-### Missing: solr.admin.error.action={0} failed:
-### Missing: solr.admin.error.notallowed=You are not allowed to perform this action.
-### Missing: solr.admin.error.norights=Administration rights are required to access this section.
+  <content>solr.admin.title=Administración búsqueda Solr
+solr.admin.submit=Aplicar
+solr.admin.error.action={0} falló:
+solr.admin.error.notallowed=No está autorizado a realizar esta acción.
+solr.admin.error.norights=Se requieren permisos de administración para acceder a esta sección.
 ### Missing: solr.admin.success.action={0} successfully triggered.
 
 solr.admin.status.title=Estado
-### Missing: solr.admin.status.queueSize.label=Queue size
+solr.admin.status.queueSize.label=Tamaño de cola
 ### Missing: solr.admin.status.queueSize.hint=The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
 
-### Missing: solr.admin.indexing.title=Indexing
+solr.admin.indexing.title=Indexando
 solr.admin.indexing.action.label=Acción
-### Missing: solr.admin.indexing.action.hint=The action to perform on the index.
-### Missing: solr.admin.indexing.action.select_index=Add to index
-### Missing: solr.admin.indexing.action.select_delete=Delete from index
-### Missing: solr.admin.indexing.action.select_reindex=Reindex
-### Missing: solr.admin.indexing.wiki.label=Wiki
+solr.admin.indexing.action.hint=La acción a realizar en el índice.
+solr.admin.indexing.action.select_index=Añadir al índice
+solr.admin.indexing.action.select_delete=Eliminar del índice
+solr.admin.indexing.action.select_reindex=Reindexar
+solr.admin.indexing.wiki.label=Wiki
 ### Missing: solr.admin.indexing.wiki.hint=The wiki for which all its documents will be affected by the selected action.
-### Missing: solr.admin.indexing.wiki.select_farm=Entire farm
+solr.admin.indexing.wiki.select_farm=Granja completa
 ### Missing: solr.admin.indexing.query.label=Custom query
 ### Missing: solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
 
 ### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
 
-solr.sortBy=Ordenar por\:
+solr.sortBy=Ordenar por:
 solr.sortBy.score=Relevancia
 solr.sortBy.title_sort=Título
 solr.sortBy.date=Fecha

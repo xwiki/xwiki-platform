@@ -76,6 +76,7 @@ public class WatchUsersTest extends AbstractTest
         followedUsers = networkPage.getFollowedUsers();
         assertEquals("There should be no more users in the list of followed users", 0, followedUsers.size());
 
+        getUtil().loginAsSuperAdmin();
         // Cleanup
         getUtil().deletePage("XWiki", alice);
         getUtil().deletePage("XWiki", bob);

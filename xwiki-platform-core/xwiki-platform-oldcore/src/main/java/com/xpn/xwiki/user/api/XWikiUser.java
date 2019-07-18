@@ -193,7 +193,12 @@ public class XWikiUser
         } else {
             try {
                 XWikiDocument userdoc = getUserDocument(context);
-                disabled = userdoc.getIntValue(getUserClassReference(), DISABLED_PROPERTY) != 0;
+                // if the user gets deleted while he's still logged-in, we consider him as disabled.
+                if (userdoc.isNew()) {
+                    disabled = true;
+                } else {
+                    disabled = userdoc.getIntValue(getUserClassReference(), DISABLED_PROPERTY) != 0;
+                }
             } catch (XWikiException e) {
                 this.logger.error("Error while checking disabled status of user [{}]", getUser(), e);
                 disabled = false;

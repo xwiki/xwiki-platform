@@ -1079,20 +1079,30 @@ public class HibernateStore implements Disposable, Integrator
 
         final String columnName = getConfiguredColumnName(persistentClass, propertyName);
 
-        return metadata(def, databaseMetaData -> {
+        return metadata(def, (databaseMetaData, session) -> {
             ResultSet resultSet;
+
+            String name = databaseName;
+
+            // Oracle does not take into account the schema provided through the JDBC API
+            DatabaseProduct product = getDatabaseProductName();
+            if (DatabaseProduct.ORACLE == product) {
+                executeStatement("alter session set current_schema = " + escapeDatabaseName(databaseName), session);
+                // Passing something even make Oracle fail
+                name = null;
+            }
 
             if (columnName != null) {
                 if (isCatalog()) {
-                    resultSet = databaseMetaData.getColumns(databaseName, null, tableName, columnName);
+                    resultSet = databaseMetaData.getColumns(name, null, tableName, columnName);
                 } else {
-                    resultSet = databaseMetaData.getColumns(null, databaseName, tableName, columnName);
+                    resultSet = databaseMetaData.getColumns(null, name, tableName, columnName);
                 }
             } else {
                 if (isCatalog()) {
-                    resultSet = databaseMetaData.getTables(databaseName, null, tableName, null);
+                    resultSet = databaseMetaData.getTables(name, null, tableName, null);
                 } else {
-                    resultSet = databaseMetaData.getTables(null, databaseName, tableName, null);
+                    resultSet = databaseMetaData.getTables(null, name, tableName, null);
                 }
             }
 
@@ -1128,7 +1138,7 @@ public class HibernateStore implements Disposable, Integrator
             try (Connection connection = jdbcConnectionAccess.obtainConnection()) {
                 DatabaseMetaData databaseMetaData = connection.getMetaData();
 
-                return function.apply(databaseMetaData);
+                return function.apply(databaseMetaData, session);
             }
         } catch (SQLException e) {
             this.logger.error("Error while extracting metadata", e);
@@ -1181,7 +1191,7 @@ public class HibernateStore implements Disposable, Integrator
      */
     public boolean isCatalogExist(String catalogName)
     {
-        return metadata(false, metadata -> {
+        return metadata(false, (metadata, session) -> {
             try (ResultSet catalogs = metadata.getCatalogs()) {
                 while (catalogs.next()) {
                     if (catalogName.equalsIgnoreCase(catalogs.getString("TABLE_CAT"))) {
@@ -1199,7 +1209,7 @@ public class HibernateStore implements Disposable, Integrator
      */
     public boolean isSchemaExist(String schemaName)
     {
-        return metadata(false, metadata -> {
+        return metadata(false, (metadata, session) -> {
             try (ResultSet schemas = this.configurationCatalog != null
                 ? metadata.getSchemas(this.configurationCatalog, null) : metadata.getSchemas()) {
                 while (schemas.next()) {

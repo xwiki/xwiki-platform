@@ -23,6 +23,8 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.function.Function;
 
+import org.hibernate.engine.spi.SessionImplementor;
+
 /**
  * A functional interface used to manipulate a {@link DatabaseMetaData}.
  * 
@@ -38,8 +40,9 @@ public interface DatabaseMetaDataFunction<R>
      * Applies this function to the given argument.
      *
      * @param metadata the metadata
+     * @param session the Hibernate sessions
      * @return the function result
      * @throws SQLException when failing
      */
-    R apply(DatabaseMetaData metadata) throws SQLException;
+    R apply(DatabaseMetaData metadata, SessionImplementor session) throws SQLException;
 }

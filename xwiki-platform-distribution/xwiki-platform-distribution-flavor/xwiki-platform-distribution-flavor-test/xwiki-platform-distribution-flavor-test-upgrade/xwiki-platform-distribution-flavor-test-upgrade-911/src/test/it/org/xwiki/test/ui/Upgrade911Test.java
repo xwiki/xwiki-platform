@@ -38,7 +38,14 @@ public class Upgrade911Test extends UpgradeTest
                 + "[wiki:xwiki] (InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-"
                 + "[9.11.8]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
             "Failed to save job status",
-            "java.nio.file.NoSuchFileException: data/jobs/status/distribution/status.xml"
+            "java.nio.file.NoSuchFileException: data/jobs/status/distribution/status.xml",
+            // Solr brings since 8.1.1 jetty dependencies in the classloader, so the upgrade might warn about collisions
+            "org.eclipse.jetty:jetty",
+
+            // This warning is not coming from XWiki but from one jetty dependency, apparently a configuration is not
+            // properly used on Solr part. More details can be found there:
+            // https://github.com/eclipse/jetty.project/issues/3454
+            "No Client EndPointIdentificationAlgorithm configured for SslContextFactory"
         );
     }
 }

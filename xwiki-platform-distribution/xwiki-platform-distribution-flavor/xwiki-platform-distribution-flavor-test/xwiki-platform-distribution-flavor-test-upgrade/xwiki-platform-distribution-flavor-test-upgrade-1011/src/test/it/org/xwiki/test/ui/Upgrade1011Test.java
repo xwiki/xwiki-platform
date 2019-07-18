@@ -35,8 +35,16 @@ public class Upgrade1011Test extends UpgradeTest
         );
         this.validateConsole.getLogCaptureConfiguration().registerExcludes(
             "Invalid extension [org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/10.11.1] on namespace "
-                + "[wiki:xwiki] (InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-"
-                + "[10.11.1]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore"
+            + "[wiki:xwiki] (InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-"
+            + "[10.11.1]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore",
+
+            // Solr brings since 8.1.1 jetty dependencies in the classloader, so the upgrade might warn about collisions
+            "org.eclipse.jetty:jetty",
+
+            // This warning is not coming from XWiki but from one jetty dependency, apparently a configuration is not
+            // properly used on Solr part. More details can be found there:
+            // https://github.com/eclipse/jetty.project/issues/3454
+            "No Client EndPointIdentificationAlgorithm configured for SslContextFactory"
         );
     }
 

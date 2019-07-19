@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Parameters for the {@link org.org.xwiki.rendering.async.internal.AsyncMacro} Macro.
+ * Parameters for the {@link org.xwiki.rendering.async.internal.AsyncMacro} Macro.
  * 
  * @version $Id$
  * @since 11.6RC1

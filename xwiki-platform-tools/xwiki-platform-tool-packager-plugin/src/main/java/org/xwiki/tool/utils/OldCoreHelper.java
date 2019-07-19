@@ -45,6 +45,7 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletRequestStub;
 import com.xpn.xwiki.web.XWikiServletResponseStub;
@@ -124,6 +125,17 @@ public class OldCoreHelper implements AutoCloseable
     public static OldCoreHelper create(ComponentManager componentManager, String wikiId, File hibernateConfig)
         throws MojoExecutionException
     {
+        // Set the Hibernate config before the initialization of the HibernateStore component
+        // The XWikiConfig object requires path to be in unix format (i.e. with forward slashes)
+        String hibernateConfigInUnixFormat = hibernateConfig.getPath().replace('\\', '/');
+        HibernateConfiguration hibernateConfiguration;
+        try {
+            hibernateConfiguration = componentManager.getInstance(HibernateConfiguration.class);
+        } catch (ComponentLookupException e) {
+            throw new MojoExecutionException("Failed to get lookup HibernateConfiguration component", e);
+        }
+        hibernateConfiguration.setPath(hibernateConfigInUnixFormat);
+
         // Lookup OldCoreHelper
         OldCoreHelper oldcoreHelper;
         try {
@@ -224,13 +236,6 @@ public class OldCoreHelper implements AutoCloseable
         this.xcontext.setDoc(new XWikiDocument(new DocumentReference(wikiId, "dummySpace", "dummyPage")));
 
         XWikiConfig config = new XWikiConfig();
-        config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
-
-        // The XWikiConfig object requires path to be in unix format (i.e. with forward slashes)
-        String hibernateConfigInUnixFormat = hibernateConfig.getPath().replace('\\', '/');
-        config.put("xwiki.store.hibernate.path", hibernateConfigInUnixFormat);
-
-        config.put("xwiki.store.hibernate.updateschema", "1");
 
         // Enable backlinks so that when documents are imported their backlinks will be saved too
         config.put("xwiki.backlinks", "1");

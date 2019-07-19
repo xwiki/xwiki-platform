@@ -74,8 +74,6 @@ public class OldCoreHelper implements AutoCloseable
 
     private String wikiId;
 
-    private File hibernateConfig;
-
     private XWikiContext xcontext;
 
     /**
@@ -155,7 +153,7 @@ public class OldCoreHelper implements AutoCloseable
 
         // Initialize OldCoreHelper
         try {
-            oldcoreHelper.initialize(wikiId, hibernateConfig);
+            oldcoreHelper.initialize(wikiId);
         } catch (Exception e) {
             throw new MojoExecutionException("Failed to get initialize OldCoreHelper component", e);
         }
@@ -163,10 +161,9 @@ public class OldCoreHelper implements AutoCloseable
         return oldcoreHelper;
     }
 
-    private void initialize(String wikiId, File hibernateConfig) throws Exception
+    private void initialize(String wikiId) throws Exception
     {
         this.wikiId = wikiId;
-        this.hibernateConfig = hibernateConfig;
 
         this.xcontext = createXWikiContext();
     }

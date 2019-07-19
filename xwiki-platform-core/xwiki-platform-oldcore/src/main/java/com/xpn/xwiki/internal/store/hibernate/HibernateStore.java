@@ -1016,9 +1016,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
                     for (SequenceInformation sequence : sequences) {
                         QualifiedSequenceName sequenceName = sequence.getSequenceName();
                         if (sequenceName.getSequenceName().getCanonicalName().equalsIgnoreCase("hibernate_sequence")
-                            && sequenceName.getSchemaName() == null
-                        // || sequenceName.getSchemaName().getCanonicalName().equals(schemaName)
-                        ) {
+                            && sequenceName.getSchemaName() != null
+                            && sequenceName.getSchemaName().getCanonicalName().equals(schemaName)                        ) {
                             // The sequence already exist, no need to create it
                             return;
                         }

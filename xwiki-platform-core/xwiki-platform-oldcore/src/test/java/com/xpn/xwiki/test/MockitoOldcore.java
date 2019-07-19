@@ -33,6 +33,7 @@ import javax.script.SimpleScriptContext;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hibernate.cfg.Configuration;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -75,8 +76,9 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
-import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
@@ -117,7 +119,9 @@ public class MockitoOldcore
 
     protected File temporaryDirectory;
 
-    private XWikiHibernateStore mockHibernateStore;
+    private HibernateStore mockHibernateStore;
+
+    private XWikiHibernateStore mockXWikiHibernateStore;
 
     private XWikiVersioningStoreInterface mockVersioningStore;
 
@@ -202,13 +206,18 @@ public class MockitoOldcore
         this.spyXWiki = spy(new XWiki());
         getXWikiContext().setWiki(this.spyXWiki);
 
-        this.mockHibernateStore = mock(XWikiHibernateStore.class);
-        this.mockVersioningStore = mock(XWikiVersioningStoreInterface.class);
+        this.mockHibernateStore = getMocker().registerMockComponent(HibernateStore.class);
+        this.mockXWikiHibernateStore = mock(XWikiHibernateStore.class);
+        getMocker().registerComponent(XWikiStoreInterface.class, XWikiHibernateBaseStore.HINT,
+            this.mockXWikiHibernateStore);
+        this.mockVersioningStore =
+            getMocker().registerMockComponent(XWikiVersioningStoreInterface.class, XWikiHibernateBaseStore.HINT);
         this.mockRightService = mock(XWikiRightService.class);
         this.mockGroupService = mock(XWikiGroupService.class);
 
-        doReturn(this.mockHibernateStore).when(this.spyXWiki).getStore();
-        doReturn(this.mockHibernateStore).when(this.spyXWiki).getHibernateStore();
+        doReturn(new Configuration()).when(this.mockHibernateStore).getConfiguration();
+        doReturn(this.mockXWikiHibernateStore).when(this.spyXWiki).getStore();
+        doReturn(this.mockXWikiHibernateStore).when(this.spyXWiki).getHibernateStore();
         doReturn(this.mockVersioningStore).when(this.spyXWiki).getVersioningStore();
         doReturn(this.mockRightService).when(this.spyXWiki).getRightService();
         doReturn(this.mockGroupService).when(this.spyXWiki).getGroupService(getXWikiContext());
@@ -777,7 +786,7 @@ public class MockitoOldcore
 
     public XWikiStoreInterface getMockStore()
     {
-        return this.mockHibernateStore;
+        return this.mockXWikiHibernateStore;
     }
 
     /**

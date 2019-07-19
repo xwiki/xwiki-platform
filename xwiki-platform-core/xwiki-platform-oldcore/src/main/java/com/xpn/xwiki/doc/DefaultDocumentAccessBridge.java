@@ -915,13 +915,14 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     public String getCurrentWiki()
     {
         XWikiContext xcontext = getContext();
-        return xcontext.getWikiId();
+        return xcontext != null ? xcontext.getWikiId() : null;
     }
 
     @Override
     public DocumentReference getCurrentAuthorReference()
     {
-        return getContext().getAuthorReference();
+        XWikiContext xcontext = getContext();
+        return xcontext != null ? xcontext.getAuthorReference() : null;
     }
 
     /**

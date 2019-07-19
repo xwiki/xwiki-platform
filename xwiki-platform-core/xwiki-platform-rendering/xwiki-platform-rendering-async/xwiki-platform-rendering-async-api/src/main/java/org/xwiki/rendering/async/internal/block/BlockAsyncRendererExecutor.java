@@ -36,7 +36,7 @@ import org.xwiki.rendering.block.Block;
 public interface BlockAsyncRendererExecutor
 {
     /**
-     * Start and cache or return the status of the job corresponding to the passed renderer.
+     * Start and cache or return the result of the execution of the configured blocks.
      * 
      * @param configuration the configuration of the execution
      * @return the {@link JobStatus}
@@ -48,7 +48,7 @@ public interface BlockAsyncRendererExecutor
     Block execute(BlockAsyncRendererConfiguration configuration) throws JobException, RenderingException;
 
     /**
-     * Start and cache or return the status of the job corresponding to the passed renderer.
+     * Start and cache or return the result of the execution of the passed renderer.
      * 
      * @param renderer the renderer to execute
      * @param configuration the configuration of the execution

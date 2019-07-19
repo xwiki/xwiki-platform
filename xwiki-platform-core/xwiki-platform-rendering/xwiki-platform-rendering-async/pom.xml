@@ -34,5 +34,6 @@
   <modules>
     <module>xwiki-platform-rendering-async-api</module>
     <module>xwiki-platform-rendering-async-default</module>
+    <module>xwiki-platform-rendering-async-macro</module>
   </modules>
 </project>

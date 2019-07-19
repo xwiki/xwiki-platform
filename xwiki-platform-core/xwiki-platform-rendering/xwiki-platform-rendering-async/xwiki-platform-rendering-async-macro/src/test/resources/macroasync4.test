@@ -1,0 +1,19 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{async async="false"}}
+{{id name="name"/}}
+{{/async}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [async] [async=false] [{{id name="name"/}}]
+beginMetaData [[syntax]=[XWiki 2.0]]
+beginMacroMarkerStandalone [id] [name=name]
+onId [name]
+endMacroMarkerStandalone [id] [name=name]
+endMetaData [[syntax]=[XWiki 2.0]]
+endMacroMarkerStandalone [async] [async=false] [{{id name="name"/}}]
+endDocument

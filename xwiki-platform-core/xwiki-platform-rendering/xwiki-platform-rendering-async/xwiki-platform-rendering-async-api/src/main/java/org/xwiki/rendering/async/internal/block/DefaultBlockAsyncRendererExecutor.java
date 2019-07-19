@@ -135,7 +135,7 @@ public class DefaultBlockAsyncRendererExecutor implements BlockAsyncRendererExec
         placeholder.setParameter("class", "xwiki-async");
         // Provide it directly as it's going to be used in the client side (the URL fragment to use in the ajax request)
         placeholder.setParameter("data-xwiki-async-id", response.getJobIdHTTPPath());
-        placeholder.setParameter("data-xwiki-async-client-id", response.getAsyncClientId().toString());
+        placeholder.setParameter("data-xwiki-async-client-id", response.getAsyncClientId());
 
         return placeholder;
     }

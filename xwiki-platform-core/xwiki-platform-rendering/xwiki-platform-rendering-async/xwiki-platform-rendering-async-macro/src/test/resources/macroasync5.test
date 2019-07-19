@@ -1,0 +1,52 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{async id="toto" cached="true" async="false"}}
+toto
+{{/async}}
+
+{{async cached="true" async="false"}}
+titi
+{{/async}}
+
+{{async cached="true" async="false"}}
+tutu
+{{/async}}
+
+{{async id="toto" cached="true" async="false"}}
+titi
+{{/async}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [async] [id=toto|cached=true|async=false] [toto]
+beginMetaData [[syntax]=[XWiki 2.0]]
+beginParagraph
+onWord [toto]
+endParagraph
+endMetaData [[syntax]=[XWiki 2.0]]
+endMacroMarkerStandalone [async] [id=toto|cached=true|async=false] [toto]
+beginMacroMarkerStandalone [async] [cached=true|async=false] [titi]
+beginMetaData [[syntax]=[XWiki 2.0]]
+beginParagraph
+onWord [titi]
+endParagraph
+endMetaData [[syntax]=[XWiki 2.0]]
+endMacroMarkerStandalone [async] [cached=true|async=false] [titi]
+beginMacroMarkerStandalone [async] [cached=true|async=false] [tutu]
+beginMetaData [[syntax]=[XWiki 2.0]]
+beginParagraph
+onWord [tutu]
+endParagraph
+endMetaData [[syntax]=[XWiki 2.0]]
+endMacroMarkerStandalone [async] [cached=true|async=false] [tutu]
+beginMacroMarkerStandalone [async] [id=toto|cached=true|async=false] [titi]
+beginMetaData [[syntax]=[XWiki 2.0]]
+beginParagraph
+onWord [toto]
+endParagraph
+endMetaData [[syntax]=[XWiki 2.0]]
+endMacroMarkerStandalone [async] [id=toto|cached=true|async=false] [titi]
+endDocument

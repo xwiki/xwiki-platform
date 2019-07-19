@@ -25,6 +25,12 @@ import org.xwiki.stability.Unstable;
 
 /**
  * This event is triggered every time an authentication failure occurs.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the username (as a {java.lang.String}) used for the authentication.</li>
+ * </ul>
  *
  * @version $Id$
  * @since 11.6RC1

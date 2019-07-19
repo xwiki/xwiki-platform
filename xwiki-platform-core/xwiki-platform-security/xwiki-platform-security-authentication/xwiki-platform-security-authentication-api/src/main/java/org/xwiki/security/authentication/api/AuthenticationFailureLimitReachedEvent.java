@@ -26,6 +26,12 @@ import org.xwiki.stability.Unstable;
 /**
  * This event occurs when a login authentication failure reach the level defined in the configuration (e.g. an user
  * failing his authentication 3 times in less than 5 minutes). See {@link AuthenticationConfiguration}.
+ * <p>
+ * The event also send the following parameters:
+ * </p>
+ * <ul>
+ * <li>source: the username (as a {java.lang.String}) used for the authentication.</li>
+ * </ul>
  *
  * @version $Id$
  * @since 11.6RC1

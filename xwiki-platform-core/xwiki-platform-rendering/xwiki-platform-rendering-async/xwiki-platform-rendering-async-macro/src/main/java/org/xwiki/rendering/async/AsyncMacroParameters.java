@@ -34,7 +34,7 @@ public class AsyncMacroParameters
 
     private boolean cached;
 
-    private Set<String> contextEntries;
+    private Set<String> context;
 
     private List<String> id;
 
@@ -73,17 +73,17 @@ public class AsyncMacroParameters
     /**
      * @return the context entries needed to execute the content
      */
-    public Set<String> getContextEntries()
+    public Set<String> getContext()
     {
-        return this.contextEntries;
+        return this.context;
     }
 
     /**
      * @param contextEntries the context entries needed to execute the content
      */
-    public void setContextEntries(Set<String> contextEntries)
+    public void setContext(Set<String> contextEntries)
     {
-        this.contextEntries = contextEntries;
+        this.context = contextEntries;
     }
 
     /**

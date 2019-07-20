@@ -33,6 +33,7 @@ var CKBUILDER_CONFIG = {
     '.editorconfig',
     '.gitignore',
     '.gitattributes',
+    '.github',
     'gruntfile.js',
     '.idea',
     '.jscsrc',

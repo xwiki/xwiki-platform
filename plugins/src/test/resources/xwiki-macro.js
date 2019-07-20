@@ -25,7 +25,14 @@ describe('XWiki Macro Plugin for CKEditor', function() {
   });
 
   beforeEach(function(done) {
-    editor = testUtils.createEditor(done, {'extraPlugins': 'xwiki-macro'});
+    editor = testUtils.createEditor(done, {
+      extraPlugins: 'xwiki-macro',
+      'xwiki-macro': {
+        nestedEditableTypes: {
+          'java.util.List<org.xwiki.rendering.block.Block>': {}
+        }
+      }
+    });
   });
 
   var getWikiMacroWidgets = function(editor) {
@@ -163,6 +170,32 @@ describe('XWiki Macro Plugin for CKEditor', function() {
           '</div>',
           '<!--stopmacro-->'
         ].join(''));
+
+        done();
+      }
+    });
+  });
+
+  it('handles unknown nested editable types as plain text', function(done) {
+    editor.setData([
+      '<!--startmacro:test|-|-->',
+      '<div class="test">',
+        '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;"',
+            ' data-xwiki-parameter-name="one">',
+          '<p>1<em>2</em>3</p>',
+        '</div>',
+        '<div data-xwiki-non-generated-content="java.util.Date" data-xwiki-parameter-name="two">',
+          '<p>1<em>2</em>3</p>',
+        '</div>',
+      '</div>',
+      '<!--stopmacro-->'
+    ].join(''), {
+      callback: function() {
+        var wikiMacroWidgets = getWikiMacroWidgets(editor);
+        expect(wikiMacroWidgets.length).toBe(1);
+
+        expect(wikiMacroWidgets[0].editables.one.getData()).toBe('<p>1<em>2</em>3</p>');
+        expect(wikiMacroWidgets[0].editables.two.getData()).toBe('123');
 
         done();
       }

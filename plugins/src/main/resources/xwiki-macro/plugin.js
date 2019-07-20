@@ -414,7 +414,8 @@
           nestedEditableSelector = 'div[' + nestedEditableNameAttribute + '="' + nestedEditableName + '"]';
         }
         var nestedEditableType = nestedEditable.getAttribute(nestedEditableTypeAttribute);
-        var nestedEditableConfig = nestedEditableTypes[nestedEditableType] || {};
+        // Allow only plain text if the nested editable type is not known, in order to be safe.
+        var nestedEditableConfig = nestedEditableTypes[nestedEditableType] || {allowedContent: ';'};
         widget.initEditable(nestedEditableName, {
           selector: nestedEditableSelector,
           allowedContent: nestedEditableConfig.allowedContent,

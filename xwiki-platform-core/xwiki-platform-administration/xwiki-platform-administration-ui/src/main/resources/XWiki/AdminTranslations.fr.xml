@@ -49,7 +49,6 @@ administration.menu.search.noResults=Aucun résultat.
 
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=Si défini à "Oui", un courriel sera envoyé à l'adresse renseignée dans le formulaire d'enregistrement.
-XWiki.XWikiPreferences_auth_active_check.hint=Si défini à "Oui", les utilisateurs devront saisir la clef envoyée par courriel pour se connecter.
 XWiki.XWikiPreferences_validation_email_content.hint=Modèle de courriel qui sera envoyé aux utilisateurs pour valider leur adresse email.
 XWiki.XWikiPreferences_confirmation_email_content.hint=Modèle de courriel qui sera envoyé aux utilisateurs après validation de leur adresse email grâce au lien présent dans le premier courriel reçu.
 XWiki.XWikiPreferences_invitation_email_content.hint=Modèle de courriel qui sera envoyé aux utilisateurs invités à s'inscrire.
@@ -117,11 +116,20 @@ administration.section.export.backupPack.hint=Définit si le package est une sau
 administration.section.users.deleteUser.confirmationMessage=L''utilisateur {0} va être retiré de tous les {1}groupes{2} auxquels il appartient. Souhaitez-vous continuer ?
 ### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
 ### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
-administration.section.users.deleteUser.markInactiveMessage=Plutôt que de supprimer l'utilisateur vous pouvez le désactiver. Ainsi il ne pourra plus se connecter et les scripts associés à cet utilisateur continueront à fonctionner.
+### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
 
 # Other Category
 admin.other=Divers
 admin.other.description=Autres configurations pour les extensions.
 administration.section.analytics.status=Status
-administration.section.analytics.status.hint=Définit si le suivi Google Analytics™ est actif ou non</content>
+administration.section.analytics.status.hint=Définit si le suivi Google Analytics™ est actif ou non
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+XWiki.XWikiPreferences_auth_active_check.hint=Si défini à "Oui", les utilisateurs devront saisir la clef envoyée par courriel pour se connecter.
+administration.section.users.deleteUser.markInactiveMessage=Plutôt que de supprimer l'utilisateur vous pouvez le désactiver. Ainsi il ne pourra plus se connecter et les scripts associés à cet utilisateur continueront à fonctionner.
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
 </xwikidoc>

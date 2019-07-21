@@ -131,8 +131,7 @@ administration.section.analytics.status.hint=Determine if the tracking in Google
 XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
 administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
   <object>
     <name>XWiki.AdminTranslations</name>
     <number>0</number>

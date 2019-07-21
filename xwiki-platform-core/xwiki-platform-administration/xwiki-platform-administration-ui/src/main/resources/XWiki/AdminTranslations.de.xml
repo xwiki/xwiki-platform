@@ -49,7 +49,6 @@ administration.menu.search.noResults=Keine Ergebnisse.
 
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=Wenn "Ja" wird beim Ausfüllen des Anmeldeformulars eine E-Mail an die angegebene E-Mail Adresse gesendet.
-XWiki.XWikiPreferences_auth_active_check.hint=Wenn "Ja" wird verhindert, dass sich Benutzer einloggen ohne den Token einzugeben, den sie zuvor per E-Mail erhalten haben.
 XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, um ihre E-Mail-Adresse zu bestätigen.
 ### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
 ### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
@@ -117,11 +116,20 @@ XWiki.XWikiPreferences_minoredit.hint=Erlaubt Seiten große (x.1) und kleine (1.
 ### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
 ### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
 ### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
-### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
 
 # Other Category
 ### Missing: admin.other=Other
 ### Missing: admin.other.description=Various configurations for extensions.
 ### Missing: administration.section.analytics.status=Status
-### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not</content>
+### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+XWiki.XWikiPreferences_auth_active_check.hint=Wenn "Ja" wird verhindert, dass sich Benutzer einloggen ohne den Token einzugeben, den sie zuvor per E-Mail erhalten haben.
+### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
 </xwikidoc>

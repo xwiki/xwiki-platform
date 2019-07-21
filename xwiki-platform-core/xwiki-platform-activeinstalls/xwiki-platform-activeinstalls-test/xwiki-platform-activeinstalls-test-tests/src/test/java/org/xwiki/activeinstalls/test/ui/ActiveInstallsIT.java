@@ -64,7 +64,7 @@ public class ActiveInstallsIT extends AbstractTest
             // till the timeout expires.
             long count = 0;
             long time = System.currentTimeMillis();
-            while (count != 1 && (System.currentTimeMillis() - time) < 5000L) {
+            while (count != 1 && (System.currentTimeMillis() - time) < 30000L) {
                 count = ElasticSearchRunner.esSetup.countAll();
                 Thread.sleep(100L);
             }

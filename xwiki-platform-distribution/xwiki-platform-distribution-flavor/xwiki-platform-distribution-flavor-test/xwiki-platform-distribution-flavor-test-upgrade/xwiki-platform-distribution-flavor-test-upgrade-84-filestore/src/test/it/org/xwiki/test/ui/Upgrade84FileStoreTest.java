@@ -75,8 +75,14 @@ public class Upgrade84FileStoreTest extends UpgradeTest
             "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/8.4.6] on namespace [wiki:xwiki] "
                 + "(InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-[8.4.6]] is "
                 + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
-            "does not exist, trying to find the new location",
-            "Could not find the deleted attachment in any other location"
-        );
+
+            // Previous store contains an index of the deleted attachment based on the absolute filesystem path (testing
+            // that migration works despite this very bad old design)
+            "/media/data-hd/test/xwiki-enterprise-jetty-hsqldb-8.4.6/data/storage/xwiki/Attachments/WebHome/~this/"
+                + "deleted-attachments/deletedattachment.txt-1549039065268] does not exist, "
+                + "trying to find the new location",
+            "/media/data-hd/test/xwiki-enterprise-jetty-hsqldb-8.4.6/data/storage/wiki1/Attachments/WebHome/~this/"
+                + "deleted-attachments/deletedattachment.txt-1551887620946] does not exist, "
+                + "trying to find the new location");
     }
 }

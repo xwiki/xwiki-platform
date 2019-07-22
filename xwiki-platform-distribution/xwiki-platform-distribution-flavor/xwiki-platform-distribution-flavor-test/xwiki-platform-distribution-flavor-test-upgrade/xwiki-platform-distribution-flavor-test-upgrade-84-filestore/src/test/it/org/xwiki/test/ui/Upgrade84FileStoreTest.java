@@ -49,8 +49,8 @@ public class Upgrade84FileStoreTest extends UpgradeTest
         assertURLContent("attachment", attachmentURL);
 
         // Check migrated deleted attachment
-        URL deletedAttachmentURL = new URL(getUtil().getBaseBinURL(wiki)
-            + "downloadrev/Attachments/WebHome/deletedattachment.txt?rev=1.1&rid=1");
+        URL deletedAttachmentURL = new URL(
+            getUtil().getBaseBinURL(wiki) + "downloadrev/Attachments/WebHome/deletedattachment.txt?rev=1.1&rid=1");
 
         assertURLContent("deletedattachment", deletedAttachmentURL);
     }
@@ -66,8 +66,7 @@ public class Upgrade84FileStoreTest extends UpgradeTest
 
         this.validateConsole.getLogCaptureConfiguration().registerExpected(
             // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
-            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]"
-        );
+            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]");
         // TODO: Some of these could be expected. Would need someone with knowledge of this test.
         this.validateConsole.getLogCaptureConfiguration().registerExcludes(
             "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-wiki/8.4.6] on namespace [wiki:wiki1] "

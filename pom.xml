@@ -782,6 +782,12 @@
                 <id>com.google.code.findbugs:jsr305</id>
                 <features>com.google.code.findbugs:annotations</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>jakarta.transaction:jakarta.transaction-api</id>
+                <features>javax.transaction:javax.transaction-api</features>
+                <features>javax.transaction:jta</features>
+                <features>org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

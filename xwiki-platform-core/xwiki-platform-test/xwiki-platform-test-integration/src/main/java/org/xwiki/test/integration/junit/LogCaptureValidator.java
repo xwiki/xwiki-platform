@@ -111,7 +111,14 @@ public class LogCaptureValidator
         // This warning is not coming from XWiki but from one jetty dependency, apparently a configuration is not
         // properly used on Solr part. More details can be found there:
         // https://github.com/eclipse/jetty.project/issues/3454
-        new Line("No Client EndPointIdentificationAlgorithm configured for SslContextFactory")
+        new Line("No Client EndPointIdentificationAlgorithm configured for SslContextFactory"),
+
+        // Java 11 restriction on field access
+        new Line("WARNING: An illegal reflective access operation has occurred"),
+        new Line("WARNING: Illegal reflective access by "),
+        new Line("WARNING: Please consider reporting this to the maintainers of"),
+        new Line("WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations"),
+        new Line("WARNING: All illegal access operations will be denied in a future release")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

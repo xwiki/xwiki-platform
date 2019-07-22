@@ -97,7 +97,16 @@ public class LogCaptureValidator
         new Line("Caused by: java.sql.SQLIntegrityConstraintViolationException: integrity constraint violation: "
             + "unique constraint or index violation; SYS_PK_10260 table: XWIKILOCK"),
         new Line("Caused by: org.hsqldb.HsqlException: integrity constraint violation:"
-            + " unique constraint or index violation; SYS_PK_10260 table: XWIKILOCK")
+            + " unique constraint or index violation; SYS_PK_10260 table: XWIKILOCK"),
+
+        // Solr brings since 8.1.1 jetty dependencies in the classloader, so the upgrade might warn about collisions
+        new Line("Collision between core extension [org.eclipse.jetty:jetty-http"),
+        new Line("Collision between core extension [org.eclipse.jetty:jetty-io"),
+        new Line("Collision between core extension [org.eclipse.jetty:jetty-util"),
+        // This warning is not coming from XWiki but from one jetty dependency, apparently a configuration is not
+        // properly used on Solr part. More details can be found there:
+        // https://github.com/eclipse/jetty.project/issues/3454
+        new Line("No Client EndPointIdentificationAlgorithm configured for SslContextFactory")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

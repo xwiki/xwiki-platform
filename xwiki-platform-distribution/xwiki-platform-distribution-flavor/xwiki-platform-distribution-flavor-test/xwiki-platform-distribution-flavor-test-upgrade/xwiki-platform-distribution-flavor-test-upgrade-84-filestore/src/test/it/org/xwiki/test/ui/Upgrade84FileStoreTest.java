@@ -75,18 +75,7 @@ public class Upgrade84FileStoreTest extends UpgradeTest
                 + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
             "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/8.4.6] on namespace [wiki:xwiki] "
                 + "(InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-[8.4.6]] is "
-                + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
-            "Solr loaded a deprecated plugin/analysis class [solr.TrieIntField]",
-            "Solr loaded a deprecated plugin/analysis class [solr.TrieFloatField]",
-            "Solr loaded a deprecated plugin/analysis class [solr.TrieLongField]",
-            "Solr loaded a deprecated plugin/analysis class [solr.TrieDoubleField]",
-            "Solr loaded a deprecated plugin/analysis class [solr.TrieDateField]",
-            "Solr loaded a deprecated plugin/analysis class [solr.SynonymFilterFactory]",
-            "Solr loaded a deprecated plugin/analysis class [solr.CurrencyField]",
-            "Solr loaded a deprecated plugin/analysis class [solr.WordDelimiterFilterFactory]",
-            "Solr loaded a deprecated plugin/analysis class [solr.LatLonType]",
-            "does not exist, trying to find the new location",
-            "Could not find the deleted attachment in any other location"
+                + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/"
         );
     }
 }

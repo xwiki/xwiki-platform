@@ -75,7 +75,9 @@ public class Upgrade84FileStoreTest extends UpgradeTest
                 + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
             "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/8.4.6] on namespace [wiki:xwiki] "
                 + "(InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-[8.4.6]] is "
-                + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/"
+                + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
+            "does not exist, trying to find the new location",
+            "Could not find the deleted attachment in any other location"
         );
     }
 }

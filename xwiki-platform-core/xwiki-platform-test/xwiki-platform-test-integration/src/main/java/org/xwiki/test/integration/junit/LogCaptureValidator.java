@@ -66,7 +66,9 @@ public class LogCaptureValidator
         new Line("Unknown asm implementation version, assuming version"),
         // Note: Happens when verbose is turned on
         new Line("Collision between core extension [javax.annotation:javax.annotation-api"),
-        new Line("[javax.annotation:javax.annotation-api/"),
+        new Line("MavenExtensionScanner - [javax.annotation:javax.annotation-api/"),
+        new Line("Collision between core extension [javax.transaction:javax.transaction-api"),
+        new Line("MavenExtensionScanner - [javax.transaction:javax.transaction-api/"),
         // Appears only for PostgreSQL database.
         new Line("WARNING: enabling \"trust\" authentication for local connections"),
         // Those errors appears from time to time, mainly on the CI, related to various JS resources such as:
@@ -101,8 +103,11 @@ public class LogCaptureValidator
 
         // Solr brings since 8.1.1 jetty dependencies in the classloader, so the upgrade might warn about collisions
         new Line("Collision between core extension [org.eclipse.jetty:jetty-http"),
+        new Line("MavenExtensionScanner - [org.eclipse.jetty:jetty-http"),
         new Line("Collision between core extension [org.eclipse.jetty:jetty-io"),
+        new Line("MavenExtensionScanner - [org.eclipse.jetty:jetty-io"),
         new Line("Collision between core extension [org.eclipse.jetty:jetty-util"),
+        new Line("MavenExtensionScanner - [org.eclipse.jetty:jetty-util"),
         // This warning is not coming from XWiki but from one jetty dependency, apparently a configuration is not
         // properly used on Solr part. More details can be found there:
         // https://github.com/eclipse/jetty.project/issues/3454

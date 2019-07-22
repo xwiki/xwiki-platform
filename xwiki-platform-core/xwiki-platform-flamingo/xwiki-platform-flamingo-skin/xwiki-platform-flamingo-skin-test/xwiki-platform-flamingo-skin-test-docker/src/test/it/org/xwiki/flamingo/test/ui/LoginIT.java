@@ -74,8 +74,8 @@ public class LoginIT
         // fixture:
         // create login and fails login with it: we don't want Admin to be blocked for authentication in
         // further tests.
-        String username = testInfo.getTestClass().get().getName();
-        String password = testInfo.getTestMethod().toString();
+        String username = testInfo.getTestMethod().get().getName();
+        String password = testInfo.getTestMethod().get().getName();
 
         // We don't need to be logged in for that.
         setup.forceGuestUser();
@@ -109,6 +109,6 @@ public class LoginIT
         assertTrue(loginPage.hasCaptchaChallenge());
 
         logCaptureConfiguration.registerExpected(
-            "Authentication failure with login [org.xwiki.flamingo.test.ui.LoginIT]");
+            "Authentication failure with login [repeatedAuthenticationFailure]");
     }
 }

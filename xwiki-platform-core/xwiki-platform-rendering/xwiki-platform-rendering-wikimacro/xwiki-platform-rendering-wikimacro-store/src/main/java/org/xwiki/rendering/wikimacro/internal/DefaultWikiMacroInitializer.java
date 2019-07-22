@@ -218,11 +218,18 @@ public class DefaultWikiMacroInitializer implements WikiMacroInitializer, WikiMa
         DocumentReference originalAuthor = xcontext.getUserReference();
         try {
             WikiMacro macro = this.wikiMacroFactory.createWikiMacro(wikiMacroDocumentReference);
+            if (macro != null) {
+                this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
 
-            this.wikiMacroManager.registerWikiMacro(wikiMacroDocumentReference, macro);
+                this.logger.debug("Macro [{}] from document [{}] is now registered.",
+                    macro.getDescriptor().getId().getId(), wikiMacroDocumentReference);
+            } else {
+                // This should only occur when creating a new WikiMacro object from object editor.
+                this.logger.debug("Macro from document [{}] cannot be registered because its id is null.",
+                    wikiMacroDocumentReference);
+            }
 
-            this.logger.debug("Macro [{}] from document [{}] is now registered.",
-                macro.getDescriptor().getId().getId(), wikiMacroDocumentReference);
+
         } catch (InsufficientPrivilegesException ex) {
             // Just log the exception and skip to the next.
             // We only log at the debug level here as this is not really an error

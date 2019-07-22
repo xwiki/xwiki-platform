@@ -127,6 +127,9 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
 
         // Extract macro definition.
         String macroId = getMacroId(macroDefinition);
+        if (macroId == null) {
+            return null;
+        }
         String macroName = getMacroName(macroDefinition, macroId);
         // The macro description as plain text
         String macroDescription = macroDefinition.getStringValue(MACRO_DESCRIPTION_PROPERTY);
@@ -194,8 +197,11 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
 
         // Verify macro id.
         if (StringUtils.isEmpty(macroId)) {
-            throw new WikiMacroException(String.format("Incomplete macro definition in [%s], macro id is empty",
+            // This should be changed to a WikiMacroException as soon as a better UI is created for WikiMacro.
+            // Right now this exception occurs each time a new WikiMacro object is created which is wrong.
+            logger.debug(String.format("Incomplete macro definition in [%s], macro id is empty",
                 macroDefinition.getReference()));
+            return null;
         }
 
         return macroId;

@@ -126,9 +126,15 @@ public class WikiMacroEventListener implements EventListener
                     this.logger.error(String.format("Failed to create wiki macro [%s]", documentReference), e);
                     return;
                 }
+                if (wikiMacro != null) {
 
-                // Register the macro.
-                registerMacro(documentReference, wikiMacro);
+                    // Register the macro.
+                    registerMacro(documentReference, wikiMacro);
+                } else {
+                    // This should only occur when creating a new WikiMacro object from object editor.
+                    this.logger.debug("Macro from document [{}] cannot be registered because its id is null.",
+                        documentReference);
+                }
             }
         }
     }

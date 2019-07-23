@@ -117,7 +117,8 @@ public class LogCaptureValidator
         new Line("WARNING: An illegal reflective access operation has occurred"),
         new Line("WARNING: Illegal reflective access by "),
         new Line("WARNING: Please consider reporting this to the maintainers of"),
-        new Line("WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations"),
+        new Line("WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective "
+            + "access operations"),
         new Line("WARNING: All illegal access operations will be denied in a future release")
     );
 

@@ -339,9 +339,11 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             return null;
         }
 
-        String mainWikiId = this.wikis.getMainWikiId();
+        String database = wikiId;
 
-        String database;
+        // Some databases have special database for main wiki
+        // It's also possible to configure the name of the main wiki database
+        String mainWikiId = this.wikis.getMainWikiId();
         if (StringUtils.equalsIgnoreCase(wikiId, mainWikiId)) {
             database = this.hibernateConfiguration.getDB();
             if (database == null) {
@@ -352,18 +354,18 @@ public class HibernateStore implements Disposable, Integrator, Initializable
                 } else if (product == DatabaseProduct.POSTGRESQL && isConfiguredInSchemaMode()) {
                     database = "public";
                 } else {
-                    database = wikiId.replace('-', '_');
+                    database = wikiId;
                 }
             }
-        } else {
-            // virtual
-            database = wikiId.replace('-', '_');
+        }
 
-            // For HSQLDB/H2 we only support uppercase schema names. This is because Hibernate doesn't properly generate
-            // quotes around schema names when it qualifies the table name when it generates the update script.
-            if (DatabaseProduct.HSQLDB == product || DatabaseProduct.H2 == product) {
-                database = StringUtils.upperCase(database);
-            }
+        // Minus (-) is not supported by many databases
+        database = database.replace('-', '_');
+
+        // In various places we need the canonical database name (which is upper case for HSQLDB, Oracle and H2) because
+        // the translation is not properly done by the Dialect
+        if (DatabaseProduct.HSQLDB == product || DatabaseProduct.ORACLE == product || DatabaseProduct.H2 == product) {
+            database = StringUtils.upperCase(database);
         }
 
         // Apply prefix
@@ -1142,14 +1144,6 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             ResultSet resultSet;
 
             String name = databaseName;
-
-            // Oracle does not take into account the schema provided through the JDBC API
-            DatabaseProduct product = getDatabaseProductName();
-            if (DatabaseProduct.ORACLE == product) {
-                executeStatement("alter session set current_schema = " + escapeDatabaseName(databaseName), session);
-                // Passing something even make Oracle fail
-                name = null;
-            }
 
             if (columnName != null) {
                 if (isCatalog()) {

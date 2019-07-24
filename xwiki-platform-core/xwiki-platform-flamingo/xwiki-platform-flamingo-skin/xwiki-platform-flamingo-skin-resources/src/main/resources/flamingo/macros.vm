@@ -536,3 +536,14 @@
 </div>
 <hr/>
 #end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the date & time picker.
+ *#
+#macro (dateTimePicker_import)
+  #set ($discard = $xwiki.linkx.use(
+    $services.webjars.url('Eonasdan-bootstrap-datetimepicker', 'css/bootstrap-datetimepicker.min.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}
+  ))
+  #set ($discard = $xwiki.jsfx.use('dateTimePicker.js', true))
+#end

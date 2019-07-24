@@ -159,14 +159,6 @@
 #end
 
 #macro (displaySearchFacetValue_customDateInterval)
-  ## A simple date picker widget.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
-  ## Used to parse and serialize the selected date using the specified date format.
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
-  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
-  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
   #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', $defaultDateFormat))
   &lt;label&gt;
     &lt;input type="checkbox" class="hidden" /&gt;
@@ -195,9 +187,13 @@
         &lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_startDate" name="startDate"
-          value="$escapetool.xml($services.localization.render('solr.facet.date.start'))"
-          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
+        #set ($startDatePickerParams = {
+          'id': "${facetRequestParameter}_startDate",
+          'name': 'startDate',
+          'data-format': $dateFormat,
+          'placeholder': $services.localization.render('solr.facet.date.start')
+        })
+        #dateTimePicker($startDatePickerParams)
       &lt;/dd&gt;
       &lt;dt class="hidden"&gt;
         &lt;label for="$escapetool.xml($facetRequestParameter)_endDate"&gt;
@@ -205,9 +201,13 @@
         &lt;/label&gt;
       &lt;/dt&gt;
       &lt;dd&gt;
-        &lt;input type="text" id="$escapetool.xml($facetRequestParameter)_endDate" name="endDate"
-          value="$escapetool.xml($services.localization.render('solr.facet.date.end'))"
-          class="datetime withTip" title="$escapetool.xml($dateFormat)" /&gt;
+        #set ($endDatePickerParams = {
+          'id': "${facetRequestParameter}_endDate",
+          'name': 'endDate',
+          'data-format': $dateFormat,
+          'placeholder': $services.localization.render('solr.facet.date.end')
+        })
+        #dateTimePicker($endDatePickerParams)
       &lt;/dt&gt;
     &lt;/dl&gt;
     &lt;div&gt;

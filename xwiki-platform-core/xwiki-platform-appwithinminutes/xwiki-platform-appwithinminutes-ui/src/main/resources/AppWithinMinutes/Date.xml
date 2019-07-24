@@ -36,30 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-{{html clean="false"}}
-##
-## This is a custom displayer used by Date properties. Since 4.3M2 this is the default Date displayer so there is no
-## need to use it on new Date properties. We have to keep it because there may be old Date properties that are still using it.
-##
-#set($field = $object.getxWikiClass().get($name))
-#set($format = $field.getProperty('dateFormat').value)
-#set($formattedValue = $escapetool.xml($datetool.format($format, $value)))
-#if($type == 'edit')
-  ## A simple date picker widget.
-  #set($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
-  #set($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js', true))
-  ## Used to parse and serialize the selected date using the date format specified in the XClass.
-  #set($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js', true))
-  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
-  #set($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
-  #set($id = $escapetool.xml("${prefix}${name}"))
-  &lt;input type="text" id="$!id" name="$!id" class="datetime t$!value.time" value="$!formattedValue" title="$!escapetool.xml($format)"/&gt;
-#else
-  $!formattedValue
-#end
-{{/html}}
-{{/velocity}}</content>
+  <content>{{include reference="AppWithinMinutes.DateDisplayer"/}}</content>
   <class>
     <name>AppWithinMinutes.Date</name>
     <customClass/>

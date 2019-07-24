@@ -2780,3 +2780,44 @@ Recursive title display detected!##
     </optgroup>
   #end
 #end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the date & time picker.
+ *#
+#macro (dateTimePicker_import)
+  ## A simple date picker widget.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  ## Used to parse and serialize the selected date using the date format specified in the XClass.
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
+#end
+
+#macro (dateTimePicker_input $parameters)
+  #set ($discard = $parameters.putIfAbsent('class', 'datetime'))
+  #set ($discard = $parameters.putIfAbsent('data-timestamp', $parameters.value.time))
+  #set ($discard = $parameters.putIfAbsent('data-locale', $services.localization.currentLocale))
+  #if ("$!parameters.get('data-format')" != '' && "$!parameters.value.time" != '')
+    #set ($parameters.value = $datetool.format($parameters.get('data-format'), $parameters.value,
+      $services.localization.currentLocale))
+  #end
+  #if ("$!parameters.disabled" == 'true')
+    #set ($parameters.disabled = 'disabled')
+  #else
+    #set ($discard = $parameters.remove('disabled'))
+  #end
+  <input type="text"
+    #foreach ($parameter in $parameters.entrySet())
+      $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+    #end
+  />
+#end
+
+#macro (dateTimePicker $parameters)
+  #dateTimePicker_import
+  #dateTimePicker_input($parameters)
+#end

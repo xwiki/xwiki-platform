@@ -37,12 +37,12 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>authentication.admin.failureStrategy.label=Stratégies en cas d'erreur
-    authentication.admin.failureStrategy.hint=Strategies to use in case of multiple authentication failure. Multiple strategies can be selected.
-    authentication.admin.failureStrategy.disableAccount.name=Disable account
-    authentication.admin.failureStrategy.captcha.name=CAPTCHA
-    authentication.admin.maxAttempts.label=Maximum number of authorized attempts
-    authentication.admin.maxAttempts.hint=This represents the maximum number of authorized login failures before the strategy is activated. This number is taken into account only in the context of the following time window. Please consider that a 0 value means the feature is disabled.
-    authentication.admin.timeWindow.label=Time window for login failures
-    authentication.admin.timeWindow.hint=The time window in seconds during which to consider the failing login attempts for activating the strategy.</content>
+authentication.admin.failureStrategy.hint=Stratégies à utiliser en cas de multiples échecs d'authentification. Plusieurs stratégies peuvent être sélectionnées.
+authentication.admin.failureStrategy.disableAccount.name=Désactiver le compte
+authentication.admin.failureStrategy.captcha.name=CAPTCHA
+authentication.admin.maxAttempts.label=Nombre maximum de tentatives d'authentification autorisées
+authentication.admin.maxAttempts.hint=Ceci représente le nombre maximum d'échec d'authentification autorisé avant qu'une stratégie soit activée. Ce nombre n'est pris en compte que dans le contexte de la marge de temps qui suit. Veuillez noter que 0 signifie que la fonctionnalité est désactivée.
+authentication.admin.timeWindow.label=Marge de temps pour les échecs d'authentification
+authentication.admin.timeWindow.hint=La marge de temps en seconde durant laquelle les échecs d'authentification seront pris en compte pour l'activation de la stratégie.</content>
   
 </xwikidoc>

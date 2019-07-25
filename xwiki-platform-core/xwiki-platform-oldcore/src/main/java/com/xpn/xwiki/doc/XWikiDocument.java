@@ -6387,7 +6387,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Deprecated
     public List<String> getTranslationList(XWikiContext context) throws XWikiException
     {
-        return getStore().getTranslationList(this, context);
+        // in few cases like accessing a deleted document, the store might be null.
+        if (getStore() != null) {
+            return getStore().getTranslationList(this, context);
+        } else {
+            return Collections.emptyList();
+        }
+
     }
 
     /**

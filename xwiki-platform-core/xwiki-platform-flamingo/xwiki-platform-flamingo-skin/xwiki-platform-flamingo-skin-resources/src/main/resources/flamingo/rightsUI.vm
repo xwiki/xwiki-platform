@@ -66,11 +66,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #set ($currentAllowed = {})
 #foreach ($i in [0..$maxlevel])
   #set ($right = $levelsRights.get($i))
-  #if ($services.security.authorization.hasAccess($right))
-    #set ($void = $currentAllowed.put($i, true))
-  #else
-    #set ($void = $currentAllowed.put($i, false))
-  #end
+  #set ($void = $currentAllowed.put($i, $services.security.authorization.hasAccess($right)))
 #end
 
 ## url to take the users and groups to display in the ajax-based table

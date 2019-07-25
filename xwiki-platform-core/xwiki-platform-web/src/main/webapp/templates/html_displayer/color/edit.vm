@@ -1,0 +1,5 @@
+#set ($colorPickerParams = {
+  'value': $displayer.value
+})
+#set ($discard = $colorPickerParams.putAll($displayer.parameters))
+#colorPicker($colorPickerParams)

@@ -42,7 +42,6 @@
 ############################
 #set($discard = $xwiki.jsx.use('FlamingoThemesCode.ThemeSheet'))
 #set($discard = $xwiki.ssx.use('FlamingoThemesCode.ThemeSheet'))
-#set($discard = $xwiki.linkx.use($services.webjars.url('colpick', 'css/colpick.css'), {'rel': 'stylesheet'}))
 ############################
 ## GLOBALS
 ############################
@@ -204,9 +203,12 @@
 ## FIELD COLOR
 ############################
 #macro(fieldColor $varName $obj)
-  &lt;div class="input-group"&gt;
-    &lt;input type="text" class="form-control color-picker type-color" id="var-$varName" name="FlamingoThemesCode.ThemeClass_0_$varName" value="$!escapetool.xml($!doc.getValue($varName, $obj))"&gt;
-  &lt;/div&gt;
+  #set ($colorPickerParams = {
+    'id': "var-$varName",
+    'name': "FlamingoThemesCode.ThemeClass_0_$varName",
+    'value': $doc.getValue($varName, $obj)
+  })
+  #colorPicker($colorPickerParams)
 #end
 ############################
 ## FIELD FONT WEIGHT
@@ -625,163 +627,6 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
   </object>
   <object>
     <name>FlamingoThemesCode.ThemeSheet</name>
-    <number>1</number>
-    <className>XWiki.JavaScriptExtension</className>
-    <guid>14468346-b5b5-48d4-95d7-99c026cdfc48</guid>
-    <class>
-      <name>XWiki.JavaScriptExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>// Configure require.js to use Colpick (https://github.com/josedvq/colpick-jQuery-Color-Picker/)
-require.config({
-  paths: {
-    'colpick': "$services.webjars.url('colpick', 'js/colpick')"
-  },
-  shim: {
-    'colpick' : ['jquery']
-  }
-});
-// Beginning of the script
-require(['jquery', 'colpick'], function($, Colpick) {
-
-  // Get the inputs that need to be enhanced
-  var inputs = $('.color-picker');
-  
-  // For each input
-  for (var i=0; i&lt;inputs.length; ++i) {
-    var input = $(inputs[i]);
-    var parent = input.parent();
-    
-    // Create the color preview box
-    parent.append('&lt;span class="input-group-addon"&gt;&lt;span class="color-preview"&gt;&lt;/span&gt;&lt;/span&gt;');
-    
-    // Update the color preview box
-    parent.find('.color-preview').css('background-color', input.val());
-    
-    // Enable the color picker
-    input.colpick({
-      layout: 'hex',
-      submit: true,
-      color: input.val(),
-      onSubmit: function(hsb, hex, rgb, el) {
-        var element = $(el);
-        // Hide the color picker
-        element.colpickHide();
-        // Update the filled value
-        element.val('#'+hex);
-        // Update the color preview box
-        element.parent().find('.color-preview').css('background-color', '#'+hex);
-        // Emit the "change" event
-        element.trigger('change');
-      }
-    });
-    
-    // If the user write a value manually
-    input.keyup(function(event){
-      var element = $(event.target);
-      // Update the color preview box
-      element.parent().find('.color-preview').css('background-color', element.val());
-      // Update the color picker
-      element.colpickSetColor(element.val(), false);
-    });
-  }
-  
-  // Hide the color picker if the user scrolls
-  $('.tab-content').scroll(function(){
-    // For each input
-    for (var i=0; i&lt;inputs.length; ++i) {
-      var input = inputs[i];
-      $(input).colpickHide();
-    }
-  });
-});
-</code>
-    </property>
-    <property>
-      <name>Color picker</name>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
-  <object>
-    <name>FlamingoThemesCode.ThemeSheet</name>
     <number>0</number>
     <className>XWiki.StyleSheetExtension</className>
     <guid>f1f1f4fd-0eea-4189-a09e-0c1d71f1fc98</guid>
@@ -904,134 +749,6 @@ require(['jquery', 'colpick'], function($, Colpick) {
     </property>
     <property>
       <use>onDemand</use>
-    </property>
-  </object>
-  <object>
-    <name>FlamingoThemesCode.ThemeSheet</name>
-    <number>1</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>e0d8fe93-ade9-49c9-a115-61218c3e4234</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <contenttype>PureText</contenttype>
-        <disabled>0</disabled>
-        <editor>PureText</editor>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>.color-preview{
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  vertical-align: text-top;
-}
-
-.colpick{
-  z-index: 10;
-}
-
-.colpick input{
-  background-color: transparent;
-  padding: 0;
-  border: 0;
-}</code>
-    </property>
-    <property>
-      <contentType>CSS</contentType>
-    </property>
-    <property>
-      <name>Color picker</name>
-    </property>
-    <property>
-      <parse/>
-    </property>
-    <property>
-      <use>currentPage</use>
     </property>
   </object>
 </xwikidoc>

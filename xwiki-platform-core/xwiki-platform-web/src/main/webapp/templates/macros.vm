@@ -2821,3 +2821,29 @@ Recursive title display detected!##
   #dateTimePicker_import
   #dateTimePicker_input($parameters)
 #end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the color picker.
+ *#
+#macro (colorPicker_import)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/colorpicker/colorPicker.js', true))
+#end
+
+#macro (colorPicker_input $parameters)
+  #set ($discard = $parameters.putIfAbsent('class', 'color-picker type-color'))
+  #if ("$!parameters.disabled" == 'true')
+    #set ($parameters.disabled = 'disabled')
+  #else
+    #set ($discard = $parameters.remove('disabled'))
+  #end
+  <input type="text"
+    #foreach ($parameter in $parameters.entrySet())
+      $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+    #end
+  />
+#end
+
+#macro (colorPicker $parameters)
+  #colorPicker_import
+  #colorPicker_input($parameters)
+#end

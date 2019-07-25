@@ -547,3 +547,30 @@
   ))
   #set ($discard = $xwiki.jsfx.use('dateTimePicker.js', true))
 #end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the color picker.
+ *#
+#macro (colorPicker_import)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('colpick', 'css/colpick.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.ssfx.use('colorPicker.css'))
+  #set ($discard = $xwiki.jsfx.use('colorPicker.js', true))
+#end
+
+#macro (colorPicker_input $parameters)
+  #set ($discard = $parameters.putIfAbsent('class', 'form-control color-picker type-color'))
+  #if ("$!parameters.disabled" == 'true')
+    #set ($parameters.disabled = 'disabled')
+  #else
+    #set ($discard = $parameters.remove('disabled'))
+  #end
+  <div class="input-group">
+    <input type="text"
+      #foreach ($parameter in $parameters.entrySet())
+        $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+      #end
+    />
+    <span class="input-group-addon"><span class="color-preview"></span></span>
+  </div>
+#end

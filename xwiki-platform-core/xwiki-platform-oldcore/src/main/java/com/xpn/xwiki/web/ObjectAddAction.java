@@ -66,7 +66,7 @@ public class ObjectAddAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         DocumentReference userReference = context.getUserReference();
 
-        XWikiDocument doc = context.getDoc().clone();
+        XWikiDocument doc = context.getDoc();
 
         // We need to clone this document first, since a cached storage would return the same object for the
         // following requests, so concurrent request might get a partially modified object, or worse, if an error

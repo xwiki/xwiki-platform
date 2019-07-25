@@ -27,14 +27,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.DocumentCreatingEvent;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.bridge.event.DocumentDeletingEvent;
 import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.AbstractEventListener;
-import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -72,7 +69,7 @@ public class RightsFilterListener extends AbstractEventListener
      */
     public RightsFilterListener()
     {
-        super(NAME, new DocumentCreatingEvent(), new DocumentDeletingEvent(), new DocumentUpdatingEvent());
+        super(NAME, new DocumentCreatingEvent(), new DocumentUpdatingEvent());
     }
 
     @Override
@@ -82,16 +79,14 @@ public class RightsFilterListener extends AbstractEventListener
 
         if (document.isMetaDataDirty()) {
             // Check local rights
-            checkModifiedRights(document, XWikiRightsDocumentInitializer.CLASS_REFERENCE, null);
+            checkModifiedRights(document, XWikiRightsDocumentInitializer.CLASS_REFERENCE);
 
             // Check global rights
-            checkModifiedRights(document, XWikiGlobalRightsDocumentInitializer.CLASS_REFERENCE,
-                (CancelableEvent) event);
+            checkModifiedRights(document, XWikiGlobalRightsDocumentInitializer.CLASS_REFERENCE);
         }
     }
 
-    private void checkModifiedRights(XWikiDocument document, LocalDocumentReference classReference,
-        CancelableEvent event)
+    private void checkModifiedRights(XWikiDocument document, LocalDocumentReference classReference)
     {
         XWikiDocument originalDocument = document.getOriginalDocument();
 
@@ -100,13 +95,8 @@ public class RightsFilterListener extends AbstractEventListener
         try {
             checkModifiedRights(document.getAuthorReference(), document.getDocumentReference(), originalRights, rights);
         } catch (AccessDeniedException e) {
-            if (event instanceof DocumentDeletedEvent) {
-                // Cancel the delete because it might have an impact on other documents
-                event.cancel("Deleting the document have an impact on rights the author does not have");
-            } else {
-                // Cancel all the right modifications
-                cancel(document, originalRights, rights);
-            }
+            // Cancel all the right modifications
+            cancel(document, originalRights, rights);
         }
     }
 

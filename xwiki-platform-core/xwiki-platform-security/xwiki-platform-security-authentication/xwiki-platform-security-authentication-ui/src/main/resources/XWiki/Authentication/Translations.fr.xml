@@ -41,8 +41,8 @@ authentication.admin.failureStrategy.hint=Stratégies à utiliser en cas de mult
 authentication.admin.failureStrategy.disableAccount.name=Désactiver le compte
 authentication.admin.failureStrategy.captcha.name=CAPTCHA
 authentication.admin.maxAttempts.label=Nombre maximum de tentatives d'authentification autorisées
-authentication.admin.maxAttempts.hint=Ceci représente le nombre maximum d'échec d'authentification autorisé avant qu'une stratégie soit activée. Ce nombre n'est pris en compte que dans le contexte de la marge de temps qui suit. Veuillez noter que 0 signifie que la fonctionnalité est désactivée.
-authentication.admin.timeWindow.label=Marge de temps pour les échecs d'authentification
-authentication.admin.timeWindow.hint=La marge de temps en seconde durant laquelle les échecs d'authentification seront pris en compte pour l'activation de la stratégie.</content>
+authentication.admin.maxAttempts.hint=Ceci représente le nombre maximum d'échec d'authentification autorisé avant qu'une stratégie soit activée. Ce nombre n'est pris en compte que dans le contexte de la plage de temps qui suit. Veuillez noter que 0 signifie que la fonctionnalité est désactivée.
+authentication.admin.timeWindow.label=Plage de temps pour les échecs d'authentification
+authentication.admin.timeWindow.hint=La plage de temps, en seconde, durant laquelle les échecs d'authentification seront pris en compte pour l'activation de la stratégie.</content>
   
 </xwikidoc>

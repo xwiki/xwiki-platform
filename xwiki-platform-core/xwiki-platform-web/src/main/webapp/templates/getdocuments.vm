@@ -27,7 +27,7 @@ $response.setContentType("application/json")
 #if ("$!excludes" != '')
   #foreach ($exclude in $excludes)
     #set ($discard = $queryParams.add($exclude))
-    #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?${queryParams.size}")
+    #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?${queryParams.size()}")
   #end
 #end
 #addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.location'))

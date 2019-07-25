@@ -65,7 +65,14 @@ public class ObjectAddAction extends XWikiAction
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         DocumentReference userReference = context.getUserReference();
-        XWikiDocument doc = context.getDoc();
+
+        XWikiDocument doc = context.getDoc().clone();
+
+        // We need to clone this document first, since a cached storage would return the same object for the
+        // following requests, so concurrent request might get a partially modified object, or worse, if an error
+        // occurs during the save, the cached object will not reflect the actual document at all.
+        doc = doc.clone();
+
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
 
         String className = oform.getClassName();

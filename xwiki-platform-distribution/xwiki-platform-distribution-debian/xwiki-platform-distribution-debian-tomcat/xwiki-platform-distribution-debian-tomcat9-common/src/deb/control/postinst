@@ -8,7 +8,7 @@ set -e
 #########################
 
 ## Make sure tomcat is able to write in the data folder
-chown -R tomcat9.tomcat9 /var/lib/xwiki/data
+chown -R tomcat.tomcat /var/lib/xwiki/data
 
 #########################
 # Configuration
@@ -26,7 +26,7 @@ systemctl daemon-reload
 # Restart tomcat9 service
 invoke-rc.d --quiet tomcat9 restart || {
     RESULT=$?
-    # Ignore if tomcat8 init script does not exist (yet)
+    # Ignore if tomcat9 init script does not exist (yet)
     if [ $RESULT != 100 ]; then
     exit $RESULT
     fi

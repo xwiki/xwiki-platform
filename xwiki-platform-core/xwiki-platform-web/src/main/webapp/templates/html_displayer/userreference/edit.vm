@@ -1,0 +1,4 @@
+#userPicker_import
+#set ($discard = $displayer.parameters.put('class', "$!displayer.parameters.get('class') suggest-users"))
+#set ($discard = $displayer.parameters.putIfAbsent('data-userScope', "$!services.wiki.user.userScope"))
+#template('html_displayer/default.vm')

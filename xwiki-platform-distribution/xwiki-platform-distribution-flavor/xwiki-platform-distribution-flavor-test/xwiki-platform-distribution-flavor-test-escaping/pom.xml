@@ -33,12 +33,6 @@
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Escaping</description>
   <dependencies>
     <dependency>
-      <groupId>cpsuite</groupId>
-      <artifactId>cpsuite</artifactId>
-      <version>1.2.5</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war</artifactId>
       <version>${project.version}</version>

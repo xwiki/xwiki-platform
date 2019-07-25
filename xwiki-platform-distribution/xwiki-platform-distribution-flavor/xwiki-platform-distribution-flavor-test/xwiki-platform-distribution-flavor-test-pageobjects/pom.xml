@@ -83,12 +83,6 @@
       <version>${project.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>cpsuite</groupId>
-      <artifactId>cpsuite</artifactId>
-      <version>1.2.5</version>
-    </dependency>
-
     <!-- Make it easy to debug flickering tests by repeating them.
          See http://tempus-fugit.googlecode.com/svn/site/documentation/annotations.html#aRepeating -->
     <dependency>

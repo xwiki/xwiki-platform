@@ -25,6 +25,7 @@ import javax.script.ScriptContext;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -69,7 +70,7 @@ public class ObjectRemoveAction extends XWikiAction
 
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
-        String username = context.getUser();
+        DocumentReference userReference = context.getUserReference();
         XWikiDocument doc = context.getDoc();
 
         // We need to clone this document first, since a cached storage would return the same object for the
@@ -83,8 +84,14 @@ public class ObjectRemoveAction extends XWikiAction
         }
 
         doc.removeObject(obj);
-        doc.setAuthor(username);
-        xwiki.saveDocument(doc, localizePlainOrKey("core.comment.deleteObject"), true, context);
+        doc.setAuthorReference(userReference);
+
+        String comment = localizePlainOrKey("core.comment.deleteObject");
+
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkSavingDocument(userReference, doc, comment, true, context);
+
+        xwiki.saveDocument(doc, comment, true, context);
 
         if (Utils.isAjaxRequest(context)) {
             response.setStatus(HttpServletResponse.SC_NO_CONTENT);

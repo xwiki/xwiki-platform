@@ -220,6 +220,9 @@ public class UploadAction extends XWikiAction
             documentComment = localizePlainOrKey("core.comment.uploadAttachmentComment", params.toArray());
         }
 
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkSavingDocument(context.getUserReference(), doc, documentComment, true, context);
+
         // Save the document.
         try {
             context.getWiki().saveDocument(doc, documentComment, context);

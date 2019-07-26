@@ -185,6 +185,10 @@ public class SaveAction extends PreviewAction
             tdoc.removeXObjects(REDIRECT_CLASS);
         }
 
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkSavingDocument(context.getUserReference(), tdoc, tdoc.getComment(), tdoc.isMinorEdit(),
+            context);
+
         // We get the comment to be used from the document
         // It was read using readFromForm
         xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);

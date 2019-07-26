@@ -29,6 +29,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 import com.xpn.xwiki.internal.mandatory.XWikiRightsDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.test.MockitoOldcore;
@@ -66,7 +67,7 @@ public class RightsFilterListenerTest
 
         XWikiDocument before = document.clone();
 
-        this.listener.onEvent(null, document, null);
+        this.listener.onEvent(new UserUpdatingDocumentEvent(), document, null);
 
         assertEquals(before, document);
     }
@@ -80,7 +81,7 @@ public class RightsFilterListenerTest
 
         XWikiDocument before = document.clone();
 
-        this.listener.onEvent(null, document, null);
+        this.listener.onEvent(new UserUpdatingDocumentEvent(), document, null);
 
         assertEquals(before, document);
     }
@@ -94,7 +95,7 @@ public class RightsFilterListenerTest
 
         XWikiDocument before = document.clone();
 
-        this.listener.onEvent(null, document, null);
+        this.listener.onEvent(new UserUpdatingDocumentEvent(), document, null);
 
         assertEquals(before, document);
     }
@@ -110,7 +111,7 @@ public class RightsFilterListenerTest
 
         XWikiDocument before = document.clone();
 
-        this.listener.onEvent(null, document, null);
+        this.listener.onEvent(new UserUpdatingDocumentEvent(), document, null);
 
         assertEquals(before, document);
     }
@@ -130,7 +131,7 @@ public class RightsFilterListenerTest
 
         XWikiDocument before = document.clone();
 
-        this.listener.onEvent(null, document, null);
+        this.listener.onEvent(new UserUpdatingDocumentEvent(), document, null);
 
         assertNotEquals(before, document);
         assertEquals(document.getOriginalDocument(), document);

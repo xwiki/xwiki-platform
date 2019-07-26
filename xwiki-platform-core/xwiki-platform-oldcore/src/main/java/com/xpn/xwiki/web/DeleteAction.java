@@ -156,8 +156,8 @@ public class DeleteAction extends XWikiAction
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
-        PermanentlyDeleteRequest deleteRequest = refactoring.getRequestFactory()
-            .createPermanentlyDeleteRequest(Collections.emptyList());
+        PermanentlyDeleteRequest deleteRequest =
+            refactoring.getRequestFactory().createPermanentlyDeleteRequest(Collections.emptyList());
         deleteRequest.setInteractive(isAsync(context.getRequest()));
         deleteRequest.setCheckAuthorRights(false);
 
@@ -219,9 +219,12 @@ public class DeleteAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiDocument doc = context.getDoc();
 
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkDeletingDocument(context.getUserReference(), doc, context);
+
         EntityReference documentReference =
-            doesAffectChildren(request, doc.getDocumentReference()) ? doc.getDocumentReference()
-                .getLastSpaceReference() : doc.getTranslatedDocument(context).getDocumentReferenceWithLocale();
+            doesAffectChildren(request, doc.getDocumentReference()) ? doc.getDocumentReference().getLastSpaceReference()
+                : doc.getTranslatedDocument(context).getDocumentReferenceWithLocale();
 
         return deleteToRecycleBin(documentReference, context);
     }
@@ -263,8 +266,8 @@ public class DeleteAction extends XWikiAction
     {
         RefactoringScriptService refactoring =
             (RefactoringScriptService) Utils.getComponent(ScriptService.class, "refactoring");
-        EntityRequest deleteRequest = refactoring.getRequestFactory()
-            .createDeleteRequest(Arrays.asList(entityReference));
+        EntityRequest deleteRequest =
+            refactoring.getRequestFactory().createDeleteRequest(Arrays.asList(entityReference));
         deleteRequest.setInteractive(isAsync(context.getRequest()));
         deleteRequest.setCheckAuthorRights(false);
 

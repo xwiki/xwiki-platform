@@ -190,6 +190,9 @@ import com.xpn.xwiki.internal.XWikiConfigDelegate;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
 import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializedEvent;
 import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializingEvent;
+import com.xpn.xwiki.internal.event.UserCreatingDocumentEvent;
+import com.xpn.xwiki.internal.event.UserDeletingDocumentEvent;
+import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
@@ -1757,6 +1760,116 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Check if the user is allowed to save the document.
+     * 
+     * @param userReference the user responsible for the changes
+     * @param document the document to save
+     * @param comment the comment to associated to the new version of the saved document
+     * @param context see {@link XWikiContext}
+     * @since 10.11.10
+     * @since 11.6
+     */
+    @Unstable
+    public void checkSavingDocument(DocumentReference userReference, XWikiDocument document, String comment,
+        XWikiContext context) throws XWikiException
+    {
+        checkSavingDocument(userReference, document, comment, false, context);
+    }
+
+    /**
+     * Check if the user is allowed to save the document.
+     * 
+     * @param userReference the user responsible for the changes
+     * @param document the document to save
+     * @param context see {@link XWikiContext}
+     * @since 10.11.10
+     * @since 11.6
+     */
+    @Unstable
+    public void checkSavingDocument(DocumentReference userReference, XWikiDocument document, XWikiContext context)
+        throws XWikiException
+    {
+        checkSavingDocument(userReference, document, "", false, context);
+    }
+
+    /**
+     * Check if the user is allowed to save the document.
+     * 
+     * @param userReference the user responsible for the changes
+     * @param document the document to save
+     * @param comment the comment to associated to the new version of the saved document
+     * @param isMinorEdit true if the new version is a minor version
+     * @param context see {@link XWikiContext}
+     * @since 10.11.10
+     * @since 11.6
+     */
+    @Unstable
+    public void checkSavingDocument(DocumentReference userReference, XWikiDocument document, String comment,
+        boolean isMinorEdit, XWikiContext context) throws XWikiException
+    {
+        String currentWiki = context.getWikiId();
+
+        try {
+            // Switch to document wiki
+            context.setWikiId(document.getDocumentReference().getWikiReference().getName());
+
+            // Make sure the document is ready to be saved
+            XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
+
+            ObservationManager om = getObservationManager();
+
+            // Notify listeners about the document about to be created or updated
+
+            // Note that for the moment the event being send is a bridge event, as we are still passing around
+            // an XWikiDocument as source and an XWikiContext as data.
+
+            if (om != null) {
+                CancelableEvent documentEvent;
+                if (originalDocument.isNew()) {
+                    documentEvent = new UserCreatingDocumentEvent(userReference, document.getDocumentReference());
+                } else {
+                    documentEvent = new UserUpdatingDocumentEvent(userReference, document.getDocumentReference());
+                }
+                om.notify(documentEvent, document, context);
+
+                // If the action has been canceled by the user then don't perform any save and throw an exception
+                if (documentEvent.isCanceled()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        String.format("User [%s] has been denied the right to save the document [%s]. Reason: [%s]",
+                            userReference, document.getDocumentReference(), documentEvent.getReason()));
+                }
+            }
+        } finally {
+            context.setWikiId(currentWiki);
+        }
+    }
+
+    private XWikiDocument prepareDocumentForSave(XWikiDocument document, String comment, boolean isMinorEdit,
+        XWikiContext context) throws XWikiException
+    {
+        // Setting comment & minor edit before saving
+        document.setComment(StringUtils.defaultString(comment));
+        document.setMinorEdit(isMinorEdit);
+
+        // We need to save the original document since saveXWikiDoc() will reset it and we
+        // need that original document for the notification below.
+        XWikiDocument originalDocument = document.getOriginalDocument();
+
+        // Make sure to always have an original document for listeners that need to compare with it.
+        // The only case where we have a null original document is supposedly when the document
+        // instance has been crafted and passed #saveDocument without using #getDocument
+        // (which is not a good practice)
+        if (originalDocument == null) {
+            originalDocument =
+                getDocument(new DocumentReference(document.getDocumentReference(), document.getLocale()), context);
+            document.setOriginalDocument(originalDocument);
+        }
+
+        return originalDocument;
+    }
+
+    /**
      * @param doc the document to save
      * @param context see {@link XWikiContext}
      */
@@ -1791,23 +1904,8 @@ public class XWiki implements EventListener
             // Switch to document wiki
             context.setWikiId(document.getDocumentReference().getWikiReference().getName());
 
-            // Setting comment & minor edit before saving
-            document.setComment(StringUtils.defaultString(comment));
-            document.setMinorEdit(isMinorEdit);
-
-            // We need to save the original document since saveXWikiDoc() will reset it and we
-            // need that original document for the notification below.
-            XWikiDocument originalDocument = document.getOriginalDocument();
-
-            // Make sure to always have an original document for listeners that need to compare with it.
-            // The only case where we have a null original document is supposedly when the document
-            // instance has been crafted and passed #saveDocument without using #getDocument
-            // (which is not a good practice)
-            if (originalDocument == null) {
-                originalDocument =
-                    getDocument(new DocumentReference(document.getDocumentReference(), document.getLocale()), context);
-                document.setOriginalDocument(originalDocument);
-            }
+            // Make sure the document is ready to be saved
+            XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
 
             ObservationManager om = getObservationManager();
 
@@ -4217,6 +4315,21 @@ public class XWiki implements EventListener
         deleteDocument(doc, true, context);
     }
 
+    private XWikiDocument prepareDocumentDelete(XWikiDocument doc, XWikiContext context)
+    {
+        // The source document is a new empty XWikiDocument to follow
+        // DocumentUpdatedEvent policy: source document in new document and the old version is available using
+        // doc.getOriginalDocument()
+        XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
+        // Again to follow general event policy, new document author is the user who modified the document
+        // (here the modification is delete)
+        blankDoc.setOriginalDocument(doc.getOriginalDocument());
+        blankDoc.setAuthorReference(context.getUserReference());
+        blankDoc.setContentAuthorReference(context.getUserReference());
+
+        return blankDoc;
+    }
+
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
         String currentWiki = null;
@@ -4225,15 +4338,7 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
-            // The source document is a new empty XWikiDocument to follow
-            // DocumentUpdatedEvent policy: source document in new document and the old version is available using
-            // doc.getOriginalDocument()
-            XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
-            // Again to follow general event policy, new document author is the user who modified the document
-            // (here the modification is delete)
-            blankDoc.setOriginalDocument(doc.getOriginalDocument());
-            blankDoc.setAuthorReference(context.getUserReference());
-            blankDoc.setContentAuthorReference(context.getUserReference());
+            XWikiDocument blankDoc = prepareDocumentDelete(doc, context);
 
             ObservationManager om = getObservationManager();
 
@@ -4273,6 +4378,50 @@ public class XWiki implements EventListener
             } catch (Exception ex) {
                 LOGGER.error("Failed to send document delete notifications for document [{}]",
                     doc.getDocumentReference(), ex);
+            }
+        } finally {
+            context.setWikiId(currentWiki);
+        }
+    }
+
+    /**
+     * Check if the user is allowed to delete the document.
+     * 
+     * @param userReference the user responsible for the delete
+     * @param document the document to delete
+     * @param context the XWiki context
+     * @throws XWikiException when failing to delete
+     * @since 11.6
+     * @since 10.11.10
+     */
+    public void checkDeletingDocument(DocumentReference userReference, XWikiDocument document, XWikiContext context)
+        throws XWikiException
+    {
+        String currentWiki = null;
+
+        currentWiki = context.getWikiId();
+        try {
+            context.setWikiId(document.getDocumentReference().getWikiReference().getName());
+
+            XWikiDocument blankDoc = prepareDocumentDelete(document, context);
+
+            ObservationManager om = getObservationManager();
+
+            // Inform notification mechanisms that a document is about to be deleted
+            // Note that for the moment the event being send is a bridge event, as we are still passing around
+            // an XWikiDocument as source and an XWikiContext as data.
+            if (om != null) {
+                CancelableEvent documentEvent =
+                    new UserDeletingDocumentEvent(userReference, document.getDocumentReference());
+                om.notify(documentEvent, blankDoc, context);
+
+                // If the action has been canceled by the user then don't perform any deletion and throw an exception
+                if (documentEvent.isCanceled()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        String.format("User [%s] has been denied the right to delete the document [%s]. Reason: [%s]",
+                            userReference, document.getDocumentReference(), documentEvent.getReason()));
+                }
             }
         } finally {
             context.setWikiId(currentWiki);

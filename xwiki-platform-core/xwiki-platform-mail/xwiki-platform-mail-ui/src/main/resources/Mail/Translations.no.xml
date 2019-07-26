@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,10 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Mail.Translations" locale="sv">
+<xwikidoc version="1.1">
   <web>Mail</web>
   <name>Translations</name>
-  <language>sv</language>
+  <language>no</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
@@ -36,22 +36,22 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: admin.email=Mail
-### Missing: admin.email.description=Configure mail sending parameters and view mail statuses.
-### Missing: admin.emailgeneral=Advanced
+  <content>admin.email=E-post
+admin.email.description=Konfigurer parametere for sending av e-post og vis e-poststatuser.
+admin.emailgeneral=Avansert
 ### Missing: admin.emailgeneral.description=Configure advanced mail parameters, like mail address obfuscation.
-### Missing: admin.emailsend=Mail Sending
-### Missing: admin.emailsend.description=Configure mail sending parameters.
-### Missing: admin.emailstatus=Mail Sending Status
-### Missing: admin.emailstatus.description=View the statuses of sent mails and resend mails that resulted in failure.
+admin.emailsend=E-post sending
+admin.emailsend.description=Konfigurer e-post-sendeparametere.
+admin.emailstatus=E-postsendingsstatus
+admin.emailstatus.description=Vis statusene til sendte e-post og send på nytt e-postmeldinger som har feilet.
 ### Missing: admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
-Mail.GeneralMailConfigClass_obfuscate=Förvräng epostadresser
+### Missing: Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
 ### Missing: Mail.GeneralMailConfigClass_obfuscate.hint=This only affects the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org
 ### Missing: Mail.SendMailConfigClass_from=Email address to send from
-### Missing: Mail.SendMailConfigClass_from.hint=The default email address used to send notification emails from
+Mail.SendMailConfigClass_from.hint=Standard e-postadressen som brukt til å sende varslingsmeldinger
 ### Missing: Mail.SendMailConfigClass_bcc=BCC email addresses
 ### Missing: Mail.SendMailConfigClass_bcc.hint=A default comma-separated list of BCC email addresses to use when sending mail
-### Missing: Mail.SendMailConfigClass_host=Email Server
+Mail.SendMailConfigClass_host=E-postserver
 ### Missing: Mail.SendMailConfigClass_host.hint=The SMTP server to send to. Defaults to "localhost"
 ### Missing: Mail.SendMailConfigClass_port=Email Server Port
 ### Missing: Mail.SendMailConfigClass_port.hint=The port of the SMTP server to use. Defaults to 25
@@ -59,21 +59,22 @@ Mail.GeneralMailConfigClass_obfuscate=Förvräng epostadresser
 ### Missing: Mail.SendMailConfigClass_username.hint=The username to connect to the SMTP server, only when authentication is required
 ### Missing: Mail.SendMailConfigClass_password=Email Server Password
 ### Missing: Mail.SendMailConfigClass_password.hint=The password to connect to the SMTP server, only when authentication is required
-### Missing: Mail.SendMailConfigClass_properties=Additional Properties
+Mail.SendMailConfigClass_properties=Ytterligere egenskaper
 ### Missing: Mail.SendMailConfigClass_properties.hint=The list of additional JavaMail properties to use (e.g. "mail.smtp.starttls.enable=true" for TLS)
 ### Missing: Mail.SendMailConfigClass_sendWaitTime=Send Wait Time
 ### Missing: Mail.SendMailConfigClass_sendWaitTime.hint=The delay between each mail being sent, in milliseconds (defaults to 8 seconds)
 ### Missing: Mail.SendMailConfigClass_discardSuccessStatuses=Discard Success Statuses?
 ### Missing: Mail.SendMailConfigClass_discardSuccessStatuses.hint=No matter whether mail statuses are kept or not for mail that has been sent successfully (defaults to true)
-### Missing: Mail.SendMailStatus_livetable.date=Date
+Mail.SendMailStatus_livetable.date=Dato
 ### Missing: Mail.SendMailStatus_livetable.batchId=Batch ID
-### Missing: Mail.SendMailStatus_livetable.type=Type
-### Missing: Mail.SendMailStatus_livetable.recipients=Recipients
-### Missing: Mail.SendMailStatus_livetable.state=Status
-### Missing: Mail.SendMailStatus_livetable.wiki=Wiki
-### Missing: Mail.SendMailStatus_livetable.error=Error
-### Missing: Mail.SendMailStatus_livetable.actions=Actions
-### Missing: Mail.SendMailStatus_livetable.resend=Resend
-### Missing: mailSender.admin.resendSuccess=The mail has been resent successfully
+Mail.SendMailStatus_livetable.type=Type
+Mail.SendMailStatus_livetable.recipients=Mottakere
+Mail.SendMailStatus_livetable.state=Status
+Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.error=Feil
+Mail.SendMailStatus_livetable.actions=Handlinger
+Mail.SendMailStatus_livetable.resend=Send på nytt
+mailSender.admin.resendSuccess=Meldingen er sendt på nytt
 ### Missing: mailSender.admin.resendFailure=Failed to resend. Click for more details.</content>
+  
 </xwikidoc>

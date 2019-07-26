@@ -49,7 +49,6 @@ administration.menu.search.noResults=Ничего не найдено.
 
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=Если установлено значение "да", то письмо будет отправлено на адрес электронной почты, указанный при заполнении регистрационной формы.
-XWiki.XWikiPreferences_auth_active_check.hint=Если установлено значение "Да", пользователи не смогут войти в систему без ввода токена, который ранее был отправлен по электронной почте.
 XWiki.XWikiPreferences_validation_email_content.hint=Шаблон письма, которое будет отправлено пользователям для проверки их адреса электронной почты.
 XWiki.XWikiPreferences_confirmation_email_content.hint=Шаблон письма, которое будет отправлено после того, как пользователь подтвердит свою учётную запись, перейдя по ссылке, полученной в первом письме.
 XWiki.XWikiPreferences_invitation_email_content.hint=Шаблон письма, которое будет отправлено пользователям, приглашенным зарегистрироваться.
@@ -113,9 +112,24 @@ administration.section.export.version.hint=Версия пакета.
 administration.section.export.withHistory.hint=Включить историю страниц в экспорт. В противном случае экспортируется только последняя версия страницы.
 administration.section.export.backupPack.hint=Укажите, будет ли пакет использоваться в качестве резервной копии. Эта опция не влияет на экспортируемый контент. Единственный эффект заключается в том, что при импорте пакета будет предварительно выбран параметр «Импортировать как резервную копию». Разница между пакетом резервного копирования и обычным пакетом заключается в том, что в первом случае последний автор страницы сохраняется во время импорта, а во втором случае пользователь, выполняющий импорт, становится последним автором каждой импортированной страницы.
 
+# Users Section
+administration.section.users.deleteUser.confirmationMessage=Пользователь {0} будет удалён, это также приведёт к удалению его из всех {1}групп{2}, частью которых он является. Уверены, что хотите продолжить?
+### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
+### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
+### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
 # Other Category
 admin.other=Прочее
 admin.other.description=Различные настройки для расширений.
 administration.section.analytics.status=Статус
-administration.section.analytics.status.hint=Определите, активно ли отслеживание в Google Analytics ™</content>
+administration.section.analytics.status.hint=Определите, активно ли отслеживание в Google Analytics ™
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+XWiki.XWikiPreferences_auth_active_check.hint=Если установлено значение "Да", пользователи не смогут войти в систему без ввода токена, который ранее был отправлен по электронной почте.
+### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
 </xwikidoc>

@@ -49,6 +49,5 @@ extension.repository.rating=Evalutations
 extension.repository.installedCount=Installations
 
 ## Administration UI
-admin.repository=Référentiel d'extensions
-</content>
+admin.repository=Référentiel d'extensions</content>
 </xwikidoc>

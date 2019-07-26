@@ -92,6 +92,7 @@ import static com.xpn.xwiki.test.mockito.OldcoreMatchers.anyXWikiDocument;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -530,6 +531,8 @@ public class MockitoOldcore
                 return null;
             }
         }).when(getSpyXWiki()).saveDocument(anyXWikiDocument(), any(String.class), anyBoolean(), anyXWikiContext());
+        doNothing().when(getSpyXWiki()).checkSavingDocument(any(DocumentReference.class), anyXWikiDocument(),
+            any(String.class), anyBoolean(), anyXWikiContext());
         doAnswer(new Answer<Void>()
         {
             @Override
@@ -547,6 +550,8 @@ public class MockitoOldcore
                 return null;
             }
         }).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
+        doNothing().when(getSpyXWiki()).checkDeletingDocument(any(DocumentReference.class), anyXWikiDocument(),
+            anyXWikiContext());
         doAnswer(new Answer<BaseClass>()
         {
             @Override

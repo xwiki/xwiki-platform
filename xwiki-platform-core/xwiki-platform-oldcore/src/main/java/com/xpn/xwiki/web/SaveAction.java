@@ -125,6 +125,7 @@ public class SaveAction extends PreviewAction
         }
 
         XWikiDocument originalDoc = doc;
+
         // We need to clone this document first, since a cached storage would return the same object for the
         // following requests, so concurrent request might get a partially modified object, or worse, if an error
         // occurs during the save, the cached object will not reflect the actual document at all.
@@ -224,12 +225,16 @@ public class SaveAction extends PreviewAction
         // We only proceed on the check between versions in case of AJAX request, so we currently stay in the edit form
         // This can be improved later by displaying a nice UI with some merge options in a sync request.
         // For now we don't want our user to loose their changes.
-        if (isConflictCheckEnabled() && Utils.isAjaxRequest(context) && request.getParameter("previousVersion") != null) {
+        if (isConflictCheckEnabled() && Utils.isAjaxRequest(context)
+            && request.getParameter("previousVersion") != null) {
             if (isConflictingWithVersion(context, originalDoc, tdoc)) {
                 return true;
             }
         }
 
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkSavingDocument(context.getUserReference(), tdoc, tdoc.getComment(), tdoc.isMinorEdit(),
+            context);
 
         // We get the comment to be used from the document
         // It was read using readFromForm
@@ -285,13 +290,14 @@ public class SaveAction extends PreviewAction
     }
 
     /**
-     * Check if the version of the document being saved is conflicting with another version.
-     * This check is done by getting the "previousVersion" parameter from the request and comparing it with
-     * latest version of the document. If the current version of the document is not the same as the previous one,
-     * a diff is computed on the document content: a conflict is detected only if the contents are different.
+     * Check if the version of the document being saved is conflicting with another version. This check is done by
+     * getting the "previousVersion" parameter from the request and comparing it with latest version of the document. If
+     * the current version of the document is not the same as the previous one, a diff is computed on the document
+     * content: a conflict is detected only if the contents are different.
+     * 
      * @param context the current context of the request.
-     * @param originalDoc the original version of the document being modified that will be saved (i.e. before
-     *                      content changes). We don't retrieve it through context since it can be a translation.
+     * @param originalDoc the original version of the document being modified that will be saved (i.e. before content
+     *            changes). We don't retrieve it through context since it can be a translation.
      * @return true in case of conflict. If it's true, the answer is immediately sent to the client.
      */
     private boolean isConflictingWithVersion(XWikiContext context, XWikiDocument originalDoc, XWikiDocument modifiedDoc)
@@ -320,26 +326,25 @@ public class SaveAction extends PreviewAction
         // we ensure that nobody edited the document between the moment the user started to edit and now
         if (!latestVersion.equals(previousVersion) || latestVersionDate.isAfter(editingVersionDate)) {
             try {
-                XWikiDocument previousDoc = getDocumentRevisionProvider().getRevision(originalDoc,
-                    previousVersion.toString());
+                XWikiDocument previousDoc =
+                    getDocumentRevisionProvider().getRevision(originalDoc, previousVersion.toString());
 
                 // if doc is new and we're here: it's a conflict, we can skip the diff check
                 // we also check that the previousDoc revision exists to avoid an exception if it has been deleted
                 if (!originalDoc.isNew() && previousDoc != null) {
                     // if changes between previousVersion and latestVersion didn't change the content, it means it's ok
                     // to save the current changes.
-                    List<Delta> contentDiff = originalDoc.getContentDiff(previousVersion.toString(),
-                        latestVersion.toString(), context);
+                    List<Delta> contentDiff =
+                        originalDoc.getContentDiff(previousVersion.toString(), latestVersion.toString(), context);
 
                     // we also need to check the object diff, to be sure there's no conflict with the inline form.
                     List<List<ObjectDiff>> objectDiff =
-                        originalDoc.getObjectDiff(previousVersion.toString(), latestVersion.toString(),
-                            context);
+                        originalDoc.getObjectDiff(previousVersion.toString(), latestVersion.toString(), context);
                     if (contentDiff.isEmpty() && objectDiff.isEmpty()) {
                         return false;
                     } else {
-                        MergeResult mergeResult = modifiedDoc.merge(previousDoc, originalDoc, new MergeConfiguration(),
-                            context);
+                        MergeResult mergeResult =
+                            modifiedDoc.merge(previousDoc, originalDoc, new MergeConfiguration(), context);
                         if (FORCE_SAVE_MERGE.equals(request.getParameter("forceSave"))
                             || mergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
                             context.put(MERGED_DOCUMENTS, "true");

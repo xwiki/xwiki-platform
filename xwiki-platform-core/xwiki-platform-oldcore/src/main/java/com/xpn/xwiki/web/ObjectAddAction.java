@@ -51,8 +51,8 @@ public class ObjectAddAction extends XWikiAction
     /**
      * Used to resolve XClass references.
      */
-    private EntityReferenceResolver<String> relativeResolver = Utils.getComponent(EntityReferenceResolver.TYPE_STRING,
-        "relative");
+    private EntityReferenceResolver<String> relativeResolver =
+        Utils.getComponent(EntityReferenceResolver.TYPE_STRING, "relative");
 
     @Override
     public boolean action(XWikiContext context) throws XWikiException
@@ -102,7 +102,13 @@ public class ObjectAddAction extends XWikiAction
         if (doc.isNew()) {
             doc.setCreatorReference(userReference);
         }
-        xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addObject"), true, context);
+
+        String comment = localizePlainOrKey("core.comment.addObject");
+
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkSavingDocument(userReference, doc, comment, true, context);
+
+        xwiki.saveDocument(doc, comment, true, context);
 
         // If this is an ajax request, no need to redirect.
         if (Utils.isAjaxRequest(context)) {

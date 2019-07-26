@@ -30,25 +30,12 @@ import org.junit.Test;
 import org.xwiki.diff.internal.DefaultDiffManager;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
-import org.xwiki.model.internal.DefaultModelConfiguration;
-import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
-import org.xwiki.model.internal.reference.DefaultStringDocumentReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
-import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.DefaultSymbolScheme;
-import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
-import org.xwiki.model.internal.reference.LocalUidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.ComponentList;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeException;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.internal.model.reference.CurrentEntityReferenceProvider;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentReferenceEntityReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentStringDocumentReferenceResolver;
-import com.xpn.xwiki.internal.model.reference.CurrentStringEntityReferenceResolver;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -406,5 +393,30 @@ public class XWikiDocumentMergeTest
 
         Assert.assertTrue(this.previousDocument.apply(this.currentDocument, true));
         Assert.assertEquals("string2", this.xobject.getStringValue("string"));
+    }
+
+    @Test
+    public void testMergeWithAddedSameObject() throws Exception
+    {
+        this.currentDocument.addXObject(this.xobject);
+        this.nextDocument.addXObject(this.xobject.clone());
+
+        MergeResult result = merge();
+        Assert.assertFalse(result.isModified());
+        Assert.assertTrue(result.getLog().getLogs(LogLevel.ERROR).isEmpty());
+    }
+
+    @Test
+    public void testMergeWithAddedSameProperty() throws Exception
+    {
+        this.previousDocument.addXObject(xobject);
+        BaseObject xobj = this.xobject.clone();
+        xobj.setStringValue("another prop", "foo");
+        this.currentDocument.addXObject(xobj);
+        this.nextDocument.addXObject(xobj.clone());
+
+        MergeResult result = merge();
+        Assert.assertFalse(result.isModified());
+        Assert.assertTrue(result.getLog().getLogs(LogLevel.ERROR).isEmpty());
     }
 }

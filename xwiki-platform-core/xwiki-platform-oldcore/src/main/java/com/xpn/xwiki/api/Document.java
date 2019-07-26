@@ -2575,13 +2575,18 @@ public class Document extends Api
     {
         XWikiDocument doc = getDoc();
 
-        DocumentReference currentUserReference = this.context.getUserReference();
+        DocumentReference currentUserReference = getXWikiContext().getUserReference();
 
         doc.setAuthorReference(currentUserReference);
 
         if (doc.isNew()) {
             doc.setCreatorReference(currentUserReference);
         }
+
+        // Make sure the user is allowed to make this modification
+        getXWikiContext().getWiki().checkSavingDocument(doc.getAuthorReference(), doc, comment, minorEdit,
+            getXWikiContext());
+
         getXWikiContext().getWiki().saveDocument(doc, comment, minorEdit, getXWikiContext());
         this.initialDoc = this.doc;
     }

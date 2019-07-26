@@ -222,6 +222,9 @@ public class CreateAction extends XWikiAction
             newDocument.setAuthorReference(currentUserReference);
             newDocument.setCreatorReference(currentUserReference);
 
+            // Make sure the user is allowed to make this modification
+            context.getWiki().checkSavingDocument(currentUserReference, newDocument, context);
+
             xwiki.saveDocument(newDocument, context);
             editMode = newDocument.getDefaultEditMode(context);
         } else {

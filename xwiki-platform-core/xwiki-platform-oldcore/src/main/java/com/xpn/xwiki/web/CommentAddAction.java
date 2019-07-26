@@ -97,8 +97,13 @@ public class CommentAddAction extends XWikiAction
             }
             doc.setAuthorReference(context.getUserReference());
 
+            String comment = localizePlainOrKey("core.comment.addComment");
+
+            // Make sure the user is allowed to make this modification
+            context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
+
             // Save the new comment.
-            xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addComment"), true, context);
+            xwiki.saveDocument(doc, comment, true, context);
         }
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {

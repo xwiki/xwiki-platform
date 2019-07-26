@@ -26,12 +26,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.event.DocumentCreatingEvent;
-import org.xwiki.bridge.event.DocumentUpdatingEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.event.CancelableEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -39,6 +38,10 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.UserCreatingDocumentEvent;
+import com.xpn.xwiki.internal.event.UserDeletingDocumentEvent;
+import com.xpn.xwiki.internal.event.UserEvent;
+import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 import com.xpn.xwiki.internal.mandatory.XWikiGlobalRightsDocumentInitializer;
 import com.xpn.xwiki.internal.mandatory.XWikiRightsDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
@@ -48,7 +51,7 @@ import com.xpn.xwiki.objects.classes.LevelsClass;
  * Cancel any modification the user does not have the right to do.
  * 
  * @version $Id$
- * @since 11.7RC1
+ * @since 11.6
  * @since 10.11.10
  */
 @Component
@@ -69,7 +72,7 @@ public class RightsFilterListener extends AbstractEventListener
      */
     public RightsFilterListener()
     {
-        super(NAME, new DocumentCreatingEvent(), new DocumentUpdatingEvent());
+        super(NAME, new UserUpdatingDocumentEvent(), new UserCreatingDocumentEvent(), new UserDeletingDocumentEvent());
     }
 
     @Override
@@ -77,26 +80,34 @@ public class RightsFilterListener extends AbstractEventListener
     {
         XWikiDocument document = (XWikiDocument) source;
 
-        if (document.isMetaDataDirty()) {
-            // Check local rights
-            checkModifiedRights(document, XWikiRightsDocumentInitializer.CLASS_REFERENCE);
+        UserEvent userEvent = (UserEvent) event;
 
-            // Check global rights
-            checkModifiedRights(document, XWikiGlobalRightsDocumentInitializer.CLASS_REFERENCE);
-        }
+        // Check local rights
+        checkModifiedRights(userEvent.getUserReference(), document, XWikiRightsDocumentInitializer.CLASS_REFERENCE,
+            null);
+
+        // Check global rights
+        checkModifiedRights(userEvent.getUserReference(), document,
+            XWikiGlobalRightsDocumentInitializer.CLASS_REFERENCE, (CancelableEvent) event);
     }
 
-    private void checkModifiedRights(XWikiDocument document, LocalDocumentReference classReference)
+    private void checkModifiedRights(DocumentReference user, XWikiDocument document,
+        LocalDocumentReference classReference, CancelableEvent event)
     {
         XWikiDocument originalDocument = document.getOriginalDocument();
 
         List<BaseObject> originalRights = originalDocument.getXObjects(classReference);
         List<BaseObject> rights = document.getXObjects(classReference);
         try {
-            checkModifiedRights(document.getAuthorReference(), document.getDocumentReference(), originalRights, rights);
+            checkModifiedRights(user, document.getDocumentReference(), originalRights, rights);
         } catch (AccessDeniedException e) {
-            // Cancel all the right modifications
-            cancel(document, originalRights, rights);
+            if (event instanceof UserDeletingDocumentEvent) {
+                // Cancel the delete because it might have an impact on other documents
+                event.cancel("Deleting the document have an impact on rights the author does not have");
+            } else {
+                // Cancel all the right modifications
+                cancel(document, originalRights, rights);
+            }
         }
     }
 

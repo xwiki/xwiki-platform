@@ -47,6 +47,12 @@ public class PropAddAction extends XWikiAction
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
+
+        // We need to clone this document first, since a cached storage would return the same object for the
+        // following requests, so concurrent request might get a partially modified object, or worse, if an error
+        // occurs during the save, the cached object will not reflect the actual document at all.
+        doc = doc.clone();
+
         XWikiForm form = context.getForm();
 
         String propName = ((PropAddForm) form).getPropName();
@@ -83,7 +89,13 @@ public class PropAddAction extends XWikiAction
                     doc.setCreatorReference(context.getUserReference());
                 }
                 doc.setMetaDataDirty(true);
-                xwiki.saveDocument(doc, localizePlainOrKey("core.comment.addClassProperty"), true, context);
+
+                String comment = localizePlainOrKey("core.comment.addClassProperty");
+
+                // Make sure the user is allowed to make this modification
+                context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
+
+                xwiki.saveDocument(doc, comment, true, context);
             }
         }
         // forward to edit

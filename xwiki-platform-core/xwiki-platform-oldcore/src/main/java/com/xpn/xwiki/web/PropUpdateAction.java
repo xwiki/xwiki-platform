@@ -40,6 +40,11 @@ public class PropUpdateAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
 
+        // We need to clone this document first, since a cached storage would return the same object for the
+        // following requests, so concurrent request might get a partially modified object, or worse, if an error
+        // occurs during the save, the cached object will not reflect the actual document at all.
+        doc = doc.clone();
+
         // Prepare new class
         BaseClass bclass = doc.getXClass();
         BaseClass bclass2 = bclass.clone();
@@ -78,16 +83,20 @@ public class PropUpdateAction extends XWikiAction
             doc.setCreator(context.getUser());
         }
         doc.setAuthor(context.getUser());
-        xwiki.saveDocument(doc, localizePlainOrKey("core.comment.updateClassProperty"), true,
-            context);
+
+        String comment = localizePlainOrKey("core.comment.updateClassProperty");
+
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
+
+        xwiki.saveDocument(doc, comment, true, context);
 
         // We need to load all documents that use this property and rename it
         if (fieldsToRename.size() > 0) {
-            List<String> list =
-                xwiki.getStore().searchDocumentsNames(
-                    ", BaseObject as obj where obj.name=doc.fullName and obj.className='"
-                        + Utils.SQLFilter(bclass.getName()) + "' and doc.fullName <> '"
-                        + Utils.SQLFilter(bclass.getName()) + "'", context);
+            List<String> list = xwiki.getStore()
+                .searchDocumentsNames(", BaseObject as obj where obj.name=doc.fullName and obj.className='"
+                    + Utils.SQLFilter(bclass.getName()) + "' and doc.fullName <> '" + Utils.SQLFilter(bclass.getName())
+                    + "'", context);
             for (String docName : list) {
                 XWikiDocument doc2 = xwiki.getDocument(docName, context);
                 doc2.renameProperties(bclass.getName(), fieldsToRename);

@@ -8946,7 +8946,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             newDocument.getValidationScript(), getValidationScript(), mergeResult));
 
         // Objects
-        List<List<ObjectDiff>> objectsDiff = previousDocument.getObjectDiff(previousDocument, newDocument, context);
+        List<List<ObjectDiff>> objectsDiff = getObjectDiff(previousDocument, newDocument, context);
         if (!objectsDiff.isEmpty()) {
             // Apply diff on result
             for (List<ObjectDiff> objectClassDiff : objectsDiff) {
@@ -8966,8 +8966,8 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             setXObject(newObject.getNumber(),
                                 configuration.isProvidedVersionsModifiables() ? newObject : newObject.clone());
                             mergeResult.setModified(true);
-                        } else {
-                            // collision between DB and new: object to add but already exists in the DB
+                        } else if (!objectResult.equals(newObject)) {
+                            // collision between DB and new: object to add but already exists in the DB and not the same
                             mergeResult.getLog().error("Collision found on object [{}]", objectResult.getReference());
                         }
                     } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
@@ -8991,8 +8991,9 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                 if (propertyResult == null) {
                                     objectResult.safeput(diff.getPropName(), newProperty);
                                     mergeResult.setModified(true);
-                                } else {
+                                } else if (!propertyResult.equals(newProperty)) {
                                     // collision between DB and new: property to add but already exists in the DB
+                                    // and not the same
                                     mergeResult.getLog().error("Collision found on object property [{}]",
                                         propertyResult.getReference());
                                 }

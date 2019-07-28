@@ -33,6 +33,24 @@ $response.setContentType("application/json")
 #addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.location'))
 #addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.title'))
 ##
+## date filter
+##
+#set ($dateFilter = $request.get("doc.date"))
+#if("$!{dateFilter}" != '')
+  #set ($dates = $dateFilter.split('-'))
+  #if ($dates.size() == 2)
+    ## Date range matching
+    #set ($discard = $queryParams.add($datetool.toDate($mathtool.toNumber($dates[0]))))
+    #set ($whereQueryPart = "${whereQueryPart} and doc.date between ?$queryParams.size()")
+    #set ($discard = $queryParams.add($datetool.toDate($mathtool.toNumber($dates[1]))))
+    #set ($whereQueryPart = "${whereQueryPart} and ?$queryParams.size()")
+  #else
+    ## Single value matching
+    #set ($discard = $queryParams.add($dateFilter))
+    #set ($whereQueryPart = "${whereQueryPart} and upper(str(doc.date)) like upper(str(?$queryParams.size()))")
+  #end
+#end
+##
 ## ORDER
 ##
 #set ($order = "$!request.sort")

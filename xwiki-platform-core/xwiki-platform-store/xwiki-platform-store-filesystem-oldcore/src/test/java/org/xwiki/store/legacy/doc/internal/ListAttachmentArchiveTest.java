@@ -43,7 +43,6 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -154,6 +153,10 @@ public class ListAttachmentArchiveTest
         XWikiAttachmentArchive xWikiAttachmentArchive = new XWikiAttachmentArchive();
         xWikiAttachmentArchive.setAttachment(new XWikiAttachment(document, "file1"));
         xWikiAttachmentArchive.setArchive(archiveAsString);
-        assertArrayEquals(archive.getArchive(xWikiContext), xWikiAttachmentArchive.getArchive(xWikiContext));
+
+        // Compare the archives using String so that we can easily see what's different in case of error. Comparing
+        // bytes using assertArrayEquals() would make it hard to see what's different.
+        assertEquals(new String(archive.getArchive(xWikiContext)),
+            new String(xWikiAttachmentArchive.getArchive(xWikiContext)));
     }
 }

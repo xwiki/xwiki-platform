@@ -64,11 +64,11 @@ public class Upgrade84FileStoreTest extends UpgradeTest
         // wiki1
         assertAttachments("wiki1");
 
-        this.validateConsole.getLogCaptureConfiguration().registerExpected(
+        validateConsole.getLogCaptureConfiguration().registerExpected(
             // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
-            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]");
-        // TODO: Some of these could be expected. Would need someone with knowledge of this test.
-        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]",
+
+            // The currently installed flavor is not valid anymore before the upgrade
             "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-wiki/8.4.6] on namespace [wiki:wiki1] "
                 + "(InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-[8.4.6]] is "
                 + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",

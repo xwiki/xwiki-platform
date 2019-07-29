@@ -117,6 +117,10 @@ public class UpgradeTest extends AbstractTest
         // Disable extension repositories to make sure it only look at local extensions
         properties.setProperty("extension.repositories", "");
 
+        // Disable Active Installs ping since there's no ElasticSearch instance setup and it's not required by the
+        // test.
+        properties.setProperty("activeinstalls.pingURL", "");
+
         executor.saveXWikiProperties();
 
         /////////////////////

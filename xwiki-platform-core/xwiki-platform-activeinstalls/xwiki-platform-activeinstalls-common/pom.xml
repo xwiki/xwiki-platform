@@ -33,6 +33,7 @@
   <description>API common to both client and server modules</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>22</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

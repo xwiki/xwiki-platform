@@ -30,8 +30,8 @@ $response.setContentType("application/json")
     #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?${queryParams.size()}")
   #end
 #end
-#addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.location'))
-#addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.title'))
+#addLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.location'))
+#addLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.title'))
 ##
 ## date filter
 ##

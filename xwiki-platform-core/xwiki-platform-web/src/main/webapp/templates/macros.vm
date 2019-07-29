@@ -1881,11 +1881,11 @@ function (row, i, table) {
     #else
       #set ($discard = $whereParams.add("%${locationFilterValue}%"))
       #if ($filterWebHome == true)
-        #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?${queryParams.size()}) ESCAPE '!')")
-        #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?${queryParams.size()}) ESCAPE '!')")
+        #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?${whereParams.size()}) ESCAPE '!')")
+        #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?${whereParams.size()}) ESCAPE '!')")
         #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
       #else
-        #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(?${queryParams.size()}) ESCAPE '!'")
+        #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(?${whereParams.size()}) ESCAPE '!'")
       #end
     #end
     #set ($whereQL = $NULL)

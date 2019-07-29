@@ -24,10 +24,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
@@ -53,7 +51,7 @@ public class DefaultJestClientManager implements JestClientManager, Initializabl
     private JestClient client;
 
     @Override
-    public void initialize() throws InitializationException
+    public void initialize()
     {
         String pingURL = this.configuration.getPingInstanceURL();
         HttpClientConfig clientConfig = new HttpClientConfig.Builder(pingURL).multiThreaded(true).build();
@@ -63,7 +61,7 @@ public class DefaultJestClientManager implements JestClientManager, Initializabl
     }
 
     @Override
-    public void dispose() throws ComponentLifecycleException
+    public void dispose()
     {
         if (this.client != null) {
             this.client.shutdownClient();

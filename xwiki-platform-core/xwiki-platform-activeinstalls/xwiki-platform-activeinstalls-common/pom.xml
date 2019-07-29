@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>API common to both client and server modules</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
   </properties>
   <dependencies>
     <dependency>
@@ -58,6 +58,13 @@
           <artifactId>commons-logging</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

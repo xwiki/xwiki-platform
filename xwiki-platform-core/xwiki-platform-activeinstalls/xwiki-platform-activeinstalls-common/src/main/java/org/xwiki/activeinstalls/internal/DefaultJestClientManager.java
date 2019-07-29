@@ -22,6 +22,8 @@ package org.xwiki.activeinstalls.internal;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.activeinstalls.ActiveInstallsConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Disposable;
@@ -43,6 +45,9 @@ import io.searchbox.client.config.HttpClientConfig;
 public class DefaultJestClientManager implements JestClientManager, Initializable, Disposable
 {
     @Inject
+    private Logger logger;
+
+    @Inject
     private ActiveInstallsConfiguration configuration;
 
     /**
@@ -54,10 +59,12 @@ public class DefaultJestClientManager implements JestClientManager, Initializabl
     public void initialize()
     {
         String pingURL = this.configuration.getPingInstanceURL();
-        HttpClientConfig clientConfig = new HttpClientConfig.Builder(pingURL).multiThreaded(true).build();
-        JestClientFactory factory = new XWikiJestClientFactory(this.configuration);
-        factory.setHttpClientConfig(clientConfig);
-        this.client = factory.getObject();
+        if (!StringUtils.isEmpty(pingURL)) {
+            HttpClientConfig clientConfig = new HttpClientConfig.Builder(pingURL).multiThreaded(true).build();
+            JestClientFactory factory = new XWikiJestClientFactory(this.configuration);
+            factory.setHttpClientConfig(clientConfig);
+            this.client = factory.getObject();
+        }
     }
 
     @Override

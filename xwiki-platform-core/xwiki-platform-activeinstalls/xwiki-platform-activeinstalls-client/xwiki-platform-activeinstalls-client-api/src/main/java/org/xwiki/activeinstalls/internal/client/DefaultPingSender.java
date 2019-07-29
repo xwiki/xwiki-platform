@@ -57,26 +57,29 @@ public class DefaultPingSender implements PingSender
     @Override
     public void sendPing() throws Exception
     {
+        // Only send a ping if an ES client is available. Note that an empty ping URL disables the feature.
         JestClient client = this.jestClientManager.getClient();
 
-        // Step 1: Create index (if already exists then it'll just be ignored)
-        client.execute(new CreateIndex.Builder(JestClientManager.INDEX).build());
+        if (client != null) {
+            // Step 1: Create index (if already exists then it'll just be ignored)
+            client.execute(new CreateIndex.Builder(JestClientManager.INDEX).build());
 
-        // Step 2: Create a mapping so that we can search distribution versions containing hyphens (otherwise they
-        // are removed by the default tokenizer/analyzer). If mapping already exists then it'll just be ignored.
-        PutMapping putMapping =
-            new PutMapping.Builder(JestClientManager.INDEX, JestClientManager.TYPE, constructJSONMapping()).build();
-        client.execute(putMapping);
+            // Step 2: Create a mapping so that we can search distribution versions containing hyphens (otherwise they
+            // are removed by the default tokenizer/analyzer). If mapping already exists then it'll just be ignored.
+            PutMapping putMapping =
+                new PutMapping.Builder(JestClientManager.INDEX, JestClientManager.TYPE, constructJSONMapping()).build();
+            client.execute(putMapping);
 
-        // Step 3: Index the data
-        Index index = new Index.Builder(constructIndexJSON())
-            .index(JestClientManager.INDEX)
-            .type(JestClientManager.TYPE)
-            .build();
-        JestResult result = client.execute(index);
+            // Step 3: Index the data
+            Index index = new Index.Builder(constructIndexJSON())
+                .index(JestClientManager.INDEX)
+                .type(JestClientManager.TYPE)
+                .build();
+            JestResult result = client.execute(index);
 
-        if (!result.isSucceeded()) {
-            throw new Exception(result.getErrorMessage());
+            if (!result.isSucceeded()) {
+                throw new Exception(result.getErrorMessage());
+            }
         }
     }
 

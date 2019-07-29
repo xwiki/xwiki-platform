@@ -2495,7 +2495,7 @@ public class Document extends Api
                 context.setWikiId(getWiki());
 
                 if (!context.getWiki().isReadOnly()) {
-                    saveDocument(comment, minorEdit);
+                    saveDocument(comment, minorEdit, false);
                 } else {
                     java.lang.Object[] args =
                         { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), getWiki() };
@@ -2573,6 +2573,11 @@ public class Document extends Api
 
     protected void saveDocument(String comment, boolean minorEdit) throws XWikiException
     {
+        saveDocument(comment, minorEdit, true);
+    }
+
+    private void saveDocument(String comment, boolean minorEdit, boolean checkSaving) throws XWikiException
+    {
         XWikiDocument doc = getDoc();
 
         DocumentReference currentUserReference = getXWikiContext().getUserReference();
@@ -2583,9 +2588,11 @@ public class Document extends Api
             doc.setCreatorReference(currentUserReference);
         }
 
-        // Make sure the user is allowed to make this modification
-        getXWikiContext().getWiki().checkSavingDocument(doc.getAuthorReference(), doc, comment, minorEdit,
-            getXWikiContext());
+        if (checkSaving) {
+            // Make sure the user is allowed to make this modification
+            getXWikiContext().getWiki().checkSavingDocument(doc.getAuthorReference(), doc, comment, minorEdit,
+                getXWikiContext());
+        }
 
         getXWikiContext().getWiki().saveDocument(doc, comment, minorEdit, getXWikiContext());
         this.initialDoc = this.doc;

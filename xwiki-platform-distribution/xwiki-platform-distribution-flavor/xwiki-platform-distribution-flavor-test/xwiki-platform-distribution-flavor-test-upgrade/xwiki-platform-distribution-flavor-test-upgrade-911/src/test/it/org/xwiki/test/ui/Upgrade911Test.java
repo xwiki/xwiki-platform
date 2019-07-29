@@ -29,23 +29,13 @@ public class Upgrade911Test extends UpgradeTest
     @Override
     protected void postUpdateValidate()
     {
-        this.validateConsole.getLogCaptureConfiguration().registerExpected(
+        validateConsole.getLogCaptureConfiguration().registerExpected(
             // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
-            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]"
-        );
-        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]",
+
+            // The currently installed flavor is not valid anymore before the upgrade
             "Invalid extension [org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/9.11.8] on namespace "
                 + "[wiki:xwiki] (InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-"
-                + "[9.11.8]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
-            "Failed to save job status",
-            "java.nio.file.NoSuchFileException: data/jobs/status/distribution/status.xml",
-            // Solr brings since 8.1.1 jetty dependencies in the classloader, so the upgrade might warn about collisions
-            "org.eclipse.jetty:jetty",
-
-            // This warning is not coming from XWiki but from one jetty dependency, apparently a configuration is not
-            // properly used on Solr part. More details can be found there:
-            // https://github.com/eclipse/jetty.project/issues/3454
-            "No Client EndPointIdentificationAlgorithm configured for SslContextFactory"
-        );
+                + "[9.11.8]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/");
     }
 }

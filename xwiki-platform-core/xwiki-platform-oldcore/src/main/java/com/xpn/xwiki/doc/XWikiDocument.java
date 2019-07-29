@@ -8750,9 +8750,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                             setXObject(newObject.getNumber(),
                                 configuration.isProvidedVersionsModifiables() ? newObject : newObject.clone());
                             mergeResult.setModified(true);
-                        } else if (!objectResult.equals(newObject)) {
-                            // collision between DB and new: object to add but already exists in the DB and not the same
-                            mergeResult.getLog().error("Collision found on object [{}]", objectResult.getReference());
+                        } else {
+                            if (!objectResult.equals(newObject)) {
+                                // collision between DB and new: object to add but already exists in the DB and not the same
+                                mergeResult.getLog().error("Collision found on object [{}]", objectResult.getReference());
+                            } else {
+                                // Already added, lets assume the user is prescient
+                                mergeResult.getLog().warn("Object [{}] already added", objectResult.getReference());
+                            }
                         }
                     } else if (diff.getAction() == ObjectDiff.ACTION_OBJECTREMOVED) {
                         if (objectResult != null) {
@@ -8775,11 +8780,17 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
                                 if (propertyResult == null) {
                                     objectResult.safeput(diff.getPropName(), newProperty);
                                     mergeResult.setModified(true);
-                                } else if (!propertyResult.equals(newProperty)) {
-                                    // collision between DB and new: property to add but already exists in the DB
-                                    // and not the same
-                                    mergeResult.getLog().error("Collision found on object property [{}]",
-                                        propertyResult.getReference());
+                                } else {
+                                    if (!propertyResult.equals(newProperty)) {
+                                        // collision between DB and new: property to add but already exists in the DB
+                                        // and not the same
+                                        mergeResult.getLog().error("Collision found on object property [{}]",
+                                            propertyResult.getReference());
+                                    } else {
+                                        // Already added, lets assume the user is prescient
+                                        mergeResult.getLog().warn("Object property [{}] already added",
+                                            propertyResult.getReference());
+                                    }
                                 }
                             } else if (diff.getAction() == ObjectDiff.ACTION_PROPERTYREMOVED) {
                                 if (propertyResult != null) {

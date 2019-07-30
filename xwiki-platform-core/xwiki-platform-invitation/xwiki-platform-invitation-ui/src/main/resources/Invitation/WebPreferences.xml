@@ -114,7 +114,7 @@
       <groups>xwiki:XWiki.XWikiAllGroup,XWiki.XWikiAllGroup</groups>
     </property>
     <property>
-      <levels>admin,view,edit,comment,delete,undelete,register</levels>
+      <levels>admin,view,edit,comment,delete,register</levels>
     </property>
     <property>
       <users>XWiki.XWikiGuest</users>

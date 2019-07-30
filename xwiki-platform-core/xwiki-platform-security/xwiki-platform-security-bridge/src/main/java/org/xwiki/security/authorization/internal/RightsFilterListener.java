@@ -137,6 +137,11 @@ public class RightsFilterListener extends AbstractEventListener
                 .getListFromString(rightObject.getStringValue(XWikiConstants.LEVELS_FIELD_NAME))) {
                 Right right = Right.toRight(level);
 
+                // If the right does not exist test programming right instead
+                if (right == Right.ILLEGAL) {
+                    right = Right.PROGRAM;
+                }
+
                 // Check if the user is allowed to manipulate this right
                 if (rightObject.getXClassReference().getName().equals(XWikiRightsDocumentInitializer.CLASS_NAME)) {
                     // Check document right for local rights

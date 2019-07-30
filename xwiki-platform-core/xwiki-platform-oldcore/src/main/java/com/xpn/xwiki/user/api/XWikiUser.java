@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -158,9 +159,9 @@ public class XWikiUser
         return this.userReference;
     }
 
-    private DocumentReference getUserClassReference()
+    private DocumentReference getUserClassReference(WikiReference userDocWiki)
     {
-        return getCurrentMixedDocumentReferenceResolver().resolve(USER_CLASS);
+        return getCurrentMixedDocumentReferenceResolver().resolve(userDocWiki.getName() + ":" + USER_CLASS);
     }
 
     private boolean isGuest()
@@ -197,7 +198,9 @@ public class XWikiUser
                 if (userdoc.isNew()) {
                     disabled = true;
                 } else {
-                    disabled = userdoc.getIntValue(getUserClassReference(), DISABLED_PROPERTY) != 0;
+                    disabled = userdoc.getIntValue(
+                        getUserClassReference(userdoc.getDocumentReference().getWikiReference()), DISABLED_PROPERTY)
+                        != 0;
                 }
             } catch (XWikiException e) {
                 this.logger.error("Error while checking disabled status of user [{}]", getUser(), e);
@@ -219,7 +222,8 @@ public class XWikiUser
             int disabledFlag = (disabled) ? 1 : 0;
             try {
                 XWikiDocument userdoc = getUserDocument(context);
-                userdoc.setIntValue(getUserClassReference(), DISABLED_PROPERTY, disabledFlag);
+                userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                    DISABLED_PROPERTY, disabledFlag);
                 context.getWiki().saveDocument(userdoc, context);
             } catch (XWikiException e) {
                 this.logger.error("Error while setting disabled status of user [{}]", getUser(), e);
@@ -241,7 +245,8 @@ public class XWikiUser
         } else {
             try {
                 XWikiDocument userdoc = getUserDocument(context);
-                active = userdoc.getIntValue(getUserClassReference(), ACTIVE_PROPERTY) != 0;
+                active = userdoc.getIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                    ACTIVE_PROPERTY) != 0;
             } catch (XWikiException e) {
                 this.logger.error("Error while checking active status of user [{}]", getUser(), e);
                 active = true;
@@ -262,7 +267,8 @@ public class XWikiUser
             int activeFlag = (active) ? 1 : 0;
             try {
                 XWikiDocument userdoc = getUserDocument(context);
-                userdoc.setIntValue(getUserClassReference(), ACTIVE_PROPERTY, activeFlag);
+                userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                    ACTIVE_PROPERTY, activeFlag);
                 context.getWiki().saveDocument(userdoc, context);
             } catch (XWikiException e) {
                 this.logger.error("Error while setting active status of user [{}]", getUser(), e);

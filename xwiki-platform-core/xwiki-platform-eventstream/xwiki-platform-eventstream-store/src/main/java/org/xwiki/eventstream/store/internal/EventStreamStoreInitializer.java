@@ -29,9 +29,9 @@ import javax.inject.Singleton;
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.observation.EventListener;
-import org.xwiki.observation.event.ApplicationStartedEvent;
 import org.xwiki.observation.event.Event;
 
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfigurationLoadedEvent;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
 
@@ -53,7 +53,7 @@ public class EventStreamStoreInitializer implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return Collections.singletonList(new ApplicationStartedEvent());
+        return Collections.singletonList(new HibernateConfigurationLoadedEvent());
     }
 
     @Override

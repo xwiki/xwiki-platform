@@ -47,11 +47,13 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.logging.LoggerManager;
+import org.xwiki.observation.ObservationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.AbstractXWikiStore;
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfigurationLoadedEvent;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -91,6 +93,9 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
 
     @Inject
     private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private ObservationManager observation;
 
     private String hibpath = "/WEB-INF/hibernate.cfg.xml";
 
@@ -206,6 +211,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
     private synchronized void initHibernate() throws HibernateException
     {
         this.store.getConfiguration().configure(getPath());
+
+        this.observation.notify(HibernateConfigurationLoadedEvent.INSTANCE, this);
 
         if (this.sessionFactory == null) {
             this.sessionFactory = Utils.getComponent(HibernateSessionFactory.class);

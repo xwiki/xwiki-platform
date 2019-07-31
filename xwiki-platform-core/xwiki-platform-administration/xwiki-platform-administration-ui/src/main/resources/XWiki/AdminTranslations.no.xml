@@ -116,7 +116,7 @@ administration.section.export.backupPack.hint=Angi om pakken skal brukes som sik
 administration.section.users.deleteUser.confirmationMessage=Brukeren {0} blir slettet og fjernet fra alle {1}gruppene{2} de var medlem av. Er du sikker på at du vil fortsette?
 administration.section.users.deleteUser.programmingRightsWarning=Brukeren du skal slette, har programmeringsrettigheter og er den siste forfatteren av {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Hvis {1,choice,1# denne siden|1&lt;disse sidene} har skript som krever programmeringsrettigheter, vil disse skriptene slutte å fungere hvis du sletter brukeren.
 administration.section.users.deleteUser.scriptRightsWarning=Brukeren du skal slette har skriptrettigheter og er den siste forfatteren av {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Skriptene fra {1,choice,1#denne siden|1&lt;disse sidene} kan slutte å fungere hvis du sletter brukeren.
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.markDisabledMessage=I stedet for å slette brukeren kan du merke profilen som deaktivert. Dette vil forhindre dem i å logge seg på og vil bevare tilgangsrettighetene knyttet til skriptene de skrev.
 
 # Other Category
 admin.other=Annet

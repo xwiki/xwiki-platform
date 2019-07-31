@@ -3,7 +3,7 @@ Version: [[version]]
 Section: java
 Priority: optional
 Architecture: all
-Depends: xwiki-common (= [[version]]), tomcat8
+Depends: xwiki-common (= [[version]]), tomcat9
 Provides: xwiki-tomcat-common
 Replaces: xwiki-tomcat-common, xwiki-enterprise-tomcat-common
 Conflicts: xwiki-tomcat-common, xwiki-enterprise-tomcat-common

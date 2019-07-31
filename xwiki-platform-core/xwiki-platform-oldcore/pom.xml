@@ -148,7 +148,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>5.4.3.Final</version>
+      <version>5.4.4.Final</version>
       <exclusions>
         <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
         <exclusion>
@@ -184,7 +184,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-c3p0</artifactId>
-      <version>5.4.3.Final</version>
+      <version>5.4.4.Final</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

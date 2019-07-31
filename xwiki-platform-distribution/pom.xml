@@ -142,7 +142,7 @@
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>5.1.47</mysql.version>
+    <mysql.version>5.1.48</mysql.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>

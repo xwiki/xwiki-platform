@@ -29,7 +29,6 @@ import java.util.List;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
-import org.suigeneris.jrcs.util.ToString;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -167,19 +166,17 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     private Archive toRCS(final XWikiContext context) throws Exception
     {
         final Version[] versions = this.getVersions();
-        Archive rcsArch = null;
+        XWikiAttachmentRCSArchive rcsArch = null;
 
         // We need to loop backward since the revision are ordered in desc order.
         int revisionNumber = this.revisions.size();
         for (int i = revisionNumber - 1; i >= 0; i--) {
             XWikiAttachment rev = this.revisions.get(i);
-            final String sdata = rev.toStringXML(true, false, context);
-            final Object[] lines = ToString.stringToArray(sdata);
             if (rcsArch == null) {
                 // First cycle.
-                rcsArch = new Archive(lines, rev.getFilename(), rev.getVersion());
+                rcsArch = new XWikiAttachmentRCSArchive(rev, context);
             } else {
-                rcsArch.addRevision(lines, "");
+                rcsArch.addRevision(rev, context);
             }
         }
         return rcsArch;

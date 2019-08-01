@@ -96,10 +96,10 @@ public class ListAttachmentArchiveTest
 
         ServletContext servletContextMock = mock(ServletContext.class);
         servletEnvironment.setServletContext(servletContextMock);
-        when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
-            .thenReturn(new File(System.getProperty("java.io.tmpdir")));
 
         File testDirectory = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
+        when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
+            .thenReturn(testDirectory);
 
         File temporaryDirectory = new File(testDirectory, "temporary");
         File permanentDirectory = new File(testDirectory, "permanent-dir");
@@ -158,5 +158,58 @@ public class ListAttachmentArchiveTest
         // bytes using assertArrayEquals() would make it hard to see what's different.
         assertEquals(new String(archive.getArchive(xWikiContext)),
             new String(xWikiAttachmentArchive.getArchive(xWikiContext)));
+    }
+
+    /**
+     * Verify that the {@link ListAttachmentArchive#getArchiveAsString(XWikiContext)} contains JRCS version dates
+     * corresponding to the attachment dates (and not current dates,
+     *
+     * @see <a href="https://jira.xwiki.org/browse/XWIKI-16620">XWIKI-16620</a>.
+     */
+    @Test
+    public void getArchiveAsStringJRCSDates(MockitoComponentManager componentManager) throws Exception
+    {
+        Utils.setComponentManager(componentManager);
+        ServletEnvironment servletEnvironment = componentManager.getInstance(Environment.class);
+
+        ServletContext servletContextMock = mock(ServletContext.class);
+        servletEnvironment.setServletContext(servletContextMock);
+
+        File testDirectory = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
+        when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
+            .thenReturn(testDirectory);
+
+        File temporaryDirectory = new File(testDirectory, "temporary");
+        File permanentDirectory = new File(testDirectory, "permanent-dir");
+
+        servletEnvironment.setTemporaryDirectory(temporaryDirectory);
+        servletEnvironment.setPermanentDirectory(permanentDirectory);
+
+        XWikiContext xWikiContext = new XWikiContext();
+        xWikiContext.setWiki(new XWiki());
+        XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
+
+        XWikiAttachment attachment11 = new XWikiAttachment(document, "file1");
+        attachment11.setVersion("8.1");
+        attachment11.setContent(IOUtils.toInputStream("First version", "UTF-8"));
+        attachment11.setMimeType("plain/text");
+        attachment11.setCharset("UTF-8");
+        attachment11.setDate(new Date(0));
+
+        XWikiAttachment attachment12 = new XWikiAttachment(document, "file1");
+        attachment12.setVersion("9.2");
+        attachment12.setContent(IOUtils.toInputStream("Second version", "UTF-8"));
+        attachment12.setMimeType("plain/text");
+        attachment12.setCharset("UTF-8");
+        attachment12.setDate(new Date(1000));
+
+        List<XWikiAttachment> attachments = new ArrayList<>();
+        attachments.add(attachment11);
+        attachments.add(attachment12);
+
+        ListAttachmentArchive archive = new ListAttachmentArchive(attachments);
+        String archiveAsString = archive.getArchiveAsString(xWikiContext);
+        assertTrue(archiveAsString.contains("date\t69.12.01.01.00.01;"));
+        assertTrue(archiveAsString.contains("date\t69.12.01.01.00.00;"));
     }
 }

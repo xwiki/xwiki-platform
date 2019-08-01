@@ -59,7 +59,7 @@ import static org.mockito.Mockito.when;
 public class ListAttachmentArchiveTest
 {
     @Test
-    public void testSort()
+    public void sort()
     {
         XWikiDocument document = new XWikiDocument(new DocumentReference("wiki", "space", "page"));
 
@@ -89,7 +89,7 @@ public class ListAttachmentArchiveTest
     }
 
     @Test
-    public void testGetArchiveAsString(MockitoComponentManager componentManager) throws Exception
+    public void getArchiveAsString(MockitoComponentManager componentManager) throws Exception
     {
         Utils.setComponentManager(componentManager);
         ServletEnvironment servletEnvironment = componentManager.getInstance(Environment.class);

@@ -22,6 +22,8 @@ package org.xwiki.extension.distribution.internal.job;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,6 +69,8 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
     private List<DistributionStep> stepList;
 
     private int currentStateIndex;
+
+    private final transient Map<String, Object> properties = new ConcurrentHashMap<>();
 
     public DistributionJobStatus(JobStatus status, ObservationManager observationManager, LoggerManager loggerManager)
     {
@@ -198,5 +202,25 @@ public class DistributionJobStatus extends DefaultJobStatus<DistributionRequest>
     public DistributionState getDistributionState()
     {
         return getDistributionState(getPreviousDistributionExtension(), getDistributionExtension());
+    }
+
+    /**
+     * @since 11.7RC1
+     * @since 11.3.3
+     * @since 10.11.10
+     */
+    void setProperty(String key, Object value)
+    {
+        this.properties.put(key, value);
+    }
+
+    /**
+     * @since 11.7RC1
+     * @since 11.3.3
+     * @since 10.11.10
+     */
+    Object getproperty(String key)
+    {
+        return this.properties.get(key);
     }
 }

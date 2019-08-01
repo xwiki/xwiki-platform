@@ -44,4 +44,18 @@ public interface DistributionJob extends Job
      *             supported)
      */
     void awaitReady() throws InterruptedException;
+
+    /**
+     * @since 11.7RC1
+     * @since 11.3.3
+     * @since 10.11.10
+     */
+    void setProperty(String key, Object value);
+
+    /**
+     * @since 11.7RC1
+     * @since 11.3.3
+     * @since 10.11.10
+     */
+    Object getProperty(String key);
 }

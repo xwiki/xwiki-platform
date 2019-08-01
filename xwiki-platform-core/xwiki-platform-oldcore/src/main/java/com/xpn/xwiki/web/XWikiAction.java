@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Vector;
 
@@ -54,6 +55,7 @@ import org.xwiki.csrf.CSRFToken;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -811,10 +813,20 @@ public abstract class XWikiAction extends Action
             context.put("rev", rev);
             XWikiDocument doc = (XWikiDocument) context.get("doc");
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
+            // if the doc is deleted and we request a specific language, we have to set the locale so we can retrieve
+            // properly the document revision.
+            if (rev.startsWith("deleted") &&
+                !StringUtils.isEmpty(context.getRequest().getParameter("language"))
+                && doc == tdoc) {
+                Locale locale = LocaleUtils.toLocale(context.getRequest().getParameter("language"), Locale.ROOT);
+                tdoc = new XWikiDocument(tdoc.getDocumentReference(), locale);
+            }
             XWikiDocument rdoc =
                 (!doc.getLocale().equals(tdoc.getLocale())) ? doc : context.getWiki().getDocument(doc, rev, context);
+
             XWikiDocument rtdoc =
                 (doc.getLocale().equals(tdoc.getLocale())) ? rdoc : context.getWiki().getDocument(tdoc, rev, context);
+
             context.put("tdoc", rtdoc);
             context.put("cdoc", rdoc);
             context.put("doc", rdoc);

@@ -67,6 +67,6 @@ public class DeletedDocumentRevisionProvider implements DocumentRevisionProvider
     @Override
     public XWikiDocument getRevision(XWikiDocument document, String revision) throws XWikiException
     {
-        return getRevision(document != null ? document.getDocumentReference() : null, revision);
+        return getRevision(document != null ? document.getDocumentReferenceWithLocale() : null, revision);
     }
 }

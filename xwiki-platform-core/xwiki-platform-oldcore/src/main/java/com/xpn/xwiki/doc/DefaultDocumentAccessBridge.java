@@ -921,7 +921,7 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     @Override
     public DocumentReference getCurrentAuthorReference()
     {
-        XWikiContext xcontext = getContext();
+        XWikiContext xcontext = this.readonlyContextProvider.get();
         return xcontext != null ? xcontext.getAuthorReference() : null;
     }
 

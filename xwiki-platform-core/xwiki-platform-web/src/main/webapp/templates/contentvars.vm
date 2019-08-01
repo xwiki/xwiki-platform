@@ -12,7 +12,7 @@
     ## That's unless the caller has explicitly asked to not escape the content (this is done for example when calling
     ## get.vm in order to get proper XML).
     #set($syntaxType = $outputSyntax.type.toIdString())
-    #if (($syntaxType == "xhtml" || $syntaxType == "html") && !$noEscapeContent)
+    #if ($syntaxType == "xhtml" || $syntaxType == "html" || $noEscapeContent)
       #set ($renderedContent = $tdoc.displayDocument($outputSyntax, $restrictedContent))
     #else
       ## Make sure to print correctly the result when it's not HTML,

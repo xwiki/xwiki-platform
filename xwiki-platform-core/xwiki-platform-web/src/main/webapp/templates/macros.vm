@@ -1563,6 +1563,8 @@ $Msz MB##
       #set ($filterType = 'text')
     #end
   #end
+  #set($title = $services.localization.render('platform.livetable.filtersTitle',
+    [$services.localization.render("${transprefix}$column")]))
   #if ($filterType == 'list' || $filterType == 'multilist')
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column"
       #if ($filterType == 'multilist')
@@ -1591,8 +1593,7 @@ $Msz MB##
   #elseif ($filterType == 'text' || $filterType == 'number')
     <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="text"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
-      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
-        [$services.localization.render("${transprefix}$column")]))" />
+      title="$escapetool.xml($title)"/>
   #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -1602,8 +1603,7 @@ $Msz MB##
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
       data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
-      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
-        [$services.localization.render("${transprefix}$column")]))">
+      title="$escapetool.xml($title)">
     </select>
   #end
 #end

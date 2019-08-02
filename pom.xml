@@ -761,6 +761,10 @@
                 <features>xerces:xmlParserAPIs/2.6.2</features>
               </extensionOverride>
               <extensionOverride>
+                <id>xerces:xercesImpl</id>
+                <features>xerces:xerces-impl</features>
+              </extensionOverride>
+              <extensionOverride>
                 <id>com.google.inject:guice:no_aop</id>
                 <features>com.google.inject:guice</features>
               </extensionOverride>

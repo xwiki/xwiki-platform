@@ -15,15 +15,14 @@ $response.setContentType("application/json")
 #set ($excludes = $request.getParameterValues('exclude'))
 #if ("$!excludes" != '')
   #foreach ($exclude in $excludes)
-    #set ($whereQueryPart = "${whereQueryPart} AND ddoc.fullName <> ?")
     #set ($discard = $queryParams.add($exclude))
+    #set ($whereQueryPart = "${whereQueryPart} AND ddoc.fullName <> ?${queryParams.size()}")
   #end
 #end
-#addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.location'), false, "AND LOWER(ddoc.fullName) LIKE LOWER(?) ESCAPE '!'")
 #set ($batchId = $request.get('doc.batchId'))
 #if ("$!batchId" != '')
-  #set ($whereQueryPart = "${whereQueryPart} AND LOWER(ddoc.batchId) LIKE LOWER(?)")
   #set ($discard = $queryParams.add("%${batchId.trim()}%"))
+  #set ($whereQueryPart = "${whereQueryPart} AND LOWER(ddoc.batchId) LIKE LOWER(?${queryParams.size()})")
 #end
 ##
 ## ORDER

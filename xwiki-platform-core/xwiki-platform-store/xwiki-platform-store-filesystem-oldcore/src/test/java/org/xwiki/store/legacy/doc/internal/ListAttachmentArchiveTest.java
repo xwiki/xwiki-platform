@@ -33,6 +33,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
@@ -89,7 +90,7 @@ public class ListAttachmentArchiveTest
     }
 
     @Test
-    public void getArchiveAsString(MockitoComponentManager componentManager) throws Exception
+    public void getArchiveAsString(MockitoComponentManager componentManager, @XWikiTempDir File tmpDir) throws Exception
     {
         Utils.setComponentManager(componentManager);
         ServletEnvironment servletEnvironment = componentManager.getInstance(Environment.class);
@@ -97,12 +98,10 @@ public class ListAttachmentArchiveTest
         ServletContext servletContextMock = mock(ServletContext.class);
         servletEnvironment.setServletContext(servletContextMock);
 
-        File testDirectory = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
-        when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
-            .thenReturn(testDirectory);
+        when(servletContextMock.getAttribute("javax.servlet.context.tempdir")).thenReturn(tmpDir);
 
-        File temporaryDirectory = new File(testDirectory, "temporary");
-        File permanentDirectory = new File(testDirectory, "permanent-dir");
+        File temporaryDirectory = new File(tmpDir, "temporary");
+        File permanentDirectory = new File(tmpDir, "permanent-dir");
 
         servletEnvironment.setTemporaryDirectory(temporaryDirectory);
         servletEnvironment.setPermanentDirectory(permanentDirectory);
@@ -167,7 +166,8 @@ public class ListAttachmentArchiveTest
      * @see <a href="https://jira.xwiki.org/browse/XWIKI-16620">XWIKI-16620</a>.
      */
     @Test
-    public void getArchiveAsStringJRCSDates(MockitoComponentManager componentManager) throws Exception
+    public void getArchiveAsStringJRCSDates(MockitoComponentManager componentManager, @XWikiTempDir File tmpDir)
+        throws Exception
     {
         Utils.setComponentManager(componentManager);
         ServletEnvironment servletEnvironment = componentManager.getInstance(Environment.class);
@@ -175,12 +175,10 @@ public class ListAttachmentArchiveTest
         ServletContext servletContextMock = mock(ServletContext.class);
         servletEnvironment.setServletContext(servletContextMock);
 
-        File testDirectory = new File("target/test-" + new Date().getTime()).getAbsoluteFile();
-        when(servletContextMock.getAttribute("javax.servlet.context.tempdir"))
-            .thenReturn(testDirectory);
+        when(servletContextMock.getAttribute("javax.servlet.context.tempdir")).thenReturn(tmpDir);
 
-        File temporaryDirectory = new File(testDirectory, "temporary");
-        File permanentDirectory = new File(testDirectory, "permanent-dir");
+        File temporaryDirectory = new File(tmpDir, "temporary");
+        File permanentDirectory = new File(tmpDir, "permanent-dir");
 
         servletEnvironment.setTemporaryDirectory(temporaryDirectory);
         servletEnvironment.setPermanentDirectory(permanentDirectory);

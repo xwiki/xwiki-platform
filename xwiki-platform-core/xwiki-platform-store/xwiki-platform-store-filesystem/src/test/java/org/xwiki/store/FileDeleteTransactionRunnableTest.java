@@ -25,7 +25,6 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.commons.io.IOUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,9 +46,7 @@ public class FileDeleteTransactionRunnableTest
 {
     private static final String[] FILE_PATH = { "path", "to", "file" };
 
-    private File storageLocation;
-
-    private File toDelete;
+    private File location;
 
     private File temp;
 
@@ -63,41 +60,33 @@ public class FileDeleteTransactionRunnableTest
     @BeforeEach
     public void setUp() throws Exception
     {
-        this.storageLocation = new File(this.tmpDir, "test-storage" + System.identityHashCode(this.getClass()));
-
-        this.toDelete = this.storageLocation;
+        this.location = this.tmpDir;
         for (int i = 0; i < FILE_PATH.length; i++) {
-            this.toDelete = new File(this.toDelete, FILE_PATH[i]);
+            this.location = new File(this.location, FILE_PATH[i]);
         }
-        this.temp = new File(this.toDelete.getParentFile(), FILE_PATH[FILE_PATH.length - 1] + "~tmp");
-        this.toDelete.getParentFile().mkdirs();
-        IOUtils.write("Delete me!", new FileOutputStream(this.toDelete));
+        this.temp = new File(this.location.getParentFile(), FILE_PATH[FILE_PATH.length - 1] + "~tmp");
+        this.location.getParentFile().mkdirs();
+        IOUtils.write("Delete me!", new FileOutputStream(this.location));
         IOUtils.write("HAHA I am here to trip you up!", new FileOutputStream(this.temp));
 
         this.lock = new ReentrantReadWriteLock();
 
-        this.runnable = new FileDeleteTransactionRunnable(this.toDelete, this.temp, this.lock);
-    }
-
-    @AfterEach
-    public void tearDown()
-    {
-        recursiveDelete(this.storageLocation);
+        this.runnable = new FileDeleteTransactionRunnable(this.location, this.temp, this.lock);
     }
 
     @Test
     public void simpleTest() throws Exception
     {
-        assertTrue(this.toDelete.exists());
+        assertTrue(this.location.exists());
         this.runnable.start();
-        assertFalse(this.toDelete.exists());
+        assertFalse(this.location.exists());
         assertFalse(this.temp.exists());
     }
 
     @Test
     public void rollbackAfterPreRunTest()
     {
-        assertTrue(this.toDelete.exists());
+        assertTrue(this.location.exists());
 
         // After preRun(), before run.
         final TransactionRunnable failRunnable = new TransactionRunnable()
@@ -105,7 +94,7 @@ public class FileDeleteTransactionRunnableTest
             public void onRun() throws Exception
             {
                 assertFalse(temp.exists());
-                assertTrue(toDelete.exists());
+                assertTrue(location.exists());
                 throw new Exception("Simulate something going wrong.");
             }
         };
@@ -118,7 +107,7 @@ public class FileDeleteTransactionRunnableTest
     @Test
     public void rollbackAfterRunTest()
     {
-        assertTrue(this.toDelete.exists());
+        assertTrue(this.location.exists());
 
         // After run() before onCommit()
         final TransactionRunnable failRunnable = new TransactionRunnable()
@@ -126,7 +115,7 @@ public class FileDeleteTransactionRunnableTest
             public void onRun() throws Exception
             {
                 assertTrue(temp.exists());
-                assertFalse(toDelete.exists());
+                assertFalse(location.exists());
                 throw new Exception("Simulate something going wrong.");
             }
         };
@@ -139,25 +128,25 @@ public class FileDeleteTransactionRunnableTest
     @Test
     public void deleteNonexistantTest() throws Exception
     {
-        this.toDelete.delete();
-        assertFalse(this.toDelete.exists());
+        this.location.delete();
+        assertFalse(this.location.exists());
         this.runnable.start();
-        assertFalse(this.toDelete.exists());
+        assertFalse(this.location.exists());
         assertFalse(this.temp.exists());
     }
 
     @Test
     public void rollbackDeleteNonexistantTest()
     {
-        this.toDelete.delete();
-        assertFalse(this.toDelete.exists());
+        this.location.delete();
+        assertFalse(this.location.exists());
 
         final TransactionRunnable failRunnable = new TransactionRunnable()
         {
             public void onRun() throws Exception
             {
                 assertFalse(temp.exists());
-                assertFalse(toDelete.exists());
+                assertFalse(location.exists());
                 throw new Exception("Simulate something going wrong.");
             }
         };
@@ -169,7 +158,7 @@ public class FileDeleteTransactionRunnableTest
                 failRunnable.runIn(str);
                 str.start();
             } catch (Exception e) {
-                assertFalse(this.toDelete.exists());
+                assertFalse(this.location.exists());
                 assertFalse(this.temp.exists());
                 throw e;
             }
@@ -182,18 +171,7 @@ public class FileDeleteTransactionRunnableTest
             str.start();
         });
 
-        assertTrue(this.toDelete.exists());
+        assertTrue(this.location.exists());
         assertFalse(this.temp.exists());
-    }
-
-    private static void recursiveDelete(final File toDelete)
-    {
-        if (toDelete.isDirectory()) {
-            final File[] children = toDelete.listFiles();
-            for (int i = 0; i < children.length; i++) {
-                recursiveDelete(children[i]);
-            }
-        }
-        toDelete.delete();
     }
 }

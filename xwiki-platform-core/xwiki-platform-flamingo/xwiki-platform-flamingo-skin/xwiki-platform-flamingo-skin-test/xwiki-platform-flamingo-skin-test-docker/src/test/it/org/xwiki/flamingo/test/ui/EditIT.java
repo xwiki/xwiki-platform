@@ -647,10 +647,9 @@ public class EditIT
         setup.getDriver().navigate().back();
         // view page -> wiki editor
         setup.getDriver().navigate().back();
+        setup.getDriver().waitUntilPageIsReloaded();
 
         wikiEditPage = new WikiEditPage();
-
-        setup.getDriver().waitUntilPageIsReloaded();
         assertEquals("fourth edit", wikiEditPage.getContent());
         wikiEditPage.setContent("fifth edit");
         viewPage = wikiEditPage.clickSaveAndView();

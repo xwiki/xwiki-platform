@@ -122,7 +122,7 @@ public class PdfExportImplTest
             + "<div id=\"xwikimaincontainerinner\" style=\"display: block; unicode-bidi: embed; \">\n"
             + "\n"
             + "<div id=\"xwikicontent\" style=\"display: block; unicode-bidi: embed; \">\n"
-            + "      <p style=\"display: block; margin-top: 3pt; margin-bottom: 3pt; unicode-bidi: embed; \">"
+            + "      <p style=\"display: block; margin-top: 12pt; margin-bottom: 12pt; unicode-bidi: embed; \">"
                 + "<span style=\"color: #f00; background-color: #fff; background-image: none; "
                 + "background-position: 0% 0%; background-size: auto auto; background-origin: padding-box; "
                 + "background-clip: border-box; background-repeat: repeat repeat; "

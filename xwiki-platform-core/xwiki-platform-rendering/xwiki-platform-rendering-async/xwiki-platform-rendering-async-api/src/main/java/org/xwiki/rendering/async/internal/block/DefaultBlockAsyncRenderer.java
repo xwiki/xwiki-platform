@@ -34,6 +34,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -41,6 +42,7 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.util.ErrorBlockGenerator;
 
 /**
  * Helper to execute Block based asynchronous renderer.
@@ -57,6 +59,9 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
 
     @Inject
     private AsyncContext asyncContext;
+
+    @Inject
+    private ErrorBlockGenerator errorBlockGenerator;
 
     private BlockAsyncRendererConfiguration configuration;
 
@@ -95,32 +100,40 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
     @Override
     public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
     {
-        // Register the known involved references and components
-        for (EntityReference reference : this.configuration.getReferences()) {
-            this.asyncContext.useEntity(reference);
-        }
-        for (ComponentRole<?> role : this.configuration.getRoles()) {
-            this.asyncContext.useComponent(role.getRoleType(), role.getRoleHint());
-        }
+        Block resultBlock;
 
-        Block block = this.configuration.getBlock();
-        XDOM xdom;
-        if (block instanceof XDOM) {
-            xdom = (XDOM) block;
-        } else {
-            Block rootBlock = block.getRoot();
-
-            if (rootBlock instanceof XDOM) {
-                xdom = (XDOM) rootBlock;
-            } else {
-                xdom = new XDOM(Collections.singletonList(rootBlock));
+        try {
+            // Register the known involved references and components
+            for (EntityReference reference : this.configuration.getReferences()) {
+                this.asyncContext.useEntity(reference);
             }
+            for (ComponentRole<?> role : this.configuration.getRoles()) {
+                this.asyncContext.useComponent(role.getRoleType(), role.getRoleHint());
+            }
+
+            Block block = this.configuration.getBlock();
+            XDOM xdom;
+            if (block instanceof XDOM) {
+                xdom = (XDOM) block;
+            } else {
+                Block rootBlock = block.getRoot();
+
+                if (rootBlock instanceof XDOM) {
+                    xdom = (XDOM) rootBlock;
+                } else {
+                    xdom = new XDOM(Collections.singletonList(rootBlock));
+                }
+            }
+
+            ///////////////////////////////////////
+            // Transformations
+
+            resultBlock = tranform(xdom, block);
+        } catch (Exception e) {
+            // Display the error in the result
+            resultBlock = new CompositeBlock(this.errorBlockGenerator
+                .generateErrorBlocks("Failed to execute asynchronous content", e, this.configuration.isInline()));
         }
-
-        ///////////////////////////////////////
-        // Transformations
-
-        Block resultBlock = tranform(xdom, block);
 
         ///////////////////////////////////////
         // Rendering

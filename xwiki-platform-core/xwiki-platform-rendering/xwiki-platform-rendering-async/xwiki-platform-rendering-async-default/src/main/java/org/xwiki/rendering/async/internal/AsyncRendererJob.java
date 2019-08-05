@@ -97,7 +97,16 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         getStatus().setRoleTypes(contextUse.getRoleTypes());
         getStatus().setUses(contextUse.getUses());
 
-        // Cache the status
+        // Cache the status as early as possible when everything is fine
+        this.cache.put(getStatus());
+    }
+
+    @Override
+    protected void jobFinished(Throwable error)
+    {
+        super.jobFinished(error);
+
+        // Make sure the status is cached no matter what
         this.cache.put(getStatus());
     }
 }

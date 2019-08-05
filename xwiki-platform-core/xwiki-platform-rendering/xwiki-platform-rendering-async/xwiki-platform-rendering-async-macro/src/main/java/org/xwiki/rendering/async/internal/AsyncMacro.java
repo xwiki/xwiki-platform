@@ -31,6 +31,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.AsyncMacroParameters;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
@@ -44,7 +45,9 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroContentParser;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.transformation.RenderingContext;
 
 /**
  * Asynchronous and cached execution of wiki content.
@@ -74,12 +77,19 @@ public class AsyncMacro extends AbstractMacro<AsyncMacroParameters>
     @Inject
     private DocumentReferenceResolver<String> resolver;
 
+    @Inject
+    private AsyncContext asyncContext;
+
+    @Inject
+    private RenderingContext renderingContext;
+
     /**
      * Default constructor.
      */
     public AsyncMacro()
     {
-        super("Async", DESCRIPTION, AsyncMacroParameters.class);
+        super("Async", DESCRIPTION, new DefaultContentDescriptor("Content to execute", true, Block.LIST_BLOCK_TYPE),
+            AsyncMacroParameters.class);
 
         setDefaultCategory(DEFAULT_CATEGORY_CONTENT);
     }
@@ -168,18 +178,23 @@ public class AsyncMacro extends AbstractMacro<AsyncMacroParameters>
 
         // Indicate the syntax of the content
         configuration.setDefaultSyntax(this.parser.getCurrentSyntax(context));
-        configuration.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
+
+        // Indicate the target syntax
+        configuration.setTargetSyntax(this.renderingContext.getTargetSyntax());
 
         // Set the transformation id
         configuration.setTransformationId(context.getTransformationContext().getId());
 
-        try
+        try {
+            Block result = this.executor.execute(configuration);
 
-        {
-            return Collections.singletonList(this.executor.execute(configuration));
-        } catch (
+            // Indicate the content is not transformed if the current execution is not async
+            if (!parameters.isAsync() || !this.asyncContext.isEnabled()) {
+                result = new MetaDataBlock(Collections.singletonList(result), this.getNonGeneratedContentMetaData());
+            }
 
-        Exception e) {
+            return Collections.singletonList(result);
+        } catch (Exception e) {
             throw new MacroExecutionException("Failed start the execution of the macro", e);
         }
     }

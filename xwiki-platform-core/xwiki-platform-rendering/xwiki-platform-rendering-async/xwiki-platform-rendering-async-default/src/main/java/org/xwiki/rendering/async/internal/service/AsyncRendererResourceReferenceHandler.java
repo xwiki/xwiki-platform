@@ -32,6 +32,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
@@ -126,29 +128,49 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         Response response = this.container.getResponse();
         response.setContentType("text/html; charset=utf-8");
 
-        // Create the asynchronous HTML meta
-        StringBuilder head = new StringBuilder();
         Map<String, Collection<Object>> uses = status.getUses();
-        for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
-            try {
-                AsyncContextHandler handler =
-                    this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
+        if (uses != null) {
+            // Create the asynchronous HTML meta
+            StringBuilder head = new StringBuilder();
+            for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
+                try {
+                    AsyncContextHandler handler =
+                        this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
 
-                handler.addHTMLHead(head, entry.getValue());
-            } catch (Exception e) {
-                this.logger.error("Failed to get HTML head for handler type [{}]", entry.getKey(), e);
+                    handler.addHTMLHead(head, entry.getValue());
+                } catch (Exception e) {
+                    this.logger.error("Failed to get HTML head for handler type [{}]", entry.getKey(), e);
+                }
             }
-        }
-        if (head.length() > 0) {
-            if (response instanceof ServletResponse) {
-                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
+            if (head.length() > 0) {
+                if (response instanceof ServletResponse) {
+                    ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD",
+                        head.toString());
+                }
             }
         }
 
         try (OutputStream stream = response.getOutputStream()) {
-            IOUtils.write(status.getResult().getResult(), stream, StandardCharsets.UTF_8);
+            if (status.getError() != null) {
+                IOUtils.write(toHTML(status.getError()), stream, StandardCharsets.UTF_8);
+            } else if (status.getResult() != null && status.getResult().getResult() != null) {
+                IOUtils.write(status.getResult().getResult(), stream, StandardCharsets.UTF_8);
+            } else {
+                // TODO: print more details about the status of the job ?
+                IOUtils.write("", stream, StandardCharsets.UTF_8);
+            }
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException("Failed to send content", e);
         }
+    }
+
+    private String toHTML(Throwable t)
+    {
+        String content = StringEscapeUtils.escapeHtml4(ExceptionUtils.getStackTrace(t));
+
+        content = content.replace(" ", "&nbsp;");
+        content = content.replace("\n", "<br/>");
+
+        return content;
     }
 }

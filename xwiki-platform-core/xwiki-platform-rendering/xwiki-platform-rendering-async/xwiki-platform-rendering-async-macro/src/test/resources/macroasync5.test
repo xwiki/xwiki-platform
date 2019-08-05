@@ -22,31 +22,39 @@ titi
 .#-----------------------------------------------------
 beginDocument
 beginMacroMarkerStandalone [async] [id=toto|cached=true|async=false] [toto]
+beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]]
 beginMetaData [[syntax]=[XWiki 2.0]]
 beginParagraph
 onWord [toto]
 endParagraph
 endMetaData [[syntax]=[XWiki 2.0]]
+endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]]
 endMacroMarkerStandalone [async] [id=toto|cached=true|async=false] [toto]
 beginMacroMarkerStandalone [async] [cached=true|async=false] [titi]
+beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]]
 beginMetaData [[syntax]=[XWiki 2.0]]
 beginParagraph
 onWord [titi]
 endParagraph
 endMetaData [[syntax]=[XWiki 2.0]]
+endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]]
 endMacroMarkerStandalone [async] [cached=true|async=false] [titi]
 beginMacroMarkerStandalone [async] [cached=true|async=false] [tutu]
+beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]]
 beginMetaData [[syntax]=[XWiki 2.0]]
 beginParagraph
 onWord [tutu]
 endParagraph
 endMetaData [[syntax]=[XWiki 2.0]]
+endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]]
 endMacroMarkerStandalone [async] [cached=true|async=false] [tutu]
 beginMacroMarkerStandalone [async] [id=toto|cached=true|async=false] [titi]
+beginMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]]
 beginMetaData [[syntax]=[XWiki 2.0]]
 beginParagraph
 onWord [toto]
 endParagraph
 endMetaData [[syntax]=[XWiki 2.0]]
+endMetaData [[non-generated-content]=[java.util.List<org.xwiki.rendering.block.Block>]]
 endMacroMarkerStandalone [async] [id=toto|cached=true|async=false] [titi]
 endDocument

@@ -261,6 +261,12 @@
               <linkName>/usr/lib/xwiki/WEB-INF/xwiki.properties</linkName>
               <linkTarget>/etc/xwiki/xwiki.properties</linkTarget>
             </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/xwiki-locales.txt</linkName>
+              <linkTarget>/etc/xwiki/xwiki-locales.txt</linkTarget>
+            </data>
           </dataSet>
         </configuration>
       </plugin>

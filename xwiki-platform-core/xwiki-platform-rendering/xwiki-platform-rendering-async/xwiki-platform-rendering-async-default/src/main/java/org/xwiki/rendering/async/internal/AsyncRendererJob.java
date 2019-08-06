@@ -106,7 +106,9 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
     {
         super.jobFinished(error);
 
-        // Make sure the status is cached no matter what
-        this.cache.put(getStatus());
+        if (error != null) {
+            // Make sure the status is cached no matter what
+            this.cache.put(getStatus());
+        }
     }
 }

@@ -150,7 +150,8 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         this.lock.writeLock().lock();
 
         try {
-            boolean cacheAllowed = status.getRequest().getRenderer().isCacheAllowed();
+            boolean longCacheAllowed =
+                status.getRequest().getRenderer() != null && status.getRequest().getRenderer().isCacheAllowed();
 
             // Avoid storing useless stuff in the RAM
             status.dispose();
@@ -158,7 +159,7 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
             String cacheKey = toCacheKey(status.getRequest().getId());
 
             // If cache is enabled, store the status in the long cache
-            if (cacheAllowed) {
+            if (longCacheAllowed) {
                 this.longCache.set(cacheKey, status);
             }
 

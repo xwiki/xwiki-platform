@@ -62,4 +62,10 @@ public class AllIT
     class NestedLoginIT extends LoginIT
     {
     }
+
+    @Nested
+    @DisplayName("WikiMacro Tests")
+    class NestedWikiMacroIT extends WikiMacroIT
+    {
+    }
 }

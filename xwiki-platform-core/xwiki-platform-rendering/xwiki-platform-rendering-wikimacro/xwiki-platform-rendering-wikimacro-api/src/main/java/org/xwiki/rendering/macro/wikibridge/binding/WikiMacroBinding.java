@@ -137,4 +137,16 @@ public class WikiMacroBinding extends HashMap<String, Object> implements Binding
     {
         this.put(CONTEXT, context);
     }
+
+    /**
+     * Replace all the content of the current binding with the given binding.
+     * @param wikiMacroBinding the macro binding values to use as replacement.
+     * @since 11.6.1
+     * @since 11.7RC1
+     */
+    public void replaceAll(WikiMacroBinding wikiMacroBinding)
+    {
+        this.clear();
+        this.putAll(wikiMacroBinding);
+    }
 }

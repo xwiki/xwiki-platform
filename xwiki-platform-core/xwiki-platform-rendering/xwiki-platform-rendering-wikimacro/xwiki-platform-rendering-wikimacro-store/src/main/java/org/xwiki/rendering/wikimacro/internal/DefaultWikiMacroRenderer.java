@@ -22,10 +22,11 @@ package org.xwiki.rendering.wikimacro.internal;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -70,7 +71,6 @@ import org.xwiki.script.ScriptContextManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Actually execute the wiki macro.
@@ -417,19 +417,27 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private void backupBindings(Map<String, Object> contextBinding, WikiMacroBinding wikiMacroBinding)
     {
         ExecutionContext econtext = this.execution.getContext();
-        Stack<Map<String, Object>> backupContextBinding =
-            (Stack<Map<String, Object>>) econtext.getProperty(BACKUP_CONTEXTBINDING_KEY);
+        Deque<Map<String, Object>> backupContextBinding =
+            (Deque<Map<String, Object>>) econtext.getProperty(BACKUP_CONTEXTBINDING_KEY);
         if (backupContextBinding == null) {
-            backupContextBinding = new Stack<>();
-            econtext.setProperty(BACKUP_CONTEXTBINDING_KEY, backupContextBinding);
+            backupContextBinding = new LinkedList<>();
+            econtext.newProperty(BACKUP_CONTEXTBINDING_KEY)
+                .initial(backupContextBinding)
+                .makeFinal()
+                .inherited()
+                .declare();
         }
         backupContextBinding.push(contextBinding);
 
-        Stack<WikiMacroBinding> backupWikiMacroBinding = (Stack<WikiMacroBinding>) econtext.getProperty(
+        Deque<WikiMacroBinding> backupWikiMacroBinding = (Deque<WikiMacroBinding>) econtext.getProperty(
             BACKUP_BINDING_KEY);
         if (backupWikiMacroBinding == null) {
-            backupWikiMacroBinding = new Stack<>();
-            econtext.setProperty(BACKUP_BINDING_KEY, backupWikiMacroBinding);
+            backupWikiMacroBinding = new LinkedList<>();
+            econtext.newProperty(BACKUP_BINDING_KEY)
+                .initial(backupWikiMacroBinding)
+                .makeFinal()
+                .inherited()
+                .declare();
         }
         backupWikiMacroBinding.push(wikiMacroBinding);
     }
@@ -437,24 +445,30 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private void restoreBindingsOrClean()
     {
         ExecutionContext econtext = this.execution.getContext();
-        Stack<Map<String, Object>> backupContextBinding =
-            (Stack<Map<String, Object>>) econtext.getProperty(BACKUP_CONTEXTBINDING_KEY);
-        if (backupContextBinding != null && backupContextBinding.size() > 1) {
-            this.xcontextProvider.get().put(MACRO_KEY, backupContextBinding.pop());
+        Deque<Map<String, Object>> backupContextBinding =
+            (Deque<Map<String, Object>>) econtext.getProperty(BACKUP_CONTEXTBINDING_KEY);
+
+        backupContextBinding.pop();
+        if (!backupContextBinding.isEmpty()) {
+            this.xcontextProvider.get().put(MACRO_KEY, backupContextBinding.peek());
         } else {
             this.xcontextProvider.get().remove(MACRO_KEY);
-            econtext.removeProperty(BACKUP_CONTEXTBINDING_KEY);
         }
 
-        Stack<WikiMacroBinding> backupWikiMacroBinding =
-            (Stack<WikiMacroBinding>) econtext.getProperty(BACKUP_BINDING_KEY);
-        if (backupWikiMacroBinding != null && backupWikiMacroBinding.size() > 1) {
-            this.scriptContextManager.getCurrentScriptContext()
-                .setAttribute(MACRO_BINDING, backupWikiMacroBinding.pop(), ScriptContext.ENGINE_SCOPE);
+        Deque<WikiMacroBinding> backupWikiMacroBinding =
+            (Deque<WikiMacroBinding>) econtext.getProperty(BACKUP_BINDING_KEY);
+        backupWikiMacroBinding.pop();
+        if (!backupWikiMacroBinding.isEmpty()) {
+            // we cannot just replace the attribute in the current script context: it would not be taken into account
+            // if we are already running a velocity script. Instead we rely on the already existing instance and
+            // we update it.
+            WikiMacroBinding newMacroBinding = backupWikiMacroBinding.peek();
+            WikiMacroBinding oldBinding =
+                (WikiMacroBinding) this.scriptContextManager.getCurrentScriptContext().getAttribute(MACRO_BINDING);
+            oldBinding.replaceAll(newMacroBinding);
         } else {
             this.scriptContextManager.getCurrentScriptContext()
                 .removeAttribute(MACRO_BINDING, ScriptContext.ENGINE_SCOPE);
-            econtext.removeProperty(BACKUP_BINDING_KEY);
         }
     }
 

@@ -74,7 +74,7 @@ public final class TagQueryUtils
 
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
+            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -98,8 +98,8 @@ public final class TagQueryUtils
      * @since 1.18
      * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
      */
-    public static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List< ? > parameterValues,
-            XWikiContext context) throws XWikiException
+    public static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List<?> parameterValues,
+        XWikiContext context) throws XWikiException
     {
         List<String> results = null;
         Map<String, Integer> tagCount = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -126,7 +126,7 @@ public final class TagQueryUtils
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
             query.bindValues((List<Object>) params);
-            query.addFilter(Utils.<QueryFilter> getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
+            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
@@ -172,8 +172,8 @@ public final class TagQueryUtils
     }
 
     /**
-     * Get documents with the passed tags with the result depending on whether the caller decides to include
-     * hidden documents or not.
+     * Get documents with the passed tags with the result depending on whether the caller decides to include hidden
+     * documents or not.
      *
      * @param tag a list of tags to match.
      * @param includeHiddenDocuments if true then include hidden documents

@@ -108,17 +108,14 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     /**
      * Get cardinality map of tags matching an hql query. Examples of usage:
      * <ul>
-     * <li>
-     * <code>
+     * <li><code>
      * $xwiki.tag.getTagCountForQuery("","doc.creator='XWiki.JohnDoe'")
      * </code> will return the cardinality map of tags for documents created by user XWiki.JohnDoe</li>
-     * <li>
-     * <code>
+     * <li><code>
      * $xwiki.tag.getTagCountForQuery(", BaseObject as obj", 
      *    "obj.name=doc.fullName and obj.className='Blog.BlogPostClass'")
      * </code> will return the cardinality map of tags associated to blog post documents</li>
-     * <li>
-     * <code>
+     * <li><code>
      * $xwiki.tag.getTagCountForQuery("", "")
      * </code> will return all tags within the wiki</li>
      * </ul>
@@ -136,10 +133,9 @@ public class TagPluginApi extends PluginApi<TagPlugin>
     }
 
     /**
-     * Get cardinality map of tags matching an hql query (parametrized version). Example of usage:
+     * Get cardinality map of tags matching an hql query (parameterized version). Example of usage:
      * <ul>
-     * <li>
-     * <code>
+     * <li><code>
      * $xwiki.tag.getTagCountForQuery("", "doc.creator = ?1", ["$!{request.creator}"])
      * </code> will return the cardinality map of tags for documents created by user-provided creator name</li>
      * </ul>
@@ -151,7 +147,7 @@ public class TagPluginApi extends PluginApi<TagPlugin>
      * @throws XWikiException if search query fails (possible failures: DB access problems, incorrect query fragments).
      * @since 1.18
      */
-    public Map<String, Integer> getTagCountForQuery(String from, String where, List< ? > parameterValues)
+    public Map<String, Integer> getTagCountForQuery(String from, String where, List<?> parameterValues)
         throws XWikiException
     {
         return this.getProtectedPlugin().getTagCountForQuery(from, where, parameterValues, this.context);

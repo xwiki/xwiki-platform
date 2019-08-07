@@ -162,6 +162,9 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     public void dispose() throws ComponentLifecycleException
     {
         this.observation.removeListener(getCacheId());
+        if (this.cache != null) {
+            this.cache.dispose();
+        }
     }
 
     protected List<Event> getCacheCleanupEvents()

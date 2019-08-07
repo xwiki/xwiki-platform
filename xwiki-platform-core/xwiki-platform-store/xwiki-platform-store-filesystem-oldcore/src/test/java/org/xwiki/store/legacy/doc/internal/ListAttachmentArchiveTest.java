@@ -20,6 +20,8 @@
 package org.xwiki.store.legacy.doc.internal;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -43,6 +45,8 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -206,7 +210,16 @@ public class ListAttachmentArchiveTest
 
         ListAttachmentArchive archive = new ListAttachmentArchive(attachments);
         String archiveAsString = archive.getArchiveAsString(xWikiContext);
-        assertTrue(archiveAsString.contains("date\t69.12.01.01.00.01;"));
-        assertTrue(archiveAsString.contains("date\t69.12.01.01.00.00;"));
+
+        assertThat(archiveAsString, containsString("date\t" + getDateAsString(attachment11.getDate())));
+        assertThat(archiveAsString, containsString("date\t" + getDateAsString(attachment12.getDate())));
+    }
+
+    private String getDateAsString(Date date)
+    {
+        // Since the machine executing this test can have any timezone, we need to compute what Date(0) and Date(1000)
+        // represent when displayed as text, as otherwise the test could flicker.
+        DateFormat formatter = new SimpleDateFormat("yy.MM.dd.HH.mm.ss");
+        return formatter.format(date);
     }
 }

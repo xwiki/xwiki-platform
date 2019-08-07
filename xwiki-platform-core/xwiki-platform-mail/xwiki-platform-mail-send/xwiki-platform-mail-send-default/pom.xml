@@ -36,6 +36,7 @@
     <xwiki.pitest.mutationThreshold>68</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Sender Implementation</xwiki.extension.name>
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>

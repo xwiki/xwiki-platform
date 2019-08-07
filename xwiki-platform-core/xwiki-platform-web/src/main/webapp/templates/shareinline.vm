@@ -25,7 +25,7 @@
       #set ($sender = "$!{escapetool.q($sender)} <noreply@$!{serverName}>")
     #end
   #end
-  #set ($recipients = [])
+  #set ($recipients = $collectionstool.set)
   #set ($errors = {})
   #set ($successes = [])
 

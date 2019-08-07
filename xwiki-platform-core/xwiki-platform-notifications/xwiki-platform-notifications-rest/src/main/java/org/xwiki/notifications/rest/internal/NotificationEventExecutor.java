@@ -430,5 +430,13 @@ public class NotificationEventExecutor implements Initializable, Disposable
         if (this.executor != null) {
             this.executor.shutdownNow();
         }
+
+        if (this.shortCache != null) {
+            this.shortCache.dispose();
+        }
+
+        if (this.longCountCache != null) {
+            this.longCountCache.dispose();
+        }
     }
 }

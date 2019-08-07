@@ -78,6 +78,21 @@
     <xwiki.nexus.skipLocalStaging>true</xwiki.nexus.skipLocalStaging>
 
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
+
+    <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
+    <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
+    <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
+    <mysql.groupId>mysql</mysql.groupId>
+    <mysql.artifactId>mysql-connector-java</mysql.artifactId>
+    <mysql.version>5.1.48</mysql.version>
+    <derby.groupId>org.apache.derby</derby.groupId>
+    <derby.artifactId>derby</derby.artifactId>
+    <derby.version>10.14.2.0</derby.version>
+    <pgsql.groupId>org.postgresql</pgsql.groupId>
+    <pgsql.artifactId>postgresql</pgsql.artifactId>
+    <pgsql.version>42.2.6</pgsql.version>
+    <oracle.version>12.2.0.1</oracle.version>
+    <mariadb.version>2.3.0</mariadb.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

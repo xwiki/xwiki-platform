@@ -90,11 +90,22 @@ public class MavenResolver
      */
     public String getPlatformVersion() throws Exception
     {
-        String platformVersion = getModelFromCurrentPOM().getProperties().getProperty("platform.version");
-        if (platformVersion == null) {
-            throw new Exception("Missing property <platform.version> in the current pom.xml");
+        return getPropertyFromCurrentPOM("platform.version");
+    }
+
+    /**
+     * @param propertyName the maven property name for which to retrieve the value
+     * @return the property value
+     * @throws Exception if the property doesn't exist
+     * @since 11.7RC1
+     */
+    public String getPropertyFromCurrentPOM(String propertyName) throws Exception
+    {
+        String propertyValue = getModelFromCurrentPOM().getProperties().getProperty(propertyName);
+        if (propertyValue == null) {
+            throw new Exception(String.format("Missing property [%s] in the current pom.xml", propertyName));
         }
-        return platformVersion;
+        return propertyValue;
     }
 
     /**

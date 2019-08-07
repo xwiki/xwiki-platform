@@ -137,19 +137,6 @@
     <!-- Default location for XWiki's Data directory -->
     <xwikiDataDir>data</xwikiDataDir>
 
-    <!-- Version of JDBC connectors we want to use in our distribution and when using build tools -->
-    <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
-    <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <mysql.groupId>mysql</mysql.groupId>
-    <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-    <mysql.version>5.1.48</mysql.version>
-    <derby.groupId>org.apache.derby</derby.groupId>
-    <derby.artifactId>derby</derby.artifactId>
-    <derby.version>10.14.2.0</derby.version>
-    <pgsql.groupId>org.postgresql</pgsql.groupId>
-    <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.6</pgsql.version>
-
     <!-- Set HSQLDB by default -->
     <xwiki.db>hsqldb</xwiki.db>
     <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>

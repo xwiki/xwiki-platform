@@ -259,27 +259,32 @@ public class WARBuilder
         switch (database) {
             case MYSQL:
                 String mysqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
-                    ? this.testConfiguration.getJDBCDriverVersion() : "5.1.45";
+                    ? this.testConfiguration.getJDBCDriverVersion()
+                    : this.mavenResolver.getPropertyFromCurrentPOM("mysql.version");
                 artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, mysqlDriverVersion);
                 break;
             case MARIADB:
                 String mariadbDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
-                    ? this.testConfiguration.getJDBCDriverVersion() : "2.3.0";
+                    ? this.testConfiguration.getJDBCDriverVersion()
+                    : this.mavenResolver.getPropertyFromCurrentPOM("mariadb.version");
                 artifact = new DefaultArtifact("org.mariadb.jdbc", "mariadb-java-client", JAR, mariadbDriverVersion);
                 break;
             case POSTGRESQL:
                 String pgsqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
-                    ? this.testConfiguration.getJDBCDriverVersion() : "42.1.4";
+                    ? this.testConfiguration.getJDBCDriverVersion()
+                    : this.mavenResolver.getPropertyFromCurrentPOM("pgsql.version");
                 artifact = new DefaultArtifact("org.postgresql", "postgresql", JAR, pgsqlDriverVersion);
                 break;
             case HSQLDB_EMBEDDED:
                 String hsqldbDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
-                    ? this.testConfiguration.getJDBCDriverVersion() : "2.4.1";
+                    ? this.testConfiguration.getJDBCDriverVersion()
+                    : this.mavenResolver.getPropertyFromCurrentPOM("hsqldb.version");
                 artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, hsqldbDriverVersion);
                 break;
             case ORACLE:
                 String oracleDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
-                    ? this.testConfiguration.getJDBCDriverVersion() : "12.2.0.1";
+                    ? this.testConfiguration.getJDBCDriverVersion()
+                    : this.mavenResolver.getPropertyFromCurrentPOM("oracle.version");
                 artifact = new DefaultArtifact("com.oracle.jdbc", "ojdbc8", JAR, oracleDriverVersion);
                 break;
             default:

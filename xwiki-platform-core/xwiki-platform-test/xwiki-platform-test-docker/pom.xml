@@ -110,12 +110,12 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.24</version>
+      <version>${mysql.version}</version>
     </dependency>
     <dependency>
       <groupId>com.oracle.jdbc</groupId>
       <artifactId>ojdbc8</artifactId>
-      <version>12.2.0.1</version>
+      <version>${oracle.version}</version>
     </dependency>
     <!-- Dependencies for WARBuilder -->
     <dependency>

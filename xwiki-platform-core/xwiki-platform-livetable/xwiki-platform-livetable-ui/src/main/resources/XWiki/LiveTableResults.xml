@@ -44,22 +44,22 @@
 ## When users start using column filtering, the generated DB query will combine both the default filtering and what the
 ## user has entered in the column filters.
 #set ($extra = '')
-#set ($params = [])
+#set ($params = {})
 #if ("$!request.space" != '')
-  #set ($extra = "${extra} AND doc.space = ?")
-  #set ($discard = $params.add($request.space))
+  #set ($extra = "${extra} AND doc.space = :doc_space")
+  #set ($discard = $params.put('doc_space', $request.space))
 #end
 #addLivetableLocationFilter($extra, $params, $!request.location)
 #if ("$!request.parent" != '')
-  #set ($extra = "${extra} and doc.parent = ?")
-  #set ($discard = $params.add($request.parent))
+  #set ($extra = "${extra} and doc.parent = :doc_parent")
+  #set ($discard = $params.put('doc_parent', $request.parent))
 #end
 #if ("$!request.orphaned" == '1')
   #set ($homepage = $services.wiki.getById($services.wiki.currentWikiId).mainPageReference)
   #set ($homepageFullName = $services.model.serialize($homepage, 'local'))
   ## On Oracle the empty parent is actually null.
-  #set ($extra = "${extra} and (doc.parent = '' or doc.parent is null) and doc.fullName &lt;&gt; ?")
-  #set ($discard = $params.add($homepageFullName))
+  #set ($extra = "${extra} and (doc.parent = '' or doc.parent is null) and doc.fullName &lt;&gt; :homepageFullName")
+  #set ($discard = $params.put('homepageFullName', $homepageFullName))
 #end
 #gridresultwithfilter("$!request.classname" $request.collist.split(',') '' "${extra}" $params)
 {{/velocity}}</content>

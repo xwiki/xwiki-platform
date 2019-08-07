@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.plugin.tag;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -101,6 +100,30 @@ public final class TagQueryUtils
     public static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, List<?> parameterValues,
         XWikiContext context) throws XWikiException
     {
+        return getTagCountForQuery(fromHql, whereHql, (Object) parameterValues, context);
+    }
+
+    /**
+     * Get cardinality map of tags matching a parameterized hql query.
+     *
+     * @param fromHql the <code>from</code> fragment of the hql query
+     * @param whereHql the <code>where</code> fragment of the hql query
+     * @param parameters map of named parameters for the query
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurrences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 11.7RC1
+     * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
+     */
+    public static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, Map<String, ?> parameters,
+        XWikiContext context) throws XWikiException
+    {
+        return getTagCountForQuery(fromHql, whereHql, (Object) parameters, context);
+    }
+
+    private static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, Object parameters,
+        XWikiContext context) throws XWikiException
+    {
         List<String> results = null;
         Map<String, Integer> tagCount = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
@@ -117,21 +140,20 @@ public final class TagQueryUtils
             where += " and " + whereHql;
         }
 
-        List<?> params = parameterValues;
-        if (params == null) {
-            params = new ArrayList<>();
-        }
         String hql = from + where;
 
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            query.bindValues((List<Object>) params);
+            if (parameters instanceof Map) {
+                query.bindValues((Map) parameters);
+            } else {
+                query.bindValues((List) parameters);
+            }
             query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                String.format("Failed to get tag count for query [%s], with parameters [%s]", hql, params.toString()),
-                e);
+                String.format("Failed to get tag count for query [%s], with parameters [%s]", hql, parameters), e);
         }
 
         Collections.sort(results, String.CASE_INSENSITIVE_ORDER);

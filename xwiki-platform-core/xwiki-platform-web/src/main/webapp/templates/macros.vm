@@ -1806,23 +1806,11 @@ function (row, i, table) {
  * @param customWhereQL if defined then use that query instead of computing it ourselves. In this case the filterWebHome
  *        parameter value is ignored
  * @internal
- * @deprecated since 11.6, use #addLocationFilter instead
  *#
 #macro(addLivetableLocationFilter $whereQL $whereParams $locationValue $filterWebHome $customWhereQL)
   #if ("$!locationValue" != '')
     ## Location is a special case, that we need to handle separatly.
     ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
-    #if ("$!customWhereQL" != '')
-      #set ($internalWhereQL = "${whereQL} $customWhereQL")
-    #else
-      #if ($filterWebHome == true)
-        #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!')")
-        #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')")
-        #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
-      #else
-        #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!'")
-      #end
-    #end
     #set ($locationFilterValue = $locationValue)
     ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as
     ## wildcards). However, it is not what the user expects (e.g. https://jira.xwiki.org/browse/XWIKI-12608).
@@ -1836,10 +1824,30 @@ function (row, i, table) {
     ## to filter on different levels:
     ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
     #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%.%'))
-    #if ("$!customWhereQL" == '')
-      #set ($discard = $whereParams.add("%${locationFilterValue}%"))
-      #if ($filterWebHome == true)
+    #if ("$!customWhereQL" != '')
+      #set ($internalWhereQL = "${whereQL} $customWhereQL")
+    #else
+      #if ($whereParams.entrySet())
+        #set ($discard = $whereParams.put('locationFilterValue', "%${locationFilterValue}%"))
+      #else
         #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+      #end
+      #if ($filterWebHome == true)
+        #if ($whereParams.entrySet())
+          #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(:locationFilterValue) ESCAPE '!')")
+          #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(:locationFilterValue) ESCAPE '!')")
+          #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
+        #else
+          #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!')")
+          #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')")
+          #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
+        #end
+      #else
+        #if ($whereParams.entrySet())
+          #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(:locationFilterValue) ESCAPE '!'")
+        #else
+          #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!'")
+        #end
       #end
     #end
     #set ($whereQL = $NULL)

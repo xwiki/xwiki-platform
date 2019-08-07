@@ -45,7 +45,7 @@
  * set of results serialized in JSON.
  *#
 #macro(gridresult $className $collist)
-  #gridresultwithfilter($className $collist '' '' [])
+  #gridresultwithfilter($className $collist '' '' {})
 #end
 
 
@@ -59,7 +59,11 @@
   ## Parametrized filter part of the query
   #set($whereSql = '')
   ## List of values to use with $whereSql
-  #set($whereParams = [])
+  #if ($filterParams.entrySet())
+    #set($whereParams = {})
+  #else
+    #set($whereParams = [])
+  #end
   #set($class = $xwiki.getDocument($className).getxWikiClass())
   ##
   ## Add the columns needed for the actual data
@@ -81,8 +85,13 @@
       ## tags in the FROM clause then we match at least one of the tags (OR operator). The only remaining option is to
       ## check that the list of tags contains each of the desired tags. HQL doesn't help us to lower-case the entire
       ## list of tags so we use an inner select for this.
-      #set($whereSql = "${whereSql} lower(?) in (select lower(tag) from tagprop.list tag)")
-      #set($discard = $whereParams.add("${tag}"))
+      #if ($whereParams.entrySet())
+        #set($whereSql = "${whereSql} lower(:wikitag${foreach.count}) in (select lower(tag) from tagprop.list tag)")
+        #set($discard = $whereParams.put("wikitag$foreach.count", "${tag}", "${tag}"))
+      #else
+        #set($whereSql = "${whereSql} lower(?) in (select lower(tag) from tagprop.list tag)")
+        #set($discard = $whereParams.add("${tag}"))
+      #end
     #end
     #set($whereSql = "${whereSql})")
   #end
@@ -94,8 +103,13 @@
   #macro(addObjectClause $objectAlias)
     #if($fromSql.indexOf($objectAlias) &lt; 0)
       #set($fromSql = "${fromSql}, BaseObject $objectAlias")
-      #set($whereSql = "${whereSql} and ${objectAlias}.name = doc.fullName and ${objectAlias}.className = ?")
-      #set($discard = $whereParams.add($propClassName))
+      #if ($whereParams.entrySet())
+        #set($whereSql = "${whereSql} and ${objectAlias}.name = doc.fullName and ${objectAlias}.className = :${objectAlias}_className")
+        #set($discard = $whereParams.put("${objectAlias}_className", $propClassName))
+      #else
+        #set($whereSql = "${whereSql} and ${objectAlias}.name = doc.fullName and ${objectAlias}.className = ?")
+        #set($discard = $whereParams.add($propClassName))
+      #end
     #end
   #end
   ## Set the order clause for a field. We first ignore the case using the lower function (so that e.g. 'aaa' equals 'AAA')
@@ -152,8 +166,13 @@
           #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
           ## FIXME: Check if this is indeed a property of the class. Hint: $propType can be used.
           ## Conditions are put on the object coresponding to the column of the order ($orderObjectAlias), which depends on which is the class of the $order
-          #set($whereSql = "${whereSql} and ${orderObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
-          #set($discard = $whereParams.add("${order}"))
+          #if ($whereParams.entrySet())
+            #set($whereSql = "${whereSql} and ${orderObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = :${safe_tableAlias}_name")
+            #set($discard = $whereParams.put("${safe_tableAlias}_name", "${order}"))
+          #else
+            #set($whereSql = "${whereSql} and ${orderObjectAlias}.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
+            #set($discard = $whereParams.add("${order}"))
+          #end
         #end
         ## Add the column to the order clause.
         #setOrderClause("${safe_tableAlias}.value", ${orderDirection}, $rawPropertyTypes.contains($propType))
@@ -164,45 +183,95 @@
   ##
   ## Compute the final queries
   ##
-  #set($sqlParams = [])
-  #set($tagsMatchingParams = [])
-  #set($allMatchingParams = [])
+  #if ($filterParams.entrySet())
+    #set($sqlParams = {})
+    #set($tagsMatchingParams = {})
+    #set($allMatchingParams = {})
+  #else
+    #set($sqlParams = [])
+    #set($tagsMatchingParams = [])
+    #set($allMatchingParams = [])
+  #end
   #if("$!className" != '')
     ## Class query
-    #set($sql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
-    #set($discard = $sqlParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
-    #set($discard = $sqlParams.addAll($whereParams))
+    #if ($sqlParams.entrySet())
+      #set($sql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = :className and doc.fullName not in (:classTemplate1, :classTemplate2) $!whereSql $!filterwhere")
+      #set($discard = $sqlParams.put('className', "${className}"))
+      #set($discard = $sqlParams.put('classTemplate1', "${className}Template"))
+      #set($discard = $sqlParams.put('classTemplate2', ${className.replaceAll('Class$', 'Template')}))
+      #set($discard = $sqlParams.putAll($whereParams))
+    #else
+      #set($sql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
+      #set($discard = $sqlParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
+      #set($discard = $sqlParams.addAll($whereParams))
+    #end
     ##
     #set($tagsMatchingFiltersFrom = ", BaseObject as obj $!fromSql $!filterfrom")
-    #set($tagsMatchingFiltersWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
-    #set($discard = $tagsMatchingParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
-    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    #if ($tagsMatchingParams.entrySet())
+      #set($tagsMatchingFiltersWhere = "obj.name=doc.fullName and obj.className = :className and doc.fullName not in (:classTemplate1, :classTemplate2) $!whereSql $!filterwhere")
+      #set($discard = $tagsMatchingParams.put('className', "${className}"))
+      #set($discard = $tagsMatchingParams.put('classTemplate1', "${className}Template"))
+      #set($discard = $tagsMatchingParams.put('classTemplate2', ${className.replaceAll('Class$', 'Template')}))
+      #set($discard = $tagsMatchingParams.putAll($whereParams))
+    #else
+      #set($tagsMatchingFiltersWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!whereSql $!filterwhere")
+      #set($discard = $tagsMatchingParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
+      #set($discard = $tagsMatchingParams.addAll($whereParams))
+    #end
     ##
     #set($allMatchingTagsFrom = ", BaseObject as obj $!filterfrom")
-    #set($allMatchingTagsWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!filterwhere")
-    #set($discard = $allMatchingParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
+    #if ($allMatchingTagsWhere.entrySet())
+      #set($allMatchingTagsWhere = "obj.name=doc.fullName and obj.className = :className and doc.fullName not in (:classTemplate1, :classTemplate2) $!filterwhere")
+      #set($discard = $allMatchingTagsWhere.put('className', "${className}"))
+      #set($discard = $allMatchingTagsWhere.put('classTemplate1', "${className}Template"))
+      #set($discard = $allMatchingTagsWhere.put('classTemplate2', ${className.replaceAll('Class$', 'Template')}))
+      #set($discard = $allMatchingTagsWhere.putAll($whereParams))
+    #else
+      #set($allMatchingTagsWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!filterwhere")
+      #set($discard = $allMatchingParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))
+    #end
     ##
     #if($filterParams)
-      #set($discard = $sqlParams.addAll($filterParams))
-      #set($discard = $tagsMatchingParams.addAll($filterParams))
-      #set($discard = $allMatchingParams.addAll($filterParams))
+      #if ($filterParams.entrySet())
+        #set($discard = $sqlParams.putAll($filterParams))
+        #set($discard = $tagsMatchingParams.putAll($filterParams))
+        #set($discard = $allMatchingParams.putAll($filterParams))
+      #else
+        #set($discard = $sqlParams.addAll($filterParams))
+        #set($discard = $tagsMatchingParams.addAll($filterParams))
+        #set($discard = $allMatchingParams.addAll($filterParams))
+      #end
     #end
   #else
     ## Document query
     #set($sql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
-    #set($discard = $sqlParams.addAll($whereParams))
+    #if ($whereParams.entrySet())
+      #set($discard = $sqlParams.putAll($whereParams))
+    #else
+      #set($discard = $sqlParams.addAll($whereParams))
+    #end
     ##
     #set($tagsMatchingFiltersFrom = "$!fromSql $!filterfrom")
     #set($tagsMatchingFiltersWhere = "1=1 $!whereSql $!filterwhere")
-    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    #if ($whereParams.entrySet())
+      #set($discard = $tagsMatchingParams.putAll($whereParams))
+    #else
+      #set($discard = $tagsMatchingParams.addAll($whereParams))
+    #end
     ##
     #set($allMatchingTagsFrom = "$!filterfrom")
     #set($allMatchingTagsWhere = "1=1 $!filterwhere")
     ##
     #if($filterParams)
-      #set($discard = $sqlParams.addAll($filterParams))
-      #set($discard = $tagsMatchingParams.addAll($filterParams))
-      #set($discard = $allMatchingParams.addAll($filterParams))
+      #if ($filterParams.entrySet())
+        #set($discard = $sqlParams.putAll($filterParams))
+        #set($discard = $tagsMatchingParams.putAll($filterParams))
+        #set($discard = $allMatchingParams.putAll($filterParams))
+      #else
+        #set($discard = $sqlParams.addAll($filterParams))
+        #set($discard = $tagsMatchingParams.addAll($filterParams))
+        #set($discard = $allMatchingParams.addAll($filterParams))
+      #end
     #end
   #end
   #if($orderSql != '')
@@ -426,7 +495,7 @@
  * @param $map stores the JSON in memory so that it can be adjusted before serialization
  *#
 #macro(gridresult_buildJSON $className $collist $map)
-  #gridresultwithfilter_buildJSON($className $collist '' '' [] $map)
+  #gridresultwithfilter_buildJSON($className $collist '' '' {} $map)
 #end
 
 
@@ -595,8 +664,13 @@
           #livetable_filterDateProperty()
         #else
           #set ($safeColName = $colName.replaceAll('[^a-zA-Z0-9_.]', '').replace('_', '.'))
-          #set ($whereSql = "${whereSql} and upper(str($safeColName)) like upper(?)")
-          #set ($discard = $whereParams.add("%$filterValue%"))
+          #if ($whereParams.entrySet())
+            #set ($whereSql = "${whereSql} and upper(str($safeColName)) like upper(:${safeColName.replace('.', '_')}_filter)")
+            #set ($discard = $whereParams.put("${safeColName.replace('.', '_')}_filter", "%$filterValue%"))
+          #else
+            #set ($whereSql = "${whereSql} and upper(str($safeColName)) like upper(?)")
+            #set ($discard = $whereParams.add("%$filterValue%"))
+          #end
         #end
       #else
         #set ($filterValues = $request.getParameterValues($colname))
@@ -608,7 +682,7 @@
 #end
 
 
-#macro (livetable_filterProperty $colname $filterValue)
+#macro (livetable_filterProperty $colname $filterValue $valueCount)
   #livetable_getTableAlias($colname)
   #livetable_getTableName($colname)
   #set ($fromSql = "$fromSql, $tableName as $safe_tableAlias")
@@ -626,9 +700,14 @@
       #addObjectClause($filterObjectAlias)
     #end
   #end
-  #set ($joinObjectTable = "${filterObjectAlias}.id = ${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ?")
+  #if ($whereParams.entrySet())
+    #set ($joinObjectTable = "${filterObjectAlias}.id = ${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = :${safe_tableAlias}_id_name")
+    #set ($discard = $whereParams.put("${safe_tableAlias}_id_name", $colname))
+  #else
+    #set ($joinObjectTable = "${filterObjectAlias}.id = ${safe_tableAlias}.id.id and ${safe_tableAlias}.id.name = ?")
+    #set ($discard = $whereParams.add($colname))
+  #end
   #set ($whereSql = "$whereSql and $joinObjectTable")
-  #set ($discard = $whereParams.add($colname))
   ##
   ## Specifies how the filter value should be matched against the stored value.
   #set ($matchType = $request.getParameter("${colname}_match"))
@@ -666,7 +745,13 @@
       ## IntegerProperty
       #set($numberValue = $numberValue.intValue())
     #end
-    #set($whereSql = "${whereSql} and ${safe_tableAlias}.value = ?")
+    #if ($whereParams.entrySet())
+      #set($whereSql = "${whereSql} and ${safe_tableAlias}.value = :${safe_tableAlias}_value")
+      #set($discard = $whereParams.put("${safe_tableAlias}_value", $numberValue))
+    #else
+      #set($whereSql = "${whereSql} and ${safe_tableAlias}.value = ?")
+      #set($discard = $whereParams.add($numberValue))
+    #end
   #else
     #if($tableName == 'FloatProperty')
       #set($numberValue = $numberValue.floatValue())
@@ -675,9 +760,14 @@
       #set($numberValue = $numberValue.doubleValue())
     #end
     #set($precision = 0.000001)
-    #set($whereSql = "${whereSql} and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
+    #if ($whereParams.entrySet())
+      #set($whereSql = "${whereSql} and abs(:${safe_tableAlias}_value - ${safe_tableAlias}.value) &lt;= ${precision}")
+      #set($discard = $whereParams.put("${safe_tableAlias}_value", $numberValue))
+    #else
+      #set($whereSql = "${whereSql} and abs(? - ${safe_tableAlias}.value) &lt;= ${precision}")
+      #set($discard = $whereParams.add($numberValue))
+    #end
   #end
-  #set($discard = $whereParams.add($numberValue))
 #end
 
 
@@ -692,13 +782,24 @@
   #end
   #set ($timestamps = $filterValue.split('-'))
   #if ($timestamps.size() == 2)
-    #set ($whereSql = "${whereSql} and $dateProperty &gt;= ? and $dateProperty &lt;= ?")
-    #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[0]))))
-    #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[1]))))
+    #if ($whereParams.entrySet())
+      #set ($whereSql = "${whereSql} and $dateProperty &gt;= :${dateProperty}1 and $dateProperty &lt;= :${dateProperty}2")
+      #set ($discard = $whereParams.put($dateProperty, $datetool.toDate($mathtool.toNumber($timestamps[0]))))
+      #set ($discard = $whereParams.put($dateProperty, $datetool.toDate($mathtool.toNumber($timestamps[1]))))
+    #else
+      #set ($whereSql = "${whereSql} and $dateProperty &gt;= ? and $dateProperty &lt;= ?")
+      #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[0]))))
+      #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[1]))))
+    #end
   #else
     ## Fall back to the older string matching
-    #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(?)")
-    #set ($discard = $whereParams.add("%$filterValue%"))
+    #if ($whereParams.entrySet())
+      #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(:$dateProperty)")
+      #set ($discard = $whereParams.put($dateProperty, "%$filterValue%"))
+    #else
+      #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(?)")
+      #set ($discard = $whereParams.add("%$filterValue%"))
+    #end
   #end
 #end
 
@@ -710,18 +811,28 @@
   #if ($matchType == 'partial' || $matchType == 'prefix')
     ## We need to join with the list of values in order to be able to use the LIKE operator.
     #set ($matchTarget = "${safe_tableAlias}_item")
+    #if ($whereParams.entrySet())
+      #set ($paramPrefix = "${safe_tableAlias}_item_")
+    #else
+      #set ($paramPrefix = $NULL)
+    #end
     #set ($joinPos = $mathtool.add($fromSql.lastIndexOf(" $safe_tableAlias"), $mathtool.add($safe_tableAlias.length(), 1)))
     #set ($fromSql = "$fromSql.substring(0, $joinPos) join ${safe_tableAlias}.list as $matchTarget $fromSql.substring($joinPos)")
   #else
     ## Perform exact matching by default (if no match type is specified).
     #set ($matchType = 'exact')
     #set ($matchTarget = "${safe_tableAlias}.list")
+    #if ($whereParams.entrySet())
+      #set ($paramPrefix = "${safe_tableAlias}_list_")
+    #else
+      #set ($paramPrefix = $NULL)
+    #end
   #end
   #set ($filterValues = $request.getParameterValues($colname))
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size())")
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget $matchType true $filterValues.size() $paramPrefix)")
   #set ($whereSql = "$whereSql and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
-    #livetable_addFilterParam($filterValue $matchType $whereParams)
+    #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
   #end
 #end
 
@@ -732,10 +843,19 @@
 #macro (livetable_filterStringListProperty)
   #set ($filterValues = $request.getParameterValues($colname))
   #set ($matchTarget = "concat('|', concat(${safe_tableAlias}.textValue, '|'))")
-  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size())")
+  #if ($whereParams.entrySet())
+    #set ($paramPrefix = "${safe_tableAlias}_textValue_")
+  #else
+    #set ($paramPrefix = $NULL)
+  #end
+  #set ($filterQuery = "#livetable_getFilterQuery($matchTarget 'partial' false $filterValues.size() $paramPrefix)")
   #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
-    #set ($discard = $whereParams.add("%|$filterValue|%"))
+    #if ($whereParams.entrySet())
+      #set ($discard = $whereParams.put("${$paramPrefix}${foreach.count}", "%|$filterValue|%"))
+    #else
+      #set ($discard = $whereParams.add("%|$filterValue|%"))
+    #end
   #end
 #end
 
@@ -754,38 +874,69 @@
       #set ($matchType = 'partial')
     #end
   #end
-  #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $valueCount)")
+  #if ($whereParams.entrySet())
+    #set ($paramPrefix = "${safe_tableAlias}_value_")
+  #else
+    #set ($paramPrefix = $NULL)
+  #end
+  #set ($filterQuery = "#livetable_getFilterQuery(""${safe_tableAlias}.value"" $matchType false $valueCount $paramPrefix)")
   #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
-    #livetable_addFilterParam($filterValue $matchType $whereParams)
+    #livetable_addFilterParam($filterValue $matchType $whereParams "${paramPrefix}${foreach.count}")
   #end
 #end
 
-
-#macro (livetable_getFilterQuery $column $matchType $isList $valueCount)
+#macro (livetable_getFilterQuery $column $matchType $isList $valueCount $paramPrefix)
+$services.logging.getLogger('toto').error($valueCount)##
   #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
   #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
     #set ($joinOperator = 'AND')
   #end
   #if ($matchType == 'partial' || $matchType == 'prefix')
-    $stringtool.repeat("upper($column) like upper(?)", " $joinOperator ", $valueCount)
+    #livetable_repeatParams("upper($column) like upper(?)", " $joinOperator ", $valueCount, $paramPrefix)
   #elseif ($isList)
-    $stringtool.repeat("? in elements($column)", " $joinOperator ", $valueCount)
+    #livetable_repeatParams("? in elements($column)", " $joinOperator ", $valueCount, $paramPrefix)
   #elseif ($valueCount &gt; 1 &amp;&amp; $joinOperator == 'OR')
-    $column in ($stringtool.repeat('?', ', ', $valueCount))
+    $column in (#livetable_repeatParams('?', ', ', $valueCount, $paramPrefix))
   #else
-    $stringtool.repeat("$column = ?", ' AND ', $valueCount)
+    #livetable_repeatParams("$column = ?", ' AND ', $valueCount, $paramPrefix)
   #end
 #end
 
+#macro (livetable_repeatParams $str $separator $valueCount $paramPrefix)
+  #if ($valueCount &gt; 0)
+    #foreach ($count in [1..$valueCount])
+      #if ($foreach.count &gt; 0)
+        $separator##
+      #end
+      #if ($paramPrefix)
+        $str.replace('?', "${paramPrefix}${foreach.count}")##
+      #else
+        $str##
+      #end
+    #end
+  #end
+#end
 
-#macro (livetable_addFilterParam $filterValue $matchType $params)
+#macro (livetable_addFilterParam $filterValue $matchType $params $paramName)
   #if ($matchType == 'partial')
-    #set ($discard = $params.add("%$!filterValue%"))
+    #if ($params.entrySet())
+      #set ($discard = $params.put($paramName, "%$!filterValue%"))
+    #else
+      #set ($discard = $params.add("%$!filterValue%"))
+    #end
   #elseif ($matchType == 'prefix')
-    #set ($discard = $params.add("$!filterValue%"))
+    #if ($params.entrySet())
+      #set ($discard = $params.put($paramName, "$!filterValue%"))
+    #else
+      #set ($discard = $params.add("$!filterValue%"))
+    #end
   #else
-    #set ($discard = $params.add($filterValue))
+    #if ($params.entrySet())
+      #set ($discard = $params.put($paramName, $filterValue))
+    #else
+      #set ($discard = $params.add($filterValue))
+    #end
   #end
 #end
 

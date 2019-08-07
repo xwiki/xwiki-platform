@@ -44,6 +44,8 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -207,7 +209,7 @@ public class ListAttachmentArchiveTest
 
         ListAttachmentArchive archive = new ListAttachmentArchive(attachments);
         String archiveAsString = archive.getArchiveAsString(xWikiContext);
-        assertTrue(archiveAsString.contains("date\t69.12.01.01.00.01;"));
-        assertTrue(archiveAsString.contains("date\t69.12.01.01.00.00;"));
+        assertThat(archiveAsString, containsString("date\t69.12.01.01.00.01;"));
+        assertThat(archiveAsString, containsString("date\t69.12.01.01.00.00;"));
     }
 }

@@ -32,6 +32,7 @@
   <description>REST API for the notifications</description>
   <properties>
     <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>

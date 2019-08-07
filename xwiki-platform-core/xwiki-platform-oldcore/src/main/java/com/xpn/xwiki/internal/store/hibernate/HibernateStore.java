@@ -96,6 +96,7 @@ import com.xpn.xwiki.store.migration.DataMigrationManager;
  */
 @Component(roles = HibernateStore.class)
 @Singleton
+// Make sure the Hibernate store is disposed at the end in case some components needs it for their own dispose
 @DisposePriority(10000)
 public class HibernateStore implements Disposable, Integrator, Initializable
 {

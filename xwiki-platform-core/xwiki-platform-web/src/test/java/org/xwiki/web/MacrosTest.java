@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class MacrosTest
 {
-    private static final String BASEDIR = System.getProperty("basedir");
+    private static final String BASEDIR = "/DATA/projets/xwiki/src/git/xwiki-platform/xwiki-platform-core/xwiki-platform-web";
 
     private VelocityEngine ve;
 

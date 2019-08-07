@@ -1841,6 +1841,7 @@ function (row, i, table) {
           #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!')")
           #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')")
           #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
+          #set ($discard = $whereParams.add("%${locationFilterValue}%"))
         #end
       #else
         #if ($whereParams.entrySet())

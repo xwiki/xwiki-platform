@@ -79,8 +79,6 @@ public class LogCaptureValidator
         new Line("jstree.min.js, line 2: TypeError: c is undefined"),
         // See: https://jira.xwiki.org/browse/XWIKI-13609 comments: this log could still happen from time to time.
         new Line("Failed to save job status"),
-        // FIXME: convert all ? based queries to ?<number> or named parameters
-        new Line("Deprecated usage legacy-style HQL ordinal parameters (`?`)"),
         // When updating a collection Hibernate start by deleting the existing elements and HSQLDB complains when there
         // is actually nothing to delete it seems
         new Line("SQL Warning Code: -1100, SQLState: 02000"),

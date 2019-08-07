@@ -84,9 +84,9 @@ public class XWikiAttachmentRCSArchive extends Archive
         calendar.setTime(newDate);
         this.head.setDate(new int[]{
             calendar.get(Calendar.YEAR) - 1900,
-            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.MONTH) + 1,
             calendar.get(Calendar.DAY_OF_MONTH),
-            calendar.get(Calendar.HOUR),
+            calendar.get(Calendar.HOUR_OF_DAY),
             calendar.get(Calendar.MINUTE),
             calendar.get(Calendar.SECOND)
         });

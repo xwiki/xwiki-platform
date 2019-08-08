@@ -90,7 +90,7 @@ public class RenderingScriptService implements ScriptService
      */
     public List<Syntax> getAvailableParserSyntaxes()
     {
-        List<Syntax> syntaxes = new ArrayList<Syntax>();
+        List<Syntax> syntaxes = new ArrayList<>();
         try {
             for (Parser parser : this.componentManagerProvider.get().<Parser>getInstanceList(Parser.class)) {
                 syntaxes.add(parser.getSyntax());
@@ -108,7 +108,7 @@ public class RenderingScriptService implements ScriptService
      */
     public List<Syntax> getAvailableRendererSyntaxes()
     {
-        List<Syntax> syntaxes = new ArrayList<Syntax>();
+        List<Syntax> syntaxes = new ArrayList<>();
         try {
             List<PrintRendererFactory> factories =
                 this.componentManagerProvider.get().getInstanceList(PrintRendererFactory.class);
@@ -213,7 +213,6 @@ public class RenderingScriptService implements ScriptService
         if (content == null || syntax == null) {
             return null;
         }
-        String input = String.valueOf(content);
 
         // Determine the escape character for the syntax.
         char escapeChar;
@@ -225,12 +224,12 @@ public class RenderingScriptService implements ScriptService
         }
 
         // Since we prefix all characters, the result size will be double the input's, so we can just use char[].
-        char[] result = new char[input.length() * 2];
+        char[] result = new char[content.length() * 2];
 
         // Escape the content.
-        for (int i = 0; i < input.length(); i++) {
+        for (int i = 0; i < content.length(); i++) {
             result[2 * i] = escapeChar;
-            result[2 * i + 1] = input.charAt(i);
+            result[2 * i + 1] = content.charAt(i);
         }
 
         return String.valueOf(result);

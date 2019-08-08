@@ -37,11 +37,14 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
+#set ($translationPrefix = 'xe.attachmentSelector')
+
 #if ($request.xaction == 'postUpload')
   #set ($targetDocument = $xwiki.getDocument($request.get('docname')))
   #set ($targetAttachDocument = $xwiki.getDocument($request.get('targetdocname')))
 
   #set ($fieldname = $request.get('fieldname'))
+  #set ($comment = $services.localization.render("${translationPrefix}.postUpload.comment", [$fieldname]))
   #set ($docAction = $request.get('docAction'))
   #set ($attachmentList = $targetAttachDocument.getAttachmentList())
   #if ($attachmentList &amp;&amp; $attachmentList.size() &gt; 0)
@@ -50,6 +53,7 @@
   #end
   $response.sendRedirect($targetDocument.getURL($docAction, $escapetool.url({
     $fieldname: $lastAttachment.filename,
+    'comment': $comment,
     'form_token': $request.form_token
   })))
   #stop
@@ -60,7 +64,6 @@
 ##
 ## Macros
 ##
-#set ($translationPrefix = 'xe.attachmentSelector')
 #set ($attachmentPickerDocName = 'XWiki.AttachmentSelector')
 
 $xwiki.ssx.use($attachmentPickerDocName)

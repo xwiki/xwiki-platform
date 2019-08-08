@@ -31,9 +31,11 @@ import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.environment.Environment;
+import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.api.Attachment;
 
@@ -53,8 +55,11 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class AttachmentMimeBodyPartFactoryTest
 {
-    private static final String TEMPORARY_DIRECTORY = "target/"
-        + AttachmentMimeBodyPartFactoryTest.class.getSimpleName();
+    private static final String TEMPORARY_DIRECTORY =
+        "target/" + AttachmentMimeBodyPartFactoryTest.class.getSimpleName();
+
+    @MockComponent
+    private Environment environment;
 
     @InjectMockComponents
     private AttachmentMimeBodyPartFactory attachmentMimeBodyPartFactory;
@@ -62,12 +67,15 @@ public class AttachmentMimeBodyPartFactoryTest
     @InjectComponentManager
     private ComponentManager componentManager;
 
+    @AfterComponent
+    public void afterComponent()
+    {
+        when(this.environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
+    }
+
     @Test
     public void createAttachmentBodyPart() throws Exception
     {
-        Environment environment = this.componentManager.getInstance(Environment.class);
-        when(environment.getTemporaryDirectory()).thenReturn(new File(TEMPORARY_DIRECTORY));
-
         Attachment attachment = mock(Attachment.class);
         when(attachment.getContentInputStream()).thenReturn(new ByteArrayInputStream("Lorem Ipsum".getBytes()));
         when(attachment.getFilename()).thenReturn("image.png");

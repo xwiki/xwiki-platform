@@ -52,13 +52,13 @@ platform.wiki.currentwiki.welcome=Willkommen im Wiki  {0}{1}{2}.
 platform.wiki.currentwiki.currentUserIsOwner=Sie sind der Besitzer dieses Wikis.
 platform.wiki.currentwiki.currentUserIsAdmin=Sie sind ein Administrator in diesem Wiki.
 platform.wiki.currentwiki.joinNeedToLogin=Um diesem Wiki beizutreten, müssen Sie eingeloggt sein.
-platform.wiki.currentwiki.currentUserNotMember=Sie sind nicht Mitglied in diesem Wiki
+platform.wiki.currentwiki.currentUserNotMember=Sie sind nicht Mitglied in diesem Wiki.
 platform.wiki.currentwiki.currentuserCanJoin=Wenn Sie wollen, können Sie {0}diesem Wiki beitreten{1}.
 platform.wiki.currentwiki.currentUserIsMember=Sie sind Mitglied in diesem Wiki.
 platform.wiki.currentwiki.currentUserCanLeave=Wenn Sie wollen, können Sie {0}dieses Wiki verlassen{1}.
 platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=Um die Liste aller Mitglieder dieses Wikis anzusehen, verwenden Sie bitte das {0}Benutzerverzeichnis{1}.
-### Missing: platform.wiki.currentwiki.invitationPendingForCurrentWiki=You have been invited to join this wiki.
-### Missing: platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=You have requested to join this wiki.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Sie sind eingeladen worden, diesem Wiki beizutreten.
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Sie haben beantragt, diesem Wiki beizutreten.
 platform.wiki.currentwiki.joinRequestAcceptedNotification=Ihr Antrag auf Mitgliedschaft im Wiki ''{0}'' wurde angenommen.
 platform.wiki.currentwiki.joinRequestRejectedNotification=Ihr Antrag auf Mitgliedschaft im Wiki ''{0}'' wurde abgelehnt.
 platform.wiki.currentwiki.candidateHandledSaveComment=Antrag von Kandidat {0} ({1}) behandelt
@@ -101,7 +101,7 @@ platform.wiki.currentwiki.candidates.label=Kandidaten
 platform.wiki.currentwiki.candidates.status.label=Status:
 platform.wiki.currentwiki.candidates.type.label=Typ:
 platform.wiki.currentwiki.candidates.reviewer.label=Administrator:
-platform.wiki.currentwiki.candidates.reviewermessage.label=Mitteilung vom Administrator;
+platform.wiki.currentwiki.candidates.reviewermessage.label=Mitteilung vom Administrator:
 platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Kommentar (privat):
 platform.wiki.currentwiki.candidates.accept.label=Annehmen
 platform.wiki.currentwiki.candidates.reject.label=Ablehnen
@@ -121,17 +121,17 @@ platform.wiki.currentwiki.prop.owner.hint=Ein Benutzer, der alle Rechte in dem W
 platform.wiki.currentwiki.prop.membershipType.hint=Auf welche Weise Benutzer dem Wiki beitreten.
 platform.wiki.currentwiki.prop.secure.hint=Wenn aktiviert, dann fangen alle vom Wiki generierten URLs mit {0}https:~/~/{1} an.
 platform.wiki.currentwiki.invite.username.hint=Benutzer, welcher zum Wiki hinzugefügt werden soll.
-platform.wiki.currentwiki.invite.message.hint=Die Mitteilung für den Benutzer
+platform.wiki.currentwiki.invite.message.hint=Die Mitteilung wurde an den Benutzer versandt.
 platform.wiki.currentwiki.candidates.hint=Benutzer, welche eine Mitgleidschaft beantragt haben, oder dazu eingeladen wurden.
-### Missing: platform.wiki.currentwiki.candidates.empty=No user has requested or been invited to join the wiki.
+platform.wiki.currentwiki.candidates.empty=Kein Benutzer hat eine Mitgliedschaft zu diesem Wiki beantragt oder ist zu diesem Wiki eingeladen worden.
 
 # ADMIN
 admin.xwiki.manageworkspace.description=Ändern Sie die Einstellungen des Wikis: Name, Beschreibung, Besitzer und Art der Mitgliedschaft.
 admin.xwiki.workspaceusers.description=Benutzerverwaltung für das Wiki: Benutzer hinzufügen, löschen und einladen, sowie Anträge auf Mitgliedschaft annehmen oder ablehnen.
 admin.xwiki.usersconfiguration.title=Konfiguration
-### Missing: admin.xwiki.members.title=Current Members
-### Missing: admin.xwiki.users.title=All Users
+admin.xwiki.members.title=Derzeitige Mitglieder
+admin.xwiki.users.title=Alle Benutzer
     
 # DRAWER ITEM
-### Missing: platform.wiki.drawer.homeWiki=Home</content>
+platform.wiki.drawer.homeWiki=Startseite</content>
 </xwikidoc>

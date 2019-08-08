@@ -906,11 +906,11 @@ $services.logging.getLogger('toto').error($valueCount)##
 #macro (livetable_repeatParams $str $separator $valueCount $paramPrefix)
   #if ($valueCount &gt; 0)
     #foreach ($count in [1..$valueCount])
-      #if ($foreach.count &gt; 0)
+      #if ($count &gt; 1)
         $separator##
       #end
       #if ($paramPrefix)
-        $str.replace('?', "${paramPrefix}${foreach.count}")##
+        $str.replace('?', ":${paramPrefix}${foreach.count}")##
       #else
         $str##
       #end

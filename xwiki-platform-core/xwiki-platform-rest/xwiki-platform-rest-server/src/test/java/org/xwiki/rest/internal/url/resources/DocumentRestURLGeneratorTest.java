@@ -80,4 +80,12 @@ public class DocumentRestURLGeneratorTest
         assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/page/translations/fr",
             this.generator.getURL(documentReference).toString());
     }
+
+    @Test
+    public void getURLWithSlash() throws Exception
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "pa/ge");
+        assertEquals("http://localhost/rest/wikis/wiki/spaces/space/pages/pa%2Fge",
+            this.generator.getURL(documentReference).toString());
+    }
 }

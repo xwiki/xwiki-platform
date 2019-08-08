@@ -402,29 +402,6 @@
   float: right;
   margin-top: -1.2em;
 }
-.annotationTools a {
-  background: transparent none no-repeat left top;
-  display: block;
-  float: left;
-  height: 16px;
-  margin:0 0 0 4px;
-  overflow: hidden;
-  text-indent: -9999px;
-  width: 16px;
-}
-.annotationTools .reply {
-  background-image: #imgURL('comments_add');
-  padding-left: 0px;
-}
-.annotationTools .edit {
-  background-image: #imgURL('pencil');
-}
-.annotationTools .delete {
-  background-image: #imgURL('cross');
-}
-.annotationTools .validate {
-  background-image: #imgURL('tick');
-}
 
 .annotationComment {
   padding: 4px 0;

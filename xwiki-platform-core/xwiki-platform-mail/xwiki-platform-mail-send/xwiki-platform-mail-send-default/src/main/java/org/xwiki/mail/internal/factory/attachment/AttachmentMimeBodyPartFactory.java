@@ -32,7 +32,6 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.environment.Environment;
@@ -59,12 +58,6 @@ public class AttachmentMimeBodyPartFactory extends AbstractMimeBodyPartFactory<A
 
     @Inject
     private Environment environment;
-
-    /**
-     * Provides access to the logger.
-     */
-    @Inject
-    private Logger logger;
 
     private File temporaryDirectory;
 

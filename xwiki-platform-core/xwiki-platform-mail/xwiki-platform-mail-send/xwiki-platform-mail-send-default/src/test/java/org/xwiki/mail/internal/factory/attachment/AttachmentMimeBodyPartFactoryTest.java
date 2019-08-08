@@ -96,8 +96,8 @@ public class AttachmentMimeBodyPartFactoryTest
         when(attachment.getFilename()).thenReturn("image.png");
         when(attachment.getMimeType()).thenReturn("image/png");
 
-        Map<String, Object> parameters = Collections.singletonMap("headers", (Object)
-            Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
+        Map<String, Object> parameters = Collections.singletonMap("headers",
+            (Object) Collections.singletonMap("Content-Transfer-Encoding", "quoted-printable"));
 
         MimeBodyPart part = this.attachmentMimeBodyPartFactory.create(attachment, parameters);
 
@@ -108,7 +108,7 @@ public class AttachmentMimeBodyPartFactoryTest
         // We verify that the Content-Disposition has the correct file name
         assertTrue(part.getFileName().matches("image\\.png"));
 
-        assertArrayEquals(new String[]{ "quoted-printable" }, part.getHeader("Content-Transfer-Encoding"));
+        assertArrayEquals(new String[] { "quoted-printable" }, part.getHeader("Content-Transfer-Encoding"));
 
         assertEquals("Lorem Ipsum", IOUtils.toString(part.getDataHandler().getInputStream(), "UTF-8"));
     }

@@ -368,7 +368,7 @@ public class Utils
                     } else if (pathElement instanceof EncodedElement) {
                         encodedPathElements[i] = pathElement.toString();
                     } else {
-                        encodedPathElements[i] = URIUtil.encodePath(pathElement.toString());
+                        encodedPathElements[i] = URIUtil.encodeWithinPath(pathElement.toString());
                     }
                 } catch (URIException e) {
                     throw new RuntimeException("Failed to encode path element: " + pathElements[i], e);
@@ -432,7 +432,7 @@ public class Utils
             if (spaceSegment.length() > 0) {
                 spaceSegment.append("/spaces/");
             }
-            spaceSegment.append(URIUtil.encodePath(space.toString()));
+            spaceSegment.append(URIUtil.encodeWithinPath(space.toString()));
         }
         return spaceSegment.toString();
     }

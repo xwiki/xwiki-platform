@@ -205,11 +205,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     if (this.selectize.settings.takeInputWidth) {
       this.selectize['$control'].width($(this).data('initialWidth'));
     }
-    // Set the title of the input field if it does exists in the select.
-    let inputTitle;
-    if (inputTitle = $(this).attr('title')) {
-      this.selectize.$control_input.attr('title', inputTitle);
-    }
+    // Set the title of the input field.
+    this.selectize.$control_input.attr('title', $(this).attr('title'));
   };
 
   var setDropDownAlignment = function(selectize) {

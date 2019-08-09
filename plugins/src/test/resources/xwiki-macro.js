@@ -131,7 +131,8 @@ describe('XWiki Macro Plugin for CKEditor', function() {
           '<!--startmacro:error|-|-->',
           '<div class="box errormessage">',
             'Error',
-            '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
+            // Add whitespaces in the type name to test that they are handled correctly.
+            '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
               '<p>test</p>',
             '</div>',
           '</div>',
@@ -150,7 +151,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
         expect(wikiMacroWidgets[0].editables.$content.getData()).toBe([
           '<p>before</p>',
           '<!--startmacro:error|-|-->',
-          '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
+          '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
             '<p>test</p>',
           '</div>',
           '<!--stopmacro-->',
@@ -162,7 +163,7 @@ describe('XWiki Macro Plugin for CKEditor', function() {
           '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
             '<p>before</p>',
             '<!--startmacro:error|-|-->',
-            '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
+            '<div data-xwiki-non-generated-content="java.util.List&lt; org.xwiki.rendering.block.Block &gt;">',
               '<p>test</p>',
             '</div>',
             '<!--stopmacro-->',

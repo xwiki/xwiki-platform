@@ -36,6 +36,22 @@
   var nestedEditableTypeAttribute = 'data-xwiki-non-generated-content';
   var nestedEditableNameAttribute = 'data-xwiki-parameter-name';
 
+  var getNestedEditableType = function(nestedEditable) {
+    var nestedEditableType;
+    if (typeof nestedEditable.getAttribute === 'function') {
+      // CKEDITOR.dom.element
+      nestedEditableType = nestedEditable.getAttribute(nestedEditableTypeAttribute);
+    } else if (nestedEditable.attributes) {
+      // CKEDITOR.htmlParser.element
+      nestedEditableType = nestedEditable.attributes[nestedEditableTypeAttribute];
+    }
+    if (typeof nestedEditableType === 'string') {
+      // Remove whitespace from the type name in order to have a single string representation.
+      nestedEditableType = nestedEditableType.replace(/\s+/g, '');
+    }
+    return nestedEditableType;
+  };
+
   var selectedMacroMarker = '__cke_selected_macro';
 
   var withLowerCaseKeys = function(object) {
@@ -158,7 +174,7 @@
             var thisWidget = this;
             // If the widget has nested editables we need to include them, otherwise their content is not saved.
             widgetElementClone.forEach(function(element) {
-              var nestedEditableType = element.attributes[nestedEditableTypeAttribute];
+              var nestedEditableType = getNestedEditableType(element);
               if (nestedEditableType && element.attributes.contenteditable) {
                 var parameterType = thisWidget.getParameterType(element.attributes[nestedEditableNameAttribute]);
                 // Skip the nested editable if it doesn't match the expected parameter type.
@@ -413,7 +429,7 @@
           nestedEditableName = nestedEditable.getAttribute(nestedEditableNameAttribute);
           nestedEditableSelector = 'div[' + nestedEditableNameAttribute + '="' + nestedEditableName + '"]';
         }
-        var nestedEditableType = nestedEditable.getAttribute(nestedEditableTypeAttribute);
+        var nestedEditableType = getNestedEditableType(nestedEditable);
         // Allow only plain text if the nested editable type is not known, in order to be safe.
         var nestedEditableConfig = nestedEditableTypes[nestedEditableType] || {allowedContent: ';'};
         widget.initEditable(nestedEditableName, {

@@ -48,9 +48,9 @@ CKEditor.ConfigClass_linkShowAdvancedTab.hint=Ermöglicht das Festlegen von Link
 CKEditor.ConfigClass_linkShowTargetTab=Link: Registerkarte Ziel anzeigen
 CKEditor.ConfigClass_linkShowTargetTab.hint=Ermöglicht das Festlegen des Link Ziel Attributs (z.B. Link in neuem Tab öffnen).
 CKEditor.ConfigClass_loadJavaScriptSkinExtensions=Lade JavaScript-Skin-Erweiterungen
-### Missing: CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Some rendering macros are displayed using JavaScript code. Loading the JavaScript code improves the WYSIWYG aspect of the editor but it may cause problems if the JavaScript code interferes with the CKEditor code or if it changes content outside of the macro output boundaries.
+CKEditor.ConfigClass_loadJavaScriptSkinExtensions.hint=Einige Rendering-Makros werden mit JavaScript-Code angezeigt. Das Laden des JavaScript-Codes verbessert den WYSIWYG-Aspekt des Editors, kann aber zu Problemen führen, wenn der JavaScript-Code den CKEditor-Code stört oder wenn er Inhalte außerhalb der Makroausgabegrenzen ändert.
 CKEditor.ConfigClass_advanced=Erweiterte Konfiguration
-### Missing: CKEditor.ConfigClass_advanced.hint=You can write a JavaScript snippet to modify directly the configuration object. Check the {0}CKEditor documentation{1} for the list of available configuration properties.
+CKEditor.ConfigClass_advanced.hint=Sie können ein JavaScript-Schnipsel schreiben, um direkt das Konfigurationsobjekt zu ändern. Die Liste der verfügbaren Konfigurationseigenschaften finden Sie in der {0}CKEditor Dokumentation{1}.
 
 ckeditor.admin.saveComment=CKEditor Konfiguration in Administration aktualisiert
 ckeditor.admin.reset=Zurücksetzen

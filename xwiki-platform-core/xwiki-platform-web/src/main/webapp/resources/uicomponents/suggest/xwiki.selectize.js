@@ -206,7 +206,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       this.selectize['$control'].width($(this).data('initialWidth'));
     }
     // Set the title of the input field.
-    this.selectize.$control_input.attr('title', $(this).attr('title'));
+    this.selectize['$control_input'].attr('title', $(this).attr('title'));
   };
 
   var setDropDownAlignment = function(selectize) {

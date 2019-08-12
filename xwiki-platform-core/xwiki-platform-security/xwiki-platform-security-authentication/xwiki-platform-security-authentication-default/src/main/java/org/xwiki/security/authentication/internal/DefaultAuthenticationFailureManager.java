@@ -86,6 +86,8 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
 
     private Map<String, AuthFailureRecord> authFailures = new HashMap<>();
 
+    private Map<DocumentReference, String> userAndAssociatedUsernames = new HashMap<>();
+
     /**
      * Default constructor.
      */
@@ -133,6 +135,10 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
             authFailures.get(username).incrementAttemptOrReset();
         } else {
             authFailures.put(username, new AuthFailureRecord());
+            DocumentReference userReference = findUser(username);
+            if (userReference != null) {
+                userAndAssociatedUsernames.put(userReference, username);
+            }
         }
 
         boolean isThresholdReached = authFailures.get(username).isThresholdReached();
@@ -146,6 +152,14 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         }
 
         return isThresholdReached;
+    }
+
+    @Override
+    public void resetAuthenticationFailureCounter(DocumentReference user)
+    {
+        if (this.userAndAssociatedUsernames.containsKey(user)) {
+            authFailures.remove(this.userAndAssociatedUsernames.get(user));
+        }
     }
 
     @Override

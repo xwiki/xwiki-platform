@@ -84,4 +84,13 @@ public interface AuthenticationFailureManager
      * @return a document reference corresponding to the username or null if it doesn't exist.
      */
     DocumentReference findUser(String username);
+
+    /**
+     * Remove all records of authentication failure for the given user.
+     * @param user the document reference of a user.
+     * @since 11.7RC1
+     */
+    default void resetAuthenticationFailureCounter(DocumentReference user)
+    {
+    }
 }

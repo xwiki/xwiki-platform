@@ -98,7 +98,15 @@ public class DefaultAuthenticationFailureManagerTest
     @Mock
     private XWikiContext context;
 
+    @Mock
+    private XWikiDocument userDocument;
+
+    @Mock
+    private XWiki xWiki;
+
     private String failingLogin = "foobar";
+
+    private DocumentReference userFailingDocumentReference = new DocumentReference("xwiki", "XWiki", failingLogin);
 
     @BeforeComponent
     public void configure(MockitoComponentManager componentManager) throws Exception
@@ -114,6 +122,9 @@ public class DefaultAuthenticationFailureManagerTest
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(3);
         when(configuration.getTimeWindow()).thenReturn(5);
         when(contextProvider.get()).thenReturn(context);
+        when(context.getMainXWiki()).thenReturn("xwiki");
+        when(context.getWiki()).thenReturn(xWiki);
+        when(xWiki.getDocument(any(DocumentReference.class), eq(context))).thenReturn(userDocument);
     }
 
     /**
@@ -194,6 +205,26 @@ public class DefaultAuthenticationFailureManagerTest
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
         this.defaultAuthenticationFailureManager.resetAuthenticationFailureCounter(this.failingLogin);
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+
+        verify(this.observationManager, times(5)).notify(new AuthenticationFailureEvent(), this.failingLogin);
+        verify(this.observationManager, times(1)).notify(new AuthenticationFailureLimitReachedEvent(),
+            this.failingLogin);
+        verify(this.strategy1, times(1)).notify(failingLogin);
+        verify(this.strategy2, times(1)).notify(failingLogin);
+    }
+
+    /**
+     * Ensure that the failure record reset is working properly.
+     */
+    @Test
+    public void resetAuthFailureRecordWithDocumentReference()
+    {
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
+        this.defaultAuthenticationFailureManager.resetAuthenticationFailureCounter(this.userFailingDocumentReference);
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
         assertFalse(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));
         assertTrue(this.defaultAuthenticationFailureManager.recordAuthenticationFailure(this.failingLogin));

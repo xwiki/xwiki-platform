@@ -28,6 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -58,6 +59,8 @@ public class XWikiUser
     private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    private AuthenticationFailureManager authenticationFailureManager;
 
     private Logger logger = LoggerFactory.getLogger(XWikiUser.class);
 
@@ -151,6 +154,15 @@ public class XWikiUser
         return localEntityReferenceSerializer;
     }
 
+    private AuthenticationFailureManager getAuthenticationFailureManager()
+    {
+        if (authenticationFailureManager == null) {
+            authenticationFailureManager = Utils.getComponent(AuthenticationFailureManager.class);
+        }
+
+        return authenticationFailureManager;
+    }
+
     public DocumentReference getUserReference()
     {
         if (this.userReference == null) {
@@ -177,6 +189,11 @@ public class XWikiUser
     private XWikiDocument getUserDocument(XWikiContext context) throws XWikiException
     {
         return context.getWiki().getDocument(getUserReference(), context);
+    }
+
+    private void removeAuthenticationFailureManagerRecord()
+    {
+        getAuthenticationFailureManager().resetAuthenticationFailureCounter(getUserReference());
     }
 
     /**
@@ -225,6 +242,11 @@ public class XWikiUser
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     DISABLED_PROPERTY, disabledFlag);
                 context.getWiki().saveDocument(userdoc, context);
+
+                // if we enable back an user we remove the authentication failure record.
+                if (!disabled) {
+                    removeAuthenticationFailureManagerRecord();
+                }
             } catch (XWikiException e) {
                 this.logger.error("Error while setting disabled status of user [{}]", getUser(), e);
             }
@@ -270,6 +292,11 @@ public class XWikiUser
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
                 context.getWiki().saveDocument(userdoc, context);
+
+                // if we activate back an user we remove the authentication failure record.
+                if (!active) {
+                    removeAuthenticationFailureManagerRecord();
+                }
             } catch (XWikiException e) {
                 this.logger.error("Error while setting active status of user [{}]", getUser(), e);
             }

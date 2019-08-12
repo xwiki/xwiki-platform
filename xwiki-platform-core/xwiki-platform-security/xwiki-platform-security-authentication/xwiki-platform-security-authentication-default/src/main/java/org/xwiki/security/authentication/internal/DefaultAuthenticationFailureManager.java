@@ -19,6 +19,7 @@
  */
 package org.xwiki.security.authentication.internal;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -79,35 +80,37 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     @Inject
     private Logger logger;
 
+    private String[] failureStrategyNames;
+
     private List<AuthenticationFailureStrategy> failureStrategyList;
 
     private Map<String, AuthFailureRecord> authFailures = new HashMap<>();
-
-    private long maxTime;
-    private int maxNbAttempts;
 
     /**
      * Default constructor.
      */
     public DefaultAuthenticationFailureManager()
     {
-        this.maxNbAttempts = -1;
-        this.maxTime = -1;
+    }
 
+    private void buildStrategyList()
+    {
+        this.failureStrategyList = new LinkedList<>();
+        for (String failureStrategyName : this.failureStrategyNames) {
+            try {
+                this.failureStrategyList.add(this.componentManager.getInstance(AuthenticationFailureStrategy.class,
+                    failureStrategyName));
+            } catch (ComponentLookupException e) {
+                logger.error("Error while getting authentication failure strategy [{}]. ", failureStrategyName, e);
+            }
+        }
     }
 
     private List<AuthenticationFailureStrategy> getFailureStrategyList()
     {
-        if (this.failureStrategyList == null) {
-            this.failureStrategyList = new LinkedList<>();
-            for (String failureStrategyName : this.configuration.getFailureStrategies()) {
-                try {
-                    this.failureStrategyList.add(this.componentManager.getInstance(AuthenticationFailureStrategy.class,
-                        failureStrategyName));
-                } catch (ComponentLookupException e) {
-                    logger.error("Error while getting authentication failure strategy [{}]. ", failureStrategyName, e);
-                }
-            }
+        if (!Arrays.equals(configuration.getFailureStrategies(), this.failureStrategyNames)) {
+            this.failureStrategyNames = this.configuration.getFailureStrategies();
+            buildStrategyList();
         }
 
         return this.failureStrategyList;
@@ -236,18 +239,12 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
 
     private long getMaxTime()
     {
-        if (this.maxTime == -1) {
-            this.maxTime = configuration.getTimeWindow() * 1000;
-        }
-        return this.maxTime;
+        return configuration.getTimeWindow() * 1000;
     }
 
     private int getMaxNbAttempts()
     {
-        if (this.maxNbAttempts == -1) {
-            this.maxNbAttempts = configuration.getMaxAuthorizedAttempts();
-        }
-        return this.maxNbAttempts;
+        return configuration.getMaxAuthorizedAttempts();
     }
 
     /**

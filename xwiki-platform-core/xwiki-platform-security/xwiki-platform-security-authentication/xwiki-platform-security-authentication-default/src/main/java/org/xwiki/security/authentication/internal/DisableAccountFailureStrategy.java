@@ -67,7 +67,7 @@ public class DisableAccountFailureStrategy implements AuthenticationFailureStrat
     @Override
     public String getForm(String username)
     {
-        return null;
+        return "";
     }
 
     /**

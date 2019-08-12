@@ -415,4 +415,24 @@ public class DefaultAuthenticationFailureManagerTest
         verify(xwiki, times(1)).getDocument(eq(globalReference), eq(context));
         verify(xwiki, times(1)).getDocument(eq(localReference), eq(context));
     }
+
+    @Test
+    public void strategiesAreRebuildInCaseOfReset()
+    {
+        when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy1" });
+        when(configuration.getMaxAuthorizedAttempts()).thenReturn(1);
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure("foo");
+        verify(configuration, times(3)).getFailureStrategies();
+        verify(strategy1, times(1)).notify("foo");
+        verify(strategy2, never()).notify(any());
+
+        // we change the configuration strategy, but we don't reset the list
+        when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy2" });
+        this.defaultAuthenticationFailureManager.recordAuthenticationFailure("foo");
+
+        // the list is already existing, we still call the old strategy
+        verify(configuration, times(6)).getFailureStrategies();
+        verify(strategy1, times(1)).notify("foo");
+        verify(strategy2, times(1)).notify(any());
+    }
 }

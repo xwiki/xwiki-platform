@@ -199,9 +199,9 @@
   {{/html}}
 #end
 
-#macro(displayFlavorInstallationStep $currentFlavor)
-  #if ($currentFlavor)
-    #set ($selectedFlavor = $currentFlavor)
+#macro(displayFlavorInstallationStep $flavorToInstall)
+  #if ($flavorToInstall)
+    #set ($selectedFlavor = $flavorToInstall)
   #else
     #set ($flavorSplitted = $request.flavor.split(':::'))
     #set ($requestFlavorId = $flavorSplitted[0])

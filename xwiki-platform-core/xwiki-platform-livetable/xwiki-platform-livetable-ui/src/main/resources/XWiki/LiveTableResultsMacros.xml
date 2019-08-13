@@ -225,7 +225,6 @@
       #set($discard = $allMatchingParams.put('className', "${className}"))
       #set($discard = $allMatchingParams.put('classTemplate1', "${className}Template"))
       #set($discard = $allMatchingParams.put('classTemplate2', ${className.replaceAll('Class$', 'Template')}))
-      #set($discard = $allMatchingParams.putAll($whereParams))
     #else
       #set($allMatchingTagsWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?) $!filterwhere")
       #set($discard = $allMatchingParams.addAll(["${className}", "${className}Template", ${className.replaceAll('Class$', 'Template')}]))

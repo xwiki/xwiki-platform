@@ -144,10 +144,12 @@ public final class TagQueryUtils
 
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            if (parameters instanceof Map) {
-                query.bindValues((Map) parameters);
-            } else {
-                query.bindValues((List) parameters);
+            if (parameters != null) {
+                if (parameters instanceof Map) {
+                    query.bindValues((Map) parameters);
+                } else {
+                    query.bindValues((List) parameters);
+                }
             }
             query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();

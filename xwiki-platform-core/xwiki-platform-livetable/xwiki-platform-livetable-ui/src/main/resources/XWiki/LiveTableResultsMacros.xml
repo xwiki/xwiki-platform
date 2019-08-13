@@ -886,7 +886,6 @@
 #end
 
 #macro (livetable_getFilterQuery $column $matchType $isList $valueCount $paramPrefix)
-$services.logging.getLogger('toto').error($valueCount)##
   #set ($joinOperator = "$!{request.get(""${colname}${joinModeMarker}"").toUpperCase()}")
   #if ($joinOperator != 'AND' &amp;&amp; $joinOperator != 'OR')
     #set ($joinOperator = 'AND')

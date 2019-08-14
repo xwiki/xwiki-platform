@@ -86,7 +86,7 @@
   ##
   #set ($extraFromClause = '')
   #set ($extraWhereClause = '')
-  #set ($extraWhereClauseParameters = [])
+  #set ($extraWhereClauseParameters = {})
   ##
   ## Step1: Get the workspace members from the workspace's members group.
   #set ($workspace = $services.workspace.getWorkspace($currentDatabase))
@@ -129,8 +129,8 @@
         #if ($velocityCount &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
-        #set ($extraWhereClause = "${extraWhereClause}?")
-        #set ($discard = $extraWhereClauseParameters.add("$!{workspaceMemberUser}"))
+        #set ($extraWhereClause = "${extraWhereClause}:workspaceMemberUser_${foreach.count}")
+        #set ($discard = $extraWhereClauseParameters.put("workspaceMemberUser_${foreach.count}", "$!{workspaceMemberUser}"))
       #end
       #set ($extraWhereClause = "${extraWhereClause})")
     #end
@@ -145,8 +145,8 @@
         #if ($velocityCount &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
-        #set ($extraWhereClause = "${extraWhereClause}?")
-        #set ($discard = $extraWhereClauseParameters.add("$!{workspaceMemberGroup.fullName}"))
+    #set ($extraWhereClause = "${extraWhereClause}:workspaceMemberGroup_${foreach.count}")
+        #set ($discard = $extraWhereClauseParameters.put("workspaceMemberGroup_${foreach.count}", "$!{workspaceMemberGroup.fullName}"))
       #end
       #set ($extraWhereClause = "${extraWhereClause}))")
     #end

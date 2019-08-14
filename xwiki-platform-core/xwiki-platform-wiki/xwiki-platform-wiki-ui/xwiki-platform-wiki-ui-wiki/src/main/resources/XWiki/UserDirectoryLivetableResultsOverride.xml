@@ -83,7 +83,7 @@
   ##
   #set ($extraFromClause = '')
   #set ($extraWhereClause = '')
-  #set ($extraWhereClauseParameters = [])
+  #set ($extraWhereClauseParameters = {})
   ##
   ## Step1: Get the wiki members from the wiki's members group.
   #set ($wikiMembers = $services.wiki.user.getMembers($currentWiki))
@@ -122,8 +122,8 @@
         #if ($velocityCount &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
-        #set ($extraWhereClause = "${extraWhereClause}?")
-        #set ($discard = $extraWhereClauseParameters.add("$!{wikiMemberUser}"))
+        #set ($extraWhereClause = "${extraWhereClause}:wikiMemberUser_${foreach.count}")
+        #set ($discard = $extraWhereClauseParameters.put("wikiMemberUser_${foreach.count}", "$!{wikiMemberUser}"))
       #end
       #set ($extraWhereClause = "${extraWhereClause})")
     #end
@@ -138,8 +138,8 @@
         #if ($velocityCount &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
-        #set ($extraWhereClause = "${extraWhereClause}?")
-        #set ($discard = $extraWhereClauseParameters.add("$!{wikiMemberGroup.fullName}"))
+        #set ($extraWhereClause = "${extraWhereClause}:wikiMemberGroup_${foreach.count}")
+        #set ($discard = $extraWhereClauseParameters.put("wikiMemberGroup_${foreach.count}", "$!{wikiMemberGroup.fullName}"))
       #end
       #set ($extraWhereClause = "${extraWhereClause}))")
     #end

@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
@@ -71,9 +72,20 @@ public class EditIT
     }
 
     @AfterEach
-    public void tearDown(LogCaptureConfiguration logCaptureConfiguration)
+    public void tearDown(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed");
+
+        // Ensure remaining tabs are properly closed.
+        if (setup.getDriver().getWindowHandles().size() > 1) {
+            String currentTabHandle = setup.getCurrentTabHandle();
+
+            for (String windowHandle : setup.getDriver().getWindowHandles()) {
+                if (!windowHandle.equals(currentTabHandle)) {
+                    setup.closeTab(windowHandle);
+                }
+            }
+        }
     }
 
     /**
@@ -635,8 +647,6 @@ public class EditIT
         wikiEditPage = viewPage.editWiki();
         wikiEditPage.setContent("third edit");
         wikiEditPage.clickSaveAndContinue();
-        // the page will be reloaded next time we go on it.
-        setup.getDriver().addPageNotYetReloadedMarker();
 
         viewPage = setup.gotoPage(testReference);
         viewPage.waitUntilPageJSIsLoaded();
@@ -649,10 +659,17 @@ public class EditIT
         setup.getDriver().navigate().back();
         // view page -> wiki editor
         setup.getDriver().navigate().back();
-        setup.getDriver().waitUntilPageIsReloaded();
+
+        setup.getDriver().waitUntilCondition(driver -> {
+            try {
+                return driver.findElement(By.id("content")) != null
+                && driver.findElement(By.id("content")).getText().equals("fourth edit");
+            } catch (NoSuchElementException e) {
+                return false;
+            }
+        });
 
         wikiEditPage = new WikiEditPage();
-        assertEquals("fourth edit", wikiEditPage.getContent());
         wikiEditPage.setContent("fifth edit");
         viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("fifth edit", viewPage.getContent());

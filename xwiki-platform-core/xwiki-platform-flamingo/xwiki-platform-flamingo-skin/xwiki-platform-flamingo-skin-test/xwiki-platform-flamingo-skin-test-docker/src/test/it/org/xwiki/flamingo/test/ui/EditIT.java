@@ -22,11 +22,14 @@ package org.xwiki.flamingo.test.ui;
 import java.util.Arrays;
 import java.util.Set;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
@@ -60,6 +63,23 @@ public class EditIT
     public void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
+    }
+
+    @AfterEach
+    public void tearDown(TestUtils setup)
+    {
+        // Ensure remaining tabs are properly closed.
+        if (setup.getDriver().getWindowHandles().size() > 1) {
+            String currentTabHandle = setup.getDriver().getWindowHandle();
+
+            for (String windowHandle : setup.getDriver().getWindowHandles()) {
+                if (!windowHandle.equals(currentTabHandle)) {
+                    setup.getDriver().switchTo().window(windowHandle);
+                    setup.getDriver().close();
+                }
+            }
+            setup.getDriver().switchTo().window(currentTabHandle);
+        }
     }
 
     /**
@@ -537,8 +557,6 @@ public class EditIT
         wikiEditPage = viewPage.editWiki();
         wikiEditPage.setContent("third edit");
         wikiEditPage.clickSaveAndContinue();
-        // the page will be reloaded next time we go on it.
-        setup.getDriver().addPageNotYetReloadedMarker();
 
         WYSIWYGEditPage wysiwygEditPage = setup.gotoPage(testReference).editWYSIWYG();
         wysiwygEditPage.setContent("fourth edit");
@@ -549,10 +567,16 @@ public class EditIT
         // view page -> wysiwyg editor
         setup.getDriver().navigate().back();
 
-        wikiEditPage = new WikiEditPage();
+        setup.getDriver().waitUntilCondition(driver -> {
+            try {
+                return driver.findElement(By.id("content")) != null
+                && driver.findElement(By.id("content")).getText().equals("fourth edit");
+            } catch (NoSuchElementException e) {
+                return false;
+            }
+        });
 
-        setup.getDriver().waitUntilPageIsReloaded();
-        assertEquals("fourth edit", wikiEditPage.getContent());
+        wikiEditPage = new WikiEditPage();
         wikiEditPage.setContent("fifth edit");
         viewPage = wikiEditPage.clickSaveAndView();
         assertEquals("fifth edit", viewPage.getContent());

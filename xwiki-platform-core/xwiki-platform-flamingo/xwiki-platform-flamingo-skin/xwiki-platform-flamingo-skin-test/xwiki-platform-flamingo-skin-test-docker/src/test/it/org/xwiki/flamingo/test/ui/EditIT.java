@@ -339,7 +339,7 @@ public class EditIT
         ViewPage viewPage = new ViewPage();
         WikiEditPage wikiEditPageTab2 = viewPage.editWiki();
         wikiEditPageTab2.setContent("A first edit from a tab.");
-        wikiEditPageTab2.clickSaveAndContinue();
+        wikiEditPageTab2.clickSaveAndView();
 
         setup.getDriver().switchTo().window(firstTab);
         wikiEditPageTab1.waitUntilPageJSIsLoaded();
@@ -362,23 +362,24 @@ public class EditIT
         setup.gotoPage(testReference);
         viewPage = new ViewPage();
         assertEquals("A second edit from another tab.", viewPage.getContent());
+        wikiEditPageTab1 = viewPage.editWiki();
 
         // Step 2: Edit another line and save&view, an automatic merge should occur
-        // We cannot directly make the changes since the
         setup.getDriver().switchTo().window(secondTab);
-        wikiEditPageTab2 = new WikiEditPage();
-        assertEquals("A first edit from a tab.", wikiEditPageTab2.getExactContent());
-        // We only add a new line from the content displayed in the editor.
-        wikiEditPageTab2.setContent("A first edit from a tab.\nAnother line.");
+        wikiEditPageTab2 = new ViewPage().editWiki();
+        assertEquals("A second edit from another tab.", wikiEditPageTab2.getExactContent());
+        wikiEditPageTab2.setContent("A second edit from another tab.\nA new line.");
+        wikiEditPageTab2.clickSaveAndContinue();
 
         // The merge should be automatic.
-        viewPage = wikiEditPageTab2.clickSaveAndView();
-        assertEquals("A second edit from another tab.\nAnother line.", viewPage.getContent());
-        wikiEditPageTab2 = viewPage.editWiki();
+        setup.getDriver().switchTo().window(firstTab);
+        wikiEditPageTab1.waitUntilPageJSIsLoaded();
+        wikiEditPageTab1.setContent("A second edit from another tab.\nAnother line.");
+        viewPage = wikiEditPageTab1.clickSaveAndView();
+        assertEquals("A second edit from another tab.\nAnother line.\nA new line.", viewPage.getContent());
 
         // Step 3: Create another conflict, check the different diffs and discard changes (reload the editor)
-        setup.getDriver().switchTo().window(firstTab);
-        wikiEditPageTab1 = setup.gotoPage(testReference).editWiki();
+        wikiEditPageTab1 = viewPage.editWiki();
         wikiEditPageTab1.setContent("A third edit from another tab.\nAnother line.\nYet another line.");
         wikiEditPageTab1.clickSaveAndContinue();
 
@@ -394,11 +395,11 @@ public class EditIT
         assertEquals(EditConflictModal.ConflictChoice.MERGE, editConflictModal.getCurrentChoice());
         assertEquals(EditConflictModal.AvailableDiffVersions.NEXT, editConflictModal.getOriginalDiffVersion());
         assertEquals(EditConflictModal.AvailableDiffVersions.MERGED, editConflictModal.getRevisedDiffVersion());
-        assertEquals(Arrays.asList("@@ -1,3 +1,3 @@",
+        assertEquals(Arrays.asList("@@ -1,3 +1,2 @@",
             "-A th<del>ird</del> edit from <del>anoth</del>e<del>r</del> tab.",
             "+A <ins>four</ins>th edit from <ins>s</ins>e<ins>cond</ins> tab.",
             " Another line.",
-            " Yet another line."),
+            "-Yet another line."),
             editConflictModal.getDiff().getDiff("Content"));
 
         // Check that the forceSave diff is not the same as the merge diff
@@ -435,9 +436,10 @@ public class EditIT
         assertEquals(EditConflictModal.AvailableDiffVersions.NEXT, editConflictModal.getRevisedDiffVersion());
         assertEquals(Arrays.asList(
             "@@ -1,2 +1,3 @@",
-            "-A <del>secon</del>d edit from another tab.",
-            "+A <ins>thir</ins>d edit from another tab.",
-            " Another line.",
+            "-A second edit from another tab.",
+            "-A new line.",
+            "+A third edit from another tab.",
+            "+Another line.",
             "+Yet another line."),
             editConflictModal.getDiff().getDiff("Content"));
         // reload the editor

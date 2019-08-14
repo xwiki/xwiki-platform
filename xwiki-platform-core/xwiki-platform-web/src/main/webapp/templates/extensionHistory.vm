@@ -43,19 +43,19 @@
 #macro (exportExtensionHistory)
   #set ($discard = $response.setContentType('application/xml'))
   #set ($discard = $response.addHeader('Content-disposition', "attachment; filename*=utf-8''extensionHistory.xml"))
-  #set ($records = $request.getParameterValues('extensionHistoryRecord'))
-  #if ($records && $records.size() > 0)
-    ## Export the oldest history records first.
-    #foreach ($i in [$mathtool.sub($records.size(), 1)..0])
-      $records.get($i)
+  #getSelectedExtensionHistoryRecords
+  #if ($selectedRecords && $selectedRecords.size() > 0)
+    #set ($output = [])
+    ## Export the oldest selected history records first.
+    #foreach ($i in [$mathtool.sub($selectedRecords.size(), 1)..0])
+      #set ($discard = $output.add($services.extension.history.serialize($selectedRecords.get($i))))
     #end
+    $stringtool.join($output, $util.newline)
   #end
 #end
 
 #macro (replayExtensionHistory)
-  ## The history records should be in the right order (oldest first) in the replay plan.
-  #set ($serializedRecords = $stringtool.join($request.getParameterValues('extensionHistoryRecord')))
-  #set ($records = $services.extension.history.deserialize($serializedRecords))
+  #createExtensionHistoryReplayPlan
   #set ($job = $services.extension.history.replay($records))
   #if ($job)
     #if ($isAjaxRequest)
@@ -231,6 +231,7 @@
   #getExtensionHistoryURL($recordsFormActionURL 'get' {})
   <form method="post" action="$recordsFormActionURL" class="extension-history-records-form">
     <div class="hidden">
+      <input type="hidden" name="source" value="$!escapetool.xml($request.source)" />
       <input type="hidden" name="form_token" value="$services.csrf.token" />
     </div>
     #displayExtensionHistoryRecords($records)
@@ -250,7 +251,7 @@
 #end
 
 #macro (getExtensionHistoryRecords)
-  #if ($request.source)
+  #if ("$!request.source" != '')
     ## History File
     #set ($sourceFile = $xwiki.getDocument('XWiki.ExtensionHistoryUploads').getAttachment($request.source))
     #set ($records = [])
@@ -267,6 +268,21 @@
     #set ($limit = 10)
     #set ($recordsFilter = $services.extension.history.records)
     #set ($records = $recordsFilter.fromThisWiki().ofType($jobTypes).list($request.offsetRecordId, $limit))
+  #end
+#end
+
+#macro (getSelectedExtensionHistoryRecords)
+  #set ($selectedRecordIds = $request.getParameterValues('extensionHistoryRecord'))
+  #if ($selectedRecordIds && $selectedRecordIds.size() > 0)
+    #set ($selectedRecordIdsSet = $collectionstool.set)
+    #set ($discard = $selectedRecordIdsSet.addAll($selectedRecordIds.subList(0, $selectedRecordIds.size())))
+    #getExtensionHistoryRecords
+    #set ($selectedRecords = [])
+    #foreach ($record in $records)
+      #if ($selectedRecordIdsSet.contains($record.id))
+        #set ($discard = $selectedRecords.add($record))
+      #end
+    #end
   #end
 #end
 
@@ -297,8 +313,7 @@
     #if ($selector)
       $selector
     #else
-      <input type="checkbox" name="extensionHistoryRecord"
-        value="$escapetool.xml($services.extension.history.serialize($record))" />
+      <input type="checkbox" name="extensionHistoryRecord" value="$escapetool.xml($record.id)" />
     #end
     ##
     ## Icon
@@ -387,11 +402,10 @@
   </form>
 #end
 
-#macro (displayExtensionHistoryReplayPlan)
-  #set ($serializedRecords = $stringtool.join($request.getParameterValues('extensionHistoryRecord')))
-  #set ($records = $services.extension.history.deserialize($serializedRecords))
+#macro (createExtensionHistoryReplayPlan)
+  #getSelectedExtensionHistoryRecords
   ## The replay plan should include the oldest history records first (because the oldest records are replayed first).
-  #set ($discard = $collectionstool.reverse($records))
+  #set ($discard = $collectionstool.reverse($selectedRecords))
   ## Modify the records based on the replay options.
   #set ($preserveUsers = $request.preserveUsers == 'true')
   #set ($namespaces = [])
@@ -400,12 +414,25 @@
       #set ($discard = $namespaces.add("wiki:$namespace"))
     #end
   #end
-  #set ($records = $services.extension.history.createReplayPlan($records, $preserveUsers, $namespaces))
+  ## Backup the ids of the selected records because we modify them when creating the replay plan.
+  #set ($selectedRecordsIds = [])
+  #foreach ($selectedRecord in $selectedRecords)
+    #set ($discard = $selectedRecordsIds.add($selectedRecord.id))
+  #end
+  #set ($records = $services.extension.history.createReplayPlan($selectedRecords, $preserveUsers, $namespaces))
+#end
+
+#macro (displayExtensionHistoryReplayPlan)
+  #createExtensionHistoryReplayPlan
   #getExtensionHistoryURL($replayPlanSubmitURL 'get' {})
   <form method="post" action="$replayPlanSubmitURL" class="extension-history-replay-plan xform">
     <h2>$services.localization.render('extension.history.replayPlan.title')</h2>
     #if ($records && $records.size() > 0)
       <div class="hidden">
+        ## Forward the replay plan parameters.
+        #foreach ($paramName in ['source', 'preserveUsers', 'namespaces'])
+          <input type="hidden" name="$paramName" value="$!escapetool.xml($request.getParameter($paramName))" />
+        #end
         <input type="hidden" name="form_token" value="$services.csrf.token" />
       </div>
       <div class="xHint">$services.localization.render('extension.history.replayPlan.hint')</div>
@@ -413,7 +440,7 @@
         #foreach ($record in $records)
           <li class="extension-history-record $!escapetool.xml($record.jobType)">
             #set ($selector = "<input type='hidden' name='extensionHistoryRecord'
-              value='$escapetool.xml($services.extension.history.serialize($record))' />")
+              value='$escapetool.xml($selectedRecordsIds.get($foreach.index))' />")
             #displayExtensionHistoryRecord($record $selector true)
           </li>
         #end

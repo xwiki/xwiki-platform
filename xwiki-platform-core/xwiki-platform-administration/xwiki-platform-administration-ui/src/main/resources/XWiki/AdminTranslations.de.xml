@@ -51,11 +51,11 @@ administration.menu.search.noResults=Keine Ergebnisse.
 XWiki.XWikiPreferences_use_email_verification.hint=Wenn "Ja" wird beim Ausfüllen des Anmeldeformulars eine E-Mail an die angegebene E-Mail Adresse gesendet.
 XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, um ihre E-Mail-Adresse zu bestätigen.
 ### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
-### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
+XWiki.XWikiPreferences_invitation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, die zur Registrierung eingeladen werden.
 
-### Missing: XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
-### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
-### Missing: XWiki.Registration_liveValidation_enabled.hint=Set this to false to disable the live validation JavaScript code (fields will still be validated at the server side).
+XWiki.Registration_heading.hint=Dies ist die Zeile oben auf der Seite, die den Personen angezeigt wird, die sich registrieren und die sich gerade registriert haben. Velocity und Wiki-Syntax können verwendet werden.
+XWiki.Registration_welcomeMessage.hint=Dies wird nur angezeigt, wenn Personen das Formular ausfüllen. Velocity und Wiki-Syntax können verwendet werden.
+XWiki.Registration_liveValidation_enabled.hint=Setzen Sie dies auf false, um den JavaScript-Code der Live-Validierung zu deaktivieren (Felder werden serverseitig noch validiert).
 ### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
 ### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
 ### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.

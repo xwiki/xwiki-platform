@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.xwiki.appwithinminutes.test.po.DateClassFieldEditPane;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
-import org.xwiki.test.ui.po.editor.DatePicker;
+import org.xwiki.test.ui.po.editor.BootstrapDateTimePicker;
 
 /**
  * Special class editor tests that address only the Date class field type.
@@ -49,30 +49,32 @@ public class DateClassFieldTest extends AbstractClassEditorTest
     {
         // First select a date using the picker and assert the value of the date input.
         DateClassFieldEditPane dateField = new DateClassFieldEditPane(editor.addField("Date").getName());
-        DatePicker datePicker = dateField.openDatePicker();
-        datePicker.setYear("2011");
-        datePicker.setMonth("October");
-        datePicker.setDay("13");
-        datePicker.setHour("8 AM");
-        datePicker.setMinute("15");
+        BootstrapDateTimePicker datePicker = dateField.openDatePicker();
+        datePicker.changeMonthAndYear().changeYear().showPreviousDecade().selectYear("2015").selectMonth("Oct")
+            .selectDay("13");
+        datePicker.toggleTimePicker().changeHour().selectHour("08").changeMinute().selectMinute("15").incrementMinute()
+            .changeSecond().selectSecond("40").decrementSecond().toggleTimePicker();
         String selectedDate = dateField.getDefaultValue();
         // Ignore the number of seconds.
-        Assert.assertTrue(String.format("The selected date [%s] doesn't start with [13/10/2011 08:15:].", selectedDate),
-            selectedDate.startsWith("13/10/2011 08:15:"));
+        Assert.assertEquals(selectedDate, "13/10/2015 08:16:39");
 
         // Set the value of the date input and assert the date selected by the picker.
         dateField.setDefaultValue("17/03/2020 19:43:34");
 
-        // Currently the date picker doesn't know how to parse a date with a specified format. The workaround is to pass
-        // the date time stamp when generating the date input, but for this the page needs to be saved and reloaded.
-        editor.clickSaveAndView().edit();
-        datePicker = new DateClassFieldEditPane("date1").openDatePicker();
+        // We need to close and reopen the date picker in order to read the new value.
+        datePicker.close();
+        datePicker = dateField.openDatePicker();
 
-        Assert.assertEquals("2020", datePicker.getYear());
-        Assert.assertEquals("March", datePicker.getMonth());
-        Assert.assertEquals("17", datePicker.getDay());
-        Assert.assertEquals("7 PM", datePicker.getHour());
-        Assert.assertEquals("40", datePicker.getMinute());
+        Assert.assertEquals("17", datePicker.getSelectedDay());
+
+        datePicker.changeMonthAndYear();
+        Assert.assertEquals("2020", datePicker.getSelectedYear());
+        Assert.assertEquals("Mar", datePicker.getSelectedMonth());
+
+        datePicker.toggleTimePicker();
+        Assert.assertEquals("19", datePicker.getSelectedHour());
+        Assert.assertEquals("43", datePicker.getSelectedMinute());
+        Assert.assertEquals("34", datePicker.getSelectedSecond());
     }
 
     /**
@@ -96,10 +98,10 @@ public class DateClassFieldTest extends AbstractClassEditorTest
         dateField.closeConfigPanel();
 
         // Select a date using the date picker.
-        DatePicker datePicker = dateField.openDatePicker();
+        BootstrapDateTimePicker datePicker = dateField.openDatePicker();
         // The current date format doesn't include time information.
-        Assert.assertFalse(datePicker.hasHourSelector());
-        datePicker.setDay("22");
+        Assert.assertFalse(datePicker.hasTimePicker());
+        datePicker.selectDay("22");
         Calendar now = Calendar.getInstance();
         now.set(Calendar.DAY_OF_MONTH, 22);
         Assert.assertEquals(new SimpleDateFormat(dateFormat).format(now.getTime()), dateField.getDefaultValue());
@@ -108,14 +110,15 @@ public class DateClassFieldTest extends AbstractClassEditorTest
         // Set the value of the date input and assert the date selected by the picker.
         dateField.setDefaultValue("2012.11.10");
 
-        // Currently the date picker doesn't know how to parse a date with a specified format. The workaround is to pass
-        // the date time stamp when generating the date input, but for this the page needs to be saved and reloaded.
-        editor.clickSaveAndView().edit();
-        datePicker = new DateClassFieldEditPane("date1").openDatePicker();
+        // We need to close and reopen the date picker in order to read the new value.
+        datePicker.close();
+        datePicker = dateField.openDatePicker();
 
-        Assert.assertEquals("2012", datePicker.getYear());
-        Assert.assertEquals("November", datePicker.getMonth());
-        Assert.assertEquals("10", datePicker.getDay());
-        Assert.assertFalse(datePicker.hasHourSelector());
+        Assert.assertEquals("10", datePicker.getSelectedDay());
+        Assert.assertFalse(datePicker.hasTimePicker());
+
+        datePicker.changeMonthAndYear();
+        Assert.assertEquals("2012", datePicker.getSelectedYear());
+        Assert.assertEquals("Nov", datePicker.getSelectedMonth());
     }
 }

@@ -80,10 +80,10 @@ public class ObjectEditPane extends FormContainerElement
      * @param datePropertyName the name of a date property of the edited object
      * @return the date picker
      */
-    public DatePicker openDatePicker(String datePropertyName)
+    public BootstrapDateTimePicker openDatePicker(String datePropertyName)
     {
         getDriver().findElementWithoutWaiting(getFormElement(), byPropertyName(datePropertyName)).click();
-        return new DatePicker();
+        return new BootstrapDateTimePicker();
     }
 
     /**

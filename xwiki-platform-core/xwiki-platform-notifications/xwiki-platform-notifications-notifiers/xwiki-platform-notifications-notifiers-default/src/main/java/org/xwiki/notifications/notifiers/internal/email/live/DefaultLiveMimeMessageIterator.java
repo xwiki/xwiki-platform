@@ -49,6 +49,8 @@ import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator
 import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceProperty;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Default implementation for {@link LiveMimeMessageIterator}.
@@ -75,6 +77,9 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
     @Inject
     private DocumentReferenceResolver<String> referenceResolver;
 
+    @Inject
+    private AuthorizationManager authorizationManager;
+
     @Override
     public void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
             CompositeEvent event, DocumentReference templateReference)
@@ -98,9 +103,9 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
         // TODO: handle followed user for who we don't cate about the notification preference, we just want to receive
         // all actions the person is doing
 
-
-        if (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)
-                || this.isTriggeredByAFollowedUser(user, resultCompositeEvent)) {
+        if (this.canAccessEvent(user, resultCompositeEvent)
+            && (this.hasCorrespondingNotificationPreference(user, resultCompositeEvent)
+                || this.isTriggeredByAFollowedUser(user, resultCompositeEvent))) {
             // Apply the filters that the user has defined in its notification preferences
             // If one of the events present in the composite event does not match a user filter, remove the event
             List<NotificationFilter> filters
@@ -180,6 +185,12 @@ public class DefaultLiveMimeMessageIterator extends AbstractMimeMessageIterator
         } catch (NotificationException e) {
             return false;
         }
+    }
+
+    private boolean canAccessEvent(DocumentReference user, CompositeEvent event)
+    {
+        DocumentReference document = event.getDocument();
+        return (document != null && authorizationManager.hasAccess(Right.VIEW, user, document));
     }
 
     /**

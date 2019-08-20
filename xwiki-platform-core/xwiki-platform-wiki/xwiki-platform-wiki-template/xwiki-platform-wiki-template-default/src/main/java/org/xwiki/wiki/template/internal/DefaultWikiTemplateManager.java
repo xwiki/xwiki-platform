@@ -144,6 +144,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
+    @Deprecated
     public WikiProvisioningJob createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId,
         String ownerId, boolean failOnExist) throws WikiTemplateManagerException
     {
@@ -159,6 +160,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
+    @Deprecated
     public WikiProvisioningJob applyTemplate(String wikiId, String templateId) throws WikiTemplateManagerException
     {
         try {
@@ -169,6 +171,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
+    @Deprecated
     public WikiProvisioningJob getWikiProvisioningJob(List<String> jobId) throws WikiTemplateManagerException
     {
         try {

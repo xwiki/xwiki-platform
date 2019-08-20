@@ -69,7 +69,11 @@ public interface WikiTemplateManager
      * @param failOnExist fail if the wiki id is not available
      * @return the job that provisions the new wiki with the template content
      * @throws WikiTemplateManagerException if problems occur
+     * @deprecated since 7.0M2, use
+     *             {@code org.xwiki.platform.wiki.creationjob.WikiCreator#createWiki(WikiCreationRequest request)}
+     *             instead
      */
+    @Deprecated
     WikiProvisioningJob createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId, String ownerId,
         boolean failOnExist) throws WikiTemplateManagerException;
 
@@ -82,7 +86,9 @@ public interface WikiTemplateManager
      * @throws WikiTemplateManagerException if problems occur
      *
      * @since 5.4RC1
+     * @deprecated since 7.0M2
      */
+    @Deprecated
     WikiProvisioningJob applyTemplate(String wikiId, String templateId) throws WikiTemplateManagerException;
 
     /**
@@ -91,6 +97,8 @@ public interface WikiTemplateManager
      * @param jobId id of wiki provisioning job
      * @return the job
      * @throws WikiTemplateManagerException if problem occurs
+     * @deprecated since 7.0M2
      */
+    @Deprecated
     WikiProvisioningJob getWikiProvisioningJob(List<String> jobId) throws WikiTemplateManagerException;
 }

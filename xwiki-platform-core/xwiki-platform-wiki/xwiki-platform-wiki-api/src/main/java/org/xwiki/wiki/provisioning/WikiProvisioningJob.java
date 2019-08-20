@@ -23,9 +23,12 @@ import org.xwiki.job.Job;
 
 /**
  * Component that provision wikis.
+ * 
  * @since 5.3M2
- * @version $Id :$
+ * @version $Id$
+ * @deprecated since 7.0M2
  */
+@Deprecated
 public interface WikiProvisioningJob extends Job
 {
 }

@@ -420,27 +420,6 @@ editors.XDataEditors = Class.create({
     objectTitle.observe('click', function(event) {
       objectTitle.up().toggleClassName('collapsed');
     }.bindAsEventListener());
-    object.select('.xobject-content dt').each(function(item) {
-      if(! item.down('input[type=checkbox]')) {
-        item.addClassName('collapsable');
-        var collapser = new Element('span', {'class' : 'collapser'});
-        collapser.observe('click', function(event) {
-          this.up('dt').next('dd').toggle();
-          this.toggleClassName('collapsed');
-        }.bindAsEventListener(collapser));
-        item.insert({top: collapser});
-      } else {
-        item.addClassName('uncollapsable');
-      }
-    });
-    object.select('.xobject-content dt label').each(function(item) {
-      item.observe('click', function(event) {
-        if(item.up('dt').down('span').hasClassName('collapsed')) {
-          item.up('dt').next('dd').toggle();
-          item.up('dt').down('span').toggleClassName('collapsed');
-        }
-      }.bindAsEventListener());
-    });
   },
   // ------------------------------------
   //  Expand/collapse classes
@@ -469,27 +448,6 @@ editors.XDataEditors = Class.create({
     propertyTitle.observe('click', function(event) {
       propertyTitle.up().toggleClassName('collapsed');
     }.bindAsEventListener());
-    property.select('.xproperty-content dt').each(function(item) {
-      if(! item.down('input[type=checkbox]')) {
-        item.addClassName('collapsable');
-        var collapser = new Element('span', {'class' : 'collapser'});
-        collapser.observe('click', function(event) {
-          this.up('dt').next('dd').toggle();
-          this.toggleClassName('collapsed');
-        }.bindAsEventListener(collapser));
-        item.insert({top: collapser});
-      } else {
-        item.addClassName('uncollapsable');
-      }
-    });
-    property.select('.xproperty-content dt label').each(function(item) {
-      item.observe('click', function(event) {
-        if(!item.up('dt').hasClassName('uncollapsable') && item.up('dt').down('span').hasClassName('collapsed')) {
-          item.up('dt').next('dd').toggle();
-          item.up('dt').down('span').toggleClassName('collapsed');
-        }
-      }.bindAsEventListener());
-    });
   },
   //---------------------------------------------------
   /* Class editor: xproperty ordering */

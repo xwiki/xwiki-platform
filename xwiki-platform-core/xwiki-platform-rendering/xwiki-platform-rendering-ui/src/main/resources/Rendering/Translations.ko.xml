@@ -20,29 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>Index</web>
+<xwikidoc version="1.2" reference="Rendering.Translations" locale="ko">
+  <web>Rendering</web>
   <name>Translations</name>
-  <language>no</language>
+  <language>ko</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Index.WebHome</parent>
+  <parent>Rendering.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>Rendering Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Rom
-index.spacesMacro.spaceIndex.title=Se rominnhold
-index.spacesMacro.spaceIndex.alt=Romindeks
-index.spacesMacro.spaceAdministration.title=Se romadministrering
-index.spacesMacro.spaceAdministration.alt=Administrer rom
-index.spacesMacro.createSpace.link=Opprett nytt rom
-index.spacesMacro.createSpace.defaultSpaceName=Romnavn
-index.spacesMacro.createSpace.submit=Opprett
-index.deletedDocuments.deleteAll=Slett alle</content>
+  <content>admin.syntaxes=구문
+admin.syntaxes.description=기본 페이지 구문을 선택하고 사용 가능한 마크업 구문을 구성하십시오.
+Rendering.RenderingConfigClass_disabledSyntaxes=사용할 수 없는 구문
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=페이지를 쓸 수 없는 마크업 구문 목록</content>
+  
 </xwikidoc>

@@ -71,19 +71,19 @@ menu.uix.extensionPoint.value.template.header.after=Nach dem Seitenkopf
 menu.uix.extensionPoint.value.panels.rightPanels=In einem rechten Panel
 menu.uix.extensionPoint.value.panels.leftPanels=In einem linken Panel
 ### Missing: menu.uix.content.label=UI Extension Content
-### Missing: menu.uix.content.hint=If you can see this then it probably means you have JavaScript disabled. You should select the same value as for the menu display location.
+menu.uix.content.hint=Wenn Sie dies sehen können, dann bedeutet das wahrscheinlich, dass Sie JavaScript deaktiviert haben. Sie sollten den gleichen Wert wie für die Position der Menüanzeige wählen.
 menu.uix.scope.label=Menü Sichtbarkeit Geltungsbereich
 menu.uix.scope.hint=Legt fest, in welchem Kontext das Menü sichtbar ist.
 
 # Menu Macro
 rendering.macro.menu.name=Menü
-### Missing: rendering.macro.menu.description=Displays a menu created using simple wiki syntax (nested lists and links).
+rendering.macro.menu.description=Zeigt ein Menü an, das mit einer einfachen Wiki-Syntax erstellt wurde (verschachtelte Listen und Links).
 rendering.macro.menu.parameter.id.name=id
-### Missing: rendering.macro.menu.parameter.id.description=Optional menu identifier that will be set on the HTML element that wraps the menu. You can use this identifier in JavaScript code to access the menu DOM or in functional tests to assert the menu items.
+rendering.macro.menu.parameter.id.description=Optionale Menükennung, die auf das HTML-Element gesetzt wird, das das Menü umgibt. Mit dieser Kennung können Sie im JavaScript-Code auf das Menü DOM zugreifen oder in Funktionstests die Menüpunkte bestätigen.
 rendering.macro.menu.parameter.type.name=Typ
-### Missing: rendering.macro.menu.parameter.type.description=The optional menu type determines the menu appearance and behaviour. The supported values are: horizontal (default value) and vertical.
-### Missing: rendering.macro.menu.content.description=Define the menu structure using wiki syntax. Each menu item should be a list item and should contain the menu item label or link. You can use nested lists for sub-menu items.
+rendering.macro.menu.parameter.type.description=Der optionale Menütyp bestimmt das Aussehen und das Verhalten des Menüs. Die unterstützten Werte sind: horizontal (Standardwert) und vertikal.
+rendering.macro.menu.content.description=Definieren Sie die Menüstruktur mit Hilfe der Wiki-Syntax. Jeder Menüpunkt sollte ein Listenelement sein und die Bezeichnung oder den Link des Menüpunkts enthalten. Verschachtelte Listen können Sie für Untermenüpunkte verwenden.
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>
+menu.description=Dies ist eine einfache Anwendung, mit der Sie Navigationsmenüs erstellen können, die entweder horizontal als obere Leiste nach dem Seitenkopf oder vertikal in einem Seitenpanel angezeigt werden.</content>
 </xwikidoc>

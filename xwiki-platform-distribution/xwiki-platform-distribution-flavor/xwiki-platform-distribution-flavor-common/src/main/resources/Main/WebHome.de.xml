@@ -73,9 +73,9 @@ Außerdem können Sie den [[Sandkasten&gt;&gt;Sandbox.WebHome]] verwenden, um we
 (%class="col-xs-12 col-sm-6"%)(((
 = Erweitern Sie Ihr Wiki =
 
-Um die Leistungsfähigkeit zu erhöhen und den Funktionsumfang Ihres Wikis zu erweitern, verwenden //Sie// den {{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}, um Erweiterungen zu suchen und zu installieren.
+Um die Leistungsfähigkeit zu erhöhen und den Funktionsumfang Ihres Wikis zu erweitern, verwenden Sie den {{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}}, um Erweiterungen zu suchen und zu installieren.
 
-Benutzen Sie das [[Erweitergungsverzeichnis&gt;&gt;http://extensions.xwiki.org]], um durch die mehr als 900 für XWiki verfügbaren Community-Erweiterungen zu blättern.
+Benutzen Sie das [[Erweiterungsverzeichnis&gt;&gt;http://extensions.xwiki.org]], um durch die mehr als 900 für XWiki verfügbaren Community-Erweiterungen zu blättern.
 )))
 (%class="col-xs-12 col-sm-6"%)(((
 = Erstellen Sie Ihre Anwendung =

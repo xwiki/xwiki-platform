@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>Index</web>
+<xwikidoc version="1.2" reference="ExtensionCode.Translations" locale="ko">
+  <web>ExtensionCode</web>
   <name>Translations</name>
-  <language>no</language>
+  <language>ko</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Index.WebHome</parent>
+  <parent>Extension.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -36,13 +36,19 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Rom
-index.spacesMacro.spaceIndex.title=Se rominnhold
-index.spacesMacro.spaceIndex.alt=Romindeks
-index.spacesMacro.spaceAdministration.title=Se romadministrering
-index.spacesMacro.spaceAdministration.alt=Administrer rom
-index.spacesMacro.createSpace.link=Opprett nytt rom
-index.spacesMacro.createSpace.defaultSpaceName=Romnavn
-index.spacesMacro.createSpace.submit=Opprett
-index.deletedDocuments.deleteAll=Slett alle</content>
+  <content>## Translations for the livetables column titles
+extension.repository.emptyvalue=
+extension.repository.name=이름
+extension.repository.summary=요약
+extension.repository.type=유형
+extension.repository.category=분류
+extension.repository.authors=저자
+extension.repository.doc.creationDate=생성
+extension.repository.doc.date=최종 수정
+extension.repository.rating=평가
+extension.repository.installedCount=설치
+
+## Administration UI
+admin.repository=확장 기능 저장소</content>
+  
 </xwikidoc>

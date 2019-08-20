@@ -20,29 +20,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>Index</web>
+<xwikidoc version="1.2" reference="Rendering.Translations" locale="no">
+  <web>Rendering</web>
   <name>Translations</name>
   <language>no</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Index.WebHome</parent>
+  <parent>Rendering.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>Rendering Translations</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Rom
-index.spacesMacro.spaceIndex.title=Se rominnhold
-index.spacesMacro.spaceIndex.alt=Romindeks
-index.spacesMacro.spaceAdministration.title=Se romadministrering
-index.spacesMacro.spaceAdministration.alt=Administrer rom
-index.spacesMacro.createSpace.link=Opprett nytt rom
-index.spacesMacro.createSpace.defaultSpaceName=Romnavn
-index.spacesMacro.createSpace.submit=Opprett
-index.deletedDocuments.deleteAll=Slett alle</content>
+  <content>admin.syntaxes=Syntakser
+admin.syntaxes.description=Velg standard sidesyntax og konfigurer de tilgjengelige merkesyntaxene.
+Rendering.RenderingConfigClass_disabledSyntaxes=Deaktiverte syntakser
+Rendering.RenderingConfigClass_disabledSyntaxes.hint=Liste med markeringssyntakser som sider ikke kan bruke</content>
+  
 </xwikidoc>

@@ -21,13 +21,12 @@
 -->
 
 <xwikidoc version="1.1">
-  <web>Index</web>
+  <web>IconThemesCode</web>
   <name>Translations</name>
   <language>no</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Index.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -36,13 +35,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Rom
-index.spacesMacro.spaceIndex.title=Se rominnhold
-index.spacesMacro.spaceIndex.alt=Romindeks
-index.spacesMacro.spaceAdministration.title=Se romadministrering
-index.spacesMacro.spaceAdministration.alt=Administrer rom
-index.spacesMacro.createSpace.link=Opprett nytt rom
-index.spacesMacro.createSpace.defaultSpaceName=Romnavn
-index.spacesMacro.createSpace.submit=Opprett
-index.deletedDocuments.deleteAll=Slett alle</content>
+  <parent>IconThemes.WebHome</parent>
+  <content>platform.icon.picker.preview=Forhåndsvisning med:
+platform.icon.picker.loading=Laster
+
+rendering.macro.iconPicker.name=Ikonvelger
+rendering.macro.iconPicker.description=Velg et ikon i XWiki-ikonsettet.
+rendering.macro.iconPicker.parameter.id.name=Id
+rendering.macro.iconPicker.parameter.id.description=DOM-ID for inndatafeltet velgeren skal gjelde for
+rendering.macro.iconPicker.parameter.class.name=Klasse
+rendering.macro.iconPicker.parameter.class.description=CSS-klasse med inndatafelter velgeren skal gjelde for
+rendering.macro.iconPicker.parameter.prefix.name=Prefiks
+rendering.macro.iconPicker.parameter.prefix.description=Prefiks som legges til før navnet på ikonet i inndatafeltet (standard: "image:icon:")</content>
+  
 </xwikidoc>

@@ -20,29 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>Index</web>
+<xwikidoc reference="Applications.Translations" locale="de">
+  <web>Applications</web>
   <name>Translations</name>
-  <language>no</language>
+  <language>de</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
+  <parent>Applications.WebHome</parent>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Index.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
+  <customClass/>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title/>
+  <title>Translations</title>
+  <defaultTemplate/>
+  <validationScript/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Rom
-index.spacesMacro.spaceIndex.title=Se rominnhold
-index.spacesMacro.spaceIndex.alt=Romindeks
-index.spacesMacro.spaceAdministration.title=Se romadministrering
-index.spacesMacro.spaceAdministration.alt=Administrer rom
-index.spacesMacro.createSpace.link=Opprett nytt rom
-index.spacesMacro.createSpace.defaultSpaceName=Romnavn
-index.spacesMacro.createSpace.submit=Opprett
-index.deletedDocuments.deleteAll=Slett alle</content>
+  
+  <content>application.index.title=Anwendungen
+application.index.drawer=Anwendungen</content>
 </xwikidoc>

@@ -24,31 +24,14 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-distribution-debian</artifactId>
+    <artifactId>xwiki-platform-distribution-debian-tomcat</artifactId>
     <version>10.11.10-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-debian-tomcat</artifactId>
-  <name>XWiki Platform - Distribution - Debian - Tomcat</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Distribution - Debian - Tomcat</description>
-  <modules>
-    <module>xwiki-platform-distribution-debian-tomcat7-common</module>
-    <module>xwiki-platform-distribution-debian-tomcat7-mysql</module>
-    <module>xwiki-platform-distribution-debian-tomcat7-pgsql</module>
-    <module>xwiki-platform-distribution-debian-tomcat8-common</module>
-    <module>xwiki-platform-distribution-debian-tomcat8-mysql</module>
-    <module>xwiki-platform-distribution-debian-tomcat8-pgsql</module>
-    <module>xwiki-platform-distribution-debian-tomcat9-common</module>
-    <module>xwiki-platform-distribution-debian-tomcat9-mysql</module>
-    <module>xwiki-platform-distribution-debian-tomcat9-pgsql</module>
-  </modules>
-  <dependencies>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-distribution-debian-common</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-      <type>deb</type>
-    </dependency>
-  </dependencies>
+  <artifactId>xwiki-platform-distribution-debian-tomcat9-mysql</artifactId>
+  <name>XWiki Platform - Distribution - Debian - Tomcat 9 - MySQL</name>
+  <packaging>deb</packaging>
+  <description>XWiki Tomcat9/MySQL based package</description>
+  <properties>
+    <debian.package>xwiki-tomcat9-mysql</debian.package>
+  </properties>
 </project>

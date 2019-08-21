@@ -123,6 +123,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ComputedFieldClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
@@ -353,7 +354,8 @@ public class ModelFactory
             property.setType(propertyClass.getClassType());
             if (hasAccess(property)) {
                 try {
-                    property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName())));
+                    property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName()), propertyClass,
+                        xwikiContext));
                 } catch (XWikiException e) {
                     // Should never happen
                     logger.error("Unexpected exception when accessing property [{}]", propertyClass.getName(), e);
@@ -956,7 +958,7 @@ public class ModelFactory
     }
 
     /**
-     * Serializes the value of the given XObject property.
+     * Serializes the value of the given XObject property. Returns an empty string for ComputedFieldClass properties.
      * 
      * @param property an XObject property
      * @return the String representation of the property value
@@ -976,6 +978,30 @@ public class ModelFactory
             return "";
         }
     }
+
+    /**
+     * Serializes the value of the given XObject property. In case the property is a ComputedFieldClass, the serialized
+     * value is the computed property value.
+     * @param property an XObject property
+     * @param propertyClass the PropertyClass of that XObject proprety
+     * @param context the XWikiContext
+     * @return the String representation of the property value
+     */
+    private static String serializePropertyValue(PropertyInterface property,
+        com.xpn.xwiki.objects.classes.PropertyClass propertyClass, XWikiContext context)
+    {
+        if (propertyClass instanceof ComputedFieldClass) {
+            // TODO: the XWikiDocument needs to be explicitely set in the context, otherwise method
+            // PropertyClass.renderInContext fires a null pointer exception: bug?
+            context.setDoc(property.getObject().getOwnerDocument());
+            ComputedFieldClass computedFieldClass = (ComputedFieldClass) propertyClass;
+            String value = computedFieldClass.displayView(propertyClass.getName(), property.getObject(), context);
+            return value;
+        } else {
+            return serializePropertyValue(property);
+        }
+    }
+
 
     public JobRequest toRestJobRequest(Request request) throws XWikiRestException
     {

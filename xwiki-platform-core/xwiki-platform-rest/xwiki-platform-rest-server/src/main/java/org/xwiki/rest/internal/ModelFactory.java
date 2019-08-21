@@ -958,8 +958,8 @@ public class ModelFactory
     }
 
     /**
-     * Serializes the value of the given XObject property. Returns an empty string for ComputedFieldClass properties.
-     * 
+     * Serializes the value of the given XObject property. ComputedField properties are not evaluated.
+     *
      * @param property an XObject property
      * @return the String representation of the property value
      */
@@ -993,9 +993,12 @@ public class ModelFactory
         if (propertyClass instanceof ComputedFieldClass) {
             // TODO: the XWikiDocument needs to be explicitely set in the context, otherwise method
             // PropertyClass.renderInContext fires a null pointer exception: bug?
+            XWikiDocument document = context.getDoc();
             context.setDoc(property.getObject().getOwnerDocument());
             ComputedFieldClass computedFieldClass = (ComputedFieldClass) propertyClass;
             String value = computedFieldClass.displayView(propertyClass.getName(), property.getObject(), context);
+            // Reset the context document to its original value.
+            context.setDoc(document);
             return value;
         } else {
             return serializePropertyValue(property);

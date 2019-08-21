@@ -958,7 +958,7 @@ public class ModelFactory
     }
 
     /**
-     * Serializes the value of the given XObject property. ComputedField properties are not evaluated.
+     * Serializes the value of the given XObject property. {@link ComputedFieldClass} properties are not evaluated.
      *
      * @param property an XObject property
      * @return the String representation of the property value
@@ -980,8 +980,8 @@ public class ModelFactory
     }
 
     /**
-     * Serializes the value of the given XObject property. In case the property is a ComputedFieldClass, the serialized
-     * value is the computed property value.
+     * Serializes the value of the given XObject property. In case the property is an instance of
+     * {@link ComputedFieldClass}, the serialized value is the computed property value.
      * @param property an XObject property
      * @param propertyClass the PropertyClass of that XObject proprety
      * @param context the XWikiContext

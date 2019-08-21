@@ -65,6 +65,7 @@ public class TextAreaMetaClass extends StringMetaClass
         editorClass.setName("editor");
         editorClass.setPrettyName("Editor");
         editorClass.setValues(UNKNWON + '|' + EditorType.TEXT + '|' + EditorType.PURE_TEXT + '|' + EditorType.WYSIWYG);
+        editorClass.setDefaultValue(UNKNWON);
         editorClass.setRelationalStorage(false);
         editorClass.setDisplayType("select");
         editorClass.setMultiSelect(false);
@@ -76,6 +77,7 @@ public class TextAreaMetaClass extends StringMetaClass
         contentTypeClass.setPrettyName("Content");
         contentTypeClass.setValues(
             UNKNWON + '|' + ContentType.WIKI_TEXT + '|' + ContentType.VELOCITY_CODE + '|' + ContentType.PURE_TEXT);
+        contentTypeClass.setDefaultValue(UNKNWON);
         contentTypeClass.setRelationalStorage(false);
         contentTypeClass.setDisplayType(editorClass.getDisplayType());
         contentTypeClass.setMultiSelect(false);

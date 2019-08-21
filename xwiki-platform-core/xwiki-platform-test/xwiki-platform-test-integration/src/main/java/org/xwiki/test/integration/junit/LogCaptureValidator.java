@@ -117,7 +117,15 @@ public class LogCaptureValidator
         new Line("WARNING: Please consider reporting this to the maintainers of"),
         new Line("WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective "
             + "access operations"),
-        new Line("WARNING: All illegal access operations will be denied in a future release")
+        new Line("WARNING: All illegal access operations will be denied in a future release"),
+
+        // This warning happens in docker test when using firefox.
+        // It seems related to this closed issue https://github.com/SeleniumHQ/docker-selenium/issues/388
+        // we might want to fix this using shm_size argument as explained in the thread, but AFAICS it doesn't guarantee
+        // to solve the issue and will potentially consume more memory. Moreover the log error doesn't look related
+        // to any problem during our tests.
+        new Line("Connection reset by peer: "
+            + "file /builds/worker/workspace/build/src/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 357")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

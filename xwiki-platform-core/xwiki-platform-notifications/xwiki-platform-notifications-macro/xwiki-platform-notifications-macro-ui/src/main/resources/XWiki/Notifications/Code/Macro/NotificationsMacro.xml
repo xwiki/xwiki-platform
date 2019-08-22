@@ -321,6 +321,8 @@ require(['jquery', 'XWikiNotificationsMacro'], function ($, XWikiNotificationsMa
               setTimeout(self.doLoad, 1000, params, untilDate, promise);
               break;
         }
+      }).fail(function () {
+        self.displayNoNotification();
       });
     };
     

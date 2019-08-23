@@ -149,7 +149,9 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
         List<BaseObject> oldXObjects = document.getXObjects(oldClassReference);
 
         for (BaseObject oldXObject : oldXObjects) {
-            document.addXObject(generateNewXObject(oldXObject));
+            if (oldXObject != null) {
+                document.addXObject(generateNewXObject(oldXObject));
+            }
         }
 
         document.removeXObjects(oldClassReference);

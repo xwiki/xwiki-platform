@@ -226,6 +226,12 @@ tbody.xwiki-livetable-display-body td a.action .action-icon {
 tbody.xwiki-livetable-display-body td a.actiondelete .action-icon {
   color: $theme.notificationErrorColor;
 }
+tbody.xwiki-livetable-display-body td.actions.hide-labels .action-label {
+  display: none;
+}
+tbody.xwiki-livetable-display-body td.actions.hide-labels .action-icon {
+  font-size: larger;
+}
 tbody.xwiki-livetable-display-body td._images img {
   margin-right: 2px;
 }

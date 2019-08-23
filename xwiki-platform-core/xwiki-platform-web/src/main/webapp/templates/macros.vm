@@ -1687,6 +1687,7 @@ function (row, i, table) {
         'class': 'actions',
         'data-title': displayName
       });
+      td.toggleClassName('hide-labels', descriptor.labels === false);
       (descriptor.actions || []).forEach(function(action, index) {
         if (row['doc_has' + action.id] || action.id === 'view' || (row['doc_has' + action.id] === undefined &&
             (row['doc_hasadmin'] || adminActions.indexOf(action.id) < 0))) {

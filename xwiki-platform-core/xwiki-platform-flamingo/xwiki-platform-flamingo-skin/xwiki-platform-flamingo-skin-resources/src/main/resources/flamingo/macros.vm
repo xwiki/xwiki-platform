@@ -240,7 +240,11 @@
               #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
-              <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
+              #set ($defaultHeaderClass = {'_actions': 'actions', '_avatar': 'avatar'})
+              #set ($discard = $colprop.putIfAbsent('headerClass', $defaultHeaderClass.get($colname)))
+              <th scope="col" class="xwiki-livetable-display-header-text $!colprop.headerClass
+                  #if ($!colprop.type == 'hidden')hidden#end
+                  #if ($isSortable)sortable #if ($colname == $selectedColumn)selected $defaultOrder#else asc#end#end">
                 #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
                 #if($isSortable)<a data-rel="${colname}">#end
                 $displayName

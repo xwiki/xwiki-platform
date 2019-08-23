@@ -1407,7 +1407,11 @@ $Msz MB##
               #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
-              <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
+              #set ($defaultHeaderClass = {'_actions': 'actions', '_avatar': 'avatar'})
+              #set ($discard = $colprop.putIfAbsent('headerClass', $defaultHeaderClass.get($colname)))
+              <th scope="col" class="xwiki-livetable-display-header-text $!colprop.headerClass
+                  #if ($!colprop.type == 'hidden')hidden#end
+                  #if ($isSortable)sortable #if ($colname == $selectedColumn)selected $defaultOrder#else asc#end#end">
                 #if($isSortable)<a rel="${colname}">#end
                 #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
                 $displayName
@@ -1517,7 +1521,7 @@ $Msz MB##
       #set ($columnProperties = $columnsProperties.get($column))
       #if ($columnProperties.type != 'hidden')
         <td class="xwiki-livetable-display-header-filter">
-          #if ($columnProperties.filterable != false)
+          #if ($columnProperties.filterable != false && "$!column" != '_actions')
             #set ($columnXClassName = $columnProperties.get('class'))
             #set ($columnXPropertyName = $column)
             #if (!$columnXClassName)
@@ -1645,54 +1649,19 @@ $displayName##
  *#
 #macro(livetablecallback $divid $collist $colprops $transprefix)
 function (row, i, table) {
-   ## Make sure the columns containing HTML are formatted in HTML indeed
-   #set ($htmlColumnKeys = ['doc.location'])
-   #foreach($htmlColumnKey in $htmlColumnKeys)
-     #if ($collist.contains($htmlColumnKey))
-       #set ($htmlColumnProps = $colprops[$htmlColumnKey])
-       #if (!$htmlColumnProps)
-         #set ($htmlColumnProps = {})
-         #set ($colprops[$htmlColumnKey] = $htmlColumnProps)
-       #end
-       #if ($htmlColumnProps.html == $NULL)
-         #set ($htmlColumnProps.html = true)
-       #end
-     #end
-   #end
-
   // This callback method has been generated from Velocity.
-  ## Translate the column descriptor.
-  #foreach ($entry in $colprops.entrySet())
-    #if ("$!entry.value.displayName" == '' && "$!transprefix" != '')
-      #set ($entry.value.displayName = $services.localization.render("${transprefix}$entry.key"))
-    #end
-  #end
-  #set ($actionsDescriptor = $colprops.get('_actions'))
-  #if ($actionsDescriptor)
-    #if (!$actionsDescriptor.labels)
-      #set ($actionsDescriptor.labels = {})
-    #end
-    #foreach ($action in $actionsDescriptor.actions)
-      #if (!$actionsDescriptor.labels.get($action))
-        #if ("$!transprefix" != '' && $services.localization.get("${transprefix}_actions.$action"))
-          #set ($discard = $actionsDescriptor.labels.put($action,
-            $services.localization.render("${transprefix}_actions.$action")))
-        #elseif ($services.localization.get("platform.livetable._actions.$action"))
-          #set ($discard = $actionsDescriptor.labels.put($action,
-            $services.localization.render("platform.livetable._actions.$action")))
-        #end
-      #end
-    #end
-  #end
+  ## Clone the column properties because we modify them.
+  #set ($columnDescriptors = $jsontool.fromString($jsontool.serialize($colprops)))
+  #livetable_normalizeColumnDescriptors($columnDescriptors $collist $transprefix)
   var columns = $jsontool.serialize($collist);
-  var columnDescriptors = $jsontool.serialize($colprops);
+  var columnDescriptors = $jsontool.serialize($columnDescriptors);
   var className = $jsontool.serialize($classname);
   var showFilterNote = false;
   if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
   #if ($collist.indexOf('doc.title') != -1)
-    #set($titleOpts = $colprops['doc.title'])
+    #set($titleOpts = $columnDescriptors['doc.title'])
     #if ("$!{titleOpts}" == ""
         || ($titleOpts['filterable'] == $NULL || $titleOpts['filterable'] == true)
         || ($titleOpts['sortable'] == $NULL   || $titleOpts['sortable'] == true))
@@ -1719,21 +1688,20 @@ function (row, i, table) {
         'data-title': displayName
       });
       (descriptor.actions || []).forEach(function(action, index) {
-        if (row['doc_has' + action] || action === 'view' || (row['doc_has' + action] === undefined &&
-            (row['doc_hasadmin'] || adminActions.indexOf(action) < 0))) {
-          if (index > 0) {
-            td.insert(' ');
-          }
+        if (row['doc_has' + action.id] || action.id === 'view' || (row['doc_has' + action.id] === undefined &&
+            (row['doc_hasadmin'] || adminActions.indexOf(action.id) < 0))) {
           var link = new Element('a', {
-            'href': row['doc_' + action + '_url'],
-            'class': 'action action' + action
-          }).update((descriptor.labels || {})[action] || action);
-          if (descriptor.ajaxActions && descriptor.ajaxActions[action]) {
+            'href': row['doc_' + action.id + '_url'],
+            'class': 'action action' + action.id
+          }).update('<span class="action-icon"></span><span class="action-label"></span>');
+          link.down('.action-icon').update(action.icon).writeAttribute('title', action.label);
+          link.down('.action-label').update(action.label.escapeHTML());
+          if (action.async) {
             link.observe('click', function(event) {
               event.stop();
               new Ajax.Request(this.href, {
                 onSuccess: function() {
-                  eval((descriptor.actionCallbacks || {})[action]);
+                  eval(action.callback);
                 }
               });
             }.bindAsEventListener(link));
@@ -1797,6 +1765,70 @@ function (row, i, table) {
   });
   return tr;
 }
+#end
+
+#macro (livetable_normalizeColumnDescriptors $columnDescriptors $colList $transPrefix)
+  ## Make sure the columns containing HTML are formatted in HTML indeed
+  #set ($htmlColumnKeys = ['doc.location'])
+  #foreach($htmlColumnKey in $htmlColumnKeys)
+    #if ($colList.contains($htmlColumnKey))
+      #set ($htmlColumnProps = $columnDescriptors[$htmlColumnKey])
+      #if (!$htmlColumnProps)
+        #set ($htmlColumnProps = {})
+        #set ($columnDescriptors[$htmlColumnKey] = $htmlColumnProps)
+      #end
+      #if ($htmlColumnProps.html == $NULL)
+        #set ($htmlColumnProps.html = true)
+      #end
+    #end
+  #end
+  ## Translate the column descriptor.
+  #foreach ($entry in $columnDescriptors.entrySet())
+    #if ("$!entry.value.displayName" == '' && "$!transPrefix" != '')
+      #set ($entry.value.displayName = $services.localization.render("${transPrefix}$entry.key"))
+    #end
+  #end
+  #livetable_normalizeActionsDescriptor($columnDescriptors $transPrefix)
+#end
+
+#macro (livetable_normalizeActionsDescriptor $columnDescriptors $transPrefix)
+  #set ($actionsDescriptor = $columnDescriptors.get('_actions'))
+  #if ($actionsDescriptor)
+    #foreach ($action in $actionsDescriptor.actions)
+      ## If the action is specified as a string then only the action id is specified.
+      #if ($action.equals("$!action"))
+        ## Note that 'labels' and 'actionCallbacks' are deprecated.
+        #set ($action = {
+          'id': $action,
+          'label': $actionsDescriptor.labels.get($action),
+          'async': $actionsDescriptor.ajaxActions.get($action),
+          'callback': $actionsDescriptor.actionCallbacks.get($action)
+        })
+        #set ($discard = $actionsDescriptor.actions.set($foreach.index, $action))
+      #end
+      #if ("$!action.label" == '')
+        #if ("$!transPrefix" != '' && $services.localization.get("${transPrefix}_actions.$action.id"))
+          #set ($action.label = $services.localization.render("${transPrefix}_actions.$action.id"))
+        #elseif ($services.localization.get("platform.livetable._actions.$action.id"))
+          #set ($action.label = $services.localization.render("platform.livetable._actions.$action.id"))
+        #else
+          #set ($action.label = $action.id)
+        #end
+      #end
+      #if ("$!action.icon" == '')
+        #set ($defaultActionIcons = {
+          'rename': 'move',
+          'delete': 'cross',
+          'restore': 'refresh',
+          'undelete': 'refresh',
+          'rights': 'lock',
+          'edit': 'pencil'
+        })
+        #set ($action.icon = $defaultActionIcons.getOrDefault($action.id, $action.id))
+      #end
+      #set ($action.icon = "$!services.icon.renderHTML($action.icon)")
+    #end
+  #end
 #end
 
 #**

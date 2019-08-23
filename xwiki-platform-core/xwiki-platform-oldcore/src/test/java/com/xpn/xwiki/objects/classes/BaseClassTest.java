@@ -19,25 +19,40 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.model.reference.DocumentReference;
+import java.util.List;
 
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import org.junit.jupiter.api.Test;
+import org.xwiki.diff.internal.DefaultDiffManager;
+import org.xwiki.logging.LogLevel;
+import org.xwiki.logging.event.LogEvent;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.ComponentList;
+
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.doc.merge.MergeResult;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the {@link BaseClass} class.
  *
  * @version $Id$
  */
+@ComponentList({
+    DefaultDiffManager.class
+})
 @ReferenceComponentList
+@OldcoreTest
 public class BaseClassTest
 {
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     @Test
     public void setDocumentReference()
@@ -129,5 +144,37 @@ public class BaseClassTest
         baseClass.addNumberField("field", "int pretty name", 30, "int");
 
         assertTrue(baseClass.addTextAreaField("field", "pretty name", 55, 33));
+    }
+
+    @Test
+    public void merge()
+    {
+        BaseClass previousClass = new BaseClass();
+        previousClass.setPrettyName("previous");
+        previousClass.setValidationScript("my validation script");
+        previousClass.setDefaultEditSheet("A previous edit sheet");
+
+        BaseClass currentClass = new BaseClass();
+        currentClass.setPrettyName("current");
+        currentClass.setValidationScript("my validation script");
+        currentClass.setDefaultEditSheet("An edit sheet");
+
+        BaseClass newClass = new BaseClass();
+        newClass.setPrettyName("new");
+        newClass.setValidationScript("my new validation script");
+        newClass.setDefaultEditSheet("A previous edit sheet");
+
+        MergeResult mergeResult = new MergeResult();
+        currentClass.merge(previousClass, newClass, new MergeConfiguration(), oldcore.getXWikiContext(), mergeResult);
+
+        List<LogEvent> errors = mergeResult.getLog().getLogsFrom(LogLevel.ERROR);
+        assertEquals(1, errors.size());
+        assertEquals("ERROR:Failed to merge objects: previous=[previous] new=[new] current=[current]",
+            errors.get(0).toString());
+
+        assertTrue(mergeResult.isModified());
+        assertEquals("current", currentClass.getPrettyName());
+        assertEquals("my new validation script", currentClass.getValidationScript());
+        assertEquals("An edit sheet", currentClass.getDefaultEditSheet());
     }
 }

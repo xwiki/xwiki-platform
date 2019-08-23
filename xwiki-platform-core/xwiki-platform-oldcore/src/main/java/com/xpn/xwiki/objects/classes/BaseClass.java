@@ -1429,7 +1429,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
             getDefaultEditSheet(), mergeResult));
 
-        setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getValidationScript(), newClass.getValidationScript(),
+        setValidationScript(MergeUtils.mergeOject(previousClass.getValidationScript(), newClass.getValidationScript(),
             getValidationScript(), mergeResult));
 
         setNameField(

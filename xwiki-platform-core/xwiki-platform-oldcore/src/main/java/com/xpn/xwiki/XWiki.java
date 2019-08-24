@@ -2051,7 +2051,7 @@ public class XWiki implements EventListener
      * extracted from it. If it's a document parent it will be completed with the necessary default references (for
      * example if it's a space reference it will load the space home page).
      *
-     * @param reference the reference of teh document
+     * @param reference the reference of the document
      * @param context see {@link XWikiContext}
      * @since 5.0M1
      */

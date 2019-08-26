@@ -19,13 +19,19 @@
  */
 package org.xwiki.store.merge;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.logging.LogLevel;
+import org.xwiki.diff.Conflict;
+import org.xwiki.diff.ConflictDecision;
+import org.xwiki.diff.internal.DefaultConflictDecision;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 
@@ -33,7 +39,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**
  * Script service allowing to perform merge operations on documents.
@@ -53,6 +58,12 @@ public class MergeScriptService implements ScriptService
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    private MergeConflictDecisionsManager conflictDecisionsManager;
+
+    @Inject
+    private MergeManager mergeManager;
+
     /**
      * Perform a merge 3 points between the currentDocument and the newDocument, the previousDocument being the common
      * ancestor of both documents. This operation doesn't save anything.
@@ -62,7 +73,7 @@ public class MergeScriptService implements ScriptService
      * @param newDocument the new version of the document to merge.
      * @return a {@link MergeDocumentResult} object containing the merged document.
      */
-    public MergeDocumentResult mergeDocument(Document previousDocument, Document currentDocument,
+    public MergeDocumentResultScript mergeDocument(Document previousDocument, Document currentDocument,
         Document newDocument)
     {
         MergeConfiguration mergeConfiguration = new MergeConfiguration();
@@ -73,9 +84,47 @@ public class MergeScriptService implements ScriptService
         XWikiDocument newDoc = newDocument.getDocument();
 
         XWikiDocument mergeDoc = currentDoc.clone();
-        MergeResult mergeResult = mergeDoc.merge(previousDoc, newDoc, mergeConfiguration, contextProvider.get());
+        MergeDocumentResult mergeResult =
+            mergeManager.mergeDocument(previousDoc, newDoc, currentDoc, mergeConfiguration);
 
-        return new MergeDocumentResult(currentDoc, previousDoc, newDoc, mergeDoc,
-            !mergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty());
+        return new MergeDocumentResultScript(mergeResult, contextProvider.get());
+    }
+
+    /**
+     * Create a {@link ConflictDecision} based on an existing conflict and a choice made.
+     *
+     * @param conflict the conflict for which the decision has been taken.
+     * @param type the choice made to solve the conflict.
+     * @param customDecision if a value is given, the decision type will be custom and this value will be used to solve
+     *                  the conflict.
+     * @return a decision that solve the conflict.
+     * @since 11.8RC1
+     */
+    @Unstable
+    public ConflictDecision<String> getDecision(Conflict<String> conflict, ConflictDecision.DecisionType type,
+        String customDecision)
+    {
+        ConflictDecision<String> conflictDecision = new DefaultConflictDecision<>(conflict);
+        if (StringUtils.isEmpty(customDecision)) {
+            conflictDecision.setType(type);
+        } else {
+            conflictDecision.setCustom(Collections.singletonList(customDecision));
+        }
+
+        return conflictDecision;
+    }
+
+    /**
+     * Record all the decisions taken in the {@link MergeConflictDecisionsManager}.
+     *
+     * @param decisionList the list of decision to save.
+     * @since 11.8RC1
+     */
+    @Unstable
+    public void recordDecisions(List<ConflictDecision> decisionList)
+    {
+        XWikiContext context = contextProvider.get();
+        conflictDecisionsManager.setConflictDecisionList(decisionList,
+            context.getDoc().getDocumentReferenceWithLocale(), context.getUserReference());
     }
 }

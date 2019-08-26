@@ -151,6 +151,23 @@
                   }
                 },
                 "ignore" : [
+                  {
+                    "code": "java.class.removed",
+                    "old": "class com.xpn.xwiki.doc.merge.CollisionException",
+                    "justification": "This class was actually not deleted but moved from xwiki-platform-oldcore module to xwiki-platform-store-merge-default module."
+                  },
+                  {
+                    "code": "java.class.removed",
+                    "old": "class com.xpn.xwiki.doc.merge.MergeException",
+                    "justification": "This class was actually not deleted but moved from xwiki-platform-oldcore module to xwiki-platform-store-merge-default module."
+                  },
+                  {
+                    "code": "java.field.serialVersionUIDChanged",
+                    "new": "field com.xpn.xwiki.objects.BaseElement<R extends org.xwiki.model.reference.EntityReference>.serialVersionUID",
+                    "oldSerialVersionUID": "-3688616098120062811",
+                    "newSerialVersionUID": "1",
+                    "justification": "Use a real serialVersionUID field. Not breaking since we never serialize it."
+                  }
                   // Add more ignores below...
                 ]
               }

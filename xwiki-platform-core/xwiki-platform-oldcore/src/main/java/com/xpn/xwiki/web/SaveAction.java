@@ -36,13 +36,15 @@ import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
-import org.xwiki.logging.LogLevel;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.store.merge.MergeDocumentResult;
+import org.xwiki.store.merge.MergeManager;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -50,7 +52,6 @@ import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.ObjectDiff;
 
 /**
@@ -89,6 +90,8 @@ public class SaveAction extends PreviewAction
     private static final String FORCE_SAVE_OVERRIDE = "override";
 
     private DocumentRevisionProvider documentRevisionProvider;
+
+    private MergeManager mergeManager;
 
     /**
      * The redirect class, used to mark pages that are redirect place-holders, i.e. hidden pages that serve only for
@@ -289,6 +292,15 @@ public class SaveAction extends PreviewAction
         return this.documentRevisionProvider;
     }
 
+    private MergeManager getMergeManager()
+    {
+        if (this.mergeManager == null) {
+            this.mergeManager = Utils.getComponent(MergeManager.class);
+        }
+
+        return this.mergeManager;
+    }
+
     /**
      * Check if the version of the document being saved is conflicting with another version. This check is done by
      * getting the "previousVersion" parameter from the request and comparing it with latest version of the document. If
@@ -343,10 +355,16 @@ public class SaveAction extends PreviewAction
                     if (contentDiff.isEmpty() && objectDiff.isEmpty()) {
                         return false;
                     } else {
-                        MergeResult mergeResult =
-                            modifiedDoc.merge(previousDoc, originalDoc, new MergeConfiguration(), context);
+                        MergeConfiguration mergeConfiguration = new MergeConfiguration();
+                        mergeConfiguration.setUserReference(context.getUserReference());
+                        mergeConfiguration.setConcernedDocument(modifiedDoc.getDocumentReferenceWithLocale());
+                        mergeConfiguration.setProvidedVersionsModifiables(true);
+
+                        MergeDocumentResult mergeDocumentResult =
+                            getMergeManager().mergeDocument(previousDoc, originalDoc, modifiedDoc, mergeConfiguration);
+
                         if (FORCE_SAVE_MERGE.equals(request.getParameter("forceSave"))
-                            || mergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+                            || !mergeDocumentResult.hasConflicts()) {
                             context.put(MERGED_DOCUMENTS, "true");
                             return false;
                         }

@@ -572,6 +572,12 @@
       <artifactId>xwiki-platform-security-authentication-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-merge-api</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
 
     <!-- Test dependencies -->
 

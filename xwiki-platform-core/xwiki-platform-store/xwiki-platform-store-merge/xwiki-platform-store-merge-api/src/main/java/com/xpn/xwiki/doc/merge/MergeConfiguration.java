@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.doc.merge;
 
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+
 /**
  * Allow to define some behaviors of the merge.
  *
@@ -31,6 +34,10 @@ public class MergeConfiguration
      * @see #isProvidedVersionsModifiables()
      */
     private boolean providedVersionsModifiables = true;
+
+    private DocumentReference concernedDocument;
+
+    private EntityReference userReference;
 
     /**
      * @param providedVersionsModifiables true if the merge is allowed to modify input elements
@@ -51,5 +58,42 @@ public class MergeConfiguration
     public boolean isProvidedVersionsModifiables()
     {
         return this.providedVersionsModifiables;
+    }
+
+    /**
+     * @return the reference of the document concerned by this merge.
+     */
+    public DocumentReference getConcernedDocument()
+    {
+        return concernedDocument;
+    }
+
+    /**
+     * Specify which document is currently merged.
+     * @param concernedDocument the reference to the document that is merged.
+     * @since 11.8RC1
+     */
+    public void setConcernedDocument(DocumentReference concernedDocument)
+    {
+        this.concernedDocument = concernedDocument;
+    }
+
+    /**
+     * @return the reference of the user performing the merge.
+     * @since 11.8RC1
+     */
+    public EntityReference getUserReference()
+    {
+        return userReference;
+    }
+
+    /**
+     * Specify which user is performing the merge.
+     * @param userReference the reference to the user doing the merge.
+     * @since 11.8RC1
+     */
+    public void setUserReference(EntityReference userReference)
+    {
+        this.userReference = userReference;
     }
 }

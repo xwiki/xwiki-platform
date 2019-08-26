@@ -165,11 +165,11 @@ public class BaseObjectTest
         BaseObject currentObject = new BaseObject();
         currentObject.setStringValue("str", "value");
 
-        when(mergeManager.mergeOject(any(), any(), any(), any())).thenReturn(new MergeManagerResult<>());
+        when(mergeManager.mergeObject(any(), any(), any(), any())).thenReturn(new MergeManagerResult<>());
         MergeManagerResult<String, String> mergeManagerResult = new MergeManagerResult<>();
         mergeManagerResult.setMergeResult("newvalue");
         mergeManagerResult.setModified(true);
-        when(mergeManager.mergeOject(eq("value"), eq("newvalue"), eq("value"), any())).thenReturn(mergeManagerResult);
+        when(mergeManager.mergeObject(eq("value"), eq("newvalue"), eq("value"), any())).thenReturn(mergeManagerResult);
 
         MergeConfiguration mergeConfiguration = new MergeConfiguration();
         MergeResult mergeResult = new MergeResult();

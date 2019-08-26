@@ -362,7 +362,7 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
         XWikiContext context, MergeResult mergeResult)
     {
         MergeManagerResult<String, String> prettyNameManagerResult =
-            getMergeManager().mergeOject(((BaseElement) previousElement).getPrettyName(),
+            getMergeManager().mergeObject(((BaseElement) previousElement).getPrettyName(),
                 ((BaseElement) newElement).getPrettyName(), getPrettyName(), configuration);
         mergeResult.getLog().addAll(prettyNameManagerResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || prettyNameManagerResult.isModified());

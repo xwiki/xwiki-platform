@@ -60,7 +60,7 @@ public interface MergeManager
      * @param <T> the type of the object
      * @return an obtained merged object.
      */
-    <T> MergeManagerResult<T, T> mergeOject(T previousObject, T newObject, T currentObject,
+    <T> MergeManagerResult<T, T> mergeObject(T previousObject, T newObject, T currentObject,
         MergeConfiguration configuration);
 
     /**

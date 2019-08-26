@@ -42,7 +42,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeException;
-import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -94,7 +93,7 @@ public class MergeManagerTest
     @Test
     public void mergeObjectSimple()
     {
-        MergeManagerResult<String, String> result = mergeManager.mergeOject("old", "new", "old", new MergeConfiguration());
+        MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "old", new MergeConfiguration());
         assertEquals("new", result.getMergeResult());
         assertTrue(result.isModified());
     }
@@ -102,7 +101,7 @@ public class MergeManagerTest
     @Test
     public void mergeObjectAlreadyDone()
     {
-        MergeManagerResult<String, String> result = mergeManager.mergeOject("old", "new", "new", new MergeConfiguration());
+        MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "new", new MergeConfiguration());
         assertEquals("new", result.getMergeResult());
         assertFalse(result.isModified());
     }
@@ -110,7 +109,7 @@ public class MergeManagerTest
     @Test
     public void mergeObjectWhileModified()
     {
-        MergeManagerResult<String, String> result = mergeManager.mergeOject("old", "new", "old modified", new MergeConfiguration());
+        MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "old modified", new MergeConfiguration());
         assertEquals("old modified", result.getMergeResult());
         assertFalse(result.isModified());
         // conflicts are flagged as errors in the log

@@ -132,7 +132,7 @@ public class DefaultMergeManager implements MergeManager
      * @return the merged object or the provided current object if the merge fail
      */
     @Override
-    public <T> MergeManagerResult<T, T> mergeOject(T previousObject, T newObject, T currentObject,
+    public <T> MergeManagerResult<T, T> mergeObject(T previousObject, T newObject, T currentObject,
         MergeConfiguration configuration)
     {
         MergeManagerResult<T, T> mergeResult = new MergeManagerResult<>();
@@ -238,7 +238,7 @@ public class DefaultMergeManager implements MergeManager
             // Title
             // We don't want to merge titles as Strings, since they are often scripts.
             // So better to merge them as objects.
-            MergeManagerResult<String, String> titleMergeResult = this.mergeOject(previousDocument.getTitle(),
+            MergeManagerResult<String, String> titleMergeResult = this.mergeObject(previousDocument.getTitle(),
                 newDocument.getTitle(), currentDocument.getTitle(), configuration);
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.TITLE, titleMergeResult);
             mergedDocument.setTitle(titleMergeResult.getMergeResult());
@@ -250,33 +250,33 @@ public class DefaultMergeManager implements MergeManager
             mergedDocument.setContent(contentMergeResult.getMergeResult());
 
             // Syntax
-            MergeManagerResult<Syntax, Syntax> syntaxMergeResult = this.mergeOject(previousDocument.getSyntax(),
+            MergeManagerResult<Syntax, Syntax> syntaxMergeResult = this.mergeObject(previousDocument.getSyntax(),
                 newDocument.getSyntax(), currentDocument.getSyntax(), configuration);
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.SYNTAX, syntaxMergeResult);
             mergedDocument.setSyntax(syntaxMergeResult.getMergeResult());
 
             // Default locale
-            MergeManagerResult<Locale, Locale> localeMergeResult = this.mergeOject(previousDoc.getDefaultLocale(),
+            MergeManagerResult<Locale, Locale> localeMergeResult = this.mergeObject(previousDoc.getDefaultLocale(),
                 newDoc.getDefaultLocale(), currentDoc.getDefaultLocale(), configuration);
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.LOCALE, localeMergeResult);
             mergedDocument.setDefaultLocale(localeMergeResult.getMergeResult());
 
             // Parent
             MergeManagerResult<EntityReference, EntityReference> parentReferenceMergeResult =
-                this.mergeOject(previousDoc.getRelativeParentReference(), newDoc.getRelativeParentReference(),
+                this.mergeObject(previousDoc.getRelativeParentReference(), newDoc.getRelativeParentReference(),
                     currentDoc.getRelativeParentReference(), configuration);
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.PARENT_REFERENCE, parentReferenceMergeResult);
             mergedDocument.setParentReference(parentReferenceMergeResult.getMergeResult());
 
             // DefaultTemplate
-            MergeManagerResult<String, String> templateMergeResult = this.mergeOject(previousDoc.getDefaultTemplate(),
+            MergeManagerResult<String, String> templateMergeResult = this.mergeObject(previousDoc.getDefaultTemplate(),
                 newDoc.getDefaultTemplate(), currentDoc.getDefaultTemplate(), configuration);
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.DEFAULT_TEMPLATE, templateMergeResult);
             mergedDocument.setDefaultTemplate(templateMergeResult.getMergeResult());
 
             // Hidden
             MergeManagerResult<Boolean, Boolean> hiddenPropertyMergeResult =
-                this.mergeOject(previousDoc.isHidden(), newDoc.isHidden(), currentDoc.isHidden(), configuration);
+                this.mergeObject(previousDoc.isHidden(), newDoc.isHidden(), currentDoc.isHidden(), configuration);
             mergeResult.putMergeResult(MergeDocumentResult.DocumentPart.HIDDEN, hiddenPropertyMergeResult);
             mergedDocument.setHidden(hiddenPropertyMergeResult.getMergeResult());
 

@@ -1415,47 +1415,47 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         BaseClass newClass = (BaseClass) newElement;
 
         MergeManagerResult<String, String> customClassMergeResult =
-            getMergeManager().mergeOject(previousClass.getCustomClass(),
+            getMergeManager().mergeObject(previousClass.getCustomClass(),
                 newClass.getCustomClass(), getCustomClass(), configuration);
         mergeResult.getLog().addAll(customClassMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || customClassMergeResult.isModified());
         setCustomClass(customClassMergeResult.getMergeResult());
 
-        MergeManagerResult<String, String> customMappingMergeResult = getMergeManager().mergeOject(previousClass.getCustomMapping(),
+        MergeManagerResult<String, String> customMappingMergeResult = getMergeManager().mergeObject(previousClass.getCustomMapping(),
             newClass.getCustomMapping(), getCustomMapping(), configuration);
         mergeResult.getLog().addAll(customMappingMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || customMappingMergeResult.isModified());
         setCustomMapping(customMappingMergeResult.getMergeResult());
 
-        MergeManagerResult<String, String> defaultWebMergeResult = getMergeManager().mergeOject(previousClass.getDefaultWeb(),
+        MergeManagerResult<String, String> defaultWebMergeResult = getMergeManager().mergeObject(previousClass.getDefaultWeb(),
             newClass.getDefaultWeb(), getDefaultWeb(), configuration);
         mergeResult.getLog().addAll(defaultWebMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || defaultWebMergeResult.isModified());
         setDefaultWeb(defaultWebMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> defaultViewSheetMergeResult =
-            getMergeManager().mergeOject(previousClass.getDefaultViewSheet(), newClass.getDefaultViewSheet(),
+            getMergeManager().mergeObject(previousClass.getDefaultViewSheet(), newClass.getDefaultViewSheet(),
                 getDefaultViewSheet(), configuration);
         mergeResult.getLog().addAll(defaultViewSheetMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || defaultViewSheetMergeResult.isModified());
         setDefaultViewSheet(defaultViewSheetMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> defaultEditSheetMergeResult =
-            getMergeManager().mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
+            getMergeManager().mergeObject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
                 getDefaultEditSheet(), configuration);
         mergeResult.getLog().addAll(defaultEditSheetMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || defaultEditSheetMergeResult.isModified());
         setDefaultEditSheet(defaultEditSheetMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> validationScriptMergeResult =
-            getMergeManager().mergeOject(previousClass.getValidationScript(), newClass.getValidationScript(),
+            getMergeManager().mergeObject(previousClass.getValidationScript(), newClass.getValidationScript(),
                 getValidationScript(), configuration);
         mergeResult.getLog().addAll(validationScriptMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || validationScriptMergeResult.isModified());
         setValidationScript(validationScriptMergeResult.getMergeResult());
 
         MergeManagerResult<String, String> nameFieldMergeResult =
-            getMergeManager().mergeOject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
+            getMergeManager().mergeObject(previousClass.getNameField(), newClass.getNameField(), getNameField(),
                 configuration);
         mergeResult.getLog().addAll(nameFieldMergeResult.getLog());
         mergeResult.setModified(mergeResult.isModified() || nameFieldMergeResult.isModified());

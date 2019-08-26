@@ -18,6 +18,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(["jquery"], function($) {
+  var update = function(element, url)
+  {
+    // TODO: show progress
+    // TODO: error handling
+    $.get({
+      url : url,
+      statusCode: {
+        200: function(data, textStatus, xhr) {
+          // Replace the element by the asynchronous result
+          element.replaceWith(data);
+
+          // Add asynchronous meta tags
+          // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
+          var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
+          if (asyncHead) {
+            $('head').append(asyncHead);
+          }
+        },
+
+        202: function(data, textStatus, xhr) {
+          update(element, url);
+        }
+      }
+    });
+  }
+
   var activateAsyncPlaceHolder = function(element)
   {
     var url = element.dataset.xwikiAsyncUrl;
@@ -39,7 +65,9 @@ require(["jquery"], function($) {
     var clientId = element.dataset.xwikiAsyncClientId;
 
     if (clientId) {
-      url += '?clientId=' + clientId;
+      url += '?clientId=' + clientId + '&timeout=' + 500;
+    } else {
+      url += '?timeout=' + 500;
     }
 
     element = $(element);
@@ -51,20 +79,7 @@ require(["jquery"], function($) {
       element.html('<span class="fa fa-spinner fa-spin"/>');
     }
 
-    // TODO: don't wait forever
-    // TODO: show progress
-    // TODO: error handling
-    $.get(url).done(function(data, textStatus, xhr) {
-      // Replace the element by the asynchronous result
-      element.replaceWith(data);
-
-      // Add asynchronous meta tags
-      // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
-      var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
-      if (asyncHead) {
-        $('head').append(asyncHead);
-      }
-    })
+    update(element, url);
   }
 
   var onMutations = function(mutations)

@@ -22,6 +22,7 @@ package org.xwiki.rendering.async.internal;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;

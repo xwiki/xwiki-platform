@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HeaderElement;
+import org.apache.http.message.BasicHeader;
 import org.xwiki.container.servlet.internal.ForwardedHeader;
 
 /**
@@ -52,6 +54,11 @@ public final class HttpServletUtils
      * Apache stuff, old de-facto standard: X-Forwarded-Proto.
      */
     public static final String HEADER_X_FORWARDED_PROTO = "x-forwarded-proto";
+
+    /**
+     * Header containing the cache control.
+     */
+    private static final String HEADER_CACHE_CONTROL = "Cache-Control";
 
     private static final String HTTP = "http";
 
@@ -205,5 +212,26 @@ public final class HttpServletUtils
         }
 
         return null;
+    }
+
+    /**
+     * @param request the servlet request input
+     * @return true if the request explicitly disable getting resources from the cache
+     * @since 11.8RC1
+     */
+    public static boolean isCacheReadAllowed(HttpServletRequest request)
+    {
+        String headerValue = request.getHeader(HEADER_CACHE_CONTROL);
+        if (headerValue != null) {
+            BasicHeader cacheControlHeader = new BasicHeader(HEADER_CACHE_CONTROL, headerValue);
+            for (HeaderElement element : cacheControlHeader.getElements()) {
+                // no-cache
+                if (element.getName().equals("no-cache")) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 }

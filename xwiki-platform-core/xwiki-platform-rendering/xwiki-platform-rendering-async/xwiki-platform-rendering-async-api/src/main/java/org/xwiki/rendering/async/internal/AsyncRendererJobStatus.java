@@ -22,6 +22,7 @@ package org.xwiki.rendering.async.internal;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -88,9 +89,10 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
 
         this.async = false;
 
-        this.result = result;
+        setResult(result);
 
         setState(State.FINISHED);
+        setEndDate(new Date());
     }
 
     /**
@@ -114,6 +116,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
         setUses(uses);
 
         setState(State.FINISHED);
+        setEndDate(new Date());
     }
 
     /**

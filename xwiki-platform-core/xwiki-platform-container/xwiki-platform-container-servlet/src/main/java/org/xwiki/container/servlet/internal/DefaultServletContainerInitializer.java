@@ -25,12 +25,14 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.xwiki.cache.CacheControl;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.ApplicationContextListenerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.RequestInitializerManager;
+import org.xwiki.container.servlet.HttpServletUtils;
 import org.xwiki.container.servlet.ServletApplicationContext;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;

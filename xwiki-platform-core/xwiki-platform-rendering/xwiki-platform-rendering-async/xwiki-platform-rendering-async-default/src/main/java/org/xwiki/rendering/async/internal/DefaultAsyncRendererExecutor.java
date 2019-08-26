@@ -37,6 +37,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.collections4.MapUtils;
 import org.slf4j.Logger;
+import org.xwiki.cache.CacheControl;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -85,6 +86,9 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     @Inject
     @Named("context")
     private ComponentManager componentManager;
+
+    @Inject
+    private CacheControl cacheControl;
 
     @Inject
     private Logger logger;
@@ -145,28 +149,30 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
     public AsyncRendererExecutorResponse render(AsyncRenderer renderer, AsyncRendererConfiguration configuration)
         throws JobException, RenderingException
     {
-        boolean async = renderer.isAsyncAllowed() && this.asyncContext.isEnabled();
+        boolean asyncAllowed = renderer.isAsyncAllowed() && this.asyncContext.isEnabled();
+        boolean cacheAllowed = renderer.isCacheAllowed();
 
         // Get context and job id
-        Map<String, Serializable> context = getContext(renderer, async, configuration);
+        Map<String, Serializable> context = getContext(asyncAllowed, cacheAllowed, configuration);
 
         // Generate job id
         List<String> jobId = getJobId(renderer, context);
 
-        if (renderer.isCacheAllowed()) {
+        if (cacheAllowed) {
             this.cache.getLock().readLock().lock();
 
             try {
                 AsyncRendererJobStatus status = getCurrent(jobId);
 
-                if (status != null) {
+                if (status != null
+                    && (status.getEndDate() == null || this.cacheControl.isCacheReadAllowed(status.getEndDate()))) {
                     if (status.getResult() != null) {
                         // Available cached result, return it
 
                         injectUses(status);
 
                         return new AsyncRendererExecutorResponse(status);
-                    } else if (async) {
+                    } else if (asyncAllowed) {
                         // Already running job, associate it with another client
                         return new AsyncRendererExecutorResponse(status, newClientId());
                     }
@@ -184,7 +190,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         AsyncRendererJobRequest request = new AsyncRendererJobRequest();
         request.setRenderer(renderer);
 
-        if (async) {
+        if (asyncAllowed) {
             this.cache.getLock().writeLock().lock();
 
             try {
@@ -284,12 +290,12 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
         }
     }
 
-    private Map<String, Serializable> getContext(AsyncRenderer renderer, boolean async,
+    private Map<String, Serializable> getContext(boolean asyncAllowed, boolean cacheAllowed,
         AsyncRendererConfiguration configuration) throws JobException
     {
         Map<String, Serializable> savedContext = null;
 
-        if (async || renderer.isCacheAllowed()) {
+        if (asyncAllowed || cacheAllowed) {
             if (configuration.getContextEntries() != null) {
                 try {
                     savedContext = this.contextStore.save(configuration.getContextEntries());
@@ -299,7 +305,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             }
 
             // If async inject the configured author
-            if (async && configuration.isSecureReferenceSet()) {
+            if (asyncAllowed && configuration.isSecureReferenceSet()) {
                 if (savedContext == null) {
                     savedContext = new HashMap<>();
                 } else {

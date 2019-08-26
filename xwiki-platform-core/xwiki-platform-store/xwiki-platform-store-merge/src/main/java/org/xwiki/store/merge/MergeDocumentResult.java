@@ -20,6 +20,7 @@
 package org.xwiki.store.merge;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import org.xwiki.stability.Unstable;
 
 /**
  * Store information about a merge operation of documents.
@@ -27,6 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id$
  * @since 11.5RC1
  */
+@Unstable
 public class MergeDocumentResult
 {
     private final boolean withConflict;

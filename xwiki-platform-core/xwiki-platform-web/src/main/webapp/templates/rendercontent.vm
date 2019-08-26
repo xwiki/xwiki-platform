@@ -17,7 +17,7 @@
 #end
 $services.progress.startStep('Compute the content to display')
 ## Make sure we don't escape the content since we want HTML to be rendered
-#set ($escapeContent = false)
+#set ($noEscapeContent = true)
 #template("contentvars.vm")
 $services.progress.endStep()
 #if ($displayTitle)

@@ -731,7 +731,51 @@ public class Document extends Api
     }
 
     /**
-     * @return the content of the document rendered.
+     * @param targetSyntax the syntax in which to render the document content
+     * @return the content of the current document rendered.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public String displayDocument(Syntax targetSyntax) throws XWikiException
+    {
+        return this.doc.displayDocument(targetSyntax, getXWikiContext());
+    }
+
+    /**
+     * @param targetSyntax the syntax in which to render the document content
+     * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @return the content of the current document rendered.
+     * @since 11.5RC1
+     */
+    @Unstable
+    public String displayDocument(Syntax targetSyntax, boolean restricted) throws XWikiException
+    {
+        return this.doc.displayDocument(targetSyntax, restricted, getXWikiContext());
+    }
+
+    /**
+     * @return the content of the current document rendered.
+     * @since 11.3RC1
+     */
+    @Unstable
+    public String displayDocument() throws XWikiException
+    {
+        return this.doc.displayDocument(getXWikiContext());
+    }
+
+    /**
+     * @return the content of the current document rendered.
+     * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @since 11.5RC1
+     */
+    @Unstable
+    public String displayDocument(boolean restricted) throws XWikiException
+    {
+        return this.doc.displayDocument(restricted, getXWikiContext());
+    }
+
+    /**
+     * @return the content of the document or its translations rendered.
      */
     public String getRenderedContent() throws XWikiException
     {
@@ -793,7 +837,7 @@ public class Document extends Api
      *
      * @param text the text to render
      * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
-     * @param restrictedTransformationContext see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
+     * @param restricted see {@link DocumentDisplayerParameters#isTransformationContextRestricted}.
      * @return the given text rendered in the context of this document using the passed Syntax
      */
     private String getRenderedContent(String text, String syntaxId, boolean restricted) throws XWikiException
@@ -2474,7 +2518,7 @@ public class Document extends Api
                 context.setWikiId(getWiki());
 
                 if (!context.getWiki().isReadOnly()) {
-                    saveDocument(comment, minorEdit);
+                    saveDocument(comment, minorEdit, false);
                 } else {
                     java.lang.Object[] args =
                         { getDefaultEntityReferenceSerializer().serialize(getDocumentReference()), getWiki() };
@@ -2552,15 +2596,27 @@ public class Document extends Api
 
     protected void saveDocument(String comment, boolean minorEdit) throws XWikiException
     {
+        saveDocument(comment, minorEdit, true);
+    }
+
+    private void saveDocument(String comment, boolean minorEdit, boolean checkSaving) throws XWikiException
+    {
         XWikiDocument doc = getDoc();
 
-        DocumentReference currentUserReference = this.context.getUserReference();
+        DocumentReference currentUserReference = getXWikiContext().getUserReference();
 
         doc.setAuthorReference(currentUserReference);
 
         if (doc.isNew()) {
             doc.setCreatorReference(currentUserReference);
         }
+
+        if (checkSaving) {
+            // Make sure the user is allowed to make this modification
+            getXWikiContext().getWiki().checkSavingDocument(doc.getAuthorReference(), doc, comment, minorEdit,
+                getXWikiContext());
+        }
+
         getXWikiContext().getWiki().saveDocument(doc, comment, minorEdit, getXWikiContext());
         this.initialDoc = this.doc;
     }
@@ -3136,5 +3192,15 @@ public class Document extends Api
     public boolean isTranslation()
     {
         return 1 == this.getDoc().getTranslation();
+    }
+
+    /**
+     * @return the maximum authorized length for a document full name (see {@link #getFullName()}).
+     * @since 11.4RC1
+     */
+    @Unstable
+    public int getLocalReferenceMaxLength()
+    {
+        return this.doc.getLocalReferenceMaxLength();
     }
 }

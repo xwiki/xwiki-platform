@@ -26,12 +26,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.id.SequenceGenerator;
+import org.hibernate.query.NativeQuery;
+import org.hibernate.query.Query;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,7 +52,9 @@ import com.xpn.xwiki.objects.StringProperty;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -114,8 +114,9 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     {
         assertEquals("select distinct doc.space, doc.name from XWikiDocument as doc",
             store.createSQLQuery("select distinct doc.space, doc.name", ""));
-        assertEquals("select distinct doc.space, doc.name, doc.date from XWikiDocument as doc "
-            + "where 1=1 order by doc.date desc",
+        assertEquals(
+            "select distinct doc.space, doc.name, doc.date from XWikiDocument as doc "
+                + "where 1=1 order by doc.date desc",
             store.createSQLQuery("select distinct doc.space, doc.name", "where 1=1 order by doc.date desc"));
     }
 
@@ -133,7 +134,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     @Test
     public void executeDeleteWikiStatementForPostgreSQLWhenInDatabaseMode() throws Exception
     {
-        when(this.hibernateStore.isInSchemaMode()).thenReturn(false);
+        when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(false);
 
         Statement statement = mock(Statement.class);
         DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;
@@ -161,7 +162,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         // Fire the logout event.
         eventListenerCaptor.getValue().onEvent(new ActionExecutingEvent("logout"), null, xcontext);
 
-        verify(query).setString("userName", "XWiki.LoggerOutter");
+        verify(query).setParameter("userName", "XWiki.LoggerOutter");
         verify(query).executeUpdate();
         verify(this.hibernateStore).beginTransaction();
         verify(this.hibernateStore).endTransaction(true);
@@ -171,12 +172,10 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     public void createHibernateSequenceIfRequiredWhenNotInUpdateCommands() throws Exception
     {
         Session session = mock(Session.class);
-        SessionFactoryImplementor sessionFactory = mock(SessionFactoryImplementor.class);
         Dialect dialect = mock(Dialect.class);
-        when(session.getSessionFactory()).thenReturn(sessionFactory);
-        when(sessionFactory.getDialect()).thenReturn(dialect);
-        when(dialect.getNativeIdentifierGeneratorClass()).thenReturn(SequenceGenerator.class);
-        SQLQuery sqlQuery = mock(SQLQuery.class);
+        when(this.hibernateStore.getDialect()).thenReturn(dialect);
+        when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
+        NativeQuery sqlQuery = mock(NativeQuery.class);
         when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
@@ -193,17 +192,15 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     public void createHibernateSequenceIfRequiredWhenInUpdateCommands() throws Exception
     {
         Session session = mock(Session.class);
-        SessionFactoryImplementor sessionFactory = mock(SessionFactoryImplementor.class);
         Dialect dialect = mock(Dialect.class);
-        when(session.getSessionFactory()).thenReturn(sessionFactory);
-        when(sessionFactory.getDialect()).thenReturn(dialect);
-        when(dialect.getNativeIdentifierGeneratorClass()).thenReturn(SequenceGenerator.class);
-        SQLQuery sqlQuery = mock(SQLQuery.class);
+        when(this.hibernateStore.getDialect()).thenReturn(dialect);
+        when(dialect.getNativeIdentifierGeneratorStrategy()).thenReturn("sequence");
+        NativeQuery sqlQuery = mock(NativeQuery.class);
         when(session.createSQLQuery("create sequence schema.hibernate_sequence")).thenReturn(sqlQuery);
         when(sqlQuery.executeUpdate()).thenReturn(0);
 
         this.store.createHibernateSequenceIfRequired(
-            new String[] {"whatever", "create sequence schema.hibernate_sequence"}, "schema", session);
+            new String[] { "whatever", "create sequence schema.hibernate_sequence" }, "schema", session);
 
         verify(session, never()).createSQLQuery("create sequence schema.hibernate_sequence");
         verify(sqlQuery, never()).executeUpdate();
@@ -225,8 +222,8 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         // Query to check if the object exists already (save versus update).
         when(xcontext.get("hibsession")).thenReturn(session);
-        when(session.createQuery("select obj.id from BaseObject as obj where obj.id = :id")).thenReturn(
-            mock(Query.class));
+        when(session.createQuery("select obj.id from BaseObject as obj where obj.id = :id", Long.class))
+            .thenReturn(mock(Query.class));
 
         // Save each object property.
         String propertyName = "query";
@@ -240,9 +237,10 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         when(property.getName()).thenReturn(propertyName);
         when(property.getClassType()).thenReturn(LargeStringProperty.class.getName());
 
-        Query oldClassTypeQuery = mock(Query.class);
-        when(session.createQuery("select prop.classType from BaseProperty as prop "
-            + "where prop.id.id = :id and prop.id.name= :name")).thenReturn(oldClassTypeQuery);
+        Query<String> oldClassTypeQuery = mock(Query.class);
+        when(session.createQuery(
+            "select prop.classType from BaseProperty as prop " + "where prop.id.id = :id and prop.id.name= :name",
+            String.class)).thenReturn(oldClassTypeQuery);
         // The old value has a different type (String -> TextArea).
         when(oldClassTypeQuery.uniqueResult()).thenReturn(StringProperty.class.getName());
 
@@ -255,11 +253,11 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         store.saveXWikiCollection(object, xcontext, false);
 
-        verify(oldClassTypeQuery).setLong("id", propertyId);
-        verify(oldClassTypeQuery).setString("name", propertyName);
+        verify(oldClassTypeQuery).setParameter("id", propertyId);
+        verify(oldClassTypeQuery).setParameter("name", propertyName);
 
-        verify(oldPropertyQuery).setLong("id", propertyId);
-        verify(oldPropertyQuery).setString("name", propertyName);
+        verify(oldPropertyQuery).setParameter("id", propertyId);
+        verify(oldPropertyQuery).setParameter("name", propertyName);
 
         // Delete the old property value and then save the new one.
         verify(session).delete(oldProperty);
@@ -281,7 +279,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         assertTrue(store.exists(doc, xcontext));
 
-        verify(query).setString("fullName", fullName);
+        verify(query).setParameter("fullName", fullName);
     }
 
     @Test
@@ -300,8 +298,8 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         assertTrue(store.exists(doc, xcontext));
 
-        verify(query).setString("fullName", fullName);
-        verify(query).setString("language", Locale.ENGLISH.toString());
+        verify(query).setParameter("fullName", fullName);
+        verify(query).setParameter("language", Locale.ENGLISH.toString());
     }
 
     @Test
@@ -342,8 +340,8 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         resultList.add("A.WebHome");
 
         when(this.hibernateStore.beginTransaction()).thenReturn(true);
-        Query query = mock(Query.class);
-        when(this.session.createQuery(any())).thenReturn(query);
+        Query<String> query = mock(Query.class);
+        when(this.session.createQuery(anyString(), same(String.class))).thenReturn(query);
         when(query.list()).thenReturn(resultList);
         DocumentReference expectedBacklink = new DocumentReference("xwiki", Arrays.asList("A"), "WebHome");
         when(this.currentMixedDocumentReferenceResolver.resolve("A.WebHome")).thenReturn(expectedBacklink);
@@ -351,7 +349,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         List<DocumentReference> obtainedReferences = this.store.loadBacklinks(documentReference, true, this.xcontext);
         assertEquals(1, obtainedReferences.size());
         assertEquals(expectedBacklink, obtainedReferences.get(0));
-        verify(query).setString("backlink", "B.WebHome");
+        verify(query).setParameter("backlink", "B.WebHome");
         verify(this.hibernateStore).beginTransaction();
         verify(this.hibernateStore).endTransaction(false);
     }
@@ -369,8 +367,8 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         resultList.add("Foo.WebHome");
 
         when(this.hibernateStore.beginTransaction()).thenReturn(true);
-        Query query = mock(Query.class);
-        when(this.session.createQuery(any())).thenReturn(query);
+        Query<String> query = mock(Query.class);
+        when(this.session.createQuery(anyString(), same(String.class))).thenReturn(query);
         when(query.list()).thenReturn(resultList);
         DocumentReference expectedBacklink = new DocumentReference("xwiki", Arrays.asList("Foo"), "WebHome");
         when(this.currentMixedDocumentReferenceResolver.resolve("Foo.WebHome")).thenReturn(expectedBacklink);
@@ -378,7 +376,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         List<DocumentReference> obtainedReferences = this.store.loadBacklinks(documentReference, true, this.xcontext);
         assertEquals(1, obtainedReferences.size());
         assertEquals(expectedBacklink, obtainedReferences.get(0));
-        verify(query).setString("backlink", "subwiki:B.WebHome");
+        verify(query).setParameter("backlink", "subwiki:B.WebHome");
         verify(this.hibernateStore).beginTransaction();
         verify(this.hibernateStore).endTransaction(false);
     }

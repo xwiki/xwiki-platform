@@ -62,6 +62,13 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
   #end
 #end
 
+## Get rights allowed for the current user
+#set ($currentAllowed = {})
+#foreach ($i in [0..$maxlevel])
+  #set ($right = $levelsRights.get($i))
+  #set ($void = $currentAllowed.put($i, $services.security.authorization.hasAccess($right)))
+#end
+
 ## url to take the users and groups to display in the ajax-based table
 #set ($url = $targetDocument.getURL('get', 'xpage=getusersandgroups'))
 #set ($saveUrl = $targetDocument.getURL('edit', "form_token=$!{services.csrf.getToken()}&xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
@@ -156,14 +163,18 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
               </th>
               ## Column headers for each configurable access right
               #foreach ($i in [0..$maxlevel])
-                <th scope="col" class="rights">$services.localization.render("rightsmanager.${levelsRights.get($i)}")</th>
+                #if ($currentAllowed[$i])
+                  <th scope="col" class="rights">$services.localization.render("rightsmanager.${levelsRights.get($i)}")</th>
+                #end
               #end
             </tr>
             <tr id="unregistered">
               ## Rights for guests, statically displayed outside the livetable
               <td id="unreguser" data-title="$escapetool.xml($services.localization.render('rightsmanager.username'))">$services.localization.render('rightsmanager.unregisteredusers')</td>
               #foreach ($i in [0..$maxlevel])
-                <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
+                #if ($currentAllowed[$i])
+                  <td class="rights" id="td${levelsRights.get($i)}" data-title="$escapetool.xml($services.localization.render("rightsmanager.${levelsRights.get($i)}"))"></td>
+                #end
               #end
             </tr>
             <tr id="usersandgroupstable-filters">
@@ -279,7 +290,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       hideScopeForUsers() || Event.observe(window, 'load', hideScopeForUsers);
     #end
 
-      window.activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
+      window.activeRights = [#foreach($i in [0..$maxlevel])#if ($currentAllowed[$i])"$levelsRights.get($i)",#end#end];
       window.saveUrl = "$saveUrl";
       window.saveUrl.replace(/&amp;/g, "&");
 
@@ -291,7 +302,9 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
       var callback = function(row, i, table, idx) { return displayUsersAndGroups(row, i, table, idx, "$!{services.csrf.getToken()}", targetDocument) };
       var ta = new XWiki.widgets.LiveTable("$url", "usersandgroupstable", callback, {"filtersNode": $('usersandgroupstable')});
     #foreach($i in [0..$maxlevel])
-      var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, "${r.get($i)}");
+      #if ($currentAllowed[$i])
+        var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", window.saveUrl, "${r.get($i)}");
+      #end
     #end
       Event.observe(window, 'load', function() {
         if($('uorgg').checked && !$('unregistered').hasClassName('hidden')) {

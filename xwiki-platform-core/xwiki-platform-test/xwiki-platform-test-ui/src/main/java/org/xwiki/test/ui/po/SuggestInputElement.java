@@ -143,7 +143,7 @@ public class SuggestInputElement extends BaseElement
         // If we simply click on the container we risk highlighting one of the selected suggestions (because the default
         // click is performed in the center of the element) and this hides the text input when multiple selection is on.
         // Safest is to click on the top left corner of the suggest input, before the first selected suggestion.
-        new Actions(getDriver()).moveToElement(this.container, 2, 2).click().build().perform();
+        new Actions(getDriver().getWrappedDriver()).moveToElement(this.container, 2, 2).click().build().perform();
         return this;
     }
 
@@ -187,10 +187,9 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement waitForSuggestions()
     {
-        // Wait for the suggestions to be fetched from the server and for the suggestion drop down list to be visible.
+
         getDriver().waitUntilCondition(driver -> !this.container.getAttribute("class").contains("loading")
             && !driver.findElements(By.cssSelector(".selectize-dropdown.active")).isEmpty());
-
         return this;
     }
 

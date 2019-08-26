@@ -22,7 +22,6 @@ package org.xwiki.rendering.async.internal;
 import java.util.List;
 
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Execute a task and return a {@link AsyncRendererResult} containing the resulting String (and possibly other more
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.10RC1
  */
-@Unstable
 public interface AsyncRenderer
 {
     /**

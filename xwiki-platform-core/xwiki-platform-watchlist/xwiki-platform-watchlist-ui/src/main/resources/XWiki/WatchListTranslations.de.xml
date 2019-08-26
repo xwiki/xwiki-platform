@@ -61,6 +61,5 @@ watchlist.table.scope.wiki=Alle Seiten des Wikis
 watchlist.table.scope.pageandchildren=Seite + Unterseiten
 watchlist.table.scope.pageonly=Nur Seite
 watchlist.table.location=Speicherort
-watchlist.table.scope=Geltungsbereich
-</content>
+watchlist.table.scope=Geltungsbereich</content>
 </xwikidoc>

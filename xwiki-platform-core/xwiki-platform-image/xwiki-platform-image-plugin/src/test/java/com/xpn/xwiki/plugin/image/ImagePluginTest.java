@@ -24,12 +24,12 @@ import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Date;
 
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
-import org.mockito.Mockito;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 
@@ -43,6 +43,11 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link ImagePlugin} class.
@@ -100,14 +105,14 @@ public class ImagePluginTest
     public void configure() throws Exception
     {
         XWiki xwiki = this.oldCore.getSpyXWiki();
-        Mockito.doReturn("10").when(xwiki).Param("xwiki.plugin.image.cache.capacity");
-        Mockito.doReturn("test").when(xwiki).Param(
-                ArgumentMatchers.eq("xwiki.plugin.image.processorHint"), ArgumentMatchers.anyString());
+        doReturn("10").when(xwiki).Param("xwiki.plugin.image.cache.capacity");
+        doReturn("test").when(xwiki).Param(ArgumentMatchers.eq("xwiki.plugin.image.processorHint"),
+            ArgumentMatchers.anyString());
 
         this.oldCore.getMocker().registerMockComponent(CacheManager.class);
 
         this.imageProcessor = this.oldCore.getMocker().registerMockComponent(ImageProcessor.class, "test");
-        Mockito.when(this.imageProcessor.isMimeTypeSupported("image/png")).thenReturn(true);
+        when(this.imageProcessor.isMimeTypeSupported("image/png")).thenReturn(true);
 
         this.plugin = new ImagePlugin("image", ImagePlugin.class.getName(), this.oldCore.getXWikiContext());
     }
@@ -115,54 +120,57 @@ public class ImagePluginTest
     @Test
     public void testDownloadAttachmentWithUnsupportedFileType()
     {
-        XWikiAttachment attachment = Mockito.mock(XWikiAttachment.class);
-        Mockito.when(attachment.getMimeType()).thenReturn("image/notsupported");
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(attachment.getMimeType()).thenReturn("image/notsupported");
+        when(attachment.getDate()).thenReturn(new Date(0));
         assertSame(attachment, plugin.downloadAttachment(attachment, new XWikiContext()));
     }
 
     @Test
     public void testCacheOfScaledAttachment() throws Exception
     {
+        Date date = new Date(0);
+
         XWikiContext xcontext = this.oldCore.getXWikiContext();
 
-        XWikiAttachment attachment = Mockito.mock(XWikiAttachment.class);
-        Mockito.when(attachment.getMimeType(xcontext)).thenReturn("image/png");
+        XWikiAttachment attachment = mock(XWikiAttachment.class);
+        when(attachment.getMimeType(xcontext)).thenReturn("image/png");
         InputStream attachmentInputStream = new ByteArrayInputStream(IMAGE_CONTENT);
-        Mockito.when(attachment.getContentInputStream(xcontext)).thenReturn(attachmentInputStream);
-        Mockito.when(attachment.clone()).thenReturn(attachment);
+        when(attachment.getContentInputStream(xcontext)).thenReturn(attachmentInputStream);
+        when(attachment.clone()).thenReturn(attachment);
+        when(attachment.getDate()).thenReturn(date);
 
-        XWikiAttachmentContent attachmentContent = Mockito.mock(XWikiAttachmentContent.class);
-        Mockito.when(attachment.getAttachment_content()).thenReturn(attachmentContent);
-        Mockito.when(attachmentContent.getContentInputStream()).thenReturn(attachmentInputStream);
-        OutputStream attachmentOutputStream = Mockito.mock(OutputStream.class);
-        Mockito.when(attachmentContent.getContentOutputStream()).thenReturn(attachmentOutputStream);
+        XWikiAttachmentContent attachmentContent = mock(XWikiAttachmentContent.class);
+        when(attachment.getAttachment_content()).thenReturn(attachmentContent);
+        when(attachmentContent.getContentInputStream()).thenReturn(attachmentInputStream);
+        OutputStream attachmentOutputStream = mock(OutputStream.class);
+        when(attachmentContent.getContentOutputStream()).thenReturn(attachmentOutputStream);
 
         CacheManager cacheManager = this.oldCore.getMocker().getInstance(CacheManager.class);
-        Cache<Object> imageCache = Mockito.mock(Cache.class);
-        Mockito.when(cacheManager.createNewLocalCache(ArgumentMatchers.any())).thenReturn(imageCache);
+        Cache<Object> imageCache = mock(Cache.class);
+        when(cacheManager.createNewLocalCache(ArgumentMatchers.any())).thenReturn(imageCache);
 
-        XWikiServletRequest request = Mockito.mock(XWikiServletRequest.class);
-        Mockito.when(request.getParameter("width")).thenReturn("30");
-        Mockito.when(request.getParameter("height")).thenReturn("30");
+        XWikiServletRequest request = mock(XWikiServletRequest.class);
+        when(request.getParameter("width")).thenReturn("30");
+        when(request.getParameter("height")).thenReturn("30");
         xcontext.setRequest(request);
 
-        Image image = Mockito.mock(Image.class);
-        Mockito.when(image.getWidth(null)).thenReturn(400);
-        Mockito.when(image.getHeight(null)).thenReturn(300);
-        Mockito.when(imageProcessor.readImage(attachmentInputStream)).thenReturn(image);
-        RenderedImage renderedImage = Mockito.mock(RenderedImage.class);
-        Mockito.when(imageProcessor.scaleImage(image, 30, 30)).thenReturn(renderedImage);
+        Image image = mock(Image.class);
+        when(image.getWidth(null)).thenReturn(400);
+        when(image.getHeight(null)).thenReturn(300);
+        when(imageProcessor.readImage(attachmentInputStream)).thenReturn(image);
+        RenderedImage renderedImage = mock(RenderedImage.class);
+        when(imageProcessor.scaleImage(image, 30, 30)).thenReturn(renderedImage);
 
         XWikiAttachment scaled = plugin.downloadAttachment(attachment, xcontext);
 
-        String cacheKey = "0;null;30;30;false;-1.0";
-        Mockito.when(imageCache.get(cacheKey)).thenReturn(scaled);
+        String cacheKey = "0;null;0;30;30;false;-1.0";
+        when(imageCache.get(cacheKey)).thenReturn(scaled);
 
         // Load again, this time from cache.
         assertSame(scaled, plugin.downloadAttachment(attachment, xcontext));
 
-        Mockito.verify(imageProcessor, Mockito.times(1)).writeImage(renderedImage,
-            "image/png", .5F, attachmentOutputStream);
-        Mockito.verify(imageCache, Mockito.times(1)).set(cacheKey, attachment);
+        verify(imageProcessor, times(1)).writeImage(renderedImage, "image/png", .5F, attachmentOutputStream);
+        verify(imageCache, times(1)).set(cacheKey, attachment);
     }
 }

@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-common</artifactId>
   <packaging>deb</packaging>
@@ -50,6 +50,18 @@
       <type>war</type>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>${mysql.groupId}</groupId>
+      <artifactId>${mysql.artifactId}</artifactId>
+      <version>${mysql.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>${pgsql.groupId}</groupId>
+      <artifactId>${pgsql.artifactId}</artifactId>
+      <version>${pgsql.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -66,11 +78,11 @@
           </execution>
         </executions>
       </plugin>
-      <!-- Unpack the war -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
+            <!-- Unpack the war -->
             <execution>
               <id>unzip-application</id>
               <phase>process-resources</phase>
@@ -87,6 +99,42 @@
                   </artifactItem>
                 </artifactItems>
                 <outputDirectory>${war.path}</outputDirectory>
+              </configuration>
+            </execution>
+            <!-- Copy MySQL JDBC connector -->
+            <execution>
+              <id>copy-mysql</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>${mysql.groupId}</groupId>
+                    <artifactId>${mysql.artifactId}</artifactId>
+                    <version>${mysql.version}</version>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${war.path}/WEB-INF/lib</outputDirectory>
+              </configuration>
+            </execution>
+            <!-- Copy PGSQL JDBC connector -->
+            <execution>
+              <id>copy-pgsql</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>${pgsql.groupId}</groupId>
+                    <artifactId>${pgsql.artifactId}</artifactId>
+                    <version>${pgsql.version}</version>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${war.path}/WEB-INF/lib</outputDirectory>
               </configuration>
             </execution>
           </executions>
@@ -260,6 +308,12 @@
               <symlink>true</symlink>
               <linkName>/usr/lib/xwiki/WEB-INF/xwiki.properties</linkName>
               <linkTarget>/etc/xwiki/xwiki.properties</linkTarget>
+            </data>
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki/WEB-INF/xwiki-locales.txt</linkName>
+              <linkTarget>/etc/xwiki/xwiki-locales.txt</linkTarget>
             </data>
           </dataSet>
         </configuration>

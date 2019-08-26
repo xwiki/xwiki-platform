@@ -1,2 +1,0 @@
-org.xwiki.container.servlet.internal.DefaultServletContainerInitializer
-900:org.xwiki.container.servlet.internal.LegacyEnvironmentConfiguration

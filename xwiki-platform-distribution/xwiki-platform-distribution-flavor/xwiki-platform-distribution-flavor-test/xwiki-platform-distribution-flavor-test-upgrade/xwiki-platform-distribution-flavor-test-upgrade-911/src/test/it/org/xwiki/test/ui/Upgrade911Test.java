@@ -26,4 +26,16 @@ package org.xwiki.test.ui;
  */
 public class Upgrade911Test extends UpgradeTest
 {
+    @Override
+    protected void postUpdateValidate()
+    {
+        validateConsole.getLogCaptureConfiguration().registerExpected(
+            // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
+            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]",
+
+            // The currently installed flavor is not valid anymore before the upgrade
+            "Invalid extension [org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/9.11.8] on namespace "
+                + "[wiki:xwiki] (InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-"
+                + "[9.11.8]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/");
+    }
 }

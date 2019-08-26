@@ -95,7 +95,7 @@ public class DefaultSecurityCacheLoaderTest
         });
         securityReferenceFactory = mocker.getInstance(SecurityReferenceFactory.class);
 
-        mocker.registerMockComponent(SecurityCache.class);
+        mocker.registerComponent(org.xwiki.security.authorization.cache.SecurityCache.class, mock(SecurityCache.class));
         mocker.registerMockComponent(SecurityCacheRulesInvalidator.class);
         mocker.registerMockComponent(SecurityEntryReader.class);
         mocker.registerMockComponent(UserBridge.class);
@@ -124,7 +124,7 @@ public class DefaultSecurityCacheLoaderTest
         when(wikiEntry.getReference()).thenReturn(entity.getParentSecurityReference().getParentSecurityReference());
         when(wikiEntry.isEmpty()).thenReturn(true);
 
-        SecurityCache securityCache = mocker.getInstance(SecurityCache.class);
+        SecurityCache securityCache = mocker.getInstance(org.xwiki.security.authorization.cache.SecurityCache.class);
         when(securityCache.get(entity)).thenReturn(documentEntry);
         when(securityCache.get(entity.getParentSecurityReference())).thenReturn(spaceEntry);
         when(securityCache.get(entity.getParentSecurityReference().getParentSecurityReference())).thenReturn(wikiEntry);

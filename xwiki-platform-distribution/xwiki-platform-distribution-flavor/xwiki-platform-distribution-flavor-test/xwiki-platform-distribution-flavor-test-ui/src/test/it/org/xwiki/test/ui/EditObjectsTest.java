@@ -28,11 +28,11 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement.SuggestionElement;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.BootstrapDateTimePicker;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
-import org.xwiki.test.ui.po.editor.DatePicker;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPane;
 import org.xwiki.test.ui.po.editor.StaticListClassEditElement;
@@ -100,7 +100,7 @@ public class EditObjectsTest extends AbstractTest
 
         // Add an object of the class created and set the value to be the test page
         ObjectEditPage oep = vp.editObjects();
-        FormElement objectForm = oep.addObject("Test.EditObjectsTestClass");
+        FormContainerElement objectForm = oep.addObject("Test.EditObjectsTestClass");
         objectForm.setFieldValue(By.id("Test.EditObjectsTestClass_0_prop"), "Test.EditObjectsTestClass");
         oep.clickSaveAndView();
 
@@ -144,7 +144,7 @@ public class EditObjectsTest extends AbstractTest
 
         // Add object
         ObjectEditPage oep = vp.editObjects();
-        FormElement objectForm = oep.addObject("Test.EditObjectsTestClass");
+        FormContainerElement objectForm = oep.addObject("Test.EditObjectsTestClass");
         objectForm.setFieldValue(By.id("Test.EditObjectsTestClass_0_prop"), "3");
         vp = oep.clickSaveAndView();
         Assert.assertEquals("this is the content: 3", vp.getContent());
@@ -203,7 +203,7 @@ public class EditObjectsTest extends AbstractTest
 
         // Add object
         ObjectEditPage oep = vp.editObjects();
-        FormElement objectForm = oep.addObject("Test.EditObjectsTestClass");
+        FormContainerElement objectForm = oep.addObject("Test.EditObjectsTestClass");
         objectForm.setFieldValue(By.id("Test.EditObjectsTestClass_0_prop"), "choice 3");
         vp = oep.clickSaveAndView();
         Assert.assertEquals("this is the content: choice 3", vp.getContent());
@@ -253,7 +253,7 @@ public class EditObjectsTest extends AbstractTest
 
         // Add object
         ObjectEditPage oep = vp.editObjects();
-        FormElement objectForm = oep.addObject("Test.EditObjectsTestClass");
+        FormContainerElement objectForm = oep.addObject("Test.EditObjectsTestClass");
         objectForm.setFieldValue(By.id("Test.EditObjectsTestClass_0_prop"), "this|that|other");
         vp = oep.clickSaveAndView();
         Assert.assertEquals("this is the content: this that other", vp.getContent());
@@ -293,11 +293,11 @@ public class EditObjectsTest extends AbstractTest
     public void testObjectAddAndRemove()
     {
         ObjectEditPage oep = ObjectEditPage.gotoPage("Test", "EditObjectsTestObject");
-        FormElement object = oep.addObject("XWiki.XWikiUsers");
+        FormContainerElement object = oep.addObject("XWiki.XWikiUsers");
         object.setFieldValue(By.id("XWiki.XWikiUsers_0_first_name"), "John");
 
         // Add another object
-        FormElement object2 = oep.addObject("XWiki.XWikiUsers");
+        FormContainerElement object2 = oep.addObject("XWiki.XWikiUsers");
 
         // Check that the unsaved value from the first object wasn't lost
         Assert.assertEquals("John", object.getFieldValue(By.id("XWiki.XWikiUsers_0_first_name")));
@@ -340,13 +340,13 @@ public class EditObjectsTest extends AbstractTest
         String className = getTestClassName() + "." + getTestMethodName();
         ObjectEditPage objectEditor = ObjectEditPage.gotoPage(getTestClassName(), getTestMethodName());
         ObjectEditPane object = objectEditor.addObject(className);
-        object.openDatePicker("date").setDay("15").close();
+        object.openDatePicker("date").selectDay("15").close();
         object.getSuggestInput("author").sendKeys("ad").waitForSuggestions().selectByVisibleText("Administrator");
 
         // Save, edit again and check the values.
         object = objectEditor.clickSaveAndView().editObjects().getObjectsOfClass(className).get(0);
-        DatePicker datePicker = object.openDatePicker("date");
-        Assert.assertEquals("15", datePicker.getDay());
+        BootstrapDateTimePicker datePicker = object.openDatePicker("date");
+        Assert.assertEquals("15", datePicker.getSelectedDay());
         datePicker.close();
         SuggestionElement author = object.getSuggestInput("author").getSelectedSuggestions().get(0);
         Assert.assertEquals("Administrator", author.getLabel());

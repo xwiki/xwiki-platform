@@ -93,7 +93,12 @@ public class LiveTableElement extends BaseElement
 
         WebElement element = getDriver().findElement(By.id(inputId));
         if ("select".equals(element.getTagName())) {
-            new Select(element).selectByVisibleText(filterValue);
+            if (element.getAttribute("class").contains("selectized")) {
+                SuggestInputElement suggestInputElement = new SuggestInputElement(element);
+                suggestInputElement.sendKeys(filterValue).selectTypedText();
+            } else {
+                new Select(element).selectByVisibleText(filterValue);
+            }
         } else {
             element.clear();
             element.sendKeys(filterValue);
@@ -210,13 +215,22 @@ public class LiveTableElement extends BaseElement
     }
 
     /**
+     * @since 11.6RC1
+     * @since 11.5
+     */
+    public WebElement getCell(int rowNumber, int columnNumber)
+    {
+        return getCell(getRow(rowNumber), columnNumber);
+    }
+
+    /**
      * @since 5.3RC1
      */
     public ViewPage clickCell(int rowNumber, int columnNumber)
     {
         WebElement tdElement = getCell(getRow(rowNumber), columnNumber);
         // First scroll the element into view, if needed, by moving the mouse to the top left corner of the element.
-        new Actions(getDriver()).moveToElement(tdElement, 0, 0).perform();
+        new Actions(getDriver().getWrappedDriver()).moveToElement(tdElement, 0, 0).perform();
         // Find the first A element and click it!
         tdElement.findElement(By.tagName("a")).click();
         return new ViewPage();

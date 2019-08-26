@@ -118,8 +118,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       item: renderItem,
       option: renderOption,
       option_create: function(data, escapeHTML) {
-        // TODO: Use translation key here.
-        var text = 'Select {0} ...';
+        var text = $jsontool.serialize($services.localization.render('web.uicomponents.suggest.selectTypedText',
+          ['{0}']));
         // The 'option' class is needed starting with v0.12.5 in order to have proper styling.
         var output = $('<div class="create option"/>').html(escapeHTML(text).replace('{0}', '<em/>'));
         output.find('em').text(data.input);
@@ -128,10 +128,10 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     },
     searchField: ['value', 'label'],
     onType: function(value) {
-      if (!this.loadedSearches.hasOwnProperty(value) && typeof this.settings.load === 'function') {
-        var wrapper = this.$wrapper;
-        wrapper.addClass(this.settings.loadingClass);
-      }
+      // Mark the picker as loading if the suggestions are retrieved asynchronously and there's no cached result for the
+      // given value.
+      var loading = typeof this.settings.load === 'function' && !this.loadedSearches.hasOwnProperty(value);
+      (this.$wrapper).toggleClass(this.settings.loadingClass, loading);
     },
     onInitialize: function() {
       var control = this.$control;
@@ -143,15 +143,11 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
   };
 
   var loadSelectedValues = function() {
-    var values = $(this).val();
-    if (!$.isArray(values)) {
-      values = [values]
-    }
     var selectize = this.selectize;
     var wrapper = selectize.$wrapper;
     wrapper.addClass(selectize.settings.loadingClass);
     selectize.loading++;
-    values.reduce(function(deferred, value) {
+    selectize.items.reduce(function(deferred, value) {
       return deferred.then(function() {
         return loadSelectedValue(selectize, value);
       });
@@ -172,7 +168,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
       load = selectize.settings.load;
     }
     if (value && typeof load === 'function') {
-      load(value, function(options) {
+      load.call(selectize, value, function(options) {
         $.isArray(options) && options.forEach(function(option) {
           var value = option[selectize.settings.valueField];
           if (selectize.options.hasOwnProperty(value)) {
@@ -209,6 +205,8 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
     if (this.selectize.settings.takeInputWidth) {
       this.selectize['$control'].width($(this).data('initialWidth'));
     }
+    // Set the title of the input field.
+    this.selectize['$control_input'].attr('title', $(this).attr('title'));
   };
 
   var setDropDownAlignment = function(selectize) {
@@ -235,16 +233,24 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
 
   $.fn.xwikiSelectize = function(settings) {
     // Save the width before the input is hidden.
-    this.data('initialWidth', this.width());
+    // Each input in the current collection might have a different initial width.
+    this.each(function() {
+      $(this).data('initialWidth', $(this).width());
+    });
     return this.not('.selectized, .selectize-control')
-      .selectize(getSettings(this, settings))
-      .each(customize).each(loadSelectedValues)
+      .on('initialize', customize)
       .on('change', function(event) {
         // Update the live table if the widget is used as a live table filter.
         var liveTableId = $(this).closest('.xwiki-livetable-display-header-filter')
           .closest('.xwiki-livetable').attr('id');
         liveTableId && $(document).trigger("xwiki:livetable:" + liveTableId + ":filtersChanged");
-      });
+      })
+      // Each input in the current collection might have different in-line settings.
+      .each(function() {
+        $(this).selectize(getSettings($(this), settings));
+      })
+      .trigger('initialize')
+      .each(loadSelectedValues);
   };
 });
 

@@ -72,8 +72,10 @@
     </span>
     <div class="information">
       <span class="name">
-        <a href="$xwiki.getURL($attachmentReference)" title="$escapetool.xml($services.localization.render(
-          'core.viewers.attachments.download'))">$escapetool.xml($attachment.filename)</a>
+        <a href="$xwiki.getURL($attachmentReference)" data-entity-type="$escapetool.xml($attachmentReference.type)"
+          data-entity-reference="$escapetool.xml($services.model.serialize($attachmentReference, 'default'))"
+          title="$escapetool.xml($services.localization.render('core.viewers.attachments.download'))"
+        >$escapetool.xml($attachment.filename)</a>
       </span>
       <div class="btn-group xwikibuttonlinks">
         #if ($services.officemanager.serverState == "Connected" &&

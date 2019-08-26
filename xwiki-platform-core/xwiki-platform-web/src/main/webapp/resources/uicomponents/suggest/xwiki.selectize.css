@@ -26,7 +26,8 @@
   background-position: center right 12px;
   padding-right: 31px;
 }
-.selectize-control.single.loading .selectize-input {
+.selectize-control.single.loading .selectize-input,
+.selectize-control.single.loading .selectize-input.input-active {
   background-position: center right 36px;
   padding-right: 55px;
 }
@@ -74,6 +75,44 @@ a.xwiki-selectize-option-label {
 .xwiki-selectize-option-hint {
   color: $theme.textSecondaryColor;
   font-size: smaller;
+}
+
+/* Asynchronous Create */
+.selectize-control.async-create > .selectize-input > div.xwiki-selectize-option {
+  background-image: none;
+  border-left: 2px solid transparent;
+  border-radius: 3px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+.selectize-control.async-create > .selectize-input > div.xwiki-selectize-option.create-pending,
+.selectize-control.async-create > .selectize-input > div.xwiki-selectize-option.create-running {
+  border-left: 2px solid $theme.notificationSuccessColor;
+}
+.selectize-control.async-create > .selectize-input > div.xwiki-selectize-option.create-failed {
+  background-color: #f2dede;
+  border-left: 2px solid $theme.notificationErrorColor;
+}
+.selectize-control.is-dragover > .selectize-input {
+  border: 1px dashed $theme.notificationSuccessColor;
+}
+
+/* Styles for bigger option icons */
+.xwiki-selectize-option-icon-wrapper.pull-left {
+  height: 36px;
+  line-height: 36px;
+  margin-right: .6em;
+  margin-top: 2px;
+  width: 36px;
+}
+.xwiki-selectize-option-icon-wrapper.pull-left .xwiki-selectize-option-icon {
+  color: $theme.textSecondaryColor;
+  font-size: 32px;
+  vertical-align: middle;
+}
+.xwiki-selectize-option-icon-wrapper.pull-left img.xwiki-selectize-option-icon {
+  max-height: 36px;
+  max-width: 36px;
 }
 
 /* Live Table Filter */

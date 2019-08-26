@@ -101,4 +101,24 @@ public interface MailSenderConfiguration
      * @since 6.4RC1
      */
     long getSendWaitTime();
+
+    /**
+     * @return the max size of the prepare queue. When this size is reached calls to put new elements on the queue will
+     *         block
+     * @since 11.6RC1
+     */
+    default int getPrepareQueueCapacity()
+    {
+        return 1000;
+    }
+
+    /**
+     * @return the max size of the send queue. When this size is reached calls to put new elements on the queue will
+     *         block
+     * @since 11.6RC1
+     */
+    default int getSendQueueCapacity()
+    {
+        return 1000;
+    }
 }

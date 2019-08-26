@@ -49,20 +49,19 @@ administration.menu.search.noResults=Keine Ergebnisse.
 
 # Registration Section
 XWiki.XWikiPreferences_use_email_verification.hint=Wenn "Ja" wird beim Ausfüllen des Anmeldeformulars eine E-Mail an die angegebene E-Mail Adresse gesendet.
-XWiki.XWikiPreferences_auth_active_check.hint=Wenn "Ja" wird verhindert, dass sich Benutzer einloggen ohne den Token einzugeben, den sie zuvor per E-Mail erhalten haben.
 XWiki.XWikiPreferences_validation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, um ihre E-Mail-Adresse zu bestätigen.
 ### Missing: XWiki.XWikiPreferences_confirmation_email_content.hint=The email template that corresponds to the mail that is sent after the user validates his account by clicking on the validation link in the first email he receives.
-### Missing: XWiki.XWikiPreferences_invitation_email_content.hint=The email template that will be send to users that are invited to register.
+XWiki.XWikiPreferences_invitation_email_content.hint=Die E-Mail-Vorlage, die an Benutzer gesendet wird, die zur Registrierung eingeladen werden.
 
-### Missing: XWiki.Registration_heading.hint=This is the line at the top of the page which is shown to people who are registering and when they have just registered. Velocity and wiki syntax may be used.
-### Missing: XWiki.Registration_welcomeMessage.hint=This is only shown when people are filling out the form. Velocity and wiki Syntax code may be used.
-### Missing: XWiki.Registration_liveValidation_enabled.hint=Set this to false to disable the live validation JavaScript code (fields will still be validated at the server side).
-### Missing: XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validation shows a message to indicate to users that they have filled in the field satisfactorily. This is the message they will get if it is not overridden for a particular field. Velocity code may be used.
-### Missing: XWiki.Registration_loginButton_enabled.hint=When the user has registered, we provide a button for them to click which will post their user name and password to the login action and get them logged in right away. This however causes the user name and password to be passed back in the HTML which may be unacceptable depending on your security needs.
-### Missing: XWiki.Registration_loginButton_autoLogin_enabled.hint=If login button is enabled, then you can have a piece of JavaScript push the login button for the user.
-### Missing: XWiki.Registration_defaultRedirect.hint=This is the URL the user will be redirected to after pushing the login button if the xredirect parameter is not specified. Velocity code may be used.
-### Missing: XWiki.Registration_requireCaptcha.hint=Set this true to require the user to solve a CAPTCHA in order to register.
-### Missing: XWiki.Registration_registrationSuccessMessage.hint=This is shown to the user when they have registered successfully. Velocity and wiki syntax code may be used.
+XWiki.Registration_heading.hint=Dies ist die Zeile oben auf der Seite, die den Personen angezeigt wird, die sich registrieren und die sich gerade registriert haben. Velocity und Wiki-Syntax können verwendet werden.
+XWiki.Registration_welcomeMessage.hint=Dies wird nur angezeigt, wenn Personen das Formular ausfüllen. Velocity und Wiki-Syntax können verwendet werden.
+XWiki.Registration_liveValidation_enabled.hint=Setzen Sie dies auf false, um den JavaScript-Code der Live-Validierung zu deaktivieren (Felder werden serverseitig noch validiert).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Die Live-Validierung zeigt eine Meldung an, die den Benutzern anzeigt, dass sie das Feld zufriedenstellend ausgefüllt haben. Dies ist die Nachricht, die sie erhalten, wenn sie nicht für ein bestimmtes Feld überschrieben wird. Es kann ein Velocity-Code verwendet werden.
+XWiki.Registration_loginButton_enabled.hint=Wenn der Benutzer sich registriert hat, bieten wir ihm eine Schaltfläche an, auf die er klicken kann, die seinen Benutzernamen und sein Passwort in die Login-Aktion einträgt und ihn sofort einloggen lässt. Dies führt jedoch dazu, dass der Benutzername und das Passwort im HTML-Format zurückgegeben werden, was je nach Ihren Sicherheitsanforderungen inakzeptabel sein kann.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Wenn die Login-Taste aktiviert ist, dann können Sie ein Stück JavaScript verwenden, indem Sie die Login-Taste für den Benutzer drücken.
+XWiki.Registration_defaultRedirect.hint=Dies ist die URL, zu der der Benutzer nach dem Drücken der Login-Taste umgeleitet wird, wenn der xredirect-Parameter nicht angegeben ist. Es kann ein Velocity-Code verwendet werden.
+XWiki.Registration_requireCaptcha.hint=Setzen Sie dies auf true, damit der Benutzer ein CAPTCHA lösen muss, um sich zu registrieren.
+XWiki.Registration_registrationSuccessMessage.hint=Dies wird dem Benutzer angezeigt, wenn er sich erfolgreich registriert hat. Velocity und Wiki-Syntaxcode können verwendet werden.
 
 # Look &amp; Feel Sections
 admin.themes=Themes
@@ -75,12 +74,12 @@ XWiki.XWikiPreferences_showattachments.hint=Zeige den Bereich für Anhänge im S
 XWiki.XWikiPreferences_showhistory.hint=Zeige den Bereich mit der Historie im Seitenlayout.
 XWiki.XWikiPreferences_showinformation.hint=Zeige den Informationsbereich im Seitenlayout.
 XWiki.XWikiPreferences_title.hint=Definiere das Seitentitel-Format wie es von Browsern angezeigt wird.
-### Missing: XWiki.XWikiPreferences_meta.hint=Define the meta data added to each page, specifying page description, author, keywords etc.
-### Missing: XWiki.XWikiPreferences_webcopyright.hint=Define the informations displayed in the copyright section of the footer.
-### Missing: XWiki.XWikiPreferences_version.hint=Define the informations displayed in the version section of the footer.
-### Missing: XWiki.XWikiPreferences_skin.hint=Specify the default skin used. It can be a filesystem skin, example "flamingo", or a custom page skin, example "XWiki.DefaultSkin"
-### Missing: XWiki.XWikiPreferences_iconTheme.hint=Specify the icon theme to use by default.
-### Missing: XWiki.XWikiPreferences_colorTheme.hint=Specify the color theme to use by default.
+XWiki.XWikiPreferences_meta.hint=Definieren Sie die Metadaten, die jeder Seite hinzugefügt werden, unter Angabe von Seitenbeschreibung, Autor, Keywords usw.
+XWiki.XWikiPreferences_webcopyright.hint=Definieren Sie die Informationen, die im Abschnitt Copyright der Fußzeile angezeigt werden.
+XWiki.XWikiPreferences_version.hint=Definieren Sie die Informationen, die im Versionsbereich der Fußzeile angezeigt werden.
+XWiki.XWikiPreferences_skin.hint=Geben Sie den verwendeten Standard-Skin an. Es kann ein Dateisystem-Skin sein, z.B. "Flamingo", oder ein benutzerdefinierter Seiten-Skin, z.B. "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_iconTheme.hint=Geben Sie das standardmäßig zu verwendende Symboltheme an.
+XWiki.XWikiPreferences_colorTheme.hint=Geben Sie das standardmäßig zu verwendende Farbschema an.
 
 # Editing Sections
 admin.edit=Bearbeiten
@@ -91,31 +90,46 @@ XWiki.XWikiPreferences_editor.hint=Wähle den Editor-Typ der standardmäßig bei
 XWiki.XWikiPreferences_editcomment.hint=Erlaubt das Eingeben einer Bemerkung wenn eine neue Seiten-Version erstellt wird.
 XWiki.XWikiPreferences_editcomment_mandatory.hint=Jede Änderung einer Seite wird erst gespeichert, wenn eine Zusammenfassung für die Version angegeben wurde.
 XWiki.XWikiPreferences_minoredit.hint=Erlaubt Seiten große (x.1) und kleine (1.x) Versionen zu haben. Die kleinen Versionen können mit dem "Kleine Änderungen anzeigen" Button in der Seiten Historie angezeigt werden.
-### Missing: admin.wysiwyg.description=Choose the default WYSIWYG editor and configure it.
-### Missing: XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=The markup syntax used by default for the page content when creating a new wiki page.
+admin.wysiwyg.description=Wählen Sie den Standard-WYSIWYG-Editor und konfiguriert ihn.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Die Markup-Syntax, die standardmäßig für den Seiteninhalt beim Erstellen einer neuen Wiki-Seite verwendet wird.
 
 # Localization Section
-### Missing: XWiki.XWikiPreferences_multilingual.hint=Enable multilingual mode if your wiki has content in multiple languages. This will allow your users to translate the wiki pages and to view the interface in their preferred language.
-### Missing: XWiki.XWikiPreferences_languages.hint=Select the languages that will be available in the interface. The users will be able to translate the pages of your wiki in any of these languages (if multilingual mode is enabled).
-### Missing: XWiki.XWikiPreferences_default_language.hint=Select the default language of the wiki
-### Missing: XWiki.XWikiPreferences_dateformat.hint=Specify the format used to display the dates (e.g. the page creation date)
-### Missing: XWiki.XWikiPreferences_timezone.hint=Globally set the timezone for the dates
+XWiki.XWikiPreferences_multilingual.hint=Aktivieren Sie den Mehrsprachigkeitsmodus, wenn Ihr Wiki Inhalte in mehreren Sprachen enthält. Dies ermöglicht es Ihren Benutzern, die Wiki-Seiten zu übersetzen und die Benutzeroberfläche in ihrer bevorzugten Sprache anzuzeigen.
+XWiki.XWikiPreferences_languages.hint=Wählen Sie die Sprachen aus, die in der Benutzeroberfläche verfügbar sein sollen. Die Benutzer können die Seiten Ihres Wikis in eine dieser Sprachen übersetzen (wenn der Mehrsprachigkeitsmodus aktiviert ist).
+XWiki.XWikiPreferences_default_language.hint=Wählt die Standardsprache des Wikis aus
+XWiki.XWikiPreferences_dateformat.hint=Spezifiziert das Format, in dem die Daten angezeigt werden (z.B. das Erstellungsdatum der Seite)
+XWiki.XWikiPreferences_timezone.hint=Legt die Zeitzone für die Daten global fest
 
 # Import Section
-### Missing: administration.section.import.hint=Begin by uploading a new package or by selecting one from the list of available packages. The content of the selected package will be displayed on the right along with the import options.
+administration.section.import.hint=Beginnen Sie, indem Sie ein neues Paket hochladen oder eines aus der Liste der verfügbaren Pakete auswählen. Der Inhalt des ausgewählten Pakets wird auf der rechten Seite zusammen mit den Importoptionen angezeigt.
 
 # Export Section
-### Missing: administration.section.export.packageName.hint=The file name used when generating the archive with the exported content.
-### Missing: administration.section.export.description.hint=The package description, displayed when importing the package.
-### Missing: administration.section.export.licence.hint=The content licence. E.g.: LGPL, GPLV2, etc.
-### Missing: administration.section.export.author.hint=The package author.
-### Missing: administration.section.export.version.hint=The package version.
-### Missing: administration.section.export.withHistory.hint=Include the page history in the export. Only the latest version of a page is exported otherwise.
-### Missing: administration.section.export.backupPack.hint=Specify if the package will be used as a backup. This option doesn't affect the exported content. The only effect is that the "Import as backup package" option will be preselected when your import the package. The difference between a backup package and a normal package is that in the first case the page last author is preserved during the import, while in the second case the user performing the import becomes the last author of each imported page.
+administration.section.export.packageName.hint=Der Dateiname, der beim Erzeugen des Archivs mit dem exportierten Inhalt verwendet wird.
+administration.section.export.description.hint=Die Paketbeschreibung, die beim Importieren des Pakets angezeigt wird.
+administration.section.export.licence.hint=Die Inhaltslizenz. Z.B.: LGPL, GPLV2, etc.
+administration.section.export.author.hint=Der Paketautor.
+administration.section.export.version.hint=Die Paketversion.
+administration.section.export.withHistory.hint=Fügt den Seitenverlauf in den Export ein. Ansonsten wird nur die neueste Version einer Seite exportiert.
+administration.section.export.backupPack.hint=Geben Sie an, ob das Paket als Backup verwendet werden soll. Diese Option hat keinen Einfluss auf den exportierten Inhalt. Der einzige Effekt ist, dass die Option "Als Backup-Paket importieren" beim Importieren des Pakets vorgewählt ist. Der Unterschied zwischen einem Backup-Paket und einem normalen Paket besteht darin, dass im ersten Fall der letzte Autor der Seite beim Import erhalten bleibt, während im zweiten Fall der Benutzer, der den Import durchführt, zum letzten Autor jeder importierten Seite wird.
+
+# Users Section
+### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
+### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
+### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
+administration.section.users.deleteUser.markDisabledMessage=Anstatt den Benutzer zu löschen, kannst du sein Profil als deaktiviert markieren. Dies verhindert, dass sie sich anmelden, und bewahrt die Zugriffsrechte, die mit den von ihnen geschriebenen Skripten verbunden sind.
 
 # Other Category
-### Missing: admin.other=Other
-### Missing: admin.other.description=Various configurations for extensions.
-### Missing: administration.section.analytics.status=Status
-### Missing: administration.section.analytics.status.hint=Determine if the tracking in Google Analytics™ is active or not</content>
+admin.other=Andere
+admin.other.description=Verschiedene Konfigurationen für Erweiterungen.
+administration.section.analytics.status=Status
+administration.section.analytics.status.hint=Bestimmen Sie, ob das Tracking in Google Analytics™ aktiv ist oder nicht
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+XWiki.XWikiPreferences_auth_active_check.hint=Wenn "Ja" wird verhindert, dass sich Benutzer einloggen ohne den Token einzugeben, den sie zuvor per E-Mail erhalten haben.
+### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
 </xwikidoc>

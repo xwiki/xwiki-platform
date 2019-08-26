@@ -49,6 +49,5 @@ extension.repository.doc.date=Letzte Änderung
 ### Missing: extension.repository.installedCount=Installs
 
 ## Administration UI
-admin.repository=Repository mit Erweiterungen
-</content>
+admin.repository=Repository mit Erweiterungen</content>
 </xwikidoc>

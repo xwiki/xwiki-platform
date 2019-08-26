@@ -8,8 +8,9 @@
 {{velocity output="false"}}
 ## Globals
 #set ($currentNamespace = "wiki:${services.wiki.currentWikiId}")
+#set ($selectedFlavor = $services.distribution.getProperty('flavor.selected'))
 #set ($currentFlavor = $services.flavor.getFlavorExtension($currentNamespace))
-#set ($isCurrentFlavorValid = $currentFlavor && $currentFlavor.isValid($extensionNamespace))
+#set ($isCurrentFlavorValid = $currentFlavor && $currentFlavor.isValid($currentNamespace))
 #set ($knownFlavors = $services.flavor.knownFlavors)
 #set ($knownFlavorId = $NULL)
 #foreach ($flavor in $knownFlavors)
@@ -24,12 +25,20 @@
   #if ($request.noFlavor)
     ## Let the wiki be empty
     #displayNoFlavor()
+  #elseif ($selectedFlavor)
+    ## A flavor already been selected
+    #displayFlavorInstallationStep($selectedFlavor)
   #elseif ($request.installFlavor && $request.flavor)
     ## The user has selected a flavor, let's propose him to install it
     #displayFlavorInstallationStep()
-  #elseif ($currentFlavor && !$isCurrentFlavorValid)
-    ## The current flavor is invalid, try to fix it
-    #displayInvalidFlavor()
+  #elseif ($currentFlavor)
+    #if (!$isCurrentFlavorValid)
+      ## The current flavor is invalid, try to fix it
+      #displayInvalidFlavor()
+    #else
+      ## The current flavor is valid, no need to select a new one
+      #displayFlavorInstallationStep($currentFlavor)
+    #end
   #else
     ## No flavor is currently installed or even selected by the user, display the flavor picker
     #displayFlavorPickerStep()
@@ -38,11 +47,11 @@
 
 #macro(displayInvalidFlavor)
   #if ($request.startUpgradePlan)
-    #set ($upgradePlanRequest = $extensionManager.createUpgradePlanRequest($currentFlavor, $extensionNamespace))
+    #set ($upgradePlanRequest = $extensionManager.createUpgradePlanRequest($currentFlavor, $currentNamespace))
     #set ($upgradePlanJob = $extensionManager.createUpgradePlan($upgradePlanRequest))
     #set ($upgradePlan = $upgradePlanJob.status)
   #else
-    #set ($upgradePlan = $extensionManager.getExtensionPlanJobStatus($currentFlavor.id.id, $extensionNamespace))
+    #set ($upgradePlan = $extensionManager.getExtensionPlanJobStatus($currentFlavor.id.id, $currentNamespace))
   #end
   #if ($isAjaxRequest)
     #displayUpgradeInvalidFlavorStatus()
@@ -190,18 +199,24 @@
   {{/html}}
 #end
 
-#macro(displayFlavorInstallationStep)
-  #set ($flavorSplitted = $request.flavor.split(':::'))
-  #set ($requestFlavorId = $flavorSplitted[0])
-  #set ($requestFlavorVersion = $flavorSplitted[1])
-  #set ($requestFlavorExtension = $services.extension.resolve($requestFlavorId, $requestFlavorVersion))
-  
+#macro(displayFlavorInstallationStep $flavorToInstall)
+  #if ($flavorToInstall)
+    #set ($selectedFlavor = $flavorToInstall)
+  #else
+    #set ($flavorSplitted = $request.flavor.split(':::'))
+    #set ($requestFlavorId = $flavorSplitted[0])
+    #set ($requestFlavorVersion = $flavorSplitted[1])
+    #set ($selectedFlavor = $services.extension.resolve($requestFlavorId, $requestFlavorVersion))
+    #set ($void = $services.distribution.setProperty('flavor.selected', $selectedFlavor))
+  #end
+  #set ($isSelectedFlavorValid = $selectedFlavor && $selectedFlavor.isValid($currentNamespace))
+
   {{html}}
     #displayFlavorLabel('platform.extension.distributionWizard.flavorStepConfirm', 'platform.extension.distributionWizard.flavorStepSelectOtherFlavor')
-    #displayExtensionAndUpdateStepButtons($requestFlavorExtension)
+    #displayExtensionAndUpdateStepButtons($selectedFlavor)
   {{/html}}
-  
-  #set ($showCompleteStepButton = $isFlavorValid)
+
+  #set ($showCompleteStepButton = $isSelectedFlavorValid)
 #end
 {{/velocity}}
 

@@ -22,49 +22,307 @@ package com.xpn.xwiki.user.api;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 public class XWikiUser
 {
     /**
+     * Class used to store user properties.
+     */
+    private static final String USER_CLASS = "XWiki.XWikiUsers";
+
+    /**
+     * The name of the property that store the active status of the user.
+     */
+    private static final String ACTIVE_PROPERTY = "active";
+
+    /**
+     * The name of the property that store the disabled status of the user.
+     */
+    private static final String DISABLED_PROPERTY = "disabled";
+
+    /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver = Utils.getComponent(
-        DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
-    private String user;
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    private AuthenticationFailureManager authenticationFailureManager;
+
+    private Logger logger = LoggerFactory.getLogger(XWikiUser.class);
+
+    private String fullName;
+
+    private DocumentReference userReference;
 
     private boolean main;
 
+    /**
+     * Create a XWikiUser from its document reference and infer if the user is global or not based on the wiki part of
+     * this reference. See {@link #isMain()} for more information.
+     * @param userReference the document reference of the user.
+     * @since 11.6RC1
+     */
+    public XWikiUser(DocumentReference userReference)
+    {
+        this(userReference, XWiki.DEFAULT_MAIN_WIKI.equals(userReference.getWikiReference().getName()));
+    }
+
+    /**
+     * Create a XWikiUser from its document reference and set the main flag. (see {@link #isMain()}).
+     * @param userReference the document reference of the user.
+     * @param main true if the user is global (i.e. registered in the main wiki)
+     * @since 11.6RC1
+     */
+    public XWikiUser(DocumentReference userReference, boolean main)
+    {
+        this.userReference = userReference;
+        setUser(getLocalEntityReferenceSerializer().serialize(userReference));
+        setMain(main);
+    }
+
+    /**
+     * Create a XWikiUser for the given user.
+     * @param user the full name of the user on the form <tt>XWiki.Foo</tt>.
+     * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference)}.
+     */
+    @Deprecated
     public XWikiUser(String user)
     {
         this(user, false);
     }
 
+    /**
+     * Create a XWikiUser for the given user.
+     * @param user the full name of the user on the form <tt>XWiki.Foo</tt>.
+     * @param main true if the user is global (i.e. registered in the main wiki)
+     * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference, boolean)}.
+     */
+    @Deprecated
     public XWikiUser(String user, boolean main)
     {
         setUser(user);
         setMain(main);
     }
 
+    /**
+     *
+     * @return user fullname
+     * @deprecated since 11.6RC1 use {@link #getFullName()}.
+     */
+    @Deprecated
     public String getUser()
     {
-        return this.user;
+        return this.fullName;
     }
 
-    private DocumentReference getUserReference(XWikiContext context)
+    /**
+     * @return the fullname of the user like <tt>XWiki.Foo</tt>.
+     */
+    public String getFullName()
     {
-        return this.currentMixedDocumentReferenceResolver.resolve(getUser());
+        return this.fullName;
+    }
+
+    private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
+    {
+        if (currentMixedDocumentReferenceResolver == null) {
+            currentMixedDocumentReferenceResolver =
+                Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        }
+        return currentMixedDocumentReferenceResolver;
+    }
+
+    private EntityReferenceSerializer<String> getLocalEntityReferenceSerializer()
+    {
+        if (localEntityReferenceSerializer == null) {
+            localEntityReferenceSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        }
+        return localEntityReferenceSerializer;
+    }
+
+    private AuthenticationFailureManager getAuthenticationFailureManager()
+    {
+        if (authenticationFailureManager == null) {
+            authenticationFailureManager = Utils.getComponent(AuthenticationFailureManager.class);
+        }
+
+        return authenticationFailureManager;
+    }
+
+    public DocumentReference getUserReference()
+    {
+        if (this.userReference == null) {
+            this.userReference = getCurrentMixedDocumentReferenceResolver().resolve(getUser());
+        }
+        return this.userReference;
+    }
+
+    private DocumentReference getUserClassReference(WikiReference userDocWiki)
+    {
+        return getCurrentMixedDocumentReferenceResolver().resolve(userDocWiki.getName() + ":" + USER_CLASS);
+    }
+
+    private boolean isGuest()
+    {
+        return XWikiRightService.isGuest(getUserReference());
+    }
+
+    private boolean isSuperAdmin()
+    {
+        return XWikiRightService.isSuperAdmin(getUserReference());
+    }
+
+    private XWikiDocument getUserDocument(XWikiContext context) throws XWikiException
+    {
+        return context.getWiki().getDocument(getUserReference(), context);
+    }
+
+    private void removeAuthenticationFailureManagerRecord()
+    {
+        getAuthenticationFailureManager().resetAuthenticationFailureCounter(getUserReference());
+    }
+
+    /**
+     * @param context used to retrieve the user document.
+     * @return true if the user is disabled. This always returns false if the user is the guest or superadmin user.
+     * @since 11.6RC1
+     */
+    public boolean isDisabled(XWikiContext context)
+    {
+        boolean disabled;
+
+        // Guest and superadmin are necessarily enabled.
+        if (isGuest() || isSuperAdmin()) {
+            disabled = false;
+        } else {
+            try {
+                XWikiDocument userdoc = getUserDocument(context);
+                // if the user gets deleted while he's still logged-in, we consider him as disabled.
+                if (userdoc.isNew()) {
+                    disabled = true;
+                } else {
+                    disabled = userdoc.getIntValue(
+                        getUserClassReference(userdoc.getDocumentReference().getWikiReference()), DISABLED_PROPERTY)
+                        != 0;
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Error while checking disabled status of user [{}]", getUser(), e);
+                disabled = false;
+            }
+        }
+        return disabled;
+    }
+
+    /**
+     * @param disabled true if the user is disabled (i.e. it can't login or make actions). False to enable the account.
+     * @param context used to retrieve the user document.
+     * @since 11.6RC1
+     */
+    public void setDisabled(boolean disabled, XWikiContext context)
+    {
+        // We don't modify any information for guest and superadmin.
+        if (!isGuest() && !isSuperAdmin()) {
+            int disabledFlag = (disabled) ? 1 : 0;
+            try {
+                XWikiDocument userdoc = getUserDocument(context);
+                userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                    DISABLED_PROPERTY, disabledFlag);
+                context.getWiki().saveDocument(userdoc, context);
+
+                // if we enable back an user we remove the authentication failure record.
+                if (!disabled) {
+                    removeAuthenticationFailureManagerRecord();
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Error while setting disabled status of user [{}]", getUser(), e);
+            }
+        }
+    }
+
+    /**
+     * @param context used to retrieve the user document.
+     * @return true if the user is active. This always returns true if the user is the guest or superadmin user.
+     * @since 11.6RC1
+     */
+    public boolean isActive(XWikiContext context)
+    {
+        boolean active;
+        // These users are necessarily active. Note that superadmin might be main-wiki-prefixed when in a subwiki.
+        if (isGuest() || isSuperAdmin()) {
+            active = true;
+        } else {
+            try {
+                XWikiDocument userdoc = getUserDocument(context);
+                active = userdoc.getIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                    ACTIVE_PROPERTY) != 0;
+            } catch (XWikiException e) {
+                this.logger.error("Error while checking active status of user [{}]", getUser(), e);
+                active = true;
+            }
+        }
+        return active;
+    }
+
+    /**
+     * @param active true if the user activated the account. False to deactivate the account.
+     * @param context used to retrieve the user document.
+     * @since 11.6RC1
+     */
+    public void setActiveStatus(boolean active, XWikiContext context)
+    {
+        // We don't modify any information for guest and superadmin.
+        if (!isGuest() && !isSuperAdmin()) {
+            int activeFlag = (active) ? 1 : 0;
+            try {
+                XWikiDocument userdoc = getUserDocument(context);
+                userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                    ACTIVE_PROPERTY, activeFlag);
+                context.getWiki().saveDocument(userdoc, context);
+
+                // if we activate back an user we remove the authentication failure record.
+                if (!active) {
+                    removeAuthenticationFailureManagerRecord();
+                }
+            } catch (XWikiException e) {
+                this.logger.error("Error while setting active status of user [{}]", getUser(), e);
+            }
+        }
+    }
+
+    /**
+     * @param context used to retrieve the user document.
+     * @return true if the user exists.
+     * @since 11.6RC1
+     */
+    public boolean exists(XWikiContext context)
+    {
+        boolean exists = false;
+        try {
+            XWikiDocument userdoc = getUserDocument(context);
+            exists = !userdoc.isNew();
+        } catch (XWikiException e) {
+            this.logger.error("Error while checking existing status of user [{}]", getUser(), e);
+        }
+        return exists;
     }
 
     public void setUser(String user)
     {
-        this.user = user;
+        this.fullName = user;
     }
 
     /**
@@ -82,10 +340,10 @@ public class XWikiUser
         if (!StringUtils.isEmpty(getUser())) {
             XWikiGroupService groupService = context.getWiki().getGroupService(context);
 
-            DocumentReference groupReference = this.currentMixedDocumentReferenceResolver.resolve(groupName);
+            DocumentReference groupReference = getCurrentMixedDocumentReferenceResolver().resolve(groupName);
 
             Collection<DocumentReference> groups =
-                groupService.getAllGroupsReferencesForMember(getUserReference(context), 0, 0, context);
+                groupService.getAllGroupsReferencesForMember(getUserReference(), 0, 0, context);
 
             if (groups.contains(groupReference)) {
                 return true;
@@ -95,6 +353,11 @@ public class XWikiUser
         return false;
     }
 
+    /**
+     * See if the user is global (i.e. registered in the main wiki) or local to a virtual wiki.
+     *
+     * @return <tt>true</tt> if the user is global, false otherwise or if an exception occurs.
+     */
     public boolean isMain()
     {
         return this.main;
@@ -121,7 +384,7 @@ public class XWikiUser
         boolean equals;
         if (obj instanceof XWikiUser) {
             XWikiUser otherUser = (XWikiUser) obj;
-            equals = otherUser.main == this.main && this.user.equals(otherUser.user);
+            equals = otherUser.main == this.main && this.fullName.equals(otherUser.fullName);
         } else {
             equals = false;
         }

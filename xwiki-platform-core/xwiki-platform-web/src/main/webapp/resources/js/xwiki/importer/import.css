@@ -30,6 +30,7 @@ div.loading {
 .package-upload {
   background: transparent url("$xwiki.getSkinFile('icons/silk/package_add.png')") no-repeat scroll 0 center;
   padding-left: 20px;
+  overflow: hidden;
 }
 
 #packagelist .xitemcontainer {
@@ -71,6 +72,10 @@ div.loading {
   overflow: hidden;
   padding: 10px;
   margin-bottom: 1px;
+}
+
+#packagecontainer {
+  overflow: hidden;
 }
 
 #packagecontainer .packageinfos {

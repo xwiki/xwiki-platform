@@ -45,6 +45,8 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.text.StringUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -99,6 +101,9 @@ public class DistributionInternalScriptService implements ScriptService
 
     @Inject
     private RenderingContext renderingContext;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     /**
      * @param <T> the type of the object
@@ -311,5 +316,39 @@ public class DistributionInternalScriptService implements ScriptService
         }
 
         return tree;
+    }
+
+    /**
+     * @since 11.7RC1
+     * @since 11.3.3
+     * @since 10.11.10
+     */
+    public void setProperty(String key, Object value)
+    {
+        if (this.authorization.hasAccess(Right.PROGRAM)) {
+            DistributionJob job = this.distributionManager.getCurrentDistributionJob();
+
+            if (job != null) {
+                job.setProperty(key, value);
+            }
+        }
+    }
+
+    /**
+     * @since 11.7RC1
+     * @since 11.3.3
+     * @since 10.11.10
+     */
+    public Object getProperty(String key)
+    {
+        if (this.authorization.hasAccess(Right.PROGRAM)) {
+            DistributionJob job = this.distributionManager.getCurrentDistributionJob();
+
+            if (job != null) {
+                return job.getProperty(key);
+            }
+        }
+
+        return null;
     }
 }

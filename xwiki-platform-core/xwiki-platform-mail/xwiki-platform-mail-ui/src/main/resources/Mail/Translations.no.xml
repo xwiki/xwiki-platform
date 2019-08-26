@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Mail</web>
+  <name>Translations</name>
+  <language>no</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Mail.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Mail Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.email=E-post
+admin.email.description=Konfigurer parametere for sending av e-post og vis e-poststatuser.
+admin.emailgeneral=Avansert
+admin.emailgeneral.description=Konfigurer avanserte e-postparametere, som for eksempel tilsløring av e-postadresser.
+admin.emailsend=E-post sending
+admin.emailsend.description=Konfigurer e-post-sendeparametere.
+admin.emailstatus=E-postsendingsstatus
+admin.emailstatus.description=Vis statusene til sendte e-post og send på nytt e-postmeldinger som har feilet.
+admin.emailstatus.hint=Hvis du ikke finner statusen til en e-post, kan det hende at egenskapen som sendte posten ikke angav at e-poststatus skulle vedvare.
+Mail.GeneralMailConfigClass_obfuscate=Tilsløre e-postadresser
+Mail.GeneralMailConfigClass_obfuscate.hint=Dette påvirker bare e-postadressene som er lagret i objektegenskaper av typen E-post, så lenge standard tilpasset visning for typen E-postegenskap ikke overskrives. Eksempel: a...@domene.no
+Mail.SendMailConfigClass_from=E-postadresse å sende fra
+Mail.SendMailConfigClass_from.hint=Standard e-postadressen som brukt til å sende varslingsmeldinger
+Mail.SendMailConfigClass_bcc=BCC-e-postadresser
+Mail.SendMailConfigClass_bcc.hint=En standard kommaseparert liste over BCC-e-postadresser som skal brukes når du sender e-post
+Mail.SendMailConfigClass_host=E-postserver
+Mail.SendMailConfigClass_host.hint=SMTP-serveren som brukes for å sende e-post. Standard er "localhost"
+Mail.SendMailConfigClass_port=E-postserverport
+Mail.SendMailConfigClass_port.hint=Porten som brukes på SMTP-serveren. Standard er 25
+Mail.SendMailConfigClass_username=Brukernavn til e-postserver
+Mail.SendMailConfigClass_username.hint=Brukernavnet for å koble til SMTP-serveren, bare når godkjenning er påkrevd
+Mail.SendMailConfigClass_password=E-postserverpassord
+Mail.SendMailConfigClass_password.hint=Passordet for å koble til SMTP-serveren, bare når godkjenning er nødvendig
+Mail.SendMailConfigClass_properties=Ytterligere egenskaper
+Mail.SendMailConfigClass_properties.hint=Listen over JavaMail-egenskaper som skal brukes (f.eks "mail.smtp.starttls.enable=true" for TLS)
+Mail.SendMailConfigClass_sendWaitTime=Ventetid før sending
+Mail.SendMailConfigClass_sendWaitTime.hint=Forsinkelsen mellom hver epost som sendes, i millisekunder (standard er 8 sekunder)
+Mail.SendMailConfigClass_discardSuccessStatuses=Slett suksessstatuser?
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Ikke lagre statusen for e-postmeldinger som er sendt vellykket (standard er ja)
+Mail.SendMailStatus_livetable.date=Dato
+Mail.SendMailStatus_livetable.batchId=BatchID
+Mail.SendMailStatus_livetable.type=Type
+Mail.SendMailStatus_livetable.recipients=Mottakere
+Mail.SendMailStatus_livetable.state=Status
+Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.error=Feil
+Mail.SendMailStatus_livetable.actions=Handlinger
+Mail.SendMailStatus_livetable.resend=Send på nytt
+mailSender.admin.resendSuccess=Meldingen er sendt på nytt
+mailSender.admin.resendFailure=Kunne ikke sende om igjen. Klikk for flere detaljer.</content>
+  
+</xwikidoc>

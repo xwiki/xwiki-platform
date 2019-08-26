@@ -35,6 +35,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -70,8 +73,10 @@ public class XWikiStatsReader
     /**
      * Used to convert a proper Document Reference to a string but without the wiki name.
      */
-    private EntityReferenceSerializer<String> compactwikiEntityReferenceSerializer = Utils.getComponent(
-        EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+    private EntityReferenceSerializer<String> compactwikiEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+
+    private QueryManager queryManager = Utils.getComponent(QueryManager.class);
 
     /**
      * Return the statistics action stored.
@@ -83,7 +88,7 @@ public class XWikiStatsReader
      */
     public Collection<Object> getRecentActions(String action, int size, XWikiContext context)
     {
-        List<Object> list = new ArrayList<Object>();
+        List<Object> list = new ArrayList<>();
 
         if ((action.equals(ViewAction.VIEW_ACTION) || (action.equals(SaveAction.ACTION_NAME)))) {
             Collection<?> actions = StatsUtil.getRecentActionFromSessions(context, action);
@@ -133,10 +138,10 @@ public class XWikiStatsReader
 
     /**
      * @param scope the set of documents for which to retrieve statistics.
-     * @param paramList the values to insert in the SQL query.
+     * @param params the values to insert in the SQL query.
      * @return the name filter HQL query part.
      */
-    private String getHqlNameFilterFromScope(Scope scope, List<Object> paramList)
+    private String getHqlNameFilterFromScope(Scope scope, Map<String, Object> params)
     {
         String nameFilter;
 
@@ -152,8 +157,8 @@ public class XWikiStatsReader
             // Select all names that are page names
             nameFilter = "name like '%.%'";
         } else {
-            nameFilter = "name like ?";
-            paramList.add(scope.getPattern());
+            nameFilter = "name like :nameFilter";
+            params.put("nameFilter", scope.getPattern());
         }
 
         return nameFilter;
@@ -177,17 +182,16 @@ public class XWikiStatsReader
         org.joda.time.Period stepDuration =
             new org.joda.time.Period(step.getYears(), step.getMonths(), step.getWeeks(), step.getDays(), 0, 0, 0, 0);
 
-        Map<DateTime, Integer> activity = new HashMap<DateTime, Integer>();
+        Map<DateTime, Integer> activity = new HashMap<>();
         while (stepStart.compareTo(periodEnd) < 0) {
             DateTime stepEnd = stepStart.plus(stepDuration);
             if (stepEnd.compareTo(periodEnd) > 0) {
                 stepEnd = periodEnd;
             }
-            List<DocumentStats> stats =
-                getDocumentStatistics(action, scope, new Period(stepStart.getMillis(), stepEnd.getMillis()),
-                    RangeFactory.FIRST, context);
+            List<DocumentStats> stats = getDocumentStatistics(action, scope,
+                new Period(stepStart.getMillis(), stepEnd.getMillis()), RangeFactory.FIRST, context);
             int actionCount = 0;
-            if (stats.size() > 0) {
+            if (!stats.isEmpty()) {
                 actionCount = stats.get(0).getPageViews();
             }
             activity.put(stepStart, actionCount);
@@ -213,32 +217,33 @@ public class XWikiStatsReader
     {
         List<DocumentStats> documentStatsList;
 
-        List<Object> paramList = new ArrayList<Object>(4);
+        Map<String, Object> params = new HashMap<>(4);
 
-        String nameFilter = getHqlNameFilterFromScope(scope, paramList);
+        String nameFilter = getHqlNameFilterFromScope(scope, params);
 
         String sortOrder = getHqlSortOrderFromRange(range);
 
-        XWikiHibernateStore store = context.getWiki().getHibernateStore();
-
         try {
-            String query =
-                MessageFormat.format("select name, sum(pageViews) from DocumentStats"
-                    + " where ({0}) and action=? and ? <= period and period < ? group by name order"
-                    + " by sum(pageViews) {1}", nameFilter, sortOrder);
+            String statement = MessageFormat.format("select name, sum(pageViews) from DocumentStats"
+                + " where ({0}) and action=:action and :start <= period and period < :end group by name order"
+                + " by sum(pageViews) {1}", nameFilter, sortOrder);
 
-            paramList.add(action);
-            paramList.add(period.getStartCode());
-            paramList.add(period.getEndCode());
+            params.put("action", action);
+            params.put("start", period.getStartCode());
+            params.put("end", period.getEndCode());
 
-            List<?> solist =
-                store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
+            Query query = this.queryManager.createQuery(statement, Query.HQL);
+            query.bindValues(params);
+            query.setLimit(range.getAbsoluteSize());
+            query.setOffset(range.getAbsoluteStart());
+
+            List<?> solist = query.execute();
 
             documentStatsList = getDocumentStatistics(solist, action);
             if (range.getSize() < 0) {
                 Collections.reverse(documentStatsList);
             }
-        } catch (XWikiException e) {
+        } catch (QueryException e) {
             documentStatsList = Collections.emptyList();
         }
 
@@ -255,7 +260,7 @@ public class XWikiStatsReader
      */
     private List<DocumentStats> getDocumentStatistics(List<?> resultSet, String action)
     {
-        List<DocumentStats> documentStatsList = new ArrayList<DocumentStats>(resultSet.size());
+        List<DocumentStats> documentStatsList = new ArrayList<>(resultSet.size());
 
         Date now = new Date();
 
@@ -286,31 +291,33 @@ public class XWikiStatsReader
     {
         List<DocumentStats> documentStatsList;
 
-        List<Object> paramList = new ArrayList<Object>(4);
+        Map<String, Object> params = new HashMap<>(4);
 
-        String nameFilter = getHqlNameFilterFromScope(scope, paramList);
+        String nameFilter = getHqlNameFilterFromScope(scope, params);
 
         String sortOrder = getHqlSortOrderFromRange(range);
 
-        XWikiHibernateStore store = context.getWiki().getHibernateStore();
         try {
-            String query =
-                MessageFormat.format("select name, sum(pageViews) from RefererStats"
-                    + " where ({0}) and referer like ? and ? <= period and period < ? group by name"
-                    + " order by sum(pageViews) {1}", nameFilter, sortOrder);
+            String statement = MessageFormat.format("select name, sum(pageViews) from RefererStats"
+                + " where ({0}) and referer like :referer and :start <= period and period < :end group by name"
+                + " order by sum(pageViews) {1}", nameFilter, sortOrder);
 
-            paramList.add(getHqlValidDomain(domain));
-            paramList.add(period.getStartCode());
-            paramList.add(period.getEndCode());
+            params.put("referer", getHqlValidDomain(domain));
+            params.put("start", period.getStartCode());
+            params.put("end", period.getEndCode());
 
-            List<?> solist =
-                store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
+            Query query = this.queryManager.createQuery(statement, Query.HQL);
+            query.bindValues(params);
+            query.setLimit(range.getAbsoluteSize());
+            query.setOffset(range.getAbsoluteStart());
+
+            List<?> solist = query.execute();
 
             documentStatsList = getDocumentStatistics(solist, "refer");
             if (range.getSize() < 0) {
                 Collections.reverse(documentStatsList);
             }
-        } catch (XWikiException e) {
+        } catch (QueryException e) {
             documentStatsList = Collections.emptyList();
         }
 
@@ -333,31 +340,33 @@ public class XWikiStatsReader
     {
         List<RefererStats> refererList;
 
-        List<Object> paramList = new ArrayList<Object>(4);
+        Map<String, Object> params = new HashMap<>(4);
 
-        String nameFilter = getHqlNameFilterFromScope(scope, paramList);
+        String nameFilter = getHqlNameFilterFromScope(scope, params);
 
         String sortOrder = getHqlSortOrderFromRange(range);
 
-        XWikiHibernateStore store = context.getWiki().getHibernateStore();
         try {
-            String query =
-                MessageFormat.format("select referer, sum(pageViews) from RefererStats"
-                    + " where ({0}) and referer like ? and ? <= period and period < ?"
-                    + " group by referer order by sum(pageViews) {1}", nameFilter, sortOrder);
+            String statement = MessageFormat.format("select referer, sum(pageViews) from RefererStats"
+                + " where ({0}) and referer like :referer and :start <= period and period < :end"
+                + " group by referer order by sum(pageViews) {1}", nameFilter, sortOrder);
 
-            paramList.add(getHqlValidDomain(domain));
-            paramList.add(period.getStartCode());
-            paramList.add(period.getEndCode());
+            params.put("referer", getHqlValidDomain(domain));
+            params.put("start", period.getStartCode());
+            params.put("end", period.getEndCode());
 
-            List<?> solist =
-                store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
+            Query query = this.queryManager.createQuery(statement, Query.HQL);
+            query.bindValues(params);
+            query.setLimit(range.getAbsoluteSize());
+            query.setOffset(range.getAbsoluteStart());
+
+            List<?> solist = query.execute();
 
             refererList = getRefererStatistics(solist);
             if (range.getSize() < 0) {
                 Collections.reverse(refererList);
             }
-        } catch (XWikiException e) {
+        } catch (QueryException e) {
             refererList = Collections.emptyList();
         }
 
@@ -375,7 +384,7 @@ public class XWikiStatsReader
     private List<RefererStats> getRefererStatistics(List<?> resultSet)
     {
         Date now = new Date();
-        List<RefererStats> stats = new ArrayList<RefererStats>(resultSet.size());
+        List<RefererStats> stats = new ArrayList<>(resultSet.size());
 
         for (Object name : resultSet) {
             Object[] result = (Object[]) name;
@@ -418,9 +427,9 @@ public class XWikiStatsReader
                 if (userListWhere.length() > 0) {
                     userListWhere.append(", ");
                 }
-                userListWhere.append('?');
 
                 paramList.add(this.compactwikiEntityReferenceSerializer.serialize(user));
+                userListWhere.append("?" + paramList.size());
             }
         } catch (Exception e) {
             LOGGER.error("Faild to get filter users list", e);
@@ -434,7 +443,8 @@ public class XWikiStatsReader
 
         // date filter
 
-        query.append(" ? <= startDate and endDate < ? group by name");
+        query.append(" ?" + (paramList.size() + 1) + " <= startDate and endDate < ?" + (paramList.size() + 2)
+            + " group by name");
         paramList.add(new Date(period.getStart()));
         paramList.add(new Date(period.getEnd()));
 
@@ -451,8 +461,8 @@ public class XWikiStatsReader
         } else if (action.equals(DownloadAction.ACTION_NAME)) {
             query.append("order by sum(downloads) " + sortOrder);
         } else {
-            query.append(MessageFormat.format("order by sum(pageSaves) {0}, sum(pageViews) {0}, sum(downloads) {0}",
-                sortOrder));
+            query.append(
+                MessageFormat.format("order by sum(pageSaves) {0}, sum(pageViews) {0}, sum(downloads) {0}", sortOrder));
         }
 
         return query.toString();
@@ -472,14 +482,13 @@ public class XWikiStatsReader
     {
         List<VisitStats> visiStatList;
 
-        List<Object> paramList = new ArrayList<Object>(2);
+        List<Object> paramList = new ArrayList<>(2);
 
         String query = createVisitStatisticsQuery(action, period, range, paramList, context);
 
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
         try {
-            List<?> solist =
-                store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
+            List<?> solist = store.search(query, range.getAbsoluteSize(), range.getAbsoluteStart(), paramList, context);
 
             visiStatList = getVisitStatistics(solist, new DateTime(period.getStart()), new DateTime(period.getEnd()));
             if (range.getSize() < 0) {
@@ -505,7 +514,7 @@ public class XWikiStatsReader
      */
     private List<VisitStats> getVisitStatistics(List<?> resultSet, DateTime startDate, DateTime endDate)
     {
-        List<VisitStats> stats = new ArrayList<VisitStats>(resultSet.size());
+        List<VisitStats> stats = new ArrayList<>(resultSet.size());
 
         for (Object name2 : resultSet) {
             Object[] result = (Object[]) name2;
@@ -579,7 +588,7 @@ public class XWikiStatsReader
 
         List<?> solist;
         if (store != null) {
-            List<Object> paramList = new ArrayList<Object>(1);
+            List<Object> paramList = new ArrayList<>(1);
             paramList.add(docName);
             solist = store.search("from RefererStats as obj where obj.name=?", 0, 0, paramList, context);
         } else {

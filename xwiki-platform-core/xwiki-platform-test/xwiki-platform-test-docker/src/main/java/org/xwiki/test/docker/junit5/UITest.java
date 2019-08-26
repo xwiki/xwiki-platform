@@ -27,10 +27,12 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.xwiki.test.docker.internal.TestReferenceParameterResolver;
+import org.xwiki.test.docker.internal.junit5.TestReferenceParameterResolver;
+import org.xwiki.test.docker.internal.junit5.XWikiDockerExtension;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.integration.junit5.ValidateConsoleExtension;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.METHOD;
@@ -46,6 +48,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, ANNOTATION_TYPE })
+@ExtendWith(ValidateConsoleExtension.class)
 @ExtendWith(XWikiDockerExtension.class)
 @ExtendWith(TestReferenceParameterResolver.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -127,6 +130,12 @@ public @interface UITest
      * @since 10.10RC1
      */
     String[] properties() default {};
+
+    /**
+     * @return the properties to overwrite in the generated extensions descriptors
+     * @since 11.6RC1
+     */
+    ExtensionOverride[] extensionOverrides() default {};
 
     /**
      * @return the optional list of JARs (specified as artifact coordinates {@code groupId:artifactId}) that should be

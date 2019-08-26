@@ -133,6 +133,5 @@ admin.xwiki.members.title=Aktualni członkowie
 admin.xwiki.users.title=Wszyscy użytkownicy
     
 # DRAWER ITEM
-platform.wiki.drawer.homeWiki=Główna
-</content>
+platform.wiki.drawer.homeWiki=Główna</content>
 </xwikidoc>

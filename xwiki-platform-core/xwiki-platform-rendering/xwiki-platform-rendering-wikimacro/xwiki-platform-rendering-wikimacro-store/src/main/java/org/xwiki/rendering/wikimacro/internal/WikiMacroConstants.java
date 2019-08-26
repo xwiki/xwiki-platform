@@ -73,9 +73,24 @@ public interface WikiMacroConstants
     String MACRO_INLINE_PROPERTY = "supportsInlineMode";
 
     /**
-     * Constant for representing macro content type property.
+     * Constant for representing macro content optionality property.
      */
     String MACRO_CONTENT_TYPE_PROPERTY = "contentType";
+
+    /**
+     * Constant for representing macro content java type property.
+     */
+    String MACRO_CONTENT_JAVA_TYPE_PROPERTY = "contentJavaType";
+
+    /**
+     * Constant for the "Wiki" choice for Macro Content Type.
+     */
+    String MACRO_CONTENT_TYPE_WIKI = "Wiki";
+
+    /**
+     * Constant for the "Unkown" choice for Macro Content Type.
+     */
+    String MACRO_CONTENT_TYPE_UNKNOWN = "Unknown";
 
     /**
      * Constant for representing macro content mandatory status.

@@ -40,6 +40,7 @@ public class WatchlistMacroTest extends AbstractTest
 
     @Before
     public void setUp() {
+        getUtil().loginAsSuperAdmin();
         String userName = RandomStringUtils.randomAlphanumeric(5);
         getUtil().createUserAndLogin(userName, "password");
 

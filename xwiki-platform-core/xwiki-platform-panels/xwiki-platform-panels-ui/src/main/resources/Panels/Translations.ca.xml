@@ -46,5 +46,7 @@ panels.emptyvalue=
 panels.children.title=Pàgines Filles
 panels.siblings.title=Pàgines Germanes
 panels.documentInformation.configureSyntaxes=Configurar més sintaxis
-</content>
+panels.documentInformation.confirmChangeSyntaxWysiwyg=Voleu convertir també el contingut del document i els objectes a la sintaxi seleccionada? Triant 'cancel·lar' revertirà la sintaxi a la prèvia i no farà res. Tinguen en compte que si trieu 'ok' perdreu les modificacions i es guardarà el document automàticament, podeu cancel·lar la aquesta modificació anant a la interfície d'històric per aquest document i revertir la última versió.
+panels.documentInformation.confirmChangeSyntax=Voleu convertir també el contingut del document i els objectes a la sintaxi seleccionada? Triant 'cancel·lar' només revertirà l'identificador de la sintaxi sintaxi, sense modificar el contingut del document. Tinguen en compte que si trieu 'ok' es guardarà el document automàticament, podeu cancel·lar la aquesta modificació anant a la interfície d'històric per aquest document i revertir la última versió.
+panels.documentInformation.failedSyntaxConversion=No s'ha pogut convertir a la sintaxi triada. Si voleu fer-la servir igualment, podeu tornar-la a triar marcant no fer la conversió.</content>
 </xwikidoc>

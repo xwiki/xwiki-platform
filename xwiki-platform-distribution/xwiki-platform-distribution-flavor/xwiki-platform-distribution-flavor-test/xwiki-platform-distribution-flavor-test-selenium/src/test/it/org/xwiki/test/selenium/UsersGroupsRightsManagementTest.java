@@ -20,8 +20,6 @@
 package org.xwiki.test.selenium;
 
 import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Keys;
 import org.xwiki.administration.test.po.AdministrationMenu;
 import org.xwiki.administration.test.po.CreateGroupModal;
 import org.xwiki.administration.test.po.EditGroupModal;
@@ -31,7 +29,6 @@ import org.xwiki.administration.test.po.RegistrationModal;
 import org.xwiki.administration.test.po.UsersAdministrationSectionPage;
 import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
 import org.xwiki.test.ui.po.ConfirmationModal;
-import org.xwiki.test.ui.po.SuggestInputElement;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -45,46 +42,6 @@ import static org.junit.Assert.assertTrue;
 public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
 {
     private AdministrationMenu administrationMenu = new AdministrationMenu();
-
-    /**
-     * <ul>
-     * <li>Validate group creation.</li>
-     * <li>Validate groups administration print "0" members for empty group.</li>
-     * <li>Validate group deletion.</li>
-     * <li>Validate rights automatically cleaned from deleted groups.</li>
-     * </ul>
-     */
-    @Test
-    public void testCreateAndDeleteGroup()
-    {
-        // Make sure there's no XWikiNewGroup before we try to create it
-        deleteGroup("XWikiNewGroup", true);
-        createGroup("XWikiNewGroup");
-
-        // Validate XWIKI-1903: Empty group shows 1 member.
-        assertEquals("Group XWikiNewGroup which is empty print more than 0 members", "0",
-            new GroupsPage().getMemberCount("XWikiNewGroup"));
-
-        // Give "view" global right to XWikiNewGroup on wiki
-        openGlobalRightsPage();
-        clickGroupsRadioButton();
-        clickViewRightsCheckbox("XWikiNewGroup", "allow");
-
-        // Give "comment" page right to XWikiNewGroup on Test.TestCreateAndDeleteGroup page
-        createPage("Test", "TestCreateAndDeleteGroup", "whatever");
-        clickEditPageAccessRights();
-        clickGroupsRadioButton();
-        clickCommentRightsCheckbox("XWikiNewGroup", "allow");
-
-        // Delete the newly created group and see if rights are cleaned
-        deleteGroup("XWikiNewGroup", false);
-
-        // Validate XWIKI-2304: When a user or a group is removed it's not removed from rights objects
-        open("XWiki", "XWikiPreferences", "edit", "editor=object");
-        assertTextNotPresent("XWikiNewGroup");
-        open("Test", "TestCreateAndDeleteGroup", "edit", "editor=object");
-        assertTextNotPresent("XWikiNewGroup");
-    }
 
     /**
      * Validate that administration show error when trying to create an existing group.
@@ -226,21 +183,6 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
     }
 
     /**
-     * Validate adding a member to a group via the administration.
-     */
-    @Test
-    public void testAddUserToGroup()
-    {
-        // Make sure there's no XWikiNewUser user before we try to create it
-        deleteUser("XWikiTestUser", true);
-        createUser("XWikiTestUser", "XWikiTestUser");
-
-        addUserToGroup("XWikiTestUser", "XWikiAdminGroup");
-
-        deleteUser("XWikiTestUser", true);
-    }
-
-    /**
      * Validate member filtering on group sheet.
      */
     @Test
@@ -309,8 +251,7 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         if (!deleteOnlyIfExists || (deleteOnlyIfExists && isExistingPage("XWiki", login))) {
             UsersAdministrationSectionPage usersPage = openUsersPage();
             ConfirmationModal confirmation = usersPage.clickDeleteUser(login);
-            assertEquals("The user XWiki." + login + " will be deleted and removed from all groups he belongs to. "
-                + "Are you sure you want to proceed?", confirmation.getMessage());
+            assertTrue(confirmation.getMessage().contains("Are you sure you want to proceed?"));
             confirmation.clickOk();
             usersPage.getUsersLiveTable().waitUntilReady();
             assertFalse(usersPage.getUsersLiveTable().hasRow("User", login));
@@ -330,23 +271,9 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
         assertTextPresent(user);
     }
 
-    private void setSuggestInputValue(String id, String value)
-    {
-        SuggestInputElement suggester = new SuggestInputElement(getDriver().findElementWithoutWaiting(By.id(id)));
-        suggester.clearSelectedSuggestions().sendKeys(value).waitForSuggestions().sendKeys(Keys.ENTER)
-            .hideSuggestions();
-    }
-
     private void clickGroupsRadioButton()
     {
         clickLinkWithXPath("//input[@name='uorg' and @value='groups']", false);
-    }
-
-    private void openGlobalRightsPage()
-    {
-        openAdministrationPage();
-        administrationMenu.expandCategoryWithName("Users & Rights").getSectionByName("Users & Rights", "Rights")
-            .click();
     }
 
     private UsersAdministrationSectionPage openUsersPage()
@@ -366,15 +293,6 @@ public class UsersGroupsRightsManagementTest extends AbstractXWikiTestCase
     private void clickViewRightsCheckbox(String groupOrUserName, String actionToVerify)
     {
         clickRightsCheckbox(groupOrUserName, actionToVerify, 2);
-    }
-
-    /**
-     * @param actionToVerify the action that the click is supposed to have done. Valid values are "allow", "deny1" or
-     *            "none".
-     */
-    private void clickCommentRightsCheckbox(String groupOrUserName, String actionToVerify)
-    {
-        clickRightsCheckbox(groupOrUserName, actionToVerify, 3);
     }
 
     private void clickRightsCheckbox(String groupOrUserName, String actionToVerify, int positionInTd)

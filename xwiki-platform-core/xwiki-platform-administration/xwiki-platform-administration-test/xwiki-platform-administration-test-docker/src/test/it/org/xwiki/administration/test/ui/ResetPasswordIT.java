@@ -36,7 +36,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.ResetPasswordCompletePage;
 import org.xwiki.administration.test.po.ResetPasswordPage;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LoginPage;
 
@@ -77,22 +79,23 @@ public class ResetPasswordIT
     private GreenMail mail;
 
     @BeforeEach
-    public void startMail(TestUtils setup)
+    public void startMail(TestUtils setup, TestConfiguration testConfiguration)
     {
         this.mail = new GreenMail(ServerSetupTest.SMTP);
         this.mail.start();
 
-        configureEmail(setup);
+        configureEmail(setup, testConfiguration);
     }
 
     @AfterEach
-    public void stopMail(TestUtils setup)
+    public void stopMail(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         if (this.mail != null) {
             this.mail.stop();
         }
 
         restoreSettings(setup);
+        logCaptureConfiguration.registerExcludes("CSRFToken: Secret token verification failed, token");
     }
 
     @Test
@@ -113,7 +116,7 @@ public class ResetPasswordIT
 
         // Try to reset the password of a non existent user
         resetPasswordPage.setUserName("SomeUserThatDoesNotExist");
-        resetPasswordPage.clickResetPassword();
+        resetPasswordPage = resetPasswordPage.clickResetPassword();
         assertFalse(resetPasswordPage.isResetPasswordSent());
         assertTrue(resetPasswordPage.getMessage().contains("user does not exist"));
 
@@ -226,10 +229,10 @@ public class ResetPasswordIT
         return result;
     }
 
-    private void configureEmail(TestUtils setup)
+    private void configureEmail(TestUtils setup, TestConfiguration testConfiguration)
     {
-        setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host", "localhost", "port",
-            "3025", "sendWaitTime", "0");
+        setup.updateObject("Mail", "MailConfig", "Mail.SendMailConfigClass", 0, "host",
+            testConfiguration.getServletEngine().getHostIP(), "port", "3025", "sendWaitTime", "0");
     }
 
     private void restoreSettings(TestUtils setup)

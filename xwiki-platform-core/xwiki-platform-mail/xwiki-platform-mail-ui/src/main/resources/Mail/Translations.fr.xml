@@ -75,6 +75,5 @@ Mail.SendMailStatus_livetable.error=Erreur
 Mail.SendMailStatus_livetable.actions=Actions
 Mail.SendMailStatus_livetable.resend=Renvoyer
 mailSender.admin.resendSuccess=Le courriel a été envoyé avec succès
-mailSender.admin.resendFailure=Le courriel n'a pas pu être envoyé de nouveau. Cliquez pour avoir plus d'information.
-</content>
+mailSender.admin.resendFailure=Le courriel n'a pas pu être envoyé de nouveau. Cliquez pour avoir plus d'information.</content>
 </xwikidoc>

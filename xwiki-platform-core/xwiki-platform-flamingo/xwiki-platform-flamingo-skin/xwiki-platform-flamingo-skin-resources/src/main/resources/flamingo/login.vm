@@ -31,6 +31,11 @@
   <!-- previous login errors -->
   #error($services.localization.render($message))
 #end
+#set($authFailureStrategyMessage = $services.security.authentication.getErrorMessage($request.j_username))
+#if ("$!authFailureStrategyMessage" != '')
+  #error($authFailureStrategyMessage)
+#end
+#set ($supplementaryForm = $services.security.authentication.getForm($request.j_username))
 <dl>
   <dt>
     <label for="j_username">$services.localization.render('username')</label>
@@ -58,6 +63,11 @@
       <input id="rememberme" type="checkbox" name="j_rememberme" value="true" tabindex="300"/> $services.localization.render('remembermeonthiscomp')
     </label>
   </dd>
+  #if ("$!supplementaryForm" != "")
+    <div id="dedicated-auth-failures-field">
+      $supplementaryForm
+    </div>
+  #end
   <dt><input type="submit" class="btn btn-primary col-xs-12" value="$services.localization.render('login')" tabindex="400"/></dt>
 </dl>
 #xwikimessageboxend()

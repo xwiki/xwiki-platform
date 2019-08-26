@@ -35,7 +35,7 @@ import org.xwiki.tag.test.po.TaggablePage;
 import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.ChangesPane;
 import org.xwiki.test.ui.po.CommentsTab;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.DocumentDiffSummary;
@@ -106,7 +106,7 @@ public class CompareVersionsTest extends AbstractTest
 
         // Add objects.
         ObjectEditPage objectEditPage = wikiEditPage.editObjects();
-        FormElement form = objectEditPage.addObject("XWiki.JavaScriptExtension");
+        FormContainerElement form = objectEditPage.addObject("XWiki.JavaScriptExtension");
         Map<String, String> assignment = new HashMap<String, String>();
         assignment.put("XWiki.JavaScriptExtension_0_name", "JavaScript code");
         assignment.put("XWiki.JavaScriptExtension_0_code", "var tmp = alice;\nalice = bob;\nbob = tmp;");

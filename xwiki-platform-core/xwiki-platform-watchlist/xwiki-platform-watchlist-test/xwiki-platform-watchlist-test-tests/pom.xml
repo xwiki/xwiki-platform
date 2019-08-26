@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-watchlist-test</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-watchlist-test-tests</artifactId>
   <name>XWiki Platform - Watchlist - Tests - Functional Tests</name>
@@ -101,7 +101,6 @@
     <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
-      <version>1.5.8</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

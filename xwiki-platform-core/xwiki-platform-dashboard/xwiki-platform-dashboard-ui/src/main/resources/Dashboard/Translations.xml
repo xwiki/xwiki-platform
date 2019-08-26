@@ -42,7 +42,8 @@ dashboard.gadgetSelector.title=Select Gadget
 dashboard.gadgetEditor.title=Edit Gadget
 dashboard.gadgetEditor.changeGadget.label=Change Gadget
 dashboard.gadgetEditor.gadgetTitle.label=Gadget Title
-dashboard.gadgetEditor.gadgetTitle.hint=The title of this gadget appears at the top of the gadget panel on the dashboard (may contain velocity code).</content>
+dashboard.gadgetEditor.gadgetTitle.hint=The title of this gadget appears at the top of the gadget panel on the dashboard (may contain velocity code).
+dashboard.initialization.saveMessage=Initialize default dashboard user setup</content>
   <object>
     <name>Dashboard.Translations</name>
     <number>0</number>

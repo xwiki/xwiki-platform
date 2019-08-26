@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -39,6 +41,7 @@ import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
@@ -99,28 +102,7 @@ public class XWikiServletURLFactoryTest
 
         // Request
         this.mockXWikiRequest = mock(XWikiRequest.class);
-        when(this.mockXWikiRequest.getScheme()).thenReturn("http");
-        when(this.mockXWikiRequest.getServerName()).thenReturn("127.0.0.1");
-        when(this.mockXWikiRequest.getServerPort()).thenReturn(-1);
-        when(this.mockXWikiRequest.isSecure()).then(new Answer<Boolean>()
-        {
-            @Override
-            public Boolean answer(InvocationOnMock invocation) throws Throwable
-            {
-                return secure;
-            }
-        });
-        when(this.mockXWikiRequest.getServletPath()).thenReturn("");
-        when(this.mockXWikiRequest.getContextPath()).thenReturn("/xwiki");
-        when(this.mockXWikiRequest.getHeader(any())).then(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return httpHeaders.get(invocation.getArgument(0));
-            }
-        });
-        this.oldcore.getXWikiContext().setRequest(mockXWikiRequest);
+        prepareMockRequest("127.0.0.1", -1);
 
         // Response
         XWikiResponse xwikiResponse = mock(XWikiResponse.class);
@@ -155,13 +137,46 @@ public class XWikiServletURLFactoryTest
         when(this.descriptorManager.getById(wikiName)).thenReturn(wikidescriptor);
     }
 
-    private void initRequest(String host, int port)
+    private void prepareMockRequest(String host, int port)
     {
+        when(this.mockXWikiRequest.getScheme()).thenReturn("http");
         when(this.mockXWikiRequest.getServerName()).thenReturn(host);
         when(this.mockXWikiRequest.getServerPort()).thenReturn(port);
+        when(this.mockXWikiRequest.isSecure()).then(new Answer<Boolean>()
+        {
+            @Override
+            public Boolean answer(InvocationOnMock invocation) throws Throwable
+            {
+                return secure;
+            }
+        });
+        when(this.mockXWikiRequest.getServletPath()).thenReturn("");
+        when(this.mockXWikiRequest.getContextPath()).thenReturn("/xwiki");
+        when(this.mockXWikiRequest.getHeader(any())).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return httpHeaders.get(invocation.getArgument(0));
+            }
+        });
+        this.oldcore.getXWikiContext().setRequest(mockXWikiRequest);
+    }
+
+    private void initRequest(String host, int port)
+    {
+        prepareMockRequest(host, port);
 
         // Reinitialize the URL factory to take into account the new request URL.
         urlFactory.init(this.oldcore.getXWikiContext());
+    }
+
+    private void initDaemonRequest(String host, int port)
+    {
+        this.mockXWikiRequest = mock(XWikiServletRequestStub.class);
+        when(((XWikiServletRequestStub) this.mockXWikiRequest).isDaemon()).thenReturn(true);
+
+        initRequest(host, port);
     }
 
     // Tests
@@ -332,7 +347,6 @@ public class XWikiServletURLFactoryTest
         // Reinitialize the URL factory to take into account the new HTTP headers.
         urlFactory.init(this.oldcore.getXWikiContext());
 
-        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
         URL url = urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
@@ -341,6 +355,20 @@ public class XWikiServletURLFactoryTest
             url.toString());
         assertEquals("/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor",
             urlFactory.getURL(url, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    public void createURLOnMainWikiInPathModeWithForcedProtocol()
+    {
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.url.protocol", "https");
+        // Reinitialize the URL factory to take into account the configuration
+        this.urlFactory.init(this.oldcore.getXWikiContext());
+
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
+
+        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "xwiki",
+            this.oldcore.getXWikiContext());
+        assertEquals("https://127.0.0.1/xwiki/bin/view/Space/Page?param1=1#anchor", url.toString());
     }
 
     /**
@@ -374,6 +402,25 @@ public class XWikiServletURLFactoryTest
     }
 
     /**
+     * Tests how URLs are serialized when the default URL is not set.
+     */
+    @Test
+    public void getURLWhenDeamonRequest() throws MalformedURLException
+    {
+        initDaemonRequest("wiki1server", -1);
+
+        this.oldcore.getXWikiContext().setWikiId("wiki2");
+
+        String url =
+            urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
+        assertEquals("/xwiki/bin/view/Space/Page", url);
+
+        url =
+            urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
+        assertEquals("http://wiki2server/xwiki/bin/view/Space/Page", url);
+    }
+
+    /**
      * When getServerURL is called on a resource from the main wiki, the user is in a subwiki, and xwiki.home is set,
      * xwiki.home should be returned. see: XWIKI-5981
      */
@@ -385,7 +432,6 @@ public class XWikiServletURLFactoryTest
         this.oldcore.getXWikiContext().setOriginalWikiId("subwiki");
 
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
-        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
         this.oldcore.getXWikiContext().setWikiId("subwiki");
 
         initRequest("virtual1.mywiki.tld", -1);
@@ -407,7 +453,6 @@ public class XWikiServletURLFactoryTest
         this.oldcore.getXWikiContext().setOriginalWikiId("subwiki");
 
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.home", "http://mainwiki.mywiki.tld/");
-        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual", "1");
 
         initRequest("virtual1.mywiki.tld", -1);
 
@@ -491,6 +536,113 @@ public class XWikiServletURLFactoryTest
         assertEquals("http://127.0.0.1/xwiki/bin/view/Space1/Space2/Page", url.toString());
     }
 
+    /**
+     * Check that if the attachment cannot be found a URL is still created with the right schema.
+     */
+    @Test
+    public void createAttachmentURLFileNotAvailable()
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        xwikiContext.setDoc(new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage")));
+        URL url =
+            this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null, xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/currentpage/file", url.toString());
+    }
+
+    /**
+     * Check that the version of the attachment is looked for to create the URL
+     */
+    @Test
+    public void createAttachmentURLFindRev()
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage"));
+        XWikiAttachment attachment = new XWikiAttachment(doc, "file");
+        attachment.setVersion("1.3");
+        doc.setAttachment(attachment);
+        xwikiContext.setDoc(doc);
+        URL url =
+            this.urlFactory.createAttachmentURL("file", "currentspace", "currentpage", "download", null, xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/currentpage/file?rev=1.3", url.toString());
+    }
+
+    /**
+     * Checked that the nested spaces are correctly resolved for creating the URL
+     */
+    @Test
+    public void createAttachmentURLFindRevNestedSpace()
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        XWikiDocument doc = new XWikiDocument(
+            new DocumentReference("xwiki", Arrays.asList("currentspace", "nestedspace"), "currentpage"));
+        XWikiAttachment attachment = new XWikiAttachment(doc, "file");
+        attachment.setVersion("1.3");
+        doc.setAttachment(attachment);
+        xwikiContext.setDoc(doc);
+        URL url = this.urlFactory.createAttachmentURL("file", "currentspace.nestedspace", "currentpage", "download",
+            null, xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/nestedspace/currentpage/file?rev=1.3",
+            url.toString());
+    }
+
+    /**
+     * Checked that the context doc is taken into account for finding the attachment to create the URL
+     */
+    @Test
+    public void createAttachmentURLFindRevAnotherContextDoc() throws XWikiException, WikiManagerException
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        XWikiDocument contextDoc = new XWikiDocument(new DocumentReference("xwiki", "currentspace", "currentpage"));
+        XWikiAttachment attachment = new XWikiAttachment(contextDoc, "file");
+        attachment.setVersion("1.3");
+        contextDoc.setAttachment(attachment);
+        xwikiContext.setDoc(contextDoc);
+
+        DocumentReference documentReference =
+            new DocumentReference("anotherwiki", Arrays.asList("anotherspace", "nestedspace"), "anotherpage");
+        XWikiDocument doc = new XWikiDocument(documentReference);
+        attachment = new XWikiAttachment(doc, "anotherfile");
+        attachment.setVersion("2.1");
+        doc.setAttachment(attachment);
+
+        when(xwikiContext.getWiki().getDocument(documentReference, xwikiContext)).thenReturn(doc);
+        when(this.descriptorManager.getById("anotherwiki"))
+            .thenReturn(new WikiDescriptor("anotherwiki", "anotherwiki"));
+
+        URL url = this.urlFactory.createAttachmentURL("anotherfile", "anotherspace.nestedspace", "anotherpage",
+            "download", null, "anotherwiki", xwikiContext);
+
+        assertEquals("http://127.0.0.1/xwiki/wiki/anotherwiki/download/anotherspace/nestedspace/anotherpage/"
+            + "anotherfile?rev=2.1", url.toString());
+        // Ensure the reference is back at the end.
+        assertEquals(new WikiReference("xwiki"), xwikiContext.getWikiReference());
+    }
+
+    /**
+     * Checked that the translation is not mixed up with the document for getting the URL
+     */
+    @Test
+    public void createAttachmentURLFindRevNestedSpaceTranslation() throws XWikiException
+    {
+        XWikiContext xwikiContext = this.oldcore.getXWikiContext();
+        XWikiDocument contextDoc = new XWikiDocument(
+            new DocumentReference("xwiki", Arrays.asList("currentspace", "nestedspace"), "translatedpage"),
+            Locale.FRENCH);
+        xwikiContext.setDoc(contextDoc);
+
+        DocumentReference documentReference =
+            new DocumentReference("xwiki", Arrays.asList("currentspace", "nestedspace"), "translatedpage");
+        XWikiDocument doc = new XWikiDocument(documentReference);
+        XWikiAttachment attachment = new XWikiAttachment(contextDoc, "file");
+        attachment.setVersion("1.3");
+        doc.setAttachment(attachment);
+        when(xwikiContext.getWiki().getDocument(documentReference, xwikiContext)).thenReturn(doc);
+        URL url = this.urlFactory.createAttachmentURL("file", "currentspace.nestedspace", "translatedpage", "download",
+            null, xwikiContext);
+        assertEquals("http://127.0.0.1/xwiki/bin/download/currentspace/nestedspace/translatedpage/file?rev=1.3",
+            url.toString());
+    }
+
     @Test
     public void createAttachmentURLWhenViewRevAndRevSpecifiedAndIsNotContextDoc()
     {
@@ -550,13 +702,15 @@ public class XWikiServletURLFactoryTest
         queryParametersMap.put("cache-version", "11.1-SNAPSHOT#");
         queryParametersMap.put("anArrayOfInt", new int[] { 42, 56 });
         queryParametersMap.put("aListWithStringToEncode", Arrays.asList("épervier", "androïde"));
-        queryParametersMap.put("aCustomObject", new Object() {
+        queryParametersMap.put("aCustomObject", new Object()
+        {
             @Override
-            public String toString() {
+            public String toString()
+            {
                 return "foo";
             }
         });
-        queryParametersMap.put("paramètre", new String[] { "foo", "bâr"});
+        queryParametersMap.put("paramètre", new String[] { "foo", "bâr" });
 
         url = this.urlFactory.createResourceURL("o;ne/t?w&o/t=hr#e e", false, this.oldcore.getXWikiContext(),
             queryParametersMap);

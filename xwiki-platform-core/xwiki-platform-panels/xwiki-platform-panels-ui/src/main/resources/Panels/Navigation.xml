@@ -204,6 +204,11 @@
 #end
 ## Inclusions are treated as exceptions to the dynamic exclusion filters.
 #if ($config.getValue('excludeTopLevelExtensionPages') == 1 || $config.getValue('excludeTopLevelApplicationPages') == 1)
+  ## FIXME: This panel is cached and the cache is not invalidated by default when an extension is installed or
+  ## uninstalled and neither when an application is created, deleted or renamed. Ideally we should invalidate the cache
+  ## whenever a top level page is created or modified but we can't do this ATM so the next best thing is to invalidate
+  ## the cache whenever a page (anywhere in the page hierarchy) is modified.
+  #set ($discard = $services.async.useEntity("wiki:$xcontext.database"))
   #foreach ($inclusion in $config.getValue('inclusions'))
     #set ($documentReference = $services.model.resolveDocument($inclusion))
     #set ($discard = $exclusions.remove("document:$documentReference"))

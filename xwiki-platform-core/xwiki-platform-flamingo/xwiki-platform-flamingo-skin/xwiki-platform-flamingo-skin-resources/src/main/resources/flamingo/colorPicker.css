@@ -1,0 +1,17 @@
+.color-preview {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: text-top;
+}
+
+.colpick {
+  /* Should be larger than the z-index of Bootstrap modal */
+  z-index: 10051;
+}
+
+.colpick input {
+  background-color: transparent;
+  padding: 0;
+  border: 0;
+}

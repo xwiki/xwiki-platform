@@ -79,7 +79,7 @@ public class PDFTest extends TestCase
         URL pdfExportURL = new URL("http://localhost:8080/xwiki/bin/export/Sandbox/WebHome?format=pdf");
         Map<String, String> urls = extractURLs(pdfExportURL);
         assertTrue(urls.containsKey("XWikiLogo.png"));
-        assertEquals("http://localhost:8080/xwiki/bin/download/Sandbox/WebHome/XWikiLogo.png",
+        assertEquals("http://localhost:8080/xwiki/bin/download/Sandbox/WebHome/XWikiLogo.png?rev=1.1",
             urls.get("XWikiLogo.png"));
 
         // Ideally we should be asserting for a value of 1 (for the embedded XWikiLogo.png image) but it seems the PDF

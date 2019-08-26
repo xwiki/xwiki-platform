@@ -316,6 +316,7 @@ public class OfficeImporterScriptService implements ScriptService
      * @param append whether to append content if the target wiki page exists
      * @return true if the operation completes successfully, false otherwise
      * @since 11.0
+     * @since 10.11.9
      */
     @Unstable
     public boolean save(XDOMOfficeDocument doc, DocumentReference documentReference, DocumentReference parentReference,

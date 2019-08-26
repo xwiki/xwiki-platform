@@ -53,7 +53,6 @@ com.xpn.xwiki.internal.localization.XWikiLocalizationContext
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
 com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer
-com.xpn.xwiki.internal.mandatory.SheetClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.TagClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiAllGroupDocumentInitializer
 com.xpn.xwiki.internal.mandatory.XWikiCommentsDocumentInitializer
@@ -112,7 +111,7 @@ com.xpn.xwiki.internal.observation.remote.converter.DocumentEventConverter
 com.xpn.xwiki.internal.observation.remote.converter.WikiEventConverter
 com.xpn.xwiki.internal.parentchild.DefaultParentChildConfiguration
 com.xpn.xwiki.internal.pdf.FOPXSLFORenderer
-com.xpn.xwiki.internal.render.DefaultLinkedResourceHelper
+com.xpn.xwiki.internal.render.LinkedResourceHelper
 com.xpn.xwiki.internal.resource.ResourceReferenceHandlerAuthenticatorListener
 com.xpn.xwiki.internal.security.authorization.DefaultAuthorExecutor
 com.xpn.xwiki.internal.skin.DefaultSkinManager
@@ -122,6 +121,7 @@ com.xpn.xwiki.internal.skin.WikiSkinUtils
 com.xpn.xwiki.internal.script.DebugInternalScriptService
 com.xpn.xwiki.internal.script.DocumentScriptSafeProvider
 com.xpn.xwiki.internal.store.StoreConfiguration
+com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration
 com.xpn.xwiki.internal.store.hibernate.HibernateStore
 com.xpn.xwiki.internal.template.DefaultTemplateManager
 com.xpn.xwiki.internal.template.InternalTemplateManager

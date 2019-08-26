@@ -532,8 +532,18 @@ XWiki.Dashboard = Class.create( {
         parameters : editParameters,
         onSuccess : function(response) {
           this.edited = false;
-          if (onComplete) {
-            onComplete();
+          if (response.responseJSON && response.responseJSON.newVersion) {
+            // update the version
+            require(['xwiki-meta'], function (xm) {
+              xm.setVersion(response.responseJSON.newVersion);
+              if (onComplete) {
+                onComplete();
+              }
+            });
+          } else {
+            if (onComplete) {
+              onComplete();
+            }
           }
         }.bind(this),
         onFailure: function(response) {

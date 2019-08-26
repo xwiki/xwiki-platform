@@ -36,12 +36,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: activity.page.link.title=Located in {0}
-activity.rss.pages.modified=Íº¨Î¶¨ÌëúÏùò blog
-activity.rss.feed.description=Î¨∏ÏÑúÎ•º ÏúÑÌïú RSS Í∏âÏãùÏùÄ URL
-### Missing: activity.rss.feed.tags.description=RSS feed for documents tagged with "{0}"
-### Missing: activity.rss.feed.spaces.description=RSS feed for documents in space(s) "{0}"
-### Missing: activity.rss.feed.tagsAndSpaces.description=RSS feed for documents tagged with "{0}" in space(s) "{1}"
+  <content>activity.page.link.title=위치 {0}
+activity.rss.pages.modified=수정된 페이지 RSS 피드
+activity.rss.feed.description=문서 변경을 위한 RSS 피드
+activity.rss.feed.tags.description="{0}"로 태그된 문서의 RSS 피드
+activity.rss.feed.spaces.description="{0}" 스페이스의 문서에 대한 RSS 피드
+activity.rss.feed.tagsAndSpaces.description="{1}" 스페이스에  "{0}" 태그된 문서에 대한 RSS 피드
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
@@ -50,6 +50,5 @@ activity.rss.feed.description=Î¨∏ÏÑúÎ•º ÏúÑÌïú RSS Í∏âÏã�
 ### Missing: activity.link.title=Located in {0} » {1} » {2}
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

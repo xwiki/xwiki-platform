@@ -144,18 +144,15 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
+    @Deprecated
     public WikiProvisioningJob createWikiFromTemplate(String newWikiId, String newWikiAlias, String templateId,
         String ownerId, boolean failOnExist) throws WikiTemplateManagerException
     {
         try {
-            // First, create the new wiki
-            WikiDescriptor descriptor = wikiManager.create(newWikiId, newWikiAlias, failOnExist);
+            // Create the new wiki
+            wikiManager.create(newWikiId, newWikiAlias, ownerId, failOnExist);
 
-            // Set the owner
-            descriptor.setOwnerId(ownerId);
-            wikiDescriptorManager.saveDescriptor(descriptor);
-
-            // finally, we apply the template to the new wiki
+            // Apply the template to the new wiki
             return applyTemplate(newWikiId, templateId);
         } catch (WikiManagerException e) {
             throw new WikiTemplateManagerException(e.getMessage(), e);
@@ -163,6 +160,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
+    @Deprecated
     public WikiProvisioningJob applyTemplate(String wikiId, String templateId) throws WikiTemplateManagerException
     {
         try {
@@ -173,6 +171,7 @@ public class DefaultWikiTemplateManager implements WikiTemplateManager
     }
 
     @Override
+    @Deprecated
     public WikiProvisioningJob getWikiProvisioningJob(List<String> jobId) throws WikiTemplateManagerException
     {
         try {

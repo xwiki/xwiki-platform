@@ -34,7 +34,7 @@ public interface RomeFeedFactory
     /**
      * @param parameters the Rss macro's parameters needed for getting the data
      * @return the feed's data 
-     * @throws org.xwiki.rendering.macro.MacroExecutionException in case the feed cannot be read
+     * @throws MacroExecutionException in case the feed cannot be read
      */
     SyndFeed createFeed(RssMacroParameters parameters) throws MacroExecutionException;
 }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
 import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
@@ -37,9 +38,11 @@ import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.event.Event;
+import org.xwiki.rendering.syntax.Syntax;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 /**
@@ -59,6 +62,9 @@ public class DocumentEventRecorder
 
     @Inject
     private EventStream eventStream;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
 
     /**
      * Record the given event.
@@ -131,6 +137,7 @@ public class DocumentEventRecorder
         // This might be wrong once non-altering events will be logged.
         event.setUser(doc.getAuthorReference());
         event.setHidden(doc.isHidden());
+        event.setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, contextProvider.get()));
         eventStream.addEvent(event);
     }
 }

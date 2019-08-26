@@ -25,14 +25,14 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Search - Solr - Parent POM</name>
   <description>Parent project for the Solr search engine.</description>
   <properties>
-    <solr.version>${lucene.version}</solr.version>
+    <solr.version>8.1.1</solr.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -53,25 +53,15 @@
         <artifactId>solr-core</artifactId>
         <version>${solr.version}</version>
         <exclusions>
-          <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
+          <!-- We use slf4j in XWiki -->
           <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>*</artifactId>
           </exclusion>
-          <exclusion>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-          </exclusion>
-          <!-- Exclude the dependencies that are needed by Solr when it runs as a separate webapp because we use
-            solr-core to embed Solr in the same webapp as XWiki. This doesn't mean we cannot communicate with a remote
-            Solr instance. This part is handled by solr-solrj jar. -->
+          <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
           <exclusion>
             <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.servlet</artifactId>
+            <artifactId>*</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.eclipse.jetty</groupId>
@@ -81,26 +71,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
           </exclusion>
-          <!-- XWiki is using org.dom4j:dom4j:2.0.0+. Previous versions of dom4j were using dom4j:dom4j
-               and thus we need to exclude them so that they don't end up in the XWiki WAR -->
-          <exclusion>
-            <groupId>dom4j</groupId>
-            <artifactId>dom4j</artifactId>
-          </exclusion>
-          <!-- We want a different version of Woodstox and the id changed -->
-          <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
-          </exclusion>
-          <!-- Exclude by default some Codehale Metric reporters and instrumenters since 1) we don't need them by
-               default (they take up disk space and load time when deploying the XWiki WAR) and 2) some of them like
-               the metrics-jetty9 one have a runtime dependency on a certain version of Jetty and won't work on other
-               servlet container or with different jetty versions...
-               See https://forum.xwiki.org/t/xwiki-10-7-war-failure-to-deploy-on-wildfly-14-0/3545 -->
-          <exclusion>
-            <groupId>io.dropwizard.metrics</groupId>
-            <artifactId>metrics-ganglia</artifactId>
-          </exclusion>
           <exclusion>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-graphite</artifactId>
@@ -109,18 +79,16 @@
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-jetty9</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>io.dropwizard.metrics</groupId>
+            <artifactId>metrics-jvm</artifactId>
+          </exclusion>
+          <!-- We want a different version of Woodstox and the id changed -->
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+          </exclusion>
         </exclusions>
-      </dependency>
-      <!-- Make sure we use the right version of Restlet. -->
-      <dependency>
-        <groupId>org.restlet.jse</groupId>
-        <artifactId>org.restlet</artifactId>
-        <version>${restlet.version}</version>
-      </dependency>
-      <!-- Explicit dependency on dom4j since we're excluding it above -->
-      <dependency>
-        <groupId>org.dom4j</groupId>
-        <artifactId>dom4j</artifactId>
       </dependency>
     </dependencies>
   </dependencyManagement>

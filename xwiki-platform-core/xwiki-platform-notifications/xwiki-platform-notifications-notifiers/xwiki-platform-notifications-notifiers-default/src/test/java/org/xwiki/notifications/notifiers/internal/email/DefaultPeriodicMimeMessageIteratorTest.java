@@ -29,10 +29,12 @@ import java.util.Map;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import com.xpn.xwiki.api.Attachment;
 import org.apache.commons.collections.map.HashedMap;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.internal.util.collections.Sets;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.mail.MailSenderConfiguration;
@@ -50,6 +52,7 @@ import static org.jgroups.util.Util.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -73,6 +76,7 @@ public class DefaultPeriodicMimeMessageIteratorTest
     private WikiDescriptorManager wikiDescriptorManager;
     private MailSenderConfiguration mailSenderConfiguration;
     private EntityReferenceSerializer<String> serializer;
+    private UserAvatarAttachmentExtractor userAvatarAttachmentExtractor;
 
     @Before
     public void setUp() throws Exception
@@ -87,6 +91,7 @@ public class DefaultPeriodicMimeMessageIteratorTest
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         mailSenderConfiguration = mocker.getInstance(MailSenderConfiguration.class);
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        userAvatarAttachmentExtractor = mocker.getInstance(UserAvatarAttachmentExtractor.class);
 
         when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("xwiki");
         when(mailSenderConfiguration.getFromAddress()).thenReturn("xwiki@xwiki.org");
@@ -123,6 +128,9 @@ public class DefaultPeriodicMimeMessageIteratorTest
                 Integer.MAX_VALUE / 4, null, new Date(0L), Collections.emptyList()))
                 .thenReturn(Arrays.asList(event2));
 
+        when(event1.getUsers()).thenReturn(Sets.newSet(userB));
+        when(event2.getUsers()).thenReturn(Sets.newSet(userB));
+
         MimeMessage message = mock(MimeMessage.class);
         when(factory.createMessage(templateReference, factoryParameters)).thenReturn(message, message);
 
@@ -130,6 +138,9 @@ public class DefaultPeriodicMimeMessageIteratorTest
         when(defaultNotificationEmailRenderer.renderPlainText(eq(event1), anyString())).thenReturn("event1");
         when(defaultNotificationEmailRenderer.renderHTML(eq(event2), anyString())).thenReturn("eventHTML2");
         when(defaultNotificationEmailRenderer.renderPlainText(eq(event2), anyString())).thenReturn("event2");
+
+        Attachment userBAvatar = mock(Attachment.class);
+        when(userAvatarAttachmentExtractor.getUserAvatar(eq(userB), anyInt())).thenReturn(userBAvatar);
 
         // Test
         PeriodicMimeMessageIterator iterator = mocker.getComponentUnderTest();
@@ -148,7 +159,8 @@ public class DefaultPeriodicMimeMessageIteratorTest
         assertEquals(Arrays.asList("event1"), velocityVariables.get("plainTextEvents"));
 
         // Count the number of attachments
-        assertEquals(1, ((List)factoryParameters.get("attachments")).size());
+        assertEquals(2, ((List)factoryParameters.get("attachments")).size());
+        assertTrue(((List)factoryParameters.get("attachments")).contains(userBAvatar));
 
         // Second iteration
         assertTrue(iterator.hasNext());
@@ -162,7 +174,8 @@ public class DefaultPeriodicMimeMessageIteratorTest
         assertEquals(Arrays.asList("event2"), velocityVariables.get("plainTextEvents"));
 
         // Make sure there is no duplicated attachments
-        assertEquals(1, ((List)factoryParameters.get("attachments")).size());
+        assertEquals(2, ((List)factoryParameters.get("attachments")).size());
+        assertTrue(((List)factoryParameters.get("attachments")).contains(userBAvatar));
 
         // End
         assertFalse(iterator.hasNext());

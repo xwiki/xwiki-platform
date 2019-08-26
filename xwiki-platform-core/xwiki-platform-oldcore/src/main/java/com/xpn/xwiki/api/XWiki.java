@@ -813,17 +813,17 @@ public class XWiki extends Api
      *
      * <pre>
      * &lt;code&gt;
-     * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ? and (doc.parent = ? or &quot;
-     *     + &quot;(doc.parent = ? and doc.space = ?))&quot;,
+     * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ?1 and (doc.parent = ?2 or &quot;
+     *     + &quot;(doc.parent = ?3 and doc.space = ?4))&quot;,
      *     [&quot;${doc.fullName}as&quot;, ${doc.fullName}, ${doc.name}, ${doc.space}]))
      * &lt;/code&gt;
      * </pre>
      *
      * @param parameterizedWhereClause the HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
-     * @param parameterValues the where clause values that replace the question marks (?)
+     * @param parameterValues the where clause values that replace the question marks (?1, ?2, etc.)
      * @return a list of document names
      * @throws XWikiException in case of error while performing the query
      * @deprecated use query service instead
@@ -854,7 +854,7 @@ public class XWiki extends Api
      *
      * @param wikiName the name of the wiki where to search.
      * @param parameterizedWhereClause the HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param maxResults the number of rows to return. If 0 then all rows are returned
      * @param startOffset the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -883,7 +883,7 @@ public class XWiki extends Api
      * {@link #searchDocuments(String, int, int, List)} for more about parameterized hql clauses.
      *
      * @param parametrizedSqlClause the HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -903,7 +903,7 @@ public class XWiki extends Api
      * properties of attach (the attachment) or doc (the document it is attached to)
      *
      * @param parametrizedSqlClause The HQL where clause. For example
-     *            {@code where doc.fullName <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))}
+     *            {@code where doc.fullName <> ?1 and (doc.parent = ?2 or (doc.parent = ?3 and doc.space = ?4))}
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.
      * @param parameterValues A {@link java.util.List} of the where clause values that replace the question marks (?)
@@ -1977,8 +1977,8 @@ public class XWiki extends Api
     /**
      * API to retrieve the URL of an a Wiki Document in any mode. The URL is generated differently depending on the
      * environment (Servlet, Portlet, PDF, etc..). The URL generation can be modified by implementing a new
-     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment).
-     * It is important to always use the URL functions to generate URL and never hardcode URLs.
+     * XWikiURLFactory object For compatibility with any target environment (and especially the portlet environment). It
+     * is important to always use the URL functions to generate URL and never hardcode URLs.
      *
      * @param fullname the page name which includes the attached file
      * @param action the mode in which to access the document (view/edit/save/..). Any valid XWiki action is possible.

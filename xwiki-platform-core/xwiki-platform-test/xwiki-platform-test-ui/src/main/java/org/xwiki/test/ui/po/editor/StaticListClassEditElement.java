@@ -19,7 +19,7 @@
  */
 package org.xwiki.test.ui.po.editor;
 
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 
 /**
  * Represents a StaticListClass property form.
@@ -51,7 +51,7 @@ public class StaticListClassEditElement extends ClassPropertyEditPane
         }
     }
 
-    public StaticListClassEditElement(FormElement form, String propertyName)
+    public StaticListClassEditElement(FormContainerElement form, String propertyName)
     {
         super(form, propertyName);
     }

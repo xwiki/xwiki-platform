@@ -35,10 +35,9 @@ import org.xwiki.officeimporter.test.po.OfficeImporterResultPage;
 import org.xwiki.officeimporter.test.po.OfficeServerAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletEngine.ServletEngine;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.AttachmentsPane;
-import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ConfirmationPage;
 import org.xwiki.test.ui.po.CreatePagePage;
 import org.xwiki.test.ui.po.DeletingPage;
@@ -63,13 +62,8 @@ import static org.junit.Assert.assertTrue;
         ServletEngine.JETTY_STANDALONE
     },
     properties = {
-        // Overridden to add the FileUploadPlugin which is needed by the test to upload some office files to import
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,"
-            + "com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
+        // Add the FileUploadPlugin which is needed by the test to upload some office files to import
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin"
     }
 )
 public class OfficeImporterIT

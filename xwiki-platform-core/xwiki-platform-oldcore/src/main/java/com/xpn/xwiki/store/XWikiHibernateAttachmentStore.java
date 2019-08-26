@@ -26,7 +26,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -131,9 +130,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 }
                 Session session = getSession(context);
 
-                Query query =
-                    session.createQuery("select attach.id from XWikiAttachmentContent as attach where attach.id = :id");
-                query.setLong("id", content.getId());
+                org.hibernate.query.Query<Long> query = session.createQuery(
+                    "select attach.id from XWikiAttachmentContent as attach where attach.id = :id", Long.class);
+                query.setParameter("id", content.getId());
                 boolean exist = query.uniqueResult() != null;
 
                 AttachmentVersioningStore store = resolveAttachmentVersioningStore(attachment, context);
@@ -239,7 +238,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             if (bTransaction) {
                 checkHibernate(context);
-                bTransaction = beginTransaction(false, context);
+                bTransaction = beginTransaction(context);
             }
             Session session = getSession(context);
 
@@ -253,7 +252,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             attachment.setContentStore(null);
 
             if (bTransaction) {
-                endTransaction(context, false, false);
+                endTransaction(context, false);
             }
         } catch (Exception e) {
             Object[] args = { attachment.getReference() };
@@ -263,7 +262,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
         } finally {
             try {
                 if (bTransaction) {
-                    endTransaction(context, false, false);
+                    endTransaction(context, false);
                 }
             } catch (Exception e) {
             }

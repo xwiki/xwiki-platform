@@ -44,8 +44,10 @@ import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
@@ -59,6 +61,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -103,9 +106,15 @@ public class DefaultModelBridgeTest
     @MockComponent
     @Named("compact")
     private EntityReferenceSerializer<String> compactEntityReferenceSerializer;
-  
+
     @MockComponent
     private JobProgressManager progressManager;
+
+    @MockComponent
+    private AuthorizationManager authorization;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @Mock
     private XWikiContext xcontext;
@@ -131,6 +140,8 @@ public class DefaultModelBridgeTest
 
         Provider<XWikiContext> xcontextProvider = mocker.getInstance(XWikiContext.TYPE_PROVIDER);
         when(xcontextProvider.get()).thenReturn(this.xcontext);
+
+        Utils.setComponentManager(this.componentManager);
 
         EntityReferenceProvider entityReferenceProvider = mocker.getInstance(EntityReferenceProvider.class);
         when(entityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
@@ -322,7 +333,8 @@ public class DefaultModelBridgeTest
 
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         String serializedParent = "xwiki:Path.To.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent);
 
@@ -342,7 +354,8 @@ public class DefaultModelBridgeTest
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         String serializedParent = "xwiki:Path.To.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -366,7 +379,8 @@ public class DefaultModelBridgeTest
 
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
         String serializedParent = "wiki:Path.To.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -374,7 +388,8 @@ public class DefaultModelBridgeTest
 
         // no need to update the parent: different wiki but same relative reference
         verify(document, never()).setParentReference(hierarchicalParent.getLocalDocumentReference());
-        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true,
+            xcontext);
     }
 
     @Test
@@ -390,7 +405,8 @@ public class DefaultModelBridgeTest
 
         DocumentReference hierarchicalParent = new DocumentReference("wiki", Arrays.asList("Path"), "WebHome");
         String serializedParent = "wiki:Path.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -398,7 +414,8 @@ public class DefaultModelBridgeTest
 
         // no need to update the parent: different name but same parents
         verify(document, never()).setParentReference(hierarchicalParent.getLocalDocumentReference());
-        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true, xcontext);
+        verify(this.xcontext.getWiki(), never()).saveDocument(document, "Update document after refactoring.", true,
+            xcontext);
     }
 
     @Test
@@ -410,7 +427,8 @@ public class DefaultModelBridgeTest
         when(document.getParentReference()).thenReturn(new DocumentReference("wiki", "What", "Ever"));
         DocumentReference hierarchicalParent = new DocumentReference("wiki", "Path", "WebHome");
         String serializedParent = "xwiki:Path.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -431,7 +449,8 @@ public class DefaultModelBridgeTest
 
         DocumentReference hierarchicalParent = new DocumentReference("wiki", "Main", "WebHome");
         String serializedParent = "xwiki:Main.WebHome";
-        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference)).thenReturn(serializedParent);
+        when(this.compactEntityReferenceSerializer.serialize(hierarchicalParent, documentReference))
+            .thenReturn(serializedParent);
         when(this.relativeStringEntityReferenceResolver.resolve(serializedParent, EntityType.DOCUMENT))
             .thenReturn(hierarchicalParent.getLocalDocumentReference());
 
@@ -732,7 +751,7 @@ public class DefaultModelBridgeTest
         XWikiDeletedDocument deletedDocument2 = mock(XWikiDeletedDocument.class);
         when(deletedDocument2.getId()).thenReturn(id2);
 
-        XWikiDeletedDocument[] deletedDocuments = {deletedDocument1, deletedDocument2};
+        XWikiDeletedDocument[] deletedDocuments = { deletedDocument1, deletedDocument2 };
 
         when(recycleBin.getAllDeletedDocuments(batchId, false, xcontext, true)).thenReturn(deletedDocuments);
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
@@ -776,12 +795,9 @@ public class DefaultModelBridgeTest
         when(xwiki.exists(documentReference, xcontext)).thenReturn(false);
         when(xwiki.getRecycleBinStore()).thenReturn(recycleBin);
 
-        when(recycleBin.getNumberOfDeletedDocuments(any())).thenReturn((long)nbDocs);
-        when(recycleBin.getAllDeletedDocumentsIds(eq(this.xcontext), anyInt())).thenReturn(new Long[]{
-            1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L
-        }).thenReturn(new Long[]{
-            11L, 12L
-        });
+        when(recycleBin.getNumberOfDeletedDocuments(any())).thenReturn((long) nbDocs);
+        when(recycleBin.getAllDeletedDocumentsIds(eq(this.xcontext), anyInt()))
+            .thenReturn(new Long[] { 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L }).thenReturn(new Long[] { 11L, 12L });
         when(request.isCheckRights()).thenReturn(false);
         when(request.isCheckAuthorRights()).thenReturn(false);
 
@@ -791,7 +807,7 @@ public class DefaultModelBridgeTest
         verify(this.progressManager, times(12)).endStep(deleteJob);
         for (int i = 1; i <= 12; i++) {
             verify(recycleBin).deleteFromRecycleBin(i, xcontext, true);
-            assertLog(i-1, Level.INFO, "Document [{}] has been permanently deleted.", documentReference);
+            assertLog(i - 1, Level.INFO, "Document [{}] has been permanently deleted.", documentReference);
         }
     }
 }

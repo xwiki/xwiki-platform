@@ -43,7 +43,6 @@
     <property name="filterType" column="nfp_filter_type">
       <type name="org.hibernate.type.EnumType">
         <param name="enumClass">org.xwiki.notifications.filters.NotificationFilterType</param>
-        <param name="useNamed">true</param>
       </type>
     </property>
 

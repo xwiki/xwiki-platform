@@ -5,6 +5,7 @@ org.xwiki.notifications.notifiers.internal.email.EmailTemplateRenderer
 org.xwiki.notifications.notifiers.internal.email.LogoAttachmentExtractor
 org.xwiki.notifications.notifiers.internal.email.MailTemplateImageAttachmentsExtractor
 org.xwiki.notifications.notifiers.internal.email.UserAvatarAttachmentExtractor
+org.xwiki.notifications.notifiers.internal.email.WatchlistLeftoversCleaner
 org.xwiki.notifications.notifiers.internal.email.WikiEmailNotificationRendererComponentBuilder
 org.xwiki.notifications.notifiers.internal.email.WikiEmailNotificationRendererDocumentInitializer
 org.xwiki.notifications.notifiers.internal.DefaultModelBridge

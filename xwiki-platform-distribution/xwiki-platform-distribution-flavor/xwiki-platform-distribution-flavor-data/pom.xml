@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-data</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Data</name>
@@ -134,6 +134,12 @@
             <dependency>
               <groupId>org.xwiki.platform</groupId>
               <artifactId>xwiki-platform-store-filesystem-oldcore</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <!-- Notification Notifiers Default module has a migrator to clean watchlist leftovers -->
+            <dependency>
+              <groupId>org.xwiki.platform</groupId>
+              <artifactId>xwiki-platform-notifications-notifiers-default</artifactId>
               <version>${project.version}</version>
             </dependency>
             <!-- We need the Servlet API dep since it's used by the Packager and since it has

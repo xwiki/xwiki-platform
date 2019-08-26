@@ -1,0 +1,15 @@
+##################################################
+# Annotation annotating a non-breakable space.
+##################################################
+.source
+web page editors now use Lorem Ipsum as their default model text
+.rendered
+<p>web page editors now use Lorem Ipsum as their default model text</p>
+.annotation
+0
+XWiki.XWikiGuest
+annotation of non breakable space
+# the space between Lorem and Ipsum is a regular space
+Lorem Ipsum
+.annotated
+<p>web page editors now use <span class="annotation ID0">Lorem Ipsum</span> as their default model text</p>

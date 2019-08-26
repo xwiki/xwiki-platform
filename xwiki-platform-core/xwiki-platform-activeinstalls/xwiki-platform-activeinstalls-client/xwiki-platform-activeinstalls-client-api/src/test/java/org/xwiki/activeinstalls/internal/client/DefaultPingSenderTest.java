@@ -32,6 +32,7 @@ import io.searchbox.core.Index;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,5 +66,22 @@ public class DefaultPingSenderTest
         // Verify that provideMapping() and provideData() are called
         verify(pingDataProvider).provideMapping();
         verify(pingDataProvider).provideData();
+    }
+
+    @Test
+    public void sendPingWhenClientNull() throws Exception
+    {
+        JestClientManager jestManager = this.mocker.getInstance(JestClientManager.class);
+        when(jestManager.getClient()).thenReturn(null);
+
+        // Register a data provider to make it available and to make sure it's not called, i.e. that a null client
+        // will prevent a ping from being sent.
+        PingDataProvider pingDataProvider = this.mocker.registerMockComponent(PingDataProvider.class, "test");
+
+        this.mocker.getComponentUnderTest().sendPing();
+
+        // Verify that provideMapping() and provideData() are not called
+        verify(pingDataProvider, never()).provideMapping();
+        verify(pingDataProvider, never()).provideData();
     }
 }

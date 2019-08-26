@@ -316,6 +316,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
       }).done(function(data){
         if (data.status == 'success') {
           obj.fadeOut();
+          xm.refreshVersion();
           notif.replace(new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.deletingDone'))', 'done'));
         } else if (data.status == 'fail') {
           if (data.cause == 'form_token') {
@@ -409,6 +410,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     }).done(function(data) {
       notif = new XWiki.widgets.Notification('$escapetool.javascript($services.localization.render('skin.sheet.js.adding'))', 'inprogress');
       if (data.status == 'success') {
+        xm.refreshVersion();
         displayObj(data.objNumber);
       } else if (data.status == 'fail') {
         if (data.cause == 'form_token') {

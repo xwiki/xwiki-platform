@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-mysql-common</artifactId>
   <name>XWiki Platform - Distribution - Debian - MySQL - Common</name>
@@ -63,13 +63,6 @@
                 <type>perm</type>
                 <prefix>/usr/share/xwiki/templates/mysql</prefix>
               </mapper>
-            </data>
-            <!-- MySQL connector -->
-            <data>
-              <type>link</type>
-              <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/lib/mysql.jar</linkName>
-              <linkTarget>/usr/share/java/mysql.jar</linkTarget>
             </data>
           </dataSet>
         </configuration>

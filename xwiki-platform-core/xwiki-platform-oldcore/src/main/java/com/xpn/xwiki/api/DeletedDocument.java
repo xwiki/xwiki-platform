@@ -26,7 +26,9 @@ import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.Right;
 
+import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -107,6 +109,15 @@ public class DeletedDocument extends Api
     }
 
     /**
+     * @return the reference of the user who deleted this document
+     * @since 11.5RC1
+     */
+    public DocumentReference getDeleterReference()
+    {
+        return this.deletedDoc.getDeleterReference();
+    }
+
+    /**
      * @return id of deleted document. id is unique only for this document.
      */
     public long getId()
@@ -131,7 +142,9 @@ public class DeletedDocument extends Api
     public boolean canUndelete()
     {
         try {
-            return hasAccessLevel(ADMIN_RIGHT, getFullName()) || hasAccessLevel("undelete", getFullName());
+            return hasAccessLevel(ADMIN_RIGHT, getFullName()) || hasAccessLevel("undelete", getFullName())
+                || (Objects.equal(this.context.getUserReference(), getDeleterReference())
+                    && hasAccess(Right.EDIT, getDocumentReference()));
         } catch (XWikiException ex) {
             // Public APIs should not throw exceptions
             LOGGER.warn("Exception while checking if entry [{}] can be restored from the recycle bin", getId(), ex);

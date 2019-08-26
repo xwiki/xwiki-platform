@@ -48,9 +48,6 @@ public class InlinePage extends ViewPage
     @FindBy(name = "action_cancel")
     private WebElement cancel;
 
-    @FindBy(id = "inline")
-    private WebElement form;
-
     public void clickPreview()
     {
         preview.click();
@@ -146,7 +143,7 @@ public class InlinePage extends ViewPage
     @Override
     public String getContent()
     {
-        return form.getText();
+        return getForm().getText();
     }
 
     /**
@@ -154,7 +151,12 @@ public class InlinePage extends ViewPage
      */
     public WebElement getForm()
     {
-        return form;
+        return getDriver().findElementWithoutWaiting(getFormLocator());
+    }
+
+    public By getFormLocator()
+    {
+        return By.id("inline");
     }
 
     /**
@@ -167,7 +169,7 @@ public class InlinePage extends ViewPage
     public String getValue(String fieldName)
     {
         String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
-        return new FormElement(getForm()).getFieldValue(By.xpath(xpath));
+        return new FormContainerElement(getFormLocator()).getFieldValue(By.xpath(xpath));
     }
 
     /**
@@ -182,10 +184,10 @@ public class InlinePage extends ViewPage
         String xpath = String.format(FIELD_XPATH_FORMAT, fieldName.length(), fieldName);
         WebElement field = getForm().findElement(By.xpath(xpath));
         if (field.getAttribute("name").equals(field.getAttribute("id"))) {
-            new FormElement(getForm()).setFieldValue(field, fieldValue);
+            new FormContainerElement(getFormLocator()).setFieldValue(field, fieldValue);
         } else {
             xpath = String.format("//*[@name = '%s' and @value = '%s']", field.getAttribute("name"), fieldValue);
-            new FormElement(getForm()).setCheckBox(By.xpath(xpath), true);
+            new FormContainerElement(getFormLocator()).setCheckBox(By.xpath(xpath), true);
         }
     }
 

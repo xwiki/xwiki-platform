@@ -114,14 +114,10 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 /* XProperty definition */
 .xproperty {
   border: none;
+  margin-top: .5em;
 }
 .xproperty-content {
-  padding: 4px 16px 8px 16px;
-  margin-bottom: 2px;
-}
-.xproperty-content dl {
-  margin: 0;
-  padding-left: 16px;
+  padding: 1em 0 1em 1em;
 }
 .xproperty-title {
   cursor: default;
@@ -155,12 +151,9 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   float: none;
   clear: both;
 }
-.xobject-content dt, .xproperty-content dt {
+.xobject-content xdt {
   font-size: 75%;
   font-weight: bold;
-}
-.xobject-content dd, .xproperty-content dd {
-  margin: 0 0 4px;
 }
 
 /* Expand/collapse */
@@ -189,12 +182,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   width: 10px;
   height: 10px;
   vertical-align: middle;
-}
-#xwikiobjects .collapsable dd {
-  padding-left: 10px;
-}
-#xwikiclassproperties .collapsable dt {
-  margin-left: -10px;
 }
 .collapsable dt .collapsed {
   background-image: url("$xwiki.getSkinFile('icons/silk/bullet_toggle_plus.png')");

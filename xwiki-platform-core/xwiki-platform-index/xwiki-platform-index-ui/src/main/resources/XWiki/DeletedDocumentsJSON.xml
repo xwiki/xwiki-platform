@@ -113,32 +113,32 @@ $response.setContentType('application/json')
   #if($velocityCount &gt; 1) , #end
   {
      #set($originalDocument = $ddoc.getDocument())
-     "fullname"  : "$escapetool.javascript($originalDocument.fullName)",
-     "title"  : "$escapetool.javascript($originalDocument.displayTitle)",
-     "url" : "$escapetool.javascript($originalDocument.getURL('viewrev', $escapetool.url({'rev' : "deleted:${item}"})))",
-     "originalUrl" : "$escapetool.javascript($originalDocument.getURL())",
+     "fullname"  : "$escapetool.javascript($ddoc.fullName)",
+     "title"  : #if ($originalDocument)"$escapetool.javascript($originalDocument.displayTitle)"#else"$escapetool.javascript($ddoc.documentReference.name)"#end,
+     "url" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'viewrev', $escapetool.url({'rev' : "deleted:${item}"})))",
+     "originalUrl" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference))",
      "canDelete" : $ddoc.canDelete(),
-     "deleteUrl" : "$escapetool.javascript($originalDocument.getURL('delete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
-     "canRestore" : $ddoc.canUndelete(),
-     #set ($ddocReferenceWithLocale = $services.model.createDocumentReference($originalDocument.documentReference, $originalDocument.locale))
+     "deleteUrl" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'delete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
+     "canRestore" : #if($originalDocument)$ddoc.canUndelete()#{else}false#end,
+     #set ($ddocReferenceWithLocale = $services.model.createDocumentReference($ddoc.documentReference, $ddoc.locale))
      #set ($exists = $xwiki.exists($ddocReferenceWithLocale))
      "alreadyExists" : ${exists},
      ## If a document to be undeleted is a translation and the main document of that translation is not yet created or undeleted, restoring this translation 
      ## will leave it inaccessible from the UI, thus "orphaned", until the main document is created or undeleted.
      #set ($causesOrphanedTranslation = false)
      #if (!$exists)
-       #set ($mainDocumentExists = $xwiki.exists($originalDocument.documentReference))
+       #set ($mainDocumentExists = $xwiki.exists($ddoc.documentReference))
        #set ($causesOrphanedTranslation = $originalDocument.isTranslation() &amp;&amp; !$mainDocumentExists)
      #end
      "causesOrphanedTranslation" : $causesOrphanedTranslation,
-     "restoreUrl" : "$escapetool.javascript($originalDocument.getURL('undelete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
+     "restoreUrl" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'undelete', "id=${item}&amp;form_token=$!{services.csrf.getToken()}"))",
      "date" : "$escapetool.javascript($xwiki.formatDate($ddoc.date, $dateFormat))",
      "deleter" : "$escapetool.javascript($ddoc.deleter)",
      "deletername" : "$escapetool.javascript($xwiki.getUserName($ddoc.deleter, false))",
      "deleterurl" : "$escapetool.javascript($xwiki.getURL($ddoc.deleter, 'view'))",
      "language" : "$ddoc.locale",
      "batchId" : "$!ddoc.batchId",
-     "batchId_url" : "$escapetool.javascript($originalDocument.getURL('undelete', "id=${item}&amp;showBatch=true"))"
+     "batchId_url" : "$escapetool.javascript($xwiki.getURL($ddoc.documentReference, 'undelete', "id=${item}&amp;showBatch=true"))"
    }
 #end
 ]}
@@ -226,6 +226,9 @@ $response.setContentType('application/json')
     </property>
     <property>
       <levels>view,edit</levels>
+    </property>
+    <property>
+      <users/>
     </property>
   </object>
 </xwikidoc>

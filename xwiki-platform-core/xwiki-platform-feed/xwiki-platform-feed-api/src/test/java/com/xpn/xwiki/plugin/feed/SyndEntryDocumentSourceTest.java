@@ -146,6 +146,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         final Mock mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
                 new Object[] {xwiki, context});
+        mockXWikiStore.stubs().method("getLimitSize").will(returnValue(255));
         mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {

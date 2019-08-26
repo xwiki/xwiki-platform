@@ -37,6 +37,9 @@ import org.xwiki.rest.resources.tags.PagesForTagsResource;
 
 import com.xpn.xwiki.api.Document;
 
+/**
+ * @version $Id$
+ */
 @Component
 @Named("org.xwiki.rest.internal.resources.tags.PagesForTagsResourceImpl")
 public class PagesForTagsResourceImpl extends XWikiResource implements PagesForTagsResource

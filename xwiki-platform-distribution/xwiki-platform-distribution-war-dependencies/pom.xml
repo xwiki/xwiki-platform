@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-war-dependencies</artifactId>
   <name>XWiki Platform - Distribution - War - Dependencies</name>
@@ -287,9 +287,9 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.rendering</groupId>
-      <artifactId>xwiki-rendering-macro-toc</artifactId>
-      <version>${rendering.version}</version>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-macro-toc</artifactId>
+      <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -400,16 +400,21 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- User management -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-default</artifactId>
+      <artifactId>xwiki-platform-rendering-wikimacro-macro-wikimacrocontent</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-script</artifactId>
+      <artifactId>xwiki-platform-rendering-wikimacro-macro-wikimacroparameter</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-rendering-async-macro</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
@@ -663,6 +668,13 @@
       <version>${project.version}</version>
       <type>pom</type>
       <scope>runtime</scope>
+      <exclusions>
+        <!-- Make sure to not package contrib extensions since they need to remain upgradeable -->
+        <exclusion>
+          <groupId>org.xwiki.contrib</groupId>
+          <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 </project>

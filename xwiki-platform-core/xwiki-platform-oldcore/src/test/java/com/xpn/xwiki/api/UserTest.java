@@ -45,7 +45,7 @@ public class UserTest extends AbstractBridgedXWikiComponentTestCase
         User u = new User(null, null);
         assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
 
-        XWikiUser xu = new XWikiUser(null);
+        XWikiUser xu = new XWikiUser((String)null);
         u = new User(xu, null);
         assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
 

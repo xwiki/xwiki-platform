@@ -49,7 +49,7 @@ import com.xpn.xwiki.plugin.tag.TagPluginApi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyListOf;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -128,7 +128,7 @@ public class LiveTableResultsTest extends PageTest
         when(query.setLimit(7)).thenReturn(query);
         // Offset starting from 0.
         when(query.setOffset(12)).thenReturn(query);
-        when(query.bindValues(anyListOf(Object.class))).thenReturn(query);
+        when(query.bindValues(anyMap())).thenReturn(query);
 
         when(query.count()).thenReturn(17L);
         when(query.execute()).thenReturn(Arrays.<Object>asList("A.B", "X.Y"));
@@ -173,8 +173,9 @@ public class LiveTableResultsTest extends PageTest
 
         verify(queryService).hql(
             ", BaseObject as obj , StringProperty prop_where  "
-                + "where obj.name=doc.fullName and obj.className = ? and doc.fullName not in (?, ?)  "
-                + "and obj.id=prop_where.id.id and prop_where.name = ?   "
+                + "where obj.name=doc.fullName and obj.className = :className and "
+                + "doc.fullName not in (:classTemplate1, :classTemplate2)  "
+                + "and obj.id=prop_where.id.id and prop_where.name = :prop_where_name   "
                 + "order by lower(prop_where.value) asc, prop_where.value asc");
     }
 

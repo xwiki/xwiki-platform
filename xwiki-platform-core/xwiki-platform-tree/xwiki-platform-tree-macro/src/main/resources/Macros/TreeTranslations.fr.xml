@@ -65,6 +65,5 @@ rendering.macro.tree.parameter.finder.description=Affiche une entrée texte qui 
 rendering.macro.tree.parameter.limit.name=Limite
 rendering.macro.tree.parameter.limit.description=Le nombre maximum de nœuds fils à afficher lorsqu'un nœud père est déplié pour la première fois. Les autres nœuds sont accessibles grâce au lien "Plus...". Ce paramètre sert essentiellement à définir la pagination afin d'améliorer les performances lorsque les nœuds fils sont nombreux. L'arbre fournit ce paramètre à l'arbre d'origine c'est pourquoi ce paramètre n'est pris en compte que dans les arbres dynamiques dont l'origine implémente le nombre de nœuds fils.
 rendering.macro.tree.content.description=Vous pouvez utiliser les listes à puces HTML imbriqués pour décrire la structure de l'arbre. Voir http://www.jstree.com/docs/html/ pour plus d'informations.
-tree.macro.editModeWarning=Cet arbre ne peut pas être affiché en mode modification.
-</content>
+tree.macro.editModeWarning=Cet arbre ne peut pas être affiché en mode modification.</content>
 </xwikidoc>

@@ -23,9 +23,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
@@ -35,13 +35,18 @@ import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.refactoring.script.RequestFactory;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.security.authorization.Right;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -49,6 +54,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -59,71 +65,74 @@ import static org.mockito.Mockito.when;
  *
  * @version $Id$
  */
+@OldcoreTest
+@ReferenceComponentList
 public class UndeleteActionTest
 {
-    /**
-     * A component manager that allows us to register mock components.
-     */
-    @Rule
-    public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
+    private static final DocumentReference DELETED_REFERENCE =
+        new DocumentReference("xwiki", "Main", "DeletedDocument");
+
+    private static final long ID = 13;
+
+    @MockComponent
+    private RequestFactory requestFactory;
+
+    @MockComponent
+    private CSRFToken csrfToken;
+
+    @Mock
+    private RefactoringScriptService refactoringScriptService;
+
+    @MockComponent
+    private JobExecutor jobExecutor;
+
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @Mock
+    private XWikiRequest request;
+
+    @Mock
+    private Job job;
+
+    @Mock
+    private RestoreRequest jobRequest;
+
+    @Mock
+    private XWikiDeletedDocument deletedDocument;
 
     /**
      * The object being tested.
      */
     private UndeleteAction undeleteAction = new UndeleteAction();
 
-    /**
-     * A mock {@link XWikiContext};
-     */
-    private XWikiContext context = mock(XWikiContext.class);
-
-    private XWikiRequest request = mock(XWikiRequest.class);
-
-    /**
-     * A mock {@link XWiki};
-     */
-    private XWiki xwiki = mock(XWiki.class);
-
-    /**
-     * A mock {@link XWikiDocument};
-     */
-    private XWikiDocument document = mock(XWikiDocument.class);
-
-    private XWikiRightService rightsService = mock(XWikiRightService.class);
-
-    private RefactoringScriptService refactoringScriptService = mock(RefactoringScriptService.class);
-
-    private RequestFactory requestFactory = mock(RequestFactory.class);
-
-    private JobExecutor jobExecutor;
-
-    private Job job = mock(Job.class);
-
-    private RestoreRequest jobRequest;
-
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
-        mocker.registerMockComponent(CSRFToken.class);
-        mocker.registerComponent(ScriptService.class, "refactoring", refactoringScriptService);
-        Utils.setComponentManager(mocker);
+        this.oldcore.getXWikiContext().setRequest(this.request);
 
-        when(context.getRequest()).thenReturn(request);
+        XWikiDocument contextDocument = mock(XWikiDocument.class);
+        when(contextDocument.getDocumentReference()).thenReturn(DELETED_REFERENCE);
+        this.oldcore.getXWikiContext().setDoc(contextDocument);
 
-        when(context.getWiki()).thenReturn(xwiki);
+        when(this.jobExecutor.execute(anyString(), any())).thenReturn(this.job);
 
-        when(xwiki.getRightService()).thenReturn(rightsService);
+        this.componentManager.registerComponent(ScriptService.class, "refactoring", this.refactoringScriptService);
+        when(this.refactoringScriptService.getRequestFactory()).thenReturn(this.requestFactory);
+        when(this.requestFactory.createRestoreRequest(any(List.class))).thenReturn(this.jobRequest);
+        when(this.requestFactory.createRestoreRequest(anyString())).thenReturn(this.jobRequest);
 
-        when(context.getDoc()).thenReturn(document);
-        when(document.getDocumentReference()).thenReturn(new DocumentReference("xwiki", "Main", "DeletedDocument"));
+        when(this.request.getParameter("id")).thenReturn(String.valueOf(ID));
 
-        jobExecutor = mocker.registerMockComponent(JobExecutor.class);
-        when(jobExecutor.execute(anyString(), any())).thenReturn(job);
-
-        jobRequest = mock(RestoreRequest.class);
-        when(refactoringScriptService.getRequestFactory()).thenReturn(requestFactory);
-        when(requestFactory.createRestoreRequest(any(List.class))).thenReturn(jobRequest);
-        when(requestFactory.createRestoreRequest(anyString())).thenReturn(jobRequest);
+        when(this.deletedDocument.getLocale()).thenReturn(Locale.ROOT);
+        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
+        when(deletedDocument.getId()).thenReturn(ID);
+        when(deletedDocument.getDocumentReference()).thenReturn(DELETED_REFERENCE);
+        doReturn(this.deletedDocument).when(this.oldcore.getSpyXWiki()).getDeletedDocument(anyLong(),
+            any(XWikiContext.class));
     }
 
     /**
@@ -132,23 +141,28 @@ public class UndeleteActionTest
     @Test
     public void restoreSingleDocument() throws Exception
     {
-        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
-        when(csrfToken.isTokenValid(null)).thenReturn(true);
+        when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
-        long id = 13;
+        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
-        when(request.getParameter("id")).thenReturn(String.valueOf(id));
+        assertFalse(this.undeleteAction.action(this.oldcore.getXWikiContext()));
 
-        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
-        when(deletedDocument.getId()).thenReturn(id);
-        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
+        verify(this.requestFactory).createRestoreRequest(Arrays.asList(ID));
+        verify(jobExecutor).execute(RefactoringJobs.RESTORE, jobRequest);
+        verify(job).join();
+    }
 
-        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
+    @Test
+    public void restoreSingleDocumentWhenDeleter() throws Exception
+    {
+        when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
-        assertFalse(undeleteAction.action(context));
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.EDIT, null, DELETED_REFERENCE))
+            .thenReturn(true);
 
-        verify(requestFactory).createRestoreRequest(Arrays.asList(id));
+        assertFalse(this.undeleteAction.action(this.oldcore.getXWikiContext()));
+
+        verify(this.requestFactory).createRestoreRequest(Arrays.asList(ID));
         verify(jobExecutor).execute(RefactoringJobs.RESTORE, jobRequest);
         verify(job).join();
     }
@@ -156,22 +170,13 @@ public class UndeleteActionTest
     @Test
     public void missingCSRFToken() throws Exception
     {
-        // Valid Deleted document ID.
-        long id = 13;
-
-        when(request.getParameter("id")).thenReturn(String.valueOf(id));
-
-        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
-
         // Invalid CSRF token.
-        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
-        when(csrfToken.isTokenValid(null)).thenReturn(false);
+        when(this.csrfToken.isTokenValid(null)).thenReturn(false);
 
-        assertFalse(undeleteAction.action(context));
+        assertFalse(this.undeleteAction.action(this.oldcore.getXWikiContext()));
 
         // Verify that the resubmission URL was retrieved to be used in the redirect.
-        verify(csrfToken).getResubmissionURL();
+        verify(this.csrfToken).getResubmissionURL();
     }
 
     /**
@@ -180,20 +185,15 @@ public class UndeleteActionTest
     @Test
     public void recycleBinDisabledOrInvalidId() throws Exception
     {
-        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
-        when(csrfToken.isTokenValid(null)).thenReturn(true);
-
-        long id = 13;
-
-        when(request.getParameter("id")).thenReturn(String.valueOf(id));
+        when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
         // null is returned when the ID is invalid or the Recycle Bin is disabled.
-        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(null);
+        doReturn(null).when(this.oldcore.getSpyXWiki()).getDeletedDocument(anyLong(), any(XWikiContext.class));
 
-        assertFalse(undeleteAction.action(context));
+        assertFalse(this.undeleteAction.action(this.oldcore.getXWikiContext()));
 
         // Verify that we never get this far.
-        verify(requestFactory, never()).createRestoreRequest(Arrays.asList(id));
+        verify(this.requestFactory, never()).createRestoreRequest(Arrays.asList(ID));
     }
 
     /**
@@ -203,25 +203,16 @@ public class UndeleteActionTest
     @Test
     public void showBatch() throws Exception
     {
-        long id = 13;
+        when(this.request.getParameter("showBatch")).thenReturn("true");
 
-        when(request.getParameter("id")).thenReturn(String.valueOf(id));
+        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
-        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
-        when(deletedDocument.getId()).thenReturn(id);
-        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
-
-        when(request.getParameter("showBatch")).thenReturn("true");
-
-        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
-
-        assertTrue(undeleteAction.action(context));
+        assertTrue(this.undeleteAction.action(this.oldcore.getXWikiContext()));
         // Render the "restore" template.
-        assertEquals("restore", undeleteAction.render(context));
+        assertEquals("restore", undeleteAction.render(this.oldcore.getXWikiContext()));
 
         // Just make sure that we stop to the display, since the "confirm=true" parameter was not passed.
-        verify(requestFactory, never()).createRestoreRequest(Arrays.asList(id));
+        verify(this.requestFactory, never()).createRestoreRequest(Arrays.asList(ID));
     }
 
     /**
@@ -230,34 +221,26 @@ public class UndeleteActionTest
     @Test
     public void restoreBatch() throws Exception
     {
-        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
-        when(csrfToken.isTokenValid(null)).thenReturn(true);
+        when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
-        long id = 13;
         String batchId = "abc123";
 
-        when(request.getParameter("id")).thenReturn(String.valueOf(id));
-
-        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
-        when(deletedDocument.getId()).thenReturn(id);
         when(deletedDocument.getBatchId()).thenReturn(batchId);
-        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
 
         // Go through the screen showing the option to include the batch and displaying its contents.
-        when(request.getParameter("showBatch")).thenReturn("true");
+        when(this.request.getParameter("showBatch")).thenReturn("true");
 
         // Option to include the entire batch when restoring is enabled.
-        when(request.getParameter("includeBatch")).thenReturn("true");
+        when(this.request.getParameter("includeBatch")).thenReturn("true");
 
         // Confirmation button pressed.
-        when(request.getParameter("confirm")).thenReturn("true");
+        when(this.request.getParameter("confirm")).thenReturn("true");
 
-        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(true);
 
-        assertFalse(undeleteAction.action(context));
+        assertFalse(this.undeleteAction.action(this.oldcore.getXWikiContext()));
 
-        verify(requestFactory).createRestoreRequest(batchId);
+        verify(this.requestFactory).createRestoreRequest(batchId);
         verify(jobExecutor).execute(RefactoringJobs.RESTORE, jobRequest);
         verify(job).join();
     }
@@ -269,26 +252,16 @@ public class UndeleteActionTest
     @Test
     public void notAllowedToRestoreSinglePage() throws Exception
     {
-        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
-        when(csrfToken.isTokenValid(null)).thenReturn(true);
+        when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
-        long id = 13;
+        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
 
-        when(request.getParameter("id")).thenReturn(String.valueOf(id));
-
-        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
-        when(deletedDocument.getId()).thenReturn(id);
-        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
-
-        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
-
-        assertTrue(undeleteAction.action(context));
+        assertTrue(this.undeleteAction.action(this.oldcore.getXWikiContext()));
         // Render the "accessdenied" template.
-        assertEquals("accessdenied", undeleteAction.render(context));
+        assertEquals("accessdenied", undeleteAction.render(this.oldcore.getXWikiContext()));
 
         // Just make sure we don`t go any further.
-        verify(requestFactory, never()).createRestoreRequest(Arrays.asList(id));
+        verify(this.requestFactory, never()).createRestoreRequest(Arrays.asList(ID));
     }
 
     /**
@@ -298,37 +271,29 @@ public class UndeleteActionTest
     @Test
     public void notAllowedToRestoreBatch() throws Exception
     {
-        CSRFToken csrfToken = mocker.getInstance(CSRFToken.class);
-        when(csrfToken.isTokenValid(null)).thenReturn(true);
+        when(this.csrfToken.isTokenValid(null)).thenReturn(true);
 
-        long id = 13;
         String batchId = "abc123";
 
-        when(request.getParameter("id")).thenReturn(String.valueOf(id));
-
-        XWikiDeletedDocument deletedDocument = mock(XWikiDeletedDocument.class);
-        when(deletedDocument.getLocale()).thenReturn(Locale.ROOT);
-        when(deletedDocument.getId()).thenReturn(id);
-        when(deletedDocument.getBatchId()).thenReturn(batchId);
-        when(xwiki.getDeletedDocument(anyLong(), any(XWikiContext.class))).thenReturn(deletedDocument);
+        when(this.deletedDocument.getBatchId()).thenReturn(batchId);
 
         // Go through the screen showing the option to include the batch and displaying its contents.
-        when(request.getParameter("showBatch")).thenReturn("true");
+        when(this.request.getParameter("showBatch")).thenReturn("true");
 
         // Option to include the entire batch when restoring is enabled.
-        when(request.getParameter("includeBatch")).thenReturn("true");
+        when(this.request.getParameter("includeBatch")).thenReturn("true");
 
         // Confirmation button pressed.
-        when(request.getParameter("confirm")).thenReturn("true");
+        when(this.request.getParameter("confirm")).thenReturn("true");
 
         // No rights to restore the page when checking from the Action. The job will check individual rights.
-        when(rightsService.hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
+        when(this.oldcore.getMockRightService().hasAccessLevel(any(), any(), any(), any())).thenReturn(false);
 
-        assertTrue(undeleteAction.action(context));
+        assertTrue(this.undeleteAction.action(this.oldcore.getXWikiContext()));
         // Render the "accessdenied" template.
-        assertEquals("accessdenied", undeleteAction.render(context));
+        assertEquals("accessdenied", undeleteAction.render(this.oldcore.getXWikiContext()));
 
         // Just make sure we don`t go any further.
-        verify(requestFactory, never()).createRestoreRequest(batchId);
+        verify(this.requestFactory, never()).createRestoreRequest(batchId);
     }
 }

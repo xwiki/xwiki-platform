@@ -25,12 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-debian-tomcat</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-debian-tomcat7-mysql</artifactId>
   <name>XWiki Platform - Distribution - Debian - Tomcat 7 - MySQL</name>
   <packaging>deb</packaging>
-  <description>XWiki Tomcat/MySQL based package</description>
+  <description>XWiki Tomcat7/MySQL based package</description>
   <properties>
     <debian.package>xwiki-tomcat7-mysql</debian.package>
   </properties>

@@ -25,19 +25,13 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-escaping</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Escaping</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Flavor - Functional Tests - Escaping</description>
   <dependencies>
-    <dependency>
-      <groupId>cpsuite</groupId>
-      <artifactId>cpsuite</artifactId>
-      <version>1.2.5</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-distribution-war</artifactId>

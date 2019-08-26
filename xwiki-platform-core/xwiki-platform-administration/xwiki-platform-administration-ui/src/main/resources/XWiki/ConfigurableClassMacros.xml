@@ -88,12 +88,12 @@
     'IntegerProperty as global'
   ])
   #set ($whereClause = [
-    "obj.name = doc.fullName and obj.className = ?",
+    "obj.name = doc.fullName and obj.className = :className",
     "category.id = obj.id and category.name = 'displayInCategory'",
     "sectionOrder.id = obj.id and sectionOrder.name = 'sectionOrder'",
-    "global.id = obj.id and global.name = 'configureGlobally' and global.value = ?"
+    "global.id = obj.id and global.name = 'configureGlobally' and global.value = :global"
   ])
-  #set ($params = [$nameOfThisDocument])
+  #set ($params = {'className' : $nameOfThisDocument})
   ## Order by category and section priority, leaving empty/null category at the end, because we want to read the
   ## category meta data from the first (most important) section in each category.
   #set ($orderByClause = [
@@ -102,18 +102,18 @@
     'sectionOrder.value'
   ])
   #if ($globaladmin == true)
-    #set ($discard = $params.add(1))
+    #set ($discard = $params.put('global', 1))
   #else
-    #set ($discard = $params.add(0))
+    #set ($discard = $params.put('global', 0))
     #if ("$!space" != '')
-      #set ($discard = $whereClause.add('doc.space = ?'))
-      #set ($discard = $params.add($space))
+      #set ($discard = $whereClause.add('doc.space = :space'))
+      #set ($discard = $params.put('space', $space))
     #end
   #end
   #if ("$!section" != '')
     #set ($discard = $fromClause.add('StringProperty as section'))
-    #set ($discard = $whereClause.add("section.id = obj.id and section.name = 'displayInSection' and section.value = ?"))
-    #set ($discard = $params.add($section))
+    #set ($discard = $whereClause.add("section.id = obj.id and section.name = 'displayInSection' and section.value = :section"))
+    #set ($discard = $params.put('section', $section))
   #end
   #set ($statement = ', ' + $stringtool.join($fromClause, ', ') +
     ' where ' + $stringtool.join($whereClause, ' and ') +

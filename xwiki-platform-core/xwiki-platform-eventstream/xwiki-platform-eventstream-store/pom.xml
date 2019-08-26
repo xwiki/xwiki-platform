@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-eventstream</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
     </parent>
     <artifactId>xwiki-platform-eventstream-store</artifactId>
     <name>XWiki Platform - Event Stream - Store</name>
@@ -35,6 +35,10 @@
         <xwiki.pitest.mutationThreshold>8</xwiki.pitest.mutationThreshold>
         <!-- Name to display by the Extension Manager -->
         <xwiki.extension.name>Event Stream Store</xwiki.extension.name>
+
+        <!-- Impossible to have both xwiki-platform-eventstream and xwiki-platform-activitystream-api
+             because they use the same table name (activitystream_events) -->
+        <xwiki.extension.features>org.xwiki.platform:xwiki-platform-activitystream-api</xwiki.extension.features>
     </properties>
     <dependencies>
         <dependency>
@@ -76,6 +80,11 @@
         <dependency>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-scheduler-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.xwiki.platform</groupId>
+            <artifactId>xwiki-platform-wiki-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <!-- Test Dependencies -->

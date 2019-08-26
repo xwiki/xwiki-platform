@@ -19,32 +19,24 @@
  */
 package com.xpn.xwiki.store;
 
-import java.sql.Connection;
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.DatabaseMetaData;
-import java.sql.Statement;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.boot.Metadata;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.cfg.Environment;
 import org.hibernate.dialect.Dialect;
-import org.hibernate.engine.SessionFactoryImplementor;
-import org.hibernate.id.SequenceGenerator;
-import org.hibernate.mapping.Table;
-import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.logging.LoggerManager;
 
@@ -52,15 +44,15 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.internal.store.AbstractXWikiStore;
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.migration.DataMigrationManager;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.Utils;
 
-public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initializable
+public class XWikiHibernateBaseStore extends AbstractXWikiStore
 {
     /**
      * The role hint of this component.
@@ -76,7 +68,10 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
     protected LoggerManager loggerManager;
 
     @Inject
-    private HibernateSessionFactory sessionFactory;
+    protected HibernateStore store;
+
+    @Inject
+    protected HibernateConfiguration hibernateConfiguration;
 
     @Inject
     @Named(HINT)
@@ -85,14 +80,6 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
     /** Need to get the xcontext to get the path to the hibernate.cfg.xml. */
     @Inject
     private Execution execution;
-
-    @Inject
-    private HibernateStore store;
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    private String hibpath = "/WEB-INF/hibernate.cfg.xml";
 
     /**
      * THis allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -106,7 +93,10 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
     public XWikiHibernateBaseStore(XWiki xwiki, XWikiContext context)
     {
         String path = xwiki.Param("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
-        LOGGER.debug("Hibernate configuration file: [" + path + "]");
+        LOGGER.debug("Hibernate configuration file: [{}]", path);
+
+        this.hibernateConfiguration = new HibernateConfiguration();
+
         setPath(path);
     }
 
@@ -119,6 +109,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
     @Deprecated
     public XWikiHibernateBaseStore(String hibpath)
     {
+        this.hibernateConfiguration = new HibernateConfiguration();
+
         setPath(hibpath);
     }
 
@@ -134,19 +126,12 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
         return HINT;
     }
 
-    @Override
-    public void initialize() throws InitializationException
-    {
-        XWikiContext context = this.xcontextProvider.get();
-        setPath(context.getWiki().Param("xwiki.store.hibernate.path", getPath()));
-    }
-
     /**
      * Allows to get the current hibernate config file path
      */
     public String getPath()
     {
-        return this.hibpath;
+        return this.hibernateConfiguration.getPath();
     }
 
     /**
@@ -156,7 +141,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     public void setPath(String hibpath)
     {
-        this.hibpath = hibpath;
+        this.hibernateConfiguration.setPath(hibpath);
     }
 
     /**
@@ -205,13 +190,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     private synchronized void initHibernate() throws HibernateException
     {
-        this.store.getConfiguration().configure(getPath());
-
-        if (this.sessionFactory == null) {
-            this.sessionFactory = Utils.getComponent(HibernateSessionFactory.class);
-        }
-
-        setSessionFactory(this.store.getConfiguration().buildSessionFactory());
+        this.store.initHibernate();
     }
 
     /**
@@ -261,7 +240,9 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      *
      * @param inputxcontext
      * @throws HibernateException
+     * @deprecated automatically done when the {@link HibernateSessionFactory} component is disposed
      */
+    @Deprecated
     public void shutdownHibernate(XWikiContext inputxcontext) throws HibernateException
     {
         this.store.shutdownHibernate();
@@ -285,26 +266,12 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      * @param force defines wether or not to force the update despite the xwiki.cfg settings
      * @throws HibernateException
      */
-    public synchronized void updateSchema(XWikiContext inputxcontext, boolean force) throws HibernateException
+    public void updateSchema(XWikiContext inputxcontext, boolean force) throws HibernateException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            // We don't update the schema if the XWiki hibernate config parameter says not to update
-            if ((!force) && (context.getWiki() != null)
-                && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
-                LOGGER.debug("Schema update deactivated for wiki [{}]", context.getWikiId());
-                return;
-            }
-
-            LOGGER.info("Updating schema for wiki [{}]...", context.getWikiId());
-
-            try {
-                String[] sql = getSchemaUpdateScript(this.store.getConfiguration(), context);
-                updateSchema(sql, context);
-            } finally {
-                LOGGER.info("Schema update for wiki [{}] done", context.getWikiId());
-            }
+            this.store.updateDatabase(context.getWikiId(), force);
         } finally {
             restoreExecutionXContext();
         }
@@ -322,7 +289,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     protected String getSchemaFromWikiName(String wikiName, DatabaseProduct databaseProduct, XWikiContext inputxcontext)
     {
-        return this.store.getSchemaFromWikiName(wikiName, databaseProduct);
+        return this.store.getDatabaseFromWikiName(wikiName, databaseProduct);
     }
 
     /**
@@ -338,7 +305,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     protected String getSchemaFromWikiName(String wikiId, XWikiContext inputxcontext)
     {
-        return this.store.getSchemaFromWikiName(wikiId);
+        return this.store.getDatabaseFromWikiName(wikiId);
     }
 
     /**
@@ -353,7 +320,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     public String getSchemaFromWikiName(XWikiContext context)
     {
-        return this.store.getSchemaFromWikiName();
+        return this.store.getDatabaseFromWikiName();
     }
 
     /**
@@ -363,67 +330,12 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      * @param config
      * @param inputxcontext
      * @throws HibernateException
+     * @deprecated do nothing since 11.5RC1
      */
+    @Deprecated
     public String[] getSchemaUpdateScript(Configuration config, XWikiContext inputxcontext) throws HibernateException
     {
-        XWikiContext context = getExecutionXContext(inputxcontext, true);
-
-        String[] schemaSQL = null;
-
-        Session session;
-        Connection connection;
-        DatabaseMetadata meta;
-        boolean bTransaction = true;
-        String dschema = null;
-
-        try {
-            bTransaction = beginTransaction(false, context);
-            session = this.store.getCurrentSession();
-            connection = session.connection();
-            setDatabase(session, context);
-
-            String contextSchema = this.store.getSchemaFromWikiName();
-
-            DatabaseProduct databaseProduct = this.store.getDatabaseProductName();
-            if (databaseProduct == DatabaseProduct.ORACLE || databaseProduct == DatabaseProduct.HSQLDB
-                || databaseProduct == DatabaseProduct.H2 || databaseProduct == DatabaseProduct.DERBY
-                || databaseProduct == DatabaseProduct.DB2
-                || (databaseProduct == DatabaseProduct.POSTGRESQL && isInSchemaMode())) {
-                dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
-                config.setProperty(Environment.DEFAULT_SCHEMA, contextSchema);
-                Iterator iter = config.getTableMappings();
-                while (iter.hasNext()) {
-                    Table table = (Table) iter.next();
-                    table.setSchema(contextSchema);
-                }
-            }
-
-            meta = new DatabaseMetadata(connection, this.store.getDialect());
-            schemaSQL = config.generateSchemaUpdateScript(this.store.getDialect(), meta);
-
-            // In order to circumvent a bug in Hibernate (See the javadoc of XWHS#createHibernateSequenceIfRequired for
-            // details), we need to ensure that Hibernate will create the "hibernate_sequence" sequence.
-            createHibernateSequenceIfRequired(schemaSQL, contextSchema, session);
-
-        } catch (Exception e) {
-            throw new HibernateException("Failed creating schema update script", e);
-        } finally {
-            try {
-                if (bTransaction) {
-                    // Use "true" so that the hibernate sequence that was possibly created above can be committed
-                    // properly (and not be rolled back!).
-                    endTransaction(context, true);
-                }
-                if (dschema != null) {
-                    config.setProperty(Environment.DEFAULT_SCHEMA, dschema);
-                }
-            } catch (Exception e) {
-            }
-
-            restoreExecutionXContext();
-        }
-
-        return schemaSQL;
+        return null;
     }
 
     /**
@@ -443,13 +355,15 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      * @param schemaName the schema name corresponding to the subwiki being updated
      * @param session the Hibernate session, used to get the Dialect object
      * @since 5.2RC1
+     * @deprecated since 11.5RC1
      */
+    @Deprecated
     protected void createHibernateSequenceIfRequired(String[] schemaSQL, String schemaName, Session session)
     {
         // There's no issue when in database mode, only in schema mode.
         if (isInSchemaMode()) {
-            Dialect dialect = ((SessionFactoryImplementor) session.getSessionFactory()).getDialect();
-            if (dialect.getNativeIdentifierGeneratorClass().equals(SequenceGenerator.class)) {
+            Dialect dialect = this.store.getDialect();
+            if (dialect.getNativeIdentifierGeneratorStrategy().equals("sequence")) {
                 // We create the sequence only if it's not already in the SQL to execute as otherwise we would get an
                 // error that the sequence already exists ("relation "hibernate_sequence" already exists").
                 boolean hasSequence = false;
@@ -487,15 +401,15 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      *
      * @param createSQL
      * @param inputxcontext
+     * @deprecated since 11.5RC1
      */
+    @Deprecated
     public void updateSchema(String[] createSQL, XWikiContext inputxcontext) throws HibernateException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         // Updating the schema for custom mappings
         Session session;
-        Connection connection;
-        Statement stmt = null;
         boolean bTransaction = true;
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         String sql = "";
@@ -503,31 +417,19 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
         try {
             bTransaction = beginTransaction(context);
             session = getSession(context);
-            connection = session.connection();
             setDatabase(session, context);
-            stmt = connection.createStatement();
-
-            // Start monitoring timer
             if (monitor != null) {
                 monitor.startTimer("sqlupgrade");
             }
             for (String element : createSQL) {
                 sql = element;
-                if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("Update Schema sql: [" + sql + "]");
-                }
-                stmt.executeUpdate(sql);
+                LOGGER.debug("Update Schema sql: [{}]", sql);
+                session.createSQLQuery(sql).executeUpdate();
             }
-            connection.commit();
+            session.getTransaction().commit();
         } catch (Exception e) {
             throw new HibernateException("Failed updating schema while executing query [" + sql + "]", e);
         } finally {
-            try {
-                if (stmt != null) {
-                    stmt.close();
-                }
-            } catch (Exception e) {
-            }
             try {
                 if (bTransaction) {
                     endTransaction(context, true);
@@ -561,15 +463,8 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
                 return;
             }
 
-            Configuration config = getMapping(bclass.getName(), custommapping);
-            /*
-             * if (isValidCustomMapping(bclass.getName(), config, bclass)==false) { throw new XWikiException(
-             * XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Cannot
-             * update schema for class " + bclass.getName() + " because of an invalid mapping"); }
-             */
-
-            String[] sql = getSchemaUpdateScript(config, context);
-            updateSchema(sql, context);
+            Metadata metadata = this.store.getMetadata(bclass.getName(), custommapping, context.getWikiId());
+            this.store.updateDatabase(metadata);
         } finally {
             restoreExecutionXContext();
         }
@@ -622,7 +517,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     protected String escapeSchema(String schema, XWikiContext context)
     {
-        return this.store.escapeSchema(schema);
+        return this.store.escapeDatabaseName(schema);
     }
 
     /**
@@ -719,7 +614,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
             Session session = this.store.getCurrentSession();
             if (session != null) {
                 if (LOGGER.isWarnEnabled()) {
-                    LOGGER.warn("Cleanup of session was needed: " + session);
+                    LOGGER.warn("Cleanup of session was needed: {}", session.toString());
                 }
 
                 this.store.endTransaction(false);
@@ -730,17 +625,29 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
 
     public SessionFactory getSessionFactory()
     {
-        return this.sessionFactory.getSessionFactory();
+        return this.store.getSessionFactory();
     }
 
+    /**
+     * @deprecated does not do anything since 11.5RC1
+     */
+    @Deprecated
     public void setSessionFactory(SessionFactory sessionFactory)
     {
-        this.sessionFactory.setSessionFactory(sessionFactory);
+        // Do nothing
     }
 
     public Configuration getConfiguration()
     {
-        return this.sessionFactory.getConfiguration();
+        return this.store.getConfiguration();
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public Metadata getMetadata()
+    {
+        return this.store.getConfigurationMetadata();
     }
 
     /**
@@ -779,7 +686,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     public String dynamicMappingTableName(String className)
     {
-        return "xwikicustom_" + className.replaceAll("\\.", "_");
+        return this.store.toDynamicMappingTableName(className);
     }
 
     /**
@@ -790,20 +697,21 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      * @param customMapping the custom mapping
      * @return a new {@link Configuration} containing this mapping alone.
      * @since 4.0M1
+     * @deprecated since 11.5RC1
      */
+    @Deprecated
     protected Configuration getMapping(String className, String customMapping)
     {
         Configuration hibconfig = new Configuration();
-        {
-            hibconfig.addXML(makeMapping(className, customMapping));
-        }
-        hibconfig.buildMappings();
+
+        hibconfig.addInputStream(
+            new ByteArrayInputStream(makeMapping(className, customMapping).getBytes(StandardCharsets.UTF_8)));
 
         return hibconfig;
     }
 
     /**
-     * Build a new XML string to define the provided mapping. Since 4.0M1, the ids are longs, and a confitionnal mapping
+     * Build a new XML string to define the provided mapping. Since 4.0M1, the ids are longs, and a conditional mapping
      * is made for Oracle.
      *
      * @param className the name of the class to map.
@@ -812,22 +720,13 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     protected String makeMapping(String className, String customMapping)
     {
-        DatabaseProduct databaseProduct = this.store.getDatabaseProductName();
-        return new StringBuilder(2000).append("<?xml version=\"1.0\"?>\n" + "<!DOCTYPE hibernate-mapping PUBLIC\n")
-            .append("\t\"-//Hibernate/Hibernate Mapping DTD//EN\"\n")
-            .append("\t\"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd\">\n").append("<hibernate-mapping>")
-            .append("<class entity-name=\"").append(className).append("\" table=\"")
-            .append(dynamicMappingTableName(className)).append("\">\n")
-            .append(" <id name=\"id\" type=\"long\" unsaved-value=\"any\">\n")
-            .append("   <column name=\"XWO_ID\" not-null=\"true\" ")
-            .append((databaseProduct == DatabaseProduct.ORACLE) ? "sql-type=\"integer\" " : "")
-            .append("/>\n   <generator class=\"assigned\" />\n").append(" </id>\n").append(customMapping)
-            .append("</class>\n</hibernate-mapping>").toString();
+        return this.store.makeMapping(className, customMapping);
     }
 
     /**
      * Callback (closure) interface for operations in hibernate. spring like.
      */
+    @FunctionalInterface
     public interface HibernateCallback<T>
     {
         /**
@@ -1042,7 +941,7 @@ public class XWikiHibernateBaseStore extends AbstractXWikiStore implements Initi
      */
     protected boolean isInSchemaMode()
     {
-        return this.store.isInSchemaMode();
+        return this.store.isConfiguredInSchemaMode();
     }
 
     /**

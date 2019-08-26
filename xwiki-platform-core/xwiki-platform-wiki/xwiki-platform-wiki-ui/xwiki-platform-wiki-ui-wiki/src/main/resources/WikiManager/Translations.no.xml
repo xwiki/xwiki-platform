@@ -1,0 +1,138 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="no">
+  <web>WikiManager</web>
+  <name>Translations</name>
+  <language>no</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Wiki Manager Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
+
+## MENU
+core.menu.type.wiki=Wiki
+core.menu.watchlist.add.wiki=Overvåk Wiki
+core.menu.watchlist.remove.wiki=Anslutt overvåking av Wiki
+core.menu.admin.wiki=Administrer wiki
+
+# WIKI INFORMATION PANEL
+platform.wiki.panel.title=Wiki-informasjon
+
+# MESSAGES
+platform.wiki.currentwiki.welcome=Velkommen til {0}{1}{2} wiki.
+platform.wiki.currentwiki.currentUserIsOwner=Du er eieren av denne wikien.
+platform.wiki.currentwiki.currentUserIsAdmin=Du er administrator på denne wikien.
+platform.wiki.currentwiki.joinNeedToLogin=For å bli medlem i denne wiki må du være logget inn.
+platform.wiki.currentwiki.currentUserNotMember=Du er ikke medlem av denne wikien.
+platform.wiki.currentwiki.currentuserCanJoin=Hvis du vil, kan du {0}bli medlem i denne wikien{1}.
+platform.wiki.currentwiki.currentUserIsMember=Du er medlem av denne wikien.
+platform.wiki.currentwiki.currentUserCanLeave=Hvis du vil, kan du {0}forlate denne wikien{1}.
+platform.wiki.currentwiki.gadgetTopActiveUsersAllMembers=For å se hele listen over wiki-medlemmer, se {0}brukerkatalogen{1}.
+platform.wiki.currentwiki.invitationPendingForCurrentWiki=Du er invitert til å bli medlem i denne wikien.
+platform.wiki.currentwiki.joinRequestPendingForCurrentWiki=Du har bedt om å bli med i denne wikien.
+platform.wiki.currentwiki.joinRequestAcceptedNotification=Din forespørsel om å bli med i wiki ''{0}'' er akseptert.
+platform.wiki.currentwiki.joinRequestRejectedNotification=Din forespørsel om å bli med i wiki ''{0}'' er blitt avvist.
+platform.wiki.currentwiki.candidateHandledSaveComment=Håndtert kandidat {0} ({1})
+platform.wiki.currentwiki.candidateHandledComment=Kommentarer:
+platform.wiki.currentwiki.candidateAcceptedSuccess=Forespørsel akseptert.
+platform.wiki.currentwiki.candidateRejectedSuccess=Forespørsel avslått.
+platform.wiki.currentwiki.inviteUserAlreadyMember={0} er allerede medlem av wikien.
+platform.wiki.currentwiki.inviteRequestAlreadyExists={0} har allerede en ventende forespørsel. Vennligst svar på den forespørselen i stedet.
+platform.wiki.currentwiki.inviteUserAlreadyInvited={0} har allerede en ventende invitasjon.
+platform.wiki.currentwiki.inviteSaveComment=Bruker ''{0}'' er invitert til å bli med i wikien.
+platform.wiki.currentwiki.inviteNotification=Du er invitert til å bli med i wikien ''{0}''.
+platform.wiki.currentwiki.inviteSuccess={0} inviterte med hell.
+platform.wiki.currentwiki.invitationCancelSaveComment=Avbrutt invitasjon {0} ({1})
+platform.wiki.currentwiki.invitationCancelNotification=Invitasjonen din er kansellert og er ikke lenger gyldig.
+platform.wiki.currentwiki.invitationCancelSuccess=Invitasjonen ble kansellert.
+platform.wiki.currentwiki.invitationCancelFailure=Feil, du kan ikke avbryte denne invitasjonen.
+platform.wiki.currentwiki.candidateReviewFailure=Feil, du kan ikke avbryte denne invitasjonen.
+
+# LABELS
+platform.wiki.currentwiki.prop.wikiprettyname.label=Navn
+platform.wiki.currentwiki.prop.description.label=Beskrivelse
+platform.wiki.currentwiki.prop.owner.label=Eier
+platform.wiki.currentwiki.prop.membershipType.label=Type medlemskap
+platform.wiki.currentwiki.prop.secure.label=Sikker (SSL)
+platform.wiki.currentwiki.member.add=Legg til eller inviter brukere til wikien
+platform.wiki.currentwiki.gadget.wikiInformation.label=Wiki informasjon
+platform.wiki.currentwiki.gadget.topActiveUsers.label=Topp aktive bidragsytere
+platform.wiki.currentwiki.panel.information.name.label=Navn
+platform.wiki.currentwiki.panel.information.description.label=Beskrivelse
+platform.wiki.currentwiki.panel.information.members.label=Medlemmer
+platform.wiki.currentwiki.invitation.view.label=Vis invitasjon
+platform.wiki.currentwiki.joinrequest.cancel.label=Avbryt forespørsel
+platform.wiki.currentwiki.joinreques.request.label=Forespørsel for å delta
+platform.wiki.currentwiki.join.label=Bli medlem
+platform.wiki.currentwiki.leave.label=Forlat Wiki
+platform.wiki.currentwiki.invite.username.label=Brukernavn
+platform.wiki.currentwiki.invite.message.label=Melding
+platform.wiki.currentwiki.invite.button.label=Inviter
+platform.wiki.currentwiki.candidates.label=Kandidater
+platform.wiki.currentwiki.candidates.status.label=Status:
+platform.wiki.currentwiki.candidates.type.label=Type:
+platform.wiki.currentwiki.candidates.reviewer.label=Admin:
+platform.wiki.currentwiki.candidates.reviewermessage.label=Administrators melding:
+platform.wiki.currentwiki.candidates.reviewerprivatecomment.label=Privat kommentar:
+platform.wiki.currentwiki.candidates.accept.label=Godta
+platform.wiki.currentwiki.candidates.reject.label=Avvis
+platform.wiki.currentwiki.candidates.invitation.cancel.label=Avbryt invitasjon
+platform.wiki.currentwiki.wikiusers.title=Wiki-brukere
+platform.wiki.currentwiki.managewikis.title=Wiki
+WikiManager.WikiCandidateMemberClass_status_pending=Venter
+WikiManager.WikiCandidateMemberClass_status_accepted=Akseptert
+WikiManager.WikiCandidateMemberClass_status_rejected=Avslått
+WikiManager.WikiCandidateMemberClass_type_request=Forespørsel
+WikiManager.WikiCandidateMemberClass_type_invitation=Invitasjon
+
+# HINTS
+platform.wiki.currentwiki.prop.wikiprettyname.hint=Visningsnavnet på wikien.
+platform.wiki.currentwiki.prop.description.hint=En kort beskrivelse av wikien og dens formål.
+platform.wiki.currentwiki.prop.owner.hint=En bruker som har alle rettighetene på wikien.
+platform.wiki.currentwiki.prop.membershipType.hint=Måten brukerne kan bli medlem av denne wikien.
+platform.wiki.currentwiki.prop.secure.hint=Hvis aktivert, vil alle wiki-genererte eksterne URL-adresser starte med {0}https:~/~/{1}.
+platform.wiki.currentwiki.invite.username.hint=Navnet på brukeren som skal legges til wikien.
+platform.wiki.currentwiki.invite.message.hint=Meldingen som skal sendes til brukeren.
+platform.wiki.currentwiki.candidates.hint=Brukere som har bedt om eller blitt invitert til å bli med i wikien.
+platform.wiki.currentwiki.candidates.empty=Ingen bruker har bedt om eller blitt invitert til å bli med i wikien.
+
+# ADMIN
+admin.xwiki.manageworkspace.description=Administrer innstillinger som wiki navn, beskrivelse, eier og medlemskapstype.
+admin.xwiki.workspaceusers.description=Administrer wiki-medlemmer: Legg til, fjern, invitere, godta eller avslå wiki-medlemmer.
+admin.xwiki.usersconfiguration.title=Konfigurasjon
+admin.xwiki.members.title=Nåværende medlemmer
+admin.xwiki.users.title=Alle brukere
+    
+# DRAWER ITEM
+platform.wiki.drawer.homeWiki=Hjem</content>
+  
+</xwikidoc>

@@ -33,7 +33,7 @@ import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.dom4j.Element;
-import org.hibernate.collection.PersistentCollection;
+import org.hibernate.collection.spi.PersistentCollection;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.xar.internal.property.ListXarObjectPropertySerializer;
 import org.xwiki.xml.XMLUtils;
@@ -45,6 +45,7 @@ import com.xpn.xwiki.internal.xml.XMLAttributeValueFilter;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
@@ -248,6 +249,22 @@ public abstract class ListClass extends PropertyClass
     }
 
     /**
+     * @since 11.5RC1
+     */
+    public boolean isLargeStorage()
+    {
+        return (getIntValue("largeStorage") == 1);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void setLargeStorage(boolean largeStorage)
+    {
+        setIntValue("largeStorage", largeStorage ? 1 : 0);
+    }
+
+    /**
      * @return a string (usually just 1 character long) used to join this list's items when displaying it in the UI in
      *         view mode.
      * @see #displayView(StringBuffer, String, String, BaseCollection, XWikiContext)
@@ -360,7 +377,7 @@ public abstract class ListClass extends PropertyClass
             // Check if it is a map entry, i.e. "key=value"
             if (withMap && (unescapedElement.indexOf('=') != -1)) {
                 // Get just the key, ignore the value/label.
-                item = StringUtils.split(unescapedElement, '=')[0];
+                item = unescapedElement.split("=", 2)[0];
             }
 
             // Ignore empty items.
@@ -428,11 +445,11 @@ public abstract class ListClass extends PropertyClass
         }
 
         String val = StringUtils.replace(value, SEPARATOR_ESCAPE + DEFAULT_SEPARATOR, "%PIPE%");
-        String[] result = StringUtils.split(val, "|");
+        String[] result = val.split("\\|");
         for (String element2 : result) {
             String element = StringUtils.replace(element2, "%PIPE%", DEFAULT_SEPARATOR);
             if (element.indexOf('=') != -1) {
-                String[] data = StringUtils.split(element, "=", 2);
+                String[] data = element.split("=", 2);
                 map.put(data[0], new ListItem(data[0], data[1]));
             } else {
                 map.put(element, new ListItem(element, element));
@@ -471,6 +488,8 @@ public abstract class ListClass extends PropertyClass
             lprop = new DBStringListProperty();
         } else if (isMultiSelect()) {
             lprop = new StringListProperty();
+        } else if (isLargeStorage()) {
+            lprop = new LargeStringProperty();
         } else {
             lprop = new StringProperty();
         }

@@ -31,7 +31,9 @@ import org.xwiki.model.reference.DocumentReference;
  *
  * @since 5.3M2
  * @version $Id$
+ * @deprecated since 7.0M2
  */
+@Deprecated
 public class WikiProvisioningJobRequest extends AbstractRequest
 {
     /**

@@ -19,6 +19,12 @@
  */
 package org.xwiki.test.docker.junit5.browser;
 
+import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.UnexpectedAlertBehaviour;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
@@ -32,34 +38,65 @@ public enum Browser
     /**
      * the Firefox Browser.
      */
-    FIREFOX(DesiredCapabilities.firefox()),
+    FIREFOX(new FirefoxOptions()),
 
     /**
      * the Chrome Browser.
      */
-    CHROME(DesiredCapabilities.chrome());
+    CHROME(new ChromeOptions());
 
     /**
      * The path where to store the test-resources on the browser container.
      */
     private static final String TEST_RESOURCES_PATH = "/tmp/test-resources";
 
-    private DesiredCapabilities capabilities;
+    private Capabilities capabilities;
 
     Browser()
     {
         // Capability will be resolved at runtime
     }
 
-    Browser(DesiredCapabilities capabilities)
+    Browser(Capabilities capabilities)
     {
         this.capabilities = capabilities;
+        this.forceDefaultCapabilities();
+    }
+
+    /**
+     * Ensure that some capabilities are set as expected for our tests.
+     */
+    private void forceDefaultCapabilities()
+    {
+        DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        // By default we want to be able to handle alerts.
+        desiredCapabilities.setCapability(CapabilityType.SUPPORTS_ALERTS, true);
+        desiredCapabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        desiredCapabilities.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        this.capabilities.merge(desiredCapabilities);
+
+        if (this.capabilities instanceof FirefoxOptions) {
+            FirefoxOptions firefoxOptions = (FirefoxOptions) this.capabilities;
+            // Create the profile on the fly, mostly for test.
+            if (firefoxOptions.getProfile() == null) {
+                firefoxOptions.setProfile(new FirefoxProfile());
+            }
+            // We want to ensure that those events are taking into account.
+            firefoxOptions.getProfile().setPreference("dom.disable_beforeunload", false);
+        } else if (this.capabilities instanceof ChromeOptions) {
+            ChromeOptions chromeOptions = (ChromeOptions) this.capabilities;
+            chromeOptions.addArguments(
+                "--whitelisted-ips",
+                "--no-sandbox",
+                "--disable-extensions"
+            );
+        }
     }
 
     /**
      * @return the Selenium capability object for the selected browser.
      */
-    public DesiredCapabilities getCapabilities()
+    public Capabilities getCapabilities()
     {
         return this.capabilities;
     }

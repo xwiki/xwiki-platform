@@ -184,7 +184,12 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>require(['jquery', 'xwiki-meta'], function($, xm) {
+  // The livetable is refreshed after each action (add/remove).
+  // Refresh the document version to avoid conflicts if we try to save afterwards
+  $(document).on('xwiki:livetable:displayComplete', function (event) {
+    xm.refreshVersion();
+  });
   $(document).on('click', '#addMembers', function(event) {
     event.preventDefault();
     var addMembersButton = $(event.target);

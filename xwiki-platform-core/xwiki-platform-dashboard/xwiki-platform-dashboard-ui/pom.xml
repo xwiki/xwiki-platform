@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-dashboard</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-dashboard-ui</artifactId>
   <name>XWiki Platform - Dashboard - UI</name>
@@ -51,6 +51,8 @@
     </dependency>
     <dependency>
       <!-- Required for the Macro Wizard that is used by the Gadget Wizard. -->
+      <!-- FIXME: it does not make sense for a platform-core extension to depend on a contrib extension.
+                  The macro editor should be moved to platform as a reusable component instead of a WYSIWYG internal feature. -->
       <groupId>org.xwiki.contrib</groupId>
       <artifactId>application-ckeditor-ui</artifactId>
       <type>xar</type>

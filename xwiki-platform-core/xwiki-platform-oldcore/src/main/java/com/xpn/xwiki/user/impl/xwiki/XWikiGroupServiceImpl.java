@@ -263,18 +263,17 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
     public void removeUserOrGroupFromAllGroups(String memberWiki, String memberSpace, String memberName,
         XWikiContext context) throws XWikiException
     {
-        List<Object> parameterValues = new ArrayList<Object>();
+        List<Object> parameterValues = new ArrayList<>();
 
-        StringBuilder where = new StringBuilder(
-            ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?");
         parameterValues.add(CLASS_XWIKIGROUPS);
+        StringBuilder where = new StringBuilder(
+            ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?"
+                + parameterValues.size());
 
         where.append(" and obj.id=prop.id.id");
 
-        where.append(" and prop.name=?");
         parameterValues.add(FIELD_XWIKIGROUPS_MEMBER);
-
-        where.append(" and prop.value like ?");
+        where.append(" and prop.name=?" + parameterValues.size());
 
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
@@ -287,6 +286,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             parameterValues.add(HQLLIKE_ALL_SYMBOL + memberWiki + WIKI_FULLNAME_SEP + memberSpace + SPACE_NAME_SEP
                 + memberName + HQLLIKE_ALL_SYMBOL);
         }
+        where.append(" and prop.value like ?" + parameterValues.size());
 
         List<XWikiDocument> documentList =
             context.getWiki().getStore().searchDocuments(where.toString(), parameterValues, context);
@@ -413,11 +413,13 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
         StringBuilder from = new StringBuilder(", BaseObject as obj");
 
-        StringBuilder where = new StringBuilder(" where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
+        StringBuilder where = new StringBuilder(" where doc.fullName=obj.name");
         parameterValues.add(classtemplate);
+        where.append(" and doc.fullName<>?" + parameterValues.size());
         parameterValues.add("XWiki." + documentClass);
+        where.append(" and obj.className=?" + parameterValues.size());
 
-        Map<String, String> fieldMap = new HashMap<String, String>();
+        Map<String, String> fieldMap = new HashMap<>();
         int fieldIndex = 0;
 
         // Manage object match strings
@@ -435,20 +437,20 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                         from.append(", " + type + " as " + fieldPrefix);
 
                         where.append(" and obj.id=" + fieldPrefix + ".id.id");
-                        where.append(" and " + fieldPrefix + ".name=?");
                         parameterValues.add(fieldName);
+                        where.append(" and " + fieldPrefix + ".name=?" + parameterValues.size());
                         ++fieldIndex;
                     } else {
                         fieldPrefix = fieldMap.get(fieldName);
                     }
 
-                    where.append(" and lower(" + fieldPrefix + ".value) like ?");
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+                    where.append(" and lower(" + fieldPrefix + ".value) like ?" + parameterValues.size());
 
                     fieldMap.put(fieldName, fieldPrefix);
                 } else {
-                    where.append(" and lower(doc." + fieldName + ") like ?");
                     parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+                    where.append(" and lower(doc." + fieldName + ") like ?" + parameterValues.size());
                 }
             }
         }
@@ -476,8 +478,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
                         from.append(", " + type + " as " + fieldPrefix);
 
                         where.append(" and obj.id=" + fieldPrefix + ".id.id");
-                        where.append(" and " + fieldPrefix + ".name=?");
+
                         parameterValues.add(fieldName);
+                        where.append(" and " + fieldPrefix + ".name=?" + parameterValues.size());
+
                         ++fieldIndex;
                     } else {
                         fieldPrefix = fieldMap.get(fieldName);

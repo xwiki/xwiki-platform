@@ -21,7 +21,7 @@ package org.xwiki.test.ui.po.editor;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.FormElement;
+import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
 
 /**
@@ -30,7 +30,7 @@ import org.xwiki.test.ui.po.SuggestInputElement;
  * @version $Id$
  * @since 5.1RC1
  */
-public class ObjectEditPane extends FormElement
+public class ObjectEditPane extends FormContainerElement
 {
     /**
      * The object type.
@@ -41,6 +41,22 @@ public class ObjectEditPane extends FormElement
      * The object number (identifies the object in the set of objects of the same type).
      */
     private int objectNumber;
+
+    /**
+     * Creates a new edit pane for an object of the specified type. The form fields from the given container should
+     * correspond to properties of the specified type.
+     *
+     * @param containerLocator the element that locates the form fields used to edit the object
+     * @param className the object type
+     * @param objectNumber the object number (identifies the object in the set of objects of the same type)
+     */
+    public ObjectEditPane(By containerLocator, String className, int objectNumber)
+    {
+        super(containerLocator);
+
+        this.className = className;
+        this.objectNumber = objectNumber;
+    }
 
     /**
      * Creates a new edit pane for an object of the specified type. The form fields from the given container should
@@ -64,10 +80,10 @@ public class ObjectEditPane extends FormElement
      * @param datePropertyName the name of a date property of the edited object
      * @return the date picker
      */
-    public DatePicker openDatePicker(String datePropertyName)
+    public BootstrapDateTimePicker openDatePicker(String datePropertyName)
     {
-        getDriver().findElementWithoutWaiting(getForm(), byPropertyName(datePropertyName)).click();
-        return new DatePicker();
+        getDriver().findElementWithoutWaiting(getFormElement(), byPropertyName(datePropertyName)).click();
+        return new BootstrapDateTimePicker();
     }
 
     /**
@@ -77,7 +93,7 @@ public class ObjectEditPane extends FormElement
     public SuggestInputElement getSuggestInput(String userPropertyName)
     {
         return new SuggestInputElement(
-            getDriver().findElementWithoutWaiting(getForm(), byPropertyName(userPropertyName)));
+            getDriver().findElementWithoutWaiting(getFormElement(), byPropertyName(userPropertyName)));
     }
 
     /**
@@ -89,5 +105,18 @@ public class ObjectEditPane extends FormElement
     public By byPropertyName(String propertyName)
     {
         return By.id(this.className + "_" + this.objectNumber + "_" + propertyName);
+    }
+
+    /**
+     * Helper to fill property values quickly.
+     *
+     * @param propertyName the name of the property to set
+     * @param propertyValue the value of the property
+     * @return the current instance.
+     */
+    public ObjectEditPane setPropertyValue(String propertyName, String propertyValue)
+    {
+        this.setFieldValue(byPropertyName(propertyName), propertyValue);
+        return this;
     }
 }

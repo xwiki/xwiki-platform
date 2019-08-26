@@ -36,8 +36,9 @@
           <input type="hidden" name="section" value="$escapetool.xml($request.section)" />
         #end
         <label class="hidden" for="extensionSearchInput">$services.localization.render('extensions.search.tip')</label>
-        <input type="text" #if ("$!request.search" == '')class="withTip" #{end}id="extensionSearchInput" name="search"
-          value="#if ("$!request.search" != '')$escapetool.xml($request.search)#{else}$services.localization.render('extensions.search.tip')#{end}" />
+        <input type="text" id="extensionSearchInput" name="search"
+          #if ("$!request.search" != '') value="$escapetool.xml($request.search)"#{end}
+          placeholder="$services.localization.render('extensions.search.tip')"/>
         <label class="hidden" for="extensionSearchRepositoryList">$services.localization.render('extensions.search.repository.label')</label>
         #set ($selectedRepositoryId = 'recommended')
         #if ($request.repo)

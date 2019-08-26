@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-pageobjects</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Page Objects test framework</name>
@@ -81,12 +81,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-tag-test-pageobjects</artifactId>
       <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>cpsuite</groupId>
-      <artifactId>cpsuite</artifactId>
-      <version>1.2.5</version>
     </dependency>
 
     <!-- Make it easy to debug flickering tests by repeating them.

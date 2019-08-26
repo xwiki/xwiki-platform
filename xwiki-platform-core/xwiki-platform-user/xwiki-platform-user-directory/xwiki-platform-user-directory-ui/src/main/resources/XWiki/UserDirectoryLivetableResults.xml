@@ -44,6 +44,9 @@
 ##
 ## Call the gridresultwithfilter macro that generates the JSON. Hardcode the XWikiUsers class because we don't want others to use this page to avoid blacklisted spaces for other classes.
 ## Note: This page can be ignored if an override exists. However, we allow possible overrides to include this page and extend the livetable's query.
+#if ("$!extraWhereClauseParameters" == "")
+  #set ($extraWhereClauseParameters = {})
+#end
 #gridresultwithfilter('XWiki.XWikiUsers' $request.collist.split(','), "$!extraFromClause", "$!extraWhereClause", $extraWhereClauseParameters)
 {{/velocity}}</content>
 </xwikidoc>

@@ -1,0 +1,1 @@
+org.xwiki.store.merge.MergeScriptService

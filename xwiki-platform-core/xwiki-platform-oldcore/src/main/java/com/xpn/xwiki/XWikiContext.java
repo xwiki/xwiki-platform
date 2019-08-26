@@ -688,15 +688,6 @@ public class XWikiContext extends Hashtable<Object, Object>
     }
 
     /**
-     * @deprecated since 6.0M1, use {@link #setInterfaceLocale(Locale)} instead
-     */
-    @Deprecated
-    public void setInterfaceLanguage(String interfaceLanguage)
-    {
-        setInterfaceLocale(LocaleUtils.toLocale(Util.normalizeLanguage(interfaceLanguage)));
-    }
-
-    /**
      * @param interfaceLocale the {@link Locale} to use to display the content
      * @since 6.0M1
      */
@@ -753,30 +744,6 @@ public class XWikiContext extends Hashtable<Object, Object>
     public void setFinished(boolean finished)
     {
         this.finished = finished;
-    }
-
-    /**
-     * @deprecated never made any sense since the context wiki can change any time
-     */
-    @Deprecated
-    public void setWikiOwner(String wikiOwner)
-    {
-        // Cannot do anything
-    }
-
-    /**
-     * @deprecated use {@link XWiki#getWikiOwner(String, XWikiContext)} instead
-     */
-    @Deprecated
-    public String getWikiOwner()
-    {
-        try {
-            return getWiki().getWikiOwner(getWikiId(), this);
-        } catch (XWikiException e) {
-            LOGGER.error("Failed to get owner for wiki [{}]", getWikiId(), e);
-        }
-
-        return null;
     }
 
     public XWikiDocument getWikiServer()

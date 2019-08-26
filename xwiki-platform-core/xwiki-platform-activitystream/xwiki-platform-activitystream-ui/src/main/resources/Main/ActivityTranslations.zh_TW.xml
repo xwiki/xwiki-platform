@@ -36,12 +36,12 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: activity.page.link.title=Located in {0}
+  <content>activity.page.link.title=位於 {0}
 activity.rss.pages.modified=頁面修改 RSS feed
 activity.rss.feed.description=文件變動 RSS feed
-### Missing: activity.rss.feed.tags.description=RSS feed for documents tagged with "{0}"
-### Missing: activity.rss.feed.spaces.description=RSS feed for documents in space(s) "{0}"
-### Missing: activity.rss.feed.tagsAndSpaces.description=RSS feed for documents tagged with "{0}" in space(s) "{1}"
+activity.rss.feed.tags.description=頁面標籤 "{0}" RSS feed
+activity.rss.feed.spaces.description=文件在 space(s) "{0}" RSS feed
+activity.rss.feed.tagsAndSpaces.description=文件標籤 "{0}" 在 space(s) "{1}"
 
 ## Used to indicate where deprecated keys start
 #@deprecatedstart
@@ -50,6 +50,5 @@ activity.rss.feed.description=文件變動 RSS feed
 ### Missing: activity.link.title=Located in {0} » {1} » {2}
 
 ## Used to indicate where deprecated keys end
-#@deprecatedend
-</content>
+#@deprecatedend</content>
 </xwikidoc>

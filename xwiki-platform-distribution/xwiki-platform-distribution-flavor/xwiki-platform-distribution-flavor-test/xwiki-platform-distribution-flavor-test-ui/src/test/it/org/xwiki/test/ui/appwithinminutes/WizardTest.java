@@ -237,7 +237,6 @@ public class WizardTest extends AbstractTest
 
         // Assert that the created application is listed in the live table.
         ApplicationsLiveTableElement appsLiveTable = appWithinMinutesHomePage.getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         Assert.assertTrue(appsLiveTable.isApplicationListed(appName));
 
         // Delete the application entries.
@@ -253,8 +252,10 @@ public class WizardTest extends AbstractTest
         homePage.clickDeleteApplication().clickYes();
         // Verify that the application is not listed anymore.
         appsLiveTable = AppWithinMinutesHomePage.gotoPage().getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         Assert.assertFalse(appsLiveTable.isApplicationListed(appName));
+
+        this.validateConsole.getLogCaptureConfiguration().registerExcludes("WikiComponentException: Registering UI "
+            + "extensions at wiki level requires wiki administration rights");
     }
 
     /**
@@ -288,8 +289,8 @@ public class WizardTest extends AbstractTest
         Assert.assertTrue(classEditPage.getContent().contains(ClassEditorTest.EMPTY_CANVAS_HINT));
         classEditPage.addField("Number");
 
-        // Step 3 and back to Step 2
-        classEditPage = classEditPage.clickNextStep().clickPreviousStep();
+        // Step 4 and back to Step 2
+        classEditPage = classEditPage.clickNextStep().clickNextStep().clickPreviousStep().clickPreviousStep();
         Assert.assertFalse(classEditPage.getContent().contains(ClassEditorTest.EMPTY_CANVAS_HINT));
         Assert.assertFalse(classEditPage.hasPreviousStep());
     }

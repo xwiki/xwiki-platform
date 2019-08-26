@@ -147,3 +147,38 @@ ul.diff-summary, .diff-summary ul {
 .diff-info-icon {
   cursor: default;
 }
+
+/**
+ * Rendered Content (HTML) Diff
+ */
+
+.html-diff [data-xwiki-html-diff="deleted"] {
+  background-color: #FFAAAA;
+}
+.html-diff [data-xwiki-html-diff="inserted"] {
+  background-color: #AAFFAA;
+}
+.html-diff [data-xwiki-html-diff-block="deleted"] {
+  background-color: #FFDDDD;
+}
+.html-diff [data-xwiki-html-diff-block="inserted"] {
+  background-color: #DDFFDD;
+}
+.html-diff [data-xwiki-html-diff-hidden="true"] {
+  display: none;
+}
+
+.html-diff [data-xwiki-html-diff-hidden="ellipsis"] {
+  height: 20px;
+  visibility: hidden;
+}
+.html-diff [data-xwiki-html-diff-hidden="ellipsis"]:before {
+  color: $theme.textSecondaryColor;
+  content: '...';
+  cursor: pointer;
+  position: absolute;
+  visibility: visible;
+}
+.html-diff [data-xwiki-html-diff-hidden="ellipsis"]:hover:before {
+  color: $theme.linkColor;
+}

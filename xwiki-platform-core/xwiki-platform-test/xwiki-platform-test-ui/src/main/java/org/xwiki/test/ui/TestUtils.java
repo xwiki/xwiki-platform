@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -65,6 +66,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -223,8 +225,8 @@ public class TestUtils
     public TestUtils()
     {
         this.httpClient = new HttpClient();
-        this.httpClient.getState().setCredentials(AuthScope.ANY, SUPER_ADMIN_CREDENTIALS);
-        this.httpClient.getParams().setAuthenticationPreemptive(true);
+
+        setDefaultCredentials(SUPER_ADMIN_CREDENTIALS);
 
         this.rest = new RestTestUtils(this);
     }
@@ -310,7 +312,13 @@ public class TestUtils
     {
         UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
 
-        this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
+        if (defaultCredentials != null) {
+            this.httpClient.getState().setCredentials(AuthScope.ANY, defaultCredentials);
+            this.httpClient.getParams().setAuthenticationPreemptive(true);
+        } else {
+            this.httpClient.getState().clearCredentials();
+            this.httpClient.getParams().setAuthenticationPreemptive(false);
+        }
 
         return currentCredentials;
     }
@@ -347,11 +355,25 @@ public class TestUtils
 
     public void loginAndGotoPage(String username, String password, String pageURL)
     {
+        loginAndGotoPage(username, password, pageURL, true);
+    }
+
+    /**
+     * @since 11.6RC1
+     */
+    public void loginAndGotoPage(String username, String password, String pageURL, boolean checkLoginSuccess)
+    {
         if (!username.equals(getLoggedInUserName())) {
             // Log in and direct to a non existent page so that it loads very fast and we don't incur the time cost of
             // going to the home page for example.
             // Also recache the CSRF token
-            getDriver().get(getURLToLoginAndGotoPage(username, password, getURL("XWiki", "Register", "register")));
+            String destUrl = getURL("XWiki", "Register", "register");
+            getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
+
+            if (checkLoginSuccess && !destUrl.equals(getDriver().getCurrentUrl())) {
+                throw
+                    new RuntimeException(String.format("Login failed with credentials: %s / %s.", username, password));
+            }
             recacheSecretTokenWhenOnRegisterPage();
             if (pageURL != null) {
                 // Go to the page asked
@@ -535,6 +557,14 @@ public class TestUtils
         gotoPage(space, page, action, toQueryString(queryParameters));
     }
 
+    /**
+     * @since 11.3RC1
+     */
+    public void gotoPage(EntityReference reference, String action, Object... queryParameters)
+    {
+        gotoPage(reference, action, toQueryString(queryParameters));
+    }
+
     public void gotoPage(String space, String page, String action, Map<String, ?> queryParameters)
     {
         gotoPage(Collections.singletonList(space), page, action, queryParameters);
@@ -625,6 +655,15 @@ public class TestUtils
     public ViewPage createPage(String space, String page, String content, String title)
     {
         return createPage(Collections.singletonList(space), page, content, title);
+    }
+
+    /**
+     * @since 11.5RC1
+     * @since 11.3.1
+     */
+    public ViewPage createPage(EntityReference reference, String content)
+    {
+        return createPage(reference, content, this.serializeReference(reference), null);
     }
 
     /**
@@ -897,6 +936,10 @@ public class TestUtils
      */
     public String getURL(EntityReference reference, String action, String queryString, String fragment)
     {
+        Serializable locale = reference.getParameters().get("locale");
+        if (locale != null) {
+            queryString += "&language=" + locale;
+        }
         return getURL(action, extractListFromReference(reference).toArray(new String[] {}), queryString, fragment);
     }
 
@@ -1284,6 +1327,23 @@ public class TestUtils
     }
 
     /**
+     * @since 11.5RC1
+     * @since 11.3.1
+     */
+    public void updateObject(EntityReference entityReference, String className, int objectNumber,
+        Object... properties)
+    {
+        // TODO: would be even quicker using REST
+        Map<String, Object> queryParameters =
+            (Map<String, Object>) toQueryParameters(className, objectNumber, properties);
+
+        // Append the updateOrCreate objectPolicy since we always want this in our tests.
+        queryParameters.put("objectPolicy", "updateOrCreate");
+
+        gotoPage(entityReference, "save", queryParameters);
+    }
+
+    /**
      * @since 8.3RC1
      */
     public void updateObject(List<String> spaces, String page, String className, int objectNumber, Object... properties)
@@ -1296,6 +1356,22 @@ public class TestUtils
         queryParameters.put("objectPolicy", "updateOrCreate");
 
         gotoPage(spaces, page, "save", queryParameters);
+    }
+
+    /**
+     * @since 11.3RC1
+     */
+    public void addClassProperty(EntityReference reference, String propertyName, String propertyType)
+    {
+        gotoPage(reference, "propadd", "propname", propertyName, "proptype", propertyType);
+    }
+
+    /**
+     * @since 11.3RC1
+     */
+    public void updateClassProperty(EntityReference reference, Object... queryParameters)
+    {
+        gotoPage(reference, "propupdate", queryParameters);
     }
 
     public void addClassProperty(String space, String page, String propertyName, String propertyType)
@@ -1520,6 +1596,17 @@ public class TestUtils
         rest().attachFile(reference, is, failIfExists);
     }
 
+    public void deleteAttachement(EntityReference pageReference, String filename) throws Exception
+    {
+        EntityReference reference = new EntityReference(filename, EntityType.ATTACHMENT, pageReference);
+        deleteAttachement(reference);
+    }
+
+    public void deleteAttachement(EntityReference reference) throws Exception
+    {
+        rest().deleteAttachement(reference);
+    }
+
     // FIXME: improve that with a REST API to directly import a XAR
     public void importXar(File file) throws Exception
     {
@@ -1641,13 +1728,20 @@ public class TestUtils
         properties.load(new ByteArrayInputStream(configuration.getBytes()));
         StringBuilder sb = new StringBuilder();
 
-        // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
+        sb.append("{{velocity}}\n"
+                + "#set($config = $!services.component.getInstance(\"org.xwiki.configuration."
+                + "ConfigurationSource\", \"xwikicfg\"))\n"
+                + "#set($props = $config.getProperties())\n");
+
+            // Since we don't have access to the XWiki object from Selenium tests and since we don't want to restart XWiki
         // with a different xwiki.cfg file for each test that requires a configuration change, we use the following
         // trick: We create a document and we access the XWiki object with a Velocity script inside that document.
         for (Map.Entry<Object, Object> param : properties.entrySet()) {
-            sb.append("{{velocity}}$!xwiki.xWiki.config.setProperty('").append(param.getKey()).append("', '")
-                .append(param.getValue()).append("')").append("\n{{/velocity}}");
+            sb.append("#set($discard = $props.put('").append(param.getKey()).append("', '")
+                .append(param.getValue()).append("'))\n");
         }
+        sb.append("#set($discard = $config.set($props))\n"
+            + "{{/velocity}}");
         createPage("Test", "XWikiConfigurationPageForTest", sb.toString(), "Test page to change xwiki.cfg");
     }
 
@@ -2123,6 +2217,10 @@ public class TestUtils
 
         public Object[] toElements(EntityReference reference)
         {
+            if (reference == null) {
+                return ArrayUtils.EMPTY_OBJECT_ARRAY;
+            }
+
             List<EntityReference> references = reference.getReversedReferenceChain();
 
             List<Object> elements = new ArrayList<>(references.size() + 2);
@@ -2400,6 +2498,11 @@ public class TestUtils
             }
         }
 
+        public void deleteAttachement(EntityReference reference) throws Exception
+        {
+            assertStatusCodes(executeDelete(AttachmentResource.class, toElements(reference)), true, STATUS_NO_CONTENT);
+        }
+
         public boolean exists(EntityReference reference) throws Exception
         {
             GetMethod getMethod = executeGet(reference);
@@ -2469,7 +2572,7 @@ public class TestUtils
                 return null;
             }
 
-            if (reference.getType() == EntityType.ATTACHMENT) {
+            if (reference != null && reference.getType() == EntityType.ATTACHMENT) {
                 return (T) getMethod.getResponseBodyAsStream();
             } else {
                 try {
@@ -2480,6 +2583,11 @@ public class TestUtils
                     getMethod.releaseConnection();
                 }
             }
+        }
+
+        public <T> T get(Object resourceURI, boolean failIfNotFound) throws Exception
+        {
+            return get(resourceURI, null, failIfNotFound);
         }
 
         public InputStream getInputStream(String resourceUri, Map<String, ?> queryParams, Object... elements)
@@ -2710,5 +2818,54 @@ public class TestUtils
         TestUtils.assertStatusCodes(
             rest().executePut(ObjectPropertyResource.class, property, rest().toElements(enabledPropertyReference)),
             true, STATUS_ACCEPTED);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public void switchTab(String tabHandle)
+    {
+        getDriver().switchTo().window(tabHandle);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public String getCurrentTabHandle()
+    {
+        return getDriver().getWindowHandle();
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public String openLinkInTab(By by, String... existingTabHandles)
+    {
+        getDriver().findElement(by).sendKeys(Keys.chord(Keys.CONTROL, Keys.RETURN));
+
+        // It might take a bit of time for the driver to know there's another window.
+        getDriver().waitUntilCondition(input -> input.getWindowHandles().size() == existingTabHandles.length + 1);
+        Set<String> windowHandles = getDriver().getWrappedDriver().getWindowHandles();
+        String newTabHandle = null;
+        List<String> tabHandles = Arrays.asList(existingTabHandles);
+        for (String handle : windowHandles) {
+            if (!tabHandles.contains(handle)) {
+                newTabHandle = handle;
+                break;
+            }
+        }
+        return newTabHandle;
+    }
+
+    /**
+     * @since 11.5
+     * @since 11.6RC1
+     */
+    public void closeTab(String secondTabHandle)
+    {
+        String currentTab = getCurrentTabHandle();
+        switchTab(secondTabHandle);
+        getDriver().close();
+        switchTab(currentTab);
     }
 }

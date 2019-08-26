@@ -33,7 +33,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.rest.internal.representations.TextPlainReader;
+import org.xwiki.rest.internal.representations.AbstractTextPlainReader;
 import org.xwiki.rest.model.jaxb.Comment;
 import org.xwiki.rest.model.jaxb.ObjectFactory;
 
@@ -45,7 +45,7 @@ import org.xwiki.rest.model.jaxb.ObjectFactory;
 @Provider
 @Consumes(MediaType.TEXT_PLAIN)
 @Singleton
-public class TextPlainCommentReader extends TextPlainReader<Comment>
+public class TextPlainCommentReader extends AbstractTextPlainReader<Comment>
 {
     @Override
     public boolean isReadable(Class< ? > type, Type genericType, Annotation[] annotations, MediaType mediaType)

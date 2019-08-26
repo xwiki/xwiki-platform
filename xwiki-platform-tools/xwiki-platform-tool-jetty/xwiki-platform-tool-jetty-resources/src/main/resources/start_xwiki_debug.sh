@@ -40,6 +40,7 @@ usage() {
   echo "-yp, --yourkitpath: The path where Yourkit can find the agent. If not passed then YourKit won't be enabled."
   echo "    For example: \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
   echo "    or \"/home/User/yjp-11.0.8/bin/linux-x86-64/\""
+  echo "--suspend: if defined then debug is in suspend mode (i.e. wait for a debugger to connect before progressing)."
   echo ""
   echo "Example: start_xwiki_debug.sh -yp \"/Applications/YourKit Java Profiler 7.0.11.app/bin/mac\""
 }
@@ -59,13 +60,6 @@ done
 PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
-# If no XWIKI_OPTS env variable has been defined use default values.
-if [ -z "$XWIKI_OPTS" ] ; then
-  XWIKI_OPTS="-Xmx1024m"
-fi
-XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
-XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
-
 # The port on which to start Jetty can be defined in an environment variable called JETTY_PORT
 if [ -z "$JETTY_PORT" ]; then
   JETTY_PORT=8080
@@ -78,6 +72,9 @@ fi
 
 # The location where to store the process id
 XWIKI_LOCK_DIR="/var/tmp"
+
+# By default suspend is false for debug
+SUSPEND="n"
 
 # Parse script parameters
 while [[ $# > 0 ]]; do
@@ -103,6 +100,10 @@ while [[ $# > 0 ]]; do
       YOURKIT_PATH="$1"
       shift
       ;;
+    --suspend)
+      SUSPEND="y"
+      shift
+      ;;
     -h|--help)
       usage
       exit 1
@@ -114,6 +115,13 @@ while [[ $# > 0 ]]; do
       ;;
   esac
 done
+
+# If no XWIKI_OPTS env variable has been defined use default values.
+if [ -z "$XWIKI_OPTS" ] ; then
+  XWIKI_OPTS="-Xmx1024m"
+fi
+XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
+XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=5005"
 
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running
 XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"

@@ -141,12 +141,19 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         this.xclass = (BaseClass) object;
     }
 
+    /**
+     * Computes the field full name using this format: {@code parentName_fieldName}. There are 2 main cases:
+     * <ul>
+     * <li>this is a class property: the prefix is the class reference (e.g. XWiki.TagClass_tags)</li>
+     * <li>this is a meta property: the prefix is the property type (e.g. TextArea_editor)</li>
+     * </ul>
+     * 
+     * @return the field full name
+     */
     public String getFieldFullName()
     {
-        if (getObject() == null) {
-            return getName();
-        }
-        return getObject().getName() + "_" + getName();
+        String prefix = getObject() != null ? getObject().getName() : getClassName();
+        return prefix + "_" + getName();
     }
 
     @Override

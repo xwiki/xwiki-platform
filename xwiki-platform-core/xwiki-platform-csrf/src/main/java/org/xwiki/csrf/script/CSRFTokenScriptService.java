@@ -65,4 +65,10 @@ public class CSRFTokenScriptService implements CSRFToken, ScriptService
     {
         return this.csrf.getResubmissionURL();
     }
+
+    @Override
+    public String getRequestURI()
+    {
+        return this.csrf.getRequestURI();
+    }
 }

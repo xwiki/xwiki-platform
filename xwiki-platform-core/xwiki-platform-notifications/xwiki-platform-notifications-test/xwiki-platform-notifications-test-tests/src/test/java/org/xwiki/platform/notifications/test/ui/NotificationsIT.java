@@ -37,6 +37,7 @@ import org.simplejavamail.email.Email;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.mail.test.po.SendMailAdministrationSectionPage;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.platform.notifications.test.po.NotificationsRSS;
 import org.xwiki.platform.notifications.test.po.NotificationsTrayPage;
 import org.xwiki.platform.notifications.test.po.NotificationsUserProfilePage;
 import org.xwiki.platform.notifications.test.po.preferences.ApplicationPreferences;
@@ -130,7 +131,7 @@ public class NotificationsIT extends AbstractTest
     @Before
     public void setUpEmails() throws Exception
     {
-        if (this.mail != null) {
+        if (mail != null) {
             // Already done
             return;
         }
@@ -148,8 +149,16 @@ public class NotificationsIT extends AbstractTest
         sendMailPage.setSendWaitTime("0");
         sendMailPage.clickSave();
 
-        this.mail = new GreenMail(ServerSetupTest.SMTP);
-        this.mail.start();
+        mail = new GreenMail(ServerSetupTest.SMTP);
+        mail.start();
+    }
+
+    @Before
+    public void setUpDomain()
+    {
+        // Set a custom main wiki domain:port to make sure it's actually used in mails
+        getUtil().updateObject("XWiki", "XWikiServerXwiki", "XWiki.XWikiServerClass", 0, "server", "externaldomain",
+            "port", "4242", "secure", "1");
     }
 
     @AfterClass
@@ -307,6 +316,13 @@ public class NotificationsIT extends AbstractTest
         assertEquals(9, tray.getUnreadNotificationsCount());
         assertEquals(1, tray.getReadNotificationsCount());
 
+        // Make sure it's still OK after a refresh
+        getUtil().gotoPage(getTestClassName(), "WebHome");
+        tray = new NotificationsTrayPage();
+        assertEquals(20, tray.getNotificationsCount());
+        assertEquals(9, tray.getUnreadNotificationsCount());
+        assertEquals(1, tray.getReadNotificationsCount());
+
         // Ensure that a notification has a correct type
         assertEquals("create", tray.getNotificationType(0));
 
@@ -359,10 +375,12 @@ public class NotificationsIT extends AbstractTest
         getUtil().login(SUPERADMIN_USER_NAME, SUPERADMIN_PASSWORD);
         SchedulerHomePage schedulerHomePage = SchedulerHomePage.gotoPage();
         schedulerHomePage.clickJobActionTrigger("Notifications daily email");
-        this.mail.waitForIncomingEmail(1);
 
-        assertEquals(1, this.mail.getReceivedMessages().length);
-        MimeMessage message = this.mail.getReceivedMessages()[0];
+        // Wait 30s instead of the default 5s to make sure the mail has enough time to arrive, even if the CI is slow.
+        mail.waitForIncomingEmail(30000L, 1);
+
+        assertEquals(1, mail.getReceivedMessages().length);
+        MimeMessage message = mail.getReceivedMessages()[0];
 
         // Convert to org.simplejavamail.email because it is more simple to read
         Email email = EmailConverter.mimeMessageToEmail(message);
@@ -449,6 +467,16 @@ public class NotificationsIT extends AbstractTest
         assertEquals("Linux as a title", tray.getNotificationPage(1));
         assertEquals("update", tray.getNotificationType(1));
         assertTrue(tray.getNotificationDescription(1).startsWith("edited by user1"));
+
+        NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
+        assertEquals(2, notificationsRSS.getEntries().size());
+        assertEquals("A comment has been added to the page \"Linux as a title\"",
+                notificationsRSS.getEntries().get(0).getTitle());
+        assertTrue(notificationsRSS.getEntries().get(0).getDescription().getValue().contains(
+                "<strong>Pages: [addComment]</strong>"));
+        assertEquals("The page \"Linux as a title\" has been modified",
+                notificationsRSS.getEntries().get(1).getTitle());
+
         tray.clearAllNotifications();
     }
 

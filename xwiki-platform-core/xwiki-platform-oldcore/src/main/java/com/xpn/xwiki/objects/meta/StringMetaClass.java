@@ -52,6 +52,9 @@ public class StringMetaClass extends PropertyMetaClass
         sizeClass.setPrettyName("Size");
         sizeClass.setSize(5);
         sizeClass.setNumberType("integer");
+        // We set the hint here in order to avoid adding a new translation key with the same message for each property
+        // type that extends String property.
+        sizeClass.setHint("String_size_hint");
         safeput(sizeClass.getName(), sizeClass);
 
         BooleanClass pickerClass = new BooleanClass(this);

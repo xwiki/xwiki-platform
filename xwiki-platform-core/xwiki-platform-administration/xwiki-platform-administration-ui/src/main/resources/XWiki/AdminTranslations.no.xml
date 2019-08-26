@@ -1,0 +1,135 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.AdminTranslations" locale="no">
+  <web>XWiki</web>
+  <name>AdminTranslations</name>
+  <language>no</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>AdminTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>administration.title=Administrasjon
+administration.title.page=Sideadministrasjon
+administration.title.wiki=Wikiadministrasjon
+administration.title.global=Global administrasjon
+administration.sectionTitle=Administrasjon: {0}
+administration.sectionTitle.page=Sideadministrasjon: {0}
+administration.sectionTitle.wiki=Wikiadministrasjon: {0}
+administration.sectionTitle.global=Global administrasjon: {0}
+administration.menu.search.hint=Søk etter...
+administration.menu.search.noResults=Ingen resultat.
+
+# Registration Section
+XWiki.XWikiPreferences_use_email_verification.hint=Hvis satt til "Ja", vil en e-post bli sendt til e-postadressen som ble oppgitt når du fylte ut registreringsskjemaet.
+XWiki.XWikiPreferences_validation_email_content.hint=E-postmalen som sendes til brukere for å validere e-postadressen.
+XWiki.XWikiPreferences_confirmation_email_content.hint=E-postmalen som tilsvarer posten som sendes etter at brukeren har godkjent sin konto ved å klikke på valideringslenken i den første e-posten han mottar.
+XWiki.XWikiPreferences_invitation_email_content.hint=E-postmalen som sendes til brukere som er invitert til å registrere seg.
+
+XWiki.Registration_heading.hint=Dette er linjen øverst på siden som vises til de som registrerer seg og når de nettopp har registrert seg. Velocity og wiki syntaks kan brukes.
+XWiki.Registration_welcomeMessage.hint=Dette vises bare når noen fyller ut skjemaet. Velocity og wiki-syntakskode kan brukes.
+XWiki.Registration_liveValidation_enabled.hint=Sett dette til false for å deaktivere JavaScript-koden for live validering (feltene vil fortsatt bli validert på serveren).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=Live validering viser en melding som indikerer til brukere at de har fylt ut feltet tilfredsstillende. Dette er meldingen de vil få hvis det ikke er overstyrt for et bestemt felt. Velocitykode kan brukes.
+XWiki.Registration_loginButton_enabled.hint=Når brukeren har registrert seg, tilbyr vi en knapp brukeren kan klikke for å legge inn brukernavn og passord til påloggingshandlingen og få dem logget inn med en gang. Dette fører imidlertid til at brukernavnet og passordet sendes tilbake i HTML-en, noe som kan være uakseptabelt avhengig av sikkerhetsbehovene dine.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Hvis innloggingsknappen er aktivert, kan du få et stykke JavaScript til å trykke på innloggingsknappen for brukeren.
+XWiki.Registration_defaultRedirect.hint=Dette er nettadressen som brukeren blir omdirigert til etter å ha trykket på innloggingsknappen hvis xredirect-parameteren ikke er spesifisert. Velocitykode kan brukes.
+XWiki.Registration_requireCaptcha.hint=Velg dette for å kreve at brukeren løser en CAPTCHA for å kunne registrere seg.
+XWiki.Registration_registrationSuccessMessage.hint=Dette vises til brukeren når de har registrert seg. Velocity og wiki-syntakskode kan brukes.
+
+# Look &amp; Feel Sections
+admin.themes=Temaer
+admin.themes.description=Tilpass farge og ikon-temaer, drakt og logo.
+admin.colorthemes.local=Lokal
+admin.colorthemes.global=Global
+XWiki.XWikiPreferences_showannotations.hint=Vis annotasjonsseksjonen i sidelayouten.
+XWiki.XWikiPreferences_showcomments.hint=Vis kommentar-delen i sidelayouten.
+XWiki.XWikiPreferences_showattachments.hint=Vis vedleggsdelen i sidelayouten.
+XWiki.XWikiPreferences_showhistory.hint=Vis historikk-delen i sidelayouten.
+XWiki.XWikiPreferences_showinformation.hint=Vis informasjonsseksjonen i sidelayouten.
+XWiki.XWikiPreferences_title.hint=Definer sidetittelformatet som nettleserne ser.
+XWiki.XWikiPreferences_meta.hint=Definer metadataene lagt til hver side, angi sidebeskrivelse, forfatter, nøkkelord osv.
+XWiki.XWikiPreferences_webcopyright.hint=Definer informasjonen som vises i opphavsrett-seksjonen av bunnteksten.
+XWiki.XWikiPreferences_version.hint=Definer informasjonen som vises i versjonseksjonen av bunnteksten.
+XWiki.XWikiPreferences_skin.hint=Angi standard drakt brukt. Det kan være filsystemdrakt, eksempel "flamingo" eller en tilpasset sidedrakt, eksempel "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_iconTheme.hint=Angi ikontema som skal brukes som standard.
+XWiki.XWikiPreferences_colorTheme.hint=Angi fargetemaet som skal brukes som standard.
+
+# Editing Sections
+admin.edit=Redigering
+admin.edit.description=Konfigurer redigeringsmodus, WYSIWYG-editoren og de tilgjengelige syntaksene.
+admin.title=Tittel
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Forhindre at brukere oppretter wiki-sider uten tittel.
+XWiki.XWikiPreferences_editor.hint=Velg hvilken type editor som skal brukes som standard for redigering av sidens innhold.
+XWiki.XWikiPreferences_editcomment.hint=Tillat å legge inn en melding når du oppretter en ny sideversjon.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=For hver endring gjort blir siden ikke lagret før en endringsmelding er oppgitt.
+XWiki.XWikiPreferences_minoredit.hint=Tillat at sider har store (x.1) og mindre (1.x) versjoner. De mindre versjonene kan ses ved hjelp av knappen "Vis mindre endringer" fra historikksiden.
+admin.wysiwyg.description=Velg standard WYSIWYG editor og konfigurer den.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=Sidesyntaks som brukes som standard for sidens innhold når du oppretter en ny wikiside.
+
+# Localization Section
+XWiki.XWikiPreferences_multilingual.hint=Aktiver flerspråkmodus hvis wikien har innhold på flere språk. Dette gjør det mulig for brukere å oversette wikisider og vise grensesnittet på sitt foretrukne språk.
+XWiki.XWikiPreferences_languages.hint=Velg språkene som vil være tilgjengelige i grensesnittet. Brukerne vil kunne oversette sidene på wikien til et av disse språkene (hvis flerspråkmodus er aktivert).
+XWiki.XWikiPreferences_default_language.hint=Velg standard språk for wikien
+XWiki.XWikiPreferences_dateformat.hint=Angi formatet som brukes til å vise datoer (for eksempel opprettelsedato for sider)
+XWiki.XWikiPreferences_timezone.hint=Sett tidssone brukt på datoer globalt
+
+# Import Section
+administration.section.import.hint=Begynn med å laste opp en ny pakke eller ved å velge en fra listen over tilgjengelige pakker. Innholdet i den valgte pakken vil bli vist til høyre sammen med importalternativene.
+
+# Export Section
+administration.section.export.packageName.hint=Filnavnet som brukes når du genererer arkivet med det eksporterte innholdet.
+administration.section.export.description.hint=Pakkebeskrivelsen, som vises når du importerer pakken.
+administration.section.export.licence.hint=Lisensiering av innholdet. F.eks.: LGPL, GPLV2, osv.
+administration.section.export.author.hint=Pakkeforfatteren.
+administration.section.export.version.hint=Pakkeversjonen.
+administration.section.export.withHistory.hint=Inkluder sidehistorikken i eksporten. Bare den nyeste versjonen av en side blir eksportert ellers.
+administration.section.export.backupPack.hint=Angi om pakken skal brukes som sikkerhetskopi. Dette alternativet påvirker ikke det eksporterte innholdet. Den eneste effekten er at alternativet "Importer som sikkerhetskopi" vil bli forhåndsvalgt når du importerer pakken. Forskjellen mellom en sikkerhetskopipakke og en vanlig pakke er at i det første tilfellet blir sideforfatteren bevart under importen, mens i det andre tilfelle blir brukeren som utfører importen den forrige forfatteren til hver importerte side.
+
+# Users Section
+administration.section.users.deleteUser.confirmationMessage=Brukeren {0} blir slettet og fjernet fra alle {1}gruppene{2} de var medlem av. Er du sikker på at du vil fortsette?
+administration.section.users.deleteUser.programmingRightsWarning=Brukeren du skal slette, har programmeringsrettigheter og er den siste forfatteren av {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Hvis {1,choice,1# denne siden|1&lt;disse sidene} har skript som krever programmeringsrettigheter, vil disse skriptene slutte å fungere hvis du sletter brukeren.
+administration.section.users.deleteUser.scriptRightsWarning=Brukeren du skal slette har skriptrettigheter og er den siste forfatteren av {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Skriptene fra {1,choice,1#denne siden|1&lt;disse sidene} kan slutte å fungere hvis du sletter brukeren.
+administration.section.users.deleteUser.markDisabledMessage=I stedet for å slette brukeren kan du merke profilen som deaktivert. Dette vil forhindre dem i å logge seg på og vil bevare tilgangsrettighetene knyttet til skriptene de skrev.
+
+# Other Category
+admin.other=Annet
+admin.other.description=Ulike konfigurasjoner for utvidelser.
+administration.section.analytics.status=Status
+administration.section.analytics.status.hint=Bestem om sporing i Google Analytics™ er aktiv eller ikke
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+XWiki.XWikiPreferences_auth_active_check.hint=Hvis satt til "Ja", vil det forhindre at brukerne logger inn uten å skrive inn token som tidligere ble sendt via e-post.
+administration.section.users.deleteUser.markInactiveMessage=I stedet for å slette brukeren kan du merke profilen sin som inaktiv. Dette forhindrer dem i å logge inn og vil bevare tilgangsrettighetene knyttet til skriptene de skrev.
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
+</xwikidoc>

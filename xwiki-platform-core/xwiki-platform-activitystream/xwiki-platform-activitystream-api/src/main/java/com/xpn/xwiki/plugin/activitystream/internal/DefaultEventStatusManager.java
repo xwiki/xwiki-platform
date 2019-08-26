@@ -33,6 +33,8 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
+import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.text.StringUtils;
@@ -67,6 +69,9 @@ public class DefaultEventStatusManager implements EventStatusManager
     @Inject
     private Provider<XWikiContext> contextProvider;
 
+    @Inject
+    private ObservationManager observation;
+
     @Override
     public List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception
     {
@@ -79,15 +84,13 @@ public class DefaultEventStatusManager implements EventStatusManager
 
         // Get the ActivityEventStatus from the database and convert them
         Query query = queryManager.createQuery("select eventStatus from ActivityEventStatusImpl eventStatus "
-                + "where eventStatus.activityEvent.id in :eventIds and eventStatus.entityId in :entityIds", Query.HQL);
+            + "where eventStatus.activityEvent.id in :eventIds and eventStatus.entityId in :entityIds", Query.HQL);
         query.bindValue("eventIds", getEventIds(events));
         query.bindValue("entityIds", entityIds);
         for (ActivityEventStatus activityEventStatus : query.<ActivityEventStatus>execute()) {
-            results.add(new DefaultEventStatus(
-                    eventConverter.convertActivityToEvent(activityEventStatus.getActivityEvent()),
-                    activityEventStatus.getEntityId(),
-                    activityEventStatus.isRead())
-            );
+            results.add(
+                new DefaultEventStatus(eventConverter.convertActivityToEvent(activityEventStatus.getActivityEvent()),
+                    activityEventStatus.getEntityId(), activityEventStatus.isRead()));
         }
 
         // For status that are not present in the database, we create objects with read = false
@@ -126,7 +129,7 @@ public class DefaultEventStatusManager implements EventStatusManager
     {
         for (EventStatus status : list) {
             if (StringUtils.equals(status.getEvent().getId(), event.getId())
-                    && StringUtils.equals(status.getEntityId(), entityId)) {
+                && StringUtils.equals(status.getEntityId(), entityId)) {
                 return true;
             }
         }
@@ -140,6 +143,8 @@ public class DefaultEventStatusManager implements EventStatusManager
 
         if (configuration.useLocalStore()) {
             saveEventStatusInStore(status);
+
+            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
         }
 
         if (configuration.useMainStore()) {
@@ -152,6 +157,8 @@ public class DefaultEventStatusManager implements EventStatusManager
             } finally {
                 context.setWikiId(oriDatabase);
             }
+
+            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
         }
     }
 

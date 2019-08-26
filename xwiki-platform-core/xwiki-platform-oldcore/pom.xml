@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -70,12 +70,12 @@
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j</artifactId>
-      <version>0.42.3</version>
+      <version>1.0.0-rc3</version>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
-      <version>0.42.3</version>
+      <version>1.0.0-rc3</version>
     </dependency>
 
     <!-- Standard dependencies found in the central repository -->
@@ -148,35 +148,45 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>3.6.9.Final</version>
+      <version>5.4.4.Final</version>
       <exclusions>
-        <!-- XWiki is using org.dom4j:dom4j:2.0.0+. Previous versions of dom4j were using dom4j:dom4j
-             and thus we need to exclude them so that they don't end up in the XWiki WAR -->
+        <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
         <exclusion>
-          <groupId>dom4j</groupId>
+          <groupId>org.jboss.spec.javax.transaction</groupId>
+          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.activation</groupId>
+          <artifactId>javax.activation-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>javax.xml.bind</groupId>
+          <artifactId>jaxb-api</artifactId>
+        </exclusion>
+        <!--  Let's hope Hibernate is fine with Dom4J 2.1.0.
+              Remove when https://jira.xwiki.org/browse/XCOMMONS-1585 is fixed. -->
+        <exclusion>
+          <groupId>org.dom4j</groupId>
           <artifactId>dom4j</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- Replace the one from Hibernate -->
+    <dependency>
+      <groupId>jakarta.xml.bind</groupId>
+      <artifactId>jakarta.xml.bind-api</artifactId>
+    </dependency>
+    <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
+    <dependency>
+      <groupId>jakarta.transaction</groupId>
+      <artifactId>jakarta.transaction-api</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-c3p0</artifactId>
-      <version>3.6.9.Final</version>
+      <version>5.4.4.Final</version>
       <scope>runtime</scope>
-      <exclusions>
-        <!-- XWiki is using com.mchange:c3p0. Previous versions of c3p0 were using c3p0:c3p0
-             and thus we need to exclude them so that they don't end up in the XWiki WAR -->
-        <exclusion>
-          <groupId>c3p0</groupId>
-          <artifactId>c3p0</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
-    <dependency>
-        <groupId>com.mchange</groupId>
-        <artifactId>c3p0</artifactId>
-        <scope>runtime</scope>
-      </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
@@ -185,7 +195,7 @@
     <dependency>
       <groupId>org.liquibase</groupId>
       <artifactId>liquibase-core</artifactId>
-      <version>2.0.5</version>
+      <version>3.6.3</version>
     </dependency>
     <dependency>
       <groupId>com.github.jsqlparser</groupId>
@@ -199,25 +209,7 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- Authentication -->
-    <dependency>
-      <groupId>securityfilter</groupId>
-      <artifactId>securityfilter</artifactId>
-      <version>2.0</version>
-      <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- XML processing -->
-    <dependency>
-      <groupId>org.dom4j</groupId>
-      <artifactId>dom4j</artifactId>
-    </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
       <artifactId>xml-apis</artifactId>
@@ -270,15 +262,6 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-api</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.mail</groupId>
-      <artifactId>javax.mail</artifactId>
-    </dependency>
-    <!-- Replace the version triggered by javax.mail by a more accurate one -->
-    <dependency>
-      <groupId>jakarta.activation</groupId>
-      <artifactId>jakarta.activation-api</artifactId>
     </dependency>
 
     <!-- Other XWiki modules -->
@@ -584,6 +567,11 @@
       <artifactId>xwiki-platform-eventstream-api</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-security-authentication-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
 
@@ -748,6 +736,7 @@
                 **/internal/observation/remote/converter/ActionExecutionEventConverter.java,
                 **/internal/script/DebugScriptService.java,
                 **/internal/store/hibernate/HibernateStore.java,
+                **/internal/store/hibernate/QueryImplementorDelegate.java,
                 **/internal/skin/*.java,
                 **/internal/template/InternalTemplateManager.java,
                 **/internal/template/TemplateEnvironmentResource.java,
@@ -828,6 +817,7 @@
                 **/security/XWikiSecurityManager.java,
                 **/store/DBCPConnectionProvider.java,
                 **/store/hibernate/DefaultHibernateSessionFactory.java,
+                **/store/hibernate/HibernateAttachmentRecycleBinStore.java,
                 **/store/hibernate/HibernateSessionFactory.java,
                 <!-- AbstractDataMigrationManager has a fan out complexity of 25 that may needs to be investigated. -->
                 **/store/migration/AbstractDataMigrationManager.java,

@@ -20,7 +20,12 @@
 package org.xwiki.rendering.macro.display;
 
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReferenceString;
+import org.xwiki.model.reference.PageReference;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayType;
+import org.xwiki.properties.annotation.PropertyFeature;
+import org.xwiki.properties.annotation.PropertyGroup;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.display.DisplayMacro} Macro.
@@ -50,6 +55,9 @@ public class DisplayMacroParameters
      * @since 3.4M1
      */
     @PropertyDescription("the reference of the resource to display")
+    @PropertyGroup("stringReference")
+    @PropertyFeature("reference")
+    @PropertyDisplayType(EntityReferenceString.class)
     public void setReference(String reference)
     {
         this.reference = reference;
@@ -69,6 +77,7 @@ public class DisplayMacroParameters
      * @since 3.4M1
      */
     @PropertyDescription("the type of the reference")
+    @PropertyGroup("stringReference")
     public EntityType getType()
     {
         return this.type;
@@ -106,6 +115,8 @@ public class DisplayMacroParameters
      * @since 10.6RC1
      */
     @PropertyDescription("The reference of the page to display")
+    @PropertyFeature("reference")
+    @PropertyDisplayType(PageReference.class)
     public void setPage(String page)
     {
         this.reference = page;

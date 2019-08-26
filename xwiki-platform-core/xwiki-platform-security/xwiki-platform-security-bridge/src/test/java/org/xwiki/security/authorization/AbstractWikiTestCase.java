@@ -73,6 +73,7 @@ public abstract class AbstractWikiTestCase extends AbstractComponentTestCase
         getComponentManager().unregisterComponent(EventListener.class, "refactoring.backLinksUpdater");
         getComponentManager().unregisterComponent(EventListener.class, "refactoring.relativeLinksUpdater");
         getComponentManager().unregisterComponent(EventListener.class, "refactoring.legacyParentFieldUpdater");
+        getComponentManager().unregisterComponent(EventListener.class, "XClassMigratorListener");
     }
 
     protected void setContext(XWikiContext ctx)

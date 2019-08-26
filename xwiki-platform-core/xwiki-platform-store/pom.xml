@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-store</artifactId>
   <name>XWiki Platform - Store - Parent POM</name>
@@ -40,5 +40,6 @@
     <module>xwiki-platform-store-serialization</module>
     <module>xwiki-platform-store-filesystem</module>
     <module>xwiki-platform-store-filesystem-oldcore</module>
+    <module>xwiki-platform-store-merge</module>
   </modules>
 </project>

@@ -43,11 +43,11 @@ public class AsyncRendererConfiguration
      */
     public Set<String> getContextEntries()
     {
-        return contextEntries;
+        return this.contextEntries;
     }
 
     /**
-     * @param contextEntries the list of context entries to take remember for the execution
+     * @param contextEntries the context entries needed to execute the content
      */
     public void setContextEntries(Set<String> contextEntries)
     {

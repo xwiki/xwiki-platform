@@ -22,6 +22,7 @@ package org.xwiki.rendering.async.internal;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -60,7 +61,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
 
     private boolean async;
 
-    private Set<Long> clients = ConcurrentHashMap.newKeySet();
+    private Set<String> clients = ConcurrentHashMap.newKeySet();
 
     /**
      * @param request the request provided when started the job
@@ -88,9 +89,10 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
 
         this.async = false;
 
-        this.result = result;
+        setResult(result);
 
         setState(State.FINISHED);
+        setEndDate(new Date());
     }
 
     /**
@@ -114,6 +116,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
         setUses(uses);
 
         setState(State.FINISHED);
+        setEndDate(new Date());
     }
 
     /**
@@ -212,30 +215,22 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
 
     /**
      * @param client the identifier of the client to associated to this status
-     * @since 10.11RC1
+     * @since 10.11.5
+     * @since 11.3RC1
      */
-    public void addClient(long client)
+    public void addClient(String client)
     {
         this.clients.add(client);
     }
 
     /**
-     * @param client the identifier of the client associated to this status
-     * @return true if the passed client was associated to this status
-     * @since 10.11RC1
+     * @return the clients
+     * @since 10.11.5
+     * @since 11.3RC1
      */
-    public boolean removeClient(long client)
+    public Set<String> getClients()
     {
-        return this.clients.remove(client);
-    }
-
-    /**
-     * @return true if the status contains associated clients
-     * @since 10.11RC1
-     */
-    public boolean hasClients()
-    {
-        return !this.clients.isEmpty();
+        return this.clients;
     }
 
     /**

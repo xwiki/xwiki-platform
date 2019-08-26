@@ -8,7 +8,7 @@
 #if($xwiki.exists("XWiki.UserInactive"))
     $xwiki.includeForm("XWiki.UserInactive", false)
 #else
-#if ($cause == 'disabled')
+#if ($cause == 'disabled' || $xcontext.cause == 'disabled')
   #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('accountdisabled'))
 #else
 #xwikimessageboxstart($services.localization.render('notice') $services.localization.render('accountnotactive'))

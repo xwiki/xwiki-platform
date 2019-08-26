@@ -20,14 +20,12 @@
 
 package com.xpn.xwiki.store.migration.hibernate;
 
-import java.util.List;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiException;
@@ -79,13 +77,11 @@ public class R73000XWIKI12277DataMigration extends AbstractHibernateDataMigratio
 
     private Object doWork(Session session) throws HibernateException
     {
-        Query query = session.createQuery(createQueryString());
+        Query<Object[]> query = session.createQuery(createQueryString(), Object[].class);
 
-        List results = query.list();
-        for (Object result : results) {
-            Object[] resultLine = (Object[]) result;
-            BaseObject object = (BaseObject) resultLine[0];
-            StringProperty typeProperty = (StringProperty) resultLine[1];
+        for (Object[] result : query.list()) {
+            BaseObject object = (BaseObject) result[0];
+            StringProperty typeProperty = (StringProperty) result[1];
 
             // Migrate each property.
             migrateProperty(typeProperty, object, session);

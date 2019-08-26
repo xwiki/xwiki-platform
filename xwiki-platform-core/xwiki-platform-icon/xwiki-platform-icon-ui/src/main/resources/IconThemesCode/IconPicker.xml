@@ -384,7 +384,7 @@ require(['jquery', 'xwiki-icon-picker'], function($) {
     xwikiCurrentIconsPicker = $(document.createElement('div'));
     xwikiCurrentIconsPicker.addClass('xwikiIconPickerContainer');
     // Insert the picker in the DOM
-    $(body).after(xwikiCurrentIconsPicker);
+    $(body).append(xwikiCurrentIconsPicker);
     // Set the position
     setPickerPosition();
     // Add the icon list section

@@ -98,6 +98,9 @@ public class TemplateTest extends AbstractTest
         saveVelocity(includeTemplate("/chw/../../WEB-INF/../WEB-INF/lib/../version.properties"));
         Assert.assertTrue("file in the wrong directory, not normalized path", getDriver().findElement(
             By.id("xwikicontent")).getText().length() == 0);
+
+        this.validateConsole.getLogCaptureConfiguration().registerExpected( "Possible break-in attempt!",
+            "Error getting resource [null]");
     }
 
     /**

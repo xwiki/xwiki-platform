@@ -65,6 +65,11 @@ import com.xpn.xwiki.web.Utils;
 @SuppressWarnings("deprecation")
 public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin implements RenderingCacheAware
 {
+    /**
+     * The URL delimiter part of query parameters.
+     */
+    protected static final String QUERY_PARAMETER_DELIMITER = "?";
+
     /** Log object to log messages in this class. */
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSkinExtensionPlugin.class);
 
@@ -110,6 +115,27 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
      * @return A <code>String</code> representation of the linking element that should be printed in the generated HTML.
      */
     public abstract String getLink(String resource, XWikiContext context);
+
+    /**
+     * Abstract method for obtaining a link that points to the actual pulled resource. Each type of resource has its own
+     * format for the link, for example Javascript uses <code>&lt;script src="/path/to/Document"&gt;</code>, while CSS
+     * uses <code>&lt;link rel="stylesheet" href="/path/to/Document"&gt;</code> (the actual syntax is longer, this is
+     * just a simplified example).
+     *
+     * @param resource the name of the wiki document holding the resource.
+     * @param parameters the parameters associated with the resource.
+     * @param context the current request context, needed to access the URLFactory.
+     * @return A <code>String</code> representation of the linking element that should be printed in the generated HTML.
+     * @since 10.11.9
+     * @since 11.3.2
+     * @since 11.6RC1
+     */
+    public String getLink(String resource, Map<String, Object> parameters, XWikiContext context)
+    {
+        getParametersMap(context).put(resource, parameters);
+
+        return getLink(resource, context);
+    }
 
     /**
      * Returns the list of always used extensions of this type. Which resources are always used depends on the type of

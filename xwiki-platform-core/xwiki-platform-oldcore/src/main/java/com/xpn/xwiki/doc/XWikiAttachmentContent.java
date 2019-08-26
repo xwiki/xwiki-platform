@@ -81,7 +81,7 @@ public class XWikiAttachmentContent implements Cloneable
      */
     public XWikiAttachmentContent(XWikiAttachment attachment)
     {
-        this.setAttachment(attachment);
+        setAttachment(attachment);
     }
 
     /**
@@ -204,6 +204,10 @@ public class XWikiAttachmentContent implements Cloneable
     public void setAttachment(XWikiAttachment attachment)
     {
         this.attachment = attachment;
+
+        if (this.attachment != null) {
+            setOwnerDocument(this.attachment.getDoc());
+        }
     }
 
     /**

@@ -368,7 +368,9 @@ public class Utils
                     } else if (pathElement instanceof EncodedElement) {
                         encodedPathElements[i] = pathElement.toString();
                     } else {
-                        encodedPathElements[i] = URIUtil.encodePath(pathElement.toString());
+                        // It looks like we cannot use URILUtil#encodeWithinPath because it does not encode the "%"
+                        // character. So it seems safer here to just encode properly the '/'.
+                        encodedPathElements[i] = URIUtil.encodePath(pathElement.toString()).replaceAll("/", "%2F");
                     }
                 } catch (URIException e) {
                     throw new RuntimeException("Failed to encode path element: " + pathElements[i], e);
@@ -432,7 +434,9 @@ public class Utils
             if (spaceSegment.length() > 0) {
                 spaceSegment.append("/spaces/");
             }
-            spaceSegment.append(URIUtil.encodePath(space.toString()));
+            // It looks like we cannot use URILUtil#encodeWithinPath because it does not encode the "%"
+            // character. So it seems safer here to just encode properly the '/'.
+            spaceSegment.append(URIUtil.encodePath(space.toString()).replaceAll("/", "%2F"));
         }
         return spaceSegment.toString();
     }

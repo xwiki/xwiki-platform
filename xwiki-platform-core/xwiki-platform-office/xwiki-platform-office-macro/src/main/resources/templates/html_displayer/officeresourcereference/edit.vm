@@ -1,0 +1,25 @@
+#set ($officeFileNameExtensions = $stringtool.join([
+  '.doc', '.docx',
+  '.xls', '.xlsx',
+  '.ppt', '.pptx',
+  '.odt', '.ott', '.fodt',
+  '.ods', '.ots', '.fods',
+  '.odp', '.otp', '.fodp',
+  '.sxw', '.sxc', '.sxi'
+], ','))
+#set ($officeMediaTypes = $stringtool.join([
+  'application/msword', 'application/vnd.ms-excel', 'application/vnd.ms-powerpoint',
+  'application/vnd.oasis.opendocument.',
+  'application/vnd.openxmlformats-officedocument.',
+  'application/vnd.sun.xml.'
+], ','))
+#set ($parameters = {
+  'data-upload-allowed': $services.security.authorization.hasAccess('edit'),
+  'data-accept': "$officeFileNameExtensions,$officeMediaTypes",
+  'placeholder': $services.localization.render('rendering.macro.office.parameter.reference.placeholder')
+})
+#set ($discard = $parameters.putAll($displayer.parameters))
+#set ($discard = $parameters.put('class', "$!parameters.get('class') pick-attachment-resource"))
+#set ($parameters.value = $displayer.value)
+#attachmentPicker_import
+#suggestInput($parameters)

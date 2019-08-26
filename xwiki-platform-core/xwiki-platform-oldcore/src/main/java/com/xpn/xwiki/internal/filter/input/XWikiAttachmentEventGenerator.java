@@ -97,7 +97,7 @@ public class XWikiAttachmentEventGenerator
                 archive = attachment.loadArchive(xcontext);
                 if (archive != null) {
                     attachmentParameters.put(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS,
-                        archive.getArchiveAsString());
+                        archive.getArchiveAsString(xcontext));
                 }
             } catch (XWikiException e) {
                 this.logger.error("Attachment [{}] has malformed history", attachment.getReference(), e);

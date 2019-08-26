@@ -260,6 +260,15 @@ public class XWikiDeletedDocument extends AbstractSimpleClass
     }
 
     /**
+     * @return the reference of the user who deleted this document
+     * @since 11.5RC1
+     */
+    public DocumentReference getDeleterReference()
+    {
+        return getDocumentReferenceResolver().resolve(this.deleter);
+    }
+
+    /**
      * @param deleter - the user which has removed the document to set
      */
     protected void setDeleter(String deleter)

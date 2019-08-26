@@ -32,6 +32,7 @@ import java.util.Objects;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.mime.MediaType;
@@ -59,6 +60,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.tika.internal.TikaUtils;
 
 import com.xpn.xwiki.XWikiContext;
@@ -783,8 +785,9 @@ public class XWikiAttachment implements Cloneable
     public void setAttachment_content(XWikiAttachmentContent attachment_content)
     {
         this.content = attachment_content;
-        if (attachment_content != null) {
-            attachment_content.setOwnerDocument(this.doc);
+
+        if (this.content != null) {
+            this.content.setAttachment(this);
         }
     }
 
@@ -900,9 +903,6 @@ public class XWikiAttachment implements Cloneable
                 archivedVersion != null ? archivedVersion.getAttachment_content() : null;
             if (archivedContent != null) {
                 setAttachment_content(archivedContent);
-            } else {
-                // Fall back on the version of the content stored in the xwikiattachment_content table.
-                loadAttachmentContent(xcontext);
             }
         }
     }
@@ -1175,7 +1175,11 @@ public class XWikiAttachment implements Cloneable
      */
     public void setMimeType(String mimeType)
     {
-        this.mimeType = mimeType;
+        if (!Objects.equals(mimeType, this.mimeType)) {
+            this.mimeType = mimeType;
+
+            setMetaDataDirty(true);
+        }
     }
 
     /**
@@ -1209,7 +1213,8 @@ public class XWikiAttachment implements Cloneable
                 // detector reads it so the next detector fails to read it.
                 mediaType = TikaUtils.detect(new BufferedInputStream(getContentInputStream(xcontext)));
             } catch (Exception e) {
-                LOGGER.warn("Failed to read the content of [{}] in order to detect its mime type.", getReference());
+                LOGGER.warn("Failed to read the content of [{}] in order to detect its mime type. Root cause: [{}]",
+                    getReference(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -1278,15 +1283,34 @@ public class XWikiAttachment implements Cloneable
         }
 
         try {
-            if (!IOUtils.contentEquals(getContentInputStream(null), attachment.getContentInputStream(null))) {
+            // Note: If the attachment from which to copy data from has a null content, don't copy the content.
+            if (isContentDifferentButNotNull(attachment)) {
                 setContent(attachment.getContentInputStream(null));
                 modified = true;
             }
         } catch (Exception e) {
-            LOGGER.error("Failed to compare content of attachments", e);
+            LOGGER.error("Failed to set content of attachment [{}] onto [{}]", this, attachment, e);
         }
 
         return modified;
+    }
+
+    private boolean isContentDifferentButNotNull(XWikiAttachment attachment) throws Exception
+    {
+        boolean isDifferent = false;
+        InputStream attachmentIs = attachment.getContentInputStream(null);
+        if (attachmentIs != null) {
+            if (this.content == null) {
+                isDifferent = true;
+            } else {
+                InputStream is = getContentInputStream(null);
+                if (is != null && !IOUtils.contentEquals(is, attachmentIs)) {
+                    isDifferent = true;
+                }
+            }
+
+        }
+        return isDifferent;
     }
 
     public boolean equalsData(XWikiAttachment otherAttachment, XWikiContext xcontext) throws XWikiException
@@ -1294,17 +1318,20 @@ public class XWikiAttachment implements Cloneable
         try {
             if (getContentLongSize(xcontext) == otherAttachment.getContentLongSize(xcontext)) {
                 InputStream is = getContentInputStream(xcontext);
-
-                try {
-                    InputStream otherIS = otherAttachment.getContentInputStream(xcontext);
-
+                if (is != null) {
                     try {
-                        return IOUtils.contentEquals(is, otherIS);
+                        InputStream otherIS = otherAttachment.getContentInputStream(xcontext);
+
+                        if (otherIS != null) {
+                            try {
+                                return IOUtils.contentEquals(is, otherIS);
+                            } finally {
+                                otherIS.close();
+                            }
+                        }
                     } finally {
-                        otherIS.close();
+                        is.close();
                     }
-                } finally {
-                    is.close();
                 }
             }
         } catch (Exception e) {
@@ -1433,5 +1460,15 @@ public class XWikiAttachment implements Cloneable
         if (this.container != null) {
             this.container.onAttachmentNameModified(previousAttachmentName, attachment);
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+        builder.append("parentReference", getDoc().getDocumentReference());
+        builder.append("filename", getFilename());
+        builder.append("version", getVersion());
+        return builder.toString();
     }
 }

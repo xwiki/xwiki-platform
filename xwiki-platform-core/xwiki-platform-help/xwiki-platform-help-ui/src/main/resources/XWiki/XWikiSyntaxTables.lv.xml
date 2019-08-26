@@ -187,6 +187,5 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 &lt;/tr&gt;
 &lt;/table&gt;
 {{/html}}
-)))
-</content>
+)))</content>
 </xwikidoc>

@@ -207,37 +207,30 @@ tbody.xwiki-livetable-display-body td:hover.typenone, tbody.xwiki-livetable-disp
   text-align: center;
   padding-left: 0;
 }
+/* Align the Actions column to the right. */
+thead.xwiki-livetable-display-header th.xwiki-livetable-display-header-text.actions,
+tbody.xwiki-livetable-display-body td.actions {
+  text-align: right;
+}
 tbody.xwiki-livetable-display-body td a.action {
   color: $theme.textPrimaryColor;
-  padding-left: 20px;
-  background-repeat: no-repeat;
-  margin-right: 5px;
-  padding-bottom: 1px;
   text-transform: capitalize;
+  white-space: nowrap;
 }
-tbody.xwiki-livetable-display-body td a.action:hover {
-  text-decoration: underline;
+tbody.xwiki-livetable-display-body td a.action + a.action {
+  margin-left: .5em;
 }
-tbody.xwiki-livetable-display-body td a.actioncopy {
-  background-image: url($xwiki.getSkinFile("icons/silk/page_white_copy.png"));
+tbody.xwiki-livetable-display-body td a.action .action-icon {
+  margin-right: .25em;
 }
-tbody.xwiki-livetable-display-body td a.actionrename {
-  background-image: url($xwiki.getSkinFile("icons/silk/textfield_rename.png"));
+tbody.xwiki-livetable-display-body td a.actiondelete .action-icon {
+  color: $theme.notificationErrorColor;
 }
-tbody.xwiki-livetable-display-body td a.actiondelete {
-  background-image: url($xwiki.getSkinFile("icons/silk/cross.png"));
+tbody.xwiki-livetable-display-body td.actions.hide-labels .action-label {
+  display: none;
 }
-tbody.xwiki-livetable-display-body td a.actionrestore {
-  background-image: url($xwiki.getSkinFile("icons/silk/arrow_refresh.png"));
-}
-tbody.xwiki-livetable-display-body td a.actionundelete {
-  background-image: url($xwiki.getSkinFile("icons/silk/arrow_refresh.png"));
-}
-tbody.xwiki-livetable-display-body td a.actionrights {
-  background-image: url($xwiki.getSkinFile("icons/silk/lock_edit.png"));
-}
-tbody.xwiki-livetable-display-body td a.actionedit {
-  background-image: url($xwiki.getSkinFile("icons/silk/page_white_edit.png"));
+tbody.xwiki-livetable-display-body td.actions.hide-labels .action-icon {
+  font-size: larger;
 }
 tbody.xwiki-livetable-display-body td._images img {
   margin-right: 2px;

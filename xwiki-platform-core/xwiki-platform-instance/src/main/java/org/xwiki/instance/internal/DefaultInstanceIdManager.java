@@ -25,6 +25,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.hibernate.HibernateException;
@@ -106,8 +109,12 @@ public class DefaultInstanceIdManager implements InstanceIdManager, Initializabl
                     @Override
                     public InstanceId doInHibernate(Session session) throws HibernateException
                     {
-                        // Retrieve the version from the database
-                        return (InstanceId) session.createCriteria(InstanceId.class).uniqueResult();
+                        // Retrieve the id from the database
+                        CriteriaBuilder builder = session.getCriteriaBuilder();
+                        CriteriaQuery<InstanceId> query = builder.createQuery(InstanceId.class);
+                        Root<InstanceId> root = query.from(InstanceId.class);
+                        query.select(root);
+                        return session.createQuery(query).getSingleResult();
                     }
                 });
 

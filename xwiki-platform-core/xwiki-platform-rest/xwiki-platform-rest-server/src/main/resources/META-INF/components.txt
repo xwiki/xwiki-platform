@@ -33,6 +33,7 @@ org.xwiki.rest.internal.resources.job.JobStatusResourceImpl
 org.xwiki.rest.internal.resources.job.JobsResourceImpl
 org.xwiki.rest.internal.resources.job.JobLogResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentHistoryResourceImpl
+org.xwiki.rest.internal.resources.attachments.AttachmentMetadataResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentAtPageVersionResourceImpl
 org.xwiki.rest.internal.resources.attachments.AttachmentsAtPageVersionResourceImpl
@@ -57,6 +58,7 @@ org.xwiki.rest.internal.resources.classes.DBListClassPropertyValuesProvider
 org.xwiki.rest.internal.resources.classes.DefaultClassPropertyValuesProvider
 org.xwiki.rest.internal.resources.classes.GroupsClassPropertyValuesProvider
 org.xwiki.rest.internal.resources.classes.PageClassPropertyValuesProvider
+org.xwiki.rest.internal.resources.classes.StaticListClassPropertyValuesProvider
 org.xwiki.rest.internal.resources.classes.UsersClassPropertyValuesProvider
 org.xwiki.rest.internal.resources.search.HQLSearchSource
 org.xwiki.rest.internal.resources.search.XWQLSearchSource

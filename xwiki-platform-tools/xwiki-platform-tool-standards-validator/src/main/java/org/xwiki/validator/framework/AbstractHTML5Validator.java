@@ -187,6 +187,16 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
     protected static final String ATTR_HREF = "href";
 
     /**
+     * Title attribute.
+     */
+    protected static final String ATTR_TITLE = "title";
+
+    /**
+     * Role attribute.
+     */
+    protected static final String ATTR_ROLE = "role";
+
+    /**
      * Blur attribute.
      */
     protected static final String ATTR_BLUR = "onblur";
@@ -255,6 +265,11 @@ public abstract class AbstractHTML5Validator extends AbstractXMLValidator
      * Charset attribute.
      */
     protected static final String ATTR_CHARSET = "charset";
+
+    /**
+     * Source attribute.
+     */
+    protected static final String ATTR_SRC = "src";
 
     /**
      * Document parsed with JSoup.

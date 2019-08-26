@@ -65,6 +65,5 @@ rendering.macro.tree.parameter.finder.description=Rādīt teksta lauku, kurā va
 rendering.macro.tree.parameter.limit.name=Robeža
 rendering.macro.tree.parameter.limit.description=Parādīto bērnu mezglu skaits, pirmo reizi izvēršot vecāka mezglu. Pārējie bērnu mezgli ir apskatāmi, klikšinot uz "vairāk..." saites. Šo parametru parasti izmanto, lai lapotu bērnu mezglus gadījumā, kad to ir daudz. Šis parametrs strādā tikai tajos kokos, kuru saturs tiek noteikts dinamiski, un kuri nodrošina bērnu mezglu skaita ierobežošanu.
 rendering.macro.tree.content.description=Lai aprakstītu koka struktūru, jūs varat izmantot iegultu HTML. Skatiet http://www.jstree.com/docs/html/ papildu informācijai.
-tree.macro.editModeWarning=Šo koku nevar parādīt mainīšanas režīmā.
-</content>
+tree.macro.editModeWarning=Šo koku nevar parādīt mainīšanas režīmā.</content>
 </xwikidoc>

@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>rendering.macro.notifications.name=Уведомления
 rendering.macro.notifications.description=Отображать уведомления о событиях, произошедших в вики.
-rendering.macro.notifications.parameter.count.name=Считать
+rendering.macro.notifications.parameter.count.name=Количество
 rendering.macro.notifications.parameter.count.description=Максимальное количество событий для отображения по умолчанию
 rendering.macro.notifications.parameter.useUserPreferences.name=Используйте настройки пользователя
 rendering.macro.notifications.parameter.useUserPreferences.description=Если установлено значение true, используются настройки пользователя относительно уведомлений
@@ -53,11 +53,11 @@ rendering.macro.notifications.parameter.displayReadEvents.description=Если t
 rendering.macro.notifications.parameter.wikis.name=Вики
 rendering.macro.notifications.parameter.wikis.description=Список вики (разделенных запятыми) для рассмотрения. Этот параметр игнорируется, если для useUserPreferences установлено значение "true".
 rendering.macro.notifications.parameter.spaces.name=Пространства
-rendering.macro.notifications.parameter.spaces.description=Список пробелов (через запятую) для рассмотрения. Этот параметр игнорируется, если для useUserPreferences установлено значение "true".
+rendering.macro.notifications.parameter.spaces.description=Список пространств (через запятую) для рассмотрения. Этот параметр игнорируется, если для useUserPreferences установлено значение "true".
 rendering.macro.notifications.parameter.pages.name=Страницы
 rendering.macro.notifications.parameter.pages.description=Список страниц (полные ссылки, разделенные запятыми) для рассмотрения. Этот параметр игнорируется, если для useUserPreferences установлено значение "true".
-rendering.macro.notifications.parameter.displayReadStatus.name=Показать статус «прочитано»
-### Missing: rendering.macro.notifications.parameter.displayReadStatus.description=Either or not the status of the events (either it has been marked as read or not) should be displayed
+rendering.macro.notifications.parameter.displayReadStatus.name=Отображать статус «прочитано»
+rendering.macro.notifications.parameter.displayReadStatus.description=Следует ли отображать статус событий (было помечено как прочитанное или нет)
 rendering.macro.notifications.parameter.users.name=Пользователи
 rendering.macro.notifications.parameter.users.description=Список пользователей для рассмотрения (через запятую). Игнорируется, если для «useUserPreferences» установлено значение «true».
 rendering.macro.notifications.parameter.displayWatchedUsersOnly.name=Показывать только подписчиков

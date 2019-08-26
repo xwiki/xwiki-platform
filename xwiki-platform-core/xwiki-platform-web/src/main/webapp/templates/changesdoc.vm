@@ -91,15 +91,47 @@
 ##
 ## Changes
 ##
-## Make the heading level adjustable when including this template.
-#if (!$headingLevel)
-  #set ($headingLevel = 2)
-#end
-#createDocumentDiff($origdoc $newdoc $docDiff)
-#createDocumentDiffSummary($docDiff $summary)
-<h$headingLevel>$services.localization.render('web.history.changes.summary')</h$headingLevel>
-#displayDocumentDiffSummary($summary)
-#if ($summary.entries.size() > 0)
-  <h$headingLevel>$services.localization.render('web.history.changes.details')</h$headingLevel>
-  #displayDocumentDiff($docDiff)
-#end
+<div class="changes-body">
+  <ul class="nav nav-pills" role="tablist">
+    <li role="presentation" class="active">
+      <a href="#rawChanges" aria-controls="rawChanges" role="tab" data-toggle="pill">
+        $escapetool.xml($services.localization.render('web.history.changes.raw'))
+      </a>
+    </li>
+    <li role="presentation">
+      <a href="#renderedChanges" aria-controls="renderedChanges" role="tab" data-toggle="pill">
+        $escapetool.xml($services.localization.render('web.history.changes.rendered'))
+      </a>
+    </li>
+  </ul>
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane active" id="rawChanges">
+      ## Make the heading level adjustable when including this template.
+      #if (!$headingLevel)
+        #set ($headingLevel = 2)
+      #end
+      #createDocumentDiff($origdoc $newdoc $docDiff)
+      #createDocumentDiffSummary($docDiff $summary)
+      <h$headingLevel>$services.localization.render('web.history.changes.summary')</h$headingLevel>
+      #displayDocumentDiffSummary($summary)
+      #if ($summary.entries.size() > 0)
+        <h$headingLevel>$services.localization.render('web.history.changes.details')</h$headingLevel>
+        #displayDocumentDiff($docDiff)
+      #end
+    </div>
+    <div role="tabpanel" class="tab-pane html-diff" id="renderedChanges">
+      #set ($htmlDiff = $services.diff.html.unified($origdoc.renderedContent, $newdoc.renderedContent))
+      #if ($htmlDiff == '')
+        <div class="infomessage">
+          $escapetool.xml($services.localization.render('web.history.changes.noChanges'))
+        </div>
+      #elseif ("$!htmlDiff" == '')
+        <div class="errormessage">
+          $escapetool.xml($services.localization.render('web.history.changes.failedToCompute'))
+        </div>
+      #else
+        $htmlDiff
+      #end
+    </div>
+  </div>
+</div>

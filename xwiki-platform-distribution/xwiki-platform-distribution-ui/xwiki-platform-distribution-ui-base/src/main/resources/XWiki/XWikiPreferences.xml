@@ -74,21 +74,6 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </admin_email>
-    <auth_active_check>
-      <customDisplay/>
-      <defaultValue/>
-      <disabled>0</disabled>
-      <displayFormType>select</displayFormType>
-      <displayType>yesno</displayType>
-      <name>auth_active_check</name>
-      <number>6</number>
-      <prettyName>Authentication Active Check</prettyName>
-      <tooltip/>
-      <unmodifiable>0</unmodifiable>
-      <validationMessage/>
-      <validationRegExp/>
-      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-    </auth_active_check>
     <authenticate_edit>
       <customDisplay/>
       <defaultValue/>
@@ -1421,7 +1406,7 @@
       <groups>XWiki.XWikiAdminGroup</groups>
     </property>
     <property>
-      <levels>admin,edit,undelete,delete,programming,comment,createwiki,script</levels>
+      <levels>admin,edit,delete,programming,comment,createwiki,script</levels>
     </property>
     <property>
       <users/>
@@ -1504,7 +1489,7 @@
       <groups>XWiki.XWikiAllGroup</groups>
     </property>
     <property>
-      <levels>edit,comment,undelete,script</levels>
+      <levels>edit,comment,script</levels>
     </property>
     <property>
       <users/>
@@ -1552,21 +1537,6 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </admin_email>
-      <auth_active_check>
-        <customDisplay/>
-        <defaultValue/>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>auth_active_check</name>
-        <number>6</number>
-        <prettyName>Authentication Active Check</prettyName>
-        <tooltip/>
-        <unmodifiable>0</unmodifiable>
-        <validationMessage/>
-        <validationRegExp/>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </auth_active_check>
       <authenticate_edit>
         <customDisplay/>
         <defaultValue/>
@@ -2815,8 +2785,8 @@ Your account on ${wikiname} has been successfully activated. You can now login a
 &lt;meta name="keywords" content="$escapetool.xml($keywords.replaceAll('[|,]', ' ').trim())" /&gt;
 &lt;meta name="rating" content="General" /&gt;
 &lt;meta name="author" content="$escapetool.xml($!xwiki.getUserName($doc.getAuthor(), false))" /&gt;
-## Add HTML tags inside the page's head element, provided by UI Extensions implementing the "org.xwiki.platform.head" Extension Point
-#foreach($uix in $services.uix.getExtensions("org.xwiki.platform.head", {'sortByParameter' : 'order'}))
+## Add HTML tags inside the page's head element, provided by UI Extensions implementing the "org.xwiki.platform.html.head" Extension Point
+#foreach($uix in $services.uix.getExtensions("org.xwiki.platform.html.head", {'sortByParameter' : 'order'}))
   $services.rendering.render($uix.execute(), 'xhtml/1.0')
 #end
 ## We verify that we don't display RSS feeds on the login page since it causes problems if these feeds are

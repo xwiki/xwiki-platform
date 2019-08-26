@@ -12,25 +12,44 @@ $response.setContentType("application/json")
 ## Display all documents in an exact given space (doesn't support Nested Spaces). Can be useful for backward
 ## compatibility for example or if there's a need to list exactly the content of a given space.
 #if ("$!request.space" != '')
-  #set ($whereQueryPart = "${whereQueryPart} AND doc.space = ?")
   #set ($discard = $queryParams.add($request.space))
+  #set ($whereQueryPart = "${whereQueryPart} AND doc.space = ?${queryParams.size()}")
 #end
 ## Display all documents in a space, including Nested Spaces
 #if ("$!request.childrenOf" != '')
-  #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName LIKE ? AND doc.fullName <> ?")
   #set ($discard = $queryParams.add($services.query.parameter().literal("$!{request.childrenOf}.").anyChars()))
+  #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName LIKE ?${queryParams.size()}")
   #set ($discard = $queryParams.add("${request.childrenOf}.WebHome"))
+  #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?${queryParams.size()}")
 #end
 ## Exclude some documents
 #set ($excludes = $request.getParameterValues('exclude'))
 #if ("$!excludes" != '')
   #foreach ($exclude in $excludes)
-    #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?")
     #set ($discard = $queryParams.add($exclude))
+    #set ($whereQueryPart = "${whereQueryPart} AND doc.fullName <> ?${queryParams.size()}")
   #end
 #end
-#addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.location'))
-#addLivetableLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.title'))
+#addLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.location'))
+#addLocationFilter($whereQueryPart, $queryParams, $!request.get('doc.title'))
+##
+## date filter
+##
+#set ($dateFilter = $request.get("doc.date"))
+#if("$!{dateFilter}" != '')
+  #set ($dates = $dateFilter.split('-'))
+  #if ($dates.size() == 2)
+    ## Date range matching
+    #set ($discard = $queryParams.add($datetool.toDate($mathtool.toNumber($dates[0]))))
+    #set ($whereQueryPart = "${whereQueryPart} and doc.date between ?$queryParams.size()")
+    #set ($discard = $queryParams.add($datetool.toDate($mathtool.toNumber($dates[1]))))
+    #set ($whereQueryPart = "${whereQueryPart} and ?$queryParams.size()")
+  #else
+    ## Single value matching
+    #set ($discard = $queryParams.add($dateFilter))
+    #set ($whereQueryPart = "${whereQueryPart} and upper(str(doc.date)) like upper(str(?$queryParams.size()))")
+  #end
+#end
 ##
 ## ORDER
 ##

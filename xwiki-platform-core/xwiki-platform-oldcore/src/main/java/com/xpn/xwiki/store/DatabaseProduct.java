@@ -113,7 +113,7 @@ public final class DatabaseProduct
     public boolean equals(Object object)
     {
         boolean result = false;
-        if ((object != null) && (object instanceof DatabaseProduct)) {
+        if (object instanceof DatabaseProduct) {
             DatabaseProduct product = (DatabaseProduct) object;
             if (product.getProductName().equals(getProductName())) {
                 result = true;

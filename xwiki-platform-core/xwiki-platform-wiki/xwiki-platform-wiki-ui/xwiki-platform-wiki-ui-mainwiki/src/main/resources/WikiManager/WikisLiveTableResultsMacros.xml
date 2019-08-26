@@ -50,7 +50,7 @@
   ## parametrized filter part of the query
   #set($whereSql = '')
   ## list of parameters to use with $whereSql
-  #set($whereParams = [])
+  #set($whereParams = {})
   #set($class = $xwiki.getDocument($className).getxWikiClass())
   ##
   ## Add the columns needed for the actual data
@@ -72,8 +72,8 @@
       ## tags in the FROM clause then we match at least one of the tags (OR operator). The only remaining option is to
       ## check that the list of tags contains each of the desired tags. HQL doesn't help us to lower-case the entire
       ## list of tags so we use an inner select for this.
-      #set($whereSql = "${whereSql} lower(?) in (select lower(tag) from tagprop.list tag)")
-      #set($discard = $whereParams.add("${tag}"))
+      #set($whereSql = "${whereSql} lower(:wikitag${foreach.count}) in (select lower(tag) from tagprop.list tag)")
+      #set($discard = $whereParams.put("wikitag$foreach.count", "${tag}"))
     #end
     #set($whereSql = "${whereSql})")
   #end
@@ -109,16 +109,16 @@
     #elseif($order == 'averagevote')
       #livetable_getTableName($order)
       #set($fromSql = "${fromSql}, BaseObject as objratings, ${tableName} ${safe_tableAlias}")
-      #set($whereSql = "${whereSql} and doc.fullName=objratings.name and objratings.className='XWiki.AverageRatingsClass' and objratings.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
-      #set($discard = $whereParams.add("${order}"))
+      #set($whereSql = "${whereSql} and doc.fullName=objratings.name and objratings.className='XWiki.AverageRatingsClass' and objratings.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = :wikiorder")
+      #set($discard = $whereParams.put('wikorder', "${order}"))
       #set($orderSql = " order by MAX(${safe_tableAlias}.value) ${orderDirection}")
     #else
       #set($multiselect = $class.get($order).getProperty('multiSelect').getValue())
       #if("$multiselect" != '1')
         #livetable_getTableName($order)
         #set($fromSql = "${fromSql}, ${tableName} ${safe_tableAlias}")
-        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = ?")
-        #set($discard = $whereParams.add("${order}"))
+        #set($whereSql = "${whereSql} and obj.id=${safe_tableAlias}.id.id and ${safe_tableAlias}.name = :wikiorder")
+        #set($discard = $whereParams.put('wikiorder', "${order}"))
         #set($orderSql = " order by MAX(${safe_tableAlias}.value) ${orderDirection}")
       #end
     #end
@@ -127,47 +127,50 @@
   ##
   ## Compute the final queries
   ##
-  #set($sqlParams = [])
-  #set($tagsMatchingParams = [])
-  #set($allMatchingParams = [])
+  #set($sqlParams = {})
+  #set($tagsMatchingParams = {})
+  #set($allMatchingParams = {})
   #if("$!className" != '')
     ## Class query
     ######## WIKI UI MAINWIKI CUSTOMIZATION #########
-    #set($countSql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = ? and doc.fullName &lt;&gt; ? $!whereSql $!filterwhere")
-    #set($discard = $sqlParams.addAll(["${className}", "${className}Template"]))
-    #set($discard = $sqlParams.addAll($whereParams))
+    #set($countSql = ", BaseObject as obj $!fromSql $!filterfrom where obj.name=doc.fullName and obj.className = :className and doc.fullName &lt;&gt; :classTemplate $!whereSql $!filterwhere")
+    #set($discard = $sqlParams.put('className', "${className}"))
+    #set($discard = $sqlParams.put('classTemplate', "${className}Template"))
+    #set($discard = $sqlParams.putAll($whereParams))
     ##
     #set($tagsMatchingFiltersFrom = ", BaseObject as obj $!fromSql $!filterfrom")
-    #set($tagsMatchingFiltersWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName &lt;&gt; ? $!whereSql $!filterwhere")
-    #set($discard = $tagsMatchingParams.addAll(["${className}", "${className}Template"]))
-    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    #set($tagsMatchingFiltersWhere = "obj.name=doc.fullName and obj.className = :tagsClassName and doc.fullName &lt;&gt; :tagsClassTemplate $!whereSql $!filterwhere")
+    #set($discard = $tagsMatchingParams.put('tagsClassName', "${className}"))
+    #set($discard = $tagsMatchingParams.put('tagsClassTemplate', "${className}Template"))
+    #set($discard = $tagsMatchingParams.putAll($whereParams))
     ##
     #set($allMatchingTagsFrom = ", BaseObject as obj $!filterfrom")
-    #set($allMatchingTagsWhere = "obj.name=doc.fullName and obj.className = ? and doc.fullName &lt;&gt; ? $!filterwhere")
-    #set($discard = $allMatchingParams.addAll(["${className}", "${className}Template"]))
+    #set($allMatchingTagsWhere = "obj.name=doc.fullName and obj.className = :allClassName and doc.fullName &lt;&gt; :allClassTemplate $!filterwhere")
+    #set($discard = $allMatchingParams.put('allClassName', "${className}"))
+    #set($discard = $allMatchingParams.put('allClassTemplate', "${className}Template"))
     #################################################
     ##
     #if($filterParams)
-      #set($discard = $sqlParams.addAll($filterParams))
-      #set($discard = $tagsMatchingParams.addAll($filterParams))
-      #set($discard = $allMatchingParams.addAll($filterParams))
+      #set($discard = $sqlParams.putAll($filterParams))
+      #set($discard = $tagsMatchingParams.putAll($filterParams))
+      #set($discard = $allMatchingParams.putAll($filterParams))
     #end
   #else
     ## Document query
     #set($countSql = "$!fromSql $!filterfrom where 1=1 $!whereSql $!filterwhere")
-    #set($discard = $sqlParams.addAll($whereParams))
+    #set($discard = $sqlParams.putAll($whereParams))
     ##
     #set($tagsMatchingFiltersFrom = "$!fromSql $!filterfrom")
     #set($tagsMatchingFiltersWhere = "1=1 $!whereSql $!filterwhere")
-    #set($discard = $tagsMatchingParams.addAll($whereParams))
+    #set($discard = $tagsMatchingParams.putAll($whereParams))
     ##
     #set($allMatchingTagsFrom = "$!filterfrom")
     #set($allMatchingTagsWhere = "1=1 $!filterwhere")
     ##
     #if($filterParams)
-      #set($discard = $sqlParams.addAll($filterParams))
-      #set($discard = $tagsMatchingParams.addAll($filterParams))
-      #set($discard = $allMatchingParams.addAll($filterParams))
+      #set($discard = $sqlParams.putAll($filterParams))
+      #set($discard = $tagsMatchingParams.putAll($filterParams))
+      #set($discard = $allMatchingParams.putAll($filterParams))
     #end
   #end
   ######## WIKI UI MAINWIKI CUSTOMIZATION #########
@@ -200,9 +203,7 @@
     ## The group by we have to use to make sure we get unique documents break $query.count so we remove it
     #set($countQuery = $services.query.hql($sql.replace('GROUP BY doc.fullName', '')))
     #set($void = $countQuery.setWiki($query.wiki))
-    #foreach($entry in $query.positionalParameters.entrySet())
-      #set($void = $countQuery.bindValue($entry.key, $entry.value))
-    #end
+    #set($void = $countQuery.bindValues($query.namedParameters))
   #else
     $countQuery = $query
   #end
@@ -312,9 +313,9 @@
     #set($discard = $itemDoc.use($className))
     #if ($isTranslation)
       ## Display the language after the document name so that not all translated documents have the same name displayed
-      #set($discard = $row.put('doc_name', "$itemDoc.name ($docLanguage)"))
+      #set($discard = $row.put('doc_name', "$itemDoc.documentReference.name ($docLanguage)"))
     #else
-      #set($discard = $row.put('doc_name', $itemDoc.name))
+      #set($discard = $row.put('doc_name', $itemDoc.documentReference.name))
     #end
     #set($discard = $row.put('doc_fullName', $fullname))
     #set($discard = $row.put('doc_space', $itemDoc.space))

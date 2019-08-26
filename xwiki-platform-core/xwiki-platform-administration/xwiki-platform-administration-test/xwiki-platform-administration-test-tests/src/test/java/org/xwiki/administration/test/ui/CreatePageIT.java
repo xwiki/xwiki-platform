@@ -64,10 +64,6 @@ public class CreatePageIT extends AbstractTest
      * Tests if a new page can be created from a template.
      */
     @Test
-    @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
     public void createPagesFromTemplate() throws Exception
     {
         // Step 0: Setup the correct environment for the test

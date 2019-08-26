@@ -38,8 +38,14 @@
       #set ($properties = $class.properties)
     #end
     #foreach ($prop in $properties)
-      <dt class="label#if($prop.isDisabled()) disabled#end"><label for="${escapetool.xml($class.name)}_${obj.number}_${escapetool.xml($prop.name)}">${escapetool.xml($prop.translatedPrettyName)}</label></dt>
-      <dd#if ($prop.isDisabled()) class="disabled"#end>#if ("$!prop.hint" != '')<p><span class="xHint">$escapetool.xml($prop.hint)</span></p>#end$doc.display($prop.name, "edit", $obj)</dd>
+      <dt#if ($prop.isDisabled()) class="disabled"#end>
+        <label for="${escapetool.xml($class.name)}_${obj.number}_${escapetool.xml($prop.name)}"
+          >$escapetool.xml($prop.translatedPrettyName)</label>
+        <span class="xHint">$!escapetool.xml($prop.hint)</span>
+      </dt>
+      <dd#if ($prop.isDisabled()) class="disabled"#end>
+        $doc.display($prop.name, 'edit', $obj)
+      </dd>
     #end
     </dl>
     #set ($deprecatedProperties = $class.getDeprecatedObjectProperties($obj))
@@ -48,7 +54,7 @@
       <strong>$services.localization.render('core.editors.object.removeDeprecatedProperties.info', [${escapetool.xml($class.name)}])</strong>
       <dl>
       #foreach ($prop in $deprecatedProperties)
-        <dt class="label disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
+        <dt class="disabled"><label>${escapetool.xml($prop.name)}:</label></dt>
         <dd class="disabled">${escapetool.xml($prop.value)}</dd>
       #end
       </dl>

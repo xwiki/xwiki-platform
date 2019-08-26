@@ -50,7 +50,7 @@ notifications.settings.filters.advanced=Erweiterte Filteroptionen
 notifications.filters.advanced.toggles.hint=Diese Filter sind standardmäßig aktiviert. Sie können sie deaktivieren, indem Sie die Schaltfläche neben jedem Filter verwenden.
 notifications.filters.advanced.toggles.table.name=Filtername
 notifications.filters.advanced.toggles.table.description=Beschreibung
-### Missing: notifications.filters.advanced.toggles.table.toggle=Toggle
+notifications.filters.advanced.toggles.table.toggle=Umschalten
 notifications.filters.advanced.modal.close=Schließen
 
 ## Filters names

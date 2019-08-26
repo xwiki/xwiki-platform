@@ -133,9 +133,6 @@ xwiki.tags=1
 #-# The path to the hibernate configuration file.
 # xwiki.store.hibernate.path=/WEB-INF/hibernate.cfg.xml
 
-#-# [Since 3.3M1] Deprecated, use xwiki.store.migration
-# xwiki.store.hibernate.updateschema=1
-
 #-# Allow or disable custom mapping for particular XClasses. Custom mapping may increase the performance of certain
 #-# queries when large number of objects from particular classes are used in the wiki.
 # xwiki.store.hibernate.custommapping=1
@@ -479,7 +476,7 @@ xwiki.plugin.image.cache.capacity=30
 
 #-# Note that this plugin is in charge of storing stats in the database, and offering some API to query them.
 #-# It doesn't provide any UI. If you wish to install a UI, please check the Statistics Application at
-#-# http://extensions.xwiki.org/xwiki/bin/view/Extension/Statistics+Application
+#-# https://extensions.xwiki.org/xwiki/bin/view/Extension/Statistics+Application
 #-# (this application is no longer bundled in XWiki starting with 8.0)
 
 #-# Stats configuration allows to globally activate/deactivate stats module (launch storage thread, register events...).

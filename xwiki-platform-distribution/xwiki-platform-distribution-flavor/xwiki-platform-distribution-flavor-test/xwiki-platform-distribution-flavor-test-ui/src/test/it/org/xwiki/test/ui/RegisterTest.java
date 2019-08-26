@@ -33,6 +33,8 @@ import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.AbstractRegistrationPage;
 import org.xwiki.test.ui.po.RegistrationPage;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * Test the user registration feature.
  * 
@@ -47,31 +49,14 @@ public class RegisterTest extends AbstractTest
     public void setUp() throws Exception
     {
         deleteUser("JohnSmith");
+        getUtil().updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0, "liveValidation_enabled",
+            useLiveValidation());
         switchUser();
+        getUtil().recacheSecretToken();
         this.registrationPage = this.getRegistrationPage();
-
-        // Switch LiveValidation on or off as needed.
-        int x = 0;
-        while (this.registrationPage.isLiveValidationEnabled() != useLiveValidation()) {
-            AdministrationSectionPage sectionPage = new AdministrationSectionPage("Registration");
-            getDriver().get(getUtil().getURLToLoginAsAdminAndGotoPage(sectionPage.getURL()));
-            getUtil().recacheSecretToken();
-            getUtil().setDefaultCredentials(TestUtils.ADMIN_CREDENTIALS);
-            getUtil().assertOnPage(sectionPage.getURL());
-            sectionPage.getForm().setFieldValue(By.name("XWiki.Registration_0_liveValidation_enabled"),
-                Boolean.valueOf(useLiveValidation()).toString());
-            sectionPage.clickSave();
-            if (x > 2) {
-                throw new WebDriverException("Unable to set useLiveValidation to " + useLiveValidation());
-            }
-            x++;
-            this.registrationPage = this.getRegistrationPage();
-        }
-
         // The prepareName javascript function is the cause of endless flickering
         // since it trys to suggest a username every time the field is focused.
         getDriver().executeJavascript("document.getElementById('xwikiname').onfocus = null;");
-
         this.registrationPage.fillInJohnSmithValues();
     }
 

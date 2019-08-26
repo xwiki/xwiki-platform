@@ -40,8 +40,8 @@ XWiki.DateTimePicker = Class.create({
   },
   _getDate : function() {
     if (!this.input._timestamp) {
+      this.input._timestamp = this.input.readAttribute('data-timestamp') || new Date().getTime();
       var classNames = $w(this.input.className);
-      this.input._timestamp = new Date().getTime();
       for(var i = 0; i < classNames.length; i++) {
         if (this.timeStampClassNamePattern.test(classNames[i])) {
           this.input._timestamp = parseInt(classNames[i].substring(1));
@@ -124,7 +124,8 @@ var initDateTimePickers = function(event) {
     $(container).select('input.datetime').each(function(dateTimeInput) {
       if (!dateTimeInput.hasClassName('initialized')) {
         // The input title holds the date format.
-        new XWiki.DateTimePicker(dateTimeInput, dateTimeInput.title);
+        var dateFormat = dateTimeInput.readAttribute('data-format') || dateTimeInput.title;
+        new XWiki.DateTimePicker(dateTimeInput, dateFormat);
         dateTimeInput.addClassName('initialized');
       }
     });

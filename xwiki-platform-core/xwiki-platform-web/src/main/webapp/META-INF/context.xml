@@ -21,7 +21,7 @@
 -->
 
 <!--
-  Used only when deplying XWiki in Tomcat.
+  Used only when deploying XWiki in Tomcat.
 
   Prevent JAR scanning and disable WebSocket and JSP support. This is done to increase Tomcat startup to the maximum.
   See https://wiki.apache.org/tomcat/HowTo/FasterStartUp &

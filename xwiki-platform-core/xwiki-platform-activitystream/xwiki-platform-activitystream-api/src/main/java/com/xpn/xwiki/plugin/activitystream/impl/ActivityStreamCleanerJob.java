@@ -45,13 +45,13 @@ public class ActivityStreamCleanerJob extends AbstractJob implements Job
     {
         ActivityStreamPlugin plugin = (ActivityStreamPlugin) getXWikiContext().getWiki()
             .getPlugin(ActivityStreamPlugin.PLUGIN_NAME, getXWikiContext());
-        List<Object> parameters = new ArrayList<Object>();
+        List<Object> parameters = new ArrayList<>();
         int days = ActivityStreamCleaner.getNumberOfDaysToKeep(getXWikiContext());
 
         if (days > 0) {
             parameters.add(DateUtils.addDays(new Date(), days * -1));
             try {
-                List<ActivityEvent> events = plugin.getActivityStream().searchEvents("date < ?", false, true, 0, 0,
+                List<ActivityEvent> events = plugin.getActivityStream().searchEvents("date < ?1", false, true, 0, 0,
                     parameters, getXWikiContext());
                 for (ActivityEvent event : events) {
                     plugin.getActivityStream().deleteActivityEvent(event, getXWikiContext());

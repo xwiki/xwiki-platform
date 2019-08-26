@@ -28,6 +28,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -62,7 +64,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         "ratingsSpacePerSpace";
 
     @Inject
-    private Logger LOGGER;
+    private Logger logger;
 
     @Inject
     @Named("user/current")
@@ -104,9 +106,8 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     public boolean hasRatingsSpaceForeachSpace(DocumentReference documentRef)
     {
         String result = getXWiki().Param("xwiki.ratings.separatepagemanager.ratingsspaceforeachspace", "0");
-        result =
-            getXWiki().getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", result,
-                getXWikiContext());
+        result = getXWiki().getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", result,
+            getXWikiContext());
         return (getRatingsConfiguration().getConfigurationParameter(documentRef,
             RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, result).equals("1"));
     }
@@ -169,27 +170,28 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     public List<Rating> getRatings(DocumentReference documentRef, int start, int count, boolean asc)
         throws RatingsException
     {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Calling separate page manager code for ratings");
+        if (logger.isDebugEnabled()) {
+            logger.debug("Calling separate page manager code for ratings");
         }
 
-        String sql = ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className=?"
-            + " and obj.id=parentprop.id.id and parentprop.id.name=?" + " and parentprop.value=?"
-            + " and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className=?"
-            + " and obj2.id=statusprop.id.id and statusprop.id.name=? and (statusprop.value=? or statusprop.value= ?) and obj.id=obj2.id) order by doc.date "
-            + (asc ? "asc" : "desc");
+        String sql =
+            ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className=?1"
+                + " and obj.id=parentprop.id.id and parentprop.id.name=?2 and parentprop.value=?3"
+                + " and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className=?4"
+                + " and obj2.id=statusprop.id.id and statusprop.id.name=?5 and (statusprop.value=?6 or statusprop.value= ?7) and obj.id=obj2.id) order by doc.date "
+                + (asc ? "asc" : "desc");
 
-        List<?> params = new ArrayList<String>(Arrays.asList(getRatingsClassName(), RATING_CLASS_FIELDNAME_PARENT,
+        List<?> params = new ArrayList<>(Arrays.asList(getRatingsClassName(), RATING_CLASS_FIELDNAME_PARENT,
             entityReferenceSerializer.serialize(documentRef), getRatingsClassName(), "status", "moderated", "refused"));
 
-        List<Rating> ratings = new ArrayList<Rating>();
+        List<Rating> ratings = new ArrayList<>();
         try {
             List<DocumentReference> ratingPageReferenceList =
                 getXWikiContext().getWiki().getStore().searchDocumentReferences(sql, params, getXWikiContext());
 
             for (DocumentReference ratingPageReference : ratingPageReferenceList) {
-                ratings.add(getRatingFromDocument(documentRef,
-                    getXWiki().getDocument(ratingPageReference, getXWikiContext())));
+                ratings.add(
+                    getRatingFromDocument(documentRef, getXWiki().getDocument(ratingPageReference, getXWikiContext())));
             }
         } catch (XWikiException e) {
             throw new RatingsException(e);
@@ -201,18 +203,19 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     @Override
     public Rating getRating(DocumentReference documentRef, int id) throws RatingsException
     {
-        String sql = ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className=?"
-            + " and obj.id=parentprop.id.id and parentprop.id.name=?" + " and parentprop.value=?"
-            + " and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className=?"
-            + " and obj2.id=statusprop.id.id and statusprop.id.name=? and (statusprop.value=? or statusprop.value=?) and obj.id=obj2.id) order by doc.date desc";
-        
-        List<?> params = new ArrayList<String>(Arrays.asList(getRatingsClassName(), RATING_CLASS_FIELDNAME_PARENT,
+        String sql =
+            ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className=?1"
+                + " and obj.id=parentprop.id.id and parentprop.id.name=?2 and parentprop.value=?3"
+                + " and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className=?4"
+                + " and obj2.id=statusprop.id.id and statusprop.id.name=?5 and (statusprop.value=?6 or statusprop.value=?7) and obj.id=obj2.id) order by doc.date desc";
+
+        List<?> params = new ArrayList<>(Arrays.asList(getRatingsClassName(), RATING_CLASS_FIELDNAME_PARENT,
             entityReferenceSerializer.serialize(documentRef), getRatingsClassName(), "status", "moderated", "refused"));
 
         try {
             List<DocumentReference> ratingPageReferenceList =
                 getXWikiContext().getWiki().getStore().searchDocumentReferences(sql, 1, id, params, getXWikiContext());
-            if ((ratingPageReferenceList == null) || (ratingPageReferenceList.size() == 0)) {
+            if (CollectionUtils.isEmpty(ratingPageReferenceList)) {
                 return null;
             } else {
                 return new SeparatePageRatingsManager().getRatingFromDocument(documentRef,
@@ -242,7 +245,7 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     public Rating getRating(String ratingId) throws RatingsException
     {
         try {
-            int i1 = ratingId.indexOf(".");
+            int i1 = StringUtils.indexOf(ratingId, '.');
             if (i1 == -1) {
                 throw new RatingsException(RatingsException.MODULE_PLUGIN_RATINGS,
                     RatingsException.ERROR_RATINGS_INVALID_RATING_ID, "Invalid rating ID, cannot parse rating id");

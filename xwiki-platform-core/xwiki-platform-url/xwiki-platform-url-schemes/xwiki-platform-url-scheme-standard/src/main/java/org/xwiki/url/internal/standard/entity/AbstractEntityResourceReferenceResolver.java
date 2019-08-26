@@ -40,7 +40,6 @@ import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.internal.entity.EntityResourceActionLister;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.internal.AbstractResourceReferenceResolver;
-import org.xwiki.url.internal.standard.StandardURLConfiguration;
 
 /**
  * Common code for Entity Resource Reference Resolvers.
@@ -71,8 +70,6 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
     private static final List<String> FILE_ACTION_LIST =
         Arrays.asList(DOWNLOAD_ACTION, DELATTACHMENT_ACTION, VIEWATTACHREV_ACTION, DOWNLOADREV_ACTION, SKIN_ACTION);
 
-    private StandardURLConfiguration configuration;
-
     private EntityResourceActionLister entityResourceActionLister;
 
     /**
@@ -86,8 +83,6 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
     public EntityResourceReference resolve(ExtendedURL extendedURL, ResourceType type, Map<String, Object> parameters)
         throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
-        EntityResourceReference reference = null;
-
         // Extract the wiki reference from the URL
         WikiReference wikiReference = extractWikiReference(extendedURL);
 
@@ -99,7 +94,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
         String attachmentName = null;
         String action = VIEW_ACTION;
 
-        if (pathSegments.size() != 0) {
+        if (!pathSegments.isEmpty()) {
             String firstSegment = pathSegments.get(0);
             action = firstSegment;
             // Generic parsing
@@ -113,8 +108,7 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
                 spaceNames = extractSpaceNames(pathSegments, 1, pathSegments.size() - 3);
             } else {
                 // Handle actions not specifying any attachment.
-                Pair<String, Integer> actionAndStartPosition =
-                    computeActionAndStartPosition(firstSegment, pathSegments);
+                Pair<String, Integer> actionAndStartPosition = computeActionAndStartPosition(firstSegment);
                 action = actionAndStartPosition.getLeft();
                 int startPosition = actionAndStartPosition.getRight();
                 // Normally the last segment is always the page name but we want to handle a special case when we
@@ -134,18 +128,16 @@ public abstract class AbstractEntityResourceReferenceResolver extends AbstractRe
             }
         }
 
-        if (reference == null) {
-            reference = new EntityResourceReference(
-                buildEntityReference(wikiReference, spaceNames, pageName, attachmentName),
+        EntityResourceReference reference =
+            new EntityResourceReference(buildEntityReference(wikiReference, spaceNames, pageName, attachmentName),
                 EntityResourceAction.fromString(action));
-        }
 
         copyParameters(extendedURL, reference);
 
         return reference;
     }
 
-    private Pair<String, Integer> computeActionAndStartPosition(String firstSegment, List<String> pathSegments)
+    private Pair<String, Integer> computeActionAndStartPosition(String firstSegment)
     {
         String action;
         int startPosition;

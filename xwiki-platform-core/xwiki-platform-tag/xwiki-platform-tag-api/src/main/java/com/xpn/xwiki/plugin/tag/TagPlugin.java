@@ -203,9 +203,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         if (!StringUtils.isBlank(spaceReference)) {
             StringBuilder where = new StringBuilder();
             where.append('(');
-            where.append("doc.space = ?");
+            where.append("doc.space = ?1");
             where.append(" OR ");
-            where.append("doc.space LIKE ?");
+            where.append("doc.space LIKE ?2");
             where.append(')');
 
             // Make sure to escape the LIKE syntax
@@ -218,11 +218,9 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         return getTagCount(context);
     }
 
-
     /**
-     * Get cardinality map of tags for a list of wiki spaces (including sub spaces).
-     * For example "'Main','Sandbox'" for all tags in the "Main" and "Sandbox" spaces,
-     * or "'Apo''stroph'" for all tags in the space "Apo'stroph".
+     * Get cardinality map of tags for a list of wiki spaces (including sub spaces). For example "'Main','Sandbox'" for
+     * all tags in the "Main" and "Sandbox" spaces, or "'Apo''stroph'" for all tags in the space "Apo'stroph".
      * 
      * @param spaces the list of space to get tags in, as a comma separated, quoted space references strings.
      * @param context XWiki context.
@@ -234,20 +232,20 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     {
         List<String> spaceRefList = TagParamUtils.spacesParameterToList(spaces);
 
-        List<Object> queryParameter = new ArrayList<>();
+        List<Object> queryParameters = new ArrayList<>();
         StringBuilder where = new StringBuilder();
         boolean first = true;
         for (String spaceReference : spaceRefList) {
             if (first) {
-                where.append("(doc.space = ? ");
+                where.append("(doc.space = ?1 ");
                 first = false;
             } else {
-                where.append(" OR doc.space = ? ");
+                where.append(" OR doc.space = ?1 ");
             }
-            queryParameter.add(spaceReference);
-            where.append("OR doc.space LIKE ?");
+            queryParameters.add(spaceReference);
+            where.append("OR doc.space LIKE ?2");
             String escapedSpaceReference = LIKE_ESCAPE.matcher(spaceReference).replaceAll(LIKE_REPLACEMENT);
-            queryParameter.add(escapedSpaceReference + LIKE_APPEND);
+            queryParameters.add(escapedSpaceReference + LIKE_APPEND);
         }
         // if first is true the "for" loop never ran, and spaces is empty
         // so only close brace if first is false
@@ -255,7 +253,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
             where.append(')');
         }
 
-        return getTagCountForQuery("", where.toString(), queryParameter, context);
+        return getTagCountForQuery("", where.toString(), queryParameters, context);
     }
 
     /**
@@ -272,7 +270,7 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
     public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, XWikiContext context)
         throws XWikiException
     {
-        return getTagCountForQuery(fromHql, whereHql, null, context);
+        return getTagCountForQuery(fromHql, whereHql, (Map) null, context);
     }
 
     /**
@@ -291,6 +289,24 @@ public class TagPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfac
         XWikiContext context) throws XWikiException
     {
         return TagQueryUtils.getTagCountForQuery(fromHql, whereHql, parameterValues, context);
+    }
+
+    /**
+     * Get cardinality map of tags matching a parameterized hql query.
+     *
+     * @param fromHql the <code>from</code> fragment of the hql query
+     * @param whereHql the <code>where</code> fragment of the hql query
+     * @param parameters map of named parameters for the query
+     * @param context XWiki context.
+     * @return map of tags (alphabetical order) with their occurrences counts.
+     * @throws XWikiException if search query fails (possible failures: DB access problems, etc).
+     * @since 11.7RC1
+     * @see TagPluginApi#getTagCountForQuery(String, String, java.util.List)
+     */
+    public Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, Map<String, ?> parameters,
+        XWikiContext context) throws XWikiException
+    {
+        return TagQueryUtils.getTagCountForQuery(fromHql, whereHql, parameters, context);
     }
 
     /**

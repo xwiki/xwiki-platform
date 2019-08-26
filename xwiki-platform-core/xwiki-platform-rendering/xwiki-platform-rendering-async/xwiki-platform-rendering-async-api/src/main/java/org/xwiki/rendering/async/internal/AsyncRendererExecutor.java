@@ -26,7 +26,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.job.JobException;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.stability.Unstable;
 
 /**
  * Start and cache asynchronous rendering.
@@ -35,16 +34,16 @@ import org.xwiki.stability.Unstable;
  * @since 10.10RC1
  */
 @Role
-@Unstable
 public interface AsyncRendererExecutor
 {
     /**
      * @param id the identifier of the execution
      * @param clientId the identifier of the client associated to the result
      * @return the status corresponding to the passed id or null if not could be found
-     * @since 10.11RC1
+     * @since 10.11.5
+     * @since 11.3RC1
      */
-    AsyncRendererJobStatus getAsyncStatus(List<String> id, long clientId);
+    AsyncRendererJobStatus getAsyncStatus(List<String> id, String clientId);
 
     /**
      * @param id the identifier of the execution
@@ -53,9 +52,10 @@ public interface AsyncRendererExecutor
      * @param unit the time unit of the {@code time} argument
      * @return the result of the {@link AsyncRenderer} execution for the passed id
      * @throws InterruptedException when the thread is interrupted while waiting
-     * @since 10.11RC1
+     * @since 10.11.5
+     * @since 11.3RC1
      */
-    AsyncRendererJobStatus getAsyncStatus(List<String> id, long clientId, long time, TimeUnit unit)
+    AsyncRendererJobStatus getAsyncStatus(List<String> id, String clientId, long time, TimeUnit unit)
         throws InterruptedException;
 
     /**

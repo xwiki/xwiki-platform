@@ -29,7 +29,6 @@ import java.util.List;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
-import org.suigeneris.jrcs.util.ToString;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -167,15 +166,17 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
     private Archive toRCS(final XWikiContext context) throws Exception
     {
         final Version[] versions = this.getVersions();
-        Archive rcsArch = null;
-        for (XWikiAttachment rev : this.revisions) {
-            final String sdata = rev.toStringXML(true, false, context);
-            final Object[] lines = ToString.stringToArray(sdata);
+        XWikiAttachmentRCSArchive rcsArch = null;
+
+        // We need to loop backward since the revision are ordered in desc order.
+        int revisionNumber = this.revisions.size();
+        for (int i = revisionNumber - 1; i >= 0; i--) {
+            XWikiAttachment rev = this.revisions.get(i);
             if (rcsArch == null) {
                 // First cycle.
-                rcsArch = new Archive(lines, rev.getFilename(), rev.getVersion());
+                rcsArch = new XWikiAttachmentRCSArchive(rev, context);
             } else {
-                rcsArch.addRevision(lines, "");
+                rcsArch.addRevision(rev, context);
             }
         }
         return rcsArch;
@@ -253,7 +254,7 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
             try {
                 final ByteArrayInputStream is = new ByteArrayInputStream(data);
                 final Archive rcsArchive = new Archive(getAttachment().getFilename(), is);
-                this.setRCSArchive(rcsArchive);
+                super.setRCSArchive(rcsArchive);
             } catch (Exception e) {
                 if (e instanceof XWikiException) {
                     throw (XWikiException) e;
@@ -264,6 +265,21 @@ public class ListAttachmentArchive extends XWikiAttachmentArchive
                     GENERIC_EXCEPTION_MESSAGE, e, args);
             }
         }
+    }
+
+    @Override
+    public String getArchiveAsString(XWikiContext context) throws XWikiException
+    {
+        if (super.getRCSArchive() == null) {
+            try {
+                super.setRCSArchive(toRCS(context));
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
+                    GENERIC_EXCEPTION_MESSAGE, e);
+            }
+        }
+        return super.getArchiveAsString();
     }
 
     @Override

@@ -275,12 +275,27 @@ describe('EntityReference', function() {
         expect(function() {new XWiki.SpaceReference('wiki', [])}).toThrow('Missing mandatory space name or invalid type for: []');
         expect(function() {new XWiki.SpaceReference('wiki', 12)}).toThrow('Missing mandatory space name or invalid type for: [12]');
     });
+
     it('equals', function() {
         var reference1 = new XWiki.DocumentReference('wiki', ['space1', 'space2'], 'page');
         var reference2 = new XWiki.DocumentReference('wiki', ['space1', 'space2'], 'page');
         var reference3 = new XWiki.DocumentReference('wiki2', ['space1', 'space2'], 'page');
         expect(reference1.equals(reference2)).toBe(true);
         expect(reference1.equals(reference3)).toBe(false);
+    });
+
+    it('hasParent', function() {
+      var documentReference = new XWiki.DocumentReference('wiki', ['Path', 'To'], 'Page');
+
+      expect(documentReference.hasParent(new XWiki.WikiReference('wiki'))).toBe(true);
+      expect(documentReference.hasParent(new XWiki.SpaceReference('wiki', 'Path'))).toBe(true);
+      expect(documentReference.hasParent(documentReference.parent)).toBe(true);
+
+      expect((new XWiki.WikiReference('wiki')).hasParent(null)).toBe(true);
+
+      expect(documentReference.hasParent(new XWiki.WikiReference('xwiki'))).toBe(false);
+      expect(documentReference.hasParent(new XWiki.SpaceReference('wiki', 'To'))).toBe(false);
+      expect(documentReference.hasParent(null)).toBe(false);
     });
   });
 });

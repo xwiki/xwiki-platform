@@ -306,8 +306,8 @@ public class ExportAction extends XWikiAction
                     where.append("or ( ");
                 }
 
-                where.append("doc.fullName like ?");
                 params.add(new DefaultQueryParameter(null).like(includePage));
+                where.append("doc.fullName like ?" + params.size());
 
                 // if they exist we process the excludedPages associated with that include
                 if (!excludedPages.isEmpty()) {
@@ -328,8 +328,8 @@ public class ExportAction extends XWikiAction
                             excludePage = excludePage.substring(wikiName.length() + 1);
                         }
 
-                        where.append(" and doc.fullName not like ?");
                         params.add(new DefaultQueryParameter(null).like(excludePage));
+                        where.append(" and doc.fullName not like ?" + params.size());
                     }
                 }
 

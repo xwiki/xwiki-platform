@@ -29,8 +29,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.annotation.event.AnnotationAddedEvent;
@@ -213,17 +213,15 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         String keySeparator = EVENT_ID_ELEMENTS_SEPARATOR;
         String wikiSpaceSeparator = ":";
 
-        String key =
-            event.getStream() + keySeparator + event.getApplication() + keySeparator + event.getWiki()
-                + wikiSpaceSeparator + event.getPage() + keySeparator + event.getType();
+        String key = event.getStream() + keySeparator + event.getApplication() + keySeparator + event.getWiki()
+            + wikiSpaceSeparator + event.getPage() + keySeparator + event.getType();
         long hash = key.hashCode();
         if (hash < 0) {
             hash = -hash;
         }
 
-        String id =
-            "" + hash + keySeparator + event.getDate().getTime() + keySeparator
-                + RandomStringUtils.randomAlphanumeric(8);
+        String id = "" + hash + keySeparator + event.getDate().getTime() + keySeparator
+            + RandomStringUtils.randomAlphanumeric(8);
         if (context.get(REQUEST_ID_CONTEXT_KEY) == null) {
             context.put(REQUEST_ID_CONTEXT_KEY, id);
         }
@@ -342,8 +340,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     }
 
     @Override
-    public void addActivityEvent(String streamName, String type, String title, List<String> params, XWikiContext context)
-        throws ActivityStreamException
+    public void addActivityEvent(String streamName, String type, String title, List<String> params,
+        XWikiContext context) throws ActivityStreamException
     {
         ActivityEvent event = newActivityEvent();
         event.setStream(streamName);
@@ -418,27 +416,26 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             try {
                 if (bTransactionMutable) {
                     hibstore.checkHibernate(context);
-                    bTransactionMutable = hibstore.beginTransaction(false, context);
+                    bTransactionMutable = hibstore.beginTransaction(context);
                 }
                 Session session = hibstore.getSession(context);
-                Query query =
-                    session
-                        .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
-                query.setString("eventId", eventId);
+                Query query = session
+                    .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
+                query.setParameter("eventId", eventId);
                 if (query.uniqueResult() != null) {
                     act = new ActivityEventImpl();
                     session.load(act, eventId);
                 }
 
                 if (bTransactionMutable) {
-                    hibstore.endTransaction(context, false, false);
+                    hibstore.endTransaction(context, false);
                 }
             } catch (Exception e) {
                 throw new ActivityStreamException();
             } finally {
                 try {
                     if (bTransactionMutable) {
-                        hibstore.endTransaction(context, false, false);
+                        hibstore.endTransaction(context, false);
                     }
                 } catch (Exception e) {
                     // Do nothing.
@@ -452,20 +449,19 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
             try {
                 if (bTransactionMutable) {
                     hibstore.checkHibernate(context);
-                    bTransactionMutable = hibstore.beginTransaction(false, context);
+                    bTransactionMutable = hibstore.beginTransaction(context);
                 }
                 Session session = hibstore.getSession(context);
-                Query query =
-                    session
-                        .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
-                query.setString("eventId", eventId);
+                Query query = session
+                    .createQuery("select act.eventId from ActivityEventImpl as act where act.eventId = :eventId");
+                query.setParameter("eventId", eventId);
                 if (query.uniqueResult() != null) {
                     act = new ActivityEventImpl();
                     session.load(act, eventId);
                 }
 
                 if (bTransactionMutable) {
-                    hibstore.endTransaction(context, false, false);
+                    hibstore.endTransaction(context, false);
                 }
             } catch (Exception e) {
                 throw new ActivityStreamException();
@@ -473,7 +469,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                 context.setWikiId(oriDatabase);
                 try {
                     if (bTransactionMutable) {
-                        hibstore.endTransaction(context, false, false);
+                        hibstore.endTransaction(context, false);
                     }
                 } catch (Exception e) {
                     // Do nothing.
@@ -704,32 +700,32 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public List<ActivityEvent> getEventsForSpace(String space, boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException
     {
-        List<Object> parameterValues = Arrays.<Object> asList(space, String.format(NESTED_SPACE_FORMAT, space));
-        return searchEvents("act.space=? OR act.space LIKE ?", filter, false, nb, start, parameterValues, context);
+        List<Object> parameterValues = Arrays.<Object>asList(space, String.format(NESTED_SPACE_FORMAT, space));
+        return searchEvents("act.space=?1 OR act.space LIKE ?2", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
     public List<ActivityEvent> getEventsForUser(String user, boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException
     {
-        List<Object> parameterValues = Arrays.<Object> asList(user);
-        return searchEvents("act.user=?", filter, false, nb, start, parameterValues, context);
+        List<Object> parameterValues = Arrays.<Object>asList(user);
+        return searchEvents("act.user=?1", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
     public List<ActivityEvent> getEvents(String stream, boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException
     {
-        List<Object> parameterValues = Arrays.<Object> asList(stream);
-        return searchEvents("act.stream=?", filter, false, nb, start, parameterValues, context);
+        List<Object> parameterValues = Arrays.<Object>asList(stream);
+        return searchEvents("act.stream=?1", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
     public List<ActivityEvent> getEventsForSpace(String stream, String space, boolean filter, int nb, int start,
         XWikiContext context) throws ActivityStreamException
     {
-        List<Object> parameterValues = Arrays.<Object> asList(stream, space, String.format(NESTED_SPACE_FORMAT, space));
-        return searchEvents("act.stream=? AND (act.space=? OR act.space LIKE ?)", filter, false, nb, start,
+        List<Object> parameterValues = Arrays.<Object>asList(stream, space, String.format(NESTED_SPACE_FORMAT, space));
+        return searchEvents("act.stream=?1 AND (act.space=?2 OR act.space LIKE ?3)", filter, false, nb, start,
             parameterValues, context);
     }
 
@@ -737,8 +733,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public List<ActivityEvent> getEventsForUser(String stream, String user, boolean filter, int nb, int start,
         XWikiContext context) throws ActivityStreamException
     {
-        List<Object> parameterValues = Arrays.<Object> asList(stream, user);
-        return searchEvents("act.stream=? AND act.user=?", filter, false, nb, start, parameterValues, context);
+        List<Object> parameterValues = Arrays.<Object>asList(stream, user);
+        return searchEvents("act.stream=?1 AND act.user=?2", filter, false, nb, start, parameterValues, context);
     }
 
     @Override
@@ -783,7 +779,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public SyndFeed getFeed(List<ActivityEvent> events, String suffix, XWikiContext context)
     {
         SyndFeed feed = new SyndFeedImpl();
-        List<SyndEntry> entries = new ArrayList<SyndEntry>();
+        List<SyndEntry> entries = new ArrayList<>();
         for (ActivityEvent event : events) {
             SyndEntry entry = getFeedEntry(event, suffix, context);
             entries.add(entry);
@@ -889,8 +885,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
         // Take events into account only once in a cluster
         if (!Utils.getComponent(RemoteObservationManagerContext.class).isRemoteState()
-                && !executionContext.getContext().hasProperty(
-                        AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
+            && !executionContext.getContext().hasProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY)) {
             executionContext.getContext().setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
 
             String eventType;
@@ -948,7 +943,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
                 additionalIdentifier = ((AnnotationUpdatedEvent) event).getIdentifier();
             }
 
-            List<String> params = new ArrayList<String>();
+            List<String> params = new ArrayList<>();
             params.add(displayTitle);
             if (additionalIdentifier != null) {
                 params.add(additionalIdentifier);
@@ -958,8 +953,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
 
                 addDocumentActivityEvent(streamName, currentDoc, eventType, msgPrefix + eventType, params, context);
             } catch (ActivityStreamException e) {
-                LOGGER.error("Exception while trying to add a document activity event, updated document: [" + wiki
-                    + ":" + currentDoc + "]");
+                LOGGER.error("Exception while trying to add a document activity event, updated document: [{}:{}]", wiki,
+                    currentDoc);
             }
 
             executionContext.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
@@ -970,10 +965,10 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     public List<ActivityEvent> getRelatedEvents(ActivityEvent event, XWikiContext context)
         throws ActivityStreamException
     {
-        List<Object> params = new ArrayList<Object>();
+        List<Object> params = new ArrayList<>();
         params.add(event.getRequestId());
 
-        return this.searchEvents("", "act.requestId= ? ", false, false, 0, 0, params, context);
+        return this.searchEvents("", "act.requestId= ?1 ", false, false, 0, 0, params, context);
     }
 
     @Override
@@ -1021,14 +1016,14 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
         int startAt, XWikiContext context) throws ActivityStreamException
     {
         StringBuffer searchHql = new StringBuffer();
-        List<Object[]> results = new ArrayList<Object[]>();
+        List<Object[]> results = new ArrayList<>();
 
         searchHql.append("select year(act.date), month(act.date), day(act.date), act.page, max(act.date), act.wiki "
             + "from ActivityEventImpl as act");
         addHiddenEventsFilter(searchHql);
         addOptionalEventsFilter(searchHql, optionalWhereClause);
-        searchHql.append(" group by year(act.date), month(act.date), day(act.date), act.page, act.wiki "
-            + "order by 5 desc");
+        searchHql.append(
+            " group by year(act.date), month(act.date), day(act.date), act.page, act.wiki " + "order by 5 desc");
 
         String originalDatabase = context.getWikiId();
         try {
@@ -1068,7 +1063,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     private void sendEventStreamEvent(AbstractEventStreamEvent eventStreamEvent, ActivityEvent event)
     {
         org.xwiki.eventstream.Event convertedEvent =
-                Utils.getComponent(EventConverter.class).convertActivityToEvent(event);
+            Utils.getComponent(EventConverter.class).convertActivityToEvent(event);
         Utils.getComponent(ObservationManager.class).notify(eventStreamEvent, convertedEvent);
     }
 }

@@ -19,32 +19,40 @@
  */
 package org.xwiki.rest.internal.resources;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URL;
-import java.util.Calendar;
-import java.util.Formatter;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+
+import org.apache.commons.lang.StringUtils;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.rest.Relations;
+import org.xwiki.query.QueryFilter;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
-import org.xwiki.rest.internal.DomainObjectFactory;
+import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Attachment;
 import org.xwiki.rest.model.jaxb.Attachments;
-import org.xwiki.rest.model.jaxb.Link;
-import org.xwiki.rest.resources.attachments.AttachmentResource;
-import org.xwiki.rest.resources.pages.PageResource;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -84,230 +92,310 @@ public class BaseAttachmentsResource extends XWikiResource
         }
     }
 
+    private static final String FILTER_FILE_TYPES = "fileTypes";
+
+    private static final Pattern COMMA = Pattern.compile("\\s*,\\s*");
+
+    private static final String DOT = ".";
+
+    private static final Map<String, String> FILTER_TO_QUERY = new HashMap<>();
+
+    static {
+        FILTER_TO_QUERY.put("space", "doc.space");
+        FILTER_TO_QUERY.put("page", "doc.fullName");
+        FILTER_TO_QUERY.put("name", "attachment.filename");
+        FILTER_TO_QUERY.put("author", "attachment.author");
+    }
+
+    @Inject
+    private ModelFactory modelFactory;
+
+    @Inject
+    @Named("hidden/document")
+    private QueryFilter hiddenDocumentFilter;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
     /**
-     * Retrieves the attachments by filtering them.
-     *
-     * @param wikiName The virtual wiki.
-     * @param name Name filter (include only attachments that matches this name)
-     * @param page Page filter (include only attachments are attached to a page matches this string)
-     * @param space Space filter (include only attachments are attached to a page in a space matching this string)
-     * @param author Author filter (include only attachments from an author who matches this string)
-     * @param types A comma separated list of string that will be matched against the actual mime type of the
-     *            attachments.
-     * @return The list of the retrieved attachments.
+     * @param scope where to retrieve the attachments from; it should be a reference to a wiki, space or document
+     * @param filters the filters used to restrict the set of attachments (you can filter by space name, document name,
+     *            attachment name, author and type)
+     * @param offset defines the start of the range
+     * @param limit the maximum number of attachments to include in the range
+     * @param withPrettyNames whether to include pretty names (like author full name and document title) in the returned
+     *            attachment metadata
+     * @return the list of attachments from the specified scope that match the given filters and that are within the
+     *         specified range
+     * @throws XWikiRestException if we fail to retrieve the attachments
      */
-    public Attachments getAttachments(String wikiName, String name, String page, String space, String author,
-        String types, Integer start, Integer number, Boolean withPrettyNames) throws XWikiRestException
+    protected Attachments getAttachments(EntityReference scope, Map<String, String> filters, Integer offset,
+        Integer limit, Boolean withPrettyNames) throws XWikiRestException
     {
-        String database = Utils.getXWikiContext(componentManager).getWikiId();
+        XWikiContext xcontext = this.xcontextProvider.get();
+        String database = xcontext.getWikiId();
 
         Attachments attachments = objectFactory.createAttachments();
 
-        /* This try is just needed for executing the finally clause. */
         try {
-            Utils.getXWikiContext(componentManager).setWikiId(wikiName);
+            xcontext.setWikiId(scope.extractReference(EntityType.WIKI).getName());
 
-            Map<String, String> filters = new HashMap<String, String>();
-            if (!name.equals("")) {
-                filters.put("name", name);
-            }
-            if (!page.equals("")) {
-                filters.put("page", name);
-            }
-            if (!space.equals("")) {
-                filters.put("space", Utils.getLocalSpaceId(parseSpaceSegments(space)));
-            }
-            if (!author.equals("")) {
-                filters.put("author", author);
-            }
-
-            /* Build the query */
-            Formatter f = new Formatter();
-            f.format("select doc.space, doc.name, doc.version, attachment from XWikiDocument as doc,"
-                + " XWikiAttachment as attachment where (attachment.docId=doc.id ");
-
-            if (filters.keySet().size() > 0) {
-                for (String param : filters.keySet()) {
-                    if (param.equals("name")) {
-                        f.format(" and upper(attachment.filename) like :name ");
-                    }
-                    if (param.equals("page")) {
-                        f.format(" and upper(doc.fullName) like :page ");
-                    }
-                    if (param.equals("space")) {
-                        f.format(" and upper(doc.space) like :space ");
-                    }
-
-                    if (param.equals("author")) {
-                        f.format(" and upper(attachment.author) like :author ");
-                    }
-                }
-            }
-
-            f.format(")");
-
-            String queryString = f.toString();
-
-            /* Execute the query by filling the parameters */
-            List<Object> queryResult = null;
-            try {
-                Query query = queryManager.createQuery(queryString, Query.XWQL).setLimit(number).setOffset(start);
-                for (String param : filters.keySet()) {
-                    query.bindValue(param, String.format("%%%s%%", filters.get(param).toUpperCase()));
-                }
-
-                queryResult = query.execute();
-            } catch (QueryException e) {
-                throw new XWikiRestException(e);
-            }
-
-            Set<String> acceptedMimeTypes = new HashSet<String>();
-            if (!types.equals("")) {
-                String[] acceptedMimetypesArray = types.split(",");
-                for (String type : acceptedMimetypesArray) {
-                    acceptedMimeTypes.add(type);
-                }
-            }
-
-            for (Object object : queryResult) {
-                Object[] fields = (Object[]) object;
-                String pageSpaceId = (String) fields[0];
-                List<String> pageSpaces = Utils.getSpacesFromSpaceId(pageSpaceId);
-                String pageName = (String) fields[1];
-                String pageId = Utils.getPageId(wikiName, pageSpaces, pageName);
-                String pageVersion = (String) fields[2];
-                XWikiAttachment xwikiAttachment = (XWikiAttachment) fields[3];
-
-                String mimeType = xwikiAttachment.getMimeType(Utils.getXWikiContext(componentManager));
-
-                boolean add = true;
-
-                /* Check the mime type filter */
-                if (acceptedMimeTypes.size() > 0) {
-                    add = false;
-
-                    for (String type : acceptedMimeTypes) {
-                        if (mimeType.toUpperCase().contains(type.toUpperCase())) {
-                            add = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (add) {
-                    /*
-                     * We manufacture attachments in place because we don't have all the data for calling the
-                     * DomainObjectFactory method (doing so would require to retrieve an actual Document)
-                     */
-                    Attachment attachment = objectFactory.createAttachment();
-                    attachment.setId(String.format("%s@%s", pageId, xwikiAttachment.getFilename()));
-                    attachment.setName(xwikiAttachment.getFilename());
-                    attachment.setLongSize(xwikiAttachment.getLongSize());
-                    // Retro compatibility
-                    attachment.setSize((int) xwikiAttachment.getLongSize());
-                    attachment.setMimeType(mimeType);
-                    attachment.setAuthor(xwikiAttachment.getAuthor());
-                    if (withPrettyNames) {
-                        attachment
-                            .setAuthorName(Utils.getAuthorName(xwikiAttachment.getAuthorReference(), componentManager));
-                    }
-
-                    Calendar calendar = Calendar.getInstance();
-                    calendar.setTime(xwikiAttachment.getDate());
-                    attachment.setDate(calendar);
-
-                    attachment.setPageId(pageId);
-                    attachment.setPageVersion(pageVersion);
-                    attachment.setVersion(xwikiAttachment.getVersion());
-
-                    URL absoluteUrl = Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(
-                        xwikiAttachment.getFilename(), pageSpaceId, pageName, "download", null, wikiName,
-                        Utils.getXWikiContext(componentManager));
-                    attachment.setXwikiAbsoluteUrl(absoluteUrl.toString());
-                    attachment.setXwikiRelativeUrl(Utils.getXWikiContext(componentManager).getURLFactory()
-                        .getURL(absoluteUrl, Utils.getXWikiContext(componentManager)));
-
-                    URI pageUri =
-                        Utils.createURI(uriInfo.getBaseUri(), PageResource.class, wikiName, pageSpaces, pageName);
-                    Link pageLink = objectFactory.createLink();
-                    pageLink.setHref(pageUri.toString());
-                    pageLink.setRel(Relations.PAGE);
-                    attachment.getLinks().add(pageLink);
-
-                    URI attachmentUri = Utils.createURI(uriInfo.getBaseUri(), AttachmentResource.class, wikiName,
-                        pageSpaces, pageName, xwikiAttachment.getFilename());
-                    Link attachmentLink = objectFactory.createLink();
-                    attachmentLink.setHref(attachmentUri.toString());
-                    attachmentLink.setRel(Relations.ATTACHMENT_DATA);
-                    attachment.getLinks().add(attachmentLink);
-
-                    attachments.getAttachments().add(attachment);
-                }
-            }
+            List<Object> queryResults = getAttachmentsQuery(scope, filters).setLimit(limit).setOffset(offset).execute();
+            attachments.withAttachments(queryResults.stream().map(this::processAttachmentsQueryResult)
+                .filter(getFileTypeFilter(filters.getOrDefault(FILTER_FILE_TYPES, "")))
+                .map(xwikiAttachment -> toRestAttachment(xwikiAttachment, withPrettyNames))
+                .collect(Collectors.toList()));
+        } catch (QueryException e) {
+            throw new XWikiRestException(e);
         } finally {
-            Utils.getXWikiContext(componentManager).setWikiId(database);
+            xcontext.setWikiId(database);
         }
 
         return attachments;
+    }
+
+    private Query getAttachmentsQuery(EntityReference scope, Map<String, String> filters) throws QueryException
+    {
+        StringBuilder statement = new StringBuilder().append("select doc.space, doc.name, doc.version, attachment")
+            .append(" from XWikiDocument as doc, XWikiAttachment as attachment");
+
+        Map<String, String> exactParams = new HashMap<>();
+        Map<String, String> prefixParams = new HashMap<>();
+        Map<String, String> suffixParams = new HashMap<>();
+        Map<String, String> containsParams = new HashMap<>();
+
+        List<String> whereClause = new ArrayList<>();
+        whereClause.add("attachment.docId = doc.id");
+
+        // Apply the specified scope.
+        if (scope.getType() == EntityType.DOCUMENT) {
+            whereClause.add("doc.fullName = :localDocumentReference");
+            exactParams.put("localDocumentReference", this.localEntityReferenceSerializer.serialize(scope));
+        } else if (scope.getType() == EntityType.SPACE) {
+            whereClause.add("(doc.space = :localSpaceReference or doc.space like :localSpaceReferencePrefix)");
+            String localSpaceReference = this.localEntityReferenceSerializer.serialize(scope);
+            exactParams.put("localSpaceReference", localSpaceReference);
+            prefixParams.put("localSpaceReferencePrefix", localSpaceReference + '.');
+        }
+
+        // Apply the specified filters.
+        applyFilters(filters, whereClause, containsParams);
+
+        // We need to handle the file type filter separately.
+        applyFileTypeFilter(filters, whereClause, suffixParams, containsParams);
+
+        statement.append(" where ").append(StringUtils.join(whereClause, " and "));
+
+        Query query = queryManager.createQuery(statement.toString(), Query.HQL);
+
+        // Bind the query parameter values.
+        for (Map.Entry<String, String> entry : exactParams.entrySet()) {
+            query.bindValue(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, String> entry : prefixParams.entrySet()) {
+            query.bindValue(entry.getKey()).literal(entry.getValue()).anyChars();
+        }
+        for (Map.Entry<String, String> entry : suffixParams.entrySet()) {
+            query.bindValue(entry.getKey()).anyChars().literal(entry.getValue());
+        }
+        for (Map.Entry<String, String> entry : containsParams.entrySet()) {
+            query.bindValue(entry.getKey()).anyChars().literal(entry.getValue()).anyChars();
+        }
+
+        query.addFilter(this.hiddenDocumentFilter);
+
+        return query;
+    }
+
+    private void applyFilters(Map<String, String> filters, List<String> constraints, Map<String, String> parameters)
+    {
+        for (Map.Entry<String, String> entry : filters.entrySet()) {
+            String column = FILTER_TO_QUERY.get(entry.getKey());
+            if (!StringUtils.isEmpty(entry.getValue()) && column != null) {
+                constraints.add(String.format("upper(%s) like :%s", column, entry.getKey()));
+                parameters.put(entry.getKey(), entry.getValue().toUpperCase());
+            }
+        }
+    }
+
+    private void applyFileTypeFilter(Map<String, String> filters, List<String> constraints,
+        Map<String, String> suffixParams, Map<String, String> containsParams)
+    {
+        List<String> fileTypeConstraints = new ArrayList<>();
+        applyMediaTypeFilter(filters, fileTypeConstraints, containsParams);
+        applyFileNameExtensionFilter(filters, fileTypeConstraints, suffixParams);
+        if (!fileTypeConstraints.isEmpty()) {
+            constraints.add("(" + StringUtils.join(fileTypeConstraints, " or ") + ")");
+        }
+    }
+
+    private void applyMediaTypeFilter(Map<String, String> filters, List<String> constraints,
+        Map<String, String> parameters)
+    {
+        Set<String> acceptedMediaTypes = getAcceptedMediaTypes(filters.getOrDefault(FILTER_FILE_TYPES, ""));
+        if (!acceptedMediaTypes.isEmpty()) {
+            // Not all the attachments have their media type saved in the database. We will filter out these attachments
+            // afterwards.
+            constraints.add("attachment.mimeType is null");
+            constraints.add("attachment.mimeType = ''");
+            int index = 0;
+            for (String mediaType : acceptedMediaTypes) {
+                String parameterName = "mediaType" + index++;
+                constraints.add("upper(attachment.mimeType) like :" + parameterName);
+                parameters.put(parameterName, mediaType);
+            }
+        }
+    }
+
+    private Set<String> getAcceptedMediaTypes(String fileTypesFilter)
+    {
+        // Filter out empty values and file name extensions (starting with dot) because we handle them separately.
+        return Arrays.asList(COMMA.split(fileTypesFilter)).stream().filter(s -> !s.isEmpty() && !s.startsWith(DOT))
+            .map(String::toUpperCase).collect(Collectors.toSet());
+    }
+
+    private void applyFileNameExtensionFilter(Map<String, String> filters, List<String> constraints,
+        Map<String, String> parameters)
+    {
+        Set<String> acceptedFileNameExtensions =
+            getAcceptedFileNameExtensions(filters.getOrDefault(FILTER_FILE_TYPES, ""));
+        if (!acceptedFileNameExtensions.isEmpty()) {
+            int index = 0;
+            for (String extension : acceptedFileNameExtensions) {
+                String parameterName = "extension" + index++;
+                constraints.add("upper(attachment.filename) like :" + parameterName);
+                parameters.put(parameterName, extension);
+            }
+        }
+    }
+
+    private Set<String> getAcceptedFileNameExtensions(String fileTypesFilter)
+    {
+        // File types that start with dot are considered file name extension filters.
+        return Arrays.asList(COMMA.split(fileTypesFilter)).stream().filter(s -> s.startsWith(DOT))
+            .map(String::toUpperCase).collect(Collectors.toSet());
+    }
+
+    private XWikiAttachment processAttachmentsQueryResult(Object queryResult)
+    {
+        Object[] fields = (Object[]) queryResult;
+        List<String> pageSpaces = Utils.getSpacesFromSpaceId((String) fields[0]);
+        String pageName = (String) fields[1];
+        String pageVersion = (String) fields[2];
+        XWikiAttachment attachment = (XWikiAttachment) fields[3];
+
+        XWikiContext xcontext = this.xcontextProvider.get();
+        DocumentReference documentReference = new DocumentReference(xcontext.getWikiId(), pageSpaces, pageName);
+        XWikiDocument document = new XWikiDocument(documentReference);
+        document.setVersion(pageVersion);
+        attachment.setDoc(document, false);
+
+        return attachment;
+    }
+
+    private Predicate<XWikiAttachment> getFileTypeFilter(String acceptedFileTypes)
+    {
+        // Not all the attachments have their media type stored in the database so we can't rely only on the
+        // query-level filtering. We need to also detect the media type after the query is executed and filter
+        // out the attachments that don't match the accepted media types.
+        Set<String> acceptedMediaTypes = getAcceptedMediaTypes(acceptedFileTypes);
+        Set<String> acceptedFileNameExtensions = getAcceptedFileNameExtensions(acceptedFileTypes);
+
+        // We accept the attachment if:
+        // * there's no media type filtering or
+        // * the media type is stored (which means it was already filtered at the query level) or
+        // * the file name matches the filter or
+        // * the computed media type matches the filter
+        return (attachment) -> acceptedMediaTypes.isEmpty() || !StringUtils.isEmpty(attachment.getMimeType())
+            || hasAcceptedFileNameExtension(attachment, acceptedFileNameExtensions)
+            || hasAcceptedMediaType(attachment, acceptedMediaTypes);
+    }
+
+    private boolean hasAcceptedFileNameExtension(XWikiAttachment attachment, Set<String> acceptedFileNameExtensions)
+    {
+        String fileName = attachment.getFilename().toUpperCase();
+        return acceptedFileNameExtensions.stream()
+            .anyMatch(acceptedFileNamedExtension -> fileName.endsWith(acceptedFileNamedExtension));
+    }
+
+    private boolean hasAcceptedMediaType(XWikiAttachment attachment, Set<String> acceptedMediaTypes)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        String detectedMediaType = attachment.getMimeType(xcontext).toUpperCase();
+        return acceptedMediaTypes.stream().anyMatch(acceptedMediaType -> detectedMediaType.contains(acceptedMediaType));
+    }
+
+    private Attachment toRestAttachment(XWikiAttachment xwikiAttachment, Boolean withPrettyNames)
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        com.xpn.xwiki.api.Attachment apiAttachment = new com.xpn.xwiki.api.Attachment(
+            new Document(xwikiAttachment.getDoc(), xcontext), xwikiAttachment, xcontext);
+        return this.modelFactory.toRestAttachment(this.uriInfo.getBaseUri(), apiAttachment, withPrettyNames, false);
     }
 
     protected Attachments getAttachmentsForDocument(Document doc, int start, int number, Boolean withPrettyNames)
     {
-        Attachments attachments = objectFactory.createAttachments();
+        Attachments attachments = this.objectFactory.createAttachments();
 
-        List<com.xpn.xwiki.api.Attachment> xwikiAttachments = doc.getAttachmentList();
-
-        RangeIterable<com.xpn.xwiki.api.Attachment> ri =
-            new RangeIterable<com.xpn.xwiki.api.Attachment>(xwikiAttachments, start, number);
-
-        for (com.xpn.xwiki.api.Attachment xwikiAttachment : ri) {
-            URL url = Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(
-                xwikiAttachment.getFilename(), doc.getSpace(), doc.getDocumentReference().getName(), "download", null,
-                doc.getWiki(), Utils.getXWikiContext(componentManager));
-            String attachmentXWikiAbsoluteUrl = url.toString();
-            String attachmentXWikiRelativeUrl = Utils.getXWikiContext(componentManager).getURLFactory().getURL(url,
-                Utils.getXWikiContext(componentManager));
-
-            attachments.getAttachments()
-                .add(DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(), xwikiAttachment,
-                    attachmentXWikiRelativeUrl, attachmentXWikiAbsoluteUrl, Utils.getXWikiApi(componentManager),
-                    withPrettyNames));
+        RangeIterable<com.xpn.xwiki.api.Attachment> attachmentsRange =
+            new RangeIterable<com.xpn.xwiki.api.Attachment>(doc.getAttachmentList(), start, number);
+        for (com.xpn.xwiki.api.Attachment xwikiAttachment : attachmentsRange) {
+            attachments.getAttachments().add(
+                this.modelFactory.toRestAttachment(this.uriInfo.getBaseUri(), xwikiAttachment, withPrettyNames, false));
         }
 
         return attachments;
     }
 
-    protected AttachmentInfo storeAttachment(Document doc, String attachmentName, byte[] content) throws XWikiException
+    protected AttachmentInfo storeAndRetrieveAttachment(Document document, String attachmentName, InputStream content,
+        Boolean withPrettyNames) throws XWikiException
     {
-        XWikiContext xcontext = Utils.getXWikiContext(componentManager);
+        XWikiContext xcontext = this.xcontextProvider.get();
+        boolean alreadyExisting = document.getAttachment(attachmentName) != null;
 
-        XWikiDocument xwikiDocument =
-            Utils.getXWiki(componentManager).getDocument(doc.getDocumentReference(), xcontext);
-
-        boolean alreadyExisting = xwikiDocument.getAttachment(attachmentName) != null;
-
-        XWikiAttachment xwikiAttachment;
-        try {
-            xwikiAttachment = xwikiDocument.setAttachment(attachmentName,
-                new ByteArrayInputStream(content != null ? content : new byte[0]), xcontext);
-        } catch (IOException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
-                String.format("Failed to store the content of attachment [%s] in document [%s].", attachmentName,
-                    doc.getPrefixedFullName()),
-                e);
-        }
-
-        Utils.getXWiki(componentManager).saveDocument(xwikiDocument, xcontext);
-
-        URL url = Utils.getXWikiContext(componentManager).getURLFactory().createAttachmentURL(attachmentName,
-            doc.getSpace(), doc.getDocumentReference().getName(), "download", null, doc.getWiki(), xcontext);
-        String attachmentXWikiAbsoluteUrl = url.toString();
-        String attachmentXWikiRelativeUrl = xcontext.getURLFactory().getURL(url, xcontext);
-
-        Attachment attachment = DomainObjectFactory.createAttachment(objectFactory, uriInfo.getBaseUri(),
-            new com.xpn.xwiki.api.Attachment(doc, xwikiAttachment, xcontext), attachmentXWikiRelativeUrl,
-            attachmentXWikiAbsoluteUrl, Utils.getXWikiApi(componentManager), false);
+        XWikiAttachment xwikiAttachment =
+            createOrUpdateAttachment(new AttachmentReference(attachmentName, document.getDocumentReference()), content);
+        // The doc has been updated during the creation of the attachment, so we need to ensure we answer with the
+        // updated version.
+        Document updatedDoc = xwikiAttachment.getDoc().newDocument(xcontext);
+        Attachment attachment = this.modelFactory.toRestAttachment(uriInfo.getBaseUri(),
+            new com.xpn.xwiki.api.Attachment(updatedDoc, xwikiAttachment, this.xcontextProvider.get()), withPrettyNames,
+            false);
 
         return new AttachmentInfo(attachment, alreadyExisting);
+    }
+
+    protected XWikiAttachment createOrUpdateAttachment(AttachmentReference attachmentReference, InputStream content)
+        throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        XWiki xwiki = xcontext.getWiki();
+        // We clone the document because we're going to modify it and we shouldn't modify the cached instance.
+        XWikiDocument document = xwiki.getDocument(attachmentReference, xcontext).clone();
+
+        XWikiAttachment attachment;
+        try {
+            attachment = document.setAttachment(attachmentReference.getName(), content, xcontext);
+        } catch (IOException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MISC,
+                String.format("Failed to create or update the attachment [%s].", attachmentReference), e);
+        }
+
+        // Set the document author.
+        document.setAuthorReference(xcontext.getUserReference());
+
+        // Calculate and store the attachment media type.
+        attachment.resetMimeType(xcontext);
+
+        // Remember the character encoding.
+        attachment.setCharset(xcontext.getRequest().getCharacterEncoding());
+
+        xwiki.saveDocument(document, xcontext);
+
+        return attachment;
     }
 }

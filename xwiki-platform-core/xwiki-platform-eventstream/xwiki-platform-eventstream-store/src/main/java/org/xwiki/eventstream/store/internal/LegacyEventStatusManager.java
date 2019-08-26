@@ -24,14 +24,19 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
+import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
+import org.xwiki.model.namespace.WikiNamespace;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.text.StringUtils;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -61,6 +66,15 @@ public class LegacyEventStatusManager implements EventStatusManager
 
     @Inject
     private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private ObservationManager observation;
+
+    @Inject
+    private NamespaceContextExecutor namespaceContextExecutor;
 
     @Override
     public List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception
@@ -133,35 +147,41 @@ public class LegacyEventStatusManager implements EventStatusManager
     {
         LegacyEventStatus status = eventConverter.convertEventStatusToLegacyActivityStatus(eventStatus);
 
+        boolean isSavedOnMainStore = false;
+
         if (configuration.useLocalStore()) {
-            saveEventStatusInStore(status);
+            String currentWiki = wikiDescriptorManager.getCurrentWikiId();
+            saveEventStatusInStore(status, currentWiki);
+            isSavedOnMainStore = wikiDescriptorManager.isMainWiki(currentWiki);
         }
 
-        if (configuration.useMainStore()) {
-            XWikiContext context = contextProvider.get();
-            // store event in the main database
-            String oriDatabase = context.getWikiId();
-            context.setWikiId(context.getMainXWiki());
-            try {
-                saveEventStatusInStore(status);
-            } finally {
-                context.setWikiId(oriDatabase);
-            }
+        if (configuration.useMainStore() && !isSavedOnMainStore) {
+            // save event into the main database (if the event was not already be recorded on the main store,
+            // otherwise we would duplicate the event)
+            saveEventStatusInStore(status, wikiDescriptorManager.getMainWikiId());
         }
     }
 
-    private void saveEventStatusInStore(LegacyEventStatus eventStatus) throws EventStreamException
+    private void saveEventStatusInStore(LegacyEventStatus eventStatus, String wikiId) throws Exception
     {
-        XWikiContext context = contextProvider.get();
-        XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-        try {
-            hibernateStore.beginTransaction(context);
-            Session session = hibernateStore.getSession(context);
-            session.save(eventStatus);
-            hibernateStore.endTransaction(context, true);
-        } catch (XWikiException e) {
-            hibernateStore.endTransaction(context, false);
-            throw new EventStreamException(e);
-        }
+        namespaceContextExecutor.execute(new WikiNamespace(wikiId),
+            () -> {
+                XWikiContext context = contextProvider.get();
+                XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+                try {
+                    hibernateStore.beginTransaction(context);
+                    Session session = hibernateStore.getSession(context);
+                    // The event status may already exists, so we use saveOrUpdate
+                    session.saveOrUpdate(eventStatus);
+                    hibernateStore.endTransaction(context, true);
+                } catch (XWikiException e) {
+                    hibernateStore.endTransaction(context, false);
+                    throw new EventStreamException(e);
+                }
+
+                this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
+                return null;
+            }
+        );
     }
 }

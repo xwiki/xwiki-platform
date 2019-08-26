@@ -65,6 +65,9 @@
 ##
 ## Form submission depends on this.
 $xwiki.jsfx.use('js/xwiki/actionbuttons/actionButtons.js', true)
+## In case of conflict issue we want to display the diff properly
+#set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
+#set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
 ##
 #if(!$section)
   #set($section = $request.getParameter('section'))
@@ -146,7 +149,7 @@ $doc.dropPermissions()##
     #elseif($app.getLocked() &amp;&amp; $app.getLockingUser() != $xcontext.getUser() &amp;&amp; !$request.getParameter('forceEdit'))
       #set($requestURL = "$request.getRequestURL()")
       #if($requestURL.indexOf('?') == -1)
-        #set($requestURL = "${requestURL}?")
+        #set($requestURL = "${requestURL}?$request.queryString")
       #end
       #showHeading($appName, $headingShowing)
 
@@ -164,7 +167,7 @@ $doc.dropPermissions()##
           &lt;/noscript&gt;
           &lt;script type="text/javascript"&gt;
             document.observe("xwiki:dom:loaded", function() {
-              XWiki.DocumentLock &amp;&amp; new XWiki.DocumentLock('$escapetool.javascript($app.fullName)').lock();
+              XWiki.DocumentLock &amp;&amp; new XWiki.DocumentLock('$escapetool.javascript($app.prefixedFullName)').lock();
             });
           &lt;/script&gt;
         {{/html}}

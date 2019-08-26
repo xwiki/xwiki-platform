@@ -191,4 +191,13 @@ public class CachedModelBridge implements ModelBridge, Initializable
             }
         }
     }
+
+    /**
+     * Clear the whole cache.
+     * @since 11.3RC1
+     */
+    public void clearCache()
+    {
+        cache.removeAll();
+    }
 }

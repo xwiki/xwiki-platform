@@ -187,6 +187,7 @@ import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocument.XWikiAttachmentToRemove;
@@ -198,6 +199,9 @@ import com.xpn.xwiki.internal.XWikiConfigDelegate;
 import com.xpn.xwiki.internal.XWikiInitializerJob;
 import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializedEvent;
 import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializingEvent;
+import com.xpn.xwiki.internal.event.UserCreatingDocumentEvent;
+import com.xpn.xwiki.internal.event.UserDeletingDocumentEvent;
+import com.xpn.xwiki.internal.event.UserUpdatingDocumentEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyDeletedEvent;
 import com.xpn.xwiki.internal.event.XObjectPropertyEvent;
@@ -210,6 +214,7 @@ import com.xpn.xwiki.internal.skin.InternalSkinManager;
 import com.xpn.xwiki.internal.skin.WikiSkin;
 import com.xpn.xwiki.internal.skin.WikiSkinUtils;
 import com.xpn.xwiki.internal.store.StoreConfiguration;
+import com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration;
 import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.job.JobRequestContext;
 import com.xpn.xwiki.objects.BaseObject;
@@ -432,6 +437,8 @@ public class XWiki implements EventListener
 
     private StoreConfiguration storeConfiguration;
 
+    private HibernateConfiguration hibernateConfiguration;
+
     private ObservationManager observationManager;
 
     private Provider<XWikiContext> xcontextProvider;
@@ -523,6 +530,15 @@ public class XWiki implements EventListener
         }
 
         return this.storeConfiguration;
+    }
+
+    private HibernateConfiguration getHibernateConfiguration()
+    {
+        if (this.hibernateConfiguration == null) {
+            this.hibernateConfiguration = Utils.getComponent(HibernateConfiguration.class);
+        }
+
+        return this.hibernateConfiguration;
     }
 
     private InternalSkinManager getInternalSkinManager()
@@ -1792,6 +1808,136 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Check if the user is allowed to save the document.
+     * 
+     * @param userReference the user responsible for the changes
+     * @param document the document to save
+     * @param comment the comment to associated to the new version of the saved document
+     * @param context see {@link XWikiContext}
+     * @since 10.11.10
+     * @since 11.6
+     */
+    @Unstable
+    public void checkSavingDocument(DocumentReference userReference, XWikiDocument document, String comment,
+        XWikiContext context) throws XWikiException
+    {
+        checkSavingDocument(userReference, document, comment, false, context);
+    }
+
+    /**
+     * Check if the user is allowed to save the document.
+     * 
+     * @param userReference the user responsible for the changes
+     * @param document the document to save
+     * @param context see {@link XWikiContext}
+     * @since 10.11.10
+     * @since 11.6
+     */
+    @Unstable
+    public void checkSavingDocument(DocumentReference userReference, XWikiDocument document, XWikiContext context)
+        throws XWikiException
+    {
+        checkSavingDocument(userReference, document, "", false, context);
+    }
+
+    /**
+     * Check if the user is allowed to save the document.
+     * 
+     * @param userReference the user responsible for the changes
+     * @param document the document to save
+     * @param comment the comment to associated to the new version of the saved document
+     * @param isMinorEdit true if the new version is a minor version
+     * @param context see {@link XWikiContext}
+     * @since 10.11.10
+     * @since 11.6
+     */
+    @Unstable
+    public void checkSavingDocument(DocumentReference userReference, XWikiDocument document, String comment,
+        boolean isMinorEdit, XWikiContext context) throws XWikiException
+    {
+        String currentWiki = context.getWikiId();
+
+        try {
+            // Switch to document wiki
+            context.setWikiId(document.getDocumentReference().getWikiReference().getName());
+
+            // Make sure the document is ready to be saved
+            XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
+
+            ObservationManager om = getObservationManager();
+
+            // Notify listeners about the document about to be created or updated
+
+            // Note that for the moment the event being send is a bridge event, as we are still passing around
+            // an XWikiDocument as source and an XWikiContext as data.
+
+            if (om != null) {
+                CancelableEvent documentEvent;
+                if (originalDocument.isNew()) {
+                    documentEvent = new UserCreatingDocumentEvent(userReference, document.getDocumentReference());
+                } else {
+                    documentEvent = new UserUpdatingDocumentEvent(userReference, document.getDocumentReference());
+                }
+                om.notify(documentEvent, document, context);
+
+                // If the action has been canceled by the user then don't perform any save and throw an exception
+                if (documentEvent.isCanceled()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        String.format("User [%s] has been denied the right to save the document [%s]. Reason: [%s]",
+                            userReference, document.getDocumentReference(), documentEvent.getReason()));
+                }
+            }
+        } finally {
+            context.setWikiId(currentWiki);
+        }
+    }
+
+    private XWikiDocument prepareDocumentForSave(XWikiDocument document, String comment, boolean isMinorEdit,
+        XWikiContext context) throws XWikiException
+    {
+        // Set the store so we can use it for checking the max length.
+        if (document.getStore() == null) {
+            document.setStore(this.getStore());
+        }
+        String fullName = getLocalStringEntityReferenceSerializer().serialize(document.getDocumentReference());
+        // If it's a new doc we check its name length to avoid a nasty SQL error.
+        if (document.isNew() && fullName.length() > document.getLocalReferenceMaxLength()) {
+            java.lang.Object[] args = { fullName, document.getLocalReferenceMaxLength(), fullName.length() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG,
+                "Cannot create document {0} because its full path is too long: only {1} characters are allowed and "
+                    + "current length is {2}.",
+                null, args);
+        }
+
+        // Setting comment & minor edit before saving
+        document.setComment(StringUtils.defaultString(comment));
+        document.setMinorEdit(isMinorEdit);
+
+        // We need to save the original document since saveXWikiDoc() will reset it and we
+        // need that original document for the notification below.
+        XWikiDocument originalDocument = document.getOriginalDocument();
+
+        // Make sure to always have an original document for listeners that need to compare with it.
+        // The only case where we have a null original document is supposedly when the document
+        // instance has been crafted and passed #saveDocument without using #getDocument
+        // (which is not a good practice)
+        // Also for document indicated as new make sure the previous document is accurate.
+        if (originalDocument == null || document.isNew()) {
+            XWikiDocument existing = getDocument(document.getDocumentReferenceWithLocale(), context);
+            // Switch the original document only if we actually find an existing document or if there is no original
+            // document in the first place
+            if (originalDocument == null || !existing.isNew()) {
+                originalDocument = existing;
+                document.setOriginalDocument(originalDocument);
+            }
+        }
+
+        return originalDocument;
+    }
+
+    /**
      * @param doc the document to save
      * @param context see {@link XWikiContext}
      */
@@ -1826,28 +1972,8 @@ public class XWiki implements EventListener
             // Switch to document wiki
             context.setWikiId(document.getDocumentReference().getWikiReference().getName());
 
-            // Setting comment & minor edit before saving
-            document.setComment(StringUtils.defaultString(comment));
-            document.setMinorEdit(isMinorEdit);
-
-            // We need to save the original document since saveXWikiDoc() will reset it and we
-            // need that original document for the notification below.
-            XWikiDocument originalDocument = document.getOriginalDocument();
-
-            // Make sure to always have an original document for listeners that need to compare with it.
-            // The only case where we have a null original document is supposedly when the document
-            // instance has been crafted and passed #saveDocument without using #getDocument
-            // (which is not a good practice)
-            // Also for document indicated as new make sure the previous document is accurate.
-            if (originalDocument == null || document.isNew()) {
-                XWikiDocument existing = getDocument(document.getDocumentReferenceWithLocale(), context);
-                // Switch the original document only if we actually find an existing document or if there is no original
-                // document in the first place
-                if (originalDocument == null || !existing.isNew()) {
-                    originalDocument = existing;
-                    document.setOriginalDocument(originalDocument);
-                }
-            }
+            // Make sure the document is ready to be saved
+            XWikiDocument originalDocument = prepareDocumentForSave(document, comment, isMinorEdit, context);
 
             ObservationManager om = getObservationManager();
 
@@ -1884,6 +2010,8 @@ public class XWiki implements EventListener
                 if (hasAttachmentRecycleBin(context)) {
                     for (XWikiAttachmentToRemove attachment : document.getAttachmentsToRemove()) {
                         if (attachment.isToRecycleBin()) {
+                            // Make sure the attachment will be deleted with its history
+                            attachment.getAttachment().loadArchive(context);
                             getAttachmentRecycleBinStore().saveToRecycleBin(attachment.getAttachment(),
                                 context.getUser(), new Date(), context, true);
                         }
@@ -1937,7 +2065,7 @@ public class XWiki implements EventListener
      * extracted from it. If it's a document parent it will be completed with the necessary default references (for
      * example if it's a space reference it will load the space home page).
      *
-     * @param reference the reference of teh document
+     * @param reference the reference of the document
      * @param context see {@link XWikiContext}
      * @since 5.0M1
      */
@@ -2935,7 +3063,7 @@ public class XWiki implements EventListener
         // in use.
         try {
             String language = Util.normalizeLanguage(context.getRequest().getParameter("language"));
-            if (StringUtils.isNotEmpty(language)) {
+            if (language != null) {
                 if ("default".equals(language)) {
                     // forgetting language cookie
                     Cookie cookie = new Cookie("language", "");
@@ -2979,7 +3107,7 @@ public class XWiki implements EventListener
             userdoc = getDocument(user, context);
             if (userdoc != null) {
                 String language =
-                        Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
+                    Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
                 if (StringUtils.isNotEmpty(language)) {
                     locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
                     if (LocaleUtils.isAvailableLocale(locale)) {
@@ -2993,8 +3121,7 @@ public class XWiki implements EventListener
         // If the default language is preferred, and since the user didn't explicitly ask for a
         // language already, then use the default wiki language.
         if (getConfiguration().getProperty("xwiki.language.preferDefault", "0").equals("1")
-                || getSpacePreference("preferDefaultLanguage", "0", context).equals("1"))
-        {
+            || getSpacePreference("preferDefaultLanguage", "0", context).equals("1")) {
             locale = defaultLocale;
             context.setLocale(locale);
             return locale;
@@ -3253,7 +3380,7 @@ public class XWiki implements EventListener
 
         if (!context.getWiki().isMultiLingual(context)) {
             language = Util.normalizeLanguage(context.getWiki().getXWikiPreference("default_language", "", context));
-            context.setInterfaceLanguage(language);
+            context.setInterfaceLocale(LocaleUtils.toLocale(language));
             return language;
         }
 
@@ -4333,6 +4460,21 @@ public class XWiki implements EventListener
         deleteDocument(doc, totrash, true, context);
     }
 
+    private XWikiDocument prepareDocumentDelete(XWikiDocument doc, XWikiContext context)
+    {
+        // The source document is a new empty XWikiDocument to follow
+        // DocumentUpdatedEvent policy: source document in new document and the old version is available using
+        // doc.getOriginalDocument()
+        XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
+        // Again to follow general event policy, new document author is the user who modified the document
+        // (here the modification is delete)
+        blankDoc.setOriginalDocument(doc.getOriginalDocument());
+        blankDoc.setAuthorReference(context.getUserReference());
+        blankDoc.setContentAuthorReference(context.getUserReference());
+
+        return blankDoc;
+    }
+
     private void deleteDocument(XWikiDocument doc, boolean totrash, boolean notify, XWikiContext context)
         throws XWikiException
     {
@@ -4342,15 +4484,7 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(doc.getDocumentReference().getWikiReference().getName());
 
-            // The source document is a new empty XWikiDocument to follow
-            // DocumentUpdatedEvent policy: source document in new document and the old version is available using
-            // doc.getOriginalDocument()
-            XWikiDocument blankDoc = new XWikiDocument(doc.getDocumentReference());
-            // Again to follow general event policy, new document author is the user who modified the document
-            // (here the modification is delete)
-            blankDoc.setOriginalDocument(doc.getOriginalDocument());
-            blankDoc.setAuthorReference(context.getUserReference());
-            blankDoc.setContentAuthorReference(context.getUserReference());
+            XWikiDocument blankDoc = prepareDocumentDelete(doc, context);
 
             ObservationManager om = getObservationManager();
 
@@ -4390,6 +4524,50 @@ public class XWiki implements EventListener
             } catch (Exception ex) {
                 LOGGER.error("Failed to send document delete notifications for document [{}]",
                     doc.getDocumentReference(), ex);
+            }
+        } finally {
+            context.setWikiId(currentWiki);
+        }
+    }
+
+    /**
+     * Check if the user is allowed to delete the document.
+     * 
+     * @param userReference the user responsible for the delete
+     * @param document the document to delete
+     * @param context the XWiki context
+     * @throws XWikiException when failing to delete
+     * @since 11.6
+     * @since 10.11.10
+     */
+    public void checkDeletingDocument(DocumentReference userReference, XWikiDocument document, XWikiContext context)
+        throws XWikiException
+    {
+        String currentWiki = null;
+
+        currentWiki = context.getWikiId();
+        try {
+            context.setWikiId(document.getDocumentReference().getWikiReference().getName());
+
+            XWikiDocument blankDoc = prepareDocumentDelete(document, context);
+
+            ObservationManager om = getObservationManager();
+
+            // Inform notification mechanisms that a document is about to be deleted
+            // Note that for the moment the event being send is a bridge event, as we are still passing around
+            // an XWikiDocument as source and an XWikiContext as data.
+            if (om != null) {
+                CancelableEvent documentEvent =
+                    new UserDeletingDocumentEvent(userReference, document.getDocumentReference());
+                om.notify(documentEvent, blankDoc, context);
+
+                // If the action has been canceled by the user then don't perform any deletion and throw an exception
+                if (documentEvent.isCanceled()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        String.format("User [%s] has been denied the right to delete the document [%s]. Reason: [%s]",
+                            userReference, document.getDocumentReference(), documentEvent.getReason()));
+                }
             }
         } finally {
             context.setWikiId(currentWiki);
@@ -4686,19 +4864,18 @@ public class XWiki implements EventListener
         // side effect of hidding hidden documents and no other workaround exists than directly using
         // XWikiStoreInterface#search directly
         String sql = "select distinct doc.fullName from XWikiDocument as doc";
-        List<String> parameters = new ArrayList<String>();
+        List<String> parameters = new ArrayList<>();
         if (space != null) {
-            sql += " where doc.space = ?";
             parameters.add(space);
+            sql += " where doc.space = ?" + parameters.size();
         }
 
         if (clean) {
             try {
                 context.setWikiId(targetWiki);
                 List<String> list = getStore().search(sql, 0, 0, parameters, context);
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.info("Deleting " + list.size() + " documents from wiki " + targetWiki);
-                }
+
+                LOGGER.info("Deleting [{}] documents from wiki [{}]", list.size(), targetWiki);
 
                 for (String docname : list) {
                     XWikiDocument doc = getDocument(docname, context);
@@ -4712,9 +4889,8 @@ public class XWiki implements EventListener
         try {
             context.setWikiId(sourceWiki);
             List<String> list = getStore().search(sql, 0, 0, parameters, context);
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Copying " + list.size() + " documents from wiki " + sourceWiki + " to wiki " + targetWiki);
-            }
+
+            LOGGER.info("Copying [{}] documents from wiki [{}] to wiki [{}]", list.size(), sourceWiki, targetWiki);
 
             WikiReference sourceWikiReference = new WikiReference(sourceWiki);
             WikiReference targetWikiReference = new WikiReference(targetWiki);
@@ -5186,21 +5362,8 @@ public class XWiki implements EventListener
 
     public int checkActive(String user, XWikiContext context) throws XWikiException
     {
-        int active = 1;
-
-        // These users are necessarily active. Note that superadmin might be main-wiki-prefixed when in a subwiki.
-        if (user.equals(XWikiRightService.GUEST_USER_FULLNAME)
-            || (user.endsWith(XWikiRightService.SUPERADMIN_USER_FULLNAME))) {
-            return active;
-        }
-
-        String checkactivefield = getXWikiPreference("auth_active_check", context);
-        if (checkactivefield.equals("1")) {
-            XWikiDocument userdoc = getDocument(user, context);
-            active = userdoc.getIntValue("XWiki.XWikiUsers", "active");
-        }
-
-        return active;
+        XWikiUser xWikiUser = new XWikiUser(user);
+        return xWikiUser.isActive(context) ? 1 : 0;
     }
 
     /**
@@ -5301,14 +5464,41 @@ public class XWiki implements EventListener
             }
         }
 
+        // the user is set after the access is checked.
+        boolean hasAccess = checkAccess(context.getAction(), doc, context);
+
+        XWikiUser user;
+        if (context.getUserReference() != null) {
+            user = new XWikiUser(context.getUserReference());
+        } else {
+            user = new XWikiUser(context.getUser());
+        }
+
         // We need to check rights before we look for translations
         // Otherwise we don't have the user language
-        if (checkAccess(context.getAction(), doc, context) == false) {
-            Object[] args = { doc.getFullName(), context.getUser() };
+        if (!hasAccess) {
+            Object[] args = { doc.getFullName(), user.getUser() };
             setPhonyDocument(reference, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access to document {0} has been denied to user {1}", null, args);
-        } else if (checkActive(context) == 0) { // if auth_active_check, check if user is inactive
+        } else if (user.isDisabled(context)) {
+            String action = context.getAction();
+            /*
+             * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest. The
+             * rational behind this behaviour is that inactive users should be able to access the same UI that guests
+             * are used to see, including custom icons, panels, and so on...
+             */
+            if (!((action.equals("skin") && (doc.getSpace().equals("skins") || doc.getSpace().equals("resources")))
+                || ((action.equals("skin") || action.equals("download") || action.equals("ssx") || action.equals("jsx"))
+                    && getRightService().hasAccessLevel("view", XWikiRightService.GUEST_USER_FULLNAME,
+                        doc.getPrefixedFullName(), context))
+                || ((action.equals("view") && doc.getFullName().equals("XWiki.AccountValidation"))))) {
+                Object[] args = { user.getUser() };
+                setPhonyDocument(reference, context, vcontext);
+                throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_DISABLED,
+                    "User {0} account is disabled", null, args);
+            }
+        } else if (!user.isActive(context)) {
             boolean allow = false;
             String action = context.getAction();
             /*
@@ -5346,7 +5536,17 @@ public class XWiki implements EventListener
         context.put("cdoc", doc);
         vcontext.put("doc", doc.newDocument(context));
         vcontext.put("cdoc", vcontext.get("doc"));
-        XWikiDocument tdoc = doc.getTranslatedDocument(context);
+        XWikiDocument tdoc;
+
+        // If the parameter language exists and is empty, it means we want to force loading the regular document
+        // not a translation. This should be handled later by doing a better separation between locale used in the UI
+        // and for loading the documents.
+        if ("".equals(context.getRequest().getParameter("language"))) {
+            tdoc = doc;
+        } else {
+            tdoc = doc.getTranslatedDocument(context);
+        }
+
         try {
             String rev = (String) context.get("rev");
             if (StringUtils.isNotEmpty(rev)) {
@@ -6330,12 +6530,12 @@ public class XWiki implements EventListener
 
     public boolean hasCustomMappings()
     {
-        return "1".equals(getConfiguration().getProperty("xwiki.store.hibernate.custommapping", "1"));
+        return getHibernateConfiguration().hasCustomMappings();
     }
 
     public boolean hasDynamicCustomMappings()
     {
-        return "1".equals(getConfiguration().getProperty("xwiki.store.hibernate.custommapping.dynamic", "0"));
+        return getHibernateConfiguration().hasDynamicCustomMappings();
     }
 
     public String getDefaultSpace(XWikiContext context)
@@ -6575,15 +6775,32 @@ public class XWiki implements EventListener
         }
     }
 
-    public Object parseGroovyFromPage(String fullname, XWikiContext context) throws XWikiException
+    public Object parseGroovyFromPage(String fullName, XWikiContext context) throws XWikiException
     {
-        return parseGroovyFromString(context.getWiki().getDocument(fullname, context).getContent(), context);
+        XWikiDocument groovyDocument = context.getWiki().getDocument(fullName, context);
+
+        Object sdoc = context.get(XWikiDocument.CKEY_SDOC);
+        context.put(XWikiDocument.CKEY_SDOC, groovyDocument);
+
+        try {
+            return parseGroovyFromString(groovyDocument.getContent(), context);
+        } finally {
+            context.put(XWikiDocument.CKEY_SDOC, sdoc);
+        }
     }
 
     public Object parseGroovyFromPage(String fullName, String jarWikiPage, XWikiContext context) throws XWikiException
     {
-        return parseGroovyFromString(context.getWiki().getDocument(fullName, context).getContent(), jarWikiPage,
-            context);
+        XWikiDocument groovyDocument = context.getWiki().getDocument(fullName, context);
+
+        Object sdoc = context.get(XWikiDocument.CKEY_SDOC);
+        context.put(XWikiDocument.CKEY_SDOC, groovyDocument);
+
+        try {
+            return parseGroovyFromString(groovyDocument.getContent(), jarWikiPage, context);
+        } finally {
+            context.put(XWikiDocument.CKEY_SDOC, sdoc);
+        }
     }
 
     public String getMacroList(XWikiContext context)
@@ -6922,179 +7139,145 @@ public class XWiki implements EventListener
         return rollback(tdoc, rev, true, context);
     }
 
+    private void restoreDeletedAttachment(XWikiAttachment rolledbackAttachment, XWikiContext context)
+        throws XWikiException
+    {
+        // Restore deleted attachments from the trash
+        if (getAttachmentRecycleBinStore() != null) {
+            // There might be multiple versions of the attachment in the trash, search for the right one
+            List<DeletedAttachment> deletedVariants =
+                getAttachmentRecycleBinStore().getAllDeletedAttachments(rolledbackAttachment, context, true);
+
+            DeletedAttachment correctVariant = null;
+            for (DeletedAttachment variant : deletedVariants) { // Reverse chronological order
+                if (variant.getDate().before(rolledbackAttachment.getDate())) {
+                    break;
+                }
+
+                correctVariant = variant;
+            }
+
+            if (correctVariant != null) {
+                XWikiAttachment restoredAttachment = correctVariant.restoreAttachment();
+
+                boolean updateArchive = false;
+
+                if (!restoredAttachment.getVersion().equals(rolledbackAttachment.getVersion())) {
+                    XWikiAttachment restoredAttachmentRevision =
+                        restoredAttachment.getAttachmentRevision(rolledbackAttachment.getVersion(), context);
+
+                    if (restoredAttachmentRevision != null) {
+                        // Update the archive since it won't be done by the store (it's a new attachment)
+                        // TODO: Remove from the archive the versions greater than the rollbacked one instead (they
+                        // would not be lost since they would still be in the recycle bin) ?
+                        rolledbackAttachment.setVersion(restoredAttachment.getVersion());
+                        updateArchive = true;
+
+                        restoredAttachment = restoredAttachmentRevision;
+                    }
+                }
+
+                rolledbackAttachment.apply(restoredAttachment);
+
+                // Restore the deleted archive
+                rolledbackAttachment
+                    .setAttachment_archive((XWikiAttachmentArchive) restoredAttachment.getAttachment_archive().clone());
+                rolledbackAttachment.getAttachment_archive().setAttachment(rolledbackAttachment);
+
+                if (updateArchive) {
+                    rolledbackAttachment.updateContentArchive(context);
+                }
+            } else {
+                // Not found in the trash, set an empty content to avoid errors
+                try {
+                    rolledbackAttachment.setContent(new ByteArrayInputStream(new byte[0]));
+                } catch (IOException e) {
+                    // The content we pass cannot fail
+                }
+            }
+        }
+    }
+
     /**
      * @param tdoc the document to rollback
      * @param rev the revision to rollback to
      * @param addRevision true if a new revision should be created
-     * @param context the XWiki context
+     * @param xcontext the XWiki context
      * @return the new document
      * @throws XWikiException when failing to rollback the document
      * @since 10.7RC1
      * @since 9.11.8
      */
-    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision, XWikiContext context)
+    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, boolean addRevision, XWikiContext xcontext)
         throws XWikiException
     {
         LOGGER.debug("Rolling back [{}] to version [{}]", tdoc, rev);
 
-        // Let's clone rolledbackDoc since we might modify it
-        XWikiDocument rolledbackDoc = getDocument(tdoc, rev, context).clone();
+        // Clone the document before modifying to avoid concurrency issues
+        XWikiDocument document = tdoc.clone();
 
+        XWikiDocument rolledbackDoc = getDocumentRevisionProvider().getRevision(tdoc, rev);
+
+        // Restore attachments
         if ("1".equals(getConfiguration().getProperty("xwiki.store.rollbackattachmentwithdocuments", "1"))) {
-            // Attachment handling strategy:
-            // - Two lists: Old Attachments, Current Attachments
-            // Goals:
-            // 1. Attachments that are only in OA must be restored from the trash
-            // 2. Attachments that are only in CA must be sent to the trash
-            // 3. Attachments that are in both lists should be reverted to the right version
-            // 4. Gotcha: deleted and re-uploaded attachments should be both trashed and restored.
-            // Plan:
-            // - Construct two lists: to restore, to revert
-            // - Iterate over OA.
-            // -- If the attachment is not in CA, add it to the restore list
-            // -- If it is in CA, but the date of the first version of the current attachment is after the date of the
-            // restored document version, add it the restore & move the current attachment to the recycle bin
-            // -- Otherwise, add it to the revert list
-            // - Iterate over CA
-            // -- If the attachment is not in OA, delete it
-
-            List<XWikiAttachment> oldAttachments = rolledbackDoc.getAttachmentList();
-            List<XWikiAttachment> currentAttachments = tdoc.getAttachmentList();
-            List<XWikiAttachment> toRestore = new ArrayList<>();
-            List<XWikiAttachment> toRevert = new ArrayList<>();
-
-            // First step, determine what to do with each attachment
             LOGGER.debug("Checking attachments");
 
-            for (XWikiAttachment oldAttachment : oldAttachments) {
-                String filename = oldAttachment.getFilename();
-                XWikiAttachment equivalentAttachment = tdoc.getAttachment(filename);
-                if (equivalentAttachment == null) {
-                    // Deleted attachment
+            for (XWikiAttachment rolledbackAttachment : rolledbackDoc.getAttachmentList()) {
+                String filename = rolledbackAttachment.getFilename();
+                XWikiAttachment attachment = document.getAttachment(filename);
+
+                if (attachment == null) {
+                    // The attachment has been deleted, search and restore it
                     LOGGER.debug("Deleted attachment: [{}]", filename);
-                    toRestore.add(oldAttachment);
-                    continue;
-                }
-                XWikiAttachment equivalentAttachmentRevision =
-                    equivalentAttachment.getAttachmentRevision(oldAttachment.getVersion(), context);
-                // We compare the number of milliseconds instead of the date objects directly because Hibernate can
-                // return java.sql.Timestamp for date fields and the JavaDoc says that Timestamp.equals(Object) doesn't
-                // return true if the passed value is a java.util.Date object with the same number of milliseconds
-                // because the nanoseconds component of the passed date is unknown.
-                if (equivalentAttachmentRevision == null
-                    || equivalentAttachmentRevision.getDate().getTime() != oldAttachment.getDate().getTime()) {
-                    // Recreated attachment
-                    LOGGER.debug("Recreated attachment: [{}]", filename);
-                    // If the attachment trash is not available, don't lose the existing attachment
-                    if (getAttachmentRecycleBinStore() != null) {
-                        getAttachmentRecycleBinStore().saveToRecycleBin(equivalentAttachment, context.getUser(),
-                            new Date(), context, true);
-                        toRestore.add(oldAttachment);
-                    }
-                    continue;
-                }
-                if (!StringUtils.equals(oldAttachment.getVersion(), equivalentAttachment.getVersion())) {
-                    // Updated attachment
-                    LOGGER.debug("Updated attachment: [{}]", filename);
-                    toRevert.add(equivalentAttachment);
-                }
-            }
-            for (XWikiAttachment attachment : currentAttachments) {
-                if (rolledbackDoc.getAttachment(attachment.getFilename()) == null) {
-                    LOGGER.debug("New attachment: " + attachment.getFilename());
-                    // XWikiDocument#save() is actually the only way to delete an attachment cleanly
-                    rolledbackDoc.getAttachmentsToRemove().add(new XWikiAttachmentToRemove(attachment, true));
-                }
-            }
 
-            // Second step, treat each affected attachment
+                    // Restore content and archive from the recycle bin
+                    restoreDeletedAttachment(rolledbackAttachment, xcontext);
+                } else {
+                    XWikiAttachment attachmentRevision =
+                        attachment.getAttachmentRevision(rolledbackAttachment.getVersion(), xcontext);
 
-            // Revert updated attachments to the old version
-            for (XWikiAttachment attachmentToRevert : toRevert) {
-                String oldAttachmentVersion =
-                    rolledbackDoc.getAttachment(attachmentToRevert.getFilename()).getVersion();
-                XWikiAttachment oldAttachmentRevision =
-                    attachmentToRevert.getAttachmentRevision(oldAttachmentVersion, context);
-                if (oldAttachmentRevision == null) {
-                    // Previous version is lost, just leave the current version in place
-                    rolledbackDoc.setAttachment(attachmentToRevert);
+                    // We compare the number of milliseconds instead of the date objects directly because Hibernate can
+                    // return java.sql.Timestamp for date fields and the JavaDoc says that Timestamp.equals(Object)
+                    // doesn't return true if the passed value is a java.util.Date object with the same number of
+                    // milliseconds because the nanoseconds component of the passed date is unknown.
+                    if (attachmentRevision == null
+                        || attachmentRevision.getDate().getTime() != rolledbackAttachment.getDate().getTime()) {
+                        // Recreated attachment
+                        LOGGER.debug("Recreated attachment: [{}]", filename);
 
-                    continue;
-                }
-                // We can't just leave the old version in place, since it will break the revision history, given the
-                // current implementation, so we set the attachment version to the most recent version, mark the content
-                // as dirty, and the storage will automatically bump up the version number.
-                // This is a hack, to be fixed once the storage doesn't take care of updating the history and version,
-                // and once the current attachment version can point to an existing version from the history.
-                oldAttachmentRevision.setVersion(attachmentToRevert.getVersion());
-                oldAttachmentRevision.setMetaDataDirty(true);
-                oldAttachmentRevision.getAttachment_content().setContentDirty(true);
+                        // Mark current attachment for deletion to not loose it
+                        document.removeAttachment(attachment);
 
-                rolledbackDoc.setAttachment(oldAttachmentRevision);
-            }
-
-            // Restore deleted attachments from the trash
-            if (getAttachmentRecycleBinStore() != null) {
-                for (XWikiAttachment attachmentToRestore : toRestore) {
-                    // There might be multiple versions of the attachment in the trash, search for the right one
-                    List<DeletedAttachment> deletedVariants =
-                        getAttachmentRecycleBinStore().getAllDeletedAttachments(attachmentToRestore, context, true);
-                    DeletedAttachment correctVariant = null;
-                    for (DeletedAttachment variant : deletedVariants) { // Reverse chronological order
-                        if (variant.getDate().before(rolledbackDoc.getDate())) {
-                            break;
+                        // Search and restore previously deleted one
+                        // If the attachment trash is not available, don't lose the existing attachment
+                        if (getAttachmentRecycleBinStore() != null) {
+                            // Restore in the right version
+                            restoreDeletedAttachment(rolledbackAttachment, xcontext);
                         }
-                        correctVariant = variant;
-                    }
-                    if (correctVariant == null) {
-                        // Not found in the trash, nothing left to do
-                        continue;
-                    }
-                    XWikiAttachment restoredAttachment = correctVariant.restoreAttachment();
-                    XWikiAttachment restoredAttachmentRevision =
-                        restoredAttachment.getAttachmentRevision(attachmentToRestore.getVersion(), context);
-
-                    if (restoredAttachmentRevision != null) {
-                        restoredAttachmentRevision.setAttachment_archive(restoredAttachment.getAttachment_archive());
-                        restoredAttachmentRevision.getAttachment_archive().setAttachment(restoredAttachmentRevision);
-                        restoredAttachmentRevision.setVersion(restoredAttachment.getVersion());
-                        restoredAttachmentRevision.setMetaDataDirty(true);
-                        restoredAttachmentRevision.getAttachment_content().setContentDirty(true);
-
-                        rolledbackDoc.setAttachment(restoredAttachmentRevision);
                     } else {
-                        // This particular version is lost, update to the one available
-                        rolledbackDoc.setAttachment(restoredAttachment);
+                        // Restore content and archive from the recycle bin
+                        rolledbackAttachment.apply(attachmentRevision);
                     }
-                }
-            } else {
-                // No trash, can't restore. Remove the attachment references, so that the document is not broken
-                for (XWikiAttachment attachmentToRestore : toRestore) {
-                    rolledbackDoc.getAttachmentList().remove(attachmentToRestore);
                 }
             }
         }
 
-        // Special treatment for deleted objects
-        rolledbackDoc.addXObjectsToRemoveFromVersion(tdoc);
+        document.apply(rolledbackDoc);
 
         // Prepare the XWikiDocument before save
-        rolledbackDoc.setNew(false);
-        rolledbackDoc.setOriginalDocument(tdoc);
-        rolledbackDoc.setAuthorReference(context.getUserReference());
-        rolledbackDoc.setContentAuthorReference(context.getUserReference());
+        document.setAuthorReference(xcontext.getUserReference());
+        document.setContentAuthorReference(xcontext.getUserReference());
 
         // Make sure the history is not modified if addRevision is disabled
         String message;
         if (!addRevision) {
-            rolledbackDoc.setMetaDataDirty(false);
-            rolledbackDoc.setContentDirty(false);
-            rolledbackDoc.setRCSVersion(tdoc.getDocumentArchive().getLatestVersion());
-            message = rolledbackDoc.getComment();
+            document.setVersion(rev);
+            document.setMetaDataDirty(false);
+            document.setContentDirty(false);
+            message = document.getComment();
         } else {
-            rolledbackDoc.setMetaDataDirty(true);
-            rolledbackDoc.setDocumentArchive(tdoc.getDocumentArchive());
-            rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
+            // Make sure to save a new version even if nothing changed
+            document.setMetaDataDirty(true);
             message = localizePlainOrKey("core.comment.rollback", rev);
         }
 
@@ -7103,28 +7286,30 @@ public class XWiki implements EventListener
             // Notify listeners about the document that is going to be rolled back.
             // Note that for the moment the event being send is a bridge event, as we are still passing around
             // an XWikiDocument as source and an XWikiContext as data.
-            om.notify(new DocumentRollingBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc, context);
+            om.notify(new DocumentRollingBackEvent(document.getDocumentReference(), rev), document, xcontext);
         }
 
-        saveDocument(rolledbackDoc, message, context);
+        XWikiDocument originalDocument = document.getOriginalDocument();
 
-        // Since the the store resets the original document, we need to temporarily put it back to send notifications.
-        XWikiDocument newOriginalDocument = rolledbackDoc.getOriginalDocument();
-        rolledbackDoc.setOriginalDocument(tdoc);
+        saveDocument(document, message, xcontext);
+
+        // Since XWiki#saveDocument resets the original document, we need to temporarily put it back to send
+        // notifications.
+        XWikiDocument newOriginalDocument = document.getOriginalDocument();
+        document.setOriginalDocument(originalDocument);
 
         try {
             if (om != null) {
                 // Notify listeners about the document that was rolled back.
                 // Note that for the moment the event being send is a bridge event, as we are still passing around an
                 // XWikiDocument as source and an XWikiContext as data.
-                om.notify(new DocumentRolledBackEvent(rolledbackDoc.getDocumentReference(), rev), rolledbackDoc,
-                    context);
+                om.notify(new DocumentRolledBackEvent(document.getDocumentReference(), rev), document, xcontext);
             }
         } finally {
-            rolledbackDoc.setOriginalDocument(newOriginalDocument);
+            document.setOriginalDocument(newOriginalDocument);
         }
 
-        return rolledbackDoc;
+        return document;
     }
 
     /**
@@ -7386,7 +7571,7 @@ public class XWiki implements EventListener
      * (the attachment) or "doc" (the document it is attached to)
      *
      * @param parametrizedSqlClause The HQL where clause. For example {@code where doc.fullName
-     *        <> ? and (attach.author = ? or (attach.filename = ? and doc.space = ?))}
+     *        <> ?1 and (attach.author = ?2 or (attach.filename = ?3 and doc.space = ?4))}
      * @param checkRight if true, only return attachments in documents which the "current user" has permission to view.
      * @param nb The number of rows to return. If 0 then all rows are returned
      * @param start The number of rows to skip at the beginning.
@@ -7410,7 +7595,7 @@ public class XWiki implements EventListener
                 + parametrizedSqlClause,
             nb, start, parameterValues, context);
 
-        HashMap<String, List<String>> filenamesByDocFullName = new HashMap<String, List<String>>();
+        HashMap<String, List<String>> filenamesByDocFullName = new HashMap<>();
 
         // Put each attachment name with the document name it belongs to
         for (int i = 0; i < results.size(); i++) {
@@ -7422,7 +7607,7 @@ public class XWiki implements EventListener
             filenamesByDocFullName.get(docFullName).add(filename);
         }
 
-        List<XWikiAttachment> out = new ArrayList<XWikiAttachment>();
+        List<XWikiAttachment> out = new ArrayList<>();
 
         // Index through the document names, get relivent attachments
         for (Map.Entry<String, List<String>> entry : filenamesByDocFullName.entrySet()) {

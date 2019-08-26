@@ -880,6 +880,17 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
         boolean relationalStorage, String values, String displayType, String separators, String defaultValue)
     {
+        return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, relationalStorage, values,
+            displayType, separators, defaultValue, ListClass.FREE_TEXT_FORBIDDEN, false);
+    }
+
+    /**
+     * @since 11.5RC1
+     */
+    public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect,
+        boolean relationalStorage, String values, String displayType, String separators, String defaultValue,
+        String freeText, boolean largeStorage)
+    {
         if (get(fieldName) == null) {
             StaticListClass list_class = new StaticListClass();
             list_class.setName(fieldName);
@@ -898,6 +909,11 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             if (defaultValue != null) {
                 list_class.setDefaultValue(defaultValue);
             }
+            list_class.setFreeText(freeText);
+            if (!ListClass.FREE_TEXT_FORBIDDEN.equals(freeText)) {
+                list_class.setPicker(true);
+            }
+            list_class.setLargeStorage(largeStorage);
             list_class.setObject(this);
             put(fieldName, list_class);
 
@@ -1413,7 +1429,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
         setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getDefaultEditSheet(), newClass.getDefaultEditSheet(),
             getDefaultEditSheet(), mergeResult));
 
-        setDefaultEditSheet(MergeUtils.mergeOject(previousClass.getValidationScript(), newClass.getValidationScript(),
+        setValidationScript(MergeUtils.mergeOject(previousClass.getValidationScript(), newClass.getValidationScript(),
             getValidationScript(), mergeResult));
 
         setNameField(

@@ -240,7 +240,11 @@
               #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
-              <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
+              #set ($defaultHeaderClass = {'_actions': 'actions', '_avatar': 'avatar'})
+              #set ($discard = $colprop.putIfAbsent('headerClass', $defaultHeaderClass.get($colname)))
+              <th scope="col" class="xwiki-livetable-display-header-text $!colprop.headerClass
+                  #if ($!colprop.type == 'hidden')hidden#end
+                  #if ($isSortable)sortable #if ($colname == $selectedColumn)selected $defaultOrder#else asc#end#end">
                 #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
                 #if($isSortable)<a data-rel="${colname}">#end
                 $displayName
@@ -524,4 +528,53 @@
 ### @param iconName The name of the icon to display, without the glyphicon prefix (eg: 'globe')
 #macro(glyphicon $iconName)
 #if("$!iconName"!='')<span class="glyphicon glyphicon-${iconName}"></span>#end
+#end
+#macro(displayDocumentTitle $stepTitle $titleHint)
+<div class="row document-header">
+  <div class="document-info col-xs-12">
+    <div id="document-title"><h1>$stepTitle</h1></div>
+    #if ($titleHint)
+      <div class="xdocLastModification">$titleHint</div>
+    #end
+  </div>
+</div>
+<hr/>
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the date & time picker.
+ *#
+#macro (dateTimePicker_import)
+  #set ($discard = $xwiki.linkx.use(
+    $services.webjars.url('Eonasdan-bootstrap-datetimepicker', 'css/bootstrap-datetimepicker.min.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}
+  ))
+  #set ($discard = $xwiki.jsfx.use('dateTimePicker.js', true))
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the color picker.
+ *#
+#macro (colorPicker_import)
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('colpick', 'css/colpick.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.ssfx.use('colorPicker.css'))
+  #set ($discard = $xwiki.jsfx.use('colorPicker.js', true))
+#end
+
+#macro (colorPicker_input $parameters)
+  #set ($discard = $parameters.putIfAbsent('class', 'form-control color-picker type-color'))
+  #if ("$!parameters.disabled" == 'true')
+    #set ($parameters.disabled = 'disabled')
+  #else
+    #set ($discard = $parameters.remove('disabled'))
+  #end
+  <div class="input-group">
+    <input type="text"
+      #foreach ($parameter in $parameters.entrySet())
+        $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+      #end
+    />
+    <span class="input-group-addon"><span class="color-preview"></span></span>
+  </div>
 #end

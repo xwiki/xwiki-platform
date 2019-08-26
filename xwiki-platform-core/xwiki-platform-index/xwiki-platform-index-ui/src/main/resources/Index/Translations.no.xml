@@ -38,12 +38,11 @@
   <hidden>true</hidden>
   <content>index.spacesMacro.title=Rom
 index.spacesMacro.spaceIndex.title=Se rominnhold
-### Missing: index.spacesMacro.spaceIndex.alt=Space Index
-### Missing: index.spacesMacro.spaceAdministration.title=See Space Administration
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
-### Missing: index.spacesMacro.createSpace.link=Create a new space
-### Missing: index.spacesMacro.createSpace.defaultSpaceName=Space name
+index.spacesMacro.spaceIndex.alt=Romindeks
+index.spacesMacro.spaceAdministration.title=Se romadministrering
+index.spacesMacro.spaceAdministration.alt=Administrer rom
+index.spacesMacro.createSpace.link=Opprett nytt rom
+index.spacesMacro.createSpace.defaultSpaceName=Romnavn
 index.spacesMacro.createSpace.submit=Opprett
 index.deletedDocuments.deleteAll=Slett alle</content>
-  
 </xwikidoc>

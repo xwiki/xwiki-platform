@@ -32,20 +32,9 @@
          - When size > 4000 Hibernates maps it to LONG. However LONG is deprecated in Oracle and shouldn't be used
            since Oracle imposes a limitation on it: there can be only be one LONG column per table. Thus when
            size > 4000 chars we must use a "materialized_clob" type
-           See https://hibernate.onjira.com/browse/HHH-5569
+           See https://hibernate.atlassian.net/browse/HHH-5569
        - Thus, use the following strategy: use the "string" type when size<4000 and materialized_clob when size>40000
-       - Lots of columns have not-null="false", since Oracle treats the empty string as NULL
-       - Numeric index columns have an explicit sql-type="integer"
-       - materialized_clob mapping to a org.hibernate.type.StringClobType type
   -->
-
-  <!-- JDBC driver will try to map a materialized_clob type to a java.sql.Clob Java type when loading objects from
-       the DB thus causing a Class Cast Exception since we use String types in Java and not java.sql.Clob
-       (see https://hibernate.onjira.com/browse/HHH-5659).
-       See also https://community.jboss.org/wiki/HibernateCoreMigrationGuide36
-       Thus we need to tell Hibernate to map materialized_clob to String.
-  -->
-  <typedef name="materialized_clob" class="org.hibernate.type.StringClobType" />
 
   <class name="org.xwiki.mail.MailStatus" table="mailsender_events">
     <id name="messageId" type="string" unsaved-value="any">

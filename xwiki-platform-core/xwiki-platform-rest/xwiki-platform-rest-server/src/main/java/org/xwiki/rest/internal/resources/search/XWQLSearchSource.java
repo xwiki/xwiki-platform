@@ -33,6 +33,9 @@ import org.xwiki.component.annotation.Component;
 @Singleton
 public class XWQLSearchSource extends AbstractDatabaseSearchSource
 {
+    /**
+     * Default constructor.
+     */
     public XWQLSearchSource()
     {
         super("xwql");

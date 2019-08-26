@@ -1,0 +1,353 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="AnnotationCode.Macros" locale="">
+  <web>AnnotationCode</web>
+  <name>Macros</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AnnotationCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity filter="none" output="false"}}
+## Not used here but kept for retro-compatibility
+#set($restURL = "${request.contextPath}/rest")
+## Retrieve the annotation class from the configuration
+#set($config = 'AnnotationCode.AnnotationConfig')
+#set($annotationClassDocName = $xwiki.getDocument($config).getObject($config).getProperty('annotationClass').value)
+#set($annotationClass = $xwiki.getDocument("$!{annotationClassDocName}").getxWikiClass())
+##
+##
+## Do not display these 'internal' properties in the form:
+#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state', 'replyto', 'highlight'])## TODO: 'color'
+##
+##
+#*
+ * Display a box for creating an annotation
+ *
+ * @param $docWiki the wiki of the annotated document
+ * @param $docSpace the space of the annotated document
+ * @param $docPage the page of the annotated document
+ * @param $annData a map containing the mandatory selection-related fields
+ * @deprecated since 7.2M2, use #displayCreateBoxFromReference instead
+ *#
+#macro(displayCreateBox $docWiki $docSpace $docPage $annData)
+  #displayCreateBoxFromReference($services.model.createDocumentReference($docWiki, $docSpace, $docPage))
+#end
+#*
+ * Display a box for creating an annotation
+ *
+ * @param $docRef the reference of the annotated document
+ * @param $annData a map containing the mandatory selection-related fields
+ *#
+#macro(displayCreateBoxFromReference $docRef $annData)
+&lt;div class="annotation-box annotation-box-create"&gt;
+  #set ($fullRestURL = "${services.rest.url($docRef)}/annotations?media=json")
+  &lt;form method="POST" action="$escapetool.xml($response.encodeURL($fullRestURL))"&gt;
+    &lt;div class="hidden"&gt;
+      #foreach($field in $annData.keySet())
+         &lt;input type="hidden" name="${field}" value="$!{escapetool.xml($annData.get(${field}))}"/&gt;
+      #end
+    &lt;/div&gt;
+    #displayAnnotationFromReference($annData, 'create', $docRef)
+    #displayAnnotationBoxButtons('create')
+  &lt;/form&gt;
+&lt;/div&gt;
+#end
+#*
+ * Display a box for editing an annotation
+ *
+ * @param $id the annotation identifier
+ * @param $docWiki the wiki of the annotated document
+ * @param $docSpace the space of the annotated document
+ * @param $docPage the page of the annotated document
+ * @deprecated, starting with 7.2M3, use #displayEditBoxFromReference instead
+ *#
+#macro(displayEditBox $id $docWiki $docSpace $docPage)
+  #displayEditBoxFromReference($id, $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
+#end
+#*
+ * Display a box for editing an annotation
+ *
+ * @param $id the annotation identifier
+ * @param $docRef the reference of the annotated document
+ *#
+#macro(displayEditBoxFromReference $id $docRef)
+  #set($ann = $services.annotations.getAnnotation($docRef, $id))
+  &lt;div class="annotation-box annotation-box-edit"&gt;
+    #if($ann)
+      #set($editURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=PUT&amp;media=json")
+      &lt;form method='POST' action="${editURL}"&gt;
+        #displayAnnotationFromReference($ann, 'edit', $docRef)
+        #displayAnnotationBoxButtons('edit')
+      &lt;/form&gt;
+    #else
+      &lt;div class="box infomessage"&gt;$services.localization.render('annotations.action.edit.error.notfound')&lt;/div&gt;
+    #end
+  &lt;/div&gt;
+#end
+#*
+ * Display a box containing the annotation
+ *
+ * @param $id the annotation identifier
+ * @param $docWiki the wiki of the annotated document
+ * @param $docSpace the space of the annotated document
+ * @param $docPage the page of the annotated document
+ * @deprecated since 7.2M3, use #displayViewBoxFromReference instead
+ *#
+#macro(displayViewBox $id $docWiki $docSpace $docPage)
+  #displayViewBoxFromReference($id, $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
+#end
+#*
+ * Display a box containing the annotation
+ *
+ * @param $target the annotated entity identifier
+ * @param $id the annotation identifier
+ * @param $docRef the reference of the annotated document
+ *#
+#macro(displayViewBoxFromReference $id $docRef)
+  #set($ann = $services.annotations.getAnnotation($docRef, $id))
+  &lt;div class="annotation-box annotation-box-view"&gt;
+    #if ($ann)
+      #*&lt;div class="links"&gt;
+        &lt;a href="#" class='annotation-view-hide'&gt;$services.localization.render('annotations.action.view.hide.text')&lt;/a&gt;
+      &lt;/div&gt;*#
+      ##&lt;div class="clearfloats"&gt;&lt;/div&gt;
+      #displayAnnotationFromReference($ann $mode $docRef)
+    #else
+      &lt;div class="box infomessage"&gt;$services.localization.render('annotations.action.view.error.notfound')&lt;/div&gt;
+    #end
+  &lt;/div&gt;
+#end
+##
+##
+##
+#*
+ * Display form buttons
+ *
+ * @param $mode 'create' or 'edit'
+ *#
+#macro(displayAnnotationBoxButtons $mode)
+  &lt;div class="buttons"&gt;
+    &lt;span class='buttonwrapper'&gt;&lt;input type="submit" class='button' value='$!{escapetool.xml($services.localization.render("annotations.action.${mode}.submit.text"))}'/&gt;&lt;/span&gt;
+    &lt;span class='buttonwrapper'&gt;&lt;input type="reset" class='button secondary' value='$!{escapetool.xml($services.localization.render("annotations.action.${mode}.cancel.text"))}'/&gt;&lt;/span&gt;
+  &lt;/div&gt;
+#end
+##
+##
+#**
+ * Display an annotation
+ *
+ * @param $ann the annotation object
+ * @param $mode view (default), list, create or edit
+ * @param $docWiki the wiki of the annotated document
+ * @param $docSpace the space of the annotated document
+ * @param $docPage the page of the annotated document
+ * @deprecated since 7.2M3, use #displayAnnotationFromReference instead
+ *#
+#macro(displayAnnotation $ann $mode $docWiki $docSpace $docPage)
+  #displayAnnotationFromReference($ann, $mode, $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
+#end
+#**
+ * Display an annotation
+ *
+ * @param $ann the annotation object
+ * @param $mode view (default), list, create or edit
+ * @param $docRef the reference of the annotated document
+ *#
+#macro(displayAnnotationFromReference $ann $mode $docRef)
+  #set ($availableModes = ['view', 'list', 'create', 'edit'])
+  #if(!$availableModes.contains("$!{mode}"))
+    #set($mode = 'view')
+  #end
+  &lt;div class="annotation $!{ann.state}" id="annotation_${mode}_$!{ann.id}"&gt;
+    &lt;div class="annotationAvatar"&gt;#mediumUserAvatar($ann.author)&lt;/div&gt;
+    &lt;div class="annotationHeader"&gt;
+      #displayAnnotationTitle($ann)
+      #displayAnnotationToolboxFromReference($ann $mode $docRef)
+    &lt;/div&gt;
+    &lt;div class="annotationContent"&gt;
+      #displayAnnotationBody($ann $mode)
+      #if ($mode == 'view' &amp;&amp; $annotationClassDocName == 'XWiki.XWikiComments')
+        #set($annoDoc = $xwiki.getDocument($docRef))
+        #set($repliesList = $annoDoc.getObjects('XWiki.XWikiComments', 'replyto', $ann.id))
+        #if($repliesList.size() &gt; 0)
+          &lt;a href="#xwikicomment_${ann.id}"&gt;$services.localization.render('annotations.action.view.thread')&lt;/a&gt;
+        #end
+      #end
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+##
+##
+#**
+ * Display the annotation title, containing author and date
+ *
+ * @param $ann the annotation object
+ *#
+#macro(displayAnnotationTitle $ann)
+  #set ($dateFormat = $xwiki.getXWikiPreference('dateformat', 'dd/MM/yyyy'))
+  &lt;div class="annotationTitle"&gt;
+    &lt;span class="annotationAuthor"&gt;$!xwiki.getUserName($ann.author)&lt;/span&gt;##
+## Do not indent this, or the comma will be misplaced
+#if("$!{ann.date}" != '')&lt;span class="sep"&gt;, &lt;/span&gt;&lt;span class="annotationDate"&gt;$xwiki.formatDate($ann.date, $dateFormat)&lt;/span&gt;#end
+  &lt;/div&gt;
+#end
+##
+##
+#**
+ * Display the annotation toolbox:
+ * - 'verify' button for modified annotations
+ * - 'edit' button for annotation authors and other users with edit rights, unless already editing
+ * - 'delete' button for annotation authors and other users with edit rights
+ *
+ * @param $ann the annotation object
+ * @param $mode view (default), list, create or edit
+ * @param $docWiki the wiki of the annotated document
+ * @param $docSpace the space of the annotated document
+ * @param $docPage the page of the annotated document
+ *#
+#macro(displayAnnotationToolbox $ann $mode $docWiki $docSpace $docPage)
+  #displayAnnotationToolboxFromReference($ann, $mode, $services.model.createDocumentReference($docWiki, $docSpace, $docPage))
+#end
+#**
+ * Display the annotation toolbox:
+ * - 'verify' button for modified annotations
+ * - 'edit' button for annotation authors and other users with edit rights, unless already editing
+ * - 'delete' button for annotation authors and other users with edit rights
+ *
+ * @param $ann the annotation object
+ * @param $mode view (default), list, create or edit
+ * @param $docRef the reference of the annotated document
+ *#
+#macro(displayAnnotationToolboxFromReference $ann $mode $docRef)
+  &lt;span class="annotationTools btn-group"&gt;
+    #if($mode != 'create' &amp;&amp; $services.annotations.canEditAnnotation($ann.id, $docRef))
+      #set($isUserComment = $services.model.resolveDocument("$!ann.get('author')", 'user') == $xcontext.userReference)
+      #set($editURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=PUT&amp;media=json")
+      #if ("$!{ann.state}" == 'UPDATED')
+        &lt;a class='btn btn-default btn-xs validate' href="${editURL}"
+          title="$services.localization.render('annotations.action.validate.tooltip')"&gt;
+          $services.icon.renderHTML('check')
+        &lt;/a&gt;
+      #end
+      #if ($mode != 'edit')
+        ## Comment reply button only for default annotations.
+        #if ("$!annotationClassDocName" == 'XWiki.XWikiComments')
+          #set($xredirect = $!escapetool.xml($request.get('xredirect')))
+          #if("$!xredirect" == '')
+            #set($xredirect = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
+          #end
+          ## add "comment reply" button
+          &lt;a class='btn btn-default btn-xs' href="${xredirect}#xwikicomment_${ann.id}"
+            title="$services.localization.render('core.viewers.comments.reply')"&gt;
+            $services.icon.renderHTML('comment')
+          &lt;/a&gt;
+        #end
+        #if($hasAdmin || $isUserComment)
+          ## use an edit url just for the fanciness of it, it won't really be used in this case. An edit form will be loaded
+          &lt;a class='edit btn btn-default btn-xs' href="${editURL}"
+            title="$services.localization.render('annotations.action.edit.tooltip')"&gt;
+            $services.icon.renderHTML('pencil')
+          &lt;/a&gt;
+        #end
+      #end
+      #if($hasAdmin || $isUserComment)
+        #set($deleteURL = "${services.rest.url($docRef)}/annotation/${escapetool.url($ann.id)}?method=DELETE&amp;media=json")
+        &lt;a class='delete btn btn-default btn-xs' href="${deleteURL}"
+          title="$services.localization.render('annotations.action.delete.tooltip')"&gt;
+          $services.icon.renderHTML('cross')
+        &lt;/a&gt;
+      #end
+    #end
+  &lt;/span&gt;
+#end
+##
+##
+#**
+ * Display the annotation body, containing all but the hidden fields.
+ * For annotation lists (which are not displayed near the actual annotation text), also display
+ * in a block quote the corresponding annotated extract.
+ * Depending on the mode, display for each field label + input (edit, create) or the field value (view, list).
+ *
+ * @param $ann the annotation object
+ * @param $mode view (default), list, create or edit
+ *#
+#macro(displayAnnotationBody $ann $mode)
+  #if ($mode == 'list')
+      #if ($ann.state == 'ALTERED')
+        &lt;div class="annotationOriginalSelection"&gt;$services.localization.render('annotations.altered.text')&lt;/div&gt;
+      #end
+    &lt;blockquote class="annotatedText"&gt;$!escapetool.xml($ann.selection)&lt;/blockquote&gt;
+  #end
+  ## in view mode and list mode, also display the original selection of this annotation
+  #if (($mode == 'view' || $mode == 'list') &amp;&amp; $ann.state == 'UPDATED')
+    &lt;div class="annotationOriginalSelection"&gt;$services.localization.render('annotations.updated.text')&lt;/div&gt;
+    &lt;blockquote class="annotatedText originalAnnotatedText"&gt;$!escapetool.xml($ann.originalSelection)&lt;/blockquote&gt;
+  #end
+  ## Fake object that allows to use the API to generate the display
+  #set($fakeObj = $doc.newObject($annotationClassDocName))
+  #set($properties = $annotationClass.properties)
+  #if ($properties.size() == $hiddenProperties.size() + 1)
+    ## Do not show property labels if there's only one property to display
+    ## get the only property that is to be displayed
+    #set($onlyProperty = '')
+    #foreach($prop in $properties)
+      #if(!$hiddenProperties.contains($prop.name))
+        #set($onlyProperty = $prop)
+        #break
+      #end
+    #end
+    #set($discard = $fakeObj.set($onlyProperty.name, "$!{ann.get($onlyProperty.name)}"))
+    &lt;div class="annotationText"&gt;
+      #if($mode == 'edit' || $mode == 'create')
+        $doc.displayEdit($onlyProperty, '', $fakeObj)
+      #else
+        $doc.displayView($onlyProperty, '', $fakeObj)
+      #end
+    &lt;/div&gt;
+  #else
+  &lt;dl&gt;
+  #foreach($prop in $properties)
+    #if (!$hiddenProperties.contains($prop.name))
+      #set($discard = $fakeObj.set($prop.name, "$!{ann.get($prop.name)}"))
+      &lt;dt class="annotationLabel"&gt;&lt;label for="$prop.name"&gt;$prop.prettyName&lt;/label&gt;&lt;/dt&gt;
+      #if($mode == 'edit' || $mode == 'create')
+        &lt;dd&gt;$doc.displayEdit($prop, '', $fakeObj)&lt;/dd&gt;
+      #else
+        &lt;dd&gt;$doc.displayView($prop, '', $fakeObj)&lt;/dd&gt;
+      #end
+    #end
+  #end
+  &lt;/dl&gt;
+  #end
+#end
+{{/velocity}}</content>
+</xwikidoc>

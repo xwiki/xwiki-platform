@@ -244,17 +244,20 @@ public class XWikiDocumentTest
             new XWikiDocument(new DocumentReference("contextdocwiki", "contextdocspace", "contextdocpage"));
         this.oldcore.getXWikiContext().setDoc(contextDocument);
 
+        this.document.setSyntax(Syntax.XWIKI_2_1);
         this.document.setContent("[[TargetPage]][[TargetLabel>>TargetPage]][[TargetSpace.TargetPage]]"
             + "[[http://externallink]][[mailto:mailto]][[]][[targetwiki:TargetSpace.TargetPage]][[page:OtherPage]]"
             + "[[attach:AttachSpace.AttachDocument@attachment.ext]][[attach:attachent.ext]]"
             + "image:ImageSpace.ImageDocument@image.png image:image.png");
-        this.document.setSyntax(Syntax.XWIKI_2_1);
+        this.baseObject.setLargeStringValue("area", "[[TargetPage]][[ObjectTargetPage]]");
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
 
-        assertEquals(new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome",
-            "TargetSpace.TargetPage.WebHome", "targetwiki:TargetSpace.TargetPage.WebHome", "OtherPage.WebHome",
-            "AttachSpace.AttachDocument.WebHome", "ImageSpace.ImageDocument.WebHome")), linkedPages);
+        assertEquals(
+            new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome", "TargetSpace.TargetPage.WebHome",
+                "targetwiki:TargetSpace.TargetPage.WebHome", "OtherPage.WebHome", "AttachSpace.AttachDocument.WebHome",
+                "ImageSpace.ImageDocument.WebHome", "Space.ObjectTargetPage.WebHome")),
+            linkedPages);
     }
 
     @Test

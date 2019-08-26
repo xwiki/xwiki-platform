@@ -20,7 +20,7 @@
 package org.xwiki.appwithinminutes.test.po;
 
 import org.openqa.selenium.WebElement;
-import org.xwiki.test.ui.po.editor.DatePicker;
+import org.xwiki.test.ui.po.editor.BootstrapDateTimePicker;
 
 /**
  * Represents the pane used to edit a 'Date' class field.
@@ -57,9 +57,9 @@ public class DateClassFieldEditPane extends ClassFieldEditPane
      * 
      * @return the date picker
      */
-    public DatePicker openDatePicker()
+    public BootstrapDateTimePicker openDatePicker()
     {
         getDefaultValueInput().click();
-        return new DatePicker();
+        return new BootstrapDateTimePicker();
     }
 }

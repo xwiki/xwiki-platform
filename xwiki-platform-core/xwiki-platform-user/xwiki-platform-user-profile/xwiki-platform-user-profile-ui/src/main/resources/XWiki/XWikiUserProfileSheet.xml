@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWiki.XWikiUserProfileSheet" locale="">
+<xwikidoc version="1.3" reference="XWiki.XWikiUserProfileSheet" locale="">
   <web>XWiki</web>
   <name>XWikiUserProfileSheet</name>
   <language/>
@@ -37,6 +37,10 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#if ($request.action == "disable" ||$request.action == "enable")
+#set ($disabled = ($request.action == "disable"))
+#set ($discard = $xwiki.getUser($request.userId).setDisabledStatus($disabled))
+#else
 #set ($discard = $xwiki.ssx.use('XWiki.XWikiUserSheet'))
 ##
 #set ($inEditMode = $xcontext.action == 'edit' || $xcontext.action == 'inline')
@@ -59,12 +63,29 @@
 #set ($sectionsObjectClassName = 'XWiki.UserProfileSectionsClass')
 #set ($sectionObjectClassName = 'XWiki.UserProfileSectionClass')
 ##
+#if ($hasAdmin &amp;&amp; $doc.getValue('disabled') == 1)
+{{warning}}
+$services.localization.render('platform.core.profile.category.profile.disabled')
+{{/warning}}
+#end
+
 {{html clean='false' wiki='true'}}
 #if (!$inEditMode)
   &lt;div class="vcard"&gt;
   &lt;span class="fn hidden"&gt;$xwiki.getUserName($doc.fullName, false)&lt;/span&gt;
 #end
   &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
+    #if ($hasAdmin &amp;&amp; !$inEditMode &amp;&amp; !$isMyProfile)
+      #if ($doc.getValue('disabled') == 1)
+        #set ($enableClass = "")
+        #set ($disableClass = "hidden")
+      #else
+        #set ($enableClass = "hidden")
+        #set ($disableClass = "")
+      #end
+      &lt;a href="#" id="enable" class="btn btn-success $enableClass"&gt;$services.icon.renderHTML('unlock') $services.localization.render('platform.core.profile.category.profile.enableAccount')&lt;/a&gt;
+      &lt;a href="#" id="disable" class="btn btn-warning $disableClass"&gt;$services.icon.renderHTML('lock') $services.localization.render('platform.core.profile.category.profile.disableAccount')&lt;/a&gt;
+    #end
     &lt;div class='userInfo'&gt;
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
@@ -182,6 +203,7 @@
 #end
 {{/html}}##
 #end
+#end
 {{/velocity}}</content>
   <object>
     <name>XWiki.XWikiUserProfileSheet</name>
@@ -199,8 +221,11 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
@@ -248,6 +273,8 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
@@ -268,7 +295,6 @@
       <code>require(['jquery', 'xwiki-meta'], function ($, xm) {
   'use strict';
   $(document).ready(function() {
-    
     /**
      * Save the new user status.
      */
@@ -294,6 +320,37 @@
         new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
       });
     };
+
+    var setUserDisableStatus = function(action) {
+      var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.saving'))", 'inprogress');
+      var url = new XWiki.Document(XWiki.Model.resolve('XWiki.XWikiUserProfileSheet', XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+      $.post(url, {
+        'action': action,
+        'csrf': xm.form_token,
+        'userId': XWiki.Model.serialize(xm.documentReference)
+      }).done(function() {
+        notification.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.done'))", 'done');
+        if (action == 'disable') {
+          $('#disable').addClass('hidden');
+          $('#enable').removeClass('hidden');
+        } else {
+          $('#disable').removeClass('hidden');
+          $('#enable').addClass('hidden');
+        }
+      }).fail(function() {
+        notification.hide();
+        new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('user.profile.network.error'))", 'error');
+      });
+    };
+
+    $('#disable').click(function (event) {
+      setUserDisableStatus('disable');
+    });
+
+    $('#enable').click(function (event) {
+      setUserDisableStatus('enable');
+    });
 
     /**
      * DOM events
@@ -333,11 +390,14 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
-        <number>6</number>
+        <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -352,7 +412,7 @@
         <disabled>0</disabled>
         <editor>PureText</editor>
         <name>code</name>
-        <number>3</number>
+        <number>2</number>
         <prettyName>Code</prettyName>
         <rows>20</rows>
         <size>50</size>
@@ -363,9 +423,11 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>contentType</name>
-        <number>1</number>
+        <number>6</number>
         <prettyName>Content Type</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
@@ -378,7 +440,7 @@
       <name>
         <disabled>0</disabled>
         <name>name</name>
-        <number>2</number>
+        <number>1</number>
         <prettyName>Name</prettyName>
         <size>30</size>
         <unmodifiable>0</unmodifiable>
@@ -389,7 +451,7 @@
         <displayFormType>select</displayFormType>
         <displayType>yesno</displayType>
         <name>parse</name>
-        <number>5</number>
+        <number>4</number>
         <prettyName>Parse content</prettyName>
         <unmodifiable>0</unmodifiable>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
@@ -398,9 +460,11 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
-        <number>4</number>
+        <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>

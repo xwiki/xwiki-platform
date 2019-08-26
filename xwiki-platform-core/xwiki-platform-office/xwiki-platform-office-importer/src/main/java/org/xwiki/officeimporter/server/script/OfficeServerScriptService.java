@@ -146,6 +146,7 @@ public class OfficeServerScriptService implements ScriptService
      */
     public String getServerState()
     {
+        this.officeServer.refreshState();
         return this.officeServer.getState().toString();
     }
 

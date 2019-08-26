@@ -48,8 +48,8 @@
   #set ($wiki = $services.wiki.getById($wikiId))
   ##
   #if ("$!wiki" == '')
-    #if ("$!{$services.wiki.lastException}" != '')
-      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastException.message]){{/error}}
+    #if ("$!{$services.wiki.lastError}" != '')
+      {{error}}$services.localization.render('platform.wiki.error.exceptionWithMessage', [$services.wiki.lastError.message]){{/error}}
     #else
       {{error}}{{translation key="platform.wiki.error.wikidoesnotexist" parameters="$wikiId"/}}{{/error}}
     #end
@@ -100,7 +100,7 @@
         #if ($result)
           {{success}}$services.localization.render('platform.wiki.users.leave.success', ['[[', $currentUser, "&gt;&gt;$currentUser]]", $wikiMainPageLinkStart, $wikiName, $wikiMainPageLinkEnd]){{/success}}
         #else
-          #printException($services.wiki.user.lastException.message)
+          #printException($services.wiki.user.lastError.message)
         #end
       #end
     #end

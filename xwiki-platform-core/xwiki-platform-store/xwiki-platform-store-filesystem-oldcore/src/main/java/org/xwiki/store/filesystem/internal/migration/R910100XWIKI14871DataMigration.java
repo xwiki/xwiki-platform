@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,7 +44,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.io.FileUtils;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -81,6 +82,8 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> serializer;
+
+    private final Set<String> migratedDeletedAttachment = new HashSet<>();
 
     @Override
     public String getDescription()
@@ -142,28 +145,42 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
                     // </entry>
                     xmlReader.nextTag();
 
-                    File directory = new File(path);
-                    if (!directory.exists()) {
-                        this.logger.warn("[{}] does not exist, trying to find the new location", directory);
+                    if (!this.migratedDeletedAttachment.contains(path)) {
+                        File directory = new File(path);
+                        if (!directory.exists()) {
+                            this.logger.warn("[{}] does not exist, trying to find the new location", directory);
 
-                        directory = findNewPath(path);
+                            directory = findNewPath(path);
 
-                        if (directory == null) {
-                            this.logger.warn("Could not find the deleted attachment in any other location");
+                            if (directory == null) {
+                                this.logger.warn("Could not find the deleted attachment in any other location");
+
+                                // Remember that this attachment could not be migrated
+                                this.migratedDeletedAttachment.add(path);
+
+                                continue;
+                            } else {
+                                this.logger.info("Found deleted attachment on [{}]", directory);
+                            }
+                        }
+
+                        if (!directory.isDirectory()) {
+                            this.logger.warn("[{}] is not a directory", directory);
 
                             continue;
-                        } else {
-                            this.logger.info("Found deleted attachment on [{}]", directory);
+                        }
+
+                        // Find document reference
+                        File documentDirectory = directory.getParentFile().getParentFile().getParentFile();
+                        DocumentReference documentReference = getPre11DocumentReference(documentDirectory);
+
+                        if (getXWikiContext().getWikiReference().equals(documentReference.getWikiReference())) {
+                            storeDeletedAttachment(directory, documentReference, session);
+
+                            // Remember which path we already migrated
+                            this.migratedDeletedAttachment.add(path);
                         }
                     }
-
-                    if (!directory.isDirectory()) {
-                        this.logger.warn("[{}] is not a directory", directory);
-
-                        continue;
-                    }
-
-                    storeDeletedAttachment(directory, session);
                 }
             }
         }
@@ -185,61 +202,55 @@ public class R910100XWIKI14871DataMigration extends AbstractFileStoreDataMigrati
         return null;
     }
 
-    private void storeDeletedAttachment(File directory, Session session)
+    private void storeDeletedAttachment(File directory, DocumentReference documentReference, Session session)
         throws ParserConfigurationException, SAXException, IOException, DataMigrationException
     {
         this.logger.info("Storing attachment metadata [{}] in the database", directory);
 
-        // Find document reference
-        File documentDirectory = directory.getParentFile().getParentFile().getParentFile();
-        DocumentReference documentReference = getPre11DocumentReference(documentDirectory);
+        // Parse ~DELETED_ATTACH_METADATA.xml
+        File file = new File(directory, "~DELETED_ATTACH_METADATA.xml");
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(file);
 
-        if (getXWikiContext().getWikiReference().equals(documentReference.getWikiReference())) {
-            // Parse ~DELETED_ATTACH_METADATA.xml
-            File file = new File(directory, "~DELETED_ATTACH_METADATA.xml");
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(file);
+        String filename = getElementText(doc, "filename", null);
+        String deleter = getElementText(doc, "deleter", null);
+        Date deleteDate = new Date(Long.valueOf(getElementText(doc, "datedeleted", null)));
 
-            String filename = getElementText(doc, "filename", null);
-            String deleter = getElementText(doc, "deleter", null);
-            Date deleteDate = new Date(Long.valueOf(getElementText(doc, "datedeleted", null)));
+        long docId = new XWikiDocument(documentReference).getId();
 
-            long docId = new XWikiDocument(documentReference).getId();
+        // We need to make sure the deleted attachment is not already in the database with a different id (left
+        // there by the attachment porter script for example)
+        org.hibernate.query.Query<Long> selectQuery = session
+            .createQuery("SELECT id FROM DeletedAttachment WHERE docId=:docId AND filename=:filename AND date=:date");
+        selectQuery.setParameter("docId", docId);
+        selectQuery.setParameter("filename", filename);
+        selectQuery.setParameter("date", new java.sql.Timestamp(deleteDate.getTime()));
+        Long databaseId = selectQuery.uniqueResult();
 
-            // We need to make sure the deleted attachment is not already in the database with a different id (left
-            // there by the attachment porter script for example)
-            Query selectQuery =
-                session.createQuery("SELECT id FROM DeletedAttachment WHERE docId=? AND filename=? AND date=?");
-            selectQuery.setLong(0, docId);
-            selectQuery.setString(1, filename);
-            selectQuery.setTimestamp(2, new java.sql.Timestamp(deleteDate.getTime()));
-            Long databaseId = (Long) selectQuery.uniqueResult();
-
-            if (databaseId == null) {
-                // Try without the milliseconds since most versions of MySQL don't support them
-                selectQuery.setTimestamp(2, new java.sql.Timestamp(deleteDate.toInstant().getEpochSecond() * 1000));
-                databaseId = (Long) selectQuery.uniqueResult();
-            }
-
-            DeletedAttachment dbAttachment;
-            if (databaseId != null) {
-                // Update the database metadata (probably left there by the attachment porter script)
-                dbAttachment = new DeletedAttachment(docId, this.serializer.serialize(documentReference), filename,
-                    FileSystemStoreUtils.HINT, deleter, deleteDate, null, databaseId);
-                session.update(dbAttachment);
-            } else {
-                // Insert new deleted attachment metadata in the DB
-                dbAttachment = new DeletedAttachment(docId, this.serializer.serialize(documentReference), filename,
-                    FileSystemStoreUtils.HINT, deleter, deleteDate, null);
-                databaseId = (Long) session.save(dbAttachment);
-            }
-
-            // Refactor file storage to be based on database id instead of date
-            File newDirectory =
-                new File(directory.getParentFile(), encode(dbAttachment.getFilename() + "-id" + databaseId));
-            FileUtils.moveDirectory(directory, newDirectory);
+        if (databaseId == null) {
+            // Try without the milliseconds since most versions of MySQL don't support them
+            selectQuery.setParameter("date", new java.sql.Timestamp(deleteDate.toInstant().getEpochSecond() * 1000));
+            databaseId = selectQuery.uniqueResult();
         }
+
+        DeletedAttachment dbAttachment;
+        if (databaseId != null) {
+            // Update the database metadata (probably left there by the attachment porter script)
+            dbAttachment = new DeletedAttachment(docId, this.serializer.serialize(documentReference), filename,
+                FileSystemStoreUtils.HINT, deleter, deleteDate, null, databaseId);
+            session.update(dbAttachment);
+        } else {
+            // Insert new deleted attachment metadata in the DB
+            dbAttachment = new DeletedAttachment(docId, this.serializer.serialize(documentReference), filename,
+                FileSystemStoreUtils.HINT, deleter, deleteDate, null);
+            databaseId = (Long) session.save(dbAttachment);
+        }
+
+        // Refactor file storage to be based on database id instead of date
+        File newDirectory =
+            new File(directory.getParentFile(), encode(dbAttachment.getFilename() + "-id" + databaseId));
+        FileUtils.moveDirectory(directory, newDirectory);
     }
 
     private String encode(String name) throws UnsupportedEncodingException

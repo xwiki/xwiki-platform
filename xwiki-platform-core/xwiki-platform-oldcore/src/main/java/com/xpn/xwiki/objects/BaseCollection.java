@@ -878,6 +878,8 @@ public abstract class BaseCollection<R extends EntityReference> extends BaseElem
                 }
             }
         }
+
+        super.merge(previousElement, newElement, configuration, context, mergeResult);
     }
 
     protected void mergeField(PropertyInterface currentElement, ElementInterface previousElement,

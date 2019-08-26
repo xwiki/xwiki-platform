@@ -1,0 +1,49 @@
+.runTransformations
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Validate that the code macro displays line numbers when using the appropriate layout option
+.#-----------------------------------------------------
+{{code language="bash" layout="linenumbers"}}
+# Display daemon status
+systemctl status dbus.service
+{{/code}}
+.#-----------------------------------------------------
+.expect|event/1.0
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarkerStandalone [code] [language=bash|layout=linenumbers] [# Display daemon status
+systemctl status dbus.service]
+beginGroup [[class]=[box]]
+beginGroup [[class]=[code]]
+beginGroup [[class]=[linenoswrapper]]
+beginGroup [[class]=[linenos]]
+onWord [1]
+onNewLine
+onWord [2]
+onNewLine
+endGroup [[class]=[linenos]]
+beginGroup
+beginFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onSpecialSymbol [#]
+onSpace
+onWord [Display]
+onSpace
+onWord [daemon]
+onSpace
+onWord [status]
+onNewLine
+endFormat [NONE] [[style]=[font-weight: italic; color: #408080; ]]
+onWord [systemctl]
+onSpace
+onWord [status]
+onSpace
+onWord [dbus]
+onSpecialSymbol [.]
+onWord [service]
+endGroup
+endGroup [[class]=[linenoswrapper]]
+endGroup [[class]=[code]]
+endGroup [[class]=[box]]
+endMacroMarkerStandalone [code] [language=bash|layout=linenumbers] [# Display daemon status
+systemctl status dbus.service]
+endDocument

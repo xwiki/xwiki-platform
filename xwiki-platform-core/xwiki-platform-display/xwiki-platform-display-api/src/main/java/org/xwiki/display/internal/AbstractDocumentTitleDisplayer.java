@@ -35,6 +35,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -132,16 +133,13 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
     {
         // Protect against infinite recursion which can happen for instance if the document title displayer is called on
         // the current document from the title field or from a script within the first content heading.
-        Map<Object, Object> xwikiContext = getXWikiContextMap();
-        @SuppressWarnings("unchecked")
-        Deque<DocumentReference> documentReferenceStack =
-            (Deque<DocumentReference>) xwikiContext.get(DOCUMENT_REFERENCE_STACK_KEY);
-        if (documentReferenceStack == null) {
-            documentReferenceStack = new LinkedList<>();
-            xwikiContext.put(DOCUMENT_REFERENCE_STACK_KEY, documentReferenceStack);
-        } else if (documentReferenceStack.contains(document.getDocumentReference())) {
-            logger.warn("Infinite recursion detected while displaying the title of [{}]. "
-                + "Using the document name as title.", document.getDocumentReference());
+        Deque<DocumentReference> documentReferenceStack = getDocumentReferenceDeque();
+
+        if (documentReferenceStack.contains(document.getDocumentReference())) {
+            this.logger.warn(
+                "Infinite recursion detected while displaying the title of [{}]. Using the document name as title.",
+                document.getDocumentReference());
+
             return getStaticTitle(document);
         }
 
@@ -151,6 +149,21 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         } finally {
             documentReferenceStack.pop();
         }
+    }
+
+    private Deque<DocumentReference> getDocumentReferenceDeque()
+    {
+        ExecutionContext econtext = this.execution.getContext();
+
+        Deque<DocumentReference> documentReferenceStack =
+            (Deque<DocumentReference>) econtext.getProperty(DOCUMENT_REFERENCE_STACK_KEY);
+
+        if (documentReferenceStack == null) {
+            documentReferenceStack = new LinkedList<>();
+            econtext.newProperty(DOCUMENT_REFERENCE_STACK_KEY).inherited().initial(documentReferenceStack).declare();
+        }
+
+        return documentReferenceStack;
     }
 
     private XDOM displayTitle(DocumentModelBridge document, DocumentDisplayerParameters parameters)
@@ -217,9 +230,8 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
         DocumentDisplayerParameters parameters)
     {
         StringWriter writer = new StringWriter();
-        String namespace =
-            defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated() ? documentReference
-                : documentAccessBridge.getCurrentDocumentReference());
+        String namespace = defaultEntityReferenceSerializer.serialize(parameters.isTransformationContextIsolated()
+            ? documentReference : documentAccessBridge.getCurrentDocumentReference());
 
         // Get the velocity engine
         VelocityEngine velocityEngine;
@@ -243,8 +255,7 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
                 // Make sure to synchronize the context wiki with the context document's wiki.
                 modelContext.setCurrentEntityReference(documentReference.getWikiReference());
             }
-            velocityEngine
-                .evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
+            velocityEngine.evaluate(velocityManager.getVelocityContext(), writer, namespace, title);
         } catch (Exception e) {
             throw new RuntimeException(e);
         } finally {
@@ -255,15 +266,6 @@ public abstract class AbstractDocumentTitleDisplayer implements DocumentDisplaye
             }
         }
         return writer.toString();
-    }
-
-    /**
-     * @return the XWiki context map
-     */
-    @SuppressWarnings("unchecked")
-    private Map<Object, Object> getXWikiContextMap()
-    {
-        return (Map<Object, Object>) execution.getContext().getProperty("xwikicontext");
     }
 
     /**

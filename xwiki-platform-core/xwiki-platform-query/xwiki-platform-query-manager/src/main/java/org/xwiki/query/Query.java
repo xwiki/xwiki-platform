@@ -22,6 +22,8 @@ package org.xwiki.query;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * This is a Query interface, representing all queries in various languages for various stores.
  *
@@ -105,6 +107,22 @@ public interface Query
      * @see #bindValue(int, Object)
      */
     Query bindValues(List<Object> values);
+
+    /**
+     * Bind a map of named parameters values. This method is a convenience method allowing passing a map of values in
+     * one call instead of multiple calls to {@link #bindValue(String, Object)}.
+     *
+     * @param values list of positional parameters values.
+     * @return this query
+     * @see #bindValue(String, Object)
+     * @since 11.5RC1
+     */
+    @Unstable
+    default Query bindValues(Map<String, ?> values)
+    {
+        values.forEach(this::bindValue);
+        return this;
+    }
 
     /**
      * Bind named parameter var with a value that will be constructed using calls to

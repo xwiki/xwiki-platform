@@ -25,7 +25,6 @@ import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.stability.Unstable;
 
 /**
  * Start and cache asynchronous {@link Block} based rendering.
@@ -34,11 +33,10 @@ import org.xwiki.stability.Unstable;
  * @since 10.10RC1
  */
 @Role
-@Unstable
 public interface BlockAsyncRendererExecutor
 {
     /**
-     * Start and cache or return the status of the job corresponding to the passed renderer.
+     * Start and cache or return the result of the execution of the configured blocks.
      * 
      * @param configuration the configuration of the execution
      * @return the {@link JobStatus}
@@ -50,7 +48,7 @@ public interface BlockAsyncRendererExecutor
     Block execute(BlockAsyncRendererConfiguration configuration) throws JobException, RenderingException;
 
     /**
-     * Start and cache or return the status of the job corresponding to the passed renderer.
+     * Start and cache or return the result of the execution of the passed renderer.
      * 
      * @param renderer the renderer to execute
      * @param configuration the configuration of the execution

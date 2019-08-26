@@ -39,7 +39,7 @@ public abstract class AbstractRegistrationPage extends BasePage
     @FindBy(id = "register")
     private WebElement registerFormElement;
 
-    private FormElement form;
+    private FormContainerElement form;
 
     public abstract void clickRegister();
 
@@ -80,10 +80,10 @@ public abstract class AbstractRegistrationPage extends BasePage
         }
     }
 
-    private FormElement getForm()
+    private FormContainerElement getForm()
     {
         if (this.form == null) {
-            this.form = new FormElement(this.registerFormElement);
+            this.form = new FormContainerElement(By.id("register"));
         }
         return this.form;
     }

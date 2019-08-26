@@ -86,7 +86,7 @@ public class XClassMigratorListenerTest
 
         Query query = mock(Query.class);
         when(this.mockQueryManager
-            .createQuery("select distinct obj.name from BaseObject as obj where obj.className = ?", Query.HQL))
+            .createQuery("select distinct obj.name from BaseObject as obj where obj.className = :className", Query.HQL))
                 .thenReturn(query);
         when(query.<String>execute()).thenReturn(Arrays.asList("Space.Page"));
 

@@ -42,6 +42,7 @@ import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -98,6 +99,10 @@ public class CascadingVfsPermissionCheckerTest
         when(authorizationManager.hasAccess(Right.VIEW, attachmentReference)).thenReturn(true);
 
         this.mocker.getComponentUnderTest().checkPermission(reference);
+
+        when(authorizationManager.hasAccess(Right.VIEW, attachmentReference)).thenReturn(false);
+
+        assertThrows(VfsException.class, () -> this.mocker.getComponentUnderTest().checkPermission(reference));
     }
 
     @Test

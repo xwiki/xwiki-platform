@@ -20,6 +20,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import java.util.Arrays;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -121,5 +122,38 @@ public class ListClassTest
     public void testGetStringFromListMultipleSeparatorsWithSeparatorsInValues()
     {
         Assert.assertEquals("a\\*b*c\\,d*e\\*f", ListClass.getStringFromList(Arrays.asList("a*b", "c,d", "e*f"), "*,"));
+    }
+
+    @Test
+    public void getMapFromString()
+    {
+        Map<String, ListItem> map = ListClass.getMapFromString("a=1|b");
+        Assert.assertEquals(2, map.size());
+        Assert.assertEquals("a", map.get("a").getId());
+        Assert.assertEquals("1", map.get("a").getValue());
+        Assert.assertEquals("b", map.get("b").getId());
+        Assert.assertEquals("b", map.get("b").getValue());
+    }
+
+    @Test
+    public void getMapFromStringWithEmptyValue()
+    {
+        Map<String, ListItem> map = ListClass.getMapFromString("|a");
+        Assert.assertEquals(2, map.size());
+        Assert.assertEquals("", map.get("").getId());
+        Assert.assertEquals("", map.get("").getValue());
+        Assert.assertEquals("a", map.get("a").getId());
+        Assert.assertEquals("a", map.get("a").getValue());
+    }
+
+    @Test
+    public void getMapFromStringWithEmptyValueWithLabel()
+    {
+        Map<String, ListItem> map = ListClass.getMapFromString("=None|a");
+        Assert.assertEquals(2, map.size());
+        Assert.assertEquals("", map.get("").getId());
+        Assert.assertEquals("None", map.get("").getValue());
+        Assert.assertEquals("a", map.get("a").getId());
+        Assert.assertEquals("a", map.get("a").getValue());
     }
 }

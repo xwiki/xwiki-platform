@@ -47,12 +47,6 @@ public class ApplicationTemplateProviderEditPage extends ApplicationEditPage
     private WebElement terminalSelect;
 
     /**
-     * This step uses the standard save button for moving to the next step.
-     */
-    @FindBy(name = "action_save")
-    private WebElement nextStepButton;
-
-    /**
      * Clicks on the Next Step button.
      *
      * @return the page that represents the next step of the App Within Minutes wizard

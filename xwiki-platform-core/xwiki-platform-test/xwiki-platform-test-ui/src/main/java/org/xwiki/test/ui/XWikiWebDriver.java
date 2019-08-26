@@ -38,6 +38,7 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.Keyboard;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.CommandExecutor;
@@ -357,7 +358,9 @@ public class XWikiWebDriver extends RemoteWebDriver
                             // Use the locator from the root.
                             element = driver.findElement(locator);
                         }
-                    } catch (NotFoundException e) {
+                    // We might obtain a StaleElementReferenceException in some edge cases when looking
+                    // for the same notifications several times for example.
+                    } catch (NotFoundException|StaleElementReferenceException e) {
                         // This exception is caught by WebDriverWait
                         // but it returns null which is not necessarily what we want.
                         if (all) {
@@ -666,7 +669,7 @@ public class XWikiWebDriver extends RemoteWebDriver
 
     // Make sure the element is visible by scrolling it into view. Otherwise it's possible for example  that the
     // visible floating save bar would hide the element.
-    private WebElement scrollTo(WebElement element)
+    public WebElement scrollTo(WebElement element)
     {
         executeScript("arguments[0].scrollIntoView();", element);
         return element;
@@ -996,5 +999,27 @@ public class XWikiWebDriver extends RemoteWebDriver
     public WebElement findElementWithoutScrolling(By by)
     {
         return this.wrappedDriver.findElement(by);
+    }
+
+    /**
+     * @return the original {@link RemoteWebDriver} created for selenium tests.
+     *          The original driver should be used for custom {@link org.openqa.selenium.interactions.Actions}.
+     * @since 11.3RC1
+     */
+    public RemoteWebDriver getWrappedDriver()
+    {
+        return this.wrappedDriver;
+    }
+
+    /**
+     * Utility method to perform a drag &amp; drop by using the appropriate WebDriver.
+     * @param source the element to drag
+     * @param target the element where to drop
+     *
+     * @since 11.3RC1
+     */
+    public void dragAndDrop(WebElement source, WebElement target)
+    {
+        new Actions(this.getWrappedDriver()).dragAndDrop(source, target).perform();
     }
 }

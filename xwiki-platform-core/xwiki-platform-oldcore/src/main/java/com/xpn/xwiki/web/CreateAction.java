@@ -138,7 +138,7 @@ public class CreateAction extends XWikiAction
 
         // Check if the document to create already exists.
         XWikiDocument newDocument = context.getWiki().getDocument(newDocumentReference, context);
-        if (handler.isDocumentAlreadyExisting(newDocument)) {
+        if (handler.isDocumentAlreadyExisting(newDocument) || handler.isDocumentPathTooLong(newDocumentReference)) {
             return CREATE_TEMPLATE;
         }
 
@@ -221,6 +221,9 @@ public class CreateAction extends XWikiAction
             DocumentReference currentUserReference = context.getUserReference();
             newDocument.setAuthorReference(currentUserReference);
             newDocument.setCreatorReference(currentUserReference);
+
+            // Make sure the user is allowed to make this modification
+            context.getWiki().checkSavingDocument(currentUserReference, newDocument, context);
 
             xwiki.saveDocument(newDocument, context);
             editMode = newDocument.getDefaultEditMode(context);

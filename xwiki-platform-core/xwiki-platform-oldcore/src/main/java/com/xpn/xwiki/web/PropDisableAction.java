@@ -39,10 +39,15 @@ public class PropDisableAction extends AbstractPropChangeAction
         throws XWikiException
     {
         XWiki xwiki = context.getWiki();
-        XWikiDocument doc = context.getDoc();
+        XWikiDocument doc = xclass.getOwnerDocument();
 
         xclass.disableField(propertyName);
-        xwiki.saveDocument(doc,
-            localizePlainOrKey("core.model.xclass.disableClassProperty.versionSummary", propertyName), true, context);
+
+        String comment = localizePlainOrKey("core.model.xclass.disableClassProperty.versionSummary", propertyName);
+
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
+
+        xwiki.saveDocument(doc, comment, true, context);
     }
 }

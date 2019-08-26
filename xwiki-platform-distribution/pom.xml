@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>11.2-SNAPSHOT</version>
+    <version>11.8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution</artifactId>
   <name>XWiki Platform - Distribution - Parent POM</name>
@@ -45,8 +45,8 @@
   </modules>
   <properties>
     <!-- The version of Maven used during XWiki runtime (more recent than the one used during the build to benefit from bugfixes and improvements)-->
-    <maven.version>3.6.0</maven.version>
-    <maven.resolver.version>1.3.1</maven.resolver.version>
+    <maven.version>3.6.1</maven.version>
+    <maven.resolver.version>1.3.3</maven.resolver.version>
 
     <!-- Flavors known to be valid with the current distribution -->
     <!-- Using ${platform.version} on purpose here. An XWiki distribution with a different version might inherit this. -->
@@ -137,13 +137,6 @@
     <!-- Default location for XWiki's Data directory -->
     <xwikiDataDir>data</xwikiDataDir>
 
-    <!-- Version of JDBC connectors we want to use in our distribution and when using build tools -->
-    <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
-    <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
-    <mysql.version>5.1.45</mysql.version>
-    <derby.version>10.14.1.0</derby.version>
-    <pgsql.version>42.1.4</pgsql.version>
-
     <!-- Set HSQLDB by default -->
     <xwiki.db>hsqldb</xwiki.db>
     <xwiki.db.jdbc.groupId>${hsqldb.groupId}</xwiki.db.jdbc.groupId>
@@ -153,7 +146,6 @@
     <xwiki.db.connection.username>sa</xwiki.db.connection.username>
     <xwiki.db.connection.password />
     <xwiki.db.connection.driver_class>org.hsqldb.jdbcDriver</xwiki.db.connection.driver_class>
-    <xwiki.db.dialect>org.hibernate.dialect.HSQLDialect</xwiki.db.dialect>
     <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
     <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
 
@@ -174,28 +166,28 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-icon-script</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-skin-skinx</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-wikimacro-store</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-administration-ui</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-extension-ui</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -206,29 +198,29 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-rendering-macro-gallery</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-chart-macro</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-tree-macro</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-ui</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-help-ui</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
@@ -240,13 +232,13 @@
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-appwithinminutes-ui</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
         <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-security-script</artifactId>
-        <version>11.2-SNAPSHOT</version>
+        <version>11.8-SNAPSHOT</version>
       </dependency>
       <!-- application-ckeditor-ui -->
       <dependency>
@@ -337,6 +329,9 @@
               </goals>
               <configuration>
                 <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
+                <!-- All we care about is duplicate in the JARs ending up in the WAR -->
+                <checkCompileClasspath>false</checkCompileClasspath>
+                <checkTestClasspath>false</checkTestClasspath>
                 <exceptions>
                   <!-- Xalan bundles a lot of other projects: org/apache/xml/**, org/apache/bcel/**, JLex/**,
                        java_cup/**, org/apache/regexp/**. In addition, it even has these jars in its source tree without
@@ -382,22 +377,6 @@
                       <class>org.w3c.dom.events.MouseEvent</class>
                       <class>org.w3c.dom.events.MutationEvent</class>
                       <class>org.w3c.dom.events.UIEvent</class>
-                    </classes>
-                  </exception>
-                  <!-- None of these should bundle org.w3c classes... Hoping that they are compatible... -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>jaxen</groupId>
-                        <artifactId>jaxen</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>xml-apis</groupId>
-                        <artifactId>xml-apis</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <classes>
-                      <class>org.w3c.dom.UserDataHandler</class>
                     </classes>
                   </exception>
                   <!-- This is a PITA. The classes are actually incompatible! We should do something about it but I
@@ -544,6 +523,7 @@
                 <ignoredClassPatterns>
                   <!-- Java 9 modules descriptor (should probably be fixed in the plugin) -->
                   <ignoredClassPattern>module-info</ignoredClassPattern>
+                  <ignoredClassPattern>META-INF.versions.9.module-info</ignoredClassPattern>
                 </ignoredClassPatterns>
               </configuration>
             </execution>
@@ -569,14 +549,13 @@
       <id>mysql</id>
       <properties>
         <xwiki.db>mysql</xwiki.db>
-        <xwiki.db.jdbc.groupId>mysql</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>mysql-connector-java</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.groupId>${mysql.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${mysql.artifactId}</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${mysql.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:mysql://localhost/xwiki?useSSL=false</xwiki.db.connection.url>
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>com.mysql.jdbc.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>
@@ -585,14 +564,13 @@
       <id>pgsql</id>
       <properties>
         <xwiki.db>pgsql</xwiki.db>
-        <xwiki.db.jdbc.groupId>org.postgresql</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>postgresql</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.groupId>${pgsql.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${pgsql.artifactId}</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${pgsql.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:postgresql:xwiki</xwiki.db.connection.url>
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>org.postgresql.Driver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.PostgreSQLDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.postgresql.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
         <xwiki.db.hbm.virtualMode>schema</xwiki.db.hbm.virtualMode>
@@ -602,14 +580,13 @@
       <id>derby</id>
       <properties>
         <xwiki.db>derby</xwiki.db>
-        <xwiki.db.jdbc.groupId>org.apache.derby</xwiki.db.jdbc.groupId>
-        <xwiki.db.jdbc.artifactId>derby</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.groupId>${derby.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${derby.artifactId}</xwiki.db.jdbc.artifactId>
         <xwiki.db.jdbc.version>${derby.version}</xwiki.db.jdbc.version>
         <xwiki.db.connection.url>jdbc:derby:database;create=true</xwiki.db.connection.url>
         <xwiki.db.connection.username />
         <xwiki.db.connection.password />
         <xwiki.db.connection.driver_class>org.apache.derby.jdbc.EmbeddedDriver</xwiki.db.connection.driver_class>
-        <xwiki.db.dialect>org.hibernate.dialect.DerbyDialect</xwiki.db.dialect>
         <xwiki.db.hbm.xwiki>xwiki.derby.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>

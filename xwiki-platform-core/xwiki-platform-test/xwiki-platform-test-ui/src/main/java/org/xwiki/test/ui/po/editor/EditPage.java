@@ -21,12 +21,15 @@ package org.xwiki.test.ui.po.editor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
@@ -63,6 +66,9 @@ public class EditPage extends BasePage
     @FindBy(id = "xwikidoctitleinput")
     private WebElement titleField;
 
+    @FindBy(id = "xwikidoclanguageinput2")
+    private WebElement defaultLanguageField;
+
     /**
      * The top floating edit menu bar.
      */
@@ -74,6 +80,15 @@ public class EditPage extends BasePage
      */
     @FindBy(id = "tmCurrentEditor")
     private WebElement currentEditorMenu;
+
+    @FindBy(id = "csrf-warning-modal")
+    private WebElement csrfWarningModal;
+
+    @FindBy(id = "cancel-save-csrf")
+    private WebElement cancelCSRFWarningButton;
+
+    @FindBy(id = "force-save-csrf")
+    private WebElement forceSaveCSRFButton;
 
     /**
      * Enumerates the available editors.
@@ -278,9 +293,9 @@ public class EditPage extends BasePage
                 + "XWiki.actionButtons.AjaxSaveAndContinue != undefined");
     }
 
-    protected List<Locale> getExistingLocales(List<WebElement> elements)
+    protected Set<Locale> getExistingLocales(List<WebElement> elements)
     {
-        List<Locale> locales = new ArrayList<>(elements.size());
+        Set<Locale> locales = new HashSet<>(elements.size());
         for (WebElement element : elements) {
             locales.add(LocaleUtils.toLocale(element.getText()));
         }
@@ -292,7 +307,7 @@ public class EditPage extends BasePage
      * @return a list of the locales already translated for this document
      * @since 9.0RC1
      */
-    public List<Locale> getExistingLocales()
+    public Set<Locale> getExistingLocales()
     {
         List<WebElement> elements =
             getDriver().findElementsWithoutWaiting(By.xpath("//p[starts-with(text(), 'Existing translations:')]//a"));
@@ -304,7 +319,7 @@ public class EditPage extends BasePage
      * @return a list of the supported locales not yet translated for this document
      * @since 9.0RC1
      */
-    public List<Locale> getNotExistingLocales()
+    public Set<Locale> getNotExistingLocales()
     {
         List<WebElement> elements =
             getDriver().findElementsWithoutWaiting(By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a"));
@@ -319,11 +334,51 @@ public class EditPage extends BasePage
      */
     public WikiEditPage clickTranslate(String locale)
     {
-        WebElement element = getDriver().findElementWithoutWaiting(
-            By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));
+        WebElement element;
+        if ("default".equals(locale)) {
+            element = getDriver().findElementByLinkText("default");
+        } else {
+            element = getDriver().findElementWithoutWaiting(
+                By.xpath("//p[starts-with(text(), 'Translate this page in:')]//a[text()='" + locale + "']"));
+        }
 
         element.click();
 
         return new WikiEditPage();
+    }
+
+    /**
+     * Set the default language input field.
+     * @param defaultLanguage the string to fill the input.
+     * @since 11.3RC1
+     */
+    public void setDefaultLanguage(String defaultLanguage)
+    {
+        defaultLanguageField.clear();
+        defaultLanguageField.sendKeys(defaultLanguage);
+    }
+
+    public String getDefaultLanguage()
+    {
+        return defaultLanguageField.getAttribute("value");
+    }
+
+    public boolean isCSRFWarningDisplayed()
+    {
+        try {
+            return this.csrfWarningModal.isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    public void clickCancelCSRFWarningButton()
+    {
+        this.cancelCSRFWarningButton.click();
+    }
+
+    public void clickForceSaveCSRFButton()
+    {
+        this.forceSaveCSRFButton.click();
     }
 }

@@ -83,11 +83,9 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
     }
 
     @Override
-    public List<Block> execute(WikiMacroParameters parameters, String macroContent, MacroTransformationContext context)
-        throws MacroExecutionException
+    public List<Block> execute(WikiMacroParameters parameters, String macroContent,
+        MacroTransformationContext context) throws MacroExecutionException
     {
-        validate(parameters, macroContent);
-
         // Create renderer
         DefaultWikiMacroRenderer renderer;
         try {
@@ -95,7 +93,7 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
         } catch (ComponentLookupException e) {
             throw new MacroExecutionException("Failed to create wiki macro rendeder", e);
         }
-
+        validate(parameters, macroContent);
         // Initialize the renderer
         renderer.initialize(this, parameters, macroContent, context);
 

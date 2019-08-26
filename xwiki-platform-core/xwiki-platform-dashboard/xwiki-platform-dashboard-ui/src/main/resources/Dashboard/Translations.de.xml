@@ -42,5 +42,6 @@ dashboard.gadgetSelector.title=Gadget auswählen
 dashboard.gadgetEditor.title=Gadget bearbeiten
 dashboard.gadgetEditor.changeGadget.label=Gadget ändern
 dashboard.gadgetEditor.gadgetTitle.label=Gadget-Titel
-dashboard.gadgetEditor.gadgetTitle.hint=Der Titel dieses Gadgets wird oben im Gadget Panel im Dashboard angezeigt (kann Velocity Code beinhalten).</content>
+dashboard.gadgetEditor.gadgetTitle.hint=Der Titel dieses Gadgets wird oben im Gadget Panel im Dashboard angezeigt (kann Velocity Code beinhalten).
+dashboard.initialization.saveMessage=Initialisiere Voreinstellungen für Benutzer-Dashboard</content>
 </xwikidoc>

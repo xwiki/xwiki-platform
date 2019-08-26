@@ -21,10 +21,9 @@ package com.xpn.xwiki.store;
 
 import javax.inject.Provider;
 
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.classic.Session;
 import org.junit.Before;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -35,7 +34,6 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
-import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -94,15 +92,9 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
         XWiki wiki = mock(XWiki.class);
         when(this.xcontext.getWiki()).thenReturn(wiki);
 
-        // For XWikiHibernateBaseStore#initHibernate()
-
-        HibernateSessionFactory sessionFactory = getMocker().getInstance(HibernateSessionFactory.class);
-        when(sessionFactory.getConfiguration()).thenReturn(mock(Configuration.class));
-
         // For XWikiHibernateBaseStore#beginTransaction()
 
         SessionFactory wrappedSessionFactory = mock(SessionFactory.class);
-        when(sessionFactory.getSessionFactory()).thenReturn(wrappedSessionFactory);
         when(wrappedSessionFactory.openSession()).thenReturn(session);
         when(session.beginTransaction()).thenReturn(transaction);
 
@@ -114,7 +106,7 @@ public abstract class AbstractXWikiHibernateStoreTest<T>
         when(this.hibernateStore.getCurrentTransaction()).thenReturn(transaction);
 
         // Default is schema mode
-        when(this.hibernateStore.isInSchemaMode()).thenReturn(true);
+        when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(true);
     }
 
     /**

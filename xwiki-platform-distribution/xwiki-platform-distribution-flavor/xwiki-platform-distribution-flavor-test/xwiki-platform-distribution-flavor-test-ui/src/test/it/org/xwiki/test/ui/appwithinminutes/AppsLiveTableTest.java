@@ -73,7 +73,6 @@ public class AppsLiveTableTest extends AbstractTest
 
         // Check the the applications live table lists the created application.
         ApplicationsLiveTableElement appsLiveTable = homePage.getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         Assert.assertTrue(appsLiveTable.hasColumn("Actions"));
         appsLiveTable.filterApplicationName(appName.substring(0, 3));
         Assert.assertTrue(appsLiveTable.isApplicationListed(appName));
@@ -83,7 +82,6 @@ public class AppsLiveTableTest extends AbstractTest
         // We should be taken back to the AppWithinMinutes home page.
         homePage = new AppWithinMinutesHomePage();
         appsLiveTable = homePage.getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         // The application name filter should've been preserved.
         Assert.assertEquals(appName.substring(0, 3), appsLiveTable.getApplicationNameFilter());
 
@@ -92,7 +90,6 @@ public class AppsLiveTableTest extends AbstractTest
         // We should be taken back to the AppWithinMinutes home page.
         homePage = new AppWithinMinutesHomePage();
         appsLiveTable = homePage.getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         // The application name filter should've been preserved.
         Assert.assertEquals(appName.substring(0, 3), appsLiveTable.getApplicationNameFilter());
         // And the deleted application shouldn't be listed anymore.
@@ -115,7 +112,6 @@ public class AppsLiveTableTest extends AbstractTest
 
         // Edit the application.
         ApplicationsLiveTableElement appsLiveTable = homePage.getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         ApplicationClassEditPage classEditor = appsLiveTable.clickEditApplication(appName);
 
         // Edit the existing class field.
@@ -149,7 +145,6 @@ public class AppsLiveTableTest extends AbstractTest
 
         // The application author should be able to edit and delete the application.
         ApplicationsLiveTableElement appsLiveTable = homePage.getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         appsLiveTable.filterApplicationName(appName);
         Assert.assertTrue(appsLiveTable.canEditApplication(appName));
         Assert.assertTrue(appsLiveTable.canDeleteApplication(appName));
@@ -159,7 +154,6 @@ public class AppsLiveTableTest extends AbstractTest
         getUtil().recacheSecretToken();
         homePage = new AppWithinMinutesHomePage();
         appsLiveTable = homePage.getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         appsLiveTable.filterApplicationName(appName);
         Assert.assertFalse(appsLiveTable.canEditApplication(appName));
         Assert.assertFalse(appsLiveTable.canDeleteApplication(appName));
@@ -167,10 +161,12 @@ public class AppsLiveTableTest extends AbstractTest
         // Login with a different user. The new user shouldn't be able to delete the application.
         getUtil().createUserAndLogin("someOtherUser", "somePassword");
         appsLiveTable = AppWithinMinutesHomePage.gotoPage().getAppsLiveTable();
-        appsLiveTable.waitUntilReady();
         appsLiveTable.filterApplicationName(appName);
         Assert.assertTrue(appsLiveTable.canEditApplication(appName));
         Assert.assertFalse(appsLiveTable.canDeleteApplication(appName));
+
+        this.validateConsole.getLogCaptureConfiguration().registerExpected("WikiComponentException: Registering UI "
+            + "extensions at wiki level requires wiki administration rights");
     }
 
     /**

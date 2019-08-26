@@ -39,7 +39,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-<content>platform.flamingo.themes.home.title=Темы Фламинго
+  <content>platform.flamingo.themes.home.title=Темы Фламинго
 platform.flamingo.themes.home.currenttheme=Текущая тема
 platform.flamingo.themes.home.otherthemes=Другие темы
 platform.flamingo.themes.home.warningOldColorThemeInstalled=Это приложение для управления темами фламинго. Тема Фламинго - это настраиваемая вариация любого скина на основе Фламинго. Если вы хотите управлять Цветовыми темами для оболочек на основе Colibri, перейдите в {0} Приложение Цветовые темы Colibri {1}.

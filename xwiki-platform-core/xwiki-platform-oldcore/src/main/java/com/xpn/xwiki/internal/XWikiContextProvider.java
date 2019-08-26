@@ -78,21 +78,30 @@ public class XWikiContextProvider implements Provider<XWikiContext>
             xcontext = (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
 
             if (xcontext == null) {
-                xcontext = this.contextProvider.createStubContext();
-
-                // Set the XWiki context
-                this.execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
-
-                // Set the stub request and the response
-                if (this.container.getRequest() == null) {
-                    this.container.setRequest(new ServletRequest(xcontext.getRequest()));
-                }
-                if (this.container.getResponse() == null) {
-                    this.container.setResponse(new ServletResponse(xcontext.getResponse()));
-                }
+                xcontext = createStubContext();
             }
         } else {
             xcontext = null;
+        }
+
+        return xcontext;
+    }
+
+    private XWikiContext createStubContext()
+    {
+        XWikiContext xcontext = this.contextProvider.createStubContext();
+
+        if (xcontext != null) {
+            // Set the XWiki context
+            this.execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
+
+            // Set the stub request and the response
+            if (this.container.getRequest() == null) {
+                this.container.setRequest(new ServletRequest(xcontext.getRequest()));
+            }
+            if (this.container.getResponse() == null) {
+                this.container.setResponse(new ServletResponse(xcontext.getResponse()));
+            }
         }
 
         return xcontext;

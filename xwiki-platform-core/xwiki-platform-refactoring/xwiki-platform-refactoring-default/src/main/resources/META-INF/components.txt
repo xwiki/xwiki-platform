@@ -1,4 +1,5 @@
 org.xwiki.refactoring.internal.listener.UpdateObjectsOnClassRenameListener
 org.xwiki.refactoring.internal.DefaultLinkRefactoring
 org.xwiki.refactoring.internal.DefaultModelBridge
+org.xwiki.refactoring.internal.ReferenceRenamer
 org.xwiki.refactoring.job.XClassDeletingListener

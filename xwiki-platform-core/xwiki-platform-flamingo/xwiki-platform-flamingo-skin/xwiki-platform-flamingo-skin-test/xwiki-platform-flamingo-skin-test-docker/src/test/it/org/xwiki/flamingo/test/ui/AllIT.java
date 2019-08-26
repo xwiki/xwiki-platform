@@ -38,4 +38,34 @@ public class AllIT
     class NestedEditIT extends EditIT
     {
     }
+
+    @Nested
+    @DisplayName("Edit Translation Tests")
+    class NestedEditTranslationIT extends EditTranslationIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Attachment Tests")
+    class NestedAttachmentIT extends AttachmentIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Velocity Macro Tests")
+    class NestedVelocityIT extends VelocityIT
+    {
+    }
+
+    @Nested
+    @DisplayName("Login Tests")
+    class NestedLoginIT extends LoginIT
+    {
+    }
+
+    @Nested
+    @DisplayName("WikiMacro Tests")
+    class NestedWikiMacroIT extends WikiMacroIT
+    {
+    }
 }

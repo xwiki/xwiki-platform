@@ -29,7 +29,7 @@ $app:
 #end
 ###
 ### Display a link to the diff
-###
+### We need to keep this code not indented since it's a plain.vm: each indent would generate a space in the mail.
 #if ($document)
 #set ($newdoc = $xwiki.getDocument($event.document, $event.events[0].documentVersion))
 #if ($event.events.size() == 1)
@@ -38,5 +38,9 @@ $app:
 #set ($lastIndex = $event.events.size() - 1)
 #set ($origdoc = $xwiki.getDocument($event.document, $event.events[$lastIndex].documentVersion).previousDocument)
 #end
-  $services.localization.render('notifications.email.seeChanges', [$document.getURL('view', "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}")])
+#set ($queryString = '')
+#if ($event.type != 'delete')
+#set ($queryString = "viewer=changes&rev1=${origdoc.version}&rev2=${newdoc.version}")
+#end
+  $services.localization.render('notifications.email.seeChanges', [$document.getURL('view', $!queryString)])
 #end

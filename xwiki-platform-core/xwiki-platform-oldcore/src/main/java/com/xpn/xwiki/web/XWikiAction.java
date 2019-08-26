@@ -22,7 +22,10 @@ package com.xpn.xwiki.web;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Vector;
 
 import javax.script.ScriptContext;
@@ -45,12 +48,14 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.job.internal.DefaultJobProgress;
 import org.xwiki.localization.ContextualLocalizationManager;
+import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -74,9 +79,11 @@ import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceReference;
 import org.xwiki.resource.internal.DefaultResourceReferenceHandlerChain;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.velocity.VelocityManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -215,6 +222,25 @@ public abstract class XWikiAction extends Action
         }
 
         return actionForward;
+    }
+
+    /**
+     * Write an error response to an ajax request.
+     *
+     * @param httpStatusCode The status code to set on the response.
+     * @param message The message that should be displayed.
+     * @param context the context.
+     */
+    protected void writeAjaxErrorResponse(int httpStatusCode, String message, XWikiContext context)
+    {
+        try {
+            context.getResponse().setContentType("text/plain");
+            context.getResponse().setStatus(httpStatusCode);
+            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
+            context.getResponse().getWriter().print(message);
+        } catch (IOException e) {
+            LOGGER.error("Failed to send error response to AJAX save and continue request.", e);
+        }
     }
 
     public ActionForward execute(XWikiContext context) throws Exception
@@ -512,7 +538,11 @@ public abstract class XWikiAction extends Action
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
                         Utils.parseTemplate(context.getWiki().Param("xwiki.access_exception", "accessdenied"), context);
                         return null;
-                    } else if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_INACTIVE) {
+                    } else if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_INACTIVE
+                        || xex.getCode() == XWikiException.ERROR_XWIKI_USER_DISABLED) {
+                        if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_DISABLED) {
+                            context.put("cause", "disabled");
+                        }
                         Utils.parseTemplate(context.getWiki().Param("xwiki.user_exception", "userinactive"), context);
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND) {
@@ -783,10 +813,20 @@ public abstract class XWikiAction extends Action
             context.put("rev", rev);
             XWikiDocument doc = (XWikiDocument) context.get("doc");
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
+            // if the doc is deleted and we request a specific language, we have to set the locale so we can retrieve
+            // properly the document revision.
+            if (rev.startsWith("deleted") &&
+                !StringUtils.isEmpty(context.getRequest().getParameter("language"))
+                && doc == tdoc) {
+                Locale locale = LocaleUtils.toLocale(context.getRequest().getParameter("language"), Locale.ROOT);
+                tdoc = new XWikiDocument(tdoc.getDocumentReference(), locale);
+            }
             XWikiDocument rdoc =
                 (!doc.getLocale().equals(tdoc.getLocale())) ? doc : context.getWiki().getDocument(doc, rev, context);
+
             XWikiDocument rtdoc =
                 (doc.getLocale().equals(tdoc.getLocale())) ? rdoc : context.getWiki().getDocument(tdoc, rev, context);
+
             context.put("tdoc", rtdoc);
             context.put("cdoc", rdoc);
             context.put("doc", rdoc);
@@ -881,11 +921,42 @@ public abstract class XWikiAction extends Action
      */
     protected boolean csrfTokenCheck(XWikiContext context) throws XWikiException
     {
+        return csrfTokenCheck(context, false);
+    }
+
+    /**
+     * Perform CSRF check and redirect to the resubmission page if needed. Throws an exception if the access should be
+     * denied, returns false if the check failed and the user will be redirected to a resubmission page.
+     *
+     * @param context current xwiki context containing the request
+     * @param jsonAnswer if true, returns a JSON answer in case of AJAX request: allow to process it properly on client.
+     * @return true if the check succeeded, false if resubmission is needed
+     * @throws XWikiException if the check fails
+     * @since 11.3RC1
+     */
+    @Unstable
+    protected boolean csrfTokenCheck(XWikiContext context, boolean jsonAnswer) throws XWikiException
+    {
+        final boolean isAjaxRequest = Utils.isAjaxRequest(context);
         CSRFToken csrf = Utils.getComponent(CSRFToken.class);
         try {
             String token = context.getRequest().getParameter("form_token");
             if (!csrf.isTokenValid(token)) {
-                sendRedirect(context.getResponse(), csrf.getResubmissionURL());
+                if (isAjaxRequest) {
+                    if (jsonAnswer) {
+                        Map<String, String> jsonObject = new LinkedHashMap<>();
+                        jsonObject.put("errorType", "CSRF");
+                        jsonObject.put("resubmissionURI", csrf.getRequestURI());
+                        jsonObject.put("newToken", csrf.getToken());
+                        this.answerJSON(context, HttpServletResponse.SC_FORBIDDEN, jsonObject);
+                    } else {
+                        final String csrfCheckFailedMessage = localizePlainOrKey("core.editors.csrfCheckFailed");
+                        writeAjaxErrorResponse(HttpServletResponse.SC_FORBIDDEN, csrfCheckFailedMessage, context);
+                    }
+                } else {
+                    sendRedirect(context.getResponse(), csrf.getResubmissionURL());
+                }
+
                 return false;
             }
         } catch (XWikiException exception) {
@@ -943,5 +1014,28 @@ public abstract class XWikiAction extends Action
         }
 
         return false;
+    }
+
+    /**
+     * Answer to a request with a JSON content.
+     * @param context the current context of the request.
+     * @param status the status code to send back.
+     * @param answer the content of the JSON answer.
+     * @throws XWikiException in case of error during the serialization of the JSON.
+     */
+    protected void answerJSON(XWikiContext context, int status, Map<String, String> answer) throws XWikiException
+    {
+        ObjectMapper mapper = new ObjectMapper();
+
+        try {
+            String jsonAnswerAsString = mapper.writeValueAsString(answer);
+            context.getResponse().setContentType("application/json");
+            context.getResponse().setContentLength(jsonAnswerAsString.length());
+            context.getResponse().setStatus(status);
+            context.getResponse().setCharacterEncoding(context.getWiki().getEncoding());
+            context.getResponse().getWriter().print(jsonAnswerAsString);
+        } catch (IOException e) {
+            throw new XWikiException("Error while sending JSON answer.", e);
+        }
     }
 }

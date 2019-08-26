@@ -44,7 +44,9 @@ panels.category=Kategorie
 panels._actions=Aktionen
 panels.emptyvalue=
 panels.children.title=Unterseiten
-### Missing: panels.siblings.title=Sibling Pages
+panels.siblings.title=Geschwisterseiten
 panels.documentInformation.configureSyntaxes=Weitere Syntaxen konfigurieren
-</content>
+panels.documentInformation.confirmChangeSyntaxWysiwyg=Möchten Sie auch den Inhalt und die Objekte des Dokuments in die gewählte Syntax konvertieren? Wenn Sie ' Abbrechen' wählen, wird die Syntax auf die vorherige zurückgesetzt und es wird nichts unternommen. Beachten Sie, dass, wenn Sie "ok" wählen, Änderungen verloren gehen und das Dokument automatisch gespeichert wird, Sie können diese Änderung rückgängig machen, indem Sie zur Anzeige der Dokumentenhistorie gehen und die letzte Version zurücksetzen.
+panels.documentInformation.confirmChangeSyntax=Möchten Sie auch den Inhalt und die Objekte des Dokuments in die gewählte Syntax konvertieren? Wenn Sie "Abbrechen" wählen, wird nur die Syntaxkennung geändert, ohne den Inhalt des Dokuments zu ändern. Beachten Sie, dass, wenn Sie "ok" wählen, das Dokument automatisch gespeichert wird, Sie diese Änderung rückgängig machen können, indem Sie zur Anzeige der Dokumentenhistorie gehen und die letzte Version zurücksetzen.
+panels.documentInformation.failedSyntaxConversion=Die Konvertierung in die ausgewählte Syntax konnte nicht durchgeführt werden. Wenn Sie diese Syntax trotzdem verwenden möchten, können Sie sie erneut auswählen und die Konvertierung nicht durchführen.</content>
 </xwikidoc>

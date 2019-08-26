@@ -34,6 +34,8 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
+import com.xpn.xwiki.objects.meta.TextAreaMetaClass;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -74,6 +76,7 @@ public class PropertyClassTest
 
         this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
         this.oldCore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
+        this.oldCore.getMocker().registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
     }
 
     /** Test the {@link PropertyClass#compareTo(PropertyClass)} method. */
@@ -157,5 +160,29 @@ public class PropertyClassTest
             this.oldCore.getXWikiContext());
 
         assertEquals("output", buffer.toString());
+    }
+
+    @Test
+    public void getFieldFullNameForClassProperty() throws Exception
+    {
+        PropertyClass propertyClass = new PropertyClass();
+        propertyClass.setName("tags");
+        propertyClass.setObject(this.xclass);
+
+        EntityReferenceSerializer<String> localEntityReferenceSerializer =
+            this.oldCore.getMocker().getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
+        when(localEntityReferenceSerializer.serialize(this.xclass.getDocumentReference())).thenReturn("XWiki.TagClass");
+
+        assertEquals("XWiki.TagClass_tags", propertyClass.getFieldFullName());
+    }
+
+    @Test
+    public void getFieldFullNameForMetaProperty()
+    {
+        PropertyClass propertyClass = new PropertyClass();
+        propertyClass.setName("editor");
+        PropertyMetaClass metaClass = new TextAreaMetaClass();
+        propertyClass.setxWikiClass(metaClass);
+        assertEquals("TextArea_editor", propertyClass.getFieldFullName());
     }
 }

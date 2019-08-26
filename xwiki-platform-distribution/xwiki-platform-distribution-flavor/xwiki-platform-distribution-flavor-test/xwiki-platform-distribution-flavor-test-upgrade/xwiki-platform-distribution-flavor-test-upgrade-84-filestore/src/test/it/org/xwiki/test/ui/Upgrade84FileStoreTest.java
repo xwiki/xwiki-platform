@@ -49,8 +49,8 @@ public class Upgrade84FileStoreTest extends UpgradeTest
         assertURLContent("attachment", attachmentURL);
 
         // Check migrated deleted attachment
-        URL deletedAttachmentURL =
-            new URL(getUtil().getBaseBinURL(wiki) + "downloadrev/Attachments/WebHome/deletedattachment.txt?rev=1.1&rid=1");
+        URL deletedAttachmentURL = new URL(
+            getUtil().getBaseBinURL(wiki) + "downloadrev/Attachments/WebHome/deletedattachment.txt?rev=1.1&rid=1");
 
         assertURLContent("deletedattachment", deletedAttachmentURL);
     }
@@ -63,5 +63,26 @@ public class Upgrade84FileStoreTest extends UpgradeTest
 
         // wiki1
         assertAttachments("wiki1");
+
+        validateConsole.getLogCaptureConfiguration().registerExpected(
+            // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
+            "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]",
+
+            // The currently installed flavor is not valid anymore before the upgrade
+            "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-wiki/8.4.6] on namespace [wiki:wiki1] "
+                + "(InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-[8.4.6]] is "
+                + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
+            "Invalid extension [org.xwiki.enterprise:xwiki-enterprise-ui-mainwiki/8.4.6] on namespace [wiki:xwiki] "
+                + "(InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-[8.4.6]] is "
+                + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
+
+            // Previous store contains an index of the deleted attachment based on the absolute filesystem path (testing
+            // that migration works despite this very bad old design)
+            "/media/data-hd/test/xwiki-enterprise-jetty-hsqldb-8.4.6/data/storage/xwiki/Attachments/WebHome/~this/"
+                + "deleted-attachments/deletedattachment.txt-1549039065268] does not exist, "
+                + "trying to find the new location",
+            "/media/data-hd/test/xwiki-enterprise-jetty-hsqldb-8.4.6/data/storage/wiki1/Attachments/WebHome/~this/"
+                + "deleted-attachments/deletedattachment.txt-1551887620946] does not exist, "
+                + "trying to find the new location");
     }
 }

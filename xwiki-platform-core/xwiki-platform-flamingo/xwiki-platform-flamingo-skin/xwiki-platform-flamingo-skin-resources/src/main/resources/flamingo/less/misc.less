@@ -283,6 +283,7 @@
   background-color: @xwiki-background-secondary-color;
   border: @border-width solid @xwiki-border-color;
   margin-top: (@grid-gutter-width / 2);
+  margin-bottom: (@grid-gutter-width / 2);
   padding-top: (@grid-gutter-width / 2);
   padding-bottom: (@grid-gutter-width / 2);
   position: relative;
@@ -353,6 +354,12 @@
   right: 30px;
 }
 
+.changes-body > .nav {
+  border-bottom: @border-width solid @xwiki-border-color;
+  margin-bottom: (@grid-gutter-width / 2);
+  padding-bottom: (@grid-gutter-width / 4);
+}
+
 // Panels Layout --------------------------------------------------------------
 /* Content Panels are defined in macros.vm in #displayPanelLayout and used in applications like Statistics */
 
@@ -396,4 +403,12 @@
 // Tree Webjar (XWIKI-15089) ---------------------------------------------------
 .skin-flamingo .jstree-xwiki .jstree-clicked {
   background-color: @nav-link-hover-bg; /* $theme.highlightColor */
+}
+
+.previewdiff-diff-options {
+  text-align: center;
+
+  .label {
+    color: @text-color;
+  }
 }

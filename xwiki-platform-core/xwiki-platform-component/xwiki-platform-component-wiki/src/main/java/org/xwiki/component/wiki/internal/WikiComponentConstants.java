@@ -21,6 +21,7 @@ package org.xwiki.component.wiki.internal;
 
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
 
 import com.xpn.xwiki.user.api.XWikiRightService;
 
@@ -38,57 +39,86 @@ public interface WikiComponentConstants
     String CLASS_AUTHOR = XWikiRightService.SUPERADMIN_USER;
 
     /**
+     * The name of the space where the wiki component xlcasses are located.
+     * 
+     * @since 11.4
+     */
+    String CLASS_SPACE_NAME = "XWiki";
+
+    /**
      * Space of the XClass documents.
      */
-    EntityReference CLASS_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
+    EntityReference CLASS_SPACE_REFERENCE = new EntityReference(CLASS_SPACE_NAME, EntityType.SPACE);
 
     /**
      * The XClass defining a component implementation.
      */
-    @Deprecated
-    String COMPONENT_CLASS = "XWiki.ComponentClass";
+    String COMPONENT_CLASS_NAME = "ComponentClass";
 
     /**
      * The XClass defining a component implementation.
      */
-    EntityReference COMPONENT_CLASS_REFERENCE = new EntityReference("ComponentClass", EntityType.DOCUMENT)
-            .appendParent(CLASS_SPACE_REFERENCE);
+    String COMPONENT_CLASS = CLASS_SPACE_NAME + '.' + COMPONENT_CLASS_NAME;
+
+    /**
+     * The XClass defining a component implementation.
+     */
+    LocalDocumentReference COMPONENT_CLASS_REFERENCE =
+        new LocalDocumentReference(COMPONENT_CLASS_NAME, CLASS_SPACE_REFERENCE);
+
+    /**
+     * The name of the XClass defining a component injection.
+     * 
+     * @since 11.4
+     */
+    String DEPENDENCY_CLASS_NAME = "ComponentDependencyClass";
 
     /**
      * The XClass defining a component injection.
      */
-    @Deprecated
-    String DEPENDENCY_CLASS = "XWiki.ComponentDependencyClass";
+    String DEPENDENCY_CLASS = CLASS_SPACE_NAME + '.' + DEPENDENCY_CLASS_NAME;
 
     /**
      * The XClass defining a component injection.
      */
-    EntityReference DEPENDENCY_CLASS_REFERENCE = new EntityReference("ComponentDependencyClass", EntityType.DOCUMENT)
-            .appendParent(CLASS_SPACE_REFERENCE);
+    LocalDocumentReference DEPENDENCY_CLASS_REFERENCE =
+        new LocalDocumentReference(DEPENDENCY_CLASS_NAME, CLASS_SPACE_REFERENCE);
+
+    /**
+     * The name of the XClass defining a component method.
+     * 
+     * @since 11.4
+     */
+    String METHOD_CLASS_NAME = "ComponentMethodClass";
 
     /**
      * The XClass defining a component method.
      */
-    @Deprecated
-    String METHOD_CLASS = "XWiki.ComponentMethodClass";
+    String METHOD_CLASS = CLASS_SPACE_NAME + '.' + METHOD_CLASS_NAME;
 
     /**
      * The XClass defining a component method.
      */
-    EntityReference METHOD_CLASS_REFRENCE =  new EntityReference("ComponentMethodClass", EntityType.DOCUMENT)
-            .appendParent(CLASS_SPACE_REFERENCE);
+    LocalDocumentReference METHOD_CLASS_REFERENCE =
+        new LocalDocumentReference(METHOD_CLASS_NAME, CLASS_SPACE_REFERENCE);
+
+    /**
+     * The name of the XClass defining a component interface implementation.
+     * 
+     * @since 11.4
+     */
+    String INTERFACE_CLASS_NAME = "ComponentInterfaceClass";
 
     /**
      * The XClass defining a component interface implementation.
      */
-    @Deprecated
-    String INTERFACE_CLASS = "XWiki.ComponentInterfaceClass";
+    String INTERFACE_CLASS = CLASS_SPACE_NAME + '.' + INTERFACE_CLASS_NAME;
 
     /**
      * The XClass defining a component interface implementation.
      */
-    EntityReference INTERFACE_CLASS_REFERENCE = new EntityReference("ComponentInterfaceClass", EntityType.DOCUMENT)
-            .appendParent(CLASS_SPACE_REFERENCE);
+    LocalDocumentReference INTERFACE_CLASS_REFERENCE =
+        new LocalDocumentReference(INTERFACE_CLASS_NAME, CLASS_SPACE_REFERENCE);
 
     /**
      * The name property of the {@link #INTERFACE_CLASS} XClass.
@@ -114,6 +144,7 @@ public interface WikiComponentConstants
      * The role type property of both {@link #COMPONENT_CLASS} and {@link #DEPENDENCY_CLASS}.
      */
     String COMPONENT_ROLE_TYPE_FIELD = "roleType";
+
     /**
      * The scope of the {@link #COMPONENT_CLASS}.
      */

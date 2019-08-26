@@ -36,8 +36,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Action used to edit+save an existing comment in a page, saves the comment
- * object in the document, requires comment right but not edit right.
+ * Action used to edit+save an existing comment in a page, saves the comment object in the document, requires comment
+ * right but not edit right.
  *
  * @version $Id$
  * @since 8.4RC1
@@ -50,7 +50,7 @@ public class CommentSaveAction extends CommentAddAction
      * Entity reference resolver.
      */
     private DocumentReferenceResolver<String> documentReferenceResolver =
-            Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
 
     /**
      * Authorization manager.
@@ -58,7 +58,7 @@ public class CommentSaveAction extends CommentAddAction
     private AuthorizationManager authorizationManager = Utils.getComponent(AuthorizationManager.class);
 
     /**
-     *  Localization manager.
+     * Localization manager.
      */
     private ContextualLocalizationManager localizationManager = Utils.getComponent(ContextualLocalizationManager.class);
 
@@ -98,7 +98,7 @@ public class CommentSaveAction extends CommentAddAction
 
         // Comment class reference
         DocumentReference commentClass = new DocumentReference(context.getWikiId(), XWiki.SYSTEM_SPACE,
-                XWikiDocument.COMMENTSCLASS_REFERENCE.getName());
+            XWikiDocument.COMMENTSCLASS_REFERENCE.getName());
 
         // Edit comment
         int commentId = getCommentIdFromRequest(request);
@@ -110,19 +110,22 @@ public class CommentSaveAction extends CommentAddAction
         // Check if the author is the current user or if the current user has the ADMIN right
         String commentAuthor = commentObj.getStringValue("author");
         DocumentReference authorReference = documentReferenceResolver.resolve(commentAuthor);
-        if (!authorReference.equals(context.getUserReference())
-                && !authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(),
-                        context.getDoc().getDocumentReference())) {
+        if (!authorReference.equals(context.getUserReference()) && !authorizationManager.hasAccess(Right.ADMIN,
+            context.getUserReference(), context.getDoc().getDocumentReference())) {
             return false;
         }
 
         // Edit the comment
-        commentObj.set(COMMENT_FIELD_NAME, request.getParameter(
-            String.format("XWiki.XWikiComments_%d_comment", commentId)), context);
+        commentObj.set(COMMENT_FIELD_NAME,
+            request.getParameter(String.format("XWiki.XWikiComments_%d_comment", commentId)), context);
+
+        String comment = this.localizationManager.getTranslationPlain("core.comment.editComment");
+
+        // Make sure the user is allowed to make this modification
+        context.getWiki().checkSavingDocument(context.getUserReference(), doc, comment, true, context);
 
         // Save it
-        xwiki.saveDocument(doc, localizationManager.getTranslationPlain("core.comment.editComment"),
-                true, context);
+        xwiki.saveDocument(doc, comment, true, context);
 
         // If xpage is specified then allow the specified template to be parsed.
         if (context.getRequest().get("xpage") != null) {

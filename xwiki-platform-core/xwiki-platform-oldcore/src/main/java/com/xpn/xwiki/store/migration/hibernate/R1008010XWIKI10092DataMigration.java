@@ -29,8 +29,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -40,7 +40,9 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.migration.DataMigrationException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -86,6 +88,13 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
                 migrateObjectsOfType(className, xclass);
             }
         }
+
+        // Clean the document cache to make sure the new properties we just added directly to the database are not lost
+        // during next save before a version of the document without those properties was already in the cache
+        XWikiStoreInterface store = xcontext.getWiki().getStore();
+        if (store instanceof XWikiCacheStoreInterface) {
+            ((XWikiCacheStoreInterface) store).flushCache();
+        }
     }
 
     private void migrateObjectsOfType(String className, BaseClass xclass) throws DataMigrationException, XWikiException
@@ -105,18 +114,17 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
         });
     }
 
-    @SuppressWarnings("unchecked")
     private List<Long> getObjectsWithMissingProperties(String className, Set<String> expectedProperties,
         Session session)
     {
         // Get all the objects that have less properties than what their class declares (the expected property count).
         // Note that we count only the expected properties (those declared by the class).
-        Query query = session.createQuery("select obj.id from BaseObject as obj, BaseProperty as prop "
+        Query<Long> query = session.createQuery("select obj.id from BaseObject as obj, BaseProperty as prop "
             + "where obj.id = prop.id.id and obj.className = :className and prop.id.name in :expectedProperties "
-            + "group by obj.id having count(prop) < :expectedPropertyCount");
-        query.setString("className", className);
+            + "group by obj.id having count(prop) < :expectedPropertyCount", Long.class);
+        query.setParameter("className", className);
         query.setParameterList("expectedProperties", expectedProperties);
-        query.setLong("expectedPropertyCount", Integer.valueOf(expectedProperties.size()).longValue());
+        query.setParameter("expectedPropertyCount", Long.valueOf(expectedProperties.size()));
         return query.list();
     }
 
@@ -141,13 +149,12 @@ public class R1008010XWIKI10092DataMigration extends AbstractHibernateDataMigrat
             .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("unchecked")
     private List<String> getCurrentProperties(Long objectId, Session session)
     {
         // The object was loaded from the database without its properties so we need to make a second query to get them.
-        Query query = session.createQuery("select prop.id.name from BaseObject as obj, BaseProperty as prop "
-            + "where obj.id = prop.id.id and obj.id = :objectId");
-        query.setLong("objectId", objectId);
+        Query<String> query = session.createQuery("select prop.id.name from BaseObject as obj, BaseProperty as prop "
+            + "where obj.id = prop.id.id and obj.id = :objectId", String.class);
+        query.setParameter("objectId", objectId);
         return query.list();
     }
 }

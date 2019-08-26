@@ -28,7 +28,6 @@ import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.LoginPage;
 import org.xwiki.test.ui.po.ResubmissionPage;
 import org.xwiki.test.ui.po.ViewPage;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Test the Login feature.
@@ -45,13 +44,14 @@ public class LoginTest extends AbstractTest
     @Before
     public void setUp()
     {
-        // Force log out (we're using the fast way since this is not part of what we want to test)
-        getUtil().forceGuestUser();
-
         // Go to any page in view mode. We choose to go to a nonexisting page so that it loads as fast as possible
         // Note: since the page doesn't exist, we need to disable the space redirect feature so that we end up on the
         // terminal page and not on WebHome in the space.
         getUtil().gotoPage("NonExistentSpace", "NonExistentPage", "view", "spaceRedirect=false");
+
+        // Force log out (we're using the fast way since this is not part of what we want to test)
+        getUtil().forceGuestUser();
+
         this.vp = new ViewPage();
         this.nonExistentPageURL = getDriver().getCurrentUrl();
     }
@@ -89,6 +89,7 @@ public class LoginTest extends AbstractTest
         LoginPage loginPage = this.vp.login();
         loginPage.loginAs("Admin", "wrong password");
         Assert.assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        validateConsole.getLogCaptureConfiguration().registerExpected("Authentication failure with login [Admin]");
     }
 
     @Test
@@ -101,6 +102,8 @@ public class LoginTest extends AbstractTest
         LoginPage loginPage = this.vp.login();
         loginPage.loginAs("non existent user", "admin");
         Assert.assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        validateConsole.getLogCaptureConfiguration()
+            .registerExpected("Authentication failure with login [non existent user]");
     }
 
     /**
@@ -145,41 +148,6 @@ public class LoginTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
-    public void testRedirectPreservesPOSTParameters()
-    {
-        String test = "Test string " + System.currentTimeMillis();
-        final String space = "Main";
-        final String page = "POSTTest";
-        LoginPage loginPage = this.vp.login();
-        loginPage.loginAsAdmin();
-        // start editing a page
-        WikiEditPage editPage = WikiEditPage.gotoPage(space, page);
-        editPage.setTitle(test);
-        editPage.setContent(test);
-        // emulate expired session: delete the cookies
-        getDriver().manage().deleteAllCookies();
-        // try to save
-        editPage.clickSaveAndView();
-        // we should have been redirected to login
-        String wantUrl = getUtil().getURL("XWiki", "XWikiLogin", "login");
-        if (wantUrl.indexOf('?') > 0) {
-            // strip parameters
-            wantUrl = wantUrl.substring(0, wantUrl.indexOf('?'));
-        }
-        Assert.assertTrue(getDriver().getCurrentUrl().startsWith(wantUrl));
-        loginPage.loginAsAdmin();
-        // we should have been redirected back to view, and the page should have been saved
-        Assert.assertTrue(getDriver().getCurrentUrl().startsWith(getUtil().getURL(space, page)));
-        editPage = WikiEditPage.gotoPage(space, page);
-        Assert.assertEquals(test, editPage.getTitle());
-        Assert.assertEquals(test, editPage.getContent());
-    }
-
-    @Test
-    @IgnoreBrowsers({
-    @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-    @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
     public void testCorrectUrlIsAccessedAfterLogin()
     {
         // We will choose the Scheduler.WebHome page to make our testing
@@ -212,5 +180,9 @@ public class LoginTest extends AbstractTest
         Assert.assertTrue(getDriver().getCurrentUrl().contains("/xwiki/bin/view/Test/TestData"));
         ViewPage viewPage = new ViewPage();
         Assert.assertEquals("this should be saved instead", viewPage.getContent());
+
+        // Expected logs
+        this.validateConsole.getLogCaptureConfiguration().registerExpected(
+            "CSRFToken: Secret token verification failed, token:");
     }
 }

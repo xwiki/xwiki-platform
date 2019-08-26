@@ -10,11 +10,6 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #set($class = $doc.getxWikiClass())
 ## These meta-properties are not fully implemented, or almost never used
 #set($hiddenProperties = ['tooltip', 'unmodifiable', 'disabled'])
-## Some additional details for a few unclear meta-properties
-#set($propertyDetails = {
-  'values' : "(separated by '|'; Example: <span class='monospace'>value1=Text displayed for value 1|value2=Text displayed for value 2|value3|value4</span>)",
-  'size' : 'of the corresponding form element in edit mode'
-})
 ##
 ##
 ##
@@ -44,40 +39,64 @@ $xwiki.jsfx.use('js/xwiki/editors/dataeditors.js', true)##
 #**
  * Display a class property
  *#
-#macro(displayProperty $field)
+#macro (displayProperty $field)
   <div id="xproperty_${field.name}" class="xproperty #if($field.disabled)disabled#end">
     <div id="xproperty_${field.name}_title" class="xproperty-title ${field.type}">
-      <h2>$!{escapetool.xml($doc.displayView($field.xWikiClass.get('prettyName'), "${field.name}_" , $field))}
-      ($doc.displayView($field.xWikiClass.get('name'), "${field.name}_" , $field): $xwiki.metaclass.get($field.classType).prettyName)</h2>
-      <div class="tools propertyTools"><a href='$doc.getURL('propdelete', "propname=${field.name}&amp;form_token=$!{services.csrf.getToken()}")' title="$services.localization.render('core.editors.class.deleteProperty.tooltip', [${field.name}])" class="tool delete">$services.localization.render('core.editors.class.deleteProperty.text')</a></div>
-    </div>
-    <div id="xproperty_${field.name}_content" class="xproperty-content"><div>
-      <div class="disabletool">
-        #set($propDef = $field.xWikiClass.get('disabled'))
-        <label for="${field.name}_disabled">$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</label>
+      <h2>
+        $!escapetool.xml($doc.displayView($field.xWikiClass.get('prettyName'), "${field.name}_" , $field))
+        ($doc.displayView($field.xWikiClass.get('name'), "${field.name}_" , $field):
+          $xwiki.metaclass.get($field.classType).prettyName)
+      </h2>
+      <div class="tools propertyTools">
+        #set ($deletePropURL = $doc.getURL('propdelete', $escapetool.url({
+          'propname': $field.name,
+          'form_token': $services.csrf.token
+        })))
+        <a class="tool delete" href="$deletePropURL" title="$services.localization.render(
+          'core.editors.class.deleteProperty.tooltip', [$field.name])">$services.localization.render(
+          'core.editors.class.deleteProperty.text')</a>
       </div>
+    </div>
+    <div id="xproperty_${field.name}_content" class="xproperty-content">
       <dl>
+        #set ($propDef = $field.xWikiClass.get('disabled'))
+        #set ($output = "#displayMetaProperty($field 'disabled' $propDef)")
+        $output.trim().replace('boolean-property', 'boolean-property disabletool')
         #foreach ($classprop in $field.xWikiClass.propertyNames)
-          #set($propDef = $field.xWikiClass.get($classprop))
-          #if($hiddenProperties.indexOf($propDef.name) == -1)
-            #if($propDef.type.indexOf('Boolean') != -1)
-              <dt class="boolean-property">
-                <label for="${field.name}_$classprop">
-                  $doc.displayEdit($propDef, "${field.name}_", $field)
-                  $escapetool.xml($propDef.prettyName)
-                </label>
-              </dt>
-              ## The empty DD is needed in order to have valid HTML.
-              <dd></dd>
-            #else
-              <dt><label for="${field.name}_$classprop">${escapetool.xml($propDef.getPrettyName())} $!{propertyDetails.get($classprop)}</label></dt>
-              <dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>
-            #end
+          #set ($propDef = $field.xWikiClass.get($classprop))
+          #if ($hiddenProperties.indexOf($propDef.name) == -1)
+            #displayMetaProperty($field $classprop $propDef)
           #end
         #end
       </dl>
-    </div></div> ## noname, xproperty-content
-  </div> ## xproperty
+    </div>
+  </div>
+#end
+##
+##
+#**
+ * Display a class meta property
+ *#
+#macro (displayMetaProperty $field $classprop $propDef)
+  #if ($propDef.type.indexOf('Boolean') != -1)
+    <dt class="boolean-property">
+      <label for="${field.name}_$classprop">
+        $doc.displayEdit($propDef, "${field.name}_", $field)
+        $escapetool.xml($propDef.prettyName)
+      </label>
+      <span class="xHint">$!escapetool.xml($propDef.hint)</span>
+    </dt>
+    ## The empty DD is needed in order to have valid HTML.
+    <dd></dd>
+  #else
+    <dt>
+      <label for="${field.name}_$classprop">
+        $escapetool.xml($propDef.translatedPrettyName)
+      </label>
+      <span class="xHint">$!escapetool.xml($propDef.hint)</span>
+    </dt>
+    <dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>
+  #end
 #end
 ##
 ##

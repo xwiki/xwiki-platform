@@ -28,8 +28,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.query.Query;
 import org.xwiki.component.annotation.Component;
 
 import com.xpn.xwiki.XWikiException;
@@ -65,23 +65,23 @@ public class R15428XWIKI2977DataMigration extends AbstractHibernateDataMigration
     public void hibernateMigrate() throws DataMigrationException, XWikiException
     {
         // migrate data
-        getStore().executeWrite(getXWikiContext(), true, new HibernateCallback<Object>()
+        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Object>()
         {
             @Override
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
-                Query q = session.createQuery("select o from BaseObject o where o.guid is null");
+                Query<BaseObject> q =
+                    session.createQuery("select o from BaseObject o where o.guid is null", BaseObject.class);
                 List<BaseObject> lst = q.list();
-                if (lst.size() == 0) {
-                    return null;
-                }
-                List<BaseObject> lst2 = new ArrayList<BaseObject>(lst.size());
-                for (BaseObject o : lst) {
-                    o.setGuid(UUID.randomUUID().toString());
-                    lst2.add(o);
-                }
-                for (BaseObject o : lst2) {
-                    session.update(o);
+                if (!lst.isEmpty()) {
+                    List<BaseObject> lst2 = new ArrayList<>(lst.size());
+                    for (BaseObject o : lst) {
+                        o.setGuid(UUID.randomUUID().toString());
+                        lst2.add(o);
+                    }
+                    for (BaseObject o : lst2) {
+                        session.update(o);
+                    }
                 }
                 return null;
             }

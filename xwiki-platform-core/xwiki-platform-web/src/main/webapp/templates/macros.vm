@@ -1389,7 +1389,11 @@ $Msz MB##
               #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
-              <th class="xwiki-livetable-display-header-text $!colprop.headerClass #if($!colprop.type=='hidden')hidden#end #if($isSortable)sortable #if($colname == $selectedColumn)selected $defaultOrder#else asc#end#end#if ($colname == '_avatar') avatar#end" scope="col">
+              #set ($defaultHeaderClass = {'_actions': 'actions', '_avatar': 'avatar'})
+              #set ($discard = $colprop.putIfAbsent('headerClass', $defaultHeaderClass.get($colname)))
+              <th scope="col" class="xwiki-livetable-display-header-text $!colprop.headerClass
+                  #if ($!colprop.type == 'hidden')hidden#end
+                  #if ($isSortable)sortable #if ($colname == $selectedColumn)selected $defaultOrder#else asc#end#end">
                 #if($isSortable)<a rel="${colname}">#end
                 #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
                 $displayName
@@ -1499,7 +1503,7 @@ $Msz MB##
       #set ($columnProperties = $columnsProperties.get($column))
       #if ($columnProperties.type != 'hidden')
         <td class="xwiki-livetable-display-header-filter">
-          #if ($columnProperties.filterable != false)
+          #if ($columnProperties.filterable != false && "$!column" != '_actions')
             #set ($columnXClassName = $columnProperties.get('class'))
             #set ($columnXPropertyName = $column)
             #if (!$columnXClassName)
@@ -1545,6 +1549,8 @@ $Msz MB##
       #set ($filterType = 'text')
     #end
   #end
+  #set($escapedTitle = $escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
+    [$services.localization.render("${transprefix}$column")])))
   #if ($filterType == 'list' || $filterType == 'multilist')
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column"
       #if ($filterType == 'multilist')
@@ -1573,8 +1579,7 @@ $Msz MB##
   #elseif ($filterType == 'text' || $filterType == 'number')
     <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="text"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
-      title="$escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
-        [$services.localization.render("${transprefix}$column")]))" />
+      title="$escapedTitle"/>
   #elseif ($filterType == 'suggest' && $xproperty)
     #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.css'),
       {'type': 'text/css', 'rel': 'stylesheet'}))
@@ -1583,7 +1588,8 @@ $Msz MB##
       {'forceSkinAction' : true, 'language' : $xcontext.locale}))
     <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
-      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)">
+      data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
+      title="$escapedTitle">
     </select>
   #end
 #end
@@ -1625,54 +1631,19 @@ $displayName##
  *#
 #macro(livetablecallback $divid $collist $colprops $transprefix)
 function (row, i, table) {
-   ## Make sure the columns containing HTML are formatted in HTML indeed
-   #set ($htmlColumnKeys = ['doc.location'])
-   #foreach($htmlColumnKey in $htmlColumnKeys)
-     #if ($collist.contains($htmlColumnKey))
-       #set ($htmlColumnProps = $colprops[$htmlColumnKey])
-       #if (!$htmlColumnProps)
-         #set ($htmlColumnProps = {})
-         #set ($colprops[$htmlColumnKey] = $htmlColumnProps)
-       #end
-       #if ($htmlColumnProps.html == $NULL)
-         #set ($htmlColumnProps.html = true)
-       #end
-     #end
-   #end
-
   // This callback method has been generated from Velocity.
-  ## Translate the column descriptor.
-  #foreach ($entry in $colprops.entrySet())
-    #if ("$!entry.value.displayName" == '' && "$!transprefix" != '')
-      #set ($entry.value.displayName = $services.localization.render("${transprefix}$entry.key"))
-    #end
-  #end
-  #set ($actionsDescriptor = $colprops.get('_actions'))
-  #if ($actionsDescriptor)
-    #if (!$actionsDescriptor.labels)
-      #set ($actionsDescriptor.labels = {})
-    #end
-    #foreach ($action in $actionsDescriptor.actions)
-      #if (!$actionsDescriptor.labels.get($action))
-        #if ("$!transprefix" != '' && $services.localization.get("${transprefix}_actions.$action"))
-          #set ($discard = $actionsDescriptor.labels.put($action,
-            $services.localization.render("${transprefix}_actions.$action")))
-        #elseif ($services.localization.get("platform.livetable._actions.$action"))
-          #set ($discard = $actionsDescriptor.labels.put($action,
-            $services.localization.render("platform.livetable._actions.$action")))
-        #end
-      #end
-    #end
-  #end
+  ## Clone the column properties because we modify them.
+  #set ($columnDescriptors = $jsontool.fromString($jsontool.serialize($colprops)))
+  #livetable_normalizeColumnDescriptors($columnDescriptors $collist $transprefix)
   var columns = $jsontool.serialize($collist);
-  var columnDescriptors = $jsontool.serialize($colprops);
+  var columnDescriptors = $jsontool.serialize($columnDescriptors);
   var className = $jsontool.serialize($classname);
   var showFilterNote = false;
   if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
   #if ($collist.indexOf('doc.title') != -1)
-    #set($titleOpts = $colprops['doc.title'])
+    #set($titleOpts = $columnDescriptors['doc.title'])
     #if ("$!{titleOpts}" == ""
         || ($titleOpts['filterable'] == $NULL || $titleOpts['filterable'] == true)
         || ($titleOpts['sortable'] == $NULL   || $titleOpts['sortable'] == true))
@@ -1698,22 +1669,22 @@ function (row, i, table) {
         'class': 'actions',
         'data-title': displayName
       });
+      td.toggleClassName('hide-labels', descriptor.labels === false);
       (descriptor.actions || []).forEach(function(action, index) {
-        if (row['doc_has' + action] || action === 'view' || (row['doc_has' + action] === undefined &&
-            (row['doc_hasadmin'] || adminActions.indexOf(action) < 0))) {
-          if (index > 0) {
-            td.insert(' ');
-          }
+        if (row['doc_has' + action.id] || action.id === 'view' || (row['doc_has' + action.id] === undefined &&
+            (row['doc_hasadmin'] || adminActions.indexOf(action.id) < 0))) {
           var link = new Element('a', {
-            'href': row['doc_' + action + '_url'],
-            'class': 'action action' + action
-          }).update((descriptor.labels || {})[action] || action);
-          if (descriptor.ajaxActions && descriptor.ajaxActions[action]) {
+            'href': row['doc_' + action.id + '_url'],
+            'class': 'action action' + action.id
+          }).update('<span class="action-icon"></span><span class="action-label"></span>');
+          link.down('.action-icon').update(action.icon).writeAttribute('title', action.label);
+          link.down('.action-label').update(action.label.escapeHTML());
+          if (action.async) {
             link.observe('click', function(event) {
               event.stop();
               new Ajax.Request(this.href, {
                 onSuccess: function() {
-                  eval((descriptor.actionCallbacks || {})[action]);
+                  eval(action.callback);
                 }
               });
             }.bindAsEventListener(link));
@@ -1779,6 +1750,70 @@ function (row, i, table) {
 }
 #end
 
+#macro (livetable_normalizeColumnDescriptors $columnDescriptors $colList $transPrefix)
+  ## Make sure the columns containing HTML are formatted in HTML indeed
+  #set ($htmlColumnKeys = ['doc.location'])
+  #foreach($htmlColumnKey in $htmlColumnKeys)
+    #if ($colList.contains($htmlColumnKey))
+      #set ($htmlColumnProps = $columnDescriptors[$htmlColumnKey])
+      #if (!$htmlColumnProps)
+        #set ($htmlColumnProps = {})
+        #set ($columnDescriptors[$htmlColumnKey] = $htmlColumnProps)
+      #end
+      #if ($htmlColumnProps.html == $NULL)
+        #set ($htmlColumnProps.html = true)
+      #end
+    #end
+  #end
+  ## Translate the column descriptor.
+  #foreach ($entry in $columnDescriptors.entrySet())
+    #if ("$!entry.value.displayName" == '' && "$!transPrefix" != '')
+      #set ($entry.value.displayName = $services.localization.render("${transPrefix}$entry.key"))
+    #end
+  #end
+  #livetable_normalizeActionsDescriptor($columnDescriptors $transPrefix)
+#end
+
+#macro (livetable_normalizeActionsDescriptor $columnDescriptors $transPrefix)
+  #set ($actionsDescriptor = $columnDescriptors.get('_actions'))
+  #if ($actionsDescriptor)
+    #foreach ($action in $actionsDescriptor.actions)
+      ## If the action is specified as a string then only the action id is specified.
+      #if ($action.equals("$!action"))
+        ## Note that 'labels' and 'actionCallbacks' are deprecated.
+        #set ($action = {
+          'id': $action,
+          'label': $actionsDescriptor.labels.get($action),
+          'async': $actionsDescriptor.ajaxActions.get($action),
+          'callback': $actionsDescriptor.actionCallbacks.get($action)
+        })
+        #set ($discard = $actionsDescriptor.actions.set($foreach.index, $action))
+      #end
+      #if ("$!action.label" == '')
+        #if ("$!transPrefix" != '' && $services.localization.get("${transPrefix}_actions.$action.id"))
+          #set ($action.label = $services.localization.render("${transPrefix}_actions.$action.id"))
+        #elseif ($services.localization.get("platform.livetable._actions.$action.id"))
+          #set ($action.label = $services.localization.render("platform.livetable._actions.$action.id"))
+        #else
+          #set ($action.label = $action.id)
+        #end
+      #end
+      #if ("$!action.icon" == '')
+        #set ($defaultActionIcons = {
+          'rename': 'move',
+          'delete': 'cross',
+          'restore': 'refresh',
+          'undelete': 'refresh',
+          'rights': 'lock',
+          'edit': 'pencil'
+        })
+        #set ($action.icon = $defaultActionIcons.getOrDefault($action.id, $action.id))
+      #end
+      #set ($action.icon = "$!services.icon.renderHTML($action.icon)")
+    #end
+  #end
+#end
+
 #**
  * Modifies the passed where clause of the query (and its parameters) to add a "location" filter.
  *
@@ -1793,17 +1828,6 @@ function (row, i, table) {
   #if ("$!locationValue" != '')
     ## Location is a special case, that we need to handle separatly.
     ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
-    #if ("$!customWhereQL" != '')
-      #set ($internalWhereQL = "${whereQL} $customWhereQL")
-    #else
-      #if ($filterWebHome == true)
-        #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!')")
-        #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')")
-        #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
-      #else
-        #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!'")
-      #end
-    #end
     #set ($locationFilterValue = $locationValue)
     ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as
     ## wildcards). However, it is not what the user expects (e.g. https://jira.xwiki.org/browse/XWIKI-12608).
@@ -1817,10 +1841,77 @@ function (row, i, table) {
     ## to filter on different levels:
     ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
     #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%.%'))
-    #if ("$!customWhereQL" == '')
+    #if ("$!customWhereQL" != '')
+      #set ($internalWhereQL = "${whereQL} $customWhereQL")
+    #else
+      #if ($whereParams.entrySet())
+        #set ($discard = $whereParams.put('locationFilterValue', "%${locationFilterValue}%"))
+      #else
+        #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+      #end
+      #if ($filterWebHome == true)
+        #if ($whereParams.entrySet())
+          #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(:locationFilterValue) ESCAPE '!')")
+          #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(:locationFilterValue) ESCAPE '!')")
+          #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
+        #else
+          #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?) ESCAPE '!')")
+          #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!')")
+          #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
+          #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+        #end
+      #else
+        #if ($whereParams.entrySet())
+          #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(:locationFilterValue) ESCAPE '!'")
+        #else
+          #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(?) ESCAPE '!'")
+        #end
+      #end
+    #end
+    #set ($whereQL = $NULL)
+    #setVariable("$whereQL", $internalWhereQL)
+ #end
+#end
+##
+##
+#**
+ * Modifies the passed where clause of the query (and its parameters) to add a "location" filter.
+ *
+ * @param whereQL existing where clause to augment
+ * @param whereParams existing query params to augment
+ * @param filterWebHome if true then treat "WebHome" as a normal input string like any other (defaults to false)
+ * @param customWhereQL if defined then use that query instead of computing it ourselves. In this case the filterWebHome
+ *        parameter value is ignored
+ * @internal
+ * @since 11.6
+ *#
+#macro(addLocationFilter $whereQL $whereParams $locationValue $filterWebHome $customWhereQL)
+  #if ("$!locationValue" != '')
+    ## Location is a special case, that we need to handle separatly.
+    ## It is actually not a real field, but a special request on doc.fullName, more user-friendly.
+    #set ($locationFilterValue = $locationValue)
+    ## Note: the "_", "[", and the "%" characters have special meanings in standard SQL servers (they behave as
+    ## wildcards). However, it is not what the user expects (e.g. https://jira.xwiki.org/browse/XWIKI-12608).
+    ## As a consequence, we must escape these characters.
+    ## See http://www.jguru.com/faq/view.jsp?EID=8881 to understand why we use the special clause 'escape' above.
+    ## Since we use '!' for the escaping, we also double existing ones.
+    #set ($locationFilterValue = $locationFilterValue.replaceAll('([\[%_!])', '!$1'))
+    ## Because the user might filter with "/" as separator we replace that by "%", because it could be "."
+    ## (the space separator) or "/" (as it is in the document name).
+    ## In addition, using "%" (any sequence of character) instead of "_" (any single character) gives the ability
+    ## to filter on different levels:
+    ##   e.g. filtering on "Blog/Intro" will return "Blog.BlogIntroduction".
+    #set ($locationFilterValue = $locationFilterValue.replaceAll('/', '%.%'))
+    #if ("$!customWhereQL" != '')
+      #set ($internalWhereQL = "${whereQL} $customWhereQL")
+    #else
       #set ($discard = $whereParams.add("%${locationFilterValue}%"))
       #if ($filterWebHome == true)
-        #set ($discard = $whereParams.add("%${locationFilterValue}%"))
+        #set ($matchNestedDocument = "(doc.name = 'WebHome' AND LOWER(doc.space) LIKE LOWER(?${whereParams.size()}) ESCAPE '!')")
+        #set ($matchTerminalDocument = "(doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE LOWER(?${whereParams.size()}) ESCAPE '!')")
+        #set ($internalWhereQL = "${whereQL} AND ($matchNestedDocument OR $matchTerminalDocument)")
+      #else
+        #set ($internalWhereQL = "${whereQL} AND LOWER(doc.fullName) LIKE LOWER(?${whereParams.size()}) ESCAPE '!'")
       #end
     #end
     #set ($whereQL = $NULL)
@@ -2339,7 +2430,7 @@ $string##
   #if ($multiSelect)
     #set ($discard = $parameters.put('multiple', 'multiple'))
   #end
-  #set ($discard = $parameters.putIfAbsent('data-userScope', $services.wiki.user.userScope))
+  #set ($discard = $parameters.putIfAbsent('data-userScope', "$!services.wiki.user.userScope"))
   #suggestInput($parameters)
 #end
 
@@ -2371,6 +2462,26 @@ $string##
     #set ($parameters = {})
   #end
   #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-pages"))
+  #suggestInput($parameters)
+#end
+
+#**
+* Pulls all the JavaScript and CSS resources needed by the attachment picker.
+*#
+#macro (attachmentPicker_import)
+  #picker_import
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestAttachments.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  ## Pull the resources required by the configured icon set in order to display attachment icons.
+  #set ($discard = $services.icon.use())
+#end
+
+#macro (attachmentPicker $parameters)
+  #attachmentPicker_import
+  #if ("$!parameters" == "")
+    #set ($parameters = {})
+  #end
+  #set ($discard = $parameters.put('class', "$!parameters.get('class') suggest-attachments"))
   #suggestInput($parameters)
 #end
 
@@ -2592,7 +2703,8 @@ Recursive title display detected!##
   #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
   #set ($discard = $parameters.put('size', 1))
   #set ($attributes = [])
-  #set ($nonAttributes = ['value', 'separators'])
+  ## Note: Remove placeholder since it's not valid to have it on an HTML SELECT element.
+  #set ($nonAttributes = ['value', 'separators', 'placeholder'])
   #foreach ($entry in $parameters.entrySet())
     #if (!$nonAttributes.contains($entry.key))
       #if ($entry.value.equals($entry.value.toString()))
@@ -2614,6 +2726,9 @@ Recursive title display detected!##
     #set ($values = [])
   #end
   <select $stringtool.join($attributes, ' ')>
+    #if ("$!parameters.placeholder" != '')
+      <option value="">$escapetool.xml($parameters.placeholder)</option>
+    #end
     #if ("$!optionsDisplayerMacroName" != '')
       #evaluate("${escapetool.h}${optionsDisplayerMacroName}(${escapetool.d}values)")
     #else
@@ -2668,9 +2783,6 @@ Recursive title display detected!##
 #end
 
 #macro (classPicker_displayOptions $selectedValues)
-  #if ("$!parameters.placeholder" != '')
-    <option value="">$escapetool.xml($parameters.placeholder)</option>
-  #end
   #set ($selectedClassReferences = $collectionstool.set)
   #foreach ($selectedValue in $selectedValues)
     #set ($discard = $selectedClassReferences.add($services.model.resolveDocument($selectedValue)))
@@ -2740,4 +2852,71 @@ Recursive title display detected!##
       #end
     </optgroup>
   #end
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the date & time picker.
+ *#
+#macro (dateTimePicker_import)
+  ## A simple date picker widget.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/calendarDateSelect.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/calendarDateSelect.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  ## Used to parse and serialize the selected date using the date format specified in the XClass.
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/simpleDateFormat.js',
+    {'forceSkinAction': true, 'language': $xcontext.locale}))
+  ## A wrapper over the CalendarDateSelect widget that uses the SimpleDateFormat to parse/serialize the dates.
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/datepicker/dateTimePicker.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/datepicker/dateTimePicker.js'))
+#end
+
+#macro (dateTimePicker_input $parameters)
+  #set ($discard = $parameters.putIfAbsent('class', 'datetime'))
+  #set ($discard = $parameters.putIfAbsent('data-timestamp', $parameters.value.time))
+  #set ($discard = $parameters.putIfAbsent('data-locale', $services.localization.currentLocale))
+  #if ("$!parameters.get('data-format')" != '' && "$!parameters.value.time" != '')
+    #set ($parameters.value = $datetool.format($parameters.get('data-format'), $parameters.value,
+      $services.localization.currentLocale))
+  #end
+  #if ("$!parameters.disabled" == 'true')
+    #set ($parameters.disabled = 'disabled')
+  #else
+    #set ($discard = $parameters.remove('disabled'))
+  #end
+  <input type="text"
+    #foreach ($parameter in $parameters.entrySet())
+      $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+    #end
+  />
+#end
+
+#macro (dateTimePicker $parameters)
+  #dateTimePicker_import
+  #dateTimePicker_input($parameters)
+#end
+
+#**
+ * Pulls all the JavaScript and CSS resources needed by the color picker.
+ *#
+#macro (colorPicker_import)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/colorpicker/colorPicker.js', true))
+#end
+
+#macro (colorPicker_input $parameters)
+  #set ($discard = $parameters.putIfAbsent('class', 'color-picker type-color'))
+  #if ("$!parameters.disabled" == 'true')
+    #set ($parameters.disabled = 'disabled')
+  #else
+    #set ($discard = $parameters.remove('disabled'))
+  #end
+  <input type="text"
+    #foreach ($parameter in $parameters.entrySet())
+      $escapetool.xml($parameter.key)="$!escapetool.xml($parameter.value)"
+    #end
+  />
+#end
+
+#macro (colorPicker $parameters)
+  #colorPicker_import
+  #colorPicker_input($parameters)
 #end

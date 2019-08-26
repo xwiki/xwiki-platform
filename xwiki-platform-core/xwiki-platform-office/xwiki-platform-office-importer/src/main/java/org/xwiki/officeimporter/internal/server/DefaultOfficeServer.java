@@ -171,6 +171,20 @@ public class DefaultOfficeServer implements OfficeServer
     }
 
     @Override
+    public void refreshState()
+    {
+        if (this.jodManager == null) {
+            setState(ServerState.NOT_CONNECTED);
+        } else {
+            if (this.jodManager.isRunning()) {
+                setState(ServerState.CONNECTED);
+            } else {
+                setState(ServerState.NOT_CONNECTED);
+            }
+        }
+    }
+
+    @Override
     public ServerState getState()
     {
         return this.state;

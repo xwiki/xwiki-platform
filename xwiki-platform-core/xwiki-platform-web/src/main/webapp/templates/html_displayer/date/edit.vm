@@ -1,0 +1,6 @@
+#set ($dateTimePickerParams = {
+  'value': $displayer.value,
+  'data-format': $xwiki.getXWikiPreference('dateformat', 'yyyy/MM/dd HH:mm')
+})
+#set ($discard = $dateTimePickerParams.putAll($displayer.parameters))
+#dateTimePicker($dateTimePickerParams)

@@ -327,6 +327,9 @@ public class PdfExportImpl implements PdfExport
             Reader re = new StringReader(html);
             InputSource source = new InputSource(re);
             SAXReader reader = new SAXReader(XHTMLDocumentFactory.getInstance());
+            // Dom4J 2.1.1 disable external DTD by default which is required here, putting it back
+            // See https://github.com/dom4j/dom4j/issues/51
+            reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
             reader.setEntityResolver(new DefaultEntityResolver());
             XHTMLDocument document = (XHTMLDocument) reader.read(source);
 

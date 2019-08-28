@@ -194,19 +194,17 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
 
     private void migrateAttachmentFiles(File attachmentDirectory, String attachmentName) throws IOException
     {
-        String encodedAttachmentName = FileSystemStoreUtils.encode(attachmentName, false);
-
-        int indexOfExtension = FilenameUtils.indexOfExtension(encodedAttachmentName);
-        String baseStoreAttachmentName = FilenameUtils.removeExtension(encodedAttachmentName);
+        int indexOfExtension = FilenameUtils.indexOfExtension(attachmentName);
+        String baseAttachmentName = FilenameUtils.removeExtension(attachmentName);
 
         for (File file : attachmentDirectory.listFiles()) {
-            if (file.getName().startsWith(baseStoreAttachmentName)) {
+            String decodedFileName = FileSystemStoreUtils.decode(file.getName());
+            if (decodedFileName.startsWith(baseAttachmentName)) {
                 String version = null;
-                if (file.getName().length() > encodedAttachmentName.length()) {
-                    version = file.getName().substring(baseStoreAttachmentName.length() + 2);
+                if (decodedFileName.length() > attachmentName.length()) {
+                    version = decodedFileName.substring(baseAttachmentName.length() + 2);
                     if (indexOfExtension != -1) {
-                        version = version.substring(0,
-                            version.length() - (encodedAttachmentName.length() - indexOfExtension));
+                        version = version.substring(0, version.length() - (attachmentName.length() - indexOfExtension));
                     }
                 }
 

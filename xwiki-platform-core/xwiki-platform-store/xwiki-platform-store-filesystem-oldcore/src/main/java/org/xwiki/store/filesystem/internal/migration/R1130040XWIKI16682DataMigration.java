@@ -51,12 +51,12 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 // Should be 1103040 but it has to be bigger than WatchlistLeftoversCleaner...
 @Named("R1130040XWIKI16682")
 @Singleton
-public class R1103040XWIKI16682DataMigration extends AbstractStoreTypeDataMigration
+public class R1130040XWIKI16682DataMigration extends AbstractStoreTypeDataMigration
 {
     /**
      * The default constructor.
      */
-    public R1103040XWIKI16682DataMigration()
+    public R1130040XWIKI16682DataMigration()
     {
         super("XWikiAttachmentContent", "contentStore");
     }
@@ -64,7 +64,7 @@ public class R1103040XWIKI16682DataMigration extends AbstractStoreTypeDataMigrat
     @Override
     public String getDescription()
     {
-        return "Fix attachments content store id missed because of a in a migration R1100000XWIKI15620";
+        return "Fix attachments content store id missed because of a bug in migration R1100000XWIKI15620";
     }
 
     @Override

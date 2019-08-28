@@ -37,7 +37,7 @@
     <span class="diff-decision" id="conflict_decision_value_previous_$line.conflict.reference" style="display: none">$line.conflict.previousElement</span>
     <span class="diff-decision" id="conflict_decision_value_next_$line.conflict.reference" style="display: none">$line.conflict.nextElement</span>
     <input class="form-control diff-decision" type="text" id="conflict_decision_value_custom_$line.conflict.reference" value="" style="display: none" />
-    <input type="hidden" id="conflict_id_$line.conflict.hashCode()" name="conflict_id" value="$line.conflict.reference" />
+    <input type="hidden" id="conflict_id_$line.conflict.reference" name="conflict_id" value="$line.conflict.reference" />
     <select class="diff-choices" id="conflict_decision_select_$line.conflict.reference" name="conflict_decision_select">
       <option value="current" selected="selected">$services.localization.render("core.editors.save.previewDiff.versionToCompare.current")</option>
       <option value="previous">$services.localization.render("core.editors.save.previewDiff.versionToCompare.previous")</option>

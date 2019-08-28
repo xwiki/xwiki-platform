@@ -97,6 +97,7 @@ public class ComputedFieldClass extends PropertyClass
      * @param object object for which the property value has to get computed
      * @param context current context
      * @return the computed property value
+     * @since 11.8
      */
     public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context) {
         String script = getScript();
@@ -114,21 +115,9 @@ public class ComputedFieldClass extends PropertyClass
                     classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
 
         } catch (Exception e) {
+            // TODO: append a rendering style complete error instead
             return e.getMessage();
         }
-    }
-
-    /**
-     * Appends the raw computed property value of this object to the passed buffer.
-     * @param buffer buffer to which the property value has to get appended
-     * @param name property name
-     * @param prefix prefix to be added
-     * @param object object for which the property value has to get computed
-     * @param context current context
-     */
-    public void getComputedValue(StringBuffer buffer, String name, String prefix, BaseCollection object,
-            XWikiContext context) {
-        buffer.append(getComputedValue(name, prefix, object, context));
     }
 
     @Override

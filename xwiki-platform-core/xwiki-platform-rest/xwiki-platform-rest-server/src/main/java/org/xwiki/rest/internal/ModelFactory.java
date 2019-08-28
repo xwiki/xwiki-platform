@@ -992,7 +992,7 @@ public class ModelFactory
     {
         if (propertyClass instanceof ComputedFieldClass) {
             // TODO: the XWikiDocument needs to be explicitely set in the context, otherwise method
-            // PropertyClass.renderInContext fires a null pointer exception: bug?
+            //  PropertyClass.renderInContext fires a null pointer exception: bug?
             XWikiDocument document = context.getDoc();
             context.setDoc(property.getObject().getOwnerDocument());
             ComputedFieldClass computedFieldClass = (ComputedFieldClass) propertyClass;

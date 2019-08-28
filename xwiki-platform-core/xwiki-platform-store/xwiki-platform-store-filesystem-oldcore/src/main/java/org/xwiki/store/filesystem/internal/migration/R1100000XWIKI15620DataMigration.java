@@ -32,6 +32,7 @@ import javax.inject.Singleton;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocaleUtils;
@@ -58,12 +59,18 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 @Singleton
 public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigration
 {
+    /**
+     * The version of the migration.
+     * 
+     * @since 11.8RC1
+     * @since 11.3.4
+     * @since 11.7.1
+     */
+    public static final int VERSION = 1100000;
+
     @Inject
     @Named(XWikiCfgConfigurationSource.ROLEHINT)
     private ConfigurationSource configuration;
-
-    @Inject
-    private FilesystemStoreTools fstools;
 
     @Override
     public String getDescription()
@@ -75,7 +82,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
     @Override
     public XWikiDBVersion getVersion()
     {
-        return new XWikiDBVersion(1100000);
+        return new XWikiDBVersion(VERSION);
     }
 
     @Override
@@ -186,14 +193,26 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
 
                     FileUtils.moveDirectory(oldAttachmentDirectory, newAttachmentDirectory);
 
-                    migrateAttachmentFiles(newAttachmentDirectory, attachmentReference.getName());
+                    migrateAttachmentFiles(newAttachmentDirectory, attachmentReference.getName(), this.logger);
                 }
             }
         }
     }
 
-    private void migrateAttachmentFiles(File attachmentDirectory, String attachmentName) throws IOException
+    /**
+     * Migrate the files located in an attachment directory.
+     * 
+     * @param attachmentDirectory the directory containing the attachment
+     * @param attachmentName the name of the attachment
+     * @param logger the logger
+     * @return true if a sub file was found
+     * @throws IOException when failing to migrate one of the files
+     */
+    public static boolean migrateAttachmentFiles(File attachmentDirectory, String attachmentName, Logger logger)
+        throws IOException
     {
+        boolean foundFile = false;
+
         int indexOfExtension = FilenameUtils.indexOfExtension(attachmentName);
         String baseAttachmentName = FilenameUtils.removeExtension(attachmentName);
 
@@ -211,11 +230,15 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
                 File newAttachmentFile =
                     new File(attachmentDirectory, StoreFileUtils.getStoredFilename(attachmentName, version));
 
-                this.logger.info("Moving attachment file [{}] to new location [{}]", file, newAttachmentFile);
+                logger.info("Moving attachment file [{}] to new location [{}]", file, newAttachmentFile);
 
                 Files.move(file.toPath(), newAttachmentFile.toPath());
+
+                foundFile = true;
             }
         }
+
+        return foundFile;
     }
 
     private void migrateDeletedAttachments(File documentContentDirectory, DocumentReference documentReference)
@@ -244,7 +267,7 @@ public class R1100000XWIKI15620DataMigration extends AbstractFileStoreDataMigrat
 
                     FileUtils.moveDirectory(oldDeletedAttachmentDirectory, newDeletedAttachmentDirectory);
 
-                    migrateAttachmentFiles(newDeletedAttachmentDirectory, attachmentReference.getName());
+                    migrateAttachmentFiles(newDeletedAttachmentDirectory, attachmentReference.getName(), this.logger);
                 }
             }
         }

@@ -35,6 +35,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.store.migration.DataMigrationException;
@@ -63,6 +64,9 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
     protected Environment environment;
 
     @Inject
+    protected FilesystemStoreTools fstools;
+
+    @Inject
     protected Logger logger;
 
     protected File pre11StoreRootDirectory;
@@ -73,7 +77,12 @@ public abstract class AbstractFileStoreDataMigration extends AbstractHibernateDa
     public void initialize() throws InitializationException
     {
         this.pre11StoreRootDirectory = new File(this.environment.getPermanentDirectory(), "storage");
-        this.storeRootDirectory = this.pre11StoreRootDirectory;
+
+        if (getVersion().getVersion() < R1100000XWIKI15620DataMigration.VERSION) {
+            this.storeRootDirectory = this.pre11StoreRootDirectory;
+        } else {
+            this.storeRootDirectory = this.fstools.getStoreRootDirectory();
+        }
     }
 
     protected File getPre11StoreRootDirectory()

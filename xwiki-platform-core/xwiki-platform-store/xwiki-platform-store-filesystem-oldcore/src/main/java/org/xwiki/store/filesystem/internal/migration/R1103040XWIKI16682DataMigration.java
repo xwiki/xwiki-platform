@@ -20,87 +20,97 @@
 
 package org.xwiki.store.filesystem.internal.migration;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.DataMigrationException;
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Base class used by migrations on store type field.
+ * Migrations for XWIKI-16682. Fix attachments content store id missed because of the bug.
  *
  * @version $Id$
- * @since 10.4RC1
+ * @since 11.3.4
+ * @since 11.7.1
+ * @since 11.8RC1
  */
-public abstract class AbstractStoreTypeDataMigration extends AbstractFileStoreDataMigration
+@Component
+// Should be 1103040 but it has to be bigger than WatchlistLeftoversCleaner...
+@Named("R1130040XWIKI16682")
+@Singleton
+public class R1103040XWIKI16682DataMigration extends AbstractStoreTypeDataMigration
 {
-    @Inject
-    protected DocumentReferenceResolver<String> resolver;
-
-    protected final String tableName;
-
-    protected final String updateQuery;
-
     /**
-     * @param tableName the name of the table linked to the attachment table
-     * @param fieldName the name of the field containing the store id
+     * The default constructor.
      */
-    public AbstractStoreTypeDataMigration(String tableName, String fieldName)
+    public R1103040XWIKI16682DataMigration()
     {
-        this.tableName = tableName;
-        this.updateQuery = "UPDATE XWikiAttachment SET " + fieldName + " = :store WHERE id IN (:ids)";
+        super("XWikiAttachmentContent", "contentStore");
     }
 
     @Override
-    public void hibernateMigrate() throws XWikiException, DataMigrationException
+    public String getDescription()
     {
-        // Get all non hibernate attachments in the database and for each one try to find if filesystem store was used
-        // (and if not use whatever is in the configuration)
-        getStore().executeWrite(getXWikiContext(), new HibernateCallback<Void>()
-        {
-            @Override
-            public Void doInHibernate(Session session) throws HibernateException
-            {
-                doWork(session);
-
-                return null;
-            }
-        });
+        return "Fix attachments content store id missed because of a in a migration R1100000XWIKI15620";
     }
 
+    @Override
+    public XWikiDBVersion getVersion()
+    {
+        // Should be 1103040 but it has to be bigger than WatchlistLeftoversCleaner...
+        return new XWikiDBVersion(1130040);
+    }
+
+    @Override
+    public void migrate() throws DataMigrationException
+    {
+        // This migration should only be executed if upgrading from > 11.0
+        int version = getCurrentDBVersion().getVersion();
+        if (version >= R1100000XWIKI15620DataMigration.VERSION) {
+            super.migrate();
+        } else {
+            this.logger
+                .info("Skipping the migration (it's only needed when migrating from a version greater than 11.0)");
+        }
+    }
+
+    @Override
     protected void doWork(Session session)
     {
         org.hibernate.query.Query selectQuery =
             session.createQuery("SELECT attachment.id, attachment.filename, document.fullName"
                 + " FROM XWikiAttachment as attachment, XWikiDocument as document"
-                + " WHERE attachment.docId = document.id AND attachment.id NOT IN (SELECT id FROM " + this.tableName
-                + ")");
+                + " WHERE attachment.docId = document.id AND (attachment.contentStore is NULL)");
 
         List<Object[]> attachments = selectQuery.list();
 
         if (!attachments.isEmpty()) {
-            setStore(attachments, session);
+            try {
+                setStore(attachments, session);
+            } catch (IOException e) {
+                throw new HibernateException("Failed to fix missed attachment", e);
+            }
         }
     }
 
-    private void setStore(List<Object[]> attachments, Session session)
+    private void setStore(List<Object[]> attachments, Session session) throws IOException
     {
         WikiReference wikiReference = getXWikiContext().getWikiReference();
 
         List<Long> fileAttachments = new ArrayList<>(attachments.size());
-
-        List<Long> otherAttachments = new ArrayList<>(attachments.size());
 
         for (Object[] attachment : attachments) {
             Long id = (Long) attachment[0];
@@ -111,34 +121,23 @@ public abstract class AbstractStoreTypeDataMigration extends AbstractFileStoreDa
 
             AttachmentReference attachmentReference = new AttachmentReference(filename, documentReference);
 
-            if (isFile(attachmentReference)) {
+            File attachmentDirectory = this.fstools.getAttachmentDir(attachmentReference);
+
+            if (attachmentDirectory.exists() && R1100000XWIKI15620DataMigration
+                .migrateAttachmentFiles(attachmentDirectory, attachmentReference.getName(), this.logger)) {
+                // Update the content store id
                 fileAttachments.add(id);
-            } else {
-                otherAttachments.add(id);
             }
         }
 
         // Set file store
         setStore(session, fileAttachments, FileSystemStoreUtils.HINT);
-
-        // Set configured store
-        setOtherStore(otherAttachments, session);
     }
 
-    protected void setOtherStore(List<Long> otherAttachments, Session session)
+    @Override
+    protected boolean isFile(AttachmentReference attachmentReference)
     {
-
-    }
-
-    protected abstract boolean isFile(AttachmentReference attachmentReference);
-
-    protected void setStore(Session session, List<Long> values, String store)
-    {
-        if (!values.isEmpty()) {
-            org.hibernate.query.Query query = session.createQuery(this.updateQuery);
-            query.setParameter("store", store);
-            query.setParameterList("ids", values);
-            query.executeUpdate();
-        }
+        // Not used
+        return false;
     }
 }

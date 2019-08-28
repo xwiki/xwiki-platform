@@ -28,6 +28,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.xwiki.cache.CacheManager;
 import org.xwiki.diff.internal.DefaultDiffManager;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
@@ -37,6 +38,7 @@ import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -55,7 +57,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ComponentList({ DefaultDiffManager.class })
@@ -165,6 +166,9 @@ public class MergeManagerTest
 
         @InjectMockComponents
         private DefaultMergeManager mergeManager;
+
+        @MockComponent
+        private CacheManager cacheManager;
 
         private XWikiDocument currentDocument;
 

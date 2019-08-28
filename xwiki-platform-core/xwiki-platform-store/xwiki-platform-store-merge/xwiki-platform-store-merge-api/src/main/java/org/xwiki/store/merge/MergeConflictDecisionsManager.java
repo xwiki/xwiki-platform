@@ -22,6 +22,7 @@ package org.xwiki.store.merge;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.diff.Conflict;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.diff.MergeConfiguration;
 import org.xwiki.model.reference.DocumentReference;
@@ -69,4 +70,29 @@ public interface MergeConflictDecisionsManager
      * @param userReference the user who made the decisions.
      */
     void removeConflictDecisionList(DocumentReference documentReference, EntityReference userReference);
+
+    /**
+     * Record a list of conflicts to be used in for the later decisions.
+     *
+     * @param documentReference the document on which the decisions should apply.
+     * @param userReference the user who performed the merge.
+     * @param conflicts the list of conflicts to record.
+     */
+    void recordConflicts(DocumentReference documentReference, EntityReference userReference,
+        List<Conflict<?>> conflicts);
+
+    /**
+     * Record a decision made for a given conflict.
+     *
+     * @param documentReference the document on which the decisions should apply.
+     * @param userReference  the user who performed the merge.
+     * @param conflictReference the reference of a conflict as given by {@link Conflict#getReference()}.
+     * @param decisionType the decision made.
+     * @param customDecision the custom decision to apply if needed, as specified in
+     *          {@link ConflictDecision#setCustom(List)} or null.
+     * @param <E> the type of element concerned by the conflict.
+     * @return {@code true} if the decision has been properly recorded, {@code false} if something went wrong.
+     */
+    <E> boolean recordDecision(DocumentReference documentReference, EntityReference userReference,
+        String conflictReference, ConflictDecision.DecisionType decisionType, List<E> customDecision);
 }

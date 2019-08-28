@@ -83,7 +83,6 @@ public class MergeScriptService implements ScriptService
         XWikiDocument currentDoc = currentDocument.getDocument();
         XWikiDocument newDoc = newDocument.getDocument();
 
-        XWikiDocument mergeDoc = currentDoc.clone();
         MergeDocumentResult mergeResult =
             mergeManager.mergeDocument(previousDoc, newDoc, currentDoc, mergeConfiguration);
 

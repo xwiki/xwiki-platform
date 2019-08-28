@@ -106,4 +106,12 @@ public class MergeDocumentResultScript
     {
         return this.mergeDocumentResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT);
     }
+
+    /**
+     * @return all the conflicts that occurred when merging the whole document.
+     */
+    public List<Conflict<Object>> getAllConflicts()
+    {
+        return this.mergeDocumentResult.getConflicts();
+    }
 }

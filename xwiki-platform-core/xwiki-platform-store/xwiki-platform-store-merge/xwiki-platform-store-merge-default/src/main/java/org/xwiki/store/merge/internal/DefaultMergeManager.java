@@ -75,7 +75,6 @@ public class DefaultMergeManager implements MergeManager
 
     private static final String WARNING_OBJECT_REMOVED = "Object [{}] already removed";
 
-
     @Inject
     private DiffManager diffManager;
 

@@ -19,7 +19,11 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -30,18 +34,23 @@ import javax.script.ScriptContext;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.script.RefactoringScriptService;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 
@@ -68,6 +77,9 @@ public class SaveAction extends PreviewAction
 
     protected static final String ASYNC_PARAM = "async";
 
+    /** Logger. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(SaveAction.class);
+
     /**
      * The key to retrieve the saved object version from the context.
      */
@@ -92,6 +104,8 @@ public class SaveAction extends PreviewAction
     private DocumentRevisionProvider documentRevisionProvider;
 
     private MergeManager mergeManager;
+
+    private MergeConflictDecisionsManager conflictDecisionsManager;
 
     /**
      * The redirect class, used to mark pages that are redirect place-holders, i.e. hidden pages that serve only for
@@ -301,6 +315,63 @@ public class SaveAction extends PreviewAction
         return this.mergeManager;
     }
 
+    private MergeConflictDecisionsManager getConflictDecisionsManager()
+    {
+        if (this.conflictDecisionsManager == null) {
+            this.conflictDecisionsManager = Utils.getComponent(MergeConflictDecisionsManager.class);
+        }
+
+        return this.conflictDecisionsManager;
+    }
+
+    /**
+     * Retrieve the conflict decisions made from the request and fill the conflict decision manager with them.
+     * We handle two list of parameters here:
+     *   - mergeChoices: those parameters are on the form [conflict id]=[choice] where the choice is defined by the
+     *                   {@link ConflictDecision.DecisionType} values.
+     *   - customChoices: those parameters are on the form [conflict id]=[encoded string] where the encoded string
+     *                    is actually the desired value to solve the conflict.
+     */
+    private void recordConflictDecisions(XWikiContext context, DocumentReference documentReference)
+    {
+        XWikiRequest request = context.getRequest();
+        String[] mergeChoices = request.getParameterValues("mergeChoices");
+        String[] customChoices = request.getParameterValues("customChoices");
+
+        // Build a map indexed by the conflict ids and whose values are the actual decoded custom values.
+        Map<String, String> customChoicesMap = new HashMap<>();
+        if (customChoices != null) {
+            for (String customChoice : customChoices) {
+                String[] splittedCustomChoiceInfo = customChoice.split("=");
+                String conflictReference = splittedCustomChoiceInfo[0];
+                String customValue = customChoice.substring(conflictReference.length() + 1);
+                try {
+                    customValue = URLDecoder.decode(customValue, request.getCharacterEncoding());
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.error("Error while decoding a custom value decision.", e);
+                }
+                customChoicesMap.put(conflictReference, customValue);
+            }
+        }
+        if (mergeChoices != null) {
+            for (String choice : mergeChoices) {
+                String[] splittedChoiceInfo = choice.split("=");
+                String conflictReference = splittedChoiceInfo[0];
+                String selectedChoice = splittedChoiceInfo[1];
+                List<String> customValue = null;
+
+                ConflictDecision.DecisionType decisionType = ConflictDecision.DecisionType
+                    .valueOf(selectedChoice.toUpperCase());
+
+                if (decisionType == ConflictDecision.DecisionType.CUSTOM) {
+                    customValue = Collections.singletonList(customChoicesMap.get(conflictReference));
+                }
+                getConflictDecisionsManager().recordDecision(documentReference, context.getUserReference(),
+                    conflictReference, decisionType, customValue);
+            }
+        }
+    }
+
     /**
      * Check if the version of the document being saved is conflicting with another version. This check is done by
      * getting the "previousVersion" parameter from the request and comparing it with latest version of the document. If
@@ -356,17 +427,41 @@ public class SaveAction extends PreviewAction
                         return false;
                     } else {
                         MergeConfiguration mergeConfiguration = new MergeConfiguration();
+
+                        // We need the reference of the user and the document in the config to retrieve
+                        // the conflict decision in the MergeManager.
                         mergeConfiguration.setUserReference(context.getUserReference());
                         mergeConfiguration.setConcernedDocument(modifiedDoc.getDocumentReferenceWithLocale());
+
+                        // The modified doc is actually the one we should save, so it's ok to modify it directly
+                        // and better for performance.
                         mergeConfiguration.setProvidedVersionsModifiables(true);
+
+                        // We need to retrieve the conflict decisions that might have occurred from the request.
+                        recordConflictDecisions(context, modifiedDoc.getDocumentReferenceWithLocale());
 
                         MergeDocumentResult mergeDocumentResult =
                             getMergeManager().mergeDocument(previousDoc, originalDoc, modifiedDoc, mergeConfiguration);
 
+                        // Be sure to not keep the conflict decisions we might have made if new conflicts occurred
+                        // we don't want to pollute the list of decisions.
+                        getConflictDecisionsManager()
+                            .removeConflictDecisionList(modifiedDoc.getDocumentReferenceWithLocale(),
+                                context.getUserReference());
+
+                        // If we don't get any conflict, or if we want to force the merge even with conflicts,
+                        // then we pursue to save the document.
                         if (FORCE_SAVE_MERGE.equals(request.getParameter("forceSave"))
                             || !mergeDocumentResult.hasConflicts()) {
                             context.put(MERGED_DOCUMENTS, "true");
                             return false;
+
+                        // If we got merge conflicts and we don't want to force it, then we record the conflict in
+                        // order to allow fixing them independently.
+                        } else {
+                            getConflictDecisionsManager().recordConflicts(modifiedDoc.getDocumentReferenceWithLocale(),
+                                context.getUserReference(),
+                                mergeDocumentResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT));
                         }
                     }
                 }

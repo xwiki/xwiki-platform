@@ -116,7 +116,7 @@
       #displayDocumentDiffSummary($summary)
       #if ($summary.entries.size() > 0)
         <h$headingLevel>$services.localization.render('web.history.changes.details')</h$headingLevel>
-        #displayDocumentDiff($docDiff)
+        #displayDocumentDiff($docDiff $conflictsList)
       #end
     </div>
     <div role="tabpanel" class="tab-pane html-diff" id="renderedChanges">

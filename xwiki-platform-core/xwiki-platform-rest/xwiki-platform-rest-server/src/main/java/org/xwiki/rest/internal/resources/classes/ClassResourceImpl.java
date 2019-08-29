@@ -34,6 +34,7 @@ import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Class;
 import org.xwiki.rest.resources.classes.ClassResource;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -53,6 +54,7 @@ public class ClassResourceImpl extends XWikiResource implements ClassResource
     private ContextualAuthorizationManager authorization;
 
     @Inject
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
 
     @Override
@@ -64,10 +66,12 @@ public class ClassResourceImpl extends XWikiResource implements ClassResource
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
-            if (!this.authorization.hasAccess(Right.VIEW, classReference)) {
-                throw new WebApplicationException(Status.UNAUTHORIZED);
+            try {
+                this.authorization.checkAccess(Right.VIEW, classReference);
+            } catch (AccessDeniedException e) {
+                throw new WebApplicationException(e, Status.UNAUTHORIZED);
             }
-            com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
+            com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(classReference);
             if (xwikiClass == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }

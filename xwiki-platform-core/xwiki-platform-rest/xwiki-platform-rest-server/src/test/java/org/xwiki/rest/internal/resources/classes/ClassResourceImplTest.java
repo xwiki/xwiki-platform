@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -38,9 +39,11 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.Class;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -60,6 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -81,6 +85,7 @@ public class ClassResourceImplTest
     private MockitoComponentManager componentManager;
 
     @MockComponent
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
 
     @MockComponent
@@ -135,22 +140,23 @@ public class ClassResourceImplTest
             XWikiDocument doc = mock(XWikiDocument.class);
             BaseClass baseClass = mock(BaseClass.class);
             Class zeclass = mock(Class.class);
-            when(xWiki.getDocument(documentReferences.get(i), xcontext)).thenReturn(doc);
+            // the cast here is mandatory, else Mockito register a mock for the call to
+            // getDocument(DocumentReference, XWikiContext)
+            when(xWiki.getDocument((EntityReference)documentReferences.get(i), xcontext)).thenReturn(doc);
             when(doc.getXClass()).thenReturn(baseClass);
             when(modelFactory.toRestClass(any(), eq(new com.xpn.xwiki.api.Class(baseClass, xcontext))))
                 .thenReturn(zeclass);
             when(zeclass.getId()).thenReturn(availableClasses.get(i));
             restClasses.add(zeclass);
         }
-
-        componentManager.registerComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed", resolver);
     }
 
     @Test
-    public void authorizedClassesOnly() throws XWikiRestException
+    public void authorizedClassesOnly() throws XWikiRestException, AccessDeniedException
     {
-        when(authorization.hasAccess(eq(Right.VIEW), eq(new DocumentReference("xwiki", "XWiki", "Protected"))))
-            .thenReturn(false);
+        DocumentReference protectedReference = new DocumentReference("xwiki", "XWiki", "Protected");
+        doThrow(new AccessDeniedException(xcontext.getUserReference(), protectedReference)).when(
+            authorization).checkAccess(eq(Right.VIEW), eq(protectedReference));
 
         String protectedClass = "XWiki.Protected";
         for (String availableClass : availableClasses) {

@@ -137,28 +137,12 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         WikiMacroVisibility macroVisibility =
             WikiMacroVisibility.fromString(macroDefinition.getStringValue(MACRO_VISIBILITY_PROPERTY));
         boolean macroSupportsInlineMode = macroDefinition.getIntValue(MACRO_INLINE_PROPERTY) != 0;
-        String macroContentType = StringUtils
-            .defaultIfEmpty(macroDefinition.getStringValue(MACRO_CONTENT_TYPE_PROPERTY), MACRO_CONTENT_OPTIONAL);
-        // The macro content description as plain text
-        String macroContentDescription = macroDefinition.getStringValue(MACRO_CONTENT_DESCRIPTION_PROPERTY);
-
-        // Verify macro description.
-        if (StringUtils.isEmpty(macroDescription)) {
-            this.logger.debug("Incomplete macro definition in [{}], macro description is empty", documentReference);
-        }
 
         // Verify default macro category.
         if (StringUtils.isEmpty(macroDefaultCategory)) {
             macroDefaultCategory = null;
             this.logger.debug("Incomplete macro definition in [{}], default macro category is empty",
                 documentReference);
-        }
-
-        // Verify macro content description.
-        if (!macroContentType.equals(MACRO_CONTENT_EMPTY) && StringUtils.isEmpty(macroContentDescription)) {
-            this.logger.debug("Incomplete macro definition in [{}], macro content description is empty",
-                documentReference);
-            macroContentDescription = "Macro content";
         }
 
         // Verify macro code.
@@ -168,11 +152,7 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         List<WikiMacroParameterDescriptor> parameterDescriptors = buildParameterDescriptors(doc);
 
         // Create macro content descriptor.
-        ContentDescriptor contentDescriptor = null;
-        if (!macroContentType.equals(MACRO_CONTENT_EMPTY)) {
-            contentDescriptor =
-                new DefaultContentDescriptor(macroContentDescription, macroContentType.equals(MACRO_CONTENT_MANDATORY));
-        }
+        ContentDescriptor contentDescriptor = getContentDescriptor(macroDefinition, documentReference);
 
         // Create macro descriptor.
         // Note that we register wiki macros for all syntaxes FTM and there's currently no way to restrict a wiki
@@ -219,6 +199,28 @@ public class DefaultWikiMacroFactory implements WikiMacroFactory, WikiMacroConst
         }
 
         return macroName;
+    }
+
+    private ContentDescriptor getContentDescriptor(BaseObject macroDefinition, DocumentReference documentReference)
+    {
+        ContentDescriptor contentDescriptor = null;
+        String macroContentVisibility = StringUtils
+            .defaultIfEmpty(macroDefinition.getStringValue(MACRO_CONTENT_TYPE_PROPERTY), MACRO_CONTENT_OPTIONAL);
+        String macroContentDescription = macroDefinition.getStringValue(MACRO_CONTENT_DESCRIPTION_PROPERTY);
+
+        // Verify macro content description.
+        if (!macroContentVisibility.equals(MACRO_CONTENT_EMPTY) && StringUtils.isEmpty(macroContentDescription)) {
+            this.logger.debug("Incomplete macro definition in [{}], macro content description is empty",
+                documentReference);
+            macroContentDescription = "Macro content";
+        }
+
+        if (!macroContentVisibility.equals(MACRO_CONTENT_EMPTY)) {
+            contentDescriptor =
+                new DefaultContentDescriptor(macroContentDescription,
+                    macroContentVisibility.equals(MACRO_CONTENT_MANDATORY));
+        }
+        return contentDescriptor;
     }
 
     private void checkMacroCode(BaseObject macroDefinition) throws WikiMacroException

@@ -90,7 +90,7 @@ public class R1130040XWIKI16682DataMigration extends AbstractStoreTypeDataMigrat
     @Override
     protected void doWork(Session session)
     {
-        org.hibernate.query.Query selectQuery =
+        org.hibernate.Query selectQuery =
             session.createQuery("SELECT attachment.id, attachment.filename, document.fullName"
                 + " FROM XWikiAttachment as attachment, XWikiDocument as document"
                 + " WHERE attachment.docId = document.id AND (attachment.contentStore is NULL)");

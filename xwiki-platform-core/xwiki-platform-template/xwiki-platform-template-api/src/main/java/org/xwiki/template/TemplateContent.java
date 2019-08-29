@@ -20,6 +20,7 @@
 package org.xwiki.template;
 
 import java.lang.reflect.Type;
+import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -95,4 +96,22 @@ public interface TemplateContent
     {
         return null;
     }
+
+    /**
+     * @return true if the result be reused several times
+     * @since 11.8RC1
+     */
+    boolean isCacheAllowed();
+
+    /**
+     * @return true if the execution should be asynchronous when possible
+     * @since 11.8RC1
+     */
+    boolean isAsyncAllowed();
+
+    /**
+     * @return the list of context entries to take remember for the execution
+     * @since 11.8RC1
+     */
+    Set<String> getContextEntries();
 }

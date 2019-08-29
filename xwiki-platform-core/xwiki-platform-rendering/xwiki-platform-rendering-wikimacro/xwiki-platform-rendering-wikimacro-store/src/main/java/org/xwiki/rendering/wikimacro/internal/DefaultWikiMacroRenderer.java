@@ -251,7 +251,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     @Override
     public boolean isCacheAllowed()
     {
-        return this.wikimacro.isCachedAllowed();
+        return this.wikimacro.isCacheAllowed();
     }
 
     @Override

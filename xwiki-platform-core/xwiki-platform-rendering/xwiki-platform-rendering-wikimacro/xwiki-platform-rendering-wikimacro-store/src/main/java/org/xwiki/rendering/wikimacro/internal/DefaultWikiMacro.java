@@ -179,12 +179,12 @@ public class DefaultWikiMacro extends AbstractAsyncContentBaseObjectWikiComponen
 
     boolean isAsyncAllowed()
     {
-        return this.async;
+        return this.asyncAllowed;
     }
 
-    boolean isCachedAllowed()
+    boolean isCacheAllowed()
     {
-        return this.cached;
+        return this.cacheAllowed;
     }
 
     XDOM getContent()

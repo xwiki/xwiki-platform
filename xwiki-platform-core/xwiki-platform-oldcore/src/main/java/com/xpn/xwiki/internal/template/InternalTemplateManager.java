@@ -26,12 +26,14 @@ import java.io.Writer;
 import java.lang.reflect.Type;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -311,6 +313,12 @@ public class InternalTemplateManager implements Initializable
         @PropertyId("raw.syntax")
         public Syntax rawSyntax;
 
+        public boolean cacheAllowed;
+
+        public boolean asyncAllowed;
+
+        public Set<String> contextEntries;
+
         protected Map<String, Object> properties = new HashMap<>();
 
         DefaultTemplateContent(String content)
@@ -344,6 +352,32 @@ public class InternalTemplateManager implements Initializable
         public Syntax getRawSyntax()
         {
             return this.rawSyntax;
+        }
+
+        @Override
+        public boolean isAsyncAllowed()
+        {
+            return this.asyncAllowed;
+        }
+
+        @Override
+        public boolean isCacheAllowed()
+        {
+            return this.cacheAllowed;
+        }
+
+        @Override
+        public Set<String> getContextEntries()
+        {
+            if (this.contextEntries == null) {
+                return Collections.emptySet();
+            }
+
+            if (this.contextEntries instanceof AbstractSet) {
+                this.contextEntries = Collections.unmodifiableSet(this.contextEntries);
+            }
+
+            return this.contextEntries;
         }
 
         @Override

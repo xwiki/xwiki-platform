@@ -52,6 +52,7 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
     private ModelFactory utils;
 
     @Inject
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
 
     @Inject
@@ -75,7 +76,7 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
             for (String className : ri) {
                 DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
                 if (this.authorization.hasAccess(Right.VIEW, classReference)) {
-                    com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
+                    com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(classReference);
                     classes.getClazzs().add(this.utils.toRestClass(uriInfo.getBaseUri(), xwikiClass));
                 }
             }

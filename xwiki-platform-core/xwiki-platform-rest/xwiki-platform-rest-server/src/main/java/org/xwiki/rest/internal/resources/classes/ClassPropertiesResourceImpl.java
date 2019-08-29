@@ -38,6 +38,7 @@ import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Properties;
 import org.xwiki.rest.resources.classes.ClassPropertiesResource;
 import org.xwiki.rest.resources.classes.ClassResource;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -51,6 +52,7 @@ import com.xpn.xwiki.XWikiException;
 public class ClassPropertiesResourceImpl extends XWikiResource implements ClassPropertiesResource
 {
     @Inject
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
 
     @Inject
@@ -65,10 +67,12 @@ public class ClassPropertiesResourceImpl extends XWikiResource implements ClassP
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
-            if (!this.authorization.hasAccess(Right.VIEW, classReference)) {
-                throw new WebApplicationException(Status.UNAUTHORIZED);
+            try {
+                this.authorization.checkAccess(Right.VIEW, classReference);
+            } catch (AccessDeniedException e) {
+                throw new WebApplicationException(e, Status.UNAUTHORIZED);
             }
-            com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
+            com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(classReference);
             if (xwikiClass == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
             }

@@ -80,7 +80,7 @@ span.diff-decision {
   display: inline-block;
 }
 
-input.diff-decision {
+textarea.diff-decision {
   width: 70%;
   display: inline-block;
 }

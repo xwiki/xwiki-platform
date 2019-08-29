@@ -19,11 +19,15 @@
  */
 package org.xwiki.rest.internal.resources.classes;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.Relations;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
@@ -34,6 +38,8 @@ import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.Property;
 import org.xwiki.rest.resources.classes.ClassPropertyResource;
 import org.xwiki.rest.resources.classes.ClassResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -44,6 +50,12 @@ import com.xpn.xwiki.XWikiException;
 @Named("org.xwiki.rest.internal.resources.classes.ClassPropertyResourceImpl")
 public class ClassPropertyResourceImpl extends XWikiResource implements ClassPropertyResource
 {
+    @Inject
+    private DocumentReferenceResolver<String> resolver;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
     @Override
     public Property getClassProperty(String wikiName, String className, String propertyName) throws XWikiRestException
     {
@@ -52,6 +64,10 @@ public class ClassPropertyResourceImpl extends XWikiResource implements ClassPro
         try {
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
+            DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
+            if (!this.authorization.hasAccess(Right.VIEW, classReference)) {
+                throw new WebApplicationException(Status.UNAUTHORIZED);
+            }
             com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
             if (xwikiClass == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);

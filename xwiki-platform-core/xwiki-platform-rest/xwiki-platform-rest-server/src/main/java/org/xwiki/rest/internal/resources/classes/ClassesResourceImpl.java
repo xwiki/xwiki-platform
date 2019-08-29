@@ -26,6 +26,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.rest.XWikiResource;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.ModelFactory;
@@ -33,6 +36,8 @@ import org.xwiki.rest.internal.RangeIterable;
 import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.Classes;
 import org.xwiki.rest.resources.classes.ClassesResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -45,6 +50,12 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
 {
     @Inject
     private ModelFactory utils;
+
+    @Inject
+    private DocumentReferenceResolver<String> resolver;
+
+    @Inject
+    private ContextualAuthorizationManager authorization;
 
     @Override
     public Classes getClasses(String wikiName, Integer start, Integer number) throws XWikiRestException
@@ -62,8 +73,11 @@ public class ClassesResourceImpl extends XWikiResource implements ClassesResourc
             Classes classes = objectFactory.createClasses();
 
             for (String className : ri) {
-                com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
-                classes.getClazzs().add(this.utils.toRestClass(uriInfo.getBaseUri(), xwikiClass));
+                DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
+                if (this.authorization.hasAccess(Right.VIEW, classReference)) {
+                    com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(className);
+                    classes.getClazzs().add(this.utils.toRestClass(uriInfo.getBaseUri(), xwikiClass));
+                }
             }
 
             return classes;

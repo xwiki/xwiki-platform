@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.ws.rs.core.UriInfo;
 
@@ -36,6 +37,7 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rest.XWikiRestException;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.Class;
@@ -81,6 +83,7 @@ public class ClassesResourceImplTest
     private MockitoComponentManager componentManager;
 
     @MockComponent
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
 
     @MockComponent
@@ -135,15 +138,15 @@ public class ClassesResourceImplTest
             XWikiDocument doc = mock(XWikiDocument.class);
             BaseClass baseClass = mock(BaseClass.class);
             Class zeclass = mock(Class.class);
-            when(xWiki.getDocument(documentReferences.get(i), xcontext)).thenReturn(doc);
+            // the cast here is mandatory, else Mockito register a mock for the call to
+            // getDocument(DocumentReference, XWikiContext)
+            when(xWiki.getDocument((EntityReference)documentReferences.get(i), xcontext)).thenReturn(doc);
             when(doc.getXClass()).thenReturn(baseClass);
             when(modelFactory.toRestClass(any(), eq(new com.xpn.xwiki.api.Class(baseClass, xcontext))))
                 .thenReturn(zeclass);
             when(zeclass.getId()).thenReturn(availableClasses.get(i));
             restClasses.add(zeclass);
         }
-
-        componentManager.registerComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed", resolver);
     }
 
     @Test

@@ -22,6 +22,7 @@ package org.xwiki.rest.internal.resources.classes;
 import java.net.URI;
 import java.util.Arrays;
 
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
@@ -43,6 +44,7 @@ import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.Link;
 import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -79,6 +81,7 @@ public class ClassPropertyValuesResourceImplTest
     private MockitoComponentManager componentManager;
 
     @MockComponent
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
 
     @MockComponent
@@ -127,6 +130,8 @@ public class ClassPropertyValuesResourceImplTest
     @Test
     public void getClassPropertyValuesUnauthorized() throws Exception
     {
+        doThrow(new AccessDeniedException(xcontext.getUserReference(), this.propertyReference)).when(
+            authorization).checkAccess(eq(Right.VIEW), eq(this.propertyReference));
         try {
             this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"), false);
             fail();
@@ -138,8 +143,6 @@ public class ClassPropertyValuesResourceImplTest
     @Test
     public void getClassPropertyValuesNotFound() throws Exception
     {
-        when(this.authorization.hasAccess(Right.VIEW, this.propertyReference)).thenReturn(true);
-
         try {
             this.resource.getClassPropertyValues("wiki", "Path.To.Class", "status", 6, Arrays.asList("text"), false);
             fail();
@@ -151,7 +154,6 @@ public class ClassPropertyValuesResourceImplTest
     @Test
     public void getClassPropertyValues() throws Exception
     {
-        when(this.authorization.hasAccess(Right.VIEW, this.propertyReference)).thenReturn(true);
         when(this.xclass.get("status")).thenReturn(new DBListClass());
 
         PropertyValues values = new PropertyValues();

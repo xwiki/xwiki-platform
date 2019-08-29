@@ -42,6 +42,7 @@ import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.rest.resources.classes.ClassPropertyResource;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesProvider;
 import org.xwiki.rest.resources.classes.ClassPropertyValuesResource;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
@@ -58,6 +59,7 @@ import com.xpn.xwiki.XWikiException;
 public class ClassPropertyValuesResourceImpl extends XWikiResource implements ClassPropertyValuesResource
 {
     @Inject
+    @Named("currentmixed")
     private DocumentReferenceResolver<String> resolver;
 
     @Inject
@@ -72,8 +74,10 @@ public class ClassPropertyValuesResourceImpl extends XWikiResource implements Cl
     {
         DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
         ClassPropertyReference classPropertyReference = new ClassPropertyReference(propertyName, classReference);
-        if (!this.authorization.hasAccess(Right.VIEW, classPropertyReference)) {
-            throw new WebApplicationException(Status.UNAUTHORIZED);
+        try {
+            this.authorization.checkAccess(Right.VIEW, classPropertyReference);
+        } catch (AccessDeniedException e) {
+            throw new WebApplicationException(e, Status.UNAUTHORIZED);
         }
         if (!exists(classPropertyReference)) {
             throw new WebApplicationException(Status.NOT_FOUND);

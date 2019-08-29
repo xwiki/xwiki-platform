@@ -220,7 +220,7 @@ platform.appwithinminutes.deleteAppNotSpecifiedError=Aucun nom d'application n'a
 
 ### Rename Application
 appWithinMinutes.renameApp.changeAppTitleInfo=Vous pouvez modifier le titre de l'application sans la renommer, simplement en éditant sa page d'accueil.
-appWithinMinutes.renameApp.regenerateAppCodeWarning=Le code de l'application va être généré à nouveau si vous renommer l'application. Les personnalisations apportées au code seront par conséquent écrasées.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=Le code de l'application va être généré à nouveau si vous renommez l'application. Les personnalisations apportées au code de l'application seront par conséquent écrasées.
 appWithinMinutes.renameApp.newName.label=Nouveau nom
 appWithinMinutes.renameApp.pageExistsError=Une page portant ce nom existe déjà à l'emplacement sélectionné.
 appWithinMinutes.renameApp.locationForbiddenError=Vous n'êtes pas autorisés à déplacer l'application à l'emplacement sélectionné.

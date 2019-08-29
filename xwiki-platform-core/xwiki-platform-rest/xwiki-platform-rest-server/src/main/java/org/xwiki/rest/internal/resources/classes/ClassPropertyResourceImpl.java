@@ -67,11 +67,7 @@ public class ClassPropertyResourceImpl extends XWikiResource implements ClassPro
             Utils.getXWikiContext(componentManager).setWikiId(wikiName);
 
             DocumentReference classReference = this.resolver.resolve(className, new WikiReference(wikiName));
-            try {
-                this.authorization.checkAccess(Right.VIEW, classReference);
-            } catch (AccessDeniedException e) {
-                throw new WebApplicationException(e, Status.UNAUTHORIZED);
-            }
+            this.authorization.checkAccess(Right.VIEW, classReference);
             com.xpn.xwiki.api.Class xwikiClass = Utils.getXWikiApi(componentManager).getClass(classReference);
             if (xwikiClass == null) {
                 throw new WebApplicationException(Status.NOT_FOUND);
@@ -95,6 +91,8 @@ public class ClassPropertyResourceImpl extends XWikiResource implements ClassPro
             throw new WebApplicationException(Status.NOT_FOUND);
         } catch (XWikiException e) {
             throw new XWikiRestException(e);
+        } catch (AccessDeniedException e) {
+            throw new WebApplicationException(e, Status.UNAUTHORIZED);
         } finally {
             Utils.getXWikiContext(componentManager).setWikiId(database);
         }

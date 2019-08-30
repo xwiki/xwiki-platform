@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.xwiki.diff.Conflict;
+import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.LogQueue;
 import org.xwiki.stability.Unstable;
 
@@ -123,6 +124,8 @@ public class MergeManagerResult<R, C>
      */
     public boolean hasConflicts()
     {
-        return !this.getConflicts().isEmpty();
+        // TODO: only the list of conflicts should be considered here: the various merge operation should
+        // create proper conflicts, and not log errors.
+        return !(this.getConflicts().isEmpty() && this.log.getLogs(LogLevel.ERROR).isEmpty());
     }
 }

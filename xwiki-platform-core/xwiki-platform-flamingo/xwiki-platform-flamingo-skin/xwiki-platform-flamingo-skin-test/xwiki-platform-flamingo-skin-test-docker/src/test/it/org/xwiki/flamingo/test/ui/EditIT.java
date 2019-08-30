@@ -680,6 +680,7 @@ public class EditIT
             + "\nAnother line with small changes."
             + "\nAnother edit from the second tab.");
         editConflictModal.submitCurrentChoice(true);
+        setup.getDriver().waitUntilPageIsReloaded();
 
         wikiEditPageTab1 = new WikiEditPage();
         assertEquals("Another completely different change for the first line."

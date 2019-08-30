@@ -85,6 +85,11 @@ textarea.diff-decision {
   display: inline-block;
 }
 
+/* Prevent displaying the maximize link */
+.diff-line .fullScreenEditLinkContainer {
+  display: none;
+}
+
 .diff-choices {
   float: right;
 }

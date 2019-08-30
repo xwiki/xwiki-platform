@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
+import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
@@ -340,7 +342,22 @@ public class SaveAction extends PreviewAction
                     // we also need to check the object diff, to be sure there's no conflict with the inline form.
                     List<List<ObjectDiff>> objectDiff =
                         originalDoc.getObjectDiff(previousVersion.toString(), latestVersion.toString(), context);
-                    if (contentDiff.isEmpty() && objectDiff.isEmpty()) {
+
+                    // we finally check the metadata: we want to get a conflict if the title changed, or the syntax,
+                    // the default language etc.
+                    // However we have to filter out the author: we don't care if the author reference changed and it's
+                    // actually most certainly the case if we are here.
+                    List<MetaDataDiff> metaDataDiff =
+                        originalDoc.getMetaDataDiff(previousVersion.toString(), latestVersion.toString(), context);
+
+                    List<MetaDataDiff> filteredMetaDataDiff = new ArrayList<>();
+                    for (MetaDataDiff dataDiff : metaDataDiff) {
+                        if (!dataDiff.getField().equals("author")) {
+                            filteredMetaDataDiff.add(dataDiff);
+                        }
+                    }
+
+                    if (contentDiff.isEmpty() && objectDiff.isEmpty() && filteredMetaDataDiff.isEmpty()) {
                         return false;
                     } else {
                         MergeResult mergeResult =

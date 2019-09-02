@@ -783,8 +783,8 @@
   #if ($timestamps.size() == 2)
     #if ($whereParams.entrySet())
       #set ($whereSql = "${whereSql} and $dateProperty &gt;= :${dateProperty}1 and $dateProperty &lt;= :${dateProperty}2")
-      #set ($discard = $whereParams.put($dateProperty, $datetool.toDate($mathtool.toNumber($timestamps[0]))))
-      #set ($discard = $whereParams.put($dateProperty, $datetool.toDate($mathtool.toNumber($timestamps[1]))))
+      #set ($discard = $whereParams.put("${dateProperty}1", $datetool.toDate($mathtool.toNumber($timestamps[0]))))
+      #set ($discard = $whereParams.put("${dateProperty}2", $datetool.toDate($mathtool.toNumber($timestamps[1]))))
     #else
       #set ($whereSql = "${whereSql} and $dateProperty &gt;= ? and $dateProperty &lt;= ?")
       #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[0]))))

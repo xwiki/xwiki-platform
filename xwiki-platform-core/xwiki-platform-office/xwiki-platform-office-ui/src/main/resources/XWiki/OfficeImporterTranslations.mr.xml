@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.OfficeImporterTranslations" locale="mr">
+  <web>XWiki</web>
+  <name>OfficeImporterTranslations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.OfficeImporter</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>office.createForm.type.name=ऑफिस मधील पान
+office.createForm.type.description=विकी पानांमध्ये कार्यालयाची कागदपत्रे आयात करा
+office.form.error.noDocument=ऑफिस दस्तऐवज आयात करण्यासाठी आपण {0} कृती तयार करा {1} वापरणे आवश्यक आहे.
+office.form.append.hint=दस्तऐवज आधीपासून विद्यमान आहे! परिणाम विद्यमान विकी पृष्ठावर जोडा
+
+office.config.serverType.hint=ऑफिस सर्व्हर प्रकार. हे अंतर्गत व्यवस्थापित (स्थानिक) किंवा बाह्य (रिमोट) केले जाऊ शकते.
+office.config.serverPort.hint=Office सर्व्हरच्या उदाहरणाशी कनेक्ट होण्यासाठी वापरलेला पोर्ट क्रमांक
+office.config.autoStart.hint=ऑफिस सर्व्हर Xwiki स्टार्टअपवेळी स्वयंचलितरित्या चालू / कनेक्ट केलेला असेल तर निर्दिष्ट करा
+office.config.serverPath.hint=ऑफिस स्थापनेचा मार्ग</content>
+  
+</xwikidoc>

@@ -24,6 +24,7 @@ import javax.script.ScriptContext;
 import org.xwiki.script.ScriptContextManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -99,11 +100,11 @@ public class ComputedFieldClass extends PropertyClass
      * @return the computed property value
      * @since 11.8
      */
-    public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context)
+    public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context) throws
+            Exception
     {
         String script = getScript();
 
-        try {
             ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
             scontext.setAttribute("name", name, ScriptContext.ENGINE_SCOPE);
             scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
@@ -114,11 +115,6 @@ public class ComputedFieldClass extends PropertyClass
 
             return renderContentInContext(script, classDocument.getSyntax().toIdString(),
                     classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
-
-        } catch (Exception e) {
-            // TODO: append a rendering style complete error instead
-            return e.getMessage();
-        }
     }
 
     @Override
@@ -139,7 +135,12 @@ public class ComputedFieldClass extends PropertyClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        buffer.append(getComputedValue(name, prefix, object, context));
+        try {
+            buffer.append(getComputedValue(name, prefix, object, context));
+        } catch (Exception e) {
+            // TODO: append a rendering style complete error instead
+            buffer.append(e.getMessage());
+        }
     }
 
     @Override

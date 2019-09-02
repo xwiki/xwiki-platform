@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>WikiManager</web>
+  <name>CommonTranslations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.wikis=विकी
+admin.wikis.descriptor=वर्णनकर्ता
+admin.wikis.descriptor.description=विकी वर्णनकर्ता कॉन्फिगर करा
+admin.wiki.description=आपल्या विकीचे वर्णन करा (सुंदर नाव आणि वर्णन) आणि त्याचा मालक आणि मुख्यपृष्ठ सेट करा.
+platform.wiki.admin.wiki.ownerProblemConfirmation=नवीन मालकाचा वापरकर्ता विद्यमान नाही किंवा हा वेगळ्या विकीमधून येऊ शकेल. \\n आपणास खात्री आहे की आपण तो वापरू इच्छिता आणि सेव्ह ऑपरेशन सुरू ठेऊ इच्छिता?
+platform.wiki.admin.wiki.csrfInvalidError=अवैध सुरक्षा (सीएसआरएफ) टोकन. कृपया पृष्ठ रीफ्रेश करा आणि पुन्हा प्रयत्न करा.
+platform.wiki.admin.wiki.requiredFieldsError='मुख्यपृष्ठ' फील्ड रिक्त असू शकत नाही.
+platform.wiki.admin.wiki.ownerWarning=चेतावणीः एकदा आपण हे बदलल्यानंतर मागील मालक त्यांचे मालक हक्क गमावतील. जर ते आपण असाल तर आपण स्वत: ला विकीपासून दूर ठेवलेले नाही याची खात्री करा. चुकून असे झाल्यास, आपणास मुख्य विकीच्या प्रशासकांशी संपर्क साधण्याची किंवा सुपर ऍडमिन खाते वापरण्याची आवश्यकता असेल.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.4RC1
+#######################################
+### Missing: admin.wiki=Wiki
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
+  
+</xwikidoc>

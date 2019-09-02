@@ -99,7 +99,8 @@ public class ComputedFieldClass extends PropertyClass
      * @return the computed property value
      * @since 11.8
      */
-    public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context) {
+    public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context)
+    {
         String script = getScript();
 
         try {

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>WikiManager</web>
+  <name>CommonTranslations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.wikis=Wikis
+admin.wikis.descriptor=Bezeichreibung
+admin.wikis.descriptor.description=Konfigurieren der Wiki-Beschreibung
+admin.wiki.description=Beschreibt das Wiki (Name und Beschreibung) und setzt seinen Besitzer und seine Homepage.
+platform.wiki.admin.wiki.ownerProblemConfirmation=Der Benutzer des neuen Besitzers existiert nicht oder er kann von einem anderen Wiki stammen.\\nSind Sie sicher, dass Sie ihn verwenden und mit dem Speichervorgang fortfahren möchten?
+platform.wiki.admin.wiki.csrfInvalidError=Ungültiges Security (CSRF)-Token. Bitte aktualisieren Sie die Seite und versuchen Sie es erneut.
+platform.wiki.admin.wiki.requiredFieldsError=Das Feld 'Homepage' darf nicht leer sein.
+platform.wiki.admin.wiki.ownerWarning=Warnung: Sobald Sie dies ändern, verliert der Vorbesitzer seine Besitzerrechte. Wenn Sie das sind, stellen Sie sicher, dass Sie sich nicht aus dem Wiki ausschließen. Wenn dies versehentlich geschieht, müssen Sie sich an die Administratoren des Hauptwikis wenden oder das Superadmin-Konto verwenden.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.4RC1
+#######################################
+### Missing: admin.wiki=Wiki
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
+  
+</xwikidoc>

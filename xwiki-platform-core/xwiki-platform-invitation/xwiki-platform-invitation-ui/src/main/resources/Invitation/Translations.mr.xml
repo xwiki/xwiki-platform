@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="Invitation.Translations" locale="mr">
+  <web>Invitation</web>
+  <name>Translations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Invitation.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>invitation.applicationsPanelEntryLabel=आमंत्रण
+
+# Invitation Administration Section
+Invitation.WebHome_from_address.hint=कडील आमंत्रण ईमेल पाठविण्यासाठी वापरलेला ईमेल पत्ता.
+Invitation.WebHome_smtp_server_password.hint=एसएमटीपी सर्व्हरशी कनेक्ट होण्यासाठी संकेतशब्द, फक्त जेव्हा प्रमाणीकरण आवश्यक असेल.
+Invitation.WebHome_smtp_server_username.hint=एसएमटीपी सर्व्हरशी कनेक्ट होण्यासाठी वापरकर्तानाव, केवळ जेव्हा प्रमाणीकरण आवश्यक असेल.
+Invitation.WebHome_smtp_port.hint=वापरण्यासाठी एसएमटीपी सर्व्हरचे पोर्ट.
+Invitation.WebHome_smtp_server.hint=पाठविण्यासाठी एसएमटीपी सर्व्हर.
+Invitation.WebHome_javamail_extra_props.hint=वापरण्यासाठी अतिरिक्त जावामेल गुणधर्मांची यादी.</content>
+  
+</xwikidoc>

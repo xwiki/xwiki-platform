@@ -779,12 +779,13 @@
   #else
     #set ($dateProperty = "${safe_tableAlias}.value")
   #end
+  #set($safeDateProperty = $dateProperty.replace('.', '_'))
   #set ($timestamps = $filterValue.split('-'))
   #if ($timestamps.size() == 2)
     #if ($whereParams.entrySet())
-      #set ($whereSql = "${whereSql} and $dateProperty &gt;= :${dateProperty}1 and $dateProperty &lt;= :${dateProperty}2")
-      #set ($discard = $whereParams.put("${dateProperty}1", $datetool.toDate($mathtool.toNumber($timestamps[0]))))
-      #set ($discard = $whereParams.put("${dateProperty}2", $datetool.toDate($mathtool.toNumber($timestamps[1]))))
+      #set ($whereSql = "${whereSql} and $dateProperty &gt;= :${safeDateProperty}1 and $dateProperty &lt;= :${safeDateProperty}2")
+      #set ($discard = $whereParams.put("${safeDateProperty}1", $datetool.toDate($mathtool.toNumber($timestamps[0]))))
+      #set ($discard = $whereParams.put("${safeDateProperty}2", $datetool.toDate($mathtool.toNumber($timestamps[1]))))
     #else
       #set ($whereSql = "${whereSql} and $dateProperty &gt;= ? and $dateProperty &lt;= ?")
       #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[0]))))
@@ -793,8 +794,8 @@
   #else
     ## Fall back to the older string matching
     #if ($whereParams.entrySet())
-      #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(:$dateProperty)")
-      #set ($discard = $whereParams.put($dateProperty, "%$filterValue%"))
+      #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(:$safeDateProperty)")
+      #set ($discard = $whereParams.put($safeDateProperty, "%$filterValue%"))
     #else
       #set ($whereSql = "${whereSql} and upper(str($dateProperty)) like upper(?)")
       #set ($discard = $whereParams.add("%$filterValue%"))

@@ -93,6 +93,7 @@ public class ComputedFieldClass extends PropertyClass
 
     /**
      * Computes and returns the raw value of this property for a given object.
+     *
      * @param name property name
      * @param prefix prefix to be added
      * @param object object for which the property value has to get computed
@@ -105,16 +106,16 @@ public class ComputedFieldClass extends PropertyClass
     {
         String script = getScript();
 
-            ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
-            scontext.setAttribute("name", name, ScriptContext.ENGINE_SCOPE);
-            scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
-            scontext.setAttribute("object", new com.xpn.xwiki.api.Object((BaseObject) object, context),
-                    ScriptContext.ENGINE_SCOPE);
+        ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
+        scontext.setAttribute("name", name, ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
+        scontext.setAttribute("object", new com.xpn.xwiki.api.Object((BaseObject) object, context),
+                ScriptContext.ENGINE_SCOPE);
 
-            XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
+        XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
 
-            return renderContentInContext(script, classDocument.getSyntax().toIdString(),
-                    classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
+        return renderContentInContext(script, classDocument.getSyntax().toIdString(),
+                classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
     }
 
     @Override
@@ -133,7 +134,7 @@ public class ComputedFieldClass extends PropertyClass
 
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
-        XWikiContext context)
+            XWikiContext context)
     {
         try {
             buffer.append(getComputedValue(name, prefix, object, context));
@@ -145,14 +146,14 @@ public class ComputedFieldClass extends PropertyClass
 
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
-        XWikiContext context)
+            XWikiContext context)
     {
         displayView(buffer, name, prefix, object, context);
     }
 
     @Override
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
-        XWikiContext context)
+            XWikiContext context)
     {
     }
 }

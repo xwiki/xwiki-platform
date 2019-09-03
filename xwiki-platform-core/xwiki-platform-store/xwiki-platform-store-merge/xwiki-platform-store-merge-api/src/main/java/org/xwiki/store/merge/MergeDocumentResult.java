@@ -168,10 +168,15 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
      */
     public void putMergeResult(DocumentPart documentPart, MergeManagerResult mergeManagerResult)
     {
-        this.mergeResults.put(documentPart, mergeManagerResult);
-        this.getLog().addAll(mergeManagerResult.getLog());
-        this.getConflicts().addAll(mergeManagerResult.getConflicts());
-        this.setModified(isModified() || mergeManagerResult.isModified());
+        if (!this.mergeResults.containsKey(documentPart)) {
+            this.mergeResults.put(documentPart, mergeManagerResult);
+            this.getLog().addAll(mergeManagerResult.getLog());
+            this.getConflicts().addAll(mergeManagerResult.getConflicts());
+            this.setModified(isModified() || mergeManagerResult.isModified());
+        } else {
+            throw new IllegalArgumentException(
+                String.format("The merge result of document part [%s] has already been put.", documentPart.name()));
+        }
     }
 
     /**

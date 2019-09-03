@@ -37,7 +37,10 @@ public class Conflict extends BaseElement
 {
     private static final String DECISION_ID = "conflict_decision_value_%s_%s";
     private static final String DECISION_SELECT_ID = "conflict_decision_select_%s";
+    private static final String DECISION_CONTAINER_ID = "conflict_decision_container_%s";
     private static final String DECISION_CLASSNAME = "diff-decision";
+
+    private WebElement container;
 
     /**
      * The available decisions to solve the conflict.
@@ -74,6 +77,7 @@ public class Conflict extends BaseElement
     public Conflict(String conflictReference)
     {
         this.conflictReference = conflictReference;
+        this.container = getDriver().findElement(By.id(String.format(DECISION_CONTAINER_ID, conflictReference)));
     }
 
     /**
@@ -81,7 +85,7 @@ public class Conflict extends BaseElement
      */
     public String getDecisionChange()
     {
-        List<WebElement> decisions = getDriver().findElements(By.className(DECISION_CLASSNAME));
+        List<WebElement> decisions = this.container.findElements(By.className(DECISION_CLASSNAME));
         for (WebElement decision : decisions) {
             if (decision.isDisplayed()) {
                 return decision.getText();
@@ -96,7 +100,7 @@ public class Conflict extends BaseElement
      */
     public boolean isDecisionChangeEmpty()
     {
-        List<WebElement> decisions = getDriver().findElements(By.className(DECISION_CLASSNAME));
+        List<WebElement> decisions = this.container.findElements(By.className(DECISION_CLASSNAME));
         for (WebElement decision : decisions) {
             if (decision.isDisplayed()) {
                 return decision.getAttribute("class").contains("empty-decision-value");
@@ -120,7 +124,7 @@ public class Conflict extends BaseElement
      */
     public DecisionType getCurrentDecision()
     {
-        List<WebElement> decisions = getDriver().findElements(By.className(DECISION_CLASSNAME));
+        List<WebElement> decisions = this.container.findElements(By.className(DECISION_CLASSNAME));
         for (WebElement decision : decisions) {
             if (decision.isDisplayed()) {
                 String id = decision.getAttribute("id");

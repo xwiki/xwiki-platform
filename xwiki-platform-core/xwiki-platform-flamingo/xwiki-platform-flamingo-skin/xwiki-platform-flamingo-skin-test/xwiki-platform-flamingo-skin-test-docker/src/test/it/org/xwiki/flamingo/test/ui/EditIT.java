@@ -670,7 +670,7 @@ public class EditIT
         editConflictModal = new EditConflictModal();
         assertTrue(editConflictModal.isDisplayed());
         assertEquals(EditConflictModal.ConflictChoice.MERGE, editConflictModal.getCurrentChoice());
-        assertEquals(Arrays.asList("@@ -1,6 +1,7 @@",
+        assertEquals(Arrays.asList("@@ -1,6 +1,6 @@",
             " First line.",
             "-<del>L</del>ine<del> N°2</del>",
             "-<del>Th</del>i<del>rd li</del>ne<del>.</del>",

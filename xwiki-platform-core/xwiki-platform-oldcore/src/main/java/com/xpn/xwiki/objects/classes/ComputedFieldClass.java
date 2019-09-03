@@ -99,7 +99,7 @@ public class ComputedFieldClass extends PropertyClass
      * @param object object for which the property value has to get computed
      * @param context current context
      * @return the computed property value
-     * @since 11.8
+     * @since 11.8RC1
      */
     public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context) throws
             Exception
@@ -134,7 +134,7 @@ public class ComputedFieldClass extends PropertyClass
 
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
-            XWikiContext context)
+        XWikiContext context)
     {
         try {
             buffer.append(getComputedValue(name, prefix, object, context));
@@ -146,14 +146,14 @@ public class ComputedFieldClass extends PropertyClass
 
     @Override
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object,
-            XWikiContext context)
+        XWikiContext context)
     {
         displayView(buffer, name, prefix, object, context);
     }
 
     @Override
     public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
-            XWikiContext context)
+        XWikiContext context)
     {
     }
 }

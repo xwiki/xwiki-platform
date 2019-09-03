@@ -128,7 +128,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
  * Various common tools for resources.
- * 
+ *
  * @version $Id$
  * @since 7.3M1
  */
@@ -987,7 +987,7 @@ public class ModelFactory
      * @param context the XWikiContext
      * @return the String representation of the property value
      */
-    private static String serializePropertyValue(PropertyInterface property,
+    private String serializePropertyValue(PropertyInterface property,
         com.xpn.xwiki.objects.classes.PropertyClass propertyClass, XWikiContext context)
     {
         if (propertyClass instanceof ComputedFieldClass) {
@@ -998,6 +998,10 @@ public class ModelFactory
                 context.setDoc(property.getObject().getOwnerDocument());
                 ComputedFieldClass computedFieldClass = (ComputedFieldClass) propertyClass;
                 return computedFieldClass.getComputedValue(propertyClass.getName(), "", property.getObject(), context);
+            } catch (Exception e) {
+                logger.error("Error while computing property value [{}] of [{}]", propertyClass.getName(),
+                        property.getObject(), e);
+                return serializePropertyValue(property);
             } finally {
                 // Reset the context document to its original value, even if an exception is raised.
                 context.setDoc(document);

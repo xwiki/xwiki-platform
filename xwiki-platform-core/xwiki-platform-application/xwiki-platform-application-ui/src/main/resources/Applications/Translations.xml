@@ -75,5 +75,5 @@
     </property>
   </object>
   <content>application.index.title=Application Index
-application.index.drawer=wikiweb=\\u7EF4\\u57FA\nwikiname=\\u9875\\u9762\nparent=\\u7236\n</content>
+application.index.drawer=Application Index\n</content>
 </xwikidoc>

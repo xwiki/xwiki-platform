@@ -31,10 +31,10 @@
   <td class="diff-line-number"><span class="fa fa-pencil"></span></td>
   <td class="diff-line-number"></td>
   <td class="diff-line">
-    <span class="diff-decision" id="conflict_decision_value_current_$block.conflict.reference">$stringtool.join($block.conflict.currentElement, "<br/>")</span>
-    <span class="diff-decision" id="conflict_decision_value_previous_$block.conflict.reference" style="display: none">$stringtool.join($block.conflict.previousElement, "<br/>")</span>
-    <span class="diff-decision" id="conflict_decision_value_next_$block.conflict.reference" style="display: none">$stringtool.join($block.conflict.nextElement, "<br/>")</span>
-    <textarea class="form-control diff-decision" id="conflict_decision_value_custom_$block.conflict.reference" style="display: none"></textarea>
+    #displayConflictValue($block.conflict "current")
+    #displayConflictValue($block.conflict "previous")
+    #displayConflictValue($block.conflict "next")
+    <textarea class="form-control diff-decision" id="conflict_decision_value_custom_$block.conflict.reference"></textarea>
     <input type="hidden" id="conflict_id_$block.conflict.reference" name="conflict_id" value="$block.conflict.reference" />
     <select class="diff-choices" id="conflict_decision_select_$block.conflict.reference" name="conflict_decision_select">
       <option value="current" selected="selected">$services.localization.render("core.editors.save.previewDiff.versionToCompare.current")</option>
@@ -44,6 +44,25 @@
     </select>
   </td>
 </tr>
+#end
+
+#macro (displayConflictValue $conflict $version)
+  #set ($spanId = "conflict_decision_value_${version}_${conflict.reference}")
+  #set ($value = [])
+  #if ($version == "current")
+    #set ($value = $conflict.currentElement)
+  #elseif ($version == "previous")
+    #set ($value = $conflict.previousElement)
+  #elseif ($version == "next")
+    #set ($value = $conflict.nextElement)
+  #end
+  #if ($value.isEmpty())
+    #set ($spanClass = "diff-decision empty-decision-value")
+    #set ($value = [$services.localization.render("core.editors.save.previewDiff.emptyDecisionValue")])
+  #else
+    #set ($spanClass = "diff-decision")
+  #end
+  <span class="$spanClass" id="$spanId">$stringtool.join($value, "<br/>")</span>
 #end
 
 #macro (displayPropertyDiff $propertyName $previousValue $newValue $_obfuscate $conflicts)

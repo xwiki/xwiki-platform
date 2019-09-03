@@ -91,6 +91,21 @@ public class Conflict extends BaseElement
     }
 
     /**
+     * @return {@code true} if the current decision value is empty, i.e. it announces that the inserted value will be
+     * removed.
+     */
+    public boolean isDecisionChangeEmpty()
+    {
+        List<WebElement> decisions = getDriver().findElements(By.className(DECISION_CLASSNAME));
+        for (WebElement decision : decisions) {
+            if (decision.isDisplayed()) {
+                return decision.getAttribute("class").contains("empty-decision-value");
+            }
+        }
+        throw new NoSuchElementException("Cannot find any visible decision.");
+    }
+
+    /**
      * Change the decision with the given type.
      * @param type the decision to be taken.
      */

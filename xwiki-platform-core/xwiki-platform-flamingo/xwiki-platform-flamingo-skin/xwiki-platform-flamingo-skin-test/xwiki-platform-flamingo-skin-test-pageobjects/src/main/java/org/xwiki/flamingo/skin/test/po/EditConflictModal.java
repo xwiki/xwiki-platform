@@ -53,7 +53,12 @@ public class EditConflictModal extends BaseModal
         /**
          * Reload choice.
          */
-        RELOAD
+        RELOAD,
+
+        /**
+         * Custom conflict fix choice.
+         */
+        CUSTOM
     }
 
     /**
@@ -95,6 +100,9 @@ public class EditConflictModal extends BaseModal
 
     @FindBy(id = "actionMergeRadio")
     private WebElement mergeChoice;
+
+    @FindBy(id = "actionCustomRadio")
+    private WebElement customChoice;
 
     @FindBy(id = "cancelDiffButton")
     private WebElement cancelButton;
@@ -158,6 +166,10 @@ public class EditConflictModal extends BaseModal
                 this.reloadChoice.click();
                 break;
 
+            case CUSTOM:
+                this.customChoice.click();
+                break;
+
             default:
                 return this;
         }
@@ -169,7 +181,7 @@ public class EditConflictModal extends BaseModal
         return new EditConflictModal();
     }
 
-    /*
+    /**
      * Chose an option to solve the conflict and submit it immediately.
      * @param choice the choice to make
      * @param waitSuccess if true, wait for the saved notification.
@@ -262,5 +274,13 @@ public class EditConflictModal extends BaseModal
             }
         } catch (StaleElementReferenceException e) {
         }
+    }
+
+    /**
+     * @return {@code true} if the options to change the diff is available.
+     */
+    public boolean isPreviewDiffOptionsAvailable()
+    {
+        return getDriver().hasElementWithoutWaiting(By.className("previewdiff-diff-options"));
     }
 }

@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.resources.objects;
 
 import java.util.List;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
@@ -32,6 +33,8 @@ import org.xwiki.rest.internal.Utils;
 import org.xwiki.rest.model.jaxb.ObjectSummary;
 import org.xwiki.rest.model.jaxb.Objects;
 import org.xwiki.rest.resources.objects.AllObjectsForClassNameResource;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -44,6 +47,9 @@ import com.xpn.xwiki.objects.BaseObject;
 @Named("org.xwiki.rest.internal.resources.objects.AllObjectsForClassNameResourceImpl")
 public class AllObjectsForClassNameResourceImpl extends XWikiResource implements AllObjectsForClassNameResource
 {
+    @Inject
+    private ContextualAuthorizationManager authorization;
+
     @Override
     public Objects getObjects(String wikiName, String className, Integer start, Integer number, String order,
             Boolean withPrettyNames) throws XWikiRestException
@@ -68,18 +74,22 @@ public class AllObjectsForClassNameResourceImpl extends XWikiResource implements
 
             for (Object object : queryResult) {
                 Object[] fields = (Object[]) object;
-
                 XWikiDocument xwikiDocument = (XWikiDocument) fields[0];
                 xwikiDocument.setDatabase(wikiName);
-                Document doc = new Document(xwikiDocument, Utils.getXWikiContext(componentManager));
-                BaseObject xwikiObject = (BaseObject) fields[1];
 
-                ObjectSummary objectSummary = DomainObjectFactory
+                if (authorization.hasAccess(Right.VIEW, xwikiDocument.getDocumentReference())) {
+
+                    Document doc = new Document(xwikiDocument, Utils.getXWikiContext(componentManager));
+
+                    BaseObject xwikiObject = (BaseObject) fields[1];
+
+                    ObjectSummary objectSummary = DomainObjectFactory
                         .createObjectSummary(objectFactory, uriInfo.getBaseUri(), Utils.getXWikiContext(
-                                componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager),
-                                withPrettyNames);
+                            componentManager), doc, xwikiObject, false, Utils.getXWikiApi(componentManager),
+                            withPrettyNames);
 
-                objects.getObjectSummaries().add(objectSummary);
+                    objects.getObjectSummaries().add(objectSummary);
+                }
             }
 
             return objects;

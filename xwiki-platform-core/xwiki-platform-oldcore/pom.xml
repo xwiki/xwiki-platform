@@ -70,12 +70,12 @@
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j</artifactId>
-      <version>1.0.0-rc3</version>
+      <version>1.0.0-rc5</version>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
-      <version>1.0.0-rc3</version>
+      <version>1.0.0-rc5</version>
     </dependency>
 
     <!-- Standard dependencies found in the central repository -->

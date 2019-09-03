@@ -128,7 +128,7 @@ import com.xpn.xwiki.objects.classes.ListClass;
 
 /**
  * Various common tools for resources.
- *
+ * 
  * @version $Id$
  * @since 7.3M1
  */

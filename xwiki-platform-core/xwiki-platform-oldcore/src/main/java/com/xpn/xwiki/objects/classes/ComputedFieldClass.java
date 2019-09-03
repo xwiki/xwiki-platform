@@ -24,7 +24,6 @@ import javax.script.ScriptContext;
 import org.xwiki.script.ScriptContextManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -91,33 +90,6 @@ public class ComputedFieldClass extends PropertyClass
         return sValue;
     }
 
-    /**
-     * Computes and returns the raw value of this property for a given object.
-     *
-     * @param name property name
-     * @param prefix prefix to be added
-     * @param object object for which the property value has to get computed
-     * @param context current context
-     * @return the computed property value
-     * @since 11.8RC1
-     */
-    public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context) throws
-            Exception
-    {
-        String script = getScript();
-
-        ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
-        scontext.setAttribute("name", name, ScriptContext.ENGINE_SCOPE);
-        scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
-        scontext.setAttribute("object", new com.xpn.xwiki.api.Object((BaseObject) object, context),
-                ScriptContext.ENGINE_SCOPE);
-
-        XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
-
-        return renderContentInContext(script, classDocument.getSyntax().toIdString(),
-                classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
-    }
-
     @Override
     public BaseProperty fromString(String value)
     {
@@ -136,8 +108,21 @@ public class ComputedFieldClass extends PropertyClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
+        String script = getScript();
+
         try {
-            buffer.append(getComputedValue(name, prefix, object, context));
+            ScriptContext scontext = Utils.getComponent(ScriptContextManager.class).getCurrentScriptContext();
+            scontext.setAttribute("name", name, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("prefix", prefix, ScriptContext.ENGINE_SCOPE);
+            scontext.setAttribute("object", new com.xpn.xwiki.api.Object((BaseObject) object, context),
+                ScriptContext.ENGINE_SCOPE);
+
+            XWikiDocument classDocument = object.getXClass(context).getOwnerDocument();
+
+            String result = renderContentInContext(script, classDocument.getSyntax().toIdString(),
+                classDocument.getAuthorReference(), classDocument.getDocumentReference(), context);
+
+            buffer.append(result);
         } catch (Exception e) {
             // TODO: append a rendering style complete error instead
             buffer.append(e.getMessage());

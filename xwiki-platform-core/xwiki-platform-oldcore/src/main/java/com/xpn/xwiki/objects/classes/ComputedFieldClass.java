@@ -24,7 +24,6 @@ import javax.script.ScriptContext;
 import org.xwiki.script.ScriptContextManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -99,6 +98,7 @@ public class ComputedFieldClass extends PropertyClass
      * @param object object for which the property value has to get computed
      * @param context current context
      * @return the computed property value
+     * @throws Exception in case an error occurs
      * @since 11.8RC1
      */
     public String getComputedValue(String name, String prefix, BaseCollection object, XWikiContext context) throws

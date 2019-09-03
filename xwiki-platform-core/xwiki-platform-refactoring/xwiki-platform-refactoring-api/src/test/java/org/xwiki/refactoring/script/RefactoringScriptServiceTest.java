@@ -26,6 +26,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.job.Job;
 import org.xwiki.job.JobException;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.model.EntityType;
@@ -41,6 +42,7 @@ import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.ReplaceUserRequest;
 import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -52,6 +54,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -329,5 +332,23 @@ public class RefactoringScriptServiceTest
         this.refactoringScriptService.permanentlyDelete(batchid);
         verify(this.requestFactory).createPermanentlyDeleteRequest(batchid);
         verify(this.jobExecutor).execute(RefactoringJobs.PERMANENTLY_DELETE, permanentlyDeleteRequest);
+    }
+
+    @Test
+    public void changeDocumentAuthor() throws Exception
+    {
+        DocumentReference alice = new DocumentReference("dev", "Users", "Alice");
+        DocumentReference bob = new DocumentReference("test", "Users", "Bob");
+
+        ReplaceUserRequest request = mock(ReplaceUserRequest.class);
+        when(this.requestFactory.createReplaceUserRequest(alice, bob)).thenReturn(request);
+
+        Job job = mock(Job.class);
+        when(this.jobExecutor.execute(RefactoringJobs.REPLACE_USER, request)).thenReturn(job);
+
+        assertSame(job, this.refactoringScriptService.changeDocumentAuthor(alice, bob));
+
+        verify(request).setReplaceDocumentAuthor(true);
+        verify(request).setReplaceDocumentContentAuthor(true);
     }
 }

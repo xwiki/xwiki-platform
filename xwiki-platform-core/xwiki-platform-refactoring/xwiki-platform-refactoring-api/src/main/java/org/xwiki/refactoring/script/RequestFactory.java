@@ -25,16 +25,18 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
@@ -44,7 +46,11 @@ import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.ReplaceUserRequest;
 import org.xwiki.refactoring.job.RestoreRequest;
+import org.xwiki.stability.Unstable;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 /**
  * Factory dedicated to the creation of the requests.
@@ -56,6 +62,9 @@ import org.xwiki.refactoring.job.RestoreRequest;
 @Singleton
 public class RequestFactory
 {
+    @Inject
+    private Logger logger;
+    
     /**
      * Needed for getting the current user reference.
      */
@@ -63,7 +72,7 @@ public class RequestFactory
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
-    private ModelContext modelContext;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     /**
      * @param type the type of refactoring
@@ -339,17 +348,55 @@ public class RequestFactory
 
     private WikiReference getCurrentWikiReference()
     {
-        WikiReference result = null;
+        String currentWikiId = this.wikiDescriptorManager.getCurrentWikiId();
+        return currentWikiId != null ? new WikiReference(currentWikiId) : null;
+    }
 
-        EntityReference currentEntityReference = this.modelContext.getCurrentEntityReference();
-        if (currentEntityReference != null) {
-            EntityReference wikiEntityReference =
-                this.modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI);
-            if (wikiEntityReference != null) {
-                result = new WikiReference(wikiEntityReference);
-            }
+    /**
+     * Creates a request to replace the occurrences of the old user reference with the new user reference.
+     * 
+     * @param oldUserReference the old user reference
+     * @param newUserReference the new user reference
+     * @return the request to replace the user reference
+     * @since 11.8RC1
+     */
+    @Unstable
+    public ReplaceUserRequest createReplaceUserRequest(DocumentReference oldUserReference,
+        DocumentReference newUserReference)
+    {
+        ReplaceUserRequest request = new ReplaceUserRequest();
+        request.setId(generateJobId(RefactoringJobs.REPLACE_USER));
+        request.setOldUserReference(oldUserReference);
+        request.setNewUserReference(newUserReference);
+        setRightsProperties(request);
+
+        Collection<String> targetWikis = null;
+        if (oldUserReference != null) {
+            targetWikis = getReplaceUserTargetWikis(oldUserReference);
+        } else if (newUserReference != null) {
+            targetWikis = getReplaceUserTargetWikis(newUserReference);
+        }
+        if (targetWikis != null) {
+            request.setEntityReferences(targetWikis.stream().map(WikiReference::new).collect(Collectors.toSet()));
         }
 
-        return result;
+        return request;
+    }
+
+    private Collection<String> getReplaceUserTargetWikis(DocumentReference userReference)
+    {
+        if (userReference.getWikiReference().getName().equals(this.wikiDescriptorManager.getMainWikiId())) {
+            // Global user, replace globally.
+            try {
+                return this.wikiDescriptorManager.getAllIds();
+            } catch (WikiManagerException e) {
+                this.logger.warn("Failed to get the list of wikis. Root cause is [{}].",
+                    ExceptionUtils.getRootCauseMessage(e));
+                return Collections.emptySet();
+            }
+        } else {
+            // Local user, replace locally.
+            return Collections.singleton(userReference.getWikiReference().getName());
+        }
     }
 }

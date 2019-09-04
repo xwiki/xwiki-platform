@@ -29,10 +29,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.xwiki.cache.CacheManager;
+import org.xwiki.diff.ConflictDecision;
+import org.xwiki.diff.internal.DefaultConflictDecision;
 import org.xwiki.diff.internal.DefaultDiffManager;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.test.annotation.ComponentList;
@@ -58,13 +62,34 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ComponentList({ DefaultDiffManager.class })
 @ComponentTest
-public class MergeManagerTest
+public class DefaultMergeManagerTest
 {
     @InjectMockComponents
     private DefaultMergeManager mergeManager;
+
+    @MockComponent
+    private MergeConflictDecisionsManager conflictDecisionsManager;
+
+    private DocumentReference documentReference;
+    private EntityReference userReference;
+    private List<ConflictDecision> conflictDecisionList;
+
+    @BeforeEach
+    public void setup()
+    {
+        this.documentReference = new DocumentReference("xwiki", "Space", "Page");
+        this.userReference = new DocumentReference("xwiki", "XWiki", "User");
+        this.conflictDecisionList = new ArrayList<>();
+
+        when(conflictDecisionsManager.getConflictDecisionList(documentReference, userReference))
+            .thenReturn(conflictDecisionList);
+    }
 
     @Test
     public void mergeWhenDifferences()
@@ -73,81 +98,154 @@ public class MergeManagerTest
             mergeManager.mergeLines("content", "content\n", "content", new MergeConfiguration());
         assertEquals("content\n", result.getMergeResult());
         assertTrue(result.isModified());
+        assertFalse(result.hasConflicts());
+
+        MergeConfiguration mergeConfiguration = new MergeConfiguration();
+        mergeConfiguration.setConcernedDocument(documentReference);
+        mergeConfiguration.setUserReference(userReference);
+
+        result =
+            mergeManager.mergeLines("content", "content\n", "content", mergeConfiguration);
+        assertEquals("content\n", result.getMergeResult());
+        assertTrue(result.isModified());
+        assertFalse(result.hasConflicts());
+        verify(conflictDecisionsManager, times(1)).getConflictDecisionList(documentReference, userReference);
     }
 
     @Test
     public void mergeWhenCurrentStringDoesntEndWithNewLine()
     {
-        MergeManagerResult<String, String> result = mergeManager.mergeLines("content", "content", "content", new MergeConfiguration());
+        MergeManagerResult<String, String> result = mergeManager.mergeLines("content", "content", "content",
+            new MergeConfiguration());
         assertEquals("content", result.getMergeResult());
         assertFalse(result.isModified());
+        assertFalse(result.hasConflicts());
     }
 
     @Test
     public void mergeWhenCurrentStringEndsWithNewLine()
     {
-        MergeManagerResult<String, String> result = mergeManager.mergeLines("content\n", "content\n", "content\n", new MergeConfiguration());
+        MergeManagerResult<String, String> result = mergeManager.mergeLines("content\n", "content\n", "content\n",
+            new MergeConfiguration());
         assertEquals("content\n", result.getMergeResult());
         assertFalse(result.isModified());
+        assertFalse(result.hasConflicts());
     }
 
     @Test
     public void mergeObjectSimple()
     {
-        MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "old", new MergeConfiguration());
+        MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "old",
+            new MergeConfiguration());
         assertEquals("new", result.getMergeResult());
         assertTrue(result.isModified());
+        assertFalse(result.hasConflicts());
     }
 
     @Test
     public void mergeObjectAlreadyDone()
     {
-        MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "new", new MergeConfiguration());
+        MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "new",
+            new MergeConfiguration());
         assertEquals("new", result.getMergeResult());
         assertFalse(result.isModified());
+        assertFalse(result.hasConflicts());
     }
 
     @Test
     public void mergeObjectWhileModified()
     {
-        MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "old modified", new MergeConfiguration());
+        MergeManagerResult<String, String> result = mergeManager.mergeObject("old", "new", "old modified",
+            new MergeConfiguration());
         assertEquals("old modified", result.getMergeResult());
         assertFalse(result.isModified());
         // conflicts are flagged as errors in the log
         assertFalse(result.getLog().getLogs(LogLevel.ERROR).isEmpty());
+        assertTrue(result.hasConflicts());
+
     }
 
     @Test
     public void mergeListSimple()
     {
         List<String> current = new ArrayList<String>(Arrays.asList("old1", "old2"));
-        MergeManagerResult<List<String>, String> result = mergeManager.mergeList(Arrays.asList("old1", "old2"), Arrays.asList("new1", "new2"), current,
-            new MergeConfiguration());
+        MergeManagerResult<List<String>, String> result = mergeManager.mergeList(Arrays.asList("old1", "old2"),
+            Arrays.asList("new1", "new2"), current, new MergeConfiguration());
         assertEquals(Arrays.asList("new1", "new2"), result.getMergeResult());
         assertTrue(result.isModified());
+        assertFalse(result.hasConflicts());
     }
 
     @Test
     public void mergeListAlreadyDone()
     {
         List<String> current = new ArrayList<String>(Arrays.asList("new1", "new2"));
-        MergeManagerResult<List<String>, String> result = mergeManager.mergeList(Arrays.asList("old1", "old2"), Arrays.asList("new1", "new2"), current,
-            new MergeConfiguration());
-        assertEquals(Arrays.asList("new1", "new2"), current);
+        MergeManagerResult<List<String>, String> result = mergeManager.mergeList(Arrays.asList("old1", "old2"),
+            Arrays.asList("new1", "new2"), current, new MergeConfiguration());
+        assertEquals(Arrays.asList("new1", "new2"), result.getMergeResult());
         assertEquals(Arrays.asList("new1", "new2"), current);
         assertFalse(result.isModified());
+        assertFalse(result.hasConflicts());
     }
 
     @Test
     public void mergeListWhileModified()
     {
-        List<String> current = new ArrayList<String>(Arrays.asList("old modified1", "old modified2"));
-        MergeManagerResult<List<String>, String> result = mergeManager.mergeList(Arrays.asList("old1", "old2"), Arrays.asList("new1", "new2"), current,
-            new MergeConfiguration());
-        assertEquals(Arrays.asList("old modified1", "old modified2"), current);
+        List<String> current = new ArrayList<String>(Arrays.asList("new1", "old modified2"));
+        MergeManagerResult<List<String>, String> result = mergeManager.mergeList(Arrays.asList("new1", "old2"),
+            Arrays.asList("new1", "new2"), current, new MergeConfiguration());
+        assertEquals(Arrays.asList("new1", "old modified2"), result.getMergeResult());
         assertFalse(result.isModified());
         // conflicts are flagged as errors in the log
         assertFalse(result.getLog().getLogs(LogLevel.ERROR).isEmpty());
+        assertTrue(result.hasConflicts());
+
+        // Apply a decision to fix the conflict
+        ConflictDecision<String> conflictDecision = new DefaultConflictDecision<>(result.getConflicts().get(0));
+        conflictDecision.setCustom(Arrays.asList("Foo", "Bar", "Thing"));
+        this.conflictDecisionList.add(conflictDecision);
+
+        MergeConfiguration mergeConfiguration = new MergeConfiguration();
+        mergeConfiguration.setUserReference(this.userReference);
+        mergeConfiguration.setConcernedDocument(this.documentReference);
+
+        result = mergeManager.mergeList(Arrays.asList("new1", "old2"),
+            Arrays.asList("new1", "new2"), current, mergeConfiguration);
+        assertEquals(Arrays.asList("new1", "old modified2"), current);
+        assertEquals(Arrays.asList("new1", "Foo", "Bar", "Thing"), result.getMergeResult());
+        assertTrue(result.isModified());
+        assertTrue(result.getLog().getLogs(LogLevel.ERROR).isEmpty());
+        assertFalse(result.hasConflicts());
+    }
+
+    @Test
+    public void mergeCharactersSimple()
+    {
+        MergeManagerResult<String, Character> result =
+            mergeManager.mergeCharacters("ab", "aib", "abc", new MergeConfiguration());
+        assertEquals("aibc", result.getMergeResult());
+        assertTrue(result.isModified());
+        assertFalse(result.hasConflicts());
+    }
+
+    @Test
+    public void mergeCharactersWhileModified()
+    {
+        MergeManagerResult<String, Character> result =
+            mergeManager.mergeCharacters("ab", "aib", "ajb", new MergeConfiguration());
+        assertEquals("ajb", result.getMergeResult());
+        assertFalse(result.isModified());
+        assertTrue(result.hasConflicts());
+    }
+
+    @Test
+    public void mergeCharactersNoChanges()
+    {
+        MergeManagerResult<String, Character> result =
+            mergeManager.mergeCharacters("ab", "ab", "ab", new MergeConfiguration());
+        assertEquals("ab", result.getMergeResult());
+        assertFalse(result.isModified());
+        assertFalse(result.hasConflicts());
     }
 
     @Nested

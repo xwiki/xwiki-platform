@@ -84,7 +84,7 @@ public class DefaultMergeConflictDecisionsManager implements MergeConflictDecisi
         try {
             conflictsCache = cacheManager.createNewCache(cacheConfiguration);
         } catch (CacheException e) {
-            logger.error("Error when creating the cache of conflicts.");
+            logger.error("Error when creating the cache of conflicts.", e);
         }
     }
 

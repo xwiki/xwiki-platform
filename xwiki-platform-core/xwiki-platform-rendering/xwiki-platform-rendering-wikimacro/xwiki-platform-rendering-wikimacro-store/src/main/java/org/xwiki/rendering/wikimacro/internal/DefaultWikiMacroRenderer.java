@@ -51,7 +51,6 @@ import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.match.BlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
@@ -85,6 +84,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 {
     /**
      * The key under which macro context will be available in the XWikiContext for scripts.
+     * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
     @Deprecated
@@ -97,6 +97,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     /**
      * The key under which macro body will be available inside macro context.
+     * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
     @Deprecated
@@ -104,6 +105,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     /**
      * The key under which macro parameters will be available inside macro context.
+     * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
     @Deprecated
@@ -111,6 +113,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     /**
      * The key under which macro transformation context will be available inside macro context.
+     * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
     @Deprecated
@@ -118,6 +121,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     /**
      * The key under which macro descriptor will be available inside macro context.
+     * 
      * @deprecated since 11.6RC1, 11.3.2, 10.11.8. {@link WikiMacroBinding} should now be used.
      */
     @Deprecated
@@ -166,7 +170,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
      */
     private static final BlockMatcher MACROCONTENT_METADATA_MATCHER =
         testedBlock -> (testedBlock instanceof MetaDataBlock)
-        && "true".equals(((MetaDataBlock) testedBlock).getMetaData().getMetaData("wikimacrocontent"));
+            && "true".equals(((MetaDataBlock) testedBlock).getMetaData().getMetaData("wikimacrocontent"));
 
     /**
      * Match all the metadata blocks that contains a non-generated-content metadata.
@@ -260,26 +264,10 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         return this.inline;
     }
 
-    /**
-     * Removes any top level paragraph since for example for the following use case we don't want an extra paragraph
-     * block: <code>= hello {{velocity}}world{{/velocity}}</code>.
-     *
-     * @param block the blocks to check and convert
-     */
-    private Block removeTopLevelParagraph(Block block)
+    @Override
+    public Syntax getTargetSyntax()
     {
-        List<Block> blocks = block.getChildren();
-
-        // Remove any top level paragraph so that the result of a macro can be used inline for example.
-        // We only remove the paragraph if there's only one top level element and if it's a paragraph.
-        if ((block.getChildren().size() == 1) && block.getChildren().get(0) instanceof ParagraphBlock) {
-            Block paragraphBlock = blocks.remove(0);
-            blocks.addAll(0, paragraphBlock.getChildren());
-
-            return new CompositeBlock(blocks);
-        }
-
-        return block;
+        return this.targetSyntax;
     }
 
     private Block extractResult(Block block, WikiMacroBinding macroBinding, boolean async)
@@ -378,7 +366,6 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     {
         DocumentReference macroDocumentReference = this.wikimacro.getDocumentReference();
 
-
         // old macro binding for $xcontext.macro
         Map<String, Object> contextMacroBinding = new HashMap<>();
         contextMacroBinding.put(MACRO_PARAMS_KEY, this.originalParameters);
@@ -390,20 +377,19 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             contextMacroBinding.put(MACRO_CONTEXT_KEY, this.syncContext);
         }
 
-
         WikiMacroBinding macroBinding = null;
         try {
             ComponentManager currentComponentManager = this.componentManager.get();
 
             XWikiContext xWikiContext = this.xcontextProvider.get();
-            Document document = new Document(xWikiContext.getWiki().getDocument(macroDocumentReference, xWikiContext),
-                xWikiContext);
+            Document document =
+                new Document(xWikiContext.getWiki().getDocument(macroDocumentReference, xWikiContext), xWikiContext);
 
             contextMacroBinding.put(MACRO_DOC_KEY, document);
 
             // new macro binding for $wikimacro
-            macroBinding = new WikiMacroBinding(this.wikimacro.getDescriptor(), this.parameters,
-                this.macroContent, async ? null : this.syncContext);
+            macroBinding = new WikiMacroBinding(this.wikimacro.getDescriptor(), this.parameters, this.macroContent,
+                async ? null : this.syncContext);
             macroBinding.put(MACRO_DOC_KEY, document);
 
             // Extension point to add more wiki macro bindings
@@ -416,11 +402,10 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             }
 
             List<org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer> oldBindingInitializers =
-                currentComponentManager.getInstanceList(
-                    org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer.class);
+                currentComponentManager
+                    .getInstanceList(org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer.class);
 
-            for (org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer bindingInitializer :
-                oldBindingInitializers) {
+            for (org.xwiki.rendering.macro.wikibridge.WikiMacroBindingInitializer bindingInitializer : oldBindingInitializers) {
                 bindingInitializer.initialize(this.wikimacro, this.parameters, this.macroContent,
                     async ? null : this.syncContext, contextMacroBinding);
             }
@@ -443,23 +428,16 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
             (Deque<Map<String, Object>>) econtext.getProperty(BACKUP_CONTEXTBINDING_KEY);
         if (backupContextBinding == null) {
             backupContextBinding = new LinkedList<>();
-            econtext.newProperty(BACKUP_CONTEXTBINDING_KEY)
-                .initial(backupContextBinding)
-                .makeFinal()
-                .inherited()
+            econtext.newProperty(BACKUP_CONTEXTBINDING_KEY).initial(backupContextBinding).makeFinal().inherited()
                 .declare();
         }
         backupContextBinding.push(contextBinding);
 
-        Deque<WikiMacroBinding> backupWikiMacroBinding = (Deque<WikiMacroBinding>) econtext.getProperty(
-            BACKUP_BINDING_KEY);
+        Deque<WikiMacroBinding> backupWikiMacroBinding =
+            (Deque<WikiMacroBinding>) econtext.getProperty(BACKUP_BINDING_KEY);
         if (backupWikiMacroBinding == null) {
             backupWikiMacroBinding = new LinkedList<>();
-            econtext.newProperty(BACKUP_BINDING_KEY)
-                .initial(backupWikiMacroBinding)
-                .makeFinal()
-                .inherited()
-                .declare();
+            econtext.newProperty(BACKUP_BINDING_KEY).initial(backupWikiMacroBinding).makeFinal().inherited().declare();
         }
         backupWikiMacroBinding.push(wikiMacroBinding);
     }
@@ -489,24 +467,22 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
                 (WikiMacroBinding) this.scriptContextManager.getCurrentScriptContext().getAttribute(MACRO_BINDING);
             oldBinding.replaceAll(newMacroBinding);
         } else {
-            this.scriptContextManager.getCurrentScriptContext()
-                .removeAttribute(MACRO_BINDING, ScriptContext.ENGINE_SCOPE);
+            this.scriptContextManager.getCurrentScriptContext().removeAttribute(MACRO_BINDING,
+                ScriptContext.ENGINE_SCOPE);
         }
     }
 
-    private WikiMacroParameters convertParameters(WikiMacroParameters parameters)
-        throws ComponentLookupException
+    private WikiMacroParameters convertParameters(WikiMacroParameters parameters) throws ComponentLookupException
     {
         ConverterManager converterManager = this.componentManager.get().getInstance(ConverterManager.class);
-        Map<String, ParameterDescriptor> parameterDescriptorMap = this.wikimacro.getDescriptor().
-            getParameterDescriptorMap();
+        Map<String, ParameterDescriptor> parameterDescriptorMap =
+            this.wikimacro.getDescriptor().getParameterDescriptorMap();
         WikiMacroParameters result = new WikiMacroParameters();
         for (String parameterName : parameters.getParameterNames()) {
             Object value = parameters.get(parameterName);
 
             if (parameterDescriptorMap.containsKey(parameterName.toLowerCase())) {
-                ParameterDescriptor parameterDescriptor = parameterDescriptorMap
-                    .get(parameterName.toLowerCase());
+                ParameterDescriptor parameterDescriptor = parameterDescriptorMap.get(parameterName.toLowerCase());
                 Type parameterType = parameterDescriptor.getParameterType();
 
                 value = converterManager.convert(parameterType, value);
@@ -586,11 +562,12 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     }
 
     /**
-     * Clean the rendered macro to allow inline editing of wikimacro content.
-     * Specifically this method will remove the macro markers that are inside the wikimacro, except those that are used
-     * inside the content of this wikimacro. It will also remove all the non-generated-content metadata blocks that are
-     * defined in the wikimacro except those also used inside the content of the wikimacro content.
-     * This method doesn't return anything but alterate the given block parameter.
+     * Clean the rendered macro to allow inline editing of wikimacro content. Specifically this method will remove the
+     * macro markers that are inside the wikimacro, except those that are used inside the content of this wikimacro. It
+     * will also remove all the non-generated-content metadata blocks that are defined in the wikimacro except those
+     * also used inside the content of the wikimacro content. This method doesn't return anything but alterate the given
+     * block parameter.
+     * 
      * @param block the block to clean.
      * @since 11.4RC1
      */
@@ -606,10 +583,10 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         // Before removing the blocks, we need to remove from the lists all those that are inside a wikimacro content
         // metadata block, so we don't alterate the wikimacro content itself.
         for (Block allWikiMacroContentMarkerBlock : allWikiMacroContentMetadataBlocks) {
-            allMacroMarkerBlocks.removeAll(
-                allWikiMacroContentMarkerBlock.getBlocks(MACRO_MARKER_MATCHER, Block.Axes.DESCENDANT));
-            allNonGeneratedContentMetadataBlocks.removeAll(allWikiMacroContentMarkerBlock.getBlocks(
-                NON_GENERATED_CONTENT_METADATA_MATCHER, Block.Axes.DESCENDANT_OR_SELF));
+            allMacroMarkerBlocks
+                .removeAll(allWikiMacroContentMarkerBlock.getBlocks(MACRO_MARKER_MATCHER, Block.Axes.DESCENDANT));
+            allNonGeneratedContentMetadataBlocks.removeAll(allWikiMacroContentMarkerBlock
+                .getBlocks(NON_GENERATED_CONTENT_METADATA_MATCHER, Block.Axes.DESCENDANT_OR_SELF));
         }
 
         // Remove all macro marker blocks that remains (outside the wikimacro content block).

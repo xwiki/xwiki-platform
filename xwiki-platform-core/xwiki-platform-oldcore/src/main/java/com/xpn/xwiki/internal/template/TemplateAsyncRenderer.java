@@ -25,18 +25,19 @@ import java.io.Writer;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.block.AbstractBlockAsyncRenderer;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
 import org.xwiki.rendering.block.Block;
@@ -47,9 +48,9 @@ import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
-import org.xwiki.rendering.renderer.printer.WriterWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationException;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.template.Template;
@@ -90,7 +91,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
     private VelocityManager velocityManager;
 
     @Inject
-    private Logger logger;
+    private AsyncContext asyncContext;
 
     private Template template;
 
@@ -100,14 +101,27 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
 
     private Syntax targetSyntax;
 
-    void initialize(Template template)
+    private String transformationId;
+
+    private TemplateContent content;
+
+    private boolean xdomMode;
+
+    Set<String> initialize(Template template, boolean inline, boolean xdomMode) throws Exception
     {
         this.template = template;
+        this.content = template.getContent();
+        this.xdomMode = xdomMode;
 
-        this.inline = syncContext.isInline();
-        this.targetSyntax = syncContext.getTransformationContext().getTargetSyntax();
+        this.inline = inline;
+        this.transformationId = this.renderingContext.getTransformationId();
 
-        this.id = Arrays.asList("template", template.getId());
+        Syntax contextTargetSyntax = this.renderingContext.getTargetSyntax();
+        this.targetSyntax = contextTargetSyntax != null ? contextTargetSyntax : Syntax.PLAIN_1_0;
+
+        this.id = Arrays.asList("template", template.getId(), this.targetSyntax.toIdString(), String.valueOf(inline));
+
+        return this.content.getContextEntries();
     }
 
     @Override
@@ -119,13 +133,13 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
     @Override
     public boolean isAsyncAllowed()
     {
-        return this.template.getContent().isAsyncAllowed();
+        return this.content.isAsyncAllowed();
     }
 
     @Override
     public boolean isCacheAllowed()
     {
-        return this.template.getContent().isCacheAllowed();
+        return this.content.isCacheAllowed();
     }
 
     @Override
@@ -135,19 +149,53 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
     }
 
     @Override
+    public Syntax getTargetSyntax()
+    {
+        return this.targetSyntax;
+    }
+
+    @Override
     public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
     {
-        // TODO: Register the known involved references and components
+        // Register the known involved references
+        if (this.content.getDocumentReference() != null) {
+            this.asyncContext.useEntity(this.content.getDocumentReference());
+        }
 
-        // Execute the template
-        XDOM result = execute(this.template, this.template.getContent());
+        if (this.content.getSourceSyntax() != null) {
+            return renderWiki(async, cached);
+        } else {
+            return renderVelocity(async, cached);
+        }
+    }
+
+    private BlockAsyncRendererResult renderWiki(boolean async, boolean cached) throws RenderingException
+    {
+        ///////////////////////////////////////
+        // Parsing and execution
+
+        Block xdom;
+        try {
+            xdom = this.parser.parse(this.content.getContent(), this.content.getSourceSyntax());
+
+            transform(xdom);
+        } catch (Exception e) {
+            throw new RenderingException("Failed to execute template", e);
+        }
+
+        ///////////////////////////////////////
+        // Inline
+
+        // If in inline mode remove any top level paragraph.
+        if (isInline()) {
+            xdom = removeTopLevelParagraph(xdom);
+        }
 
         ///////////////////////////////////////
         // Rendering
 
-        String resultString = null;
-
-        if (async || cached) {
+        String resultString;
+        if (cached || async || !this.xdomMode) {
             BlockRenderer renderer;
             try {
                 renderer = this.componentManager.get().getInstance(BlockRenderer.class, this.targetSyntax.toIdString());
@@ -156,109 +204,62 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
             }
 
             WikiPrinter printer = new DefaultWikiPrinter();
-            renderer.render(result, printer);
+            renderer.render(xdom, printer);
 
             resultString = printer.toString();
-        }
-
-        return new BlockAsyncRendererResult(resultString, result);
-    }
-
-    private void render(Template template, TemplateContent content, Writer writer) throws Exception
-    {
-        if (content.getSourceSyntax() != null) {
-            XDOM xdom = execute(template, content);
-
-            render(xdom, writer);
         } else {
-            evaluateContent(template, content, writer);
-        }
-    }
-
-    private void render(XDOM xdom, Writer writer)
-    {
-        WikiPrinter printer = new WriterWikiPrinter(writer);
-
-        BlockRenderer blockRenderer;
-        try {
-            blockRenderer =
-                this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
-        } catch (ComponentLookupException e) {
-            blockRenderer = this.plainRenderer;
+            resultString = null;
         }
 
-        blockRenderer.render(xdom, printer);
+        return new BlockAsyncRendererResult(resultString, xdom);
     }
 
-    private XDOM execute(Template template, TemplateContent content) throws Exception
+    private BlockAsyncRendererResult renderVelocity(boolean async, boolean cached) throws RenderingException
     {
-        XDOM xdom = getXDOM(template, content);
+        ///////////////////////////////////////
+        // Velocity
 
-        transform(xdom);
+        String result = evaluateContent(this.template, this.content);
 
-        return xdom;
-    }
+        ///////////////////////////////////////
+        // XDOM
 
-    public XDOM getXDOM(Template template) throws Exception
-    {
         XDOM xdom;
-
-        if (template != null) {
-            xdom = getXDOM(template, template.getContent());
-        } else {
-            xdom = new XDOM(Collections.<Block>emptyList());
-        }
-
-        return xdom;
-    }
-
-    private XDOM getXDOM(Template template, TemplateContent content) throws Exception
-    {
-        XDOM xdom;
-
-        if (content.getSourceSyntax() != null) {
-            xdom = this.parser.parse(content.getContent(), content.getSourceSyntax());
-        } else {
-            String result = evaluateContent(template, content);
+        if (cached || this.xdomMode) {
             if (StringUtils.isEmpty(result)) {
                 xdom = new XDOM(Collections.emptyList());
             } else {
                 xdom = new XDOM(Arrays.asList(new RawBlock(result,
-                    content.getRawSyntax() != null ? content.getRawSyntax() : renderingContext.getTargetSyntax())));
+                    this.content.getRawSyntax() != null ? this.content.getRawSyntax() : this.targetSyntax)));
             }
+        } else {
+            xdom = null;
         }
 
-        return xdom;
+        return new BlockAsyncRendererResult(result, xdom);
     }
 
-    private void transform(Block block)
+    private void transform(Block block) throws TransformationException
     {
         TransformationContext transformationContext =
             new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)),
                 this.renderingContext.getDefaultSyntax(), this.renderingContext.isRestricted());
 
-        transformationContext.setId(this.renderingContext.getTransformationId());
-        transformationContext.setTargetSyntax(getTargetSyntax());
+        transformationContext.setId(this.transformationId);
+        transformationContext.setTargetSyntax(this.targetSyntax);
 
-        try {
-            transform(block, transformationContext);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        transform(block, transformationContext);
     }
 
-    private Syntax getTargetSyntax()
-    {
-        Syntax targetSyntax = this.renderingContext.getTargetSyntax();
-
-        return targetSyntax != null ? targetSyntax : Syntax.PLAIN_1_0;
-    }
-
-    private String evaluateContent(Template template, TemplateContent content) throws Exception
+    private String evaluateContent(Template template, TemplateContent content) throws RenderingException
     {
         Writer writer = new StringWriter();
 
-        evaluateContent(template, content, writer);
+        try {
+            evaluateContent(template, content, writer);
+        } catch (Exception e) {
+            throw new RenderingException("Failed to evaludate template", e);
+        }
 
         return writer.toString();
     }

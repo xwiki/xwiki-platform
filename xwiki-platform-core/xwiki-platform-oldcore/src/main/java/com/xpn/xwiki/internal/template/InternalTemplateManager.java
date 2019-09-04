@@ -65,6 +65,8 @@ import org.xwiki.properties.PropertyException;
 import org.xwiki.properties.RawProperties;
 import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyId;
+import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.GroupBlock;
 import org.xwiki.rendering.block.RawBlock;
@@ -78,9 +80,6 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.WriterWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.rendering.transformation.TransformationContext;
-import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Resource;
@@ -125,12 +124,6 @@ public class InternalTemplateManager implements Initializable
     @Inject
     private VelocityManager velocityManager;
 
-    /**
-     * Used to execute transformations.
-     */
-    @Inject
-    private TransformationManager transformationManager;
-
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
@@ -161,9 +154,6 @@ public class InternalTemplateManager implements Initializable
     private ConverterManager converter;
 
     @Inject
-    private AuthorExecutor authorExecutor;
-
-    @Inject
     private InternalSkinManager skins;
 
     @Inject
@@ -171,6 +161,12 @@ public class InternalTemplateManager implements Initializable
 
     @Inject
     private JobProgressManager progress;
+
+    @Inject
+    private Provider<TemplateAsyncRenderer> rendererProvider;
+
+    @Inject
+    private BlockAsyncRendererExecutor asyncExecutor;
 
     @Inject
     private Logger logger;
@@ -577,7 +573,7 @@ public class InternalTemplateManager implements Initializable
 
     private XDOM generateError(Throwable throwable)
     {
-        List<Block> errorBlocks = new ArrayList<Block>();
+        List<Block> errorBlocks = new ArrayList<>();
 
         // Add short message
         Map<String, String> errorBlockParams = Collections.singletonMap("class", "xwikirenderingerror");
@@ -593,22 +589,6 @@ public class InternalTemplateManager implements Initializable
         errorBlocks.add(new GroupBlock(Arrays.asList(descriptionBlock), errorDescriptionBlockParams));
 
         return new XDOM(errorBlocks);
-    }
-
-    private void transform(Block block)
-    {
-        TransformationContext txContext =
-            new TransformationContext(block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block)),
-                this.renderingContext.getDefaultSyntax(), this.renderingContext.isRestricted());
-
-        txContext.setId(this.renderingContext.getTransformationId());
-        txContext.setTargetSyntax(getTargetSyntax());
-
-        try {
-            this.transformationManager.performTransformations(block, txContext);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     /**
@@ -759,15 +739,7 @@ public class InternalTemplateManager implements Initializable
                 repository != null ? getTemplate(templateName, repository) : getTemplate(templateName);
 
             if (template != null) {
-                if (template.getContent().isAuthorProvided()) {
-                    this.authorExecutor.call(() -> {
-                        render(template, template.getContent(), writer);
-
-                        return null;
-                    }, template.getContent().getAuthorReference(), template.getContent().getDocumentReference());
-                } else {
-                    render(template, template.getContent(), writer);
-                }
+                render(template, writer);
             }
         } finally {
             this.progress.endStep(templateName);
@@ -776,18 +748,26 @@ public class InternalTemplateManager implements Initializable
 
     public void render(Template template, Writer writer) throws Exception
     {
-        render(template, template.getContent(), writer);
-    }
-
-    private void render(Template template, TemplateContent content, Writer writer) throws Exception
-    {
-        if (content.getSourceSyntax() != null) {
-            XDOM xdom = execute(template, content);
-
-            render(xdom, writer);
-        } else {
-            evaluateContent(template, content, writer);
+        if (template == null) {
+            return;
         }
+
+        TemplateAsyncRenderer renderer = this.rendererProvider.get();
+
+        Set<String> contextEntries = renderer.initialize(template, false, false);
+
+        AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
+
+        configuration.setContextEntries(contextEntries);
+
+        if (template.getContent().isAuthorProvided()) {
+            configuration.setSecureReference(template.getContent().getDocumentReference(),
+                template.getContent().getAuthorReference());
+        }
+
+        String result = this.asyncExecutor.render(renderer, configuration);
+
+        writer.append(result);
     }
 
     private void render(XDOM xdom, Writer writer)
@@ -838,43 +818,39 @@ public class InternalTemplateManager implements Initializable
         return xdom;
     }
 
-    private XDOM execute(Template template, TemplateContent content) throws Exception
-    {
-        XDOM xdom = getXDOM(template, content);
-
-        transform(xdom);
-
-        return xdom;
-    }
-
     public XDOM execute(String templateName) throws Exception
     {
         final Template template = getTemplate(templateName);
 
-        if (template != null) {
-            if (template.getContent().isAuthorProvided()) {
-                return this.authorExecutor.call(() -> execute(template, template.getContent()),
-                    template.getContent().getAuthorReference(), template.getContent().getDocumentReference());
-            } else {
-                return execute(template, template.getContent());
-            }
-        }
-
-        return null;
+        return execute(template);
     }
 
     public XDOM execute(Template template) throws Exception
     {
-        if (template != null) {
-            if (template.getContent().isAuthorProvided()) {
-                return this.authorExecutor.call(() -> execute(template, template.getContent()),
-                    template.getContent().getAuthorReference(), template.getContent().getDocumentReference());
-            } else {
-                return execute(template, template.getContent());
-            }
+        if (template == null) {
+            return null;
         }
 
-        return null;
+        TemplateAsyncRenderer renderer = this.rendererProvider.get();
+
+        Set<String> contextEntries = renderer.initialize(template, false, true);
+
+        AsyncRendererConfiguration configuration = new AsyncRendererConfiguration();
+
+        configuration.setContextEntries(contextEntries);
+
+        if (template.getContent().isAuthorProvided()) {
+            configuration.setSecureReference(template.getContent().getDocumentReference(),
+                template.getContent().getAuthorReference());
+        }
+
+        Block block = this.asyncExecutor.execute(renderer, configuration);
+
+        if (block instanceof XDOM) {
+            return (XDOM) block;
+        }
+
+        return new XDOM(Collections.singletonList(block));
     }
 
     private String evaluateContent(Template template, TemplateContent content) throws Exception

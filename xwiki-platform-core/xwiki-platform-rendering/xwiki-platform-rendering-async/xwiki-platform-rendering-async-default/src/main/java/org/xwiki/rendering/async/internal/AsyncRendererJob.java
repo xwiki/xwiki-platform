@@ -78,11 +78,9 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
     {
         AsyncRenderer renderer = getRequest().getRenderer();
 
-        if (!renderer.isCacheAllowed()) {
-            // Enable async execution only if cache is disabled as otherwise we could end up with place holders not
-            // associated to any job since it was not really executed the following times
-            this.asyncContext.setEnabled(true);
-        }
+        // Enable async execution only if cache is disabled as otherwise we could end up with place holders not
+        // associated to any job since it was not really executed the following times
+        this.asyncContext.setEnabled(!renderer.isCacheAllowed());
 
         // Prepare to catch stuff to invalidate the cache
         ((DefaultAsyncContext) this.asyncContext).pushContextUse();

@@ -29,7 +29,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Provider;
 import javax.script.ScriptContext;
-import javax.script.SimpleScriptContext;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +60,7 @@ import org.xwiki.refactoring.internal.LinkRefactoring;
 import org.xwiki.refactoring.internal.ModelBridge;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.ScriptContextManager;
+import org.xwiki.script.internal.CloneableSimpleScriptContext;
 import org.xwiki.script.internal.ScriptExecutionContextInitializer;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
@@ -318,7 +318,7 @@ public class MockitoOldcore
         econtext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, this.context);
         this.scriptContext = (ScriptContext) econtext.getProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID);
         if (this.scriptContext == null) {
-            this.scriptContext = new SimpleScriptContext();
+            this.scriptContext = new CloneableSimpleScriptContext();
             econtext.setProperty(ScriptExecutionContextInitializer.SCRIPT_CONTEXT_ID, this.scriptContext);
         }
 

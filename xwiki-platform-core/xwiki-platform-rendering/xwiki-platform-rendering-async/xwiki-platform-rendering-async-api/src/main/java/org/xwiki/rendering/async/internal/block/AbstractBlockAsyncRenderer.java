@@ -19,12 +19,16 @@
  */
 package org.xwiki.rendering.async.internal.block;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.CompositeBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
@@ -59,5 +63,27 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
             ((MutableRenderingContext) this.renderingContext).transformInContext(this.macroTransformation,
                 transformationContext, block);
         }
+    }
+
+    /**
+     * Removes any top level paragraph since for example for the following use case we don't want an extra paragraph
+     * block: <code>= hello {{velocity}}world{{/velocity}}</code>.
+     *
+     * @param block the blocks to check and convert
+     */
+    protected Block removeTopLevelParagraph(Block block)
+    {
+        List<Block> blocks = block.getChildren();
+
+        // Remove any top level paragraph so that the result of a macro can be used inline for example.
+        // We only remove the paragraph if there's only one top level element and if it's a paragraph.
+        if ((block.getChildren().size() == 1) && block.getChildren().get(0) instanceof ParagraphBlock) {
+            Block paragraphBlock = blocks.remove(0);
+            blocks.addAll(0, paragraphBlock.getChildren());
+
+            return new CompositeBlock(blocks);
+        }
+
+        return block;
     }
 }

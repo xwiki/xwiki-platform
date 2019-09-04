@@ -60,4 +60,17 @@ public interface BlockAsyncRendererExecutor
      */
     Block execute(BlockAsyncRenderer renderer, AsyncRendererConfiguration configuration)
         throws JobException, RenderingException;
+
+    /**
+     * Start and cache or return the result of the execution of the passed renderer.
+     * 
+     * @param renderer the renderer to execute
+     * @param configuration the configuration of the execution
+     * @return the {@link JobStatus}
+     * @throws JobException when failing to start the job
+     * @throws RenderingException when failing to execute the renderer (in case asynchronous execution is disabled)
+     * @since 11.8RC1
+     */
+    String render(BlockAsyncRenderer renderer, AsyncRendererConfiguration configuration)
+        throws JobException, RenderingException;
 }

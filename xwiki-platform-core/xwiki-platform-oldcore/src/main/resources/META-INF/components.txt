@@ -125,7 +125,11 @@ com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration
 com.xpn.xwiki.internal.store.hibernate.HibernateStore
 com.xpn.xwiki.internal.template.DefaultTemplateManager
 com.xpn.xwiki.internal.template.InternalTemplateManager
+com.xpn.xwiki.internal.template.TemplateAsyncRenderer
+com.xpn.xwiki.internal.template.TemplateContext
+com.xpn.xwiki.internal.template.TemplateContextInitializer
 com.xpn.xwiki.internal.template.TemplateListener
+com.xpn.xwiki.internal.template.VelocityTemplateEvaluator
 com.xpn.xwiki.internal.query.ConfiguredQueryExecutorProvider
 com.xpn.xwiki.internal.query.CurrentLanguageQueryFilter
 com.xpn.xwiki.script.sheet.SheetScriptService

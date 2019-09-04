@@ -1,5 +1,5 @@
-#if (!$XWIKIVARS_VM)
-#set ($XWIKIVARS_VM = true)
+## Make sure this template is not executed more than necessary
+##!unique=request
 #template("frequentlyUsedDocs.vm")
 #set ($isGuest = $xcontext.getUser().equals('XWiki.XWikiGuest'))
 #set ($isSuperAdmin = ($xcontext.user == 'XWiki.superadmin'))
@@ -135,4 +135,3 @@
 #set ($isInPortletMode = $xwikimode == 1 || "$!request.getAttribute('javax.portlet.request')" != '')
 #set ($isInServletMode = $xwikimode == 0 && !$isInPortletMode)
 #template("deprecatedVars.vm")
-#end

@@ -37,6 +37,7 @@ import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.AuthorizationManager;
@@ -154,7 +155,7 @@ public class TemplateManagerTest
 
         Template template = this.templateManager.createStringTemplate("", author);
 
-        assertThrows(AccessDeniedException.class, () -> this.templateManager.render(template, new StringWriter()));
+        assertThrows(RenderingException.class, () -> this.templateManager.render(template, new StringWriter()));
     }
 
     @Test

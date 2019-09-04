@@ -147,12 +147,12 @@ public abstract class AbstractWikiUIExtension extends AbstractAsyncContentBaseOb
         }
 
         // Indicate if asynchronous execution is enabled for this UI extension
-        executorConfiguration.setAsyncAllowed(this.async);
+        executorConfiguration.setAsyncAllowed(this.asyncAllowed);
 
         // Indicate if caching is enabled for this UI extension
-        executorConfiguration.setCacheAllowed(this.cached);
+        executorConfiguration.setCacheAllowed(this.cacheAllowed);
 
-        if (this.cached) {
+        if (this.cacheAllowed) {
             // The role type and hint of the UI extension component so that the cache is invalidated when modified
             executorConfiguration.useComponent(getRoleType(), getRoleHint());
         }

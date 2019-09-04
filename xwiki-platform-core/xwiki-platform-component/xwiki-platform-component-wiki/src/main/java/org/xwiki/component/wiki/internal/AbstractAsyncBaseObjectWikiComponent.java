@@ -49,9 +49,9 @@ public abstract class AbstractAsyncBaseObjectWikiComponent extends AbstractBaseO
      */
     public static final String XPROPERTY_ASYNC_CONTEXT = "async_context";
 
-    protected final boolean async;
+    protected final boolean asyncAllowed;
 
-    protected final boolean cached;
+    protected final boolean cacheAllowed;
 
     protected final Set<String> contextEntries;
 
@@ -64,8 +64,8 @@ public abstract class AbstractAsyncBaseObjectWikiComponent extends AbstractBaseO
     {
         super(baseObject, roleType, roleHint);
 
-        this.async = baseObject.getIntValue(XPROPERTY_ASYNC_ENABLED, 0) == 1;
-        this.cached = baseObject.getIntValue(XPROPERTY_ASYNC_CACHED, 0) == 1;
+        this.asyncAllowed = baseObject.getIntValue(XPROPERTY_ASYNC_ENABLED, 0) == 1;
+        this.cacheAllowed = baseObject.getIntValue(XPROPERTY_ASYNC_CACHED, 0) == 1;
         List<String> contextEntriesList = baseObject.getListValue(XPROPERTY_ASYNC_CONTEXT);
         this.contextEntries = contextEntriesList != null ? new HashSet<>(contextEntriesList) : null;
     }

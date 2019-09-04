@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="Dashboard.Translations" locale="mr">
+  <web>Dashboard</web>
+  <name>Translations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Dashboard.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>dashboard.templateProvider.description=सानुकूल करण्यासारखे गॅझेट
+
+dashboard.gadgetSelector.title=गॅझेट निवडा
+dashboard.gadgetEditor.title=गॅझेट संपादित करा
+dashboard.gadgetEditor.changeGadget.label=गॅझेट बदला
+dashboard.gadgetEditor.gadgetTitle.label=गॅझेट शीर्षक
+dashboard.gadgetEditor.gadgetTitle.hint=या गॅझेटचे शीर्षक डॅशबोर्डवरील गॅझेट पॅनेलच्या शीर्षस्थानी दिसते (यात वेग कोड असू शकतो).
+dashboard.initialization.saveMessage=डीफॉल्ट डॅशबोर्ड वापरकर्ता सेटअप प्रारंभ करा</content>
+  
+</xwikidoc>

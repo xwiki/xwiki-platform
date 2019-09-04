@@ -58,9 +58,14 @@
     'last_name': {'type': 'text', 'sortable': false},
     'scope': {'type': 'list', 'sortable': false},
     '_actions': {
-      'actions': ['edit', 'delete'],
-      'filterable': false
-     }
+      'actions': [
+        'edit',
+        {'id': 'disable', 'icon': 'lock'},
+        {'id': 'enable', 'icon': 'unlock'},
+        'delete'
+      ],
+      'labels': false
+    }
   })
   #set ($columns = ['name', 'first_name', 'last_name', '_actions'])
   #set ($liveTableOptions = {
@@ -140,6 +145,9 @@
 #end
 
 #macro (deleteUserModal)
+  ## Load the resources needed by the user picker in order to be able to select the new author when deleting users that
+  ## have script or programming rights.
+  #userPicker_import
   &lt;div class="modal" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="deleteUserModal-label"
       data-liveTable="#userstable" data-liveTableAction="delete"&gt;
     &lt;div class="modal-dialog" role="document"&gt;
@@ -168,7 +176,7 @@
 
 #macro (deleteUserModalContent $userReference)
   {{html clean="false"}}
-  #set ($userReference = $services.model.resolveDocument($userReference, 'user'))
+  #set ($userReference = $services.model.resolveDocument($userReference, 'user', $doc.documentReference))
   &lt;p&gt;$services.localization.render('administration.section.users.deleteUser.confirmationMessage', [
     "#displayUser($userReference {'useInlineHTML': true})",
     "&lt;a href='$xwiki.getURL($userReference, 'view', 'category=groups')'&gt;",
@@ -176,36 +184,65 @@
   ])&lt;/p&gt;
   ## Check if the user we're about to delete has programming or script rights because in this case deleting the user may
   ## break the pages where this user was the last (content) author.
-  #set ($mainWikiPrefsRef = $services.model.createDocumentReference($xcontext.mainWikiName, 'XWiki',
+  ##
+  ## Note that we check programming and script rights at the wiki level only, in the wiki where the user is defined.
+  ## This doesn't cover all the cases because script right can be set at page level so it's possible that the user has
+  ## script right only on some pages (and not at the wiki level). Counting the pages that were last modified by this
+  ## user and for which they have script right is costly (we need to check script right separately for each page that
+  ## was last modified by the user, we can't do it in the database query).
+  #set ($wikiPrefsRef = $services.model.createDocumentReference($userReference.wikiReference.name, 'XWiki',
     'XWikiPreferences'))
-  #if ($services.security.authorization.hasAccess('programming', $userReference, $mainWikiPrefsRef))
-    #maybeShowDeleteUserWarning($userReference 'administration.section.users.deleteUser.programmingRightsWarning')
-  #elseif ($services.security.authorization.hasAccess('script', $userReference, $mainWikiPrefsRef))
-    #maybeShowDeleteUserWarning($userReference 'administration.section.users.deleteUser.scriptRightsWarning')
+  #if ($services.security.authorization.hasAccess('programming', $userReference, $wikiPrefsRef))
+    #maybeShowDeleteUserWarning($userReference 'programming')
+  #elseif ($services.security.authorization.hasAccess('script', $userReference, $wikiPrefsRef))
+    #maybeShowDeleteUserWarning($userReference 'script')
   #end
-  ## Make sure the administrator knows that he can use the "disabled" user profile property instead of deleting the user.
-  &lt;div class="box infomessage"&gt;
-    $services.localization.render('administration.section.users.deleteUser.markDisabledMessage')
-  &lt;/div&gt;
   {{/html}}
 #end
 
-#macro (maybeShowDeleteUserWarning $userReference $translationKey)
+#macro (maybeShowDeleteUserWarning $userReference $right)
   #countPagesLastModifiedBy($userReference)
   #if ($pageCount &gt; 0)
-    &lt;div class="box errormessage"&gt;
-      #set ($pageIndexURL = $xwiki.getURL('Main.AllDocs') + '#|t=alldocs&amp;doc.author=' +
+    &lt;div class="box errormessage xform"&gt;
+      #set ($pageIndexReference = $services.model.createDocumentReference(
+        $userReference.wikiReference.name, 'Main', 'AllDocs'))
+      #set ($pageIndexURL = $xwiki.getURL($pageIndexReference) + '#|t=alldocs&amp;doc.author=' +
         $escapetool.url($services.model.serialize($userReference, 'local')))
+      #set ($translationKey = "administration.section.users.deleteUser.${right}RightsWarning")
       $services.localization.render($translationKey, ["&lt;a href='$pageIndexURL'&gt;", $pageCount, '&lt;/a&gt;'])
+      &lt;dl&gt;
+        &lt;dt&gt;
+          &lt;label for="newAuthor"&gt;$escapetool.xml($services.localization.render(
+            'administration.section.users.deleteUser.newAuthor'))&lt;/label&gt;
+          #set ($translationKey = 'administration.section.users.deleteUser.newAuthor.hint')
+          #set ($rightTranslation = $services.localization.render(
+            "administration.section.users.deleteUser.newAuthor.$right"))
+          &lt;span class="xHint"&gt;$escapetool.xml($services.localization.render($translationKey,
+            [$rightTranslation]))&lt;/span&gt;
+        &lt;/dt&gt;
+        &lt;dd&gt;
+          #set ($userPickerParams = {
+            'id': 'newAuthor',
+            'name': 'newAuthor',
+            'data-required-right': $right
+          })
+          #userPicker(false $userPickerParams)
+          #set ($translationKey = 'administration.section.users.deleteUser.newAuthor.error')
+          &lt;span class="xErrorMsg hidden"&gt;$escapetool.xml($services.localization.render($translationKey,
+            [$rightTranslation]))&lt;/span&gt;
+        &lt;/dd&gt;
+      &lt;/dl&gt;
     &lt;/div&gt;
   #end
 #end
 
 #macro (countPagesLastModifiedBy $userReference)
   #if ($userReference.wikiReference.name == $xcontext.mainWikiName)
+    ## Global user: search everywhere.
     #set ($wikis = $services.wiki.allIds)
   #else
-    #set ($wikis = $userReference.wikiReference.name)
+    ## Local user: search only in the wiki where the user is defined.
+    #set ($wikis = [$userReference.wikiReference.name])
   #end
   #set ($pageCount = 0)
   #set ($statement = 'where doc.author = :user or doc.contentAuthor = :user')
@@ -218,6 +255,15 @@
     #set ($pageCount = $pageCount + $services.query.xwql($statement).setWiki($wiki).addFilter('unique'
       ).bindValue('user', $userReferenceString).count())
   #end
+#end
+
+#macro (validateNewAuthor $newAuthorReference $requiredRight)
+  #set ($newAuthorReference = $services.model.resolveDocument($newAuthorReference, 'user', $doc.documentReference))
+  #set ($wikiPrefsRef = $services.model.createDocumentReference($newAuthorReference.wikiReference.name, 'XWiki',
+    'XWikiPreferences'))
+  #jsonResponse({
+    'valid': $services.security.authorization.hasAccess($requiredRight, $newAuthorReference, $wikiPrefsRef)
+  })
 #end
 
 #macro (doView)
@@ -251,6 +297,8 @@
 {{velocity}}
 #if ($request.data == 'deleteUserModalContent' &amp;&amp; "$!request.userReference" != '')
   #deleteUserModalContent($request.userReference)
+#elseif ($request.data == 'validateNewAuthor' &amp;&amp; "$!request.newAuthor" != '' &amp;&amp; "$!request.requiredRight" != '')
+  #validateNewAuthor($request.newAuthor $request.requiredRight)
 #else
   #doView
 #end
@@ -470,6 +518,47 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
   });
 
   //
+  // Disable / Enable User Accounts
+  //
+  (function() {
+    var notificationMessage = {
+      enable: {
+        inProgress: $jsontool.serialize($services.localization.render('administration.section.users.enableUser.inProgress')),
+        done: $jsontool.serialize($services.localization.render('administration.section.users.enableUser.done')),
+        failed: $jsontool.serialize($services.localization.render('administration.section.users.enableUser.failed'))
+      },
+      disable: {
+        inProgress: $jsontool.serialize($services.localization.render('administration.section.users.disableUser.inProgress')),
+        done: $jsontool.serialize($services.localization.render('administration.section.users.disableUser.done')),
+        failed: $jsontool.serialize($services.localization.render('administration.section.users.disableUser.failed'))
+      }
+    }
+    var onToggleUser = function(action, event) {
+      event.preventDefault();
+      var actionTrigger = $(this);
+      if (actionTrigger.hasClass('pending')) {
+        // Another request is already in progress.
+        return;
+      }
+      actionTrigger.addClass('pending');
+      var notification = new XWiki.widgets.Notification(notificationMessage[action].inProgress, 'inprogress');
+      // The enable and disable actions redirect to the user profile by default which may take a lot of time to render so
+      // we redirect to a URL that doesn't render anything.
+      var emptyResponseURL = new XWiki.Document('AdminUsersSheet', 'XWiki').getURL('get', 'outputSyntax=plain');
+      $.post(actionTrigger.attr('href'), {'xredirect': emptyResponseURL}).done(function() {
+        window['livetable_userstable'].refresh();
+        notification.replace(new XWiki.widgets.Notification(notificationMessage[action].done, 'done'));
+      }).fail(function() {
+        notification.replace(new XWiki.widgets.Notification(notificationMessage[action].failed, 'error'));
+      }).always(function() {
+        actionTrigger.removeClass('pending');
+      });
+    };
+    $('#userstable').on('click', 'a.actionenable', $.proxy(onToggleUser, null, 'enable'));
+    $('#userstable').on('click', 'a.actiondisable', $.proxy(onToggleUser, null, 'disable'));
+  })();
+
+  //
   // User Deletion
   //
   var deleteUserModal = $('#deleteUserModal');
@@ -491,6 +580,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       'userReference': userReference
     }, function(html) {
       deleteUserModalBody.html(html);
+      $(document).trigger('xwiki:dom:updated', {'elements': deleteUserModalBody.toArray()});
     }, 'html').always(function() {
       deleteUserModalBody.removeClass('loading');
       deleteUserButton.prop('disabled', false);
@@ -508,6 +598,41 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     loadDeleteUserModalContent(userReference);
   });
 
+  // Validate that the selected new author has the required access rights.
+  var newAuthorValidationRequest;
+  var validateNewAuthor = function(newAuthor, requiredRight) {
+    // Abort the previous validation request.
+    if (newAuthorValidationRequest) {
+      newAuthorValidationRequest.abort();
+    }
+    if (newAuthor) {
+      var url = new XWiki.Document('AdminUsersSheet', 'XWiki').getURL('get');
+      newAuthorValidationRequest = $.get(url, {
+        data: 'validateNewAuthor',
+        newAuthor: newAuthor,
+        requiredRight: requiredRight
+      });
+      return newAuthorValidationRequest;
+    } else {
+      return $.Deferred().resolve({valid: true}).promise();
+    }
+  };
+  deleteUserModal.on('change', '#newAuthor', function(event) {
+    // Disable the modal submit button while we validate the new author.
+    deleteUserButton.prop('disabled', true);
+    var newAuthorField = $(event.target);
+    // Hide the previous error message.
+    newAuthorField.nextAll('.xErrorMsg').addClass('hidden');
+    validateNewAuthor(newAuthorField.val(), newAuthorField.data('requiredRight')).done(function(result) {
+      if (result.valid === false) {
+        newAuthorField.nextAll('.xErrorMsg').removeClass('hidden');
+      }
+    }).always(function() {
+      // Re-enable the modal submit button.
+      deleteUserButton.prop('disabled', false);
+    });
+  });
+
   deleteUserButton.click(function() {
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('xe.admin.users.delete.inProgress')),
@@ -517,6 +642,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
     $.post('', {
       xpage: 'deleteuorg',
       docname: userReference,
+      newAuthor: deleteUserModal.find('#newAuthor').val(),
       form_token: xm.form_token
     }).done(function() {
       deleteUserModal.data('liveTable').deleteRow(deleteUserModal.data('rowIndex'));
@@ -643,19 +769,36 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       <cache>long</cache>
     </property>
     <property>
-      <code>/**
+      <code>#template('colorThemeInit.vm')
+
+/**
  * Users Live Table
  */
 #userstable td[data-title] {
   vertical-align: middle;
 }
+#userstable .actiondisable .action-icon {
+  color: $theme.notificationWarningColor;
+}
+#userstable .actionenable .action-icon {
+  color: $theme.notificationSuccessColor;
+}
 
 /**
  * Delete User Modal
  */
-
 #deleteUserModal .userName {
   font-weight: bolder;
+}
+#deleteUserModal .errormessage {
+  margin-bottom: 0;
+}
+#deleteUserModal .xform &gt; dl {
+  margin-top: 1em;
+}
+/* Make sure the drop down for the new author picker is shown on top of the modal. */
+body &gt; .selectize-dropdown {
+  z-index: 10051;
 }</code>
     </property>
     <property>
@@ -665,7 +808,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       <name/>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>onDemand</use>

@@ -609,9 +609,11 @@ var XWiki = (function(XWiki) {
       // Change the diff based on the action chosen.
       var radioSelect = function () {
         var selectedValue = $$('input[name=warningConflictAction]:checked')[0].value;
-        if (selectedValue == "merge" || selectedValue == "custom") {
+        if (selectedValue == "merge") {
           previewDiff("NEXT", "MERGED");
-        } else if (selectedValue == "override") {
+        // It's the next and current value which will be used for the merge, so better use them in case of custom
+        // conflicts resolution.
+        } else if (selectedValue == "override" || selectedValue == "custom") {
           previewDiff("NEXT", "CURRENT");
         } else if (selectedValue == "reload") {
           previewDiff("CURRENT", "NEXT");

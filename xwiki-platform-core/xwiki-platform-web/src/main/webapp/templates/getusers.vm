@@ -1,5 +1,5 @@
-#macro (displayUserAliasWithAvatar $userReference)
-  <div class="user" data-reference="$escapetool.xml($userReference)">
+#macro (displayUserAliasWithAvatar $userReference $disabled)
+  <div class="user#if ($disabled) disabled#end" data-reference="$escapetool.xml($userReference)">
     <span class="user-avatar-wrapper">
       #getUserAvatarURL($userReference $avatarURL 120)
       <img class="user-avatar" src="$escapetool.xml($avatarURL.url)" />
@@ -98,8 +98,13 @@
   #else
     #set ($scope = 'local')
   #end
-  ## Prevent users from deleting themselves.
-  #set ($hasDelete = $xcontext.userReference != $user.documentReference
+  #set ($hasEdit = $services.security.authorization.hasAccess('edit', $user.documentReference))
+  #set ($disabled = $user.getValue('active') == 0 || $user.getValue('disabled') == 1)
+  #set ($hasEnable = $hasEdit && $disabled)
+  ## Prevent users from disabling their own accounts.
+  #set ($hasDisable = $hasEdit && !$disabled && $xcontext.userReference != $user.documentReference)
+  ## Delete user accounts only after they have been disabled. Also prevent users from deleting their own accounts.
+  #set ($hasDelete = $disabled && $xcontext.userReference != $user.documentReference
     && $services.security.authorization.hasAccess('delete', $user.documentReference))
   #set ($discard = $row.putAll({
     'doc_fullName': $user.fullName,
@@ -107,11 +112,23 @@
     'doc_url': $user.getURL(),
     'doc_viewable': $services.security.authorization.hasAccess('view', $user.documentReference),
     'doc_hasadmin': $xwiki.hasAdminRights(),
-    'doc_hasedit': $services.security.authorization.hasAccess('edit', $user.documentReference),
+    'doc_hasedit': $hasEdit,
     'doc_edit_url': $user.getURL('edit'),
     'doc_hasdelete': $hasDelete,
     'doc_delete_url': $user.getURL('delete'),
-    'name': "#displayUserAliasWithAvatar($user.documentReference)",
+    'doc_hasdisable': $hasDisable,
+    'doc_disable_url': $user.getURL('save', $escapetool.url({
+      'XWiki.XWikiUsers_0_disabled': 1,
+      'comment': $services.localization.render('core.users.disable.saveComment'),
+      'form_token': $services.csrf.token
+    })),
+    'doc_hasenable': $hasEnable,
+    'doc_enable_url': $user.getURL('save', $escapetool.url({
+      'XWiki.XWikiUsers_0_disabled': 0,
+      'comment': $services.localization.render('core.users.enable.saveComment'),
+      'form_token': $services.csrf.token
+    })),
+    'name': "#displayUserAliasWithAvatar($user.documentReference $disabled)",
     'first_name': $userObject.getValue('first_name'),
     'last_name': $userObject.getValue('last_name'),
     'scope': $services.localization.render("xe.admin.groups.$scope")

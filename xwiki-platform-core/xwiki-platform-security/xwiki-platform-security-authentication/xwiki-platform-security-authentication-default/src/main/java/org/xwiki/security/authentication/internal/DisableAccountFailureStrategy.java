@@ -19,23 +19,35 @@
  */
 package org.xwiki.security.authentication.internal;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.securityfilter.filter.SecurityRequestWrapper;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
 import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 import org.xwiki.security.authentication.api.AuthenticationFailureStrategy;
 
+import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
  * A strategy to disable authentication in case of repeated failure with a login.
+ * <p>
  * This strategy will do two things: if no user account can be found associated to the login, it will simply block any
  * further check. If a user account can be found, it will disable it automatically allowing an admin to take an action
  * such as changing the user password or at least informing the user about the attack. When the user account is enable
@@ -45,15 +57,27 @@ import com.xpn.xwiki.user.api.XWikiUser;
  * @since 11.6RC1
  */
 @Component
-@Named("disableAccount")
+@Named(DisableAccountFailureStrategy.NAME)
 @Singleton
-public class DisableAccountFailureStrategy implements AuthenticationFailureStrategy
+public class DisableAccountFailureStrategy implements AuthenticationFailureStrategy, EventListener
 {
+    /**
+     * The component name.
+     */
+    public static final String NAME = "disableAccount";
+
+    protected static final LocalDocumentReference USER_CLASS_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiUsers");
+
     @Inject
     private ContextualLocalizationManager contextLocalization;
 
+    /**
+     * We access the {@link AuthenticationFailureManager} through a provider because it depends on the
+     * {@link ObservationManager} and thus we want to avoid a dependency loop while event listeners are initialized.
+     */
     @Inject
-    private AuthenticationFailureManager authenticationFailureManager;
+    private Provider<AuthenticationFailureManager> authenticationFailureManager;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -81,7 +105,7 @@ public class DisableAccountFailureStrategy implements AuthenticationFailureStrat
     @Override
     public boolean validateForm(String username, SecurityRequestWrapper request)
     {
-        DocumentReference userDocumentReference = this.authenticationFailureManager.findUser(username);
+        DocumentReference userDocumentReference = this.authenticationFailureManager.get().findUser(username);
         if (userDocumentReference != null) {
             return !new XWikiUser(userDocumentReference).isDisabled(this.contextProvider.get());
         }
@@ -91,14 +115,51 @@ public class DisableAccountFailureStrategy implements AuthenticationFailureStrat
     /**
      * When the threshold is reached, we try to find the account of the user based on the username, and we disable its
      * account if we manage to do so.
+     * 
      * @param username the username used for the authentication failure.
      */
     @Override
     public void notify(String username)
     {
-        DocumentReference userDocumentReference = this.authenticationFailureManager.findUser(username);
+        DocumentReference userDocumentReference = this.authenticationFailureManager.get().findUser(username);
         if (userDocumentReference != null) {
             new XWikiUser(userDocumentReference).setDisabled(true, this.contextProvider.get());
         }
+    }
+
+    @Override
+    public List<Event> getEvents()
+    {
+        return Collections.singletonList(new DocumentUpdatedEvent());
+    }
+
+    @Override
+    public String getName()
+    {
+        return NAME;
+    }
+
+    @Override
+    public void onEvent(Event event, Object source, Object data)
+    {
+        XWikiDocument updatedDocument = (XWikiDocument) source;
+        BaseObject updatedUserObject = updatedDocument.getXObject(USER_CLASS_REFERENCE);
+        XWikiDocument originalDocument = updatedDocument.getOriginalDocument();
+        BaseObject originalUserObject = originalDocument.getXObject(USER_CLASS_REFERENCE);
+        if (originalUserObject != null && updatedUserObject != null
+            && (propertyValueChanged(originalUserObject, updatedUserObject, "disabled", 0)
+                || propertyValueChanged(originalUserObject, updatedUserObject, "active", 1))) {
+            // Remove the authentication failure record when the user account is re-enabled or activated.
+            this.authenticationFailureManager.get()
+                .resetAuthenticationFailureCounter(updatedDocument.getDocumentReference());
+        }
+    }
+
+    private boolean propertyValueChanged(BaseObject originalObject, BaseObject updatedObject, String propertyName,
+        int expectedValue)
+    {
+
+        return originalObject.getIntValue(propertyName) != expectedValue
+            && updatedObject.getIntValue(propertyName) == expectedValue;
     }
 }

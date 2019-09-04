@@ -1,0 +1,117 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="AnnotationCode.Translations" locale="mr">
+  <web>AnnotationCode</web>
+  <name>Translations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AnnotationCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>annotations.title=भाष्य करा
+annotations.menu.loading=भाष्य सेटिंग्ज लोड करीत आहे
+annotations.menu.loaderror=अयशस्वी:
+annotations.tab.info.noannotations=या पृष्ठावर भाष्ये नाहीत
+
+annotations.settings.display=भाष्ये दाखवा
+annotations.settings.error.wrongsyntax=XWiki / 1.0 च्या वाक्यरचने मध्ये लिहिलेल्या पृष्ठांसाठी भाष्य उपलब्ध नाहीत.
+annotations.settings.error.notarget=यासाठी भाष्ये सेटिंग्ज मिळविण्यासाठी कोणतेही पृष्ठ निर्दिष्ट केलेले नाही.
+
+annotations.annotated.loading=भाष्य केलेले पृष्ठ लोड करीत आहे
+annotations.annotated.loaderror=अयशस्वी:
+annotations.annotated.loaderror.wrongresponse=चुकीचे स्वरूपित सर्व्हर प्रतिसाद
+annotations.annotated.error.noannotatedelement=सामग्री उपलब्ध नसल्यामुळे भाष्य लोड करणे शक्य झाले नाही.
+annotations.annotated.error.wrongsyntax=XWiki / 1.0 च्या वाक्यरचने मध्ये लिहिलेल्या पृष्ठांसाठी भाष्य उपलब्ध नाहीत.
+
+annotations.action.edit.text=[संपादित करा]
+annotations.action.edit.tooltip=भाष्य संपादित करा
+annotations.action.edit.submit.text=अपडेट करा
+annotations.action.edit.cancel.text=रद्द करा
+annotations.action.edit.success=भाष्य अपडेट केले.
+annotations.action.edit.loaderror=अयशस्वी:
+annotations.action.edit.error.notfound=हे भाष्य आता अस्तित्वात नाही. कृपया अपडेट केलेल्या दृश्यासाठी पृष्ठ रीफ्रेश करा.
+
+annotations.action.delete.text=[हटवा]
+annotations.action.delete.tooltip=भाष्य हटवा
+annotations.action.delete.confirm=आपली खात्री आहे की आपण हे भाष्य हटवू इच्छिता?
+annotations.action.delete.inProgress=भाष्य हटवित आहे ...
+annotations.action.delete.done=भाष्य हटविले
+annotations.action.delete.failed=भाष्य हटविण्यात अयशस्वी:
+
+annotations.action.create.submit.text=भाष्य जोडा
+annotations.action.create.cancel.text=रद्द करा
+annotations.action.create.selection.invalid=कृपया पृष्ठ सामग्रीमधील एक रिक्त नसलेला मजकूर निवडा.
+annotations.action.create.form.loaderror=अयशस्वी:
+annotations.action.create.success=भाष्य जोडले.
+annotations.action.create.loaderror=अयशस्वी:
+annotations.action.create.error.unauthorized=आपण या पृष्ठावर भाष्ये जोडण्यासाठी अधिकृत नाही.
+annotations.action.create.error.unauthorizedguest=आपण या पृष्ठावर भाष्ये जोडण्यासाठी अधिकृत नाही. प्रथम लॉग इन करण्याचा प्रयत्न करा.
+annotations.action.create.helpmessage=मजकुराचा एखादा भाग भाष्य करण्यासाठी, ते निवडा आणि {0} दाबा.
+annotations.action.create.error.wrongsyntax=XWiki / 1.0 वाक्यरचने मध्ये लिहिलेल्या पृष्ठांसाठी भाष्य उपलब्ध नाहीत.
+### Missing: annotations.action.create.error.notarget=Unspecified target (page) to create annotations for.
+
+### Missing: annotations.action.view.hide.text=hide
+### Missing: annotations.action.view.form.loaderror=Failed:
+### Missing: annotations.action.view.error.notfound=This annotation does not exist anymore. Please refresh the page for an updated view.
+### Missing: annotations.action.view.thread=View thread
+
+### Missing: annotations.altered.text=This annotation could not be displayed because the annotated text was not found in the page:
+### Missing: annotations.updated.text=This annotation was automatically repositioned after a page update. Originally:
+### Missing: annotations.action.validate.text=[Validate]
+### Missing: annotations.action.validate.tooltip=Validate the automatic update of the selected text of this annotation
+### Missing: annotations.action.validate.success=Annotation validated.
+### Missing: annotations.action.validate.loaderror=Failed:
+
+### Missing: annotations.filters.show=Filter
+### Missing: annotations.filters.nooption=There are no values to filter for "{0}"
+### Missing: annotations.filters.anyvalue=any value
+### Missing: annotations.filters.clearvalue=clear
+
+### Missing: annotations.config.title=Annotations configuration panel
+### Missing: annotations.config.display.title=Annotation display
+### Missing: annotations.config.type.title=Annotation type
+### Missing: annotations.config.activate.title=Annotation activation
+### Missing: annotations.config.activate.explanation=The following two settings allow you to configure which locations annotations are active in. The first setting specifies the general rule, while the second list specifies the locations for which the rule shouldn't apply. For example, activated "yes" and exception locations "XWiki" and "Main" means that annotations will be active on all locations except for "XWiki" and "Main". As an opposite example, using activated "no" and exception locations "Documents" means that annotations will be active only for the "Documents" location.
+### Missing: annotations.config.type.explanation=Add properties to this class if you want extra properties for your annotations.
+### Missing: admin.annotations=Annotations
+### Missing: admin.annotations.description=Configure the page annotations
+
+### Missing: AnnotationCode.AnnotationConfig_activated=Annotations are activated
+### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces=Except for the following locations
+### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
+### Missing: AnnotationCode.AnnotationConfig_displayed=Display annotations by default
+### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight=Highlight annotations by default
+### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
+### Missing: AnnotationCode.AnnotationConfig_annotationClass=XWiki class defining annotations structure</content>
+  
+</xwikidoc>

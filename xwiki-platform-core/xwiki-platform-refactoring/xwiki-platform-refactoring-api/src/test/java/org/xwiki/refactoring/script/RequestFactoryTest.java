@@ -20,6 +20,8 @@
 package org.xwiki.refactoring.script;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -27,7 +29,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
@@ -37,14 +38,17 @@ import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.ReplaceUserRequest;
 import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
@@ -57,9 +61,10 @@ public class RequestFactoryTest
     private DocumentAccessBridge documentAccessBridge;
 
     @MockComponent
-    private ModelContext modelContext;
+    private WikiDescriptorManager wikiDescriptorManager;
 
     private DocumentReference userReference = new DocumentReference("wiki", "Users", "Carol");
+
     private WikiReference wikiReference = new WikiReference("wiki");
 
     @BeforeEach
@@ -68,7 +73,7 @@ public class RequestFactoryTest
         MockitoAnnotations.initMocks(this);
         when(documentAccessBridge.getCurrentUserReference()).thenReturn(this.userReference);
         when(documentAccessBridge.getCurrentAuthorReference()).thenReturn(this.userReference);
-        when(modelContext.getCurrentEntityReference()).thenReturn(this.userReference);
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn(this.wikiReference.getName());
     }
 
     @Test
@@ -271,5 +276,48 @@ public class RequestFactoryTest
         assertFalse(deleteRequest.isDeep());
         assertFalse(deleteRequest.isInteractive());
         assertTrue(deleteRequest.isCheckRights());
+    }
+
+    @Test
+    public void createReplaceUserRequestWithLocalUser()
+    {
+        DocumentReference alice = new DocumentReference("dev", "Users", "Alice");
+        DocumentReference bob = new DocumentReference("test", "Users", "Bob");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("test");
+
+        ReplaceUserRequest request = this.requestFactory.createReplaceUserRequest(alice, bob);
+
+        assertEquals(Arrays.asList(RefactoringJobs.GROUP, "replaceUser"), request.getId().subList(0, 2));
+        assertEquals(alice, request.getOldUserReference());
+        assertEquals(bob, request.getNewUserReference());
+
+        assertTrue(request.isCheckRights());
+        assertEquals(this.userReference, request.getUserReference());
+        assertEquals(this.userReference, request.getAuthorReference());
+        assertFalse(request.isInteractive());
+
+        assertEquals(Collections.singleton(alice.getWikiReference()), request.getEntityReferences());
+    }
+
+    @Test
+    public void createReplaceUserRequestWithGlobalUser() throws Exception
+    {
+        DocumentReference bob = new DocumentReference("test", "Users", "Bob");
+        when(this.wikiDescriptorManager.getMainWikiId()).thenReturn("test");
+        when(this.wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("test", "dev"));
+
+        ReplaceUserRequest request = this.requestFactory.createReplaceUserRequest(null, bob);
+
+        assertEquals(Arrays.asList(RefactoringJobs.GROUP, "replaceUser"), request.getId().subList(0, 2));
+        assertNull(request.getOldUserReference());
+        assertEquals(bob, request.getNewUserReference());
+
+        assertTrue(request.isCheckRights());
+        assertEquals(this.userReference, request.getUserReference());
+        assertEquals(this.userReference, request.getAuthorReference());
+        assertFalse(request.isInteractive());
+
+        assertEquals(new HashSet<>(Arrays.asList(bob.getWikiReference(), new WikiReference("dev"))),
+            request.getEntityReferences());
     }
 }

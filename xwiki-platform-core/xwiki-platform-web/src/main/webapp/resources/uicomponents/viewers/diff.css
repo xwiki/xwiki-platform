@@ -90,6 +90,10 @@ textarea.diff-decision {
   display: none;
 }
 
+.empty-decision-value {
+  color: red;
+}
+
 .diff-choices {
   float: right;
 }

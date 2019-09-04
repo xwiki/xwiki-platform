@@ -24,11 +24,11 @@ import java.util.Collection;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.security.authentication.api.AuthenticationFailureManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -60,7 +60,7 @@ public class XWikiUser
 
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
 
-    private AuthenticationFailureManager authenticationFailureManager;
+    private ContextualLocalizationManager localization;
 
     private Logger logger = LoggerFactory.getLogger(XWikiUser.class);
 
@@ -154,13 +154,18 @@ public class XWikiUser
         return localEntityReferenceSerializer;
     }
 
-    private AuthenticationFailureManager getAuthenticationFailureManager()
+    private ContextualLocalizationManager getLocalization()
     {
-        if (authenticationFailureManager == null) {
-            authenticationFailureManager = Utils.getComponent(AuthenticationFailureManager.class);
+        if (this.localization == null) {
+            this.localization = Utils.getComponent(ContextualLocalizationManager.class);
         }
 
-        return authenticationFailureManager;
+        return this.localization;
+    }
+
+    private String localizePlainOrKey(String key, Object... parameters)
+    {
+        return StringUtils.defaultString(getLocalization().getTranslationPlain(key, parameters), key);
     }
 
     public DocumentReference getUserReference()
@@ -189,11 +194,6 @@ public class XWikiUser
     private XWikiDocument getUserDocument(XWikiContext context) throws XWikiException
     {
         return context.getWiki().getDocument(getUserReference(), context);
-    }
-
-    private void removeAuthenticationFailureManagerRecord()
-    {
-        getAuthenticationFailureManager().resetAuthenticationFailureCounter(getUserReference());
     }
 
     /**
@@ -241,12 +241,8 @@ public class XWikiUser
                 XWikiDocument userdoc = getUserDocument(context);
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     DISABLED_PROPERTY, disabledFlag);
-                context.getWiki().saveDocument(userdoc, context);
-
-                // if we enable back an user we remove the authentication failure record.
-                if (!disabled) {
-                    removeAuthenticationFailureManagerRecord();
-                }
+                context.getWiki().saveDocument(userdoc,
+                    localizePlainOrKey("core.users." + (disabled ? "disable" : "enable") + ".saveComment"), context);
             } catch (XWikiException e) {
                 this.logger.error("Error while setting disabled status of user [{}]", getUser(), e);
             }
@@ -291,12 +287,8 @@ public class XWikiUser
                 XWikiDocument userdoc = getUserDocument(context);
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
-                context.getWiki().saveDocument(userdoc, context);
-
-                // if we activate back an user we remove the authentication failure record.
-                if (!active) {
-                    removeAuthenticationFailureManagerRecord();
-                }
+                context.getWiki().saveDocument(userdoc,
+                    localizePlainOrKey("core.users." + (active ? "activate" : "deactivate") + ".saveComment"), context);
             } catch (XWikiException e) {
                 this.logger.error("Error while setting active status of user [{}]", getUser(), e);
             }

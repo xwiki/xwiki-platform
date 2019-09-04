@@ -109,7 +109,20 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       $('#conflict_decision_select_' + conflictId).on('change', function () { changeConflictDecision(conflictId) });
     };
 
-    container.find('input[name=conflict_id]').each(function () { bindConflictDecision($(this).val()); });
+    var onlyDisplayCurrent = function (conflictId) {
+      ['custom', 'previous', 'current', 'next'].forEach(function (item) {
+        if (item !== 'current') {
+          $('#conflict_decision_value_' + item + '_' + conflictId).hide();
+        } else {
+          $('#conflict_decision_value_' + item + '_' + conflictId).show();
+        }
+      });
+    };
+
+    container.find('input[name=conflict_id]').each(function () {
+      bindConflictDecision($(this).val());
+      onlyDisplayCurrent($(this).val());
+    });
   };
 
   //

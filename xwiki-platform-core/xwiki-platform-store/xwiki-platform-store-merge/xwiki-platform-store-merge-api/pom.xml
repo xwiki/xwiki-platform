@@ -36,6 +36,10 @@
   <description>
     XWiki module API dedicated to perform document merge operations and manage related conflicts resolution.
   </description>
+  <properties>
+    <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>100</xwiki.pitest.mutationThreshold>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -57,6 +61,13 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-bridge</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <!-- Test Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 

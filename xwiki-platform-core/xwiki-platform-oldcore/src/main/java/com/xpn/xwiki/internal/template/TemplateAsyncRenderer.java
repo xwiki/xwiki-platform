@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.internal.template;
 
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Arrays;
@@ -35,7 +34,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.block.AbstractBlockAsyncRenderer;
@@ -43,7 +41,6 @@ import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
@@ -51,11 +48,8 @@ import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
-import org.xwiki.velocity.VelocityManager;
 
 /**
  * Actually execute the template.
@@ -71,24 +65,10 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
     private Provider<ComponentManager> componentManager;
 
     @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManagerProvider;
-
-    @Inject
-    private AuthorizationManager authorization;
-
-    @Inject
-    private JobProgressManager progress;
-
-    @Inject
-    @Named("plain/1.0")
-    private BlockRenderer plainRenderer;
-
-    @Inject
     private ContentParser parser;
 
     @Inject
-    private VelocityManager velocityManager;
+    private VelocityTemplateEvaluator evaluator;
 
     @Inject
     private AsyncContext asyncContext;
@@ -256,51 +236,11 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         Writer writer = new StringWriter();
 
         try {
-            evaluateContent(template, content, writer);
+            this.evaluator.evaluateContent(template, content, writer);
         } catch (Exception e) {
-            throw new RenderingException("Failed to evaludate template", e);
+            throw new RenderingException("Failed to evaluate template", e);
         }
 
         return writer.toString();
-    }
-
-    private void evaluateContent(Template template, TemplateContent content, Writer writer) throws Exception
-    {
-        // Make sure the author of the template has script right (required to execute Velocity)
-        if (content.isAuthorProvided()) {
-            this.authorization.checkAccess(Right.SCRIPT, content.getAuthorReference(), content.getDocumentReference());
-        }
-
-        // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
-        // by Velocity as a cache index key for caching macros.
-        String namespace = this.renderingContext.getTransformationId();
-
-        boolean renderingContextPushed = false;
-        if (namespace == null) {
-            namespace = template.getId() != null ? template.getId() : "unknown namespace";
-
-            if (this.renderingContext instanceof MutableRenderingContext) {
-                // Make the current velocity template id available
-                ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
-                    this.renderingContext.getXDOM(), this.renderingContext.getDefaultSyntax(), namespace,
-                    this.renderingContext.isRestricted(), this.renderingContext.getTargetSyntax());
-
-                renderingContextPushed = true;
-            }
-        }
-
-        this.progress.startStep(template, "template.evaluateContent.message",
-            "Evaluate content of template with id [{}]", template.getId());
-
-        try {
-            this.velocityManager.evaluate(writer, namespace, new StringReader(content.getContent()));
-        } finally {
-            // Get rid of temporary rendering context
-            if (renderingContextPushed) {
-                ((MutableRenderingContext) this.renderingContext).pop();
-            }
-
-            this.progress.endStep(template);
-        }
     }
 }

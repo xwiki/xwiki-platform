@@ -38,6 +38,8 @@ public class AsyncRendererConfiguration
 
     protected DocumentReference secureDocumentReference;
 
+    protected boolean secureSet;
+
     /**
      * @return the list of context entries to take remember for the execution
      */
@@ -59,7 +61,7 @@ public class AsyncRendererConfiguration
      */
     public boolean isSecureReferenceSet()
     {
-        return this.secureDocumentReference != null;
+        return this.secureSet;
     }
 
     /**
@@ -86,5 +88,6 @@ public class AsyncRendererConfiguration
     {
         this.secureDocumentReference = documentReference;
         this.secureAuthorReference = authorReference;
+        this.secureSet = true;
     }
 }

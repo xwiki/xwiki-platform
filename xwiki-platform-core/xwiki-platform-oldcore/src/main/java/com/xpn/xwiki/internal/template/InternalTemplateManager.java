@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.template;
 
 import java.io.PrintWriter;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
@@ -73,21 +72,17 @@ import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.VerbatimBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.renderer.printer.WriterWikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.skin.Resource;
 import org.xwiki.skin.ResourceRepository;
 import org.xwiki.skin.Skin;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateContent;
-import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.internal.skin.AbstractEnvironmentResource;
@@ -122,9 +117,6 @@ public class InternalTemplateManager implements Initializable
     private ContentParser parser;
 
     @Inject
-    private VelocityManager velocityManager;
-
-    @Inject
     @Named("context")
     private Provider<ComponentManager> componentManagerProvider;
 
@@ -157,9 +149,6 @@ public class InternalTemplateManager implements Initializable
     private InternalSkinManager skins;
 
     @Inject
-    private AuthorizationManager authorization;
-
-    @Inject
     private JobProgressManager progress;
 
     @Inject
@@ -167,6 +156,12 @@ public class InternalTemplateManager implements Initializable
 
     @Inject
     private BlockAsyncRendererExecutor asyncExecutor;
+
+    @Inject
+    private TemplateContext templateContext;
+
+    @Inject
+    private VelocityTemplateEvaluator evaluator;
 
     @Inject
     private Logger logger;
@@ -315,6 +310,8 @@ public class InternalTemplateManager implements Initializable
 
         public Set<String> contextEntries;
 
+        public UniqueContext unique;
+
         protected Map<String, Object> properties = new HashMap<>();
 
         DefaultTemplateContent(String content)
@@ -360,6 +357,12 @@ public class InternalTemplateManager implements Initializable
         public boolean isCacheAllowed()
         {
             return this.cacheAllowed;
+        }
+
+        @Override
+        public UniqueContext getUnique()
+        {
+            return this.unique;
         }
 
         @Override
@@ -654,8 +657,8 @@ public class InternalTemplateManager implements Initializable
             if (StringUtils.isEmpty(result)) {
                 xdom = new XDOM(Collections.emptyList());
             } else {
-                xdom = new XDOM(Arrays.asList(new RawBlock(result,
-                    content.getRawSyntax() != null ? content.getRawSyntax() : renderingContext.getTargetSyntax())));
+                xdom = new XDOM(Arrays.asList(new RawBlock(result, content.getRawSyntax() != null
+                    ? content.getRawSyntax() : this.renderingContext.getTargetSyntax())));
             }
         }
 
@@ -748,7 +751,7 @@ public class InternalTemplateManager implements Initializable
 
     public void render(Template template, Writer writer) throws Exception
     {
-        if (template == null) {
+        if (!shouldExecute(template)) {
             return;
         }
 
@@ -760,14 +763,21 @@ public class InternalTemplateManager implements Initializable
 
         configuration.setContextEntries(contextEntries);
 
-        if (template.getContent().isAuthorProvided()) {
-            configuration.setSecureReference(template.getContent().getDocumentReference(),
-                template.getContent().getAuthorReference());
+        TemplateContent templateContent = template.getContent();
+        if (templateContent.isAuthorProvided()) {
+            configuration.setSecureReference(templateContent.getDocumentReference(),
+                templateContent.getAuthorReference());
         }
 
         String result = this.asyncExecutor.render(renderer, configuration);
 
         writer.append(result);
+    }
+
+    private boolean shouldExecute(Template template) throws Exception
+    {
+        return template != null
+            && (template.getContent().getUnique() == null || !this.templateContext.isExecuted(template));
     }
 
     private void render(XDOM xdom, Writer writer)
@@ -827,8 +837,8 @@ public class InternalTemplateManager implements Initializable
 
     public XDOM execute(Template template) throws Exception
     {
-        if (template == null) {
-            return null;
+        if (!shouldExecute(template)) {
+            return new XDOM(Collections.emptyList());
         }
 
         TemplateAsyncRenderer renderer = this.rendererProvider.get();
@@ -857,49 +867,9 @@ public class InternalTemplateManager implements Initializable
     {
         Writer writer = new StringWriter();
 
-        evaluateContent(template, content, writer);
+        this.evaluator.evaluateContent(template, content, writer);
 
         return writer.toString();
-    }
-
-    private void evaluateContent(Template template, TemplateContent content, Writer writer) throws Exception
-    {
-        // Make sure the author of the template has script right (required to execute Velocity)
-        if (content.isAuthorProvided()) {
-            this.authorization.checkAccess(Right.SCRIPT, content.getAuthorReference(), content.getDocumentReference());
-        }
-
-        // Use the Transformation id as the name passed to the Velocity Engine. This name is used internally
-        // by Velocity as a cache index key for caching macros.
-        String namespace = this.renderingContext.getTransformationId();
-
-        boolean renderingContextPushed = false;
-        if (namespace == null) {
-            namespace = template.getId() != null ? template.getId() : "unknown namespace";
-
-            if (this.renderingContext instanceof MutableRenderingContext) {
-                // Make the current velocity template id available
-                ((MutableRenderingContext) this.renderingContext).push(this.renderingContext.getTransformation(),
-                    this.renderingContext.getXDOM(), this.renderingContext.getDefaultSyntax(), namespace,
-                    this.renderingContext.isRestricted(), this.renderingContext.getTargetSyntax());
-
-                renderingContextPushed = true;
-            }
-        }
-
-        this.progress.startStep(template, "template.evaluateContent.message",
-            "Evaluate content of template with id [{}]", template.getId());
-
-        try {
-            this.velocityManager.evaluate(writer, namespace, new StringReader(content.getContent()));
-        } finally {
-            // Get rid of temporary rendering context
-            if (renderingContextPushed) {
-                ((MutableRenderingContext) this.renderingContext).pop();
-            }
-
-            this.progress.endStep(template);
-        }
     }
 
     private Syntax getTargetSyntax()

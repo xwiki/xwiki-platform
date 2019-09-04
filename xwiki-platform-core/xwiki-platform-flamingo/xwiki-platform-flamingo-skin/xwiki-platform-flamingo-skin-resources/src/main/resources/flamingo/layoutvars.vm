@@ -1,3 +1,5 @@
+## Make sure this template is not executed more than necessary
+##!unique=request
 ##
 ## In admin mode, Panels.PanelWizard must display the layout for the requested space
 ##

@@ -19,35 +19,36 @@
  */
 package org.xwiki.mail.internal.configuration;
 
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.WikiReference;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-
 /**
- * Provides configuration from the Mail.SendMailConfigClass document in the current wiki.
+ * Provides configuration from the Mail.SendMailConfigClass document in the main wiki.
  * If the Mail.SendMailConfigClass xobject exists in the Mail.MailConfig document then always use configuration
  * values from it and if it doesn't then use the passed default values (if a default value is passed).
  *
  * @version $Id$
- * @since 6.4M2
+ * @since 11.8RC1
  */
 @Component
-@Named("mailsend")
+@Named("mailsendmainwiki")
 @Singleton
-public class SendMailConfigClassDocumentConfigurationSource
+public class MainWikiSendMailConfigClassDocumentConfigurationSource
     extends AbstractSendMailConfigClassDocumentConfigurationSource
 {
     @Override
     protected String getCacheId()
     {
-        return "configuration.document.mail.send";
+        return "configuration.document.mail.send.mainwiki";
     }
 
     @Override
     protected DocumentReference getDocumentReference()
     {
-        return new DocumentReference(MAILCONFIG_REFERENCE, getCurrentWikiReference());
+        return new DocumentReference(MAILCONFIG_REFERENCE, new WikiReference(this.wikiManager.getMainWikiId()));
     }
 }

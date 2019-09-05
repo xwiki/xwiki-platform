@@ -20,18 +20,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Mail.MailConfig" locale="">
+<xwikidoc version="1.3" reference="Mail.MailConfigurable" locale="">
   <web>Mail</web>
-  <name>MailConfig</name>
+  <name>MailConfigurable</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Mail.WebHome</parent>
+  <parent>WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Mail Configuration</title>
+  <title>Mail Configurable</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
@@ -47,10 +47,10 @@
     <filesize>8309</filesize>
   </attachment>
   <object>
-    <name>Mail.MailConfig</name>
+    <name>Mail.MailConfigurable</name>
     <number>0</number>
     <className>XWiki.ConfigurableClass</className>
-    <guid>8887c25f-a95f-44ba-8b87-c119e65a0d36</guid>
+    <guid>75df241e-35fe-488a-9609-ac8277c54a96</guid>
     <class>
       <name>XWiki.ConfigurableClass</name>
       <customClass/>
@@ -101,10 +101,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -278,10 +278,10 @@
     </property>
   </object>
   <object>
-    <name>Mail.MailConfig</name>
+    <name>Mail.MailConfigurable</name>
     <number>1</number>
     <className>XWiki.ConfigurableClass</className>
-    <guid>4bee1ca8-fffb-4c7a-b9f6-780a1338e31d</guid>
+    <guid>c32ab560-e1ad-443c-ad37-8ce875f2a046</guid>
     <class>
       <name>XWiki.ConfigurableClass</name>
       <customClass/>
@@ -332,10 +332,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -509,10 +509,10 @@
     </property>
   </object>
   <object>
-    <name>Mail.MailConfig</name>
+    <name>Mail.MailConfigurable</name>
     <number>2</number>
     <className>XWiki.ConfigurableClass</className>
-    <guid>b867c013-9ab7-406e-9fe2-4cafed309b0b</guid>
+    <guid>22207ce0-3597-43bb-9a5c-b0503b63132e</guid>
     <class>
       <name>XWiki.ConfigurableClass</name>
       <customClass/>
@@ -563,10 +563,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>

@@ -92,6 +92,13 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-oldcore</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.icegreen</groupId>
       <artifactId>greenmail</artifactId>
       <scope>test</scope>

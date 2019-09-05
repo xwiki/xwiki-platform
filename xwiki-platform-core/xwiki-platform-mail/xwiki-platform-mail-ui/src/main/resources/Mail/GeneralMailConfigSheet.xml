@@ -37,34 +37,14 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($configDocName = 'Mail.MailConfig')
-#set ($configDoc = $xwiki.getDocument($configDocName))
-#set ($configClassName = 'Mail.GeneralMailConfigClass')
-#set ($configObj = $configDoc.getObject($configClassName))
 ## =======================================================
-## Step 1: Migrate Mail config data
-## =======================================================
-## We bundle Mail.MailConfig without a Mail.GeneralMailConfigClass xobject, allowing us to migrate mail configuration
-## that were previously stored in XWikiPreferences into a Mail.GeneralMailConfigClass xobject.
-#if ($xcontext.action == 'admin' &amp;&amp; "$!configObj" == '')
-  ## Create the xobject
-  #set ($configObj = $configDoc.newObject($configClassName))
-  ## Get the "obfuscate" value from the old location
-  #set ($oldValue = $xwiki.getSpacePreference('obfuscateEmailAddresses'))
-  #if ("$!oldValue" != '')
-    #set ($discard = $configObj.set('obfuscate', $oldValue))
-  #end
-  ## Save the new xobject!
-  #set ($discard = $configDoc.save('Migrated Mail configuration found in XWikiPreferences', true))
-#end
-## =======================================================
-## Step 2: Display form
+## Display form
 ## =======================================================
 #set ($params = {
   'general': ['obfuscate']
 })
-#set ($paramDoc = $configDoc)
-#set ($paramClass = $configClassName)
+#set ($paramDoc = $xwiki.getDocument('Mail.MailConfig'))
+#set ($paramClass = 'Mail.GeneralMailConfigClass')
 {{/velocity}}
 
 {{include reference="XWiki.AdminFieldsDisplaySheet" /}}</content>

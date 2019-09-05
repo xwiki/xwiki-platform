@@ -23,7 +23,10 @@ import java.util.Arrays;
 import java.util.Properties;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import com.xpn.xwiki.XWikiContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.configuration.ConfigurationSource;
@@ -32,14 +35,14 @@ import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.*;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for {@link org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration}.
@@ -57,16 +60,29 @@ public class DefaultMailSenderConfigurationTest
     private DefaultMailSenderConfiguration configuration;
 
     @MockComponent
-    @Named("documents")
-    private ConfigurationSource documentsSource;
-
-    @MockComponent
     @Named("mailsend")
     private ConfigurationSource mailConfigDocumentSource;
 
     @MockComponent
+    @Named("mailsendmainwiki")
+    private ConfigurationSource mainWikiMailConfigDocumentSource;
+
+    @MockComponent
     @Named("xwikiproperties")
     private ConfigurationSource xwikiPropertiesSource;
+
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @MockComponent
+    private Provider<XWikiContext> xcontextProvider;
+
+    @BeforeEach
+    public void setUp()
+    {
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("mainwiki");
+        when(this.wikiDescriptorManager.isMainWiki("mainwiki")).thenReturn(true);
+    }
 
     @Test
     public void getFromAddressWhenNotConfigured()
@@ -77,61 +93,62 @@ public class DefaultMailSenderConfigurationTest
     @Test
     public void getFromAddressWhenDefinedInXWikiProperties()
     {
-        when(this.documentsSource.getProperty("admin_email", String.class)).thenReturn(null);
-        when(this.mailConfigDocumentSource.getProperty("from", null)).thenReturn(null);
         when(this.xwikiPropertiesSource.getProperty("mail.sender.from", String.class)).thenReturn("john@doe.com");
 
         assertEquals("john@doe.com", this.configuration.getFromAddress());
     }
 
     @Test
-    public void getFromAddressWhenDefinedInXWikiPreferences()
+    public void getFromAddressFromMailConfigDocumentInMainWiki()
     {
-        when(this.documentsSource.getProperty("admin_email", String.class)).thenReturn("john@doe.com");
-        when(this.mailConfigDocumentSource.getProperty("from", "john@doe.com")).thenReturn("john@doe.com");
+        when(this.mailConfigDocumentSource.getProperty("from", String.class)).thenReturn("john@doe.com");
 
         assertEquals("john@doe.com", this.configuration.getFromAddress());
     }
 
     @Test
-    public void getFromAddressWhenDefinedInMailConfig()
+    public void getFromAddressFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
     {
-        when(this.documentsSource.getProperty("admin_email", String.class)).thenReturn(null);
-        when(this.mailConfigDocumentSource.getProperty("from", (String) null)).thenReturn("john@doe.com");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
+        when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
+        when(this.xcontextProvider.get()).thenReturn(mock(XWikiContext.class));
+
+        when(this.mailConfigDocumentSource.getProperty("from", String.class)).thenReturn(null);
+        when(this.mainWikiMailConfigDocumentSource.getProperty("from", String.class)).thenReturn("john@doe.com");
 
         assertEquals("john@doe.com", this.configuration.getFromAddress());
     }
 
     @Test
-    public void getAdditionalPropertiesFromMailConfigDocument()
+    public void getAdditionalPropertiesFromMailConfigDocumentInMainWiki()
     {
-        when(this.documentsSource.getProperty("javamail_extra_props", String.class)).thenReturn("key=value");
-        when(this.mailConfigDocumentSource.getProperty("properties", "key=value")).thenReturn(
+        when(this.mailConfigDocumentSource.getProperty("properties", String.class)).thenReturn(
             "key1=value1\nkey2=value2");
 
-        Properties properties = this.configuration.getAdditionalProperties();
-        assertEquals("value1", properties.getProperty("key1"));
-        assertEquals("value2", properties.getProperty("key2"));
+        Properties returnedProperties = this.configuration.getAdditionalProperties();
+        assertEquals("value1", returnedProperties.getProperty("key1"));
+        assertEquals("value2", returnedProperties.getProperty("key2"));
     }
 
     @Test
-    public void getAdditionalPropertiesFromXWikiPreferences()
+    public void getAdditionalPropertiesFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
     {
-        when(this.documentsSource.getProperty("javamail_extra_props", String.class)).thenReturn(
-            "key1=value1\nkey2=value2");
-        when(this.mailConfigDocumentSource.getProperty("properties", "key1=value1\nkey2=value2")).thenReturn(
-            "key1=value1\nkey2=value2");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
+        when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
+        when(this.xcontextProvider.get()).thenReturn(mock(XWikiContext.class));
 
-        Properties properties = this.configuration.getAdditionalProperties();
-        assertEquals("value1", properties.getProperty("key1"));
-        assertEquals("value2", properties.getProperty("key2"));
+        when(this.mailConfigDocumentSource.getProperty("properties", String.class)).thenReturn(null);
+        when(this.mainWikiMailConfigDocumentSource.getProperty("properties", String.class)).thenReturn(
+                "key1=value1\nkey2=value2");
+
+        Properties returnedProperties = this.configuration.getAdditionalProperties();
+        assertEquals("value1", returnedProperties.getProperty("key1"));
+        assertEquals("value2", returnedProperties.getProperty("key2"));
     }
 
     @Test
     public void getAdditionalPropertiesFromXWikiProperties()
     {
-        when(this.documentsSource.getProperty("javamail_extra_props")).thenReturn(null);
-
         Properties properties = new Properties();
         properties.setProperty("key1", "value1");
         properties.setProperty("key2", "value2");
@@ -145,8 +162,7 @@ public class DefaultMailSenderConfigurationTest
     @Test
     public void getAdditionalPropertiesWhenErrorInFormat()
     {
-        when(this.documentsSource.getProperty("javamail_extra_props", String.class)).thenReturn("\\uinvalid");
-        when(this.mailConfigDocumentSource.getProperty("properties", "\\uinvalid")).thenReturn("\\uinvalid");
+        when(this.mailConfigDocumentSource.getProperty("properties", String.class)).thenReturn("\\uinvalid");
 
         assertTrue(this.configuration.getAdditionalProperties().isEmpty());
 
@@ -159,13 +175,13 @@ public class DefaultMailSenderConfigurationTest
     @Test
     public void getAllProperties()
     {
-        when(this.mailConfigDocumentSource.getProperty("properties", (String) null)).thenReturn(
+        when(this.mailConfigDocumentSource.getProperty("properties", String.class)).thenReturn(
             "mail.smtp.starttls.enable=true");
-        when(this.mailConfigDocumentSource.getProperty("username", (String) null)).thenReturn(null);
-        when(this.mailConfigDocumentSource.getProperty("password", (String) null)).thenReturn(null);
-        when(this.mailConfigDocumentSource.getProperty("host", (String) null)).thenReturn("server");
+        when(this.mailConfigDocumentSource.getProperty("username", String.class)).thenReturn(null);
+        when(this.mailConfigDocumentSource.getProperty("password", String.class)).thenReturn(null);
+        when(this.mailConfigDocumentSource.getProperty("host", String.class)).thenReturn("server");
         when(this.mailConfigDocumentSource.getProperty("port", Integer.class)).thenReturn(25);
-        when(this.mailConfigDocumentSource.getProperty("from", (String) null)).thenReturn("john@doe.com");
+        when(this.mailConfigDocumentSource.getProperty("from", String.class)).thenReturn("john@doe.com");
 
         Properties returnedProperties = this.configuration.getAllProperties();
 
@@ -179,19 +195,10 @@ public class DefaultMailSenderConfigurationTest
     }
 
     @Test
-    public void usesAuthenticationWhenNoUserNameAndPassword()
-    {
-        when(this.documentsSource.getProperty("smtp_server_username", (String) null)).thenReturn(null);
-        when(this.documentsSource.getProperty("smtp_server_password", (String) null)).thenReturn(null);
-
-        assertFalse(this.configuration.usesAuthentication());
-    }
-
-    @Test
     public void usesAuthenticationWhenUserNameAndPasswordExist()
     {
-        when(this.mailConfigDocumentSource.getProperty("username", (String) null)).thenReturn("user");
-        when(this.mailConfigDocumentSource.getProperty("password", (String) null)).thenReturn("pass");
+        when(this.mailConfigDocumentSource.getProperty("username", String.class)).thenReturn("user");
+        when(this.mailConfigDocumentSource.getProperty("password", String.class)).thenReturn("pass");
 
         assertTrue(this.configuration.usesAuthentication());
     }
@@ -199,8 +206,7 @@ public class DefaultMailSenderConfigurationTest
     @Test
     public void getPortFromXWikiPreferences()
     {
-        when(this.documentsSource.getProperty("smtp_port")).thenReturn("25");
-        when(this.mailConfigDocumentSource.getProperty("port", 25)).thenReturn(25);
+        when(this.mailConfigDocumentSource.getProperty("port", Integer.class)).thenReturn(25);
 
         assertEquals(25, this.configuration.getPort());
     }

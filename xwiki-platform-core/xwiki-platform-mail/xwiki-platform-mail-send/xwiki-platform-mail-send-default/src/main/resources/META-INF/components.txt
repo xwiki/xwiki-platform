@@ -5,6 +5,7 @@ org.xwiki.mail.internal.AddressesConverter
 org.xwiki.mail.internal.AddressConverter
 org.xwiki.mail.internal.MemoryMailListener
 org.xwiki.mail.internal.MailMandatoryDocumentInitializer
+org.xwiki.mail.internal.MailConfigMandatoryDocumentInitializer
 org.xwiki.mail.internal.thread.MailSenderInitializerListener
 org.xwiki.mail.internal.thread.PrepareMailQueueManager
 org.xwiki.mail.internal.thread.SendMailQueueManager
@@ -17,6 +18,7 @@ org.xwiki.mail.internal.script.AlwaysAllowScriptServicePermissionChecker
 org.xwiki.mail.internal.script.ProgrammingRightsScriptServicePermissionChecker
 org.xwiki.mail.internal.configuration.DefaultMailSenderConfiguration
 org.xwiki.mail.internal.configuration.SendMailConfigClassDocumentConfigurationSource
+org.xwiki.mail.internal.configuration.MainWikiSendMailConfigClassDocumentConfigurationSource
 org.xwiki.mail.internal.FileSystemMailContentStore
 org.xwiki.mail.internal.DefaultSessionFactory
 org.xwiki.mail.internal.factory.attachment.AttachmentMimeBodyPartFactory

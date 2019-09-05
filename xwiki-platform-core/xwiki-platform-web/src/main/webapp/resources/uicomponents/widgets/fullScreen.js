@@ -84,23 +84,28 @@ widgets.FullScreen = Class.create({
   },
   /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
-    if (this.isXWikiEditor(item) && this.isMaximizable(item)) {
-      this.addWikiContentButton(item);
-    } else if (this.isVisibleTextareaOrMaximizable(item) && this.isMaximizable(item)) {
-      this.addElementButton(item);
+    if (!this.isNotMaximizable(item)) {
+      if (this.isWikiContent(item)) {
+        this.addWikiContentButton(item);
+      } else if (this.isWikiField(item)) {
+        this.addWikiFieldButton(item);
+      } else {
+        // a div element with class maximazable
+        this.addElementButton(item);
+      }
     }
   },
-  isMaximizable: function (item) {
+  isNotMaximizable: function (item) {
     return !item.hasClassName('not-maximizable');
   },
   // Some simple functions that help deciding what kind of editor is the target element
-  isXWikiEditor : function (textarea) {
-    // WYSIWYG Editor or Wiki Editor
+  isWikiContent : function (textarea) {
+    // If the textarea is not visible, then the WYSIWYG editor is active.
     return textarea.name == 'content' && textarea.visible();
   },
-  isVisibleTextareaOrMaximizable : function (textarea) {
-    // Any other visible textarea or textarea with maximizable class.
-    return textarea.visible() || textarea.hasClassName('maximizable');
+  isWikiField : function (textarea) {
+    // If the textarea is not visible, then the WYSIWYG editor is active.
+    return textarea.visible();
   },
   /** Adds the fullscreen button in the Wiki editor toolbar. */
   addWikiContentButton : function (textarea) {
@@ -109,11 +114,14 @@ widgets.FullScreen = Class.create({
     if (textarea._toolbar) {
       textarea._toolbar.insert({top: this.createOpenButton(textarea)});
     } else {
-      this.addElementButton(textarea);
+      this.addWikiFieldButton(textarea);
     }
   },
-  addElementButton: function (element) {
+  addElementButton: function(element) {
     Element.insert(element, {before: this.createOpenLink(element)});
+  },
+  addWikiFieldButton : function (textarea) {
+    Element.insert(textarea, {before: this.createOpenLink(textarea)});
   },
   /** Creates a full screen activator button for the given element. */
   createOpenButton : function (targetElement) {

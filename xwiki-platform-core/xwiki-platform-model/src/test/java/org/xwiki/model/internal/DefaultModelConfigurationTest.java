@@ -19,18 +19,19 @@
  */
 package org.xwiki.model.internal;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.ModelConfiguration;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link DefaultModelConfiguration}.
@@ -38,47 +39,50 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  * @version $Id$
  * @since 2.2M1
  */
-@ComponentList({RelativeStringEntityReferenceResolver.class, DefaultStringEntityReferenceSerializer.class})
+@ComponentTest
+@ComponentList({
+    RelativeStringEntityReferenceResolver.class,
+    DefaultStringEntityReferenceSerializer.class
+})
 public class DefaultModelConfigurationTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<ModelConfiguration> mocker =
-        new MockitoComponentMockingRule<ModelConfiguration>(DefaultModelConfiguration.class);
+    @InjectMockComponents
+    private DefaultModelConfiguration configuration;
 
-    private MemoryConfigurationSource configuration;
-
-    @Before
-    public void before() throws Exception
+    private MemoryConfigurationSource configurationSource;
+    
+    @BeforeEach
+    public void before(MockitoComponentManager componentManager) throws Exception
     {
-        this.configuration = this.mocker.registerMemoryConfigurationSource();
+        this.configurationSource = componentManager.registerMemoryConfigurationSource();
     }
 
     @Test
-    public void testGetDefaultReferenceNameWhenDefinedInConfiguration() throws ComponentLookupException
+    public void getDefaultReferenceNameWhenDefinedInConfiguration()
     {
-        this.configuration.setProperty("model.reference.default.wiki", "defaultWiki");
-        this.configuration.setProperty("model.reference.default.document", "defaultDocument");
-        this.configuration.setProperty("model.reference.default.space", "defaultSpace");
-        this.configuration.setProperty("model.reference.default.attachment", "defaultFilename");
-        this.configuration.setProperty("model.reference.default.object", "defaultObject");
-        this.configuration.setProperty("model.reference.default.object_property", "defaultProperty");
+        this.configurationSource.setProperty("model.reference.default.wiki", "defaultWiki");
+        this.configurationSource.setProperty("model.reference.default.document", "defaultDocument");
+        this.configurationSource.setProperty("model.reference.default.space", "defaultSpace");
+        this.configurationSource.setProperty("model.reference.default.attachment", "defaultFilename");
+        this.configurationSource.setProperty("model.reference.default.object", "defaultObject");
+        this.configurationSource.setProperty("model.reference.default.object_property", "defaultProperty");
 
-        Assert.assertEquals("defaultWiki", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.WIKI));
-        Assert.assertEquals("defaultDocument", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.DOCUMENT));
-        Assert.assertEquals("defaultSpace", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.SPACE));
-        Assert.assertEquals("defaultFilename", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.ATTACHMENT));
-        Assert.assertEquals("defaultObject", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.OBJECT));
-        Assert.assertEquals("defaultProperty", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
+        assertEquals("defaultWiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
+        assertEquals("defaultDocument", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));
+        assertEquals("defaultSpace", this.configuration.getDefaultReferenceValue(EntityType.SPACE));
+        assertEquals("defaultFilename", this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT));
+        assertEquals("defaultObject", this.configuration.getDefaultReferenceValue(EntityType.OBJECT));
+        assertEquals("defaultProperty", this.configuration.getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
     }
 
     @Test
     public void testGetDefaultReferenceNameWhenNotDefinedInConfiguration() throws ComponentLookupException
     {
-        Assert.assertEquals("xwiki", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.WIKI));
-        Assert.assertEquals("WebHome", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.DOCUMENT));
-        Assert.assertEquals("Main", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.SPACE));
-        Assert.assertEquals("filename", this.mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.ATTACHMENT));
-        Assert.assertEquals("object", mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.OBJECT));
-        Assert.assertEquals("property", mocker.getComponentUnderTest().getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
+        assertEquals("xwiki", this.configuration.getDefaultReferenceValue(EntityType.WIKI));
+        assertEquals("WebHome", this.configuration.getDefaultReferenceValue(EntityType.DOCUMENT));
+        assertEquals("Main", this.configuration.getDefaultReferenceValue(EntityType.SPACE));
+        assertEquals("filename", this.configuration.getDefaultReferenceValue(EntityType.ATTACHMENT));
+        assertEquals("object", this.configuration.getDefaultReferenceValue(EntityType.OBJECT));
+        assertEquals("property", this.configuration.getDefaultReferenceValue(EntityType.OBJECT_PROPERTY));
     }
 }

@@ -93,9 +93,13 @@
   #end
   #set($rows = [])
   #foreach ($group in $subGroups)
+    #set ($title = $xwiki.getDocument($group).title)
+    #if ($title == '')
+      #set ($title = $group.name)
+    #end
     #set($void = $rows.add({
         'doc_viewable' : true,
-        'group' : $group.name,
+        'group' : $title,
         'group_url' : $xwiki.getURL($group)
       }))
   #end

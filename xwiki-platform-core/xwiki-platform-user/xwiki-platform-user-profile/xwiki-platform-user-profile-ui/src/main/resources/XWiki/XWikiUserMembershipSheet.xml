@@ -94,7 +94,7 @@
   #set($rows = [])
   #foreach ($group in $subGroups)
     #set ($title = $xwiki.getDocument($group).title)
-    #if ($title == '')
+    #if ("$!title" == '')
       #set ($title = $group.name)
     #end
     #set($void = $rows.add({

@@ -1,0 +1,81 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.UserDirectoryColumnsDisplayer" locale="">
+  <web>XWiki</web>
+  <name>UserDirectoryColumnsDisplayer</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.UserDirectoryPreferencesClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#if ($type == 'edit' || $type == 'search')
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('selectize.js', 'css/selectize.bootstrap3.css'),
+    {'type': 'text/css', 'rel': 'stylesheet'}))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/xwiki.selectize.js', true))
+  #set ($options = [])
+  #set ($xwikiUsersClass = $xwiki.getDocument('XWiki.XWikiUsers').xWikiClass)
+  #foreach ($propertyClass in $xwikiUsersClass.properties)
+    ## It doesn't make sense to show password columns in the User Directory.
+    #if ($propertyClass.classType != 'Password')
+      #set ($discard = $options.add({
+        'value': $propertyClass.name,
+        'label': $propertyClass.translatedPrettyName
+      }))
+    #end
+  #end
+  #set ($id = $escapetool.xml("${prefix}${name}"))
+  #set ($selectizeSettings = {
+    'options': $sorttool.sort($options, 'label'),
+    'items': $value.split('\s+'),
+    'delimiter': ' '
+  })
+  {{html clean="false"}}
+  ## We don't use a select element because we need to submit the selected values concatenated (the 'columns' property
+  ## type is TextArea which reads only the first value that is submitted).
+  &lt;input id="$id" class="xwiki-selectize" name="$id" type="text"
+    placeholder="$escapetool.xml($services.localization.render('userdirectory.configuration.columns.editHint'))"
+    data-xwiki-selectize="$escapetool.xml($jsontool.serialize($selectizeSettings))" /&gt;
+  {{/html}}
+#elseif ($type == 'view')
+  $doc.displayView($field, $prefix, $object)
+#elseif ($type == 'rendered')
+  $doc.displayRendered($field, $prefix, $object)
+#elseif ($type == 'hidden')
+  $doc.displayHidden($field, $prefix, $object)
+#else
+  ## In order for the custom displayer to be taken into account, the result of its evaluation with an unknown display
+  ## mode must not be empty. Let's output something.
+  Unknown display mode.
+#end
+{{/velocity}}</content>
+</xwikidoc>

@@ -37,16 +37,27 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="XWiki.LiveTableResultsMacros" /}}
+
 {{velocity wiki="false"}}
 ##
-## Override the blacklisted spaces preference since we want to display users from the entire wiki (all spaces).
-#set ($blacklistedSpaces = [])
+## This page is overridden in subwikis by UserDirectoryLivetableResultsOverride, which includes this page and extends
+## the live table query to support global/local user filtering.
 ##
-## Call the gridresultwithfilter macro that generates the JSON. Hardcode the XWikiUsers class because we don't want others to use this page to avoid blacklisted spaces for other classes.
-## Note: This page can be ignored if an override exists. However, we allow possible overrides to include this page and extend the livetable's query.
-#if ("$!extraWhereClauseParameters" == "")
+#set ($columns = $request.collist.split(','))
+## Hide disabled and inactive user profiles if requested.
+#if ($request.hideDisabledProfiles == 'true' &amp;&amp; !$columns.contains('active') &amp;&amp; !$columns.contains('disabled'))
+  #set ($extraFromClause = "$!extraFromClause, IntegerProperty as activeProperty, IntegerProperty as disabledProperty")
+  #set ($isActive = "obj.id = activeProperty.id.id and activeProperty.id.name = 'active' and " +
+    'activeProperty.value = 1')
+  ## The 'disabled' property might not be set (its value is null) in which case we consider the profile as enabled.
+  #set ($isNotDisabled = "obj.id = disabledProperty.id.id and disabledProperty.id.name = 'disabled' and " +
+    '(disabledProperty.value is null or disabledProperty.value &lt;&gt; 1)')
+  #set ($extraWhereClause = "$!extraWhereClause and $isActive and $isNotDisabled")
+#end
+#if ("$!extraWhereClauseParameters" == '')
   #set ($extraWhereClauseParameters = {})
 #end
-#gridresultwithfilter('XWiki.XWikiUsers' $request.collist.split(','), "$!extraFromClause", "$!extraWhereClause", $extraWhereClauseParameters)
+## Generate the live table results as JSON.
+#gridresultwithfilter('XWiki.XWikiUsers' $columns "$!extraFromClause" "$!extraWhereClause" $extraWhereClauseParameters)
 {{/velocity}}</content>
 </xwikidoc>

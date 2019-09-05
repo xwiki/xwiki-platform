@@ -39,8 +39,9 @@
   <content>{{include reference='XWiki.UserDirectoryMacros'/}}
 
 {{velocity}}
-#displayUserDirectory(true)
-#set($docextras=[])
+#set ($customize = $request.customize == 'true')
+#displayUserDirectory($customize)
+#set ($docextras = [])
 {{/velocity}}</content>
   <object>
     <name>Main.UserDirectory</name>

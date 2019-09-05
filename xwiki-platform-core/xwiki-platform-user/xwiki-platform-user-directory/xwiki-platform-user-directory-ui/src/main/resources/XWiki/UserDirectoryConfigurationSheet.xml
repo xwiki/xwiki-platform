@@ -42,7 +42,7 @@
 #if ($doc.documentReference.name == 'UserDirectoryConfigurationSheet')
   {{warning}}$services.localization.render('platform.userdirectory.configSheetApplyOnConfiguration'){{/warning}}
 #else
-  #displayUserDirectoryCustomizationForm(true)
+  #displayUserDirectory(true)
 #end
 {{/velocity}}</content>
 </xwikidoc>

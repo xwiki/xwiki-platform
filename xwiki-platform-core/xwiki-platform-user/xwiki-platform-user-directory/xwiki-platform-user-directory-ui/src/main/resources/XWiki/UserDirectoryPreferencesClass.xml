@@ -47,9 +47,10 @@
     <nameField/>
     <validationScript/>
     <columns>
-      <customDisplay/>
+      <customDisplay>{{include reference="XWiki.UserDirectoryColumnsDisplayer"/}}</customDisplay>
       <disabled>0</disabled>
       <editor>PureText</editor>
+      <hint>The list of columns, corresponding to properties of the User class, to be displayed in the user directory</hint>
       <name>columns</name>
       <number>1</number>
       <picker>0</picker>
@@ -61,6 +62,21 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
     </columns>
+    <hideDisabledProfiles>
+      <customDisplay/>
+      <defaultValue>1</defaultValue>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint>Exclude from the user directory the users that have their profile disabled</hint>
+      <name>hideDisabledProfiles</name>
+      <number>2</number>
+      <prettyName>Hide disabled user profiles</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </hideDisabledProfiles>
   </class>
   <object>
     <name>XWiki.UserDirectoryPreferencesClass</name>

@@ -420,13 +420,14 @@ function displayUsersAndGroups(row, i, table, idx, form_token, targetDocument)
   } else {
     username.setAttribute('data-title', "$escapetool.javascript($services.localization.render('rightsmanager.username'))");
   }
+  var title = (row.title || row.username);
   if (row.wikiname == "local") {
     var a = document.createElement('a');
     a.href = userurl;
-    a.appendChild( document.createTextNode( row.username ) );
+    a.appendChild(document.createTextNode(title));
     username.appendChild( a );
   } else {
-    username.appendChild(document.createTextNode(row.username));
+    username.appendChild(document.createTextNode(title));
   }
 
   // We set this map manually because we cannot use foreach loops with yuicompressor, that forbids the '#' character,

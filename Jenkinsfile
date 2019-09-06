@@ -284,6 +284,9 @@ private void buildInsideNode(map)
       if (map.properties != null) {
         properties = map.properties
       }
+      if (map.daysToKeepStr != null) {
+        daysToKeepStr = map.daysToKeepStr
+      }
       if (map.pom != null) {
         pom = map.pom
       }

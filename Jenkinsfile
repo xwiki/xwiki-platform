@@ -29,7 +29,8 @@ def builds = [
     build(
       name: 'Main',
       profiles: 'legacy,integration-tests,snapshotModules',
-      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true'
+      properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
+      daysToKeepStr: env['BRANCH_NAME'] == 'master' ? '30' : null
     )
   },
   'Distribution' : {
@@ -55,7 +56,8 @@ def builds = [
   'Flavor Test - UI' : {
     buildFunctionalTest(
       name: 'Flavor Test - UI',
-      pom: 'xwiki-platform-distribution-flavor-test-ui/pom.xml'
+      pom: 'xwiki-platform-distribution-flavor-test-ui/pom.xml',
+      daysToKeepStr: env['BRANCH_NAME'] == 'master' ? '30' : null
     )
   },
   'Flavor Test - Misc' : {
@@ -79,7 +81,8 @@ def builds = [
   'Flavor Test - Selenium' : {
     buildFunctionalTest(
       name: 'Flavor Test - Selenium',
-      pom: 'xwiki-platform-distribution-flavor-test-selenium/pom.xml'
+      pom: 'xwiki-platform-distribution-flavor-test-selenium/pom.xml',
+      daysToKeepStr: env['BRANCH_NAME'] == 'master' ? '30' : null
     )
   },
   'Flavor Test - Upgrade' : {

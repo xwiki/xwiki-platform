@@ -477,7 +477,10 @@
    * User scope filtering (for sub-wikis).
    */
   $('#userScopeFilter').change(function(event) {
-    var value = $(this).value;
+    var value = $(this).val();
+    // The live table is recreated when an user directory setting is changed (live preview) so we can't cache the
+    // reference to the live table instance.
+    var usersLiveTable = window['livetable_userdirectory'];
     var url = usersLiveTable.getUrl;
     if (url.search('userScope=') &gt;= 0) {
       // Replace the old value.

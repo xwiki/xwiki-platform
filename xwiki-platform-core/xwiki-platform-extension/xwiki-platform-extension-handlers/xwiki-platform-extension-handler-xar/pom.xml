@@ -91,6 +91,14 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
     </dependency>
+    <!-- The merge manager implem is needed for the DefaultXWikiDocumentMerger and this module should be able
+     to run independently for the extension manager.
+     -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-store-merge-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Test dependencies -->
     <dependency>
@@ -98,12 +106,6 @@
       <artifactId>xwiki-platform-test-oldcore</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-store-merge-default</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>

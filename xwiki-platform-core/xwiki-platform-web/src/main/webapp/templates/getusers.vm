@@ -99,7 +99,7 @@
     #set ($scope = 'local')
   #end
   #set ($hasEdit = $services.security.authorization.hasAccess('edit', $user.documentReference))
-  #set ($disabled = $xwiki.getUser($user.fullName).isDisabled())
+  #set ($disabled = $xwiki.getUser($user.documentReference).isDisabled())
   #set ($hasEnable = $hasEdit && $disabled)
   ## Prevent users from disabling their own accounts.
   #set ($hasDisable = $hasEdit && !$disabled && $xcontext.userReference != $user.documentReference)

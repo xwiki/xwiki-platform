@@ -46,12 +46,16 @@ public class XWikiUser
 
     /**
      * The name of the property that store the active status of the user.
+     * @since 11.8RC1
      */
+    @Unstable
     public static final String ACTIVE_PROPERTY = "active";
 
     /**
      * The name of the property that store the information if an email was checked for the user.
+     * @since 11.8RC1
      */
+    @Unstable
     public static final String EMAIL_CHECKED_PROPERTY = "email_checked";
 
     /**

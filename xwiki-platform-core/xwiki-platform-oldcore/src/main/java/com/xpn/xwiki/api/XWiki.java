@@ -2236,6 +2236,19 @@ public class XWiki extends Api
     }
 
     /**
+     * Retrieve a user from its document reference.
+     *
+     * @param userReference the reference of the user.
+     * @return the user corresponding to the reference.
+     * @since 11.8RC1
+     */
+    @Unstable
+    public User getUser(DocumentReference userReference)
+    {
+        return this.xwiki.getUser(userReference, getXWikiContext());
+    }
+
+    /**
      * API allowing to format a date according to the default Wiki setting The date format is provided in the
      * 'dateformat' parameter of the XWiki Preferences
      *

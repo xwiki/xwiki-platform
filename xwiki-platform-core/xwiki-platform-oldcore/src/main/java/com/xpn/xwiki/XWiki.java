@@ -4231,14 +4231,32 @@ public class XWiki implements EventListener
 
     public User getUser(XWikiContext context)
     {
-        XWikiUser xwikiUser = context.getXWikiUser();
+        return getUser(context.getUserReference(), context);
+    }
+
+    /**
+     * @deprecated since 11.8RC1 prefer using {@link #getUser(DocumentReference, XWikiContext)}.
+     */
+    @Deprecated
+    public User getUser(String username, XWikiContext context)
+    {
+        XWikiUser xwikiUser = new XWikiUser(username);
         User user = new User(xwikiUser, context);
         return user;
     }
 
-    public User getUser(String username, XWikiContext context)
+    /**
+     * Retrieve a user from its document reference.
+     *
+     * @param userReference the reference of the user.
+     * @param context the current context.
+     * @return the user corresponding to that document reference.
+     * @since 11.8RC1
+     */
+    @Unstable
+    public User getUser(DocumentReference userReference, XWikiContext context)
     {
-        XWikiUser xwikiUser = new XWikiUser(username);
+        XWikiUser xwikiUser = new XWikiUser(userReference);
         User user = new User(xwikiUser, context);
         return user;
     }

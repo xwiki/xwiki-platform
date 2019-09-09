@@ -36,10 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>userdirectory.userScopeFilter=Portée des utilisateurs :
+  <content>XWiki.UserDirectoryPreferencesClass_columns=Colonnes à afficher
+XWiki.UserDirectoryPreferencesClass_columns_hint=La liste des colonnes, correspondant à des propriétés de la classe User, à afficher dans l'annuaire utilisateurs
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Masquer les profils des utilisateurs désactivés
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Exclure les utilisateurs dont le profil est désactivé de l'annuaire des utilisateurs
+
+userdirectory.userScopeFilter=Portée des utilisateurs :
 userdirectory.userScopeFilter.hint=Choisissez le type d'utilisateurs que vous souhaitez afficher.
 userdirectory.userScopeFilter.local=Les utilisateurs locaux
 userdirectory.userScopeFilter.global=Les utilisateurs globaux membres de ce wiki
+userdirectory.configuration.title=Paramètres
+userdirectory.configuration.columns.editHint=Cliquez pour sélectionner les colonnes
+
 platform.userdirectory.customizeNotAllowed=Vous n'êtes pas autorisé à personnaliser cet annuaire utilisateur.
 platform.userdirectory.configTitle=Configuration de l'annuaire utilisateur
 platform.userdirectory.configSheetTitle=Fiche de configuration de l'annuaire utilisateur

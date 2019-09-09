@@ -146,9 +146,9 @@ public class DisableAccountFailureStrategy implements AuthenticationFailureStrat
         BaseObject updatedUserObject = updatedDocument.getXObject(USER_CLASS_REFERENCE);
         XWikiDocument originalDocument = updatedDocument.getOriginalDocument();
         BaseObject originalUserObject = originalDocument.getXObject(USER_CLASS_REFERENCE);
+
         if (originalUserObject != null && updatedUserObject != null
-            && (propertyValueChanged(originalUserObject, updatedUserObject, "disabled", 0)
-                || propertyValueChanged(originalUserObject, updatedUserObject, "active", 1))) {
+            && (propertyValueChanged(originalUserObject, updatedUserObject, XWikiUser.ACTIVE_PROPERTY, 1))) {
             // Remove the authentication failure record when the user account is re-enabled or activated.
             this.authenticationFailureManager.get()
                 .resetAuthenticationFailureCounter(updatedDocument.getDocumentReference());
@@ -158,7 +158,6 @@ public class DisableAccountFailureStrategy implements AuthenticationFailureStrat
     private boolean propertyValueChanged(BaseObject originalObject, BaseObject updatedObject, String propertyName,
         int expectedValue)
     {
-
         return originalObject.getIntValue(propertyName) != expectedValue
             && updatedObject.getIntValue(propertyName) == expectedValue;
     }

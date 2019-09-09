@@ -98,7 +98,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addTextAreaField("address", "Address", 40, 3);
 
         xclass.addBooleanField("extensionConflictSetup", "Enable extension conflict setup", "yesno");
-        xclass.addBooleanField("disabled", "Disabled");
+        xclass.addBooleanField("email_checked", "Email address verified");
     }
 
     @Override

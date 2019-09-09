@@ -98,6 +98,16 @@ public class User extends Api
     }
 
     /**
+     * @return {@code true} if the user is disabled, false if it is enabled.
+     * @since 11.8RC1
+     */
+    @Unstable
+    public boolean isDisabled()
+    {
+        return this.user.isDisabled(getXWikiContext());
+    }
+
+    /**
      * Check if the user belongs to a group or not. This method only check direct membership (no recursive checking) in
      * the current wiki.
      *

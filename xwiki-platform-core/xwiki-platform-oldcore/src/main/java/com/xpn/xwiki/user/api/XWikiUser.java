@@ -29,6 +29,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -46,12 +47,12 @@ public class XWikiUser
     /**
      * The name of the property that store the active status of the user.
      */
-    private static final String ACTIVE_PROPERTY = "active";
+    public static final String ACTIVE_PROPERTY = "active";
 
     /**
-     * The name of the property that store the disabled status of the user.
+     * The name of the property that store the information if an email was checked for the user.
      */
-    private static final String DISABLED_PROPERTY = "disabled";
+    public static final String EMAIL_CHECKED_PROPERTY = "email_checked";
 
     /**
      * @see com.xpn.xwiki.internal.model.reference.CurrentMixedStringDocumentReferenceResolver
@@ -76,6 +77,7 @@ public class XWikiUser
      * @param userReference the document reference of the user.
      * @since 11.6RC1
      */
+    @Unstable
     public XWikiUser(DocumentReference userReference)
     {
         this(userReference, XWiki.DEFAULT_MAIN_WIKI.equals(userReference.getWikiReference().getName()));
@@ -87,6 +89,7 @@ public class XWikiUser
      * @param main true if the user is global (i.e. registered in the main wiki)
      * @since 11.6RC1
      */
+    @Unstable
     public XWikiUser(DocumentReference userReference, boolean main)
     {
         this.userReference = userReference;
@@ -198,29 +201,73 @@ public class XWikiUser
 
     /**
      * @param context used to retrieve the user document.
-     * @return true if the user is disabled. This always returns false if the user is the guest or superadmin user.
+     * @return true if the user is email have been checked before.
+     *          This always returns true if the user is the guest or superadmin user.
+     * @since 11.8RC1
+     */
+    @Unstable
+    public boolean isEmailChecked(XWikiContext context)
+    {
+        boolean isChecked;
+        // These users are necessarily active. Note that superadmin might be main-wiki-prefixed when in a subwiki.
+        if (isGuest() || isSuperAdmin()) {
+            isChecked = true;
+        } else {
+            try {
+                XWikiDocument userdoc = getUserDocument(context);
+                isChecked = userdoc.getIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                    EMAIL_CHECKED_PROPERTY) != 0;
+            } catch (XWikiException e) {
+                this.logger.error("Error while checking email_checked status of user [{}]", getUser(), e);
+                isChecked = true;
+            }
+        }
+        return isChecked;
+    }
+
+    /**
+     * @param checked true if the email address was checked for the user. False if it wasn't checked.
+     * @param context used to retrieve the user document.
+     * @since 11.8RC1
+     */
+    @Unstable
+    public void setEmailChecked(boolean checked, XWikiContext context)
+    {
+        // We don't modify any information for guest and superadmin.
+        if (!isGuest() && !isSuperAdmin()) {
+            int checkedFlag = (checked) ? 1 : 0;
+            try {
+                XWikiDocument userdoc = getUserDocument(context);
+                userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                    ACTIVE_PROPERTY, checkedFlag);
+                context.getWiki().saveDocument(userdoc, localizePlainOrKey("core.users." +
+                    (checked ? "email_checked" : "email_unchecked") + ".saveComment"), context);
+            } catch (XWikiException e) {
+                this.logger.error("Error while setting email_checked status of user [{}]", getUser(), e);
+            }
+        }
+    }
+
+    /**
+     * @param context used to retrieve the user document.
+     * @return true if the user is disabled (i.e. its active property is set to 0).
+     *         This always returns false if the user is the guest or superadmin user.
      * @since 11.6RC1
      */
+    @Unstable
     public boolean isDisabled(XWikiContext context)
     {
         boolean disabled;
-
-        // Guest and superadmin are necessarily enabled.
+        // These users are necessarily active. Note that superadmin might be main-wiki-prefixed when in a subwiki.
         if (isGuest() || isSuperAdmin()) {
             disabled = false;
         } else {
             try {
                 XWikiDocument userdoc = getUserDocument(context);
-                // if the user gets deleted while he's still logged-in, we consider him as disabled.
-                if (userdoc.isNew()) {
-                    disabled = true;
-                } else {
-                    disabled = userdoc.getIntValue(
-                        getUserClassReference(userdoc.getDocumentReference().getWikiReference()), DISABLED_PROPERTY)
-                        != 0;
-                }
+                disabled = userdoc.getIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                    ACTIVE_PROPERTY) == 0;
             } catch (XWikiException e) {
-                this.logger.error("Error while checking disabled status of user [{}]", getUser(), e);
+                this.logger.error("Error while checking active status of user [{}]", getUser(), e);
                 disabled = false;
             }
         }
@@ -228,67 +275,22 @@ public class XWikiUser
     }
 
     /**
-     * @param disabled true if the user is disabled (i.e. it can't login or make actions). False to enable the account.
+     * @param disable true if the user disabled the account. False to enable the account.
      * @param context used to retrieve the user document.
      * @since 11.6RC1
      */
-    public void setDisabled(boolean disabled, XWikiContext context)
+    @Unstable
+    public void setDisabled(boolean disable, XWikiContext context)
     {
         // We don't modify any information for guest and superadmin.
         if (!isGuest() && !isSuperAdmin()) {
-            int disabledFlag = (disabled) ? 1 : 0;
-            try {
-                XWikiDocument userdoc = getUserDocument(context);
-                userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
-                    DISABLED_PROPERTY, disabledFlag);
-                context.getWiki().saveDocument(userdoc,
-                    localizePlainOrKey("core.users." + (disabled ? "disable" : "enable") + ".saveComment"), context);
-            } catch (XWikiException e) {
-                this.logger.error("Error while setting disabled status of user [{}]", getUser(), e);
-            }
-        }
-    }
-
-    /**
-     * @param context used to retrieve the user document.
-     * @return true if the user is active. This always returns true if the user is the guest or superadmin user.
-     * @since 11.6RC1
-     */
-    public boolean isActive(XWikiContext context)
-    {
-        boolean active;
-        // These users are necessarily active. Note that superadmin might be main-wiki-prefixed when in a subwiki.
-        if (isGuest() || isSuperAdmin()) {
-            active = true;
-        } else {
-            try {
-                XWikiDocument userdoc = getUserDocument(context);
-                active = userdoc.getIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
-                    ACTIVE_PROPERTY) != 0;
-            } catch (XWikiException e) {
-                this.logger.error("Error while checking active status of user [{}]", getUser(), e);
-                active = true;
-            }
-        }
-        return active;
-    }
-
-    /**
-     * @param active true if the user activated the account. False to deactivate the account.
-     * @param context used to retrieve the user document.
-     * @since 11.6RC1
-     */
-    public void setActiveStatus(boolean active, XWikiContext context)
-    {
-        // We don't modify any information for guest and superadmin.
-        if (!isGuest() && !isSuperAdmin()) {
-            int activeFlag = (active) ? 1 : 0;
+            int activeFlag = (disable) ? 0 : 1;
             try {
                 XWikiDocument userdoc = getUserDocument(context);
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, activeFlag);
                 context.getWiki().saveDocument(userdoc,
-                    localizePlainOrKey("core.users." + (active ? "activate" : "deactivate") + ".saveComment"), context);
+                    localizePlainOrKey("core.users." + (disable ? "disable" : "enable") + ".saveComment"), context);
             } catch (XWikiException e) {
                 this.logger.error("Error while setting active status of user [{}]", getUser(), e);
             }
@@ -300,6 +302,7 @@ public class XWikiUser
      * @return true if the user exists.
      * @since 11.6RC1
      */
+    @Unstable
     public boolean exists(XWikiContext context)
     {
         boolean exists = false;

@@ -32,9 +32,11 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -59,7 +61,7 @@ public class DisableAccountFailureStrategyTest
     private XWikiDocument updatedDocument;
 
     @BeforeEach
-    public void configure()
+    public void configure() throws XWikiException
     {
         DocumentReference documentReference = new DocumentReference("test", "Some", "Page");
 
@@ -79,21 +81,6 @@ public class DisableAccountFailureStrategyTest
     }
 
     @Test
-    public void resetAuthenticationFailureCounterWhenAccountIsReEnabled()
-    {
-        when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
-            .getIntValue("disabled")).thenReturn(1);
-        when(
-            this.updatedDocument.getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE).getIntValue("disabled"))
-                .thenReturn(0);
-
-        disableStrategy.onEvent(new DocumentUpdatedEvent(), this.updatedDocument, null);
-
-        verify(this.authenticationFailureManagerProvider.get())
-            .resetAuthenticationFailureCounter(this.updatedDocument.getDocumentReference());
-    }
-
-    @Test
     public void resetAuthenticationFailureCounterWhenAccountIsActivated()
     {
         when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
@@ -104,6 +91,48 @@ public class DisableAccountFailureStrategyTest
         disableStrategy.onEvent(new DocumentUpdatedEvent(), this.updatedDocument, null);
 
         verify(this.authenticationFailureManagerProvider.get())
+            .resetAuthenticationFailureCounter(this.updatedDocument.getDocumentReference());
+    }
+
+    @Test
+    public void dontResetAuthenticationFailureCounterWhenAccountRemainsInactive()
+    {
+        when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
+            .getIntValue("active")).thenReturn(0);
+        when(this.updatedDocument.getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE).getIntValue("active"))
+            .thenReturn(0);
+
+        disableStrategy.onEvent(new DocumentUpdatedEvent(), this.updatedDocument, null);
+
+        verify(this.authenticationFailureManagerProvider.get(), never())
+            .resetAuthenticationFailureCounter(this.updatedDocument.getDocumentReference());
+    }
+
+    @Test
+    public void dontResetAuthenticationFailureCounterWhenAccountRemainsActive()
+    {
+        when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
+            .getIntValue("active")).thenReturn(1);
+        when(this.updatedDocument.getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE).getIntValue("active"))
+            .thenReturn(1);
+
+        disableStrategy.onEvent(new DocumentUpdatedEvent(), this.updatedDocument, null);
+
+        verify(this.authenticationFailureManagerProvider.get(), never())
+            .resetAuthenticationFailureCounter(this.updatedDocument.getDocumentReference());
+    }
+
+    @Test
+    public void dontResetAuthenticationFailureCounterWhenAccountIsDeactivated()
+    {
+        when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
+            .getIntValue("active")).thenReturn(1);
+        when(this.updatedDocument.getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE).getIntValue("active"))
+            .thenReturn(0);
+
+        disableStrategy.onEvent(new DocumentUpdatedEvent(), this.updatedDocument, null);
+
+        verify(this.authenticationFailureManagerProvider.get(), never())
             .resetAuthenticationFailureCounter(this.updatedDocument.getDocumentReference());
     }
 
@@ -126,16 +155,8 @@ public class DisableAccountFailureStrategyTest
     }
 
     @Test
-    public void onDocumentUpdatedWhenUserAccountIsDisabled()
+    public void validateFormReturnsFalseWhenUserNotFound()
     {
-        when(this.updatedDocument.getOriginalDocument().getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE)
-            .getIntValue("disabled")).thenReturn(0);
-        when(
-            this.updatedDocument.getXObject(DisableAccountFailureStrategy.USER_CLASS_REFERENCE).getIntValue("disabled"))
-                .thenReturn(1);
-
-        disableStrategy.onEvent(new DocumentUpdatedEvent(), this.updatedDocument, null);
-
-        verify(this.authenticationFailureManagerProvider, never()).get();
+        assertFalse(this.disableStrategy.validateForm("Foo", null));
     }
 }

@@ -43,15 +43,12 @@
 ## This page is overridden in subwikis by UserDirectoryLivetableResultsOverride, which includes this page and extends
 ## the live table query to support global/local user filtering.
 ##
-## Hide disabled and inactive user profiles if requested.
+## Hide inactive user profiles if requested.
 #if ($request.hideDisabledProfiles == 'true')
-  #set ($extraFromClause = "$!extraFromClause, IntegerProperty as activeProperty, IntegerProperty as disabledProperty")
+  #set ($extraFromClause = "$!extraFromClause, IntegerProperty as activeProperty")
   #set ($isActive = "obj.id = activeProperty.id.id and activeProperty.id.name = 'active' and " +
     'activeProperty.value = 1')
-  ## The 'disabled' property might not be set (its value is null) in which case we consider the profile as enabled.
-  #set ($isNotDisabled = "obj.id = disabledProperty.id.id and disabledProperty.id.name = 'disabled' and " +
-    '(disabledProperty.value is null or disabledProperty.value &lt;&gt; 1)')
-  #set ($extraWhereClause = "$!extraWhereClause and $isActive and $isNotDisabled")
+  #set ($extraWhereClause = "$!extraWhereClause and $isActive")
 #end
 #if ("$!extraWhereClauseParameters" == '')
   #set ($extraWhereClauseParameters = {})

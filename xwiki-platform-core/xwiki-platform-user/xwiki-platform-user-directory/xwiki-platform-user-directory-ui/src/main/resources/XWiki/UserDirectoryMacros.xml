@@ -190,15 +190,14 @@
   ## We don't hide the disabled user profiles when the active and disabled columns are present because the user can use
   ## the live table filters to achieve this.
   #set ($hideDisabledProfilesValue = $configuration.getValue('hideDisabledProfiles'))
-  #if (!$columns.contains('active') &amp;&amp; !$columns.contains('disabled')
+  #if (!$columns.contains('active')
       &amp;&amp; ($hideDisabledProfilesValue == 1 || ("$!hideDisabledProfilesValue" == '' &amp;&amp;
       $configuration.xWikiClass.get('hideDisabledProfiles').getValue('defaultValue') == 1)))
     #set ($options.extraParams = "$!options.extraParams&amp;hideDisabledProfiles=true")
   #end
   ## We need to know which users are disabled or inactive in order to display them differently.
-  #set ($discard = $columns.addAll(['active', 'disabled']))
+  #set ($discard = $columns.addAll(['active']))
   #set ($discard = $columnsProperties.putIfAbsent('active', {'type': 'hidden'}))
-  #set ($discard = $columnsProperties.putIfAbsent('disabled', {'type': 'hidden'}))
   ## Display the computed livetable.
   #livetable('userdirectory' $columns $columnsProperties $options)
   {{/html}}
@@ -435,7 +434,7 @@
    */
   var maybeMarkDisabled = function(row, rowData) {
     // We use the abstract comparison (==) because the property value might come as a string.
-    if (rowData &amp;&amp; (rowData.disabled_value == 1 || rowData.active_value != 1)) {
+    if (rowData &amp;&amp; (rowData.active_value != 1)) {
       row.find('td.doc_name').addClass('user disabled');
     }
   };

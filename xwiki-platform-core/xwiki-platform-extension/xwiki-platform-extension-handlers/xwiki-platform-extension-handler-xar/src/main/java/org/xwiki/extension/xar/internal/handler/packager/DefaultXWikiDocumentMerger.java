@@ -205,7 +205,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
         MergeDocumentResult documentMergeResult;
         try {
-            documentMergeResult = mergeManager.mergeDocument(previousDocument, nextDocument, currentDocument,
+            documentMergeResult = mergeManager.mergeDocument(previousDocument, nextDocument, mergedDocument,
                 mergeConfiguration);
         } catch (Exception e) {
             // Unexpected error, lets behave as if there was a conflict
@@ -213,6 +213,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
             documentMergeResult.getLog()
                 .error("Unexpected exception thrown. Usually means there is a bug in the merge.", e);
             documentMergeResult.setModified(true);
+            documentMergeResult.setMergeResult(mergedDocument);
         }
 
         documentMergeResult.getLog().log(this.logger);

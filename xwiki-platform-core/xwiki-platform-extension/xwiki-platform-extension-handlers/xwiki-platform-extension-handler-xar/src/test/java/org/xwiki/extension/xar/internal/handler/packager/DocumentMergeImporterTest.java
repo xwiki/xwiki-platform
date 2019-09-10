@@ -156,7 +156,7 @@ public class DocumentMergeImporterTest
 
         this.mergeResult = new MergeDocumentResult(this.currentDocument, this.previousDocument, this.nextDocument);
         when(this.mergeManager.mergeDocument(same(this.previousDocument), same(this.nextDocument),
-            same(this.currentDocument), any(MergeConfiguration.class))).thenReturn(this.mergeResult);
+            same(this.mergedDocument), any(MergeConfiguration.class))).thenReturn(this.mergeResult);
 
         // job status
 

@@ -36,17 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: XWiki.UserDirectoryPreferencesClass_columns=Columns to display
-### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=The list of columns, corresponding to properties of the User class, to be displayed in the user directory
-### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Hide disabled user profiles
-### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Exclude from the user directory the users that have their profile disabled
+  <content>XWiki.UserDirectoryPreferencesClass_columns=Столбцы для отображения
+XWiki.UserDirectoryPreferencesClass_columns_hint=Список столбцов, соответствующих свойствам класса, для отображения в каталоге пользователя
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Скрыть отключенные профили пользователей
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Исключить из каталога пользователей пользователей, чей профиль отключен
 
 userdirectory.userScopeFilter=Область пользователя:
 userdirectory.userScopeFilter.hint=Выберите категорию пользователей, которых вы хотите отобразить.
 userdirectory.userScopeFilter.local=Локальные пользователи
 userdirectory.userScopeFilter.global=Глобальные пользователи, которые являются членами этой вики
-### Missing: userdirectory.configuration.title=Settings
-### Missing: userdirectory.configuration.columns.editHint=Click to select the columns
+userdirectory.configuration.title=Настройки
+userdirectory.configuration.columns.editHint=Нажмите, чтобы выбрать столбцы
 
 platform.userdirectory.customizeNotAllowed=Вам не разрешено настраивать этот каталог пользователей.
 platform.userdirectory.configTitle=Настройки каталога пользователя

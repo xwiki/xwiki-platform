@@ -660,4 +660,15 @@ public class BasePage extends BaseElement
         return getDriver().hasElementWithoutWaiting(By.xpath(
             "//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle +"']"));
     }
+
+    public boolean isForbidden()
+    {
+        List<WebElement> messages = getDriver().findElementsWithoutWaiting(By.className("xwikimessage"));
+        for (WebElement message : messages) {
+            if (message.getText().contains("You are not allowed to view this page or perform this action.")) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

@@ -19,14 +19,20 @@
  */
 package com.xpn.xwiki.objects;
 
+import org.xwiki.store.merge.MergeManagerResult;
+
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
-import com.xpn.xwiki.internal.merge.MergeUtils;
 
 public class LargeStringProperty extends BaseStringProperty
 {
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        setValue(MergeUtils.mergeLines((String) previousValue, (String) newValue, getValue(), mergeResult));
+        MergeManagerResult<String, String> valueMergeManagerResult = getMergeManager()
+            .mergeLines((String) previousValue, (String) newValue, getValue(), new MergeConfiguration());
+        mergeResult.getLog().addAll(valueMergeManagerResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || valueMergeManagerResult.isModified());
+        setValue(valueMergeManagerResult.getMergeResult());
     }
 }

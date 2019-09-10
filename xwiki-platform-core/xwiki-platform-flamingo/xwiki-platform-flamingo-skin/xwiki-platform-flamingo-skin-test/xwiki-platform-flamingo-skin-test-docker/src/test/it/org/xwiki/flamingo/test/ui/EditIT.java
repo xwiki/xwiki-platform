@@ -20,6 +20,7 @@
 package org.xwiki.flamingo.test.ui;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,6 +47,7 @@ import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.LoginPage;
 import org.xwiki.test.ui.po.ResubmissionPage;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.diff.Conflict;
 import org.xwiki.test.ui.po.editor.PreviewEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -403,7 +405,8 @@ public class EditIT
      *      save diffs are different, verify manipulating diffs, submit reload of the editor
      *   4. Edit different places, save&continue, ensure the automatic merge is performed and the editor is reloaded
      *      with fresh content.
-     *   5. Create another last conflict, Save&Continue, fix by forcing save.
+     *   5. Create another conflict, Save&Continue, fix by forcing save.
+     *   6. Create multiple conflicts and solve them with custom fixes.
      */
     @Test
     @Order(8)
@@ -425,6 +428,7 @@ public class EditIT
         WikiEditPage wikiEditPageTab2 = viewPage.editWiki();
         wikiEditPageTab2.setContent("A first edit from a tab.");
         wikiEditPageTab2.clickSaveAndView();
+        // Tab2 = A first edit from a tab.
 
         setup.switchTab(firstTabHandle);
         wikiEditPageTab1.waitUntilPageJSIsLoaded();
@@ -439,9 +443,11 @@ public class EditIT
         assertEquals(EditConflictModal.AvailableDiffVersions.MERGED, editConflictModal.getRevisedDiffVersion());
         assertEquals(Arrays.asList("@@ -1,1 +1,1 @@",
             "-A <del>fir</del>s<del>t</del> edit from a tab.",
-            "+A s<ins>econd</ins> edit from a<ins>nother</ins> tab."), editConflictModal.getDiff().getDiff("Content"));
+            "+A s<ins>econd</ins> edit from a<ins>nother</ins> tab."),
+            editConflictModal.getDiff().getDiff("Content"));
         editConflictModal.submitCurrentChoice(true);
         setup.getDriver().waitUntilPageIsReloaded();
+        // Tab1 = A second edit from another tab.
 
         // Check that merge with save&continue indeed save the content
         setup.gotoPage(testReference);
@@ -455,6 +461,7 @@ public class EditIT
         assertEquals("A second edit from another tab.", wikiEditPageTab2.getExactContent());
         wikiEditPageTab2.setContent("A second edit from another tab.\nA new line.");
         wikiEditPageTab2.clickSaveAndContinue();
+        // Tab2 = "A second edit from another tab.\nA new line."
 
         // The merge should be automatic.
         setup.switchTab(firstTabHandle);
@@ -462,11 +469,13 @@ public class EditIT
         wikiEditPageTab1.setContent("A second edit from another tab.\nAnother line.");
         viewPage = wikiEditPageTab1.clickSaveAndView();
         assertEquals("A second edit from another tab.\nAnother line.\nA new line.", viewPage.getContent());
+        // Tab1 = "A second edit from another tab.\nAnother line.\nA new line."
 
         // Step 3: Create another conflict, check the different diffs and discard changes (reload the editor)
         wikiEditPageTab1 = viewPage.editWiki();
         wikiEditPageTab1.setContent("A third edit from another tab.\nAnother line.\nYet another line.");
         wikiEditPageTab1.clickSaveAndContinue();
+        // Tab1 = "A third edit from another tab.\nAnother line.\nYet another line."
 
         setup.switchTab(secondTabHandle);
         wikiEditPageTab2.waitUntilPageJSIsLoaded();
@@ -486,6 +495,21 @@ public class EditIT
             " Another line.",
             "-Yet another line."),
             editConflictModal.getDiff().getDiff("Content"));
+
+        // Check that the custom choice diff is the same, but we cannot change the versions, and one conflict
+        // is displayed
+        editConflictModal = editConflictModal.makeChoice(EditConflictModal.ConflictChoice.CUSTOM);
+        assertEquals(EditConflictModal.ConflictChoice.CUSTOM, editConflictModal.getCurrentChoice());
+        assertFalse(editConflictModal.isPreviewDiffOptionsAvailable());
+        assertEquals(Arrays.asList("@@ -1,1 +1,1 @@",
+            "-A th<del>ird</del> edit from <del>anoth</del>e<del>r</del> tab.",
+            "+A <ins>four</ins>th edit from <ins>s</ins>e<ins>cond</ins> tab.",
+            "[Conflict Resolution]",
+            "@@ -2,2 +2,1 @@",
+            " Another line.",
+            "-Yet another line."),
+            editConflictModal.getDiff().getDiff("Content"));
+        assertEquals(1, editConflictModal.getDiff().getConflicts("Content").size());
 
         // Check that the forceSave diff is not the same as the merge diff
         editConflictModal = editConflictModal.makeChoice(EditConflictModal.ConflictChoice.OVERRIDE);
@@ -533,6 +557,7 @@ public class EditIT
         wikiEditPageTab2 = new WikiEditPage();
         assertEquals("A third edit from another tab.\nAnother line.\nYet another line.",
             wikiEditPageTab2.getContent());
+        // Tab2 = "A third edit from another tab.\nAnother line.\nYet another line."
 
         // Step 4: Edit different places, ensure the automatic merge is performed and the editor refreshed
         setup.switchTab(firstTabHandle);
@@ -540,6 +565,7 @@ public class EditIT
         wikiEditPageTab1.setContent("A third edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.");
         wikiEditPageTab1.clickSaveAndContinue();
+        // Tab1 = "A third edit from another tab.\nAnother line.\nYet another line with other few changes."
 
         setup.switchTab(secondTabHandle);
         wikiEditPageTab2.waitUntilPageJSIsLoaded();
@@ -551,11 +577,14 @@ public class EditIT
         wikiEditPageTab2 = new WikiEditPage();
         assertEquals("A fourth edit from another tab.\nAnother line.\nYet another line with other few changes.",
             wikiEditPageTab2.getContent());
+        // Tab2 = "A fourth edit from another tab.\nAnother line.\nYet another line with other few changes."
 
         // Step 5: Create a conflict, force save, ensure the data are saved
         wikiEditPageTab2.setContent("A fourth edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.\nAnd again a new line");
         wikiEditPageTab2.clickSaveAndContinue();
+        // Tab2 = "A fourth edit from another tab.\nAnother line."
+        //                + "\nYet another line with other few changes.\nAnd again a new line"
         setup.switchTab(firstTabHandle);
         wikiEditPageTab1.waitUntilPageJSIsLoaded();
         wikiEditPageTab1.setContent("A fifth edit from another tab.\nAnother line."
@@ -597,6 +626,135 @@ public class EditIT
         viewPage = new ViewPage();
         assertEquals("A fifth edit from another tab.\nAnother line."
             + "\nYet another line with other few changes.", viewPage.getContent());
+        // Tab1 = "A fifth edit from another tab.\nAnother line."
+        //                + "\nYet another line with other few changes."
+
+        // Step6: Create 2 conflicts, fix with custom decisions: the first one with a custom value,
+        // the second one by taking the next value.
+        wikiEditPageTab1 = viewPage.editWiki();
+        wikiEditPageTab1.setContent(
+              "First line."
+            + "\nSecond line."
+            + "\nThird line."
+            + "\nFourth line."
+            + "\nFifth line."
+            + "\nSeventh line.");
+        wikiEditPageTab1.clickSaveAndContinue();
+
+        setup.switchTab(secondTabHandle);
+        wikiEditPageTab2 = setup.gotoPage(testReference).editWiki();
+        wikiEditPageTab2.setContent(
+              "First line."
+            + "\nLine N°2"
+            + "\nThird line."
+            + "\nFifth line."
+            + "\nSixth line."
+            + "\nSeventh line.");
+        wikiEditPageTab2.clickSaveAndView();
+
+        setup.switchTab(firstTabHandle);
+        wikiEditPageTab1 = new WikiEditPage();
+        // The editor will be reloaded because of the merge
+        setup.getDriver().addPageNotYetReloadedMarker();
+
+        wikiEditPageTab1.setContent(
+              "First line."
+            + "\nSecond line."
+            + "\nLine N°4"
+            + "\nFifth line."
+            + "\n6th line."
+            + "\nSeventh line."
+        );
+        wikiEditPageTab1.clickSaveAndContinue(false);
+
+        editConflictModal = new EditConflictModal();
+        assertTrue(editConflictModal.isDisplayed());
+        assertEquals(EditConflictModal.ConflictChoice.MERGE, editConflictModal.getCurrentChoice());
+        assertEquals(Arrays.asList("@@ -1,6 +1,6 @@",
+            " First line.",
+            "-<del>L</del>ine<del> N°2</del>",
+            "-<del>Th</del>i<del>rd li</del>ne<del>.</del>",
+            "+<ins>Second l</ins>ine<ins>.</ins>",
+            "+<ins>L</ins>ine<ins> N°4</ins>",
+            " Fifth line.",
+            "-<del>Six</del>th line.",
+            "+<ins>6</ins>th line.",
+            " Seventh line."
+            ),
+            editConflictModal.getDiff().getDiff("Content"));
+
+        editConflictModal = editConflictModal.makeChoice(EditConflictModal.ConflictChoice.CUSTOM);
+        assertEquals(Arrays.asList("@@ -1,1 +1,1 @@",
+            " First line.",
+            "@@ -2,2 +2,2 @@",
+            "-<del>L</del>ine<del> N°2</del>",
+            "-<del>Th</del>i<del>rd li</del>ne<del>.</del>",
+            "+<ins>Second l</ins>ine<ins>.</ins>",
+            "+<ins>L</ins>ine<ins> N°4</ins>",
+            "[Conflict Resolution]",
+            "@@ -4,1 +4,1 @@",
+            " Fifth line.",
+            "@@ -5,1 +5,1 @@",
+            "-<del>Six</del>th line.",
+            "+<ins>6</ins>th line.",
+            "[Conflict Resolution]",
+            "@@ -6,1 +6,1 @@",
+            " Seventh line."
+            ),
+            editConflictModal.getDiff().getDiff("Content"));
+        List<Conflict> conflicts = editConflictModal.getDiff().getConflicts("Content");
+        assertEquals(2, conflicts.size());
+
+        Conflict conflict = conflicts.get(0);
+
+        assertEquals(Conflict.DecisionType.CURRENT, conflict.getCurrentDecision());
+        assertFalse(conflict.isDecisionChangeEmpty());
+        assertEquals("Second line.\nLine N°4", conflict.getDecisionChange());
+        conflict.setDecision(Conflict.DecisionType.PREVIOUS);
+        assertFalse(conflict.isDecisionChangeEmpty());
+        assertEquals("Second line.\nThird line.", conflict.getDecisionChange());
+        conflict.setDecision(Conflict.DecisionType.NEXT);
+        assertFalse(conflict.isDecisionChangeEmpty());
+        assertEquals("Line N°2\nThird line.", conflict.getDecisionChange());
+        conflict.setCustomValue("Another completely different change for the second line."
+            + "\nAnother line with small changes."
+            + "\nAnother edit from the second tab.");
+
+        conflict = conflicts.get(1);
+        assertEquals(Conflict.DecisionType.CURRENT, conflict.getCurrentDecision());
+        assertFalse(conflict.isDecisionChangeEmpty());
+        assertEquals("6th line.", conflict.getDecisionChange());
+        conflict.setDecision(Conflict.DecisionType.NEXT);
+        assertFalse(conflict.isDecisionChangeEmpty());
+        assertEquals("Sixth line.", conflict.getDecisionChange());
+        conflict.setDecision(Conflict.DecisionType.PREVIOUS);
+        assertTrue(conflict.isDecisionChangeEmpty());
+
+        // Current choices:
+        // Custom value with 3 lines, for first conflict
+        // And previous version, for second conflict.
+        editConflictModal.submitCurrentChoice(true);
+        setup.getDriver().waitUntilPageIsReloaded();
+
+        wikiEditPageTab1 = new WikiEditPage();
+        assertEquals("First line."
+            + "\nAnother completely different change for the second line."
+            + "\nAnother line with small changes."
+            + "\nAnother edit from the second tab."
+            + "\nFifth line."
+            + "\nSeventh line.", wikiEditPageTab1.getExactContent());
+
+        viewPage = setup.gotoPage(testReference);
+        assertEquals("First line."
+            + "\nAnother completely different change for the second line."
+            + "\nAnother line with small changes."
+            + "\nAnother edit from the second tab."
+            + "\nFifth line."
+            + "\nSeventh line.", viewPage.getContent());
+
+        // We don't want to put that in a finally, because in case of problem on second tab, we might lose the context,
+        // and create a selenium error by trying to get a screenshot on a closed tab.
+        // We rely on the afterAll method which should properly close the tab for this.
         setup.closeTab(secondTabHandle);
     }
 

@@ -418,14 +418,14 @@
       <dependency>
         <groupId>com.github.jsqlparser</groupId>
         <artifactId>jsqlparser</artifactId>
-        <version>2.1</version>
+        <version>3.0</version>
       </dependency>
 
       <!-- JNR -->
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.2.19</version>
+        <version>1.2.20</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>

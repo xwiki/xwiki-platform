@@ -98,6 +98,12 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
     }
 
     @Override
+    public Syntax getTargetSyntax()
+    {
+        return this.configuration.getTargetSyntax();
+    }
+
+    @Override
     public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
     {
         Block resultBlock;

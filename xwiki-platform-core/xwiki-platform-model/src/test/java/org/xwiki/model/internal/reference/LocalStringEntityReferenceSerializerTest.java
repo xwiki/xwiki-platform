@@ -19,16 +19,14 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link LocalStringEntityReferenceSerializer}.
@@ -36,41 +34,29 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  * @version $Id$
  * @since 2.2M1
  */
+@ComponentTest
 @ComponentList({
     DefaultSymbolScheme.class
 })
 public class LocalStringEntityReferenceSerializerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<EntityReferenceSerializer<String>> mocker =
-        new MockitoComponentMockingRule<>(LocalStringEntityReferenceSerializer.class);
+    @InjectMockComponents
+    private LocalStringEntityReferenceSerializer serializer;
 
-    @Rule
-    public MockitoComponentMockingRule<DefaultStringEntityReferenceResolver> resolverMocker =
-        new MockitoComponentMockingRule<>(DefaultStringEntityReferenceResolver.class);
-
-    private EntityReferenceSerializer<String> serializer;
-
-    private EntityReferenceResolver<String> resolver;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        this.serializer = this.mocker.getComponentUnderTest();
-        this.resolver = this.resolverMocker.getComponentUnderTest();
-    }
+    @InjectMockComponents
+    private DefaultStringEntityReferenceResolver resolver;
 
     @Test
-    public void serializeDocumentReference() throws Exception
+    public void serializeDocumentReference()
     {
-        EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("space.page", serializer.serialize(reference));
+        EntityReference reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
+        assertEquals("space.page", this.serializer.serialize(reference));
     }
     
     @Test
     public void serializeSpaceReferenceWithChild()
     {
-        EntityReference reference = resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("space", serializer.serialize(reference.getParent()));
+        EntityReference reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
+        assertEquals("space", this.serializer.serialize(reference.getParent()));
     }
 }

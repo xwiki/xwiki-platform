@@ -37,6 +37,8 @@ import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.store.merge.MergeManager;
+import org.xwiki.store.merge.MergeManagerResult;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -44,7 +46,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
-import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
@@ -55,6 +56,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public abstract class BaseElement<R extends EntityReference> implements ElementInterface, Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     protected static final Logger LOGGER = LoggerFactory.getLogger(BaseObject.class);
 
     /**
@@ -98,6 +101,15 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     private EntityReferenceSerializer<String> localUidStringEntityReferenceSerializer;
 
     private ContextualLocalizationManager localization;
+
+    /**
+     * @return a merge manager instance.
+     * @since 11.8RC1
+     */
+    protected MergeManager getMergeManager()
+    {
+        return Utils.getComponent(MergeManager.class);
+    }
 
     @Override
     public R getReference()
@@ -349,8 +361,12 @@ public abstract class BaseElement<R extends EntityReference> implements ElementI
     public void merge(ElementInterface previousElement, ElementInterface newElement, MergeConfiguration configuration,
         XWikiContext context, MergeResult mergeResult)
     {
-        setPrettyName(MergeUtils.mergeOject(((BaseElement) previousElement).getPrettyName(),
-            ((BaseElement) newElement).getPrettyName(), getPrettyName(), mergeResult));
+        MergeManagerResult<String, String> prettyNameManagerResult =
+            getMergeManager().mergeObject(((BaseElement) previousElement).getPrettyName(),
+                ((BaseElement) newElement).getPrettyName(), getPrettyName(), configuration);
+        mergeResult.getLog().addAll(prettyNameManagerResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || prettyNameManagerResult.isModified());
+        setPrettyName(prettyNameManagerResult.getMergeResult());
     }
 
     @Override

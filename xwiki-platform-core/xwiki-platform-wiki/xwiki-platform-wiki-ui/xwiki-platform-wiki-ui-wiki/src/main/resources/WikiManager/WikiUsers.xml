@@ -564,7 +564,9 @@ require(['jquery'], function($) {
 require(['jquery'], function($) {
   // Refresh the members live table whenever an user is created or deleted.
   $('#userstable').on('xwiki:user:created xwiki:user:deleted', function() {
-    editgrouptable.refresh();
+    if (typeof editgrouptable != 'undefined') {
+      editgrouptable.refresh();
+    }
   });
 });</code>
     </property>

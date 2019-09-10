@@ -62,8 +62,9 @@
 ##
 #set ($sectionsObjectClassName = 'XWiki.UserProfileSectionsClass')
 #set ($sectionObjectClassName = 'XWiki.UserProfileSectionClass')
+#set ($isDisabled = $xwiki.getUser($doc.fullName).isDisabled())
 ##
-#if ($hasAdmin &amp;&amp; $doc.getValue('disabled') == 1)
+#if ($hasAdmin &amp;&amp; $isDisabled)
 {{warning}}
 $services.localization.render('platform.core.profile.category.profile.disabled')
 {{/warning}}
@@ -76,7 +77,7 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
 #end
   &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
     #if ($hasAdmin &amp;&amp; !$inEditMode &amp;&amp; !$isMyProfile)
-      #if ($doc.getValue('disabled') == 1)
+      #if ($isDisabled)
         #set ($enableClass = "")
         #set ($disableClass = "hidden")
       #else

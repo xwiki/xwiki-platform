@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -40,6 +41,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.Response;
 import org.xwiki.container.servlet.ServletResponse;
+import org.xwiki.job.event.status.JobStatus.State;
 import org.xwiki.rendering.async.AsyncContextHandler;
 import org.xwiki.rendering.async.internal.AsyncRendererExecutor;
 import org.xwiki.rendering.async.internal.AsyncRendererJobStatus;
@@ -103,8 +105,8 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         // Get the asynchronous renderer status
         AsyncRendererJobStatus status;
         try {
-            // TODO: don't wait forever and return the job progress if not finished
-            status = this.executor.getAsyncStatus(reference.getId(), clientId, Long.MAX_VALUE, TimeUnit.DAYS);
+            status = this.executor.getAsyncStatus(reference.getId(), clientId, reference.getTimeout(),
+                TimeUnit.MILLISECONDS);
         } catch (InterruptedException e) {
             throw new ResourceReferenceHandlerException("Failed to get content", e);
         }
@@ -115,16 +117,31 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         }
 
         // Send the result back
-        sendReponse(status);
+        if (status.getState() != State.FINISHED) {
+            sendRUNNINGReponse(status);
+        } else {
+            sendFINISHEDReponse(status);
+        }
 
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
         // Resource Reference.
         chain.handleNext(reference);
     }
 
-    private void sendReponse(AsyncRendererJobStatus status) throws ResourceReferenceHandlerException
+    private void sendRUNNINGReponse(AsyncRendererJobStatus status) throws ResourceReferenceHandlerException
     {
-        // Send the result back
+        Response response = this.container.getResponse();
+        response.setContentType("application/json; charset=utf-8");
+
+        if (response instanceof ServletResponse) {
+            ((ServletResponse) response).getHttpServletResponse().setStatus(HttpServletResponse.SC_ACCEPTED);
+        }
+
+        // TODO: Send back a REST version of the job status
+    }
+
+    private void sendFINISHEDReponse(AsyncRendererJobStatus status) throws ResourceReferenceHandlerException
+    {
         Response response = this.container.getResponse();
         response.setContentType("text/html; charset=utf-8");
 

@@ -55,6 +55,8 @@ public class AppsLiveTableTest extends AbstractTest
         String password = RandomStringUtils.randomAlphanumeric(6);
         getUtil().createUserAndLogin(userName, password);
         homePage = AppWithinMinutesHomePage.gotoPage();
+        this.validateConsole.getLogCaptureConfiguration().registerExpected("WikiComponentException: Registering UI "
+            + "extensions at wiki level requires wiki administration rights");
     }
 
     /**
@@ -164,9 +166,6 @@ public class AppsLiveTableTest extends AbstractTest
         appsLiveTable.filterApplicationName(appName);
         Assert.assertTrue(appsLiveTable.canEditApplication(appName));
         Assert.assertFalse(appsLiveTable.canDeleteApplication(appName));
-
-        this.validateConsole.getLogCaptureConfiguration().registerExpected("WikiComponentException: Registering UI "
-            + "extensions at wiki level requires wiki administration rights");
     }
 
     /**

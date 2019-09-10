@@ -30,13 +30,14 @@ rgba($red, $green, $blue, $opacity)##
 td.diff-line-number {
   border-right: 1px solid $theme.borderColor;
   color: $lightTextSecondaryColor;
-  text-align: right;
-  vertical-align: top;
+  text-align: center;
+  vertical-align: middle;
 }
 
 td.diff-line {
   /* Take all the available space. */
   width: 100%;
+  vertical-align: middle;
 }
 
 .diff-line-added {
@@ -63,6 +64,38 @@ td.diff-line-meta {
 .diff-line ins {
   background-color: #AAFFAA;
   text-decoration: none;
+}
+
+.diff-conflict {
+  background-color: #FFCF00;
+}
+
+.diff-conflict-resolution {
+  background-color: #B8DEFF;
+  border: 1px dashed;
+}
+
+span.diff-decision {
+  padding-top: 10px;
+  display: inline-block;
+}
+
+textarea.diff-decision {
+  width: 70%;
+  display: inline-block;
+}
+
+/* Prevent displaying the maximize link */
+.diff-line .fullScreenEditLinkContainer {
+  display: none;
+}
+
+.empty-decision-value {
+  color: red;
+}
+
+.diff-choices {
+  float: right;
 }
 
 dt.diff-header {

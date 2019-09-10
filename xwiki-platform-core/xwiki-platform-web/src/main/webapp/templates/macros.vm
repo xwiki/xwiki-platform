@@ -1642,7 +1642,7 @@ function (row, i, table) {
   if (!row['doc_viewable']) {
     $($jsontool.serialize("${divid}-inaccessible-docs")).removeClassName('hidden');
   }
-  #if ($collist.indexOf('doc.title') != -1)
+  #if ($collist.contains('doc.title'))
     #set($titleOpts = $columnDescriptors['doc.title'])
     #if ("$!{titleOpts}" == ""
         || ($titleOpts['filterable'] == $NULL || $titleOpts['filterable'] == true)

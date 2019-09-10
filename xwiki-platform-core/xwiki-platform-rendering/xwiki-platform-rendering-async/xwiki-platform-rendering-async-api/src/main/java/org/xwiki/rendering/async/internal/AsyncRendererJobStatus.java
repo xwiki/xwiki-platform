@@ -83,7 +83,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
      * @param request the request
      * @param result the result of the renderer execution
      */
-    AsyncRendererJobStatus(AsyncRendererJobRequest request, AsyncRendererResult result)
+    public AsyncRendererJobStatus(AsyncRendererJobRequest request, AsyncRendererResult result)
     {
         super(JOBTYPE, request, null, null, null);
 

@@ -37,77 +37,14 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-#set ($configDocName = 'Mail.MailConfig')
-#set ($configDoc = $xwiki.getDocument($configDocName))
-#set ($configClassName = 'Mail.SendMailConfigClass')
-#set ($configObj = $configDoc.getObject($configClassName))
 ## =======================================================
-## Step 1: Migrate Mail config data
-## =======================================================
-## We bundle Mail.MailConfig without a Mail.SendMailConfigClass xobject, allowing us to migrate mail configuration
-## that were previously stored in XWikiPreferences into a Mail.SendMailConfigClass xobject.
-#if ($xcontext.action == 'admin' &amp;&amp; "$!configObj" == '')
-  ## Create the xobject
-  #set ($configObj = $configDoc.newObject($configClassName))
-  ## Get the "from" value from the old location
-  #set ($oldValue = $xwiki.getSpacePreference('admin_email'))
-  #if ("$!oldValue" != '')
-    #set ($discard = $configObj.set('from', $oldValue))
-  #else
-    ## Make sure the value is set and thus overrides the old config
-    #set ($discard = $configObj.set('from', ''))
-  #end
-  ## Get the "host" value from the old location
-  #set ($oldValue = $xwiki.getSpacePreference('smtp_server'))
-  #if ("$!oldValue" != '')
-    #set ($discard = $configObj.set('host', $oldValue))
-  #else
-    ## Make sure the value is set and thus overrides the old config
-    #set ($discard = $configObj.set('host', 'localhost'))
-  #end
-  ## Get the "port" value from the old location
-  #set ($oldValue = $xwiki.getSpacePreference('smtp_port'))
-  #if ("$!oldValue" != '')
-    #set ($discard = $configObj.set('port', $oldValue))
-  #else
-    ## Make sure the value is set and thus overrides the old config
-    #set ($discard = $configObj.set('port', '25'))
-  #end
-  ## Get the "username" value from the old location
-  #set ($oldValue = $xwiki.getSpacePreference('smtp_server_username'))
-  #if ("$!oldValue" != '')
-    #set ($discard = $configObj.set('username', $oldValue))
-  #else
-    ## Make sure the value is set and thus overrides the old config
-    #set ($discard = $configObj.set('username', ''))
-  #end
-  ## Get the "password" value from the old location
-  #set ($oldValue = $xwiki.getSpacePreference('smtp_server_password'))
-  #if ("$!oldValue" != '')
-    #set ($discard = $configObj.set('password', $oldValue))
-  #else
-    ## Make sure the value is set and thus overrides the old config
-    #set ($discard = $configObj.set('password', ''))
-  #end
-  ## Get the "properties" value from the old location
-  #set ($oldValue = $xwiki.getSpacePreference('javamail_extra_props'))
-  #if ("$!oldValue" != '')
-    #set ($discard = $configObj.set('properties', $oldValue))
-  #else
-    ## Make sure the value is set and thus overrides the old config
-    #set ($discard = $configObj.set('properties', ''))
-  #end
-  ## Save the new xobject!
-  #set ($discard = $configDoc.save('Migrated Mail configuration found in XWikiPreferences', true))
-#end
-## =======================================================
-## Step 2: Display form
+## Display form
 ## =======================================================
 #set ($params = {
   'send': ['from', 'bcc', 'host', 'port', 'username', 'password', 'properties', 'sendWaitTime', 'discardSuccessStatuses']
 })
-#set ($paramDoc = $configDoc)
-#set ($paramClass = $configClassName)
+#set ($paramDoc = $xwiki.getDocument('Mail.MailConfig'))
+#set ($paramClass = 'Mail.SendMailConfigClass')
 {{/velocity}}
 
 {{include reference="XWiki.AdminFieldsDisplaySheet" /}}</content>

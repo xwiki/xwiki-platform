@@ -36,6 +36,10 @@ import org.xwiki.test.ui.po.BaseElement;
  */
 public class EntityDiff extends BaseElement
 {
+    private static final String CONFLICTS_ID_INPUT_NAME = "conflict_id";
+    private static final String XPATH_PROPERTY_DIFF = ".//div[@class = 'diff-container' and "
+        + "parent::dd/preceding-sibling::dt[1][@class = 'diff-header' and normalize-space(.) = '%s']]";
+
     /**
      * The element that wraps and contains the changes for all the entity's properties.
      */
@@ -70,18 +74,34 @@ public class EntityDiff extends BaseElement
     public List<String> getDiff(String propertyName)
     {
         WebElement element =
-            this.container.findElement(By.xpath(".//div[@class = 'diff-container' and "
-                + "parent::dd/preceding-sibling::dt[1][@class = 'diff-header' and normalize-space(.) = '"
-                + propertyName + "']]"));
+            this.container.findElement(By.xpath(String.format(XPATH_PROPERTY_DIFF, propertyName)));
         List<String> diff = new ArrayList<>();
         for (WebElement line : getDriver().findElementsWithoutWaiting(element, By.xpath(".//td[3]"))) {
             if (getDriver().findElementsWithoutWaiting(line, By.tagName("ins")).size() > 0
                 || getDriver().findElementsWithoutWaiting(line, By.tagName("del")).size() > 0) {
                 diff.add(String.valueOf(getDriver().executeJavascript("return arguments[0].innerHTML", line)));
+            } else if (getDriver().findElementsWithoutWaiting(line, By.className("diff-choices")).size() > 0) {
+                diff.add("[Conflict Resolution]");
             } else {
                 diff.add(line.getText());
             }
         }
         return diff;
+    }
+
+    /**
+     * @param propertyName the name of a modified property of the underlying entity
+     * @return the list of conflicts displayed in that diff.
+     */
+    public List<Conflict> getConflicts(String propertyName)
+    {
+        WebElement element =
+            this.container.findElement(By.xpath(String.format(XPATH_PROPERTY_DIFF, propertyName)));
+
+        List<Conflict> conflictList = new ArrayList<>();
+        for (WebElement conflictIdElement : element.findElements(By.name(CONFLICTS_ID_INPUT_NAME))) {
+            conflictList.add(new Conflict(conflictIdElement.getAttribute("value")));
+        }
+        return conflictList;
     }
 }

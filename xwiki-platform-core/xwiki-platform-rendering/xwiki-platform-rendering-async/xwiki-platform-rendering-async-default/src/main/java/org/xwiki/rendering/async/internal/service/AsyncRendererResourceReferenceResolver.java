@@ -28,6 +28,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.CreateResourceReferenceException;
 import org.xwiki.resource.ResourceReference;
@@ -73,6 +74,12 @@ public class AsyncRendererResourceReferenceResolver extends AbstractResourceRefe
             clientId = clientIds.get(0);
         }
 
-        return new AsyncRendererResourceReference(resourceType, pathSegments, clientId);
+        long timeout = Long.MAX_VALUE;
+        List<String> timeouts = representation.getParameters().get("timeout");
+        if (CollectionUtils.isNotEmpty(timeouts)) {
+            timeout = NumberUtils.toLong(timeouts.get(0), timeout);
+        }
+
+        return new AsyncRendererResourceReference(resourceType, pathSegments, clientId, timeout);
     }
 }

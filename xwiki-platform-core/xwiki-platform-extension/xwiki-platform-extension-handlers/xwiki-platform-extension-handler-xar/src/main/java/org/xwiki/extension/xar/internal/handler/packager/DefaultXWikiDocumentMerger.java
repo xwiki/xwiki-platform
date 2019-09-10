@@ -20,7 +20,6 @@
 package org.xwiki.extension.xar.internal.handler.packager;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -35,15 +34,15 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.merge.MergeDocumentResult;
+import org.xwiki.store.merge.MergeManager;
 import org.xwiki.xar.XarEntryType.UpgradeType;
 
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import com.xpn.xwiki.doc.merge.MergeResult;
 
 /**
  * Default implementation of {@link XWikiDocumentMerger};
@@ -56,9 +55,6 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 {
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
     private MandatoryDocumentInitializerManager initializerManager;
 
     @Inject
@@ -66,6 +62,9 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
     @Inject
     private JobContext jobContext;
+
+    @Inject
+    private MergeManager mergeManager;
 
     @Inject
     private Logger logger;
@@ -192,8 +191,6 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
     private XWikiDocument merge3(XWikiDocument currentDocument, XWikiDocument previousDocument,
         XWikiDocument nextDocument, XWikiDocumentMergerConfiguration configuration)
     {
-        XWikiContext xcontext = this.xcontextProvider.get();
-
         // Check if there is any customization
         if (currentDocument.equalsData(previousDocument)) {
             // Check if there is any difference between previous and new
@@ -206,12 +203,13 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         MergeConfiguration mergeConfiguration = new MergeConfiguration();
         mergeConfiguration.setProvidedVersionsModifiables(true);
 
-        MergeResult documentMergeResult;
+        MergeDocumentResult documentMergeResult;
         try {
-            documentMergeResult = mergedDocument.merge(previousDocument, nextDocument, mergeConfiguration, xcontext);
+            documentMergeResult = mergeManager.mergeDocument(previousDocument, nextDocument, currentDocument,
+                mergeConfiguration);
         } catch (Exception e) {
             // Unexpected error, lets behave as if there was a conflict
-            documentMergeResult = new MergeResult();
+            documentMergeResult = new MergeDocumentResult(currentDocument, previousDocument, nextDocument);
             documentMergeResult.getLog()
                 .error("Unexpected exception thrown. Usually means there is a bug in the merge.", e);
             documentMergeResult.setModified(true);
@@ -245,7 +243,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
     private XWikiDocument askDocumentToSave(XWikiDocument currentDocument, XWikiDocument previousDocument,
         XWikiDocument nextDocument, XWikiDocument mergedDocument, XWikiDocumentMergerConfiguration configuration,
-        MergeResult documentMergeResult)
+        MergeDocumentResult documentMergeResult)
     {
         // Indicate future author to whoever is going to answer the question
         if (currentDocument != null) {

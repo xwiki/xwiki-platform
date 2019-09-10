@@ -43,6 +43,7 @@ import java.util.List;
  * @version $Id$
  */
 @Component
+// Should be 1103000 but too late to change it...
 @Named("R1130000WatchlistLeftoversCleaner")
 @Singleton
 public class WatchlistLeftoversCleaner extends AbstractHibernateDataMigration
@@ -94,6 +95,7 @@ public class WatchlistLeftoversCleaner extends AbstractHibernateDataMigration
     @Override
     public XWikiDBVersion getVersion()
     {
+        // Should be 1103000 but too late to change it...
         return new XWikiDBVersion(1130000);
     }
 }

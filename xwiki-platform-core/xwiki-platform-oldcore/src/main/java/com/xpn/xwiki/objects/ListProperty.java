@@ -25,10 +25,11 @@ import java.util.List;
 
 import org.hibernate.collection.internal.PersistentList;
 import org.hibernate.collection.spi.PersistentCollection;
+import org.xwiki.store.merge.MergeManagerResult;
 
+import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.internal.AbstractNotifyOnUpdateList;
-import com.xpn.xwiki.internal.merge.MergeUtils;
 import com.xpn.xwiki.internal.objects.ListPropertyPersistentList;
 import com.xpn.xwiki.objects.classes.ListClass;
 
@@ -257,7 +258,15 @@ public class ListProperty extends BaseProperty implements Cloneable
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {
-        MergeUtils.mergeList((List<String>) previousValue, (List<String>) newValue, this.list, mergeResult);
+        MergeManagerResult<List<String>, String> listStringMergeManagerResult = getMergeManager()
+            .mergeList((List<String>) previousValue, (List<String>) newValue, this.list, new MergeConfiguration());
+        mergeResult.getLog().addAll(listStringMergeManagerResult.getLog());
+        mergeResult.setModified(mergeResult.isModified() || listStringMergeManagerResult.isModified());
+
+        if (listStringMergeManagerResult.isModified()) {
+            this.list.clear();
+            this.list.addAll(listStringMergeManagerResult.getMergeResult());
+        }
     }
 
     /**

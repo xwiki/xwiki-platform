@@ -48,6 +48,12 @@ public class Upgrade84FileStoreTest extends UpgradeTest
 
         assertURLContent("attachment", attachmentURL);
 
+        // Check migrated attachment
+        URL attachmentURLWithWhiteSpaces = new URL(
+            getUtil().getBaseBinURL(wiki) + "download/Attachments/WebHome/attachment%20with%20white%20spaces.txt");
+
+        assertURLContent("attachment with white spaces", attachmentURLWithWhiteSpaces);
+
         // Check migrated deleted attachment
         URL deletedAttachmentURL = new URL(
             getUtil().getBaseBinURL(wiki) + "downloadrev/Attachments/WebHome/deletedattachment.txt?rev=1.1&rid=1");

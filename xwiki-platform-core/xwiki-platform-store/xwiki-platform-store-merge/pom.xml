@@ -29,25 +29,12 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-platform-store-merge</artifactId>
   <name>XWiki Platform - Store - Merge - Parent POM</name>
-  <packaging>jar</packaging>
+  <packaging>pom</packaging>
   <description>
-    XWiki module dedicated to perform document merge operations and manage related conflicts resolution.
+    XWiki modules dedicated to perform document merge operations and manage related conflicts resolution.
   </description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-component-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-script</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-  </dependencies>
+  <modules>
+    <module>xwiki-platform-store-merge-api</module>
+    <module>xwiki-platform-store-merge-default</module>
+  </modules>
 </project>

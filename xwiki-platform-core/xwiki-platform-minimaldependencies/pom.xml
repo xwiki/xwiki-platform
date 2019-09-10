@@ -263,7 +263,7 @@
     <!-- Merge script service is used by the merging conflict window, so we need to render it in case of conflict. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-store-merge</artifactId>
+      <artifactId>xwiki-platform-store-merge-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

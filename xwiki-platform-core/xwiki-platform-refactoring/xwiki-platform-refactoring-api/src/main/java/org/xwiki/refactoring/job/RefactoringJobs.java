@@ -19,6 +19,8 @@
  */
 package org.xwiki.refactoring.job;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Known refactoring job types.
  *
@@ -73,6 +75,14 @@ public interface RefactoringJobs
      * @since 7.4M2
      */
     String CREATE = GROUP_PREFIX + "create";
+
+    /**
+     * The role hint of the job that replace user references.
+     * 
+     * @since 11.8RC1
+     */
+    @Unstable
+    String REPLACE_USER = GROUP_PREFIX + "replaceUser";
 
     /**
      * The role hint of the job that permanently deletes entities.

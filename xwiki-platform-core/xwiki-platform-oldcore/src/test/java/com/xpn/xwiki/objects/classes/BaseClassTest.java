@@ -26,7 +26,10 @@ import org.xwiki.diff.internal.DefaultDiffManager;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.merge.MergeManager;
+import org.xwiki.store.merge.MergeManagerResult;
 import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
 import com.xpn.xwiki.doc.merge.MergeResult;
@@ -38,6 +41,9 @@ import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for the {@link BaseClass} class.
@@ -53,6 +59,9 @@ public class BaseClassTest
 {
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;
+
+    @MockComponent
+    private MergeManager mergeManager;
 
     @Test
     public void setDocumentReference()
@@ -163,6 +172,28 @@ public class BaseClassTest
         newClass.setPrettyName("new");
         newClass.setValidationScript("my new validation script");
         newClass.setDefaultEditSheet("A previous edit sheet");
+
+        when(mergeManager.mergeObject(any(), any(), any(), any())).thenReturn(new MergeManagerResult<>());
+
+        MergeManagerResult<String, String> mergeManagerResult = new MergeManagerResult<>();
+        mergeManagerResult.setMergeResult("current");
+        mergeManagerResult.setModified(false);
+        mergeManagerResult.getLog().error("Failed to merge objects: previous=[previous] new=[new] current=[current]");
+        when(mergeManager.mergeObject(eq("previous"), eq("new"), eq("current"), any())).thenReturn(mergeManagerResult);
+
+        mergeManagerResult = new MergeManagerResult<>();
+        mergeManagerResult.setMergeResult("my new validation script");
+        mergeManagerResult.setModified(true);
+        when(mergeManager
+            .mergeObject(eq("my validation script"), eq("my new validation script"), eq("my validation script"), any()))
+            .thenReturn(mergeManagerResult);
+
+        mergeManagerResult = new MergeManagerResult<>();
+        mergeManagerResult.setMergeResult("An edit sheet");
+        mergeManagerResult.setModified(false);
+        when(mergeManager
+            .mergeObject(eq("A previous edit sheet"), eq("A previous edit sheet"), eq("An edit sheet"), any()))
+            .thenReturn(mergeManagerResult);
 
         MergeResult mergeResult = new MergeResult();
         currentClass.merge(previousClass, newClass, new MergeConfiguration(), oldcore.getXWikiContext(), mergeResult);

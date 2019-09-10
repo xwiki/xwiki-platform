@@ -1,29 +1,71 @@
-#macro (unifiedDiff $previous $next)
+#macro (unifiedDiff $previous $next $conflicts)
   #set ($discard = $xwiki.ssfx.use('uicomponents/viewers/diff.css', true))
   #set ($discard = $xwiki.jsfx.use('uicomponents/viewers/diff.js'))
   <div class="diff-container">
     <table>
-    #foreach ($block in $services.diff.display.unified($previous, $next))
-      <tr>
+    #foreach ($block in $services.diff.display.unified($previous, $next, $conflicts))
+      <tr #if ($block.isConflicting())class="diff-conflict"#end>
         <td class="diff-line-number">...</td>
         <td class="diff-line-number">...</td>
         <td class="diff-line diff-line-meta">@@ -$mathtool.add($block.previousStart, 1),$block.previousSize
           +$mathtool.add($block.nextStart, 1),$block.nextSize @@</td>
       </tr>
       #foreach ($line in $block)
-      <tr>
-        #set ($lineNumber = $line.index + 1)
-        <td class="diff-line-number">#if (!$line.added)$lineNumber#end</td>
-        <td class="diff-line-number">#if (!$line.deleted)$lineNumber#end</td>
-        <td class="diff-line diff-line-$line.type.toString().toLowerCase()">#unifiedDiffLine($line)</td>
-      </tr>
+        <tr #if ($block.isConflicting())class="diff-conflict"#end>
+          #set ($lineNumber = $line.index + 1)
+          <td class="diff-line-number">#if (!$line.added)$lineNumber#end</td>
+          <td class="diff-line-number">#if (!$line.deleted)$lineNumber#end</td>
+          <td class="diff-line diff-line-$line.type.toString().toLowerCase()">#unifiedDiffLine($line)</td>
+        </tr>
+      #end
+      #if ($block.isConflicting())
+        #displayConflict($block)
       #end
     #end
     </table>
   </div>
 #end
 
-#macro (displayPropertyDiff $propertyName $previousValue $newValue $_obfuscate)
+#macro (displayConflict $block)
+<tr class="diff-conflict-resolution">
+  <td class="diff-line-number"><span class="fa fa-pencil"></span></td>
+  <td class="diff-line-number"></td>
+  <td class="diff-line" id="conflict_decision_container_$block.conflict.reference">
+    #displayConflictValue($block.conflict "current")
+    #displayConflictValue($block.conflict "previous")
+    #displayConflictValue($block.conflict "next")
+    <textarea class="form-control diff-decision" id="conflict_decision_value_custom_$block.conflict.reference"></textarea>
+    <input type="hidden" id="conflict_id_$block.conflict.reference" name="conflict_id" value="$block.conflict.reference" />
+    <select class="diff-choices" id="conflict_decision_select_$block.conflict.reference" name="conflict_decision_select">
+      <option value="current" selected="selected">$services.localization.render("core.editors.save.previewDiff.versionToCompare.current")</option>
+      <option value="previous">$services.localization.render("core.editors.save.previewDiff.versionToCompare.previous")</option>
+      <option value="next">$services.localization.render("core.editors.save.previewDiff.versionToCompare.next")</option>
+      <option value="custom">$services.localization.render("core.editors.save.previewDiff.versionToCompare.custom")</option>
+    </select>
+  </td>
+</tr>
+#end
+
+#macro (displayConflictValue $conflict $version)
+  #set ($spanId = "conflict_decision_value_${version}_${conflict.reference}")
+  #set ($value = [])
+  #if ($version == "current")
+    #set ($value = $conflict.currentElement)
+  #elseif ($version == "previous")
+    #set ($value = $conflict.previousElement)
+  #elseif ($version == "next")
+    #set ($value = $conflict.nextElement)
+  #end
+  #if ($value.isEmpty())
+    #set ($spanClass = "diff-decision empty-decision-value")
+    #set ($value = [$services.localization.render("core.editors.save.previewDiff.emptyDecisionValue")])
+  #else
+    #set ($spanClass = "diff-decision")
+  #end
+  <span class="$spanClass" id="$spanId">$stringtool.join($value, "<br/>")</span>
+#end
+
+#macro (displayPropertyDiff $propertyName $previousValue $newValue $_obfuscate $conflicts)
   #set ($previousValue = "$!previousValue")
   #set ($newValue = "$!newValue")
   #if (!$_obfuscate && $previousValue != $newValue
@@ -39,15 +81,15 @@
     #end
   </dt>
   #if (!$_obfuscate)
-    <dd>#unifiedDiff($previousValue $newValue)</dd>
+    <dd>#unifiedDiff($previousValue $newValue $conflicts)</dd>
   #end
   #set ($_obfuscate = $NULL)
 #end
 
-#macro (maybeDisplayPropertyDiff $propertyName $previousValue $newValue $_obfuscate)
+#macro (maybeDisplayPropertyDiff $propertyName $previousValue $newValue $_obfuscate $conflicts)
   ## Test if the raw values are different.
   #if ($previousValue != $newValue)
-    #displayPropertyDiff($propertyName $previousValue $newValue $_obfuscate)
+    #displayPropertyDiff($propertyName $previousValue $newValue $_obfuscate $conflicts)
   #end
 #end
 
@@ -67,7 +109,7 @@
   #set ($propertyPrettyName = $NULL)
 #end
 
-#macro (displayDocumentFieldsDiff $oldDoc $newDoc $metaDataDiff $tagsDiff)
+#macro (displayDocumentFieldsDiff $oldDoc $newDoc $metaDataDiff $tagsDiff $conflicts)
   <dl class="diff-group">
     #set ($documentReference = $oldDoc.documentReference)
     #if (!$documentReference)
@@ -94,7 +136,7 @@
           #end
         #end
         #set ($contentLabel = $services.localization.render('web.history.changes.document.content'))
-        #maybeDisplayPropertyDiff($contentLabel $oldDoc.content $newDoc.content)
+        #maybeDisplayPropertyDiff($contentLabel $oldDoc.content $newDoc.content $NULL $conflicts)
       </dl>
     </dd>
   </dl>
@@ -293,13 +335,13 @@
   })
 #end
 
-#macro (displayDocumentDiff $docDiff)
+#macro (displayDocumentDiff $docDiff $conflicts)
   ##
   ## Document properties: title, content, tags, author, language...
   ##
   #set ($hasContentChanges = $docDiff.oldDoc && $docDiff.newDoc && $docDiff.oldDoc.content != $docDiff.newDoc.content)
   #if ($docDiff.metaData.size() > 0 || $docDiff.tags || $hasContentChanges)
-    #displayDocumentFieldsDiff($docDiff.oldDoc $docDiff.newDoc $docDiff.metaData $docDiff.tags)
+    #displayDocumentFieldsDiff($docDiff.oldDoc $docDiff.newDoc $docDiff.metaData $docDiff.tags $conflicts)
   #end
   ##
   ## Attachment changes

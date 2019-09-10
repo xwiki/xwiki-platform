@@ -345,6 +345,9 @@ var XWiki = (function(XWiki) {
         $('forceSave').remove();
       }
 
+      $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
+      $$('input[name=customChoices]').forEach(function (item) {item.remove();});
+
       if (isCreateFromTemplate) {
         if (response.responseJSON) {
           // Start the progress display.
@@ -558,8 +561,17 @@ var XWiki = (function(XWiki) {
       // Submit the choice made: if it's reload, reload the editors,
       // else submit the save with the right forceSave input.
       var submitAction = function () {
+        // Ensure the previous values are really removed.
+        // It might not be the case if another conflict arise for example.
+        if ($('forceSave')) {
+          $('forceSave').remove();
+        }
+
+        $$('input[name=mergeChoices]').forEach(function (item) {item.remove();});
+        $$('input[name=customChoices]').forEach(function (item) {item.remove();});
         require(['jquery'], function ($) {
           var action = $('input[name=warningConflictAction]:checked').val();
+          getConflictIds().map(retrieveDecisions);
           $('#previewDiffModal').modal('hide');
           if (action === "reload") {
             self.reloadEditor();
@@ -599,10 +611,35 @@ var XWiki = (function(XWiki) {
         var selectedValue = $$('input[name=warningConflictAction]:checked')[0].value;
         if (selectedValue == "merge") {
           previewDiff("NEXT", "MERGED");
-        } else if (selectedValue == "override") {
+        // It's the next and current value which will be used for the merge, so better use them in case of custom
+        // conflicts resolution.
+        } else if (selectedValue == "override" || selectedValue == "custom") {
           previewDiff("NEXT", "CURRENT");
         } else if (selectedValue == "reload") {
           previewDiff("CURRENT", "NEXT");
+        }
+      };
+
+      var getConflictIds = function () {
+        return $$('input[name=conflict_id]').map(function (item) {return item.value;})
+      };
+
+      var retrieveDecisions = function (conflictId) {
+        var selectValue = $('conflict_decision_select_' + conflictId).value;
+        var customValue = $('conflict_decision_value_custom_' + conflictId).value;
+        self.form.insert(new Element("input", {
+          type: "hidden",
+          name: "mergeChoices",
+          id: "mergeChoices_" + conflictId,
+          value: conflictId + "=" + selectValue
+        }));
+        if (selectValue === "custom") {
+          self.form.insert(new Element("input", {
+            type: "hidden",
+            name: "customChoices",
+            id: "custom_" + conflictId,
+            value: conflictId + "=" + encodeURI(customValue)
+          }));
         }
       };
 
@@ -630,6 +667,7 @@ var XWiki = (function(XWiki) {
           $('input[name=warningConflictAction]').on('change', radioSelect);
           $('#previewDiffChangeDiff').on('click', previewDiff);
           $('#submitDiffButton').on('click', submitAction);
+          $(document).trigger("xwiki:dom:updated", {'elements': $('#previewDiffModal').toArray()});
         });
       };
 

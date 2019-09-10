@@ -138,6 +138,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
             Job job = this.executor.getJob(id);
 
             if (job != null) {
+                // Wait for the job to be finished (or until the timeout is reached)
                 job.join(time, unit);
             }
         }

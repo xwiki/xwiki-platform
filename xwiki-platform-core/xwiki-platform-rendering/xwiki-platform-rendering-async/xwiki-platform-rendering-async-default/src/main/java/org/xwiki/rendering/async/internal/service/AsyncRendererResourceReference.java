@@ -36,19 +36,23 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
 
     private final String clientId;
 
+    private final long timeout;
+
     /**
      * Default constructor.
      * 
      * @param type see {@link #getType()}
      * @param id the id of the async renderer
      * @param clientId the id of the client associated with the async execution
+     * @param timeout how long (in milliseconds) to wait for the job to be finished
      */
-    public AsyncRendererResourceReference(ResourceType type, List<String> id, String clientId)
+    public AsyncRendererResourceReference(ResourceType type, List<String> id, String clientId, long timeout)
     {
         setType(type);
 
         this.id = id;
         this.clientId = clientId;
+        this.timeout = timeout;
     }
 
     /**
@@ -71,5 +75,13 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
     public String toString()
     {
         return getId().toString();
+    }
+
+    /**
+     * @return how long (in milliseconds) to wait for the job to be finished
+     */
+    public long getTimeout()
+    {
+        return this.timeout;
     }
 }

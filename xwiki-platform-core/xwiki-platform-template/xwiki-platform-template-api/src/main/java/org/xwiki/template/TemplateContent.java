@@ -20,6 +20,8 @@
 package org.xwiki.template;
 
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.Set;
 
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
@@ -33,6 +35,21 @@ import org.xwiki.stability.Unstable;
  */
 public interface TemplateContent
 {
+    /**
+     * The various contexts in which to make a template unique.
+     * 
+     * @version $Id$
+     * @since 11.8RC1
+     */
+    @Unstable
+    enum UniqueContext
+    {
+        /**
+         * Unique for the whole request.
+         */
+        REQUEST
+    }
+
     /**
      * @return the source of the template
      */
@@ -92,6 +109,46 @@ public interface TemplateContent
      */
     @Unstable
     default DocumentReference getDocumentReference()
+    {
+        return null;
+    }
+
+    /**
+     * @return true if the result be reused several times
+     * @since 11.8RC1
+     */
+    @Unstable
+    default boolean isCacheAllowed()
+    {
+        return false;
+    }
+
+    /**
+     * @return true if the execution should be asynchronous when possible
+     * @since 11.8RC1
+     */
+    @Unstable
+    default boolean isAsyncAllowed()
+    {
+        return false;
+    }
+
+    /**
+     * @return the list of context entries to take remember for the execution
+     * @since 11.8RC1
+     */
+    @Unstable
+    default Set<String> getContextEntries()
+    {
+        return Collections.emptySet();
+    }
+
+    /**
+     * @return true if the template should be executed only once even if referenced several times
+     * @since 11.8RC1
+     */
+    @Unstable
+    default UniqueContext getUnique()
     {
         return null;
     }

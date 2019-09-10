@@ -21,13 +21,15 @@
 package org.xwiki.store.filesystem.internal.migration;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.hibernate.HibernateException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
-import org.xwiki.store.internal.FileSystemStoreUtils;
 
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -67,6 +69,10 @@ public class R910000XWIKI14697DataMigration extends AbstractXWIKI14697DataMigrat
     {
         File attachmentFolder = getAttachmentDir(attachmentReference);
 
-        return new File(attachmentFolder, FileSystemStoreUtils.encode(attachmentReference.getName(), false)).exists();
+        try {
+            return new File(attachmentFolder, URLEncoder.encode(attachmentReference.getName(), "UTF8")).exists();
+        } catch (UnsupportedEncodingException e) {
+            throw new HibernateException("UTF8 is unknown", e);
+        }
     }
 }

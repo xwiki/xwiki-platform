@@ -3821,7 +3821,9 @@ public class XWiki implements EventListener
 
             // Compare the two keys
             if ((!storedKey.equals("") && (storedKey.equals(validationKey)))) {
-                userObject.setIntValue("active", 1);
+                XWikiUser xWikiUser = new XWikiUser(userDocument.getDocumentReference());
+                xWikiUser.setDisabled(false, context);
+                xWikiUser.setEmailChecked(true, context);
                 saveDocument(userDocument, context);
 
                 if (withConfirmEmail) {
@@ -3897,13 +3899,16 @@ public class XWiki implements EventListener
 
             // Mark the user as active or waiting email validation.
             if (withValidation) {
-                map.put("active", new String[] { "0" });
+                map.put(XWikiUser.ACTIVE_PROPERTY, new String[] { "0" });
+                map.put(XWikiUser.EMAIL_CHECKED_PROPERTY, new String[] { "0" });
+
                 validkey = generateValidationKey(16);
                 map.put("validkey", new String[] { validkey });
 
             } else {
                 // Mark user active
-                map.put("active", new String[] { "1" });
+                map.put(XWikiUser.ACTIVE_PROPERTY, new String[] { "1" });
+                map.put(XWikiUser.EMAIL_CHECKED_PROPERTY, new String[] { "1" });
             }
 
             // Create the user.
@@ -4240,14 +4245,32 @@ public class XWiki implements EventListener
 
     public User getUser(XWikiContext context)
     {
-        XWikiUser xwikiUser = context.getXWikiUser();
+        return getUser(context.getUserReference(), context);
+    }
+
+    /**
+     * @deprecated since 11.8RC1 prefer using {@link #getUser(DocumentReference, XWikiContext)}.
+     */
+    @Deprecated
+    public User getUser(String username, XWikiContext context)
+    {
+        XWikiUser xwikiUser = new XWikiUser(username);
         User user = new User(xwikiUser, context);
         return user;
     }
 
-    public User getUser(String username, XWikiContext context)
+    /**
+     * Retrieve a user from its document reference.
+     *
+     * @param userReference the reference of the user.
+     * @param context the current context.
+     * @return the user corresponding to that document reference.
+     * @since 11.8RC1
+     */
+    @Unstable
+    public User getUser(DocumentReference userReference, XWikiContext context)
     {
-        XWikiUser xwikiUser = new XWikiUser(username);
+        XWikiUser xwikiUser = new XWikiUser(userReference);
         User user = new User(xwikiUser, context);
         return user;
     }
@@ -5355,15 +5378,23 @@ public class XWiki implements EventListener
         return "1".equals(getConfiguration().getProperty("xwiki.authentication.group.allgroupimplicit"));
     }
 
+    /**
+     * @deprecated since 11.8RC1 prefer using {@link XWikiUser#isDisabled(XWikiContext)}.
+     */
+    @Deprecated
     public int checkActive(XWikiContext context) throws XWikiException
     {
         return checkActive(context.getUser(), context);
     }
 
+    /**
+     * @deprecated since 11.8RC1 prefer using {@link XWikiUser#isDisabled(XWikiContext)}.
+     */
+    @Deprecated
     public int checkActive(String user, XWikiContext context) throws XWikiException
     {
         XWikiUser xWikiUser = new XWikiUser(user);
-        return xWikiUser.isActive(context) ? 1 : 0;
+        return xWikiUser.isDisabled(context) ? 0 : 1;
     }
 
     /**
@@ -5481,7 +5512,8 @@ public class XWiki implements EventListener
             setPhonyDocument(reference, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Access to document {0} has been denied to user {1}", null, args);
-        } else if (user.isDisabled(context)) {
+        // User is disabled: the mail address is marked as checked
+        } else if (user.isDisabled(context) && user.isEmailChecked(context)) {
             String action = context.getAction();
             /*
              * Allow inactive users to see skins, ressources, SSX, JSX and downloads they could have seen as guest. The
@@ -5498,7 +5530,8 @@ public class XWiki implements EventListener
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_DISABLED,
                     "User {0} account is disabled", null, args);
             }
-        } else if (!user.isActive(context)) {
+        // User actually needs to activate his mail address.
+        } else if (user.isDisabled(context) && !user.isEmailChecked(context)) {
             boolean allow = false;
             String action = context.getAction();
             /*

@@ -79,7 +79,7 @@ public abstract class AbstractStoreTypeDataMigration extends AbstractFileStoreDa
         });
     }
 
-    private void doWork(Session session)
+    protected void doWork(Session session)
     {
         org.hibernate.query.Query selectQuery =
             session.createQuery("SELECT attachment.id, attachment.filename, document.fullName"

@@ -44,10 +44,12 @@ import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.refactoring.job.MoveRequest;
 import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
+import org.xwiki.refactoring.job.ReplaceUserRequest;
 import org.xwiki.refactoring.job.RestoreRequest;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides refactoring-specific scripting APIs.
@@ -498,5 +500,40 @@ public class RefactoringScriptService implements ScriptService
     public Job permanentlyDelete(List<Long> deletedDocumentIds)
     {
         return this.permanentlyDelete(getRequestFactory().createPermanentlyDeleteRequest(deletedDocumentIds));
+    }
+
+    /**
+     * Schedules an asynchronous job for replacing the author and the content author of the existing wiki pages. If the
+     * old author is from the main wiki then the entire wiki farm is updated. Otherwise only the subwiki of the old
+     * author is updated.
+     * 
+     * @param oldAuthorReference the old author reference
+     * @param newAuthorReference the new author reference
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 11.8RC1
+     */
+    @Unstable
+    public Job changeDocumentAuthor(DocumentReference oldAuthorReference, DocumentReference newAuthorReference)
+    {
+        ReplaceUserRequest request =
+            getRequestFactory().createReplaceUserRequest(oldAuthorReference, newAuthorReference);
+        request.setReplaceDocumentAuthor(true);
+        request.setReplaceDocumentContentAuthor(true);
+        return this.replaceUser(request);
+    }
+
+    /**
+     * Schedules an asynchronous job to perform the given request.
+     * 
+     * @param request the request to perform (specifies the old user reference and the new user reference)
+     * @return the job that has been scheduled and that can be used to monitor the progress of the operation,
+     *         {@code null} in case of failure
+     * @since 11.8RC1
+     */
+    @Unstable
+    public Job replaceUser(ReplaceUserRequest request)
+    {
+        return this.execute(RefactoringJobs.REPLACE_USER, request);
     }
 }

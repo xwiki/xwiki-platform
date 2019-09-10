@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="XWiki.UserDirectoryMacros" locale="">
   <web>XWiki</web>
   <name>UserDirectoryMacros</name>
   <language/>
@@ -48,13 +48,17 @@
 #set ($defaultConfigurationDoc = $xwiki.getDocument($defaultConfigurationDocReference))
 #set ($defaultConfiguration = $defaultConfigurationDoc.getObject($directoryPreferencesClassName))
 
-## Set the fixed columns that we want the user directory to always show.
-#set ($columns = ['_avatar', 'doc.name'])
+## We use an ordered set to collect the live table columns because we want to avoid duplicates (they break the live
+## table filtering query) and at the same time we want to preserve the column order.
+#set ($columns = $collectionstool.orderedSet)
+## Add the fixed columns that we want the user directory to always show.
+#set ($discard = $columns.addAll(['_avatar', 'doc.name']))
 
 ## Default configuration
 ## The columns that the user directory will default to when no user preferences exist or when the user resets to default.
 ## These defaults can be configured by the wiki's admins.
-#if ($doc.fullName != 'Main.UserDirectory')
+#set ($isGlobalUserDirectory = $doc.fullName != 'Main.UserDirectory')
+#if ($isGlobalUserDirectory)
   ## Fallback defaults.
   #set ($defaultColumnsString = 'first_name last_name')
 #else
@@ -64,7 +68,7 @@
 #set ($defaultColumns = $defaultColumnsString.split('\s+'))
 
 ## Current Configuration
-#if ($doc.fullName != 'Main.UserDirectory' || $isGuest || $isSuperAdmin)
+#if ($isGlobalUserDirectory || $isGuest || $isSuperAdmin)
   ## Use the default configuration when editing the default configuration itself or
   ## when the current user doesn't have a profile document, so no preferences.
   #set ($configurationDoc = $defaultConfigurationDoc)
@@ -72,8 +76,9 @@
   ## Use the current user's configuration
   #set ($configurationDoc = $xwiki.getDocument($xcontext.userReference))
 #end
-## Get or create the current configuration object.
-#set ($configuration = $configurationDoc.getObject($directoryPreferencesClassName, true))
+## Get or create the current configuration object, taking into account the values from the request (which is needed for
+## the live preview).
+#set ($configuration = $configurationDoc.updateObjectFromRequest($directoryPreferencesClassName))
 
 ## Read the configuration and initialize with defaults if necessary.
 #set ($columnsString = $configuration.getValue('columns').trim())
@@ -91,8 +96,8 @@
 
 ## Build the list of columns to display.
 #foreach ($column in $columnsString.split('\s+'))
-  ## Skip invalid or duplicate columns. Duplicate columns break the livetable filtering query.
-  #if ($column.trim() != '' &amp;&amp; $xwikiUsersClass.get($column) &amp;&amp; !$columns.contains($column))
+  ## Skip invalid columns.
+  #if ($column.trim() != '' &amp;&amp; $xwikiUsersClass.get($column))
     #set ($discard = $columns.add($column))
   #end
 #end
@@ -100,7 +105,8 @@
 ##
 ## Build and display the resulting livetable, nothing else.
 ##
-#macro (displayUserDirectoryNoCustomization)
+#macro (displayUserDirectoryLiveTable)
+  {{html clean="false"}}
   #set ($columnsProperties = {})
   #foreach ($column in $columns)
     #set ($columnProperties = {
@@ -149,7 +155,8 @@
     'resultPage' : "$services.model.serialize($userDirectoryLivetableResultsReference)",
     'translationPrefix' : 'xe.userdirectory.',
     'tagCloud' : true,
-    'rowCount': 10
+    'rowCount': 10,
+    'outputOnlyHtml': true
   })
   ## Add a filter for subwikis
   #if ($xcontext.database != $xcontext.mainWikiName &amp;&amp; "$!services.wiki" != '' &amp;&amp; "$!services.wiki.user" != '')
@@ -160,52 +167,94 @@
       #set ($discard = $options.put('extraParams', 'userScope=local'))
     #end
     #if ($userScope == 'LOCAL_AND_GLOBAL')
-      #set ($discard = $xwiki.jsx.use('Main.UserDirectory'))
-
-      {{html}}
-        &lt;form class='xform third' action=''&gt;
-          &lt;dl&gt;
-            &lt;dt&gt;
-              &lt;label for='userScopeFilter'&gt;$services.localization.render('userdirectory.userScopeFilter')&lt;/label&gt;
-              &lt;span class='xHint'&gt;$services.localization.render('userdirectory.userScopeFilter.hint')&lt;/span&gt;
-            &lt;/dt&gt;
-            &lt;dd&gt;
-              &lt;select name='userScope' id='userScopeFilter'&gt;
-                &lt;option value='local'&gt;$services.localization.render('userdirectory.userScopeFilter.local')&lt;/option&gt;
-                &lt;option value='global'&gt;$services.localization.render('userdirectory.userScopeFilter.global')&lt;/option&gt;
-              &lt;/select&gt;
-            &lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/form&gt;
-      {{/html}}
-
+      &lt;form class='xform third' action=''&gt;
+        &lt;dl&gt;
+          &lt;dt&gt;
+            &lt;label for='userScopeFilter'&gt;$services.localization.render('userdirectory.userScopeFilter')&lt;/label&gt;
+            &lt;span class='xHint'&gt;$services.localization.render('userdirectory.userScopeFilter.hint')&lt;/span&gt;
+          &lt;/dt&gt;
+          &lt;dd&gt;
+            &lt;select name='userScope' id='userScopeFilter'&gt;
+              &lt;option value='local'&gt;$services.localization.render('userdirectory.userScopeFilter.local')&lt;/option&gt;
+              &lt;option value='global'&gt;$services.localization.render('userdirectory.userScopeFilter.global')&lt;/option&gt;
+            &lt;/select&gt;
+          &lt;/dd&gt;
+        &lt;/dl&gt;
+      &lt;/form&gt;
     #end
   #end
+  ## We can't filter the values of the 'disabled' user profile property directly from the 'extraParams' live table
+  ## results option because we can't express 'not equal' (we need to say: include only the user profiles for which the
+  ## value of the 'disabled' property is not equal to 1). An user profile that doesn't have any value set for the
+  ## 'disabled' property is enabled.
+  ## We don't hide the disabled user profiles when the active and disabled columns are present because the user can use
+  ## the live table filters to achieve this.
+  #set ($hideDisabledProfilesValue = $configuration.getValue('hideDisabledProfiles'))
+  #if (!$columns.contains('active') &amp;&amp; !$columns.contains('disabled')
+      &amp;&amp; ($hideDisabledProfilesValue == 1 || ("$!hideDisabledProfilesValue" == '' &amp;&amp;
+      $configuration.xWikiClass.get('hideDisabledProfiles').getValue('defaultValue') == 1)))
+    #set ($options.extraParams = "$!options.extraParams&amp;hideDisabledProfiles=true")
+  #end
+  ## We need to know which users are disabled or inactive in order to display them differently.
+  #set ($discard = $columns.addAll(['active', 'disabled']))
+  #set ($discard = $columnsProperties.putIfAbsent('active', {'type': 'hidden'}))
+  #set ($discard = $columnsProperties.putIfAbsent('disabled', {'type': 'hidden'}))
   ## Display the computed livetable.
   #livetable('userdirectory' $columns $columnsProperties $options)
+  {{/html}}
 #end
 
 ## xredirect value used to come back to the current URL when performing actions
-#set ($xredirect = $doc.getURL($xcontext.action, ${request.queryString}))
+#set ($xredirect = $doc.getURL($xcontext.action, $request.queryString))
 
 ##
-## Displays the customization form and preview. Also handles the form's action.
+## Displays the customization form and preview. Also handles the form's actions.
 ##
-#macro (displayUserDirectoryCustomizationForm $withPreview)
+#macro (displayUserDirectoryCustomizationForm)
   #if (!$configurationDoc.hasAccessLevel('edit'))
     {{error}}$services.localization.render('platform.userdirectory.customizeNotAllowed'){{/error}}
   #else
-    #if ("$!request.action" != '')
-      #if ($request.action == 'add')
-        #set ($columnToAdd = $request.value.trim())
-        #if (!$columns.contains($columnToAdd))
-          #set ($columnsString = "$!columnsString $columnToAdd")
-          #set ($columnsString = $columnsString.trim())
-          #set ($discard = $configuration.set('columns', $columnsString))
-          #set ($discard = $configurationDoc.save('Updated user directory preferences.'))
-        #end
-      #elseif ($request.action == 'reset')
-        #if ($doc.fullName != 'Main.UserDirectory')
+    #handleUserDirectoryAction()
+    ##
+    ## Customization form
+    ##
+    (% id="HUserDirectoryConfiguration" %)
+    == {{translation key="userdirectory.configuration.title"/}} ==
+    {{html clean="false"}}
+    &lt;form class="user-directory-settings xform" action="$configurationDoc.getURL('save')" method="post"&gt;
+      &lt;div class="hidden"&gt;
+        &lt;input type="hidden" name="form_token" value="$escapetool.xml($services.csrf.token)" /&gt;
+        &lt;input type="hidden" name="objectPolicy" value="updateOrCreate" /&gt;
+        &lt;input type="hidden" name="xredirect" value="$escapetool.xml($xredirect)" /&gt;
+        &lt;input type="hidden" name="comment" value="Updated user directory preferences" /&gt;
+      &lt;/div&gt;
+      &lt;dl&gt;
+        #displayProperty('columns' $configuration 'edit')
+        #displayProperty('hideDisabledProfiles' $configuration 'edit')
+      &lt;/dl&gt;
+      &lt;p&gt;
+        &lt;input class="button" type="submit" name="action_save"
+          value="$escapetool.xml($services.localization.render('xe.userdirectory.customizeSaveButtonLabel'))"/&gt;
+        #set ($resetQueryString = "$!request.queryString&amp;" + $escapetool.url({
+          'action': 'reset',
+          'form_token': $services.csrf.token,
+          'xredirect': $xredirect
+        }))
+        #set ($resetURL = $doc.getURL($xcontext.action, $resetQueryString))
+        &lt;a href="$escapetool.xml($resetURL)" class="button secondary"&gt;
+          $escapetool.xml($services.localization.render('xe.userdirectory.customizeResetButtonLabel'))
+        &lt;/a&gt;
+      &lt;/p&gt;
+    &lt;/form&gt;
+    {{/html}}
+  #end
+#end
+
+#macro (handleUserDirectoryAction)
+  #if ("$!request.action" != '')
+    #if ($services.csrf.isTokenValid($request.form_token))
+      #if ($request.action == 'reset')
+        #if ($isGlobalUserDirectory)
           ## For the global configuration it might be best to keep the object but set default values.
           #set ($discard = $configuration.set('columns', $defaultColumnsString))
         #else
@@ -213,108 +262,249 @@
           #set ($discard = $configurationDoc.removeObject($configuration))
         #end
         #set ($discard = $configurationDoc.save('Reset user directory preferences.'))
-      #elseif ($request.action == 'save')
-        #set ($discard = $configurationDoc.updateObjectFromRequest($directoryPreferencesClassName))
-        #set ($discard = $configurationDoc.save('Updated user directory preferences.'))
       #end
       ## Redirect using xredirect so that the page can be safely refreshed after an action.
-      $response.sendRedirect($request.xredirect)
-      #stop()
+      #set ($discard = $response.sendRedirect($request.xredirect))
+    #elseif ($request.getHeader('X-Requested-With') == 'XMLHttpRequest')
+      #set ($discard = $response.sendError(401, 'CSRF token verification failed!'))
+    #else
+      #set ($discard = $response.sendRedirect($services.csrf.resubmissionURL))
     #end
-    ##
-    ## Customize form. Note: Using 2 forms to be able to do everything without JavaScript.
-    ##
-    (% id="HUserDirectoryCustomizeColumns" %)
-    == {{translation key="xe.userdirectory.customizeColumnsTitle"/}} ==
-    {{html clean='false' wiki='true'}}
-    &lt;form class='xform' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
-      &lt;dl&gt;
-        &lt;dt&gt;
-          &lt;label&gt;{{translation key="xe.userdirectory.customizeAvailableColumnsLabel"/}}&lt;/label&gt;
-          &lt;span class='xHint'&gt;{{translation key="xe.userdirectory.customizeAvailableColumnsHint"/}}&lt;/span&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;
-          &lt;select name='value'&gt;
-          ## Sort the properties by the translated pretty name.
-          #set ($propertyPrettyNameToNameMap = {})
-          #foreach ($property in $xwikiUsersClass.properties)
-            #set ($discard = $propertyPrettyNameToNameMap.put($xwikiUsersClass.get($property.name).translatedPrettyName, $property.name))
-          #end
-          #set ($sortedPropertyPrettyNameToNameList = $collectionstool.sort($propertyPrettyNameToNameMap.entrySet(), 'key'))
-          ## Display each translated pretty name, except the ones already selected and passwords which we don`t want to expose unnecesarily.
-          #foreach ($propertyEntry in $sortedPropertyPrettyNameToNameList)
-            #set ($property = $xwikiUsersClass.get($propertyEntry.value))
-            #if (!$columns.contains($property.name) &amp;&amp; $property.classType != 'Password')
-              &lt;option value="$property.name"&gt;$propertyEntry.key&lt;/option&gt;
-            #end
-          #end
-          &lt;/select&gt;
-        &lt;/dd&gt;
-        &lt;dd&gt;
-          &lt;input type='hidden' name='xredirect' value="$xredirect" /&gt;
-          &lt;input type='hidden' name='action' value='add' /&gt;
-          &lt;span class='buttonwrapper'&gt;
-            &lt;input type="submit" class="button" name="submit" value="$services.localization.render('xe.userdirectory.customizeAddColumnButtonLabel')" /&gt;
-          &lt;/span&gt;
-        &lt;/dd&gt;
-      &lt;/dl&gt;
-    &lt;/form&gt;
-    &lt;form class='xform' action="$doc.getURL($xcontext.action, $request.queryString)" method='post'&gt;
-      &lt;dl&gt;
-        &lt;dt&gt;
-          &lt;label&gt;{{translation key="xe.userdirectory.customizeSelectedColumnsLabel"/}}&lt;/label&gt;
-          &lt;span class='xHint'&gt;$services.localization.render('xe.userdirectory.customizeSelectedColumnsHint')&lt;/span&gt;
-        &lt;/dt&gt;
-        &lt;dd&gt;$configurationDoc.display('columns', 'edit', $configuration)&lt;/dd&gt;
-        &lt;dd&gt;
-          &lt;input type='hidden' name='xredirect' value="$xredirect" /&gt;
-          &lt;input type='hidden' name='action' value='save' /&gt;
-          &lt;span class='buttonwrapper'&gt;
-            &lt;input class='button' type='submit' name='submit' value="$services.localization.render('xe.userdirectory.customizeSaveButtonLabel')"/&gt;
-          &lt;/span&gt;
-          &lt;span class="buttonwrapper"&gt;
-            &lt;a href="$doc.getURL($xcontext.action, "$request.queryString&amp;amp;action=reset&amp;amp;xredirect=$escapetool.url($xredirect)")" class='button secondary'&gt;{{translation key="xe.userdirectory.customizeResetButtonLabel"/}}&lt;/a&gt;
-          &lt;/span&gt;
-        &lt;/dd&gt;
-      &lt;/dl&gt;
-    &lt;/form&gt;
-    {{/html}}
-    #if ($withPreview)
-      ## Display the preview.
-      (% id="HUserDirectoryCustomizePreview" %)
-      == {{translation key="xe.userdirectory.customizePreviewTitle"/}} ==
-      #displayUserDirectory(false)
-    #end
+    #stop()
   #end
+#end
+
+#macro (displayProperty $propertyName $object $action)
+  #set ($propertyClass = $object.xWikiClass.get($propertyName))
+  #set ($isCheckbox = $propertyClass.getValue('displayFormType') == 'checkbox')
+  #set ($fieldDisplay = $stringtool.removeEnd($stringtool.removeStart($object.display($propertyName, $action),
+    '{{html clean="false" wiki="false"}}'), '{{/html}}'))
+  &lt;dt&gt;
+    &lt;label #if ($action == 'edit' &amp;&amp; !$isCheckbox)
+        for="$escapetool.xml("${object.xWikiClass.name}_${object.number}_$propertyName")"#end&gt;
+      #if ($isCheckbox)
+        $fieldDisplay
+      #end
+      $escapetool.xml($propertyClass.translatedPrettyName)
+    &lt;/label&gt;
+    &lt;span class="xHint"&gt;
+      $!escapetool.xml($propertyClass.hint)
+    &lt;/span&gt;
+  &lt;/dt&gt;
+  &lt;dd&gt;#if (!$isCheckbox)$fieldDisplay#end&lt;/dd&gt;
 #end
 
 ##
 ## Displays the user directory with customization status and customization form for when it is being customized.
 ##
-#macro (displayUserDirectoryCustomizationOptions $withPreview)
+#macro (displayUserDirectoryCustomizationOptions $customize)
   ##
   ## Ability to customize the view.
   ##
-  #if ($request.customize == 'true')
-    #displayUserDirectoryCustomizationForm($withPreview)
+  #if ($customize)
+    #displayUserDirectoryCustomizationForm()
   #elseif ($isCustomized)
-    {{warning}}$services.localization.render('xe.userdirectory.isCustomizedWarning', ["$doc.fullName", "customize=true&amp;action=reset&amp;xredirect=$escapetool.url($xredirect)", "$doc.fullName", 'customize=true']){{/warning}}
+    {{warning}}
+    $services.localization.render('xe.userdirectory.isCustomizedWarning', [
+      "$doc.fullName",
+      $escapetool.url({
+        'customize': true,
+        'action': 'reset',
+        'xredirect': $xredirect
+      }),
+      "$doc.fullName",
+      'customize=true'
+    ])
+    {{/warning}}
   #elseif ($isGuest)
-    {{info}}$services.localization.render('xe.userdirectory.canCustomizeInfoGuest', ["path:$doc.getURL('login')"]){{/info}}
+    {{info}}
+    $services.localization.render('xe.userdirectory.canCustomizeInfoGuest', ["path:$doc.getURL('login')"])
+    {{/info}}
   #else
-    {{info}}$services.localization.render('xe.userdirectory.canCustomizeInfo', ["$doc.fullName", 'customize=true']){{/info}}
+    {{info}}
+    $services.localization.render('xe.userdirectory.canCustomizeInfo', ["$doc.fullName", 'customize=true'])
+    {{/info}}
   #end
 #end
 
 ##
 ## Displays the user directory.
-## @param $displayCustomization true if the customization options are to be displayed; false otherwise.
 ##
-#macro (displayUserDirectory $displayCustomizationOptions)
-  #if ($displayCustomizationOptions)
-    #displayUserDirectoryCustomizationOptions(false)
+#macro (displayUserDirectory $customize)
+  #set ($discard = $xwiki.jsx.use('XWiki.UserDirectoryMacros'))
+  #displayUserDirectoryCustomizationOptions($customize)
+
+  #if ($customize)
+    (% id="HUserDirectoryCustomizePreview" %)
+    == {{translation key="xe.userdirectory.customizePreviewTitle"/}} ==
+
   #end
-  #displayUserDirectoryNoCustomization()
+  #displayUserDirectoryLiveTable()
 #end
 {{/velocity}}</content>
+  <object>
+    <name>XWiki.UserDirectoryMacros</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>4f24c82a-c30a-4551-ad18-f2411706dd55</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-events-bridge'], function($) {
+  /**
+   * Mark disabled and inactive user profiles.
+   */
+  var maybeMarkDisabled = function(row, rowData) {
+    // We use the abstract comparison (==) because the property value might come as a string.
+    if (rowData &amp;&amp; (rowData.disabled_value == 1 || rowData.active_value != 1)) {
+      row.find('td.doc_name').addClass('user disabled');
+    }
+  };
+  // Update the markers when the live table rows are refreshed.
+  $(document).on('xwiki:livetable:userdirectory:newrow', function(event, data) {
+    maybeMarkDisabled($(data.row), data.data);
+  });
+  // Initialize the markers. We need this because the 'newrow' event might have been already triggered.
+  var usersLiveTable = window['livetable_userdirectory'];
+  if (usersLiveTable) {
+    $('table#userdirectory tr[data-index]').each(function() {
+      var row = $(this);
+      var rowData = usersLiveTable.fetchedRows[row.data('index')];
+      maybeMarkDisabled(row, rowData);
+    });
+  }
+
+  /**
+   * Live preview when the User Directory settings are modified.
+   */
+  $('form.user-directory-settings').change(function(event) {
+    // Default on user-level configuration.
+    var configDocument = XWiki.currentDocument;
+    if (configDocument.page !== 'UserDirectory' || configDocument.space !== 'Main') {
+      // Global configuration.
+      configDocument = new XWiki.Document('UserDirectoryConfiguration', 'XWiki');
+    }
+    var url = configDocument.getURL('get', 'customize=true');
+    var data = $(this).serialize();
+    var oldLiveTableContainer = $('.xwiki-livetable-container').addClass('loading');
+    // We can't use load() here because the live table has in-line script tags that have to be evaluated.
+    $.get(url, data).done(function(html) {
+      var newLiveTableContainer = $('&lt;div/&gt;').html(html).find('.xwiki-livetable-container');
+      oldLiveTableContainer.replaceWith(newLiveTableContainer);
+    });
+  });
+
+  /**
+   * User scope filtering (for sub-wikis).
+   */
+  $('#userScopeFilter').change(function(event) {
+    var value = $(this).val();
+    // The live table is recreated when an user directory setting is changed (live preview) so we can't cache the
+    // reference to the live table instance.
+    var usersLiveTable = window['livetable_userdirectory'];
+    var url = usersLiveTable.getUrl;
+    if (url.search('userScope=') &gt;= 0) {
+      // Replace the old value.
+      if (value === 'local') {
+        url = url.replace('userScope=global', 'userScope=local');
+      } else {
+        url = url.replace('userScope=local', 'userScope=global');
+      }
+    } else {
+      url = url + '&amp;userScope=' + value;
+    }
+    usersLiveTable.getUrl = url;
+    usersLiveTable.refresh();
+  });
+});</code>
+    </property>
+    <property>
+      <name/>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
 </xwikidoc>

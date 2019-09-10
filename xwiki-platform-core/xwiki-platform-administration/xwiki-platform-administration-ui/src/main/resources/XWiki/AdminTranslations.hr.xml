@@ -113,10 +113,20 @@ administration.section.export.withHistory.hint=U izvoz uključi povijest stranic
 administration.section.export.backupPack.hint=Naznačite hoće li paket biti korišten kao rezervna kopija. Ova opcija ne utječe na izvezeni sadržaj. Jedini učinak je taj da će kod uvoza paketa biti predodabrana opcija "Uvezi kao paket rezervne kopije". Razlika između paketa rezervne kopije i običnog paketa je ta da se u prvom slučaju prilikom uvoza čuva posljednji autor stranice, dok u drugom slučaju posljednji autor svake uvezene stranice postaje onaj korisnik koji obavlja uvoz.
 
 # Users Section
+### Missing: administration.section.users.enableUser.inProgress=Enabling user account...
+### Missing: administration.section.users.enableUser.done=User account enabled
+### Missing: administration.section.users.enableUser.failed=Failed to enable the user account
+### Missing: administration.section.users.disableUser.inProgress=Disabling user account...
+### Missing: administration.section.users.disableUser.done=User account disabled
+### Missing: administration.section.users.disableUser.failed=Failed to disable the user account
 ### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user without replacing the author.
+### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user without replacing the author.
+### Missing: administration.section.users.deleteUser.newAuthor=New Author
+### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
+### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
+### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
+### Missing: administration.section.users.deleteUser.newAuthor.script=script
 
 # Other Category
 admin.other=Ostalo
@@ -130,6 +140,10 @@ administration.section.analytics.status.hint=Odredite je li Google Analytics™ 
 ## Deprecated since 11.6RC1
 XWiki.XWikiPreferences_auth_active_check.hint=Ako je postavljeno na "Da", korisnicima će zapriječiti prijavu bez unosa tokena prethodno poslanog e-poštom.
 ### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
+## Deprecated since 11.8RC1
+### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>
 </xwikidoc>

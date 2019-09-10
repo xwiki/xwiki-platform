@@ -2236,6 +2236,19 @@ public class XWiki extends Api
     }
 
     /**
+     * Retrieve a user from its document reference.
+     *
+     * @param userReference the reference of the user.
+     * @return the user corresponding to the reference.
+     * @since 11.8RC1
+     */
+    @Unstable
+    public User getUser(DocumentReference userReference)
+    {
+        return this.xwiki.getUser(userReference, getXWikiContext());
+    }
+
+    /**
      * API allowing to format a date according to the default Wiki setting The date format is provided in the
      * 'dateformat' parameter of the XWiki Preferences
      *
@@ -2829,6 +2842,29 @@ public class XWiki extends Api
         // TODO: The implementation should be done in com.xpn.xwiki.XWiki as this class should
         // delegate all implementations to that Class.
         DocumentReference docReference = getCurrentMixedDocumentReferenceResolver().resolve(documentName);
+        return getClass(docReference);
+    }
+
+    /**
+     * Get the XWiki Class object defined in the passed Document name.
+     * <p>
+     * Note: This method doesn't require any rights for accessing the passed Document (as opposed to the
+     * {@link com.xpn.xwiki.api.Document#getClass()} method which does require to get a Document object first. This is
+     * thus useful in cases where the calling code doesn't have the access right to the specified Document. It is safe
+     * because there are no sensitive data stored in a Class definition.
+     * </p>
+     *
+     * @param docReference the reference of the document for which to get the Class object.
+     * @return the XWiki Class object defined in the passed Document reference. If the passed Document name points to a
+     *         Document with no Class defined then an empty Class object is returned (i.e. a Class object with no
+     *         properties).
+     * @throws XWikiException if the reference doesn't exist.
+     * @since 10.11.10
+     * @since 11.8RC1
+     * @since 11.3.4
+     */
+    public Class getClass(EntityReference docReference) throws XWikiException
+    {
         return new Class(this.xwiki.getDocument(docReference, this.context).getXClass(), this.context);
     }
 

@@ -76,5 +76,4 @@ Mail.SendMailStatus_livetable.actions=Handlinger
 Mail.SendMailStatus_livetable.resend=Send på nytt
 mailSender.admin.resendSuccess=Meldingen er sendt på nytt
 mailSender.admin.resendFailure=Kunne ikke sende om igjen. Klikk for flere detaljer.</content>
-  
 </xwikidoc>

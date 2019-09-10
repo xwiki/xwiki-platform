@@ -76,8 +76,12 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
     @Override
     protected void runInternal() throws Exception
     {
-        // Enable async execution since we are already in an asynchronous context
-        this.asyncContext.setEnabled(true);
+        AsyncRenderer renderer = getRequest().getRenderer();
+
+        // Enable async execution only if cache is disabled as otherwise we could end up with place holders not
+        // associated to any job since it was not really executed the following times
+        this.asyncContext.setEnabled(!renderer.isCacheAllowed());
+
         // Prepare to catch stuff to invalidate the cache
         ((DefaultAsyncContext) this.asyncContext).pushContextUse();
 
@@ -86,7 +90,6 @@ public class AsyncRendererJob extends AbstractJob<AsyncRendererJobRequest, Async
         // (other than executing it at the beginning of every single element which might be executed asynchronously...)
         this.templateManager.execute("xwikivars.vm");
 
-        AsyncRenderer renderer = getRequest().getRenderer();
         AsyncRendererResult result = renderer.render(true, renderer.isCacheAllowed());
 
         getStatus().setResult(result);

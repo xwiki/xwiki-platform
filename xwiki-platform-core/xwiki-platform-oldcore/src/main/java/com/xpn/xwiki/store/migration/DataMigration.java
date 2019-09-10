@@ -22,8 +22,12 @@ package com.xpn.xwiki.store.migration;
 import org.xwiki.component.annotation.Role;
 
 /**
- * Interface for data migration. New data migration should be named like "R"+vernum+issuenumber+"DataMigration" to
- * prevent collisions.
+ * Interface for data migration. New data migration should be named using the
+ * {@code "R"+vernum+issuenumber+"DataMigration"} format to prevent collisions. The format for {@code vernum} is
+ * {@code MMmmbbN} where {@code M} is the 0-leftpadded major (e.g. "6" is written as "06"), {@code m} is the
+ * 0-leftpadded minor, {@code b} is the 0-leftpadded bugfix number and {@code N} a digit to be incremented in case we
+ * have several migrations in a given release. For example, the first migration for 10.8 would have the number
+ * {@code 1008000}.
  *
  * @version $Id$
  * @since 3.4M1

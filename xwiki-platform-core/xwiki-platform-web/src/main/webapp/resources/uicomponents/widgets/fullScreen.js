@@ -84,14 +84,19 @@ widgets.FullScreen = Class.create({
   },
   /** According to the type of each element being maximized, a button in created and attached to it. */
   addBehavior : function (item) {
-    if (this.isWikiContent(item)) {
-      this.addWikiContentButton(item);
-    } else if (this.isWikiField(item)) {
-      this.addWikiFieldButton(item);
-    } else {
-      // a div element with class maximazable
-      this.addElementButton(item);
+    if (!this.isNotMaximizable(item)) {
+      if (this.isWikiContent(item)) {
+        this.addWikiContentButton(item);
+      } else if (this.isWikiField(item)) {
+        this.addWikiFieldButton(item);
+      } else {
+        // a div element with class maximazable
+        this.addElementButton(item);
+      }
     }
+  },
+  isNotMaximizable: function (item) {
+    return !item.hasClassName('not-maximizable');
   },
   // Some simple functions that help deciding what kind of editor is the target element
   isWikiContent : function (textarea) {

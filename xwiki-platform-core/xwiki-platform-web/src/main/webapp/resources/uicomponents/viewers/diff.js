@@ -93,6 +93,38 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     });
   };
 
+  var enhanceConflictDecision = function (container) {
+    var changeConflictDecision = function (conflictId) {
+      var selectValue = $('#conflict_decision_select_' + conflictId).val();
+      ['custom', 'previous', 'current', 'next'].forEach(function (item) {
+        if (item !== selectValue) {
+          $('#conflict_decision_value_' + item + '_' + conflictId).hide();
+        } else {
+          $('#conflict_decision_value_' + item + '_' + conflictId).show();
+        }
+      });
+    };
+
+    var bindConflictDecision = function (conflictId) {
+      $('#conflict_decision_select_' + conflictId).on('change', function () { changeConflictDecision(conflictId) });
+    };
+
+    var onlyDisplayCurrent = function (conflictId) {
+      ['custom', 'previous', 'current', 'next'].forEach(function (item) {
+        if (item !== 'current') {
+          $('#conflict_decision_value_' + item + '_' + conflictId).hide();
+        } else {
+          $('#conflict_decision_value_' + item + '_' + conflictId).show();
+        }
+      });
+    };
+
+    container.find('input[name=conflict_id]').each(function () {
+      bindConflictDecision($(this).val());
+      onlyDisplayCurrent($(this).val());
+    });
+  };
+
   //
   // Initialization
   //
@@ -100,7 +132,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   var init = function(container) {
     enhanceDiffSummaryItems(container);
     enhanceHTMLDiff(container);
-  }
+    enhanceConflictDecision(container);
+  };
 
   $(document).on('xwiki:dom:updated', function(event, data) {
     init($(data.elements));

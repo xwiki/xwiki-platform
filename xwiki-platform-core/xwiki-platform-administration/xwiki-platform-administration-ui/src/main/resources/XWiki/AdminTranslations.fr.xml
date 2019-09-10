@@ -113,10 +113,20 @@ administration.section.export.withHistory.hint=Inclure l'historique de la page d
 administration.section.export.backupPack.hint=Définit si le package est une sauvegarde. Cette option n'influe pas sur le contenu des pages mais, lors de l'import, pré-sélectionne l'option "Importer le package comme une sauvegarde". Dans ce cas, l'auteur est conservé. Au contraire lors de l'import d'un package normal, l'utilisateur effectuant l'import devient automatiquement le dernier auteur des pages importées.
 
 # Users Section
+administration.section.users.enableUser.inProgress=Activation du compte utilisateur…
+administration.section.users.enableUser.done=Compte utilisateur activé
+administration.section.users.enableUser.failed=Impossible d'activer le compte utilisateur
+administration.section.users.disableUser.inProgress=Désactivation du compte utilisateur…
+administration.section.users.disableUser.done=Compte utilisateur désactivé
+administration.section.users.disableUser.failed=Impossible de désactiver le compte utilisateur
 administration.section.users.deleteUser.confirmationMessage=L''utilisateur {0} va être retiré de tous les {1}groupes{2} auxquels il appartient. Souhaitez-vous continuer ?
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user without replacing the author.
+### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user without replacing the author.
+administration.section.users.deleteUser.newAuthor=Nouvel auteur
+### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
+### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
+### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
+administration.section.users.deleteUser.newAuthor.script=script
 
 # Other Category
 admin.other=Divers
@@ -130,6 +140,10 @@ administration.section.analytics.status.hint=Définit si le suivi Google Analyti
 ## Deprecated since 11.6RC1
 XWiki.XWikiPreferences_auth_active_check.hint=Si défini à "Oui", les utilisateurs devront saisir la clef envoyée par courriel pour se connecter.
 administration.section.users.deleteUser.markInactiveMessage=Plutôt que de supprimer l'utilisateur vous pouvez le désactiver. Ainsi il ne pourra plus se connecter et les scripts associés à cet utilisateur continueront à fonctionner.
+
+## Deprecated since 11.8RC1
+### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>
 </xwikidoc>

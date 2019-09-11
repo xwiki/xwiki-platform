@@ -79,7 +79,7 @@ $xwiki.ssfx.use('js/xwiki/table/livetable.css', true)
 #set ($denyGuest = {})
 #foreach ($obj in $targetDocument.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
   #set ($pers = "$!obj.getProperty('users').getValue()")
-  #if ($pers.matches("^(.*,)?${regextool.quote($guest)}(,.*)?${escapetool.d}"))
+  #if ($pers.matches("^(.*,)?${regextool.quote($guest)}(,.*)?$"))
     #set ($specifiedRights = $!obj.getProperty('levels').getValue().split(','))
     #foreach ($right in $specifiedRights)
       #if ($rightsLevels.containsKey($right) && $maxlevel >= $rightsLevels.get($right))

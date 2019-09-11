@@ -1046,12 +1046,12 @@ $html
 #set($height = "600")
 #end
 #if($color!="")
-#set($color = $color.replaceAll('#',"%23"))
+#set($color = $color.replaceAll("#","%23"))
 #else
 #set($color = "%232952A3")
 #end
 #if($bgcolor!="")
-#set($bgcolor = $bgcolor.replaceAll('#',"%23"))
+#set($bgcolor = $bgcolor.replaceAll("#","%23"))
 #else
 #set($bgcolor = "%232952A3")
 #end

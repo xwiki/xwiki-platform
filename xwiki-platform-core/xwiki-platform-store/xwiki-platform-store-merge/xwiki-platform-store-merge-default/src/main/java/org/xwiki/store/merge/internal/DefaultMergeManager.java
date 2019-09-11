@@ -99,6 +99,16 @@ public class DefaultMergeManager implements MergeManager
         return null;
     }
 
+    private void cleanDecisionList(MergeConfiguration configuration)
+    {
+        EntityReference userReference = configuration.getUserReference();
+        DocumentReference concernedDocument = configuration.getConcernedDocument();
+
+        if (userReference != null && concernedDocument != null) {
+            this.mergeConflictDecisionsManager.removeConflictDecisionList(concernedDocument, userReference);
+        }
+    }
+
     @Override
     public MergeManagerResult<String, String> mergeLines(String previousStr, String newStr, String currentStr,
         MergeConfiguration configuration)
@@ -310,6 +320,9 @@ public class DefaultMergeManager implements MergeManager
             mergeResult.setMergeResult(currentDocument);
             mergeResult.getLog().error("Cannot merge documents that are not of XWikiDocument class.");
         }
+
+        // Ensure that the decisions won't be reused at the next merge.
+        this.cleanDecisionList(configuration);
         return mergeResult;
     }
 

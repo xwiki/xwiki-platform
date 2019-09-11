@@ -1,0 +1,184 @@
+#macro (definePasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName)
+ ## The password field, mandatory and must be at least 6 characters long.
+  #set ($field =
+    {'name': $passwordFieldName,
+      'label': $services.localization.render('core.register.password'),
+      'params': {
+        'type': 'password',
+        'autocomplete': 'off',
+        'size': '60'
+      },
+      'validate': {
+        'mandatory': {
+          'failureMessage': $services.localization.render('core.validation.required.message')
+        },
+        'regex': {
+          'pattern': '/.{6,}/',
+          'failureMessage': $services.localization.render('xe.admin.registration.passwordTooShort')
+        }
+      }
+    })
+  #set ($discard = $fields.add($field))
+  ##
+  ## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
+  #set ($field =
+    {'name': $confirmPasswordFieldName,
+      'label': $services.localization.render('core.register.passwordRepeat'),
+      'params': {
+        'type': 'password',
+        'autocomplete': 'off',
+        'size': '60'
+      },
+      'validate': {               
+        'mandatory': {
+          'failureMessage': $services.localization.render('core.validation.required.message')
+        },
+        'mustMatch': {                
+          'name': $passwordFieldName,
+          'failureMessage': $services.localization.render('xe.admin.registration.passwordMismatch')
+        },                
+        'regex': {
+          'pattern': '/.{6,}/',
+          'failureMessage': $services.localization.render('xe.admin.registration.passwordTooShort')
+        }
+      }
+    })
+  #set ($discard = $fields.add($field))
+#end
+##
+#*
+ * Generate HTML form.
+ *
+ * @param $fields The array of fields to use for generating HTML code.
+ * @param $fieldMandatoryStar The tag parameters for a * indicating a mandatory field.
+ * @param $failureMessageParams The tag parameters for a failure message.
+ *#
+#macro (generateHtml, $fields, $fieldMandatoryStar, $failureMessageParams)
+  <dl>
+  #foreach ($field in $fields)
+    #if ($field.get('name'))
+      #set ($fieldName = $field.get('name'))
+      #if ($field.get('label'))
+        #set ($label = $field.get('label'))
+        <dt><label for="$fieldName">$label
+        #if ($field.get('validate').get('mandatory'))
+          <span ##
+          #foreach ($entry in $fieldMandatoryStar.entrySet())
+            $entry.getKey()="$entry.getValue()" ##
+          #end
+          >$services.localization.render('core.validation.required')</span>
+        #end
+          </label>
+        </dt>
+      #end
+      ## If no tag then default tag is <input>
+      #if ($field.get('tag'))
+        #set ($tag = $field.get('tag'))
+      #else
+        #set ($tag = 'input')
+      #end
+      <dd><$tag id="$fieldName" ##
+      #set ($params = $field.get('params'))
+      ## If no name parameter is specified, then we use the field name
+      #if (!$params.get('name'))
+        #set ($discard = $params.put('name', $fieldName))
+      #end
+      #foreach ($entry in $params.entrySet())
+        ## If a parameter is specified as '' then we don't include it.
+        #if ($entry.getValue() != '')
+          $entry.getKey()="$escapetool.xml($entry.getValue())" ##
+        #end
+      #end
+      ></$tag>
+      #if ($field.get('error'))
+        <span ##
+        #foreach ($entry in $failureMessageParams.entrySet())
+          $entry.getKey()="$entry.getValue()" ##
+        #end
+        >$field.get('error')</span>
+      #end
+      </dd>
+    #else
+      ERROR: Field with no name.
+    #end##if fieldName exists
+  #end
+  </dl>
+#end
+##
+#*
+ * Generate the Javascript for interacting with LiveValidation.
+ *
+ * @param $fields The array of fields which to validate.
+ *#
+## TODO: rename it as generateFieldsValidationJS
+#macro (generateJavascript, $fields)
+  $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
+  $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
+  <script type='text/javascript'>
+  /* <![CDATA[ */
+  document.observe('xwiki:dom:loaded', function() {
+  ##
+  #foreach ($field in $fields)
+    #if ($field.get('validate') && $field.get('name'))
+      #set ($validate = $field.get('validate'))
+      #if (($validate.get('mandatory') && !$validate.get('mandatory').get('noscript'))
+          || ($validate.get('regex') && !$validate.get('regex').get('noscript'))
+          || ($validate.get('mustMatch') && !$validate.get('mustMatch').get('noscript')))
+        #set ($fieldName = $field.get('name'))
+        #if ($validate.get('fieldOkayMessage'))
+          #set ($okayMessage = $validate.get('fieldOkayMessage'))
+        #elseif (!$validate.get('hideOkayMessage'))
+          #set ($okayMessage = $services.localization.render('core.validation.valid.message'))
+          #else
+            #set ($okayMessage = '')
+        #end
+        var ${fieldName}Validator = new LiveValidation("$fieldName", {validMessage: "$okayMessage", wait: 500});
+        ##
+        #if ($validate.get('mandatory'))
+          #set ($mandatory = $validate.get('mandatory'))
+          #if ($mandatory.get('failureMessage') && !$mandatory.get('noscript'))
+            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.get('failureMessage')"});
+          #end
+        #end
+        ##
+        #if ($validate.get('mustMatch'))
+          #set ($mustMatch = $validate.get('mustMatch'))
+          #if ($mustMatch.get('name') && $mustMatch.get('failureMessage')  && !$mustMatch.get('noscript'))
+            ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.get('name')]")[0], 
+            failureMessage: "$!mustMatch.get('failureMessage')"});
+          #end
+        #end
+        ##
+        #if ($validate.get('regex'))
+          #set ($regex = $validate.get('regex'))
+          #set ($pattern = "")
+          #if ($regex.get('jsPattern'))
+            #set ($pattern = $regex.get('jsPattern'))
+          #elseif ($regex.get('pattern'))
+            #set ($pattern = $regex.get('pattern'))
+          #end
+          #set ($failMessage = "")
+          #if ($regex.get('jsFailureMessage'))
+            #set ($failMessage = $regex.get('jsFailureMessage'))
+          #elseif ($regex.get('failureMessage'))
+            #set ($failMessage = $regex.get('failureMessage'))
+          #end
+          #if ($pattern != '' && $failMessage != '' && !$regex.get('noscript'))
+            ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage"});
+          #end
+        #end
+      #end
+    #end
+  #end
+    });// ]]>
+  </script>
+#end
+##
+#macro (outputPasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName, 
+  $fieldMandatoryStar, $failureMessageParams, $useLiveValidation)
+  #definePasswordFields($fields, $passwordFieldName, $confirmPasswordFieldName)
+  #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams, $useLiveValidation)
+  #if ($useLiveValidation)
+    #generateJavascript($fields)
+  #end
+#end

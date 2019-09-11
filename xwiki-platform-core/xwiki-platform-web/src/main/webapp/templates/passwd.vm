@@ -3,18 +3,15 @@
 ###
 ###
 #template("startpage.vm")
-###
-### Validation script
-###
-<script>
-document.observe('xwiki:dom:loaded', function() {
-  var passwordValidator = new LiveValidation($$("input[name=password]")[0], { validMessage: "$services.localization.render('core.validation.valid.message')", wait: 500} );
-  passwordValidator.add( Validate.Format, { pattern: /.{6,}/, failureMessage: "$services.localization.render('platform.core.profile.passwd.passwordTooShort')"} );
-  var password2Validator = new LiveValidation($$("input[name=password2]")[0], { validMessage: "$services.localization.render('core.validation.valid.message')", wait: 500} );
-  password2Validator.add( Validate.Confirmation, { match: $$("input[name=password]")[0], failureMessage: "$services.localization.render('platform.core.profile.passwd.passwordMissmatch')"} );
-  password2Validator.add( Validate.Format, { pattern: /.{6,}/, failureMessage: "$services.localization.render('platform.core.profile.passwd.passwordTooShort')"} );
-});
-</script>
+#template("register_macros.vm")
+## Defines what server generated error messages should look like
+## The error message when a field is entered incorrectly
+#set($failureMessageParams = {'class': 'LV_validation_message LV_invalid'})
+##
+## The * next to the fields to denote they are mandatory.
+#set($fieldMandatoryStar = {'class': 'xRequired'})
+
+## TODO: display the message for wrong original pass in the right place
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
   <div id="mainContentArea">
@@ -28,6 +25,7 @@ document.observe('xwiki:dom:loaded', function() {
         #set($errorMessage = "")
         #set($password = $request.password)
         #set($password2 = $request.password2)
+         ## Server-side checking
         #if($isCurrentUsersProfile || !$hasAdmin)
           #set($user = $xwiki.getUser())
           #set($isOriginalPasswordValid = $user.checkPassword($request.originalpassword))
@@ -60,23 +58,37 @@ document.observe('xwiki:dom:loaded', function() {
         #end
       #end
       #if(!$isValidPassword)
-        #set($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
-        #set($discard = $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true))
         $services.localization.render('platform.core.profile.passwd.instructions')
-
-      <form class="xform third" action="" method="post" autocomplete="off">
+        #set ($fields = [])
+        #set($field =
+          {'name': 'originalpassword',
+            'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
+            'params': {
+              'type': 'password',
+              'size': '60',
+              'autocomplete': 'off'
+            },
+            'validate': {
+              'mandatory': {
+                'failureMessage': $services.localization.render('core.validation.required.message')
+              },
+              'programmaticValidation': {
+                'code': '$user.checkPassword($request.originalpassword)',
+                'failureMessage': $services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')
+              },
+              'hideOkayMessage': 'true'
+            }
+          })
+        #set ($discard  = $fields.add($field))
+        #definePasswordFields($fields, 'password', 'password2')
+        <form class="xform third" action="" method="post" autocomplete="off">
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
-        <dl>
-          #if($isCurrentUsersProfile || !$hasAdmin)
-            <dt><label for="xwikioriginalpassword">$services.localization.render('platform.core.profile.passwd.originalPassword')</label></dt>
-            <dd><input id="xwikioriginalpassword" type="password" name="originalpassword" value="$!escapetool.xml($request.originalpassword)" size="60"/></dd>
-          #end
-          <dt><label id="xwikipasswordlabel" for="xwikipassword">$services.localization.render('platform.core.profile.passwd.newPassword')</label></dt>
-          <dd><input id="xwikipassword" type="password" name="password" value="$!escapetool.xml($request.password)" size="60"/></dd>
-          <dt><label id="xwikipassword2label" for="xwikipassword2">$services.localization.render('platform.core.profile.passwd.reenterPassword')</label></dt>
-          <dd><input id="xwikipassword2" type="password" name="password2" value="$!escapetool.xml($request.password2)" size="60"/></dd>
-        </dl>
+        #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
+        #set ($useLiveValidation = true)
+        #if ($useLiveValidation)
+          #generateJavascript($fields)
+        #end
         <div class="padded buttons">
           <span class="buttonwrapper"><input type="submit" value="$services.localization.render('platform.core.profile.passwd.submit')" class="button"/></span>
           <span class="buttonwrapper"><a href="$doc.getURL("view")" class="secondary button">$services.localization.render('platform.core.profile.passwd.cancel')</a></span>

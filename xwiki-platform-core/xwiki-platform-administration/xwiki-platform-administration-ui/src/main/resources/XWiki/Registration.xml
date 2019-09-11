@@ -36,7 +36,8 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{template name="register_macros.vm"/}}
+{{velocity}}
 ## The registration is enabled:
 ## - on the main wiki
 ## - on a subwiki if there is no service "$services.wiki.user"

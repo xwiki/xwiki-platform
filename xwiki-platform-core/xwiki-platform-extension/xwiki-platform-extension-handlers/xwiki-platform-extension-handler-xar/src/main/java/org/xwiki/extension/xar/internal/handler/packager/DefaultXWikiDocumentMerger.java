@@ -19,12 +19,17 @@
  */
 package org.xwiki.extension.xar.internal.handler.packager;
 
+import java.util.List;
+
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.diff.Conflict;
+import org.xwiki.diff.ConflictDecision;
 import org.xwiki.extension.xar.XWikiDocumentMerger;
 import org.xwiki.extension.xar.XWikiDocumentMergerConfiguration;
 import org.xwiki.extension.xar.XarExtensionException;
@@ -34,10 +39,12 @@ import org.xwiki.job.Job;
 import org.xwiki.job.JobContext;
 import org.xwiki.logging.LogLevel;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.xar.XarEntryType.UpgradeType;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializerManager;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -46,7 +53,7 @@ import com.xpn.xwiki.doc.merge.MergeConfiguration;
 
 /**
  * Default implementation of {@link XWikiDocumentMerger};
- * 
+ *
  * @version $Id$
  * @since 10.3
  */
@@ -65,6 +72,12 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
     @Inject
     private MergeManager mergeManager;
+
+    @Inject
+    private MergeConflictDecisionsManager conflictDecisionsManager;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
 
     @Inject
     private Logger logger;
@@ -124,7 +137,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
             } else {
                 // Already existing document in database but without previous version
                 if (!currentDocument.equalsData(nextDocument)) {
-                    result = askDocumentToSave(currentDocument, null, nextDocument, null, configuration, null);
+                    result = askDocumentToSave(currentDocument, null, nextDocument, configuration, null);
                 }
             }
         } else {
@@ -145,7 +158,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
             result = merge3(currentDocument, previousDocument, nextDocument, configuration);
         } else {
             // Document have been deleted in the database
-            result = askDocumentToSave(null, previousDocument, nextDocument, null, configuration, null);
+            result = askDocumentToSave(null, previousDocument, nextDocument, configuration, null);
         }
 
         return result;
@@ -197,29 +210,26 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
             return currentDocument.equalsData(nextDocument) ? currentDocument : nextDocument;
         }
 
-        // 3 ways merge
-        XWikiDocument mergedDocument = currentDocument.clone();
-
         MergeConfiguration mergeConfiguration = new MergeConfiguration();
-        mergeConfiguration.setProvidedVersionsModifiables(true);
+        mergeConfiguration.setUserReference(contextProvider.get().getUserReference());
+        mergeConfiguration.setConcernedDocument(currentDocument.getDocumentReferenceWithLocale());
+        mergeConfiguration.setProvidedVersionsModifiables(false);
 
         MergeDocumentResult documentMergeResult;
         try {
-            documentMergeResult = mergeManager.mergeDocument(previousDocument, nextDocument, mergedDocument,
+            documentMergeResult = mergeManager.mergeDocument(previousDocument, nextDocument, currentDocument,
                 mergeConfiguration);
         } catch (Exception e) {
             // Unexpected error, lets behave as if there was a conflict
             documentMergeResult = new MergeDocumentResult(currentDocument, previousDocument, nextDocument);
             documentMergeResult.getLog()
                 .error("Unexpected exception thrown. Usually means there is a bug in the merge.", e);
-            documentMergeResult.setModified(true);
-            documentMergeResult.setMergeResult(mergedDocument);
+            documentMergeResult.setMergeResult(currentDocument.clone());
         }
 
         documentMergeResult.getLog().log(this.logger);
 
-        return askDocumentToSave(currentDocument, previousDocument, nextDocument, mergedDocument, configuration,
-            documentMergeResult);
+        return askDocumentToSave(currentDocument, previousDocument, nextDocument, configuration, documentMergeResult);
     }
 
     private XWikiDocument getMandatoryDocument(DocumentReference documentReference)
@@ -243,10 +253,18 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
     }
 
     private XWikiDocument askDocumentToSave(XWikiDocument currentDocument, XWikiDocument previousDocument,
-        XWikiDocument nextDocument, XWikiDocument mergedDocument, XWikiDocumentMergerConfiguration configuration,
+        XWikiDocument nextDocument, XWikiDocumentMergerConfiguration configuration,
         MergeDocumentResult documentMergeResult)
     {
         // Indicate future author to whoever is going to answer the question
+        XWikiDocument mergedDocument;
+
+        if (documentMergeResult != null) {
+            mergedDocument = (XWikiDocument) documentMergeResult.getMergeResult();
+        } else {
+            mergedDocument = null;
+        }
+
         if (currentDocument != null) {
             nextDocument.setCreatorReference(currentDocument.getCreatorReference());
         }
@@ -273,6 +291,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
         // Calculate the conflict type
         ConflictQuestion.ConflictType type;
+        List<Conflict<?>> documentContentConflicts = null;
         if (previousDocument == null) {
             type = ConflictQuestion.ConflictType.CURRENT_EXIST;
         } else if (currentDocument == null) {
@@ -280,6 +299,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         } else if (documentMergeResult != null) {
             if (!documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
                 type = ConflictQuestion.ConflictType.MERGE_FAILURE;
+                documentContentConflicts = documentMergeResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT);
             } else {
                 type = ConflictQuestion.ConflictType.MERGE_SUCCESS;
             }
@@ -289,7 +309,8 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
         // Create a question
         ConflictQuestion question =
-            new ConflictQuestion(currentDocument, previousDocument, nextDocument, mergedDocument, type);
+            new ConflictQuestion(currentDocument, previousDocument, nextDocument, mergedDocument, type,
+                documentContentConflicts);
 
         // Find the answer
         GlobalAction contextAction = getMergeConflictAnswer(question.getType(), configuration);
@@ -310,6 +331,23 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
                     // TODO: log something ?
                 }
             }
+        }
+
+        List<ConflictDecision> decisions = question.getDecisions();
+        if (question.getGlobalAction() == GlobalAction.MERGED && !decisions.isEmpty())
+        {
+            // record the decisions
+            this.conflictDecisionsManager.setConflictDecisionList(decisions,
+                currentDocument.getDocumentReferenceWithLocale(), contextProvider.get().getUserReference());
+
+            // try again the merge with the decisions
+            MergeConfiguration mergeConfiguration = new MergeConfiguration();
+            mergeConfiguration.setConcernedDocument(currentDocument.getDocumentReferenceWithLocale());
+            mergeConfiguration.setUserReference(contextProvider.get().getUserReference());
+            mergeConfiguration.setProvidedVersionsModifiables(false);
+            documentMergeResult = mergeManager.mergeDocument(previousDocument, nextDocument, currentDocument,
+                mergeConfiguration);
+            mergedDocument = (XWikiDocument) documentMergeResult.getMergeResult();
         }
 
         // Find the XWikiDocument to save

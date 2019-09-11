@@ -764,6 +764,7 @@ $namespace##
   </div>
   #if ($originalDocument && $revisedDocument)
     <div id="changescontent">
+      #set ($conflictsList = $question.documentConflicts)
       #set ($rev1 = $originalVersion.toLowerCase())
       #set ($rev2 = $revisedVersion.toLowerCase())
       #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
@@ -1141,6 +1142,13 @@ $namespace##
     ## A merge conflict occurred during installation.
     #set ($discard = $question.setGlobalAction($request.versionToKeep))
     #set ($discard = $question.setAlways($request.autoResolve.equals('true')))
+    #set ($allDecisions = $request.getParameterValues("conflict_decision_select"));
+    #set ($allCustoms = $request.getParameterValues("conflict_decision_value_custom"))
+    #foreach($conflictReference in $request.getParameterValues("conflict_id"))
+      #set ($decision = $allDecisions[$foreach.index])
+      #set ($custom = $allCustoms[$foreach.index])
+      #set ($discard = $question.setConflictDecision($conflictReference, $decision, $custom))
+    #end
   #elseif ($questionType.endsWith('.CleanPagesQuestion'))
     #foreach ($entry in $question.pages.entrySet())
       ## Currently there's no string representation of a document reference with parameters (such as locale) that can

@@ -33,3 +33,6 @@ nbproject
 .clover
 *~
 **/overlays/*.info
+
+# Debugging stuff to not commit
+xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/test/resources/xwiki-platform-search-solr-server-data.zip

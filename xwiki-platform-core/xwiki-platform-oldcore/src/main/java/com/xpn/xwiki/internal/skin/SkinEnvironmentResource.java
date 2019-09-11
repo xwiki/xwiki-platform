@@ -70,7 +70,7 @@ public class SkinEnvironmentResource extends AbstractEnvironmentResource
     {
         XWikiContext xcontext = this.xcontextProvider.get();
 
-        Map<String, String> parameters = new LinkedHashMap<>();
+        Map<String, Object> parameters = new LinkedHashMap<>();
         if (getURLConfiguration().useResourceLastModificationDate()) {
             try {
                 URL resourceUrl = this.xcontextProvider.get().getEngineContext().getResource(this.getPath());

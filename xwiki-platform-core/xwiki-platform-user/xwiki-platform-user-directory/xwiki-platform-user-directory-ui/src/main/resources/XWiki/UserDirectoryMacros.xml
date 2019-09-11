@@ -196,7 +196,7 @@
     #set ($options.extraParams = "$!options.extraParams&amp;hideDisabledProfiles=true")
   #end
   ## We need to know which users are disabled or inactive in order to display them differently.
-  #set ($discard = $columns.addAll(['active']))
+  #set ($discard = $columns.add('active'))
   #set ($discard = $columnsProperties.putIfAbsent('active', {'type': 'hidden'}))
   ## Display the computed livetable.
   #livetable('userdirectory' $columns $columnsProperties $options)
@@ -433,8 +433,8 @@
    * Mark disabled and inactive user profiles.
    */
   var maybeMarkDisabled = function(row, rowData) {
-    // We use the abstract comparison (==) because the property value might come as a string.
-    if (rowData &amp;&amp; (rowData.active_value != 1)) {
+    // We use the abstract comparison (!=) because the property value might come as a string.
+    if (rowData &amp;&amp; rowData.active_value != 1) {
       row.find('td.doc_name').addClass('user disabled');
     }
   };

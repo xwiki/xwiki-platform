@@ -236,8 +236,8 @@
             #set($columnCount = 0)
             #foreach($colname in $collist)
               #set($colprop = $colprops.get($colname))
-              #set($isFilterable = $colprop.filterable != false && "$!colname" != '_actions')
-              #set($isSortable = $colprop.sortable != false && "$!colname" != '_actions')
+              #set ($isFilterable = $colprop.filterable != false && $colname != '_actions' && $colprop.type != 'hidden')
+              #set ($isSortable = $colprop.sortable != false && $colname != '_actions' && $colprop.type != 'hidden')
               ## Get the column's display name to use in the header.
               #set($displayName = "#getLivetableColumnDisplayName($colname, $colprop, $transprefix)")
               #set ($defaultHeaderClass = {'_actions': 'actions', '_avatar': 'avatar'})

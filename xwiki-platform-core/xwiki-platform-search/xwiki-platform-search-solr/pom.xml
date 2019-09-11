@@ -53,6 +53,17 @@
         <artifactId>solr-core</artifactId>
         <version>${solr.version}</version>
         <exclusions>
+          <!-- We want a different version of Woodstox and the id changed -->
+          <exclusion>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
+          </exclusion>
+          <!-- We use slf4j in XWiki -->
+          <exclusion>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
           <exclusion>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -69,17 +80,6 @@
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-jvm</artifactId>
           </exclusion>
-          <!-- We want a different version of Woodstox and the id changed -->
-          <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
-          </exclusion>
-          <!-- We use slf4j in XWiki -->
-          <exclusion>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-          <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
           <exclusion>
             <groupId>org.restlet.jee</groupId>
             <artifactId>*</artifactId>

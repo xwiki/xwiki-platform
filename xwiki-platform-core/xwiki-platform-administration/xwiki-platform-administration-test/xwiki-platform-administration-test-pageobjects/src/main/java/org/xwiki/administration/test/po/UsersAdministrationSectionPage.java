@@ -112,6 +112,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     {
         getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "disable")))
             .click();
+        this.waitForNotificationSuccessMessage("User account disabled");
         this.usersLiveTable.waitUntilReady();
         return this;
     }
@@ -134,6 +135,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     {
         getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "enable")))
             .click();
+        this.waitForNotificationSuccessMessage("User account enabled");
         this.usersLiveTable.waitUntilReady();
         return this;
     }

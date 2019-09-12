@@ -140,9 +140,7 @@
     #end
 
     &lt;select name="${prefix}${name}" id="${prefix}${name}" data-current-scope="$currentScope"&gt;
-      #if ("$!value" == '' || !$colorThemeExists)
-        &lt;option value="$!escapetool.xml($value)" selected="selected"&gt;---&lt;/option&gt;
-      #end
+      &lt;option value="$!escapetool.xml($value)" selected="selected"&gt;---&lt;/option&gt;
       #displaySkinLines($flamingoThemesFromThisWiki, $services.localization.render('admin.colorthemes.flamingothemes'), 'local')
       #displaySkinLines($colibriThemesFromThisWiki,  $services.localization.render('admin.colorthemes.colibrithemes'), 'local')
       #if ($isSubWiki)

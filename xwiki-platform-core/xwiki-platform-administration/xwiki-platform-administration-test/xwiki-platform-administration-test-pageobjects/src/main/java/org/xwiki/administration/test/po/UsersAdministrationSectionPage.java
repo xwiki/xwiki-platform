@@ -55,7 +55,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     public static UsersAdministrationSectionPage gotoPage()
     {
         AdministrationSectionPage.gotoPage(ADMINISTRATION_SECTION_ID);
-        return new UsersAdministrationSectionPage();
+        return new UsersAdministrationSectionPage().waitUntilPageIsLoaded();
     }
 
     public UsersAdministrationSectionPage()

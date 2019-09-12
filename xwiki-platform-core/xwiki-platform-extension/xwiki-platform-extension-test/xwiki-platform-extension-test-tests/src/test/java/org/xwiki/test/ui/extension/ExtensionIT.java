@@ -830,9 +830,11 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
 
         changesPane = mergeConflictPane.getChanges();
         List<String> expectedDiff = new ArrayList<>();
-        expectedDiff.add("@@ -1,9 +1,9 @@");
+        expectedDiff.add("@@ -1,1 +1,1 @@");
         expectedDiff.add("-= Usage =");
         expectedDiff.add("+=<ins>=</ins> Usage =<ins>=</ins>");
+        expectedDiff.add("[Conflict Resolution]");
+        expectedDiff.add("@@ -2,8 +2,8 @@");
         expectedDiff.add(" ");
         expectedDiff.add("-{{code}}");
         expectedDiff.add("+{{code<ins> language=\"none\"</ins>}}");

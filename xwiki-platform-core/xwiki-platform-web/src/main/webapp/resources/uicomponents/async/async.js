@@ -26,15 +26,15 @@ require(["jquery"], function($) {
       url : url,
       statusCode: {
         200: function(data, textStatus, xhr) {
-          // Replace the element by the asynchronous result
-          element.replaceWith(data);
-
           // Add asynchronous meta tags
           // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
           var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
           if (asyncHead) {
             $('head').append(asyncHead);
           }
+
+          // Replace the element by the asynchronous result
+          element.replaceWith(data);
         },
 
         202: function(data, textStatus, xhr) {

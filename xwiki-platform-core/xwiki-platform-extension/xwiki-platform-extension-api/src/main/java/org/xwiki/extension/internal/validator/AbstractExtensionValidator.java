@@ -62,6 +62,24 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
      */
     public static final String PROPERTY_CHECKRIGHTS = "checkrights";
 
+    /**
+     * The name of the property indicating of rights of the user should be checked.
+     * 
+     * @since 10.11.10
+     * @since 11.3.5
+     * @since 11.8RC1
+     */
+    public static final String PROPERTY_CHECKRIGHTS_USER = "checkUserRights";
+
+    /**
+     * The name of the property indicating of rights of the author should be checked.
+     * 
+     * @since 10.11.10
+     * @since 11.3.5
+     * @since 11.8RC1
+     */
+    public static final String PROPERTY_CHECKRIGHTS_CALLER = "checkAuthorRights";
+
     @Inject
     protected AuthorizationManager authorization;
 
@@ -87,20 +105,23 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
         return null;
     }
 
-    protected void checkAccess(EntityReference reference, Right right, Request request) throws AccessDeniedException
-    {
-        // Context author
-        checkAccess(PROPERTY_CALLERREFERENCE, reference, right, request);
-
-        // Context user
-        checkAccess(PROPERTY_USERREFERENCE, reference, right, request);
-    }
-
-    private void checkAccess(String propertyCallerreference, EntityReference reference, Right right, Request request)
+    protected void checkAccess(EntityReference entityReference, Right right, Request request)
         throws AccessDeniedException
     {
-        if (request.getProperty(propertyCallerreference) != null) {
-            this.authorization.checkAccess(right, getRequestUserReference(propertyCallerreference, request), reference);
+        // Context author
+        checkAccess(PROPERTY_CHECKRIGHTS_CALLER, PROPERTY_CALLERREFERENCE, entityReference, right, request);
+
+        // Context user
+        checkAccess(PROPERTY_CHECKRIGHTS_USER, PROPERTY_USERREFERENCE, entityReference, right, request);
+    }
+
+    private void checkAccess(String propertySetReference, String propertyReference, EntityReference entityReference,
+        Right right, Request request) throws AccessDeniedException
+    {
+        DocumentReference userReference = getRequestUserReference(propertyReference, request);
+
+        if (userReference != null || request.getProperty(propertySetReference) == Boolean.TRUE) {
+            this.authorization.checkAccess(right, userReference, entityReference);
         }
     }
 
@@ -169,25 +190,27 @@ public abstract class AbstractExtensionValidator implements ExtensionValidator
         checkAccess(null, entityRight, request);
     }
 
-    private void checkUserRight(EntityReference reference, Request request) throws AccessDeniedException
+    private void checkUserRight(EntityReference entityReference, Request request) throws AccessDeniedException
     {
         // Context author
-        checkUserAccess(PROPERTY_CALLERREFERENCE, reference, request);
+        checkUserAccess(PROPERTY_CHECKRIGHTS_CALLER, PROPERTY_CALLERREFERENCE, entityReference, request);
 
         // Context user
-        checkUserAccess(PROPERTY_USERREFERENCE, reference, request);
+        checkUserAccess(PROPERTY_CHECKRIGHTS_USER, PROPERTY_USERREFERENCE, entityReference, request);
     }
 
-    private void checkUserAccess(String property, EntityReference reference, Request request)
-        throws AccessDeniedException
+    private void checkUserAccess(String propertySetReference, String propertyReference, EntityReference entityReference,
+        Request request) throws AccessDeniedException
     {
-        if (request.getProperty(property) != null) {
-            // Allow a user to install an extension in its own namespace
-            DocumentReference currentAuthorReference = getRequestUserReference(property, request);
+        DocumentReference userReference = getRequestUserReference(propertyReference, request);
 
-            if (!currentAuthorReference.equals(reference)) {
+        if (userReference != null || request.getProperty(propertySetReference) == Boolean.TRUE) {
+            // Allow a user to install an extension in its own namespace
+            DocumentReference currentAuthorReference = getRequestUserReference(propertyReference, request);
+
+            if (currentAuthorReference == null || !currentAuthorReference.equals(entityReference)) {
                 // Need programming right to register an extension in another user namespace
-                checkAccess(null, Right.PROGRAM, request);
+                this.authorization.checkAccess(Right.PROGRAM, userReference, null);
             }
         }
     }

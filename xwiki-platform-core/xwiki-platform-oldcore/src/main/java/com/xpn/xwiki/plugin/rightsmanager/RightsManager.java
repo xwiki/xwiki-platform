@@ -108,9 +108,9 @@ public final class RightsManager
     private static final String RIGHTSLISTFIELD_SEP = ",|";
 
     /**
-     * Join symbol of the list fields for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS} classes.
+     * Separator symbol of the list fields used for users and groups fields.
      */
-    private static final String RIGHTSLISTFIELD_JOIN = "|";
+    private static final String USERGROUPLISTFIELD_SEP = ",";
 
     /**
      * Symbol use in HQL "like" command that means "all characters".
@@ -910,7 +910,7 @@ public final class RightsManager
         String userOrGroupField = user ? RIGHTSFIELD_USERS : RIGHTSFIELD_GROUPS;
 
         List<String> usersOrGroups =
-            ListClass.getListFromString(right.getStringValue(userOrGroupField), RIGHTSLISTFIELD_SEP, false);
+            ListClass.getListFromString(right.getLargeStringValue(userOrGroupField), USERGROUPLISTFIELD_SEP, false);
 
         if (userOrGroupWiki != null) {
             needUpdate |= usersOrGroups.remove(userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName);
@@ -925,7 +925,7 @@ public final class RightsManager
         }
 
         if (needUpdate) {
-            right.setStringValue(userOrGroupField, StringUtils.join(usersOrGroups.toArray(), RIGHTSLISTFIELD_JOIN));
+            right.setStringValue(userOrGroupField, StringUtils.join(usersOrGroups, USERGROUPLISTFIELD_SEP));
         }
 
         return needUpdate;

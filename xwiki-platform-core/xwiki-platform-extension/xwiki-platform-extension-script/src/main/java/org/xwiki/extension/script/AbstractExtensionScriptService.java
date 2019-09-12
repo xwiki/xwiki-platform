@@ -116,10 +116,12 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     protected <T extends AbstractRequest> void setRightsProperties(T extensionRequest)
     {
         extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
+        extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_USER, true);
         extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
             this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
+            extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_CALLER, true);
             extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CALLERREFERENCE,
                 callerDocument.getContentAuthorReference());
         }

@@ -748,15 +748,16 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     public Job createUpgradePlan(InstallRequest request)
     {
+        request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
+        request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_USER, true);
         request.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
             this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
+            request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_CALLER, true);
             request.setProperty(AbstractExtensionValidator.PROPERTY_CALLERREFERENCE,
                 callerDocument.getContentAuthorReference());
         }
-
-        request.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
 
         Job job = null;
         try {

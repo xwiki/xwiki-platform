@@ -49,7 +49,14 @@
       #set ($discard = $resourceParams.put($entry.key, $value))
     #end
   #end
-  #set ($macro.options.reference = "path:$doc.getURL('get', $escapetool.url($resourceParams))")
+  ## If the current doc is forbidden in view, the tree won't be displayed because of a 403.
+  ## In that case we fallback on requesting it from the main page of the wiki.
+  #if (!$xwiki.hasAccess("view", $doc.reference))
+    #set ($docForRequest = $xwiki.getDocument("Main.WebHome"))
+  #else
+    #set ($docForRequest = $doc)
+  #end
+  #set ($macro.options.reference = "path:$docForRequest.getURL('get', $escapetool.url($resourceParams))")
   #set ($editable = $macro.options.remove('readOnly') != 'true')
   #set ($macro.options.dragAndDrop = $editable)
   #set ($macro.options.contextMenu = $editable)

@@ -1,5 +1,44 @@
-#macro (definePasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName)
- ## The password field, mandatory and must be at least 6 characters long.
+#macro (definePasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName, $passwordOptions)
+  #set ($passwordRegexes = [])
+  #set ($patternLength = "/.{" + $passwordOptions.passwordLength + ",}/")
+  #set ($passwordRegex =
+  {
+    'pattern' : $patternLength,
+    'failureMessage' : $services.localization.render('xe.admin.registration.passwordTooShort')
+  })
+  #set ($discard = $passwordRegexes.add($passwordRegex))
+  #if ($passwordOptions.passwordRuleOneUpperCaseEnabled)
+    #set ($passwordRegex =
+    {
+      'pattern' : '/[A-Z]+/',
+      'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainUppercase')
+    })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #if ($passwordOptions.passwordRuleOneLowerCaseEnabled)
+    #set ($passwordRegex =
+    {
+      'pattern' : '/[a-z]+/',
+      'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainLowercase')
+    })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #if ($passwordOptions.passwordRuleOneNumberEnabled)
+    #set ($passwordRegex =
+    {
+      'pattern' : '/[0-9]+/',
+      'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainNumber')
+    })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #if ($passwordOptions.passwordRuleOneSymbolEnabled)
+    #set ($passwordRegex =
+    {
+      'pattern' : '/\W+/',
+      'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainSymbol')
+    })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
   #set ($field =
     {'name': $passwordFieldName,
       'label': $services.localization.render('core.register.password'),
@@ -12,10 +51,7 @@
         'mandatory': {
           'failureMessage': $services.localization.render('core.validation.required.message')
         },
-        'regex': {
-          'pattern': '/.{6,}/',
-          'failureMessage': $services.localization.render('xe.admin.registration.passwordTooShort')
-        }
+        'regexes': $passwordRegexes
       }
     })
   #set ($discard = $fields.add($field))
@@ -36,10 +72,6 @@
         'mustMatch': {                
           'name': $passwordFieldName,
           'failureMessage': $services.localization.render('xe.admin.registration.passwordMismatch')
-        },                
-        'regex': {
-          'pattern': '/.{6,}/',
-          'failureMessage': $services.localization.render('xe.admin.registration.passwordTooShort')
         }
       }
     })
@@ -52,8 +84,13 @@
  * @param $fields The array of fields to use for generating HTML code.
  * @param $fieldMandatoryStar The tag parameters for a * indicating a mandatory field.
  * @param $failureMessageParams The tag parameters for a failure message.
+ * @param $request The request that is made by submitting the form.
  *#
-#macro (generateHtml, $fields, $fieldMandatoryStar, $failureMessageParams)
+#macro (generateHtml, $fields, $fieldMandatoryStar, $failureMessageParams, $request)
+  ## Put the same values back into the fields (if is there any problem with a field from the request that is made).
+  #if ("$!request" != '')
+    #getParams($fields, $request)
+  #end
   <dl>
   #foreach ($field in $fields)
     #if ($field.get('name'))
@@ -109,14 +146,13 @@
  * Generate the Javascript for interacting with LiveValidation.
  *
  * @param $fields The array of fields which to validate.
- *#
-## TODO: rename it as generateFieldsValidationJS
+ *###
 #macro (generateJavascript, $fields)
-  $xwiki.get('jsfx').use('uicomponents/widgets/validation/livevalidation_prototype.js')
-  $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
+  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true))
   <script type='text/javascript'>
   /* <![CDATA[ */
-  document.observe('xwiki:dom:loaded', function() {
+  var initRegistrationFormValidation = function() {
   ##
   #foreach ($field in $fields)
     #if ($field.get('validate') && $field.get('name'))
@@ -125,6 +161,8 @@
           || ($validate.get('regex') && !$validate.get('regex').get('noscript'))
           || ($validate.get('mustMatch') && !$validate.get('mustMatch').get('noscript')))
         #set ($fieldName = $field.get('name'))
+        ## TODO: add condition for not displaying this message for checking of the original password used in 
+        ## change password form
         #if ($validate.get('fieldOkayMessage'))
           #set ($okayMessage = $validate.get('fieldOkayMessage'))
         #elseif (!$validate.get('hideOkayMessage'))
@@ -143,7 +181,7 @@
         ##
         #if ($validate.get('mustMatch'))
           #set ($mustMatch = $validate.get('mustMatch'))
-          #if ($mustMatch.get('name') && $mustMatch.get('failureMessage')  && !$mustMatch.get('noscript'))
+          #if ($mustMatch.get('name') && $mustMatch.get('failureMessage') && !$mustMatch.get('noscript'))
             ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.get('name')]")[0], 
             failureMessage: "$!mustMatch.get('failureMessage')"});
           #end
@@ -166,19 +204,48 @@
           #if ($pattern != '' && $failMessage != '' && !$regex.get('noscript'))
             ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage"});
           #end
-        #end
-      #end
-    #end
-  #end
+        #end##if regex
+      #end##if contains js validateable fields.
+    #end##if validate
+  #end##loop
+    };
+    document.observe('xwiki:dom:loaded', initRegistrationFormValidation);
+    document.observe('xwiki:dom:updated', function(event) {
+      var container = (event && event.memo && event.memo.elements && event.memo.elements[0]) || $('body');
+      if (container.down('form#register')) {
+        initRegistrationFormValidation();
+      }
     });// ]]>
   </script>
 #end
 ##
 #macro (outputPasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName, 
-  $fieldMandatoryStar, $failureMessageParams, $useLiveValidation)
+  $fieldMandatoryStar, $failureMessageParams, $request, $useLiveValidation)
   #definePasswordFields($fields, $passwordFieldName, $confirmPasswordFieldName)
-  #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams, $useLiveValidation)
+  #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams, $request, $useLiveValidation)
   #if ($useLiveValidation)
     #generateJavascript($fields)
+  #end
+#end
+#*
+ * Get parameters from request so that values will be filled in if there is a mistake
+ * in one of the entries. Entries will be returned to fields[n].params.value
+ * Fields will not be returned if they have either noReturn or error specified.
+ *
+ * @param $fields The array of fields to get parameters for.
+ *###
+#macro(getParams $fields, $request)
+  #foreach($field in $fields)
+    #if($field.get('name') && $request.get($field.get('name')))
+      #if(!$field.get('noReturn') && !$field.get('error'))
+        #if(!$field.get('params'))
+          #set($params = {})
+          #set($discard = $field.put('params', $params))
+        #else
+          #set($params = $field.get('params'))
+        #end
+        #set($discard = $params.put('value', $request.get($field.get('name'))))
+      #end
+    #end
   #end
 #end

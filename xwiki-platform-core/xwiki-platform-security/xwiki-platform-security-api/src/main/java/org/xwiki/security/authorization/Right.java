@@ -303,7 +303,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     public static Right toRight(String string)
     {
         for (Right right : VALUES) {
-            if (right.name.equals(string)) {
+            if (right.name.equalsIgnoreCase(string)) {
                 return right;
             }
         }

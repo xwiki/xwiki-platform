@@ -88,6 +88,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -763,8 +764,7 @@ public abstract class XWikiAction extends Action
 
         // Look if the document has a redirect object
         XWikiDocument doc = context.getDoc();
-        BaseObject redirectObj =
-            doc.getXObject(new DocumentReference("RedirectClass", new SpaceReference("XWiki", wikiReference)));
+        BaseObject redirectObj = doc.getXObject(RedirectClassDocumentInitializer.REFERENCE);
         if (redirectObj == null) {
             return false;
         }

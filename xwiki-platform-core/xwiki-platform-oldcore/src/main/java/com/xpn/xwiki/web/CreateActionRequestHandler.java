@@ -53,6 +53,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -132,13 +133,6 @@ public class CreateActionRequestHandler
      */
     private static final EntityReference TEMPLATE_PROVIDER_CLASS = new EntityReference("TemplateProviderClass",
         EntityType.DOCUMENT, new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
-
-    /**
-     * The redirect class, used to mark pages that are redirect place-holders, i.e. hidden pages that serve only for
-     * redirecting the user to a different page (e.g. when a page has been moved).
-     */
-    private static final EntityReference REDIRECT_CLASS = new EntityReference("RedirectClass", EntityType.DOCUMENT,
-        new EntityReference(XWiki.SYSTEM_SPACE, EntityType.SPACE));
 
     /**
      * The property name for the spaces in the template provider object.
@@ -234,9 +228,8 @@ public class CreateActionRequestHandler
 
         // Get the available templates, in the current space, to check if all conditions to create a new document are
         // met
-        availableTemplateProviders =
-            loadAvailableTemplateProviders(document.getDocumentReference().getLastSpaceReference(),
-                templateProviderClassReference, context);
+        availableTemplateProviders = loadAvailableTemplateProviders(
+            document.getDocumentReference().getLastSpaceReference(), templateProviderClassReference, context);
 
         // Get the type of document to create
         type = request.get(TYPE);
@@ -426,10 +419,10 @@ public class CreateActionRequestHandler
         List<Document> templates = new ArrayList<>();
         try {
             QueryManager queryManager = Utils.getComponent((Type) QueryManager.class, "secure");
-            Query query =
-                queryManager.createQuery("from doc.object(XWiki.TemplateProviderClass) as template "
+            Query query = queryManager.createQuery(
+                "from doc.object(XWiki.TemplateProviderClass) as template "
                     + "where doc.fullName not like 'XWiki.TemplateProviderTemplate' " + "order by template.name",
-                    Query.XWQL);
+                Query.XWQL);
 
             // TODO: Extend the above query to include a filter on the type and allowed spaces properties so we can
             // remove the java code below, thus improving performance by not loading all the documents, but only the
@@ -441,12 +434,12 @@ public class CreateActionRequestHandler
             for (String templateProviderName : templateProviderDocNames) {
                 // get the document and template provider object
                 DocumentReference reference = getCurrentMixedResolver().resolve(templateProviderName);
-                
+
                 // Verify that the current user has the view right on the Template document
                 if (!getAuthManager().hasAccess(Right.VIEW, reference)) {
                     continue;
                 }
-                    
+
                 XWikiDocument templateDoc = context.getWiki().getDocument(reference, context);
                 BaseObject templateObject = templateDoc.getXObject(templateClassReference);
 
@@ -635,11 +628,10 @@ public class CreateActionRequestHandler
             if (creationRestrictionsEnforced && !isTemplateProviderAllowedInSpace(templateProvider, spaceReference,
                 TP_CREATION_RESTRICTIONS_PROPERTY)) {
                 // put an exception on the context, for create.vm to know to display an error
-                Object[] args = {templateProvider.getStringValue(TEMPLATE), spaceReference, name};
-                XWikiException exception =
-                    new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
-                        "Template {0} cannot be used in space {1} when creating page {2}", null, args);
+                Object[] args = { templateProvider.getStringValue(TEMPLATE), spaceReference, name };
+                XWikiException exception = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_TEMPLATE_NOT_AVAILABLE,
+                    "Template {0} cannot be used in space {1} when creating page {2}", null, args);
 
                 ScriptContext scontext = getCurrentScriptContext();
                 scontext.setAttribute(EXCEPTION, exception, ScriptContext.ENGINE_SCOPE);
@@ -673,10 +665,9 @@ public class CreateActionRequestHandler
                 ScriptContext.ENGINE_SCOPE);
 
             // Throw an exception.
-            Object[] args = {newDocument.getDocumentReference()};
+            Object[] args = { newDocument.getDocumentReference() };
             XWikiException documentAlreadyExists =
-                new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
+                new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
                     "Cannot create document {0} because it already has content", null, args);
             scontext.setAttribute(EXCEPTION, documentAlreadyExists, ScriptContext.ENGINE_SCOPE);
 
@@ -689,7 +680,7 @@ public class CreateActionRequestHandler
     /**
      * @param reference the new document reference to check
      * @return true if the serialized document path is too long according to the limitation provided by
-     *              {@link XWikiDocument#getLocalReferenceMaxLength()}.
+     *         {@link XWikiDocument#getLocalReferenceMaxLength()}.
      * @since 11.4RC1
      */
     @Unstable
@@ -704,7 +695,8 @@ public class CreateActionRequestHandler
             XWikiException documentPathIsTooLong = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG,
                 "Cannot create document {0} because its full path is too long: only {1} characters are allowed and "
-                    + "current length is {2}.", null, args);
+                    + "current length is {2}.",
+                null, args);
             ScriptContext scontext = getCurrentScriptContext();
             scontext.setAttribute(EXCEPTION, documentPathIsTooLong, ScriptContext.ENGINE_SCOPE);
             // Expose to the template the path of the document that is too long in order to understand the problem.
@@ -734,7 +726,7 @@ public class CreateActionRequestHandler
     private boolean isEmptyDocument(XWikiDocument document)
     {
         // If it's a new document or a redirect placeholder, it's fine.
-        if (document.isNew() || document.getXObject(REDIRECT_CLASS) != null) {
+        if (document.isNew() || document.getXObject(RedirectClassDocumentInitializer.REFERENCE) != null) {
             return true;
         }
 
@@ -769,7 +761,7 @@ public class CreateActionRequestHandler
     {
         return Utils.getComponent(VelocityManager.class).getVelocityContext();
     }
-    
+
     /**
      * @return the authorization manager
      * @since 9.11

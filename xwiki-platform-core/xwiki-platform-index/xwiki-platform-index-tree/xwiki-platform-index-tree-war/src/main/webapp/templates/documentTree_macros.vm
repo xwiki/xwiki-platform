@@ -51,8 +51,9 @@
   #end
   ## If the current doc is forbidden in view, the tree won't be displayed because of a 403.
   ## In that case we fallback on requesting it from the main page of the wiki.
-  #if (!$xwiki.hasAccess("view", $doc.reference))
-    #set ($docForRequest = $xwiki.getDocument("Main.WebHome"))
+  #if (!$services.security.authorization.hasAccess("view", $doc.getDocumentReference()))
+    #set ($docForRequestReference = $services.wiki.getCurrentWikiDescriptor().getMainPageReference())
+    #set ($docForRequest = $xwiki.getDocument($docForRequestReference))
   #else
     #set ($docForRequest = $doc)
   #end

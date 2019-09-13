@@ -544,7 +544,10 @@ public abstract class XWikiAction extends Action
                         if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_DISABLED) {
                             context.put("cause", "disabled");
                         }
+                        // In case of user disabled or inactive, the resources are actually forbidden.
+                        context.getResponse().setStatus(HttpServletResponse.SC_FORBIDDEN);
                         Utils.parseTemplate(context.getWiki().Param("xwiki.user_exception", "userinactive"), context);
+
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND) {
                         context.put("message", "attachmentdoesnotexist");

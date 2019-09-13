@@ -322,9 +322,9 @@ public class RepositoryManager implements Initializable, Disposable
         boolean valid = isValid(document, extensionObject, xcontext);
 
         if (valid) {
-            this.logger.debug("The extension in the document [{}] is not valid", document.getDocumentReference());
-        } else {
             this.logger.debug("The extension in the document [{}] is valid", document.getDocumentReference());
+        } else {
+            this.logger.debug("The extension in the document [{}] is not valid", document.getDocumentReference());
         }
 
         int currentValue = getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_VALIDEXTENSION, 0);

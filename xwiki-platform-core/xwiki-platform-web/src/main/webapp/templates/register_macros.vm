@@ -1,3 +1,12 @@
+## Defines what server generated error messages should look like
+## The error message when a field is entered incorrectly
+#set ($failureMessageParams = {'class': 'LV_validation_message LV_invalid'})
+## 'LV_validation_message LV_invalid' depends on this:
+$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
+##
+## The * next to the fields to denote they are mandatory.
+#set($fieldMandatoryStar = {'class': 'xRequired'})
+##
 #macro (definePasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName, $passwordOptions)
   #set ($passwordRegexes = [])
   #set ($patternLength = "/.{" + $passwordOptions.passwordLength + ",}/")
@@ -55,8 +64,9 @@
       }
     })
   #set ($discard = $fields.add($field))
-  ##
-  ## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
+##TODO: indent these 2 lines for not creating nbsp
+##
+## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
   #set ($field =
     {'name': $confirmPasswordFieldName,
       'label': $services.localization.render('core.register.passwordRepeat'),
@@ -86,11 +96,9 @@
  * @param $failureMessageParams The tag parameters for a failure message.
  * @param $request The request that is made by submitting the form.
  *#
-#macro (generateHtml, $fields, $fieldMandatoryStar, $failureMessageParams, $request)
+#macro (generateHtml, $fields, $request)
   ## Put the same values back into the fields (if is there any problem with a field from the request that is made).
-  #if ("$!request" != '')
-    #getParams($fields, $request)
-  #end
+  #getParams($fields, $request)
   <dl>
   #foreach ($field in $fields)
     #if ($field.get('name'))
@@ -140,6 +148,7 @@
     #end##if fieldName exists
   #end
   </dl>
+  #generateJavascript($fields)
 #end
 ##
 #*
@@ -148,8 +157,8 @@
  * @param $fields The array of fields which to validate.
  *###
 #macro (generateJavascript, $fields)
+  ## Load only the js since the CSS is loaded when LV_validation_message LV_invalid is defined
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
-  #set ($discard = $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true))
   <script type='text/javascript'>
   /* <![CDATA[ */
   var initRegistrationFormValidation = function() {
@@ -183,7 +192,7 @@
           #set ($mustMatch = $validate.get('mustMatch'))
           #if ($mustMatch.get('name') && $mustMatch.get('failureMessage') && !$mustMatch.get('noscript'))
             ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.get('name')]")[0], 
-            failureMessage: "$!mustMatch.get('failureMessage')"});
+              failureMessage: "$!mustMatch.get('failureMessage')"});
           #end
         #end
         ##
@@ -216,16 +225,12 @@
         initRegistrationFormValidation();
       }
     });// ]]>
-  </script>
-#end
+    </script>
+#end##macro
 ##
-#macro (outputPasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName, 
-  $fieldMandatoryStar, $failureMessageParams, $request, $useLiveValidation)
-  #definePasswordFields($fields, $passwordFieldName, $confirmPasswordFieldName)
-  #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams, $request, $useLiveValidation)
-  #if ($useLiveValidation)
-    #generateJavascript($fields)
-  #end
+#macro (outputPasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName,$request)
+  #definePasswordFields($fields, $passwordFieldName, $confirmPasswordFieldName, {})
+  #generateHtml($fields, $request)
 #end
 #*
  * Get parameters from request so that values will be filled in if there is a mistake

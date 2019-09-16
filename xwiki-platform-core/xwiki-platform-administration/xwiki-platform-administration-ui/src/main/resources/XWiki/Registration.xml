@@ -60,15 +60,6 @@
   ## Load the configuration from a seperate document.
   #loadConfig('XWiki.RegistrationConfig')
   ##
-  ## Defines what server generated error messages should look like
-  ## The error message when a field is entered incorrectly
-  #set($failureMessageParams = { 'class' : 'LV_validation_message LV_invalid'})
-  ## 'LV_validation_message LV_invalid' depends on this:
-  $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
-  ##
-  ## The * next to the fields to denote they are mandatory.
-  #set($fieldMandatoryStar = { 'class' : 'xRequired'})
-  ##
   #*
    * You may include this document in other documents using {{include reference="XWiki.Registration"/}}
    * To specify that the user is invited and should be allowed to register even if Guest does not have permission to
@@ -209,6 +200,13 @@
       }
     })
   #set($discard = $fields.add($field))
+  ## Make sure the chosen user name is not already taken
+  ## This macro is called by programmaticValidation for xwikiname (above)
+  #macro (nameAvailable, $name)
+    #if( $xwiki.exists("$userSpace$name"))
+      failed
+    #end
+  #end
   ##
   ##The password field, mandatory and must be at least 6 characters long.
   ##The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
@@ -375,15 +373,12 @@
             &lt;input type="hidden" name="parent" value="$!{services.model.serialize($userDirectoryReference, 'default')}" /&gt;
           #end
         &lt;/div&gt;
-        #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams, $request)
+        #generateHtml($fields, $request)
         &lt;p class="buttons"&gt;
           &lt;span class="buttonwrapper"&gt;
             &lt;input type="submit" value="$services.localization.render('core.register.submit')" class="button"/&gt;
           &lt;/span&gt;
         &lt;/p&gt;
-        #if ($useLiveValidation)
-          #generateJavascript($fields)
-        #end
       &lt;/form&gt;
     {{/html}}
 
@@ -498,13 +493,6 @@
     #end##if(validate)
   #end##loop
 #end##macro
-## Make sure the chosen user name is not already taken
-## This macro is called by programmaticValidation for xwikiname (above)
-#macro(nameAvailable, $name)
-  #if($xwiki.exists("$userSpace$name"))
-    failed
-  #end
-#end
 #*
  * Create the user.
  * Calls $xwiki.createUser to create a new user.

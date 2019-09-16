@@ -4,12 +4,6 @@
 ###
 #template("startpage.vm")
 #template("register_macros.vm")
-## Defines what server generated error messages should look like
-## The error message when a field is entered incorrectly
-#set($failureMessageParams = {'class': 'LV_validation_message LV_invalid'})
-##
-## The * next to the fields to denote they are mandatory.
-#set($fieldMandatoryStar = {'class': 'xRequired'})
 
 ## TODO: display the message for wrong original pass in the right place
 <div class="minwidthb"></div>
@@ -25,7 +19,7 @@
         #set($errorMessage = "")
         #set($password = $request.password)
         #set($password2 = $request.password2)
-         ## Server-side checking
+        ## Server-side checking
         #if($isCurrentUsersProfile || !$hasAdmin)
           #set($user = $xwiki.getUser())
           #set($isOriginalPasswordValid = $user.checkPassword($request.originalpassword))
@@ -60,7 +54,7 @@
       #if(!$isValidPassword)
         $services.localization.render('platform.core.profile.passwd.instructions')
         #set ($fields = [])
-        #set($field =
+        #set ($field =
           {'name': 'originalpassword',
             'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
             'params': {
@@ -84,11 +78,7 @@
         <form class="xform third" action="" method="post" autocomplete="off">
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
-        #generateHtml($fields, $fieldMandatoryStar, $failureMessageParams)
-        #set ($useLiveValidation = true)
-        #if ($useLiveValidation)
-          #generateJavascript($fields)
-        #end
+        #generateHtml($fields)
         <div class="padded buttons">
           <span class="buttonwrapper"><input type="submit" value="$services.localization.render('platform.core.profile.passwd.submit')" class="button"/></span>
           <span class="buttonwrapper"><a href="$doc.getURL("view")" class="secondary button">$services.localization.render('platform.core.profile.passwd.cancel')</a></span>

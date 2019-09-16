@@ -68,18 +68,26 @@ public class AsyncRendererResourceReferenceResolver extends AbstractResourceRefe
             }
         }
 
-        String clientId = null;
-        List<String> clientIds = representation.getParameters().get("clientId");
-        if (CollectionUtils.isNotEmpty(clientIds)) {
-            clientId = clientIds.get(0);
-        }
+        String clientId = getParameter(representation, "clientId");
 
         long timeout = Long.MAX_VALUE;
-        List<String> timeouts = representation.getParameters().get("timeout");
-        if (CollectionUtils.isNotEmpty(timeouts)) {
-            timeout = NumberUtils.toLong(timeouts.get(0), timeout);
+        String timeoutString = getParameter(representation, "timeout");
+        if (timeoutString != null) {
+            timeout = NumberUtils.toLong(timeoutString, timeout);
         }
 
-        return new AsyncRendererResourceReference(resourceType, pathSegments, clientId, timeout);
+        String wiki = getParameter(representation, "wiki");
+
+        return new AsyncRendererResourceReference(resourceType, pathSegments, clientId, timeout, wiki);
+    }
+
+    private String getParameter(ExtendedURL representation, String key)
+    {
+        List<String> timeouts = representation.getParameters().get(key);
+        if (CollectionUtils.isNotEmpty(timeouts)) {
+            return timeouts.get(0);
+        }
+
+        return null;
     }
 }

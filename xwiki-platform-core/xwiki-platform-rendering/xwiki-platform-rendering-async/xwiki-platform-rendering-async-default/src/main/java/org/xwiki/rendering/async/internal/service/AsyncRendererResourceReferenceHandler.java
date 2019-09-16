@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletResponse;
 
@@ -50,6 +51,9 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.context.RequestInitializer;
 
 /**
  * Async renderer resource handler.
@@ -80,6 +84,12 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
 
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private RequestInitializer requestInitializer;
 
     @Inject
     private Logger logger;
@@ -120,7 +130,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         if (status.getState() != State.FINISHED) {
             sendRUNNINGReponse(status);
         } else {
-            sendFINISHEDReponse(status);
+            sendFINISHEDReponse(reference, status);
         }
 
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
@@ -128,7 +138,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         chain.handleNext(reference);
     }
 
-    private void sendRUNNINGReponse(AsyncRendererJobStatus status) throws ResourceReferenceHandlerException
+    private void sendRUNNINGReponse(AsyncRendererJobStatus status)
     {
         Response response = this.container.getResponse();
         response.setContentType("application/json; charset=utf-8");
@@ -140,13 +150,14 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         // TODO: Send back a REST version of the job status
     }
 
-    private void sendFINISHEDReponse(AsyncRendererJobStatus status) throws ResourceReferenceHandlerException
+    private void sendFINISHEDReponse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status)
+        throws ResourceReferenceHandlerException
     {
         Response response = this.container.getResponse();
         response.setContentType("text/html; charset=utf-8");
 
         Map<String, Collection<Object>> uses = status.getUses();
-        if (uses != null) {
+        if (uses != null && response instanceof ServletResponse) {
             // Create the asynchronous HTML meta
             StringBuilder head = new StringBuilder();
             for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
@@ -154,16 +165,16 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
                     AsyncContextHandler handler =
                         this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
 
+                    // Setup a proper request and URL factory for the passed wiki
+                    this.requestInitializer.restoreRequest(reference.getWiki(), this.xcontextProvider.get());
+
                     handler.addHTMLHead(head, entry.getValue());
                 } catch (Exception e) {
                     this.logger.error("Failed to get HTML head for handler type [{}]", entry.getKey(), e);
                 }
             }
             if (head.length() > 0) {
-                if (response instanceof ServletResponse) {
-                    ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD",
-                        head.toString());
-                }
+                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
             }
         }
 

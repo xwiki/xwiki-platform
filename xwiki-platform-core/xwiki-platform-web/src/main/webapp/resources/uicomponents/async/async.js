@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(["jquery"], function($) {
+require(["jquery", 'xwiki-meta'], function($, xm) {
   var update = function(element, url)
   {
     // TODO: show progress
@@ -65,10 +65,12 @@ require(["jquery"], function($) {
     var clientId = element.dataset.xwikiAsyncClientId;
 
     if (clientId) {
-      url += '?clientId=' + clientId + '&timeout=' + 500;
+      url += '?clientId=' + clientId + '&';
     } else {
-      url += '?timeout=' + 500;
+      url += '?';
     }
+
+    url += 'timeout=' + 500 + '&wiki=' + xm.wiki;
 
     element = $(element);
 

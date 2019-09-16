@@ -203,7 +203,7 @@
   ## Make sure the chosen user name is not already taken
   ## This macro is called by programmaticValidation for xwikiname (above)
   #macro (nameAvailable, $name)
-    #if( $xwiki.exists("$userSpace$name"))
+    #if ($xwiki.exists("$userSpace$name"))
       failed
     #end
   #end

@@ -29,6 +29,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.apache.commons.io.IOUtils;
@@ -46,6 +47,9 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.internal.context.RequestInitializer;
 
 /**
  * Async renderer resource handler.
@@ -76,6 +80,12 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
 
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
+
+    @Inject
+    private RequestInitializer requestInitializer;
 
     @Inject
     private Logger logger;
@@ -133,6 +143,9 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
             try {
                 AsyncContextHandler handler =
                     this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
+
+                // Setup a proper request and URL factory for the passed wiki
+                this.requestInitializer.restoreRequest(reference.getWiki(), this.xcontextProvider.get());
 
                 handler.addHTMLHead(head, entry.getValue());
             } catch (Exception e) {

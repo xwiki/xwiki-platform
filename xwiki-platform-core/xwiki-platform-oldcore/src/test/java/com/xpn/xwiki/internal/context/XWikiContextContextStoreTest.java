@@ -29,8 +29,11 @@ import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.container.Container;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.manager.WikiManagerException;
 
@@ -62,11 +65,15 @@ import static org.mockito.Mockito.when;
  */
 @OldcoreTest
 @ReferenceComponentList
+@ComponentList(RequestInitializer.class)
 public class XWikiContextContextStoreTest
 {
     private static final String WIKI = "wiki";
 
     private static final String REQUESTWIKI = "requestwiki";
+
+    @MockComponent
+    private Container container;
 
     @InjectMockitoOldcore
     private MockitoOldcore oldcore;

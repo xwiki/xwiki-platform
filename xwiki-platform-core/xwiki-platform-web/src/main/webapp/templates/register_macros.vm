@@ -91,8 +91,6 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  * Generate HTML form.
  *
  * @param $fields The array of fields to use for generating HTML code.
- * @param $fieldMandatoryStar The tag parameters for a * indicating a mandatory field.
- * @param $failureMessageParams The tag parameters for a failure message.
  * @param $request The request that is made by submitting the form.
  *#
 #macro (generateHtml, $fields, $request)
@@ -156,7 +154,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  * @param $fields The array of fields which to validate.
  *###
 #macro (generateJavascript, $fields)
-  ## Load only the js since the CSS is loaded when LV_validation_message LV_invalid is defined
+  ## Load only the JS since the CSS is loaded after the declaration of LV_validation_message LV_invalid.
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
   <script type='text/javascript'>
   /* <![CDATA[ */
@@ -169,8 +167,6 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           || ($validate.get('regex') && !$validate.get('regex').get('noscript'))
           || ($validate.get('mustMatch') && !$validate.get('mustMatch').get('noscript')))
         #set ($fieldName = $field.get('name'))
-        ## TODO: add condition for not displaying this message for checking of the original password used in 
-        ## change password form
         #if ($validate.get('fieldOkayMessage'))
           #set ($okayMessage = $validate.get('fieldOkayMessage'))
         #elseif (!$validate.get('hideOkayMessage'))
@@ -237,18 +233,19 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  * Fields will not be returned if they have either noReturn or error specified.
  *
  * @param $fields The array of fields to get parameters for.
+ * @request The request that is made, from which the params will be returned.
  *###
 #macro(getParams $fields, $request)
-  #foreach($field in $fields)
-    #if($field.get('name') && $request.get($field.get('name')))
-      #if(!$field.get('noReturn') && !$field.get('error'))
-        #if(!$field.get('params'))
-          #set($params = {})
-          #set($discard = $field.put('params', $params))
+  #foreach ($field in $fields)
+    #if ($field.get('name') && $request.get($field.get('name')))
+      #if (!$field.get('noReturn') && !$field.get('error'))
+        #if (!$field.get('params'))
+          #set ($params = {})
+          #set ($discard = $field.put('params', $params))
         #else
-          #set($params = $field.get('params'))
+          #set ($params = $field.get('params'))
         #end
-        #set($discard = $params.put('value', $request.get($field.get('name'))))
+        #set ($discard = $params.put('value', $request.get($field.get('name'))))
       #end
     #end
   #end

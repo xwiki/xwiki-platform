@@ -64,9 +64,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       }
     })
   #set ($discard = $fields.add($field))
-##TODO: indent these 2 lines for not creating nbsp
-##
-## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
+  ##
+  ## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
   #set ($field =
     {'name': $confirmPasswordFieldName,
       'label': $services.localization.render('core.register.passwordRepeat'),

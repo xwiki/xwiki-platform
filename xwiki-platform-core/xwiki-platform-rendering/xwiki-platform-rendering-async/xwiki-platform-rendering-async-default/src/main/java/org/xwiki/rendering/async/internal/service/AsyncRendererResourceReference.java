@@ -36,7 +36,6 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
 
     private final String clientId;
 
-
     private final String wiki;
 
     /**
@@ -50,14 +49,13 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
      * @since 10.3.5
      * @since 10.11.10
      */
-    public AsyncRendererResourceReference(ResourceType type, List<String> id, String clientId,
-        String wiki)
+    public AsyncRendererResourceReference(ResourceType type, List<String> id, String clientId, String wiki)
     {
         setType(type);
 
         this.id = id;
         this.clientId = clientId;
-        this.timeout = timeout;
+        this.wiki = wiki;
     }
 
     /**

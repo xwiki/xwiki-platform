@@ -90,7 +90,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.7</pgsql.version>
+    <pgsql.version>42.2.8</pgsql.version>
     <oracle.version>12.2.0.1</oracle.version>
     <mariadb.version>2.3.0</mariadb.version>
   </properties>

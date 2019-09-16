@@ -26,9 +26,9 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.wiki.internal.AbstractAsyncClassDocumentInitializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 
+import com.xpn.xwiki.internal.mandatory.AbstractAsyncClassDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;

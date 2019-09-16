@@ -22,6 +22,7 @@ com.xpn.xwiki.internal.context.XWikiContextContextStore
 com.xpn.xwiki.internal.converter.DocumentConverter
 com.xpn.xwiki.internal.converter.XWikiDocumentConverter
 com.xpn.xwiki.internal.debug.DebugConfiguration
+com.xpn.xwiki.internal.display.DefaultDocumentContentAsyncRenderer
 com.xpn.xwiki.internal.doc.DatabaseDocumentRevisionProvider
 com.xpn.xwiki.internal.doc.DefaultDocumentRevisionProvider
 com.xpn.xwiki.internal.doc.DeletedDocumentRevisionProvider
@@ -52,6 +53,7 @@ com.xpn.xwiki.internal.filter.output.XWikiDocumentOutputFilterStream
 com.xpn.xwiki.script.display.DisplayScriptService
 com.xpn.xwiki.internal.job.JobRequestContextInitializer
 com.xpn.xwiki.internal.localization.XWikiLocalizationContext
+com.xpn.xwiki.internal.mandatory.DocumentAsyncClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
 com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer

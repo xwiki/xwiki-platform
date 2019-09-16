@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.component.wiki.internal;
+package com.xpn.xwiki.internal.mandatory;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -41,6 +41,21 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  */
 public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {
+    /**
+     * Indicate if the asynchronous execution is allowed for this extension.
+     */
+    public static final String XPROPERTY_ASYNC_ENABLED = "async_enabled";
+
+    /**
+     * Indicate if caching is allowed for this UI extension.
+     */
+    public static final String XPROPERTY_ASYNC_CACHED = "async_cached";
+
+    /**
+     * Indicate the list of context elements required by the UI extension execution.
+     */
+    public static final String XPROPERTY_ASYNC_CONTEXT = "async_context";
+
     @Inject
     private ContextStoreManager contextStore;
 
@@ -62,10 +77,8 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addBooleanField(AbstractAsyncBaseObjectWikiComponent.XPROPERTY_ASYNC_ENABLED, "Asynchronous rendering",
-            null, Boolean.FALSE);
-        xclass.addBooleanField(AbstractAsyncBaseObjectWikiComponent.XPROPERTY_ASYNC_CACHED, "Cached", null,
-            Boolean.FALSE);
+        xclass.addBooleanField(XPROPERTY_ASYNC_ENABLED, "Asynchronous rendering", null, Boolean.FALSE);
+        xclass.addBooleanField(XPROPERTY_ASYNC_CACHED, "Cached", null, Boolean.FALSE);
 
         // TODO: move all that in a custom displayer to be less static
         Collection<String> contextEntries;
@@ -89,7 +102,6 @@ public abstract class AbstractAsyncClassDocumentInitializer extends AbstractMand
                 entriesString.append(translation);
             }
         }
-        xclass.addStaticListField(AbstractAsyncBaseObjectWikiComponent.XPROPERTY_ASYNC_CONTEXT, "Context elements", 5,
-            true, entriesString.toString());
+        xclass.addStaticListField(XPROPERTY_ASYNC_CONTEXT, "Context elements", 5, true, entriesString.toString());
     }
 }

@@ -27,6 +27,7 @@ import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
+import org.hibernate.cfg.Configuration;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
@@ -127,6 +128,7 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         
         Mock hibernateStore = registerMockComponent(HibernateStore.class);
         hibernateStore.stubs().method("dispose").isVoid();
+        hibernateStore.stubs().method("getConfiguration").will(returnValue(new Configuration()));
 
         this.document.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
 

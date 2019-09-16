@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Provider;
 import javax.script.ScriptContext;
 
@@ -60,9 +59,6 @@ import org.xwiki.rendering.macro.wikibridge.WikiMacroExecutionStartsEvent;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroParameters;
 import org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBinding;
 import org.xwiki.rendering.macro.wikibridge.binding.WikiMacroBindingInitializer;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -178,10 +174,6 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     private static final BlockMatcher NON_GENERATED_CONTENT_METADATA_MATCHER =
         testedBlock -> (testedBlock instanceof MetaDataBlock)
             && ((MetaDataBlock) testedBlock).getMetaData().getMetaData(MetaData.NON_GENERATED_CONTENT) != null;
-
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManager;
 
     @Inject
     private AsyncContext asyncContext;
@@ -346,17 +338,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         String resultString = null;
 
         if (async || cached) {
-            BlockRenderer renderer;
-            try {
-                renderer = this.componentManager.get().getInstance(BlockRenderer.class, this.targetSyntax.toIdString());
-            } catch (ComponentLookupException e) {
-                throw new RenderingException("Failed to lookup renderer for syntax [" + this.targetSyntax + "]", e);
-            }
-
-            WikiPrinter printer = new DefaultWikiPrinter();
-            renderer.render(blockResult, printer);
-
-            resultString = printer.toString();
+            resultString = render(blockResult);
         }
 
         return new BlockAsyncRendererResult(resultString, blockResult);
@@ -379,7 +361,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         WikiMacroBinding macroBinding = null;
         try {
-            ComponentManager currentComponentManager = this.componentManager.get();
+            ComponentManager currentComponentManager = this.componentManagerProvider.get();
 
             XWikiContext xWikiContext = this.xcontextProvider.get();
             Document document =
@@ -474,7 +456,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
     private WikiMacroParameters convertParameters(WikiMacroParameters parameters) throws ComponentLookupException
     {
-        ConverterManager converterManager = this.componentManager.get().getInstance(ConverterManager.class);
+        ConverterManager converterManager = this.componentManagerProvider.get().getInstance(ConverterManager.class);
         Map<String, ParameterDescriptor> parameterDescriptorMap =
             this.wikimacro.getDescriptor().getParameterDescriptorMap();
         WikiMacroParameters result = new WikiMacroParameters();

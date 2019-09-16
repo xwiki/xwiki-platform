@@ -23,13 +23,20 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -45,6 +52,10 @@ import org.xwiki.rendering.transformation.TransformationManager;
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
 {
+    @Inject
+    @Named("context")
+    protected Provider<ComponentManager> componentManagerProvider;
+
     @Inject
     protected TransformationManager transformationManager;
 
@@ -85,5 +96,27 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
         }
 
         return block;
+    }
+
+    /**
+     * @param block the block to render
+     * @return the result of the block rendering
+     * @throws RenderingException when failing to renderer the block
+     * @since 11.8RC1
+     */
+    protected String render(Block block) throws RenderingException
+    {
+        BlockRenderer renderer;
+        try {
+            renderer =
+                this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
+        } catch (ComponentLookupException e) {
+            throw new RenderingException("Failed to lookup renderer for syntax [" + getTargetSyntax() + "]", e);
+        }
+
+        WikiPrinter printer = new DefaultWikiPrinter();
+        renderer.render(block, printer);
+
+        return printer.toString();
     }
 }

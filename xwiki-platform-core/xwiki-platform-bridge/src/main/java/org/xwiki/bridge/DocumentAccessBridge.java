@@ -113,7 +113,8 @@ public interface DocumentAccessBridge
     /**
      * Get the document object associated with the passed document name and context locale.
      * <p>
-     * Note that the returned document does not contain objects and attachment so it should be used very carefully.
+     * Note that the returned document does not contain objects and attachments (unless it's the default version) so it
+     * should be used very carefully.
      * 
      * @param documentReference the reference of the document instance to find
      * @return the document instance matching the passed document reference and context locale
@@ -127,9 +128,26 @@ public interface DocumentAccessBridge
     }
 
     /**
+     * Get the document object associated with the passed document and context locale.
+     * <p>
+     * Note that the returned document does not contain objects and attachments (unless it's the default version) so it
+     * should be used very carefully.
+     * 
+     * @param documentReference the reference of the document instance to find
+     * @return the document instance matching the passed document reference and context locale
+     * @throws Exception when loading the document failed
+     * @since 11.8RC1
+     */
+    default DocumentModelBridge getTranslatedDocumentInstance(DocumentModelBridge documentReference) throws Exception
+    {
+        return getDocument(documentReference.getDocumentReference());
+    }
+
+    /**
      * Get the document object associated with the passed entity reference and context locale.
      * <p>
-     * Note that the returned document does not contain objects and attachment so it should be used very carefully.
+     * Note that the returned document does not contain objects and attachments (unless it's the default version) so it
+     * should be used very carefully.
      * 
      * @param entityReference the reference of the entity instance to find
      * @return the document instance matching the passed document reference and context locale

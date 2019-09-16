@@ -123,14 +123,14 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         }
 
         // Send the result back
-        sendReponse(status);
+        sendResponse(reference, status);
 
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
         // Resource Reference.
         chain.handleNext(reference);
     }
 
-    private void sendReponse(AsyncRendererJobStatus status) throws ResourceReferenceHandlerException
+    private void sendResponse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status) throws ResourceReferenceHandlerException
     {
         // Send the result back
         Response response = this.container.getResponse();

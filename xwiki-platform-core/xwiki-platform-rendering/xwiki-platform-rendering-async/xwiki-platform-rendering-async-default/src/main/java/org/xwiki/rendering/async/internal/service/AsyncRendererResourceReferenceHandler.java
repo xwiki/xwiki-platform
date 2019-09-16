@@ -128,9 +128,9 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
 
         // Send the result back
         if (status.getState() != State.FINISHED) {
-            sendRUNNINGReponse(status);
+            sendRUNNINGResponse(status);
         } else {
-            sendFINISHEDReponse(reference, status);
+            sendFINISHEDResponse(reference, status);
         }
 
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
@@ -138,7 +138,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         chain.handleNext(reference);
     }
 
-    private void sendRUNNINGReponse(AsyncRendererJobStatus status)
+    private void sendRUNNINGResponse(AsyncRendererJobStatus status)
     {
         Response response = this.container.getResponse();
         response.setContentType("application/json; charset=utf-8");
@@ -150,7 +150,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         // TODO: Send back a REST version of the job status
     }
 
-    private void sendFINISHEDReponse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status)
+    private void sendFINISHEDResponse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status)
         throws ResourceReferenceHandlerException
     {
         Response response = this.container.getResponse();

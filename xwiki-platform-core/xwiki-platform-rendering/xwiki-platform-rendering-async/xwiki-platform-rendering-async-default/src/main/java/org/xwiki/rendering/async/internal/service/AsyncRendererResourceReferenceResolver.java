@@ -67,12 +67,20 @@ public class AsyncRendererResourceReferenceResolver extends AbstractResourceRefe
             }
         }
 
-        String clientId = null;
-        List<String> clientIds = representation.getParameters().get("clientId");
-        if (CollectionUtils.isNotEmpty(clientIds)) {
-            clientId = clientIds.get(0);
+        String clientId = getParameter(representation, "clientId");
+
+        String wiki = getParameter(representation, "wiki");
+
+        return new AsyncRendererResourceReference(resourceType, pathSegments, clientId, wiki);
+    }
+
+    private String getParameter(ExtendedURL representation, String key)
+    {
+        List<String> timeouts = representation.getParameters().get(key);
+        if (CollectionUtils.isNotEmpty(timeouts)) {
+            return timeouts.get(0);
         }
 
-        return new AsyncRendererResourceReference(resourceType, pathSegments, clientId);
+        return null;
     }
 }

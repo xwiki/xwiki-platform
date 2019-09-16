@@ -36,19 +36,28 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
 
     private final String clientId;
 
+
+    private final String wiki;
+
     /**
      * Default constructor.
      * 
      * @param type see {@link #getType()}
      * @param id the id of the async renderer
      * @param clientId the id of the client associated with the async execution
+     * @param wiki the identifier of the current wiki
+     * @since 11.8RC1
+     * @since 10.3.5
+     * @since 10.11.10
      */
-    public AsyncRendererResourceReference(ResourceType type, List<String> id, String clientId)
+    public AsyncRendererResourceReference(ResourceType type, List<String> id, String clientId,
+        String wiki)
     {
         setType(type);
 
         this.id = id;
         this.clientId = clientId;
+        this.timeout = timeout;
     }
 
     /**
@@ -71,5 +80,13 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
     public String toString()
     {
         return getId().toString();
+    }
+
+    /**
+     * @return the identifier of the current wiki
+     */
+    public String getWiki()
+    {
+        return this.wiki;
     }
 }

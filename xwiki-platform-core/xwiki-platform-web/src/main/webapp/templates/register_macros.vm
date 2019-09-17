@@ -5,7 +5,7 @@
 $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
 ##
 ## The * next to the fields to denote they are mandatory.
-#set($fieldMandatoryStar = {'class': 'xRequired'})
+#set ($fieldMandatoryStar = {'class': 'xRequired'})
 ##
 #macro (definePasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName, $passwordOptions)
   #set ($passwordRegexes = [])
@@ -121,7 +121,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       #end
       <dd><$tag id="$fieldName" ##
       #set ($params = $field.get('params'))
-      ## If no name parameter is specified, then we use the field name
+      ## If no name parameter is specified, then we use the field name.
       #if (!$params.get('name'))
         #set ($discard = $params.put('name', $fieldName))
       #end
@@ -142,7 +142,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       </dd>
     #else
       ERROR: Field with no name.
-    #end##if fieldName exists
+    #end
   #end
   </dl>
   #generateJavascript($fields)
@@ -154,7 +154,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  * @param $fields The array of fields which to validate.
  *###
 #macro (generateJavascript, $fields)
-  ## Load only the JS since the CSS is loaded after the declaration of LV_validation_message LV_invalid.
+  ## Load only the JS since the CSS is loaded after the declaration of 'LV_validation_message LV_invalid'.
   #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
   <script type='text/javascript'>
   /* <![CDATA[ */
@@ -233,11 +233,12 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  * Fields will not be returned if they have either noReturn or error specified.
  *
  * @param $fields The array of fields to get parameters for.
- * @request The request that is made, from which the params will be returned.
+ * @param $request The request that is made, from which the params will be returned.
  *###
 #macro (getParams $fields, $request)
   #foreach ($field in $fields)
-    #if ($field.get('name') && $request.get($field.get('name')))
+    ## Use silent notation since sometimes the request will be null & nothing should happen.
+    #if ($field.get('name') && $!request.get($field.get('name')))
       #if (!$field.get('noReturn') && !$field.get('error'))
         #if (!$field.get('params'))
           #set ($params = {})

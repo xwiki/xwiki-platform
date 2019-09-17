@@ -33,7 +33,7 @@
         #elseif($password == '')
           #set($errorMessage = $services.localization.render('platform.core.profile.passwd.passwordCannotBeEmpty'))
           #set($isValidPassword = false)
-        #elseif($password.length() < 6)
+        #elseif ($password.length() < 6)
           #set($errorMessage = $services.localization.render('platform.core.profile.passwd.passwordTooShort'))
           #set($isValidPassword = false)
         #end
@@ -72,12 +72,13 @@
         #definePasswordFields($fields, 'password', 'password2')
         ## Change the label for new password fields
         #set ($fields[1].label = $services.localization.render('platform.core.profile.passwd.newPassword'))
-        #set ($fields[2].label = $services.localization.render('platform.core.profile.passwd.reenterPassword'))
+        ## This key fits better.
+        #set ($fields[2].label = $services.localization.render('xe.admin.passwordReset.step2.newPasswordVerification.label'))
         <form class="xform third" action="" method="post" autocomplete="off">
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
         #generateHtml($fields)
-        #if($request.password && !$isValidPassword)
+        #if ($request.password && !$isValidPassword)
           <span class='box errormessage'>$errorMessage</span>
         #end
         <div class="padded buttons">
@@ -96,6 +97,6 @@
     #xwikimessageboxstart($services.localization.render('platform.core.noticeMessageType') $services.localization.render('platform.core.profile.passwd.notaUser'))
     #xwikimessageboxend()
   #end
-  </div>## mainContentArea
-</div>## main
+  </div>
+</div>
 #template("endpage.vm")

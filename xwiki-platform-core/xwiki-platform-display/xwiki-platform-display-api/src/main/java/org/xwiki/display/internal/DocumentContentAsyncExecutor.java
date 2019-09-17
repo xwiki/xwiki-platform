@@ -17,33 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.display;
+package org.xwiki.display.internal;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.display.internal.DocumentContentAsyncRenderer;
-import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.component.annotation.InstantiationStrategy;
+import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.context.Execution;
 import org.xwiki.model.ModelContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.RenderingException;
-import org.xwiki.rendering.async.AsyncContext;
-import org.xwiki.rendering.async.internal.block.AbstractBlockAsyncRenderer;
-import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -53,12 +46,9 @@ import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
+import org.xwiki.rendering.transformation.TransformationException;
+import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.velocity.VelocityManager;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.mandatory.DocumentAsyncClassDocumentInitializer;
-import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Default implementation of DocumentContentAsyncRenderer.
@@ -66,9 +56,9 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id$
  * @since 11.8RC1
  */
-@Component
-public class DefaultDocumentContentAsyncRenderer extends AbstractBlockAsyncRenderer
-    implements DocumentContentAsyncRenderer
+@Component(roles = DocumentContentAsyncExecutor.class)
+@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
+public class DocumentContentAsyncExecutor
 {
     /**
      * The context property which indicates if the current code was called from a template (only Velocity execution) or
@@ -77,16 +67,13 @@ public class DefaultDocumentContentAsyncRenderer extends AbstractBlockAsyncRende
     private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
 
     @Inject
-    private AsyncContext asyncContext;
-
-    @Inject
     private DocumentAccessBridge documentAccessBridge;
 
     @Inject
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private Execution execution;
 
     @Inject
     private VelocityManager velocityManager;
@@ -98,68 +85,37 @@ public class DefaultDocumentContentAsyncRenderer extends AbstractBlockAsyncRende
     private ContentParser parser;
 
     @Inject
+    private TransformationManager transformationManager;
+
+    @Inject
     private Logger logger;
 
     private DocumentDisplayerParameters parameters;
-
-    private boolean asyncAllowed;
-
-    private boolean cacheAllowed;
-
-    private Set<String> contextElements;
 
     private XDOM xdom;
 
     private DocumentReference documentReference;
 
-    private XWikiDocument document;
-
-    private List<String> id;
+    private DocumentModelBridge document;
 
     private Syntax syntax;
 
     private String transformationId;
 
-    @Override
-    public Set<String> initialize(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    /**
+     * @param transformationId the transformation identifier
+     * @param document the document to execute
+     * @param parameters display parameters
+     */
+    public void initialize(String transformationId, DocumentModelBridge document,
+        DocumentDisplayerParameters parameters)
     {
         this.parameters = parameters;
 
-        if (document instanceof XWikiDocument) {
-            this.document = (XWikiDocument) document;
-
-            BaseObject asyncObject = this.document.getXObject(DocumentAsyncClassDocumentInitializer.CLASS_REFERENCE);
-            if (asyncObject != null) {
-                this.asyncAllowed =
-                    asyncObject.getIntValue(DocumentAsyncClassDocumentInitializer.XPROPERTY_ASYNC_ENABLED) == 1;
-                this.cacheAllowed =
-                    asyncObject.getIntValue(DocumentAsyncClassDocumentInitializer.XPROPERTY_ASYNC_CACHED) == 1;
-
-                if (this.asyncAllowed || this.cacheAllowed) {
-                    this.contextElements = new HashSet<>(
-                        asyncObject.getListValue(DocumentAsyncClassDocumentInitializer.XPROPERTY_ASYNC_CONTEXT));
-                }
-            }
-        }
-
-        this.transformationId = this.defaultEntityReferenceSerializer
-            .serialize(parameters.isContentTransformed() && parameters.isTransformationContextIsolated()
-                ? document.getDocumentReference() : this.documentAccessBridge.getCurrentDocumentReference());
-
+        this.transformationId = transformationId;
         this.xdom = getContent(document, parameters);
         this.documentReference = document.getDocumentReference();
         this.syntax = document.getSyntax();
-
-        if (this.asyncAllowed || this.cacheAllowed) {
-            this.id = Arrays.asList("display", "document", "content",
-                this.defaultEntityReferenceSerializer.serialize(this.documentReference), this.parameters.getSectionId(),
-                this.parameters.getTargetSyntax() != null ? this.parameters.getTargetSyntax().toIdString() : null,
-                this.transformationId, String.valueOf(this.parameters.isContentTransformed()),
-                String.valueOf(this.parameters.isTransformationContextRestricted()),
-                String.valueOf(this.parameters.isTransformationContextIsolated()));
-        }
-
-        return this.contextElements;
     }
 
     /**
@@ -236,42 +192,24 @@ public class DefaultDocumentContentAsyncRenderer extends AbstractBlockAsyncRende
     private XDOM parseContent(String content, Syntax syntax, DocumentReference source)
     {
         try {
-            return parser.parse(content, syntax, source);
+            return this.parser.parse(content, syntax, source);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    @Override
-    public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
-    {
-        // Register the known involved references
-        this.asyncContext.useEntity(this.documentReference);
-
-        ///////////////////////////////////////
-        // Execute
-
-        execute(async);
-
-        ///////////////////////////////////////
-        // Rendering
-
-        String resultString = null;
-
-        if (async || cached) {
-            resultString = render(this.xdom);
-        }
-
-        return new BlockAsyncRendererResult(resultString, this.xdom);
-    }
-
-    private void execute(boolean async)
+    /**
+     * @param async true if the execution is asynchronous
+     * @return the result of the execution
+     * @throws RenderingException when failing to execute the content
+     */
+    public XDOM execute(boolean async) throws RenderingException
     {
         // This tells display() methods that we are inside the rendering engine and thus that they can return wiki
         // syntax and not HTML syntax (which is needed when outside the rendering engine, i.e. when we're inside
         // templates using only Velocity for example).
-        XWikiContext xcontext = this.xcontextProvider.get();
-        Object isInRenderingEngine = xcontext.put(IS_IN_RENDERING_ENGINE, true);
+        Map<Object, Object> xwikiContext = getXWikiContextMap();
+        Object isInRenderingEngine = xwikiContext.put(IS_IN_RENDERING_ENGINE, true);
 
         maybeOpenNameSpace(isInRenderingEngine);
 
@@ -290,11 +228,22 @@ public class DefaultDocumentContentAsyncRenderer extends AbstractBlockAsyncRende
             maybeCloseNameSpace(isInRenderingEngine);
 
             if (isInRenderingEngine != null) {
-                xcontext.put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
+                xwikiContext.put(IS_IN_RENDERING_ENGINE, isInRenderingEngine);
             } else {
-                xcontext.remove(IS_IN_RENDERING_ENGINE);
+                xwikiContext.remove(IS_IN_RENDERING_ENGINE);
             }
         }
+
+        return this.xdom;
+    }
+
+    /**
+     * @return the XWiki context map
+     */
+    @SuppressWarnings("unchecked")
+    private Map<Object, Object> getXWikiContextMap()
+    {
+        return (Map<Object, Object>) this.execution.getContext().getProperty("xwikicontext");
     }
 
     /**
@@ -347,8 +296,9 @@ public class DefaultDocumentContentAsyncRenderer extends AbstractBlockAsyncRende
      * Displays the given document in a new execution context.
      * 
      * @return the result of displaying the given document
+     * @throws RenderingException when failing to rendering the content
      */
-    private void executeInIsolatedExecutionContext(boolean async)
+    private void executeInIsolatedExecutionContext(boolean async) throws RenderingException
     {
         Map<String, Object> backupObjects = new HashMap<>();
         EntityReference currentWikiReference = this.modelContext.getCurrentEntityReference();
@@ -365,7 +315,7 @@ public class DefaultDocumentContentAsyncRenderer extends AbstractBlockAsyncRende
 
             executeInCurrentExecutionContext();
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RenderingException(e.getMessage(), e);
         } finally {
             this.documentAccessBridge.popDocumentFromContext(backupObjects);
 
@@ -378,8 +328,9 @@ public class DefaultDocumentContentAsyncRenderer extends AbstractBlockAsyncRende
      * Displays the given document in the current execution context.
      * 
      * @return the result of displaying the given document
+     * @throws TransformationException when failing to execute transformations
      */
-    private void executeInCurrentExecutionContext()
+    private void executeInCurrentExecutionContext() throws RenderingException
     {
         if (!this.parameters.isContentTransformed()) {
             return;
@@ -393,40 +344,6 @@ public class DefaultDocumentContentAsyncRenderer extends AbstractBlockAsyncRende
         TransformationContext txContext =
             new TransformationContext(this.xdom, this.syntax, this.parameters.isTransformationContextRestricted());
         txContext.setId(this.transformationId);
-        try {
-            this.transformationManager.performTransformations(this.xdom, txContext);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<String> getId()
-    {
-        return this.id;
-    }
-
-    @Override
-    public boolean isAsyncAllowed()
-    {
-        return this.asyncAllowed;
-    }
-
-    @Override
-    public boolean isCacheAllowed()
-    {
-        return this.cacheAllowed;
-    }
-
-    @Override
-    public boolean isInline()
-    {
-        return false;
-    }
-
-    @Override
-    public Syntax getTargetSyntax()
-    {
-        return this.parameters.getTargetSyntax();
+        this.transformationManager.performTransformations(this.xdom, txContext);
     }
 }

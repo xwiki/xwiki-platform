@@ -17,31 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.internal.display;
+package org.xwiki.display.internal;
 
 import java.util.Collections;
+import java.util.HashMap;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.display.internal.DocumentDisplayerParameters;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import com.xpn.xwiki.internal.display.DefaultDocumentContentAsyncRenderer;
-import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
@@ -51,15 +52,28 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DefaultDocumentContentAsyncRenderer}.
+ * Unit tests for {@link DocumentContentDisplayer}.
  *
  * @version $Id$
  */
-@OldcoreTest
-public class DefaultDocumentContentAsyncRendererTest
+@ComponentTest
+@ComponentList({ DefaultDocumentContentAsyncParser.class })
+public class DocumentContentDisplayerTest
 {
     @InjectMockComponents
-    private DefaultDocumentContentAsyncRenderer renderer;
+    private DocumentContentAsyncExecutor documentExecutor;
+
+    @InjectMockComponents
+    private DocumentContentAsyncRenderer documentRenderer;
+
+    @InjectMockComponents
+    private DocumentContentDisplayer documentDisplayer;
+
+    @MockComponent
+    private BlockAsyncRendererExecutor executor;
+
+    @MockComponent
+    private Execution execution;
 
     @MockComponent
     private DocumentModelBridge document;
@@ -76,6 +90,20 @@ public class DefaultDocumentContentAsyncRendererTest
     @Test
     public void baseMetaDataIsSetBeforeExecutingTransformations() throws Exception
     {
+        when(this.executor.execute(any(), any())).then(new Answer<Block>()
+        {
+            @Override
+            public Block answer(InvocationOnMock invocation) throws Throwable
+            {
+                return invocation.<DocumentContentAsyncRenderer>getArgument(0).render(false, false).getBlock();
+            }
+        });
+
+        // The execution context is expected to have the "xwikicontext" property set.
+        ExecutionContext executionContext = new ExecutionContext();
+        executionContext.setProperty("xwikicontext", new HashMap<String, Object>());
+        when(this.execution.getContext()).thenReturn(executionContext);
+
         // The document being displayed.
         XDOM content = new XDOM(Collections.emptyList());
         when(this.document.getXDOM()).thenReturn(content);
@@ -106,10 +134,7 @@ public class DefaultDocumentContentAsyncRendererTest
         parameters.setTransformationContextIsolated(false);
 
         // Execute the display.
-        this.renderer.initialize(this.document, parameters);
-        BlockAsyncRendererResult result = this.renderer.render(false, false);
-        assertSame(content, result.getBlock());
-        assertNull(result.getResult());
+        assertSame(content, this.documentDisplayer.display(document, parameters));
 
         // Make sure the transformations are executed exactly once, and on the right content.
         verify(this.transformationManager, times(1)).performTransformations(same(content),

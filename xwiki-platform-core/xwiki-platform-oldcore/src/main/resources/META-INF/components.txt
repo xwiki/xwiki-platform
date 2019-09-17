@@ -23,7 +23,7 @@ com.xpn.xwiki.internal.context.XWikiContextContextStore
 com.xpn.xwiki.internal.converter.DocumentConverter
 com.xpn.xwiki.internal.converter.XWikiDocumentConverter
 com.xpn.xwiki.internal.debug.DebugConfiguration
-com.xpn.xwiki.internal.display.DefaultDocumentContentAsyncRenderer
+com.xpn.xwiki.internal.display.XWikiDocumentContentAsyncParser
 com.xpn.xwiki.internal.doc.DatabaseDocumentRevisionProvider
 com.xpn.xwiki.internal.doc.DefaultDocumentRevisionProvider
 com.xpn.xwiki.internal.doc.DeletedDocumentRevisionProvider

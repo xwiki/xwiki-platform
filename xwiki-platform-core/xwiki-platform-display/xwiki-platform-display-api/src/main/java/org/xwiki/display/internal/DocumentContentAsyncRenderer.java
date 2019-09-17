@@ -19,25 +19,138 @@
  */
 package org.xwiki.display.internal;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
-import org.xwiki.component.annotation.Role;
-import org.xwiki.rendering.async.internal.block.BlockAsyncRenderer;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.rendering.async.internal.AsyncProperties;
+import org.xwiki.rendering.async.internal.block.AbstractBlockAsyncRenderer;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.syntax.Syntax;
 
 /**
- * An asynchronous renderer for the document content displayer.
+ * Default implementation of DocumentContentAsyncRenderer.
  * 
  * @version $Id$
  * @since 11.8RC1
  */
-@Role
-public interface DocumentContentAsyncRenderer extends BlockAsyncRenderer
+@Component(roles = DocumentContentAsyncRenderer.class)
+public class DocumentContentAsyncRenderer extends AbstractBlockAsyncRenderer
 {
+    @Inject
+    private DocumentContentAsyncExecutor executor;
+
+    @Inject
+    private AsyncContext asyncContext;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
+
+    @Inject
+    private DocumentContentAsyncParser asyncParser;
+
+    private DocumentDisplayerParameters parameters;
+
+    private AsyncProperties asyncProperties;
+
+    private DocumentReference documentReference;
+
+    private List<String> id;
+
     /**
-     * @param document the document to display
+     * @param document the document to execute
      * @param parameters display parameters
-     * @return the elements from the context needed by the execution
+     * @return the context elements required during the execution
      */
-    Set<String> initialize(DocumentModelBridge document, DocumentDisplayerParameters parameters);
+    public Set<String> initialize(DocumentModelBridge document, DocumentDisplayerParameters parameters)
+    {
+        this.parameters = parameters;
+
+        this.asyncProperties = this.asyncParser.getAsyncProperties(document);
+
+        String transformationId = this.defaultEntityReferenceSerializer
+            .serialize(parameters.isContentTransformed() && parameters.isTransformationContextIsolated()
+                ? document.getDocumentReference() : this.documentAccessBridge.getCurrentDocumentReference());
+
+        this.documentReference = document.getDocumentReference();
+
+        if (this.asyncProperties.isAsyncAllowed() || this.asyncProperties.isCacheAllowed()) {
+            this.id = Arrays.asList("display", "document", "content",
+                this.defaultEntityReferenceSerializer.serialize(this.documentReference), this.parameters.getSectionId(),
+                this.parameters.getTargetSyntax() != null ? this.parameters.getTargetSyntax().toIdString() : null,
+                transformationId, String.valueOf(this.parameters.isContentTransformed()),
+                String.valueOf(this.parameters.isTransformationContextRestricted()),
+                String.valueOf(this.parameters.isTransformationContextIsolated()));
+        }
+
+        this.executor.initialize(transformationId, document, parameters);
+
+        return this.asyncProperties.getContextElements();
+    }
+
+    @Override
+    public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
+    {
+        // Register the known involved references
+        this.asyncContext.useEntity(this.documentReference);
+
+        ///////////////////////////////////////
+        // Execute
+
+        XDOM xdom = this.executor.execute(async);
+
+        ///////////////////////////////////////
+        // Rendering
+
+        String resultString = null;
+
+        if (async || cached) {
+            resultString = render(xdom);
+        }
+
+        return new BlockAsyncRendererResult(resultString, xdom);
+    }
+
+    @Override
+    public List<String> getId()
+    {
+        return this.id;
+    }
+
+    @Override
+    public boolean isAsyncAllowed()
+    {
+        return this.asyncProperties.isAsyncAllowed();
+    }
+
+    @Override
+    public boolean isCacheAllowed()
+    {
+        return this.asyncProperties.isCacheAllowed();
+    }
+
+    @Override
+    public boolean isInline()
+    {
+        return false;
+    }
+
+    @Override
+    public Syntax getTargetSyntax()
+    {
+        return this.parameters.getTargetSyntax();
+    }
 }

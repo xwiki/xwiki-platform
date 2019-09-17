@@ -100,14 +100,14 @@ resource.doc.label=Page
 resource.doc.placeholder=Emplacement.De.La.Page
 resource.icon.label=Icône
 resource.mailto.label=Adresse email
-resource.mailto.placeholder=user@example.org
+resource.mailto.placeholder=utilisateur@exemple.org
 resource.path.label=Emplacement
 resource.path.placeholder=/Emplacement/du/fichier
 resource.unc.label=Chemin UNC
 resource.unc.placeholder=//serveur/partage/chemin/du/fichier
 resource.unknown.label=Inconnu
 resource.url.label=URL
-resource.url.placeholder=http://www.example.org/image.png
+resource.url.placeholder=http://www.exemple.org/image.png
 resource.user.label=Utilisateur
 resource.user.placeholder=alias
 

@@ -72,7 +72,6 @@
       <artifactId>xwiki-platform-rendering-macro-context</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Testing dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -134,24 +133,6 @@
       <groupId>org.xwiki.rendering</groupId>
       <artifactId>xwiki-rendering-test</artifactId>
       <version>${rendering.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-oldcore</artifactId>
-      <version>${project.version}</version>
-      <type>pom</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-rendering-async-default</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>

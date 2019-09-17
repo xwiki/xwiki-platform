@@ -370,7 +370,7 @@ public class DisplayMacroTest extends AbstractComponentTestCase
                 will(returnValue(reference));
                 allowing(mockSetup.bridge).getDocumentInstance((EntityReference) reference);
                 will(returnValue(mockDocument));
-                allowing(mockSetup.bridge).getTranslatedDocumentInstance(reference);
+                allowing(mockSetup.bridge).getTranslatedDocumentInstance(mockDocument);
                 will(returnValue(mockDocument));
                 allowing(mockDocument).getSyntax();
                 will(returnValue(Syntax.XWIKI_2_0));

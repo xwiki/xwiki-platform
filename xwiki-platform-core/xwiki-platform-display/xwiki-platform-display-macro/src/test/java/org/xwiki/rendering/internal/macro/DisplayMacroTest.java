@@ -341,7 +341,7 @@ public class DisplayMacroTest extends AbstractComponentTestCase
         parameters.setSection("unknown");
 
         try {
-            runDisplayMacro(parameters, "content");
+            runDisplayMacro(parameters, "content", false);
             Assert.fail("Should have raised an exception");
         } catch (MacroExecutionException expected) {
             Assert.assertEquals("Cannot find section [unknown] in document [wiki:Space.DisplayedPage]",
@@ -407,6 +407,12 @@ public class DisplayMacroTest extends AbstractComponentTestCase
 
     private List<Block> runDisplayMacro(DisplayMacroParameters parameters, String displayedContent) throws Exception
     {
+        return runDisplayMacro(parameters, displayedContent, true);
+    }
+
+    private List<Block> runDisplayMacro(DisplayMacroParameters parameters, String displayedContent, boolean pushpopMock)
+        throws Exception
+    {
         final DocumentReference displayedDocumentReference = new DocumentReference("wiki", "Space", "DisplayedPage");
         String displayedDocStringRef = "wiki:space.page";
         setUpDocumentMock(displayedDocStringRef, displayedDocumentReference, displayedContent);
@@ -415,10 +421,13 @@ public class DisplayMacroTest extends AbstractComponentTestCase
             {
                 oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(same(displayedDocumentReference)));
                 will(returnValue(true));
-                oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(same(mockDocument)));
                 atMost(1).of(mockSetup.bridge).getCurrentDocumentReference();
                 will(returnValue(displayedDocumentReference));
-                oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
+
+                if (pushpopMock) {
+                    oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(same(mockDocument)));
+                    oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
+                }
             }
         });
         this.displayMacro.setDocumentAccessBridge(this.mockSetup.bridge);

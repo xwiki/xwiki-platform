@@ -116,6 +116,7 @@ public class DocumentContentAsyncExecutor
         this.xdom = getContent(document, parameters);
         this.documentReference = document.getDocumentReference();
         this.syntax = document.getSyntax();
+        this.document = document;
     }
 
     /**

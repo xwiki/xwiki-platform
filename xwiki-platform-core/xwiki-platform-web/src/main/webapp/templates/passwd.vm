@@ -5,7 +5,6 @@
 #template("startpage.vm")
 #template("register_macros.vm")
 
-## TODO: display the message for wrong original pass in the right place
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
   <div id="mainContentArea">
@@ -43,13 +42,9 @@
           $doc.save("$services.localization.render('platform.core.profile.passwd.passwordChanged')", true)
         #end
       #end
-      #if($request.password)
-        #if($isValidPassword)
-          <span class='box infomessage'>$services.localization.render('platform.core.profile.passwd.success')</span>
-          <a href = "$doc.getURL("view")">$services.localization.render('platform.core.profile.passwd.return')</a>
-        #else
-          <span class='box errormessage'>$errorMessage</span>
-        #end
+      #if($request.password && $isValidPassword)
+        <span class='box infomessage'>$services.localization.render('platform.core.profile.passwd.success')</span>
+        <a href = "$doc.getURL("view")">$services.localization.render('platform.core.profile.passwd.return')</a>
       #end
       #if(!$isValidPassword)
         $services.localization.render('platform.core.profile.passwd.instructions')
@@ -82,6 +77,9 @@
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
         #generateHtml($fields)
+        #if($request.password && !$isValidPassword)
+          <span class='box errormessage'>$errorMessage</span>
+        #end
         <div class="padded buttons">
           <span class="buttonwrapper"><input type="submit" value="$services.localization.render('platform.core.profile.passwd.submit')" class="button"/></span>
           <span class="buttonwrapper"><a href="$doc.getURL("view")" class="secondary button">$services.localization.render('platform.core.profile.passwd.cancel')</a></span>

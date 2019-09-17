@@ -64,8 +64,8 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       }
     })
   #set ($discard = $fields.add($field))
-  ##
-  ## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
+##
+## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
   #set ($field =
     {'name': $confirmPasswordFieldName,
       'label': $services.localization.render('core.register.passwordRepeat'),
@@ -208,10 +208,10 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           #if ($pattern != '' && $failMessage != '' && !$regex.get('noscript'))
             ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage"});
           #end
-        #end##if regex
-      #end##if contains js validateable fields.
-    #end##if validate
-  #end##loop
+        #end
+      #end
+    #end
+  #end
     };
     document.observe('xwiki:dom:loaded', initRegistrationFormValidation);
     document.observe('xwiki:dom:updated', function(event) {
@@ -221,9 +221,9 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       }
     });// ]]>
     </script>
-#end##macro
+#end
 ##
-#macro (outputPasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName,$request)
+#macro (outputPasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName, $request)
   #definePasswordFields($fields, $passwordFieldName, $confirmPasswordFieldName, {})
   #generateHtml($fields, $request)
 #end
@@ -235,7 +235,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  * @param $fields The array of fields to get parameters for.
  * @request The request that is made, from which the params will be returned.
  *###
-#macro(getParams $fields, $request)
+#macro (getParams $fields, $request)
   #foreach ($field in $fields)
     #if ($field.get('name') && $request.get($field.get('name')))
       #if (!$field.get('noReturn') && !$field.get('error'))

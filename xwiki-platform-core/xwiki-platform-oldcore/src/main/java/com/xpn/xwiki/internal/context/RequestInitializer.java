@@ -95,7 +95,6 @@ public class RequestInitializer
      * Initialize a request and URL factory for the passed wiki.
      * 
      * @param storedWikiId the context wiki
-     * @param contextStore the enabled context elements
      * @param xcontext the XWiki context
      */
     public void restoreRequest(String storedWikiId, XWikiContext xcontext)

@@ -77,7 +77,7 @@
         <form class="xform third" action="" method="post" autocomplete="off">
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
-        #generateHtml($fields)
+        #generateHtml($fields, $NULL)
         #if ($request.password && !$isValidPassword)
           <span class='box errormessage'>$errorMessage</span>
         #end

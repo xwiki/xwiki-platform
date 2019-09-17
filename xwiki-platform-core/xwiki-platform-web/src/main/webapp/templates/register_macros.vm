@@ -237,7 +237,6 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  *###
 #macro (getParams $fields, $request)
   #foreach ($field in $fields)
-    ## Use silent notation since sometimes the request will be null & nothing should happen.
     #if ($field.get('name') && $!request.get($field.get('name')))
       #if (!$field.get('noReturn') && !$field.get('error'))
         #if (!$field.get('params'))

@@ -49,7 +49,7 @@
   <properties>
     <ckeditor.version>4.12.1</ckeditor.version>
     <!-- The path to the folder where we clone the CKEditor sources. -->
-    <ckeditor.path>${project.build.directory}/ckeditor-dev-${ckeditor.version}</ckeditor.path>
+    <ckeditor.path>${project.build.directory}/ckeditor4-${ckeditor.version}</ckeditor.path>
     <ckeditor.builder.path>${ckeditor.path}/dev/builder</ckeditor.builder.path>
     <ckeditor.plugins.path>${ckeditor.path}/plugins</ckeditor.plugins.path>
     <!-- Follow the specifications regarding the WebJar content path.
@@ -94,7 +94,7 @@
                 <goal>wget</goal>
               </goals>
               <configuration>
-                <url>https://github.com/ckeditor/ckeditor-dev/archive/${ckeditor.version}.zip</url>
+                <url>https://github.com/ckeditor/ckeditor4/archive/${ckeditor.version}.zip</url>
                 <unpack>true</unpack>
               </configuration>
             </execution>

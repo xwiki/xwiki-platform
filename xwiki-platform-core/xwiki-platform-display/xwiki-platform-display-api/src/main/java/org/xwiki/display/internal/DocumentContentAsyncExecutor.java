@@ -218,7 +218,7 @@ public class DocumentContentAsyncExecutor
             if (this.parameters.isExecutionContextIsolated()) {
                 executeInIsolatedExecutionContext(async);
             } else {
-                executeInCurrentExecutionContext();
+                executeInCurrentExecutionContext(async);
             }
         } finally {
             // Since we configure Velocity to have local macros (i.e. macros visible only to the local context), since
@@ -314,7 +314,7 @@ public class DocumentContentAsyncExecutor
             // Make sure to synchronize the context wiki with the context document's wiki.
             this.modelContext.setCurrentEntityReference(this.documentReference.getWikiReference());
 
-            executeInCurrentExecutionContext();
+            executeInCurrentExecutionContext(async);
         } catch (Exception e) {
             throw new RenderingException(e.getMessage(), e);
         } finally {
@@ -331,9 +331,9 @@ public class DocumentContentAsyncExecutor
      * @return the result of displaying the given document
      * @throws TransformationException when failing to execute transformations
      */
-    private void executeInCurrentExecutionContext() throws RenderingException
+    private void executeInCurrentExecutionContext(boolean async) throws RenderingException
     {
-        if (!this.parameters.isContentTransformed()) {
+        if (!async && !this.parameters.isContentTransformed()) {
             return;
         }
 

@@ -28,7 +28,10 @@ import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.context.internal.DefaultExecutionContextManager;
 import org.xwiki.display.internal.ConfiguredDocumentDisplayer;
 import org.xwiki.display.internal.DefaultDisplayConfiguration;
+import org.xwiki.display.internal.DefaultDocumentContentAsyncParser;
 import org.xwiki.display.internal.DefaultDocumentDisplayer;
+import org.xwiki.display.internal.DocumentContentAsyncExecutor;
+import org.xwiki.display.internal.DocumentContentAsyncRenderer;
 import org.xwiki.display.internal.DocumentContentDisplayer;
 import org.xwiki.display.internal.DocumentTitleDisplayer;
 import org.xwiki.localization.internal.DefaultContextualLocalizationManager;
@@ -40,6 +43,9 @@ import org.xwiki.properties.internal.DefaultBeanManager;
 import org.xwiki.properties.internal.DefaultConverterManager;
 import org.xwiki.properties.internal.converter.ConvertUtilsConverter;
 import org.xwiki.properties.internal.converter.EnumConverter;
+import org.xwiki.rendering.async.internal.BaseAsyncRendererExecutor;
+import org.xwiki.rendering.async.internal.DefaultAsyncContext;
+import org.xwiki.rendering.async.internal.block.DefaultBlockAsyncRendererExecutor;
 import org.xwiki.rendering.internal.macro.DefaultMacroContentParser;
 import org.xwiki.rendering.internal.macro.DefaultMacroIdFactory;
 import org.xwiki.rendering.internal.macro.DefaultMacroManager;
@@ -153,6 +159,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultDocumentDisplayer.class,
     DocumentTitleDisplayer.class,
     DocumentContentDisplayer.class,
+    DefaultBlockAsyncRendererExecutor.class,
+    DocumentContentAsyncRenderer.class,
+    DefaultDocumentContentAsyncParser.class,
+    DocumentContentAsyncExecutor.class,
+    BaseAsyncRendererExecutor.class,
+    DefaultAsyncContext.class,
     SheetDocumentDisplayer.class,
 
     // Sheet

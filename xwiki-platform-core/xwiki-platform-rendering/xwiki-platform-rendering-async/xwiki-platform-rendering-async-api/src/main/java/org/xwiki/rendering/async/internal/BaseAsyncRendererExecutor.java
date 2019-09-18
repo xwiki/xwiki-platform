@@ -22,6 +22,9 @@ package org.xwiki.rendering.async.internal;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.job.JobException;
 import org.xwiki.rendering.RenderingException;
 
@@ -31,6 +34,8 @@ import org.xwiki.rendering.RenderingException;
  * @version $Id$
  * @since 11.8RC1
  */
+@Component
+@Singleton
 public class BaseAsyncRendererExecutor implements AsyncRendererExecutor
 {
     @Override

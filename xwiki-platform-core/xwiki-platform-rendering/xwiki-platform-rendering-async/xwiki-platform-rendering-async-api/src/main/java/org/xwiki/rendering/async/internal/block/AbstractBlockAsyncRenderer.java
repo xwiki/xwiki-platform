@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.async.internal.block;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -118,5 +119,23 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
         renderer.render(block, printer);
 
         return printer.toString();
+    }
+
+    /**
+     * @since 11.8RC1
+     */
+    protected List<String> createId(Object... values)
+    {
+        List<String> id = new ArrayList<>(values.length);
+
+        for (Object value : values) {
+            if (value == null) {
+                id.add("");
+            } else {
+                id.add(value.toString());
+            }
+        }
+
+        return id;
     }
 }

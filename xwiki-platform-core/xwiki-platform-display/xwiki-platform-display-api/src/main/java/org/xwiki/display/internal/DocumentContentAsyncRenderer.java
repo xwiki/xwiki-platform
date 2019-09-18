@@ -19,7 +19,6 @@
  */
 package org.xwiki.display.internal;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -88,12 +87,11 @@ public class DocumentContentAsyncRenderer extends AbstractBlockAsyncRenderer
         this.documentReference = document.getDocumentReference();
 
         if (this.asyncProperties.isAsyncAllowed() || this.asyncProperties.isCacheAllowed()) {
-            this.id = Arrays.asList("display", "document", "content",
+            this.id = createId("display", "document", "content",
                 this.defaultEntityReferenceSerializer.serialize(this.documentReference), this.parameters.getSectionId(),
-                this.parameters.getTargetSyntax() != null ? this.parameters.getTargetSyntax().toIdString() : null,
-                transformationId, String.valueOf(this.parameters.isContentTransformed()),
-                String.valueOf(this.parameters.isTransformationContextRestricted()),
-                String.valueOf(this.parameters.isTransformationContextIsolated()));
+                this.parameters.getTargetSyntax() != null ? this.parameters.getTargetSyntax().toIdString() : "",
+                transformationId, this.parameters.isContentTransformed(),
+                this.parameters.isTransformationContextRestricted(), this.parameters.isTransformationContextIsolated());
         }
 
         this.executor.initialize(transformationId, document, parameters);

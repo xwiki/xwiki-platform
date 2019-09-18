@@ -20,7 +20,6 @@
 package org.xwiki.rendering.wikimacro.internal;
 
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -224,7 +223,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         // Find index of the macro in the XDOM
         long index = syncContext.getXDOM().indexOf(syncContext.getCurrentMacroBlock());
 
-        this.id = Arrays.asList("rendering", "wikimacro", wikimacro.getId(), String.valueOf(index));
+        this.id = createId("rendering", "wikimacro", wikimacro.getId(), index);
         try {
             this.parameters = convertParameters(parameters);
         } catch (ComponentLookupException e) {

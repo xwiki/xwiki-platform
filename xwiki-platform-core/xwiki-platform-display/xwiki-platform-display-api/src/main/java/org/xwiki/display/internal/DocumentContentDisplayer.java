@@ -19,6 +19,7 @@
  */
 package org.xwiki.display.internal;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -30,6 +31,7 @@ import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 
 /**
@@ -62,7 +64,9 @@ public class DocumentContentDisplayer implements DocumentDisplayer
 
         // Execute
         try {
-            return (XDOM) this.executor.execute(renderer, configuration);
+            Block block = this.executor.execute(renderer, configuration);
+
+            return block instanceof XDOM ? (XDOM) block : new XDOM(Arrays.asList(block));
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage(), e);
         }

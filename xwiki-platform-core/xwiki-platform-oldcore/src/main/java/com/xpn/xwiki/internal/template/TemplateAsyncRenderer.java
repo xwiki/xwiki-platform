@@ -88,7 +88,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         Syntax contextTargetSyntax = this.renderingContext.getTargetSyntax();
         this.targetSyntax = contextTargetSyntax != null ? contextTargetSyntax : Syntax.PLAIN_1_0;
 
-        this.id = Arrays.asList("template", template.getId(), this.targetSyntax.toIdString(), String.valueOf(inline));
+        this.id = createId("template", template.getId(), this.targetSyntax.toIdString(), inline);
 
         return this.content.getContextEntries();
     }

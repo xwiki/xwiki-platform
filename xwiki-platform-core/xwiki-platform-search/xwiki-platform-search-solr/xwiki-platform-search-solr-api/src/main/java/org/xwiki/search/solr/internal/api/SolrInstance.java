@@ -72,6 +72,7 @@ public interface SolrInstance extends Initializable
      * @return SolrDocument matching the given id, if found, null otherwise.
      * @throws IOException if problems occur.
      * @throws SolrServerException if problems occur.
+     * @since 11.8RC1
      */
     SolrDocument get(String id) throws IOException, SolrServerException;
 

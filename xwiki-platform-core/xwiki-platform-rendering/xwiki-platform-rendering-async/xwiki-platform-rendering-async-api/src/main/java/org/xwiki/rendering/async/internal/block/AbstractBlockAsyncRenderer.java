@@ -38,6 +38,7 @@ import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.renderer.BlockRenderer;
 import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
+import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -109,8 +110,12 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
     {
         BlockRenderer renderer;
         try {
-            renderer =
-                this.componentManagerProvider.get().getInstance(BlockRenderer.class, getTargetSyntax().toIdString());
+            Syntax targetSyntax = getTargetSyntax();
+            if (targetSyntax == null) {
+                targetSyntax = this.renderingContext.getTargetSyntax();
+            }
+
+            renderer = this.componentManagerProvider.get().getInstance(BlockRenderer.class, targetSyntax.toIdString());
         } catch (ComponentLookupException e) {
             throw new RenderingException("Failed to lookup renderer for syntax [" + getTargetSyntax() + "]", e);
         }

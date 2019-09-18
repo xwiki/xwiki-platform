@@ -25,6 +25,7 @@ import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.StreamingResponseCallback;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.common.params.SolrParams;
 import org.xwiki.component.annotation.Role;
@@ -64,6 +65,15 @@ public interface SolrInstance extends Initializable
      * @throws IOException if problems occur.
      */
     void add(List<SolrInputDocument> solrDocuments) throws SolrServerException, IOException;
+
+    /**
+     * Retrieves a {@link SolrDocument} by its id.
+     * @param id a SolrDocument id.
+     * @return SolrDocument matching the given id, if found, null otherwise.
+     * @throws IOException if problems occur.
+     * @throws SolrServerException if problems occur.
+     */
+    SolrDocument get(String id) throws IOException, SolrServerException;
 
     /**
      * Delete a single entry from the Solr index.

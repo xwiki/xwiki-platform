@@ -71,6 +71,11 @@ platform.xclass.defaultClassSheet.template.missingObject=The template does not c
 platform.xclass.defaultClassSheet.template.addObject=Add a {0} object to the template
 platform.xclass.defaultClassSheet.template.view=View the template page ({0})
 
+platform.xclass.defaultClassSheet.templateProvider.heading=Class Template Provider
+platform.xclass.defaultClassSheet.templateProvider.description=The {0}template provider{0} allows to create wiki pages using an existing template. A template will be displayed in the {0}Create{0} menu.
+platform.xclass.defaultClassSheet.templateProvider.create=Create the template provider
+platform.xclass.defaultClassSheet.templateProvider.view=View the template provider page ({0})
+platform.xclass.templateProvider.defaultDescription=Add a new {0} entry.
 #
 # Classes
 #

@@ -38,12 +38,24 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
         },
 
         202: function(data, textStatus, xhr) {
+          // Display the spinner only if we wait more than one iteration
+          showSpinner(element);
+
           update(element, url);
         }
       }
     });
   }
 
+  var showSpinner = function(element)
+  {
+    if (element.tagName == 'div') {
+      element.html('<div class="fa fa-spinner fa-spin"/>');
+    } else {
+      element.html('<span class="fa fa-spinner fa-spin"/>');
+    }
+  }
+  
   var activateAsyncPlaceHolder = function(element)
   {
     var url = element.dataset.xwikiAsyncUrl;
@@ -73,13 +85,6 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
     url += 'timeout=' + 500 + '&wiki=' + xm.wiki;
 
     element = $(element);
-
-    // Insert spinner (it will replaced by the result)
-    if (element.tagName == 'div') {
-      element.html('<div class="fa fa-spinner fa-spin"/>');
-    } else {
-      element.html('<span class="fa fa-spinner fa-spin"/>');
-    }
 
     update(element, url);
   }

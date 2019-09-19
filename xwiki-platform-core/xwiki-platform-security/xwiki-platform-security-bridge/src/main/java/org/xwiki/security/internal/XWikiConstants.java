@@ -63,8 +63,22 @@ public interface XWikiConstants
     /** XWiki class for storing global rights. */
     String GLOBAL_CLASSNAME = "XWikiGlobalRights";
 
+    /**
+     * XWiki class for storing global rights.
+     * 
+     * @since 11.8RC1
+     */
+    String GLOBAL_CLASS = XWIKI_SPACE + '.' + GLOBAL_CLASSNAME;
+
     /** XWiki class for storing rights. */
     String LOCAL_CLASSNAME = "XWikiRights";
+
+    /**
+     * XWiki class for storing rights.
+     * 
+     * @since 11.8RC1
+     */
+    String LOCAL_CLASS = XWIKI_SPACE + '.' + LOCAL_CLASSNAME;
 
     /** Field name for level in xwiki rights object. */
     String LEVELS_FIELD_NAME = "levels";

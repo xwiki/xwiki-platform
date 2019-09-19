@@ -19,7 +19,6 @@
  */
 package org.xwiki.security.authorization.internal;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,17 +37,21 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.EventListener;
+import org.xwiki.observation.AbstractEventListener;
+import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.security.SecurityReferenceFactory;
 import org.xwiki.security.authorization.AuthorizationException;
 import org.xwiki.security.authorization.cache.SecurityCache;
+import org.xwiki.security.authorization.event.RightUpdatedEvent;
 import org.xwiki.security.internal.XWikiConstants;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XObjectEvent;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseObjectReference;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 
 /**
@@ -60,16 +63,15 @@ import com.xpn.xwiki.user.api.XWikiGroupService;
 @Component
 @Named(DefaultSecurityCacheRulesInvalidatorListener.NAME)
 @Singleton
-public class DefaultSecurityCacheRulesInvalidatorListener implements EventListener
+public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventListener
 {
     /**
-     * The name of the listener. 
+     * The name of the listener.
      */
     public static final String NAME =
         "org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidatorListener";
 
-    private static final List<Event> EVENTS =
-        Arrays.<Event>asList(new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
+    private static final String XWIKISERVER_CLASS = "XWiki.XWikiServerClass";
 
     /** Logger. **/
     @Inject
@@ -100,16 +102,19 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
-    @Override
-    public String getName()
-    {
-        return NAME;
-    }
+    @Inject
+    private ObservationManager observation;
 
-    @Override
-    public List<Event> getEvents()
+    /**
+     * Default constructor.
+     */
+    public DefaultSecurityCacheRulesInvalidatorListener()
     {
-        return EVENTS;
+        super(NAME, new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent(),
+            BaseObjectReference.anyEvents(XWikiConstants.GROUP_CLASS),
+            BaseObjectReference.anyEvents(XWikiConstants.GLOBAL_CLASS),
+            BaseObjectReference.anyEvents(XWikiConstants.LOCAL_CLASS),
+            BaseObjectReference.anyEvents(XWIKISERVER_CLASS));
     }
 
     /**
@@ -184,14 +189,21 @@ public class DefaultSecurityCacheRulesInvalidatorListener implements EventListen
         try {
             deliverUpdateEvent(ref);
             if (isGroupDocument(source)) {
-                // When a group receive a new member, the update event is triggered and the above invalidate the group
-                // and also all its existing members already in cache, but NOT the new member that could be currently
-                // in the cache, and is not yet linked to the group. Here, we invalidate individually all members of
-                // the group based on the updated group, which will only have the effect of invaliding new members.
+                // When a group receive a new member, the update event is triggered and the above invalidate the
+                // group and also all its existing members already in cache, but NOT the new member that could be
+                // currently in the cache, and is not yet linked to the group. Here, we invalidate individually all
+                // members of the group based on the updated group, which will only have the effect of invalidating
+                // new members.
                 invalidateGroupMembers(ref, securityCache);
             }
         } catch (AuthorizationException e) {
             this.logger.error("Failed to invalidate group members on the document: {}", ref, e);
+        }
+
+        // Make sure to send the RightUpdatedEvent event after the security cache is cleaned
+        if (event instanceof XObjectEvent) {
+            // Notify that a right may have changed
+            this.observation.notify(new RightUpdatedEvent(), source);
         }
     }
 

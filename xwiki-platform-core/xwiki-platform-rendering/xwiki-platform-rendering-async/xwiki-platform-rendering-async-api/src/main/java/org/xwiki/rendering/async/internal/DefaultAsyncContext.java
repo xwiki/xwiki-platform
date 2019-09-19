@@ -32,6 +32,8 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentRole;
 import org.xwiki.component.descriptor.DefaultComponentRole;
@@ -39,8 +41,10 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContext.DeclarationBuilder;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Default implementation of {@link AsyncContext}.
@@ -53,6 +57,116 @@ import org.xwiki.rendering.async.AsyncContext;
 public class DefaultAsyncContext implements AsyncContext
 {
     /**
+     * Gather a right check (right, user, entity).
+     * 
+     * @version $Id$
+     * @since 11.8RC1
+     */
+    public static class RightEntry
+    {
+        private final Right right;
+
+        private final DocumentReference userReference;
+
+        private final EntityReference entityReference;
+
+        private final boolean allowed;
+
+        /**
+         * @param right the right needed for execution of the action
+         * @param userReference the user to check the right for
+         * @param entityReference the entity on which to check the right
+         * @param result the result of the evaluation
+         */
+        public RightEntry(Right right, DocumentReference userReference, EntityReference entityReference, boolean result)
+        {
+            this.right = right;
+            this.userReference = userReference;
+            this.entityReference = entityReference;
+            this.allowed = result;
+        }
+
+        /**
+         * @return the right needed for execution of the action
+         */
+        public Right getRight()
+        {
+            return this.right;
+        }
+
+        /**
+         * @return the user to check the right for
+         */
+        public DocumentReference getUserReference()
+        {
+            return this.userReference;
+        }
+
+        /**
+         * @return the entity on which to check the right
+         */
+        public EntityReference getEntityReference()
+        {
+            return this.entityReference;
+        }
+
+        /**
+         * @return the result of the evaluation
+         */
+        public boolean isAllowed()
+        {
+            return this.allowed;
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj == this) {
+                return true;
+            }
+
+            if (obj instanceof RightEntry) {
+                EqualsBuilder builder = new EqualsBuilder();
+
+                builder.append(this.right, ((RightEntry) obj).right);
+                builder.append(this.userReference, ((RightEntry) obj).userReference);
+                builder.append(this.entityReference, ((RightEntry) obj).entityReference);
+
+                return builder.build();
+            }
+
+            return false;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            HashCodeBuilder builder = new HashCodeBuilder();
+
+            builder.append(this.right);
+            builder.append(this.userReference);
+            builder.append(this.entityReference);
+
+            return builder.build();
+        }
+
+        @Override
+        public String toString()
+        {
+            StringBuilder builder = new StringBuilder();
+
+            builder.append('{');
+            builder.append("right=").append(this.right);
+            builder.append(", user=").append(this.userReference);
+            builder.append(", entity=").append(this.entityReference);
+            builder.append(", allowed=").append(this.allowed);
+            builder.append('}');
+
+            return builder.toString();
+        }
+    }
+
+    /**
      * Remember the entities and components manipulated during an execution.
      * 
      * @version $Id$
@@ -64,6 +178,8 @@ public class DefaultAsyncContext implements AsyncContext
         private final Set<Type> roleTypes = new HashSet<>();
 
         private final Set<ComponentRole<?>> roles = new HashSet<>();
+
+        private final Set<RightEntry> rights = new HashSet<>();
 
         private final Map<String, Collection<Object>> uses = new HashMap<>();
 
@@ -89,6 +205,14 @@ public class DefaultAsyncContext implements AsyncContext
         public Set<ComponentRole<?>> getRoles()
         {
             return this.roles;
+        }
+
+        /**
+         * @return the rights
+         */
+        public Set<RightEntry> getRights()
+        {
+            return this.rights;
         }
 
         /**
@@ -211,6 +335,16 @@ public class DefaultAsyncContext implements AsyncContext
 
         if (contextUse != null) {
             contextUse.roles.add(new DefaultComponentRole<>(roleType, roleHint));
+        }
+    }
+
+    @Override
+    public void useRight(Right right, DocumentReference userReference, EntityReference entityReference, boolean allowed)
+    {
+        ContextUse contextUse = getContextUse();
+
+        if (contextUse != null) {
+            contextUse.rights.add(new RightEntry(right, userReference, entityReference, allowed));
         }
     }
 

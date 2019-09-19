@@ -29,6 +29,7 @@ import org.xwiki.environment.Environment;
 import org.xwiki.job.Job;
 import org.xwiki.job.JobExecutor;
 import org.xwiki.job.Request;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
@@ -36,6 +37,8 @@ import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.AsyncRendererJobRequest;
 import org.xwiki.rendering.async.internal.AsyncRendererJobStatus;
 import org.xwiki.rendering.test.integration.RenderingTestSuite;
+import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.MockingComponentManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -61,6 +64,8 @@ public class IntegrationTests
             cm.registerMockComponent(mockery, ObservationManager.class, "default");
         final AsyncContext asyncContext = cm.registerMockComponent(mockery, AsyncContext.class, "default");
         final JobExecutor jobExecutor = cm.registerMockComponent(mockery, JobExecutor.class, "default");
+        final AuthorizationManager authorization =
+            cm.registerMockComponent(mockery, AuthorizationManager.class, "default");
         final Job job = mockery.mock(Job.class);
         final AsyncRendererJobRequest jobRequest = new AsyncRendererJobRequest();
         final AsyncRendererJobStatus jobStatus = new AsyncRendererJobStatus(jobRequest, observationManager, null);
@@ -83,6 +88,11 @@ public class IntegrationTests
                 will(returnValue(job));
                 allowing(jobExecutor).getJob(with(any(List.class)));
                 will(returnValue(null));
+                allowing(authorization).hasAccess(with(any(Right.class)), with(any(DocumentReference.class)),
+                    with(any(EntityReference.class)));
+                will(returnValue(true));
+                allowing(authorization).checkAccess(with(any(Right.class)), with(any(DocumentReference.class)),
+                    with(any(EntityReference.class)));
             }
         });
     }

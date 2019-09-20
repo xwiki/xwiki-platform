@@ -19,8 +19,11 @@
  */
 package org.xwiki.security.authorization.internal;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,6 +39,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationManager;
@@ -49,9 +53,8 @@ import org.xwiki.security.internal.XWikiConstants;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.internal.event.XObjectEvent;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseObjectReference;
+import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 
 /**
@@ -71,7 +74,12 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
     public static final String NAME =
         "org.xwiki.security.authorization.internal.DefaultSecurityCacheRulesInvalidatorListener";
 
-    private static final String XWIKISERVER_CLASS = "XWiki.XWikiServerClass";
+    private static final LocalDocumentReference XWIKISERVER_CLASS =
+        new LocalDocumentReference("XWiki", "XWikiServerClass");
+
+    private static final Set<LocalDocumentReference> RIGHT_OBJECTS =
+        new HashSet<>(Arrays.asList(XWikiConstants.GROUP_CLASS_REFERENCE, XWikiConstants.GLOBAL_CLASS_REFERENCE,
+            XWikiConstants.LOCAL_CLASS_REFERENCE, XWIKISERVER_CLASS));
 
     /** Logger. **/
     @Inject
@@ -110,35 +118,19 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
      */
     public DefaultSecurityCacheRulesInvalidatorListener()
     {
-        super(NAME, new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent(),
-            BaseObjectReference.anyEvents(XWikiConstants.GROUP_CLASS),
-            BaseObjectReference.anyEvents(XWikiConstants.GLOBAL_CLASS),
-            BaseObjectReference.anyEvents(XWikiConstants.LOCAL_CLASS),
-            BaseObjectReference.anyEvents(XWIKISERVER_CLASS));
-    }
-
-    /**
-     * Obtain a document reference to the {@link com.xpn.xwiki.doc.XWikiDocument} given as parameter.
-     * 
-     * @param xwikiDocument The xwiki document.
-     * @return The document reference.
-     */
-    private static DocumentReference getDocumentReference(Object xwikiDocument)
-    {
-        XWikiDocument doc = (XWikiDocument) xwikiDocument;
-        return doc.getDocumentReference();
+        super(NAME, new DocumentCreatedEvent(), new DocumentUpdatedEvent(), new DocumentDeletedEvent());
     }
 
     /**
      * @param source an xwiki document, that has just been updated.
      * @return true if and only if the xwiki document corresponds to a group.
      */
-    private boolean isGroupDocument(Object source)
+    private boolean isGroupDocument(XWikiDocument document)
     {
-        XWikiDocument doc = (XWikiDocument) source;
-        DocumentReference docRef = doc.getDocumentReference();
+        DocumentReference docRef = document.getDocumentReference();
         DocumentReference groupClass = resolver.resolve(XWikiConstants.GROUP_CLASS, docRef);
-        List<BaseObject> objects = doc.getXObjects(groupClass);
+        List<BaseObject> objects = document.getXObjects(groupClass);
+
         return objects != null && objects.size() > 0;
     }
 
@@ -185,10 +177,12 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
-        DocumentReference ref = getDocumentReference(source);
+        XWikiDocument document = (XWikiDocument) source;
+
+        DocumentReference ref = document.getDocumentReference();
         try {
             deliverUpdateEvent(ref);
-            if (isGroupDocument(source)) {
+            if (isGroupDocument(document)) {
                 // When a group receive a new member, the update event is triggered and the above invalidate the
                 // group and also all its existing members already in cache, but NOT the new member that could be
                 // currently in the cache, and is not yet linked to the group. Here, we invalidate individually all
@@ -201,10 +195,26 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
         }
 
         // Make sure to send the RightUpdatedEvent event after the security cache is cleaned
-        if (event instanceof XObjectEvent) {
+        if (shouldSendRightUpdatedEvent(document, (XWikiContext) data)) {
             // Notify that a right may have changed
             this.observation.notify(new RightUpdatedEvent(), source);
         }
+    }
+
+    private boolean shouldSendRightUpdatedEvent(XWikiDocument document, XWikiContext xcontext)
+    {
+        List<List<ObjectDiff>> documentDiff =
+            document.getObjectDiff(document.getOriginalDocument(), document, xcontext);
+
+        for (List<ObjectDiff> objecstDiff : documentDiff) {
+            for (ObjectDiff objectDiff : objecstDiff) {
+                if (RIGHT_OBJECTS.contains(objectDiff.getXClassReference().getLocalDocumentReference())) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

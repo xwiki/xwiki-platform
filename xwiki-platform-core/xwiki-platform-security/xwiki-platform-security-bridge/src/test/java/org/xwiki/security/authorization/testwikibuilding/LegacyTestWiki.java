@@ -1067,6 +1067,8 @@ public class LegacyTestWiki extends AbstractTestWiki
                     will(returnValue(documentReference));
                     allowing(mockedDocument).isNew();
                     will(returnValue(isNew));
+                    allowing(mockedDocument).getXObjects();
+                    will(returnValue(Collections.emptyMap()));
                 }
             });
 

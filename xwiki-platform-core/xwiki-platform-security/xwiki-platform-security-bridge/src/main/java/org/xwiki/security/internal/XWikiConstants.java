@@ -57,8 +57,22 @@ public interface XWikiConstants
     /** Prefix of wiki descriptor documents. */
     String WIKI_DESCRIPTOR_PREFIX = "XWikiServer";
 
-    /** Name of group class. */
-    String GROUP_CLASS = "XWiki.XWikiGroups";
+    /**
+     * Name of the group class.
+     * 
+     * @since 11.8RC1
+     */
+    String GROUP_CLASS_NAME = "XWikiGroups";
+
+    /** Full name of group class. */
+    String GROUP_CLASS = XWIKI_SPACE + '.' + GROUP_CLASS_NAME;
+
+    /**
+     * The reference of he group class.
+     * 
+     * @since 11.8RC1
+     */
+    LocalDocumentReference GROUP_CLASS_REFERENCE = new LocalDocumentReference(XWIKI_SPACE, GROUP_CLASS_NAME);
 
     /** XWiki class for storing global rights. */
     String GLOBAL_CLASSNAME = "XWikiGlobalRights";
@@ -70,6 +84,13 @@ public interface XWikiConstants
      */
     String GLOBAL_CLASS = XWIKI_SPACE + '.' + GLOBAL_CLASSNAME;
 
+    /**
+     * The reference of the class for storing global rights.
+     * 
+     * @since 11.8RC1
+     */
+    LocalDocumentReference GLOBAL_CLASS_REFERENCE = new LocalDocumentReference(XWIKI_SPACE, GLOBAL_CLASSNAME);
+
     /** XWiki class for storing rights. */
     String LOCAL_CLASSNAME = "XWikiRights";
 
@@ -79,6 +100,13 @@ public interface XWikiConstants
      * @since 11.8RC1
      */
     String LOCAL_CLASS = XWIKI_SPACE + '.' + LOCAL_CLASSNAME;
+
+    /**
+     * The reference of the class for storing rights.
+     * 
+     * @since 11.8RC1
+     */
+    LocalDocumentReference LOCAL_CLASS_REFERENCE = new LocalDocumentReference(XWIKI_SPACE, LOCAL_CLASSNAME);
 
     /** Field name for level in xwiki rights object. */
     String LEVELS_FIELD_NAME = "levels";

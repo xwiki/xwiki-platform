@@ -334,6 +334,9 @@
     #if (!$hasClassTemplateProvider)
       #set ($templateProviderClassName = 'XWiki.TemplateProviderClass')
       ## Do the page creation and object addition in one step, providing some default values.
+      ## In order to get the root space of the class and use it as restrictionSpace, we need to be sure that we have
+      ## the expected result for multiple level hierarchies, like MyApplication.Code.MyApplicationClass. In this case,
+      ## the template provider in enabled in MyApplication space.
       #set ($restrictionSpace = $doc.documentReference.spaceReferences.get(0).name)
       #set ($createUrlQueryString = $escapetool.url({
         'classname': $templateProviderClassName,

@@ -21,11 +21,13 @@ package com.xpn.xwiki.internal.converter;
 
 import java.lang.reflect.Type;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.properties.converter.ConversionException;
 
@@ -42,17 +44,26 @@ import com.xpn.xwiki.doc.XWikiDocument;
 @Singleton
 public class DocumentConverter extends AbstractConverter<Document>
 {
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
     @Override
     public <G> G convert(Type targetType, Object sourceValue)
     {
         if (sourceValue == null) {
             return null;
         }
-        if (sourceValue instanceof Document) {
-            return convertFromType(targetType, sourceValue);
+
+        G result;
+        if (targetType.equals(String.class)) {
+            result = (G) convertToString((Document) sourceValue);
+        } else if (sourceValue instanceof Document) {
+            result = convertFromType(targetType, sourceValue);
         } else {
-            return super.convert(targetType, sourceValue);
+            result = super.convert(targetType, sourceValue);
         }
+
+        return result;
     }
 
     private <G> G convertFromType(Type targetType, Object sourceValue)
@@ -77,5 +88,11 @@ public class DocumentConverter extends AbstractConverter<Document>
     private XWikiDocument convertToXWikiDocument(Document document)
     {
         return document.getDocument();
+    }
+
+    @Override
+    protected String convertToString(Document value)
+    {
+        return this.serializer.serialize(value.getDocumentReference());
     }
 }

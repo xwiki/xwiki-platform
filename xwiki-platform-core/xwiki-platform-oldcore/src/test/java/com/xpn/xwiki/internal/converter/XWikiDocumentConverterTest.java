@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -54,6 +55,9 @@ public class XWikiDocumentConverterTest
 
     @MockComponent
     private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> serializer;
 
     @Mock
     private XWikiDocument xWikiDocument;
@@ -99,5 +103,13 @@ public class XWikiDocumentConverterTest
     public void convertFromDocument()
     {
         assertSame(this.xWikiDocument, documentConverter.convert(XWikiDocument.class, document));
+    }
+
+    @Test
+    public void convertToString()
+    {
+        when(serializer.serialize(xWikiDocument.getDocumentReference())).thenReturn("reference");
+
+        assertSame("reference", documentConverter.convert(String.class, xWikiDocument));
     }
 }

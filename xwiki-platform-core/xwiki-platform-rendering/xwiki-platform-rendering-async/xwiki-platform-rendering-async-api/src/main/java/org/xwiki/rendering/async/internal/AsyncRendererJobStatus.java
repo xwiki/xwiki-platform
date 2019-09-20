@@ -204,7 +204,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     }
 
     /**
-     * @return
+     * @return the right checks to invalidate the cache
      * @since 11.8RC1
      */
     public Set<RightEntry> getRights()
@@ -213,7 +213,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     }
 
     /**
-     * @param rights
+     * @param rights the right checks to invalidate the cache
      * @since 11.8RC1
      */
     void setRights(Set<RightEntry> rights)

@@ -53,28 +53,21 @@ public class DocumentConverter extends AbstractConverter<Document>
         if (sourceValue == null) {
             return null;
         }
-
-        G result;
-        if (targetType.equals(String.class)) {
-            result = (G) convertToString((Document) sourceValue);
-        } else if (sourceValue instanceof Document) {
-            result = convertFromType(targetType, sourceValue);
+        if (sourceValue instanceof Document) {
+            return convertFromType(targetType, sourceValue);
         } else {
-            result = super.convert(targetType, sourceValue);
+            return super.convert(targetType, sourceValue);
         }
-
-        return result;
     }
 
     private <G> G convertFromType(Type targetType, Object sourceValue)
     {
-        Document document = (Document) sourceValue;
-        Class typeClass = ReflectionUtils.getTypeClass(targetType);
-
-        if (EntityReference.class.isAssignableFrom(typeClass)) {
-            return (G) convertToEntityReference(document);
+        if (targetType.equals(String.class)) {
+            return (G) convertToString((Document) sourceValue);
+        } else if (EntityReference.class.isAssignableFrom(ReflectionUtils.getTypeClass(targetType))) {
+            return (G) convertToEntityReference((Document) sourceValue);
         } else if (targetType == XWikiDocument.class) {
-            return (G) convertToXWikiDocument(document);
+            return (G) convertToXWikiDocument((Document) sourceValue);
         } else {
             throw new ConversionException(String.format("Unsupported target type [%s]", targetType));
         }

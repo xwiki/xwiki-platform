@@ -58,17 +58,11 @@ public class XWikiDocumentConverter extends AbstractConverter<XWikiDocument>
         if (sourceValue == null) {
             return null;
         }
-
-        G result;
-        if (targetType.equals(String.class)) {
-            result = (G) convertToString((XWikiDocument) sourceValue);
-        } else if (sourceValue instanceof XWikiDocument) {
-            result = convertFromType(targetType, sourceValue);
+        if (sourceValue instanceof XWikiDocument) {
+            return convertFromType(targetType, sourceValue);
         } else {
-            result = super.convert(targetType, sourceValue);
+            return super.convert(targetType, sourceValue);
         }
-
-        return result;
     }
 
     @Override
@@ -88,13 +82,12 @@ public class XWikiDocumentConverter extends AbstractConverter<XWikiDocument>
 
     private <G> G convertFromType(Type targetType, Object sourceValue)
     {
-        XWikiDocument document = (XWikiDocument) sourceValue;
-        Class typeClass = ReflectionUtils.getTypeClass(targetType);
-
-        if (EntityReference.class.isAssignableFrom(typeClass)) {
-            return (G) convertToEntityReference(document);
+        if (targetType.equals(String.class)) {
+            return (G) convertToString((XWikiDocument) sourceValue);
+        } else if (EntityReference.class.isAssignableFrom(ReflectionUtils.getTypeClass(targetType))) {
+            return (G) convertToEntityReference((XWikiDocument) sourceValue);
         } else if (targetType == Document.class) {
-            return (G) convertToDocument(document);
+            return (G) convertToDocument((XWikiDocument) sourceValue);
         } else {
             throw new ConversionException(String.format("Unsupported source type [%s]", targetType));
         }

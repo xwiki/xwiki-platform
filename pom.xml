@@ -912,6 +912,60 @@
         </pluginManagement>
       </build>
     </profile>
+    <profile>
+      <!-- To be executed when building snapshots. This allows to not have to have a special settings.xml file
+           when building snapshots while not incurring the downside of specifying a maven remote repo for releases,
+           see https://blog.sonatype.com/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/ -->
+      <id>snapshot</id>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>xwiki-snapshots</id>
+          <name>XWiki Nexus Plugin Snapshot Repository Proxy</name>
+          <url>http://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+          <id>xwiki-releases</id>
+          <name>XWiki Nexus Plugin Releases Repository Proxy</name>
+          <url>http://nexus.xwiki.org/nexus/content/groups/public</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+      <repositories>
+        <repository>
+          <id>xwiki-snapshots</id>
+          <name>XWiki Nexus Snapshot Repository Proxy</name>
+          <url>http://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>xwiki-releases</id>
+          <name>XWiki Nexus Releases Repository Proxy</name>
+          <url>http://nexus.xwiki.org/nexus/content/groups/public</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
+    </profile>
   </profiles>
   <distributionManagement>
     <repository>

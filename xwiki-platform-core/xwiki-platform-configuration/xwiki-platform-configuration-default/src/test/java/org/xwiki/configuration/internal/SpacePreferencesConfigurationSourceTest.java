@@ -35,8 +35,8 @@ import org.xwiki.model.reference.LocalDocumentReference;
  */
 public class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
-    private static final DocumentReference SPACE_DOCUMENT = new DocumentReference(CURRENT_WIKI, "currentspace",
-        SpacePreferencesConfigurationSource.DOCUMENT_NAME);
+    private static final DocumentReference SPACE_DOCUMENT =
+        new DocumentReference(CURRENT_WIKI, "currentspace", SpacePreferencesConfigurationSource.DOCUMENT_NAME);
 
     public SpacePreferencesConfigurationSourceTest()
     {
@@ -63,8 +63,6 @@ public class SpacePreferencesConfigurationSourceTest extends AbstractTestDocumen
     {
         setStringProperty(SPACE_DOCUMENT, "key", "value");
 
-        String result = this.componentManager.getComponentUnderTest().getProperty("key", String.class);
-
-        Assert.assertEquals("value", result);
+        Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key", String.class));
     }
 }

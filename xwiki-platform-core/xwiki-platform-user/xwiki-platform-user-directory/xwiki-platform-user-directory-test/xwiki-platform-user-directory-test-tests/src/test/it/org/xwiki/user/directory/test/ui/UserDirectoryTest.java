@@ -44,7 +44,7 @@ public class UserDirectoryTest extends AbstractTest
     @After
     public void validate()
     {
-        this.validateConsole.getLogCaptureConfiguration().registerExcludes(
+        validateConsole.getLogCaptureConfiguration().registerExcludes(
             "Exception in macro #displayCheckedIfWatched called at",
             "Exception in macro #generateNotificationInput called at",
             "DefaultNotificationFilterPreference is not mapped"/*,

@@ -167,6 +167,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     /**
      * @param enabled if the preference is enabled or not
      */
+    @Override
     public void setEnabled(boolean enabled)
     {
         this.enabled = enabled;

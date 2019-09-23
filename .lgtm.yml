@@ -21,6 +21,6 @@
 extraction:
   java:
     index:
-      # Use the snapshots profile so that the XWiki Maven Remote repository is specified for locating snapshot
+      # Use the snapshot profile so that the XWiki Maven Remote repository is specified for locating snapshot
       # artifacts.
-      build_command: "mvn clean install -Psnapshots"
+      build_command: "mvn clean install -Psnapshot"

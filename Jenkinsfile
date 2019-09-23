@@ -28,7 +28,7 @@ def builds = [
   'Main' : {
     build(
       name: 'Main',
-      profiles: 'legacy,integration-tests,snapshots',
+      profiles: 'legacy,integration-tests,snapshot',
       properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
       daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
     )
@@ -36,7 +36,7 @@ def builds = [
   'Distribution' : {
     build(
       name: 'Distribution',
-      profiles: 'legacy,integration-tests,snapshots',
+      profiles: 'legacy,integration-tests,snapshot',
       pom: 'xwiki-platform-distribution/pom.xml'
     )
   },

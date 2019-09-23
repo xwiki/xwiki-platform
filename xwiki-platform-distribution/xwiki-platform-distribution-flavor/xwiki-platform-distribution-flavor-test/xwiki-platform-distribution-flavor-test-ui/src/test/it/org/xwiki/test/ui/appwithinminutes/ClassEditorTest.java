@@ -79,7 +79,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
             new LongTextClassFieldEditPane(editor.addField("Long Text").getName());
         longTextField.openConfigPanel();
         longTextField.setRows(3);
-        longTextField.setEditor("Text");
+        longTextField.setEditor("Wiki");
         longTextField.closeConfigPanel();
         Assert.assertEquals(3, longTextField.getPreviewRows());
     }

@@ -163,7 +163,7 @@ public class WikiTemplateIT
         // Note that the whole flavor defined in the pom.xml (i.e. org.xwiki.platform:xwiki-platform-wiki-ui-wiki) will
         // be copied and that's a lot of pages (over 800+), and this takes time. If the CI agent is busy with other
         // jobs running in parallel it'll take even more time. Thus we put a large value to be safe.
-        wikiCreationPage.waitForFinalizeButton(60 * 3);
+        wikiCreationPage.waitForFinalizeButton(60 * 5);
         // Ensure there is no error in the log
         assertFalse(wikiCreationPage.hasLogError());
 

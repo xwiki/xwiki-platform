@@ -229,7 +229,7 @@
       </build>
     </profile>
     <profile>
-      <id>snapshotModules</id>
+      <id>snapshots</id>
       <dependencies>
         <dependency>
           <groupId>org.xwiki.commons</groupId>

@@ -28,7 +28,7 @@ def builds = [
   'Main' : {
     build(
       name: 'Main',
-      profiles: 'legacy,integration-tests,snapshotModules',
+      profiles: 'legacy,integration-tests,snapshots',
       properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
       daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
     )
@@ -36,7 +36,7 @@ def builds = [
   'Distribution' : {
     build(
       name: 'Distribution',
-      profiles: 'legacy,integration-tests,snapshotModules',
+      profiles: 'legacy,integration-tests,snapshots',
       pom: 'xwiki-platform-distribution/pom.xml'
     )
   },
@@ -158,7 +158,7 @@ private void buildStandardAll(builds)
       // can benefit from them even though some quality checks have not yet passed. In // we start a build with the
       // quality profile that executes various quality checks.
       //
-      // Note: We configure the snapshot extension repository in XWiki (-PsnapshotModules) in the generated
+      // Note: We configure the snapshot extension repository in XWiki (-Psnapshots) in the generated
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
       builds['Main'].call()
 

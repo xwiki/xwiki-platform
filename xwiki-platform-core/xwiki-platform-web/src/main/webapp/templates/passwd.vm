@@ -49,27 +49,26 @@
       #if(!$isValidPassword)
         $services.localization.render('platform.core.profile.passwd.instructions')
         #set ($fields = [])
-        #set ($field =
-          { 'name': 'originalpassword',
-            'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
-            'params': {
-              'type': 'password',
-              'size': '60',
-              'autocomplete': 'off'
+        #set ($discard  = $fields.add({
+          'name': 'originalpassword',
+          'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
+          'params': {
+            'type': 'password',
+            'size': '60',
+            'autocomplete': 'off'
+          },
+          'validate': {
+            'mandatory': {
+              'failureMessage': $services.localization.render('core.validation.required.message')
             },
-            'validate': {
-              'mandatory': {
-                'failureMessage': $services.localization.render('core.validation.required.message')
-              },
-              'programmaticValidation': {
-                'code': '$user.checkPassword($request.originalpassword)',
-                'failureMessage': $services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')
-              },
-              'hideOkayMessage': 'true'
-            }
-          })
-        #set ($discard  = $fields.add($field))
-        #definePasswordFields($fields, 'password', 'password2')
+            'programmaticValidation': {
+              'code': '$user.checkPassword($request.originalpassword)',
+              'failureMessage': $services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')
+            },
+            'hideOkayMessage': 'true'
+          }
+        }))
+        #definePasswordFields($fields 'password' 'password2')
         ## Change the label for new password fields
         #set ($fields[1].label = $services.localization.render('platform.core.profile.passwd.newPassword'))
         ## This key fits better.

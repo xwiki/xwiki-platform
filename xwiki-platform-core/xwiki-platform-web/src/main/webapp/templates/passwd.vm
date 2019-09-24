@@ -49,7 +49,7 @@
       #if(!$isValidPassword)
         $services.localization.render('platform.core.profile.passwd.instructions')
         #set ($fields = [])
-        #set ($discard  = $fields.add({
+        #set ($discard = $fields.add({
           'name': 'originalpassword',
           'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
           'params': {
@@ -68,7 +68,7 @@
             'hideOkayMessage': 'true'
           }
         }))
-        #definePasswordFields($fields 'password' 'password2')
+        #definePasswordFields($fields, 'password', 'password2')
         ## Change the label for new password fields
         #set ($fields[1].label = $services.localization.render('platform.core.profile.passwd.newPassword'))
         ## This key fits better.

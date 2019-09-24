@@ -177,7 +177,7 @@
                     "code": "java.method.removed",
                     "old": "method void com.xpn.xwiki.user.api.XWikiUser::setActiveStatus(boolean, com.xpn.xwiki.XWikiContext)",
                     "justification": "This method was added on XWiki 11.6RC1 and is actually redundant with XWikiUser#setDisabled"
-                  },
+                  }
                   // Add more ignores below...
                 ]
               }

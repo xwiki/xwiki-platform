@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.wikimacro.internal;
 
+import org.xwiki.model.reference.LocalDocumentReference;
+
 /**
  * Constants identifying various properties used for defining wiki macros.
  *
@@ -41,6 +43,14 @@ public interface WikiMacroConstants
      * Constant for representing XWiki.WikiMacroClass xwiki class.
      */
     String WIKI_MACRO_CLASS = WIKI_MACRO_CLASS_SPACE + '.' + WIKI_MACRO_CLASS_PAGE;
+
+    /**
+     * Constant for representing XWiki.WikiMacroClass xwiki class local reference.
+     * 
+     * @since 11.8RC1
+     */
+    LocalDocumentReference WIKI_MACRO_CLASS_REFERENCE =
+        new LocalDocumentReference(WIKI_MACRO_CLASS_SPACE, WIKI_MACRO_CLASS_PAGE);
 
     /**
      * Constant for representing macro id property.

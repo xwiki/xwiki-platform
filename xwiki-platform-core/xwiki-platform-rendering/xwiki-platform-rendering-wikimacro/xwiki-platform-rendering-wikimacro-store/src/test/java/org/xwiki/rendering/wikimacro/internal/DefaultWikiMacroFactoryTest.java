@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.component.wiki.internal.bridge.ContentParser;
 import org.xwiki.model.reference.DocumentReference;
@@ -35,23 +34,27 @@ import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.DefaultContentDescriptor;
 import org.xwiki.rendering.macro.wikibridge.WikiMacro;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroDescriptor;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
-import com.xpn.xwiki.test.reference.ReferenceComponentList;
-import com.xpn.xwiki.web.Utils;
-
+import org.xwiki.rendering.macro.wikibridge.WikiMacroException;
 import org.xwiki.rendering.macro.wikibridge.WikiMacroVisibility;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 /**
@@ -64,10 +67,11 @@ import static org.mockito.Mockito.when;
 @ReferenceComponentList
 public class DefaultWikiMacroFactoryTest
 {
-    private XWikiDocument macroDefinitionDoc;
+    private final static DocumentReference DOCUMENT_REFERENCE = new DocumentReference("xwiki", "Macros", "Test");
 
-    @Mock
-    private XWiki mockXWiki;
+    private BaseObject macroObject;
+
+    private XWikiDocument macroDefinitionDoc;
 
     @InjectMockComponents
     private DefaultWikiMacroFactory wikiMacroFactory;
@@ -78,45 +82,56 @@ public class DefaultWikiMacroFactoryTest
     @MockComponent
     private ContentParser contentParser;
 
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
     @BeforeEach
     protected void setUp() throws Exception
     {
         // Build the macro definition document.
-        BaseObject obj = new BaseObject();
-        obj.setClassName("XWiki.WikiMacroClass");
-        obj.setStringValue("id", "testmacro");
-        obj.setStringValue("name", "Test Macro");
-        obj.setStringValue("description", "This is a macro used for testing purposes.");
-        obj.setStringValue("defaultCategory", "Test");
-        obj.setStringValue("visibility", "Current User");
-        obj.setIntValue("supportsInlineMode", 1);
-        obj.setStringValue("contentType", "No content");
-        obj.setStringValue("code", "==Hi==");
-        macroDefinitionDoc = new XWikiDocument(new DocumentReference("xwiki", "Macros", "Test"));
-        macroDefinitionDoc.addObject("XWiki.WikiMacroClass", obj);
+        this.macroObject = new BaseObject();
+        this.macroObject.setXClassReference(WikiMacroConstants.WIKI_MACRO_CLASS_REFERENCE);
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_ID_PROPERTY, "testmacro");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_NAME_PROPERTY, "Test Macro");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_DESCRIPTION_PROPERTY,
+            "This is a macro used for testing purposes.");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_DEFAULT_CATEGORY_PROPERTY, "Test");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_VISIBILITY_PROPERTY, "Current User");
+        this.macroObject.setIntValue(WikiMacroConstants.MACRO_INLINE_PROPERTY, 1);
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "No content");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, "==Hi==");
+        this.macroDefinitionDoc =
+            this.oldcore.getSpyXWiki().getDocument(DOCUMENT_REFERENCE, this.oldcore.getXWikiContext());
+        this.macroDefinitionDoc.addXObject(this.macroObject);
+        saveDocument();
+    }
 
-        // Setup the mock xwiki.
-        when(this.mockXWiki.getDocument(any(DocumentReference.class), any())).thenReturn(macroDefinitionDoc);
-
-        // Set this mock xwiki in context.
-        Utils.getContext().setWiki(this.mockXWiki);
+    private void saveDocument()
+    {
+        try {
+            this.oldcore.getSpyXWiki().saveDocument(this.macroDefinitionDoc, this.oldcore.getXWikiContext());
+        } catch (XWikiException e) {
+            fail(e);
+        }
     }
 
     @Test
     public void createWikiMacro() throws Exception
     {
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentReference("xwiki", "Macros", "Test"));
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(DOCUMENT_REFERENCE);
         assertNotNull(macro);
 
         // Check if the macro was built correctly.
         assertEquals("testmacro", macro.getId());
+        assertEquals("testmacro", macro.getDescriptor().getId().getId());
         assertEquals("Test Macro", macro.getDescriptor().getName());
         assertEquals("This is a macro used for testing purposes.", macro.getDescriptor().getDescription());
         assertEquals("Test", macro.getDescriptor().getDefaultCategory());
         assertEquals(WikiMacroVisibility.USER, ((WikiMacroDescriptor) macro.getDescriptor()).getVisibility());
         assertTrue(macro.supportsInlineMode());
         assertNull(macro.getDescriptor().getContentDescriptor());
+        assertTrue(macro.getDescriptor().getParameterDescriptorMap().isEmpty());
 
         // Verify that the wiki macro descriptor has a macro id without a syntax since wiki macros are registered for
         // all syntaxes.
@@ -124,13 +139,34 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
+    public void isAllowed() throws Exception
+    {
+        assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
+        assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
+        assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.GLOBAL));
+
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.ADMIN, null,
+            DOCUMENT_REFERENCE.getWikiReference())).thenReturn(true);
+
+        assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
+        assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
+        assertFalse(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.GLOBAL));
+
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(Right.PROGRAM, null, null)).thenReturn(true);
+
+        assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.USER));
+        assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.WIKI));
+        assertTrue(this.wikiMacroFactory.isAllowed(DOCUMENT_REFERENCE, WikiMacroVisibility.GLOBAL));
+    }
+
+    @Test
     public void createWikiMacroWithoutName() throws Exception
     {
-        BaseObject obj = macroDefinitionDoc.getObject("XWiki.WikiMacroClass");
-        obj.setStringValue("name", "");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_NAME_PROPERTY, "");
+        saveDocument();
 
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentReference("xwiki", "Macros", "Test"));
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(DOCUMENT_REFERENCE);
         assertNotNull(macro);
 
         // Check if the macro was built correctly.
@@ -140,12 +176,13 @@ public class DefaultWikiMacroFactoryTest
     @Test
     public void createWikiMacroWithContent() throws Exception
     {
-        BaseObject obj = macroDefinitionDoc.getObject("XWiki.WikiMacroClass");
-        obj.setStringValue("contentType", "Optional");
-        obj.setStringValue("contentDescription", "the content of the macro");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "Optional");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_DESCRIPTION_PROPERTY,
+            "the content of the macro");
+        saveDocument();
 
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentReference("xwiki", "Macros", "Test"));
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(DOCUMENT_REFERENCE);
         assertNotNull(macro);
 
         ContentDescriptor contentDescriptor = macro.getDescriptor().getContentDescriptor();
@@ -157,15 +194,26 @@ public class DefaultWikiMacroFactoryTest
     }
 
     @Test
-    public void createWikiMacroWithContentWikiType() throws Exception
+    public void createWikiMacroWithEmptyCode() throws Exception
     {
-        BaseObject obj = macroDefinitionDoc.getObject("XWiki.WikiMacroClass");
-        obj.setStringValue("contentType", "Mandatory");
-        obj.setStringValue("contentDescription", "the content of the macro");
-        obj.setStringValue("contentJavaType", "Wiki");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CODE_PROPERTY, "");
+        saveDocument();
 
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentReference("xwiki", "Macros", "Test"));
+        assertThrows(WikiMacroException.class, () -> this.wikiMacroFactory.createWikiMacro(DOCUMENT_REFERENCE));
+    }
+
+    @Test
+    public void createWikiMacroWithContentWikiType() throws Exception
+    {
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "Mandatory");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_DESCRIPTION_PROPERTY,
+            "the content of the macro");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_JAVA_TYPE_PROPERTY, "Wiki");
+        saveDocument();
+
+        // Build a wiki macro.
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(DOCUMENT_REFERENCE);
         assertNotNull(macro);
 
         ContentDescriptor contentDescriptor = macro.getDescriptor().getContentDescriptor();
@@ -179,13 +227,15 @@ public class DefaultWikiMacroFactoryTest
     @Test
     public void createWikiMacroWithContentCustomType() throws Exception
     {
-        BaseObject obj = macroDefinitionDoc.getObject("XWiki.WikiMacroClass");
-        obj.setStringValue("contentType", "Mandatory");
-        obj.setStringValue("contentDescription", "the content of the macro");
-        obj.setStringValue("contentJavaType", "java.util.Map<java.lang.String, java.util.Set<java.lang.Integer>>");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_TYPE_PROPERTY, "Mandatory");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_DESCRIPTION_PROPERTY,
+            "the content of the macro");
+        this.macroObject.setStringValue(WikiMacroConstants.MACRO_CONTENT_JAVA_TYPE_PROPERTY,
+            "java.util.Map<java.lang.String, java.util.Set<java.lang.Integer>>");
+        saveDocument();
 
         // Build a wiki macro.
-        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(new DocumentReference("xwiki", "Macros", "Test"));
+        WikiMacro macro = this.wikiMacroFactory.createWikiMacro(DOCUMENT_REFERENCE);
         assertNotNull(macro);
 
         ContentDescriptor contentDescriptor = macro.getDescriptor().getContentDescriptor();
@@ -196,5 +246,16 @@ public class DefaultWikiMacroFactoryTest
         Type expectedType = new DefaultParameterizedType(null, Map.class, String.class,
             new DefaultParameterizedType(null, Set.class, Integer.class));
         assertEquals(expectedType, contentDescriptor.getType());
+    }
+
+    @Test
+    public void containsWikiMacro()
+    {
+        assertTrue(this.wikiMacroFactory.containsWikiMacro(DOCUMENT_REFERENCE));
+
+        this.macroDefinitionDoc.removeXObject(this.macroObject);
+        saveDocument();
+
+        assertFalse(this.wikiMacroFactory.containsWikiMacro(DOCUMENT_REFERENCE));
     }
 }

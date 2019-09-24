@@ -24,7 +24,7 @@
   <parent>
     <artifactId>xwiki-platform-rendering-wikimacro-macros</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>11.8-SNAPSHOT</version>
+    <version>11.8-rc-1</version>
   </parent>
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - Macro - WikiMacroContent</name>
   <description>XWiki Platform - Rendering - Wiki Macro Bridge - Macro - WikiMacroContent</description>

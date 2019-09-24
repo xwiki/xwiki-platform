@@ -62,29 +62,28 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         },
         'regexes': $passwordRegexes
       }
-    })
-  #set ($discard = $fields.add($field))
+    }
+  )
 ##
 ## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
-  #set ($field =
-    {'name': $confirmPasswordFieldName,
-      'label': $services.localization.render('core.register.passwordRepeat'),
-      'params': {
-        'type': 'password',
-        'autocomplete': 'off',
-        'size': '60'
+  #set ($discard = $fields.add({
+    'name': $confirmPasswordFieldName,
+    'label': $services.localization.render('core.register.passwordRepeat'),
+    'params': {
+      'type': 'password',
+      'autocomplete': 'off',
+      'size': '60'
+    },
+    'validate': {
+      'mandatory': {
+        'failureMessage': $services.localization.render('core.validation.required.message')
       },
-      'validate': {               
-        'mandatory': {
-          'failureMessage': $services.localization.render('core.validation.required.message')
-        },
-        'mustMatch': {                
-          'name': $passwordFieldName,
-          'failureMessage': $services.localization.render('xe.admin.registration.passwordMismatch')
-        }
+      'mustMatch': {
+        'name': $passwordFieldName,
+        'failureMessage': $services.localization.render('xe.admin.registration.passwordMismatch')
       }
-    })
-  #set ($discard = $fields.add($field))
+    }
+  }))
 #end
 ##
 #*
@@ -98,15 +97,15 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   #getParams($fields, $request)
   <dl>
   #foreach ($field in $fields)
-    #if ($field.get('name'))
-      #set ($fieldName = $field.get('name'))
-      #if ($field.get('label'))
-        #set ($label = $field.get('label'))
+    #if ($field.name)
+      #set ($fieldName = $field.name)
+      #if ($field.label)
+        #set ($label = $field.label)
         <dt><label for="$fieldName">$label
-        #if ($field.get('validate').get('mandatory'))
+        #if ($field.validate.mandatory)
           <span ##
           #foreach ($entry in $fieldMandatoryStar.entrySet())
-            $entry.getKey()="$entry.getValue()" ##
+            $entry.key="$entry.value" ##
           #end
           >$services.localization.render('core.validation.required')</span>
         #end
@@ -114,34 +113,34 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         </dt>
       #end
       ## If no tag then default tag is <input>
-      #if ($field.get('tag'))
-        #set ($tag = $field.get('tag'))
+      #if ($field.tag)
+        #set ($tag = $field.tag)
       #else
         #set ($tag = 'input')
       #end
       <dd><$tag id="$fieldName" ##
-      #set ($params = $field.get('params'))
+      #set ($params = $field.params)
       ## If no name parameter is specified, then we use the field name.
-      #if (!$params.get('name'))
+      #if (!$params.name)
         #set ($discard = $params.put('name', $fieldName))
       #end
       #foreach ($entry in $params.entrySet())
         ## If a parameter is specified as '' then we don't include it.
-        #if ($entry.getValue() != '')
-          $entry.getKey()="$escapetool.xml($entry.getValue())" ##
+        #if ($entry.value != '')
+          $entry.key="$escapetool.xml($entry.value)" ##
         #end
       #end
       ></$tag>
-      #if ($field.get('error'))
+      #if ($field.error)
         <span ##
         #foreach ($entry in $failureMessageParams.entrySet())
-          $entry.getKey()="$entry.getValue()" ##
+          $entry.key="$entry.value" ##
         #end
-        >$field.get('error')</span>
+        >$field.error</span>
       #end
       </dd>
     #else
-      ERROR: Field with no name.
+      $services.localization.render('xe.admin.registration.fieldWithNoName')
     #end
   #end
   </dl>
@@ -161,51 +160,51 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   var initRegistrationFormValidation = function() {
   ##
   #foreach ($field in $fields)
-    #if ($field.get('validate') && $field.get('name'))
-      #set ($validate = $field.get('validate'))
-      #if (($validate.get('mandatory') && !$validate.get('mandatory').get('noscript'))
-          || ($validate.get('regex') && !$validate.get('regex').get('noscript'))
-          || ($validate.get('mustMatch') && !$validate.get('mustMatch').get('noscript')))
-        #set ($fieldName = $field.get('name'))
-        #if ($validate.get('fieldOkayMessage'))
-          #set ($okayMessage = $validate.get('fieldOkayMessage'))
-        #elseif (!$validate.get('hideOkayMessage'))
+    #if ($field.validate && $field.name)
+      #set ($validate = $field.validate)
+      #if (($validate.mandatory && !$validate.mandatory.noscript)
+          || ($validate.regex && !$validate.regex.noscript)
+          || ($validate.mustMatch) && !$validate.mustMatch.noscript)
+        #set ($fieldName = $field.name)
+        #if ($validate.fieldOkayMessage)
+          #set ($okayMessage = $validate.fieldOkayMessage)
+        #elseif (!$validate.hideOkayMessage)
           #set ($okayMessage = $services.localization.render('core.validation.valid.message'))
           #else
             #set ($okayMessage = '')
         #end
         var ${fieldName}Validator = new LiveValidation("$fieldName", {validMessage: "$okayMessage", wait: 500});
         ##
-        #if ($validate.get('mandatory'))
-          #set ($mandatory = $validate.get('mandatory'))
-          #if ($mandatory.get('failureMessage') && !$mandatory.get('noscript'))
-            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.get('failureMessage')"});
+        #if ($validate.mandatory)
+          #set ($mandatory = $validate.mandatory)
+          #if ($mandatory.failureMessage && !$mandatory.noscript)
+            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.failureMessage"});
           #end
         #end
         ##
-        #if ($validate.get('mustMatch'))
-          #set ($mustMatch = $validate.get('mustMatch'))
-          #if ($mustMatch.get('name') && $mustMatch.get('failureMessage') && !$mustMatch.get('noscript'))
-            ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.get('name')]")[0], 
-              failureMessage: "$!mustMatch.get('failureMessage')"});
+        #if ($validate.mustMatch)
+          #set ($mustMatch = $validate.mustMatch)
+          #if ($mustMatch.name && $mustMatch.failureMessage && !$mustMatch.noscript)
+            ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.name]")[0], 
+              failureMessage: "$!mustMatch.failureMessage"});
           #end
         #end
         ##
-        #if ($validate.get('regex'))
-          #set ($regex = $validate.get('regex'))
+        #if ($validate.regex)
+          #set ($regex = $validate.regex)
           #set ($pattern = "")
-          #if ($regex.get('jsPattern'))
-            #set ($pattern = $regex.get('jsPattern'))
-          #elseif ($regex.get('pattern'))
-            #set ($pattern = $regex.get('pattern'))
+          #if ($regex.jsPattern)
+            #set ($pattern = $regex.jsPattern)
+          #elseif ($regex.pattern)
+            #set ($pattern = $regex.pattern)
           #end
           #set ($failMessage = "")
-          #if ($regex.get('jsFailureMessage'))
-            #set ($failMessage = $regex.get('jsFailureMessage'))
-          #elseif ($regex.get('failureMessage'))
-            #set ($failMessage = $regex.get('failureMessage'))
+          #if ($regex.jsFailureMessage)
+            #set ($failMessage = $regex.jsFailureMessage)
+          #elseif ($regex.failureMessage)
+            #set ($failMessage = $regex.failureMessage)
           #end
-          #if ($pattern != '' && $failMessage != '' && !$regex.get('noscript'))
+          #if ($pattern != '' && $failMessage != '' && !$regex.noscript)
             ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage"});
           #end
         #end
@@ -237,15 +236,15 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
  *###
 #macro (getParams $fields, $request)
   #foreach ($field in $fields)
-    #if ($field.get('name') && $!request.get($field.get('name')))
-      #if (!$field.get('noReturn') && !$field.get('error'))
-        #if (!$field.get('params'))
+    #if ($field.name && $!request.get($field.name))
+      #if (!$field.noReturn && !$field.error)
+        #if (!$field.params)
           #set ($params = {})
           #set ($discard = $field.put('params', $params))
         #else
-          #set ($params = $field.get('params'))
+          #set ($params = $field.params)
         #end
-        #set ($discard = $params.put('value', $request.get($field.get('name'))))
+        #set ($discard = $params.put('value', $request.get($field.name)))
       #end
     #end
   #end

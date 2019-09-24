@@ -50,7 +50,7 @@
         $services.localization.render('platform.core.profile.passwd.instructions')
         #set ($fields = [])
         #set ($field =
-          {'name': 'originalpassword',
+          { 'name': 'originalpassword',
             'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
             'params': {
               'type': 'password',

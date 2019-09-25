@@ -41,9 +41,16 @@
 ## At first you should keep the default presentation and just save the document.
 
 #set($class = $doc.getObject('XWiki.MyClass').xWikiClass)
-#foreach($prop in $class.properties)
-  ; $doc.displayPrettyName($prop.name)
-  : $doc.display($prop.name)
-#end
+(% class="xform" %)(((
+  #foreach($prop in $class.properties)
+    ; {{html clean="false"}}
+      <label for="${class.name}_${class.number}_${prop.name}">$doc.displayPrettyName($prop.name)</label>
+      #if($prop.hint)
+        <span class="xHint">$prop.hint</span>
+      #end
+    {{/html}}
+    : $doc.display($prop.name)
+  #end
+)))
 {{/velocity}}</content>
 </xwikidoc>

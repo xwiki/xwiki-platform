@@ -41,7 +41,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
@@ -118,13 +117,13 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             throw new SolrServerException(
                 "Failed to initialize the Solr core. Please check the configuration and log messages.");
         } else if (coreContainer.getCores().size() > 1) {
-            this.logger.warn("Multiple Solr cores detected: {}. Using the first one.", coreContainer.getAllCoreNames());
+            this.logger.warn("Multiple Solr cores detected: [{}]. Using the first one.", coreContainer.getAllCoreNames());
         }
         return coreContainer;
     }
 
     @Override
-    public void dispose() throws ComponentLifecycleException
+    public void dispose()
     {
         if (this.server != null) {
             try {
@@ -237,9 +236,8 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
         // Create the home directory
         if (!solrHomeDirectory.mkdirs()) {
             // Does not exist and can not be created.
-            throw new IllegalArgumentException(
-                String.format("The given path [%s] could not be created due to and invalid value %s", solrHomeDirectory,
-                    "or to insufficient filesystem permissions"));
+            throw new IllegalArgumentException(String.format("The given path [%s] could not be created due to an "
+                + "invalid value or to insufficient filesystem permissions", solrHomeDirectory));
         }
 
         // Initialize the Solr Home with the default configuration files if the folder does not already exist.

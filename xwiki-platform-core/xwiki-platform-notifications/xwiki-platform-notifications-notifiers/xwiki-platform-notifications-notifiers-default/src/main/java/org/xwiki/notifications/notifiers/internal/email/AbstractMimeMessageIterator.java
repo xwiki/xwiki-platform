@@ -76,6 +76,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
     private static final String ATTACHMENTS = "attachments";
 
+    private static final String EMAIL_USER = "emailUser";
+
     @Inject
     protected Logger logger;
 
@@ -218,6 +220,8 @@ public abstract class AbstractMimeMessageIterator implements Iterator<MimeMessag
 
         // Put in the velocity parameters all the events and their rendered version
         Map<String, Object> velocityVariables = getVelocityVariables();
+
+        velocityVariables.put(EMAIL_USER, usedId);
         velocityVariables.put(EVENTS, currentEvents);
         velocityVariables.put(HTML_EVENTS, htmlEvents);
         velocityVariables.put(PLAIN_TEXT_EVENTS, plainTextEvents);

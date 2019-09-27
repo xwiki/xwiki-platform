@@ -146,6 +146,7 @@ public class DefaultPeriodicMimeMessageIteratorTest
         assertEquals(Arrays.asList(event1), velocityVariables.get("events"));
         assertEquals(Arrays.asList("eventHTML1"), velocityVariables.get("htmlEvents"));
         assertEquals(Arrays.asList("event1"), velocityVariables.get("plainTextEvents"));
+        assertEquals("xwiki:XWiki.UserA", velocityVariables.get("emailUser"));
 
         // Count the number of attachments
         assertEquals(1, ((List)factoryParameters.get("attachments")).size());
@@ -160,6 +161,7 @@ public class DefaultPeriodicMimeMessageIteratorTest
         assertEquals(Arrays.asList(event2), velocityVariables.get("events"));
         assertEquals(Arrays.asList("eventHTML2"), velocityVariables.get("htmlEvents"));
         assertEquals(Arrays.asList("event2"), velocityVariables.get("plainTextEvents"));
+        assertEquals("xwiki:XWiki.UserC", velocityVariables.get("emailUser"));
 
         // Make sure there is no duplicated attachments
         assertEquals(1, ((List)factoryParameters.get("attachments")).size());

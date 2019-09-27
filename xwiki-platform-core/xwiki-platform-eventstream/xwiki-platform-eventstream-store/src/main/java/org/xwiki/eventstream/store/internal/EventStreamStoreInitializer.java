@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,10 +72,25 @@ public class EventStreamStoreInitializer implements EventListener
             this.sessionFactory.getConfiguration().getProperty("hibernate.connection.driver_class"),
             this.sessionFactory.getConfiguration().getProperty("connection.driver_class"));
         if (StringUtils.containsIgnoreCase(driverClass, "oracle")) {
-            this.sessionFactory.getConfiguration()
-                .addInputStream(Util.getResourceAsStream("eventstream.oracle.hbm.xml"));
+            this.sessionFactory.getConfiguration().addInputStream(getMappingFile("eventstream.oracle.hbm.xml"));
         } else {
-            this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream("eventstream.hbm.xml"));
+            this.sessionFactory.getConfiguration().addInputStream(getMappingFile("eventstream.hbm.xml"));
         }
+    }
+
+    private InputStream getMappingFile(String mappingFileName)
+    {
+        InputStream resource = Util.getResourceAsStream(mappingFileName);
+
+        // It could happen that the resource is not found in the file system, in the Servlet Context or in the current
+        // Thread Context Classloader. In this case try to get it from the CL used to load this class since the default
+        // mapping file is located in the same JAR that contains this code.
+        // This can happen in the case when this JAR is installed as a root extension (and thus in a ClassLoader not
+        // visible from the current Thread Context Classloader at the time when the ApplicationStartedEvent event
+        // is sent (the thread context CL is set to the current wiki CL later on).
+        if (resource == null) {
+            resource = getClass().getClassLoader().getResourceAsStream(mappingFileName);
+        }
+        return resource;
     }
 }

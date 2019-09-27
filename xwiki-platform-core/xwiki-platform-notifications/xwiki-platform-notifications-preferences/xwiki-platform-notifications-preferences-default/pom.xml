@@ -32,6 +32,11 @@
   <description>Default bridge to oldcore for the notifications preferences API module.</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.19</xwiki.jacoco.instructionRatio>
+    <!-- Needs to be on root at least because xwiki-platform-notifications-preferences-api is installed on root as
+         it's drawn by xwiki-platform-notifications-notifiers-default which is installed on root, and
+         xwiki-platform-notifications-preferences-api requires xwiki-platform-notifications-notifiers-default at
+         runtime. -->
+    <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>
     <dependency>

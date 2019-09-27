@@ -33,7 +33,7 @@ import org.xwiki.test.docker.junit5.UITest;
     properties = {
         // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed
         "xwikiCfgSuperadminPassword=pass",
-        // The Mail module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
+        // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
         // Disable the DW
         "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"

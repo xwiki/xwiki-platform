@@ -195,6 +195,8 @@ public class DefaultSecurityCacheRulesInvalidatorListener extends AbstractEventL
         }
 
         // Make sure to send the RightUpdatedEvent event after the security cache is cleaned
+        // FIXME: for some reason if one of the event that listen to RightUpdatedEvent check the right it can put the
+        // cache in a bad state. See https://jira.xwiki.org/browse/XWIKI-16381.
         if (shouldSendRightUpdatedEvent(document, (XWikiContext) data)) {
             // Notify that a right may have changed
             this.observation.notify(new RightUpdatedEvent(), source);

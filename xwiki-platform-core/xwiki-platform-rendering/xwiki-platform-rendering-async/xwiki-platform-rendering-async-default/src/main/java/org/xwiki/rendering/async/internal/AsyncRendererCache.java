@@ -296,10 +296,15 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
 
     private void checkRight(RightEntry right, Set<String> keys)
     {
-        if (this.authorization.hasAccess(right.getRight(), right.getUserReference(),
-            right.getEntityReference()) != right.isAllowed()) {
-            clean(keys);
-        }
+        // TODO: we are supposed to make sure the right check result changed here but it seems to trigger a bug in the
+        // security cache that need to be fixed before we can do that.
+        // In the meantime we don't have much other choice than removing all async result which are impacted by a right
+        // check. See https://jira.xwiki.org/browse/XWIKI-16748.
+        // if (this.authorization.hasAccess(right.getRight(), right.getUserReference(),
+        //     right.getEntityReference()) != right.isAllowed()) {
+        //     clean(keys);
+        // }
+        clean(keys);
     }
 
     /**

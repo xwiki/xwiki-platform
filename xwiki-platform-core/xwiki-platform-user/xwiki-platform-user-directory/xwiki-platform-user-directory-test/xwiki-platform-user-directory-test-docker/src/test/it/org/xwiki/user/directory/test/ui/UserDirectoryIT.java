@@ -19,29 +19,41 @@
  */
 package org.xwiki.user.directory.test.ui;
 
-import org.junit.After;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.user.directory.test.po.UserDirectoryPage;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.xwiki.test.ui.AbstractTest.validateConsole;
 
 /**
  * Tests the User Directory feature.
  *
  * @version $Id$
- * @since 5.1M1
+ * @since 11.8
  */
-public class UserDirectoryTest extends AbstractTest
+@UITest(
+    properties = {
+        // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml.
+        // Note that the Notifications feature is drawn by the Tag UI extension that is a dependency of User Directory
+        // UI dependency (it's used to display the tag cloud for the User Directory Livetable). Ideally the Tag UI
+        // extension would only optionnally draw the Notifications feature, since it's used only in the UI for
+        // displaying documents tagged with a given tag, where the Activity Stream for a tag is displayed too (and
+        // Activity Stream is implemented with the Notifications feature).
+        "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
+    },
+    extraJARs = {
+        // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
+        // we need to provide the JAR inside WEB-INF/lib
+        "org.xwiki.platform:xwiki-platform-notifications-filters-default"
+    })
+public class UserDirectoryIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
-    @After
+    @AfterEach
     public void validate()
     {
         validateConsole.getLogCaptureConfiguration().registerExcludes(
@@ -54,10 +66,12 @@ public class UserDirectoryTest extends AbstractTest
     }
 
     @Test
-    public void verifyUserIsListed()
+    public void verifyUserIsListed(TestUtils setup)
     {
+        setup.loginAsSuperAdmin();
+
         // Delete possible existing user
-        getUtil().deletePage("XWiki", "test");
+        setup.deletePage("XWiki", "test");
 
         UserDirectoryPage page = UserDirectoryPage.gotoPage();
 
@@ -66,7 +80,8 @@ public class UserDirectoryTest extends AbstractTest
         assertEquals(0, liveTableElement.getRowCount());
 
         // Add a user and verify it's visible in the livetable
-        getUtil().createUserAndLogin("test", "testtest", "first_name", "John", "last_name", "Doe");
+        setup.createUserAndLogin("test", "testtest", "first_name", "John", "last_name", "Doe");
+
         // Go back to the user directory page since the user creation navigated to another page
         page = UserDirectoryPage.gotoPage();
         assertEquals(1, liveTableElement.getRowCount());
@@ -75,7 +90,7 @@ public class UserDirectoryTest extends AbstractTest
         assertTrue(liveTableElement.hasRow("Last Name", "Doe"));
 
         // Log out to verify the livetable works in guest view too
-        getUtil().forceGuestUser();
+        setup.forceGuestUser();
         assertEquals(1, liveTableElement.getRowCount());
         assertTrue(liveTableElement.hasRow("User ID", "test"));
         assertTrue(liveTableElement.hasRow("First Name", "John"));

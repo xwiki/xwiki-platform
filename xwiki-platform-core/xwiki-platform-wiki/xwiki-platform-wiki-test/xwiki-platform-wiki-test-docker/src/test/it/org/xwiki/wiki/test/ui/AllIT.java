@@ -43,7 +43,6 @@ import org.xwiki.test.docker.junit5.UITest;
         // we need to provide the JAR inside WEB-INF/lib
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
         // Required by components located in a core extensions
-        "org.xwiki.platform:xwiki-platform-notifications-preferences-default",
         "org.xwiki.platform:xwiki-platform-wiki-template-default",
         // TODO: improve the docker test framework to indicate xwiki-platform-wiki-ui-wiki instead of all those jars one
         // by one

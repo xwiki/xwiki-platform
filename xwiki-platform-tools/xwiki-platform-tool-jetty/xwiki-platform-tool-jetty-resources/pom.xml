@@ -76,6 +76,7 @@
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-start</artifactId>
       <version>${jetty.version}</version>
+      <classifier>shaded</classifier>
       <optional>true</optional>
     </dependency>
     <dependency>

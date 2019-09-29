@@ -32,7 +32,7 @@
       <outputFileNameMapping>start.jar</outputFileNameMapping>
       <outputDirectory>/jetty</outputDirectory>
       <includes>
-        <include>org.eclipse.jetty:jetty-start</include>
+        <include>org.eclipse.jetty:jetty-start:jar:shaded</include>
       </includes>
       <!-- Needed to prevent warning since our project has a pom packaging and is not producing any artifact -->
       <useProjectArtifact>false</useProjectArtifact>

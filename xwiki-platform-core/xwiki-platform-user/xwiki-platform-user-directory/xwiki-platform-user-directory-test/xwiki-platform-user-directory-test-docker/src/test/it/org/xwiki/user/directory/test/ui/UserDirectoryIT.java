@@ -59,9 +59,7 @@ public class UserDirectoryIT
         validateConsole.getLogCaptureConfiguration().registerExcludes(
             "Exception in macro #displayCheckedIfWatched called at",
             "Exception in macro #generateNotificationInput called at",
-            "DefaultNotificationFilterPreference is not mapped"/*,
-            "Caused by: org.hibernate.hql.ast.QuerySyntaxException: DefaultNotificationFilterPreference is not mapped "
-                + "[select nfp from DefaultNotificationFilterPreference nfp where nfp.owner = :owner order by nfp.id]"*/
+            "TypeError: p is undefined"
         );
     }
 

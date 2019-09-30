@@ -69,7 +69,7 @@
 	            'hideOkayMessage': 'true'
 	          }
 	        }))
-	      #end
+        #end
         #definePasswordFields($fields, 'password', 'password2')
         ## Change the label for new password fields.
         ## Even if the user has admin rights or not, the fields for new password will be the last two.

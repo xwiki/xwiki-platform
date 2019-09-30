@@ -565,7 +565,7 @@ define('xwiki-suggestAttachments', [
         percent: 0
       }
     };
-    return uploadFile(attachment.data, selectize.settings)
+    return uploadFile(attachment.data)
     .then($.proxy(processAttachment, null, selectize.settings))
     // Load the attachment icon before updating the display in order to reduce the flickering.
     .then(attachmentsIcon.loadIcon)

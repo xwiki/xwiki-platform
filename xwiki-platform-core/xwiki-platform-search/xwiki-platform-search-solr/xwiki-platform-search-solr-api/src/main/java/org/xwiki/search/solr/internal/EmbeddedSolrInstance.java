@@ -117,7 +117,8 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             throw new SolrServerException(
                 "Failed to initialize the Solr core. Please check the configuration and log messages.");
         } else if (coreContainer.getCores().size() > 1) {
-            this.logger.warn("Multiple Solr cores detected: [{}]. Using the first one.", coreContainer.getAllCoreNames());
+            this.logger.warn("Multiple Solr cores detected: [{}]. Using the first one.",
+                coreContainer.getAllCoreNames());
         }
         return coreContainer;
     }

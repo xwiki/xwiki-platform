@@ -31,6 +31,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.stability.Unstable;
 
+import com.google.common.base.Objects;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -46,6 +47,7 @@ public class XWikiUser
 
     /**
      * The name of the property that store the active status of the user.
+     * 
      * @since 11.8RC1
      */
     @Unstable
@@ -53,6 +55,7 @@ public class XWikiUser
 
     /**
      * The name of the property that store the information if an email was checked for the user.
+     * 
      * @since 11.8RC1
      */
     @Unstable
@@ -71,24 +74,31 @@ public class XWikiUser
 
     private String fullName;
 
+    private boolean fullNameNull;
+
     private DocumentReference userReference;
+
+    private boolean userReferenceSet;
 
     private boolean main;
 
     /**
      * Create a XWikiUser from its document reference and infer if the user is global or not based on the wiki part of
      * this reference. See {@link #isMain()} for more information.
+     * 
      * @param userReference the document reference of the user.
      * @since 11.6RC1
      */
     @Unstable
     public XWikiUser(DocumentReference userReference)
     {
-        this(userReference, XWiki.DEFAULT_MAIN_WIKI.equals(userReference.getWikiReference().getName()));
+        this(userReference,
+            userReference == null || XWiki.DEFAULT_MAIN_WIKI.equals(userReference.getWikiReference().getName()));
     }
 
     /**
      * Create a XWikiUser from its document reference and set the main flag. (see {@link #isMain()}).
+     * 
      * @param userReference the document reference of the user.
      * @param main true if the user is global (i.e. registered in the main wiki)
      * @since 11.6RC1
@@ -97,12 +107,14 @@ public class XWikiUser
     public XWikiUser(DocumentReference userReference, boolean main)
     {
         this.userReference = userReference;
-        setUser(getLocalEntityReferenceSerializer().serialize(userReference));
+        this.userReferenceSet = true;
+
         setMain(main);
     }
 
     /**
      * Create a XWikiUser for the given user.
+     * 
      * @param user the full name of the user on the form <tt>XWiki.Foo</tt>.
      * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference)}.
      */
@@ -114,6 +126,7 @@ public class XWikiUser
 
     /**
      * Create a XWikiUser for the given user.
+     * 
      * @param user the full name of the user on the form <tt>XWiki.Foo</tt>.
      * @param main true if the user is global (i.e. registered in the main wiki)
      * @deprecated since 11.6RC1 use {@link #XWikiUser(DocumentReference, boolean)}.
@@ -125,15 +138,41 @@ public class XWikiUser
         setMain(main);
     }
 
+    private void setUserReference(DocumentReference userReference)
+    {
+        this.userReference = userReference;
+        this.userReferenceSet = true;
+    }
+
+    private String toFullName(DocumentReference userReference)
+    {
+        if (userReference != null) {
+            return getLocalEntityReferenceSerializer().serialize(userReference);
+        } else {
+            return XWikiRightService.GUEST_USER_FULLNAME;
+        }
+    }
+
+    private DocumentReference fromFullName(String fullName)
+    {
+        DocumentReference reference = null;
+
+        if (fullName != null && !fullName.endsWith(XWikiRightService.GUEST_USER_FULLNAME)
+            && !fullName.equals(XWikiRightService.GUEST_USER)) {
+            reference = getCurrentMixedDocumentReferenceResolver().resolve(fullName);
+        }
+
+        return reference;
+    }
+
     /**
-     *
      * @return user fullname
      * @deprecated since 11.6RC1 use {@link #getFullName()}.
      */
     @Deprecated
     public String getUser()
     {
-        return this.fullName;
+        return getFullName();
     }
 
     /**
@@ -141,6 +180,11 @@ public class XWikiUser
      */
     public String getFullName()
     {
+        if (this.fullName == null && !this.fullNameNull) {
+            this.fullName = toFullName(this.userReference);
+            this.fullNameNull = this.fullName == null;
+        }
+
         return this.fullName;
     }
 
@@ -177,9 +221,10 @@ public class XWikiUser
 
     public DocumentReference getUserReference()
     {
-        if (this.userReference == null) {
-            this.userReference = getCurrentMixedDocumentReferenceResolver().resolve(getUser());
+        if (!this.userReferenceSet) {
+            setUserReference(fromFullName(getUser()));
         }
+
         return this.userReference;
     }
 
@@ -205,8 +250,8 @@ public class XWikiUser
 
     /**
      * @param context used to retrieve the user document.
-     * @return true if the user is email have been checked before.
-     *          This always returns true if the user is the guest or superadmin user.
+     * @return true if the user is email have been checked before. This always returns true if the user is the guest or
+     *         superadmin user.
      * @since 11.8RC1
      */
     @Unstable
@@ -219,8 +264,9 @@ public class XWikiUser
         } else {
             try {
                 XWikiDocument userdoc = getUserDocument(context);
-                isChecked = userdoc.getIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
-                    EMAIL_CHECKED_PROPERTY) != 0;
+                isChecked =
+                    userdoc.getIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
+                        EMAIL_CHECKED_PROPERTY) != 0;
             } catch (XWikiException e) {
                 this.logger.error("Error while checking email_checked status of user [{}]", getUser(), e);
                 isChecked = true;
@@ -244,8 +290,8 @@ public class XWikiUser
                 XWikiDocument userdoc = getUserDocument(context);
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
                     ACTIVE_PROPERTY, checkedFlag);
-                context.getWiki().saveDocument(userdoc, localizePlainOrKey("core.users." +
-                    (checked ? "email_checked" : "email_unchecked") + ".saveComment"), context);
+                context.getWiki().saveDocument(userdoc, localizePlainOrKey(
+                    "core.users." + (checked ? "email_checked" : "email_unchecked") + ".saveComment"), context);
             } catch (XWikiException e) {
                 this.logger.error("Error while setting email_checked status of user [{}]", getUser(), e);
             }
@@ -254,8 +300,8 @@ public class XWikiUser
 
     /**
      * @param context used to retrieve the user document.
-     * @return true if the user is disabled (i.e. its active property is set to 0).
-     *         This always returns false if the user is the guest or superadmin user.
+     * @return true if the user is disabled (i.e. its active property is set to 0). This always returns false if the
+     *         user is the guest or superadmin user.
      * @since 11.6RC1
      */
     @Unstable
@@ -322,6 +368,10 @@ public class XWikiUser
     public void setUser(String user)
     {
         this.fullName = user;
+        this.fullNameNull = this.fullName == null;
+
+        this.userReference = null;
+        this.userReferenceSet = false;
     }
 
     /**
@@ -383,7 +433,8 @@ public class XWikiUser
         boolean equals;
         if (obj instanceof XWikiUser) {
             XWikiUser otherUser = (XWikiUser) obj;
-            equals = otherUser.main == this.main && this.fullName.equals(otherUser.fullName);
+
+            equals = otherUser.main == this.main && Objects.equal(getUserReference(), otherUser.getUserReference());
         } else {
             equals = false;
         }

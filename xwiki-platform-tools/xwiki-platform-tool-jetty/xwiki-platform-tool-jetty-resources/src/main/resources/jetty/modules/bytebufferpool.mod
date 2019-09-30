@@ -18,37 +18,30 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-#
-# Jetty std err/out logging
-#
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
 
-[depend]
-server
+[description]
+Configures the ByteBufferPool used by ServerConnectors.
 
 [xml]
-etc/jetty-logging.xml
-
-[files]
-logs/
-
-[lib]
-lib/logging/**.jar
-resources/
+etc/jetty-bytebufferpool.xml
 
 [ini-template]
-## Logging Configuration
-# Configure jetty logging for default internal behavior STDERR output
-# -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.StdErrLog
+### Server ByteBufferPool Configuration
+## Minimum capacity to pool ByteBuffers
+#jetty.byteBufferPool.minCapacity=0
 
-# Configure jetty logging for slf4j
-# -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.Slf4jLog
+## Maximum capacity to pool ByteBuffers
+#jetty.byteBufferPool.maxCapacity=65536
 
-# Configure jetty logging for java.util.logging
-# -Dorg.eclipse.jetty.util.log.class=org.eclipse.jetty.util.log.JavaUtilLog
+## Capacity factor
+#jetty.byteBufferPool.factor=1024
 
-# STDERR / STDOUT Logging
-# Number of days to retain logs
-# jetty.log.retain=90
-# Directory for logging output
-# Either a path relative to ${jetty.base} or an absolute path
-# jetty.logs=logs
+## Maximum queue length for each bucket (-1 for unbounded)
+#jetty.byteBufferPool.maxQueueLength=-1
+
+## Maximum heap memory retainable by the pool (-1 for unlimited)
+#jetty.byteBufferPool.maxHeapMemory=-1
+
+## Maximum direct memory retainable by the pool (-1 for unlimited)
+#jetty.byteBufferPool.maxDirectMemory=-1

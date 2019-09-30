@@ -55,7 +55,8 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
-      <!-- In addition we need to specify the version so that it's the one that is required by the version of Jetty used. -->
+      <!-- In addition we need to specify the version so that it's the one that is required by the version of Jetty
+           used. -->
       <version>3.1.0</version>
       <optional>true</optional>
       <scope>compile</scope>

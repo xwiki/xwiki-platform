@@ -49,30 +49,35 @@
       #if(!$isValidPassword)
         $services.localization.render('platform.core.profile.passwd.instructions')
         #set ($fields = [])
-        #set ($discard = $fields.add({
-          'name': 'originalpassword',
-          'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
-          'params': {
-            'type': 'password',
-            'size': '60',
-            'autocomplete': 'off'
-          },
-          'validate': {
-            'mandatory': {
-              'failureMessage': $services.localization.render('core.validation.required.message')
-            },
-            'programmaticValidation': {
-              'code': '$user.checkPassword($request.originalpassword)',
-              'failureMessage': $services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')
-            },
-            'hideOkayMessage': 'true'
-          }
-        }))
+        #if (!$hasAdmin)
+					#set ($discard = $fields.add({
+	          'name': 'originalpassword',
+	          'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
+	          'params': {
+	            'type': 'password',
+	            'size': '60',
+	            'autocomplete': 'off'
+	          },
+	          'validate': {
+	            'mandatory': {
+	              'failureMessage': $services.localization.render('core.validation.required.message')
+	            },
+	            'programmaticValidation': {
+	              'code': '$user.checkPassword($request.originalpassword)',
+	              'failureMessage': $services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')
+	            },
+	            'hideOkayMessage': 'true'
+	          }
+	        }))
+	      #end
         #definePasswordFields($fields, 'password', 'password2')
-        ## Change the label for new password fields
-        #set ($fields[1].label = $services.localization.render('platform.core.profile.passwd.newPassword'))
+        ## Change the label for new password fields.
+        ## Even if the user has admin rights or not, the fields for new password will be the last two.
+        #set ($index = $fields.size() - 2)
+        #set ($fields[$index].label = $services.localization.render('platform.core.profile.passwd.newPassword'))
+				#set ($index = $index + 1)
         ## This key fits better.
-        #set ($fields[2].label = $services.localization.render('xe.admin.passwordReset.step2.newPasswordVerification.label'))
+        #set ($fields[$index].label = $services.localization.render('xe.admin.passwordReset.step2.newPasswordVerification.label'))
         <form class="xform third" action="" method="post" autocomplete="off">
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>

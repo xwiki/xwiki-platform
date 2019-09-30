@@ -50,7 +50,7 @@
         $services.localization.render('platform.core.profile.passwd.instructions')
         #set ($fields = [])
         #if (!$hasAdmin)
-					#set ($discard = $fields.add({
+          #set ($discard = $fields.add({
 	          'name': 'originalpassword',
 	          'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
 	          'params': {
@@ -75,7 +75,7 @@
         ## Even if the user has admin rights or not, the fields for new password will be the last two.
         #set ($index = $fields.size() - 2)
         #set ($fields[$index].label = $services.localization.render('platform.core.profile.passwd.newPassword'))
-				#set ($index = $index + 1)
+        #set ($index = $index + 1)
         ## This key fits better.
         #set ($fields[$index].label = $services.localization.render('xe.admin.passwordReset.step2.newPasswordVerification.label'))
         <form class="xform third" action="" method="post" autocomplete="off">

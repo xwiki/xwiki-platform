@@ -663,6 +663,15 @@ public class Document extends Api
     }
 
     /**
+     * @param defaultLocale the locale content in the default document version
+     * @since 11.9RC1
+     */
+    public void setDefaultLocale(Locale defaultLocale)
+    {
+        this.doc.setDefaultLocale(defaultLocale);
+    }
+
+    /**
      * TODO document this or mark it deprecated
      */
     public String getDefaultTemplate()

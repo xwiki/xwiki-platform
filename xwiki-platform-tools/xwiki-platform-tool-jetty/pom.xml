@@ -31,9 +31,6 @@
   <name>XWiki Platform - Tools - Jetty - Parent POM</name>
   <packaging>pom</packaging>
   <description>Tools for packaging a Jetty installation</description>
-  <properties>
-    <jetty.version>9.4.20.v20190813</jetty.version>
-  </properties>
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-tool-jetty-listener</module>

@@ -120,14 +120,4 @@
   <Set name="dumpAfterStart"><Property name="jetty.server.dumpAfterStart" deprecated="jetty.dump.start" default="false"/></Set>
   <Set name="dumpBeforeStop"><Property name="jetty.server.dumpBeforeStop" deprecated="jetty.dump.stop" default="false"/></Set>
 
-  <!-- In order to avoid getting a "java.lang.IllegalStateException: Form too large" error when editing large page in
-       XWiki we need to tell Jetty to allow for large content since by default it only allows for 20K. We do this by
-       passing the "org.eclipse.jetty.server.Request.maxFormContentSize" attribute.
-       Note that setting this value too high can leave your server vulnerable to denial of service attacks.
-  -->
-  <Call name="setAttribute">
-    <Arg>org.eclipse.jetty.server.Request.maxFormContentSize</Arg>
-    <Arg><Property name="jetty.maxFormContentSize" default="1000000"/></Arg>
-  </Call>
-
 </Configure>

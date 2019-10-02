@@ -29,4 +29,4 @@ deploy
 requestlog
 
 [xml]
-etc/jetty-notify-ready.xml
+etc/jetty-xwiki.xml

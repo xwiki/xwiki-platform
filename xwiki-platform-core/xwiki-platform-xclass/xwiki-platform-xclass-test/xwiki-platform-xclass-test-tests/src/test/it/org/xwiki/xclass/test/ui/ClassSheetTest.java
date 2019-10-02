@@ -122,7 +122,7 @@ public class ClassSheetTest extends AbstractTest
             ViewPage viewPage = editPage.clickSaveAndView();
 
             Assert.assertEquals(pageName, viewPage.getDocumentTitle());
-            Assert.assertEquals("Your favorite color\nblue\nYour current age\n27", viewPage.getContent());
+            Assert.assertEquals("YOUR FAVORITE COLOR\nblue\nYOUR CURRENT AGE\n27", viewPage.getContent());
             viewPage.clickBreadcrumbLink(classTitle);
             classSheetPage.waitUntilPageIsLoaded();
 

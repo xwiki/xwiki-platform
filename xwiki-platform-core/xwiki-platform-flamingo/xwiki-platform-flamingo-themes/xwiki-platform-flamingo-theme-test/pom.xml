@@ -39,6 +39,13 @@
   </properties>
   <modules>
     <module>xwiki-platform-flamingo-theme-test-pageobjects</module>
-    <module>xwiki-platform-flamingo-theme-test-tests</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-flamingo-theme-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

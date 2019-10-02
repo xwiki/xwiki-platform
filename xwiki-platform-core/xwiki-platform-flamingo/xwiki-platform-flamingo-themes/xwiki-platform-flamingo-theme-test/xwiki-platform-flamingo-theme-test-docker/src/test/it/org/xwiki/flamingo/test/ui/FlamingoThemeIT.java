@@ -21,20 +21,22 @@ package org.xwiki.flamingo.test.ui;
 
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
 import org.xwiki.flamingo.test.po.EditThemePage;
 import org.xwiki.flamingo.test.po.PreviewBox;
 import org.xwiki.flamingo.test.po.ThemeApplicationWebHomePage;
 import org.xwiki.flamingo.test.po.ViewThemePage;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
+import org.xwiki.test.ui.TestUtils;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UI tests for the Flamingo Theme Application.
@@ -42,16 +44,24 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 6.3M1
  */
-public class FlamingoThemeTest extends AbstractTest
+@UITest
+public class FlamingoThemeIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
+    @AfterEach
+    public void verify(LogCaptureConfiguration logCaptureConfiguration)
+    {
+        // TODO: Understand the problem and fix it
+        logCaptureConfiguration.registerExcludes("line 13: NS_ERROR_NOT_INITIALIZED");
+    }
 
     @Test
-    public void validateColorThemeFeatures() throws Exception
+    public void validateColorThemeFeatures(TestUtils setup, TestInfo info)
     {
+        setup.loginAsSuperAdmin();
+
         // First make sure the theme we'll create doesn't exist
-        getUtil().deletePage("FlamingoThemes", getTestMethodName());
+        String testMethodName = info.getTestMethod().get().getName();
+        setup.deletePage("FlamingoThemes", testMethodName);
 
         // Note: we don't reset the color theme before we start even though the test below could fail and thus have
         // our test theme set. We don't do that since we want to test that the default CT is Charcoal by default.
@@ -80,7 +90,7 @@ public class FlamingoThemeTest extends AbstractTest
         assertFalse(otherThemes.contains("Charcoal"));
 
         // Create a new theme
-        EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(getTestMethodName());
+        EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(testMethodName);
         editThemePage.waitUntilPreviewIsLoaded();
 
         // First, disable auto refresh because it slows down the test
@@ -97,18 +107,18 @@ public class FlamingoThemeTest extends AbstractTest
         themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
 
         // Set the new theme as current, from the Theme Home page
-        themeApplicationWebHomePage.useTheme(getTestMethodName());
+        themeApplicationWebHomePage.useTheme(testMethodName);
         // Verify that the new theme is used
-        assertEquals(getTestMethodName(), themeApplicationWebHomePage.getCurrentTheme());
+        assertEquals(testMethodName, themeApplicationWebHomePage.getCurrentTheme());
         // Look at the values
-        assertEquals("rgba(255, 0, 0, 1)", themeApplicationWebHomePage.getPageBackgroundColor());
+        assertEquals("rgb(255, 0, 0)", themeApplicationWebHomePage.getPageBackgroundColor());
         assertEquals("monospace", themeApplicationWebHomePage.getFontFamily().toLowerCase());
         // Test 'lessCode' is correctly handled
-        assertEquals("rgba(0, 0, 255, 1)", themeApplicationWebHomePage.getTextColor());
+        assertEquals("rgb(0, 0, 255)", themeApplicationWebHomePage.getTextColor());
 
         // Verify we can select a theme by clicking the "use this theme" link, and view it
         themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
-        ViewThemePage themePage = themeApplicationWebHomePage.seeTheme(getTestMethodName());
+        ViewThemePage themePage = themeApplicationWebHomePage.seeTheme(testMethodName);
         themePage.waitUntilPreviewIsLoaded();
 
         // Switch back to Charcoal
@@ -120,8 +130,8 @@ public class FlamingoThemeTest extends AbstractTest
         presentationAdministrationSectionPage = administrationPage.clickThemesSection();
 
         // Set the newly created color theme as the active theme
-        presentationAdministrationSectionPage.setColorTheme(getTestMethodName());
-        assertEquals(getTestMethodName(), presentationAdministrationSectionPage.getCurrentColorTheme());
+        presentationAdministrationSectionPage.setColorTheme(testMethodName);
+        assertEquals(testMethodName, presentationAdministrationSectionPage.getCurrentColorTheme());
         presentationAdministrationSectionPage.clickSave();
 
         // Click on the 'customize' button to edit the theme to verify it works
@@ -141,7 +151,7 @@ public class FlamingoThemeTest extends AbstractTest
         themeApplicationWebHomePage.useTheme("Charcoal");
     }
 
-    private void verifyAllVariablesCategoriesArePresent(EditThemePage editThemePage) throws Exception
+    private void verifyAllVariablesCategoriesArePresent(EditThemePage editThemePage)
     {
         List<String> categories = editThemePage.getVariableCategories();
         assertEquals(11, categories.size());
@@ -158,7 +168,7 @@ public class FlamingoThemeTest extends AbstractTest
         assertTrue(categories.contains("Advanced"));
     }
 
-    private void verifyVariablesCategoriesDoesNotDisappear(EditThemePage editThemePage) throws Exception
+    private void verifyVariablesCategoriesDoesNotDisappear(EditThemePage editThemePage)
     {
         // Because of an incompatibility between PrototypeJS and Bootstrap, the variables categories can disappear
         // (see: https://jira.xwiki.org/browse/XWIKI-11670).
@@ -171,7 +181,7 @@ public class FlamingoThemeTest extends AbstractTest
         assertEquals(11, editThemePage.getVariableCategories().size());
     }
 
-    private void verifyThatPreviewWorks(EditThemePage editThemePage) throws Exception
+    private void verifyThatPreviewWorks(EditThemePage editThemePage)
     {
         // Verify that the preview is working with the current values
         PreviewBox previewBox = editThemePage.getPreviewBox();
@@ -190,9 +200,9 @@ public class FlamingoThemeTest extends AbstractTest
         // Verify that there is still no errors
         assertFalse(previewBox.hasError());
         // Verify that the modification have been made in the preview
-        assertEquals("rgba(255, 0, 0, 1)", previewBox.getPageBackgroundColor());
+        assertEquals("rgb(255, 0, 0)", previewBox.getPageBackgroundColor());
         assertEquals("monospace", previewBox.getFontFamily());
         // Test 'lessCode' is correctly handled (since 7.3M1)
-        assertEquals("rgba(0, 0, 255, 1)", previewBox.getTextColor());
+        assertEquals("rgb(0, 0, 255)", previewBox.getTextColor());
     }
 }

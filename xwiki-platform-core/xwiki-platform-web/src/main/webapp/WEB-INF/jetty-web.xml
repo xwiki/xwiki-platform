@@ -20,17 +20,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
-
-<Configure id="Server" class="org.eclipse.jetty.server.Server">
-
-  <!-- Jetty lifecycle listener that prints a message to open a browser when the server is started. This is to provide
-       information to newbies so that they know what to do after the server is started.
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+  <!-- In order to avoid getting a "java.lang.IllegalStateException: Form too large" error when editing large page in
+       XWiki we need to tell Jetty to allow for large content since by default it only allows for 20K. We do this by
+       passing the "org.eclipse.jetty.server.Request.maxFormContentSize" attribute.
+       Note 1: Setting this value too high can leave your server vulnerable to denial of service attacks.
+       Note 2: We're setting it here instead of in Jetty's XML configuration files so that the XWiki WAR can be used
+       in any Jetty config and work out of the box.
   -->
-  <Call name="addLifeCycleListener">
-    <Arg>
-      <New class="org.xwiki.tools.jetty.listener.NotifyListener" />
-    </Arg>
-  </Call>
-
+  <Set name="maxFormContentSize">1000000</Set>
 </Configure>

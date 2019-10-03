@@ -1603,7 +1603,29 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
   #end
   #set ($lastItem = $mathtool.min($items.size(), $mathtool.add($paginationParams.firstItem,
     $paginationParams.itemsPerPage)))
-  #set ($items = $items.subList($paginationParams.firstItem, $lastItem))
+  #set ($firstItem = $paginationParams.firstItem)
+  #if ($firstItem >= $lastItem && $lastItem > 0 && ! $!request.get("${key}PagingReset"))
+     #set ($redirectUrl = $paginationParams.url)
+     #if (!$redirectUrl)
+       ## sometimes the 'url' is missing from the $paginationParams
+       ## so we need to recompute it
+       #set ($requestParams = {})
+       #set ($discard = $requestParams.putAll($request.getParameterMap()))
+       #set ($discard = $requestParams.remove($paginationParams.itemParamName))
+       #set ($discard = $requestParams.remove($paginationParams.itemsPerPageParamName))
+       #set ($redirectUrl = $doc.getURL($xcontext.action, $escapetool.url($requestParams)))
+     #end
+     #if ($redirectUrl.indexOf('?') < 0)
+       #set ($discard = $response.sendRedirect("${redirectUrl}?${key}PagingReset=1"))
+     #else
+       #set ($discard = $response.sendRedirect("${redirectUrl}&${key}PagingReset=1"))
+     #end
+     #stop
+  #end
+  #if ($request.get("${key}PagingReset"))
+     <div class="box infomessage">$escapetool.xml($services.localization.render('platform.extension.updater.pagingrestart'))</div>
+  #end
+  #set ($items = $items.subList($firstItem, $lastItem))
   #foreach ($item in $items)
     #if ($foreach.index == 0 || $item.namespace != $extensionNamespace)
       #if ($foreach.index > 0)

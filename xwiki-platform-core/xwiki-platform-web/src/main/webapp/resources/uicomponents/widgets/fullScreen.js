@@ -96,7 +96,7 @@ widgets.FullScreen = Class.create({
     }
   },
   isNotMaximizable: function (item) {
-    return !item.hasClassName('not-maximizable');
+    return item.hasClassName('not-maximizable');
   },
   // Some simple functions that help deciding what kind of editor is the target element
   isWikiContent : function (textarea) {

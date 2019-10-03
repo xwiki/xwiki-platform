@@ -32,6 +32,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -39,6 +40,7 @@ import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
@@ -113,15 +115,14 @@ public class DefaultHTMLConverterTest
     public void toHTML() throws Exception
     {
         String source = "wiki syntax";
-        String syntaxId = "syntax/x.y";
+        Syntax syntax = new Syntax(new SyntaxType("syntax", "Syntax"), "x.y");
 
         // The source should be parsed.
-        Parser parser = this.mocker.registerMockComponent(Parser.class, syntaxId);
-
+        ContentParser contentParser = this.mocker.getInstance(ContentParser.class);
         XDOM xdom = new XDOM(Collections.<Block>emptyList());
-        when(parser.parse(any(StringReader.class))).thenReturn(xdom);
+        when(contentParser.parse(source, syntax, null)).thenReturn(xdom);
 
-        Assert.assertEquals("", mocker.getComponentUnderTest().toHTML(source, syntaxId));
+        Assert.assertEquals("", mocker.getComponentUnderTest().toHTML(source, syntax.toIdString()));
 
         // Verify that the macro transformations have been executed.
         Transformation macroTransformation = mocker.getInstance(Transformation.class, "macro");

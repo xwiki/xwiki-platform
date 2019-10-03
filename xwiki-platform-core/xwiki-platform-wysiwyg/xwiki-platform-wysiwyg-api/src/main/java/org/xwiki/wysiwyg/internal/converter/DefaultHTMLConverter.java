@@ -28,9 +28,11 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
@@ -88,6 +90,9 @@ public class DefaultHTMLConverter implements HTMLConverter
      */
     @Inject
     private RenderingContext renderingContext;
+
+    @Inject
+    private ContentParser contentParser;
 
     /**
      * The component used to execute the XDOM macro transformations before rendering to XHTML.
@@ -149,13 +154,25 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Override
     public String toHTML(String source, String syntaxId)
     {
+        Syntax syntax;
+        try {
+            syntax = Syntax.valueOf(syntaxId);
+        } catch (ParseException e) {
+            throw new RuntimeException(String.format("Cannot convert to HTML: Invalid syntax [%s]", syntaxId), e);
+        }
+
+        return toHTML(source, syntax, null);
+    }
+
+    @Override
+    public String toHTML(String source, Syntax syntax, EntityReference sourceReference)
+    {
         try {
             // Parse
-            Parser parser = this.contextComponentManager.getInstance(Parser.class, syntaxId);
-            XDOM xdom = parser.parse(new StringReader(source));
+            XDOM xdom = this.contentParser.parse(source, syntax, sourceReference);
 
             // Execute the macro transformation
-            executeMacroTransformation(xdom, Syntax.valueOf(syntaxId));
+            executeMacroTransformation(xdom, syntax);
 
             // Render
             WikiPrinter printer = new DefaultWikiPrinter();

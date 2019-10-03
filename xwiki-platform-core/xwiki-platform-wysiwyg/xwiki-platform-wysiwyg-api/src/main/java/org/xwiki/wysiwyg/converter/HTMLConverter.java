@@ -20,6 +20,9 @@
 package org.xwiki.wysiwyg.converter;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.stability.Unstable;
 
 /**
  * Converts HTML to/from a specified syntax.
@@ -33,10 +36,27 @@ public interface HTMLConverter
      * Converts the given source text from the specified syntax to HTML.
      *
      * @param source the text to be converted
-     * @param syntaxId the syntax identifier
+     * @param syntaxId the syntax of the source
      * @return the HTML result of the conversion
+     * @deprecated since 11.9RC1, use {@link #toHTML(String, Syntax, EntityReference)} instead
      */
+    @Deprecated
     String toHTML(String source, String syntaxId);
+
+    /**
+     * Converts the given source text from the specified syntax to HTML.
+     *
+     * @param source the text to be converted
+     * @param syntax the syntax of the source
+     * @param sourceReference the reference of the source
+     * @return the HTML result of the conversion
+     * @since 11.9RC1
+     */
+    @Unstable
+    default String toHTML(String source, Syntax syntax, EntityReference sourceReference)
+    {
+        return toHTML(source, syntax.toIdString());
+    }
 
     /**
      * Cleans and converts the given HTML fragment to the specified syntax.

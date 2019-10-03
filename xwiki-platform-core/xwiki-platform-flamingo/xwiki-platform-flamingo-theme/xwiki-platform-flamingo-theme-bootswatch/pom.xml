@@ -24,65 +24,25 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-flamingo-themes</artifactId>
+    <artifactId>xwiki-platform-flamingo-theme</artifactId>
     <version>11.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-flamingo-theme-ui</artifactId>
+  <artifactId>xwiki-platform-flamingo-theme-bootswatch</artifactId>
   <packaging>xar</packaging>
-  <name>XWiki Platform - Flamingo - Theme - UI</name>
-  <description>Visually customize any Flamingo-based skin and preview the results live + Default Themes</description>
+  <name>XWiki Platform - Flamingo - Theme - Bootswatch</name>
+  <description>Themes for Flamingo created by Bootswatch</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>Flamingo Theme Application</xwiki.extension.name>
+    <xwiki.extension.name>Bootswatch Themes for Flamingo</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
-    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-flamingo-theme</xwiki.extension.features>
+    <xwiki.extension.features>org.xwiki.platform:xwiki-platform-flamingo-bootswatchthemes</xwiki.extension.features>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-icon-script</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-webjars-api</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>requirejs</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>jquery</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>less</artifactId>
-      <version>2.5.3</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.webjars</groupId>
-      <artifactId>colpick</artifactId>
-      <version>2.0.2</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-attachment-ui</artifactId>
+      <artifactId>xwiki-platform-flamingo-theme-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <!-- Needed by themes that uses Open Sans font, like Iceberg -->
-    <dependency>
-      <groupId>org.webjars.bower</groupId>
-      <artifactId>open-sans</artifactId>
-      <version>1.1.0</version>
-      <scope>runtime</scope>
     </dependency>
   </dependencies>
 
@@ -94,23 +54,67 @@
         <configuration>
           <entries>
             <entry>
-              <document>FlamingoThemes.Charcoal</document>
+              <document>FlamingoThemes.Cerulean</document>
               <type>demo</type>
             </entry>
             <entry>
-              <document>FlamingoThemes.Garden</document>
+              <document>FlamingoThemes.Cosmo</document>
               <type>demo</type>
             </entry>
             <entry>
-              <document>FlamingoThemes.Iceberg</document>
+              <document>FlamingoThemes.Cyborg</document>
               <type>demo</type>
             </entry>
             <entry>
-              <document>FlamingoThemes.Kitty</document>
+              <document>FlamingoThemes.Darkly</document>
               <type>demo</type>
             </entry>
             <entry>
-              <document>FlamingoThemes.Marina</document>
+              <document>FlamingoThemes.Flatly</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Journal</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Lumen</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Paper</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Readable</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Sandstone</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Simplex</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Slate</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Spacelab</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Superhero</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.United</document>
+              <type>demo</type>
+            </entry>
+            <entry>
+              <document>FlamingoThemes.Yeti</document>
               <type>demo</type>
             </entry>
           </entries>

@@ -27,10 +27,10 @@
     <artifactId>xwiki-platform-flamingo</artifactId>
     <version>11.9-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-flamingo-themes</artifactId>
-  <name>XWiki Platform - Flamingo - Themes - Parent POM</name>
+  <artifactId>xwiki-platform-flamingo-theme</artifactId>
+  <name>XWiki Platform - Flamingo - Theme - Parent POM</name>
   <packaging>pom</packaging>
-  <description>XWiki Platform - Flamingo - Themes - Parent POM</description>
+  <description>XWiki Platform - Flamingo - Theme - Parent POM</description>
   <modules>
     <module>xwiki-platform-flamingo-theme-bootswatch</module>
     <module>xwiki-platform-flamingo-theme-ui</module>

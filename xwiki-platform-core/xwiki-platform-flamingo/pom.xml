@@ -33,6 +33,6 @@
   <description>Modules related to the Flamingo Skin</description>
   <modules>
     <module>xwiki-platform-flamingo-skin</module>
-    <module>xwiki-platform-flamingo-themes</module>
+    <module>xwiki-platform-flamingo-theme</module>
   </modules>
 </project>

@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
@@ -123,6 +124,9 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Named("context")
     private ComponentManager contextComponentManager;
 
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
     @Override
     public String fromHTML(String dirtyHTML, String syntaxId)
     {
@@ -154,14 +158,7 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Override
     public String toHTML(String source, String syntaxId)
     {
-        Syntax syntax;
-        try {
-            syntax = Syntax.valueOf(syntaxId);
-        } catch (ParseException e) {
-            throw new RuntimeException(String.format("Cannot convert to HTML: Invalid syntax [%s]", syntaxId), e);
-        }
-
-        return toHTML(source, syntax, null);
+        return toHTML(source, getSyntax(syntaxId), null);
     }
 
     @Override
@@ -188,16 +185,26 @@ public class DefaultHTMLConverter implements HTMLConverter
     @Override
     public String parseAndRender(String dirtyHTML, String syntaxId)
     {
+        return parseAndRender(dirtyHTML, getSyntax(syntaxId), null);
+    }
+
+    @Override
+    public String parseAndRender(String dirtyHTML, Syntax syntax, EntityReference sourceReference)
+    {
         boolean renderingContextPushed = false;
         try {
             // Clean
             String html = this.htmlCleaner.clean(dirtyHTML);
 
-            Syntax syntax = Syntax.valueOf(syntaxId);
             renderingContextPushed = maybeSetRenderingContextSyntax(syntax);
 
             // Parse
             XDOM xdom = this.xhtmlParser.parse(new StringReader(html));
+
+            // Add the source reference to be a good citizen
+            if (sourceReference != null) {
+                xdom.getMetaData().addMetaData(MetaData.SOURCE, this.serializer.serialize(sourceReference));
+            }
 
             // The XHTML parser sets the "syntax" meta data property of the created XDOM to "xhtml/1.0". The syntax meta
             // data is used as the default syntax for macro content. We have to change this to the specified syntax
@@ -219,6 +226,15 @@ public class DefaultHTMLConverter implements HTMLConverter
             if (renderingContextPushed) {
                 ((MutableRenderingContext) this.renderingContext).pop();
             }
+        }
+    }
+
+    private Syntax getSyntax(String syntaxId)
+    {
+        try {
+            return Syntax.valueOf(syntaxId);
+        } catch (ParseException e) {
+            throw new RuntimeException(String.format("Invalid syntax [%s]", syntaxId), e);
         }
     }
 

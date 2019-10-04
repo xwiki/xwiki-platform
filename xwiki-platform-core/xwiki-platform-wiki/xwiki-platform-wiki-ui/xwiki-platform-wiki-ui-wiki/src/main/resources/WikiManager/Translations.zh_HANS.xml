@@ -20,10 +20,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="WikiManager.Translations" locale="es">
+<xwikidoc version="1.3" reference="WikiManager.Translations" locale="zh_HANS">
   <web>WikiManager</web>
   <name>Translations</name>
-  <language>es</language>
+  <language>zh_HANS</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
@@ -39,9 +39,9 @@
   <content># Various translations that are used in the wiki template and, implicitly, in the created wiki.
 
 ## MENU
-### Missing: core.menu.type.wiki=Wiki
-core.menu.watchlist.add.wiki=Observar la Wiki
-core.menu.watchlist.remove.wiki=Dejar de observar la Wiki
+core.menu.type.wiki=Wiki
+### Missing: core.menu.watchlist.add.wiki=Watch Wiki
+### Missing: core.menu.watchlist.remove.wiki=Unwatch Wiki
 ### Missing: core.menu.admin.wiki=Administer wiki
 
 # WIKI INFORMATION PANEL
@@ -98,7 +98,7 @@ core.menu.watchlist.remove.wiki=Dejar de observar la Wiki
 ### Missing: platform.wiki.currentwiki.invite.message.label=Message
 ### Missing: platform.wiki.currentwiki.invite.button.label=Invite
 ### Missing: platform.wiki.currentwiki.candidates.label=Candidates
-platform.wiki.currentwiki.candidates.status.label=Estado:
+### Missing: platform.wiki.currentwiki.candidates.status.label=Status:
 ### Missing: platform.wiki.currentwiki.candidates.type.label=Type:
 ### Missing: platform.wiki.currentwiki.candidates.reviewer.label=Admin:
 ### Missing: platform.wiki.currentwiki.candidates.reviewermessage.label=Admin's Message:
@@ -134,4 +134,5 @@ platform.wiki.currentwiki.candidates.status.label=Estado:
     
 # DRAWER ITEM
 ### Missing: platform.wiki.drawer.homeWiki=Home</content>
+  
 </xwikidoc>

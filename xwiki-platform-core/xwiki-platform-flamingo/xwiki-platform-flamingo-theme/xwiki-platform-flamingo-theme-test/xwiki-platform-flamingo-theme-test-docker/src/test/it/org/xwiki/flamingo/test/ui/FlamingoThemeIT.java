@@ -111,10 +111,10 @@ public class FlamingoThemeIT
         // Verify that the new theme is used
         assertEquals(testMethodName, themeApplicationWebHomePage.getCurrentTheme());
         // Look at the values
-        assertEquals("rgb(255, 0, 0)", themeApplicationWebHomePage.getPageBackgroundColor());
+        assertEquals("rgba(255, 0, 0, 1)", themeApplicationWebHomePage.getPageBackgroundColor());
         assertEquals("monospace", themeApplicationWebHomePage.getFontFamily().toLowerCase());
         // Test 'lessCode' is correctly handled
-        assertEquals("rgb(0, 0, 255)", themeApplicationWebHomePage.getTextColor());
+        assertEquals("rgba(0, 0, 255, 1)", themeApplicationWebHomePage.getTextColor());
 
         // Verify we can select a theme by clicking the "use this theme" link, and view it
         themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
@@ -200,9 +200,9 @@ public class FlamingoThemeIT
         // Verify that there is still no errors
         assertFalse(previewBox.hasError());
         // Verify that the modification have been made in the preview
-        assertEquals("rgb(255, 0, 0)", previewBox.getPageBackgroundColor());
+        assertEquals("rgba(255, 0, 0, 1)", previewBox.getPageBackgroundColor());
         assertEquals("monospace", previewBox.getFontFamily());
         // Test 'lessCode' is correctly handled (since 7.3M1)
-        assertEquals("rgb(0, 0, 255)", previewBox.getTextColor());
+        assertEquals("rgba(0, 0, 255, 1)", previewBox.getTextColor());
     }
 }

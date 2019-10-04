@@ -38,4 +38,6 @@ nbproject
 xwiki-platform-core/xwiki-platform-search/xwiki-platform-search-solr/xwiki-platform-search-solr-api/src/test/resources/xwiki-platform-search-solr-server-data.zip
 
 # Weblate
-/.translation
+# This folder is actually used internally by weblate to know if something needs to be committed or not, ignoring it
+# implies that weblate won't trigger any commit anymore.
+#/.translation

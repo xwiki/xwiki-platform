@@ -1600,41 +1600,36 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
     'noSx': true
   })
   #paginationPrepareParams($paginationParams)
-  #if ($items.size() > $paginationParams.itemsPerPage)
-    #set ($hasPagination = true)
+  #set ($hasPagination = $items.size() > $paginationParams.itemsPerPage)
+  #set ($indexOutOfRange = $items.size() > 0 && $paginationParams.firstItem >= $items.size())
+  #if ($hasPagination || $indexOutOfRange)
     #set ($paginationParams.totalItems = $items.size())
     #set ($requestParams = {})
     #set ($discard = $requestParams.putAll($request.getParameterMap()))
     #set ($discard = $requestParams.remove($paginationParams.itemParamName))
     #set ($discard = $requestParams.remove($paginationParams.itemsPerPageParamName))
+    #if ($indexOutOfRange)
+      #if ($!request.get("${key}PagingReset"))
+        ## it seems we already got redirected. how this?
+        #set ($paginationParams.firstItem = 0)
+      #else
+        #set ($discard = $requestParams.put("${key}PagingReset", "1"))
+        #set ($redirectUrl = $doc.getURL($xcontext.action, $escapetool.url($requestParams)))
+        #set ($discard = $response.sendRedirect($redirectUrl))
+        #stop
+      #end
+    #end
+  #end
+  #if($hasPagination)
     #set ($paginationParams.url = $doc.getURL($xcontext.action, $escapetool.url($requestParams)))
     #pagination($paginationParams)
   #end
   #set ($lastItem = $mathtool.min($items.size(), $mathtool.add($paginationParams.firstItem,
     $paginationParams.itemsPerPage)))
-  #set ($firstItem = $paginationParams.firstItem)
-  #if ($firstItem >= $lastItem && $lastItem > 0 && ! $!request.get("${key}PagingReset"))
-     #set ($redirectUrl = $paginationParams.url)
-     #if (!$redirectUrl)
-       ## sometimes the 'url' is missing from the $paginationParams
-       ## so we need to recompute it
-       #set ($requestParams = {})
-       #set ($discard = $requestParams.putAll($request.getParameterMap()))
-       #set ($discard = $requestParams.remove($paginationParams.itemParamName))
-       #set ($discard = $requestParams.remove($paginationParams.itemsPerPageParamName))
-       #set ($redirectUrl = $doc.getURL($xcontext.action, $escapetool.url($requestParams)))
-     #end
-     #if ($redirectUrl.indexOf('?') < 0)
-       #set ($discard = $response.sendRedirect("${redirectUrl}?${key}PagingReset=1"))
-     #else
-       #set ($discard = $response.sendRedirect("${redirectUrl}&${key}PagingReset=1"))
-     #end
-     #stop
-  #end
   #if ($request.get("${key}PagingReset"))
      <div class="box infomessage">$escapetool.xml($services.localization.render('platform.extension.updater.pagingrestart'))</div>
   #end
-  #set ($items = $items.subList($firstItem, $lastItem))
+  #set ($items = $items.subList($paginationParams.firstItem, $lastItem))
   #foreach ($item in $items)
     #if ($foreach.index == 0 || $item.namespace != $extensionNamespace)
       #if ($foreach.index > 0)

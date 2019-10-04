@@ -393,9 +393,11 @@
   </resource-ref>
   -->
 
+  <!-- Uncomment if you wish to overwrite the default xwiki.cfg location or by pass the /etc/xwiki/xwiki.cfg step
   <env-entry>
     <env-entry-name>XWikiConfig</env-entry-name>
     <env-entry-type>java.lang.String</env-entry-type>
     <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>
   </env-entry>
+   -->
 </web-app>

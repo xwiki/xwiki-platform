@@ -1609,6 +1609,8 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
         #set ($discard = $response.sendRedirect($redirectUrl))
         #stop
       #end
+    #else
+      #set ($discard = $requestParams.remove("${key}PagingReset"))
     #end
   #end
   #if($hasPagination)

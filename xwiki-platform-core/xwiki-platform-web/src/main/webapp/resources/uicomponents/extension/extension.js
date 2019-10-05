@@ -658,7 +658,7 @@ var toQueryParams = function(url) {
  * or 'admin' action (depending whether the extension is displayed alone or in the administration section).
  */
 var fixExtensionLinks = function(container) {
-  (container || $('body')).select("a.extension-link").each(function (link) {
+  (container || $('body')).select("a.extension-link, .paginationFilter a").each(function (link) {
     var linkQueryParams = toQueryParams(link.getAttribute('href'));
     var currentQueryParams = toQueryParams(window.location.href);
     if (linkQueryParams.extensionId) {
@@ -671,6 +671,7 @@ var fixExtensionLinks = function(container) {
       ['extensionId', 'extensionVersion', 'extensionVersionConstraint', 'extensionNamespace'].each(function(param) {
         delete currentQueryParams[param];
       });
+      for (param in linkQueryParams) { currentQueryParams[param] = linkQueryParams[param] }
     }
     link.setAttribute('href', XWiki.currentDocument.getURL(XWiki.contextaction,
       Object.toQueryString(currentQueryParams)));

@@ -668,10 +668,10 @@ var fixExtensionLinks = function(container) {
         currentQueryParams.extensionNamespace = linkQueryParams.extensionNamespace;
       }
     } else {
-      ['extensionId', 'extensionVersion', 'extensionVersionConstraint', 'extensionNamespace'].each(function(param) {
+      ['extensionId', 'extensionVersion', 'extensionVersionConstraint', 'extensionNamespace', 'invalidPagingReset', 'outdatedPagingReset'].each(function(param) {
         delete currentQueryParams[param];
       });
-      for (param in linkQueryParams) { currentQueryParams[param] = linkQueryParams[param] }
+      Object.extend(currentQueryParams, linkQueryParams);
     }
     link.setAttribute('href', XWiki.currentDocument.getURL(XWiki.contextaction,
       Object.toQueryString(currentQueryParams)));

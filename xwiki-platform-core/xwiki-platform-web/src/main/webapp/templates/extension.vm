@@ -1609,7 +1609,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
     #set ($discard = $requestParams.remove($paginationParams.itemParamName))
     #set ($discard = $requestParams.remove($paginationParams.itemsPerPageParamName))
     #if ($indexOutOfRange)
-      #if ($!request.get("${key}PagingReset"))
+      #if ($request.get("${key}PagingReset"))
         ## it seems we already got redirected. how this?
         #set ($paginationParams.firstItem = 0)
       #else

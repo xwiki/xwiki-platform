@@ -358,7 +358,8 @@ define('xwiki-ckeditor', [
             '&lt;/li&gt;'].join(''),
           outputTemplate: '&lt;a href="{url}" data-reference="{typed}|-|{type}|-|{reference}"&gt;{label}&lt;/a&gt;',
           marker: '[',
-          itemsLimit: 10
+          minChars: 0,
+          itemsLimit: 8
         }
       ]
     };
@@ -1198,9 +1199,15 @@ ul.cke_autocomplete_panel {
   border-radius: 4px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   padding: 5px 0;
+  width: auto;
+  max-width: 100%;
+  min-width: 200px;
 }
 .cke_autocomplete_panel &gt; li.ckeditor-autocomplete-item {
   padding: 3px 12px;
+}
+.cke_autocomplete_panel &gt; li.ckeditor-autocomplete-item &gt; div {
+  white-space: nowrap;
 }
 .ckeditor-autocomplete-item-icon-wrapper {
   display: inline-block;

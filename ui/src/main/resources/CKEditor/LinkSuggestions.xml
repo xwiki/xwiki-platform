@@ -41,6 +41,8 @@
   <hidden>true</hidden>
   <content>{{template name="hierarchy_macros.vm"/}}
 
+{{include reference="XWiki.SuggestSolrMacros"/}}
+
 {{include reference="XWiki.DocumentTreeMacros"/}}
 
 {{velocity output="false"}}
@@ -117,20 +119,75 @@
     #set ($discard = $suggestions.add($suggestion))
   #end
 #end
+
+#macro (searchEntities $input $limit $entityReferences)
+  #if ($xwiki.exists('XWiki.SuggestSolrMacros'))
+    #searchEntitiesSolr($input $limit $entityReferences)
+  #elseif ($xwiki.exists('XWiki.DocumentTreeMacros'))
+    #searchEntitiesDatabase($input $limit $entityReferences)
+  #end
+#end
+
+#macro (searchEntitiesSolr $input $limit $entityReferences)
+  ## Enable prefix search.
+  #set ($input = "$input* $input")
+  #set ($results = [])
+  #searchDocumentsSolr($input $limit $results)
+  #searchAttachmentsSolr($input $limit $results)
+  #set ($results = $sorttool.sort($results, 'score:desc'))
+  #foreach ($result in $results.subList(0, $mathtool.min($results.size(), $limit)))
+    #set ($discard = $entityReferences.add($services.solr.resolve($result)))
+  #end
+#end
+
+#macro (searchDocumentsSolr $input $limit $results)
+  #set ($params = [
+    'fq=type:DOCUMENT',
+    'fq=doclocale:""',
+    'qf=title^6 name^4 doccontent^2 doccontentraw',
+    'fl=type wiki spaces name score',
+    "bq=author:""$services.model.serialize($xcontext.userReference, 'default')""",
+    "bq=creator:""$services.model.serialize($xcontext.userReference, 'default')""",
+    'bf=recip(ms(NOW,date),3.16e-11,1,1)'
+  ])
+  #executeSolrQuery($input $params $limit $results)
+#end
+
+#macro (searchAttachmentsSolr $input $limit $results)
+  #set ($params = [
+    'fq=type:ATTACHMENT',
+    'qf=filename^4 attcontent',
+    'fl=type wiki spaces name filename score',
+    "bq=attauthor:""$services.model.serialize($xcontext.userReference, 'default')""",
+    "bq=space_exact:""$services.model.serialize($doc.documentReference.parent, 'local')""",
+    'bf=recip(ms(NOW,attdate_sort),3.16e-11,1,1)'
+  ])
+  #executeSolrQuery($input $params $limit $results)
+#end
+
+#macro (executeSolrQuery $text $params $limit $results)
+  #set ($paramsAsString = $stringtool.join($params, $util.newline))
+  #createSearchSuggestQuery($paramsAsString $text $query)
+  #set ($discard = $query.setLimit($limit))
+  #set ($discard = $results.addAll($query.execute()[0].results))
+#end
+
+#macro (searchEntitiesDatabase $input $limit $entityReferences)
+  #set ($halfLimit = $limit / 2)
+  #searchDocumentsDatabase($input $halfLimit)
+  #set ($discard = $entityReferences.addAll($documentReferences))
+  #searchAttachmentsDatabase($input $halfLimit)
+  #set ($discard = $entityReferences.addAll($attachmentReferences))
+#end
 {{/velocity}}
 
 {{velocity wiki="false"}}
-#set ($input = "$!request.input.trim()")
-#if ($input != '')
-  #if ($xwiki.exists('XWiki.SuggestSolrMacros'))
-    ## Enable prefix search.
-    #set ($input = "$input* $input")
-  #end
+#set ($input = $request.input.trim())
+#if ("$!input" != '' || $input == '')
+  #set ($entityReferences = [])
+  #searchEntities($input 8 $entityReferences)
   #set ($suggestions = [])
-  #searchDocuments($input 5)
-  #getSuggestions($documentReferences $suggestions)
-  #searchAttachments($input 5)
-  #getSuggestions($attachmentReferences $suggestions)
+  #getSuggestions($entityReferences $suggestions)
   #if ($xcontext.action == 'get')
     #set ($discard = $response.setContentType('application/json'))
   #end

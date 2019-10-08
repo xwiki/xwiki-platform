@@ -22,8 +22,3 @@ require.config({
     'bootstrap3-typeahead': 'webjars/bootstrap3-typeahead.min'
   }
 });
-
-// HACK: We need this in order to prevent the "ReferenceError: Can't find variable: ES6Promise" error starting with
-// CKEditor 4.12.1. The reason is because we're running the tests using PhantomJS and we're using RequireJS to load the
-// modules. See https://github.com/ckeditor/ckeditor-dev/issues/3287
-window.Promise = window.Promise || function() {};

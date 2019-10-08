@@ -359,7 +359,7 @@ define('xwiki-ckeditor', [
           outputTemplate: '&lt;a href="{url}" data-reference="{typed}|-|{type}|-|{reference}"&gt;{label}&lt;/a&gt;',
           marker: '[',
           minChars: 0,
-          itemsLimit: 8
+          itemsLimit: 6
         }
       ]
     };
@@ -1198,6 +1198,7 @@ ul.cke_autocomplete_panel {
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 4px;
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  font: inherit;
   padding: 5px 0;
   width: auto;
   max-width: 100%;
@@ -1226,7 +1227,6 @@ ul.cke_autocomplete_panel {
 .ckeditor-autocomplete-item-hint {
   color: $theme.textSecondaryColor;
   font-size: smaller;
-  margin-top: .3em;
 }
 .ckeditor-autocomplete-item-hint:empty {
   margin-top: 0;

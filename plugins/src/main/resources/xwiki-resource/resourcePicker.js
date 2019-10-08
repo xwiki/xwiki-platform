@@ -17,7 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], function($, $resource) {
+define('resourcePickerTranslationKeys', [], [
+  'attach.hint',
+  'doc.hint'
+]);
+
+define('resourcePicker', [
+  'jquery', 'resource', 'l10n!resourcePicker', 'bootstrap3-typeahead'
+], function($, $resource, translations) {
   'use strict';
 
   var resourcePickerTemplate =
@@ -145,12 +152,14 @@ define('resourcePicker', ['jquery', 'resource', 'bootstrap3-typeahead'], functio
       return;
     }
     resourceTypeButton.val(newValue);
-    resourceTypeButton.attr('title', selectedResourceType.text().trim());
     var disabled = typeof $resource.pickers[newValue] !== 'function';
     resourceTypeButton.prop('disabled', disabled);
     if (disabled) {
+      resourceTypeButton.attr('title', selectedResourceType.text().trim());
       // Just in case someone checks the disabled attribute instead of the property.
       resourceTypeButton.attr('disabled', 'disabled');
+    } else {
+      resourceTypeButton.attr('title', translations.get(newValue + '.hint'));
     }
     resourceTypeButton.find('.icon').attr('class', selectedResourceType.find('.icon').attr('class'));
     resourcePicker.find('.resourceReference').attr('placeholder', selectedResourceType.attr('data-placeholder'));

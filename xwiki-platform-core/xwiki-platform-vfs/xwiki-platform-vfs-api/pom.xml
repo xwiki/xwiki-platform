@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>Access content of archives (Zip, Tar, Jar, GZip, etc)</description>
   <properties>
-    <truevfs.version>0.12.0</truevfs.version>
+    <truevfs.version>0.12.1</truevfs.version>
     <truecommons.version>2.5.0</truecommons.version>
     <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>67</xwiki.pitest.mutationThreshold>

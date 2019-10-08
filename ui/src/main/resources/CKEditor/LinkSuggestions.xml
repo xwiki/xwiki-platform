@@ -73,7 +73,7 @@
     'type': $entityTypeToLinkType.get($entityReference.type.toString()),
     'typed': "$typed",
     'label': $entityReference.name,
-    'hint': $hint.trim()
+    'hint': $services.xml.unescape($hint.trim())
   }))
 #end
 

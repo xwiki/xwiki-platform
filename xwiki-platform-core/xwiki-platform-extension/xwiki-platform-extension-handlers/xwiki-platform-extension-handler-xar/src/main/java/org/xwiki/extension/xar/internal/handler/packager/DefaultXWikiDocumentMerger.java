@@ -217,8 +217,8 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
 
         MergeDocumentResult documentMergeResult;
         try {
-            documentMergeResult = mergeManager.mergeDocument(previousDocument, nextDocument, currentDocument,
-                mergeConfiguration);
+            documentMergeResult =
+                mergeManager.mergeDocument(previousDocument, nextDocument, currentDocument, mergeConfiguration);
         } catch (Exception e) {
             // Unexpected error, lets behave as if there was a conflict
             documentMergeResult = new MergeDocumentResult(currentDocument, previousDocument, nextDocument);
@@ -297,7 +297,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         } else if (currentDocument == null) {
             type = ConflictQuestion.ConflictType.CURRENT_DELETED;
         } else if (documentMergeResult != null) {
-            if (!documentMergeResult.getLog().getLogs(LogLevel.ERROR).isEmpty()) {
+            if (documentMergeResult.getLog().hasLevel(LogLevel.ERROR)) {
                 type = ConflictQuestion.ConflictType.MERGE_FAILURE;
                 documentContentConflicts = documentMergeResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT);
             } else {
@@ -308,9 +308,8 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         }
 
         // Create a question
-        ConflictQuestion question =
-            new ConflictQuestion(currentDocument, previousDocument, nextDocument, mergedDocument, type,
-                documentContentConflicts);
+        ConflictQuestion question = new ConflictQuestion(currentDocument, previousDocument, nextDocument,
+            mergedDocument, type, documentContentConflicts);
 
         // Find the answer
         GlobalAction contextAction = getMergeConflictAnswer(question.getType(), configuration);
@@ -334,8 +333,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         }
 
         List<ConflictDecision> decisions = question.getDecisions();
-        if (question.getGlobalAction() == GlobalAction.MERGED && !decisions.isEmpty())
-        {
+        if (question.getGlobalAction() == GlobalAction.MERGED && !decisions.isEmpty()) {
             // record the decisions
             this.conflictDecisionsManager.setConflictDecisionList(decisions,
                 currentDocument.getDocumentReferenceWithLocale(), contextProvider.get().getUserReference());
@@ -345,8 +343,8 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
             mergeConfiguration.setConcernedDocument(currentDocument.getDocumentReferenceWithLocale());
             mergeConfiguration.setUserReference(contextProvider.get().getUserReference());
             mergeConfiguration.setProvidedVersionsModifiables(false);
-            documentMergeResult = mergeManager.mergeDocument(previousDocument, nextDocument, currentDocument,
-                mergeConfiguration);
+            documentMergeResult =
+                mergeManager.mergeDocument(previousDocument, nextDocument, currentDocument, mergeConfiguration);
             mergedDocument = (XWikiDocument) documentMergeResult.getMergeResult();
         }
 

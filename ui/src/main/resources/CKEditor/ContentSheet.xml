@@ -66,9 +66,17 @@
     &lt;body id="body" class="skin-flamingo viewbody main wiki-$xcontext.database
         space-$escapetool.xml($serializedSpaceReference.replaceAll(' ', '_'))"&gt;##
       #if ($source.html)
-        #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString()))
+        #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference))
+        #if ("$!html" == '' &amp;&amp; $html != '')
+          ## Before XWiki 11.9RC1 (see XWIKI-16737)
+          #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString()))
+        #end
       #else
-        #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString()))
+        #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReference))
+        #if ("$!html" == '' &amp;&amp; $html != '')
+          ## Before XWiki 11.9RC1 (see XWIKI-16737)
+          #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString()))
+        #end
       #end
       ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
       ## The result must be unescaped before being passed to the CKEditor as input.

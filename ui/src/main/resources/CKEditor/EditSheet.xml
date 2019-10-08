@@ -177,7 +177,6 @@
 #set ($macroWizardBundlePath = "${ckeditorBasePath}plugins/xwiki-macro/macroWizard.bundle.min")
 #set ($modalPath = "${ckeditorBasePath}plugins/xwiki-dialog/modal.min")
 #set ($l10nPath = "${ckeditorBasePath}plugins/xwiki-localization/l10n.min")
-#set ($promisePath = "${ckeditorBasePath}vendor/promise")
 #if ($resourcePickerBundlePath.indexOf('?') &gt;= 0)
   ## Before XWiki 7.1M1 the WebJar resource path was included in the query string which means we have to specify the
   ## '.js' extension (Require.js doesn't add it in this case).
@@ -185,7 +184,6 @@
   #set ($macroWizardBundlePath = "${macroWizardBundlePath}.js")
   #set ($modalPath = "${modalPath}.js")
   #set ($l10nPath = "${l10nPath}.js")
-  #set ($promisePath = "${$promisePath}.js")
 #end
 */
 require.config({
@@ -199,14 +197,13 @@ require.config({
     modal: '$!modalPath',
     l10n: '$!l10nPath',
     macroWizard: '$!macroWizardBundlePath',
-    'bootstrap3-typeahead': '$!bootstrap3typeaheadPath',
-    promise: '$!promisePath'
+    'bootstrap3-typeahead': '$!bootstrap3typeaheadPath'
   },
   shim: {
     ckeditor: {
       exports: 'CKEDITOR',
       // This includes dependencies of the plugins bundled with the CKEditor code.
-      deps: ['jquery', 'resource', 'resourcePicker', 'macroWizard', 'promisePolyfill']
+      deps: ['jquery', 'resource', 'resourcePicker', 'macroWizard']
     }
   },
   config: {
@@ -215,16 +212,6 @@ require.config({
     }
   }
 });
-
-// CKEditor doesn't load the Promise library the right way so we fix this here temporarily.
-// See https://github.com/ckeditor/ckeditor-dev/issues/3287
-if (window.Promise) {
-  define('promisePolyfill', function() {});
-} else {
-  define('promisePolyfill', ['promise'], function(Promise) {
-    window.Promise = Promise;
-  });
-}
 
 window.CKEDITOR_BASEPATH = "$!ckeditorBasePath";
 

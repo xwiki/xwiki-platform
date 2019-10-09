@@ -113,20 +113,20 @@ administration.section.export.withHistory.hint=Включить историю �
 administration.section.export.backupPack.hint=Укажите, будет ли пакет использоваться в качестве резервной копии. Эта опция не влияет на экспортируемый контент. Единственный эффект заключается в том, что при импорте пакета будет предварительно выбран параметр «Импортировать как резервную копию». Разница между пакетом резервного копирования и обычным пакетом заключается в том, что в первом случае последний автор страницы сохраняется во время импорта, а во втором случае пользователь, выполняющий импорт, становится последним автором каждой импортированной страницы.
 
 # Users Section
-### Missing: administration.section.users.enableUser.inProgress=Enabling user account...
-### Missing: administration.section.users.enableUser.done=User account enabled
-### Missing: administration.section.users.enableUser.failed=Failed to enable the user account
-### Missing: administration.section.users.disableUser.inProgress=Disabling user account...
-### Missing: administration.section.users.disableUser.done=User account disabled
-### Missing: administration.section.users.disableUser.failed=Failed to disable the user account
+administration.section.users.enableUser.inProgress=Включение учетной записи пользователя ...
+administration.section.users.enableUser.done=Учетная запись пользователя включена
+administration.section.users.enableUser.failed=Не удалось включить учетную запись пользователя
+administration.section.users.disableUser.inProgress=Отключение учетной записи пользователя ...
+administration.section.users.disableUser.done=Учетная запись пользователя отключена
+administration.section.users.disableUser.failed=Не удалось отключить учетную запись пользователя
 administration.section.users.deleteUser.confirmationMessage=Пользователь {0} будет удалён, это также приведёт к удалению его из всех {1}групп{2}, частью которых он является. Уверены, что хотите продолжить?
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user without replacing the author.
-### Missing: administration.section.users.deleteUser.newAuthor=New Author
-### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
-### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
-### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
-### Missing: administration.section.users.deleteUser.newAuthor.script=script
+administration.section.users.deleteUser.programmingRightsWarning=Пользователь, которого вы собираетесь удалить, обладает правами программирования и является последним автором {0} {1, выбор, 1#1 страница|1&lt;{1} страниц}{2}. Если {1, по выбору, 1 # на этой странице есть сценарии | 1 &lt;на этих страницах}, требующие прав на программирование, то эти сценарии перестанут работать, если вы удалите пользователя без замены автора.
+administration.section.users.deleteUser.scriptRightsWarning=Пользователь, которого вы собираетесь удалить, имеет права сценария и является последним автором {0} {1, выбор, 1#1 страницы|1 &lt;{1} страниц} {2}. Сценарии из {1, choice, 1#этой страницы|1&lt;этих страниц} могут перестать работать, если вы удалите пользователя без замены автора.
+administration.section.users.deleteUser.newAuthor=Новый Автор
+administration.section.users.deleteUser.newAuthor.hint=Выберите пользователя с правами {0} или оставьте это поле пустым, если вы не хотите заменять автора.
+administration.section.users.deleteUser.newAuthor.error=Выбранный пользователь не имеет прав {0}!
+administration.section.users.deleteUser.newAuthor.programming=программирование
+administration.section.users.deleteUser.newAuthor.script=скрипт
 
 # Other Category
 admin.other=Прочее

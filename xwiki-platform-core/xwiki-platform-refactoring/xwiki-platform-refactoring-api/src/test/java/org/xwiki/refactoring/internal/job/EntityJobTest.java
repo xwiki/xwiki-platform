@@ -23,12 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.job.JobContext;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.job.JobGroupPath;
-import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -40,7 +37,9 @@ import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.EntityRequest;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.mockito.MockitoComponentManagerRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -53,10 +52,13 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@ComponentTest
 public class EntityJobTest
 {
-    private static class NoopEntityJob extends AbstractEntityJob<EntityRequest, EntityJobStatus<EntityRequest>>
+    public static class NoopEntityJob extends AbstractEntityJob<EntityRequest, EntityJobStatus<EntityRequest>>
     {
+        final List<EntityReference> references = new ArrayList<>();
+
         @Override
         public String getType()
         {
@@ -76,7 +78,7 @@ public class EntityJobTest
         @Override
         protected void process(EntityReference entityReference)
         {
-            // No operation.
+            this.references.add(entityReference);
         }
 
         @Override
@@ -92,74 +94,65 @@ public class EntityJobTest
         }
     }
 
-    @Rule
-    public MockitoComponentManagerRule mocker = new MockitoComponentManagerRule();
-
+    @MockComponent
     private AuthorizationManager authorization = mock(AuthorizationManager.class);
 
+    @MockComponent
     private ModelBridge modelBridge = mock(ModelBridge.class);
 
-    private void initialize(NoopEntityJob job, EntityRequest request)
+    @MockComponent
+    private EntityReferenceProvider defaultEntityReferenceProvider;
+
+    @InjectMockComponents
+    private NoopEntityJob job;
+
+    @BeforeEach
+    public void beforeEach()
     {
-        ReflectionUtils.setFieldValue(job, "jobContext", mock(JobContext.class));
-        ReflectionUtils.setFieldValue(job, "progressManager", mock(JobProgressManager.class));
-        ReflectionUtils.setFieldValue(job, "authorization", this.authorization);
-        ReflectionUtils.setFieldValue(job, "modelBridge", this.modelBridge);
-
-        EntityReferenceProvider defaultEntityReferenceProvider = mock(EntityReferenceProvider.class);
-        ReflectionUtils.setFieldValue(job, "defaultEntityReferenceProvider", defaultEntityReferenceProvider);
-        when(defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
+        when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
+    }
 
-        job.initialize(request);
+    private void initialize(EntityRequest request)
+    {
+        this.job.initialize(request);
     }
 
     @Test
     public void getGroupPath()
     {
-        NoopEntityJob job = new NoopEntityJob();
         EntityRequest request = new EntityRequest();
 
         DocumentReference aliceReference = new DocumentReference("chess", Arrays.asList("Path", "To"), "Alice");
         request.setEntityReferences(aliceReference.getReversedReferenceChain());
-        initialize(job, request);
+        initialize(request);
         assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess")), job.getGroupPath());
 
         DocumentReference bobReference = new DocumentReference("dev", Arrays.asList("Path", "To"), "Bob");
         request.setEntityReferences(Arrays.<EntityReference>asList(aliceReference, bobReference));
-        initialize(job, request);
+        initialize(request);
         assertEquals(new JobGroupPath(Arrays.asList("refactoring")), job.getGroupPath());
 
         DocumentReference carolReference = new DocumentReference("chess", Arrays.asList("Path", "To"), "Carol");
         request.setEntityReferences(Arrays.<EntityReference>asList(aliceReference, carolReference));
-        initialize(job, request);
+        initialize(request);
         assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess", "Path", "To")), job.getGroupPath());
 
         DocumentReference daveReference = new DocumentReference("chess", Arrays.asList("Path", "To2"), "Dave");
         request.setEntityReferences(Arrays.<EntityReference>asList(aliceReference, carolReference, daveReference));
-        initialize(job, request);
+        initialize(request);
         assertEquals(new JobGroupPath(Arrays.asList("refactoring", "chess", "Path")), job.getGroupPath());
     }
 
     @Test
     public void processEachEntity()
     {
-        final List<EntityReference> references = new ArrayList<>();
-        NoopEntityJob job = new NoopEntityJob()
-        {
-            @Override
-            protected void process(EntityReference entityReference)
-            {
-                references.add(entityReference);
-            }
-        };
-
         DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("Path", "To"), "Success");
         EntityRequest request = new EntityRequest();
         request.setEntityReferences(documentReference.getReversedReferenceChain());
-        initialize(job, request);
-        job.run();
-        assertEquals(request.getEntityReferences(), references);
+        initialize(request);
+        this.job.run();
+        assertEquals(request.getEntityReferences(), this.job.references);
     }
 
     @Test
@@ -179,11 +172,10 @@ public class EntityJobTest
         when(this.modelBridge.getDocumentReferences(spaceReference))
             .thenReturn(Arrays.asList(alice, alicePrefs, aliceBio, bob, bobPrefs, bobBio, carolBio));
 
-        NoopEntityJob job = new NoopEntityJob();
-        initialize(job, new EntityRequest());
+        initialize(new EntityRequest());
 
         final List<DocumentReference> documentReferences = new ArrayList<>();
-        job.visitDocuments(spaceReference, new Visitor<DocumentReference>()
+        this.job.visitDocuments(spaceReference, new Visitor<DocumentReference>()
         {
             @Override
             public void visit(DocumentReference documentReference)
@@ -210,14 +202,13 @@ public class EntityJobTest
             .thenReturn(true);
         when(this.authorization.hasAccess(Right.DELETE, userReference, documentReference)).thenReturn(false);
 
-        NoopEntityJob job = new NoopEntityJob();
-        initialize(job, request);
+        initialize(request);
 
         // checkRights = true
-        assertTrue(job.hasAccess(Right.EDIT, documentReference.getLastSpaceReference()));
-        assertFalse(job.hasAccess(Right.DELETE, documentReference));
+        assertTrue(this.job.hasAccess(Right.EDIT, documentReference.getLastSpaceReference()));
+        assertFalse(this.job.hasAccess(Right.DELETE, documentReference));
 
         // checkRights = false
-        assertTrue(job.hasAccess(Right.DELETE, documentReference));
+        assertTrue(this.job.hasAccess(Right.DELETE, documentReference));
     }
 }

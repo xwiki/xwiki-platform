@@ -51,6 +51,14 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- The dashboard might change the behaviour of the profile, so we want to test with it -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-dashboard-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

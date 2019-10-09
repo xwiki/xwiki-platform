@@ -475,10 +475,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #try()
       #set ($discard = $copyAsJob.join())
       #set ($copyAsJobStatus = $services.job.getJobStatus($copyAsJob.request.id))
-      #set ($errorLogs = $copyAsJobStatus.log.getLogs('ERROR'))
-      #if ($errorLogs.size() &gt; 0)
-        #set ($errorMessage = $errorLogs.get(0).toString())
-      #end
+      #set ($errorMessage = $copyAsJobStatus.logTail.getFirstLogEvents('ERROR').toString())
     #end
   #end
 #end

@@ -140,7 +140,7 @@
           #end
         #end
         $services.template.execute('logging_macros.vm')
-        #printLogs($jobstatus.log)
+        #printLogs($jobstatus.logTail)
       #end
     </div>
   </body>

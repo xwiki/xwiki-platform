@@ -56,7 +56,7 @@
         #if (!$finished)
           #displayJobProgressBar($jobStatus)
         #else
-          #if ($jobStatus.log.getLogs('ERROR').isEmpty())
+          #if (!$jobStatus.logTail.hasLogLevel('ERROR'))
             &lt;div class="box successmessage"&gt;
               Done.
             &lt;/div&gt;

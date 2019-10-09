@@ -42,7 +42,7 @@
 #macro(filterStreamJobMessage $jobStatus)
   #set($finished = $jobStatus.state.name() == 'FINISHED')
   #if ($finished)
-    #if ($jobStatus.log.getLogs('ERROR').isEmpty())
+    #if (!$jobStatus.logTail.hasLogLevel('ERROR'))
       &lt;div class="box successmessage"&gt;
         Done.
       &lt;/div&gt;

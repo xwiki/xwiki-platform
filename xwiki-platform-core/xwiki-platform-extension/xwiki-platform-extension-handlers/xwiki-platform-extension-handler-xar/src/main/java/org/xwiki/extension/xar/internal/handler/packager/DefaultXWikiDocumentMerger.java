@@ -297,7 +297,7 @@ public class DefaultXWikiDocumentMerger implements XWikiDocumentMerger
         } else if (currentDocument == null) {
             type = ConflictQuestion.ConflictType.CURRENT_DELETED;
         } else if (documentMergeResult != null) {
-            if (documentMergeResult.getLog().hasLevel(LogLevel.ERROR)) {
+            if (documentMergeResult.getLog().hasLogLevel(LogLevel.ERROR)) {
                 type = ConflictQuestion.ConflictType.MERGE_FAILURE;
                 documentContentConflicts = documentMergeResult.getConflicts(MergeDocumentResult.DocumentPart.CONTENT);
             } else {

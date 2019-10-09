@@ -4972,8 +4972,8 @@ public class XWiki implements EventListener
     public URL getServerURL(String wikiId, XWikiContext xcontext) throws MalformedURLException
     {
         // In virtual wiki path mode the server is the standard one
-        if ("1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
-            return null;
+        if (!xcontext.isMainWiki(wikiId) && "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
+            return getServerURL(xcontext.getMainXWiki(), xcontext);
         }
 
         // If main wiki check the main wiki home page configuration

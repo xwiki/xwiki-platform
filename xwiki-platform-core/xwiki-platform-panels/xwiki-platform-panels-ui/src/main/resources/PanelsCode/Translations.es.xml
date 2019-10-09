@@ -1,0 +1,69 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="PanelsCode.Translations" locale="es">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.panels.applications.helper=Aquí, puede seleccionar qué aplicaciones se muestran en la Barra de Aplicaciones (por defecto, a la izquierda). Cualquier aplicación nueva se mostrará allí. Si desea eliminar alguna, sólo tiene que arrastrar y soltar el icono de la primera caja a la otra. También puede reordenar las aplicaciones como desee. No se olvide guardar sus cambios!
+platform.panels.applications.displayedapps=Aplicaciones en la barra
+platform.panels.applications.blacklistedapps=Aplicaciones que no están en la barra
+platform.panels.applications.save=Guardar
+platform.panels.applications.revert=Restablecer
+platform.panels.applications.ajax.success=Configuración se ha guardado.
+platform.panels.applications.ajax.csrf=La validación CSRF falló. Pruebe a recargar la página.
+platform.panels.applications.ajax.noright=No tiene derecho a editar PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.error=Error guardando sus cambio(s).
+admin.panels.applications=Panel de aplicaciones
+admin.panels.applications.description=Administre qué aplicaciones se muestran en el Panel de aplicaciones.
+
+admin.panels.navigation=Panel de navegación
+admin.panels.navigation.description=Administre qué páginas se muestran en el Panel de navegación.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Excluir páginas de extensión de nivel superior
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Este filtro dinámico elimina del árbol de navegación las páginas de nivel superior que pertenecen a una extensión instalada, si no están destinadas a ser modificadas.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Excluir páginas de aplicación de nivel superior
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=Este filtro dinámico elimina del árbol de navegación las páginas de nivel superior que pertenecen a una aplicación creada con App Within Minutes.
+PanelsCode.NavigationConfigurationClass_exclusions=Exclusiones
+PanelsCode.NavigationConfigurationClass_exclusions.hint=La lista de páginas a excluir del árbol de navegación.
+PanelsCode.NavigationConfigurationClass_inclusions=Inclusiones
+PanelsCode.NavigationConfigurationClass_inclusions.hint=La lista de páginas a incluir en el árbol de navegación aunque hayan sido excluidas por un filtro anterior.
+platform.panels.navigation.configuration.excludedPages=Páginas excluidas
+platform.panels.navigation.configuration.excludedPages.hint=Utilice arrastrar y soltar para mover las páginas fuera del árbol de navegación o para volver a colocarlas.
+platform.panels.navigation.configuration.excludedPages.empty=Ninguno
+platform.panels.navigation.configuration.topLevelExtensionPages=Páginas de extensión de nivel superior
+platform.panels.navigation.configuration.topLevelApplicationPages=Páginas de aplicación de nivel superior
+platform.panels.navigation.configuration.otherPages=Otras páginas
+platform.panels.navigation.configuration.saveComment=Actualizada la configuración del Panel de Navegación desde la Administración</content>
+  
+</xwikidoc>

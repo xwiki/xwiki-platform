@@ -111,6 +111,9 @@ resource.url.placeholder=http://www.example.org/image.png
 resource.user.label=Пользователь
 resource.user.placeholder=алиас
 
+resourcePicker.attach.hint=Выберите вложение
+resourcePicker.doc.hint=Выберите страницу
+
 entityResourceSuggester.doc.placeholder=Найти страницу ...
 entityResourceSuggester.attach.placeholder=Найти вложение ...
 

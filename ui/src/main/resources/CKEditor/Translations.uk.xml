@@ -111,6 +111,9 @@ CKEditor.ConfigClass_removeButtons.hint=Перелік функцій панел
 ### Missing: resource.user.label=User
 ### Missing: resource.user.placeholder=alias
 
+### Missing: resourcePicker.attach.hint=Select an attachment
+### Missing: resourcePicker.doc.hint=Select a page
+
 ### Missing: entityResourceSuggester.doc.placeholder=Find a page...
 ### Missing: entityResourceSuggester.attach.placeholder=Find an attachment...
 

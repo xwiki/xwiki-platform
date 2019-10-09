@@ -117,6 +117,13 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
      */
     private static final String HQLLIKE_ALL_SYMBOL = "%";
 
+    /**
+     * Query to retrieve all groups with a given member.
+     */
+    private static final String ALL_GROUPS_WITH_MEMBER_QUERY = ", BaseObject as obj, StringProperty as prop "
+        + "where doc.fullName=obj.name and obj.className=?1 and obj.id=prop.id.id "
+        + "and prop.name=?2 and prop.value like ?3";
+
     private static final String NAME = "groupservice";
 
     private static final List<Event> EVENTS = new ArrayList<Event>()
@@ -139,6 +146,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
 
     private EntityReferenceSerializer<String> localWikiEntityReferenceSerializer =
         Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
 
     @Override
     public synchronized void init(XWiki xwiki, XWikiContext context) throws XWikiException
@@ -259,21 +269,59 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
         return needUpdate;
     }
 
+    private boolean replaceMemberFromGroup(XWikiDocument groupDocument, DocumentReference memberSourceReference,
+        DocumentReference memberTargetReference, XWikiContext context)
+    {
+        boolean needUpdate = false;
+
+        List<BaseObject> groups = groupDocument.getXObjects(GROUPCLASS_REFERENCE);
+        String memberSource = this.compactWikiEntityReferenceSerializer.serialize(memberSourceReference);
+        String memberTarget = this.compactWikiEntityReferenceSerializer.serialize(memberTargetReference);
+
+        if (groups != null) {
+            for (BaseObject bobj : groups) {
+                if (bobj != null) {
+                    String member = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
+
+                    if (member.equals(memberSource)) {
+                        bobj.set(FIELD_XWIKIGROUPS_MEMBER, memberTarget, context);
+                        needUpdate = true;
+                    }
+                }
+            }
+        }
+
+        return needUpdate;
+    }
+
+    @Override
+    public void replaceMemberInAllGroups(DocumentReference memberSourceReference,
+        DocumentReference memberTargetReference, XWikiContext context) throws XWikiException
+    {
+        String memberSource = this.compactWikiEntityReferenceSerializer.serialize(memberSourceReference);
+
+        List<Object> parameterValues = new ArrayList<>();
+        parameterValues.add(CLASS_XWIKIGROUPS);
+        parameterValues.add(FIELD_XWIKIGROUPS_MEMBER);
+        parameterValues.add(memberSource);
+
+        List<XWikiDocument> documentList =
+            context.getWiki().getStore().searchDocuments(ALL_GROUPS_WITH_MEMBER_QUERY, parameterValues, context);
+
+        for (XWikiDocument groupDocument : documentList) {
+            if (replaceMemberFromGroup(groupDocument, memberSourceReference, memberTargetReference, context)) {
+                context.getWiki().saveDocument(groupDocument, context);
+            }
+        }
+    }
+
     @Override
     public void removeUserOrGroupFromAllGroups(String memberWiki, String memberSpace, String memberName,
         XWikiContext context) throws XWikiException
     {
         List<Object> parameterValues = new ArrayList<>();
-
         parameterValues.add(CLASS_XWIKIGROUPS);
-        StringBuilder where = new StringBuilder(
-            ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?"
-                + parameterValues.size());
-
-        where.append(" and obj.id=prop.id.id");
-
         parameterValues.add(FIELD_XWIKIGROUPS_MEMBER);
-        where.append(" and prop.name=?" + parameterValues.size());
 
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(memberWiki)) {
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
@@ -286,10 +334,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, EventListener
             parameterValues.add(HQLLIKE_ALL_SYMBOL + memberWiki + WIKI_FULLNAME_SEP + memberSpace + SPACE_NAME_SEP
                 + memberName + HQLLIKE_ALL_SYMBOL);
         }
-        where.append(" and prop.value like ?" + parameterValues.size());
 
         List<XWikiDocument> documentList =
-            context.getWiki().getStore().searchDocuments(where.toString(), parameterValues, context);
+            context.getWiki().getStore().searchDocuments(ALL_GROUPS_WITH_MEMBER_QUERY, parameterValues, context);
 
         for (XWikiDocument groupDocument : documentList) {
             if (removeUserOrGroupFromGroup(groupDocument, memberWiki, memberSpace, memberName, context)) {

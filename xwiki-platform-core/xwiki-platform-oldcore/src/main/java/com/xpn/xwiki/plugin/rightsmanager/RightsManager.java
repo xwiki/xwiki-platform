@@ -32,6 +32,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -117,6 +119,15 @@ public final class RightsManager
      */
     private static final String HQLLIKE_ALL_SYMBOL = "%";
 
+    /**
+     * Use to retrieve documents concerned by a specific user or group rights.
+     * See {@link #removeUserOrGroupFromAllRights(String, String, String, boolean, XWikiContext)}
+     * and {@link #replaceUserOrGroupFromAllRights(DocumentReference, DocumentReference, boolean, XWikiContext)}.
+     */
+    private static final String ALL_RIGHTS_QUERY = ", BaseObject as obj, %s as prop "
+        + "where doc.fullName=obj.name and (obj.className=?1 or obj.className=?2) "
+        + "and obj.id=prop.id.id and prop.name=?3 and prop.value like ?4";
+
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -135,6 +146,12 @@ public final class RightsManager
      */
     private DocumentReferenceResolver<String> currentDocumentReferenceResolver =
         Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki");
+
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer =
+        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
 
     /**
      * Hidden constructor of RightsManager only access via getInstance().
@@ -907,7 +924,7 @@ public final class RightsManager
     {
         boolean needUpdate = false;
 
-        String userOrGroupField = user ? RIGHTSFIELD_USERS : RIGHTSFIELD_GROUPS;
+        String userOrGroupField = getUserOrGroupField(user);
 
         List<String> usersOrGroups =
             ListClass.getListFromString(right.getLargeStringValue(userOrGroupField), USERGROUPLISTFIELD_SEP, false);
@@ -929,6 +946,11 @@ public final class RightsManager
         }
 
         return needUpdate;
+    }
+
+    private String getUserOrGroupField(boolean user)
+    {
+        return user ? RIGHTSFIELD_USERS : RIGHTSFIELD_GROUPS;
     }
 
     /**
@@ -1017,17 +1039,11 @@ public final class RightsManager
 
         String fieldTypeName = ((PropertyClass) rightClass.get(fieldName)).newProperty().getClass().getSimpleName();
 
-        StringBuilder where = new StringBuilder(", BaseObject as obj, " + fieldTypeName
-            + " as prop where doc.fullName=obj.name" + " and (obj.className=?1 or obj.className=?2)");
+        String where = String.format(ALL_RIGHTS_QUERY, fieldTypeName);
+
         parameterValues.add(rightClass.getName());
         parameterValues.add(globalRightClass.getName());
-
-        where.append(" and obj.id=prop.id.id");
-
-        where.append(" and prop.name=?3");
         parameterValues.add(fieldName);
-
-        where.append(" and prop.value like ?4");
 
         if (context.getWikiId() == null || context.getWikiId().equalsIgnoreCase(userOrGroupWiki)) {
             if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
@@ -1042,11 +1058,147 @@ public final class RightsManager
         }
 
         List<XWikiDocument> documentList =
-            context.getWiki().getStore().searchDocuments(where.toString(), parameterValues, context);
+            context.getWiki().getStore().searchDocuments(where, parameterValues, context);
 
         for (XWikiDocument groupDocument : documentList) {
             if (removeUserOrGroupFromAllRights(groupDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
                 context)) {
+                context.getWiki().saveDocument(groupDocument, context);
+            }
+        }
+    }
+
+    /**
+     * Replace a user or a group reference with another one on a right object.
+     * @param right the right to change.
+     * @param userOrGroupSourceReference the reference of the user or group that we need to replace
+     * @param userOrGroupTargetReference the reference of the user or group that will be used as replacement
+     * @param user if {@code true} the reference will be looked in the users properties, else in the groups one
+     * @return {@code true} if the right has been changed
+     * @since 11.9RC1
+     */
+    private boolean replaceUserOrGroupFromRight(BaseObject right, DocumentReference userOrGroupSourceReference,
+        DocumentReference userOrGroupTargetReference, boolean user)
+    {
+        boolean needUpdate = false;
+
+        String userOrGroupField = getUserOrGroupField(user);
+        List<String> usersOrGroups =
+            ListClass.getListFromString(right.getLargeStringValue(userOrGroupField), USERGROUPLISTFIELD_SEP, false);
+
+        String userOrGroupSource = this.compactWikiEntityReferenceSerializer.serialize(userOrGroupSourceReference);
+        String userOrGroupTarget = this.compactWikiEntityReferenceSerializer.serialize(userOrGroupTargetReference);
+
+        if (usersOrGroups.remove(userOrGroupSource)) {
+            usersOrGroups.add(userOrGroupTarget);
+            needUpdate = true;
+        }
+
+        if (needUpdate) {
+            right.setStringValue(userOrGroupField, StringUtils.join(usersOrGroups, USERGROUPLISTFIELD_SEP));
+        }
+
+        return needUpdate;
+    }
+
+    /**
+     * Replace a user or a group reference with another one on either the global or local rights
+     * of a {@link XWikiDocument}.
+     *
+     * @param rightsDocument the document where to update the rights
+     * @param userOrGroupSourceReference the reference of the user or group that we need to replace
+     * @param userOrGroupTargetReference the reference of the user or group that will be used as replacement
+     * @param user if {@code true} the reference will be looked in the users properties, else in the groups one
+     * @param global if {@code true} update the XWikiGlobalRights objects, else update the XWikiRights objects
+     * @return {@code true} if some rights have changed
+     * @since 11.9RC1
+     */
+    private boolean replaceUserOrGroupFromRights(XWikiDocument rightsDocument,
+        DocumentReference userOrGroupSourceReference, DocumentReference userOrGroupTargetReference, boolean user,
+        boolean global)
+    {
+        boolean needUpdate = false;
+
+        EntityReference rightClassReference =
+            global ? XWikiRightServiceImpl.GLOBALRIGHTCLASS_REFERENCE : XWikiRightServiceImpl.RIGHTCLASS_REFERENCE;
+
+        List<BaseObject> rightObjects = rightsDocument.getXObjects(rightClassReference);
+        if (rightObjects != null) {
+            for (BaseObject bobj : rightObjects) {
+                if (bobj == null) {
+                    continue;
+                }
+                needUpdate |=
+                    replaceUserOrGroupFromRight(bobj, userOrGroupSourceReference, userOrGroupTargetReference, user);
+            }
+        }
+
+        return needUpdate;
+    }
+
+    /**
+     * Replace a user or a group reference with another one on both the local and global
+     * rights of a {@link XWikiDocument}.
+     *
+     * @param rightsDocument the document where to update the rights
+     * @param userOrGroupSourceReference the reference of the user or group that we need to replace
+     * @param userOrGroupTargetReference the reference of the user or group that will be used as replacement
+     * @param user if {@code true} the reference will be looked in the users properties, else in the groups one
+     * @return {@code true} if some rights have changed
+     * @since 11.9RC1
+     */
+    private boolean replaceUserOrGroupFromAllRights(XWikiDocument rightsDocument,
+        DocumentReference userOrGroupSourceReference, DocumentReference userOrGroupTargetReference, boolean user)
+    {
+        return replaceUserOrGroupFromRights(rightsDocument, userOrGroupSourceReference, userOrGroupTargetReference,
+            user, true)
+            || replaceUserOrGroupFromRights(rightsDocument, userOrGroupSourceReference, userOrGroupTargetReference,
+            user, false);
+    }
+
+    /**
+     * Replace a user or a group reference with another one on all rights of the current wiki.
+     *
+     * @param userOrGroupSourceReference the reference of the user or group that we need to replace
+     * @param userOrGroupTargetReference the reference of the user or group that will be used as replacement
+     * @param user if {@code true} the reference will be looked in the users properties, else in the groups one
+     * @param context the current context
+     * @throws XWikiException in case of errors
+     * @since 11.9RC1
+     */
+    @Unstable
+    public void replaceUserOrGroupFromAllRights(DocumentReference userOrGroupSourceReference,
+        DocumentReference userOrGroupTargetReference, boolean user, XWikiContext context) throws XWikiException
+    {
+        List<String> parameterValues = new ArrayList<>();
+
+        String fieldName;
+        if (user) {
+            fieldName = RIGHTSFIELD_USERS;
+        } else {
+            fieldName = RIGHTSFIELD_GROUPS;
+        }
+
+        BaseClass rightClass = context.getWiki().getRightsClass(context);
+        BaseClass globalRightClass = context.getWiki().getGlobalRightsClass(context);
+
+        String fieldTypeName = ((PropertyClass) rightClass.get(fieldName)).newProperty().getClass().getSimpleName();
+
+        String where = String.format(ALL_RIGHTS_QUERY, fieldTypeName);
+
+        parameterValues.add(this.localEntityReferenceSerializer.serialize(rightClass.getReference()));
+        parameterValues.add(this.localEntityReferenceSerializer.serialize(globalRightClass.getReference()));
+        parameterValues.add(fieldName);
+        parameterValues.add(HQLLIKE_ALL_SYMBOL
+            + this.compactWikiEntityReferenceSerializer.serialize(userOrGroupSourceReference)
+            + HQLLIKE_ALL_SYMBOL);
+
+        List<XWikiDocument> documentList =
+            context.getWiki().getStore().searchDocuments(where, parameterValues, context);
+
+        for (XWikiDocument groupDocument : documentList) {
+            if (replaceUserOrGroupFromAllRights(groupDocument, userOrGroupSourceReference, userOrGroupTargetReference,
+                user)) {
                 context.getWiki().saveDocument(groupDocument, context);
             }
         }

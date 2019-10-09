@@ -52,6 +52,7 @@ import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.ObservationManager;
@@ -109,6 +110,11 @@ public class MockitoOldcore
     public static final LocalDocumentReference USER_CLASS = new LocalDocumentReference("XWiki", "XWikiUsers");
 
     public static final LocalDocumentReference GROUP_CLASS = new LocalDocumentReference("XWiki", "XWikiGroups");
+
+    public static final LocalDocumentReference RIGHTS_CLASS = new LocalDocumentReference("XWiki", "XWikiRights");
+
+    public static final LocalDocumentReference GLOBAL_RIGHTS_CLASS =
+        new LocalDocumentReference("XWiki", "XWikiGlobalRights");
 
     private final MockitoComponentManager componentManager;
 
@@ -680,6 +686,56 @@ public class MockitoOldcore
                 return groupClass;
             }
         }).when(getSpyXWiki()).getGroupClass(anyXWikiContext());
+
+        // RightsClass
+        doAnswer(new Answer<BaseClass>()
+        {
+            @Override
+            public BaseClass answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiContext xcontext = invocation.getArgument(0);
+
+                XWikiDocument rightDocument = getSpyXWiki().getDocument(
+                    new DocumentReference(RIGHTS_CLASS, new WikiReference(xcontext.getWikiId())), xcontext);
+
+                final BaseClass rightClass = rightDocument.getXClass();
+
+                if (rightDocument.isNew()) {
+                    rightClass.addTextField("groups", "groups", 80);
+                    rightClass.addTextField("levels", "Access Levels", 80);
+                    rightClass.addTextField("users", "Users", 80);
+                    rightClass.addBooleanField("allow", "Allow/Deny", "allow");
+                    getSpyXWiki().saveDocument(rightDocument, xcontext);
+                }
+
+                return rightClass;
+            }
+        }).when(getSpyXWiki()).getRightsClass(anyXWikiContext());
+
+        // GlobalRightsClass
+        doAnswer(new Answer<BaseClass>()
+        {
+            @Override
+            public BaseClass answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiContext xcontext = invocation.getArgument(0);
+
+                XWikiDocument globalRightDocument = getSpyXWiki().getDocument(
+                    new DocumentReference(GLOBAL_RIGHTS_CLASS, new WikiReference(xcontext.getWikiId())), xcontext);
+
+                final BaseClass globalRightClass = globalRightDocument.getXClass();
+
+                if (globalRightDocument.isNew()) {
+                    globalRightClass.addTextField("groups", "groups", 80);
+                    globalRightClass.addTextField("levels", "Access Levels", 80);
+                    globalRightClass.addTextField("users", "Users", 80);
+                    globalRightClass.addBooleanField("allow", "Allow/Deny", "allow");
+                    getSpyXWiki().saveDocument(globalRightDocument, xcontext);
+                }
+
+                return globalRightClass;
+            }
+        }).when(getSpyXWiki()).getGlobalRightsClass(anyXWikiContext());
 
         // Query Manager
         // If there's already a Query Manager registered, use it instead.

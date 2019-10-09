@@ -48,8 +48,8 @@ import org.w3c.dom.NodeList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.xstream.internal.SafeXStream;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomReader;
 import com.thoughtworks.xstream.io.xml.DomWriter;
 
@@ -74,7 +74,7 @@ public class JAXBConverter implements Initializable
         Calendar.class, Date.class, URI.class, Image.class, DataHandler.class, Source.class, UUID.class));
 
     @Inject
-    private XStream xstream;
+    private SafeXStream xstream;
 
     private DocumentBuilderFactory dbFactory;
 

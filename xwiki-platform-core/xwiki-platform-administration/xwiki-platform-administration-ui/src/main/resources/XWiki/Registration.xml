@@ -216,6 +216,46 @@
   #end
   ##
   ##The password field, mandatory and must be at least 6 characters long.
+  #set ($passwordRegexes = [])
+  #set ($patternLength = "/.{" + $passwordLength + ",}/")
+  #set ($passwordRegex =
+    {
+      'pattern' : $patternLength,
+      'failureMessage' : $services.localization.render('xe.admin.registration.passwordTooShort')
+    })
+  #set ($discard = $passwordRegexes.add($passwordRegex))
+  #if ($passwordRuleOneUpperCaseEnabled)
+    #set ($passwordRegex =
+      {
+        'pattern' : '/[A-Z]+/',
+         'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainUppercase')
+      })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #if ($passwordRuleOneLowerCaseEnabled)
+    #set ($passwordRegex =
+      {
+        'pattern' : '/[a-z]+/',
+         'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainLowercase')
+      })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #if ($passwordRuleOneNumberEnabled)
+    #set ($passwordRegex =
+      {
+        'pattern' : '/[0-9]+/',
+         'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainNumber')
+      })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #if ($passwordRuleOneSymbolEnabled)
+    #set ($passwordRegex =
+      {
+        'pattern' : '/\W+/',
+         'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainSymbol')
+      })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
   #set($field =
     {'name' : 'register_password',
       'label' : $services.localization.render('core.register.password'),
@@ -228,10 +268,7 @@
         'mandatory' : {
           'failureMessage' : $services.localization.render('core.validation.required.message')
         },
-        'regex' : {
-          'pattern' : '/.{6,}/',
-          'failureMessage' : $services.localization.render('xe.admin.registration.passwordTooShort')
-        }
+        'regexes' : $passwordRegexes
       }
     })
   #set($discard = $fields.add($field))
@@ -252,10 +289,6 @@
         'mustMatch' : {
           'name' : 'register_password',
           'failureMessage' : $services.localization.render('xe.admin.registration.passwordMismatch')
-        },
-        'regex' : {
-          'pattern' : '/.{6,}/',
-          'failureMessage' : $services.localization.render('xe.admin.registration.passwordTooShort')
         }
       }
     })
@@ -452,6 +485,27 @@
   #set($temp = $response.sendRedirect($xwiki.getURL($mainWikiRegisterPageReference, 'register', $request.queryString)))
 #end
 ##
+#macro(validateRegex $fieldValue, $fieldName, $regex, $error)
+  #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
+    ## Make Java regexes more compatible with Perl/js style regexes by removing leading and trailing /
+    #if($regex.get('pattern').length() &gt; 1)
+      #set($pattern = $regex.get('pattern'))
+      #if($pattern.lastIndexOf('/') &lt; $pattern.length() - 1)
+        ERROR: In field: ${fieldName}: regex validation does not allow flags after the /, please fix [${pattern}].
+      #end
+      #set($pattern = $pattern.substring($mathtool.add(1, $pattern.indexOf('/')), $pattern.lastIndexOf('/')))
+      #else
+        ## I don't expect this but want to maintain compatibility.
+        #set($pattern = $regex.get('pattern'))
+      #end
+      #if($regextool.find($value, $pattern).isEmpty())
+        #set($error = $regex.get('failureMessage'))
+      #end
+  #elseif($regex.get('pattern'))
+    ERROR: In field: ${fieldName}: regex validation must include failureMessage.
+  #end
+#end
+
 ####### The Macros (nothing below this point is run directly) #########
 #*
  * Server side validation, this is necessary for security and because not everyone has Javascript
@@ -485,23 +539,13 @@
         ## We won't bother with regex validation if there is no entry, that would defeat the purpose of 'mandatory'
         #if($error == '' &amp;&amp; $validate.get('regex') &amp;&amp; $value &amp;&amp; $value != '')
           #set($regex = $validate.get('regex'))
-          #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
-            ## Make Java regexes more compatible with Perl/js style regexes by removing leading and trailing /
-            #if($regex.get('pattern').length() &gt; 1)
-              #set($pattern = $regex.get('pattern'))
-              #if($pattern.lastIndexOf('/') &lt; $pattern.length() - 1)
-                  ERROR: In field: ${fieldName}: regex validation does not allow flags after the /, please fix [${pattern}].
-              #end
-              #set($pattern = $pattern.substring($mathtool.add(1, $pattern.indexOf('/')), $pattern.lastIndexOf('/')))
-            #else
-              ## I don't expect this but want to maintain compatibility.
-              #set($pattern = $regex.get('pattern'))
-            #end
-            #if($regextool.find($value, $pattern).isEmpty())
-              #set($error = $regex.get('failureMessage'))
-            #end
-          #elseif($regex.get('pattern'))
-            ERROR: In field: ${fieldName}: regex validation must include failureMessage.
+          #validateRegex($value, $fieldName, $regex, $error)
+        #end
+        ## List of regex validation
+        #if($error == '' &amp;&amp; $validate.get('regexes') &amp;&amp; $value &amp;&amp; $value != '')
+          #set($regexes = $validate.get('regexes'))
+          #foreach ($regex in $regexes)
+            #validateRegex($value, $fieldName, $regex, $error)
           #end
         #end
         ##
@@ -811,6 +855,11 @@
     #set($defaultRedirect = "$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))")
     #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
     #set($registrationSuccessMessage = '{{info}}$services.localization.render("core.register.successful", ["[[${userFullName}&gt;&gt;${userSpace}${userName}]]", ${userName}]){{/info}}')
+    #set($passwordLength = 6)
+    #set($passwordRuleOneLowerCaseEnabled = false)
+    #set($passwordRuleOneUpperCaseEnabled = false)
+    #set($passwordRuleOneNumberEnabled = false)
+    #set($passwordRuleOneSymbolEnabled = false)
   #else
     #set($configObject = $configDocument.getObject($configurationClassName))
     #if ($xcontext.action == 'register')
@@ -834,6 +883,22 @@
     #if($configObject.getProperty('requireCaptcha').getValue() == 1)
       #set($requireCaptcha = true)
     #end
+    #if($configObject.getProperty('passwordRuleOneLowerCaseEnabled').getValue() == 1)
+      #set($passwordRuleOneLowerCaseEnabled = true)
+    #end
+    #if($configObject.getProperty('passwordRuleOneUpperCaseEnabled').getValue() == 1)
+      #set($passwordRuleOneUpperCaseEnabled = true)
+    #end
+    #if($configObject.getProperty('passwordRuleOneNumberEnabled').getValue() == 1)
+      #set($passwordRuleOneNumberEnabled = true)
+    #end
+    #if($configObject.getProperty('passwordRuleOneSymbolEnabled').getValue() == 1)
+      #set($passwordRuleOneSymbolEnabled = true)
+    #end
+    #set($passwordLength = $configObject.getProperty('passwordLength').getValue())
+    #if ("$!passwordLength" == "" || $passwordLength &lt; 1)
+      #set ($passwordLength = 6)
+    #end
   #end
 #end
 {{/velocity}}</content>
@@ -847,7 +912,9 @@
     <nameField/>
     <validationScript/>
     <defaultRedirect>
+      <customDisplay/>
       <disabled>0</disabled>
+      <hint/>
       <name>defaultRedirect</name>
       <number>7</number>
       <picker>0</picker>
@@ -931,6 +998,80 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
     </loginButton_enabled>
+    <passwordLength>
+      <customDisplay/>
+      <disabled>0</disabled>
+      <hint/>
+      <name>passwordLength</name>
+      <number>10</number>
+      <numberType>integer</numberType>
+      <prettyName>Require a password with the given length</prettyName>
+      <size>10</size>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+    </passwordLength>
+    <passwordRuleOneLowerCaseEnabled>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>passwordRuleOneLowerCaseEnabled</name>
+      <number>11</number>
+      <prettyName>Require at least one lower case character in the password</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </passwordRuleOneLowerCaseEnabled>
+    <passwordRuleOneNumberEnabled>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>passwordRuleOneNumberEnabled</name>
+      <number>13</number>
+      <prettyName>Require at least one number in the password</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </passwordRuleOneNumberEnabled>
+    <passwordRuleOneSymbolEnabled>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>passwordRuleOneSymbolEnabled</name>
+      <number>14</number>
+      <prettyName>Require at least one symbol character in the password</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </passwordRuleOneSymbolEnabled>
+    <passwordRuleOneUpperCaseEnabled>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint/>
+      <name>passwordRuleOneUpperCaseEnabled</name>
+      <number>12</number>
+      <prettyName>Require at least one upper case character in the password</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </passwordRuleOneUpperCaseEnabled>
     <registrationSuccessMessage>
       <contenttype>---</contenttype>
       <customDisplay/>

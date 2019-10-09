@@ -92,10 +92,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>
@@ -283,7 +283,9 @@
       <nameField/>
       <validationScript/>
       <defaultRedirect>
+        <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>defaultRedirect</name>
         <number>7</number>
         <picker>0</picker>
@@ -295,7 +297,9 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </defaultRedirect>
       <heading>
+        <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>heading</name>
         <number>1</number>
         <picker>0</picker>
@@ -307,7 +311,9 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </heading>
       <liveValidation_defaultFieldOkMessage>
+        <customDisplay/>
         <disabled>0</disabled>
+        <hint/>
         <name>liveValidation_defaultFieldOkMessage</name>
         <number>4</number>
         <picker>0</picker>
@@ -319,10 +325,12 @@
         <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
       </liveValidation_defaultFieldOkMessage>
       <liveValidation_enabled>
+        <customDisplay/>
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
         <displayType/>
+        <hint/>
         <name>liveValidation_enabled</name>
         <number>3</number>
         <prettyName>Enable Javascript field validation</prettyName>
@@ -332,10 +340,12 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </liveValidation_enabled>
       <loginButton_autoLogin_enabled>
+        <customDisplay/>
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
         <displayType/>
+        <hint/>
         <name>loginButton_autoLogin_enabled</name>
         <number>6</number>
         <prettyName>Enable automatic login</prettyName>
@@ -345,10 +355,12 @@
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </loginButton_autoLogin_enabled>
       <loginButton_enabled>
+        <customDisplay/>
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
         <displayType/>
+        <hint/>
         <name>loginButton_enabled</name>
         <number>5</number>
         <prettyName>Enable login button</prettyName>
@@ -357,9 +369,86 @@
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </loginButton_enabled>
+      <passwordLength>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>passwordLength</name>
+        <number>14</number>
+        <numberType>integer</numberType>
+        <prettyName>Require a password with the given length</prettyName>
+        <size>10</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </passwordLength>
+      <passwordRuleOneLowerCaseEnabled>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>passwordRuleOneLowerCaseEnabled</name>
+        <number>10</number>
+        <prettyName>Require at least one lower case character in the password</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </passwordRuleOneLowerCaseEnabled>
+      <passwordRuleOneNumberEnabled>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>passwordRuleOneNumberEnabled</name>
+        <number>12</number>
+        <prettyName>Require at least one number in the password</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </passwordRuleOneNumberEnabled>
+      <passwordRuleOneSymbolEnabled>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>passwordRuleOneSymbolEnabled</name>
+        <number>13</number>
+        <prettyName>Require at least one symbol character in the password</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </passwordRuleOneSymbolEnabled>
+      <passwordRuleOneUpperCaseEnabled>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <hint/>
+        <name>passwordRuleOneUpperCaseEnabled</name>
+        <number>11</number>
+        <prettyName>Require at least one upper case character in the password</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </passwordRuleOneUpperCaseEnabled>
       <registrationSuccessMessage>
+        <contenttype>---</contenttype>
+        <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
+        <hint/>
         <name>registrationSuccessMessage</name>
         <number>9</number>
         <picker>0</picker>
@@ -372,21 +461,26 @@
         <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
       </registrationSuccessMessage>
       <requireCaptcha>
+        <customDisplay/>
         <defaultValue/>
         <disabled>0</disabled>
         <displayFormType>checkbox</displayFormType>
         <displayType/>
+        <hint/>
         <name>requireCaptcha</name>
         <number>8</number>
-        <prettyName>Require captcha to register</prettyName>
+        <prettyName>Require CAPTCHA to register</prettyName>
         <unmodifiable>0</unmodifiable>
         <validationMessage/>
         <validationRegExp/>
         <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
       </requireCaptcha>
       <welcomeMessage>
+        <contenttype>---</contenttype>
+        <customDisplay/>
         <disabled>0</disabled>
         <editor>PureText</editor>
+        <hint/>
         <name>welcomeMessage</name>
         <number>2</number>
         <picker>0</picker>
@@ -416,6 +510,21 @@
     </property>
     <property>
       <loginButton_enabled>1</loginButton_enabled>
+    </property>
+    <property>
+      <passwordLength>6</passwordLength>
+    </property>
+    <property>
+      <passwordRuleOneLowerCaseEnabled>0</passwordRuleOneLowerCaseEnabled>
+    </property>
+    <property>
+      <passwordRuleOneNumberEnabled>0</passwordRuleOneNumberEnabled>
+    </property>
+    <property>
+      <passwordRuleOneSymbolEnabled>0</passwordRuleOneSymbolEnabled>
+    </property>
+    <property>
+      <passwordRuleOneUpperCaseEnabled>0</passwordRuleOneUpperCaseEnabled>
     </property>
     <property>
       <registrationSuccessMessage>#set($fullName = "$request.get('register_first_name') $request.get('register_last_name')")

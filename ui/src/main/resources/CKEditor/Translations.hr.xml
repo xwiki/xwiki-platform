@@ -111,6 +111,9 @@ resource.url.placeholder=http://www.example.org/image.png
 resource.user.label=Korisnik
 resource.user.placeholder=alias
 
+### Missing: resourcePicker.attach.hint=Select an attachment
+### Missing: resourcePicker.doc.hint=Select a page
+
 entityResourceSuggester.doc.placeholder=Pronađi stranicu...
 entityResourceSuggester.attach.placeholder=Pronađi privitak...
 

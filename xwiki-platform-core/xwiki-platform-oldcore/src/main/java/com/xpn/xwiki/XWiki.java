@@ -5001,7 +5001,7 @@ public class XWiki implements EventListener
                         if (protocol == null && port == -1) {
                             // If request is a "real" one keep using the same protocol (if asking for the same wiki)
                             XWikiRequest request = xcontext.getRequest();
-                            if (wikiDescriptor.getId().equals(xcontext.getOriginalWikiId())
+                            if (request != null && wikiDescriptor.getId().equals(xcontext.getOriginalWikiId())
                                 && !(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
                                 URL sourceURL = HttpServletUtils.getSourceBaseURL(xcontext.getRequest());
 

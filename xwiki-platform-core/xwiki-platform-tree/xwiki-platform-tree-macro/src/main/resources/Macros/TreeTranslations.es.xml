@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Macros.Tree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.tree.name=Árbol
+rendering.macro.tree.description=Muestra una jerarquía de árbol definida por el contenido de la macro o el parámetro fuente.
+rendering.macro.tree.parameter.reference.name=Referencia
+rendering.macro.tree.parameter.reference.description=La referencia al recurso que describe la estructura de árbol y su menú contextual, y que se llama para realizar las acciones en los nodos de árbol. Este recurso se utiliza para cargar el árbol dinámicamente (bajo demanda) cuando se abre un nodo de árbol, y para solicitar el menú contextual cuando el usuario hace clic con el botón derecho del ratón en un nodo de árbol que lo tiene. El recurso no es estático. Para los árboles estáticos debería utilizar el contenido de las macros en su lugar. La referencia puede ser una referencia a un documento o una URL/ruta.
+rendering.macro.tree.parameter.root.name=Raíz
+rendering.macro.tree.parameter.root.description=El identificador del nodo raíz. Esto es útil si desea visualizar únicamente los descendientes de un nodo determinado (que es la raíz especificada). El árbol muestra los hijos del nodo raíz en el primer nivel, por lo que el nodo raíz no se muestra realmente. Se visualiza el árbol completo si no se especifica el nodo raíz.
+rendering.macro.tree.parameter.showRoot.name=Mostrar raíz
+rendering.macro.tree.parameter.showRoot.description=Determina si raíz o no. El nodo raíz no se muestra por defecto porque suele estar implícito en el contexto en el que se muestra el árbol (por ejemplo, una etiqueta delante del árbol). Sin embargo, hay algunos casos en los que puede que desee mostrar el nodo raíz: para poder crear un nuevo nodo bajo la raíz.
+rendering.macro.tree.parameter.dragAndDrop.name=Arrastrar y soltar
+rendering.macro.tree.parameter.dragAndDrop.description=Especifica si el usuario debe ser capaz de arrastrar y soltar nodos de árbol.
+rendering.macro.tree.parameter.contextMenu.name=Menú contextual
+rendering.macro.tree.parameter.contextMenu.description=Determina si mostrar el menú contextual cuando el usuario haga clic con el botón derecho del ratón en un nodo de árbol.
+rendering.macro.tree.parameter.class.name=Clase
+rendering.macro.tree.parameter.class.description=Clases CSS adicionales para añadir al elemento HTML de nivel superior del árbol.
+rendering.macro.tree.parameter.icons.name=Iconos
+rendering.macro.tree.parameter.icons.description=Determina si mostrar o no los iconos del nodo de árbol. Puede que desee ocultar los iconos si todos los nodos de árbol son del mismo tipo o si desea ganar algún espacio horizontal.
+rendering.macro.tree.parameter.edges.name=Bordes
+rendering.macro.tree.parameter.edges.description=Determina si mostrar los bordes que conectan los nodos de los árboles hermanos entre sí y con sus padres.
+rendering.macro.tree.parameter.links.name=Enlaces
+rendering.macro.tree.parameter.links.description=Especifica si las etiquetas de los nodos deben verse y comportarse como enlaces (anclas).
+rendering.macro.tree.parameter.checkboxes.name=Casillas de verificación
+rendering.macro.tree.parameter.checkboxes.description=Determina si se muestra una casilla de selección antes de cada nodo de árbol para permitir al usuario seleccionar varios nodos de árbol.
+rendering.macro.tree.parameter.openTo.name=Abierto a
+rendering.macro.tree.parameter.openTo.description=El id del nodo en el que se abrirá el árbol. Todos los antepasados del nodo especificado, hasta la raíz del árbol, también se abrirán.
+rendering.macro.tree.parameter.finder.name=Buscador
+rendering.macro.tree.parameter.finder.description=Muestra una entrada de texto que se puede utilizar para encontrar nodos de árbol. La entrada se muestra encima del árbol y ofrece sugerencias a medida que escribe según el contenido del árbol. Cuando se selecciona una sugerencia, el árbol se desglosa hasta el nodo correspondiente.
+rendering.macro.tree.parameter.limit.name=Límite
+rendering.macro.tree.parameter.limit.description=El número máximo de nodos secundarios que se mostrarán al expandir un nodo padre por primera vez. El resto de los nodos hijo son accesibles a través de un enlace "más...". Este parámetro se utiliza básicamente para paginar los nodos hijo y, por lo tanto, ayuda a escalar el árbol cuando el número de nodos hijo es grande. El árbol pasa este parámetro a la fuente del árbol, por lo que sólo funciona con árboles dinámicos cuya fuente implementa el límite de recuento de hijos.
+rendering.macro.tree.content.description=Puede utilizar listas desordenadas HTML anidadas para describir la estructura de árbol. Visite http://www.jstree.com/docs/html/ para obtener más información.
+tree.macro.editModeWarning=Este árbol no se puede mostrar en el modo de edición.</content>
+  
+</xwikidoc>

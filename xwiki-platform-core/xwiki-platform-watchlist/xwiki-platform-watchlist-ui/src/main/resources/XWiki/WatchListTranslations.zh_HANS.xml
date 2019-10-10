@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>WatchListTranslations</name>
+  <language>zh_HANS</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WatchListClass</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>WatchListTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Macro "watchlist"
+### Missing: rendering.macro.watchlist.name=Watch List
+### Missing: rendering.macro.watchlist.description=Show the content of your current watchlist.
+
+### XWiki.WatchListClass
+### Missing: XWiki.WatchListClass_interval_realtime=Realtime
+### Missing: XWiki.WatchListClass_interval_Scheduler.WatchListHourlyNotifier=Hourly
+### Missing: XWiki.WatchListClass_interval_Scheduler.WatchListDailyNotifier=Daily
+### Missing: XWiki.WatchListClass_interval_Scheduler.WatchListWeeklyNotifier=Weekly
+
+### Notification Icons    
+### Missing: watchlist.notifications.icons.on=ON
+### Missing: watchlist.notifications.icons.off=OFF
+### Missing: watchlist.notifications.icons.tooltip.page=Watch this page
+### Missing: watchlist.notifications.icons.tooltip.pageAndChildren=Watch this page and its children
+### Missing: watchlist.notifications.icons.tooltip.space=Watch the parent page and its children
+### Missing: watchlist.notifications.icons.tooltip.wiki=Watch this wiki
+### Missing: watchlist.notifications.changeStatusError=Failed to change the status of the WatchList.
+watchlist.settings=设置
+
+### Watchlist livetable (in the macro)
+### Missing: watchlist.table.scope.wiki=All pages of the wiki
+### Missing: watchlist.table.scope.pageandchildren=Page + Children
+### Missing: watchlist.table.scope.pageonly=Page Only
+### Missing: watchlist.table.location=Location
+### Missing: watchlist.table.scope=Scope</content>
+  
+</xwikidoc>

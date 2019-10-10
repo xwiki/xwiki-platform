@@ -1,0 +1,90 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Menu.MenuTranslations" locale="es">
+  <web>Menu</web>
+  <name>MenuTranslations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>MenuClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Class fields
+Menu.MenuClass_content1=Estructura de menú
+
+# Live table generic keys
+menu.livetable.doc.title=Título de página
+menu.livetable.doc.name=Nombre de página
+menu.livetable.doc.location=Ubicación
+menu.livetable.doc.space=Espacio
+menu.livetable.doc.fullname=Nombre completo de la página
+menu.livetable.doc.author=Último autor
+menu.livetable.doc.creator=Creador
+menu.livetable.doc.date=Fecha de actualización
+menu.livetable.doc.creationDate=Fecha de creación
+menu.livetable._avatar=Avatar
+menu.livetable._images=Imágenes
+menu.livetable._attachments=Adjuntos
+menu.livetable._actions=Acciones
+menu.livetable._actions.edit=Editar
+menu.livetable._actions.delete=Eliminar
+menu.livetable.emptyvalue=-
+
+# Live table specific keys
+menu.livetable.content1=Estructura de Menú
+
+# Administration keys
+admin.menu.name=Menús
+
+# UIX keys
+menu.uix.extensionPoint.label=Ubicación del Menú
+menu.uix.extensionPoint.hint=Especifica dónde mostrar el menú. El menú se muestra horizontal o verticalmente, según la ubicación elegida.
+menu.uix.extensionPoint.value.nowhere=En ninguna parte
+menu.uix.extensionPoint.value.template.header.after=Después de la cabecera de página
+menu.uix.extensionPoint.value.panels.rightPanels=Dentro de un panel derecho
+menu.uix.extensionPoint.value.panels.leftPanels=Dentro de un panel izquierdo
+menu.uix.content.label=Contenido de la extensión de la IU
+menu.uix.content.hint=Si puedes ver esto entonces probablemente significa que tienes JavaScript desactivado. Debe seleccionar el mismo valor que para la ubicación de visualización del menú.
+menu.uix.scope.label=Alcance de la visibilidad del Menú
+menu.uix.scope.hint=Especifica en qué contexto es visible el menú.
+
+# Menu Macro
+rendering.macro.menu.name=Menú
+rendering.macro.menu.description=Muestra un menú creado utilizando una sintaxis wiki simple (listas anidadas y enlaces).
+rendering.macro.menu.parameter.id.name=Id
+rendering.macro.menu.parameter.id.description=Identificador de menú opcional que se establecerá en el elemento HTML que envuelve el menú. Puede utilizar este identificador en código JavaScript para acceder al menú DOM o en pruebas funcionales para afirmar los elementos del menú.
+rendering.macro.menu.parameter.type.name=Tipo
+rendering.macro.menu.parameter.type.description=El tipo de menú opcional determina la apariencia y el comportamiento del menú. Los valores soportados son: horizontal (valor por defecto) y vertical.
+rendering.macro.menu.content.description=Define la estructura del menú usando sintaxis wiki. Cada elemento del menú debe ser un elemento de la lista y debe contener la etiqueta o enlace del elemento del menú. Puede utilizar listas anidadas para elementos de submenú.
+
+# Menu WebHome
+menu.description=Esto es una sencilla aplicación que le ayuda a crear menús de navegación que se mostrarán horizontalmente como una barra superior después del encabezado de la página o verticalmente en un panel lateral.</content>
+  
+</xwikidoc>

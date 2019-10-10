@@ -1,0 +1,155 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.AdminTranslations" locale="es">
+  <web>XWiki</web>
+  <name>AdminTranslations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>AdminTranslations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>administration.title=Administración
+administration.title.page=Administración de la página
+administration.title.wiki=Administración del Wiki
+administration.title.global=Administración Global
+administration.sectionTitle=Administración: {0}
+administration.sectionTitle.page=Administración de la página: {0}
+administration.sectionTitle.wiki=Administración del Wiki: {0}
+administration.sectionTitle.global=Administración Global: {0}
+administration.menu.search.hint=Buscar...
+administration.menu.search.noResults=No hay resultados.
+
+# Registration Section
+XWiki.XWikiPreferences_use_email_verification.hint=Si la respuesta es "Sí", se enviará un correo electrónico a la dirección de correo electrónico indicada al rellenar el formulario de registro.
+XWiki.XWikiPreferences_validation_email_content.hint=La plantilla de correo electrónico que se enviará a los usuarios para validar su dirección de correo electrónico.
+XWiki.XWikiPreferences_confirmation_email_content.hint=La plantilla de correo electrónico que corresponde al correo que se envía después de que el usuario valide su cuenta haciendo clic en el enlace de validación en el primer correo electrónico que recibe.
+XWiki.XWikiPreferences_invitation_email_content.hint=La plantilla de correo electrónico que se enviará a los usuarios que quieran registrarse.
+
+XWiki.Registration_heading.hint=Esta es la línea en la parte superior de la página que se muestra a las personas que se están registrando y cuando se acaban de registrar. Se puede usar sintaxis velocity y wiki.
+XWiki.Registration_welcomeMessage.hint=Esto sólo se muestra cuando la gente está rellenando el formulario. Se puede usar sintaxis velocity ywiki.
+XWiki.Registration_liveValidation_enabled.hint=Defina esta opción como false para desactivar el código JavaScript de validación en tiempo real (los campos seguirán siendo validados en el lado del servidor).
+XWiki.Registration_liveValidation_defaultFieldOkMessage.hint=La validación en tiempo real muestra un mensaje para indicar a los usuarios que han rellenado el campo satisfactoriamente. Este es el mensaje que recibirán si no se anula para un campo en particular. Se puede utilizar la sintaxis velocity.
+XWiki.Registration_loginButton_enabled.hint=Cuando el usuario se ha registrado, le proporcionamos un botón para que haga clic en el que publicará su nombre de usuario y contraseña en la acción de inicio de sesión y los hará iniciar sesión de inmediato. Sin embargo, esto hace que el nombre de usuario y la contraseña se devuelvan en el HTML, lo que puede ser inaceptable en función de sus necesidades de seguridad.
+XWiki.Registration_loginButton_autoLogin_enabled.hint=Si el botón de inicio de sesión está activado, puede hacer que un fragmento de JavaScript "pulse" el botón de inicio de sesión para el usuario.
+XWiki.Registration_defaultRedirect.hint=Esta es la URL a la que el usuario será redirigido después de pulsar el botón de inicio de sesión si no se especifica el parámetro xredirect. Se puede utilizar la sintaxis velocity.
+XWiki.Registration_requireCaptcha.hint=Active esto para requerir que el usuario resuelva un CAPTCHA para poder registrarse.
+XWiki.Registration_registrationSuccessMessage.hint=Esto se muestra al usuario cuando se ha registrado correctamente. Se puede usar la sintaxis velocity y la de la wiki.
+XWiki.Registration_passwordLength.hint=La longitud mínima de la contraseña. Una contraseña más larga es más segura, se recomienda mantenerla por encima de los 6 caracteres.
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=Si esta opción está seleccionada, fuerza al usuario a elegir una contraseña con al menos un carácter en minúsculas.
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=Si esta opción está seleccionada, fuerza al usuario a elegir una contraseña con al menos un carácter en mayúsculas.
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=Si esta opción está seleccionada, fuerza al usuario a elegir una contraseña con al menos un número.
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Si esta opción está seleccionada, fuerza al usuario a elegir una contraseña con al menos un símbolo.
+
+# Look &amp; Feel Sections
+admin.themes=Temas
+admin.themes.description=Personaliza el color y los temas de los iconos, el skin y el logo.
+admin.colorthemes.local=Local
+admin.colorthemes.global=Global
+XWiki.XWikiPreferences_showannotations.hint=Mostrar la sección de anotaciones en la página.
+XWiki.XWikiPreferences_showcomments.hint=Mostrar la sección de comentarios en la página.
+XWiki.XWikiPreferences_showattachments.hint=Mostrar la sección de archivos adjuntos en la página.
+XWiki.XWikiPreferences_showhistory.hint=Visualizar la sección de historial en la página.
+XWiki.XWikiPreferences_showinformation.hint=Mostrar la sección de información en la página.
+XWiki.XWikiPreferences_title.hint=Defina el formato del título de la página tal y como lo ven los navegadores.
+XWiki.XWikiPreferences_meta.hint=Definir los metadatos que se añaden a cada página, especificando la descripción de la página, el autor, las palabras clave, etc.
+XWiki.XWikiPreferences_webcopyright.hint=Defina la información mostrada en la sección de derechos de autor del pie de página.
+XWiki.XWikiPreferences_version.hint=Defina la información mostrada en la sección de versión del pie de página.
+XWiki.XWikiPreferences_skin.hint=Especifique el skin empleado por defecto. Puede ser un skin del sistema de archivos, por ejemplo "flamingo", o un skin de página personalizado, por ejemplo "XWiki.DefaultSkin"
+XWiki.XWikiPreferences_iconTheme.hint=Especifique el tema del icono que se utilizará de forma predeterminada.
+XWiki.XWikiPreferences_colorTheme.hint=Especifique el tema de color que se utilizará de forma predeterminada.
+
+# Editing Sections
+admin.edit=Editando
+admin.edit.description=Configure el modo de edición, el editor WYSIWYG y las sintaxis disponibles.
+admin.title=Título
+XWiki.XWikiPreferences_xwiki.title.mandatory.hint=Evitar que los usuarios creen páginas wiki con títulos vacíos.
+XWiki.XWikiPreferences_editor.hint=Seleccione el tipo de editor que se utilizará de forma predeterminada para editar el contenido de la página.
+XWiki.XWikiPreferences_editcomment.hint=Permite introducir un mensaje al crear una nueva versión de la página.
+XWiki.XWikiPreferences_editcomment_mandatory.hint=Por cada cambio realizado, la página no se guardará hasta que se escriba un resumen del cambio realizado.
+XWiki.XWikiPreferences_minoredit.hint=Permitir que las páginas tengan versiones mayores (x.1) y menores (1.x). Las versiones menores se pueden ver utilizando el botón "Mostrar ediciones menores" en el historial de la página.
+admin.wysiwyg.description=Elija el editor WYSIWYG predeterminado y configúrelo.
+XWiki.XWikiPreferences_core.defaultDocumentSyntax.hint=La sintaxis de marcado utilizada por defecto para el contenido de la página cuando se crea una nueva página wiki.
+
+# Localization Section
+XWiki.XWikiPreferences_multilingual.hint=Habilita el modo multilingüe si tu wiki tiene contenido en varios idiomas. Esto permitirá a sus usuarios traducir las páginas del wiki y ver la interfaz en su idioma preferido.
+XWiki.XWikiPreferences_languages.hint=Seleccione los idiomas que estarán disponibles en la interfaz. Los usuarios podrán traducir las páginas de su wiki en cualquiera de estos idiomas (si el modo multilingüe está activado).
+XWiki.XWikiPreferences_default_language.hint=Seleccione el idioma por defecto del wiki
+XWiki.XWikiPreferences_dateformat.hint=Especifique el formato utilizado para mostrar las fechas (por ejemplo, la fecha de creación de la página)
+XWiki.XWikiPreferences_timezone.hint=Establecer globalmente la zona horaria
+
+# Import Section
+administration.section.import.hint=Comience subiendo un nuevo paquete o seleccionando uno de la lista de paquetes disponibles. El contenido del paquete seleccionado se mostrará a la derecha junto con las opciones de importación.
+
+# Export Section
+administration.section.export.packageName.hint=El nombre de archivo utilizado al generar el archivo comprimido con el contenido exportado.
+administration.section.export.description.hint=La descripción del paquete, que se muestra al importar el paquete.
+administration.section.export.licence.hint=La licencia del contenido. Por ejemplo: LGPL, GPLV2, etc.
+administration.section.export.author.hint=El autor del paquete.
+administration.section.export.version.hint=La versión del paquete.
+administration.section.export.withHistory.hint=Incluya el historial de páginas en la exportación. De lo contrario, sólo se exporta la última versión de una página.
+administration.section.export.backupPack.hint=Especifique si el paquete se utilizará como copia de seguridad. Esta opción no afecta al contenido exportado. El único efecto es que la opción "Importar como paquete de copia de seguridad" estará preseleccionada cuando importe el paquete. La diferencia entre un paquete de copia de seguridad y un paquete normal es que en el primer caso el último autor de la página se conserva durante la importación, mientras que en el segundo caso el usuario que realiza la importación se convierte en el último autor de cada página importada.
+
+# Users Section
+administration.section.users.enableUser.inProgress=Habilitando cuenta de usuario...
+administration.section.users.enableUser.done=Cuenta de usuario habilitada
+administration.section.users.enableUser.failed=No se ha habilitado la cuenta de usuario
+administration.section.users.disableUser.inProgress=Desactivando la cuenta de usuario...
+administration.section.users.disableUser.done=Cuenta de usuario desactivada
+administration.section.users.disableUser.failed=No se ha podido desactivar la cuenta de usuario
+administration.section.users.deleteUser.confirmationMessage=El usuario {0} será borrado y eliminado de todos los {1}grupos{2} de los que formaba parte. ¿Estás seguro de que quieres proceder?
+administration.section.users.deleteUser.programmingRightsWarning=El usuario que está a punto de eliminar tiene derechos de programación y es el último autor de {0}{1,choice,1#1 la página|1&lt;{1} las páginas}{2}. Si {1,choice,1#esta página tiene|1&lt;estas páginas tienen} scripts que requieren derechos de programación, estos scripts dejarán de funcionar si elimina el usuario sin reemplazar al autor.
+administration.section.users.deleteUser.scriptRightsWarning=El usuario que está a punto de eliminar tiene permisos de Scripts y es el último autor de {0}{1,choice,1#1 página|1&lt;{1} páginas}{2}. Los scripts de {1,choice,1#esta página|1&lt;estas páginas} pueden dejar de funcionar si elimina el usuario sin reemplazar al autor.
+administration.section.users.deleteUser.newAuthor=Nuevo Autor
+administration.section.users.deleteUser.newAuthor.hint=Seleccione un usuario que tenga permisos de {0} o deje este campo vacío si no desea reemplazar al autor.
+administration.section.users.deleteUser.newAuthor.error=¡El usuario seleccionado no tiene permisos de {0}!
+administration.section.users.deleteUser.newAuthor.programming=programando
+administration.section.users.deleteUser.newAuthor.script=script
+
+# Other Category
+admin.other=Otro
+admin.other.description=Diversas configuraciones de extensiones.
+administration.section.analytics.status=Estado
+administration.section.analytics.status.hint=Determinar si el seguimiento en Google Analytics™ está activo o no
+
+## Used to indicate where deprecated keys end
+#@deprecatedstart
+
+## Deprecated since 11.6RC1
+### Missing: XWiki.XWikiPreferences_auth_active_check.hint=If set to "Yes" it will prevent the users from logging in without entering the token which was previously sent by email.
+### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
+## Deprecated since 11.8RC1
+### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
+  
+</xwikidoc>

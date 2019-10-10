@@ -62,6 +62,11 @@ XWiki.Registration_loginButton_autoLogin_enabled.hint=Ukoliko je omogućen gumb 
 XWiki.Registration_defaultRedirect.hint=Ovo je URL na koji će korisnik biti preusmjeren nakon pritiska gumba za prijavu ukoliko nije naznačen xredirect parametar. Može se uporijebiti Velocity kôd.
 XWiki.Registration_requireCaptcha.hint=Omogućite ovo kako biste učinili obaveznim da korisnik riješi CAPTCHA-u da bi se registrirao.
 XWiki.Registration_registrationSuccessMessage.hint=Ovo se prikazuje korisniku kada se uspješno registrira. Može se uporijebiti Velocity kôd i kôd wiki sintakse.
+### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
+### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
+### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
+### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
+### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
 
 # Look &amp; Feel Sections
 admin.themes=Teme

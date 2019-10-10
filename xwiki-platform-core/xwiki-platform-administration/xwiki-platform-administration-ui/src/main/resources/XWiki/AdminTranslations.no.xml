@@ -62,6 +62,11 @@ XWiki.Registration_loginButton_autoLogin_enabled.hint=Hvis innloggingsknappen er
 XWiki.Registration_defaultRedirect.hint=Dette er nettadressen som brukeren blir omdirigert til etter å ha trykket på innloggingsknappen hvis xredirect-parameteren ikke er spesifisert. Velocitykode kan brukes.
 XWiki.Registration_requireCaptcha.hint=Velg dette for å kreve at brukeren løser en CAPTCHA for å kunne registrere seg.
 XWiki.Registration_registrationSuccessMessage.hint=Dette vises til brukeren når de har registrert seg. Velocity og wiki-syntakskode kan brukes.
+### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
+### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
+### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
+### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
+### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
 
 # Look &amp; Feel Sections
 admin.themes=Temaer

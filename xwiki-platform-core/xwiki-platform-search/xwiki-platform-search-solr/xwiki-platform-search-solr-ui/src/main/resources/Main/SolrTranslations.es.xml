@@ -41,11 +41,11 @@ solr.admin.submit=Aplicar
 solr.admin.error.action={0} falló:
 solr.admin.error.notallowed=No está autorizado a realizar esta acción.
 solr.admin.error.norights=Se requieren permisos de administración para acceder a esta sección.
-### Missing: solr.admin.success.action={0} successfully triggered.
+solr.admin.success.action={0} ejecutado con éxito.
 
 solr.admin.status.title=Estado
 solr.admin.status.queueSize.label=Tamaño de cola
-### Missing: solr.admin.status.queueSize.hint=The number of entities that are left to be indexed, re-indexed or deleted from the index (depending on the executed action).
+solr.admin.status.queueSize.hint=El número de entidades que quedan por indexar, re-indexar o eliminar del índice (dependiendo de la acción ejecutada).
 
 solr.admin.indexing.title=Indexando
 solr.admin.indexing.action.label=Acción
@@ -54,28 +54,28 @@ solr.admin.indexing.action.select_index=Añadir al índice
 solr.admin.indexing.action.select_delete=Eliminar del índice
 solr.admin.indexing.action.select_reindex=Reindexar
 solr.admin.indexing.wiki.label=Wiki
-### Missing: solr.admin.indexing.wiki.hint=The wiki for which all its documents will be affected by the selected action.
+solr.admin.indexing.wiki.hint=El wiki para el que todos sus documentos se verán afectados por la acción seleccionada.
 solr.admin.indexing.wiki.select_farm=Granja completa
-### Missing: solr.admin.indexing.query.label=Custom query
-### Missing: solr.admin.indexing.query.hint=Optional query to limit the documents that will be affected by the selected action in the index.
+solr.admin.indexing.query.label=Consulta personalizada
+solr.admin.indexing.query.hint=Consulta opcional para limitar los documentos que se verán afectados por la acción seleccionada en el índice.
 
-### Missing: solr.admin.info.affectedDocuments=Affected documents in the index:
+solr.admin.info.affectedDocuments=Documentos afectados en el índice:
 
 solr.sortBy=Ordenar por:
 solr.sortBy.score=Relevancia
 solr.sortBy.title_sort=Título
-solr.sortBy.date=Fecha
-solr.sortBy.author_display_sort=Último Autor
-### Missing: solr.sortBy.filename_sort=File name
-### Missing: solr.sortBy.attsize_sort=File size
-### Missing: solr.sortBy.attdate_sort=Upload date
-### Missing: solr.sortBy.attauthor_display_sort=Uploaded by
-### Missing: solr.sortOrder.asc=Ascending
-### Missing: solr.sortOrder.desc=Descending
+solr.sortBy.date=Fecha de última modificación
+solr.sortBy.author_display_sort=Último autor
+solr.sortBy.filename_sort=Nombre de fichero
+solr.sortBy.attsize_sort=Tamaño del fichero
+solr.sortBy.attdate_sort=Fecha de subida
+solr.sortBy.attauthor_display_sort=Subido por
+solr.sortOrder.asc=Ascendente
+solr.sortOrder.desc=Descendiente
 
-### Missing: solr.options=Show:
-### Missing: solr.options.highlight=Highlighting
-### Missing: solr.options.highlight.title=Display en extract of what was matched in each result
+solr.options=Mostrar:
+solr.options.highlight=Resaltando
+solr.options.highlight.title=Mostrar un extracto de lo que coincidió en cada resultado
 ### Missing: solr.options.facet=Facets
 ### Missing: solr.options.facet.title=Allow extra filtering of the result
 

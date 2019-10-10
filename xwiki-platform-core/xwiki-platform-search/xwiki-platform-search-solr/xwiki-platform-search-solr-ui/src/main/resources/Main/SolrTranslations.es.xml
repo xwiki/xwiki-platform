@@ -76,8 +76,8 @@ solr.sortOrder.desc=Descendiente
 solr.options=Mostrar:
 solr.options.highlight=Resaltando
 solr.options.highlight.title=Mostrar un extracto de lo que coincidió en cada resultado
-### Missing: solr.options.facet=Facets
-### Missing: solr.options.facet.title=Allow extra filtering of the result
+solr.options.facet=Facetas
+solr.options.facet.title=Permitir un filtrado adicional sobre el resultado
 
 ### Missing: solr.result.language=Language
 ### Missing: solr.result.locatedIn=Located in

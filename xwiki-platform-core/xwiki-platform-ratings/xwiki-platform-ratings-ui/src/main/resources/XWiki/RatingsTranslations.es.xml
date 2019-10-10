@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc>
+  <web>XWiki</web>
+  <name>RatingsTranslations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Ratings</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.ratings=Valoraciones
+admin.ratings.activateratings=Activar las valoraciones en este wiki
+admin.ratings.activateratingsinfo=Al activar las valoraciones en este wiki se mostrará una valoración media visual (formada por estrellas) en la esquina superior derecha de cada documento de este wiki (excepto los que se encuentran en el espacio *XWiki*). Los usuarios autentificados podrán calificar los documentos haciendo clic en las estrellas. Una alternativa a esto es usar el *Panel de Calificaciones*, por ejemplo para habilitar sólo las calificaciones en los espacios deseados. Para usar el Panel de Calificaciones, por favor visite la sección de administración del *Asistente de Paneles*.
+admin.ratings.resetratings=Restablecer todas las valoraciones en este wiki. Esto hará que todos los documentos comiencen de nuevo sin votación. Tenga en cuenta que esta operación es irreversible, además de ser un proceso de reversión documento por documento. Restablecer todas las clasificaciones puede llevar un tiempo si el wiki tiene una gran cantidad de documentos ya valorados.
+admin.ratings.uninstallratings=La desinstalación de la aplicación de valoraciones eliminará los documentos que componen la aplicación, pero *se conservarán todos los votos sobre el documento clasificado*. Si reinstala la aplicación más tarde, los documentos volverán a empezar con la puntuación media guardada que tenían antes de desinstalar la aplicación. Finalmente, la desinstalación de la aplicación de valoraciones *quitará la categoría de valoraciones* de la administración del wiki.
+admin.ratings.ratingsactivated=Las valoraciones han sido activadas
+admin.ratings.ratingsdeactivated=Las valoraciones han sido desactivadas
+admin.ratings.illegalrequest=Petición inválida
+rating.rate=¡Vota!
+rating.yourvote=Tu voto
+rating.logintorate=Iniciar sesión para valorar
+rating.novotes=Todavía no hay valoraciones</content>
+  
+</xwikidoc>

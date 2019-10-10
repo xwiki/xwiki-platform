@@ -36,9 +36,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>La zona de pruebas es una parte de su wiki que puede modificar líbremente. Esta pendasa para permitirle practicar la edición. Podrá escribir como funciona la creación y edición de páginas. Para empezar simplemente pinche en **Editar**.
+  <content>La zona de pruebas es una parte de su wiki que puede modificar libremente. Esta pensada para permitirle practicar la edición. Podrá escribir como funciona la creación y edición de páginas. Para empezar simplemente pinche en **Editar**.
 
-{{info}}No se preocupe acerca de sobreescribir o perder cosas cuando edite la página, simpre puede volver a la versión inicial de la página desde la pestaña de "Historial" al final de la página.{{/info}}
+{{info}}No se preocupe acerca de sobreescribir o perder cosas cuando edite la página, simepre puede volver a la versión inicial de la página desde la pestaña de "Historial" al final de la página.{{/info}}
 
 Aquí hay unas cuantas páginas de prueba con las que puede jugar:
 
@@ -50,7 +50,7 @@ Abajo hay una demostración de la [[Sintaxis XWiki&gt;&gt;XWiki.XWikiSyntax]] qu
 
 = Encabezados = 
 
-XWiki ofrece 6 niveles de encabezado. Puede usarlos para escructurar sus páginas.
+XWiki ofrece 6 niveles de encabezado. Puede usarlos para estructurar sus páginas.
 
 == Nivel 2 de Encabezado ==
 
@@ -117,7 +117,7 @@ Puede insertar imágenes en sus páginas del wiki:
 
 = Macros =
 
-Las macros le permiten hacer que el contenido del wiki luzca mejor y para añadir características acicionales a su wiki. Aquí hay dos ejemplos de como las macros pueden usarse en las páginas del wiki:
+Las macros le permiten hacer que el contenido del wiki luzca mejor y para añadir características adicionales a su wiki. Aquí hay dos ejemplos de como las macros pueden usarse en las páginas del wiki:
 
 == Macro de Atención ==
 

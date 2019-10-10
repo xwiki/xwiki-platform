@@ -43,7 +43,7 @@
   #set($status = $services.wiki.creationjob.getJobStatus($wikiId))
   #set($lastError = $status.logTail.getLastLogEvent('ERROR'))
   #set($hasErrorLog = false)
-  #if (lastError)
+  #if ($lastError)
     #set($hasErrorLog = true)
   #end
   #set($errorMessage = "")

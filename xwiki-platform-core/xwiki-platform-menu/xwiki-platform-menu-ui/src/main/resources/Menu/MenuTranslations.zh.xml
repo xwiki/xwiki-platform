@@ -1,0 +1,90 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Menu.MenuTranslations" locale="zh">
+  <web>Menu</web>
+  <name>MenuTranslations</name>
+  <language>zh</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <parent>MenuClass</parent>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content># Class fields
+Menu.MenuClass_content1=菜单结构
+
+# Live table generic keys
+menu.livetable.doc.title=页面标题
+menu.livetable.doc.name=页面名称
+menu.livetable.doc.location=位置
+menu.livetable.doc.space=空间
+menu.livetable.doc.fullname=页面全名
+menu.livetable.doc.author=最后作者
+menu.livetable.doc.creator=创作者
+menu.livetable.doc.date=更新日期
+menu.livetable.doc.creationDate=创建日期
+menu.livetable._avatar=头像
+menu.livetable._images=图片
+menu.livetable._attachments=附件
+menu.livetable._actions=操作
+menu.livetable._actions.edit=编辑
+menu.livetable._actions.delete=删除
+menu.livetable.emptyvalue=-
+
+# Live table specific keys
+menu.livetable.content1=菜单结构
+
+# Administration keys
+admin.menu.name=菜单
+
+# UIX keys
+menu.uix.extensionPoint.label=菜单显示位置
+menu.uix.extensionPoint.hint=指定显示菜单的位置。根据所选位置，水平或垂直显示菜单。
+menu.uix.extensionPoint.value.nowhere=没有地方
+menu.uix.extensionPoint.value.template.header.after=页面标题之后
+menu.uix.extensionPoint.value.panels.rightPanels=右侧面板内
+menu.uix.extensionPoint.value.panels.leftPanels=在左面板内
+menu.uix.content.label=UI扩展内容
+menu.uix.content.hint=如果看到此消息，则可能意味着您已禁用JavaScript。您应该选择与菜单显示位置相同的值。
+menu.uix.scope.label=菜单可见范围
+menu.uix.scope.hint=指定菜单在哪个上下文中可见。
+
+# Menu Macro
+rendering.macro.menu.name=菜单
+rendering.macro.menu.description=显示使用简单Wiki语法（嵌套列表和链接）创建的菜单。
+rendering.macro.menu.parameter.id.name=Id
+rendering.macro.menu.parameter.id.description=将在包装菜单的HTML元素上设置的可选菜单标识符。您可以在JavaScript代码中使用此标识符来访问菜单DOM，或在功能测试中使用此标识符来断言菜单项。
+rendering.macro.menu.parameter.type.name=类型
+rendering.macro.menu.parameter.type.description=可选的菜单类型确定菜单的外观和行为。支持的值为：水平（默认值）和垂直。
+rendering.macro.menu.content.description=使用Wiki语法定义菜单结构。每个菜单项应为一个列表项，并应包含菜单项的标签或链接。您可以将嵌套列表用于子菜单项。
+
+# Menu WebHome
+menu.description=这是一个简单的应用程序，可帮助您创建导航菜单，以将其作为页面标题后的顶部栏水平显示或在侧面面板中垂直显示。</content>
+  
+</xwikidoc>

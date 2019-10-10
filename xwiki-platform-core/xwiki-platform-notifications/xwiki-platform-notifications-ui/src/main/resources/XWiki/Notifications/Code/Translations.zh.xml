@@ -95,7 +95,7 @@ notifications.filters.preferences.setEnabled.done=过滤器偏好已保存！
 notifications.filters.preferences.setEnabled.error=保存过滤器偏好失败
 
 ## Notifications toggles
-notifications.toggle.disabled.hint=如果您想关注这些位置，则需要在设置中启用通知
+notifications.toggle.disabled.hint=如果您想监视这些位置，则需要在设置中启用通知
 
 ## Notifications formats
 notifications.format.alert=警报
@@ -144,11 +144,11 @@ notifications.settings.applications.hint=这是可以发送通知的应用程序
 notifications.settings.applications.forGuest=登录或注册以处理您的通知设置。
 notifications.settings.applications.appName=名称
 notifications.settings.events=事件
-notifications.settings.watch.title=已关注页面
-notifications.settings.watch.autowatchmode=自动关注页面
-notifications.settings.watch.autowatchmode.hint=在您完成工作后决定是否要关注页面
+notifications.settings.watch.title=已监视页面
+notifications.settings.watch.autowatchmode=自动监视页面
+notifications.settings.watch.autowatchmode.hint=在您完成工作后决定是否要监视页面
 notifications.settings.watch.forGuest=登录或注册以处理您的通知设置。
-notifications.settings.watch.disabled=已关注的实体被禁用。请联系您的管理员。
+notifications.settings.watch.disabled=已监视的实体被禁用，请联系您的管理员。
 notifications.events.by=由{0}编辑。
 notifications.events.lastChange=最后更改：{0}。
 notifications.events.lastComment=最后评论：{0}。
@@ -195,8 +195,8 @@ rendering.macro.notificationsApplicationsPreferences.description=显示当前用
 rendering.macro.notificationsApplicationsPreferences.parameter.target.name=目标
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=宏的目标（可以是当前用户的“用户”或当前Wiki的“wiki”）
 
-rendering.macro.notificationsAutoWatchPreferences.name=通知自动关注偏好
-rendering.macro.notificationsAutoWatchPreferences.description=显示当前用户关于自动关注页面的偏好。
+rendering.macro.notificationsAutoWatchPreferences.name=通知自动监视偏好
+rendering.macro.notificationsAutoWatchPreferences.description=显示当前用户关于自动监视页面的偏好。
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=目标
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=宏的目标（可以是当前用户的“用户”或当前wiki的“wiki”）
 
@@ -206,10 +206,10 @@ notifications.filters.preferences.label.space=切换页面和子通知
 notifications.filters.preferences.label.wiki=切换Wiki通知
 
 ## Notifications switches
-notifications.switches.tooltip.page=关注该页面
-notifications.switches.tooltip.pageAndChildren=关注该页面及其所有子页面
-notifications.switches.tooltip.space=关注父页面及其所有子页面
-notifications.switches.tooltip.wiki=关注该Wiki
+notifications.switches.tooltip.page=监视该页面
+notifications.switches.tooltip.pageAndChildren=监视该页面及其所有子页面
+notifications.switches.tooltip.space=监视父页面及其所有子页面
+notifications.switches.tooltip.wiki=监视该Wiki
 notifications.switches.changeStatusError=无法更改通知的状态。</content>
   
 </xwikidoc>

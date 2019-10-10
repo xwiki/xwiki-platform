@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>SkinsCode</web>
+  <name>Translations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>SkinsCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>skin.sheet.title=स्कीन
+skin.sheet.properties=स्कीन गुणधर्म
+skin.sheet.deprecatedProperties=नापसंत केलेले गुणधर्म
+skin.sheet.overriddenTemplates=अधिलिखित टेम्पलेट्स
+skin.sheet.addTemplate=नवीन अधिलिखित टेम्पलेट जोडा
+skin.sheet.add=जोडा
+skin.sheet.overrideTemplateWarning=हा विभाग आपल्याला स्कीनची टेम्पलेट अधिलिखित करण्याची परवानगी देतो. ही तांत्रिक बाब आहे आणि आपल्याला त्याचे परिणाम माहित असले पाहिजेत.
+skin.sheet.deprecatedPropertiesWarning=हा विभाग रेट्रो-अनुकूलतेसाठी येथे आहे. आपण वरील येथे 'अधिलिखित टेम्पलेट्स' यंत्रणा वापरली पाहिजे.
+skin.sheet.nojs=JavaScript शिवाय आपण हा विभाग वापरू शकत नाही. परंतु आपण त्याऐवजी {0} ऑब्जेक्ट एडिटर {1} वापरू शकता आणि व्यक्तिचलितरित्या {2} ऑब्जेक्ट्स जोडू शकता.
+
+skin.sheet.js.deleting=हटवित आहे ...
+skin.sheet.js.deletingDone=टेम्पलेट हटविले गेले आहे!
+skin.sheet.js.error.csrf=जतन करताना CSRF प्रमाणीकरण अयशस्वी. पुन्हा प्रयत्न करण्यासाठी आपल्या ब्राउझरला रीफ्रेश करा.
+skin.sheet.js.error.rights=अपुऱ्या परवानग्यांमुळे स्कीन जतन करण्यात अयशस्वी.
+skin.sheet.js.deleteConfirmationText=आपली खात्री आहे की आपण हे टेम्पलेट हटवू इच्छिता?
+skin.sheet.js.deleteConfirmationYes=होय, ते हटवा
+skin.sheet.js.deleteConfirmationNo=नाही, रद्द करा
+skin.sheet.js.adding=जोडत आहे...
+skin.sheet.js.addingDone=टेम्पलेट जोडले गेले आहे!
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 7.1M1
+#######################################
+### Missing: skin.sheet.overridedTemplates=Overridden templates
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
+  
+</xwikidoc>

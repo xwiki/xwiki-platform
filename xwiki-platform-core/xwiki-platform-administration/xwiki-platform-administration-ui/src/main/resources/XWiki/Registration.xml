@@ -51,7 +51,6 @@
   #set($loginAction = 'loginsubmit')
   ##
   #set($documentName = 'XWiki.Registration')
-  #set($configurationClassName = 'XWiki.Registration')
   ##
   ## Security measure:
   ## If this document is changed such that it must have programming permission in order to run, change this to false.
@@ -352,7 +351,7 @@
     ## This must not be in a #set directive as it will output messages if something goes wrong.
     #validateFields($fields, $request)
     ## If server side validation was successfull, create the user
-    #if(!$registrationFailed)
+    #if($allFieldsValid)
       #createUser($fields, $request, $response, $doAfterRegistration)
     #end
   #end
@@ -396,103 +395,6 @@
   #set($temp = $response.sendRedirect($xwiki.getURL($mainWikiRegisterPageReference, 'register', $request.queryString)))
 #end
 ##
-#macro(validateRegex $fieldValue, $fieldName, $regex, $error)
-  #if($regex.get('pattern') &amp;&amp; $regex.get('failureMessage'))
-    ## Make Java regexes more compatible with Perl/js style regexes by removing leading and trailing /
-    #if($regex.get('pattern').length() &gt; 1)
-      #set($pattern = $regex.get('pattern'))
-      #if($pattern.lastIndexOf('/') &lt; $pattern.length() - 1)
-        ERROR: In field: ${fieldName}: regex validation does not allow flags after the /, please fix [${pattern}].
-      #end
-      #set($pattern = $pattern.substring($mathtool.add(1, $pattern.indexOf('/')), $pattern.lastIndexOf('/')))
-      #else
-        ## I don't expect this but want to maintain compatibility.
-        #set($pattern = $regex.get('pattern'))
-      #end
-      #if($regextool.find($value, $pattern).isEmpty())
-        #set($error = $regex.get('failureMessage'))
-      #end
-  #elseif($regex.get('pattern'))
-    ERROR: In field: ${fieldName}: regex validation must include failureMessage.
-  #end
-#end
-
-####### The Macros (nothing below this point is run directly) #########
-#*
- * Server side validation, this is necessary for security and because not everyone has Javascript
- *
- * @param $fields The array of fields to validate.
- * @param $request An XWikiRequest object which made the register request, used to get parameters.
- *###
-#macro(validateFields, $fields, $request)
-  #foreach($field in $fields)
-    #if($field.get('validate') &amp;&amp; $field.get('name'))
-      #set($fieldName = $field.get('name'))
-      #set($validate = $field.get('validate'))
-      #set($error = '')
-      #set($value = $request.get($fieldName))
-      #if("$!value" != '' || $field.get('type') == 'html')
-        ##
-        ## mustMatch validation
-        #if($error == '' &amp;&amp; $validate.get('mustMatch'))
-          #set($mustMatch = $validate.get('mustMatch'))
-          #if($mustMatch.get('name') &amp;&amp; $mustMatch.get('failureMessage'))
-            #if($request.get($fieldName) != $request.get($mustMatch.get('name')))
-              #set($error = $mustMatch.get('failureMessage'))
-            #end
-          #else
-            ERROR: In field: ${fieldName}: mustMatch validation required both name
-                   (of field which this field must match) and failureMessage.
-          #end
-        #end
-        ##
-        ## Regex validation
-        ## We won't bother with regex validation if there is no entry, that would defeat the purpose of 'mandatory'
-        #if($error == '' &amp;&amp; $validate.get('regex') &amp;&amp; $value &amp;&amp; $value != '')
-          #set($regex = $validate.get('regex'))
-          #validateRegex($value, $fieldName, $regex, $error)
-        #end
-        ## List of regex validation
-        #if($error == '' &amp;&amp; $validate.get('regexes') &amp;&amp; $value &amp;&amp; $value != '')
-          #set($regexes = $validate.get('regexes'))
-          #foreach ($regex in $regexes)
-            #validateRegex($value, $fieldName, $regex, $error)
-          #end
-        #end
-        ##
-        ## If regex and mustMatch validation passed, try programmatic validation
-        #if($error == '' &amp;&amp; $validate.get('programmaticValidation'))
-          #set($pv = $validate.get('programmaticValidation'))
-          #if($pv.get('code') &amp;&amp; $pv.get('failureMessage'))
-            #set($pvReturn = "#evaluate($pv.get('code'))")
-            #if($pvReturn.indexOf('failed') != -1)
-              #set($error = $pv.get('failureMessage'))
-            #end
-          #else
-            ERROR: In field: ${fieldName}: programmaticValidation requires code and failureMessage
-          #end
-        #end
-      #else
-        ##
-        ## If no content, check if content is mandatory
-        #if($validate.get('mandatory'))
-          #set($mandatory = $validate.get('mandatory'))
-          #if($mandatory.get('failureMessage'))
-            #set($error = $mandatory.get('failureMessage'))
-          #else
-            ERROR: In field: ${fieldName}: mandatory validation requires a failureMessage
-          #end
-        #end
-      #end
-      #if($error != '')
-        #set($discard = $field.put('error', $error))
-        #set($registrationFailed = true)
-      #end
-    #elseif(!$field.get('name'))
-      ERROR: Field with no name.
-    #end##if(validate)
-  #end##loop
-#end##macro
 #*
  * Create the user.
  * Calls $xwiki.createUser to create a new user.
@@ -588,71 +490,6 @@
   #end
   ##
 #end## createUser Macro
-
-#*
- * Get the configuration from the configuration object.
- *
- * @param $configDocumentName The name of the document to get the configuration from.
- *###
-#macro(loadConfig, $configDocumentName)
-  #set($configDocument = $xwiki.getDocument($configDocumentName))
-  #set ($passwordOptions = {})
-  #if(!$configDocument || !$configDocument.getObject($configurationClassName))
-    ## No config document, load defaults.
-    #set($heading = "$services.localization.render('core.register.title')")
-    #set($welcomeMessage = "$services.localization.render('core.register.welcome')")
-    #set($useLiveValidation = true)
-    #set($defaultFieldOkayMessage = "$services.localization.render('core.validation.valid.message')")
-    #set($loginButton = true)
-    #set($defaultRedirect = "$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))")
-    #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
-    #set($registrationSuccessMessage = '{{info}}$services.localization.render("core.register.successful", ["[[${userFullName}&gt;&gt;${userSpace}${userName}]]", ${userName}]){{/info}}')
-    #set($passwordOptions.passwordLength = 6)
-    #set($passwordOptions.passwordRuleOneLowerCaseEnabled = false)
-    #set($passwordOptions.passwordRuleOneUpperCaseEnabled = false)
-    #set($passwordOptions.passwordRuleOneNumberEnabled = false)
-    #set($passwordOptions.passwordRuleOneSymbolEnabled = false)
-  #else
-    #set($configObject = $configDocument.getObject($configurationClassName))
-    #if ($xcontext.action == 'register')
-      #set ($heading = "(% id='document-title'%)((( = #evaluate($configObject.getProperty('heading').getValue()) = )))(%%)")
-    #else
-      #set ($heading = "= #evaluate($configObject.getProperty('heading').getValue()) =")
-    #end
-    #set($welcomeMessage = "#evaluate($configObject.getProperty('welcomeMessage').getValue())")
-    #if($configObject.getProperty('liveValidation_enabled').getValue() == 1)
-      #set($useLiveValidation = true)
-    #end
-    #set($defaultFieldOkayMessage = "#evaluate($configObject.getProperty('liveValidation_defaultFieldOkMessage').getValue())")
-    #if($configObject.getProperty('loginButton_enabled').getValue() == 1)
-      #set($loginButton = true)
-    #end
-    #if($configObject.getProperty('loginButton_autoLogin_enabled').getValue() == 1)
-      #set($autoLogin = true)
-    #end
-    #set($defaultRedirect = "#evaluate($configObject.getProperty('defaultRedirect').getValue())")
-    #set($registrationSuccessMessage = "$configObject.getProperty('registrationSuccessMessage').getValue()")
-    #if($configObject.getProperty('requireCaptcha').getValue() == 1)
-      #set($requireCaptcha = true)
-    #end
-    #if($configObject.getProperty('passwordRuleOneLowerCaseEnabled').getValue() == 1)
-      #set($passwordOptions.passwordRuleOneLowerCaseEnabled = true)
-    #end
-    #if($configObject.getProperty('passwordRuleOneUpperCaseEnabled').getValue() == 1)
-      #set($passwordOptions.passwordRuleOneUpperCaseEnabled = true)
-    #end
-    #if($configObject.getProperty('passwordRuleOneNumberEnabled').getValue() == 1)
-      #set($passwordOptions.passwordRuleOneNumberEnabled = true)
-    #end
-    #if($configObject.getProperty('passwordRuleOneSymbolEnabled').getValue() == 1)
-      #set($passwordOptions.passwordRuleOneSymbolEnabled = true)
-    #end
-    #set($passwordOptions.passwordLength = $configObject.getProperty('passwordLength').getValue())
-    #if ("$!passwordOptions.passwordLength" == "" || $passwordOptions.passwordLength &lt; 1)
-      #set ($passwordOptions.passwordLength = 6)
-    #end
-  #end
-#end
 {{/velocity}}</content>
   <class>
     <name>XWiki.Registration</name>

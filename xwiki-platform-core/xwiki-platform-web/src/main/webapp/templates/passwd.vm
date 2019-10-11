@@ -4,7 +4,9 @@
 ###
 #template("startpage.vm")
 #template("register_macros.vm")
-
+#set ($fields = [])
+#loadConfig('XWiki.RegistrationConfig')
+#definePasswordFields($fields, 'password', 'password2', $passwordOptions)
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
   <div id="mainContentArea">
@@ -23,21 +25,16 @@
           #set($user = $xwiki.getUser())
           #set($isOriginalPasswordValid = $user.checkPassword($request.originalpassword))
           #if(!$isOriginalPasswordValid)
-            #set($errorMessage = $services.localization.render('platform.core.profile.passwd.invalidOriginalPassword'))
+            #set($discard = $errorMessage.add($services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')))
             #set($isValidPassword = false)
           #end
         #end
-        #if($password != $password2)
-          #set($errorMessage = $services.localization.render('platform.core.profile.passwd.passwordMissmatch'))
-          #set($isValidPassword = false)
-        #elseif($password == '')
-          #set($errorMessage = $services.localization.render('platform.core.profile.passwd.passwordCannotBeEmpty'))
-          #set($isValidPassword = false)
-        #elseif ($password.length() < 6)
-          #set($errorMessage = $services.localization.render('platform.core.profile.passwd.passwordTooShort'))
-          #set($isValidPassword = false)
-        #end
-        #if($isValidPassword)
+        #validateFields($fields, $request)
+        #set ($isValidPassword = $isValidPassword && $allFieldsValid)
+        #if(!$isValidPassword)
+          #set ($discard = $errorMessage.addAll($allFieldsErrors))
+        #else
+          #set ($isValidPassword = true)
           $doc.set('password', $password, $userObject)
           $doc.save("$services.localization.render('platform.core.profile.passwd.passwordChanged')", true)
         #end
@@ -48,11 +45,10 @@
       #end
       #if(!$isValidPassword)
         $services.localization.render('platform.core.profile.passwd.instructions')
-        #set ($fields = [])
         ## We won't ask for the original password if the user is admin and not updating his own profile.
         ## In all other cases, we ask for it.
         #if (!$hasAdmin || $isCurrentUsersProfile)
-          #set ($discard = $fields.add({
+          #set ($discard = $fields.add(0, {
 	          'name': 'originalpassword',
 	          'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
 	          'params': {
@@ -72,7 +68,6 @@
 	          }
 	        }))
         #end
-        #definePasswordFields($fields, 'password', 'password2')
         ## Change the label for new password fields.
         ## Even if the user has admin rights or not, the fields for new password will be the last two.
         #set ($index = $fields.size() - 2)
@@ -85,7 +80,7 @@
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
         #generateHtml($fields, $NULL)
         #if ($request.password && !$isValidPassword)
-          <span class='box errormessage'>$errorMessage</span>
+          <span class='box errormessage'>$stringtool.join($errorMessage, "<br/>")</span>
         #end
         <div class="padded buttons">
           <span class="buttonwrapper"><input type="submit" value="$services.localization.render('platform.core.profile.passwd.submit')" class="button"/></span>

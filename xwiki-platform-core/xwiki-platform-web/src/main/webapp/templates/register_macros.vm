@@ -48,22 +48,21 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     })
     #set ($discard = $passwordRegexes.add($passwordRegex))
   #end
-  #set ($field =
-    {'name': $passwordFieldName,
-      'label': $services.localization.render('core.register.password'),
-      'params': {
-        'type': 'password',
-        'autocomplete': 'off',
-        'size': '60'
+  #set ($discard = $fields.add({
+    'name': $passwordFieldName,
+    'label': $services.localization.render('core.register.password'),
+    'params': {
+      'type': 'password',
+      'autocomplete': 'off',
+      'size': '60'
+    },
+    'validate': {
+      'mandatory': {
+        'failureMessage': $services.localization.render('core.validation.required.message')
       },
-      'validate': {
-        'mandatory': {
-          'failureMessage': $services.localization.render('core.validation.required.message')
-        },
-        'regexes': $passwordRegexes
-      }
+      'regexes': $passwordRegexes
     }
-  )
+  }))
 ##
 ## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
   #set ($discard = $fields.add({

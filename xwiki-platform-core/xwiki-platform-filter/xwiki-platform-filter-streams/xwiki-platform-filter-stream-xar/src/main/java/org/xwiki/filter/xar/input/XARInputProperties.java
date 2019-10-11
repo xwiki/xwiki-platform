@@ -187,7 +187,7 @@ public class XARInputProperties extends XMLInputProperties
      * @return true indicates if extension event should be generated if possible
      * @since 6.2M1
      */
-    @PropertyName("Indicates if extension event should be generated if possible")
+    @PropertyName("With extensions")
     @PropertyDescription("Indicates if extension event should be generated if possible")
     public boolean isWithExtension()
     {
@@ -207,6 +207,8 @@ public class XARInputProperties extends XMLInputProperties
      * @return the type of the object property to parse
      * @since 9.0RC1
      */
+    @PropertyName("Object property type")
+    @PropertyDescription("The type of the object property to parse (when the input is an object property)")
     public String getObjectPropertyType()
     {
         return this.objectPropertyType;

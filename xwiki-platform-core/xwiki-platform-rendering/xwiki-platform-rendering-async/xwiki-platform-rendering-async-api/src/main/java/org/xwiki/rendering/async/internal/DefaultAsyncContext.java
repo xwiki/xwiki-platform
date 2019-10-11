@@ -20,11 +20,11 @@
 package org.xwiki.rendering.async.internal;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
@@ -357,7 +357,7 @@ public class DefaultAsyncContext implements AsyncContext
             Collection<Object> values = contextUse.uses.get(type);
 
             if (values == null) {
-                values = new ArrayList<>();
+                values = new LinkedHashSet<>();
                 contextUse.uses.put(type, values);
             }
 

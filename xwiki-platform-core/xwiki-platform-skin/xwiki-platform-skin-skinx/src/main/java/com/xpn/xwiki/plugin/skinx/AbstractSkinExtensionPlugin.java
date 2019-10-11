@@ -398,14 +398,15 @@ public abstract class AbstractSkinExtensionPlugin extends XWikiDefaultPlugin imp
     }
 
     @Override
-    public UsedExtension getCacheResources(XWikiContext context) {
+    public UsedExtension getCacheResources(XWikiContext context)
+    {
         return new CachedItem.UsedExtension(getPulledResources(context),
-                       new HashMap<String, Map<String, Object>>(getParametersMap(context)));
+            new HashMap<String, Map<String, Object>>(getParametersMap(context)));
     }
 
     @Override
-    public void restoreCacheResources(XWikiContext context,
-                   UsedExtension extension) {
+    public void restoreCacheResources(XWikiContext context, UsedExtension extension)
+    {
         getPulledResources(context).addAll(extension.resources);
         getParametersMap(context).putAll(extension.parameters);
     }

@@ -89,7 +89,18 @@ public class SkinExtensionAsyncContextHandler implements AsyncContextHandler
     }
 
     @Override
-    public void addHTMLHead(StringBuilder meta, Collection<Object> values)
+    public void addHTMLHead(StringBuilder head, Collection<Object> values)
+    {
+        addHTMLHead(head, values, true);
+    }
+
+    @Override
+    public void addHTMLHead(StringBuilder head, Collection<Object> values, boolean scripts)
+    {
+        addHTMLHead(head, values, scripts ? null : Boolean.FALSE);
+    }
+
+    private void addHTMLHead(StringBuilder head, Collection<Object> values, Boolean scripts)
     {
         // TODO: A bit hacky right now, the skinx module should be refactored to be fully based on components
         XWikiContext xcontext = this.xcontextProvider.get();
@@ -101,11 +112,19 @@ public class SkinExtensionAsyncContextHandler implements AsyncContextHandler
             AbstractSkinExtensionPlugin skinPlugin = getPlugin(info.getType(), plugins);
 
             if (skinPlugin != null) {
-                meta.append(skinPlugin.getLink(info.getResource(), info.getParameters(), xcontext));
+                if (scripts == null || skinPlugin.getName().startsWith("js") == scripts.booleanValue()) {
+                    head.append(skinPlugin.getLink(info.getResource(), info.getParameters(), xcontext));
+                }
             } else {
                 this.logger.warn("Cannot find skin extension plugin for resource type [{}]", info.getType());
             }
         }
+    }
+
+    @Override
+    public void addHTMLScripts(StringBuilder head, Collection<Object> values)
+    {
+        addHTMLHead(head, values, Boolean.TRUE);
     }
 
     private AbstractSkinExtensionPlugin getPlugin(String name, List<XWikiPluginInterface> plugins)

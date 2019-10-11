@@ -156,27 +156,7 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
         Response response = this.container.getResponse();
         response.setContentType("text/html; charset=utf-8");
 
-        Map<String, Collection<Object>> uses = status.getUses();
-        if (uses != null && response instanceof ServletResponse) {
-            // Create the asynchronous HTML meta
-            StringBuilder head = new StringBuilder();
-            for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
-                try {
-                    AsyncContextHandler handler =
-                        this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
-
-                    // Setup a proper request and URL factory for the passed wiki
-                    this.requestInitializer.restoreRequest(reference.getWiki(), this.xcontextProvider.get());
-
-                    handler.addHTMLHead(head, entry.getValue());
-                } catch (Exception e) {
-                    this.logger.error("Failed to get HTML head for handler type [{}]", entry.getKey(), e);
-                }
-            }
-            if (head.length() > 0) {
-                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
-            }
-        }
+        addUse(reference, status, response);
 
         try (OutputStream stream = response.getOutputStream()) {
             if (status.getError() != null) {
@@ -189,6 +169,37 @@ public class AsyncRendererResourceReferenceHandler extends AbstractResourceRefer
             }
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException("Failed to send content", e);
+        }
+    }
+
+    private void addUse(AsyncRendererResourceReference reference, AsyncRendererJobStatus status, Response response)
+    {
+        Map<String, Collection<Object>> uses = status.getUses();
+        if (uses != null && response instanceof ServletResponse) {
+            // Create the asynchronous HTML meta
+            StringBuilder head = new StringBuilder();
+            StringBuilder scripts = new StringBuilder();
+            for (Map.Entry<String, Collection<Object>> entry : uses.entrySet()) {
+                try {
+                    AsyncContextHandler handler =
+                        this.componentManager.getInstance(AsyncContextHandler.class, entry.getKey());
+
+                    // Setup a proper request and URL factory for the passed wiki
+                    this.requestInitializer.restoreRequest(reference.getWiki(), this.xcontextProvider.get());
+
+                    handler.addHTMLHead(head, entry.getValue(), false);
+                    handler.addHTMLScripts(scripts, entry.getValue());
+                } catch (Exception e) {
+                    this.logger.error("Failed to get HTML head for handler type [{}]", entry.getKey(), e);
+                }
+            }
+            if (head.length() > 0) {
+                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-HEAD", head.toString());
+            }
+            if (scripts.length() > 0) {
+                ((ServletResponse) response).getHttpServletResponse().addHeader("X-XWIKI-HTML-SCRIPTS",
+                    scripts.toString());
+            }
         }
     }
 

@@ -27,7 +27,6 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
       statusCode: {
         200: function(data, textStatus, xhr) {
           // Add asynchronous meta tags
-          // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
           var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
           if (asyncHead) {
             $('head').append(asyncHead);
@@ -35,6 +34,13 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
 
           // Replace the element by the asynchronous result
           element.replaceWith(data);
+
+          // Insert the scripts after the HTML
+          var asyncScripts = xhr.getResponseHeader('X-XWIKI-HTML-SCRIPTS');
+          if (asyncScripts) {
+            // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
+            $('head').append(asyncScripts);
+          }
         },
 
         202: function(data, textStatus, xhr) {

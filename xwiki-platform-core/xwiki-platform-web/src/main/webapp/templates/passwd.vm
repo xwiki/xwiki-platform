@@ -44,7 +44,12 @@
         <a href = "$doc.getURL("view")">$services.localization.render('platform.core.profile.passwd.return')</a>
       #end
       #if(!$isValidPassword)
-        $services.localization.render('platform.core.profile.passwd.instructions')
+        #if ("$!passwordOptions" == "")
+          #set ($passwordLength = 6)
+        #else
+          #set ($passwordLength = $passwordOptions.passwordLength)
+        #end
+        $services.localization.render('platform.core.profile.passwd.instructionsPasswordLength', $passwordLength)
         ## We won't ask for the original password if the user is admin and not updating his own profile.
         ## In all other cases, we ask for it.
         #if (!$hasAdmin || $isCurrentUsersProfile)

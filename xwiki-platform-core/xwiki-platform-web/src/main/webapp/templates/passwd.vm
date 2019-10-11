@@ -49,7 +49,9 @@
       #if(!$isValidPassword)
         $services.localization.render('platform.core.profile.passwd.instructions')
         #set ($fields = [])
-        #if (!$hasAdmin)
+        ## We won't ask for the original password if the user is admin and not updating his own profile.
+        ## In all other cases, we ask for it.
+        #if (!$hasAdmin || $isCurrentUsersProfile)
           #set ($discard = $fields.add({
 	          'name': 'originalpassword',
 	          'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),

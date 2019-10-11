@@ -49,7 +49,7 @@
   #set($errorMessage = "")
   #if ($status.error)
     ## The last error log is what actually stopped the job
-    #set($errorMessage = lastError.getFormattedMessage())
+    #set($errorMessage = $lastError.getFormattedMessage())
   #end
   ## Log
   #template('logging_macros.vm')

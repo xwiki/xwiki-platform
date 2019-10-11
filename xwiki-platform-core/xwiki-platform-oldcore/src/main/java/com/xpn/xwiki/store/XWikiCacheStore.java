@@ -227,20 +227,18 @@ public class XWikiCacheStore extends AbstractXWikiStore
             this.store.saveXWikiDoc(doc, context, bTransaction);
 
             doc.setStore(this.store);
-
-            // We need to flush so that caches
-            // on the cluster are informed about the change
+        } finally {
+            // Flushing the cache
             String key = getKey(doc, context);
             getCache().remove(key);
             getPageExistCache().remove(key);
 
             /*
              * We do not want to save the document in the cache at this time. If we did, this would introduce the
-             * possibility for cache incoherence if the document is not saved in the database properly. In addition, the
-             * attachments uploaded to the document stay with it so we want the document in it's current form to be
-             * garbage collected as soon as the request is complete.
+             * possibility for cache incoherence if the document is not saved in the database properly.
              */
-        } finally {
+
+            // Restore the previous XWikiContext
             restoreExecutionXContext();
         }
     }

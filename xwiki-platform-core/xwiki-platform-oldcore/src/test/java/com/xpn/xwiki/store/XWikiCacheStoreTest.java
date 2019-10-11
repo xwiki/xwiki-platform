@@ -19,9 +19,8 @@
  */
 package com.xpn.xwiki.store;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
@@ -30,14 +29,19 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.test.annotation.ComponentList;
 
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static com.xpn.xwiki.test.mockito.OldcoreMatchers.isCacheConfiguration;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -49,18 +53,19 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@OldcoreTest
 @ComponentList(UidStringEntityReferenceSerializer.class)
 public class XWikiCacheStoreTest
-{
-    @Rule
-    public MockitoOldcoreRule oldcore = new MockitoOldcoreRule();
+{    
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     private Cache<XWikiDocument> cache;
 
     private Cache<Boolean> existCache;
 
-    @Before
-    public void before() throws Exception
+    @BeforeEach
+    public void beforeEach() throws Exception
     {
         this.oldcore.getMocker().registerMockComponent(RemoteObservationManagerContext.class);
         this.oldcore.getMocker().registerMockComponent(ObservationManager.class);
@@ -75,7 +80,7 @@ public class XWikiCacheStoreTest
     }
 
     @Test
-    public void testLoadXWikiDoc() throws Exception
+    public void loadXWikiDoc() throws Exception
     {
         // Set current wiki
         this.oldcore.getXWikiContext().setWikiId("wiki");
@@ -114,5 +119,27 @@ public class XWikiCacheStoreTest
 
         verifyNoMoreInteractions(this.cache);
         verifyNoMoreInteractions(this.existCache);
+    }
+
+    @Test
+    public void saveXWikiDocumentFailing() throws XWikiException
+    {
+        // Set current wiki
+        this.oldcore.getXWikiContext().setWikiId("wiki");
+
+        // Save a document
+        DocumentReference reference = new DocumentReference("wiki", "space", "page");
+
+        XWikiCacheStore store = new XWikiCacheStore(this.oldcore.getMockStore(), this.oldcore.getXWikiContext());
+
+        XWikiDocument document = new XWikiDocument(reference);
+
+        doThrow(XWikiException.class).when(this.oldcore.getMockStore()).saveXWikiDoc(document,
+            this.oldcore.getXWikiContext(), true);
+
+        assertThrows(XWikiException.class, () -> store.saveXWikiDoc(document, this.oldcore.getXWikiContext(), true));
+
+        verify(this.cache).remove("4:wiki5:space4:page");
+        verify(this.existCache).remove("4:wiki5:space4:page");
     }
 }

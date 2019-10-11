@@ -59,7 +59,7 @@ $services.template.execute('logging_macros.vm')
     #set ($logOffset = $mathtool.max($logOffset, 0))
   #end
   #set ($log = [])
-  #foreach ($logEvent in $status.logTail.getLogEvents($logOffset, $status.logTail.size()))
+  #foreach ($logEvent in $status.logTail.getLogEvents($logOffset, -1))
     #set ($discard = $log.add({
       'level': $logEvent.level.toString().toLowerCase(),
       'renderedMessage': "#printLog($logEvent)"

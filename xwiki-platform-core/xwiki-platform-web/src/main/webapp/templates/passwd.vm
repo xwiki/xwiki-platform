@@ -17,7 +17,7 @@
       <div id="document-title"><h1>$services.localization.render('platform.core.profile.passwd.title', [$escapetool.xml($xwiki.getUserName($doc.fullName, false))])</h1></div>
       #if($request.password && $request.password2)
         #set($isValidPassword = true)
-        #set($errorMessage = "")
+        #set($errorMessage = [])
         #set($password = $request.password)
         #set($password2 = $request.password2)
         ## Server-side checking

@@ -62,11 +62,11 @@ XWiki.Registration_loginButton_autoLogin_enabled.hint=Si le bouton de connexion 
 XWiki.Registration_defaultRedirect.hint=URL vers laquelle l'utilisateur sera redirigé après avoir cliqué sur le bouton de Connexion si le paramètre xredirect n'est pas renseigné. Vous pouvez indiquer du code Velocity.
 XWiki.Registration_requireCaptcha.hint=Activer pour exiger de l'utilisateur la saisie d'un CAPTCHA lors de son enregistrement.
 XWiki.Registration_registrationSuccessMessage.hint=Affiché à l'utilisateur en fin de procédure d'inscription. Vous pouvez indiquer du code Velocity.
-### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
-### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
-### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
-### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
-### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
+XWiki.Registration_passwordLength.hint=Taille minimale du mot de passe. Un mot de passe long est plus sûr. Il est recommandé d'avoir un mot de passe de plus de 6 caractères.
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=Si actif, oblige l'utilisateur à définir un mot de passe contenant au moins une lettre minuscule.
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=Si actif, oblige l'utilisateur à définir un mot de passe contenant au moins une lettre majuscule.
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=Si actif, oblige l'utilisateur à définir un mot de passe contenant au moins un chiffre.
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Si actif, oblige l'utilisateur à définir un mot de passe contenant au moins un symbole.
 
 # Look &amp; Feel Sections
 admin.themes=Thèmes

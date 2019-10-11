@@ -50,16 +50,16 @@ public class BaseObject extends BaseCollection<BaseObjectReference> implements O
      * blanks, except for the page name for which the default page name is used instead and for the wiki name for which
      * the current wiki is used instead of the current document reference's wiki.
      */
-    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver2;
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     private DocumentReferenceResolver<String> getCurrentMixedDocumentReferenceResolver()
     {
-        if (this.currentMixedDocumentReferenceResolver2 == null) {
-            this.currentMixedDocumentReferenceResolver2 =
+        if (this.currentMixedDocumentReferenceResolver == null) {
+            this.currentMixedDocumentReferenceResolver =
                 Utils.getComponent(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
         }
 
-        return this.currentMixedDocumentReferenceResolver2;
+        return this.currentMixedDocumentReferenceResolver;
     }
 
     /**

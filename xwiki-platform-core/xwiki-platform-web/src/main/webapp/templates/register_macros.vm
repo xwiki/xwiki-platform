@@ -151,6 +151,23 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   #generateJavascript($fields)
 #end
 ##
+#macro (validateRegexJS $regex $fieldName)
+  #set ($pattern = "")
+  #if ($regex.jsPattern)
+    #set ($pattern = $regex.jsPattern)
+  #elseif ($regex.pattern)
+    #set ($pattern = $regex.pattern)
+  #end
+  #set ($failMessage = "")
+  #if ($regex.jsFailureMessage)
+    #set ($failMessage = $regex.jsFailureMessage)
+  #elseif ($regex.failureMessage)
+    #set ($failMessage = $regex.failureMessage)
+  #end
+  #if ($pattern != '' && $failMessage != '' && !$regex.noscript)
+    ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage"});
+  #end
+#end
 #*
  * Generate the Javascript for interacting with LiveValidation.
  *
@@ -168,6 +185,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       #set ($validate = $field.validate)
       #if (($validate.mandatory && !$validate.mandatory.noscript)
           || ($validate.regex && !$validate.regex.noscript)
+          || $validate.regexes
           || ($validate.mustMatch) && !$validate.mustMatch.noscript)
         #set ($fieldName = $field.name)
         #if ($validate.fieldOkayMessage)
@@ -196,20 +214,11 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
         ##
         #if ($validate.regex)
           #set ($regex = $validate.regex)
-          #set ($pattern = "")
-          #if ($regex.jsPattern)
-            #set ($pattern = $regex.jsPattern)
-          #elseif ($regex.pattern)
-            #set ($pattern = $regex.pattern)
-          #end
-          #set ($failMessage = "")
-          #if ($regex.jsFailureMessage)
-            #set ($failMessage = $regex.jsFailureMessage)
-          #elseif ($regex.failureMessage)
-            #set ($failMessage = $regex.failureMessage)
-          #end
-          #if ($pattern != '' && $failMessage != '' && !$regex.noscript)
-            ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage"});
+          #validateRegexJS($regex $fieldName)
+        #end
+        #if ($validate.regexes)
+          #foreach($regex in $validate.regexes)
+            #validateRegexJS($regex $fieldName)
           #end
         #end
       #end

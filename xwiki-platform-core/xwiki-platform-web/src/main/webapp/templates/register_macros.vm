@@ -417,7 +417,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       #set($passwordOptions.passwordRuleOneSymbolEnabled = true)
     #end
     #set($passwordOptions.passwordLength = $configObject.getProperty('passwordLength').getValue())
-    #if ("$!passwordOptions.passwordLength" == "" || $passwordOptions.passwordLength > 1)
+    #if ("$!passwordOptions.passwordLength" == "" || $passwordOptions.passwordLength <= 1)
       #set ($passwordOptions.passwordLength = 6)
     #end
   #end

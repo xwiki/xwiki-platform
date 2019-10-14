@@ -59,6 +59,14 @@
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
+    <!-- We want the RegistrationConfig pages to ensure the behaviour of changing password with the policies -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-administration-ui</artifactId>
+      <version>${project.version}</version>
+      <type>xar</type>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

@@ -174,7 +174,21 @@
                     "oldValue": "\"Indicates if extension event should be generated if possible\"",
                     "newValue": "\"With extensions\"",
                     "justification": "Not a breakage"
-                  }
+                  },
+                  {
+                    "code": "java.field.serialVersionUIDChanged",
+                    "new": "field com.xpn.xwiki.objects.BaseObject.serialVersionUID",
+                    "oldSerialVersionUID": "-6939304097846704545",
+                    "newSerialVersionUID": "1",
+                    "justification": "Not a breakage"
+                  },
+                  {
+                    "code": "java.field.serialVersionUIDChanged",
+                    "new": "field com.xpn.xwiki.objects.BaseProperty<R extends org.xwiki.model.reference.EntityReference>.serialVersionUID",
+                    "oldSerialVersionUID": "1014924568649400298",
+                    "newSerialVersionUID": "1",
+                    "justification": "Not a breakage"
+                  },
                   // Add more ignores below...
                 ]
               }

@@ -569,5 +569,10 @@ public class XWikiMockitoTest
         when(this.wikis.getMainWikiDescriptor()).thenReturn(mainwikiDescriptor);
 
         assertEquals(new URL("http://mainwiki.com"), this.xwiki.getServerURL("subwiki", this.context));
+
+        mainwikiDescriptor.setSecure(null);
+        mainwikiDescriptor.setPort(8080);
+
+        assertEquals(new URL("http://mainwiki.com:8080"), this.xwiki.getServerURL("subwiki", this.context));
     }
 }

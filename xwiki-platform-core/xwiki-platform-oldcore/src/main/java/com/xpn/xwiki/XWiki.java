@@ -84,6 +84,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.http.protocol.HTTP;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -4951,10 +4952,10 @@ public class XWiki implements EventListener
                         int port = getWikiPort(wikiDescriptor, xcontext);
 
                         if (protocol == null && port == -1) {
-                            // If request is a "real" one keep using the same protocol (if asking for the same wiki)
+                            // If request is a "real" one keep using the same protocol/port (if asking for the same wiki)
                             XWikiRequest request = xcontext.getRequest();
-                            if (wikiDescriptor.getId().equals(xcontext.getOriginalWikiId())
-                                && !(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+                            if (request != null && wikiDescriptor.getId().equals(xcontext.getOriginalWikiId())
+                                && !isDaemon(request)) {
                                 URL sourceURL = HttpServletUtils.getSourceBaseURL(xcontext.getRequest());
 
                                 protocol = sourceURL.getProtocol();
@@ -4965,7 +4966,8 @@ public class XWiki implements EventListener
                             }
                         }
 
-                        return new URL(protocol, server, port, "");
+                        return new URL(protocol != null ? protocol : (port == 443 ? "https" : "http"), server, port,
+                            "");
                     }
                 }
             } catch (WikiManagerException e) {
@@ -4974,6 +4976,12 @@ public class XWiki implements EventListener
         }
 
         return null;
+    }
+
+    private boolean isDaemon(XWikiRequest request)
+    {
+        return request.getHttpServletRequest() instanceof XWikiServletRequestStub
+            && ((XWikiServletRequestStub) request).isDaemon();
     }
 
     private String getWikiProtocol(WikiDescriptor wikiDescriptor)

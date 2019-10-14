@@ -273,6 +273,14 @@ private void buildInsideNode(map)
         heapDumpPath = "-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
     }
 
+    // Override the FF binary path since we're on an old branch and we need to use FF 32.0.1 (as testing with a
+    // newer version requires a newer version of Selenium and that in turn requires Guava 21+, which is hard to
+    // update and that we updated in XWiki 11.6+
+    // Example of running "which firefox-bin":
+    // - on the agent directly: "/home/hudsonagent/firefox//firefox-bin"
+    // - inside the xwiki jenkins docker image "/usr/bin/firefox/firefox-bin"
+    def ffpath = sh script: 'which firefox-bin', returnStdout: true
+    def newffpath = "${ffpath.substring(0, ffpath.indexOf('/firefox') + 8)}-32.0.1/firefox-bin"
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
       jobProperties = getCustomJobProperties()
@@ -282,9 +290,7 @@ private void buildInsideNode(map)
       if (map.profiles != null) {
         profiles = map.profiles
       }
-      if (map.properties != null) {
-        properties = map.properties
-      }
+      properties = "${map.properties ?: ''} -Dwebdriver.firefox.bin=${newffpath}"
       if (map.pom != null) {
         pom = map.pom
       }

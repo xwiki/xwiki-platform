@@ -37,6 +37,17 @@
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-leg-rc</artifactId>
+      <version>3.141.59</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>javax.servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

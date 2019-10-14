@@ -61,13 +61,6 @@
                 <value>${basedir}/target/screenshots</value>
               </property>
             </systemProperties>
-            <!-- Verify that unit tests don't output anything to stdout/stderr -->
-            <properties>
-              <property>
-                <name>listener</name>
-                <value>org.xwiki.test.CaptureConsoleRunListener</value>
-              </property>
-            </properties>
           </configuration>
           <dependencies>
             <dependency>

@@ -680,12 +680,6 @@
                 <value>${xwiki.surefire.captureconsole.skip}</value>
               </property>
             </systemProperties>
-            <properties>
-              <property>
-                <name>listener</name>
-                <value>org.xwiki.test.CaptureConsoleRunListener</value>
-              </property>
-            </properties>
           </configuration>
           <dependencies>
             <dependency>

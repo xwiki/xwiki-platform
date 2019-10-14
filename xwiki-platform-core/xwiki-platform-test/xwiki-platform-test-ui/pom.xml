@@ -31,6 +31,9 @@
   <name>XWiki Platform - Test - UI Tests Framework</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - UI Tests Framework</description>
+  <properties>
+    <selenium.version>3.141.59</selenium.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -45,7 +48,7 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <version>2.44.0</version>
+      <version>${selenium.version}</version>
       <exclusions>
         <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
         <exclusion>
@@ -59,6 +62,12 @@
           <artifactId>testng</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <!-- Used to download/install/setup the gecko driver for Selenium for the FF browser -->
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <version>3.7.1</version>
     </dependency>
     <!-- Used to build support for phantomjs -->
     <dependency>

@@ -330,6 +330,9 @@
         &lt;/dt&gt;
         #if ($out != '')
           &lt;dd&gt;$out&lt;/dd&gt;
+        #else
+          ## We always display a dd element to avoid having a last dt element alone, which would lead to an invalid html.
+          &lt;dd class="hidden"&gt;$out&lt;/dd&gt;
         #end
       #end## If property is in propertiesToShow
     #end## Foreach property in this class

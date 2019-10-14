@@ -26,6 +26,8 @@ import com.xpn.xwiki.doc.merge.MergeResult;
 
 public class LargeStringProperty extends BaseStringProperty
 {
+    private static final long serialVersionUID = 1L;
+
     @Override
     protected void mergeValue(Object previousValue, Object newValue, MergeResult mergeResult)
     {

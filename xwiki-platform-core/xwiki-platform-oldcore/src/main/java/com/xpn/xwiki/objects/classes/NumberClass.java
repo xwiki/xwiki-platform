@@ -35,6 +35,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class NumberClass extends PropertyClass
 {
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "number";
 
     /** Logging helper object. */

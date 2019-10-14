@@ -62,6 +62,8 @@ import com.xpn.xwiki.web.Utils;
 public class PropertyClass extends BaseCollection<ClassPropertyReference>
     implements PropertyClassInterface, Comparable<PropertyClass>
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Logging helper object.
      */

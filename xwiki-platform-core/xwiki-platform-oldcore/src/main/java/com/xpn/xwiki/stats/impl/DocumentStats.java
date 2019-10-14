@@ -53,6 +53,8 @@ public class DocumentStats extends XWikiStats
         visits
     }
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default {@link DocumentStats} constructor.
      */

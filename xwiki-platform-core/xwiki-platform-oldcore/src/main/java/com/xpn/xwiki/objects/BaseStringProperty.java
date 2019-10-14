@@ -28,6 +28,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
  */
 public class BaseStringProperty extends BaseProperty
 {
+    private static final long serialVersionUID = 1L;
+
     /** The value of the string. */
     private String value;
 

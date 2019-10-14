@@ -44,6 +44,8 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 public class BaseProperty<R extends EntityReference> extends BaseElement<R>
     implements PropertyInterface, Serializable, Cloneable
 {
+    private static final long serialVersionUID = 1L;
+
     private BaseCollection object;
 
     private long id;

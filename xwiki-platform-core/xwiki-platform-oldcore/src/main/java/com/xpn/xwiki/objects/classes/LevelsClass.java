@@ -46,6 +46,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class LevelsClass extends ListClass
 {
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "levelslist";
 
     public LevelsClass(PropertyMetaClass wclass)

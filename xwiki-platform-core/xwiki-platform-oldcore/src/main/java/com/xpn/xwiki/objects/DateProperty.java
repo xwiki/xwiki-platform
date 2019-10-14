@@ -30,6 +30,8 @@ import org.xwiki.xar.internal.property.DateXarObjectPropertySerializer;
  */
 public class DateProperty extends BaseProperty implements Cloneable
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The property value.
      */

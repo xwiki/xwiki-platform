@@ -24,6 +24,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public abstract class NumberProperty extends BaseProperty
 {
+    private static final long serialVersionUID = 1L;
+
     private Number value;
 
     public NumberProperty()

@@ -47,6 +47,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
  */
 public class GroupsClass extends ListClass
 {
+    private static final long serialVersionUID = 1L;
+
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(GroupsClass.class);
 

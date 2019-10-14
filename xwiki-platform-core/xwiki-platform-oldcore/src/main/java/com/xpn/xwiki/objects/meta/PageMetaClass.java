@@ -38,6 +38,8 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 @Singleton
 public class PageMetaClass extends DBListMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructor for PageMetaClass.
      */

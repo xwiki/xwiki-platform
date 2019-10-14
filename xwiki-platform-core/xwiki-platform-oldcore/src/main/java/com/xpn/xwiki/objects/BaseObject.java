@@ -43,6 +43,8 @@ import com.xpn.xwiki.web.Utils;
 
 public class BaseObject extends BaseCollection<BaseObjectReference> implements ObjectInterface, Serializable, Cloneable
 {
+    private static final long serialVersionUID = 1L;
+
     private String guid;
 
     /**

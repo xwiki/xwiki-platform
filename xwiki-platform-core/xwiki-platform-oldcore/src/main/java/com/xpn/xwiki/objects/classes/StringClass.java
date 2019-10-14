@@ -31,6 +31,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class StringClass extends PropertyClass
 {
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "string";
 
     public StringClass(String name, String prettyname, PropertyMetaClass wclass)

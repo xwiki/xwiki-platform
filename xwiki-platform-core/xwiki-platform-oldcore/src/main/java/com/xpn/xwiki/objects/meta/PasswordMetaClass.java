@@ -70,6 +70,8 @@ public class PasswordMetaClass extends StringMetaClass
      */
     public static final String ALGORITHM_KEY = "algorithm";
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor. Initializes the default meta properties of a Password XClass property.
      */

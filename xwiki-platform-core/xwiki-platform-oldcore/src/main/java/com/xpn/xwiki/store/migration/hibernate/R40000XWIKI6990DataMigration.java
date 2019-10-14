@@ -119,6 +119,8 @@ public class R40000XWIKI6990DataMigration extends AbstractHibernateDataMigration
     /** Stub statistic class used to compute new ids from existing objects. */
     private static class StatsIdComputer extends XWikiStats
     {
+        private static final long serialVersionUID = 1L;
+
         /** Name of the statistic. */
         private String name;
 

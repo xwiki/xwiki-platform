@@ -46,11 +46,11 @@ userdirectory.userScopeFilter.hint=Seleccione la categoría de usuarios que dese
 userdirectory.userScopeFilter.local=Usuarios locales
 userdirectory.userScopeFilter.global=Usuarios globales que son miembros de este wiki
 userdirectory.configuration.title=Configuraciones
-### Missing: userdirectory.configuration.columns.editHint=Click to select the columns
+userdirectory.configuration.columns.editHint=Haga clic para seleccionar las columnas
 
-### Missing: platform.userdirectory.customizeNotAllowed=You are not allowed to customize this User Directory.
-### Missing: platform.userdirectory.configTitle=User Directory Configuration
-### Missing: platform.userdirectory.configSheetTitle=User Directory Configuration Sheet
-### Missing: platform.userdirectory.configSheetApplyOnConfiguration=This sheet must be applied on the UserDirectory Configuration document.</content>
+platform.userdirectory.customizeNotAllowed=No se le permite personalizar este directorio de usuarios.
+platform.userdirectory.configTitle=Configuración del directorio de usuario
+platform.userdirectory.configSheetTitle=Hoja de configuración del directorio de usuario
+platform.userdirectory.configSheetApplyOnConfiguration=Esta hoja debe ser aplicada en el documento de Configuración del Directorio de Usuario.</content>
   
 </xwikidoc>

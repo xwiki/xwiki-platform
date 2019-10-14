@@ -18,14 +18,14 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
   #set ($passwordRegex =
   {
     'pattern' : $patternLength,
-    'failureMessage' : $services.localization.render('xe.admin.registration.passwordTooShort')
+    'failureMessage' : $services.localization.render('platform.core.profile.passwd.instructionsPasswordLength', $passwordLength)
   })
   #set ($discard = $passwordRegexes.add($passwordRegex))
   #if ($passwordOptions.passwordRuleOneUpperCaseEnabled)
     #set ($passwordRegex =
     {
       'pattern' : '/[A-Z]+/',
-      'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainUppercase')
+      'failureMessage' : $services.localization.render('platform.core.profile.passwd.passwordMustContainUppercase')
     })
     #set ($discard = $passwordRegexes.add($passwordRegex))
   #end
@@ -33,7 +33,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #set ($passwordRegex =
     {
       'pattern' : '/[a-z]+/',
-      'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainLowercase')
+      'failureMessage' : $services.localization.render('platform.core.profile.passwd.passwordMustContainLowercase')
     })
     #set ($discard = $passwordRegexes.add($passwordRegex))
   #end
@@ -41,7 +41,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #set ($passwordRegex =
     {
       'pattern' : '/[0-9]+/',
-      'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainNumber')
+      'failureMessage' : $services.localization.render('platform.core.profile.passwd.passwordMustContainNumber')
     })
     #set ($discard = $passwordRegexes.add($passwordRegex))
   #end
@@ -49,7 +49,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
     #set ($passwordRegex =
     {
       'pattern' : '/\W+/',
-      'failureMessage' : $services.localization.render('xe.admin.registration.passwordMustContainSymbol')
+      'failureMessage' : $services.localization.render('platform.core.profile.passwd.passwordMustContainSymbol')
     })
     #set ($discard = $passwordRegexes.add($passwordRegex))
   #end
@@ -84,7 +84,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
       },
       'mustMatch': {
         'name': $passwordFieldName,
-        'failureMessage': $services.localization.render('xe.admin.registration.passwordMismatch')
+        'failureMessage': $services.localization.render('platform.core.profile.passwd.passwordMissmatch')
       }
     }
   }))

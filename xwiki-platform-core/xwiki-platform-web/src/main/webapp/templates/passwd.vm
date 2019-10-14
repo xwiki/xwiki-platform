@@ -6,7 +6,7 @@
 #template("register_macros.vm")
 #set ($fields = [])
 #loadConfig('XWiki.RegistrationConfig')
-#definePasswordFields($fields, 'password', 'password2', $passwordOptions)
+#definePasswordFields($fields, 'xwikipassword', 'xwikipassword2', $passwordOptions)
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
   <div id="mainContentArea">
@@ -15,15 +15,15 @@
     #set($isCurrentUsersProfile = $doc.documentReference.equals($xcontext.userReference))
     #if($isCurrentUsersProfile || $hasAdmin)
       <div id="document-title"><h1>$services.localization.render('platform.core.profile.passwd.title', [$escapetool.xml($xwiki.getUserName($doc.fullName, false))])</h1></div>
-      #if($request.password && $request.password2)
+      #if($request.xwikipassword && $request.xwikipassword2)
         #set($isValidPassword = true)
         #set($errorMessage = [])
-        #set($password = $request.password)
-        #set($password2 = $request.password2)
+        #set($password = $request.xwikipassword)
+        #set($password2 = $request.xwikipassword2)
         ## Server-side checking
         #if($isCurrentUsersProfile || !$hasAdmin)
           #set($user = $xwiki.getUser())
-          #set($isOriginalPasswordValid = $user.checkPassword($request.originalpassword))
+          #set($isOriginalPasswordValid = $user.checkPassword($request.xwikioriginalpassword))
           #if(!$isOriginalPasswordValid)
             #set($discard = $errorMessage.add($services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')))
             #set($isValidPassword = false)
@@ -39,7 +39,7 @@
           $doc.save("$services.localization.render('platform.core.profile.passwd.passwordChanged')", true)
         #end
       #end
-      #if($request.password && $isValidPassword)
+      #if($request.xwikipassword && $isValidPassword)
         <span class='box infomessage'>$services.localization.render('platform.core.profile.passwd.success')</span>
         <a href = "$doc.getURL("view")">$services.localization.render('platform.core.profile.passwd.return')</a>
       #end
@@ -54,7 +54,7 @@
         ## In all other cases, we ask for it.
         #if (!$hasAdmin || $isCurrentUsersProfile)
           #set ($discard = $fields.add(0, {
-	          'name': 'originalpassword',
+	          'name': 'xwikioriginalpassword',
 	          'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
 	          'params': {
 	            'type': 'password',
@@ -66,7 +66,7 @@
 	              'failureMessage': $services.localization.render('core.validation.required.message')
 	            },
 	            'programmaticValidation': {
-	              'code': '$user.checkPassword($request.originalpassword)',
+	              'code': '$user.checkPassword($request.xwikioriginalpassword)',
 	              'failureMessage': $services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')
 	            },
 	            'hideOkayMessage': 'true'
@@ -84,7 +84,7 @@
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
         #generateHtml($fields, $NULL)
-        #if ($request.password && !$isValidPassword)
+        #if ($request.xwikipassword && !$isValidPassword)
           <span class='box errormessage'>$stringtool.join($errorMessage, "<br/>")</span>
         #end
         <div class="padded buttons">

@@ -284,7 +284,7 @@ public class UserProfileTest extends AbstractTest
     {
         ChangePasswordPage changePasswordPage = this.customProfilePage.switchToPreferences().changePassword();
         changePasswordPage.submit();
-        Assert.assertEquals("Your new password should be at least 6 characters long.", changePasswordPage.getValidationErrorMessage());
+        Assert.assertEquals("This field is required.", changePasswordPage.getValidationErrorMessage());
     }
 
     @Test
@@ -317,4 +317,32 @@ public class UserProfileTest extends AbstractTest
         changePasswordPage.submit();
         Assert.assertEquals("Current password is invalid.", changePasswordPage.getErrorMessage());
     }
+
+//    @Test
+//    public void changePasswordWhenPolicyIsLength8AndNumberMandatory()
+//    {
+//        // Update password policy to enforce password with 8 characters and a mandatory number in it
+//        getUtil().updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,
+//            "passwordLength", "8",
+//            "passwordRuleOneNumberEnabled", "1");
+//        try {
+//            getUtil().loginAsSuperAdminAndGotoPage(this.customProfilePage.getURL());
+//            PreferencesUserProfilePage preferencesPage = this.customProfilePage.switchToPreferences();
+//            ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
+//            changePasswordPage.changePasswordAsAdmin("foo", "foo");
+//            changePasswordPage.submit();
+//            Assert.assertEquals("The password must contain at least one number.", changePasswordPage.getValidationErrorMessage());
+//            changePasswordPage.changePasswordAsAdmin("foo6", "foo6");
+//            changePasswordPage.submit();
+//            Assert.assertEquals("Your new password must be at least 8 characters long.", changePasswordPage.getValidationErrorMessage());
+//            changePasswordPage.changePasswordAsAdmin("foo6foo8", "foo6foo8");
+//            changePasswordPage.submit();
+//            Assert.assertEquals("Your password has been successfully changed.", changePasswordPage.getSuccessMessage());
+//        } finally {
+//            // put back standard config
+//            getUtil().updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,
+//                "passwordLength", "6",
+//                "passwordRuleOneNumberEnabled", "0");
+//        }
+//    }
 }

@@ -62,25 +62,6 @@
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
           </exclusion>
-          <!-- Exclude the dependencies that are needed by Solr when it runs as a separate webapp because we use
-            solr-core to embed Solr in the same webapp as XWiki. This doesn't mean we cannot communicate with a remote
-            Solr instance. This part is handled by solr-solrj jar. -->
-          <exclusion>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>org.restlet.ext.servlet</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-          </exclusion>
           <!-- XWiki is using org.dom4j:dom4j:2.0.0+. Previous versions of dom4j were using dom4j:dom4j
                and thus we need to exclude them so that they don't end up in the XWiki WAR -->
           <exclusion>
@@ -108,6 +89,21 @@
           <exclusion>
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-jetty9</artifactId>
+          </exclusion>
+          <!-- Exclude the dependencies that are needed by Solr when it runs as a separate webapp because we use
+            solr-core to embed Solr in the same webapp as XWiki. This doesn't mean we cannot communicate with a remote
+            Solr instance. This part is handled by solr-solrj jar. -->
+          <exclusion>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>*</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

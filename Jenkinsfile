@@ -269,6 +269,7 @@ private void buildInsideNode(map)
         heapDumpPath = "-XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=\"${oomPath}\""
     }
 
+    def firefoxVersionSystemProperty = getFirefoxVersionSystemProperty()
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
       jobProperties = getCustomJobProperties()
@@ -278,9 +279,7 @@ private void buildInsideNode(map)
       if (map.profiles != null) {
         profiles = map.profiles
       }
-      if (map.properties != null) {
-        properties = map.properties
-      }
+      properties = "${map.properties ?: ''} ${firefoxVersionSystemProperty}"
       if (map.pom != null) {
         pom = map.pom
       }

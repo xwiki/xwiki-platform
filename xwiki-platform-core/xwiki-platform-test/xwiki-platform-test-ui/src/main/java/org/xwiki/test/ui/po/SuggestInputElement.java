@@ -36,7 +36,7 @@ import org.openqa.selenium.interactions.Actions;
  */
 public class SuggestInputElement extends BaseElement
 {
-    public static class SuggestionElement extends BaseElement
+    public class SuggestionElement extends BaseElement
     {
         private final WebElement suggestion;
 
@@ -93,9 +93,7 @@ public class SuggestInputElement extends BaseElement
         {
             select();
 
-            // We don't send the keys directly to the text input because it can be hidden.(e.g. when multiple selection
-            // is on and we click on a selected suggestion).
-            getDriver().getKeyboard().sendKeys(Keys.BACK_SPACE);
+            getTextInput().sendKeys(Keys.BACK_SPACE);
         }
 
         /**

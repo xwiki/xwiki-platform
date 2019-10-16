@@ -58,7 +58,6 @@ public class WebDriverFactory
                 .addPreference("app.update.auto", false)
                 .addPreference("app.update.enabled", false)
                 .addPreference("app.update.silent", false);
-            options.setLogLevel(FirefoxDriverLogLevel.TRACE);
             driver = new FirefoxDriver(options);
 
             // Hide the Add-on bar (from the bottom of the window, with "WebDriver" written on the right) because it can

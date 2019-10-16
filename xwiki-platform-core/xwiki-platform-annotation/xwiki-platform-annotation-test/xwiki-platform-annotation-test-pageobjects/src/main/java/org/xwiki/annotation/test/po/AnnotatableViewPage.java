@@ -180,7 +180,12 @@ public class AnnotatableViewPage extends BaseElement
     public void simulateCTRL_M()
     {
         WebElement body = getDriver().findElement(By.id("body"));
-        body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
+        String os = System.getProperty("os.name");
+        if (os.equals("Mac OS X")) {
+            body.sendKeys(Keys.chord(Keys.COMMAND, "m"));
+        } else {
+            body.sendKeys(Keys.chord(Keys.CONTROL, "m"));
+        }
     }
 
     /**

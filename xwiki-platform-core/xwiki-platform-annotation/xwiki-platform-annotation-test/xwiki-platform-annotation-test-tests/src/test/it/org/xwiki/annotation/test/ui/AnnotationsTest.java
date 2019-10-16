@@ -38,11 +38,9 @@ import static org.junit.Assert.assertTrue;
  */
 public class AnnotationsTest extends AbstractTest
 {
-    // Note: Make sure Annotations and Comments are merged (this is not the default ATM!) by setting the
-    // $showannotation velocity variable to false in the page content
-    private static final String CONTENT = "{{velocity}}#set ($showannotations = false){{/velocity}}"
-        + "It's an easy-to-edit website that will help you work better together. This Wiki is made of pages "
-        + "sorted by spaces. You're currently in the Main space, looking at its home page (WebHome).";
+    private static final String CONTENT = "It's an easy-to-edit website that will help you work better together. "
+        + "This Wiki is made of pages sorted by spaces. You're currently in the Main space, looking at its home page "
+        + "(WebHome).";
 
     private static final String ANNOTATED_TEXT_1 = "work better together";
 
@@ -65,9 +63,14 @@ public class AnnotationsTest extends AbstractTest
     private static final String USER_PASS = "pass";
 
     @Before
-    public void setUp() throws Exception
+    public void setUp()
     {
+        getUtil().loginAsSuperAdmin();
+
+        getUtil().deletePage(getTestClassName(), getTestMethodName());
+
         getUtil().createUser(USER_NAME, USER_PASS, "", "");
+        getUtil().login(USER_NAME, USER_PASS);
     }
 
     @Test
@@ -75,10 +78,8 @@ public class AnnotationsTest extends AbstractTest
         @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason = "See https://jira.xwiki.org/browse/XE-1146"),
         @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177")
     })
-    public void addAndDeleteAnnotations() throws Exception
+    public void addAndDeleteAnnotations()
     {
-        getUtil().deletePage(getTestClassName(), getTestMethodName());
-        getUtil().login(USER_NAME, USER_PASS);
         AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(
             getUtil().createPage(getTestClassName(), getTestMethodName(), CONTENT, null));
         CommentsTab commentsTab = annotatableViewPage.getWrappedViewPage().openCommentsDocExtraPane();
@@ -120,14 +121,10 @@ public class AnnotationsTest extends AbstractTest
      */
     @Test
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason = "See https://jira.xwiki.org/browse/XE-1177")
-    public void annotationsShouldNotBeShownInXWiki10Syntax() throws Exception
+    public void annotationsShouldNotBeShownInXWiki10Syntax()
     {
-        getUtil().deletePage(getTestClassName(), getTestMethodName());
-        // Note: Make sure Annotations and Comments are merged (this is not the default ATM!) by setting the
-        // $showannotation velocity variable to false in the page content
         AnnotatableViewPage annotatableViewPage = new AnnotatableViewPage(
-            getUtil().createPage(getTestClassName(), getTestMethodName(),
-                "#set ($showannotations = false)\nSome content",
+            getUtil().createPage(getTestClassName(), getTestMethodName(), "Some content",
                 "AnnotationsTest in XWiki 1.0 Syntax", "xwiki/1.0"));
 
         annotatableViewPage.showAnnotationsPane();

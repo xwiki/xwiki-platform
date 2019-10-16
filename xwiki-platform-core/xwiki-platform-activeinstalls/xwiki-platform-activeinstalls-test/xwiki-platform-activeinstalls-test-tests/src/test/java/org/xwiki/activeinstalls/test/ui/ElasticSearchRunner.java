@@ -38,7 +38,7 @@ public class ElasticSearchRunner extends PageObjectSuite
     @Override
     protected void beforeTests()
     {
-        // Start ES *before* XWiki is started (this is important starting XWiki means checking that XWiki is up by
+        // Start ES *before* XWiki is started (this is important since starting XWiki means checking that XWiki is up by
         // requesting one page and that page will trigger the send of the ping to the ES instance!).
         esSetup = new EsSetup();
         esSetup.execute(deleteAll());

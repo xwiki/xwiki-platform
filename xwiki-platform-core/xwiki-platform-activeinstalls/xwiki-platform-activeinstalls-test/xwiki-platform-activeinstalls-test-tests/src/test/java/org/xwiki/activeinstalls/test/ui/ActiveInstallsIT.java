@@ -85,8 +85,8 @@ public class ActiveInstallsIT extends AbstractTest
         ViewPage vp = applicationPanel.clickApplication("Active Installs");
 
         // Verify we're on the right page!
-        Assert.assertEquals(ActiveInstallsHomePage.getSpace(), vp.getMetaDataValue("space"));
-        Assert.assertEquals(ActiveInstallsHomePage.getPage(), vp.getMetaDataValue("page"));
+        assertEquals(ActiveInstallsHomePage.getSpace(), vp.getMetaDataValue("space"));
+        assertEquals(ActiveInstallsHomePage.getPage(), vp.getMetaDataValue("page"));
 
         // Configure the Active Installs feature to count "org.xwiki.*" distribution ids.
         getUtil().updateObject("ActiveInstalls", "ActiveInstallsConfig", "ActiveInstalls.ActiveInstallsConfig", 0,

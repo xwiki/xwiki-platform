@@ -18,7 +18,7 @@ $services.template.execute('logging_macros.vm')
     </div>
     #if ($jobStatus && $jobStatus.logTail.size() > 0)
       <p class="ui-progress-message">
-        #printLogMessage($jobStatus.logTail.lastLogEvent))
+        #printLogMessage($jobStatus.logTail.lastLogEvent)
       </p>
     #end
   </div>

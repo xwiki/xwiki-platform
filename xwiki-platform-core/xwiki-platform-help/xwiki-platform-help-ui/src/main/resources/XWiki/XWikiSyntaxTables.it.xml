@@ -56,7 +56,7 @@ Parola 1 | Parola 2
 |Parola 1|Parola 2
 )))
 |Tabella con Parametri|(((
-&lt;table style="background-color:red;align:center"&gt;
+&lt;table style="background-color:red;text-align:center"&gt;
 &lt;tbody&gt;
 &lt;tr&gt;
 &lt;td&gt;Titolo 1&lt;/td&gt;
@@ -121,7 +121,7 @@ $xwiki.jsfx.use("js/xwiki/table/tablefilterNsort.js", true)
 |Parola 1|Parola 2
 )))
 |Tabella con Parametri|((({{{
-(% style="background-color:red;align:center" %)
+(% style="background-color:red;text-align:center" %)
 |=Titolo 1|=(% style="background-color:yellow" %)Titolo 2
 |Parola 1|Parola 2
 }}})))|(((

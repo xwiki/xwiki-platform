@@ -145,7 +145,7 @@
     : {{html}}&lt;input type="text" id="$pageInputId" class="withTip" name="name" value="$pageText" /&gt;{{/html}}
     (% class="buttonwrapper" %)
     (((
-        {{html}}&lt;input type="submit" class="button" value="$services.localization.render('create')" /&gt;{{/html}}
+        {{html}}&lt;input type="submit" class="button" name="create" value="$services.localization.render('create')" /&gt;{{/html}}
     )))
   )))
 {{html clean="false"}}

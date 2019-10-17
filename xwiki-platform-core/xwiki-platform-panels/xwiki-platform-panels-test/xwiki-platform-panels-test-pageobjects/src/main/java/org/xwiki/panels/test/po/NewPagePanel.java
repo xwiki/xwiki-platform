@@ -48,6 +48,12 @@ public class NewPagePanel extends ViewPage
     @FindBy(xpath = "//input[@type = 'text' and @name = 'name']")
     private WebElement pageNameTextField;
 
+    /**
+     * The create button
+     */
+    @FindBy(xpath = "//input[@type = 'submit' and @name = 'create']")
+    private WebElement createButton;
+
     public static NewPagePanel gotoPage()
     {
         getUtil().gotoPage("Panels", "NewPage");
@@ -68,7 +74,7 @@ public class NewPagePanel extends ViewPage
         this.spaceNameTextField.sendKeys(spaceReferenceString);
         this.pageNameTextField.clear();
         this.pageNameTextField.sendKeys(pageName);
-        this.pageNameTextField.submit();
+        this.createButton.click();
         return new CreatePagePage();
     }
 }

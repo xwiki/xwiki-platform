@@ -19,14 +19,16 @@
  */
 package org.xwiki.url.internal.filesystem;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.url.filesystem.FilesystemExportContext;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertSame;
 import static org.mockito.Mockito.when;
 
 /**
@@ -35,34 +37,52 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 7.2M1
  */
+@ComponentTest
 public class FilesystemExportContextProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<FilesystemExportContextProvider> mocker =
-        new MockitoComponentMockingRule<>(FilesystemExportContextProvider.class);
+    @MockComponent
+    private Execution execution;
+
+    @InjectMockComponents
+    private FilesystemExportContextProvider provider;
+
+    private ExecutionContext ec = new ExecutionContext();
+
+    @BeforeEach
+    public void beforeEach()
+    {
+        when(this.execution.getContext()).thenReturn(ec);
+    }
 
     @Test
     public void getWhenExportContextNotInEC() throws Exception
     {
-        ExecutionContext ec = new ExecutionContext();
-        Execution execution = this.mocker.getInstance(Execution.class);
-        when(execution.getContext()).thenReturn(ec);
-
-        FilesystemExportContext fec = this.mocker.getComponentUnderTest().get();
+        FilesystemExportContext fec = this.provider.get();
         assertSame(fec, ec.getProperty("filesystemExportContext"));
     }
 
     @Test
     public void getWhenExportContextAlreadyInEC() throws Exception
     {
-        ExecutionContext ec = new ExecutionContext();
         FilesystemExportContext fec = new FilesystemExportContext();
         ec.setProperty("filesystemExportContext", fec);
-        Execution execution = this.mocker.getInstance(Execution.class);
-        when(execution.getContext()).thenReturn(ec);
 
-        FilesystemExportContext newfec = this.mocker.getComponentUnderTest().get();
+        FilesystemExportContext newfec = this.provider.get();
         assertSame(newfec, ec.getProperty("filesystemExportContext"));
         assertSame(newfec, fec);
+    }
+
+    @Test
+    public void set() throws Exception
+    {
+        FilesystemExportContext fec = new FilesystemExportContext();
+        FilesystemExportContextProvider.set(this.ec, fec);
+
+        assertSame(fec, this.provider.get());
+
+        FilesystemExportContext fec2 = new FilesystemExportContext();
+        FilesystemExportContextProvider.set(this.ec, fec2);
+
+        assertSame(fec2, this.provider.get());
     }
 }

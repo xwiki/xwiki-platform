@@ -116,6 +116,7 @@ public class BasePage extends BaseElement
     public BasePage()
     {
         super();
+        waitUntilPageIsLoaded();
         waitUntilPageJSIsLoaded();
     }
 
@@ -588,6 +589,9 @@ public class BasePage extends BaseElement
 
         // Make sure all asynchronous elements have been executed
         getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");
+
+        // Make sure the shortcuts are loaded
+        getDriver().waitUntilJavascriptCondition("return shortcut != null && shortcut != undefined");
     }
 
     /**

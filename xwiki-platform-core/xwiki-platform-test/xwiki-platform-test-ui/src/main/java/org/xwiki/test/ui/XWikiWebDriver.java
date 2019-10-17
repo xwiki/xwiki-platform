@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
@@ -628,11 +629,18 @@ public class XWikiWebDriver extends RemoteWebDriver
             {
                 boolean result = false;
 
-                Object rawResult = executeJavascript(booleanExpression, arguments);
-                if (rawResult instanceof Boolean) {
-                    result = (Boolean) rawResult;
-                } else {
-                    throw new IllegalArgumentException("The executed javascript does not return a boolean value");
+                try {
+                    Object rawResult = executeJavascript(booleanExpression, arguments);
+                    if (rawResult instanceof Boolean) {
+                        result = (Boolean) rawResult;
+                    } else {
+                        throw new IllegalArgumentException("The executed javascript does not return a boolean value");
+                    }
+                } catch (JavascriptException e) {
+                    // We might obtain reference error when checking the presence of some properties during a wait.
+                    if (!e.getMessage().contains("ReferenceError")) {
+                        throw e;
+                    }
                 }
 
                 return result;
@@ -1013,6 +1021,16 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void dragAndDrop(WebElement source, WebElement target)
     {
-        new Actions(this.getWrappedDriver()).dragAndDrop(source, target).perform();
+        createActions().dragAndDrop(source, target).perform();
+    }
+
+    /**
+     * Utility method to build a proper instance of {@link Actions}.
+     * @return a new instance of {@link Actions}.
+     * @since 11.9RC1
+     */
+    public Actions createActions()
+    {
+        return new Actions(getWrappedDriver());
     }
 }

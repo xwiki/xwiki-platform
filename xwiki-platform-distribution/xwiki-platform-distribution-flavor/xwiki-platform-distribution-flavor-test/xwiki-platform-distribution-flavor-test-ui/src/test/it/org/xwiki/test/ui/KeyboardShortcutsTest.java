@@ -27,6 +27,8 @@ import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.test.ui.browser.IgnoreBrowser;
 import org.xwiki.test.ui.browser.IgnoreBrowsers;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.EditPage;
+import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 /**
  * Verify the keyboard shortcuts feature of XWiki.
@@ -44,75 +46,88 @@ public class KeyboardShortcutsTest extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
-    public void testKeyboardShortcuts()
+    public void testKeyboardShortcuts() throws InterruptedException
     {
-        ViewPage vp = getUtil().gotoPage("Sandbox", "WebHome");
+        getUtil().gotoPage("Sandbox", "WebHome");
 
-        // Test default edit mode (WYSIWYG for Sandbox.WebHome) key
-        vp.sendKeys("e");
+        // Test default edit mode (Wiki for Sandbox.WebHome) key
+        sendKeys("e");
+        new WikiEditPage();
+        Assert.assertTrue(getUtil().isInWikiEditMode());
 
         // Test Cancel key
-        vp.sendKeys(Keys.chord(Keys.ALT, "c"));
-        vp.waitUntilPageIsLoaded();
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().createActions().keyDown(Keys.ALT).sendKeys("c").keyUp(Keys.ALT).perform();
+        getDriver().waitUntilPageIsReloaded();
+        new ViewPage();
         Assert.assertTrue(getUtil().isInViewMode());
 
         // Test Wiki edit key
-        vp.sendKeys("k");
-        vp.waitUntilPageIsLoaded();
+        sendKeys("k");
+        new ViewPage();
         Assert.assertTrue(getUtil().isInWikiEditMode());
 
         // Test WYSIWYG edit mode key
-        vp = getUtil().gotoPage("Sandbox", "WebHome");
-        vp.sendKeys("g");
+        getUtil().gotoPage("Sandbox", "WebHome");
+        sendKeys("g");
+        new ViewPage();
+        Assert.assertTrue(getUtil().isInWYSIWYGEditMode());
 
         // Test Inline Form edit mode key
-        vp = getUtil().gotoPage("Sandbox", "WebHome");
-        vp.sendKeys("f");
-        vp.waitUntilPageIsLoaded();
+        getUtil().gotoPage("Sandbox", "WebHome");
+        sendKeys("f");
+        new EditPage();
         Assert.assertTrue(getUtil().isInInlineEditMode());
 
         // Test Rights edit mode key on a terminal document
-        vp = getUtil().gotoPage("Sandbox", "TestPage1");
-        vp.sendKeys("r");
-        vp.waitUntilPageIsLoaded();
+        getUtil().gotoPage("Sandbox", "TestPage1");
+        sendKeys("r");
+        new ViewPage();
         Assert.assertTrue(getUtil().isInRightsEditMode());
 
         // Test Rights edit mode key on a non terminal document
-        vp = getUtil().gotoPage("Sandbox", "WebHome");
-        vp.sendKeys("r");
-        vp.waitUntilPageIsLoaded();
+        getUtil().gotoPage("Sandbox", "WebHome");
+        sendKeys("r");
+        new ViewPage();
         Assert.assertTrue(getUtil().isInAdminMode());
         AdministrationPage administrationPage = new AdministrationPage();
         Assert.assertTrue(administrationPage.hasSection("PageRights"));
 
         // Test Object edit mode key
-        vp = getUtil().gotoPage("Sandbox", "WebHome");
-        vp.sendKeys("o");
-        vp.waitUntilPageIsLoaded();
+        getUtil().gotoPage("Sandbox", "WebHome");
+        sendKeys("o");
+        new EditPage();
         Assert.assertTrue(getUtil().isInObjectEditMode());
 
         // Test Class edit mode key
-        vp = getUtil().gotoPage("Sandbox", "WebHome");
-        vp.sendKeys("s");
-        vp.waitUntilPageIsLoaded();
+        getUtil().gotoPage("Sandbox", "WebHome");
+        sendKeys("s");
+        new EditPage();
         Assert.assertTrue(getUtil().isInClassEditMode());
 
         // Test Delete key
-        vp = getUtil().gotoPage("Sandbox", "WebHome");
-        vp.sendKeys(Keys.DELETE);
-        vp.waitUntilPageIsLoaded();
+        getUtil().gotoPage("Sandbox", "WebHome");
+        sendKeys(Keys.DELETE);
+        new ViewPage();
         Assert.assertTrue(getUtil().isInDeleteMode());
 
         // Test Rename key
-        vp = getUtil().gotoPage("Sandbox", "WebHome");
-        vp.sendKeys(Keys.F2);
-        vp.waitUntilPageIsLoaded();
+        getUtil().gotoPage("Sandbox", "WebHome");
+        sendKeys(Keys.F2);
+        new ViewPage();
         Assert.assertTrue(getUtil().isInRenameMode());
 
         // Test View Source key
-        vp = getUtil().gotoPage("Sandbox", "WebHome");
-        vp.sendKeys("d");
-        vp.waitUntilPageIsLoaded();
+        getUtil().gotoPage("Sandbox", "WebHome");
+        sendKeys("d");
+        new ViewPage();
         Assert.assertTrue(getUtil().isInSourceViewMode());
+    }
+
+    private void sendKeys(CharSequence... keys)
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().createActions().sendKeys(keys).perform();
+        getDriver().waitUntilPageIsReloaded();
     }
 }

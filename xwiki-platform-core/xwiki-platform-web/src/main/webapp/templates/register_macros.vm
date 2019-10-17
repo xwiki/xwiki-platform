@@ -134,7 +134,7 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           $entry.key="$escapetool.xml($entry.value)" ##
         #end
       #end
-      ></$tag>
+      />
       #if ($field.error)
         <span ##
         #foreach ($entry in $failureMessageParams.entrySet())

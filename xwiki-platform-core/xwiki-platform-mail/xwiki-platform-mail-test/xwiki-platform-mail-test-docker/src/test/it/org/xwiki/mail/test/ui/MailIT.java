@@ -23,6 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.mail.internet.MimeMessage;
 
@@ -203,17 +205,17 @@ public class MailIT
         setup.attachFile(this.testClassName, "MailTemplate", "something.txt", bais, true,
             new UsernamePasswordCredentials("superadmin", "pass"));
 
-        String xwikiURLPrefix = String.format("http://%s:%s/xwiki/bin/view",
+        String requestURLPrefix = String.format("http://%s:%s/xwiki/bin/view",
             testConfiguration.getServletEngine().getInternalIP(),
             testConfiguration.getServletEngine().getInternalPort());
 
         // Step 5: Send a template email (with an attachment) to a single email address
-        sendTemplateMailToEmail(setup, xwikiURLPrefix);
+        sendTemplateMailToEmail(setup, requestURLPrefix);
 
         // Step 6: Send a template email to all the users in the XWikiAllGroup Group (we'll create 2 users) + to
         // two other users (however since they're part of the group they'll receive only one mail each, we thus test
         // deduplicatio!).
-        sendTemplateMailToUsersAndGroup(setup, xwikiURLPrefix);
+        sendTemplateMailToUsersAndGroup(setup, requestURLPrefix);
 
         // Step 7: Navigate to the Mail Sending Status Admin page and assert that the Livetable displays the entry for
         // the sent mails
@@ -261,7 +263,8 @@ public class MailIT
         assertTrue(vp.getContent().matches("(?s)MSGID.*SUMMARY.*DESCRIPTION.*"));
     }
 
-    private void sendTemplateMailToEmail(TestUtils setup, String xwikiURLPrefix) throws Exception
+    private void  sendTemplateMailToEmail(TestUtils setup, String requestURLPrefix)
+        throws Exception
     {
         // Remove existing pages (for pages that we create below)
         setup.deletePage(this.testClassName, "SendMail");
@@ -300,18 +303,19 @@ public class MailIT
         this.mail.waitForIncomingEmail(30000L, 1);
         assertEquals(1, this.mail.getReceivedMessages().length);
         assertReceivedMessages(1,
-            "Subject: Status for John on " + this.testClassName + ".SendMail",
-            "Hello John from superadmin - Served from " + xwikiURLPrefix + "/MailIT/SendMail",
-            "<strong>Hello John from superadmin - Served from " + xwikiURLPrefix + "/MailIT/SendMail - "
-                + "url: " + xwikiURLPrefix + "/Main/</strong>",
-            "X-MailType: Test",
-            "Content-Type: text/plain; name=something.txt",
-            "Content-ID: <something.txt>",
-            "Content-Disposition: attachment; filename=something.txt",
-            "Content of attachment");
+            "\\QSubject: Status for John on " + this.testClassName + ".SendMail\\E",
+            "\\QHello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMail\\E",
+            "\\Q<strong>Hello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMail - "
+                + "url: http://\\E.*\\Q/Main/</strong>\\E",
+            "\\QX-MailType: Test\\E",
+            "\\QContent-Type: text/plain; name=something.txt\\E",
+            "\\QContent-ID: <something.txt>\\E",
+            "\\QContent-Disposition: attachment; filename=something.txt\\E",
+            "\\QContent of attachment\\E");
     }
 
-    private void sendTemplateMailToUsersAndGroup(TestUtils setup, String xwikiURLPrefix) throws Exception
+    private void sendTemplateMailToUsersAndGroup(TestUtils setup, String requestURLPrefix)
+        throws Exception
     {
         // Remove existing pages (for pages that we create below)
         setup.deletePage(this.testClassName, "SendMailGroupAndUsers");
@@ -357,9 +361,9 @@ public class MailIT
         this.mail.waitForIncomingEmail(30000L, 3);
         assertEquals(3, this.mail.getReceivedMessages().length);
         assertReceivedMessages(2,
-            "Subject: Status for John on " + this.testClassName + ".SendMailGroupAndUsers",
-            "Hello John from superadmin - Served from " + xwikiURLPrefix + "/MailIT/SendMailGroupAndUsers - "
-                + "url: " + xwikiURLPrefix + "/Main/");
+            "\\QSubject: Status for John on " + this.testClassName + ".SendMailGroupAndUsers\\E",
+            "\\QHello John from superadmin - Served from " + requestURLPrefix + "/MailIT/SendMailGroupAndUsers - "
+                + "url: http://\\E.*\\Q/Main/\\E");
     }
 
     private void assertReceivedMessages(int expectedMatchingCount, String... expectedLines) throws Exception
@@ -375,7 +379,9 @@ public class MailIT
             String fullContent = baos.toString();
             boolean match = true;
             for (int i = 0; i < expectedLines.length; i++) {
-                if (!fullContent.contains(expectedLines[i])) {
+                Pattern pattern = Pattern.compile(expectedLines[i]);
+                Matcher matcher = pattern.matcher(fullContent);
+                if (!matcher.find()) {
                     match = false;
                     break;
                 }

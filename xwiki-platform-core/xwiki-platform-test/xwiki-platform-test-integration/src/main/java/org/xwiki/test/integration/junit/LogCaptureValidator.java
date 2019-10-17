@@ -138,7 +138,11 @@ public class LogCaptureValidator
 
         // Happened only locally so far, might be related to a bad configuration, anyway it shouldn't have any impact
         // on our tests.
-        new Line("Unable to open /var/lib/flatpak/exports/share/dconf/profile/user")
+        new Line("Unable to open /var/lib/flatpak/exports/share/dconf/profile/user"),
+
+        // Triggered by the HTML5 Validator.
+        // This should be fixed with https://jira.xwiki.org/browse/XWIKI-16791
+        new Line("The “type” attribute is unnecessary for JavaScript resources.")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

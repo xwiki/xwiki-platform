@@ -119,13 +119,26 @@ public class LogCaptureValidator
             + "access operations"),
         new Line("WARNING: All illegal access operations will be denied in a future release"),
 
-        // This warning happens in docker test when using firefox.
+        // This warning happens in tests when using firefox.
         // It seems related to this closed issue https://github.com/SeleniumHQ/docker-selenium/issues/388
         // we might want to fix this using shm_size argument as explained in the thread, but AFAICS it doesn't guarantee
         // to solve the issue and will potentially consume more memory. Moreover the log error doesn't look related
         // to any problem during our tests.
-        new Line("Connection reset by peer: "
-            + "file /builds/worker/workspace/build/src/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 357")
+        // The warning is something such as:
+        // Connection reset by peer:
+        // file /builds/worker/workspace/build/src/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 357
+        // But the path might be different from machine to machine, and the error might be localized.
+        // So we keep only the end of the path to match warnings in different configurations.
+        new Line("ipc/chromium/src/chrome/common/ipc_channel_posix.cc"),
+
+        // Warning obtained locally only so far when testing with firefox.
+        // It's related to this issue: https://bugzilla.mozilla.org/show_bug.cgi?id=1132140
+        // It shouldn't have any impact on our tests.
+        new Line(" ../glib/gobject/gsignal.c:3498: signal name 'load_complete' is invalid"),
+
+        // Happened only locally so far, might be related to a bad configuration, anyway it shouldn't have any impact
+        // on our tests.
+        new Line("Unable to open /var/lib/flatpak/exports/share/dconf/profile/user")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

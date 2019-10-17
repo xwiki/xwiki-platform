@@ -54,7 +54,7 @@ public class ObjectEditPage extends EditPage
 
     public ObjectEditPane addObject(String className)
     {
-        new SuggestInputElement(this.classNameField).click().selectByValue(className);
+        new SuggestInputElement(this.classNameField).click().waitForSuggestions().selectByValue(className);
 
         final By objectsLocator = By.cssSelector("[id='xclass_" + className + "'] .xobject");
         final int initialObjectCount = getDriver().findElementsWithoutWaiting(objectsLocator).size();

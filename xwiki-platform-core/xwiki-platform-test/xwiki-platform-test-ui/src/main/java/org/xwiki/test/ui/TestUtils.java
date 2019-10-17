@@ -287,6 +287,20 @@ public class TestUtils
         options.deleteAllCookies();
         if (session != null) {
             for (Cookie cookie : session.getCookies()) {
+                // Using a cookie with localhost domain apparently triggers the following error in firefox:
+                // org.openqa.selenium.UnableToSetCookieException:
+                //[Exception... "Component returned failure code: 0x80070057 (NS_ERROR_ILLEGAL_VALUE)
+                // [nsICookieManager.add]" nsresult: "0x80070057 (NS_ERROR_ILLEGAL_VALUE)"
+                // location: "JS frame :: chrome://marionette/content/cookie.js :: cookie.add :: line 177" data: no]
+                //
+                // According to the following stackoverflow thread
+                // https://stackoverflow.com/questions/1134290/cookies-on-localhost-with-explicit-domain
+                // a working solution is to put null in the cookie domain.
+                // Now we might need to fix this in our real code, but the situation is not quite clear for me.
+                if ("localhost".equals(cookie.getDomain())) {
+                    cookie = new Cookie(cookie.getName(), cookie.getValue(), null, cookie.getPath(),
+                        cookie.getExpiry(), cookie.isSecure(), cookie.isHttpOnly());
+                }
                 options.addCookie(cookie);
             }
         }

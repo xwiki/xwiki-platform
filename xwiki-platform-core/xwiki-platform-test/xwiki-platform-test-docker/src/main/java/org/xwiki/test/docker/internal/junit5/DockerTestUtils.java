@@ -21,6 +21,7 @@ package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -284,4 +285,22 @@ public final class DockerTestUtils
         }
         return repetitionIndex;
     }
+
+    /**
+     * @return the current host name
+     * @since 11.9RC1
+     */
+    public static String getHostName()
+    {
+        String hostname;
+        try {
+            InetAddress ip = InetAddress.getLocalHost();
+            hostname = ip.getHostName();
+        } catch (Exception e) {
+            LOGGER.warn("Failed to get hostname", e);
+            hostname = "Unknown";
+        }
+        return hostname;
+    }
+
 }

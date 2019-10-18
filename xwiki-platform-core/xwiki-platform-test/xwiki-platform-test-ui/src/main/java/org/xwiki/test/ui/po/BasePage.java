@@ -28,10 +28,12 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
@@ -673,5 +675,128 @@ public class BasePage extends BaseElement
             }
         }
         return false;
+    }
+
+    /**
+     * Use the following keyboard shortcut and wait for a new page to load.
+     * This should be only used for shortcuts that indeed loads a new page.
+     * @param shortcut the keyboard key combination to perform.
+     */
+    private void useShortcutKeyAndLoads(CharSequence... shortcut)
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().createActions().sendKeys(shortcut).perform();
+        getDriver().waitUntilPageIsReloaded();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to edit page.
+     * @return a new {@link EditPage}
+     * @since 11.9RC1
+     */
+    public EditPage useShortcutKeyForEditing()
+    {
+        useShortcutKeyAndLoads("e");
+        return new EditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to wiki edit page.
+     * @return a new {@link WikiEditPage}
+     * @since 11.9RC1
+     */
+    public WikiEditPage useShortcutKeyForWikiEditing()
+    {
+        useShortcutKeyAndLoads("k");
+        return new WikiEditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to WYSIWYG edit page.
+     * @return a new {@link WYSIWYGEditPage}
+     * @since 11.9RC1
+     */
+    public WYSIWYGEditPage useShortcutKeyForWysiwygEditing()
+    {
+        useShortcutKeyAndLoads("g");
+        return new WYSIWYGEditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to Inline Form edit page.
+     * @return a new {@link InlinePage}
+     * @since 11.9RC1
+     */
+    public InlinePage useShortcutKeyForInlineEditing()
+    {
+        useShortcutKeyAndLoads("f");
+        return new InlinePage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to rights edit page.
+     * @return a new {@link BasePage}: it can be actually either a {@link RightsEditPage} or an AdministrationPage
+     *          depending if the page is terminal or not.
+     * @since 11.9RC1
+     */
+    public BasePage useShortcutKeyForRightsEditing()
+    {
+        useShortcutKeyAndLoads("r");
+        return new BasePage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to object edit page.
+     * @return a new {@link ObjectEditPage}
+     * @since 11.9RC1
+     */
+    public ObjectEditPage useShortcutKeyForObjectEditing()
+    {
+        useShortcutKeyAndLoads("o");
+        return new ObjectEditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to class edit page.
+     * @return a new {@link ClassEditPage}
+     * @since 11.9RC1
+     */
+    public ClassEditPage useShortcutKeyForClassEditing()
+    {
+        useShortcutKeyAndLoads("s");
+        return new ClassEditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to delete page.
+     * @return a new {@link ConfirmationPage}
+     * @since 11.9RC1
+     */
+    public ConfirmationPage useShortcutKeyForPageDeletion()
+    {
+        useShortcutKeyAndLoads(Keys.DELETE);
+        return new ConfirmationPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to rename page.
+     * @return a new {@link RenamePage}
+     * @since 11.9RC1
+     */
+    public RenamePage useShortcutKeyForPageRenaming()
+    {
+        useShortcutKeyAndLoads(Keys.F2);
+        return new RenamePage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to the source view of a page.
+     * @return a new {@link ViewPage}
+     * @since 11.9RC1
+     */
+    public ViewPage useShortcutKeyForSourceViewer()
+    {
+        useShortcutKeyAndLoads("d");
+        return new ViewPage();
     }
 }

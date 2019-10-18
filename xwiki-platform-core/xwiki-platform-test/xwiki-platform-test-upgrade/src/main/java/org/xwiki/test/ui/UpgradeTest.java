@@ -302,8 +302,7 @@ public class UpgradeTest extends AbstractTest
             upgradeFlavor = upgradeFlavor.upgrade();
 
             // Make sure there hasn't been any error or warning during the install plan
-            assertNoErrorWarningLog("Unexpected error(s) or warning(s) found in the log during flavor install plan.",
-                upgradeFlavor.openProgressSection());
+            assertNoErrorWarningLog(upgradeFlavor.openProgressSection());
 
             // Confirm upgrade
             upgradeFlavor = upgradeFlavor.confirm();
@@ -322,8 +321,7 @@ public class UpgradeTest extends AbstractTest
             }
 
             // Make sure there hasn't been any error or warning during the install
-            assertNoErrorWarningLog("Unexpected error(s) or warning(s) found in the log during flavor install.",
-                upgradeFlavor.openProgressSection());
+            assertNoErrorWarningLog(upgradeFlavor.openProgressSection());
         } finally {
             getUtil().getDriver().setTimeout(timeout);
         }
@@ -331,7 +329,7 @@ public class UpgradeTest extends AbstractTest
         assertEquals("installed", upgradeFlavor.getStatus());
     }
 
-    private void assertNoErrorWarningLog(String message, ExtensionProgressPane progress)
+    private void assertNoErrorWarningLog(ExtensionProgressPane progress)
     {
         List<LogItemPane> logs = progress.getJobLog(LogLevel.WARN, LogLevel.ERROR);
 

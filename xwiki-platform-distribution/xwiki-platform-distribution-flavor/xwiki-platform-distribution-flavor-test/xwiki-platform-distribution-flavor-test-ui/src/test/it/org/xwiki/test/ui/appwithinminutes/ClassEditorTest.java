@@ -141,9 +141,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
         Assert.assertEquals("date2", fieldNames.get(1));
 
         // Go back to the class editor.
-        getDriver().navigate().back();
-        getDriver().navigate().back();
-        new ViewPage().edit();
+        goToEditor();
         editor = new ApplicationClassEditPage();
 
         // Change the order of the class fields.
@@ -214,7 +212,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
         editor.getSaveAndViewButton().click();
         waitForPageSourceContains(invalidFieldNameErrorMessage);
 
-        getDriver().navigate().back();
+        goToEditor();
         editor = new ApplicationClassEditPage();
         field = editor.addField("User");
         field.openConfigPanel();
@@ -225,7 +223,7 @@ public class ClassEditorTest extends AbstractClassEditorTest
         editor.getSaveAndViewButton().click();
         waitForPageSourceContains(invalidFieldNameErrorMessage);
 
-        getDriver().navigate().back();
+        goToEditor();
         editor = new ApplicationClassEditPage();
         field = editor.addField("Group");
         field.openConfigPanel();

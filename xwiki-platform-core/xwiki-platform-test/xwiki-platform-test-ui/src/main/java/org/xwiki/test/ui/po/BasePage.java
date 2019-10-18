@@ -325,7 +325,10 @@ public class BasePage extends BaseElement
     {
         if (isElementVisible(DRAWER_MATCHER)) {
             // The drawer is visible, so we close it by clicking outside the drawer
-            this.mainContainerDiv.click();
+            // We don't perform directly a click since it could lead to a
+            // org.openqa.selenium.ElementClickInterceptedException because of a drawer-overlay-upper above it.
+            // The click through action is performed with a move and click, which is what we really want.
+            getDriver().createActions().click(this.mainContainerDiv).perform();
             getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
 
             return true;

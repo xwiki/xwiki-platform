@@ -140,7 +140,7 @@ public class UpgradeTest extends AbstractTest
     public void upgrade() throws Exception
     {
         // Access home page (and be automatically redirected)
-        getUtil().gotoPage("Main", "WebHome");
+        getUtil().gotoPage("Main", "WebHome", "view");
 
         // Make sure we are redirected to the Distribution Wizard
         assertEquals(

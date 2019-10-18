@@ -158,7 +158,9 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement clear()
     {
-        getTextInput().clear();
+        // We cannot call WebElement#clear method because it does not fire the right keyboard events,
+        // so better to rely on a key combination to remove the content.
+        getTextInput().sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.BACK_SPACE));
         return this;
     }
 

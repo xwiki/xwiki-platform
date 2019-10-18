@@ -24,32 +24,56 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
     // TODO: error handling
     $.get({
       url : url,
+      complete: function(xhr, textStatus) {
+        switch (xhr.status) {
+            case 200:
+               // Add asynchronous meta tags
+                var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
+                if (asyncHead) {
+                  $('head').append(asyncHead);
+                }
+
+                // Replace the element by the asynchronous result
+                element.replaceWith(xhr.responseText);
+
+                // Insert the scripts after the HTML
+                var asyncScripts = xhr.getResponseHeader('X-XWIKI-HTML-SCRIPTS');
+                if (asyncScripts) {
+                  // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
+                  $('head').append(asyncScripts);
+                }
+
+                break;
+
+            case 202:
+                // Display the spinner only if we wait more than one iteration
+                showSpinner(element);
+
+                update(element, url);
+                break;
+
+            default:
+              // Get rid of the spinner since it's now useless
+              element.remove();
+          }
+      }
+    /*
       statusCode: {
-        200: function(data, textStatus, xhr) {
-          // Add asynchronous meta tags
-          var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
-          if (asyncHead) {
-            $('head').append(asyncHead);
-          }
 
-          // Replace the element by the asynchronous result
-          element.replaceWith(data);
-
-          // Insert the scripts after the HTML
-          var asyncScripts = xhr.getResponseHeader('X-XWIKI-HTML-SCRIPTS');
-          if (asyncScripts) {
-            // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
-            $('head').append(asyncScripts);
-          }
-        },
 
         202: function(data, textStatus, xhr) {
           // Display the spinner only if we wait more than one iteration
           showSpinner(element);
 
           update(element, url);
+        },
+
+        default: function(data, textStatus, xhr) {
+          // Get rid of the spinner since it's now useless
+          element.remove();
         }
       }
+      */
     });
   }
 

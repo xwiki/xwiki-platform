@@ -54,6 +54,8 @@ public class ObjectEditPage extends EditPage
 
     public ObjectEditPane addObject(String className)
     {
+        // Ensure to scroll to the action button, in case we where below in the page.
+        getDriver().scrollTo(classNameSubmit);
         new SuggestInputElement(this.classNameField).click().waitForSuggestions().selectByValue(className);
 
         final By objectsLocator = By.cssSelector("[id='xclass_" + className + "'] .xobject");

@@ -116,7 +116,6 @@ public class BasePage extends BaseElement
     public BasePage()
     {
         super();
-        waitUntilPageIsLoaded();
         waitUntilPageJSIsLoaded();
     }
 

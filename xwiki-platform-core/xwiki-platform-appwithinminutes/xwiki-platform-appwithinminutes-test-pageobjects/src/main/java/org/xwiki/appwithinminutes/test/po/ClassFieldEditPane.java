@@ -21,6 +21,7 @@ package org.xwiki.appwithinminutes.test.po;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -88,7 +89,9 @@ public class ClassFieldEditPane extends BaseElement
     public void setDefaultValue(String defaultValue)
     {
         WebElement defaultValueInput = getDefaultValueInput();
-        defaultValueInput.clear();
+        // WebElement#clear does not send the right keyboard events, it's better to use a key combination
+        // to replace the actual content of the input.
+        defaultValueInput.sendKeys(Keys.chord(Keys.CONTROL, "a"));
         defaultValueInput.sendKeys(defaultValue);
     }
 

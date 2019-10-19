@@ -125,7 +125,9 @@ public class ApplicationNameTest extends AbstractTest
         // Fix the application name and move to the next step using the Enter key.
         appCreatePage.setApplicationName(getTestMethodName());
         appCreatePage.waitForApplicationNamePreview();
+        getDriver().addPageNotYetReloadedMarker();
         appCreatePage.getApplicationNameInput().sendKeys(Keys.RETURN);
+        getDriver().waitUntilPageIsReloaded();
         Assert.assertEquals(getTestMethodName(), new ViewPage().getDocumentTitle());
     }
 

@@ -266,7 +266,7 @@
             #set($xredirect = "$xwiki.getURL($docRef, 'view', $!{request.queryString})")
           #end
           ## add "comment reply" button
-          &lt;a class='btn btn-default btn-xs' href="${xredirect}#xwikicomment_${ann.id}"
+          &lt;a class='btn btn-default btn-xs reply' href="${xredirect}#xwikicomment_${ann.id}"
             title="$services.localization.render('core.viewers.comments.reply')"&gt;
             $services.icon.renderHTML('comment')
           &lt;/a&gt;

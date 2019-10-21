@@ -142,7 +142,12 @@ public class LogCaptureValidator
 
         // Triggered by the HTML5 Validator.
         // This should be fixed with https://jira.xwiki.org/browse/XWIKI-16791
-        new Line("The “type” attribute is unnecessary for JavaScript resources.")
+        new Line("The “type” attribute is unnecessary for JavaScript resources."),
+
+        // This error apparently occurs because an async resource was still loading when we move to another page
+        // This is most certainly related to some pages for which we don't wait the JS to be loaded properly before
+        // making some assertion or interactions.
+        new Line("java.lang.IllegalStateException: Response is ABORTED")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

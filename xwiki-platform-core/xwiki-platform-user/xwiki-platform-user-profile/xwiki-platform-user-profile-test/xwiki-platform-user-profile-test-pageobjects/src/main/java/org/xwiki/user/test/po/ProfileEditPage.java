@@ -21,7 +21,6 @@ package org.xwiki.user.test.po;
 
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 
 /** User profile, the profile information pane, edit mode. */
@@ -151,14 +150,5 @@ public class ProfileEditPage extends EditPage
     {
         this.userBlogFeed.clear();
         this.userBlogFeed.sendKeys(userBlogFeed);
-    }
-
-    @Override
-    public <T extends ViewPage> T clickSaveAndView()
-    {
-        getDriver().addPageNotYetReloadedMarker();
-        super.clickSaveAndView();
-        getDriver().waitUntilPageIsReloaded();
-        return (T) new ViewPage();
     }
 }

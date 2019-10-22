@@ -22,7 +22,6 @@ package org.xwiki.user.test.po;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.ui.Select;
-import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 
 /** User profile, the preferences pane, edit mode. */
@@ -78,16 +77,8 @@ public class PreferencesEditPage extends EditPage
         // When it's fixed use instead:
         //   Select select = new Select(this.timezone);
         //   select.selectByValue(value);
+        getDriver().scrollTo(this.timezone);
         this.timezone.clear();
         this.timezone.sendKeys(value);
-    }
-
-    @Override
-    public <T extends ViewPage> T clickSaveAndView()
-    {
-        getDriver().addPageNotYetReloadedMarker();
-        super.clickSaveAndView();
-        getDriver().waitUntilPageIsReloaded();
-        return (T) new ViewPage();
     }
 }

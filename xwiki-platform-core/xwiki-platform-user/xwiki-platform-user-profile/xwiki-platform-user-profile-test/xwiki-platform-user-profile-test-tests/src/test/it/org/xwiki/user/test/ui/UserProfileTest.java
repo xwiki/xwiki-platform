@@ -83,10 +83,11 @@ public class UserProfileTest extends AbstractTest
     private String userName;
 
     @Before
-    public void setUp()
+    public void setUp() throws Exception
     {
-        getUtil().recacheSecretToken();
         this.userName = getTestClassName() + getTestMethodName();
+        getUtil().loginAsSuperAdmin();
+        getUtil().rest().deletePage("XWiki", this.userName);
         getUtil().createUserAndLogin(this.userName, DEFAULT_PASSWORD);
 
         this.customProfilePage = ProfileUserProfilePage.gotoPage(this.userName);

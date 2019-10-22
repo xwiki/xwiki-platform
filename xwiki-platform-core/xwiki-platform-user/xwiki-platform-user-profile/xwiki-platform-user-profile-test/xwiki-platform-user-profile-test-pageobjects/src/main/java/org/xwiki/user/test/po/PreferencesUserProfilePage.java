@@ -68,8 +68,12 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
 
     public PreferencesEditPage editPreferences()
     {
+        getDriver().addPageNotYetReloadedMarker();
         this.editPreferences.click();
-        return new PreferencesEditPage();
+        getDriver().waitUntilPageIsReloaded();
+        PreferencesEditPage preferencesEditPage = new PreferencesEditPage();
+        preferencesEditPage.waitUntilPageJSIsLoaded();
+        return preferencesEditPage;
     }
 
     public ChangePasswordPage changePassword()

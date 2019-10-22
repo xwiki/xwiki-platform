@@ -1034,4 +1034,27 @@ public class XWikiWebDriver extends RemoteWebDriver
     {
         return new Actions(getWrappedDriver());
     }
+
+    /**
+     * Same as {@link Actions#moveToElement(WebElement, int, int)} except that the target is the top-left corner of the
+     * target, instead of the center.
+     * @param target the element for which we want to reach the offset from the top-left corner.
+     * @param offsetX the offset on the right of the top-left corner to move to
+     * @param offsetY the offset on the bottom of the top-left corner to move to
+     * @param chainFrom the existing actions to be chain to, or null to create a dedicated chain of actions.
+     * @return an actions with the right move.
+     * @since 11.9RC1
+     */
+    public Actions moveToTopLeftCornerOfTargetWithOffset(WebElement target, int offsetX, int offsetY, Actions chainFrom)
+    {
+        Dimension containerDimension = target.getSize();
+        int newOffsetX = - containerDimension.getWidth() / 2 + offsetX;
+        int newOffsetY = - containerDimension.getHeight() / 2 + offsetY;
+
+        if (chainFrom == null) {
+            return createActions().moveToElement(target, newOffsetX, newOffsetY);
+        } else {
+            return chainFrom.moveToElement(target, newOffsetX, newOffsetY);
+        }
+    }
 }

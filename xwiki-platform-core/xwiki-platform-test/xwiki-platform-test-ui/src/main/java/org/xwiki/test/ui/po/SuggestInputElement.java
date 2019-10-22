@@ -24,10 +24,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
 /**
  * Represents the actions possible on the suggest input widget.
@@ -144,10 +142,7 @@ public class SuggestInputElement extends BaseElement
         // Safest is to click on the top left corner of the suggest input, before the first selected suggestion.
         // And selenium only move to the center of the element, so we have to compute the offset for the top-left corner
         // and we click on (2,2) to avoid missing it.
-        Dimension containerDimension = this.container.getSize();
-        int offsetX = - containerDimension.getWidth() / 2 + 2;
-        int offsetY = - containerDimension.getHeight() / 2 + 2;
-        getDriver().createActions().moveToElement(this.container, offsetX, offsetY).click().build().perform();
+        getDriver().moveToTopLeftCornerOfTargetWithOffset(this.container, 2, 2, null).click().build().perform();
         return this;
     }
 

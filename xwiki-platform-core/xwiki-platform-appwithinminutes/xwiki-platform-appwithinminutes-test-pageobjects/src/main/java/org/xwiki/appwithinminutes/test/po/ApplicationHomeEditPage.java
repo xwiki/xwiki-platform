@@ -173,8 +173,19 @@ public class ApplicationHomeEditPage extends ApplicationEditPage
      */
     public void moveLiveTableColumnBefore(String columnToMove, String beforeColumn)
     {
-        new Actions(getDriver().getWrappedDriver()).clickAndHold(getLiveTableColumn(columnToMove))
-            .moveToElement(getLiveTableColumn(beforeColumn), 0, 0).release().perform();
+        WebElement columnToMoveElement = getLiveTableColumn(columnToMove);
+        WebElement beforeColumnElement = getLiveTableColumn(beforeColumn);
+        getDriver().scrollTo(columnToMoveElement);
+        Actions actions = getDriver().createActions().clickAndHold(columnToMoveElement);
+
+        // We move the column from the center, so we need to ensure that we actually move it with an offset of half its
+        // width to be sure it's before the other column element.
+        int offsetX = -(columnToMoveElement.getSize().getWidth() / 2);
+
+        // Safety measure to ensure we remain on the same vertical alignment
+        int offsetY = 2;
+        getDriver().moveToTopLeftCornerOfTargetWithOffset(beforeColumnElement, offsetX, offsetY, actions)
+            .release().perform();
     }
 
     /**

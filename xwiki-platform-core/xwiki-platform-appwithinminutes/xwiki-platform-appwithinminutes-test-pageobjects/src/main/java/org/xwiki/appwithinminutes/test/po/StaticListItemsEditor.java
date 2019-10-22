@@ -134,8 +134,16 @@ public class StaticListItemsEditor extends BaseElement
      */
     public void moveBefore(String valueToMove, String beforeValue)
     {
-        new Actions(getDriver().getWrappedDriver()).clickAndHold(getItem(valueToMove))
-            .moveToElement(getItem(beforeValue), 0, 0).release().perform();
+        WebElement itemToMove = getItem(valueToMove);
+        WebElement itemBefore = getItem(beforeValue);
+
+        Actions actions = getDriver().createActions().clickAndHold(itemToMove);
+
+        // We move the item from the center, so we need to ensure that we actually move it with an offset of half its
+        // width to be sure it's before the other item element.
+        int offsetX = - (itemToMove.getSize().getWidth() / 2);
+        int offsetY = 2;
+        getDriver().moveToTopLeftCornerOfTargetWithOffset(itemBefore, offsetX, offsetY, actions).release().perform();
     }
 
     /**

@@ -52,6 +52,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -208,13 +211,16 @@ public class XWikiServletURLFactoryTest
     }
 
     @Test
-    public void createURLOnSubWikiInPathMode()
+    public void createURLOnSubWikiInPathMode() throws MalformedURLException
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
 
         URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
             this.oldcore.getXWikiContext());
         assertEquals("http://127.0.0.1/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", url.toString());
+
+        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL("wiki1", this.oldcore.getXWikiContext());
+        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL(this.oldcore.getXWikiContext().getMainXWiki(), this.oldcore.getXWikiContext());
     }
 
     @Test

@@ -4972,8 +4972,8 @@ public class XWiki implements EventListener
 
     public URL getServerURL(String wikiId, XWikiContext xcontext) throws MalformedURLException
     {
-        // In virtual wiki path mode the server is the standard one
-        if (!xcontext.isMainWiki(wikiId) && "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
+        // In path based the base URL is the same for all wikis
+        if (!xcontext.isMainWiki(wikiId) && isPathBased()) {
             return getServerURL(xcontext.getMainXWiki(), xcontext);
         }
 
@@ -5085,7 +5085,7 @@ public class XWiki implements EventListener
     public String getServletPath(String wikiName, XWikiContext context)
     {
         // unless we are in virtual wiki path mode we should return null
-        if (!context.isMainWiki(wikiName) && "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
+        if (!context.isMainWiki(wikiName) && isPathBased()) {
             try {
                 WikiDescriptor wikiDescriptor = getWikiDescriptorManager().getById(wikiName);
                 if (wikiDescriptor != null) {
@@ -7795,5 +7795,14 @@ public class XWiki implements EventListener
     public long ParamAsLong(String key, long default_value)
     {
         return getConfiguration().getProperty(key, default_value);
+    }
+
+    /**
+     * @return true if the wiki is in path based mode, fale otherwise
+     * @since 11.9RC1
+     */
+    public boolean isPathBased()
+    {
+        return "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"));
     }
 }

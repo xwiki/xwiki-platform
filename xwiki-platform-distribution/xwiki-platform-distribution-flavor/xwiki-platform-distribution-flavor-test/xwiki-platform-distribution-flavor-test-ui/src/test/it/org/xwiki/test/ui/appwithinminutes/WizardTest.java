@@ -173,11 +173,10 @@ public class WizardTest extends AbstractTest
         Assert.assertEquals(1, childrenLiveTable.getRowCount());
         Assert.assertTrue(childrenLiveTable.hasPageWithTitle(firstEntryName));
 
-        // Go back to the application home page.
-        getDriver().navigate().back();
-
-        // Click the edit button.
-        homePage.edit();
+        // Go back to the application home edit page.
+        getUtil().gotoPage(
+            Arrays.asList(getClass().getSimpleName(), this.testName.getMethodName(), appName)
+            , "WebHome", "edit", "");
         homeEditPage = new ApplicationHomeEditPage();
 
         // Change the application description.

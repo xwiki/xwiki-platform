@@ -37,9 +37,73 @@
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
-{{html}}
-#template('exportinline.vm')
-{{/html}}
+#if ($xcontext.action != 'get')
+  {{template name="exportinline.vm" /}}
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($xcontext.action == 'get')
+  {{include reference="XWiki.DocumentTreeMacros" /}}
+#end
+{{/velocity}}
+
+{{velocity output="false"}}
+#macro (postProcessDocumentTreeData $data)
+  #if ($request.data == 'children')
+    ## Change the icons in order to be able to differentiate content pages from extension pages and from customized
+    ## extension pages.
+    #foreach ($node in $data)
+      #if ($node.data.type == 'document')
+        #set ($documentReference = $services.model.resolveDocument($node.data.id))
+        #set ($iconName = 'file-text')
+        #set ($iconStyle = 'text-success')
+        #if ($services.extension.xar.isExtensionDocument($documentReference))
+          #if ($services.extension.xar.isCustomizedExtensionDocument($documentReference))
+            #set ($iconName = 'file-code')
+            #set ($iconStyle = 'text-warning')
+            #if ($request.filters == 'installedExtensionDocument')
+              ## This node is visible probably because it has some child content pages, but the user should not be able
+              ## to select it with the current filter.
+              #set ($node.state = {'disabled': true, 'undetermined': true})
+            #end
+          #else
+            #set ($iconName = 'file-white')
+            #set ($iconStyle = 'text-danger')
+            #if ($request.filters == 'pristineInstalledExtensionDocument'
+                || $request.filters == 'installedExtensionDocument')
+              ## This node is visible probably because it has some child content pages or child customized extension
+              ## pages, but the user should not be able to select it with the current filter.
+              #set ($node.state = {'disabled': true, 'undetermined': true})
+            #end
+          #end
+          ## Show the extension name and id as a tool tip for the tree node.
+          #set ($installedExtensions = $services.extension.xar.getInstalledExtensions($documentReference))
+          #set ($tooltip = [])
+          #foreach ($installedExtension in $installedExtensions)
+            #set ($discard = $tooltip.add("$installedExtension.name ($installedExtension.id)"))
+          #end
+          #if ($tooltip.size() &gt; 0)
+            #set ($node.a_attr.title = $stringtool.join($tooltip, ', '))
+          #end
+        #end
+        #set ($iconMetaData = $services.icon.getMetaData($iconName))
+        #if ($iconMetaData.iconSetType == 'IMAGE')
+          #set ($node.icon = $iconMetaData.url)
+        #elseif ($iconMetaData.iconSetType == 'FONT')
+          #set ($node.icon = "$iconMetaData.cssClass $iconStyle")
+        #end
+      #end
+    #end
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($xcontext.action == 'get')
+  #updateDocTreeConfigFromRequest
+  #handleDocumentTreeRequest
+#end
 {{/velocity}}</content>
   <object>
     <name>XWiki.AdminExportSheet</name>

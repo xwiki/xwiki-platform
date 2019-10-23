@@ -1,0 +1,97 @@
+#template('documentTree_macros.vm')
+#set ($exportTreeFilters = [{
+  'id': 'installedExtensionDocument',
+  'class': 'text-success',
+  'icon': 'file-text'
+}, {
+  'id': 'pristineInstalledExtensionDocument',
+  'class': 'text-warning',
+  'icon': 'file-code'
+}, {
+  'class': 'text-danger',
+  'icon': 'file-white'
+}])
+#macro (exportTreeFilterDropDown $defaultFilter)
+  #set ($defaultFilterTitle = '')
+  <ul class="dropdown-menu">
+    #foreach ($exportTreeFilter in $exportTreeFilters)
+      #set ($isDefaultFilter = "$!defaultFilter" == "$!exportTreeFilter.id")
+      <li#if ($isDefaultFilter) class="active"#end>
+        <a href="#" data-filter="$!escapetool.xml($exportTreeFilter.id)">
+          <span class="$escapetool.xml($exportTreeFilter.get('class'))"
+            >$services.icon.renderHTML($exportTreeFilter.icon)</span>
+          #set ($filterTitle = $escapetool.xml($services.localization.render(
+            "core.exporter.filter.$exportTreeFilter.getOrDefault('id', 'none')")))
+          #if ($isDefaultFilter)
+            #set ($defaultFilterTitle = $filterTitle)
+          #end
+          <span class="export-tree-filter-title">$filterTitle</span>
+          <span class="xHint">$escapetool.xml($services.localization.render(
+            "core.exporter.filter.${exportTreeFilter.getOrDefault('id', 'none')}.hint"))</span>
+        </a>
+      </li>
+    #end
+  </ul>
+#end
+#macro (exportTreeFilter $defaultFilter)
+  #set ($filterDropDown = "#exportTreeFilterDropDown($defaultFilter)")
+  <div class="btn-group export-tree-filter pull-left">
+    <input type="hidden" name="filter" value="$!escapetool.xml($defaultFilter)" />
+    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false">
+      $escapetool.xml($services.localization.render('core.exporter.filter'))
+      <span class="active-filter-title">$defaultFilterTitle</span>
+      <span class="caret"></span>
+    </button>
+    $filterDropDown
+  </div>
+#end
+#macro (exportTreeActions)
+  <div class="export-tree-actions pull-right">
+    <a href="#" class="export-tree-action selectAll btn btn-link">$escapetool.xml($services.localization.render(
+      'core.exporter.selectAll'))</a>/<a href="#" class="export-tree-action selectNone btn btn-link">
+      $escapetool.xml($services.localization.render('core.exporter.selectNone'))</a>
+  </div>
+#end
+#macro (exportTree $settings)
+  ## We set filterHiddenDocuments to false because we want administrators to see all the pages that are going to be
+  ## exported, even when their user profile was configured to not show hidden pages.
+  #set ($exportTreeSettings = {
+    'class' : 'export-tree',
+    'filterHiddenDocuments': false,
+    'sheet': 'XWiki.AdminExportSheet',
+    'showAttachments': false,
+    'showTranslations': false
+  })
+  #set ($discard = $exportTreeSettings.putAll($settings))
+  #documentTree($exportTreeSettings)
+#end
+#macro (exportTreeLegend)
+  <dl class="export-tree-legend xHint">
+    <dt>$escapetool.xml($services.localization.render('core.exporter.legend'))</dt>
+    <dd></dd>
+    <dt class="text-success">$services.icon.renderHTML('file-text')</dt>
+    <dd>$escapetool.xml($services.localization.render('core.exporter.legend.contentPage'))</dd>
+    <dt class="text-warning">$services.icon.renderHTML('file-code')</dt>
+    <dd>$escapetool.xml($services.localization.render('core.exporter.legend.customizedExtensionPage'))</dd>
+    <dt class="text-danger">$services.icon.renderHTML('file-white')</dt>
+    <dd>$escapetool.xml($services.localization.render('core.exporter.legend.cleanExtensionPage'))</dd>
+  </dl>
+#end
+#macro (exportTreeSelector $settings)
+  #set ($macro.settings = {})
+  #set ($discard = $macro.settings.putAll($settings))
+  #set ($discard = $xwiki.jsfx.use('uicomponents/exporter/exporter.js', {'forceSkinAction': true}))
+  <div class="export-tree-container">
+    <div class="clearfix">
+      #set ($defaultFilter = $macro.settings.remove('filter'))
+      #if ($defaultFilter)
+        #set ($macro.settings.filters = [$defaultFilter])
+      #end
+      #exportTreeFilter($defaultFilter)
+      #exportTreeActions()
+    </div>
+    #exportTree($macro.settings)
+    #exportTreeLegend()
+  </div>
+#end

@@ -245,6 +245,24 @@
 
 // Content menu  ======================================================
 
+// Used a mix of LESS variables in order to assure the content buttons
+// have a styling more similar to breadcrumbs than buttons, while looking
+// decent across the bundled color themes
+.flat-buttons {
+  .btn-default {
+    background-color: @breadcrumb-bg;
+    background-image: none;
+    border-color: @dropdown-divider-bg;
+    box-shadow: none;
+    color: @dropdown-link-color;
+    text-shadow: none;
+  }
+
+ .btn-default:hover, .btn-default:active, .open .dropdown-toggle {
+    border-color: darken(@dropdown-divider-bg, 10%);
+  }
+}
+
 #contentmenu {
   .text-right();
 
@@ -259,19 +277,5 @@
     }
   }
 
-  // Used a mix of LESS variables in order to assure the content buttons
-  // have a styling more similar to breadcrumbs than buttons, while looking
-  // decent across the bundled color themes
-  .btn-default {
-    background-color: @breadcrumb-bg;
-    background-image: none;
-    border-color: @dropdown-divider-bg;
-    box-shadow: none;
-    color: @dropdown-link-color;
-    text-shadow: none;
-  }
-
- .btn-default:hover, .btn-default:active, .open .dropdown-toggle {
-    border-color: darken(@dropdown-divider-bg, 10%);
-  }
+  .flat-buttons();
 }

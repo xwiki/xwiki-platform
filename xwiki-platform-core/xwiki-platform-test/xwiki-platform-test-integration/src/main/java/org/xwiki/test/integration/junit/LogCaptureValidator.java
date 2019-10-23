@@ -147,7 +147,12 @@ public class LogCaptureValidator
         // This error apparently occurs because an async resource was still loading when we move to another page
         // This is most certainly related to some pages for which we don't wait the JS to be loaded properly before
         // making some assertion or interactions.
-        new Line("java.lang.IllegalStateException: Response is ABORTED")
+        new Line("java.lang.IllegalStateException: Response is ABORTED"),
+
+        // Warning obtain from time to time in case of slow network, the full warning is:
+        // There was an error managing geckodriver 0.26.0 (github-production-release-asset-2e65be.s3.amazonaws.com:
+        // Temporary failure in name resolution) ... trying again using cache and mirror
+        new Line("i.g.bonigarcia.wdm.WebDriverManager - There was an error managing geckodriver")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

@@ -35,7 +35,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @version $Id$
  */
 @Component
-@Named("WikiManagerCode.WikiTemplateClass")
+@Named("WikiManager.WikiTemplateClass")
 @Singleton
 public class WikiTemplateClassDocumentInitializer extends AbstractMandatoryClassInitializer
 {

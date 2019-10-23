@@ -132,11 +132,16 @@
       #getSuggestions($data)
     #end
     #if ($data)
+      #postProcessDocumentTreeData($data)
       #jsonResponse($data)
     #else
       $response.sendError(404)
     #end
   #end
+#end
+
+#macro (postProcessDocumentTreeData $data)
+  ## This is just a hook to allow post processing the document tree data.
 #end
 
 ##------------------------------------------------------------

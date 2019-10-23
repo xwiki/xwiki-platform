@@ -51,7 +51,7 @@ public class ExportModal extends BaseModal
         getDriver().waitUntilElementIsVisible(By.id(EXPORT_MODAL_ID));
         getDriver().findElementByLinkText(OTHER_FORMAT_PANE_LINK).click();
 
-        getDriver().waitUntilElementIsVisible(By.cssSelector("#exportModelOtherCollapse.collapse.in"));
+        getDriver().waitUntilElementIsVisible(By.cssSelector("#exportModalOtherCollapse.collapse.in"));
         return new OtherFormatPane();
     }
 

@@ -240,8 +240,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (wikiId == null) {
             wikiId = context.getWikiId();
         } else if (!context.isMainWiki(wikiId) && context.getWiki().isPathBased()) {
-            // In path based the base URL is the same for all wikis
-            return getServerURL(context.getMainXWiki(), context);
+            // In path based the base URL is the same for all wikis so we generate it from original context
+            return getServerURL(context.getOriginalWikiId(), context);
         }
 
         URL inputURL = getDefaultURL(wikiId, context);

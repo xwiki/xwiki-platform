@@ -111,10 +111,14 @@ public class FlamingoThemeIT
         // Verify that the new theme is used
         assertEquals(testMethodName, themeApplicationWebHomePage.getCurrentTheme());
         // Look at the values
-        assertEquals("rgb(255, 0, 0)", themeApplicationWebHomePage.getPageBackgroundColor());
-        assertEquals("monospace", themeApplicationWebHomePage.getFontFamily().toLowerCase());
+        // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed
+        // for now we get rgb value with Firefox and rgba value with Chrome
+        //assertEquals("rgb(255, 0, 0)", themeApplicationWebHomePage.getPageBackgroundColor());
         // Test 'lessCode' is correctly handled
-        assertEquals("rgb(0, 0, 255)", themeApplicationWebHomePage.getTextColor());
+        //assertEquals("rgb(0, 0, 255)", themeApplicationWebHomePage.getTextColor());
+        assertColor(255, 0, 0, themeApplicationWebHomePage.getPageBackgroundColor());
+        assertColor(0, 0, 255, themeApplicationWebHomePage.getTextColor());
+        assertEquals("monospace", themeApplicationWebHomePage.getFontFamily().toLowerCase());
 
         // Verify we can select a theme by clicking the "use this theme" link, and view it
         themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
@@ -149,6 +153,14 @@ public class FlamingoThemeIT
         // Switch back to Charcoal (just to set the default back if you need to execute the test again)
         themeApplicationWebHomePage = ThemeApplicationWebHomePage.gotoPage();
         themeApplicationWebHomePage.useTheme("Charcoal");
+    }
+
+    private void assertColor(int red, int green, int blue, String obtainedValue)
+    {
+        assertTrue(obtainedValue.contains("rgb"), "This is not an rgb value: "+obtainedValue);
+        String rgbComponent = String.format("%s, %s, %s", red, green, blue);
+        assertTrue(obtainedValue.contains(rgbComponent),
+            "Wrong RGB component [expected = " + rgbComponent + "| Obtained = " + obtainedValue);
     }
 
     private void verifyAllVariablesCategoriesArePresent(EditThemePage editThemePage)
@@ -199,10 +211,14 @@ public class FlamingoThemeIT
         editThemePage.refreshPreview();
         // Verify that there is still no errors
         assertFalse(previewBox.hasError());
+        // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed
+        // for now we get rgb value with Firefox and rgba value with Chrome
         // Verify that the modification have been made in the preview
-        assertEquals("rgb(255, 0, 0)", previewBox.getPageBackgroundColor());
-        assertEquals("monospace", previewBox.getFontFamily());
+        //assertEquals("rgb(255, 0, 0)", previewBox.getPageBackgroundColor());
         // Test 'lessCode' is correctly handled (since 7.3M1)
-        assertEquals("rgb(0, 0, 255)", previewBox.getTextColor());
+        //assertEquals("rgb(0, 0, 255)", previewBox.getTextColor());
+        assertColor(255, 0, 0, previewBox.getPageBackgroundColor());
+        assertColor(0, 0, 255, previewBox.getTextColor());
+        assertEquals("monospace", previewBox.getFontFamily());
     }
 }

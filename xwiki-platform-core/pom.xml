@@ -182,6 +182,16 @@
                     "newSerialVersionUID": "1",
                     "justification": "Not a breakage"
                   },
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitializer",
+                    "new": "class com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitializer",
+                    "annotationType": "javax.inject.Named",
+                    "attribute": "value",
+                    "oldValue": "\"XWiki.SchedulerJobSheet\"",
+                    "newValue": "\"XWiki.SchedulerJobClass\"",
+                    "justification": "Not a breakage"
+                  }
                   // Add more ignores below...
                 ]
               }

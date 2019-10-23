@@ -35,10 +35,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.properties.converter.Converter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
@@ -65,15 +65,12 @@ public class WikiTreeNodeTest
     private WikiTreeNode wikiTreeNode;
 
     @MockComponent
-    @Named("current")
-    private EntityReferenceResolver<String> currentEntityReferenceResolver;
+    @Named("entityTreeNodeId")
+    private Converter<EntityReference> entityTreeNodeIdConverter;
 
     @MockComponent
     @Named("local")
     private EntityReferenceSerializer<String> localEntityReferenceSerializer;
-
-    @MockComponent
-    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
 
     @MockComponent
     private EntityReferenceProvider defaultEntityReferenceProvider;
@@ -108,18 +105,19 @@ public class WikiTreeNodeTest
     {
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
-        when(this.currentEntityReferenceResolver.resolve("foo", EntityType.WIKI)).thenReturn(new WikiReference("foo"));
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "wiki:foo"))
+            .thenReturn(new WikiReference("foo"));
 
         DocumentReference alice = new DocumentReference("bar", "A", "WebHome");
-        when(this.currentEntityReferenceResolver.resolve("bar:A.WebHome", EntityType.DOCUMENT)).thenReturn(alice);
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:bar:A.WebHome")).thenReturn(alice);
         when(this.localEntityReferenceSerializer.serialize(alice.getParent())).thenReturn("A");
 
         DocumentReference bob = new DocumentReference("foo", "B", "WebHome");
-        when(this.currentEntityReferenceResolver.resolve("foo:B.WebHome", EntityType.DOCUMENT)).thenReturn(bob);
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:foo:B.WebHome")).thenReturn(bob);
         when(this.localEntityReferenceSerializer.serialize(bob.getParent())).thenReturn("B");
 
-        when(this.defaultEntityReferenceSerializer.serialize(new DocumentReference("foo", "C", "WebHome")))
-            .thenReturn("foo:C.WebHome");
+        when(this.entityTreeNodeIdConverter.convert(String.class, new DocumentReference("foo", "C", "WebHome")))
+            .thenReturn("document:foo:C.WebHome");
 
         when(this.query.addFilter(any(QueryFilter.class))).thenReturn(this.query);
     }
@@ -157,10 +155,10 @@ public class WikiTreeNodeTest
             Arrays.asList("document:bar:A.WebHome", "document:foo:B.WebHome", "document:foo:C.D", "space:foo:C")));
 
         DocumentReference denis = new DocumentReference("foo", "C", "D");
-        when(this.currentEntityReferenceResolver.resolve("foo:C.D", EntityType.DOCUMENT)).thenReturn(denis);
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:foo:C.D")).thenReturn(denis);
 
         SpaceReference carol = new SpaceReference("foo", "C");
-        when(this.currentEntityReferenceResolver.resolve("foo:C", EntityType.SPACE)).thenReturn(carol);
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "space:foo:C")).thenReturn(carol);
         when(this.localEntityReferenceSerializer.serialize(carol)).thenReturn("C");
 
         when(this.queryManager.createQuery(

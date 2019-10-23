@@ -1,3 +1,5 @@
+org.xwiki.index.tree.internal.EntityTreeNodeIdConverter
+
 org.xwiki.index.tree.internal.nestedpages.query.ChildPageFilter
 org.xwiki.index.tree.internal.nestedpages.query.DocumentReferenceResolverFilter
 org.xwiki.index.tree.internal.nestedpages.query.ExcludedDocumentFilter

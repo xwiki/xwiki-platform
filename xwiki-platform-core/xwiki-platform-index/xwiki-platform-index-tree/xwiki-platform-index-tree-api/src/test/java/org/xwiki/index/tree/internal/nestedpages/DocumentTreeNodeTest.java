@@ -37,8 +37,8 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.properties.converter.Converter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.query.QueryManager;
@@ -69,10 +69,6 @@ public class DocumentTreeNodeTest
 {
     @InjectMockComponents
     private DocumentTreeNode documentTreeNode;
-
-    @MockComponent
-    @Named("current")
-    private EntityReferenceResolver<String> currentEntityReferenceResolver;
 
     @MockComponent
     private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
@@ -121,6 +117,10 @@ public class DocumentTreeNodeTest
     @Named("nestedPagesOrderedByName")
     private Query nestedPagesOrderedByName;
 
+    @MockComponent
+    @Named("entityTreeNodeId")
+    private Converter<EntityReference> entityTreeNodeIdConverter;
+
     private DocumentReference documentReference =
         new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "WebHome");
 
@@ -140,14 +140,19 @@ public class DocumentTreeNodeTest
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
 
-        when(this.currentEntityReferenceResolver.resolve("wiki:Path.To.Page.WebHome", EntityType.DOCUMENT))
-            .thenReturn(documentReference);
-        when(this.defaultEntityReferenceSerializer.serialize(documentReference))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page.WebHome"))
+            .thenReturn(this.documentReference);
+        when(this.entityTreeNodeIdConverter.convert(String.class, this.documentReference.getParent()))
+            .thenReturn("space:wiki:Path.To.Page");
+        when(this.defaultEntityReferenceSerializer.serialize(this.documentReference))
             .thenReturn("wiki:Path.To.Page.WebHome");
-        when(this.localEntityReferenceSerializer.serialize(documentReference.getParent())).thenReturn("Path.To.Page");
+        when(this.localEntityReferenceSerializer.serialize(this.documentReference.getParent()))
+            .thenReturn("Path.To.Page");
 
-        when(this.currentEntityReferenceResolver.resolve("wiki:Some.Page", EntityType.DOCUMENT))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Some.Page"))
             .thenReturn(this.terminalDocumentReference);
+        when(this.entityTreeNodeIdConverter.convert(String.class, this.terminalDocumentReference.getParent()))
+            .thenReturn("space:wiki:Some");
         when(this.defaultEntityReferenceSerializer.serialize(this.terminalDocumentReference))
             .thenReturn("wiki:Some.Page");
 
@@ -183,7 +188,8 @@ public class DocumentTreeNodeTest
 
         DocumentReference alice = new DocumentReference("wiki", Arrays.asList("Path.To.Page"), "Alice");
         when(this.nestedPagesOrderedByName.execute()).thenReturn(Collections.singletonList(alice));
-        when(this.defaultEntityReferenceSerializer.serialize(alice)).thenReturn("wiki:Path.To.Page.Alice");
+        when(this.entityTreeNodeIdConverter.convert(String.class, alice))
+            .thenReturn("document:wiki:Path.To.Page.Alice");
 
         assertEquals(
             Arrays.asList("objects:wiki:Path.To.Page.WebHome", "addDocument:wiki:Path.To.Page.WebHome",
@@ -196,8 +202,9 @@ public class DocumentTreeNodeTest
         DocumentReference bob = new DocumentReference("wiki", Arrays.asList("Path.To.Page"), "Bob");
         DocumentReference carol = new DocumentReference("wiki", Arrays.asList("Path.To.Page"), "Carol");
         when(this.nestedPagesOrderedByName.execute()).thenReturn(Arrays.asList(bob, carol));
-        when(this.defaultEntityReferenceSerializer.serialize(bob)).thenReturn("wiki:Path.To.Page.Bob");
-        when(this.defaultEntityReferenceSerializer.serialize(carol)).thenReturn("wiki:Path.To.Page.Carol");
+        when(this.entityTreeNodeIdConverter.convert(String.class, bob)).thenReturn("document:wiki:Path.To.Page.Bob");
+        when(this.entityTreeNodeIdConverter.convert(String.class, carol))
+            .thenReturn("document:wiki:Path.To.Page.Carol");
 
         assertEquals(Arrays.asList("document:wiki:Path.To.Page.Bob", "document:wiki:Path.To.Page.Carol"),
             this.documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 6, 3));
@@ -253,24 +260,25 @@ public class DocumentTreeNodeTest
             new HashSet<>(Arrays.asList("document:wiki:Path.To.OtherPage", "document:wiki:Path.To.Page.Alice",
                 "document:wiki:Path.WebHome", "document:wiki:Path.To.Page.Bob.WebHome")));
 
-        when(this.currentEntityReferenceResolver.resolve("wiki:Path.To.OtherPage", EntityType.DOCUMENT))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.OtherPage"))
             .thenReturn(new DocumentReference("wiki", Arrays.asList("Path", "To"), "OtherPage"));
-        when(this.currentEntityReferenceResolver.resolve("wiki:Path.WebHome", EntityType.DOCUMENT))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.WebHome"))
             .thenReturn(new DocumentReference("wiki", "Path", "WebHome"));
 
         DocumentReference alice = new DocumentReference("Alice", this.documentReference.getLastSpaceReference());
-        when(this.currentEntityReferenceResolver.resolve("wiki:Path.To.Page.Alice", EntityType.DOCUMENT))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page.Alice"))
             .thenReturn(alice);
         when(this.localEntityReferenceSerializer.serialize(alice)).thenReturn("Path.To.Page.Alice");
 
         DocumentReference bob = new DocumentReference("wiki", Arrays.asList("Path", "To", "Page", "Bob"), "WebHome");
-        when(this.currentEntityReferenceResolver.resolve("wiki:Path.To.Page.Bob.WebHome", EntityType.DOCUMENT))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page.Bob.WebHome"))
             .thenReturn(bob);
         when(this.localEntityReferenceSerializer.serialize(bob.getParent())).thenReturn("Path.To.Page.Bob");
 
         DocumentReference child = new DocumentReference("Child", this.documentReference.getLastSpaceReference());
         when(this.nestedPagesOrderedByName.execute()).thenReturn(Collections.singletonList(child));
-        when(this.defaultEntityReferenceSerializer.serialize(child)).thenReturn("wiki:Path.To.Page.Child");
+        when(this.entityTreeNodeIdConverter.convert(String.class, child))
+            .thenReturn("document:wiki:Path.To.Page.Child");
 
         assertEquals(Collections.singletonList("document:wiki:Path.To.Page.Child"),
             this.documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 0, 5));
@@ -287,12 +295,12 @@ public class DocumentTreeNodeTest
             new HashSet<>(Arrays.asList("document:wiki:Path.To.Page.Alice", "document:wiki:Path.To.Page.Bob.WebHome")));
 
         DocumentReference alice = new DocumentReference("Alice", this.documentReference.getLastSpaceReference());
-        when(this.currentEntityReferenceResolver.resolve("wiki:Path.To.Page.Alice", EntityType.DOCUMENT))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page.Alice"))
             .thenReturn(alice);
         when(this.localEntityReferenceSerializer.serialize(alice)).thenReturn("Path.To.Page.Alice");
 
         DocumentReference bob = new DocumentReference("wiki", Arrays.asList("Path", "To", "Page", "Bob"), "WebHome");
-        when(this.currentEntityReferenceResolver.resolve("wiki:Path.To.Page.Bob.WebHome", EntityType.DOCUMENT))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page.Bob.WebHome"))
             .thenReturn(bob);
         when(this.localEntityReferenceSerializer.serialize(bob.getParent())).thenReturn("Path.To.Page.Bob");
 

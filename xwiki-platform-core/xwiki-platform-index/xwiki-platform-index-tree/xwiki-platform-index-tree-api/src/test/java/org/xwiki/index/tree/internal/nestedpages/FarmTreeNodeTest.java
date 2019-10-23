@@ -27,11 +27,11 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.properties.converter.Converter;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -56,14 +56,15 @@ public class FarmTreeNodeTest
     private WikiDescriptorManager wikiDescriptorManager;
 
     @MockComponent
-    @Named("current")
-    private EntityReferenceResolver<String> currentEntityReferenceResolver;
+    @Named("entityTreeNodeId")
+    private Converter<EntityReference> entityTreeNodeIdConverter;
 
     @BeforeEach
     public void before() throws Exception
     {
         when(this.wikiDescriptorManager.getAllIds()).thenReturn(Arrays.asList("one", "two", "three"));
-        when(this.currentEntityReferenceResolver.resolve("two", EntityType.WIKI)).thenReturn(new WikiReference("two"));
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "wiki:two"))
+            .thenReturn(new WikiReference("two"));
     }
 
     @Test
@@ -73,9 +74,9 @@ public class FarmTreeNodeTest
 
         this.farmTreeNode.getProperties().put("exclusions",
             new HashSet<>(Arrays.asList("wiki:two", "document:three:Path.To.one", "foo:bar", "space:wiki:three")));
-        when(this.currentEntityReferenceResolver.resolve("three:Path.To.one", EntityType.DOCUMENT))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:three:Path.To.one"))
             .thenReturn(new DocumentReference("three", Arrays.asList("Path", "To"), "one"));
-        when(this.currentEntityReferenceResolver.resolve("wiki:three", EntityType.SPACE))
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "space:wiki:three"))
             .thenReturn(new SpaceReference("wiki", "three"));
 
         assertEquals(2, this.farmTreeNode.getChildCount("anyId"));

@@ -326,7 +326,7 @@
 ## Administration Sheet, used to display a common UI for some wiki features (presentation, users,
 ## groups, rights etc.) at global / space level and also for several applications.
 ##**************************************************************************************************
-#if($xcontext.action == 'view')
+#if($xcontext.action == 'view' &amp;&amp; "$!request.viewer" == '')
   $response.sendRedirect($xwiki.getURL($doc.getFullName(), 'admin', $request.getQueryString()))##
 #else
   $xwiki.jsx.use('XWiki.AdminSheet')##

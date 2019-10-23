@@ -54,7 +54,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -178,6 +177,7 @@ public class XWikiServletURLFactoryTest
     {
         this.mockXWikiRequest = mock(XWikiServletRequestStub.class);
         when(((XWikiServletRequestStub) this.mockXWikiRequest).isDaemon()).thenReturn(true);
+        when(((XWikiServletRequestStub) this.mockXWikiRequest).getHttpServletRequest()).thenReturn(this.mockXWikiRequest);
 
         initRequest(host, port);
     }
@@ -221,6 +221,38 @@ public class XWikiServletURLFactoryTest
 
         verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL("wiki1", this.oldcore.getXWikiContext());
         verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL(this.oldcore.getXWikiContext().getMainXWiki(), this.oldcore.getXWikiContext());
+    }
+
+    @Test
+    public void createURLOnSubWikiInPathModeDaemonThread() throws WikiManagerException
+    {
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
+        initDaemonRequest("request", 8080);
+        WikiDescriptor descriptor = new WikiDescriptor("mainwiki", "mainwiki");
+        descriptor.setPort(42);
+        when(this.descriptorManager.getById(this.oldcore.getXWikiContext().getMainXWiki())).thenReturn(descriptor);
+
+        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
+            this.oldcore.getXWikiContext());
+        assertEquals("http://mainwiki:42/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", url.toString());
+    }
+
+    @Test
+    public void createURLOnSubWikiFromSubWikiInPathMode() throws MalformedURLException
+    {
+        this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "1");
+
+        // Initialize the URL factory based on the subwiki instead of the main one
+        this.oldcore.getXWikiContext().setOriginalWikiId("wiki1");
+        initRequest("origin", 42);
+
+        URL url = this.urlFactory.createURL("Space", "Page", "view", "param1=1", "anchor", "wiki1",
+            this.oldcore.getXWikiContext());
+        assertEquals("http://origin:42/xwiki/wiki/wiki1server/view/Space/Page?param1=1#anchor", url.toString());
+
+        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL("wiki1", this.oldcore.getXWikiContext());
+        verify(this.oldcore.getSpyXWiki(), times(0)).getServerURL(this.oldcore.getXWikiContext().getMainXWiki(),
+            this.oldcore.getXWikiContext());
     }
 
     @Test
@@ -431,7 +463,7 @@ public class XWikiServletURLFactoryTest
      * xwiki.home should be returned. see: XWIKI-5981
      */
     @Test
-    public void getServerURLFromVirtualWithXWikiDotHomeEnabled() throws MalformedURLException
+    public void getServerURLFromSubWikiWithXWikiDotHomeEnabled() throws MalformedURLException
     {
         // This is called by XWiki#getXWiki() and is set to whatever the user asks for.
         // The test sets it to "xwiki" which is wrong for this test.
@@ -450,7 +482,7 @@ public class XWikiServletURLFactoryTest
      * Proves that from a virtual wiki, URLs generated to point to the main wiki will use xwiki.home. see: XWIKI-5981
      */
     @Test
-    public void createURLWhenWikiDotHomeParameterFromVirtualWiki()
+    public void createURLWhenWikiDotHomeParameterFromSubWiki()
     {
         this.oldcore.getXWikiContext().setWikiId("subwiki");
 

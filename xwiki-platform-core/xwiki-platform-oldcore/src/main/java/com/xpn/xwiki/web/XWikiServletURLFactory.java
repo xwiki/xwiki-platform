@@ -239,9 +239,6 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         if (wikiId == null) {
             wikiId = context.getWikiId();
-        } else if (!context.isMainWiki(wikiId) && context.getWiki().isPathBased()) {
-            // In path based the base URL is the same for all wikis so we generate it from original context
-            return getServerURL(context.getOriginalWikiId(), context);
         }
 
         URL inputURL = getDefaultURL(wikiId, context);
@@ -251,6 +248,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             return inputURL;
         }
 
+        // Path based mode we fallback on original default
+        if (context.getWiki().isPathBased() && !StringUtils.equals(context.getOriginalWikiId(), wikiId)) {
+            return getServerURL(context.getOriginalWikiId(), context);
+        }
+
+        // Try to get the URL from the descriptor
         URL url = context.getWiki().getServerURL(wikiId, context);
         if (url != null) {
             return url;

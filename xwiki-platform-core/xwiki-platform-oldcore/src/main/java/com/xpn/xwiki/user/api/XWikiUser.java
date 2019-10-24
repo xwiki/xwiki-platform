@@ -264,9 +264,10 @@ public class XWikiUser
         } else {
             try {
                 XWikiDocument userdoc = getUserDocument(context);
-                isChecked =
-                    userdoc.getIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
-                        EMAIL_CHECKED_PROPERTY) != 0;
+                DocumentReference userClassReference =
+                    getUserClassReference(userdoc.getDocumentReference().getWikiReference());
+                // Default value of email_checked should be 1 (i.e. checked) if not set.
+                isChecked = userdoc.getIntValue(userClassReference, EMAIL_CHECKED_PROPERTY, 1) != 0;
             } catch (XWikiException e) {
                 this.logger.error("Error while checking email_checked status of user [{}]", getUser(), e);
                 isChecked = true;
@@ -289,7 +290,7 @@ public class XWikiUser
             try {
                 XWikiDocument userdoc = getUserDocument(context);
                 userdoc.setIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
-                    ACTIVE_PROPERTY, checkedFlag);
+                    EMAIL_CHECKED_PROPERTY, checkedFlag);
                 context.getWiki().saveDocument(userdoc, localizePlainOrKey(
                     "core.users." + (checked ? "email_checked" : "email_unchecked") + ".saveComment"), context);
             } catch (XWikiException e) {
@@ -314,8 +315,10 @@ public class XWikiUser
         } else {
             try {
                 XWikiDocument userdoc = getUserDocument(context);
-                disabled = userdoc.getIntValue(getUserClassReference(userdoc.getDocumentReference().getWikiReference()),
-                    ACTIVE_PROPERTY) == 0;
+                DocumentReference userClassReference =
+                    getUserClassReference(userdoc.getDocumentReference().getWikiReference());
+                // Default value of active should be 1 (i.e. active) if not set
+                disabled = userdoc.getIntValue(userClassReference, ACTIVE_PROPERTY, 1) == 0;
             } catch (XWikiException e) {
                 this.logger.error("Error while checking active status of user [{}]", getUser(), e);
                 disabled = false;

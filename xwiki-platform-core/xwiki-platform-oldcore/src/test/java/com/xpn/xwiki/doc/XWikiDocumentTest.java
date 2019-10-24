@@ -95,6 +95,8 @@ public class XWikiDocumentTest
 
     private static final String CLASSNAME = DOCSPACE + "." + DOCNAME;
 
+    private static final DocumentReference CLASS_REFERENCE = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
+
     private XWikiDocument document;
 
     private XWikiDocument translatedDocument;
@@ -802,5 +804,18 @@ public class XWikiDocumentTest
 
         assertSame(oldVelocityContext, execution.getContext().getProperty("velocityContext"));
         assertSame(oldVelocityContext, this.oldcore.getXWikiContext().get("vcontext"));
+    }
+
+    @Test
+    public void getIntValue()
+    {
+        assertEquals(42, this.document.getIntValue(CLASS_REFERENCE, "int", 99));
+        assertEquals(42, this.document.getIntValue(CLASS_REFERENCE, "int"));
+
+        assertEquals(0, this.document.getIntValue(CLASS_REFERENCE, "foo"));
+        assertEquals(99, this.document.getIntValue(CLASS_REFERENCE, "foo", 99));
+
+        assertEquals(0, this.document.getIntValue(new DocumentReference("foo", "bar", "bla"), "foo"));
+        assertEquals(99, this.document.getIntValue(new DocumentReference("foo", "bar", "bla"), "foo", 99));
     }
 }

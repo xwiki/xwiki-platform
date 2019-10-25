@@ -40,7 +40,8 @@ public class FlamingoSkinExecutor extends ColibriSkinExecutor
     
     private void openDrawer()
     {
-        getTest().clickLinkWithLocator("tmDrawerActivator");
+        getTest().waitPage();
+        getDriver().findElementById("tmDrawerActivator").click();
         getDriver().waitUntilElementIsVisible(By.id("tmDrawer"));
     }
 

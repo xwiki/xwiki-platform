@@ -296,6 +296,11 @@ public class ConfigurableClassIT
     public void testAddConfigurableApplicationInNonexistantSection(TestUtils setup, TestReference testReference)
     {
         String section = testReference.getLastSpaceReference().getName();
+
+        // Ensure the section does not exist yet
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        assertTrue(administrationPage.hasNotSection("Other", section));
+
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
@@ -307,7 +312,8 @@ public class ConfigurableClassIT
         String fullName = setup.serializeReference(testReference).split(":")[1];
 
         // Check it's available in global section.
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        administrationPage = AdministrationPage.gotoPage();
+        assertTrue(administrationPage.hasSection("Other", section));
         administrationPage.clickSection("Other", section);
         AdministrationSectionPage asp = new AdministrationSectionPage(section);
         asp.waitUntilActionButtonIsLoaded();

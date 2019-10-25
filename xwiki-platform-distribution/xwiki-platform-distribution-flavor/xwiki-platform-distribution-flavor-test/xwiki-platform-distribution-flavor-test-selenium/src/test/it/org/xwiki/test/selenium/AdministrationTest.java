@@ -40,36 +40,6 @@ import static org.junit.Assert.*;
  */
 public class AdministrationTest extends AbstractXWikiTestCase
 {
-    private AdministrationMenu administrationMenu = new AdministrationMenu();
-
-    /**
-     * Test to see an application page is included only if that application exists
-     */
-    @Test
-    public void testApplicationSection()
-    {
-        clickAdministerWiki();
-        assertTrue(administrationMenu.hasSectionWithId("Search"));
-        // Delete the Search administration page and test it's not present in the global administration menu anymore.
-        deletePage("XWiki", "SearchAdmin");
-        clickAdministerWiki();
-        assertTrue(administrationMenu.hasNotSectionWithId("Search"));
-        restorePage("XWiki", "SearchAdmin");
-    }
-
-    /**
-     * Test modifying XWiki.XWikiPreferences multi-language field and save it.
-     */
-    @Test
-    public void testSettingXWikiPreferences()
-    {
-        clickAdministerWiki();
-        administrationMenu.expandCategoryWithId("content").getSectionById("Localization").click();
-        getSelenium().select("//select[@name='XWiki.XWikiPreferences_0_multilingual']", "label=Yes");
-        clickLinkWithXPath("//input[@value='Save']", true);
-        assertElementPresent("//a[@id='tmLanguages']");
-    }
-
     /**
      * Test functionality of the ForgotUsername page:
      * <ul>

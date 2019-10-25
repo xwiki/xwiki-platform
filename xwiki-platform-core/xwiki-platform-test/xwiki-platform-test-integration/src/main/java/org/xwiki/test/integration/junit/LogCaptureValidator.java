@@ -152,7 +152,8 @@ public class LogCaptureValidator
         // Warning obtain from time to time in case of slow network, the full warning is:
         // There was an error managing geckodriver 0.26.0 (github-production-release-asset-2e65be.s3.amazonaws.com:
         // Temporary failure in name resolution) ... trying again using cache and mirror
-        new Line("i.g.bonigarcia.wdm.WebDriverManager - There was an error managing geckodriver")
+        new Line("There was an error managing geckodriver 0.[0-9]+.0 "
+            + "(.*: Temporary failure in name resolution) ... trying again using cache and mirror", true)
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

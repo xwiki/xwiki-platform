@@ -87,7 +87,6 @@ public class CompareVersionsTest extends AbstractTest
         // when the document is moved to a different parent since it means changing the identity of the document for
         // now and thus changing it means getting a new document.
         getUtil().setHierarchyMode("parentchild");
-        getDriver().navigate().refresh();
 
         // Create the test page.
         testPage = getUtil().createPage(getTestClassName(), pageName, "one\ntwo\nthree", "Test");
@@ -159,7 +158,6 @@ public class CompareVersionsTest extends AbstractTest
     {
         // Put back the default hierarchy mode
         getUtil().setHierarchyMode("reference");
-        getDriver().navigate().refresh();
     }
 
     @Test

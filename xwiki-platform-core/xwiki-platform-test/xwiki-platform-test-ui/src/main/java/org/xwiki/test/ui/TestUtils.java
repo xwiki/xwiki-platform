@@ -1707,6 +1707,13 @@ public class TestUtils
     public void setHierarchyMode(String mode)
     {
         setPropertyInXWikiPreferences("core.hierarchyMode", "String", mode);
+
+        // We need to force a reload of http://localhost:8080/xwiki/bin/skin/resources/js/xwiki/xwiki-min.js
+        // after the edition of the hierarchy since it some actions of the JS are related to a service and the JS
+        // might be cached in the browser.
+        // FIXME: this should be removed once https://jira.xwiki.org/browse/XWIKI-16809 is fixed.
+        gotoPage("XWiki", "XWikiPreferences", "edit", "editor", "object");
+        getDriver().navigate().refresh();
     }
 
     /**

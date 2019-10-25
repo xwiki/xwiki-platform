@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -49,6 +48,7 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.tree.TreeFilter;
 import org.xwiki.tree.TreeNode;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -121,6 +121,14 @@ public class DocumentTreeNodeTest
     @Named("entityTreeNodeId")
     private Converter<EntityReference> entityTreeNodeIdConverter;
 
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
+
+    @MockComponent
+    @Named("test")
+    private TreeFilter filter;
+
     private DocumentReference documentReference =
         new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "WebHome");
 
@@ -129,9 +137,7 @@ public class DocumentTreeNodeTest
     @BeforeComponent
     public void configure(MockitoComponentManager componentManager) throws Exception
     {
-        Provider<ComponentManager> contextComponentManagerProvider = componentManager.registerMockComponent(
-            new DefaultParameterizedType(null, Provider.class, ComponentManager.class), "context");
-        when(contextComponentManagerProvider.get()).thenReturn(componentManager);
+        when(this.contextComponentManagerProvider.get()).thenReturn(componentManager);
     }
 
     @BeforeEach
@@ -275,6 +281,22 @@ public class DocumentTreeNodeTest
             .thenReturn(bob);
         when(this.localEntityReferenceSerializer.serialize(bob.getParent())).thenReturn("Path.To.Page.Bob");
 
+        this.documentTreeNode.getProperties().put("filters", Collections.singletonList("test"));
+        when(this.entityTreeNodeIdConverter.convert(String.class, alice.getParent())).thenReturn("space:wiki:Path.To.Page");
+        when(this.filter.getChildExclusions("space:wiki:Path.To.Page")).thenReturn(new HashSet<>(
+            Arrays.asList("document:wiki:Path.To.Page.John.WebHome", "document:wiki:Path.To.Page.Oliver")));
+
+        DocumentReference john = new DocumentReference("wiki", Arrays.asList("Path", "To", "Page", "John"), "WebHome");
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page.John.WebHome"))
+            .thenReturn(john);
+        when(this.localEntityReferenceSerializer.serialize(john.getLastSpaceReference()))
+            .thenReturn("Path.To.Page.John");
+
+        DocumentReference oliver = new DocumentReference("wiki", Arrays.asList("Path", "To", "Page"), "Oliver");
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page.Oliver"))
+            .thenReturn(oliver);
+        when(this.localEntityReferenceSerializer.serialize(oliver)).thenReturn("Path.To.Page.Oliver");
+
         DocumentReference child = new DocumentReference("Child", this.documentReference.getLastSpaceReference());
         when(this.nestedPagesOrderedByName.execute()).thenReturn(Collections.singletonList(child));
         when(this.entityTreeNodeIdConverter.convert(String.class, child))
@@ -284,8 +306,9 @@ public class DocumentTreeNodeTest
             this.documentTreeNode.getChildren("document:wiki:Path.To.Page.WebHome", 0, 5));
 
         verify(this.nestedPagesOrderedByName).bindValue("excludedDocuments",
-            Collections.singleton("Path.To.Page.Alice"));
-        verify(this.nestedPagesOrderedByName).bindValue("excludedSpaces", Collections.singleton("Path.To.Page.Bob"));
+            new HashSet<>(Arrays.asList("Path.To.Page.Alice", "Path.To.Page.Oliver")));
+        verify(this.nestedPagesOrderedByName).bindValue("excludedSpaces",
+            new HashSet<>(Arrays.asList("Path.To.Page.Bob", "Path.To.Page.John")));
     }
 
     @Test

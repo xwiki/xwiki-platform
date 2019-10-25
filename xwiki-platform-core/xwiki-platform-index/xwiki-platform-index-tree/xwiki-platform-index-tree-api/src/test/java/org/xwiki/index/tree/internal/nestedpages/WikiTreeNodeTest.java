@@ -25,10 +25,12 @@ import java.util.HashSet;
 import java.util.Locale;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
@@ -45,6 +47,8 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.tree.TreeFilter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -100,8 +104,16 @@ public class WikiTreeNodeTest
     @Mock
     private Query query;
 
+    @MockComponent
+    @Named("context")
+    private Provider<ComponentManager> contextComponentManagerProvider;
+
+    @MockComponent
+    @Named("test")
+    private TreeFilter filter;
+
     @BeforeEach
-    public void before()
+    public void before(MockitoComponentManager componentManager)
     {
         when(this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT))
             .thenReturn(new EntityReference("WebHome", EntityType.DOCUMENT));
@@ -120,6 +132,8 @@ public class WikiTreeNodeTest
             .thenReturn("document:foo:C.WebHome");
 
         when(this.query.addFilter(any(QueryFilter.class))).thenReturn(this.query);
+
+        when(this.contextComponentManagerProvider.get()).thenReturn(componentManager);
     }
 
     @Test
@@ -161,6 +175,14 @@ public class WikiTreeNodeTest
         when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "space:foo:C")).thenReturn(carol);
         when(this.localEntityReferenceSerializer.serialize(carol)).thenReturn("C");
 
+        this.wikiTreeNode.getProperties().put("filters", Collections.singletonList("test"));
+        when(this.entityTreeNodeIdConverter.convert(String.class, new WikiReference("foo"))).thenReturn("wiki:foo");
+        when(this.filter.getChildExclusions("wiki:foo")).thenReturn(Collections.singleton("document:foo:J.WebHome"));
+
+        DocumentReference john = new DocumentReference("foo", "J", "WebHome");
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:foo:J.WebHome")).thenReturn(john);
+        when(this.localEntityReferenceSerializer.serialize(john.getLastSpaceReference())).thenReturn("J");
+
         when(this.queryManager.createQuery(
             "select count(*) from XWikiSpace where parent is null " + "and reference not in (:excludedSpaces)",
             Query.HQL)).thenReturn(this.query);
@@ -169,7 +191,7 @@ public class WikiTreeNodeTest
         assertEquals(2L, this.wikiTreeNode.getChildCount("wiki:foo"));
 
         verify(this.query).setWiki("foo");
-        verify(this.query).bindValue("excludedSpaces", new HashSet<String>(Arrays.asList("B", "C")));
+        verify(this.query).bindValue("excludedSpaces", new HashSet<String>(Arrays.asList("B", "C", "J")));
     }
 
     @Test

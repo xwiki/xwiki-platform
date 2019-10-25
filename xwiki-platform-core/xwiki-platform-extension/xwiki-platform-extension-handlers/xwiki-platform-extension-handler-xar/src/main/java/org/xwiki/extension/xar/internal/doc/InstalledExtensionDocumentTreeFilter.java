@@ -27,12 +27,12 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.index.tree.internal.AbstractEntityTreeFilter;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.tree.AbstractEntityTreeFilter;
 
 /**
  * Excludes from the document tree the documents that are part of an installed extension. The result is the tree of
@@ -57,24 +57,11 @@ public class InstalledExtensionDocumentTreeFilter extends AbstractEntityTreeFilt
     private EntityReferenceProvider defaultEntityReferenceProvider;
 
     @Override
-    protected EntityReference resolve(String nodeId)
-    {
-        EntityReference entityReference = super.resolve(nodeId);
-        if (entityReference.getType() == EntityType.SPACE) {
-            // Use the space home page instead because that's what we use in the extension document tree.
-            String defaultDocumentName =
-                defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
-            entityReference = new DocumentReference(defaultDocumentName, new SpaceReference(entityReference));
-        }
-        return entityReference;
-    }
-
-    @Override
-    protected Set<EntityReference> getExclusions(EntityReference parentReference)
+    public Set<EntityReference> getChildExclusions(EntityReference parentReference)
     {
         // Exclude from the generic page tree the pages that are part of an extension and that don't contain any nested
         // content pages.
-        return this.tree.getChildren(parentReference).stream().filter(this::hasNoContentPages)
+        return this.tree.getChildren(getNodeReference(parentReference)).stream().filter(this::hasNoContentPages)
             .collect(Collectors.toSet());
     }
 
@@ -85,5 +72,23 @@ public class InstalledExtensionDocumentTreeFilter extends AbstractEntityTreeFilt
         // extension is not recommended.
         return this.counter.countNestedPages(documentReference) <= this.tree.getNestedExtensionPages(documentReference)
             .size();
+    }
+
+    @Override
+    public Set<EntityReference> getDescendantExclusions(EntityReference parentReference)
+    {
+        return this.tree.getNestedExtensionPages(getNodeReference(parentReference)).stream()
+            .collect(Collectors.toSet());
+    }
+
+    protected EntityReference getNodeReference(EntityReference entityReference)
+    {
+        if (entityReference.getType() == EntityType.SPACE) {
+            // Use the space home page instead because that's what we use in the extension document tree.
+            String defaultDocumentName =
+                defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName();
+            return new DocumentReference(defaultDocumentName, new SpaceReference(entityReference));
+        }
+        return entityReference;
     }
 }

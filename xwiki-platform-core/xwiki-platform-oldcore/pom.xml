@@ -234,6 +234,11 @@
       <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-tree-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- PDF export, image processing -->
     <dependency>

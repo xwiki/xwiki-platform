@@ -22,24 +22,28 @@ package org.xwiki.tree;
 import java.util.Set;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.stability.Unstable;
 
 /**
- * The interface used to filter tree nodes.
+ * The interface used to filter entity tree nodes.
  * 
  * @version $Id$
  * @since 11.10RC1
  */
 @Role
 @Unstable
-public interface TreeFilter
+public interface EntityTreeFilter
 {
     /**
-     * Tree filters can implement both local and global exclusions. Local exclusions take into account the specified
-     * parent node while global exclusions simply ignore it, returning a set of exclusions that apply to all nodes.
-     * 
-     * @param parentNodeId specifies the parent node to filter
+     * @param parentReference specifies the parent node to filter
      * @return the set of child nodes to exclude from the specified parent
      */
-    Set<String> getChildExclusions(String parentNodeId);
+    Set<EntityReference> getChildExclusions(EntityReference parentReference);
+
+    /**
+     * @param parentReference specifies the parent node to filter
+     * @return the set of descendant nodes to exclude from the sub-tree rooted in the specified parent node
+     */
+    Set<EntityReference> getDescendantExclusions(EntityReference parentReference);
 }

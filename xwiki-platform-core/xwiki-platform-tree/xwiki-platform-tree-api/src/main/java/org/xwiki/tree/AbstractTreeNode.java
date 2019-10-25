@@ -95,7 +95,7 @@ public abstract class AbstractTreeNode implements TreeNode
         // Initialize with global exclusions.
         Set<String> exclusions = new HashSet<>(getExclusions());
         // Add exclusions from filters.
-        exclusions.addAll(getFilters().stream().flatMap(filter -> filter.getExclusions(parentNodeId).stream())
+        exclusions.addAll(getFilters().stream().flatMap(filter -> filter.getChildExclusions(parentNodeId).stream())
             .collect(Collectors.toSet()));
         return exclusions;
     }

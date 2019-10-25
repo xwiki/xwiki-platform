@@ -47,12 +47,12 @@ import org.xwiki.model.reference.EntityReference;
 public class PristineInstalledExtensionDocumentTreeFilter extends InstalledExtensionDocumentTreeFilter
 {
     @Override
-    protected Set<EntityReference> getExclusions(EntityReference parentReference)
+    public Set<EntityReference> getChildExclusions(EntityReference parentReference)
     {
         // Exclude from the generic page tree the extension pages have not been customized and that don't have any
         // nested content pages or nested extension pages with customizations.
-        return this.tree.getChildren(parentReference).stream().filter(this::hasNoCustomizationsAndContentPages)
-            .collect(Collectors.toSet());
+        return this.tree.getChildren(getNodeReference(parentReference)).stream()
+            .filter(this::hasNoCustomizationsAndContentPages).collect(Collectors.toSet());
     }
 
     private boolean hasNoCustomizationsAndContentPages(DocumentReference documentReference)
@@ -60,5 +60,12 @@ public class PristineInstalledExtensionDocumentTreeFilter extends InstalledExten
         return !this.tree.isCustomizedExtensionPage(documentReference)
             && this.tree.getNestedCustomizedExtensionPages(documentReference).isEmpty()
             && hasNoContentPages(documentReference);
+    }
+
+    @Override
+    public Set<EntityReference> getDescendantExclusions(EntityReference parentReference)
+    {
+        return this.tree.getNestedExtensionPages(getNodeReference(parentReference)).stream()
+            .filter(extensionPage -> !this.tree.isCustomizedExtensionPage(extensionPage)).collect(Collectors.toSet());
     }
 }

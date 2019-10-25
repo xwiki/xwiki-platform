@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.index.tree.internal;
+package org.xwiki.tree;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,7 +27,7 @@ import javax.inject.Named;
 
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.properties.converter.Converter;
-import org.xwiki.tree.TreeFilter;
+import org.xwiki.stability.Unstable;
 
 /**
  * Base class for entity tree filters.
@@ -35,27 +35,26 @@ import org.xwiki.tree.TreeFilter;
  * @version $Id$
  * @since 11.10RC1
  */
-public abstract class AbstractEntityTreeFilter implements TreeFilter
+@Unstable
+public abstract class AbstractEntityTreeFilter implements TreeFilter, EntityTreeFilter
 {
     @Inject
     @Named("entityTreeNodeId")
     private Converter<EntityReference> entityTreeNodeIdConverter;
 
     @Override
-    public Set<String> getExclusions(String parentNodeId)
+    public Set<String> getChildExclusions(String parentNodeId)
     {
-        return getExclusions(resolve(parentNodeId)).stream().map(this::serialize).collect(Collectors.toSet());
+        return getChildExclusions(resolve(parentNodeId)).stream().map(this::serialize).collect(Collectors.toSet());
     }
 
-    protected EntityReference resolve(String nodeId)
+    private EntityReference resolve(String nodeId)
     {
         return this.entityTreeNodeIdConverter.convert(EntityReference.class, nodeId);
     }
 
-    protected String serialize(EntityReference entityReference)
+    private String serialize(EntityReference entityReference)
     {
         return this.entityTreeNodeIdConverter.convert(String.class, entityReference);
     }
-
-    protected abstract Set<EntityReference> getExclusions(EntityReference parentReference);
 }

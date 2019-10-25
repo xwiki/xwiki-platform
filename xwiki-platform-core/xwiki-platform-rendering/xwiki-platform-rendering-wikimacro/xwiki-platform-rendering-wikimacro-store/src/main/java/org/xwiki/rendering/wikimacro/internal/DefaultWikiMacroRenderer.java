@@ -338,7 +338,12 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         if (async || cached) {
             BlockRenderer renderer;
             try {
-                renderer = this.componentManager.get().getInstance(BlockRenderer.class, this.targetSyntax.toIdString());
+                Syntax rendererSyntax = this.targetSyntax;
+                if (rendererSyntax == null) {
+                    rendererSyntax = this.renderingContext.getTargetSyntax();
+                }
+
+                renderer = this.componentManager.get().getInstance(BlockRenderer.class, rendererSyntax.toIdString());
             } catch (ComponentLookupException e) {
                 throw new RenderingException("Failed to lookup renderer for syntax [" + this.targetSyntax + "]", e);
             }

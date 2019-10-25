@@ -249,7 +249,14 @@ public class DefaultAsyncContext implements AsyncContext
     @Override
     public void setEnabled(boolean enabled)
     {
-        this.execution.getContext().setProperty(KEY_ENABLED, enabled);
+        ExecutionContext context = this.execution.getContext();
+
+        if (!context.hasProperty(KEY_ENABLED)) {
+            // Make sure the property is inherited
+            context.newProperty(KEY_ENABLED).inherited().declare();
+        }
+
+        context.setProperty(KEY_ENABLED, enabled);
     }
 
     /**

@@ -22,6 +22,7 @@ package org.xwiki.user.directory.test.ui;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.user.directory.test.po.UserDirectoryPage;
@@ -53,18 +54,8 @@ import static org.xwiki.test.ui.AbstractTest.validateConsole;
     })
 public class UserDirectoryIT
 {
-    @AfterEach
-    public void validate()
-    {
-        validateConsole.getLogCaptureConfiguration().registerExcludes(
-            "Exception in macro #displayCheckedIfWatched called at",
-            "Exception in macro #generateNotificationInput called at",
-            "TypeError: p is undefined"
-        );
-    }
-
     @Test
-    public void verifyUserIsListed(TestUtils setup)
+    public void verifyUserIsListed(TestUtils setup, LogCaptureConfiguration logCaptureConfiguration)
     {
         setup.loginAsSuperAdmin();
 
@@ -93,5 +84,11 @@ public class UserDirectoryIT
         assertTrue(liveTableElement.hasRow("User ID", "test"));
         assertTrue(liveTableElement.hasRow("First Name", "John"));
         assertTrue(liveTableElement.hasRow("Last Name", "Doe"));
+
+        logCaptureConfiguration.registerExcludes(
+            "Exception in macro #displayCheckedIfWatched called at",
+            "Exception in macro #generateNotificationInput called at",
+            "TypeError: p is undefined"
+        );
     }
 }

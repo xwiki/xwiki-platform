@@ -31,7 +31,6 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 import org.xwiki.test.ui.AbstractTest;
 
 import com.thoughtworks.selenium.Selenium;
@@ -895,7 +894,7 @@ public abstract class AbstractXWikiTestCase extends AbstractTest implements Skin
         WebDriver driver = getDriver();
         WebElement source = driver.findElement(sourceLocator);
         WebElement target = driver.findElement(targetLocator);
-        new Actions(driver).dragAndDrop(source, target).build().perform();
+        getDriver().createActions().dragAndDrop(source, target).build().perform();
     }
 
     /**
@@ -908,7 +907,7 @@ public abstract class AbstractXWikiTestCase extends AbstractTest implements Skin
     {
         WebDriver driver = getDriver();
         // First scroll the element into view, if needed, by moving the mouse to the top left corner of the element.
-        new Actions(driver).moveToElement(driver.findElement(locator), 0, 0).perform();
+        getDriver().createActions().moveToElement(driver.findElement(locator), 0, 0).perform();
         // Then scroll the page up a bit so that the element is not at the top of the window where the floating menu is.
         driver.findElement(By.xpath("//body")).sendKeys(Keys.ARROW_UP);
     }

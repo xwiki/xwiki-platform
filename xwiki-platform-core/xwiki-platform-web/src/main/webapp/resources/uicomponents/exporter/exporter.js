@@ -416,6 +416,7 @@ require([
         form.empty().attr('action', $(this).attr('href').replace(/pages=.*?(&|$)/g, ''));
         // Fill the form and submit.
         createHiddenInputsFromExportTree(exportTree, form);
+        $(this).closest('#exportModalOtherCollapse').find('input[type="hidden"][name="filter"]').clone().appendTo(form);
         form.submit();
       }
     }

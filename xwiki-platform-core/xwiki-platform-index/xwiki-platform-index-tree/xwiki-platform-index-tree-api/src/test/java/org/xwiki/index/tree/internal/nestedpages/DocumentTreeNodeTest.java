@@ -37,6 +37,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.properties.converter.Converter;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
@@ -282,7 +284,8 @@ public class DocumentTreeNodeTest
         when(this.localEntityReferenceSerializer.serialize(bob.getParent())).thenReturn("Path.To.Page.Bob");
 
         this.documentTreeNode.getProperties().put("filters", Collections.singletonList("test"));
-        when(this.entityTreeNodeIdConverter.convert(String.class, alice.getParent())).thenReturn("space:wiki:Path.To.Page");
+        when(this.entityTreeNodeIdConverter.convert(String.class, alice.getParent()))
+            .thenReturn("space:wiki:Path.To.Page");
         when(this.filter.getChildExclusions("space:wiki:Path.To.Page")).thenReturn(new HashSet<>(
             Arrays.asList("document:wiki:Path.To.Page.John.WebHome", "document:wiki:Path.To.Page.Oliver")));
 
@@ -384,5 +387,54 @@ public class DocumentTreeNodeTest
         when(this.attachmentsTreeNode.getChildCount("attachments:wiki:Some.Page")).thenReturn(0);
 
         assertEquals(3L, this.documentTreeNode.getChildCount("document:wiki:Some.Page"));
+    }
+
+    @Test
+    public void getParentForTerminalPage()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.Page"))
+            .thenReturn(documentReference);
+
+        when(this.entityTreeNodeIdConverter.convert(String.class,
+            new DocumentReference("WebHome", documentReference.getLastSpaceReference())))
+                .thenReturn("document:wiki:Path.To.WebHome");
+
+        assertEquals("document:wiki:Path.To.WebHome", this.documentTreeNode.getParent("document:wiki:Path.To.Page"));
+    }
+
+    @Test
+    public void getParentForNestedPage()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "WebHome");
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.To.WebHome"))
+            .thenReturn(documentReference);
+
+        when(this.entityTreeNodeIdConverter.convert(String.class, new DocumentReference("wiki", "Path", "WebHome")))
+            .thenReturn("document:wiki:Path.WebHome");
+
+        assertEquals("document:wiki:Path.WebHome", this.documentTreeNode.getParent("document:wiki:Path.To.WebHome"));
+    }
+
+    @Test
+    public void getParentForTopLevelPage()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "Path", "WebHome");
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "document:wiki:Path.WebHome"))
+            .thenReturn(documentReference);
+
+        when(this.entityTreeNodeIdConverter.convert(String.class, new WikiReference("wiki"))).thenReturn("wiki:wiki");
+
+        assertEquals("wiki:wiki", this.documentTreeNode.getParent("document:wiki:Path.WebHome"));
+    }
+
+    @Test
+    public void getParentForInvalidNode()
+    {
+        SpaceReference spaceReference = new SpaceReference("wiki", "Path");
+        when(this.entityTreeNodeIdConverter.convert(EntityReference.class, "space:wiki:Path"))
+            .thenReturn(spaceReference);
+
+        assertEquals(null, this.documentTreeNode.getParent("space:wiki:Path"));
     }
 }

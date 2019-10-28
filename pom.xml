@@ -61,7 +61,7 @@
     <keypress.version>2.1.5</keypress.version>
 
     <!-- Jetty version -->
-    <jetty.version>9.4.21.v20190926</jetty.version>
+    <jetty.version>9.4.22.v20191022</jetty.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>

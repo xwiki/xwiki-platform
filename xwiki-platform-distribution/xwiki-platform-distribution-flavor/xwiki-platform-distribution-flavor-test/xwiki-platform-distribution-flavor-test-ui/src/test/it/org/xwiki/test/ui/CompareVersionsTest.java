@@ -87,6 +87,12 @@ public class CompareVersionsTest extends AbstractTest
         // when the document is moved to a different parent since it means changing the identity of the document for
         // now and thus changing it means getting a new document.
         getUtil().setHierarchyMode("parentchild");
+        // We need to force a reload of http://localhost:8080/xwiki/bin/skin/resources/js/xwiki/xwiki-min.js
+        // after the edition of the hierarchy since it some actions of the JS are related to a service and the JS
+        // might be cached in the browser.
+        // FIXME: this should be removed once https://jira.xwiki.org/browse/XWIKI-16809 is fixed.
+        getUtil().gotoPage("XWiki", "Foo", "edit");
+        getDriver().navigate().refresh();
 
         // Create the test page.
         testPage = getUtil().createPage(getTestClassName(), pageName, "one\ntwo\nthree", "Test");

@@ -235,6 +235,12 @@ define('export-tree', ['jquery', 'tree'], function($) {
     }).on('model.jstree', function(event, data) {
       // When new child nodes are loaded..
       var tree = data.instance;
+      // Make sure the new nodes have an original state, even if empty, because some jsTree functions
+      // (e.g. is_undetermined) fail otherwise.
+      data.nodes.forEach(function(nodeId) {
+        var node = tree.get_node(nodeId);
+        node.original.state = node.original.state || {};
+      });
       if (tree.is_selected(data.parent)) {
         // If the parent is selected then the checkbox plugin pre-selects the new child nodes.
         deselectDisabledNodes(tree, data.nodes);

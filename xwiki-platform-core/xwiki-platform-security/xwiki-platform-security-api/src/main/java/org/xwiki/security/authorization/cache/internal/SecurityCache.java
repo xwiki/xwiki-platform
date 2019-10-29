@@ -41,11 +41,11 @@ public interface SecurityCache extends org.xwiki.security.authorization.cache.Se
     /**
      * Add an entry to this cache.
      * @param entry The rule entry to add.
-     * @throws org.xwiki.security.authorization.cache.ParentEntryEvictedException when the parent entry of
+     * @throws ParentEntryEvictedException when the parent entry of
      * this entry was evicted before this insertion.  Since all
      * entries, except wiki-entries, must have a parent cached, the
      * {@link org.xwiki.security.authorization.cache.SecurityCacheLoader} must restart its load attempt.
-     * @throws org.xwiki.security.authorization.cache.ConflictingInsertionException when another thread have
+     * @throws ConflictingInsertionException when another thread have
      * inserted this entry, but with a different content.
      */
     void add(SecurityRuleEntry entry)

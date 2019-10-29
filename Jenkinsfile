@@ -274,6 +274,7 @@ private void buildInsideNode(map)
 
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
+      javadoc = false
       jobProperties = getCustomJobProperties()
       if (map.goals != null) {
         goals = map.goals

@@ -181,7 +181,7 @@
                     "oldSerialVersionUID": "1014924568649400298",
                     "newSerialVersionUID": "1",
                     "justification": "Not a breakage"
-                  },
+                  }
                   // Add more ignores below...
                 ]
               }

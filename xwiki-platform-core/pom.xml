@@ -144,44 +144,6 @@
                   }
                 },
                 "ignore" : [
-                  {
-                    "code": "java.annotation.added",
-                    "old": "method java.lang.String org.xwiki.filter.xar.input.XARInputProperties::getObjectPropertyType()",
-                    "new": "method java.lang.String org.xwiki.filter.xar.input.XARInputProperties::getObjectPropertyType()",
-                    "annotation": "@org.xwiki.properties.annotation.PropertyDescription(\"The type of the object property to parse (when the input is an object property)\")",
-                    "justification": "Not a breakage"
-                  },
-                  {
-                    "code": "java.annotation.added",
-                    "old": "method java.lang.String org.xwiki.filter.xar.input.XARInputProperties::getObjectPropertyType()",
-                    "new": "method java.lang.String org.xwiki.filter.xar.input.XARInputProperties::getObjectPropertyType()",
-                    "annotation": "@org.xwiki.properties.annotation.PropertyName(\"Object property type\")",
-                    "justification": "Not a breakage"
-                  },
-                  {
-                    "code": "java.annotation.attributeValueChanged",
-                    "old": "method boolean org.xwiki.filter.xar.input.XARInputProperties::isWithExtension()",
-                    "new": "method boolean org.xwiki.filter.xar.input.XARInputProperties::isWithExtension()",
-                    "annotationType": "org.xwiki.properties.annotation.PropertyName",
-                    "attribute": "value",
-                    "oldValue": "\"Indicates if extension event should be generated if possible\"",
-                    "newValue": "\"With extensions\"",
-                    "justification": "Not a breakage"
-                  },
-                  {
-                    "code": "java.field.serialVersionUIDChanged",
-                    "new": "field com.xpn.xwiki.objects.BaseObject.serialVersionUID",
-                    "oldSerialVersionUID": "-6939304097846704545",
-                    "newSerialVersionUID": "1",
-                    "justification": "Not a breakage"
-                  },
-                  {
-                    "code": "java.field.serialVersionUIDChanged",
-                    "new": "field com.xpn.xwiki.objects.BaseProperty<R extends org.xwiki.model.reference.EntityReference>.serialVersionUID",
-                    "oldSerialVersionUID": "1014924568649400298",
-                    "newSerialVersionUID": "1",
-                    "justification": "Not a breakage"
-                  }
                   // Add more ignores below...
                 ]
               }

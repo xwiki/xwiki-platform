@@ -163,11 +163,10 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         ///////////////////////////////////////
         // Rendering
 
-        String resultString;
-        if (cached || async || !this.xdomMode) {
+        String resultString = null;
+
+        if (async || !this.xdomMode) {
             resultString = render(xdom);
-        } else {
-            resultString = null;
         }
 
         return new BlockAsyncRendererResult(resultString, xdom);

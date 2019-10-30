@@ -336,7 +336,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
 
         String resultString = null;
 
-        if (async || cached) {
+        if (async) {
             resultString = render(blockResult);
         }
 

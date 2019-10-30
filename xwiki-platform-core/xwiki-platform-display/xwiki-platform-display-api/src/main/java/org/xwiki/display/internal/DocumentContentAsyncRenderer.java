@@ -115,7 +115,7 @@ public class DocumentContentAsyncRenderer extends AbstractBlockAsyncRenderer
 
         String resultString = null;
 
-        if (async || cached) {
+        if (async) {
             resultString = render(xdom);
         }
 

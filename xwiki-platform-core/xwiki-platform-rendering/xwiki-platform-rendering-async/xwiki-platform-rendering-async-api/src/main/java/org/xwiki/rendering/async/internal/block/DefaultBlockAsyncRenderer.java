@@ -135,7 +135,7 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
 
         String resultString = null;
 
-        if (async || cached) {
+        if (async) {
             resultString = render(resultBlock);
         }
 

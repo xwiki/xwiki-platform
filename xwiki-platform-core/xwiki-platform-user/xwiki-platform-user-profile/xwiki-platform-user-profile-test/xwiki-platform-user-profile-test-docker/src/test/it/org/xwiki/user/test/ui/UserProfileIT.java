@@ -19,9 +19,12 @@
  */
 package org.xwiki.user.test.ui;
 
+import java.io.File;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
@@ -131,11 +134,12 @@ public class UserProfileIT
     /** Functionality check: changing the profile picture. */
     @Test
     @Order(2)
-    public void changeAvatarImage()
+    public void changeAvatarImage(TestConfiguration testConfiguration)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         ChangeAvatarPage changeAvatarImage = userProfilePage.changeAvatarImage();
-        changeAvatarImage.setAvatarImage(IMAGE_NAME);
+        File imageFile = new File(testConfiguration.getBrowser().getTestResourcesPath(), IMAGE_NAME);
+        changeAvatarImage.setAvatarImage(imageFile.getAbsolutePath());
         changeAvatarImage.submit();
         assertEquals(IMAGE_NAME, userProfilePage.getAvatarImageName());
     }

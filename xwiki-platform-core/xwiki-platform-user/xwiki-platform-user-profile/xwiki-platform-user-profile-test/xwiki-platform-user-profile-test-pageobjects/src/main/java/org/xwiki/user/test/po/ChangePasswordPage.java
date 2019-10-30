@@ -83,9 +83,10 @@ public class ChangePasswordPage extends BasePage
         return successMessage.getText();
     }
 
-    public void submit()
+    public ChangePasswordPage submit()
     {
         this.changePassword.click();
+        return new ChangePasswordPage();
     }
 
     public void cancel()

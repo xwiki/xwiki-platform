@@ -166,15 +166,15 @@ public class UserChangePasswordIT
             PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
             ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
             changePasswordPage.changePasswordAsAdmin("foo", "foo");
-            changePasswordPage.submit();
+            changePasswordPage = changePasswordPage.submit();
             assertEquals("Your new password must be at least 8 characters long.",
                 changePasswordPage.getValidationErrorMessage());
             changePasswordPage.changePasswordAsAdmin("foofoofoo", "foofoofoo");
-            changePasswordPage.submit();
+            changePasswordPage = changePasswordPage.submit();
             assertEquals("The password must contain at least one number.",
                 changePasswordPage.getValidationErrorMessage());
             changePasswordPage.changePasswordAsAdmin("foofoofoo42", "foofoofoo42");
-            changePasswordPage.submit();
+            changePasswordPage = changePasswordPage.submit();
             assertEquals("Your password has been successfully changed.", changePasswordPage.getSuccessMessage());
         } finally {
             // put back standard config

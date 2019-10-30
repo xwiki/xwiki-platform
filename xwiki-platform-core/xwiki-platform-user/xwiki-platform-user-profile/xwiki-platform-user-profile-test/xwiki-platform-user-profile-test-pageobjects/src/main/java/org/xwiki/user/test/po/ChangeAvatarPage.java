@@ -37,10 +37,9 @@ public class ChangeAvatarPage extends BasePage
     @FindBy(xpath = "//*[@id='attachment-picker-close']")
     private WebElement cancelButton;
 
-    public void setAvatarImage(String imageName)
+    public void setAvatarImage(String filePath)
     {
-        URL fileUrl = this.getClass().getResource("/" + imageName);
-        this.avatarInput.sendKeys(fileUrl.getPath());
+        this.avatarInput.sendKeys(filePath);
     }
 
     public void submit()

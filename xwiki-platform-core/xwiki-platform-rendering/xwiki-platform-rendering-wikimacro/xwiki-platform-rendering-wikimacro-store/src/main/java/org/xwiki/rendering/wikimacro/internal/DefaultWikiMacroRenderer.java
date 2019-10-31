@@ -43,7 +43,6 @@ import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.block.AbstractBlockAsyncRenderer;
-import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.MacroBlock;
@@ -318,7 +317,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
     }
 
     @Override
-    public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
+    public Block execute(boolean async, boolean cached) throws RenderingException
     {
         // Register the known involved references and components
         this.asyncContext.useComponent(this.wikimacro.getRoleType(), this.wikimacro.getRoleHint());
@@ -329,18 +328,7 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         ///////////////////////////////////////
         // Transform
 
-        Block blockResult = transform(macroXDOM, async);
-
-        ///////////////////////////////////////
-        // Rendering
-
-        String resultString = null;
-
-        if (async) {
-            resultString = render(blockResult);
-        }
-
-        return new BlockAsyncRendererResult(resultString, blockResult);
+        return transform(macroXDOM, async);
     }
 
     private WikiMacroBinding createBinding(boolean async)

@@ -33,8 +33,7 @@ import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.AsyncProperties;
 import org.xwiki.rendering.async.internal.block.AbstractBlockAsyncRenderer;
-import org.xwiki.rendering.async.internal.block.BlockAsyncRendererResult;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.syntax.Syntax;
 
 /**
@@ -100,26 +99,12 @@ public class DocumentContentAsyncRenderer extends AbstractBlockAsyncRenderer
     }
 
     @Override
-    public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
+    public Block execute(boolean async, boolean cached) throws RenderingException
     {
         // Register the known involved references
         this.asyncContext.useEntity(this.documentReference);
 
-        ///////////////////////////////////////
-        // Execute
-
-        XDOM xdom = this.executor.execute(async);
-
-        ///////////////////////////////////////
-        // Rendering
-
-        String resultString = null;
-
-        if (async) {
-            resultString = render(xdom);
-        }
-
-        return new BlockAsyncRendererResult(resultString, xdom);
+        return this.executor.execute(async);
     }
 
     @Override

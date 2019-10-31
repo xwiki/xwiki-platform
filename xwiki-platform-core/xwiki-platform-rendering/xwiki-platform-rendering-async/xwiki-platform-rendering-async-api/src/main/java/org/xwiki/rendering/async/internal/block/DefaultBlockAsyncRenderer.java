@@ -93,7 +93,7 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
     }
 
     @Override
-    public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
+    public Block execute(boolean async, boolean cached) throws RenderingException
     {
         Block resultBlock;
 
@@ -130,16 +130,7 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
                 .generateErrorBlocks("Failed to execute asynchronous content", e, this.configuration.isInline()));
         }
 
-        ///////////////////////////////////////
-        // Rendering
-
-        String resultString = null;
-
-        if (async) {
-            resultString = render(resultBlock);
-        }
-
-        return new BlockAsyncRendererResult(resultString, resultBlock);
+        return resultBlock;
     }
 
     private Block tranform(XDOM xdom, Block block) throws RenderingException

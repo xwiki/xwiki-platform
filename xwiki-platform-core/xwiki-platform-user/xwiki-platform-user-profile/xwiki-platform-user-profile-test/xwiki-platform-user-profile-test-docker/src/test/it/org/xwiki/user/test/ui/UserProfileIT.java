@@ -168,8 +168,9 @@ public class UserProfileIT
         // Setting to Advanced user
         preferencesEditPage = preferencesPage.editPreferences();
         preferencesEditPage.setAdvancedUserType();
-        userProfilePage = preferencesEditPage.clickSaveAndView();
+        preferencesEditPage.clickSaveAndView();
 
+        userProfilePage = new ProfileUserProfilePage(this.userName);
         userProfilePage.switchToPreferences();
         assertEquals(ADVANCED_USER, preferencesPage.getUserType());
     }
@@ -185,8 +186,9 @@ public class UserProfileIT
         // Setting to Text Editor
         PreferencesEditPage preferencesEditPage = preferencesPage.editPreferences();
         preferencesEditPage.setDefaultEditorText();
-        userProfilePage = preferencesEditPage.clickSaveAndView();
+        preferencesEditPage.clickSaveAndView();
 
+        userProfilePage = new ProfileUserProfilePage(this.userName);
         preferencesPage = userProfilePage.switchToPreferences();
         assertEquals(TEXT_EDITOR, preferencesPage.getDefaultEditor());
 
@@ -195,8 +197,9 @@ public class UserProfileIT
         preferencesPage = userProfilePage.switchToPreferences();
         preferencesEditPage = preferencesPage.editPreferences();
         preferencesEditPage.setDefaultEditorWysiwyg();
-        userProfilePage = preferencesEditPage.clickSaveAndView();
+        preferencesEditPage.clickSaveAndView();
 
+        userProfilePage = new ProfileUserProfilePage(this.userName);
         preferencesPage = userProfilePage.switchToPreferences();
         assertEquals(WYSIWYG_EDITOR, preferencesPage.getDefaultEditor());
 
@@ -205,8 +208,9 @@ public class UserProfileIT
         preferencesPage = userProfilePage.switchToPreferences();
         preferencesEditPage = preferencesPage.editPreferences();
         preferencesEditPage.setDefaultEditorDefault();
-        userProfilePage = preferencesEditPage.clickSaveAndView();
+        preferencesEditPage.clickSaveAndView();
 
+        userProfilePage = new ProfileUserProfilePage(this.userName);
         preferencesPage = userProfilePage.switchToPreferences();
         assertEquals(DEFAULT_EDITOR, preferencesPage.getDefaultEditor());
     }

@@ -120,7 +120,7 @@ public class VfsResourceReferenceHandlerTest
         when(document.getAttachment(attachmentName)).thenReturn(attachment);
 
         when(attachment.getDate()).thenReturn(new Date());
-        when(attachment.getContentSize(xcontext)).thenReturn(1000);
+        when(attachment.getContentLongSize(xcontext)).thenReturn(1000L);
 
         when(attachment.getContentInputStream(xcontext)).thenReturn(
             createZipInputStream(StringUtils.join(path, '/'), "success!"));

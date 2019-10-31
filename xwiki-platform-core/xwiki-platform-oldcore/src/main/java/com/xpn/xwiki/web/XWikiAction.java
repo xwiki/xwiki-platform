@@ -1034,4 +1034,22 @@ public abstract class XWikiAction extends Action
             throw new XWikiException("Error while sending JSON answer.", e);
         }
     }
+
+    /**
+     * Make sure to set the right length (or nothing) in the reponse.
+     * 
+     * @param response the response
+     * @param length the length to set in the response
+     * @since 11.10RC1
+     * @since 10.11.10
+     * @since 11.3.6
+     */
+    protected void setContentLength(XWikiResponse response, long length)
+    {
+        // FIXME: call setContentLengthLong directly when https://jira.xwiki.org/browse/XWIKI-16829 is fixed
+        // Set the content length in the response only if it fit in an int
+        if (length <= Integer.MAX_VALUE) {
+            response.setContentLength((int) length);
+        }
+    }
 }

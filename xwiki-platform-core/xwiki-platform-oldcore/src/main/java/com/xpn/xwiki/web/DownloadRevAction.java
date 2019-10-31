@@ -94,7 +94,7 @@ public class DownloadRevAction extends DownloadAction
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
         // Sending the content of the attachment
         try {
-            response.setContentLength(attachment.getContentSize(context));
+            setContentLength(response, attachment.getContentLongSize(context));
             IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,

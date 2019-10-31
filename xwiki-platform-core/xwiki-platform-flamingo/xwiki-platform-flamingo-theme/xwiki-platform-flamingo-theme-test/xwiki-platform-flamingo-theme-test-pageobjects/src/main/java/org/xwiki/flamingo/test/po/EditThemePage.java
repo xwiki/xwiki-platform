@@ -115,7 +115,14 @@ public class EditThemePage extends EditPage
 
     public void waitUntilPreviewIsLoaded()
     {
-        getDriver().waitUntilElementDisappears(By.id("preview-curtain"));
+        // increase the timeout for the preview: it might take some time to load.
+        int currentTimeout = getDriver().getTimeout();
+        try {
+            getDriver().setTimeout(20);
+            getDriver().waitUntilElementDisappears(By.id("preview-curtain"));
+        } finally {
+            getDriver().setTimeout(currentTimeout);
+        }
     }
 
     public PreviewBox getPreviewBox()

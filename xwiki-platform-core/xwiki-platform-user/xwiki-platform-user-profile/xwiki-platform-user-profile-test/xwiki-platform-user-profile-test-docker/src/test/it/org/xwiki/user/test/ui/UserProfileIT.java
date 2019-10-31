@@ -117,8 +117,9 @@ public class UserProfileIT
         profileEditPage.setUserAddress(USER_ADDRESS);
         profileEditPage.setUserBlog(USER_BLOG);
         profileEditPage.setUserBlogFeed(USER_BLOGFEED);
-        userProfilePage = profileEditPage.clickSaveAndView();
+        profileEditPage.clickSaveAndView();
 
+        userProfilePage = new ProfileUserProfilePage(this.userName);
         // Check that the information was updated
         assertEquals(USER_FIRST_NAME, userProfilePage.getUserFirstName());
         assertEquals(USER_LAST_NAME, userProfilePage.getUserLastName());
@@ -157,8 +158,9 @@ public class UserProfileIT
         PreferencesEditPage preferencesEditPage = preferencesPage.editPreferences();
         preferencesEditPage.setSimpleUserType();
         preferencesEditPage.setTimezone(PARIS_TZ);
-        userProfilePage = preferencesEditPage.clickSaveAndView();
+        preferencesEditPage.clickSaveAndView();
 
+        userProfilePage = new ProfileUserProfilePage(this.userName);
         preferencesPage = userProfilePage.switchToPreferences();
         assertEquals(SIMPLE_USER, preferencesPage.getUserType());
         assertEquals(PARIS_TZ, preferencesPage.getTimezone());

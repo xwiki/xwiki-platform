@@ -29,7 +29,8 @@ import org.xwiki.test.docker.junit5.UITest;
  * @since 11.10RC1
  * @version $Id$
  */
-@UITest
+// extraJARs needed for the hibernate mapping.
+@UITest(extraJARs = { "org.xwiki.platform:xwiki-platform-eventstream-store" })
 public class AllIT
 {
     @Nested

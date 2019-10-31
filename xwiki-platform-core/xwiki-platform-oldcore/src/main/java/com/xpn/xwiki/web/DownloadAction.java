@@ -21,7 +21,6 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.IllegalCharsetNameException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,9 +73,8 @@ public class DownloadAction extends XWikiAction
     public static final List<String> MIMETYPE_WHITELIST =
         Arrays.asList("audio/basic", "audio/L24", "audio/mp4", "audio/mpeg", "audio/ogg", "audio/vorbis",
             "audio/vnd.rn-realaudio", "audio/vnd.wave", "audio/webm", "image/gif", "image/jpeg", "image/pjpeg",
-            "image/png", "image/svg+xml", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf",
-            "video/mpeg", "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv",
-            "video/x-flv");
+            "image/png", "image/svg+xml", "image/tiff", "text/csv", "text/plain", "text/xml", "text/rtf", "video/mpeg",
+            "video/ogg", "video/quicktime", "video/webm", "video/x-matroska", "video/x-ms-wmv", "video/x-flv");
 
     /** Key of the whitelist in xwiki.properties. */
     public static final String WHITELIST_PROPERTY = "attachment.download.whitelist";
@@ -98,7 +96,7 @@ public class DownloadAction extends XWikiAction
      */
     public DownloadAction()
     {
-       this.handleRedirectObject = true;
+        this.handleRedirectObject = true;
     }
 
     @Override
@@ -155,12 +153,12 @@ public class DownloadAction extends XWikiAction
             // Try to load the attachment content just to make sure that the attachment really exists
             // This will throw an exception if the attachment content isn't available
             try {
-                attachment.getContentSize(context);
+                attachment.getContentLongSize(context);
             } catch (XWikiException e) {
                 Object[] args = { filename };
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                    "Attachment content {0} not found", null, args);
+                    XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, "Attachment content {0} not found", null,
+                    args);
             }
 
             long lastModifiedOnClient = request.getDateHeader("If-Modified-Since");
@@ -191,10 +189,10 @@ public class DownloadAction extends XWikiAction
 
     private void throwNotFoundException(String filename) throws XWikiException
     {
-        String message = filename == null ? "Attachment not found" :
-            String.format("Attachment [%s] not found", filename);
-        throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-            XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND, message);
+        String message =
+            filename == null ? "Attachment not found" : String.format("Attachment [%s] not found", filename);
+        throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
+            message);
     }
 
     /**
@@ -212,11 +210,8 @@ public class DownloadAction extends XWikiAction
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
-    private boolean sendPartialContent(final XWikiAttachment attachment,
-        final XWikiRequest request,
-        final XWikiResponse response,
-        final XWikiContext context)
-        throws XWikiException, IOException
+    private boolean sendPartialContent(final XWikiAttachment attachment, final XWikiRequest request,
+        final XWikiResponse response, final XWikiContext context) throws XWikiException, IOException
     {
         String range = request.getHeader(RANGE_HEADER_NAME);
         Matcher m = RANGE_HEADER_PATTERN.matcher(range);
@@ -234,9 +229,9 @@ public class DownloadAction extends XWikiAction
                 return false;
             }
             if (end == null) {
-                end = attachment.getContentSize(context) - 1L;
+                end = attachment.getContentLongSize(context) - 1L;
             }
-            end = Math.min(end, attachment.getContentSize(context) - 1L);
+            end = Math.min(end, attachment.getContentLongSize(context) - 1L);
             writeByteRange(attachment, start, end, request, response, context);
             return true;
         }
@@ -256,11 +251,8 @@ public class DownloadAction extends XWikiAction
      * @throws XWikiException if the attachment content cannot be retrieved
      * @throws IOException if the response cannot be written
      */
-    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end,
-        final XWikiRequest request,
-        final XWikiResponse response,
-        final XWikiContext context)
-        throws XWikiException, IOException
+    private void writeByteRange(final XWikiAttachment attachment, Long start, Long end, final XWikiRequest request,
+        final XWikiResponse response, final XWikiContext context) throws XWikiException, IOException
     {
         if (start >= 0 && start < attachment.getContentLongSize(context)) {
             InputStream data = attachment.getContentInputStream(context);
@@ -269,10 +261,10 @@ public class DownloadAction extends XWikiAction
             setCommonHeaders(attachment, request, response, context);
             response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
             if ((end - start + 1L) < Integer.MAX_VALUE) {
-                response.setContentLength((int) (end - start + 1));
+                setContentLength(response, end - start + 1);
             }
-            response.setHeader("Content-Range", "bytes " + start + "-" + end + SEPARATOR
-                + attachment.getContentLongSize(context));
+            response.setHeader("Content-Range",
+                "bytes " + start + "-" + end + SEPARATOR + attachment.getContentLongSize(context));
             IOUtils.copyLarge(data, response.getOutputStream());
         } else {
             response.setStatus(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
@@ -289,23 +281,18 @@ public class DownloadAction extends XWikiAction
      * @param context the XWikiContext just in case it is needed to load the attachment content
      * @throws XWikiException if something goes wrong
      */
-    private void sendContent(final XWikiAttachment attachment,
-        final XWikiRequest request,
-        final XWikiResponse response,
-        final String filename,
-        final XWikiContext context)
-        throws XWikiException
+    private void sendContent(final XWikiAttachment attachment, final XWikiRequest request, final XWikiResponse response,
+        final String filename, final XWikiContext context) throws XWikiException
     {
         InputStream stream = null;
         try {
             setCommonHeaders(attachment, request, response, context);
-            response.setContentLength(attachment.getContentSize(context));
+            setContentLength(response, attachment.getContentLongSize(context));
             stream = attachment.getContentInputStream(context);
             IOUtils.copy(stream, response.getOutputStream());
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                "Exception while sending response", e);
+                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
         } finally {
             if (stream != null) {
                 IOUtils.closeQuietly(stream);
@@ -434,10 +421,8 @@ public class DownloadAction extends XWikiAction
      * @param response the response to write to.
      * @param context the current request context
      */
-    private void setCommonHeaders(final XWikiAttachment attachment,
-        final XWikiRequest request,
-        final XWikiResponse response,
-        final XWikiContext context)
+    private void setCommonHeaders(final XWikiAttachment attachment, final XWikiRequest request,
+        final XWikiResponse response, final XWikiContext context)
     {
         // Choose the right content type
         String mimetype = attachment.getMimeType(context);
@@ -449,8 +434,7 @@ public class DownloadAction extends XWikiAction
             response.setCharacterEncoding(characterEncoding);
         }
 
-        String ofilename =
-            Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", "%20");
+        String ofilename = Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", "%20");
 
         // The inline attribute of Content-Disposition tells the browser that they should display
         // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more
@@ -463,9 +447,8 @@ public class DownloadAction extends XWikiAction
         boolean hasPR = false;
         String author = attachment.getAuthor();
         try {
-            hasPR =
-                context.getWiki().getRightService().hasAccessLevel(
-                    "programming", author, "XWiki.XWikiPreferences", context);
+            hasPR = context.getWiki().getRightService().hasAccessLevel("programming", author, "XWiki.XWikiPreferences",
+                context);
         } catch (Exception e) {
             hasPR = false;
         }

@@ -83,7 +83,7 @@ public class MockitoDownloadActionTest
 
         // Setup the returned attachment
         XWikiAttachment attachment = mock(XWikiAttachment.class);
-        when(attachment.getContentSize(xcontext)).thenReturn(100);
+        when(attachment.getContentLongSize(xcontext)).thenReturn(100L);
         Date now = new Date();
         when(attachment.getDate()).thenReturn(now);
         when(attachment.getFilename()).thenReturn("file.ext");
@@ -156,7 +156,7 @@ public class MockitoDownloadActionTest
 
         // Setup the returned attachment
         XWikiAttachment attachment = mock(XWikiAttachment.class);
-        when(attachment.getContentSize(xcontext)).thenReturn(100);
+        when(attachment.getContentLongSize(xcontext)).thenReturn(100L);
         Date now = new Date();
         when(attachment.getDate()).thenReturn(now);
         when(attachment.getFilename()).thenReturn("file.ext");

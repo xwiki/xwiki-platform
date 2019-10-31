@@ -147,7 +147,7 @@ public class ZipExplorerTest
 
         assertEquals("Directory/File.txt", newAttachment.getFilename());
         assertEquals(zipFileContent.length(), newAttachment.getLongSize());
-        assertEquals(zipFileContent.length(), newAttachment.getContentSize(context));
+        assertEquals(zipFileContent.length(), newAttachment.getContentLongSize(context));
         assertEquals(zipFileContent, new String(newAttachment.getContent(context)));
     }
 
@@ -267,7 +267,7 @@ public class ZipExplorerTest
         when(attachment.getAuthorReference()).thenReturn(new DocumentReference("wiki", "XWiki", "Vincent"));
         when(attachment.getDate()).thenReturn(new Date());
         when(attachment.getFilesize()).thenReturn((content == null) ? 0 : content.length);
-        when(attachment.getContentSize(any(XWikiContext.class))).thenReturn((content == null) ? 0 : content.length);
+        when(attachment.getContentLongSize(any(XWikiContext.class))).thenReturn((content == null) ? 0 : (long) content.length);
         when(attachment.getContent(any(XWikiContext.class))).thenReturn((content == null) ? new byte[0] : content);
         when(attachment.getContentInputStream(any(XWikiContext.class))).thenReturn(
             new ByteArrayInputStream((content == null) ? new byte[0] : content));

@@ -122,7 +122,7 @@ public class R1130040XWIKI16682DataMigration extends AbstractStoreTypeDataMigrat
 
             if (StringUtils.isEmpty(filename)) {
                 this.logger.warn("Unsupported attachment with empty string as name has been found on document [{}]."
-                    + "Ignoreing it.", documentReference);
+                    + " Ignoring it.", documentReference);
 
                 continue;
             }

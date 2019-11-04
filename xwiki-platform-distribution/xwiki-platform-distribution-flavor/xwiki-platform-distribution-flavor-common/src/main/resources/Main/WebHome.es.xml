@@ -73,7 +73,7 @@ También puede usar el [[Sandbox&gt;&gt;Sandbox.WebHome]] para obtener más cont
 (%class="col-xs-12 col-sm-6"%)(((
 = Extendiendo tu Wiki  =
 
-Para extender el poder y las funcionalidades de tu wiki con las características que //tu// necesitas, dirígete a. {{velocity}}[[Gestor de Extensiones&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), `admin', 'admin', `editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} donde puede buscar e instalar extensiones..
+Para extender el poder y las funcionalidades de tu wiki con las características que //tu// necesitas, dirígete a. {{velocity}}[[Gestor de Extensiones&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} donde puede buscar e instalar extensiones..
 
 Para navegar a través de más de 900 extensiones proporcionadas por la comunidad de XWiki, diríjase al [[Repositorio de extensiones&gt;&gt;http://extensions.xwiki.org]].)))
 

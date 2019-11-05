@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -36,6 +37,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.XWikiUsersDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.migration.DataMigrationException;
@@ -52,6 +54,12 @@ import com.xpn.xwiki.user.api.XWikiUser;
  *   - If the disable property existed:
  *       * Set the active property with the disable property value
  *       * Remove the disable property
+ * Note that we willingly don't put the new email_checked property in the XWikiUser class,
+ * but we only put the property values in the user objects.
+ * The reason is that we don't want the XClassMigratorListener to be called by modifying the XClass since it would
+ * iterate over all user objects and save them a second time.
+ * Instead, we rely solely on the {@link XWikiUsersDocumentInitializer} to put the property on the xclass: when the
+ * XClassMigratorListener will be called, the properties will be already present in the objects, so we avoid a new save.
  *
  * NB: The minor version of the migration is incremented with 30 because of a previous migration in 11 cycle badly
  * named.
@@ -69,6 +77,11 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
     @Inject
     @Named("current")
     private DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    private Logger logger;
+
+    private BaseClass userClass;
 
     @Override
     public String getDescription()
@@ -88,13 +101,23 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
         // Get all users
         List<String> allUsers = getStore().executeRead(getXWikiContext(), this::getAllUsers);
 
+        logger.info("Migration needed for [{}] users on database [{}].",
+            allUsers.size(), getXWikiContext().getWikiId());
+
         // Remove the old property from XWikiUsers class
         removeDisableProperty();
 
+        int i = 0;
         // Migrate all users objects
         for (String user : allUsers) {
             applyMigrationsOnUser(user);
+            if (++i % 100 == 0) {
+                logger.info("[{}] users on [{}] have been migrated on database [{}]...", i, allUsers.size(),
+                    getXWikiContext().getWikiId());
+            }
         }
+        logger.info("[{}] users on [{}] have been migrated on database [{}].", allUsers.size(), allUsers.size(),
+            getXWikiContext().getWikiId());
     }
 
     private List<String> getAllUsers(Session session) throws HibernateException, XWikiException
@@ -111,9 +134,7 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
         XWiki xwiki = context.getWiki();
         DocumentReference userDocReference = documentReferenceResolver.resolve(docUser);
         XWikiDocument userDocument = xwiki.getDocument(userDocReference, context);
-
-        BaseClass userClass = xwiki.getUserClass(context);
-        BaseObject userObject = userDocument.getXObject(userClass.getReference());
+        BaseObject userObject = userDocument.getXObject(getUserClass().getReference());
 
         // By default, we consider users are enabled and active.
         int disable = userObject.getIntValue(OLD_DISABLED_PROPERTY, 0);
@@ -134,14 +155,22 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
         xwiki.saveDocument(userDocument, context);
     }
 
+    private BaseClass getUserClass() throws XWikiException
+    {
+        if (this.userClass == null) {
+            XWikiDocument userClassDoc = getXWikiContext().getWiki()
+                .getDocument(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE, getXWikiContext());
+            this.userClass = userClassDoc.getXClass();
+        }
+        return this.userClass;
+    }
+
     private void removeDisableProperty() throws XWikiException
     {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
-        BaseClass userClass = xwiki.getUserClass(context);
-
-        userClass.removeField(OLD_DISABLED_PROPERTY);
-        xwiki.saveDocument(userClass.getOwnerDocument(), context);
+        getUserClass().removeField(OLD_DISABLED_PROPERTY);
+        xwiki.saveDocument(getUserClass().getOwnerDocument(), context);
     }
 
 }

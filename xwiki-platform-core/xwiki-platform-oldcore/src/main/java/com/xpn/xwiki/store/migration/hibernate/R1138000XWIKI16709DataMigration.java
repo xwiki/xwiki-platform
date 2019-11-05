@@ -122,8 +122,12 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
 
     private List<String> getAllUsers(Session session) throws HibernateException, XWikiException
     {
+        // We select only XWikiUsers documents that have not been migrated yet:
+        // i.e. those that does not have an email_checked property yet.
         Query<String> query = session.createQuery("select doc.fullName from XWikiDocument doc, BaseObject obj"
-            + " where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'", String.class);
+            + " where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'"
+            + " and obj.id not in (select prop.id.id from IntegerProperty prop where prop.id.name='email_checked')",
+            String.class);
 
         return query.list();
     }

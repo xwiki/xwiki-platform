@@ -108,16 +108,26 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
         removeDisableProperty();
 
         int i = 0;
+        int failures = 0;
         // Migrate all users objects
         for (String user : allUsers) {
-            applyMigrationsOnUser(user);
+            try {
+                applyMigrationsOnUser(user);
+            } catch (XWikiException e) {
+                logger.error("Error while migrating information for user [{}] on database [{}]", user,
+                    getXWikiContext().getWikiId(), e);
+                failures++;
+            }
             if (++i % 100 == 0) {
-                logger.info("[{}] users on [{}] have been migrated on database [{}]...", i, allUsers.size(),
+                logger.info("[{}] users on [{}] have been migrated on database [{}]...", i - failures, allUsers.size(),
                     getXWikiContext().getWikiId());
             }
         }
-        logger.info("[{}] users on [{}] have been migrated on database [{}].", allUsers.size(), allUsers.size(),
-            getXWikiContext().getWikiId());
+        logger.info("[{}] users on [{}] have been migrated on database [{}].", allUsers.size() - failures,
+            allUsers.size(), getXWikiContext().getWikiId());
+        if (failures > 0) {
+            logger.warn("[{}] users have not been properly migrated, please check the logs above.", failures);
+        }
     }
 
     private List<String> getAllUsers(Session session) throws HibernateException, XWikiException

@@ -153,7 +153,11 @@ public class LogCaptureValidator
         // There was an error managing geckodriver 0.26.0 (github-production-release-asset-2e65be.s3.amazonaws.com:
         // Temporary failure in name resolution) ... trying again using cache and mirror
         new Line("There was an error managing geckodriver 0.[0-9]+.0 "
-            + "(.*: Temporary failure in name resolution) ... trying again using cache and mirror", true)
+            + "(.*: Temporary failure in name resolution) ... trying again using cache and mirror", true),
+
+        // Doesn't reproduce locally but fails on the CI. Cause unknown FTM.
+        new Line("JavaScript error: resource://gre/modules/UrlClassifierListManager.jsm, line 680: "
+            + "TypeError: this.tablesData[table] is undefined")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Allow registering excludes and expected failling log content for tests.
+ * Allow registering excludes and expected failing log content for tests.
  *
  * @version $Id$
  * @since 11.4RC1

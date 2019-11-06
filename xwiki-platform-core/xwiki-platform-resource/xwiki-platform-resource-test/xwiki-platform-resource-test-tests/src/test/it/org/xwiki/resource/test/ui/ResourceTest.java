@@ -22,7 +22,6 @@ package org.xwiki.resource.test.ui;
 import java.net.URL;
 
 import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
 import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
@@ -37,16 +36,6 @@ import static org.junit.Assert.*;
  */
 public class ResourceTest extends AbstractTest
 {
-    @AfterEach
-    public void validate()
-    {
-        // TODO: Fix this when we understand the problem. Doesn't reproduce locally but fails on the CI.
-        this.validateConsole.getLogCaptureConfiguration().registerExpected(
-            "JavaScript error: resource://gre/modules/UrlClassifierListManager.jsm, line 680: "
-                + "TypeError: this.tablesData[table] is undefined"
-        );
-    }
-
     @Test
     public void accessResources() throws Exception
     {

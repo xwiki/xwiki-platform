@@ -119,6 +119,23 @@ public final class DockerTestUtils
     }
 
     /**
+     * @param sourceDirectory the directory to copy
+     * @param targetDirectory the directory into which to copy the files
+     * @throws Exception when an error occurs during the copy
+     */
+    public static void copyDirectory(File sourceDirectory, File targetDirectory) throws Exception
+    {
+        createDirectory(targetDirectory);
+        try {
+            org.codehaus.plexus.util.FileUtils.copyDirectoryStructureIfModified(sourceDirectory, targetDirectory);
+        } catch (IOException e) {
+            throw new Exception(
+                String.format("Failed to copy directory [%] to [%]", sourceDirectory, targetDirectory), e);
+        }
+    }
+
+
+    /**
      * Start following a docker container's logs from the moment this API is called.
      *
      * @param container the container for which to follow the logs

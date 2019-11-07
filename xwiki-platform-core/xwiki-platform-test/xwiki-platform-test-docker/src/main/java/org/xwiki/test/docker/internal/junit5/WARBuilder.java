@@ -43,6 +43,7 @@ import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
 import org.xwiki.tool.extension.util.ExtensionMojoHelper;
 
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.copyDirectory;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.copyFile;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.createDirectory;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.unzip;
@@ -221,6 +222,10 @@ public class WARBuilder
             }
             unzip(file, targetWARDirectory);
         }
+
+        // Copy maven project webapp resources, if any.
+        File webappResourceDirectory = new File("src/test/webapp");
+        copyDirectory(webappResourceDirectory, this.targetWARDirectory);
     }
 
     private void copyJARs(TestConfiguration testConfiguration, List<Artifact> jarDependencies, File libDirectory)

@@ -51,7 +51,7 @@ public class WikiTemplateIT
     private static final String TEMPLATE_CONTENT = "Content of the template";
 
     @BeforeAll
-    public void setup(TestUtils setup) throws Exception
+    public void setup(TestUtils setup)
     {
         setup.loginAsSuperAdmin();
     }

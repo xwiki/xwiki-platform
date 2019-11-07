@@ -36,7 +36,9 @@ import org.xwiki.test.docker.junit5.UITest;
         // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
         // Disable the DW
-        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"
+        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false",
+        // Enable Hibernate statistics to debug SQL execution times
+        "xwikiDbAdditionalProperties=<property name=\"hibernate.generate_statistics\">true</property>"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus

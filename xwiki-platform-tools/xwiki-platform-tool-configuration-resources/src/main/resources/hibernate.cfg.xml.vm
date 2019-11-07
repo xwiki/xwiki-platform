@@ -89,6 +89,7 @@
     <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     -->
 
+    $!xwikiDbAdditionalProperties
 ## DO NOT USE XML COMMENT IN BETWEEN DB SPECIFIC CONFIGURATION, IT RENDER COMMENTING/UNCOMMENTING THE RIGHT
 ## CONFIGURATION A PAIN
 

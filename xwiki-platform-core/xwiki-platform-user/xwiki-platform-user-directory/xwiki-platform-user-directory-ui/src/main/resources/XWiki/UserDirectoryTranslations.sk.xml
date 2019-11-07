@@ -36,10 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: userdirectory.userScopeFilter=User scope:
+  <content>### Missing: XWiki.UserDirectoryPreferencesClass_columns=Columns to display
+### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=The list of columns, corresponding to properties of the User class, to be displayed in the user directory
+### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Hide disabled user profiles
+### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Exclude from the user directory the users that have their profile disabled
+
+### Missing: userdirectory.userScopeFilter=User scope:
 ### Missing: userdirectory.userScopeFilter.hint=Select the category of users you want to display.
 userdirectory.userScopeFilter.local=Lokálne užívatelia
 userdirectory.userScopeFilter.global=Užívatelia, ktorí sú členmi tejto wiki.
+### Missing: userdirectory.configuration.title=Settings
+### Missing: userdirectory.configuration.columns.editHint=Click to select the columns
+
 platform.userdirectory.customizeNotAllowed=Nemáte právo upravovať tento adresár.
 platform.userdirectory.configTitle=Konfigurácia užívateľského adresára
 platform.userdirectory.configSheetTitle=Konfigurácia užívateľského adresára

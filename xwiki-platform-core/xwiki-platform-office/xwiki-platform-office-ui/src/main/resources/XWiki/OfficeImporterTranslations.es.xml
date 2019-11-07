@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.OfficeImporterTranslations" locale="es">
+  <web>XWiki</web>
+  <name>OfficeImporterTranslations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.OfficeImporter</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>office.createForm.type.name=Página de Office
+office.createForm.type.description=Importar documentos de Office a páginas wiki
+office.form.error.noDocument=Debe utilizar la acción {0}create{1} para importar un documento de Office.
+office.form.append.hint=¡El documento ya existe! Añada el resultado a la página wiki existente
+
+office.config.serverType.hint=El tipo de servidor de Office. Puede ser gestionado internamente (local) o externamente (remoto).
+office.config.serverPort.hint=El número de puerto utilizado para conectarse al servidor de Office
+office.config.autoStart.hint=Especifique si el servidor de Office debe iniciarse o conectarse automáticamente al inicio de XWiki
+office.config.serverPath.hint=La ruta a la instalación de Office</content>
+  
+</xwikidoc>

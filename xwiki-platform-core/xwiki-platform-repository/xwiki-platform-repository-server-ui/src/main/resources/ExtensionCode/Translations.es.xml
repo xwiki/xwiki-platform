@@ -41,13 +41,13 @@ extension.repository.emptyvalue=
 extension.repository.name=Nombre
 extension.repository.summary=Resumen
 extension.repository.type=Tipo
-### Missing: extension.repository.category=Category
+extension.repository.category=Categoría
 extension.repository.authors=Autores
-### Missing: extension.repository.doc.creationDate=Created On
-### Missing: extension.repository.doc.date=Last Modified
-### Missing: extension.repository.rating=Rating
-### Missing: extension.repository.installedCount=Installs
+extension.repository.doc.creationDate=Creado el
+extension.repository.doc.date=Última modificación
+extension.repository.rating=Valoración
+extension.repository.installedCount=Instalaciones
 
 ## Administration UI
-### Missing: admin.repository=Extension Repository</content>
+admin.repository=Repositorio de extensiones</content>
 </xwikidoc>

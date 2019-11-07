@@ -36,13 +36,20 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>userdirectory.userScopeFilter=Brukertype:
+  <content>### Missing: XWiki.UserDirectoryPreferencesClass_columns=Columns to display
+### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=The list of columns, corresponding to properties of the User class, to be displayed in the user directory
+### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Hide disabled user profiles
+### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Exclude from the user directory the users that have their profile disabled
+
+userdirectory.userScopeFilter=Brukertype:
 userdirectory.userScopeFilter.hint=Velg kategorien av brukere du vil vise.
 userdirectory.userScopeFilter.local=Lokale brukere
 userdirectory.userScopeFilter.global=Globale brukere som er medlemmer av denne wikien
+### Missing: userdirectory.configuration.title=Settings
+### Missing: userdirectory.configuration.columns.editHint=Click to select the columns
+
 platform.userdirectory.customizeNotAllowed=Du har ikke tilgang til å tilpasse denne brukerkatalogen.
 platform.userdirectory.configTitle=Brukerkatalogkonfigurasjon
 platform.userdirectory.configSheetTitle=Brukerkatalogkonfigurasjonsark
 platform.userdirectory.configSheetApplyOnConfiguration=Dette arket må brukes på brukerkatalogkonfigurasjonsdokumentet.</content>
-  
 </xwikidoc>

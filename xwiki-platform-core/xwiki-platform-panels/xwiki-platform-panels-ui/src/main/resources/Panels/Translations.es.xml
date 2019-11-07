@@ -36,17 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: panels.available=Available Panels
-### Missing: panels.name=Name
-### Missing: panels.description=Description
-### Missing: panels.type=Type
-### Missing: panels.category=Category
+  <content>panels.available=Paneles disponibles
+panels.name=Nombre
+panels.description=Descripción
+panels.type=Tipo
+panels.category=Categoría
 panels._actions=Acciones
 panels.emptyvalue=
-### Missing: panels.children.title=Child Pages
-### Missing: panels.siblings.title=Sibling Pages
-### Missing: panels.documentInformation.configureSyntaxes=Configure more syntaxes
-### Missing: panels.documentInformation.confirmChangeSyntaxWysiwyg=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will reset the syntax to the previous one and do nothing. Note that if you choose 'ok' you will loose modifications and this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
-### Missing: panels.documentInformation.confirmChangeSyntax=Do you want to also convert the document's content and objects to the selected syntax? Choosing 'cancel' will only change the syntax identifier, without modifying the document's content. Note that if you choose 'ok' this will save the document automatically, you can cancel this modification by going to the document history interface and revert the last version.
-### Missing: panels.documentInformation.failedSyntaxConversion=Failed to convert to the selected syntax. If you want to use this syntax anyway, you can select it again and choose not to perform the conversion.</content>
+panels.children.title=Páginas hijas
+panels.siblings.title=Páginas hermanas
+panels.documentInformation.configureSyntaxes=Configurar más sintaxis
+panels.documentInformation.confirmChangeSyntaxWysiwyg=¿Desea convertir también el contenido y los objetos del documento a la sintaxis seleccionada? Eligiendo 'cancelar' restablecerá la sintaxis a la anterior y no hará nada. Tenga en cuenta que si selecciona 'ok' perderá las modificaciones y guardará el documento automáticamente, puede cancelar esta modificación yendo a la interfaz del historial del documento y revertir la última versión.
+panels.documentInformation.confirmChangeSyntax=¿Desea convertir también el contenido y los objetos del documento a la sintaxis seleccionada? Eligiendo 'cancelar' sólo cambiará el identificador de sintaxis, sin modificar el contenido del documento. Tenga en cuenta que si selecciona 'ok' guardará el documento automáticamente, puede cancelar esta modificación yendo a la interfaz de historial del documento y revirtiendo a la última versión.
+panels.documentInformation.failedSyntaxConversion=No se pudo convertir a la sintaxis seleccionada. Si desea utilizar esta sintaxis de todas formas, puede seleccionarla de nuevo y elegir no realizar la conversión.</content>
 </xwikidoc>

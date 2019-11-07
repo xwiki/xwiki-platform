@@ -1,0 +1,69 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="PanelsCode.Translations" locale="zh">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>zh</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.panels.applications.helper=在这里，您可以选择应用程序栏中显示的应用（默认情况下位于左侧）。任何新的应用都将显示在那里。如果要删除应用，只需将图标从第一个框拖放到另一个框即可。您还可以根据需要将应用重新排序。最后，别忘了保存更改！
+platform.panels.applications.displayedapps=应用栏中的应用
+platform.panels.applications.blacklistedapps=未在应用栏的应用
+platform.panels.applications.save=保存
+platform.panels.applications.revert=重置
+platform.panels.applications.ajax.success=已保存配置。
+platform.panels.applications.ajax.csrf=CSRF验证失败。请刷新页面后再重试。
+platform.panels.applications.ajax.noright=您没有修改PanelsCode.ApplicationsPanelConfiguration的权限。
+platform.panels.applications.ajax.error=无法保存您的更改。
+admin.panels.applications=应用面板
+admin.panels.applications.description=管理应用程序面板中显示的应用程序。
+
+admin.panels.navigation=导航面板
+admin.panels.navigation.description=管理导航面板中显示的页面。
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=排除顶级扩展页面
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=此动态过滤器会从导航树中删除属于已安装扩展的顶级页面（如果它们不打算进行修改）。
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=排除顶级应用程序页面
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=此动态过滤器从导航树中删除属于使用App Within Minutes创建的应用程序的顶级页面。
+PanelsCode.NavigationConfigurationClass_exclusions=排除项
+PanelsCode.NavigationConfigurationClass_exclusions.hint=要从导航树中排除的页面列表。
+PanelsCode.NavigationConfigurationClass_inclusions=包含项
+PanelsCode.NavigationConfigurationClass_inclusions.hint=要包含在导航树中的页面列表，即使它们被先前的过滤器排除在外。
+platform.panels.navigation.configuration.excludedPages=已排除的页面
+platform.panels.navigation.configuration.excludedPages.hint=使用拖放操作将页面移出导航树或将其放回原位。
+platform.panels.navigation.configuration.excludedPages.empty=无
+platform.panels.navigation.configuration.topLevelExtensionPages=顶级扩展页面
+platform.panels.navigation.configuration.topLevelApplicationPages=顶级应用页面
+platform.panels.navigation.configuration.otherPages=其他页面
+platform.panels.navigation.configuration.saveComment=从管理中更新了导航面板配置</content>
+  
+</xwikidoc>

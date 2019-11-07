@@ -40,8 +40,8 @@
 
 ## MENU
 core.menu.type.wiki=Wiki
-core.menu.watchlist.add.wiki=查看Wiki
-core.menu.watchlist.remove.wiki=未查看的Wiki
+core.menu.watchlist.add.wiki=关注Wiki
+core.menu.watchlist.remove.wiki=取消关注Wiki
 core.menu.admin.wiki=管理Wiki
 
 # WIKI INFORMATION PANEL

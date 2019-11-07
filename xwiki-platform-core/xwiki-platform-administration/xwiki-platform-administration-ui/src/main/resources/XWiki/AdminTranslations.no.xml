@@ -62,6 +62,11 @@ XWiki.Registration_loginButton_autoLogin_enabled.hint=Hvis innloggingsknappen er
 XWiki.Registration_defaultRedirect.hint=Dette er nettadressen som brukeren blir omdirigert til etter å ha trykket på innloggingsknappen hvis xredirect-parameteren ikke er spesifisert. Velocitykode kan brukes.
 XWiki.Registration_requireCaptcha.hint=Velg dette for å kreve at brukeren løser en CAPTCHA for å kunne registrere seg.
 XWiki.Registration_registrationSuccessMessage.hint=Dette vises til brukeren når de har registrert seg. Velocity og wiki-syntakskode kan brukes.
+### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
+### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
+### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
+### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
+### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
 
 # Look &amp; Feel Sections
 admin.themes=Temaer
@@ -113,10 +118,20 @@ administration.section.export.withHistory.hint=Inkluder sidehistorikken i ekspor
 administration.section.export.backupPack.hint=Angi om pakken skal brukes som sikkerhetskopi. Dette alternativet påvirker ikke det eksporterte innholdet. Den eneste effekten er at alternativet "Importer som sikkerhetskopi" vil bli forhåndsvalgt når du importerer pakken. Forskjellen mellom en sikkerhetskopipakke og en vanlig pakke er at i det første tilfellet blir sideforfatteren bevart under importen, mens i det andre tilfelle blir brukeren som utfører importen den forrige forfatteren til hver importerte side.
 
 # Users Section
+### Missing: administration.section.users.enableUser.inProgress=Enabling user account...
+### Missing: administration.section.users.enableUser.done=User account enabled
+### Missing: administration.section.users.enableUser.failed=Failed to enable the user account
+### Missing: administration.section.users.disableUser.inProgress=Disabling user account...
+### Missing: administration.section.users.disableUser.done=User account disabled
+### Missing: administration.section.users.disableUser.failed=Failed to disable the user account
 administration.section.users.deleteUser.confirmationMessage=Brukeren {0} blir slettet og fjernet fra alle {1}gruppene{2} de var medlem av. Er du sikker på at du vil fortsette?
 administration.section.users.deleteUser.programmingRightsWarning=Brukeren du skal slette, har programmeringsrettigheter og er den siste forfatteren av {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Hvis {1,choice,1# denne siden|1&lt;disse sidene} har skript som krever programmeringsrettigheter, vil disse skriptene slutte å fungere hvis du sletter brukeren.
 administration.section.users.deleteUser.scriptRightsWarning=Brukeren du skal slette har skriptrettigheter og er den siste forfatteren av {0}{1,choice,1#1 side|1&lt;{1} sider}{2}. Skriptene fra {1,choice,1#denne siden|1&lt;disse sidene} kan slutte å fungere hvis du sletter brukeren.
-administration.section.users.deleteUser.markDisabledMessage=I stedet for å slette brukeren kan du merke profilen som deaktivert. Dette vil forhindre dem i å logge seg på og vil bevare tilgangsrettighetene knyttet til skriptene de skrev.
+### Missing: administration.section.users.deleteUser.newAuthor=New Author
+### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
+### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
+### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
+### Missing: administration.section.users.deleteUser.newAuthor.script=script
 
 # Other Category
 admin.other=Annet
@@ -130,6 +145,10 @@ administration.section.analytics.status.hint=Bestem om sporing i Google Analytic
 ## Deprecated since 11.6RC1
 XWiki.XWikiPreferences_auth_active_check.hint=Hvis satt til "Ja", vil det forhindre at brukerne logger inn uten å skrive inn token som tidligere ble sendt via e-post.
 administration.section.users.deleteUser.markInactiveMessage=I stedet for å slette brukeren kan du merke profilen sin som inaktiv. Dette forhindrer dem i å logge inn og vil bevare tilgangsrettighetene knyttet til skriptene de skrev.
+
+## Deprecated since 11.8RC1
+administration.section.users.deleteUser.markDisabledMessage=I stedet for å slette brukeren kan du merke profilen som deaktivert. Dette vil forhindre dem i å logge seg på og vil bevare tilgangsrettighetene knyttet til skriptene de skrev.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>
 </xwikidoc>

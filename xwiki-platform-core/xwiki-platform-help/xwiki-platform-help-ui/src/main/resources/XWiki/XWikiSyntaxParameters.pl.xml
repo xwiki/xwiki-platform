@@ -56,7 +56,7 @@ W Gramatyce XWiki 1.0 nie ma możliwości wprowadzania parametrów i jedynym spo
 
 W XWiki wersji {{velocity}}$crtSyntaxVer{{/velocity}} można przekazać parametry do róznych elementów gramatycznych a także bloków tekstu. Jest to używane np. do ich stylizowania. Możesz ustawić dowolny parametr jako parę typu klucz/wartość. Renderer XHTML przekaże te argumenty jako atrybuty XHTML do wewnętrnzej reprezentacji róznych elementów gramatycznych.
 
-|=(% style="width="60%" %)XWiki Gramatyka {{velocity}}$crtSyntaxVer{{/velocity}}|=Wygenerowany XHTML
+|=(% style="width:60%" %)XWiki Gramatyka {{velocity}}$crtSyntaxVer{{/velocity}}|=Wygenerowany XHTML
 |((({{{
 (% class="myClass" style="myStyle" id="myId" %)
 = nagłówek =

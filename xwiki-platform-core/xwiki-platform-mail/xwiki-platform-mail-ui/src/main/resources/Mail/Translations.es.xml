@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Mail</web>
+  <name>Translations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Mail.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Mail Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.email=Email
+admin.email.description=Configure los parámetros de envío de correo y vea los estados del correo.
+admin.emailgeneral=Avanzado
+admin.emailgeneral.description=Configurar parámetros de correo avanzados, como la ofuscación de direcciones de correo.
+admin.emailsend=Envío de emails
+admin.emailsend.description=Configure los parámetros de envío de correo.
+admin.emailstatus=Estado de envío de correo
+admin.emailstatus.description=Ver los estados de los correos enviados y reenviar los correos fallidos.
+admin.emailstatus.hint=Si no puede encontrar el estado de un correo, es posible que se deba a que en la propiedad que define el envío del correo no se especificó que se persistiese el estado.
+Mail.GeneralMailConfigClass_obfuscate=Ofuscar direcciones de correo electrónico
+Mail.GeneralMailConfigClass_obfuscate.hint=Esto sólo afecta a las direcciones de correo electrónico almacenadas en las propiedades de objeto del tipo Email, siempre y cuando no se sobrescriba el visor personalizado para el tipo de propiedad Email. Ejemplo: a...@domain.org
+Mail.SendMailConfigClass_from=Dirección de correo electrónico desde la que se enviará
+Mail.SendMailConfigClass_from.hint=La dirección de correo electrónico predeterminada que se utiliza para enviar mensajes de notificación
+Mail.SendMailConfigClass_bcc=Dirección de email BBC
+Mail.SendMailConfigClass_bcc.hint=Una lista predeterminada, separada por comas, de las direcciones de correo electrónico de BCC que se utilizarán al enviar correo
+Mail.SendMailConfigClass_host=Servidor de email
+Mail.SendMailConfigClass_host.hint=El servidor SMTP que se empleará. Por defecto es "localhost"
+Mail.SendMailConfigClass_port=Puerto del servidor de correo electrónico
+Mail.SendMailConfigClass_port.hint=El puerto del servidor SMTP a utilizar. Por defecto: 25
+Mail.SendMailConfigClass_username=Nombre de usuario del servidor de correo electrónico
+Mail.SendMailConfigClass_username.hint=El nombre de usuario para conectarse al servidor SMTP, sólo cuando se requiere autenticación
+Mail.SendMailConfigClass_password=Contraseña del servidor de correo electrónico
+Mail.SendMailConfigClass_password.hint=La contraseña para conectarse al servidor SMTP, sólo cuando se requiere autenticación
+Mail.SendMailConfigClass_properties=Propiedades adicionales
+Mail.SendMailConfigClass_properties.hint=La lista de propiedades adicionales de JavaMail a utilizar (por ejemplo, "mail.smtp.starttls.enable=true" para TLS)
+Mail.SendMailConfigClass_sendWaitTime=Máximo tiempo de espera
+Mail.SendMailConfigClass_sendWaitTime.hint=El retraso entre cada correo que se envía, en milisegundos (por defecto son 8 segundos)
+Mail.SendMailConfigClass_discardSuccessStatuses=¿Descartar los registros exitosos?
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=No importa si los estados de correo se mantienen o no para el correo que se ha enviado con éxito (por defecto a true)
+Mail.SendMailStatus_livetable.date=Fecha
+Mail.SendMailStatus_livetable.batchId=ID de Lote
+Mail.SendMailStatus_livetable.type=Tipo
+Mail.SendMailStatus_livetable.recipients=Destinatarios
+Mail.SendMailStatus_livetable.state=Estado
+Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.error=Error
+Mail.SendMailStatus_livetable.actions=Acciones
+Mail.SendMailStatus_livetable.resend=Reenviar
+mailSender.admin.resendSuccess=El correo ha sido reenviado con éxito
+mailSender.admin.resendFailure=No se ha podido reenviar. Haga clic para más detalles.</content>
+  
+</xwikidoc>

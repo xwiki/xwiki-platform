@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Macros.Tree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.tree.name=ट्री
+rendering.macro.tree.description=मॅक्रो सामग्री किंवा स्त्रोत मापदंडानुसार परिभाषित केलेले ट्री वर्गीकरण प्रदर्शित करते.
+rendering.macro.tree.parameter.reference.name=संदर्भ
+### Missing: rendering.macro.tree.parameter.reference.description=The reference to the resource that describes the tree structure and its context menu, and which is called to perform the actions on the tree nodes. This resource is used to load the tree dynamically (on demand) when a tree node is opened, and to ask for the context menu when the user right-clicks on a tree node that has it. So the resource is not static. For static trees you should use the macro content instead. The reference can be a document reference or an URL/path.
+rendering.macro.tree.parameter.root.name=मूळ
+rendering.macro.tree.parameter.root.description=रूट नोड आयडी. आपण दिलेल्या नोडचे वंशज (जे निर्दिष्ट रूट आहे) प्रदर्शित करू इच्छित असल्यास हे उपयुक्त आहे. ट्री पहिल्या स्तरावर रूट नोडच्या मुलांना प्रदर्शित करते, म्हणून रूट नोड प्रत्यक्षात प्रदर्शित होत नाही. रूट नोड निर्दिष्ट नसल्यास संपूर्ण ट्री दर्शविले जाते.
+rendering.macro.tree.parameter.showRoot.name=रूट (मूळ) दाखवा
+### Missing: rendering.macro.tree.parameter.showRoot.description=Whether to show the root node or not. The root node is not shown by default because it is usually implied from the context where the tree is displayed (e.g. a label before the tree). There are some cases though when you may want to display the root node: to be able to create a new node under the root.
+rendering.macro.tree.parameter.dragAndDrop.name=ड्रॅग आणि ड्रॉप करा
+rendering.macro.tree.parameter.dragAndDrop.description=वापरकर्त्याने ट्रीचे नोड ड्रॅग आणि ड्रॉप करण्यास सक्षम असावे किंवा नाही हे निर्दिष्ट करते.
+rendering.macro.tree.parameter.contextMenu.name=संदर्भ मेनू
+rendering.macro.tree.parameter.contextMenu.description=जेव्हा वापरकर्ता ट्री नोडवर उजवे क्लिक करतो तेव्हा संदर्भ मेनू दर्शवायचा की नाही.
+rendering.macro.tree.parameter.class.name=वर्ग
+rendering.macro.tree.parameter.class.description=ट्रीच्या उच्च स्तरीय HTML घटकात जोडण्यासाठी अतिरिक्त CSS वर्ग.
+rendering.macro.tree.parameter.icons.name=आयकॉन
+### Missing: rendering.macro.tree.parameter.icons.description=Whether to show the tree node icons or not. You may want to hide the icons if all the tree nodes are of the same type or if you want to win some horizontal space.
+rendering.macro.tree.parameter.edges.name=कडा
+### Missing: rendering.macro.tree.parameter.edges.description=Whether to show the edges that connect the sibling tree nodes between themselves and with their parent.
+rendering.macro.tree.parameter.links.name=दुवे
+rendering.macro.tree.parameter.links.description=नोड लेबले दुवे म्हणून (लंगर म्हणून) पहायला हव्या आणि वागाव्यात हे निर्दिष्ट करते.
+rendering.macro.tree.parameter.checkboxes.name=चेकबॉक्सेस
+rendering.macro.tree.parameter.checkboxes.description=वापरकर्त्याला एकाधिक ट्री नोड निवडण्याची परवानगी देण्यासाठी प्रत्येक ट्री नोडसमोर चेकबॉक्स दर्शवायचा की नाही.
+rendering.macro.tree.parameter.openTo.name=वर उघडा
+### Missing: rendering.macro.tree.parameter.openTo.description=The id of the node to open the tree to. All the ancestors of the specified node, up to the root of the tree, will be opened also.
+rendering.macro.tree.parameter.finder.name=शोधक
+### Missing: rendering.macro.tree.parameter.finder.description=Show a text input that can be used to find tree nodes. The input is displayed above the tree and offers suggestions as you type based on the content of the tree. When a suggestion is selected, the tree is expanded up to the corresponding node.
+rendering.macro.tree.parameter.limit.name=मर्यादा
+### Missing: rendering.macro.tree.parameter.limit.description=The maximum number of child nodes to display when expanding a parent node for the first time. The rest of the child nodes are accessible through a "more ..." link. This parameter is basically used to paginate the child nodes and thus helps the tree scale when the number of child nodes is large. The tree passes this parameter to the tree source so it works only with dynamic trees whose source implements child count limit.
+### Missing: rendering.macro.tree.content.description=You can use nested HTML unordered lists to describe the tree structure. See http://www.jstree.com/docs/html/ for more information.
+tree.macro.editModeWarning=हा ट्री संपादन मोडमध्ये प्रदर्शित केला जाऊ शकत नाही.</content>
+  
+</xwikidoc>

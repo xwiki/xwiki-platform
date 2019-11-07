@@ -62,6 +62,11 @@ XWiki.Registration_loginButton_autoLogin_enabled.hint=Wenn die Login-Taste aktiv
 XWiki.Registration_defaultRedirect.hint=Dies ist die URL, zu der der Benutzer nach dem Drücken der Login-Taste umgeleitet wird, wenn der xredirect-Parameter nicht angegeben ist. Es kann ein Velocity-Code verwendet werden.
 XWiki.Registration_requireCaptcha.hint=Setzen Sie dies auf true, damit der Benutzer ein CAPTCHA lösen muss, um sich zu registrieren.
 XWiki.Registration_registrationSuccessMessage.hint=Dies wird dem Benutzer angezeigt, wenn er sich erfolgreich registriert hat. Velocity und Wiki-Syntaxcode können verwendet werden.
+### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
+### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
+### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
+### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
+### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
 
 # Look &amp; Feel Sections
 admin.themes=Themes
@@ -113,10 +118,20 @@ administration.section.export.withHistory.hint=Fügt den Seitenverlauf in den Ex
 administration.section.export.backupPack.hint=Geben Sie an, ob das Paket als Backup verwendet werden soll. Diese Option hat keinen Einfluss auf den exportierten Inhalt. Der einzige Effekt ist, dass die Option "Als Backup-Paket importieren" beim Importieren des Pakets vorgewählt ist. Der Unterschied zwischen einem Backup-Paket und einem normalen Paket besteht darin, dass im ersten Fall der letzte Autor der Seite beim Import erhalten bleibt, während im zweiten Fall der Benutzer, der den Import durchführt, zum letzten Autor jeder importierten Seite wird.
 
 # Users Section
+### Missing: administration.section.users.enableUser.inProgress=Enabling user account...
+### Missing: administration.section.users.enableUser.done=User account enabled
+### Missing: administration.section.users.enableUser.failed=Failed to enable the user account
+### Missing: administration.section.users.disableUser.inProgress=Disabling user account...
+### Missing: administration.section.users.disableUser.done=User account disabled
+### Missing: administration.section.users.disableUser.failed=Failed to disable the user account
 ### Missing: administration.section.users.deleteUser.confirmationMessage=The user {0} will be deleted and removed from all the {1}groups{2} that they were part of. Are you sure you want to proceed?
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
-administration.section.users.deleteUser.markDisabledMessage=Anstatt den Benutzer zu löschen, kannst du sein Profil als deaktiviert markieren. Dies verhindert, dass sie sich anmelden, und bewahrt die Zugriffsrechte, die mit den von ihnen geschriebenen Skripten verbunden sind.
+### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user without replacing the author.
+### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user without replacing the author.
+### Missing: administration.section.users.deleteUser.newAuthor=New Author
+### Missing: administration.section.users.deleteUser.newAuthor.hint=Select an user that has {0} rights or leave this field empty if you don''t want to replace the author.
+### Missing: administration.section.users.deleteUser.newAuthor.error=The selected user doesn''t have {0} rights!
+### Missing: administration.section.users.deleteUser.newAuthor.programming=programming
+### Missing: administration.section.users.deleteUser.newAuthor.script=script
 
 # Other Category
 admin.other=Andere
@@ -130,6 +145,10 @@ administration.section.analytics.status.hint=Bestimmen Sie, ob das Tracking in G
 ## Deprecated since 11.6RC1
 XWiki.XWikiPreferences_auth_active_check.hint=Wenn "Ja" wird verhindert, dass sich Benutzer einloggen ohne den Token einzugeben, den sie zuvor per E-Mail erhalten haben.
 ### Missing: administration.section.users.deleteUser.markInactiveMessage=Instead of deleting the user you can mark their profile as inactive. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
+## Deprecated since 11.8RC1
+administration.section.users.deleteUser.markDisabledMessage=Anstatt den Benutzer zu löschen, kannst du sein Profil als deaktiviert markieren. Dies verhindert, dass sie sich anmelden, und bewahrt die Zugriffsrechte, die mit den von ihnen geschriebenen Skripten verbunden sind.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>
 </xwikidoc>

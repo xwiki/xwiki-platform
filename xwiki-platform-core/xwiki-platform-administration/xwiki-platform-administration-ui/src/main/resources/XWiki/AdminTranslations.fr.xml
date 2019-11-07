@@ -62,6 +62,11 @@ XWiki.Registration_loginButton_autoLogin_enabled.hint=Si le bouton de connexion 
 XWiki.Registration_defaultRedirect.hint=URL vers laquelle l'utilisateur sera redirigé après avoir cliqué sur le bouton de Connexion si le paramètre xredirect n'est pas renseigné. Vous pouvez indiquer du code Velocity.
 XWiki.Registration_requireCaptcha.hint=Activer pour exiger de l'utilisateur la saisie d'un CAPTCHA lors de son enregistrement.
 XWiki.Registration_registrationSuccessMessage.hint=Affiché à l'utilisateur en fin de procédure d'inscription. Vous pouvez indiquer du code Velocity.
+XWiki.Registration_passwordLength.hint=Taille minimale du mot de passe. Un mot de passe long est plus sûr. Il est recommandé d'avoir un mot de passe de plus de 6 caractères.
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=Si actif, oblige l'utilisateur à définir un mot de passe contenant au moins une lettre minuscule.
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=Si actif, oblige l'utilisateur à définir un mot de passe contenant au moins une lettre majuscule.
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=Si actif, oblige l'utilisateur à définir un mot de passe contenant au moins un chiffre.
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Si actif, oblige l'utilisateur à définir un mot de passe contenant au moins un symbole.
 
 # Look &amp; Feel Sections
 admin.themes=Thèmes
@@ -113,10 +118,20 @@ administration.section.export.withHistory.hint=Inclure l'historique de la page d
 administration.section.export.backupPack.hint=Définit si le package est une sauvegarde. Cette option n'influe pas sur le contenu des pages mais, lors de l'import, pré-sélectionne l'option "Importer le package comme une sauvegarde". Dans ce cas, l'auteur est conservé. Au contraire lors de l'import d'un package normal, l'utilisateur effectuant l'import devient automatiquement le dernier auteur des pages importées.
 
 # Users Section
+administration.section.users.enableUser.inProgress=Activation du compte utilisateur…
+administration.section.users.enableUser.done=Compte utilisateur activé
+administration.section.users.enableUser.failed=Impossible d'activer le compte utilisateur
+administration.section.users.disableUser.inProgress=Désactivation du compte utilisateur…
+administration.section.users.disableUser.done=Compte utilisateur désactivé
+administration.section.users.disableUser.failed=Impossible de désactiver le compte utilisateur
 administration.section.users.deleteUser.confirmationMessage=L''utilisateur {0} va être retiré de tous les {1}groupes{2} auxquels il appartient. Souhaitez-vous continuer ?
-### Missing: administration.section.users.deleteUser.programmingRightsWarning=The user you''re about to delete has Programming Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. If {1,choice,1#this page has|1&lt;these pages have} scripts requiring programming rights then these scripts will stop working if you delete the user.
-### Missing: administration.section.users.deleteUser.scriptRightsWarning=The user you''re about to delete has Script Rights and is the last author of {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. The scripts from {1,choice,1#this page|1&lt;these pages} may stop working if you delete the user.
-### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+administration.section.users.deleteUser.programmingRightsWarning=L''utilisateur que vous êtes sur le point de supprimer possède les droits de Programmation et est le dernier auteur de {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. Si {1,choice,1#cette page a|1&lt;ces pages ont} des scripts requérant les droits de programmation, ces scripts peuvent cesser de fonctionner si vous supprimez l''utilisateur sans désigner de nouvel auteur pour ces pages.
+administration.section.users.deleteUser.scriptRightsWarning=L''utilisateur que vous êtes sur le point de supprimer possède les droits de Scripts et est le dernier auteur de {0}{1,choice,1#1 page|1&lt;{1} pages}{2}. Les scripts provenant de {1,choice,1#cette page|1&lt;ces pages} peuvent cesser de fonctionner si vous supprimez l''utilisateur sans désigner de nouvel auteur pour ces pages.
+administration.section.users.deleteUser.newAuthor=Nouvel auteur
+administration.section.users.deleteUser.newAuthor.hint=Sélectionnez un utilisateur qui possède les droits {0} ou laissez ce champ vide si vous ne souhaitez pas remplacer l''auteur.
+administration.section.users.deleteUser.newAuthor.error=L''utilisateur sélectionné n''a pas les droits {0} !
+administration.section.users.deleteUser.newAuthor.programming=de programmation
+administration.section.users.deleteUser.newAuthor.script=script
 
 # Other Category
 admin.other=Divers
@@ -130,6 +145,10 @@ administration.section.analytics.status.hint=Définit si le suivi Google Analyti
 ## Deprecated since 11.6RC1
 XWiki.XWikiPreferences_auth_active_check.hint=Si défini à "Oui", les utilisateurs devront saisir la clef envoyée par courriel pour se connecter.
 administration.section.users.deleteUser.markInactiveMessage=Plutôt que de supprimer l'utilisateur vous pouvez le désactiver. Ainsi il ne pourra plus se connecter et les scripts associés à cet utilisateur continueront à fonctionner.
+
+## Deprecated since 11.8RC1
+### Missing: administration.section.users.deleteUser.markDisabledMessage=Instead of deleting the user you can mark their profile as disabled. This will prevent them from logging in and will preserve the access rights associated with the scripts they wrote.
+
 ## Used to indicate where deprecated keys end
 #@deprecatedend</content>
 </xwikidoc>

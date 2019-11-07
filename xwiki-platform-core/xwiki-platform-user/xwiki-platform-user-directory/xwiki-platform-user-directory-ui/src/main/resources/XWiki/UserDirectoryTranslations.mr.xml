@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>UserDirectoryTranslations</name>
+  <language>mr</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Main.UserDirectory</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: XWiki.UserDirectoryPreferencesClass_columns=Columns to display
+### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=The list of columns, corresponding to properties of the User class, to be displayed in the user directory
+### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Hide disabled user profiles
+### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Exclude from the user directory the users that have their profile disabled
+
+userdirectory.userScopeFilter=वापरकर्ता व्याप्ती:
+userdirectory.userScopeFilter.hint=आपण प्रदर्शित करू इच्छित वापरकर्त्यांची श्रेणी निवडा.
+userdirectory.userScopeFilter.local=स्थानिक वापरकर्ते
+userdirectory.userScopeFilter.global=या विकीचे सदस्य असलेले वैश्विक वापरकर्ते
+### Missing: userdirectory.configuration.title=Settings
+### Missing: userdirectory.configuration.columns.editHint=Click to select the columns
+
+platform.userdirectory.customizeNotAllowed=आपल्याला ही वापरकर्ता निर्देशिका सानुकूलित करण्याची परवानगी नाही.
+platform.userdirectory.configTitle=वापरकर्ता निर्देशिका कॉन्फिगरेशन
+platform.userdirectory.configSheetTitle=वापरकर्ता निर्देशिका कॉन्फिगरेशन पत्रक
+platform.userdirectory.configSheetApplyOnConfiguration=हे पत्रक वापरकर्ता निर्देशिका कॉन्फिगरेशन दस्तऐवजात लागू केले जाणे आवश्यक आहे.</content>
+  
+</xwikidoc>

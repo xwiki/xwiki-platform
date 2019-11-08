@@ -75,7 +75,6 @@ import com.xpn.xwiki.web.Utils;
 import io.sf.carte.doc.dom4j.CSSStylableElement;
 import io.sf.carte.doc.dom4j.XHTMLDocument;
 import io.sf.carte.doc.dom4j.XHTMLDocumentFactory;
-import io.sf.carte.doc.style.css.CSSDocument;
 import io.sf.carte.doc.xml.dtd.DefaultEntityResolver;
 
 /**
@@ -333,8 +332,7 @@ public class PdfExportImpl implements PdfExport
             // transform it into PDF. We want to control all the CSS rules we apply and thus don't need nor want to
             // have extra ones applied.
             // See https://groups.google.com/forum/?#!topic/css4j/CVqzjz3ZXXQ for extra details.
-            docFactory.getStyleSheetFactory().getUserAgentStyleSheet(
-                CSSDocument.ComplianceMode.STRICT).getCssRules().clear();
+            docFactory.getStyleSheetFactory().getUserAgentStyleSheet().getCssRules().clear();
             SAXReader reader = new SAXReader(docFactory);
             // Dom4J 2.1.1 disable external DTD by default which is required here, putting it back
             // See https://github.com/dom4j/dom4j/issues/51

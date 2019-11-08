@@ -108,24 +108,20 @@ public class PdfExportImplTest
         //   TODO: right now we output the DOM with DOM4J and use the default of converting entities when using the
         //   XMLWriter. We need to decide if that's correct or if we should call XMLWriter#setResolveEntityRefs(false)
         //   instead.
+
         String expected = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\" "
                 + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">"
-                + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head style=\"display: none; \">"
-            + "<title style=\"display: none; \">\n"
+                + "<html xmlns=\"http://www.w3.org/1999/xhtml\"><head><title>\n"
             + "  Main.ttt - ttt\n"
             + "</title>"
-            + "<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\" style=\"display: none; \"/>"
-            + "<meta content=\"en\" name=\"language\" style=\"display: none; \"/>"
-            + "</head><body class=\"exportbody\" id=\"body\" pdfcover=\"0\" pdftoc=\"0\" "
-                + "style=\"display: block; margin-top: 8px; margin-right: 8px; margin-bottom: 8px; margin-left: 8px; "
-                + "unicode-bidi: embed; \">"
-            + "<div id=\"xwikimaincontainer\" style=\"display: block; unicode-bidi: embed; \">\n"
-            + "<div id=\"xwikimaincontainerinner\" style=\"display: block; unicode-bidi: embed; \">\n"
-            + "\n"
-            + "<div id=\"xwikicontent\" style=\"display: block; unicode-bidi: embed; \">\n"
-            + "      <p style=\"display: block; margin-top: 3pt; margin-bottom: 3pt; unicode-bidi: embed; \">"
-                + "<span style=\"color: #f00; background-color: #fff; background-image: none; "
+            + "<meta content=\"text/html; charset=UTF-8\" http-equiv=\"Content-Type\"/>"
+            + "<meta content=\"en\" name=\"language\"/>"
+            + "</head><body class=\"exportbody\" id=\"body\" pdfcover=\"0\" pdftoc=\"0\">"
+            + "<div id=\"xwikimaincontainer\">\n"
+            + "<div id=\"xwikimaincontainerinner\">\n\n"
+            + "<div id=\"xwikicontent\">\n"
+            + "      <p><span style=\"color: #f00; background-color: #fff; background-image: none; "
                 + "background-position: 0% 0%; background-size: auto auto; background-origin: padding-box; "
                 + "background-clip: border-box; background-repeat: repeat repeat; "
                 + "background-attachment: scroll; \">Hello Clément</span></p>\n"
@@ -133,6 +129,7 @@ public class PdfExportImplTest
             + "</div>\n"
             + "</div>"
             + "</body></html>";
+
         assertEquals(expected, pdfExport.applyCSS(html, css, xcontext));
     }
 }

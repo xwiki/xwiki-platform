@@ -75,6 +75,7 @@ import com.xpn.xwiki.web.Utils;
 import io.sf.carte.doc.dom4j.CSSStylableElement;
 import io.sf.carte.doc.dom4j.XHTMLDocument;
 import io.sf.carte.doc.dom4j.XHTMLDocumentFactory;
+import io.sf.carte.doc.style.css.CSSDocument;
 import io.sf.carte.doc.xml.dtd.DefaultEntityResolver;
 
 /**
@@ -326,16 +327,28 @@ public class PdfExportImpl implements PdfExport
             // Prepare the input
             Reader re = new StringReader(html);
             InputSource source = new InputSource(re);
-            SAXReader reader = new SAXReader(XHTMLDocumentFactory.getInstance());
+            XHTMLDocumentFactory docFactory = XHTMLDocumentFactory.getInstance();
+            // Clear the default stylesheet loaded by CSS4J. CSS4J does this to simulate the browser (UA) stylesheet
+            // that is applied but in our case we don't display the resulting HTML in a browser but as input to
+            // transform it into PDF. We want to control all the CSS rules we apply and thus don't need nor want to
+            // have extra ones applied.
+            // See https://groups.google.com/forum/?#!topic/css4j/CVqzjz3ZXXQ for extra details.
+            docFactory.getStyleSheetFactory().getUserAgentStyleSheet(
+                CSSDocument.ComplianceMode.STRICT).getCssRules().clear();
+            SAXReader reader = new SAXReader(docFactory);
+            // Dom4J 2.1.1 disable external DTD by default which is required here, putting it back
+            // See https://github.com/dom4j/dom4j/issues/51
+            reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
             reader.setEntityResolver(new DefaultEntityResolver());
             XHTMLDocument document = (XHTMLDocument) reader.read(source);
 
             // Set the base URL so that CSS4J can resolve URLs in CSS. Use the current document in the XWiki Context
             document.setBaseURL(new URL(context.getDoc().getExternalURL("view", context)));
 
-            // Apply the style sheet
+            // Apply the style sheet.
             document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));
             applyInlineStyle(document.getRootElement());
+
             OutputFormat outputFormat = new OutputFormat("", false);
             if ((context == null) || (context.getWiki() == null)) {
                 outputFormat.setEncoding("UTF-8");

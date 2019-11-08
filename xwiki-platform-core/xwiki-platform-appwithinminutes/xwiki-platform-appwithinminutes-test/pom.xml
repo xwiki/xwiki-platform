@@ -24,21 +24,27 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-appwithinminutes</artifactId>
     <version>11.10-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-appwithinminutes</artifactId>
-  <name>XWiki Platform - App Within Minutes</name>
+  <artifactId>xwiki-platform-appwithinminutes-test</artifactId>
+  <name>XWiki Platform - App Within Minutes - Test - Parent</name>
   <packaging>pom</packaging>
-  <description>Create collaborative web applications within minutes, based on XWiki's powerful structured data management system</description>
+  <description>Tests for App Within Minutes</description>
+  <properties>
+    <!-- Don't run backward-compatibility checks in test modules since we don't consider them as public APIs -->
+    <xwiki.revapi.skip>true</xwiki.revapi.skip>
+    <!-- Don't run Checkstyle in test modules -->
+    <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
+  </properties>
   <modules>
-    <module>xwiki-platform-appwithinminutes-ui</module>
+    <module>xwiki-platform-appwithinminutes-test-pageobjects</module>
   </modules>
   <profiles>
     <profile>
-      <id>integration-tests</id>
+      <id>docker</id>
       <modules>
-        <module>xwiki-platform-appwithinminutes-test</module>
+        <module>xwiki-platform-appwithinminutes-test-docker</module>
       </modules>
     </profile>
   </profiles>

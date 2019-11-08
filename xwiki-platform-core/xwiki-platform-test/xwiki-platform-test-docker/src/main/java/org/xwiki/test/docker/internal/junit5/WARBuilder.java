@@ -225,7 +225,9 @@ public class WARBuilder
 
         // Copy maven project webapp resources, if any.
         File webappResourceDirectory = new File("src/test/webapp");
-        copyDirectory(webappResourceDirectory, this.targetWARDirectory);
+        if (webappResourceDirectory.exists()) {
+            copyDirectory(webappResourceDirectory, this.targetWARDirectory);
+        }
     }
 
     private void copyJARs(TestConfiguration testConfiguration, List<Artifact> jarDependencies, File libDirectory)

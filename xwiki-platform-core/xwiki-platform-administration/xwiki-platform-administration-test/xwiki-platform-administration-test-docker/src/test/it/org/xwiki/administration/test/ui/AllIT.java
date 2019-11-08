@@ -74,4 +74,10 @@ public class AllIT
     class NestedUsersGroupsRightsManagementsIT extends UsersGroupsRightsManagementIT
     {
     }
+
+    @Nested
+    @DisplayName("Forgot Username")
+    class NestedForgotUsernameIT extends ForgotUsernameIT
+    {
+    }
 }

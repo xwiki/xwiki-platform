@@ -113,7 +113,7 @@ public final class DockerTestUtils
         try {
             org.codehaus.plexus.util.FileUtils.copyFileToDirectoryIfModified(source, targetDirectory);
         } catch (IOException e) {
-            throw new Exception(String.format("Failed to copy file [%] to [%]", source, targetDirectory),
+            throw new Exception(String.format("Failed to copy file [%s] to [%s]", source, targetDirectory),
                 e);
         }
     }
@@ -130,10 +130,9 @@ public final class DockerTestUtils
             org.codehaus.plexus.util.FileUtils.copyDirectoryStructureIfModified(sourceDirectory, targetDirectory);
         } catch (IOException e) {
             throw new Exception(
-                String.format("Failed to copy directory [%] to [%]", sourceDirectory, targetDirectory), e);
+                String.format("Failed to copy directory [%s] to [%s]", sourceDirectory, targetDirectory), e);
         }
     }
-
 
     /**
      * Start following a docker container's logs from the moment this API is called.

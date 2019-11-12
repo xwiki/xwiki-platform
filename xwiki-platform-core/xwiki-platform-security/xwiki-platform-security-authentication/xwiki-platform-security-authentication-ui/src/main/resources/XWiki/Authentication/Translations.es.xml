@@ -44,5 +44,4 @@ authentication.admin.maxAttempts.label=Número máximo de intentos autorizados
 authentication.admin.maxAttempts.hint=Esto representa el número máximo de fallos de inicio de sesión autorizados antes de que se active la estrategia. Este número sólo se tiene en cuenta en el contexto de la siguiente ventana de tiempo. Tenga en cuenta que un valor 0 significa que la función está desactivada.
 authentication.admin.timeWindow.label=Ventana de tiempo para los fallos de inicio de sesión
 authentication.admin.timeWindow.hint=La ventana de tiempo en segundos durante la cual la estrategia considerará el inicio de sesión como fallido.</content>
-  
 </xwikidoc>

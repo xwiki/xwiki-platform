@@ -32,21 +32,35 @@
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>
+  <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity}}
+#set ($discard = $xwiki.jsx.use('XWiki.Authentication.Administration'))
 #set ($authConfig = $services.security.authentication.authenticationConfiguration)
 #set ($selectedStrategies = {})
 #foreach ($strategy in $authConfig.getFailureStrategies())
 #set ($discard = $selectedStrategies.put($strategy, true))
 #end
 {{html clean="false"}}
-&lt;form method="post" action="${xwiki.getURL('XWiki.Authentication.Configuration', 'save')}" class='xform'&gt;
+&lt;form method="post" id="authenticationSecurityConfigForm" action="${xwiki.getURL('XWiki.Authentication.Configuration', 'save')}" class='xform'&gt;
   &lt;div class="hidden"&gt;
     &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
     &lt;input type='hidden' name='xredirect' value="$xwiki.getRequestURL()" /&gt;
   &lt;/div&gt;
+  &lt;dl&gt;
+     &lt;dt&gt;
+       &lt;label for="XWiki.Authentication.ConfigurationClass_0_isAuthenticationSecurityEnabled"&gt;$services.localization.render('authentication.admin.isAuthenticationSecurityEnabled.label')&lt;/label&gt;
+       &lt;span class='xHint'&gt;$services.localization.render('authentication.admin.isAuthenticationSecurityEnabled.hint')&lt;/span&gt;
+     &lt;dt&gt;
+     &lt;dd&gt;
+       &lt;select name="XWiki.Authentication.ConfigurationClass_0_isAuthenticationSecurityEnabled" id="XWiki.Authentication.ConfigurationClass_0_isAuthenticationSecurityEnabled"&gt;
+         &lt;option value="0" #if(!$authConfig.isAuthenticationSecurityEnabled())selected="selected"#end&gt;$services.localization.render('authentication.admin.isAuthenticationSecurityEnabled.disabled')&lt;/option&gt;
+         &lt;option value="1" #if($authConfig.isAuthenticationSecurityEnabled())selected="selected"#end&gt;$services.localization.render('authentication.admin.isAuthenticationSecurityEnabled.enabled')&lt;/option&gt;
+       &lt;/select&gt;
+     &lt;/dd&gt;
+  &lt;/dl&gt;
   &lt;dl&gt;
     &lt;dt&gt;
       &lt;label for="XWiki.Authentication.ConfigurationClass_0_failureStrategy"&gt;$services.localization.render('authentication.admin.failureStrategy.label')&lt;/label&gt;
@@ -312,6 +326,131 @@
     </property>
     <property>
       <sectionOrder/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.Authentication.Administration</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>58be8200-2ec7-4d02-9fc5-8375df878e68</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-events-bridge'], function($) {
+  var retrieveFields = function () {
+    return $('input,select', '#authenticationSecurityConfigForm').filter(function () {
+        var name = $(this).attr('name');
+        return name != undefined &amp;&amp; name.indexOf('XWiki.Authentication.ConfigurationClass_0') != -1 &amp;&amp; name.indexOf('isAuthenticationSecurityEnabled') == -1;
+     });
+  };
+
+  var disableFields = function () {
+    retrieveFields().attr('disabled', true);
+  };
+
+  var enableFields = function () {
+    retrieveFields().attr('disabled', false);
+  };
+
+  var initialize = function () {
+    var select = $('#XWiki\\.Authentication\\.ConfigurationClass_0_isAuthenticationSecurityEnabled');
+    if (select.val() == 1) {
+      enableFields();
+    } else {
+      disableFields();
+    }
+    select.on('change', initialize);
+  };
+  (XWiki.isInitialized ? initialize() : document.on('xwiki:dom:loaded', initialize));
+});</code>
+    </property>
+    <property>
+      <name>Administration JSX</name>
+    </property>
+    <property>
+      <parse>0</parse>
+    </property>
+    <property>
+      <use>currentPage</use>
     </property>
   </object>
 </xwikidoc>

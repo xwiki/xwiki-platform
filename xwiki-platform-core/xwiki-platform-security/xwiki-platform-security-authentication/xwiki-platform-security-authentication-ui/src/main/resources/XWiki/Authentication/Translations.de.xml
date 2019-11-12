@@ -44,5 +44,4 @@ authentication.admin.maxAttempts.label=Maximale Anzahl der Autorisierungsversuch
 authentication.admin.maxAttempts.hint=Dies entspricht der maximalen Anzahl von Anmeldefehlern, bevor die Strategie aktiviert wird. Diese Zahl wird nur im Rahmen des folgenden Zeitfensters berücksichtigt. Bitte beachten Sie, dass ein Wert von 0 bedeutet, dass die Funktion deaktiviert ist.
 authentication.admin.timeWindow.label=Zeitfenster für Login-Fehler
 authentication.admin.timeWindow.hint=Das Zeitfenster in Sekunden, in dem die Berücksichtigung der fehlgeschlagenen Anmeldung versucht wird, die Strategie zu aktivieren.</content>
-  
 </xwikidoc>

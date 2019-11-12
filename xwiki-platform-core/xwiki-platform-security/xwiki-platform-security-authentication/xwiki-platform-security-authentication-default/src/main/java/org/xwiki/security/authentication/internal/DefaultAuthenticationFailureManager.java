@@ -118,6 +118,16 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         return this.failureStrategyList;
     }
 
+    private boolean isAuthenticationSecurityEnabled()
+    {
+        // historically the feature was considered as disabled if max attempts = 0, max time = 0 or the strategy list
+        // was empty. We keep that as possible way to say it's disabled.
+        return configuration.isAuthenticationSecurityEnabled()
+            && getMaxNbAttempts() != 0
+            && getMaxTime() != 0
+            && !getFailureStrategyList().isEmpty();
+    }
+
     @Override
     public boolean recordAuthenticationFailure(String username)
     {
@@ -125,8 +135,9 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         observationManager.notify(AUTHENTICATION_FAILURE_EVENT, username);
 
         // If the config is set to 0 for max attempts or time window, it means the feature is disabled,
-        // we can immediately return.
-        if (getMaxNbAttempts() == 0 || getMaxTime() == 0 || getFailureStrategyList().isEmpty()) {
+        // we can immediately return, and we clear the data.
+        if (!isAuthenticationSecurityEnabled()) {
+            this.authFailures.clear();
             return false;
         }
 
@@ -193,6 +204,12 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
     public boolean validateForm(String username, SecurityRequestWrapper request)
     {
         boolean result = true;
+
+        // If the config is set to 0 for max attempts or time window, it means the feature is disabled,
+        // we can clear the data.
+        if (!isAuthenticationSecurityEnabled()) {
+            this.authFailures.clear();
+        }
 
         // We only call the strategies if the threshold is reached.
         if (isThresholdReached(username)) {

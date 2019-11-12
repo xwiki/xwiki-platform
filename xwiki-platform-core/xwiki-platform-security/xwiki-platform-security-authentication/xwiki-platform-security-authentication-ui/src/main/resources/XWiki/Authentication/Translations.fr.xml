@@ -43,5 +43,9 @@ authentication.admin.failureStrategy.captcha.name=CAPTCHA
 authentication.admin.maxAttempts.label=Nombre maximum de tentatives d'authentification autorisées
 authentication.admin.maxAttempts.hint=Ceci représente le nombre maximum d'échec d'authentification autorisé avant qu'une stratégie soit activée. Ce nombre n'est pris en compte que dans le contexte de la plage de temps qui suit. Veuillez noter que 0 signifie que la fonctionnalité est désactivée.
 authentication.admin.timeWindow.label=Plage de temps pour les échecs d'authentification
-authentication.admin.timeWindow.hint=La plage de temps, en seconde, durant laquelle les échecs d'authentification seront pris en compte pour l'activation de la stratégie.</content>
+authentication.admin.timeWindow.hint=La plage de temps, en seconde, durant laquelle les échecs d'authentification seront pris en compte pour l'activation de la stratégie.
+authentication.admin.isAuthenticationSecurityEnabled.label=Activer ou désactiver le mécanisme d'authentification sécurisée
+authentication.admin.isAuthenticationSecurityEnabled.hint=Désactiver le mécanisme d'authentification sécurisée supprimera du même coup le journal des échecs d'authentification.
+authentication.admin.isAuthenticationSecurityEnabled.disabled=Désactivé
+authentication.admin.isAuthenticationSecurityEnabled.enabled=Activé</content>
 </xwikidoc>

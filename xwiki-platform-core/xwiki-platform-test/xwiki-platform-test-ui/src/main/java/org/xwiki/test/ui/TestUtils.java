@@ -1300,8 +1300,6 @@ public class TestUtils
     public void addObject(String space, String page, String className, Object... properties)
     {
         gotoPage(space, page, "objectadd", toQueryParameters(className, null, properties));
-        // Force instance of the page object to wait on loading to avoid javascript race condition.
-        new ObjectEditPage().waitUntilPageIsLoaded();
     }
 
     /**
@@ -1310,8 +1308,6 @@ public class TestUtils
     public void addObject(EntityReference reference, String className, Object... properties)
     {
         gotoPage(reference, "objectadd", toQueryParameters(className, null, properties));
-        // Force instance of the page object to wait on loading to avoid javascript race condition.
-        new ObjectEditPage().waitUntilPageIsLoaded();
     }
 
     /**
@@ -1320,15 +1316,11 @@ public class TestUtils
     public void addObject(EntityReference reference, String className, Map<String, ?> properties)
     {
         gotoPage(reference, "objectadd", toQueryParameters(className, null, properties));
-        // Force instance of the page object to wait on loading to avoid javascript race condition.
-        new ObjectEditPage().waitUntilPageIsLoaded();
     }
 
     public void addObject(String space, String page, String className, Map<String, ?> properties)
     {
         gotoPage(space, page, "objectadd", toQueryParameters(className, null, properties));
-        // Force instance of the page object to wait on loading to avoid javascript race condition.
-        new ObjectEditPage().waitUntilPageIsLoaded();
     }
 
     public void deleteObject(String space, String page, String className, int objectNumber) throws Exception
@@ -1386,8 +1378,6 @@ public class TestUtils
     public void addClassProperty(EntityReference reference, String propertyName, String propertyType)
     {
         gotoPage(reference, "propadd", "propname", propertyName, "proptype", propertyType);
-        // Force instance of the page object to wait on loading to avoid javascript race condition.
-        new ClassEditPage().waitUntilPageIsLoaded();
     }
 
     /**
@@ -1396,15 +1386,11 @@ public class TestUtils
     public void updateClassProperty(EntityReference reference, Object... queryParameters)
     {
         gotoPage(reference, "propupdate", queryParameters);
-        // Force instance of the page object to wait on loading to avoid javascript race condition.
-        new ClassEditPage().waitUntilPageIsLoaded();
     }
 
     public void addClassProperty(String space, String page, String propertyName, String propertyType)
     {
         gotoPage(space, page, "propadd", "propname", propertyName, "proptype", propertyType);
-        // Force instance of the page object to wait on loading to avoid javascript race condition.
-        new ClassEditPage().waitUntilPageIsLoaded();
     }
 
     /**

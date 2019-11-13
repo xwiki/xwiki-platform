@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class ForgotUsernameIT
 {
     @Test
-    public void retrieveUsername(TestUtils testUtils, TestReference testReference)
+    public void retrieveUsername(TestUtils testUtils)
     {
         String user = "realuser";
         String userMail = "realuser@host.org";

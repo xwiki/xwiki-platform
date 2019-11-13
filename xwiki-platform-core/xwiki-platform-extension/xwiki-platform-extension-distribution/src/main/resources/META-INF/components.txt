@@ -5,6 +5,7 @@ org.xwiki.extension.distribution.internal.DistributionInternalScriptService
 org.xwiki.extension.distribution.internal.DocumentsModifiedDuringDistributionListener
 org.xwiki.extension.distribution.internal.WikiDistributionWikiEventListener
 org.xwiki.extension.distribution.internal.job.DefaultDistributionJob
+org.xwiki.extension.distribution.internal.job.step.CleanExtensionsDistributionStep
 org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep
 org.xwiki.extension.distribution.internal.job.step.FirstAdminUserStep
 org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep

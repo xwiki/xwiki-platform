@@ -67,6 +67,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -550,11 +551,14 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        // Force proper id
-        String extensionId = uninstallRequest.getExtensions().iterator().next().getId();
-        String namespace =
-            uninstallRequest.getNamespaces() == null ? null : uninstallRequest.getNamespaces().iterator().next();
-        uninstallRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        if (uninstallRequest.getId() == null) {
+            // Force proper id
+            String extensionId = uninstallRequest.getExtensions().iterator().next().getId();
+            String namespace =
+                uninstallRequest.getNamespaces() == null ? null : uninstallRequest.getNamespaces().iterator().next();
+            uninstallRequest
+                .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        }
 
         // Check rights
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
@@ -608,7 +612,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      */
     private UninstallRequest createUninstallPlanRequest(ExtensionId extensionId, String namespace)
     {
-        UninstallRequest uninstallRequest = new UninstallRequest();
+        UninstallRequest uninstallRequest = createUninstallRequest();
         uninstallRequest
             .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_PLAN_PREFIX, extensionId.getId(), namespace));
         uninstallRequest.setInteractive(true);
@@ -620,6 +624,24 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
         // Indicate if it's allowed to do modification on root namespace
         uninstallRequest.setRootModificationsAllowed(
             namespace == null || this.xcontextProvider.get().isMainWiki(toWikiId(namespace)));
+
+        return uninstallRequest;
+    }
+
+    /**
+     * Create an {@link UninstallRequest} instance.
+     * 
+     * @param extensionId the identifier of the extension to uninstall
+     * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
+     *            extension will be uninstalled globally
+     * @return the {@link UninstallRequest}
+     * @since 11.10RC1
+     */
+    @Unstable
+    public UninstallRequest createUninstallRequest()
+    {
+        UninstallRequest uninstallRequest = new UninstallRequest();
+        uninstallRequest.setInteractive(true);
 
         contextualize(uninstallRequest);
 
@@ -667,8 +689,10 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param uninstallRequest the uninstall plan request to perform
      * @return the {@link Job} object which can be used to monitor the progress of the uninstall plan process, or
      *         {@code null} in case of failure
+     * @since 11.10RC1
      */
-    private Job createUninstallPlan(UninstallRequest uninstallRequest)
+    @Unstable
+    public Job createUninstallPlan(UninstallRequest uninstallRequest)
     {
         setError(null);
 

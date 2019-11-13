@@ -36,9 +36,10 @@ import org.xwiki.job.JobStatusStore;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.stability.Unstable;
 
 /**
  * Provides job-specific scripting APIs.
@@ -84,9 +85,6 @@ public class JobScriptService implements ScriptService
     @Inject
     private Execution execution;
 
-    @Inject
-    private WikiDescriptorManager wikis;
-
     /**
      * @param jobId the job id
      * @return the status of the specified job, {@code null} if the status cannot be found
@@ -107,6 +105,20 @@ public class JobScriptService implements ScriptService
         }
 
         return jobStatus;
+    }
+
+    /**
+     * @param jobId the job id
+     * @return the job instance, {@code null} if the job does not exist
+     * @throws AccessDeniedException when the author does not have the right to use this API
+     * @since 11.10RC1
+     */
+    @Unstable
+    public Job getJob(List<String> jobId) throws AccessDeniedException
+    {
+        this.authorization.checkAccess(Right.PROGRAM);
+
+        return this.jobExecutor.getJob(jobId);
     }
 
     /**

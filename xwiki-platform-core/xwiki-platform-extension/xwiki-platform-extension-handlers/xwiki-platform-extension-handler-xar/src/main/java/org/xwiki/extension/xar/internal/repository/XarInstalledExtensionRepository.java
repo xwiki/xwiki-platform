@@ -34,7 +34,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -77,9 +76,6 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
 
     @Inject
     private transient XarEntryTypeResolver typeResolver;
-
-    @Inject
-    private transient Logger logger;
 
     /**
      * Index used to find extensions owners of a document installed on a specific wiki.
@@ -335,17 +331,18 @@ public class XarInstalledExtensionRepository extends AbstractInstalledExtensionR
     }
 
     @Override
-    public Collection<InstalledExtension> getBackwardDependencies(String id, String namespace) throws ResolveException
+    public Collection<InstalledExtension> getBackwardDependencies(String id, String namespace, boolean withOptional)
+        throws ResolveException
     {
         InstalledExtension extension = this.installedRepository.getInstalledExtension(id, namespace);
 
         return extension.getType().equals(XarExtensionHandler.TYPE)
-            ? this.installedRepository.getBackwardDependencies(id, namespace) : null;
+            ? this.installedRepository.getBackwardDependencies(id, namespace, withOptional) : null;
     }
 
     @Override
-    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId)
-        throws ResolveException
+    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId,
+        boolean withOptional) throws ResolveException
     {
         InstalledExtension extension = this.installedRepository.resolve(extensionId);
 

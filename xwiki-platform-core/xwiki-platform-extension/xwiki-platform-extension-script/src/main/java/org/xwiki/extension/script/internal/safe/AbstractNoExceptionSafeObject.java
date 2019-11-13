@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import java.util.concurrent.Callable;
+
 import javax.inject.Inject;
 
 import org.xwiki.context.Execution;
@@ -54,7 +56,7 @@ public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObjec
      * @param safeProvider the provider of instances safe for public scripts
      * @param execution provide access to the current context
      */
-    public AbstractNoExceptionSafeObject(T wrapped, ScriptSafeProvider< ? > safeProvider, Execution execution)
+    public AbstractNoExceptionSafeObject(T wrapped, ScriptSafeProvider<?> safeProvider, Execution execution)
     {
         this(wrapped, safeProvider, execution, false);
     }
@@ -65,7 +67,7 @@ public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObjec
      * @param execution provide access to the current context
      * @param hasProgrammingRight does the caller script has programming right
      */
-    public AbstractNoExceptionSafeObject(T wrapped, ScriptSafeProvider< ? > safeProvider, Execution execution,
+    public AbstractNoExceptionSafeObject(T wrapped, ScriptSafeProvider<?> safeProvider, Execution execution,
         boolean hasProgrammingRight)
     {
         super(wrapped, safeProvider);
@@ -93,5 +95,29 @@ public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObjec
     protected void setError(Exception e)
     {
         this.execution.getContext().setProperty(ExtensionManagerScriptService.EXTENSIONERROR_KEY, e);
+    }
+
+    /**
+     * @since 11.10RC1
+     */
+    protected <R> R wrapError(Callable<R> callable)
+    {
+        setError(null);
+
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * @since 11.10RC1
+     */
+    protected <R> R safeWrapError(Callable<R> callable)
+    {
+        return wrapError(() -> safe(callable.call()));
     }
 }

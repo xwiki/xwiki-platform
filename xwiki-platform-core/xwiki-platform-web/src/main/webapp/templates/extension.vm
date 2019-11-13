@@ -97,14 +97,14 @@
 #end
 
 #macro (displayExtensionName $extension)
-  #set ($name = "$!{extension.name}")
-  #if ($name == '')
-    #set ($name = "$!{extension.id.id}")
-    #if ($name.indexOf(':') >= 0)
-      #set ($name = $name.substring($mathtool.add($name.indexOf(':'), 1)))
-    #end
-  #end
-  ${name}##
+#set ($name = "$!{extension.name}")
+#if ($name == '')
+#set ($name = "$!{extension.id.id}")
+#if ($name.indexOf(':') >= 0)
+#set ($name = $name.substring($mathtool.add($name.indexOf(':'), 1)))
+#end
+#end
+${name}##
 #end
 
 #macro (displayExtensionActionButtons $extension $readOnly)

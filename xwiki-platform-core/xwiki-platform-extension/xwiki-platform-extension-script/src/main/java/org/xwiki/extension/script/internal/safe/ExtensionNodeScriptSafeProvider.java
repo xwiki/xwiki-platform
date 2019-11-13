@@ -19,22 +19,27 @@
  */
 package org.xwiki.extension.script.internal.safe;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.extension.job.plan.ExtensionPlan;
+import org.xwiki.extension.Extension;
+import org.xwiki.extension.internal.tree.DefaultExtensionNode;
+import org.xwiki.extension.tree.ExtensionNode;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
- * Provide safe ExtensionPlan.
+ * Provide safe ExtensionNode.
  * 
  * @version $Id$
- * @since 4.0M2
+ * @since 11.10RC1
  */
 @Component
 @Singleton
-public class ExtensionPlanScriptSafeProvider implements ScriptSafeProvider<ExtensionPlan>
+public class ExtensionNodeScriptSafeProvider implements ScriptSafeProvider<ExtensionNode>
 {
     /**
      * The provider of instances safe for public scripts.
@@ -44,8 +49,20 @@ public class ExtensionPlanScriptSafeProvider implements ScriptSafeProvider<Exten
     private ScriptSafeProvider defaultSafeProvider;
 
     @Override
-    public <S> S get(ExtensionPlan unsafe)
+    public ExtensionNode get(ExtensionNode unsafe)
     {
-        return (S) new SafeExtensionPlan(unsafe, this.defaultSafeProvider);
+        List<ExtensionNode> safeChildren;
+        List<ExtensionNode> children = unsafe.getChildren();
+        if (children.isEmpty()) {
+            safeChildren = children;
+        } else {
+            safeChildren = new ArrayList<>(children.size());
+
+            children.forEach(c -> safeChildren.add(get(c)));
+        }
+
+        Extension safeExtension = (Extension) this.defaultSafeProvider.get(unsafe.getExtension());
+
+        return new DefaultExtensionNode(unsafe.getNamespace(), safeExtension, safeChildren);
     }
 }

@@ -20,6 +20,7 @@
 package org.xwiki.extension.script;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +36,7 @@ import org.xwiki.job.script.JobScriptService;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -197,5 +199,41 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     protected void setError(Exception e)
     {
         this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
+    }
+
+    /**
+     * Call the passed callable but try/catch and return null in case of exception (and update the last error).
+     * 
+     * @param <R> the result type of method {@code call}
+     * @param callable a task that returns a result and may throw an exception
+     * @return the computed result
+     * @since 11.10RC1
+     */
+    @Unstable
+    protected <R> R wrapError(Callable<R> callable)
+    {
+        setError(null);
+
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Call the passed callable but try/catch and return null in case of exception (and update the last error). A safe
+     * verison of the result is returned.
+     * 
+     * @param <R> the result type of method {@code call}
+     * @param callable a task that returns a result and may throw an exception
+     * @return the safe version of the computed result
+     * @since 11.10RC1
+     */
+    protected <R> R safeWrapError(Callable<R> callable)
+    {
+        return wrapError(() -> safe(callable.call()));
     }
 }

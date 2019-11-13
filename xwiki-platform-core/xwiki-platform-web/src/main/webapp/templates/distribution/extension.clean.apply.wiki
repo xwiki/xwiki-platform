@@ -1,0 +1,88 @@
+##!source.syntax=xwiki/2.1
+= {{translation key="platform.extension.distributionWizard.extension.cleanStep.apply.title"/}}
+
+{{velocity output="false"}}
+#macro(createUninstallJobRequest $uninstalledExtensions $uninstallRequest)
+  #set ($uninstallRequest = $extensionManager.createUninstallRequest())
+  #set($void = $uninstallRequest.setId(['extensions', 'distribution', 'clean', 'uninstall']))
+  #set($void = $uninstallRequest.setInteractive(true))
+  #foreach ($uninstalledExtensionId in $uninstalledExtensionIds)
+    #set($void = $uninstallRequest.addExtension($uninstalledExtensionId))
+  #end
+  #set($void = $uninstallRequest.addNamespace($currentNamespace))
+  #if ($xcontext.isMainWiki())
+    #set($void = $uninstallRequest.addNamespace($NULL))
+  #end
+#end
+
+#macro(formHiddenCleanApply)
+  #formHidden()
+
+  <input type="hidden" name="cleanapply"/>
+
+  #foreach ($uninstalledExtensionId in $uninstalledExtensionIds)
+    <input type="hidden" name="uninstalled_extension_ids" value="$escapetool.xml($uninstalledExtensionId)"/>
+  #end
+
+  #foreach ($topExtensionId in $topExtensionIds)
+    <input type="hidden" name="top_extension_ids" value="$escapetool.xml($topExtensionId)"/>
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($request.cleanapplyfinalize)
+  {{template name="distribution/extension.clean.apply.finalize.wiki"/}}
+#elseif ($request.cleanapplyreport)
+  {{template name="distribution/extension.clean.apply.report.wiki"/}}
+#else
+  #if (!$uninstalledExtensions.isEmpty())
+    #createUninstallJobRequest($uninstalledExtensions $uninstallRequest)
+    #set ($uninstallPlanJob = $extensionManager.createUninstallPlan($uninstallRequest))
+    ## Wait for the job to finish (no need to display a progress since it's fast)
+    #set ($void = $uninstallPlanJob.join())
+    #if ($uninstallPlanJob.status.error)
+      {{error}}
+        TODO: The uninstall plan failed.
+      {{/error}}
+    #else
+      {{html clean="false"}}
+        #displayExtensionPlan($uninstallPlanJob.status)
+      {{/html}}
+    #end
+  #end
+
+  #if (!$topExtensions.isEmpty())
+  {{html}}
+    <dl>
+      <dt>$services.localization.render("extensions.install.list.top")</dt>
+      <dd>
+        <ul class="dependencies">
+          #foreach($topExtension in $topExtensions)
+            <li>#displayDependency($topExtension.extension $topExtension.namespace)</li>
+          #end
+        </ul>
+      </dd>
+    </dl>
+  {{/html}}
+  #end
+
+  {{html}}
+    <form action="">
+      #formHiddenCleanApply()
+
+      #em_submitButton('Continue', 'cleanapplyfinalize', false, '')
+    </form>
+
+    <form action="">
+      #formHidden()
+
+      #foreach($extensoinId in $requestUninstalled)
+        <input type="hidden" name="uninstalled_extensions" value="$extensoinId"/>
+      #end
+
+      #em_submitButton($services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.back'), '', true, '')
+    </form>
+  {{/html}}
+#end
+{{/velocity}}

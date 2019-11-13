@@ -116,33 +116,38 @@ $xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', tru
           </label>
         </dt>
       #end
-      ## If no tag then default tag is <input>
-      #if ($field.tag)
-        #set ($tag = $field.tag)
+      ## If the field define its own html content, then use it directly.
+      #if ($field.get('type') == 'html')
+        <dd>$field.get('html')</dd>
       #else
-        #set ($tag = 'input')
-      #end
-      <dd><$tag id="$fieldName" ##
-      #set ($params = $field.params)
-      ## If no name parameter is specified, then we use the field name.
-      #if (!$params.name)
-        #set ($discard = $params.put('name', $fieldName))
-      #end
-      #foreach ($entry in $params.entrySet())
-        ## If a parameter is specified as '' then we don't include it.
-        #if ($entry.value != '')
-          $entry.key="$escapetool.xml($entry.value)" ##
+        ## If no tag then default tag is <input>
+        #if ($field.tag)
+          #set ($tag = $field.tag)
+        #else
+          #set ($tag = 'input')
         #end
-      #end
-      />
-      #if ($field.error)
-        <span ##
-        #foreach ($entry in $failureMessageParams.entrySet())
-          $entry.key="$entry.value" ##
+        <dd><$tag id="$fieldName" ##
+        #set ($params = $field.params)
+        ## If no name parameter is specified, then we use the field name.
+        #if (!$params.name)
+          #set ($discard = $params.put('name', $fieldName))
         #end
-        >$field.error</span>
+        #foreach ($entry in $params.entrySet())
+          ## If a parameter is specified as '' then we don't include it.
+          #if ($entry.value != '')
+            $entry.key="$escapetool.xml($entry.value)" ##
+          #end
+        #end
+        />
+        #if ($field.error)
+          <span ##
+          #foreach ($entry in $failureMessageParams.entrySet())
+            $entry.key="$entry.value" ##
+          #end
+          >$field.error</span>
+        #end
+        </dd>
       #end
-      </dd>
     #else
       $services.localization.render('xe.admin.registration.fieldWithNoName')
     #end

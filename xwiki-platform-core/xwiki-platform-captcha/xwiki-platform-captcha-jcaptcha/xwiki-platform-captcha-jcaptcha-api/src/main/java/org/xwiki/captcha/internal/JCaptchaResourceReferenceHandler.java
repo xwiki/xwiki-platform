@@ -22,10 +22,8 @@ package org.xwiki.captcha.internal;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -36,10 +34,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletRequest;
+import org.xwiki.container.servlet.ServletResponse;
 import org.xwiki.resource.AbstractResourceReferenceHandler;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
+import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceAction;
 
 import com.octo.captcha.component.sound.wordtosound.AbstractFreeTTSWordToSound;
@@ -60,7 +62,7 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("jcaptcha")
 @Singleton
-public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceHandler<EntityResourceAction>
+public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceHandler<ResourceType>
 {
     private static final String FREETTS_PROPERTIES_KEY = "freetts.voices";
 
@@ -78,10 +80,13 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
     @Inject
     private CaptchaServiceManager captchaServiceManager;
 
+    @Inject
+    private Container container;
+
     @Override
-    public List<EntityResourceAction> getSupportedResourceReferences()
+    public List<ResourceType> getSupportedResourceReferences()
     {
-        return Arrays.asList(ACTION);
+        return Arrays.asList(JCaptchaResourceReference.TYPE);
     }
 
     @Override
@@ -89,12 +94,10 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
         throws ResourceReferenceHandlerException
     {
         try {
-            XWikiContext context = contextProvider.get();
+            HttpServletRequest request = ((ServletRequest) this.container.getRequest()).getHttpServletRequest();
+            HttpServletResponse response = ((ServletResponse) this.container.getResponse()).getHttpServletResponse();
 
-            HttpServletRequest request = context.getRequest();
-            HttpServletResponse response = context.getResponse();
-
-            Map<String, Object> captchaParameters = readCaptchaParameters(reference);
+            JCaptchaResourceReference jCaptchaResourceReference = (JCaptchaResourceReference) reference;
 
             // This system property configures and enables the the available voices. The FreeTTSWordToSound
             // implementation is broken (i.e. relevant code commented out apparently by mistake) and fails to register
@@ -105,9 +108,10 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
                 System.setProperty(FREETTS_PROPERTIES_KEY, AbstractFreeTTSWordToSound.defaultVoicePackage);
             }
 
-            CaptchaService captchaService = captchaServiceManager.getCaptchaService(captchaParameters);
+            CaptchaService captchaService =
+                captchaServiceManager.getCaptchaService(jCaptchaResourceReference.getEngine());
 
-            String type = (String) captchaParameters.get("type");
+            String type = jCaptchaResourceReference.getCaptchaType();
             String id = request.getSession().getId();
             Locale locale = request.getLocale();
 
@@ -151,28 +155,5 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this
         // Resource Reference.
         chain.handleNext(reference);
-    }
-
-    /**
-     * @param reference the requested resource reference
-     * @return the captchaParameters extracted from the request
-     */
-    private Map<String, Object> readCaptchaParameters(ResourceReference reference)
-    {
-        Map<String, Object> captchaParameters = new HashMap<>();
-
-        // Convert the resource parameters (Map<String, List<String>>) to captcha parameters (Map<String, Object>).
-        if (reference.getParameters() != null && reference.getParameters().size() > 0) {
-            reference.getParameters().forEach((key, value) -> {
-                if (value.size() == 1) {
-                    captchaParameters.put(key, value.get(0));
-                } else if (value.size() == 0) {
-                    captchaParameters.remove(key);
-                } else {
-                    captchaParameters.put(key, value);
-                }
-            });
-        }
-        return captchaParameters;
     }
 }

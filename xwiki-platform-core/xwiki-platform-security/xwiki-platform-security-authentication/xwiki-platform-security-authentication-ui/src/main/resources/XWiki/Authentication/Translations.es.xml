@@ -43,5 +43,9 @@ authentication.admin.failureStrategy.captcha.name=CAPTCHA
 authentication.admin.maxAttempts.label=Número máximo de intentos autorizados
 authentication.admin.maxAttempts.hint=Esto representa el número máximo de fallos de inicio de sesión autorizados antes de que se active la estrategia. Este número sólo se tiene en cuenta en el contexto de la siguiente ventana de tiempo. Tenga en cuenta que un valor 0 significa que la función está desactivada.
 authentication.admin.timeWindow.label=Ventana de tiempo para los fallos de inicio de sesión
-authentication.admin.timeWindow.hint=La ventana de tiempo en segundos durante la cual la estrategia considerará el inicio de sesión como fallido.</content>
+authentication.admin.timeWindow.hint=La ventana de tiempo en segundos durante la cual la estrategia considerará el inicio de sesión como fallido.
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.label=Enable or disable the authentication security mechanism
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.hint=Disabling the authentication security mechanism will also reset the authentication failure records.
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.disabled=Disabled
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.enabled=Enabled</content>
 </xwikidoc>

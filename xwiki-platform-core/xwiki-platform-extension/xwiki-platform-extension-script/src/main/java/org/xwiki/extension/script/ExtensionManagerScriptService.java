@@ -631,9 +631,6 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     /**
      * Create an {@link UninstallRequest} instance.
      * 
-     * @param extensionId the identifier of the extension to uninstall
-     * @param namespace the (optional) namespace from where to uninstall the extension; if {@code null} or empty, the
-     *            extension will be uninstalled globally
      * @return the {@link UninstallRequest}
      * @since 11.10RC1
      */

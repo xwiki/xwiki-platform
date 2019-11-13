@@ -105,12 +105,12 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     private ScriptService jobScriptService;
 
     /**
-     * @param <T> the type of the object
+     * @param <S> the type of the safe object version
      * @param unsafe the unsafe object
      * @return the safe version of the passed object
      */
     @SuppressWarnings("unchecked")
-    protected <S, T> S safe(T unsafe)
+    protected <S> S safe(Object unsafe)
     {
         return (S) this.scriptProvider.get(unsafe);
     }
@@ -146,6 +146,8 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     }
 
     /**
+     * @param namespace the namespace
+     * @return the wiki identifier
      * @since 8.1M1
      */
     protected String toWikiId(String namespace)
@@ -158,6 +160,8 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     }
 
     /**
+     * @param wiki the wiki identifier
+     * @return the namespace
      * @since 8.1M1
      */
     protected String fromWikitoNamespace(String wiki)

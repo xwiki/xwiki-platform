@@ -236,6 +236,7 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      * @return the safe version of the computed result
      * @since 11.10RC1
      */
+    @Unstable
     protected <R> R safeWrapError(Callable<R> callable)
     {
         return wrapError(() -> safe(callable.call()));

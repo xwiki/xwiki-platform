@@ -1,0 +1,52 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Authentication.Translations" locale="ru">
+  <web>XWiki.Authentication</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <parent>WebHome</parent>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>authentication.admin.failureStrategy.label=Стратегии отказа
+authentication.admin.failureStrategy.hint=Стратегии для использования в случае множественной ошибки аутентификации. Можно выбрать несколько стратегий.
+authentication.admin.failureStrategy.disableAccount.name=Отключить учетную запись
+authentication.admin.failureStrategy.captcha.name=CAPTCHA
+authentication.admin.maxAttempts.label=Максимальное количество попыток авторизации
+authentication.admin.maxAttempts.hint=Максимальное количество неудачных попыток входа в систему до активации стратегии. Учитывается только в контексте следующего временного периода. Обратите внимание, что значение 0 означает, что функция отключена.
+authentication.admin.timeWindow.label=Временной период учета ошибок авторизации
+authentication.admin.timeWindow.hint=Временной период в секундах, в течение которого учитываются неудачные попытки входа в систему для активации стратегии.
+authentication.admin.isAuthenticationSecurityEnabled.label=Включить или отключить механизм безопасности аутентификации
+authentication.admin.isAuthenticationSecurityEnabled.hint=Отключение механизма безопасности аутентификации также сбрасывает записи об ошибках аутентификации.
+authentication.admin.isAuthenticationSecurityEnabled.disabled=Отключено
+authentication.admin.isAuthenticationSecurityEnabled.enabled=Включено</content>
+  
+</xwikidoc>

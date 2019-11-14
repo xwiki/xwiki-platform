@@ -157,6 +157,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             LOGGER.info("(*) Provision extensions for test...");
             provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
+            // Set the IP/port for the container since startServletEngine() wasn't called and it's set there normally.
+            testConfiguration.getServletEngine().setIP("localhost");
+            testConfiguration.getServletEngine().setPort(8080);
+            setXWikiURL(testConfiguration, extensionContext);
+
             LOGGER.info("XWiki is already started, using running instance at [{}] to execute the tests...",
                 loadXWikiURL(extensionContext));
 
@@ -369,6 +374,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         saveServletContainerExecutor(extensionContext, executor);
         executor.start(sourceWARDirectory);
 
+        setXWikiURL(testConfiguration, extensionContext);
+    }
+
+    private void setXWikiURL(TestConfiguration testConfiguration, ExtensionContext extensionContext)
+    {
         // URL to access XWiki from the host.
         String xwikiURL = computeXWikiURLPrefix(testConfiguration.getServletEngine().getIP(),
             testConfiguration.getServletEngine().getPort());

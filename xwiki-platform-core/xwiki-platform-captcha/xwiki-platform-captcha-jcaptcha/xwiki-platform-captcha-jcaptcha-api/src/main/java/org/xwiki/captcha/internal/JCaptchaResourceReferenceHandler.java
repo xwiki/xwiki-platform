@@ -27,7 +27,6 @@ import java.util.Locale;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +41,6 @@ import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceHandlerChain;
 import org.xwiki.resource.ResourceReferenceHandlerException;
 import org.xwiki.resource.ResourceType;
-import org.xwiki.resource.entity.EntityResourceAction;
 
 import com.octo.captcha.component.sound.wordtosound.AbstractFreeTTSWordToSound;
 import com.octo.captcha.module.web.image.ImageToJpegHelper;
@@ -50,8 +48,6 @@ import com.octo.captcha.module.web.sound.SoundToWavHelper;
 import com.octo.captcha.service.CaptchaService;
 import com.octo.captcha.service.image.ImageCaptchaService;
 import com.octo.captcha.service.sound.SoundCaptchaService;
-import com.sun.star.lang.IllegalArgumentException;
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * URL Resource Handler for exposing the generated CAPTCHA resources (image/sound/text).
@@ -66,16 +62,11 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
 {
     private static final String FREETTS_PROPERTIES_KEY = "freetts.voices";
 
-    private static final EntityResourceAction ACTION = new EntityResourceAction("jcaptcha");
-
     private static final String TYPE_IMAGE = "image";
 
     private static final String TYPE_SOUND = "sound";
 
     private static final String TYPE_TEXT = "text";
-
-    @Inject
-    private Provider<XWikiContext> contextProvider;
 
     @Inject
     private CaptchaServiceManager captchaServiceManager;
@@ -139,7 +130,7 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
                     // Write the challenge to the response.
                     String challenge = (String) captchaService.getChallengeForID(id, locale);
                     try (OutputStream responseOutput = response.getOutputStream()) {
-                        IOUtils.write(challenge, response.getOutputStream(), Charset.defaultCharset());
+                        IOUtils.write(challenge, responseOutput, Charset.defaultCharset());
                     }
 
                     break;
@@ -149,7 +140,7 @@ public class JCaptchaResourceReferenceHandler extends AbstractResourceReferenceH
             }
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException(
-                String.format("Failed to handle resource [%s]", ACTION.getActionName()), e);
+                String.format("Failed to handle resource [%s]", JCaptchaResourceReference.TYPE), e);
         }
 
         // Be a good citizen, continue the chain, in case some lower-priority Handler has something to do for this

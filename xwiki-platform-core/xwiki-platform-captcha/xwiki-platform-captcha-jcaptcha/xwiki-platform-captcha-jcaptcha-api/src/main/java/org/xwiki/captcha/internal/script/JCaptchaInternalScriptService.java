@@ -68,15 +68,17 @@ public class JCaptchaInternalScriptService implements ScriptService
         }
         // Construct a JCaptchaResourceReference so that we can serialize it
         JCaptchaResourceReference resourceReference = new JCaptchaResourceReference(type, engine);
-        for (Map.Entry<String, Object> parameterEntry : params.entrySet()) {
-            resourceReference.addParameter(parameterEntry.getKey(), parameterEntry.getValue());
+        if (params != null) {
+            for (Map.Entry<String, Object> parameterEntry : params.entrySet()) {
+                resourceReference.addParameter(parameterEntry.getKey(), parameterEntry.getValue());
+            }
         }
 
         ExtendedURL extendedURL;
         try {
             extendedURL = this.defaultResourceReferenceSerializer.serialize(resourceReference);
         } catch (SerializeResourceReferenceException | UnsupportedResourceReferenceException e) {
-            this.logger.warn("Error while serializing WebJar URL for type [{}], engine = [{}]. Root cause = [{}]",
+            this.logger.warn("Error while serializing JCaptcha URL for type [{}], engine = [{}]. Root cause = [{}]",
                 type, engine, ExceptionUtils.getRootCauseMessage(e));
             return null;
         }

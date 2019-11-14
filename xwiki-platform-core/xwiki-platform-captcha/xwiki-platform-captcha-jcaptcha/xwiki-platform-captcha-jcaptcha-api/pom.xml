@@ -28,8 +28,8 @@
   <artifactId>xwiki-platform-captcha-jcaptcha-api</artifactId>
   <name>XWiki Platform - CAPTCHA - JCaptcha - API</name>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.65</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>54</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>JCaptcha API</xwiki.extension.name>
   </properties>
@@ -97,6 +97,12 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

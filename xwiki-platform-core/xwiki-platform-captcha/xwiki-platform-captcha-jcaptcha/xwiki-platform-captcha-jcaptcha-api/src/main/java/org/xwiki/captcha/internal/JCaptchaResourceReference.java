@@ -33,7 +33,7 @@ import org.xwiki.resource.ResourceType;
 public class JCaptchaResourceReference extends AbstractResourceReference
 {
     /**
-     * Represents a WebJars Resource Type.
+     * Represents a JCaptcha Resource Type.
      */
     public static final ResourceType TYPE = new ResourceType("jcaptcha");
 

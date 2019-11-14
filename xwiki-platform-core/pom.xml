@@ -144,6 +144,19 @@
                   }
                 },
                 "ignore" : [
+                  {
+                    "code": "java.method.parameterTypeParameterChanged",
+                    "old": "parameter <S, T> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(===T===)",
+                    "new": "parameter <S> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(===java.lang.Object===)",
+                    "justification": "False positive. See https://github.com/revapi/revapi/issues/170"
+                  },
+                  {
+                    "code": "java.generics.formalTypeParameterRemoved",
+                    "old": "method <S, T> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(T)",
+                    "new": "method <S> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(java.lang.Object)",
+                    "typeParameter": "T",
+                    "justification": "False positive. See https://github.com/revapi/revapi/issues/170"
+                  }
                   // Add more ignores below...
                 ]
               }

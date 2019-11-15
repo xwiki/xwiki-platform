@@ -37,7 +37,12 @@
     <!-- Don't run Checkstyle in test modules -->
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
   </properties>
-  <modules>
-    <module>xwiki-platform-vfs-test-tests</module>
-  </modules>
+  <profiles>
+    <profile>
+      <id>docker</id>
+      <modules>
+        <module>xwiki-platform-vfs-test-docker</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

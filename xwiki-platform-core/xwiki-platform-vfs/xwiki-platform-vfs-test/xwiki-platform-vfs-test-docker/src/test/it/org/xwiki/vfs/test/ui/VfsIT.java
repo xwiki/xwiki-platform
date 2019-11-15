@@ -25,16 +25,18 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
-import org.xwiki.test.ui.po.ViewPage;
+import org.openqa.selenium.WebElement;
+import org.xwiki.test.docker.junit5.ExtensionOverride;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Functional tests for the VFS feature.
@@ -42,33 +44,43 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 7.4M2
  */
-public class VfsTest extends AbstractTest
+@UITest(
+    extensionOverrides = {
+        @ExtensionOverride(
+            extensionId = "com.google.code.findbugs:jsr305",
+            overrides = {
+                "features=com.google.code.findbugs:annotations"
+            }
+        )
+    }
+)
+public class VfsIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule superAdminAuthenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     @Test
-    public void testVfsMacro() throws Exception
+    public void testVfsMacro(TestUtils setup, TestReference reference, XWikiWebDriver driver) throws Exception
     {
+        setup.loginAsSuperAdmin();
+
         // Delete pages that we create in the test
-        getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
+        setup.rest().delete(reference);
 
         // Scenario:
         // - Attach a zip to a wiki page
         // - Use the VFS Tree Macro to display the content of that zip
         // - Click on a tree node to display the content of a file inside the zip
-        getUtil().attachFile(getTestClassName(), getTestMethodName(), "test.zip", createZipInputStream(), false);
+        setup.attachFile(reference, "test.zip", createZipInputStream(), false);
         String content = "{{vfsTree root=\"attach:test.zip\"/}}";
-        ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), content, "VFS Test");
+        setup.createPage(reference, content, "VFS Test");
 
         // Get hold of the Tree and expand the directory node and the click on the first children node
-        TreeElement tree = new TreeElement(getDriver().findElement(By.cssSelector(".xtree")));
+        WebElement xwikiContentDiv = driver.findElement(By.id("xwikicontent"));
+        TreeElement tree = new TreeElement(xwikiContentDiv.findElement(By.cssSelector(".xtree")));
         tree.waitForIt();
         TreeNodeElement node = tree.getNode("//directory");
         node = node.open();
         node.waitForIt();
         node.getChildren().get(0).select();
-        assertEquals("content2", getDriver().findElement(By.tagName("body")).getText());
+        assertEquals("content2", driver.findElement(By.tagName("body")).getText());
     }
 
     private InputStream createZipInputStream() throws Exception
@@ -88,5 +100,4 @@ public class VfsTest extends AbstractTest
         }
         return new ByteArrayInputStream(baos.toByteArray());
     }
-
 }

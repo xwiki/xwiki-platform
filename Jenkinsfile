@@ -109,13 +109,18 @@ def builds = [
   'Quality' : {
     build(
       name: 'Quality',
-      // TODO call sonar:sonar when we fix the memory issue of executing that goal on platform. Right now we don't have
-      // enough memory on Jenkins Master for that.
-      //   goals: 'clean install jacoco:report',
-      // Note: When we do so, also add:
-      //   sonar: true
       goals: 'clean install jacoco:report',
-      profiles: 'quality,legacy'
+      profiles: 'quality,legacy',
+    )
+  },
+  'Sonar' : {
+    // Note: ideally, this should be part of the 'Quality' build but last time we tried it was using too much memory
+    // so until we make it work, we're testing Sonar in a separate build to not fail the 'Quality' one.
+    build(
+      name: 'Sonar',
+      goals: 'clean install',
+      profiles: 'legacy',
+      sonar: true
     )
   }
 ]
@@ -221,6 +226,10 @@ private void buildStandardAll(builds)
     'quality': {
       // Run the quality checks
       builds['Quality'].call()
+    },
+    'sonar': {
+      // Sonar analysis + push to Sonarcloud.io
+      builds['Sonar'].call()
     }
   )
 }

@@ -19,31 +19,13 @@
  */
 package org.xwiki.extension.test.po.distribution;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-
 /**
- * The Outdated Extensions step UI.
+ * The Orphaned Dependencies step UI.
  * 
  * @version $Id$
- * @since 10.7RC1
+ * @since 11.10RC1
  */
-public class ExtensionsDistributionStep extends AbstractDistributionPage
+public class OrphanedDependenciesDistributionStep extends AbstractDistributionPage
 {
-    // TODO: move that in a dedicated PO since that's a EM UI element
-    @FindBy(xpath = "//button[@value='checkForUpdates']")
-    private WebElement checkForUpdates;
 
-    // TODO: move that in a dedicated PO since that's actually a EM UI element
-    public ExtensionsDistributionStep checkForUpdates()
-    {
-        // Click the button
-        this.checkForUpdates.click();
-
-        // Wait for the result
-        getDriver().waitUntilElementIsVisible(By.xpath("//div[@class='extensionUpdater']/p[@class='xHint']"));
-
-        return new ExtensionsDistributionStep();
-    }
 }

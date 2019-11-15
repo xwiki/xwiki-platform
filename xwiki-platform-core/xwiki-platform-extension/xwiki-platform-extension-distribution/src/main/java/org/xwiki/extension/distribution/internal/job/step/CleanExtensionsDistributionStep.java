@@ -33,7 +33,7 @@ import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 
 /**
- * Base step in charge of cleaning orphan extension.
+ * Step in charge of cleaning orphaned extension dependencies.
  * 
  * @version $Id$
  * @since 11.10RC1

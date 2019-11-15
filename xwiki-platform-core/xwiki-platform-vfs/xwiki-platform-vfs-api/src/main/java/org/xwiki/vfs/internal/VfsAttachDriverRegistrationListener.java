@@ -19,7 +19,7 @@
  */
 package org.xwiki.vfs.internal;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -27,9 +27,9 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.event.ApplicationReadyEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.vfs.internal.attach.AttachDriver;
@@ -46,7 +46,7 @@ import net.java.truevfs.access.TConfig;
 @Component
 @Named("vfsAttachDriver")
 @Singleton
-public class VfsAttachDriverRegistrationListener implements EventListener
+public class VfsAttachDriverRegistrationListener implements EventListener, Initializable
 {
     /**
      * The name of the listener.
@@ -66,11 +66,23 @@ public class VfsAttachDriverRegistrationListener implements EventListener
     @Override
     public List<Event> getEvents()
     {
-        return Arrays.<Event>asList(new ApplicationReadyEvent());
+        // We don't listen to any event because all we're interested in is that we initialize TrueVFS when
+        // this listener is initialized. This allows to fulfill the two uses cases we need:
+        // 1) When the VFS API extension is installed at runtime, the Extension Manager handles the listeners found in
+        // in it by instantiating them and registering them against the Observation Manager. Thus the initialize()
+        // method below is called and TrueVFS initialized.
+        // 2) When XWiki starts, all found listeners are also instantiated and registered.
+        return Collections.emptyList();
     }
 
     @Override
     public void onEvent(Event event, Object source, Object data)
+    {
+        // Nothing to do since we don't expect any event.
+    }
+
+    @Override
+    public void initialize()
     {
         // Register our Attach VFS Driver and inject a Component Manager in it.
         TConfig config = TConfig.current();

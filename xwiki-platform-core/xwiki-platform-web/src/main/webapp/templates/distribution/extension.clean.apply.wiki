@@ -5,7 +5,7 @@
 #macro(createUninstallJobRequest $uninstalledExtensions $uninstallRequest)
   #set ($uninstallRequest = $extensionManager.createUninstallRequest())
   #set($void = $uninstallRequest.setId(['extensions', 'distribution', 'clean', 'uninstall']))
-  #set($void = $uninstallRequest.setInteractive(true))
+  #set($void = $uninstallRequest.setInteractive(false))
   #foreach ($uninstalledExtensionId in $uninstalledExtensionIds)
     #set($void = $uninstallRequest.addExtension($uninstalledExtensionId))
   #end

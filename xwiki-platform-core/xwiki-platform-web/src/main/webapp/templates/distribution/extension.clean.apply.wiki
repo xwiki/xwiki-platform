@@ -71,7 +71,7 @@
     <form action="">
       #formHiddenCleanApply()
 
-      #em_submitButton('Continue', 'cleanapplyfinalize', false, '')
+      #em_submitButton($services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.cleanapplyfinalize'), 'cleanapplyfinalize', false, '')
     </form>
 
     <form action="">

@@ -87,11 +87,19 @@ public class UpgradeTest extends AbstractTest
 
     private static final String STEP_ADMIN_NAME = "Admin user";
 
+    private static final int STEP_ADMIN_ID = 0;
+
     private static final String STEP_FLAVOR_NAME = "Flavor";
+
+    private static final int STEP_FLAVOR_ID = 1;
 
     private static final String STEP_ORPHANED_NAME = "Orphaned extensions";
 
+    private static final int STEP_ORPHANED_ID = 2;
+
     private static final String STEP_EXTENSIONS_NAME = "Extensions";
+
+    private static final int STEP_EXTENSIONS_ID = 3;
 
     /**
      * Automatically register as Admin user.
@@ -200,22 +208,25 @@ public class UpgradeTest extends AbstractTest
 
         List<DistributionStepIcon> icons = welcomeStep.getIcons();
 
-        assertFalse(icons.get(0).isDone());
-        assertFalse(icons.get(0).isActive());
-        assertEquals(1, icons.get(0).getNumber());
-        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
-        assertFalse(icons.get(1).isDone());
-        assertFalse(icons.get(1).isActive());
-        assertEquals(2, icons.get(1).getNumber());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
-        assertFalse(icons.get(2).isDone());
-        assertFalse(icons.get(2).isActive());
-        assertEquals(3, icons.get(2).getNumber());
-        assertEquals(STEP_ORPHANED_NAME, icons.get(2).getName());
-        assertFalse(icons.get(3).isDone());
-        assertFalse(icons.get(3).isActive());
-        assertEquals(4, icons.get(3).getNumber());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(3).getName());
+        assertFalse(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_ID + 1, icons.get(STEP_ADMIN_ID).getNumber());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isDone());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(2, icons.get(STEP_FLAVOR_ID).getNumber());
+        assertEquals(STEP_FLAVOR_ID + 1, icons.get(STEP_FLAVOR_ID).getNumber());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(3, icons.get(STEP_ORPHANED_ID).getNumber());
+        assertEquals(STEP_ORPHANED_ID + 1, icons.get(STEP_ORPHANED_ID).getNumber());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(4, icons.get(STEP_EXTENSIONS_ID).getNumber());
+        assertEquals(STEP_EXTENSIONS_ID + 1, icons.get(STEP_EXTENSIONS_ID).getNumber());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
         // Go to next step
         welcomeStep.clickCompleteStep();
@@ -228,21 +239,18 @@ public class UpgradeTest extends AbstractTest
         // Steps
         List<DistributionStepIcon> icons = flavorStep.getIcons();
 
-        assertTrue(icons.get(0).isDone());
-        assertFalse(icons.get(0).isActive());
-        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
-        assertEquals(2, icons.get(1).getNumber());
-        assertFalse(icons.get(1).isDone());
-        assertTrue(icons.get(1).isActive());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
-        assertFalse(icons.get(2).isDone());
-        assertFalse(icons.get(2).isActive());
-        assertEquals(3, icons.get(2).getNumber());
-        assertEquals(STEP_ORPHANED_NAME, icons.get(2).getName());
-        assertFalse(icons.get(3).isDone());
-        assertFalse(icons.get(3).isActive());
-        assertEquals(4, icons.get(3).getNumber());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(3).getName());
+        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isDone());
+        assertTrue(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
         // Make sure complete step is disabled
         assertFalse(flavorStep.isCompleteStepDisabled());
@@ -368,24 +376,22 @@ public class UpgradeTest extends AbstractTest
         List<DistributionStepIcon> icons = extensionsStep.getIcons();
 
         // Make sure the extensions step is active
-        if (!icons.get(2).isActive()) {
+        if (!icons.get(STEP_ORPHANED_ID).isActive()) {
             return;
         }
 
-        assertTrue(icons.get(0).isDone());
-        assertFalse(icons.get(0).isActive());
-        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
-        assertTrue(icons.get(1).isDone());
-        assertFalse(icons.get(1).isActive());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
-        assertFalse(icons.get(2).isDone());
-        assertTrue(icons.get(2).isActive());
-        assertEquals(3, icons.get(2).getNumber());
-        assertEquals(STEP_ORPHANED_NAME, icons.get(2).getName());
-        assertFalse(icons.get(3).isDone());
-        assertFalse(icons.get(3).isActive());
-        assertEquals(4, icons.get(3).getNumber());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(3).getName());
+        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertTrue(icons.get(STEP_FLAVOR_ID).isDone());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isDone());
+        assertTrue(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
         // TODO: check some stuff
 
@@ -402,24 +408,22 @@ public class UpgradeTest extends AbstractTest
         List<DistributionStepIcon> icons = extensionsStep.getIcons();
 
         // Make sure the extensions step is active
-        if (!icons.get(2).isActive()) {
+        if (!icons.get(STEP_EXTENSIONS_ID).isActive()) {
             return;
         }
 
-        assertTrue(icons.get(0).isDone());
-        assertFalse(icons.get(0).isActive());
-        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
-        assertTrue(icons.get(1).isDone());
-        assertFalse(icons.get(1).isActive());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
-        assertTrue(icons.get(2).isDone());
-        assertFalse(icons.get(2).isActive());
-        assertEquals(3, icons.get(2).getNumber());
-        assertEquals(STEP_ORPHANED_NAME, icons.get(2).getName());
-        assertFalse(icons.get(3).isDone());
-        assertTrue(icons.get(3).isActive());
-        assertEquals(4, icons.get(3).getNumber());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(3).getName());
+        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertTrue(icons.get(STEP_FLAVOR_ID).isDone());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertTrue(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertTrue(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
         // Search for extension update
         extensionsStep.checkForUpdates();
@@ -437,20 +441,18 @@ public class UpgradeTest extends AbstractTest
         // Steps
         List<DistributionStepIcon> icons = reportStep.getIcons();
 
-        assertTrue(icons.get(0).isDone());
-        assertFalse(icons.get(0).isActive());
-        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
-        assertTrue(icons.get(1).isDone());
-        assertFalse(icons.get(1).isActive());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
-        assertTrue(icons.get(2).isDone());
-        assertFalse(icons.get(2).isActive());
-        assertEquals(3, icons.get(2).getNumber());
-        assertEquals(STEP_ORPHANED_NAME, icons.get(2).getName());
-        assertTrue(icons.get(3).isDone());
-        assertFalse(icons.get(3).isActive());
-        assertEquals(4, icons.get(3).getNumber());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(3).getName());
+        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertTrue(icons.get(STEP_FLAVOR_ID).isDone());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertTrue(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertTrue(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
         // Finish
         reportStep.clickCompleteStep();

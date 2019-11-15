@@ -37,10 +37,13 @@ import org.xwiki.extension.internal.converter.ExtensionIdConverter;
 import org.xwiki.extension.test.po.ExtensionPane;
 import org.xwiki.extension.test.po.ExtensionProgressPane;
 import org.xwiki.extension.test.po.LogItemPane;
+import org.xwiki.extension.test.po.distribution.CleanApplyDistributionStep;
+import org.xwiki.extension.test.po.distribution.CleanApplyFinalizeDistributionStep;
+import org.xwiki.extension.test.po.distribution.CleanApplyReportDistributionStep;
+import org.xwiki.extension.test.po.distribution.CleanDistributionStep;
 import org.xwiki.extension.test.po.distribution.DistributionStepIcon;
 import org.xwiki.extension.test.po.distribution.ExtensionsDistributionStep;
 import org.xwiki.extension.test.po.distribution.FlavorDistributionStep;
-import org.xwiki.extension.test.po.distribution.OrphanedDependenciesDistributionStep;
 import org.xwiki.extension.test.po.distribution.ReportDistributionStep;
 import org.xwiki.extension.test.po.distribution.WelcomeDistributionStep;
 import org.xwiki.extension.test.po.flavor.FlavorPane;
@@ -93,7 +96,7 @@ public class UpgradeTest extends AbstractTest
 
     private static final int STEP_FLAVOR_ID = 1;
 
-    private static final String STEP_ORPHANED_NAME = "Orphaned extensions";
+    private static final String STEP_ORPHANED_NAME = "Orphaned dependencies";
 
     private static final int STEP_ORPHANED_ID = 2;
 
@@ -369,7 +372,7 @@ public class UpgradeTest extends AbstractTest
 
     private void orphanedDependenciesStep()
     {
-        OrphanedDependenciesDistributionStep extensionsStep = new OrphanedDependenciesDistributionStep();
+        CleanDistributionStep extensionsStep = new CleanDistributionStep();
 
         // Steps
 
@@ -393,10 +396,20 @@ public class UpgradeTest extends AbstractTest
         assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
         assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
-        // TODO: check some stuff
+        // Confirm the extension to uninstall/make top level
+        CleanApplyDistributionStep cleanApply = extensionsStep.clickContinue();
+
+        // Validate the plan
+        CleanApplyFinalizeDistributionStep cleanApplyFinalize = cleanApply.clickContinue();
+
+        // Wait for uninstall to finish
+        cleanApplyFinalize.waitForUninstallComplete();
+
+        // Get a report
+        CleanApplyReportDistributionStep applyReport = cleanApplyFinalize.clickContinue();
 
         // Go to next step
-        extensionsStep.clickCompleteStep();
+        applyReport.clickCompleteStep();
     }
 
     private void extensionsStep()

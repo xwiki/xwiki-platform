@@ -19,13 +19,27 @@
  */
 package org.xwiki.extension.test.po.distribution;
 
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.FindBy;
+
 /**
  * The Orphaned Dependencies step UI.
  * 
  * @version $Id$
  * @since 11.10RC1
  */
-public class OrphanedDependenciesDistributionStep extends AbstractDistributionPage
+public class CleanDistributionStep extends AbstractDistributionPage
 {
+    @FindBy(xpath = "//input[@name='cleanapply']")
+    private WebElement continueButton;
 
+    public CleanApplyDistributionStep clickContinue()
+    {
+        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
+        getDriver().addPageNotYetReloadedMarker();
+        this.continueButton.click();
+        getDriver().waitUntilPageIsReloaded();
+
+        return new CleanApplyDistributionStep();
+    }
 }

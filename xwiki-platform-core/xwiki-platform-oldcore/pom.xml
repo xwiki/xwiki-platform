@@ -148,22 +148,6 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>${hibernate.version}</version>
-      <exclusions>
-        <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
-        <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>javax.activation-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Replace the one from Hibernate -->
     <dependency>

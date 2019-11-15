@@ -128,6 +128,27 @@
         <artifactId>c3p0</artifactId>
         <version>0.9.5.4</version>
       </dependency>
+      <!-- Hibernate -->
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>${hibernate.version}</version>
+        <exclusions>
+          <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
+          <exclusion>
+            <groupId>org.jboss.spec.javax.transaction</groupId>
+            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
       <!-- Jython engine -->
       <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->
       <dependency>

@@ -61,7 +61,7 @@ public class SpacesMacroPane extends BaseElement
         this.spaceNameTextField.sendKeys(spaceName);
         // The WebElement#submit method does not wait anymore,
         // so we need to explicitely wait on the page reload.
-        // cf https://github.com/SeleniumHQ/selenium/issues/7691
+        // cf https://github.com/mozilla/geckodriver/issues/1026
         getDriver().addPageNotYetReloadedMarker();
         this.spaceNameTextField.submit();
         getDriver().waitUntilPageIsReloaded();

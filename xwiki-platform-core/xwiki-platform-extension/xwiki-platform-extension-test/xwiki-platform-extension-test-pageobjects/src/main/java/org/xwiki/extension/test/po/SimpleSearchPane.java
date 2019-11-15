@@ -102,7 +102,7 @@ public class SimpleSearchPane extends BaseElement
     {
         searchInput.clear();
 
-        // FIXME: workaround for https://github.com/SeleniumHQ/selenium/issues/7691
+        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
         // Since sendKeys is not waiting anymore and bulletproof it
         getDriver().addPageNotYetReloadedMarker();
         searchInput.sendKeys(keywords, Keys.ENTER);

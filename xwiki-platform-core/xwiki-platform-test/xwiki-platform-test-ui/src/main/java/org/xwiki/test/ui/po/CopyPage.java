@@ -148,7 +148,7 @@ public class CopyPage extends ViewPage
     public CopyOverwritePromptPage clickCopyButtonExpectingOverwritePrompt()
     {
         // The WebElement#submit method does not wait anymore for the page to load,
-        // cf: https://github.com/SeleniumHQ/selenium/issues/7691
+        // cf: https://github.com/mozilla/geckodriver/issues/1026
         getDriver().addPageNotYetReloadedMarker();
         this.copyButton.submit();
         getDriver().waitUntilPageIsReloaded();

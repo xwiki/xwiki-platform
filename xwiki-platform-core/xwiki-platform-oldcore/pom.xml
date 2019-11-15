@@ -148,7 +148,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>5.4.8.Final</version>
+      <version>${hibernate.version}</version>
       <exclusions>
         <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
         <exclusion>
@@ -162,12 +162,6 @@
         <exclusion>
           <groupId>javax.xml.bind</groupId>
           <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <!--  Let's hope Hibernate is fine with Dom4J 2.1.0.
-              Remove when https://jira.xwiki.org/browse/XCOMMONS-1585 is fixed. -->
-        <exclusion>
-          <groupId>org.dom4j</groupId>
-          <artifactId>dom4j</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -184,7 +178,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-c3p0</artifactId>
-      <version>5.4.4.Final</version>
+      <version>${hibernate.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>

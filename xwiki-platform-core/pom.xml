@@ -156,6 +156,19 @@
                     "new": "method <S> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(java.lang.Object)",
                     "typeParameter": "T",
                     "justification": "False positive. See https://github.com/revapi/revapi/issues/170"
+                  },
+                  {
+                    "code": "java.method.parameterTypeParameterChanged",
+                    "old": "parameter <S, T> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(===T===) @ org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "new": "parameter <S> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(===java.lang.Object===) @ org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "justification": "False positive. See https://github.com/revapi/revapi/issues/170"
+                  },
+                  {
+                    "code": "java.generics.formalTypeParameterRemoved",
+                    "old": "method <S, T> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(T) @ org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "new": "method <S> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(java.lang.Object) @ org.xwiki.extension.xar.script.XarExtensionScriptService",
+                    "typeParameter": "T",
+                    "justification": "False positive. See https://github.com/revapi/revapi/issues/170"
                   }
                   // Add more ignores below...
                 ]

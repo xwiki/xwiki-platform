@@ -110,7 +110,7 @@ def builds = [
     build(
       name: 'Quality',
       goals: 'clean install jacoco:report',
-      profiles: 'quality,legacy',
+      profiles: 'quality,legacy'
     )
   },
   'Sonar' : {

@@ -224,6 +224,12 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             saveScreenshotAndVideo(extensionContext);
         }
 
+        // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
+        String agentName = System.getProperty("jenkinsAgentName");
+        if (agentName != null) {
+            LOGGER.info("Jenkins Agent: [{}]", agentName);
+        }
+
         throw throwable;
     }
 

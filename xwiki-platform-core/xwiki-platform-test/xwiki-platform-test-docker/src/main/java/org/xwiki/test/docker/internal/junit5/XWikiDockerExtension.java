@@ -224,9 +224,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             saveScreenshotAndVideo(extensionContext);
         }
 
-        // Display the current host to have debug information about CI agent on which the test was executed.
-        LOGGER.info("Host name: [{}]", DockerTestUtils.getHostName());
-
         throw throwable;
     }
 

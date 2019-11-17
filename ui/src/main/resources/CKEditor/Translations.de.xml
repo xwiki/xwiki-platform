@@ -111,7 +111,7 @@ resource.url.placeholder=http://www.example.org/bild.png
 resource.user.label=Benutzer
 resource.user.placeholder=Alias
 
-resourcePicker.attach.hint=Wählen Sie eine Anlage
+resourcePicker.attach.hint=Wählen Sie einen Anhang
 resourcePicker.doc.hint=Wählen Sie eine Seite
 
 entityResourceSuggester.doc.placeholder=Eine Seite zu finden…

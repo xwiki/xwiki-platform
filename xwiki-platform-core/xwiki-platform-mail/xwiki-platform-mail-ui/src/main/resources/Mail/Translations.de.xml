@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Mail</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Mail.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Mail Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.email=Mail
+admin.email.description=Konfigurieren Sie die Parameter für den E-Mail-Versand und zeigen Sie den Status der E-Mails an.
+admin.emailgeneral=Erweitert
+admin.emailgeneral.description=Konfigurieren Sie erweiterte Mail-Parameter, wie z.B. die Verschleierung der Mail-Adresse.
+admin.emailsend=Mail-Versand
+admin.emailsend.description=Konfigurieren Sie die Parameter für den E-Mail-Versand.
+admin.emailstatus=Mail-Sendestatus
+admin.emailstatus.description=Zeigen Sie den Status von gesendeten Mails an und senden Sie Mails erneut, die zu einem Fehler führten.
+admin.emailstatus.hint=Wenn Sie den Status einer Mail nicht finden können, kann es daran liegen, dass die Eigenschaft, die die Mail gesendet hat, nicht angibt, dass der Mailstatus bestehen bleiben soll.
+Mail.GeneralMailConfigClass_obfuscate=E-Mail-Adressen verbergen
+Mail.GeneralMailConfigClass_obfuscate.hint=Dies betrifft nur die in den Objekteigenschaften vom Typ E-Mail gespeicherten E-Mail-Adressen, sofern der standardmäßige benutzerdefinierte Anzeigemodus für den Eigenschaftentyp E-Mail nicht überschrieben wird. Beispiel: a...@domain.org
+Mail.SendMailConfigClass_from=Absende-E-Mail-Adresse
+Mail.SendMailConfigClass_from.hint=Die Standard-E-Mail-Adresse, die zum Senden von Benachrichtigungs-E-Mails verwendet wird
+Mail.SendMailConfigClass_bcc=BCC-E-Mail-Adressen
+Mail.SendMailConfigClass_bcc.hint=Eine standardmäßig kommagetrennte Liste von BCC-E-Mail-Adressen, die beim Senden von E-Mails verwendet werden sollen
+Mail.SendMailConfigClass_host=E-Mail-Server
+Mail.SendMailConfigClass_host.hint=Der SMTP-Server, an den gesendet werden soll. Standardwert ist "localhost"
+Mail.SendMailConfigClass_port=E-Mail-Server-Port
+Mail.SendMailConfigClass_port.hint=Der Port des zu verwendenden SMTP-Servers. Standardwert ist 25
+Mail.SendMailConfigClass_username=E-Mail-Server-Benutzername
+Mail.SendMailConfigClass_username.hint=Der Benutzername für die Verbindung zum SMTP-Server, nur wenn eine Authentifizierung erforderlich ist
+Mail.SendMailConfigClass_password=E-Mail-Server-Passwort
+Mail.SendMailConfigClass_password.hint=Das Passwort für die Verbindung zum SMTP-Server, nur wenn eine Authentifizierung erforderlich ist
+Mail.SendMailConfigClass_properties=Zusätzliche Eigenschaften
+Mail.SendMailConfigClass_properties.hint=Die Liste der zusätzlichen zu verwendenden JavaMail-Eigenschaften (z.B. "mail.smtp.starttls.enable=true" für TLS)
+Mail.SendMailConfigClass_sendWaitTime=Sende-Wartezeit
+Mail.SendMailConfigClass_sendWaitTime.hint=Die Verzögerung zwischen den einzelnen Sendungen in Millisekunden (Standardwert ist 8 Sekunden)
+Mail.SendMailConfigClass_discardSuccessStatuses=Erfolgsstatus verwerfen?
+Mail.SendMailConfigClass_discardSuccessStatuses.hint=Unabhängig davon, ob der Mailstatus für erfolgreich gesendete Mails erhalten bleibt oder nicht (Standardwert ist true)
+Mail.SendMailStatus_livetable.date=Datum
+Mail.SendMailStatus_livetable.batchId=Batch ID
+Mail.SendMailStatus_livetable.type=Typ
+Mail.SendMailStatus_livetable.recipients=Empfänger
+Mail.SendMailStatus_livetable.state=Status
+Mail.SendMailStatus_livetable.wiki=Wiki
+Mail.SendMailStatus_livetable.error=Fehler
+Mail.SendMailStatus_livetable.actions=Aktionen
+Mail.SendMailStatus_livetable.resend=Erneut senden
+mailSender.admin.resendSuccess=Die Mail wurde erfolgreich erneut gesendet
+mailSender.admin.resendFailure=Es konnte nicht erneut gesendet werden. Klicken Sie hier für weitere Informationen.</content>
+  
+</xwikidoc>

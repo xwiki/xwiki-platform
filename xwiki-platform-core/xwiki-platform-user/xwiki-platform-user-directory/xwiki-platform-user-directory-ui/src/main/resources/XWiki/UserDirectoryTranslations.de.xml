@@ -36,17 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: XWiki.UserDirectoryPreferencesClass_columns=Columns to display
-### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=The list of columns, corresponding to properties of the User class, to be displayed in the user directory
-### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Hide disabled user profiles
-### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Exclude from the user directory the users that have their profile disabled
+  <content>XWiki.UserDirectoryPreferencesClass_columns=Anzuzeigende Spalten
+XWiki.UserDirectoryPreferencesClass_columns_hint=Die Liste der Spalten, die den Eigenschaften der Benutzerklasse entsprechen und im Benutzerverzeichnis angezeigt werden sollen
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Deaktivierte Benutzerprofile ausblenden
+XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Schließen Sie die Benutzer aus dem Benutzerverzeichnis aus, bei denen das Profil deaktiviert ist
 
 userdirectory.userScopeFilter=Benutzerart:
 userdirectory.userScopeFilter.hint=Wählen Sie, welche Art von Benutzern Sie anzeigen möchten
 userdirectory.userScopeFilter.local=Lokaler Benutzer
 userdirectory.userScopeFilter.global=Globale Benutzer, welche in diesem Wiki Mitglieder sind
-### Missing: userdirectory.configuration.title=Settings
-### Missing: userdirectory.configuration.columns.editHint=Click to select the columns
+userdirectory.configuration.title=Einstellungen
+userdirectory.configuration.columns.editHint=Klicken Sie hier, um die Spalten auszuwählen
 
 platform.userdirectory.customizeNotAllowed=Sie sind nicht berechtigt, dieses Benutzerverzeichnis anzupassen.
 platform.userdirectory.configTitle=Konfiguration des Benutzerverzeichnisses

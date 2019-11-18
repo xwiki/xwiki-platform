@@ -192,8 +192,9 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         // Check that the results match the search query.
         for (int i = 0; i < searchResults.getPagination().getPageCount(); i++) {
             ExtensionPane extension = searchResults.getExtension(i);
-            assertTrue("Can't find [commons] in the summary/id/name parts of extension [" + extension.getId() + "] ("
-                + extension.getSummary() + ")",
+            assertTrue(
+                "Can't find [commons] in the summary/id/name parts of extension [" + extension.getId() + "] ("
+                    + extension.getSummary() + ")",
                 extension.getSummary().toLowerCase().contains("commons")
                     || extension.getId().getId().toLowerCase().contains("commons")
                     || extension.getName().toLowerCase().contains("commons"));
@@ -624,8 +625,7 @@ public class ExtensionIT extends AbstractExtensionAdminAuthenticatedIT
         assertEquals("Resolving extension [bob-xar-extension 2.5-milestone-2] from namespace [Home]",
             log.get(2).getMessage());
         assertEquals("info", log.get(log.size() - 1).getLevel());
-        assertEquals(
-            "Finished job of type [uninstall] with identifier " + "[extension/action/bob-xar-extension/wiki:xwiki]",
+        assertEquals("Finished job of type [uninstall] with identifier [extension/action/bob-xar-extension/wiki:xwiki]",
             log.get(log.size() - 1).getMessage());
 
         // Check if the uninstalled pages have been deleted.

@@ -24,28 +24,65 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+/**
+ * Represents the preview iframe of when customizing a theme.
+ * Be careful when using it: the context is switched to be inside the iframe when the box is created. You need to call
+ * explicitely {@link #switchToDefaultContent()} to come back on the main frame.
+ *
+ * @version $Id$
+ */
 public class PreviewBox extends CSSGetterPage
 {
+    /**
+     * Default constructor: it switches automatically inside the iframe (see {@link #switchToPreviewBox()}).
+     */
+    public PreviewBox()
+    {
+        super();
+        switchToPreviewBox();
+    }
+
+    /**
+     * Switch the selenium context inside the iframe.
+     * Call {@link #switchToDefaultContent()} to switch out.
+     */
+    public void switchToPreviewBox()
+    {
+        getDriver().switchTo().frame("iframe");
+    }
+
+    /**
+     * Switch to the main frame.
+     */
+    public void switchToDefaultContent()
+    {
+        getDriver().switchTo().defaultContent();
+    }
+
     @Override
     protected String getElementCSSValue(final By locator, String attribute)
     {
-        try {
-            getDriver().switchTo().frame("iframe");
-            WebElement element = getDriver().findElement(locator);
-            return element.getCssValue(attribute);
-        } finally {
-            getDriver().switchTo().defaultContent();
-        }
+        return getDriver().findElement(locator).getCssValue(attribute);
     }
 
     public boolean hasError()
     {
+        return hasError(false);
+    }
+
+    /**
+     * @param switchBack set to true to automatically call {@link #switchToDefaultContent()} after the return.
+     * @return {@code true} if the box contain less errors.
+     */
+    public boolean hasError(boolean switchBack)
+    {
         try {
-            getDriver().switchTo().frame("iframe");
             List<WebElement> errors = getDriver().findElementsWithoutWaiting(By.className("less-error-message"));
             return !errors.isEmpty();
         } finally {
-            getDriver().switchTo().defaultContent();
+            if (switchBack) {
+                switchToDefaultContent();
+            }
         }
     }
 }

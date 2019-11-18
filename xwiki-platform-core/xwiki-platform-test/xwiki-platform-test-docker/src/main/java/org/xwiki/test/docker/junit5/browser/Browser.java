@@ -19,11 +19,15 @@
  */
 package org.xwiki.test.docker.junit5.browser;
 
+import java.util.logging.Level;
+
 import org.openqa.selenium.Capabilities;
 import org.openqa.selenium.UnexpectedAlertBehaviour;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -69,10 +73,13 @@ public enum Browser
     private void forceDefaultCapabilities()
     {
         DesiredCapabilities desiredCapabilities = new DesiredCapabilities();
+        LoggingPreferences logPrefs = new LoggingPreferences();
+        logPrefs.enable(LogType.BROWSER, Level.ALL);
         // By default we want to be able to handle alerts.
         desiredCapabilities.setCapability(CapabilityType.SUPPORTS_ALERTS, true);
         desiredCapabilities.setCapability(CapabilityType.UNEXPECTED_ALERT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
         desiredCapabilities.setCapability(CapabilityType.UNHANDLED_PROMPT_BEHAVIOUR, UnexpectedAlertBehaviour.IGNORE);
+        desiredCapabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
         this.capabilities.merge(desiredCapabilities);
 
         if (this.capabilities instanceof FirefoxOptions) {

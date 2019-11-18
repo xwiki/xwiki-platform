@@ -64,7 +64,9 @@ public class ThemeApplicationWebHomePage extends CSSGetterPage
         WebElement elem = getDriver().findElement(By.xpath("//div[@class='theme-info']"
             + "//h3/span/span/a[contains(text(), '"+themeName+"')]"
             + "/../../../..//a[contains(text(), 'Use this Theme')]"));
+        getDriver().addPageNotYetReloadedMarker();
         elem.click();
+        getDriver().waitUntilPageIsReloaded();
     }
 
     public EditThemePage createNewTheme(String themeName)

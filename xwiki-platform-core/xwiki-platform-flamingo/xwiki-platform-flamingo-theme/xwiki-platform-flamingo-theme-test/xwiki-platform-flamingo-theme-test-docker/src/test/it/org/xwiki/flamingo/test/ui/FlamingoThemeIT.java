@@ -24,6 +24,7 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
+import org.openqa.selenium.TimeoutException;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ThemesAdministrationSectionPage;
 import org.xwiki.flamingo.test.po.EditThemePage;
@@ -91,7 +92,17 @@ public class FlamingoThemeIT
 
         // Create a new theme
         EditThemePage editThemePage = themeApplicationWebHomePage.createNewTheme(testMethodName);
-        editThemePage.waitUntilPreviewIsLoaded();
+        // From time-to-time the preview does not load on Firefox certainly because of some JS race condition.
+        // Right now we cannot get the javascript console logs because of a geckodriver limitation, so it's hard to
+        // fix properly. In the meantime, I'm trying to force a reload of the page in case it didn't work the first
+        // time: it should prevent most of the flickers.
+        try {
+            editThemePage.waitUntilPreviewIsLoaded();
+        } catch (TimeoutException e) {
+            // try to force a refresh, without using navigate().refresh() which is not working properly...
+            setup.getDriver().get(setup.getDriver().getCurrentUrl());
+            editThemePage = new EditThemePage();
+        }
 
         // First, disable auto refresh because it slows down the test
         // (and can even make it fails if the computer is slow)
@@ -142,12 +153,18 @@ public class FlamingoThemeIT
         presentationAdministrationSectionPage.clickOnCustomize();
         editThemePage = new EditThemePage();
 
-        // Wait for the preview to be fully loaded
-        assertTrue(editThemePage.isPreviewBoxLoading());
-        editThemePage.waitUntilPreviewIsLoaded();
-        // First, disable auto refresh because it slows down the test
-        // (and can even make it fails if the computer is slow)
-        editThemePage.setAutoRefresh(false);
+        // From time-to-time the preview does not load on Firefox certainly because of some JS race condition.
+        // Right now we cannot get the javascript console logs because of a geckodriver limitation, so it's hard to
+        // fix properly. In the meantime, I'm trying to force a reload of the page in case it didn't work the first
+        // time: it should prevent most of the flickers.
+        try {
+            editThemePage.waitUntilPreviewIsLoaded();
+        } catch (TimeoutException e) {
+            // try to force a refresh, without using navigate().refresh() which is not working properly...
+            setup.getDriver().get(setup.getDriver().getCurrentUrl());
+            editThemePage = new EditThemePage();
+        }
+        assertFalse(editThemePage.getPreviewBox().hasError(true));
         editThemePage.clickSaveAndView();
 
         // Switch back to Charcoal (just to set the default back if you need to execute the test again)
@@ -197,7 +214,7 @@ public class FlamingoThemeIT
     {
         // Verify that the preview is working with the current values
         PreviewBox previewBox = editThemePage.getPreviewBox();
-        assertFalse(previewBox.hasError());
+        assertFalse(previewBox.hasError(true));
         // Select a variable category and change value
         editThemePage.selectVariableCategory("Base colors");
         editThemePage.setVariableValue("xwiki-page-content-bg", "#ff0000");
@@ -209,6 +226,7 @@ public class FlamingoThemeIT
         editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");
         // Refresh
         editThemePage.refreshPreview();
+        previewBox = editThemePage.getPreviewBox();
         // Verify that there is still no errors
         assertFalse(previewBox.hasError());
         // FIXME: The following should be put back when https://github.com/SeleniumHQ/selenium/issues/7697 will be fixed
@@ -220,5 +238,6 @@ public class FlamingoThemeIT
         assertColor(255, 0, 0, previewBox.getPageBackgroundColor());
         assertColor(0, 0, 255, previewBox.getTextColor());
         assertEquals("monospace", previewBox.getFontFamily());
+        previewBox.switchToDefaultContent();
     }
 }

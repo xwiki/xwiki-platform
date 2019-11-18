@@ -58,7 +58,7 @@ public class EditThemePage extends EditPage
     public List<String> getVariableCategories()
     {
         List<String> results = new ArrayList<>();
-        List<WebElement> categoryElems = getDriver().findElements(
+        List<WebElement> categoryElems = getDriver().findElementsWithoutWaiting(
                 By.xpath("//div[@id='panel-theme-variables']//div[@class='panel-body']"
                         + "//li//a[@data-toggle='tab']"));
         for (WebElement elem : categoryElems) {
@@ -115,14 +115,7 @@ public class EditThemePage extends EditPage
 
     public void waitUntilPreviewIsLoaded()
     {
-        // increase the timeout for the preview: it might take some time to load.
-        int currentTimeout = getDriver().getTimeout();
-        try {
-            getDriver().setTimeout(20);
-            getDriver().waitUntilElementDisappears(By.id("preview-curtain"));
-        } finally {
-            getDriver().setTimeout(currentTimeout);
-        }
+        getDriver().waitUntilElementDisappears(By.id("preview-curtain"));
     }
 
     public PreviewBox getPreviewBox()
@@ -133,7 +126,7 @@ public class EditThemePage extends EditPage
     @Override
     public ViewThemePage clickSaveAndView()
     {
-        this.save.click();
+        super.clickSaveAndView();
         return new ViewThemePage();
     }
 

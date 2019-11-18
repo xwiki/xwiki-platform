@@ -185,6 +185,20 @@
                     "oldValue": "\"XWiki.SchedulerJobSheet\"",
                     "newValue": "\"XWiki.SchedulerJobClass\"",
                     "justification": "Not a breakage"
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method void com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreService::runInternal()",
+                    "new": "method void com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreService::runInternal() throws java.lang.InterruptedException",
+                    "exception": "java.lang.InterruptedException",
+                    "justification": "Not a real breakage since you're supposed to extend runInternal() and not call it"
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method void com.xpn.xwiki.util.AbstractXWikiRunnable::runInternal()",
+                    "new": "method void com.xpn.xwiki.util.AbstractXWikiRunnable::runInternal() throws java.lang.InterruptedException",
+                    "exception": "java.lang.InterruptedException",
+                    "justification": "Not a real breakage since this is an internal class. It's just located in a wrongly-named package for historical reasons (needs to be move to the 'internal' package)"
                   }
                   // Add more ignores below...
                 ]

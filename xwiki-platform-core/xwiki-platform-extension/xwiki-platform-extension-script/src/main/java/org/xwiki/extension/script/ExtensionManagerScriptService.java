@@ -400,11 +400,15 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        // Force proper id
-        String extensionId = installRequest.getExtensions().iterator().next().getId();
-        String namespace =
-            installRequest.getNamespaces() == null ? null : installRequest.getNamespaces().iterator().next();
-        installRequest.setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        if (installRequest.getId() == null || (installRequest.getId().size() > 2
+            && installRequest.getId().get(1).equals(ExtensionRequest.JOBID_PLAN_PREFIX))) {
+            // Force proper id
+            String extensionId = installRequest.getExtensions().iterator().next().getId();
+            String namespace =
+                installRequest.getNamespaces() == null ? null : installRequest.getNamespaces().iterator().next();
+            installRequest
+                .setId(ExtensionRequest.getJobId(ExtensionRequest.JOBID_ACTION_PREFIX, extensionId, namespace));
+        }
 
         // Check rights
         if (!this.authorization.hasAccess(Right.PROGRAM)) {
@@ -551,7 +555,8 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
     {
         setError(null);
 
-        if (uninstallRequest.getId() == null) {
+        if (uninstallRequest.getId() == null || (uninstallRequest.getId().size() > 2
+            && uninstallRequest.getId().get(1).equals(ExtensionRequest.JOBID_PLAN_PREFIX))) {
             // Force proper id
             String extensionId = uninstallRequest.getExtensions().iterator().next().getId();
             String namespace =

@@ -3259,7 +3259,7 @@ public class XWiki implements EventListener
         // Get context language
         String contextLanguage = context.getLanguage();
         // If the language exists in the context, it was previously set by another call
-        if (contextLanguage != null && contextLanguage != "") {
+        if (!StringUtils.isEmpty(contextLanguage)) {
             return contextLanguage;
         }
 
@@ -3425,7 +3425,7 @@ public class XWiki implements EventListener
             }
         }
         // Next we get the language from the context
-        if (contextLanguage != null && contextLanguage != "") {
+        if (!StringUtils.isEmpty(contextLanguage)) {
             language = contextLanguage;
         }
         // Next we get the language from the cookie

@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
@@ -106,9 +105,9 @@ public class NavigationIT
         // Test Rights edit mode key on a non terminal document
         viewPage = testUtils.gotoPage(testReference);
         viewPage.useShortcutKeyForRightsEditing();
-        Assert.assertTrue(testUtils.isInAdminMode());
+        assertTrue(testUtils.isInAdminMode());
         AdministrationPage administrationPage = new AdministrationPage();
-        Assert.assertTrue(administrationPage.hasSection("PageRights"));
+        assertTrue(administrationPage.hasSection("PageRights"));
 
         // Test Object edit mode key
         viewPage = testUtils.gotoPage(testReference);

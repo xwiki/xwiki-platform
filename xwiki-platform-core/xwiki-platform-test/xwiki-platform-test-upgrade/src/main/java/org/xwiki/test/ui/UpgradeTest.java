@@ -34,6 +34,7 @@ import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
+import org.xwiki.extension.test.ExtensionTestUtils;
 import org.xwiki.extension.test.po.ExtensionPane;
 import org.xwiki.extension.test.po.ExtensionProgressPane;
 import org.xwiki.extension.test.po.LogItemPane;
@@ -50,6 +51,7 @@ import org.xwiki.extension.test.po.flavor.FlavorPane;
 import org.xwiki.extension.test.po.flavor.FlavorPicker;
 import org.xwiki.extension.test.po.flavor.FlavorPickerInstallStep;
 import org.xwiki.logging.LogLevel;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.po.ViewPage;
@@ -67,6 +69,11 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class UpgradeTest extends AbstractTest
 {
+    protected static final ExtensionId EXTENSIONID_WATCHLIST_UI =
+        new ExtensionId("org.xwiki.platform:xwiki-platform-watchlist-ui");
+
+    protected static ExtensionTestUtils extensionTestUtil;
+
     private static final String PREVIOUSFLAVOR_NAME = System.getProperty("previousFlavorName");
 
     private static final ExtensionId PREVIOUSFLAVOR_ID =
@@ -141,6 +148,18 @@ public class UpgradeTest extends AbstractTest
         // Init and start
 
         init(Arrays.asList(executor));
+
+        extensionTestUtil = new ExtensionTestUtils(getUtil());
+    }
+
+    protected void assertInstalledOnMainWiki(ExtensionId extensionId) throws Exception
+    {
+        assertTrue(extensionTestUtil.isInstalled(extensionId, new WikiNamespace("xwiki")));
+    }
+
+    protected void assertNotInstalledOnMainWiki(ExtensionId extensionId) throws Exception
+    {
+        assertFalse(extensionTestUtil.isInstalled(extensionId, new WikiNamespace("xwiki")));
     }
 
     // Test
@@ -191,6 +210,12 @@ public class UpgradeTest extends AbstractTest
         ViewPage page = new ViewPage();
 
         assertEquals("xwiki:Main.WebHome", page.getMetaDataValue("reference"));
+
+        ////////////////////
+        // Common Validations
+
+        // Make sure the watchlist UI has been uninstalled
+        assertNotInstalledOnMainWiki(EXTENSIONID_WATCHLIST_UI);
 
         ////////////////////
         // Custom validation

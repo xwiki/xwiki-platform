@@ -24,11 +24,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 
 /**
  * Base class for representing a node in a tree structure.
@@ -41,6 +48,10 @@ public abstract class AbstractTreeNode implements TreeNode
 {
     @Inject
     protected Logger logger;
+
+    @Inject
+    @Named("context")
+    protected Provider<ComponentManager> contextComponentManagerProvider;
 
     private final Map<String, Object> properties = new HashMap<String, Object>();
 
@@ -73,14 +84,42 @@ public abstract class AbstractTreeNode implements TreeNode
         return (String) getProperties().get(PROPERTY_ORDER_BY);
     }
 
+    @SuppressWarnings("unchecked")
     protected Set<String> getExclusions()
     {
-        @SuppressWarnings("unchecked")
-        Set<String> exclusions = (Set<String>) getProperties().get(PROPERTY_EXCLUSIONS);
-        if (exclusions == null) {
-            exclusions = new HashSet<>();
-        }
+        return (Set<String>) getProperties().getOrDefault(PROPERTY_EXCLUSIONS, new HashSet<>());
+    }
+
+    protected Set<String> getExclusions(String parentNodeId)
+    {
+        // Initialize with global exclusions.
+        Set<String> exclusions = new HashSet<>(getExclusions());
+        // Add exclusions from filters.
+        exclusions.addAll(getFilters().stream().flatMap(filter -> filter.getChildExclusions(parentNodeId).stream())
+            .collect(Collectors.toSet()));
         return exclusions;
+    }
+
+    private List<TreeFilter> getFilters()
+    {
+        return ((List<?>) getProperties().getOrDefault(PROPERTY_FILTERS, Collections.emptyList())).stream()
+            .map(this::getFilter).filter(Objects::nonNull).collect(Collectors.toList());
+    }
+
+    private TreeFilter getFilter(Object filter)
+    {
+        if (filter instanceof TreeFilter) {
+            return (TreeFilter) filter;
+        } else if (filter instanceof String) {
+            try {
+                return this.contextComponentManagerProvider.get().getInstance(TreeFilter.class, (String) filter);
+            } catch (ComponentLookupException e) {
+                this.logger.warn("Skipping tree filter [{}]. Root cause is [{}].", filter,
+                    ExceptionUtils.getRootCauseMessage(e));
+                this.logger.debug("Stacktrace:", e);
+            }
+        }
+        return null;
     }
 
     protected <E> List<E> subList(List<E> list, int offset, int limit)

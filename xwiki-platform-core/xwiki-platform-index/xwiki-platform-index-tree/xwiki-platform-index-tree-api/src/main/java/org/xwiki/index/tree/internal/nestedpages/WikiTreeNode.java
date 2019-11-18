@@ -141,6 +141,6 @@ public class WikiTreeNode extends AbstractEntityTreeNode
     @Override
     public String getParent(String nodeId)
     {
-        return "farm:*";
+        return FARM_NODE_ID;
     }
 }

@@ -5,11 +5,13 @@
 ## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
 #set ($docTreeConfig = {
   'exclusions': $collectionstool.set,
+  'filters': [],
   'filterByClass': '',
   'filterHiddenDocuments': true,
   'hierarchyMode': 'reference',
   'limit': 15,
   'root': '',
+  'sheet': '',
   'showAddAttachment': false,
   'showAddDocument': false,
   'showAttachments': true,

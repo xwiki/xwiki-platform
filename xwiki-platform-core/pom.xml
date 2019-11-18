@@ -177,11 +177,14 @@
                     "justification": "False positive. See https://github.com/revapi/revapi/issues/170"
                   },
                   {
-                    "code": "java.generics.formalTypeParameterRemoved",
-                    "old": "method <S, T> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(T) @ org.xwiki.platform.flavor.script.FlavorManagerScriptService",
-                    "new": "method <S> S org.xwiki.extension.script.AbstractExtensionScriptService::safe(java.lang.Object) @ org.xwiki.platform.flavor.script.FlavorManagerScriptService",
-                    "typeParameter": "T",
-                    "justification": "False positive. See https://github.com/revapi/revapi/issues/170"
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitializer",
+                    "new": "class com.xpn.xwiki.plugin.scheduler.internal.SchedulerJobClassDocumentInitializer",
+                    "annotationType": "javax.inject.Named",
+                    "attribute": "value",
+                    "oldValue": "\"XWiki.SchedulerJobSheet\"",
+                    "newValue": "\"XWiki.SchedulerJobClass\"",
+                    "justification": "Not a breakage"
                   }
                   // Add more ignores below...
                 ]

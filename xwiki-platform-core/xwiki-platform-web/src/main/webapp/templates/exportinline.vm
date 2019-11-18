@@ -1,5 +1,22 @@
-<form action="$doc.getURL('export', $escapetool.url($request.parameterMap))" method="post" class="xform">
-<dl>
+#template('export_macros.vm')
+<form id="export" class="xform row" method="post"
+  action="$doc.getURL('export', $escapetool.url($request.parameterMap))">
+#set ($hasExportTree = $xwiki.exists('XWiki.AdminExportSheet'))
+#if ($hasExportTree)
+  <dl class="col-xs-12">
+    <dt>
+      <label>Pages</label>
+      <span class="xHint">$escapetool.xml($services.localization.render('core.exporter.selectPages'))</span>
+    </dt>
+    <dd>
+      #exportTreeSelector({
+        'filter': 'pristineInstalledExtensionDocument',
+        'root': "wiki:$xcontext.database"
+      })
+    </dd>
+  </dl>
+#end
+<dl class="col-md-6">
   <dt>
     <label for="name">$services.localization.render('export_packagename')</label>
     <span class="xHint">$services.localization.render('administration.section.export.packageName.hint')</span>
@@ -15,6 +32,8 @@
     <span class="xHint">$services.localization.render('administration.section.export.licence.hint')</span>
   </dt>
   <dd><input type="text" name="licence" id="licence" value=""/></dd>
+</dl>
+<dl class="col-md-6">
   <dt>
     <label for="author">$services.localization.render('export_author')</label>
     <span class="xHint">$services.localization.render('administration.section.export.author.hint')</span>
@@ -49,9 +68,11 @@
   </dt>
   <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
 </dl>
-<div class="buttons">
+<div class="buttons col-xs-12">
   <span class="buttonwrapper">
-    <input type="submit" value="$services.localization.render('export')" class="button"/>
+    <input type="submit" value="$services.localization.render('export')" class="button"
+      ## Disable the submit button until the export tree is ready, if the export tree is available.
+      #if ($hasExportTree)disabled="disabled"#end/>
   </span>
 </div>
 </form>

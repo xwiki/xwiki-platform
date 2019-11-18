@@ -347,6 +347,7 @@ printer = print
 rosette = certificate
 rss = rss
 shape_group=object-group
+shape_square=square-o
 shape_ungroup=object-ungroup
 shield = shield
 sitemap=sitemap

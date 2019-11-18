@@ -1,1 +1,2 @@
+org.xwiki.tree.internal.EntityTreeNodeIdConverter
 org.xwiki.tree.script.TreeScriptService

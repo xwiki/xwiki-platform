@@ -157,7 +157,12 @@ public class LogCaptureValidator
 
         // Doesn't reproduce locally but fails on the CI. Cause unknown FTM.
         new Line("JavaScript error: resource://gre/modules/UrlClassifierListManager.jsm, line 680: "
-            + "TypeError: this.tablesData[table] is undefined")
+            + "TypeError: this.tablesData[table] is undefined"),
+
+        // The error is not related to our test but to some interaction components in Firefox.
+        new Line("JavaScript error: resource://gre/modules/ActorManagerChild.jsm, line 252: "
+            + "NS_ERROR_XPC_BAD_CONVERT_NATIVE: Component returned failure code: 0x8057000a "
+            + "(NS_ERROR_XPC_BAD_CONVERT_NATIVE) [xpcIJSWeakReference.get]")
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

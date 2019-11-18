@@ -31,12 +31,12 @@ import org.openqa.selenium.support.FindBy;
  */
 public class CleanApplyFinalizeDistributionStep extends AbstractDistributionPage
 {
-    @FindBy(xpath = "//input[@name='cleanapplyreport']")
+    @FindBy(xpath = "//button[@name='cleanapplyreport']")
     private WebElement continueButton;
 
     public void waitForUninstallComplete()
     {
-        getDriver().waitUntilElementIsVisible(By.xpath("//input[@name='cleanapplyreport' and not(@disabled)]"));
+        getDriver().waitUntilElementIsVisible(By.xpath("//button[@name='cleanapplyreport' and not(@disabled)]"));
     }
 
     public CleanApplyReportDistributionStep clickContinue()

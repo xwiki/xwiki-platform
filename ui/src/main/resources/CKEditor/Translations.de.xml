@@ -111,8 +111,8 @@ resource.url.placeholder=http://www.example.org/bild.png
 resource.user.label=Benutzer
 resource.user.placeholder=Alias
 
-### Missing: resourcePicker.attach.hint=Select an attachment
-### Missing: resourcePicker.doc.hint=Select a page
+resourcePicker.attach.hint=Wählen Sie einen Anhang
+resourcePicker.doc.hint=Wählen Sie eine Seite
 
 entityResourceSuggester.doc.placeholder=Eine Seite zu finden…
 entityResourceSuggester.attach.placeholder=Einen Anhang finden…

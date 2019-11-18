@@ -118,7 +118,7 @@ def builds = [
     // so until we make it work, we're testing Sonar in a separate build to not fail the 'Quality' one.
     build(
       name: 'Sonar',
-      goals: 'clean install sonar:sonar',
+      goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'legacy',
       sonar: true
     )

@@ -68,4 +68,10 @@ public class AllIT
     class NestedWikiMacroIT extends WikiMacroIT
     {
     }
+
+    @Nested
+    @DisplayName("Navigation Tests")
+    class NestedNavigationIT extends NavigationIT
+    {
+    }
 }

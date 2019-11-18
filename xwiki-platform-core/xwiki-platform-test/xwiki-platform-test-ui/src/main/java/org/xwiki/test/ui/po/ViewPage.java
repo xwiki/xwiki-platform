@@ -73,6 +73,13 @@ public class ViewPage extends BasePage
         return new AttachmentsPane();
     }
 
+    public InformationPane openInformationDocExtraPane()
+    {
+        getDriver().findElement(By.id("Informationlink")).click();
+        waitForDocExtraPaneActive("information");
+        return new InformationPane();
+    }
+
     /** @return does this page exist. */
     public boolean exists()
     {
@@ -211,5 +218,35 @@ public class ViewPage extends BasePage
     public boolean contentContainsElement(By elementLocator)
     {
         return getDriver().hasElementWithoutWaiting(this.content, elementLocator);
+    }
+
+    private void useShortcutForDocExtraPane(String shortcut, String pane)
+    {
+        getDriver().createActions().sendKeys(shortcut).perform();
+        waitForDocExtraPaneActive(pane);
+    }
+
+    public AttachmentsPane useShortcutKeyForAttachmentPane()
+    {
+        useShortcutForDocExtraPane("a", "attachments");
+        return new AttachmentsPane();
+    }
+
+    public HistoryPane useShortcutKeyForHistoryPane()
+    {
+        useShortcutForDocExtraPane("h", "history");
+        return new HistoryPane();
+    }
+
+    public CommentsTab useShortcutKeyForCommentPane()
+    {
+        useShortcutForDocExtraPane("c", "comments");
+        return new CommentsTab();
+    }
+
+    public InformationPane useShortcutKeyForInformationPane()
+    {
+        useShortcutForDocExtraPane("i", "information");
+        return new InformationPane();
     }
 }

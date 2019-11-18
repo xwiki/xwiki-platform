@@ -42,6 +42,11 @@ public class AttachmentsPane extends BaseElement
 
     private ConfirmationModal confirmDelete;
 
+    public boolean isOpened()
+    {
+        return getDriver().findElementWithoutWaiting(By.id("attachmentscontent")).isDisplayed();
+    }
+
     /**
      * Fills the URL with the specified file path.
      * 

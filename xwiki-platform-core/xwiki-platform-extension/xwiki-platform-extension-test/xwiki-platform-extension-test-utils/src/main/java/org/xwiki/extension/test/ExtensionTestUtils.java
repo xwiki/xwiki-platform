@@ -149,7 +149,9 @@ public class ExtensionTestUtils
     {
         Map<String, String> parameters = new HashMap<>();
         parameters.put("extensionId", extensionId.getId());
-        parameters.put("extensionVersion", extensionId.getVersion().getValue());
+        if (extensionId.getVersion() != null) {
+            parameters.put("extensionVersion", extensionId.getVersion().getValue());
+        }
         if (namespace != null) {
             String namespaceString = namespace.serialize();
             parameters.put("extensionNamespace", namespaceString != null ? namespaceString : "");

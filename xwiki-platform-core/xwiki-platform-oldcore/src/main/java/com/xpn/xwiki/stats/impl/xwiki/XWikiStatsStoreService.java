@@ -117,7 +117,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
     }
 
     @Override
-    public void runInternal()
+    public void runInternal() throws InterruptedException
     {
         try {
             while (true) {
@@ -127,6 +127,7 @@ public class XWikiStatsStoreService extends AbstractXWikiRunnable
             if (LOGGER.isWarnEnabled()) {
                 LOGGER.warn("Statistics storing thread has been interrupted.", e);
             }
+            throw e;
         } catch (StopStatsStoreException e) {
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.warn("Statistics storing thread received stop order.", e);

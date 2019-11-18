@@ -67,7 +67,7 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
     }
 
     @Override
-    protected void runInternal()
+    protected void runInternal() throws InterruptedException
     {
         while (true) {
             try {
@@ -79,11 +79,7 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
                     "Failed to send Active Installation ping to [{}]. Error = [{}]. Will retry in [{}] seconds...",
                     this.configuration.getPingInstanceURL(), ExceptionUtils.getRootCauseMessage(e), WAIT_TIME / 1000);
             }
-            try {
-                Thread.sleep(WAIT_TIME);
-            } catch (InterruptedException e) {
-                break;
-            }
+            Thread.sleep(WAIT_TIME);
         }
     }
 }

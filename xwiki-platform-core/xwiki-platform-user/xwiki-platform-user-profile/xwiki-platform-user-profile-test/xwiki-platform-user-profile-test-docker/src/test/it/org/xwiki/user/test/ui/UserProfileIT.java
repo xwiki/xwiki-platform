@@ -97,8 +97,7 @@ public class UserProfileIT
         // line 1: TypeError: f is undefined
         //
         // It looks like it's not a problem for the tests, nevertheless it should be fixed in the future.
-        // Best would be to migrate those as docker tests.
-        logCaptureConfiguration.registerExcludes("TypeError: f is undefined");
+        logCaptureConfiguration.registerExcludeRegexes(".*\\/js\\/xwiki\\/meta\\.js.*, line 1: TypeError: f is undefined");
     }
 
     /** Functionality check: changing profile information. */

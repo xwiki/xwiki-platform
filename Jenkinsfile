@@ -120,6 +120,7 @@ def builds = [
       name: 'Sonar',
       goals: 'clean install jacoco:report sonar:sonar',
       profiles: 'legacy',
+      properties: '-Dxwiki.revapi.skip=true -Dxwiki.spoon.skip=true -Dxwiki.checkstyle.skip=true'
       sonar: true
     )
   }

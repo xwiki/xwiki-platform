@@ -164,6 +164,11 @@ public class UpgradeTest extends AbstractTest
 
     // Test
 
+    protected void setupLogs()
+    {
+        // Extended to ignore expected logs
+    }
+
     /**
      * Execute the Distribution Wizard for an upgrade from previous version to current SNAPSHOT.
      * 
@@ -172,6 +177,9 @@ public class UpgradeTest extends AbstractTest
     @Test
     public void upgrade() throws Exception
     {
+        // Setup logs ignores
+        setupLogs();
+
         // Access home page (and be automatically redirected)
         getUtil().gotoPage("Main", "WebHome", "view");
 

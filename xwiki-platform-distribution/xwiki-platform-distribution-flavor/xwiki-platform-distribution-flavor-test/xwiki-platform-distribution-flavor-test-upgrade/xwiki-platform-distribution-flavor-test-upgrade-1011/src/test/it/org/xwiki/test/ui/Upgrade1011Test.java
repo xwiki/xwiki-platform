@@ -27,7 +27,7 @@ package org.xwiki.test.ui;
 public class Upgrade1011Test extends UpgradeTest
 {
     @Override
-    protected void postUpdateValidate()
+    protected void setupLogs()
     {
         validateConsole.getLogCaptureConfiguration().registerExpected(
             // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
@@ -38,5 +38,4 @@ public class Upgrade1011Test extends UpgradeTest
                 + "[wiki:xwiki] (InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-"
                 + "[10.11.1]] is incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore");
     }
-
 }

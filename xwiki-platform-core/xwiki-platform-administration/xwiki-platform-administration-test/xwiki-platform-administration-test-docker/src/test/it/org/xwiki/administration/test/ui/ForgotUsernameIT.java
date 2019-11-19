@@ -22,7 +22,6 @@ package org.xwiki.administration.test.ui;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.ForgotUsernameCompletePage;
 import org.xwiki.administration.test.po.ForgotUsernamePage;
-import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 

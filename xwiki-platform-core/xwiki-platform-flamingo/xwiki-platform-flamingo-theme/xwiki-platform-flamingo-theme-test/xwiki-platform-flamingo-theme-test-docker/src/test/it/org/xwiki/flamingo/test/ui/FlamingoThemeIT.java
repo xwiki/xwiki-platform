@@ -61,8 +61,8 @@ public class FlamingoThemeIT
     {
         // This error might be seen from time to time in case of error with the preview the first time with firefox.
         // See the try/catch below.
-        logCaptureConfiguration.registerExcludeRegexes("JavaScript error: "
-            + "http://.*/xwiki/bin/jsx/FlamingoThemesCode/ThemeSheet?language=en&docVersion=1.1, "
+        logCaptureConfiguration.registerExcludes(
+            "/xwiki/bin/jsx/FlamingoThemesCode/ThemeSheet?language=en&docVersion=1.1, "
             + "line 1: TypeError: h[0].contentWindow.lessCodePlugin is undefined");
         setup.loginAsSuperAdmin();
 
@@ -231,7 +231,14 @@ public class FlamingoThemeIT
         editThemePage.selectVariableCategory("Advanced");
         editThemePage.setTextareaValue("lessCode", ".main{ color: #0000ff; }");
         // Refresh
-        editThemePage.refreshPreview();
+        // From time-to-time the preview does not load on Firefox certainly because of some JS race condition.
+        // Right now we cannot get the javascript console logs because of a geckodriver limitation, so it's hard to
+        // fix properly. For now, I'm trying to just trigger once again the refresh in case of first timeout.
+        try {
+            editThemePage.refreshPreview();
+        } catch (TimeoutException e) {
+            editThemePage.refreshPreview();
+        }
         previewBox = editThemePage.getPreviewBox();
         // Verify that there is still no errors
         assertFalse(previewBox.hasError());

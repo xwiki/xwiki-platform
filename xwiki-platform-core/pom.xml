@@ -206,6 +206,13 @@
                     "new": "method void com.xpn.xwiki.util.AbstractXWikiRunnable::runInternal() throws java.lang.InterruptedException",
                     "exception": "java.lang.InterruptedException",
                     "justification": "Not a real breakage since this is an internal class. It's just located in a wrongly-named package for historical reasons (needs to be move to the 'internal' package)"
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method void com.xpn.xwiki.plugin.feed.UpdateThread::runInternal()",
+                    "new": "method void com.xpn.xwiki.plugin.feed.UpdateThread::runInternal() throws java.lang.InterruptedException",
+                    "exception": "java.lang.InterruptedException",
+                    "justification": "Not a real breakage since you're supposed to extend runInternal() and not call it"
                   }
                   // Add more ignores below...
                 ]

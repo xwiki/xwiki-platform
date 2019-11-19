@@ -56,8 +56,14 @@ public class FlamingoThemeIT
     }
 
     @Test
-    public void validateColorThemeFeatures(TestUtils setup, TestInfo info)
+    public void validateColorThemeFeatures(TestUtils setup, TestInfo info,
+        LogCaptureConfiguration logCaptureConfiguration)
     {
+        // This error might be seen from time to time in case of error with the preview the first time with firefox.
+        // See the try/catch below.
+        logCaptureConfiguration.registerExcludeRegexes("JavaScript error: "
+            + "http://.*/xwiki/bin/jsx/FlamingoThemesCode/ThemeSheet?language=en&docVersion=1.1, "
+            + "line 1: TypeError: h[0].contentWindow.lessCodePlugin is undefined");
         setup.loginAsSuperAdmin();
 
         // First make sure the theme we'll create doesn't exist

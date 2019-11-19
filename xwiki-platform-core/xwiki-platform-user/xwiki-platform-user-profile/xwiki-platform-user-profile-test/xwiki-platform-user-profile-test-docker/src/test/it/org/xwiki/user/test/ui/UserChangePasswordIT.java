@@ -27,6 +27,7 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.user.test.po.ChangePasswordPage;
 import org.xwiki.user.test.po.PreferencesUserProfilePage;
 import org.xwiki.user.test.po.ProfileUserProfilePage;
@@ -61,6 +62,12 @@ public class UserChangePasswordIT
         setup.loginAsSuperAdmin();
         setup.rest().deletePage("XWiki", this.userName);
         setup.createUserAndLogin(this.userName, DEFAULT_PASSWORD);
+
+        // At first edition the Dashboard is saving the doc to insert a new object, so we need to be sure
+        // this has been done before performing our other test, to avoid getting stale element references.
+        setup.gotoPage("XWiki", this.userName, "edit");
+        // Ensure JS has been loaded
+        new EditPage();
 
         // The following error happened from time-to-time:
         // JavaScript error: http://localhost:8080/xwiki/resources/js/xwiki/meta.js?cache-version=1571475464000,

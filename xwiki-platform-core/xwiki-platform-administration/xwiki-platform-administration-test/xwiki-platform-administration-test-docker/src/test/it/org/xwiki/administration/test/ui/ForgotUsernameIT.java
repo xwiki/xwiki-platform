@@ -33,7 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Test the ForgotUsername UI.
  *
  * @version $Id$
- * @since 11.10/
+ * @since 11.10
+ */
 @UITest
 public class ForgotUsernameIT
 {

@@ -85,9 +85,7 @@ public class ProfileUserProfilePage extends AbstractUserProfilePage
     public ProfileEditPage editProfile()
     {
         this.editProfile.click();
-        ProfileEditPage profileEditPage = new ProfileEditPage();
-        profileEditPage.waitUntilPageIsLoaded();
-        return profileEditPage;
+        return new ProfileEditPage();
     }
 
     public String getURL()

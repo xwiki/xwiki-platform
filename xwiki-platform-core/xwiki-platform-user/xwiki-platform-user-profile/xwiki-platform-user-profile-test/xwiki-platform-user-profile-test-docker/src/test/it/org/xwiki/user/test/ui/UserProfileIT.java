@@ -24,11 +24,15 @@ import java.io.File;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.HistoryPane;
+import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
 import org.xwiki.user.test.po.PreferencesEditPage;
 import org.xwiki.user.test.po.PreferencesUserProfilePage;
@@ -87,10 +91,15 @@ public class UserProfileIT
     public void setUp(TestUtils setup, TestReference testReference, LogCaptureConfiguration logCaptureConfiguration)
         throws Exception
     {
-        this.userName = testReference.getName() + testReference.getLastSpaceReference().getName();
+        this.userName = testReference.getLastSpaceReference().getName();
         setup.loginAsSuperAdmin();
         setup.rest().deletePage("XWiki", this.userName);
         setup.createUserAndLogin(this.userName, DEFAULT_PASSWORD);
+
+        // At first edition the Dashboard is saving the doc to insert a new object, so we need to be sure
+        // this has been done before performing our other test, to avoid getting stale element references.
+        setup.gotoPage("XWiki", this.userName, "edit");
+        new EditPage();
 
         // The following error happened from time-to-time:
         // JavaScript error: http://localhost:8080/xwiki/resources/js/xwiki/meta.js?cache-version=1571475464000,
@@ -103,7 +112,7 @@ public class UserProfileIT
     /** Functionality check: changing profile information. */
     @Test
     @Order(1)
-    public void editProfile()
+    public void editProfile(TestUtils testUtils)
     {
         ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
         ProfileEditPage profileEditPage = userProfilePage.editProfile();
@@ -233,5 +242,15 @@ public class UserProfileIT
         if (commentId != -1) {
             userProfilePage.openCommentsDocExtraPane().deleteCommentByID(commentId);
         }
+    }
+
+    @Test
+    @Order(6)
+    public void ensureDashboardUIAddAnObjectAtFirstEdit()
+    {
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        HistoryPane historyPane = userProfilePage.openHistoryDocExtraPane();
+        assertEquals("Initialize default dashboard user setup", historyPane.getCurrentVersionComment());
+        assertEquals("2.1", historyPane.getCurrentVersion());
     }
 }

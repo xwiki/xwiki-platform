@@ -59,6 +59,9 @@
   ## Parametrized filter part of the query
   #set($whereSql = '')
   ## List of values to use with $whereSql
+  #if (!$filterParams)
+    #set($filterParams = {})
+  #end
   #if ($filterParams.entrySet())
     #set($whereParams = {})
   #else

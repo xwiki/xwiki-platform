@@ -148,7 +148,7 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.async.internal.block.BlockAsyncRenderer#render(boolean, boolean)
-     * @since 11.10RC1
+     * @since 11.10
      */
     @Override
     public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
@@ -172,7 +172,7 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
      * @param async true if the renderer is executed asynchronously
      * @param cached true of the result of the renderer will be cached
      * @return true if the result of the execution should be rendered
-     * @since 11.10RC1
+     * @since 11.10
      */
     protected boolean isRendered(boolean async, boolean cached)
     {
@@ -184,7 +184,7 @@ public abstract class AbstractBlockAsyncRenderer implements BlockAsyncRenderer
      * @param cached true of the result of the renderer will be cached
      * @return the result of the execution
      * @throws RenderingException when failing to execute the renderer
-     * @since 11.10RC1
+     * @since 11.10
      */
     protected Block execute(boolean async, boolean cached) throws RenderingException
     {

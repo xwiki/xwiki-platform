@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * UI Tests related to password change.
  *
- * @since 11.10RC1
+ * @since 11.10
  * @version $Id$
  */
 @UITest

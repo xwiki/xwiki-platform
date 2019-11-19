@@ -26,7 +26,7 @@ import org.openqa.selenium.support.FindBy;
  * The Orphaned Dependencies step UI.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 public class CleanDistributionStep extends AbstractDistributionPage
 {

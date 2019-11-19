@@ -37,7 +37,7 @@ import org.xwiki.properties.converter.AbstractConverter;
  * Supports conversion between string entity tree node id and {@link EntityReference}.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component
 @Singleton

@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Tests the live table that lists the existing applications on the AppWithinMinutes home page.
  *
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @UITest
 public class AppsLiveTableIT

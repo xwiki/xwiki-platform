@@ -33,7 +33,7 @@ import org.xwiki.stability.Unstable;
  * Base class for entity tree filters.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Unstable
 public abstract class AbstractEntityTreeFilter implements TreeFilter, EntityTreeFilter

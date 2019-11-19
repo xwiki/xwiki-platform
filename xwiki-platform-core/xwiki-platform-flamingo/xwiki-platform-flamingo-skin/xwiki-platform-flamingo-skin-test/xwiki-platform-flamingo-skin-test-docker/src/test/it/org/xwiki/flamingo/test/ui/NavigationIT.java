@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Tests related to navigation in the wiki.
  * 
- * @since 11.10RC1
+ * @since 11.10
  * @version $Id$
  */
 @UITest

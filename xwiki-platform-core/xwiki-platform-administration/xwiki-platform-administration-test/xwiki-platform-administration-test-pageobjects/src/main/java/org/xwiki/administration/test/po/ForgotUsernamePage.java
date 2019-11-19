@@ -27,7 +27,7 @@ import org.xwiki.test.ui.po.ViewPage;
  * Represents the ForgotUsername page.
  *
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 public class ForgotUsernamePage extends ViewPage
 {

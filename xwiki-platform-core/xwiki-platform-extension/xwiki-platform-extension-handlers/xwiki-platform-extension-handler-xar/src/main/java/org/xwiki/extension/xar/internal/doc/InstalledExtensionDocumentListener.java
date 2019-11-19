@@ -60,7 +60,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * extensions.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component
 @Named(InstalledExtensionDocumentListener.HINT)

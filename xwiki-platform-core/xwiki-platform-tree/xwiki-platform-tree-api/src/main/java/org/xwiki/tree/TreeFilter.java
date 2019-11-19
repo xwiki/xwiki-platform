@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * The interface used to filter tree nodes.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Role
 @Unstable

@@ -40,7 +40,7 @@ import org.xwiki.url.ExtendedURL;
 /**
  * A dedicated script service to manipulate {@link JCaptchaResourceReference}.
  *
- * @since 11.10RC1
+ * @since 11.10
  * @version $Id$
  */
 @Component

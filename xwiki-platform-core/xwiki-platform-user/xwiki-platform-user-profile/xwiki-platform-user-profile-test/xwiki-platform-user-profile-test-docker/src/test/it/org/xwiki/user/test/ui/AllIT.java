@@ -26,7 +26,7 @@ import org.xwiki.test.docker.junit5.UITest;
 /**
  * All UI tests for the user profile.
  *
- * @since 11.10RC1
+ * @since 11.10
  * @version $Id$
  */
 // extraJARs needed for the hibernate mapping.

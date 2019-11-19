@@ -35,7 +35,7 @@ import org.xwiki.script.internal.safe.ScriptSafeProvider;
  * Provide safe ExtensionNode.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component
 @Singleton

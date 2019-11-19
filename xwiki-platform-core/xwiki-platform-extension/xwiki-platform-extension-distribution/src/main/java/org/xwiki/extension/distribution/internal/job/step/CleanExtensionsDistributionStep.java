@@ -36,7 +36,7 @@ import org.xwiki.extension.repository.InstalledExtensionRepository;
  * Step in charge of cleaning orphaned extension dependencies.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component
 @Named(CleanExtensionsDistributionStep.ID)

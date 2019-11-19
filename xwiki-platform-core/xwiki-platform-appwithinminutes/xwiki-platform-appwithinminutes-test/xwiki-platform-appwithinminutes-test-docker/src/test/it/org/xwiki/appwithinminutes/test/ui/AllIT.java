@@ -27,7 +27,7 @@ import org.xwiki.test.docker.junit5.UITest;
  * All UI tests for the App Within Minutes.
  *
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @UITest
 public class AllIT

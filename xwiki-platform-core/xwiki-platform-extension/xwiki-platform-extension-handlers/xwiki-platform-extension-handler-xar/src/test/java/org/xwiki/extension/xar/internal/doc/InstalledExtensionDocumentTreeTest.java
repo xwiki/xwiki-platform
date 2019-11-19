@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link InstalledExtensionDocumentTree}.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @ComponentTest
 public class InstalledExtensionDocumentTreeTest

@@ -39,7 +39,7 @@ import org.xwiki.model.reference.EntityReference;
  * </ul>
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component
 @Singleton

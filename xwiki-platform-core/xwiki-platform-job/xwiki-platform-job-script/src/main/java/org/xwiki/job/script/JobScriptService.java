@@ -111,7 +111,7 @@ public class JobScriptService implements ScriptService
      * @param jobId the job id
      * @return the job instance, {@code null} if the job does not exist
      * @throws AccessDeniedException when the author does not have the right to use this API
-     * @since 11.10RC1
+     * @since 11.10
      */
     @Unstable
     public Job getJob(List<String> jobId) throws AccessDeniedException

@@ -36,7 +36,7 @@ import org.xwiki.url.URLNormalizer;
 /**
  * Converts a {@link JCaptchaResourceReference} into a relative {@link ExtendedURL} (with the Context Path added).
  *
- * @since 11.10RC1
+ * @since 11.10
  * @version $Id$
  */
 @Component

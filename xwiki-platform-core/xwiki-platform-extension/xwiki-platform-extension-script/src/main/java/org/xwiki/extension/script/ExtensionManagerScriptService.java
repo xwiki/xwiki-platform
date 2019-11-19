@@ -637,7 +637,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * Create an {@link UninstallRequest} instance.
      * 
      * @return the {@link UninstallRequest}
-     * @since 11.10RC1
+     * @since 11.10
      */
     @Unstable
     public UninstallRequest createUninstallRequest()
@@ -691,7 +691,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
      * @param uninstallRequest the uninstall plan request to perform
      * @return the {@link Job} object which can be used to monitor the progress of the uninstall plan process, or
      *         {@code null} in case of failure
-     * @since 11.10RC1
+     * @since 11.10
      */
     @Unstable
     public Job createUninstallPlan(UninstallRequest uninstallRequest)

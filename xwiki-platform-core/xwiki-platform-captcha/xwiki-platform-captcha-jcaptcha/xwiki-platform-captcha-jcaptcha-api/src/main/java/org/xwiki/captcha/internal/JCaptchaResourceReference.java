@@ -27,7 +27,7 @@ import org.xwiki.resource.ResourceType;
 /**
  * Represents a reference to a JCaptcha image.
  *
- * @since 11.10RC1
+ * @since 11.10
  * @version $Id$
  */
 public class JCaptchaResourceReference extends AbstractResourceReference

@@ -40,7 +40,7 @@ import org.xwiki.query.QueryManager;
  * Counts nested pages.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component(roles = NestedPageCounter.class)
 @Singleton

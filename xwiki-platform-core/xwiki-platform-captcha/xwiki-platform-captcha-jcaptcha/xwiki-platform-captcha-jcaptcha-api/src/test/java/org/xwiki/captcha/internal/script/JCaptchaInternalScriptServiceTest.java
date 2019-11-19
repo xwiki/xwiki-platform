@@ -46,7 +46,7 @@ import static org.mockito.Mockito.when;
 /**
  * Validate the behaviour of {@link JCaptchaInternalScriptService}.
  *
- * @since 11.10RC1
+ * @since 11.10
  * @version $Id$
  */
 @ComponentTest

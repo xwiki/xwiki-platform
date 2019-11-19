@@ -62,7 +62,7 @@ import com.xpn.xwiki.web.XWikiRequest;
  * Resolves the list of documents selected by the current request.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component(roles = DocumentSelectionResolver.class)
 @Singleton

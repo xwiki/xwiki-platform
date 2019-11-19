@@ -25,7 +25,7 @@ import org.openqa.selenium.support.FindBy;
 /**
  * PO for Page Information pane.
  *
- * @since 11.10RC1
+ * @since 11.10
  * @version $Id$
  */
 public class InformationPane extends BaseElement

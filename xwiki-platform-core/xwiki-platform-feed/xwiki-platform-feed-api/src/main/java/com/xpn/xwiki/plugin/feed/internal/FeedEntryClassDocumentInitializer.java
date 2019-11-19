@@ -33,7 +33,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * Create or update the {@code XWiki.FeedEntryClass} document with all required information.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component
 @Singleton

@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link EntityTreeNodeIdConverter}.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @ComponentTest
 public class EntityTreeNodeIdConverterTest

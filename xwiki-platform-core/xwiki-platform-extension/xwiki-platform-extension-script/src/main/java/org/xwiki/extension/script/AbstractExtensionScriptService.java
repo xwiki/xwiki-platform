@@ -211,7 +211,7 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      * @param <R> the result type of method {@code call}
      * @param callable a task that returns a result and may throw an exception
      * @return the computed result
-     * @since 11.10RC1
+     * @since 11.10
      */
     @Unstable
     protected <R> R wrapError(Callable<R> callable)
@@ -234,7 +234,7 @@ public abstract class AbstractExtensionScriptService implements ScriptService
      * @param <R> the result type of method {@code call}
      * @param callable a task that returns a result and may throw an exception
      * @return the safe version of the computed result
-     * @since 11.10RC1
+     * @since 11.10
      */
     @Unstable
     protected <R> R safeWrapError(Callable<R> callable)

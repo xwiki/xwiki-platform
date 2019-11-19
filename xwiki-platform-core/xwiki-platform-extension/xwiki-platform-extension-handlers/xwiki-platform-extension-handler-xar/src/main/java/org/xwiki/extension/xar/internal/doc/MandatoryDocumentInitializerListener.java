@@ -55,7 +55,7 @@ import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializedEvent;
  * {@link MandatoryDocumentInitializer}s.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component
 @Named(MandatoryDocumentInitializerListener.HINT)

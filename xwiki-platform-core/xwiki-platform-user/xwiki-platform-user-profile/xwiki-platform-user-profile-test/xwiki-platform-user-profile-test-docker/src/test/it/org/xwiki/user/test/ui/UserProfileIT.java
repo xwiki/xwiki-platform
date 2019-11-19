@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
  * Test the User Profile.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @UITest
 public class UserProfileIT

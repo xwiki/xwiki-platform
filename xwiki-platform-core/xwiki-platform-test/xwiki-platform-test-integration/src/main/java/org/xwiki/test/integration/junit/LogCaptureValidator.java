@@ -189,7 +189,7 @@ public class LogCaptureValidator
      * @param logContent the log content to validate
      * @param configuration the user-registered excludes and expected log lines
      * @param displayMissing true if warning should be logged when excluded/expected logs are not found
-     * @since 11.10RC1
+     * @since 11.10
      */
     public void validate(String logContent, LogCaptureConfiguration configuration, boolean displayMissing)
     {

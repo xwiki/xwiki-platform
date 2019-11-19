@@ -44,7 +44,7 @@ import org.xwiki.model.reference.SpaceReference;
  * Provides information about the hierarchy of installed extension documents.
  * 
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component(roles = InstalledExtensionDocumentTree.class)
 @Singleton

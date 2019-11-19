@@ -37,7 +37,7 @@ import org.xwiki.url.internal.AbstractResourceReferenceResolver;
  * A decided resolver for {@link JCaptchaResourceReference}.
  *
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @Component
 @Named("jcaptcha")

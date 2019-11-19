@@ -1047,7 +1047,7 @@ public abstract class XWikiAction extends Action
      * 
      * @param response the response
      * @param length the length to set in the response
-     * @since 11.10RC1
+     * @since 11.10
      * @since 10.11.10
      * @since 11.3.6
      */

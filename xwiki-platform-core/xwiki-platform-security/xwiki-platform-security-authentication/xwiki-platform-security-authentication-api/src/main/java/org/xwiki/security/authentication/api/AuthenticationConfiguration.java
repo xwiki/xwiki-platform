@@ -50,7 +50,7 @@ public interface AuthenticationConfiguration
 
     /**
      * @return {@code true} if the authentication security mechanism is enabled.
-     * @since 11.10RC1
+     * @since 11.10
      */
     default boolean isAuthenticationSecurityEnabled()
     {

@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  * Validate the behaviour of {@link JCaptchaResourceReferenceResolver}.
  *
  * @version $Id$
- * @since 11.10RC1
+ * @since 11.10
  */
 @ComponentTest
 public class JCaptchaResourceReferenceResolverTest

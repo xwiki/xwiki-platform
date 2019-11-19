@@ -98,7 +98,7 @@ public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObjec
     }
 
     /**
-     * @since 11.10RC1
+     * @since 11.10
      */
     protected <R> R wrapError(Callable<R> callable)
     {
@@ -114,7 +114,7 @@ public abstract class AbstractNoExceptionSafeObject<T> extends AbstractSafeObjec
     }
 
     /**
-     * @since 11.10RC1
+     * @since 11.10
      */
     protected <R> R safeWrapError(Callable<R> callable)
     {

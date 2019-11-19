@@ -182,6 +182,17 @@ public class LogCaptureValidator
      */
     public void validate(String logContent, LogCaptureConfiguration configuration)
     {
+        validate(logContent, configuration, true);
+    }
+
+    /**
+     * @param logContent the log content to validate
+     * @param configuration the user-registered excludes and expected log lines
+     * @param displayMissing true if warning should be logged when excluded/expected logs are not found
+     * @since 11.10RC1
+     */
+    public void validate(String logContent, LogCaptureConfiguration configuration, boolean displayMissing)
+    {
         List<Line> allExcludes = new ArrayList<>();
         allExcludes.addAll(GLOBAL_EXCLUDES);
         allExcludes.addAll(configuration.getExcludedLines());
@@ -192,32 +203,8 @@ public class LogCaptureValidator
 
         List<String> matchingExcludes = new ArrayList<>();
         List<Line> matchingDefinitions = new ArrayList<>();
-        List<String> matchingLines = LOG_PARSER.parse(logContent).stream()
-            .filter(p -> {
-                for (String searchString : SEARCH_STRINGS) {
-                    if (p.contains(searchString)) {
-                        return true;
-                    }
-                }
-                return false;
-            })
-            .filter(p -> {
-                for (Line excludedLine : allExcludes) {
-                    if (isMatching(p, excludedLine)) {
-                        matchingExcludes.add(p);
-                        matchingDefinitions.add(excludedLine);
-                        return false;
-                    }
-                }
-                for (Line expectedLine : allExpected) {
-                    if (isMatching(p, expectedLine)) {
-                        matchingDefinitions.add(expectedLine);
-                        return false;
-                    }
-                }
-                return true;
-            })
-            .collect(Collectors.toList());
+        List<String> matchingLines =
+            getMatchingLines(logContent, allExcludes, allExpected, matchingExcludes, matchingDefinitions);
 
         // At the end of the tests, output warnings for matching excluded lines so that developers can see that
         // there  are excludes that need to be fixed.
@@ -226,18 +213,48 @@ public class LogCaptureValidator
                 StringUtils.join(matchingExcludes, NL));
         }
 
-        // Also display not matching excludes and expected so that developers can notice them and realize that the
-        // issues that existed might have been fixed. Note however that currently we can't have exclude/expected by
-        // configuration (for Docker-based tests) and thus it's possible that there are non matching excludes/expected
-        // simply because they exist only in a different configuration.
-        displayMissingWarning(configuration.getExcludedLines(), matchingDefinitions, "excludes");
-        displayMissingWarning(configuration.getExpectedLines(), matchingDefinitions, "expected");
+        if (displayMissing) {
+            // Also display not matching excludes and expected so that developers can notice them and realize that the
+            // issues that existed might have been fixed. Note however that currently we can't have exclude/expected by
+            // configuration (for Docker-based tests) and thus it's possible that there are non matching
+            // excludes/expected simply because they exist only in a different configuration.
+            displayMissingWarning(configuration.getExcludedLines(), matchingDefinitions, "excludes");
+            displayMissingWarning(configuration.getExpectedLines(), matchingDefinitions, "expected");
+        }
 
         // Fail the test if there are matching lines that have no exclude or no expected.
         if (!matchingLines.isEmpty()) {
             throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
                 matchingLines.stream().collect(Collectors.joining(NL))));
         }
+    }
+
+    private List<String> getMatchingLines(String logContent, List<Line> allExcludes, List<Line> allExpected,
+        List<String> matchingExcludes, List<Line> matchingDefinitions)
+    {
+        return LOG_PARSER.parse(logContent).stream().filter(p -> {
+            for (String searchString : SEARCH_STRINGS) {
+                if (p.contains(searchString)) {
+                    return true;
+                }
+            }
+            return false;
+        }).filter(p -> {
+            for (Line excludedLine : allExcludes) {
+                if (isMatching(p, excludedLine)) {
+                    matchingExcludes.add(p);
+                    matchingDefinitions.add(excludedLine);
+                    return false;
+                }
+            }
+            for (Line expectedLine : allExpected) {
+                if (isMatching(p, expectedLine)) {
+                    matchingDefinitions.add(expectedLine);
+                    return false;
+                }
+            }
+            return true;
+        }).collect(Collectors.toList());
     }
 
     private void displayMissingWarning(List<Line> definitions, List<Line> matchingDefinitions, String missingType)

@@ -400,7 +400,7 @@ public class UpgradeTest extends AbstractTest
         }
 
         LogCaptureValidator validator = new LogCaptureValidator();
-        validator.validate(builder.toString(), validateConsole.getLogCaptureConfiguration());
+        validator.validate(builder.toString(), validateConsole.getLogCaptureConfiguration(), false);
     }
 
     private void orphanedDependenciesStep()

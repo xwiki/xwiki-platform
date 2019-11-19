@@ -60,14 +60,28 @@ public class ExtensionTestUtils
 
     private final Map<Integer, Boolean> initialized = new ConcurrentHashMap<>();
 
+    private UsernamePasswordCredentials adminCredentials = TestUtils.SUPER_ADMIN_CREDENTIALS;
+
     /**
      * Creates a new instance.
      * 
      * @param utils the generic test utility methods
      */
-    public ExtensionTestUtils(TestUtils utils) throws Exception
+    public ExtensionTestUtils(TestUtils utils)
     {
         this.utils = utils;
+    }
+
+    /**
+     * Creates a new instance.
+     * 
+     * @param utils the generic test utility methods
+     * @param adminCredentials the admin credentials to use
+     */
+    public ExtensionTestUtils(TestUtils utils, UsernamePasswordCredentials adminCredentials)
+    {
+        this.utils = utils;
+        this.adminCredentials = adminCredentials;
     }
 
     private void checkinit() throws Exception
@@ -79,7 +93,7 @@ public class ExtensionTestUtils
             try (InputStream extensionTestService = this.getClass().getResourceAsStream("/extensionTestService.wiki")) {
                 // Make sure to save the service with superadmin
                 UsernamePasswordCredentials currentCredentials =
-                    this.utils.setDefaultCredentials(TestUtils.SUPER_ADMIN_CREDENTIALS);
+                    this.utils.setDefaultCredentials(this.adminCredentials);
 
                 // Save the service
                 this.utils.rest().savePage(SERVICE_REFERENCE,

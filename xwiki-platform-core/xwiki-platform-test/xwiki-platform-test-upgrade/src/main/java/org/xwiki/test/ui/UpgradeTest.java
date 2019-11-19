@@ -149,7 +149,8 @@ public class UpgradeTest extends AbstractTest
 
         init(Arrays.asList(executor));
 
-        extensionTestUtil = new ExtensionTestUtils(getUtil());
+        // Use Admin credentials since superadmin is not enabled by default
+        extensionTestUtil = new ExtensionTestUtils(getUtil(), TestUtils.ADMIN_CREDENTIALS);
     }
 
     protected void assertInstalledOnMainWiki(ExtensionId extensionId) throws Exception

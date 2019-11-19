@@ -77,7 +77,7 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Needed by the template provider UI and probably others in the future. -->
+    <!-- Needed by the Export and Page Templates administration sections, and probably others in the future. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-index-tree-macro</artifactId>

@@ -59,7 +59,7 @@
   #set ($exportTreeSettings = {
     'class' : 'export-tree',
     'filterHiddenDocuments': false,
-    'sheet': 'XWiki.AdminExportSheet',
+    'sheet': 'XWiki.ExportDocumentTree',
     'showAttachments': false,
     'showTranslations': false
   })

@@ -59,7 +59,7 @@
     </div>
     <div id="exportModalOtherCollapse" class="panel-collapse collapse" role="tabpanel" aria-labelledby="exportModalHeadingOther">
       <div class="panel-body xform">
-        #set ($hasExportTree = $doc.documentReference.name == 'WebHome' && $xwiki.exists('XWiki.AdminExportSheet'))
+        #set ($hasExportTree = $doc.documentReference.name == 'WebHome' && $xwiki.exists('XWiki.ExportDocumentTree'))
         #if ($hasExportTree)
           <p>$escapetool.xml($services.localization.render('core.exporter.selectPages'))</p>
           #exportTreeSelector({

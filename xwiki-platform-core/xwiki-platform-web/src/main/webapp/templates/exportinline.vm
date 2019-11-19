@@ -1,7 +1,7 @@
 #template('export_macros.vm')
 <form id="export" class="xform row" method="post"
   action="$doc.getURL('export', $escapetool.url($request.parameterMap))">
-#set ($hasExportTree = $xwiki.exists('XWiki.AdminExportSheet'))
+#set ($hasExportTree = $xwiki.exists('XWiki.ExportDocumentTree'))
 #if ($hasExportTree)
   <dl class="col-xs-12">
     <dt>

@@ -92,7 +92,14 @@ public class CompareVersionsTest extends AbstractTest
         // might be cached in the browser.
         // FIXME: this should be removed once https://jira.xwiki.org/browse/XWIKI-16809 is fixed.
         getUtil().gotoPage("XWiki", "Foo", "edit");
-        getDriver().navigate().refresh();
+        // Refresh does not work properly, so trying to do a manual refresh
+        String currentUrl = getDriver().getCurrentUrl();
+        if (currentUrl.contains("?")) {
+            currentUrl = currentUrl.concat("?cache-buster=42");
+        } else {
+            currentUrl = currentUrl.concat("&cache-buster=42");
+        }
+        getDriver().get(currentUrl);
 
         // Create the test page.
         testPage = getUtil().createPage(getTestClassName(), pageName, "one\ntwo\nthree", "Test");

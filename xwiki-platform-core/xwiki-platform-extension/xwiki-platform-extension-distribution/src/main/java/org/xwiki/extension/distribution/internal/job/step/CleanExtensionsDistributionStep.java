@@ -83,9 +83,9 @@ public class CleanExtensionsDistributionStep extends AbstractExtensionDistributi
             if (installedExtension.isDependency(namespace)) {
                 try {
                     // Check in root namespace when on main wiki
-                    if (installedExtension.isInstalled(null) && isMainWiki()) {
-                        if (this.installedRepository.getBackwardDependencies(installedExtension.getId(), true)
-                            .isEmpty()) {
+                    if (installedExtension.isInstalled(null)) {
+                        if (isMainWiki() && this.installedRepository
+                            .getBackwardDependencies(installedExtension.getId(), true).isEmpty()) {
                             return true;
                         }
                     } else {

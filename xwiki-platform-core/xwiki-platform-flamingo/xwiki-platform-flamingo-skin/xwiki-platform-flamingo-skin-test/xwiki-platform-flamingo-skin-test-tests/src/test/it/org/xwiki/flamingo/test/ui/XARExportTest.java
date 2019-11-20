@@ -63,17 +63,16 @@ public class XARExportTest extends AbstractTest
         // Create 50 pages under that space (will be used for the test with lot of selected pages)
         for (int i = 0; i < 50; i++) {
             String name = "Foo_" + i;
-            DocumentReference documentReference = new DocumentReference("xwiki",
-                Arrays.asList("Foo", name), "WebHome");
+            DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("Foo", name), "WebHome");
             if (!getUtil().rest().exists(documentReference)) {
                 getUtil().rest().savePage(documentReference);
             }
         }
 
         for (int i = 0; i < 20; i++) {
-            String name = "Foo_10_"+i;
-            DocumentReference documentReference = new DocumentReference("xwiki",
-                Arrays.asList("Foo", "Foo_10", name), "WebHome");
+            String name = "Foo_10_" + i;
+            DocumentReference documentReference =
+                new DocumentReference("xwiki", Arrays.asList("Foo", "Foo_10", name), "WebHome");
             if (!getUtil().rest().exists(documentReference)) {
                 getUtil().rest().savePage(documentReference);
             }
@@ -84,8 +83,8 @@ public class XARExportTest extends AbstractTest
     }
 
     /**
-     * Scenario: export a XAR after opening the export window and selecting "Other Format". Don't change anything in
-     * he tree of export.
+     * Scenario: export a XAR after opening the export window and selecting "Other Format". Don't change anything in the
+     * tree of export.
      */
     private void exportXARAll() throws Exception
     {
@@ -106,8 +105,7 @@ public class XARExportTest extends AbstractTest
 
         otherFormatPane.clickExportAsXARButton();
 
-        String postURL = getUtil().getURL("Foo", "WebHome",
-            "export", "format=xar&name=Foo.WebHome");
+        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
         assertEquals(postURL, otherFormatPane.getForm().getAttribute("action"));
 
         List<String> expectedPages = new ArrayList<>();
@@ -164,7 +162,7 @@ public class XARExportTest extends AbstractTest
 
         otherFormatPane.clickExportAsXARButton();
 
-        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome");
+        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
         assertEquals(postURL, otherFormatPane.getForm().getAttribute("action"));
 
         List<String> expectedPages = new ArrayList<>();
@@ -179,8 +177,8 @@ public class XARExportTest extends AbstractTest
     }
 
     /**
-     * Scenario: Export a XAR after opening main tree and a subtree and unselecting nodes including the pagination
-     * node of the subtree.
+     * Scenario: Export a XAR after opening main tree and a subtree and unselecting nodes including the pagination node
+     * of the subtree.
      */
     public void exportXARWithUnselect()
     {
@@ -207,7 +205,6 @@ public class XARExportTest extends AbstractTest
         TreeNodeElement node4 = root.getChildren().get(4);
         TreeNodeElement node6 = root.getChildren().get(6);
 
-
         // nodes are ordered using alphabetical order:
         // 1 -> Foo_1
         // 2 -> Foo_10
@@ -231,10 +228,9 @@ public class XARExportTest extends AbstractTest
         // 2 -> Foo_10/Foo_10_15
         node2.getChildren().get(7).select();
 
-
         otherFormatPane.clickExportAsXARButton();
 
-        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome");
+        String postURL = getUtil().getURL("Foo", "WebHome", "export", "format=xar&name=Foo.WebHome&");
         assertEquals(postURL, otherFormatPane.getForm().getAttribute("action"));
 
         List<String> expectedPages = new ArrayList<>();

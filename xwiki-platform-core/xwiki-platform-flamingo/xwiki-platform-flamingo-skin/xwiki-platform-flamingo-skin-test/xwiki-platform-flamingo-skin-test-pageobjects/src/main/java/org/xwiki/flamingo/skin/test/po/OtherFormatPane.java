@@ -36,7 +36,7 @@ import org.xwiki.tree.test.po.TreeElement;
 public class OtherFormatPane extends BaseElement
 {
     private static final String CONTAINER_TREE_CLASS = "export-tree-container";
-    private static final String FORM_ID = "export-form";
+    private static final String FORM_ID = "export-modal-form";
     private static final String TREE_CLASS = "export-tree";
     private static final String XAR_EXPORT_LINK_TEXT = "Export as XAR";
     private static final String VALUE_ATTR = "value";

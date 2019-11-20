@@ -521,6 +521,7 @@ public class ConfigurableClassIT
 
         // Go to the document, it will create a lock.
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section1);
+        asp.waitUntilPageIsLoaded();
         asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
 
@@ -533,6 +534,7 @@ public class ConfigurableClassIT
         setup.getDriver().switchTo().window(firstTab);
 
         asp = AdministrationSectionPage.gotoPage(section2);
+        asp.waitUntilPageIsLoaded();
         asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
         viewPage = setup.gotoPage(page1);

@@ -30,6 +30,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
@@ -822,7 +823,7 @@ public class EditIT
             try {
                 return driver.findElement(By.id("content")) != null
                 && driver.findElement(By.id("content")).getText().equals("fourth edit");
-            } catch (NoSuchElementException e) {
+            } catch (NoSuchElementException | StaleElementReferenceException e) {
                 return false;
             }
         });

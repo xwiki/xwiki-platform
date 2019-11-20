@@ -50,7 +50,7 @@ public class NotifyListener extends AbstractLifeCycleListener
         LOGGER.info(DELIMITER);
         try {
             String serverUrl = "http://" + InetAddress.getLocalHost().getCanonicalHostName() + ":"
-                + System.getProperty("jetty.port", "8080") + "/";
+                + System.getProperty("jetty.http.port", "8080") + "/";
             LOGGER.info(Messages.getString("jetty.startup.notification"), serverUrl);
         } catch (UnknownHostException ex) {
             // Shouldn't happen, localhost should be available

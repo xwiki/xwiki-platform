@@ -170,7 +170,6 @@ administration.section.users.deleteUser.markDisabledMessage=Instead of deleting 
         <disabled>0</disabled>
         <displayType>select</displayType>
         <freeText>forbidden</freeText>
-        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>scope</name>
         <number>1</number>

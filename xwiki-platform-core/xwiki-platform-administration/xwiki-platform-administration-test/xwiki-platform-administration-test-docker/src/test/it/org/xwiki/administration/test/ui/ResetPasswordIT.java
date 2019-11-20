@@ -143,6 +143,7 @@ public class ResetPasswordIT
         // Check the result
         assertTrue(resetPasswordPage.isResetPasswordSent());
         // Check the emails received by the user
+        assertTrue(this.mail.waitForIncomingEmail(1));
         MimeMessage[] receivedEmails = this.mail.getReceivedMessages();
         assertEquals(1, receivedEmails.length);
         MimeMessage receivedEmail = receivedEmails[0];

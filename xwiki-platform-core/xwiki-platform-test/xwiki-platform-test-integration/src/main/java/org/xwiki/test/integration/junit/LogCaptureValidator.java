@@ -166,7 +166,7 @@ public class LogCaptureValidator
 
         // Warning produced sometimes when displaying the tour while there is no noticeable problem with it and it
         // started without any change to the JS code
-        new Line("JavaScript error: .*/jsx/TourCode/TourJS?.*, line 1: TypeError: k is undefined", true)
+        new Line("JavaScript error: .*\\/jsx\\/TourCode\\/TourJS?.*, line 1: TypeError: k is undefined", true)
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

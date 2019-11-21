@@ -106,7 +106,16 @@ public class UserProfileIT
         // line 1: TypeError: f is undefined
         //
         // It looks like it's not a problem for the tests, nevertheless it should be fixed in the future.
-        logCaptureConfiguration.registerExcludeRegexes(".*\\/js\\/xwiki\\/meta\\.js.*, line 1: TypeError: f is undefined");
+        logCaptureConfiguration.registerExcludeRegexes(
+            ".*\\/js\\/xwiki\\/meta\\.js.*, line 1: TypeError: f is undefined");
+
+        // The following errors happened from time-to-time:
+        // JavaScript error: http://xwikiweb:8080/xwiki/bin/jsx/XWiki/Notifications/Code/Macro/NotificationsMacro
+        //   ?language=en&docVersion=1.1, line 1: TypeError: v is undefined
+        //
+        // It looks like it's not a problem for the tests, nevertheless it should be fixed in the future.
+        // Best would be to migrate those as docker tests.
+        logCaptureConfiguration.registerExcludes("TypeError: v is undefined");
     }
 
     /** Functionality check: changing profile information. */

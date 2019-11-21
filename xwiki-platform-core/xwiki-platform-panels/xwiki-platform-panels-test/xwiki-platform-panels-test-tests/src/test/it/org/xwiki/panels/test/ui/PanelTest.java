@@ -73,21 +73,26 @@ public class PanelTest extends AbstractTest
      * @see "XWIKI-8591: Cannot use a panel with a name containing spaces"
      */
     @Test
-    public void addPanelWithSpacesInName()
+    public void addPanelWithSpacesAndSymbolsInName()
     {
         // Delete panel that will be created by the test
-        String panelName = "My First Panel";
+        String panelName = "Is # & \u0163 triky\"? c:\\windows /root $util";
         getUtil().deletePage("Panels", panelName);
 
         // Create a panel whose name contain spaces.
         PanelEditPage panelEditPage = PanelsHomePage.gotoPage().createPanel(panelName);
-        panelEditPage.setContent(String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, panelName, getTestMethodName()));
+
+        // We cannot reuse the panel name since we need special escapes.
+        panelEditPage.setContent(
+            String.format(PanelEditPage.DEFAULT_CONTENT_FORMAT, "Is # & \\u0163 triky\\\"? c:\\\\windows /root $util",
+                getTestMethodName()));
         panelEditPage.clickSaveAndContinue();
 
         // Add the panel to the right column from the administration.
-        setRightPanelInAdministration(panelName);
+        setRightPanelInAdministration("Is # & ţ triky\"? c:\\\\windows /root $util");
         getUtil().gotoPage(getTestClassName(), getTestMethodName());
-        assertTrue(new PageWithPanels().hasPanel(panelName));
+
+        assertTrue(new PageWithPanels().hasPanel("Is # & \\u0163 triky\\\"? c:\\\\windows /root $util"));
     }
 
     /**

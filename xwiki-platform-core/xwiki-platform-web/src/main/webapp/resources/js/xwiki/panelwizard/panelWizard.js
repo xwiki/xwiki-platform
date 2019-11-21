@@ -375,12 +375,12 @@ function save() {
   url += "&showRightPanels=" + window.showRightColumn;
   if (window.showLeftColumn) {
     var leftPanelsList = leftPanelsInput ? leftPanelsInput.value : getBlocNameList(leftPanels);
-    url += "&leftPanels=" + leftPanelsList;
+    url += "&leftPanels=" + encodeURIComponent(leftPanelsList);
     url += "&leftPanelsWidth=" + leftPanelsWidthInput.value;
   }
   if (window.showRightColumn) {
     var rightPanelsList = rightPanelsInput ? rightPanelsInput.value : getBlocNameList(rightPanels);
-    url += "&rightPanels=" + rightPanelsList;
+    url += "&rightPanels=" + encodeURIComponent(rightPanelsList);
     url += "&rightPanelsWidth=" + rightPanelsWidthInput.value;
   }
   executeCommand(url, saveResult);

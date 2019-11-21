@@ -19,7 +19,10 @@
  */
 package org.xwiki.extension.xar.internal.job;
 
+import javax.inject.Provider;
+
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
@@ -34,12 +37,19 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.test.MockitoOldcoreRule;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 public class RepairXarJobTest extends AbstractExtensionHandlerTest
 {
     private InstalledExtensionRepository xarExtensionRepository;
+
+    @Rule
+    public MockitoOldcoreRule oldcoreRule = new MockitoOldcoreRule();
 
     @AfterComponent
     public void afterComponent() throws Exception
@@ -54,6 +64,10 @@ public class RepairXarJobTest extends AbstractExtensionHandlerTest
         super.setUp();
 
         this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
+
+        // Some listeners (e.g. InstalledExtensionDocumentListener) use the old core API.
+        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        when(xcontextProvider.get()).thenReturn(this.oldcoreRule.getXWikiContext());
 
         // avoid dependency issue with refactoring listeners
         this.mocker.registerMockComponent(ModelBridge.class);

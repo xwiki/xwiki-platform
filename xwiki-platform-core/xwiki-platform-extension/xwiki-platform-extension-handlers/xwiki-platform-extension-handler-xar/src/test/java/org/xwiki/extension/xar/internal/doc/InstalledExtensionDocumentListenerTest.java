@@ -33,6 +33,7 @@ import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.event.ExtensionUninstalledEvent;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.xar.internal.event.XarExtensionUninstalledEvent;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.packager.PackageConfiguration;
 import org.xwiki.extension.xar.internal.handler.packager.Packager;
@@ -174,8 +175,9 @@ public class InstalledExtensionDocumentListenerTest
         when(((XarInstalledExtensionRepository) this.xarRepositoryProvider.get())
             .getXarInstalledExtensions(bobWithLocale)).thenReturn(Collections.singleton(otherXARInstalledExtension));
 
-        this.listener.onEvent(new ExtensionUninstalledEvent(new ExtensionId("org.xwiki.test:test"), "wiki:test"),
-            xarInstalledExtension, null);
+        ExtensionUninstalledEvent extensionUninstalledEvent =
+            new ExtensionUninstalledEvent(new ExtensionId("org.xwiki.test:test"), "wiki:test");
+        this.listener.onEvent(new XarExtensionUninstalledEvent(extensionUninstalledEvent), xarInstalledExtension, null);
 
         verify(this.tree).removeExtensionPage(alice);
         verify(this.tree, never()).removeExtensionPage(bob);

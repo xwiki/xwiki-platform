@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,9 +39,10 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.event.ExtensionEvent;
 import org.xwiki.extension.event.ExtensionInstalledEvent;
-import org.xwiki.extension.event.ExtensionUninstalledEvent;
-import org.xwiki.extension.event.ExtensionUpgradedEvent;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
+import org.xwiki.extension.xar.internal.event.XarExtensionInstalledEvent;
+import org.xwiki.extension.xar.internal.event.XarExtensionUninstalledEvent;
+import org.xwiki.extension.xar.internal.event.XarExtensionUpgradedEvent;
 import org.xwiki.extension.xar.internal.handler.UnsupportedNamespaceException;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.extension.xar.internal.handler.XarHandlerUtils;
@@ -97,7 +99,7 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
     public InstalledExtensionDocumentListener()
     {
         super(HINT, new ApplicationReadyEvent(), new WikiReadyEvent(), new DocumentUpdatedEvent(),
-            new ExtensionInstalledEvent(), new ExtensionUpgradedEvent(), new ExtensionUninstalledEvent());
+            new XarExtensionInstalledEvent(), new XarExtensionUpgradedEvent(), new XarExtensionUninstalledEvent());
     }
 
     @SuppressWarnings("unchecked")
@@ -113,11 +115,11 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
             addExtensionDocuments(this.wikiDescriptorManagerProvider.get().getCurrentWikiId());
         } else if (event instanceof WikiReadyEvent) {
             addExtensionDocuments((String) source);
-        } else if (event instanceof ExtensionInstalledEvent) {
+        } else if (event instanceof XarExtensionInstalledEvent) {
             addExtensionDocuments((ExtensionEvent) event, (InstalledExtension) source);
-        } else if (event instanceof ExtensionUninstalledEvent) {
+        } else if (event instanceof XarExtensionUninstalledEvent) {
             removeExtensionDocuments((ExtensionEvent) event, (InstalledExtension) source);
-        } else if (event instanceof ExtensionUpgradedEvent) {
+        } else if (event instanceof XarExtensionUpgradedEvent) {
             ((Collection<InstalledExtension>) data).stream().forEach(
                 oldInstalledExtension -> removeExtensionDocuments((ExtensionEvent) event, oldInstalledExtension));
             addExtensionDocuments((ExtensionEvent) event, (InstalledExtension) source);
@@ -136,15 +138,13 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
         String namespace = "wiki:" + wiki;
         this.xarRepositoryProvider.get().getInstalledExtensions(namespace).stream()
             .forEach(installedExtension -> addExtensionDocuments(
-                new ExtensionInstalledEvent(installedExtension.getId(), namespace), installedExtension));
+                new XarExtensionInstalledEvent(new ExtensionInstalledEvent(installedExtension.getId(), namespace)),
+                installedExtension));
     }
 
     private void addExtensionDocuments(ExtensionEvent extensionEvent, InstalledExtension installedExtension)
     {
-        if (extensionEvent.hasNamespace() && installedExtension instanceof XarInstalledExtension) {
-            getExtensionDocuments((XarInstalledExtension) installedExtension, extensionEvent.getNamespace()).stream()
-                .forEach(this::addExtensionDocument);
-        }
+        forEachExtensionDocument(extensionEvent, installedExtension, this::addExtensionDocument);
     }
 
     private void addExtensionDocument(DocumentReference documentReference)
@@ -155,9 +155,15 @@ public class InstalledExtensionDocumentListener extends AbstractEventListener
 
     private void removeExtensionDocuments(ExtensionEvent extensionEvent, InstalledExtension installedExtension)
     {
+        forEachExtensionDocument(extensionEvent, installedExtension, this::removeExtensionDocument);
+    }
+
+    private void forEachExtensionDocument(ExtensionEvent extensionEvent, InstalledExtension installedExtension,
+        Consumer<DocumentReference> action)
+    {
         if (extensionEvent.hasNamespace() && installedExtension instanceof XarInstalledExtension) {
             getExtensionDocuments((XarInstalledExtension) installedExtension, extensionEvent.getNamespace()).stream()
-                .forEach(this::removeExtensionDocument);
+                .forEach(action);
         }
     }
 

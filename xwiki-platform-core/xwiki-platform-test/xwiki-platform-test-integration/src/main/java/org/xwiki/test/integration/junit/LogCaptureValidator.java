@@ -162,7 +162,11 @@ public class LogCaptureValidator
         // The error is not related to our test but to some interaction components in Firefox.
         new Line("JavaScript error: resource://gre/modules/ActorManagerChild.jsm, line 252: "
             + "NS_ERROR_XPC_BAD_CONVERT_NATIVE: Component returned failure code: 0x8057000a "
-            + "(NS_ERROR_XPC_BAD_CONVERT_NATIVE) [xpcIJSWeakReference.get]")
+            + "(NS_ERROR_XPC_BAD_CONVERT_NATIVE) [xpcIJSWeakReference.get]"),
+
+        // Warning produced sometimes when displaying the tour while there is no noticeable problem with it and it
+        // started without any change to the JS code
+        new Line("JavaScript error: .*/jsx/TourCode/TourJS?.*, line 1: TypeError: k is undefined", true)
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

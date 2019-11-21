@@ -32,9 +32,6 @@ import org.xwiki.flamingo.test.po.PreviewBox;
 import org.xwiki.flamingo.test.po.ThemeApplicationWebHomePage;
 import org.xwiki.flamingo.test.po.ViewThemePage;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.browser.Browser;
-import org.xwiki.test.docker.junit5.database.Database;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 
@@ -48,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 6.3M1
  */
-@UITest(database = Database.MYSQL, servletEngine = ServletEngine.TOMCAT, servletEngineTag = "9", browser = Browser.CHROME)
+@UITest
 public class FlamingoThemeIT
 {
     @AfterEach

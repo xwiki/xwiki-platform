@@ -45,7 +45,13 @@ define(['jquery'], function($) {
         self.restURL = html.data('xwiki-rest-url');
         self.form_token = html.data('xwiki-form-token');
         // Since 10.4RC1
-        self.userReference = XWiki.Model.resolve(html.data('xwiki-user-reference'), XWiki.EntityType.DOCUMENT);
+        // For the guest user we set userReference to null
+        var userReferenceString = html.data('xwiki-user-reference');
+        if (userReferenceString) {
+          self.userReference = XWiki.Model.resolve(userReferenceString, XWiki.EntityType.DOCUMENT);
+        } else {
+          self.userReference = null;
+        }
         // Since 11.2RC1
         self.isNew = html.data('xwiki-isnew');
       } else {

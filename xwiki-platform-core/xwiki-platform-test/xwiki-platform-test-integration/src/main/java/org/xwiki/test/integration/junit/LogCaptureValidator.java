@@ -44,6 +44,11 @@ public class LogCaptureValidator
         "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
 
     private static final List<Line> GLOBAL_EXCLUDES = Arrays.asList(
+        // For now we exclude all Javascript errors since 1) all we've seen so far are coming from the test fwk and
+        // excluding them one by one is painful and 2) we're not yet ready to tackle fixing them. We could decide to
+        // remove this global exclude in the future.
+        new Line("JavaScript error:"),
+
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
         new Line("Could not validate integrity of download from file"),
         // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.
@@ -71,12 +76,6 @@ public class LogCaptureValidator
         new Line("MavenExtensionScanner - [javax.transaction:javax.transaction-api/"),
         // Appears only for PostgreSQL database.
         new Line("WARNING: enabling \"trust\" authentication for local connections"),
-        // Those errors appears from time to time, mainly on the CI, related to various JS resources such as:
-        // jsTree, jQuery, keypress, xwiki-events-bridge, iScroll, etc.
-        // This seems to be related to actions being performed before all the resources have been correctly loaded.
-        new Line("require.min.js?r=1, line 7"),
-        // Cannot reproduce locally but happened on the CI for MenuIT.
-        new Line("jstree.min.js, line 2: TypeError: c is undefined"),
         // See: https://jira.xwiki.org/browse/XWIKI-13609 comments: this log could still happen from time to time.
         new Line("Failed to save job status"),
         // When updating a collection Hibernate start by deleting the existing elements and HSQLDB complains when there
@@ -153,20 +152,7 @@ public class LogCaptureValidator
         // There was an error managing geckodriver 0.26.0 (github-production-release-asset-2e65be.s3.amazonaws.com:
         // Temporary failure in name resolution) ... trying again using cache and mirror
         new Line("There was an error managing geckodriver 0.[0-9]+.0 "
-            + "(.*: Temporary failure in name resolution) ... trying again using cache and mirror", true),
-
-        // Doesn't reproduce locally but fails on the CI. Cause unknown FTM.
-        new Line("JavaScript error: resource://gre/modules/UrlClassifierListManager.jsm, line 680: "
-            + "TypeError: this.tablesData[table] is undefined"),
-
-        // The error is not related to our test but to some interaction components in Firefox.
-        new Line("JavaScript error: resource://gre/modules/ActorManagerChild.jsm, line 252: "
-            + "NS_ERROR_XPC_BAD_CONVERT_NATIVE: Component returned failure code: 0x8057000a "
-            + "(NS_ERROR_XPC_BAD_CONVERT_NATIVE) [xpcIJSWeakReference.get]"),
-
-        // Warning produced sometimes when displaying the tour while there is no noticeable problem with it and it
-        // started without any change to the JS code
-        new Line("JavaScript error: .*\\/jsx\\/TourCode\\/TourJS?.*, line 1: TypeError: k is undefined", true)
+            + "(.*: Temporary failure in name resolution) ... trying again using cache and mirror", true)
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(

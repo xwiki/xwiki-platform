@@ -67,8 +67,6 @@ public class AppsLiveTableIT
     {
         logCaptureConfiguration.registerExpected("WikiComponentException: Registering UI "
             + "extensions at wiki level requires wiki administration rights");
-        logCaptureConfiguration.registerExpected("xwiki/bin/jsx/AppWithinMinutes/WebHome?language=en&docVersion=1.1,"
-            + " line 1: TypeError: a is undefined");
 
         testUtils.login(USERNAME, PASSWORD);
         this.appName = testReference.getLastSpaceReference().getName();

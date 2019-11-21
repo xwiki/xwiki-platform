@@ -55,7 +55,7 @@ public class UserChangePasswordIT
     private String userName;
 
     @BeforeEach
-    public void setUp(TestUtils setup, TestReference testReference, LogCaptureConfiguration logCaptureConfiguration)
+    public void setUp(TestUtils setup, TestReference testReference)
         throws Exception
     {
         this.userName = testReference.getName() + testReference.getLastSpaceReference().getName();
@@ -68,14 +68,6 @@ public class UserChangePasswordIT
         setup.gotoPage("XWiki", this.userName, "edit");
         // Ensure JS has been loaded
         new EditPage();
-
-        // The following error happened from time-to-time:
-        // JavaScript error: http://localhost:8080/xwiki/resources/js/xwiki/meta.js?cache-version=1571475464000,
-        // line 1: TypeError: f is undefined
-        //
-        // It looks like it's not a problem for the tests, nevertheless it should be fixed in the future.
-        // Best would be to migrate those as docker tests.
-        logCaptureConfiguration.registerExcludes("TypeError: f is undefined");
     }
 
     /** Functionality check: changing the password. */

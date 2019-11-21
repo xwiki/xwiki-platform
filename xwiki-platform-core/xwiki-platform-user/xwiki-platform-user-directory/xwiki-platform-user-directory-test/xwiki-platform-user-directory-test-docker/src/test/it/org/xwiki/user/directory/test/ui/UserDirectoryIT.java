@@ -87,8 +87,7 @@ public class UserDirectoryIT
 
         logCaptureConfiguration.registerExcludes(
             "Exception in macro #displayCheckedIfWatched called at",
-            "Exception in macro #generateNotificationInput called at",
-            "TypeError: p is undefined"
+            "Exception in macro #generateNotificationInput called at"
         );
     }
 }

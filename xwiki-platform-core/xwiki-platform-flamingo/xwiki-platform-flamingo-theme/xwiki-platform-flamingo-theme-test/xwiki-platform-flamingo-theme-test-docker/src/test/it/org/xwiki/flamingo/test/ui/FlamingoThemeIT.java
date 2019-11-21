@@ -32,6 +32,9 @@ import org.xwiki.flamingo.test.po.PreviewBox;
 import org.xwiki.flamingo.test.po.ThemeApplicationWebHomePage;
 import org.xwiki.flamingo.test.po.ViewThemePage;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.browser.Browser;
+import org.xwiki.test.docker.junit5.database.Database;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.ui.TestUtils;
 
@@ -45,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 6.3M1
  */
-@UITest
+@UITest(database = Database.MYSQL, servletEngine = ServletEngine.TOMCAT, servletEngineTag = "9", browser = Browser.CHROME)
 public class FlamingoThemeIT
 {
     @AfterEach
@@ -56,14 +59,8 @@ public class FlamingoThemeIT
     }
 
     @Test
-    public void validateColorThemeFeatures(TestUtils setup, TestInfo info,
-        LogCaptureConfiguration logCaptureConfiguration)
+    public void validateColorThemeFeatures(TestUtils setup, TestInfo info)
     {
-        // This error might be seen from time to time in case of error with the preview the first time with firefox.
-        // See the try/catch below.
-        logCaptureConfiguration.registerExcludes(
-            "/xwiki/bin/jsx/FlamingoThemesCode/ThemeSheet?language=en&docVersion=1.1, "
-            + "line 1: TypeError: h[0].contentWindow.lessCodePlugin is undefined");
         setup.loginAsSuperAdmin();
 
         // First make sure the theme we'll create doesn't exist

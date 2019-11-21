@@ -49,6 +49,7 @@ import org.xwiki.test.ui.po.LoginPage;
 import org.xwiki.test.ui.po.ResubmissionPage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.Conflict;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.PreviewEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -1023,12 +1024,14 @@ public class EditIT
 
         String className = setup.serializeReference(testReference).split(":")[1];
         setup.addObject(testReference, className, "prop", "22");
+        new ObjectEditPage().waitUntilPageIsLoaded();
         setup.gotoPage(testReference, "save", "xvalidate=1");
         ViewPage viewPage = new ViewPage();
         assertEquals("value: 22", viewPage.getContent());
 
 
         setup.updateObject(testReference, className, 0, "prop", "44");
+        new ObjectEditPage().waitUntilPageIsLoaded();
         setup.gotoPage(testReference, "save", "xvalidate=1");
         InlinePage inlinePage = new InlinePage();
         assertTrue(inlinePage.getForm().isDisplayed());

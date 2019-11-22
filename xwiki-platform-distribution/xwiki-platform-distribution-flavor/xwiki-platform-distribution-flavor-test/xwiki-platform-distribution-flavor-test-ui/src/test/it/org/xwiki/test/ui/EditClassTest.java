@@ -88,12 +88,10 @@ public class EditClassTest extends AbstractTest
             "$!doc.getObject('Test.EditObjectsTestClass').getProperty('prop1').value{{/velocity}}",
             getTestMethodName());
 
-        // Add an object of the class created
-        ObjectEditPage oep = vp.editObjects();
-        FormContainerElement objectForm = oep.addObject("Test.EditObjectsTestClass");
-        objectForm.setFieldValue(By.id("Test.EditObjectsTestClass_0_prop1"), "testing value 1");
-        objectForm.setFieldValue(By.id("Test.EditObjectsTestClass_0_prop2"), "testing value 2");
-        vp = oep.clickSaveAndView();
+        getUtil().addObject("Test", "EditObjectsTestObject", "Test.EditObjectsTestClass",
+            "prop1", "testing value 1", "prop2", "testing value 2");
+
+        vp = getUtil().gotoPage("Test", "EditObjectsTestObject");
 
         Assert.assertEquals("this is the content: testing value 1/testing value 2/testing value 1", vp.getContent());
 
@@ -105,7 +103,7 @@ public class EditClassTest extends AbstractTest
         vp = getUtil().gotoPage("Test", "EditObjectsTestObject");
         Assert.assertEquals("this is the content: /testing value 2/testing value 1", vp.getContent());
 
-        oep = vp.editObjects();
+        ObjectEditPage oep = vp.editObjects();
         Assert.assertNotNull(getDriver().findElement(By.className("deprecatedProperties")));
         Assert.assertNotNull(getDriver().findElement(By.cssSelector(".deprecatedProperties label")));
         Assert.assertEquals("prop1:", getDriver().findElement(By.cssSelector(".deprecatedProperties label")).getText());

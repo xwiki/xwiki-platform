@@ -56,8 +56,16 @@ Caused by: #printThrowable($throwable.cause true)
       ## Skip the last message element because we always have more message elements than arguments.
       #break
     #end
+
     #if ($log.argumentArray.size() > $foreach.index)
-      #set ($argument = $log.argumentArray.get($foreach.index))
+      #try("outofboundexception")
+         #set ($argument = $log.argumentArray.get($foreach.index))
+      #end
+      #if ("$!outofboundexception" != '')
+        #set ($outofboundexceptionMessage = "Cannot reach argument $foreach.index with an array of size $log.argumentArray.size()")
+        #displayException($outofboundexceptionMessage, $outofboundexception)
+        #set ($argument = $NULL)
+      #end
     #else
       #set ($argument = $NULL)
     #end

@@ -272,8 +272,15 @@
   .flat-buttons();
 
   ul.dropdown-menu {
+    // Increase the minimum width because the hint is displayed on multiple lines.
+    min-width: 320px;
     // Fixes list padding overwritten by the panel styles.
     padding: @line-height-computed/4 0;
+
+    li .xHint {
+      // The hint can be displayed on multiple lines.
+      white-space: normal;
+    }
   }
 }
 

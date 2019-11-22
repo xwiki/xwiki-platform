@@ -1024,6 +1024,8 @@ public class EditIT
 
         String className = setup.serializeReference(testReference).split(":")[1];
         setup.addObject(testReference, className, "prop", "22");
+        // This should be put inside setup#addObject in the future, since addObject leads to the open of
+        // the Object Editor.
         new ObjectEditPage().waitUntilPageIsLoaded();
         setup.gotoPage(testReference, "save", "xvalidate=1");
         ViewPage viewPage = new ViewPage();
@@ -1031,7 +1033,6 @@ public class EditIT
 
 
         setup.updateObject(testReference, className, 0, "prop", "44");
-        new ObjectEditPage().waitUntilPageIsLoaded();
         setup.gotoPage(testReference, "save", "xvalidate=1");
         InlinePage inlinePage = new InlinePage();
         assertTrue(inlinePage.getForm().isDisplayed());

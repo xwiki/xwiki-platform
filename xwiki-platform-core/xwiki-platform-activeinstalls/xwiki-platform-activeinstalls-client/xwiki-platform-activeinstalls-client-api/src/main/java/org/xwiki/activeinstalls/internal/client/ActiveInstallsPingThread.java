@@ -60,6 +60,8 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
      */
     private ActiveInstallsConfiguration configuration;
 
+    private long retryTimeout;
+
     /**
      * @param configuration used to nicely display the ping URL in logs if there's an error...
      * @param manager used to send the ping to the remote instance
@@ -79,7 +81,13 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
         }
     }
 
-    private void sendPing() throws InterruptedException
+    /**
+     * Send a ping, trying several times in case of failure.
+     *
+     * @throws InterruptedException if the send is still failing after the retries
+     * @since 11.10
+     */
+    void sendPing() throws InterruptedException
     {
         int count = 1;
         while (count <= RETRIES) {
@@ -96,10 +104,24 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
                 LOGGER.warn(message);
                 // Wait a little but before retrying so that it makes a difference.
                 if (count < RETRIES) {
-                    Thread.sleep(WAIT_TIME_RETRY);
+                    Thread.sleep(getRetryTimeout());
                 }
             }
             count++;
         }
+    }
+
+    /**
+     * @param milliseconds the number of milliseconds to wait between retries
+     * @since 11.10
+     */
+    void setRetryTimeout(long milliseconds)
+    {
+        this.retryTimeout = milliseconds;
+    }
+
+    private long getRetryTimeout()
+    {
+        return this.retryTimeout > -1 ? this.retryTimeout : WAIT_TIME_RETRY;
     }
 }

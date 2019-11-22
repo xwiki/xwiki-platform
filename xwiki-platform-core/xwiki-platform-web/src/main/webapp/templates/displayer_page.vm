@@ -11,9 +11,12 @@
     #set ($values = [$value])
   #end
   #set ($pages = [])
-  #foreach($pageReference in $values)
-    #set ($page = "#displayPageReference($pageReference)")
-    #set ($discard = $pages.add($page.trim()))
+  #foreach ($pageReference in $values)
+    ## Skip empty values.
+    #if ("$!pageReference" != '')
+      #set ($page = "#displayPageReference($pageReference)")
+      #set ($discard = $pages.add($page.trim()))
+    #end
   #end
   $stringtool.join($pages, ', ')
 #elseif ($type == 'rendered')
@@ -28,8 +31,10 @@
 
 #macro(displayPageReference $pageReference)
   #set ($pageDoc = $xwiki.getDocument($pageReference))
-  #if ("$!pageDoc" == "")
-    $pageReference
+  #if ("$!pageDoc" == '')
+    ## Page with restricted access.
+    ## The view displayer generates HTML so we need to escape the XML special characters from the page reference.
+    $escapetool.xml($pageReference)
   #else
     #set ($title = $escapetool.xml($pageDoc.plainTitle))
     #if ($pageDoc.isNew())

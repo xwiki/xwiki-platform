@@ -131,16 +131,16 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 
     private void migrateUser(DocumentReference user) throws NotificationException
     {
-        logger.info("Migrating the notification filter preferences of user [{}].", user);
+        this.logger.info("Migrating the notification filter preferences of user [{}].", user);
 
-        XWikiContext context = contextProvider.get();
+        XWikiContext context = this.contextProvider.get();
         XWiki xwiki = context.getWiki();
 
         final DocumentReference notificationFilterPreferenceClass
             = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(user.getWikiReference());
 
         try {
-            logger.info("Loading the current notification filter preferences of user [{}].", user);
+            this.logger.info("Loading the current notification filter preferences of user [{}].", user);
             XWikiDocument doc = xwiki.getDocument(user, context);
 
             // Get the old preferences
@@ -149,21 +149,22 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
 
             // Make sure we have not already saved in the database the migrated preferences (it would mean the migration
             // has already been executed but stopped while the user's page was saving)
-            Set<NotificationFilterPreference> preferencesInTheNewStore = modelBridge.getFilterPreferences(user);
-            if (!modelBridge.getFilterPreferences(user).isEmpty()
+            Set<NotificationFilterPreference> preferencesInTheNewStore = this.modelBridge.getFilterPreferences(user);
+            if (!this.modelBridge.getFilterPreferences(user).isEmpty()
                 && preferencesInTheNewStore.size() == preferencesToSave.size())
             {
-                logger.info("It seems the notification filter preferences of user [{}] has already been migrated,"
+                this.logger.info("It seems the notification filter preferences of user [{}] has already been migrated,"
                     + " but the old ones have not been removed from the user's page yet. Probably a previous"
                     + " migration has been run but stopped in the middle of the process.", user);
             } else {
                 // Save to the new store
-                logger.info("Saving the migrated notification filter preferences of user [{}] in the new store.", user);
-                modelBridge.saveFilterPreferences(user, preferencesToSave);
+                this.logger.info("Saving the migrated notification filter preferences of user [{}] in the new store.",
+                    user);
+                this.modelBridge.saveFilterPreferences(user, preferencesToSave);
             }
 
             // Remove the old xobjects
-            logger.info("Removing the old notification filter preferences in the page of the user [{}] "
+            this.logger.info("Removing the old notification filter preferences in the page of the user [{}] "
                 + "(please wait, it could be long).", user);
             doc.removeXObjects(notificationFilterPreferenceClass);
             xwiki.saveDocument(doc, "Migrate notification filter preferences to the new store.", context);
@@ -271,11 +272,11 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         try {
-            for (String wikiId : wikiDescriptorManager.getAllIds()) {
+            for (String wikiId : this.wikiDescriptorManager.getAllIds()) {
                 migrateWiki(wikiId);
             }
         } catch (Exception e) {
-            logger.error("Failed to migrate notification filter preferences.", e);
+            this.logger.error("Failed to migrate notification filter preferences.", e);
         }
     }
 
@@ -286,34 +287,37 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
         final DocumentReference notificationFilterPreferenceClass
             = NOTIFICATION_FILTER_PREFERENCE_CLASS.setWikiReference(wikiReference);
 
-        // Don't execute the migration if the old class has already been deleted.
-        XWikiContext context = contextProvider.get();
+        // Don't execute the migration if the old class has already been deleted. It's important that the code here
+        // executes as fast as possible since it'll be executed at each XWiki startup.
+        XWikiContext context = this.contextProvider.get();
         XWiki xwiki = context.getWiki();
         if (!xwiki.exists(notificationFilterPreferenceClass, context)) {
-            logger.info("Wiki [{}] has already been migrated.", wikiId);
+            this.logger.info("Wiki [{}] has already been migrated.", wikiId);
             return;
         }
 
         // Otherwise, let's do the migration
         try {
-            logger.info("Getting the list of the users having notification filter preferences to migrate on wiki [{}].",
+            this.logger.info(
+                "Getting the list of the users having notification filter preferences to migrate on wiki [{}].",
                 wikiId);
-            Query query = queryManager.createQuery("select distinct doc.fullName from Document doc, "
+            Query query = this.queryManager.createQuery("select distinct doc.fullName from Document doc, "
                     + "doc.object(XWiki.Notifications.Code.NotificationFilterPreferenceClass) obj",
                     Query.XWQL).setWiki(wikiId);
             for (String fullName : query.<String>execute()) {
-                migrateUser(referenceResolver.resolve(fullName, wikiReference));
+                migrateUser(this.referenceResolver.resolve(fullName, wikiReference));
             }
 
             // Remove the useless class when all user have been migrated (not to trash because the trash might have not
             // been initialized yet since we are in a migrator).
             XWikiDocument oldClassDoc = xwiki.getDocument(notificationFilterPreferenceClass, context);
             if (!oldClassDoc.isNew()) {
-                logger.info("Removing the old notification filter preference class on wiki [{}].", wikiId);
+                this.logger.info("Removing the old notification filter preference class on wiki [{}].", wikiId);
                 xwiki.deleteDocument(oldClassDoc, false, context);
             }
         } catch (Exception e) {
-            logger.error("Failed to migrate notification filter preferences on wiki [{}].", wikiReference.getName(), e);
+            this.logger.error("Failed to migrate notification filter preferences on wiki [{}].",
+                wikiReference.getName(), e);
         }
     }
 }

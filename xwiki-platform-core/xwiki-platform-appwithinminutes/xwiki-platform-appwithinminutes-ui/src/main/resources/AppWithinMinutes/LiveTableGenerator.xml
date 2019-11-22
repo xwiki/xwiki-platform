@@ -48,7 +48,7 @@ $string.replace("'", "''")##
   ## Field types that aren't sortable nor filterable.
   #set ($unsortableFieldTypes = ['TextArea', 'ComputedField'])
   ## Field types that have HTML display.
-  #set ($htmlFieldTypes = ['TextArea', 'Users', 'Groups'])
+  #set ($htmlFieldTypes = ['TextArea', 'Users', 'Groups', 'Page'])
   #foreach ($column in $columns)
     #set ($field = $xclass.get($column))
     #if ($field.getProperty('customDisplay').value == '{{include reference="AppWithinMinutes.Title"/}}')

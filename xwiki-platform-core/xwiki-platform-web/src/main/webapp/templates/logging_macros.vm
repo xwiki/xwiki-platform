@@ -63,7 +63,7 @@ Caused by: #printThrowable($throwable.cause true)
       #end
       #if ("$!outofboundexception" != '')
         #set ($outofboundexceptionMessage = "Cannot reach argument $foreach.index with an array of size $log.argumentArray.size()")
-        #displayException($outofboundexceptionMessage, $outofboundexception)
+        $services.logging.getLogger("logging_macros.vm").error($outofboundexceptionMessage, $outofboundexception)
         #set ($argument = $NULL)
       #end
     #else

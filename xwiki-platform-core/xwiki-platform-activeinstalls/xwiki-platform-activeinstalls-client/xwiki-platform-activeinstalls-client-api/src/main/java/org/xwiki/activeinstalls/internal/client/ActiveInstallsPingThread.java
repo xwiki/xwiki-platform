@@ -44,7 +44,11 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
     /**
      * Once every 24 hours.
      */
-    private static final long WAIT_TIME = 1000L * 60L * 60L * 24L;
+    private static final long WAIT_TIME_FULL = 1000L * 60L * 60L * 24L;
+
+    private static final long WAIT_TIME_RETRY = 1000L * 3L;
+
+    private static final long RETRIES = 3;
 
     /**
      * @see #ActiveInstallsPingThread(org.xwiki.activeinstalls.ActiveInstallsConfiguration, PingSender)
@@ -70,16 +74,32 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
     protected void runInternal() throws InterruptedException
     {
         while (true) {
+            sendPing();
+            Thread.sleep(WAIT_TIME_FULL);
+        }
+    }
+
+    private void sendPing() throws InterruptedException
+    {
+        int count = 1;
+        while (count <= RETRIES) {
             try {
                 this.manager.sendPing();
+                break;
             } catch (Exception e) {
-                // Failed to connect or send the ping to the remote Elastic Search instance, will try again after the
-                // sleep.
-                LOGGER.warn(
-                    "Failed to send Active Installation ping to [{}]. Error = [{}]. Will retry in [{}] seconds...",
-                    this.configuration.getPingInstanceURL(), ExceptionUtils.getRootCauseMessage(e), WAIT_TIME / 1000);
+                String message = String.format("Failed to send Active Installation ping to [%s] (try [%s]). "
+                    + "Error = [%s].", this.configuration.getPingInstanceURL(), count,
+                    ExceptionUtils.getRootCauseMessage(e));
+                if (count == RETRIES) {
+                    message = String.format("%s Will retry in [%s] seconds...", message, WAIT_TIME_FULL / 1000);
+                }
+                LOGGER.warn(message);
+                // Wait a little but before retrying so that it makes a difference.
+                if (count < RETRIES) {
+                    Thread.sleep(WAIT_TIME_RETRY);
+                }
             }
-            Thread.sleep(WAIT_TIME);
+            count++;
         }
     }
 }

@@ -49,7 +49,7 @@ public class ActiveInstallsInitializerListener implements EventListener
     /**
      * The events observed by this event listener.
      */
-    private static final List<Event> EVENTS = new ArrayList<Event>(Arrays.asList(new ApplicationReadyEvent()));
+    private static final List<Event> EVENTS = new ArrayList<>(Arrays.asList(new ApplicationReadyEvent()));
 
     /**
      * Used to send the ping to the remote instance.

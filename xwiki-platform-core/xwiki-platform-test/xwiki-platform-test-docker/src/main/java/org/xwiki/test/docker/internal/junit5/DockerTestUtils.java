@@ -22,6 +22,8 @@ package org.xwiki.test.docker.internal.junit5;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -67,6 +69,8 @@ public final class DockerTestUtils
     private static final char DASH = '-';
 
     private static final Pattern REPETITION_PATTERN = Pattern.compile("\\[test-template-invocation:#(.*)\\]");
+
+    private static List<String> pulledImages = new ArrayList<>();
 
     private DockerTestUtils()
     {
@@ -195,12 +199,14 @@ public final class DockerTestUtils
     public static void startContainer(GenericContainer container, TestConfiguration testConfiguration) throws Exception
     {
         // Get the latest image in case the tag has been updated on dockerhub.
-        if (!testConfiguration.isOffline()) {
-            LOGGER.info("Pulling image [{}]", container.getDockerImageName());
-            PullImageCmd command = container.getDockerClient().pullImageCmd(container.getDockerImageName());
+        String dockerImageName = container.getDockerImageName();
+        if (!testConfiguration.isOffline() && !pulledImages.contains(dockerImageName)) {
+            LOGGER.info("Pulling image [{}]", dockerImageName);
+            PullImageCmd command = container.getDockerClient().pullImageCmd(dockerImageName);
             PullImageResultCallback response = new PullImageResultCallback();
             response = command.exec(response);
             response.awaitCompletion();
+            pulledImages.add(dockerImageName);
         }
 
         container.start();

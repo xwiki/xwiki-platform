@@ -201,7 +201,6 @@ public final class DockerTestUtils
             PullImageResultCallback response = new PullImageResultCallback();
             response = command.exec(response);
             response.awaitCompletion();
-            LOGGER.info("END Pulling image [{}]", container.getDockerImageName());
         }
 
         container.start();

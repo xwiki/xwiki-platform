@@ -187,7 +187,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         this.testConfiguration.getServletEngine().setPort(xwikiPort);
     }
 
-    private void startContainer()
+    private void startContainer() throws Exception
     {
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
         // start listening.

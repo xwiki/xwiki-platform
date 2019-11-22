@@ -42,6 +42,8 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.dockerjava.api.command.LogContainerCmd;
+import com.github.dockerjava.api.command.PullImageCmd;
+import com.github.dockerjava.core.command.PullImageResultCallback;
 
 import ch.qos.logback.classic.Level;
 
@@ -188,12 +190,18 @@ public final class DockerTestUtils
      * @param container the container to start
      * @param testConfiguration the configuration to build (database, debug mode, etc). Used to verify if we're online
      *        to pull the image
+     * @throws Exception if the container fails to start
      */
-    public static void startContainer(GenericContainer container, TestConfiguration testConfiguration)
+    public static void startContainer(GenericContainer container, TestConfiguration testConfiguration) throws Exception
     {
         // Get the latest image in case the tag has been updated on dockerhub.
         if (!testConfiguration.isOffline()) {
-            container.getDockerClient().pullImageCmd(container.getDockerImageName());
+            LOGGER.info("Pulling image [{}]", container.getDockerImageName());
+            PullImageCmd command = container.getDockerClient().pullImageCmd(container.getDockerImageName());
+            PullImageResultCallback response = new PullImageResultCallback();
+            response = command.exec(response);
+            response.awaitCompletion();
+            LOGGER.info("END Pulling image [{}]", container.getDockerImageName());
         }
 
         container.start();

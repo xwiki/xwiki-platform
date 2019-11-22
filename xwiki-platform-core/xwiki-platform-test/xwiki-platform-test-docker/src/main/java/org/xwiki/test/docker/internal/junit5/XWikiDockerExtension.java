@@ -174,7 +174,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     @Override
-    public void beforeEach(ExtensionContext extensionContext)
+    public void beforeEach(ExtensionContext extensionContext) throws Exception
     {
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
@@ -318,7 +318,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
-        ExtensionContext extensionContext)
+        ExtensionContext extensionContext) throws Exception
     {
         BrowserContainerExecutor browserContainerExecutor = new BrowserContainerExecutor(testConfiguration);
         BrowserWebDriverContainer webDriverContainer = browserContainerExecutor.start();
@@ -356,7 +356,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         return webDriverContainer;
     }
 
-    private void startDatabase(TestConfiguration testConfiguration)
+    private void startDatabase(TestConfiguration testConfiguration) throws Exception
     {
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
         executor.start(testConfiguration);

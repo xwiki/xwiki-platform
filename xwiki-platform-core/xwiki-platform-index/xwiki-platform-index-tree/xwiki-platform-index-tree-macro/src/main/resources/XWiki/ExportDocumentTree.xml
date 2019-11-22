@@ -68,6 +68,10 @@
           #if ($services.extension.xar.isCustomizedExtensionDocument($documentReference))
             #set ($iconName = 'file-code')
             #set ($iconStyle = 'text-warning')
+            #if ($services.extension.xar.isEditAllowed($documentReference))
+              ## Distinguish safe modifications (e.g. configuration) from unsafe modifications (code).
+              #set ($iconStyle = 'text-success')
+            #end
             #if ($request.filters == 'installedExtensionDocument')
               ## This node is visible probably because it has some child content pages, but the user should not be able
               ## to select it with the current filter.

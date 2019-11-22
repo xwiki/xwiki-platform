@@ -292,7 +292,7 @@ public class NotificationFilterPreferencesMigrator extends AbstractEventListener
         XWikiContext context = this.contextProvider.get();
         XWiki xwiki = context.getWiki();
         if (!xwiki.exists(notificationFilterPreferenceClass, context)) {
-            this.logger.info("Wiki [{}] has already been migrated.", wikiId);
+            this.logger.debug("Wiki [{}] has already been migrated.", wikiId);
             return;
         }
 

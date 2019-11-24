@@ -21,13 +21,14 @@ package org.xwiki.extension.xar.internal.job;
 
 import javax.inject.Provider;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.AbstractExtensionHandlerTest;
+import org.xwiki.extension.test.MockitoRepositoryUtilsExtension;
 import org.xwiki.extension.xar.internal.handler.XarExtensionHandler;
 import org.xwiki.job.Job;
 import org.xwiki.logging.LogLevel;
@@ -38,43 +39,48 @@ import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.test.MockitoOldcoreRule;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+@OldcoreTest
+@ExtendWith(MockitoRepositoryUtilsExtension.class)
 public class RepairXarJobTest extends AbstractExtensionHandlerTest
 {
     private InstalledExtensionRepository xarExtensionRepository;
 
-    @Rule
-    public MockitoOldcoreRule oldcoreRule = new MockitoOldcoreRule();
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
 
     @AfterComponent
     public void afterComponent() throws Exception
     {
-        this.repositoryUtil.getComponentManager().registerMockComponent(WikiDescriptorManager.class);
+        this.componentManager.registerMockComponent(WikiDescriptorManager.class);
     }
 
     @Override
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
         super.setUp();
 
-        this.mocker.registerMockComponent(ContextualAuthorizationManager.class);
+        this.componentManager.registerMockComponent(ContextualAuthorizationManager.class);
 
         // Some listeners (e.g. InstalledExtensionDocumentListener) use the old core API.
-        Provider<XWikiContext> xcontextProvider = this.mocker.registerMockComponent(XWikiContext.TYPE_PROVIDER);
-        when(xcontextProvider.get()).thenReturn(this.oldcoreRule.getXWikiContext());
+        Provider<XWikiContext> xcontextProvider =
+            this.componentManager.registerMockComponent(XWikiContext.TYPE_PROVIDER);
+        when(xcontextProvider.get()).thenReturn(this.oldcore.getXWikiContext());
 
         // avoid dependency issue with refactoring listeners
-        this.mocker.registerMockComponent(ModelBridge.class);
-        this.mocker.registerMockComponent(LinkRefactoring.class);
+        this.componentManager.registerMockComponent(ModelBridge.class);
+        this.componentManager.registerMockComponent(LinkRefactoring.class);
 
         this.xarExtensionRepository =
-            this.mocker.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
+            this.componentManager.getInstance(InstalledExtensionRepository.class, XarExtensionHandler.TYPE);
     }
 
     protected Job repair(ExtensionId extensionId, String[] namespaces, LogLevel failFrom) throws Throwable

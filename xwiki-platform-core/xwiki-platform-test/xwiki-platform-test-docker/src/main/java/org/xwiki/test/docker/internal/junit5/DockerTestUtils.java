@@ -200,7 +200,15 @@ public final class DockerTestUtils
     {
         // Get the latest image in case the tag has been updated on dockerhub.
         String dockerImageName = container.getDockerImageName();
-        if (!testConfiguration.isOffline() && !pulledImages.contains(dockerImageName)) {
+
+        // Don't pull if:
+        // - we're offline
+        // - we've already pulled this image in this test run
+        // - the container corresponds to an image that's been dynamically built by the test and thus that doesn't
+        //   exists on dockerhub.
+        if (!testConfiguration.isOffline() && !pulledImages.contains(dockerImageName)
+            && !(container instanceof XWikiLocalGenericContainer))
+        {
             LOGGER.info("Pulling image [{}]", dockerImageName);
             PullImageCmd command = container.getDockerClient().pullImageCmd(dockerImageName);
             PullImageResultCallback response = new PullImageResultCallback();

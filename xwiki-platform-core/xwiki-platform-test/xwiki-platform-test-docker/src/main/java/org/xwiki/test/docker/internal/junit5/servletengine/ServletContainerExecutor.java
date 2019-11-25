@@ -36,6 +36,7 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -250,7 +251,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 LOGGER.info("(*) Build a dedicated image embedding LibreOffice...");
                 // The second argument of the ImageFromDockerfile is here to indicate we won't delete the image
                 // at the end of the test container execution.
-                container = new GenericContainer(new ImageFromDockerfile(imageName, false)
+                container = new XWikiLocalGenericContainer(new ImageFromDockerfile(imageName, false)
                     .withDockerfileFromBuilder(builder -> {
                         builder
                             .from(baseImageName)
@@ -277,7 +278,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         builder.build();
                     }));
             } else {
-                container = new GenericContainer(imageName);
+                container = new XWikiLocalGenericContainer(imageName);
             }
         } else {
             container = new GenericContainer(baseImageName);

@@ -34,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.10RC1
  */
 @Role
-@Unstable
 public interface AsyncContext
 {
     /**

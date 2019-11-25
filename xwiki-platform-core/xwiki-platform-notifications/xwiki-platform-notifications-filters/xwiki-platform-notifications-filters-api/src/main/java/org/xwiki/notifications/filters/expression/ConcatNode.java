@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters.expression;
 
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define a CONCAT condition in a filtering expression.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.8RC1
  * @since 9.11.8
  */
-@Unstable
 public final class ConcatNode extends AbstractValueNode<AbstractNode>
 {
     private AbstractNode rightOperand;

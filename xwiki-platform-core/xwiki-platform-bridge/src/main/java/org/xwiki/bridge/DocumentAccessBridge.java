@@ -30,7 +30,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.ObjectPropertyReference;
 import org.xwiki.model.reference.ObjectReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -50,7 +49,6 @@ public interface DocumentAccessBridge
      * @return the document reference
      * @since 10.6RC1
      */
-    @Unstable
     default DocumentReference getDocumentReference(EntityReference entityReference)
     {
         return new DocumentReference(entityReference.extractReference(EntityType.DOCUMENT));
@@ -839,7 +837,6 @@ public interface DocumentAccessBridge
      * @since 10.8.2
      * @since 9.11.9
      */
-    @Unstable
     default DocumentReference getCurrentAuthorReference()
     {
         return null;

@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Fast access to group membership.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.8RC1
  */
 @Role
-@Unstable
 public interface GroupManager
 {
     /**

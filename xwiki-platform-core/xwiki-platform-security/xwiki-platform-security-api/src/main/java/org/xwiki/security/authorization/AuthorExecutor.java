@@ -23,7 +23,6 @@ import java.util.concurrent.Callable;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * Allow executing some code with the right of a provided user.
@@ -59,7 +58,6 @@ public interface AuthorExecutor
      * @param <V> the result type of method <tt>call</tt>
      * @since 10.11RC1
      */
-    @Unstable
     default <V> V call(Callable<V> callable, DocumentReference authorReference, DocumentReference sourceReference)
         throws Exception
     {
@@ -103,7 +101,6 @@ public interface AuthorExecutor
      * @see #after(AutoCloseable)
      * @since 10.11RC1
      */
-    @Unstable
     default AutoCloseable before(DocumentReference authorReference, DocumentReference sourceReference)
     {
         return before(authorReference);

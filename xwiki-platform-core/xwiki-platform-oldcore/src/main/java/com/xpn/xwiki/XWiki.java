@@ -2079,7 +2079,6 @@ public class XWiki implements EventListener
      * @throws XWikiException
      * @since 10.6RC1
      */
-    @Unstable
     public XWikiDocument getDocument(String reference, EntityType type, XWikiContext xcontext) throws XWikiException
     {
         return getDocument(getRelativeEntityReferenceResolver().resolve(reference, type), xcontext);
@@ -2173,7 +2172,6 @@ public class XWiki implements EventListener
      * @param context see {@link XWikiContext}
      * @since 10.6RC1
      */
-    @Unstable
     public XWikiDocument getDocument(PageReference reference, XWikiContext context) throws XWikiException
     {
         DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
@@ -2202,7 +2200,6 @@ public class XWiki implements EventListener
      * @return the document reference
      * @since 10.6RC1
      */
-    @Unstable
     public DocumentReference getDocumentReference(EntityReference reference, XWikiContext context)
     {
         DocumentReference documentReference = getCurrentGetDocumentResolver().resolve(reference);

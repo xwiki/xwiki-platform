@@ -23,7 +23,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.stability.Unstable;
 
 /**
  * Temporary interface to access XWiki information without depending on oldcore.
@@ -61,6 +60,5 @@ public interface XWikiBridge
      * @return the compatible reference
      * @since 10.6RC1
      */
-    @Unstable
     EntityReference toCompatibleEntityReference(EntityReference reference);
 }

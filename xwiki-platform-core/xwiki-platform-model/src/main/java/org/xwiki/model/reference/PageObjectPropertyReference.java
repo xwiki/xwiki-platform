@@ -20,7 +20,6 @@
 package org.xwiki.model.reference;
 
 import org.xwiki.model.EntityType;
-import org.xwiki.stability.Unstable;
 
 /**
  * References a property in an object in a document (the value of the property).
@@ -28,7 +27,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.6RC1
  */
-@Unstable
 public class PageObjectPropertyReference extends EntityReference
 {
     /**

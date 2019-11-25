@@ -28,7 +28,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide an interface for interacting with user notification filters preferences.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.9
  */
 @Role
-@Unstable
 public interface NotificationFilterPreferenceManager
 {
     /**

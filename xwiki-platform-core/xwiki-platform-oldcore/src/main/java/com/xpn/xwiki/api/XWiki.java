@@ -301,7 +301,6 @@ public class XWiki extends Api
      * @throws XWikiException
      * @since 10.6RC1
      */
-    @Unstable
     public Document getEntityDocument(String reference, EntityType type) throws XWikiException
     {
         XWikiDocument doc = this.xwiki.getDocument(reference, type, getXWikiContext());

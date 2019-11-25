@@ -1534,7 +1534,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the reference of the document as {@link PageReference}
      * @since 10.6RC1
      */
-    @Unstable
     public PageReference getPageReference()
     {
         if (this.pageReferenceCache == null) {
@@ -1548,7 +1547,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the reference of the document as {@link PageReference} including the {@link Locale}
      * @since 10.6RC1
      */
-    @Unstable
     public PageReference getPageReferenceWithLocale()
     {
         if (this.pageReferenceWithLocaleCache == null) {

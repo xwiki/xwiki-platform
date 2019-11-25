@@ -35,7 +35,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.security.authorization.AuthorExecutor;
-import org.xwiki.stability.Unstable;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
 
@@ -369,7 +368,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
      * 
      * @since 10.11RC1
      */
-    @Unstable
     protected String renderContentInContext(final String content, final String syntax,
         DocumentReference authorReference, DocumentReference secureDocument, final XWikiContext context)
         throws Exception

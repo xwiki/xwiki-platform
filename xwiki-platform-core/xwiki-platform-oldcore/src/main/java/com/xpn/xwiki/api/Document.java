@@ -255,7 +255,6 @@ public class Document extends Api
      * @return the reference of the document as {@link PageReference} without the {@link Locale}
      * @since 10.6RC1
      */
-    @Unstable
     public PageReference getPageReference()
     {
         return this.doc.getPageReference();
@@ -265,7 +264,6 @@ public class Document extends Api
      * @return the reference of the document as {@link PageReference} including the {@link Locale}
      * @since 10.6RC1
      */
-    @Unstable
     public PageReference getPageReferenceWithLocale()
     {
         return this.doc.getPageReferenceWithLocale();
@@ -2120,7 +2118,6 @@ public class Document extends Api
      * @return {@code true} if the user has the specified right on this document, {@code false} otherwise
      * @since 10.6RC1
      */
-    @Unstable
     public boolean hasAccess(Right right, DocumentReference userReference)
     {
         return getAuthorizationManager().hasAccess(right, userReference, getDocumentReference());

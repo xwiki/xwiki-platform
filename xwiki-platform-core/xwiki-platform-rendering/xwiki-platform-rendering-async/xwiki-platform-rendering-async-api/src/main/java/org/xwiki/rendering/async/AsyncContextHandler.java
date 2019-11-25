@@ -22,7 +22,6 @@ package org.xwiki.rendering.async;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Called to give a chance to an handler to do something with the values associated to a cached rendering (inject some
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.10RC1
  */
 @Role
-@Unstable
 public interface AsyncContextHandler
 {
     /**

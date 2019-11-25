@@ -23,7 +23,6 @@ import java.lang.reflect.ParameterizedType;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Resolve an Attachment reference defined in a given representation into a validated {@link PageAttachmentReference}
@@ -35,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @param <T> the type of the representation (eg a String)
  */
 @Role
-@Unstable
 public interface PageAttachmentReferenceResolver<T>
 {
     /**

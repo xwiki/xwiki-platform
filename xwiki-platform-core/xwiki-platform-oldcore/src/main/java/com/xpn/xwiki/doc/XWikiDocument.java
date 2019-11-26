@@ -1548,7 +1548,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the reference of the document as {@link PageReference}
      * @since 10.6RC1
      */
-    @Unstable
     public PageReference getPageReference()
     {
         if (this.pageReferenceCache == null) {
@@ -1562,7 +1561,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @return the reference of the document as {@link PageReference} including the {@link Locale}
      * @since 10.6RC1
      */
-    @Unstable
     public PageReference getPageReferenceWithLocale()
     {
         if (this.pageReferenceWithLocaleCache == null) {
@@ -5933,12 +5931,27 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public int getIntValue(DocumentReference classReference, String fieldName)
     {
+        return getIntValue(classReference, fieldName, 0);
+    }
+
+    /**
+     * Retrieve the int value of the given property of the first object of the given class.
+     *
+     * @param classReference the reference of the object to find
+     * @param fieldName the property to get the value from
+     * @param defaultValue the default value to return if the object doesn't exist, or if the property is not set
+     * @return the retrieved value or the default value.
+     * @since 11.9RC1
+     */
+    @Unstable
+    public int getIntValue(DocumentReference classReference, String fieldName, int defaultValue)
+    {
         BaseObject obj = getXObject(classReference, 0);
         if (obj == null) {
-            return 0;
+            return defaultValue;
         }
 
-        return obj.getIntValue(fieldName);
+        return obj.getIntValue(fieldName, defaultValue);
     }
 
     /**

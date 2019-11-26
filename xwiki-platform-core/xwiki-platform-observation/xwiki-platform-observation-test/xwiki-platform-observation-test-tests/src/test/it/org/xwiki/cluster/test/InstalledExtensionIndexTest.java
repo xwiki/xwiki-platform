@@ -47,6 +47,8 @@ import org.xwiki.test.ui.AbstractTest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.wiki.internal.descriptor.DefaultWikiDescriptorManager;
 import org.xwiki.wiki.internal.manager.WikiDescriptorCache;
+import org.xwiki.xstream.internal.SafeXStream;
+import org.xwiki.xstream.internal.XStreamUtils;
 
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -74,6 +76,8 @@ public class InstalledExtensionIndexTest extends AbstractClusterHttpTest
         componentDeclarations.add(new ComponentDeclaration(InfinispanCacheFactory.class.getName()));
 
         componentDeclarations.add(new ComponentDeclaration(JAXBConverter.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(SafeXStream.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(XStreamUtils.class.getName()));
         loader.initialize(AbstractTest.componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);
 
         // Make sure extension utils is initialized and set.

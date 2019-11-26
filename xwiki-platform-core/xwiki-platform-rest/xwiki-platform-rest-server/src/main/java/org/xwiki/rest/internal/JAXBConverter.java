@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import javax.activation.DataHandler;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.xml.datatype.Duration;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -47,9 +48,8 @@ import org.w3c.dom.NodeList;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.job.internal.xstream.SafeXStream;
+import org.xwiki.xstream.internal.SafeXStream;
 
-import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomReader;
 import com.thoughtworks.xstream.io.xml.DomWriter;
 
@@ -73,14 +73,14 @@ public class JAXBConverter implements Initializable
         boolean.class, byte.class, QName.class, XMLGregorianCalendar.class, byte[].class, byte[].class, Duration.class,
         Calendar.class, Date.class, URI.class, Image.class, DataHandler.class, Source.class, UUID.class));
 
-    private XStream xstream;
+    @Inject
+    private SafeXStream xstream;
 
     private DocumentBuilderFactory dbFactory;
 
     @Override
     public void initialize() throws InitializationException
     {
-        this.xstream = new SafeXStream();
         this.dbFactory = DocumentBuilderFactory.newInstance();
     }
 

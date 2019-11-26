@@ -24,8 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Represents a type of entity (ie a Model Object such as a Wiki, a Space, a Document, an Attachment, etc).
  * 
@@ -87,7 +85,6 @@ public enum EntityType
      * 
      * @since 10.6RC1
      */
-    @Unstable
     PAGE(WIKI, null),
 
     /**
@@ -95,7 +92,6 @@ public enum EntityType
      * 
      * @since 10.6RC1
      */
-    @Unstable
     PAGE_ATTACHMENT(PAGE),
 
     /**
@@ -103,7 +99,6 @@ public enum EntityType
      * 
      * @since 10.6RC1
      */
-    @Unstable
     PAGE_OBJECT(PAGE),
 
     /**
@@ -111,7 +106,6 @@ public enum EntityType
      * 
      * @since 10.6RC1
      */
-    @Unstable
     PAGE_OBJECT_PROPERTY(PAGE_OBJECT),
 
     /**
@@ -119,7 +113,6 @@ public enum EntityType
      * 
      * @since 10.6RC1
      */
-    @Unstable
     PAGE_CLASS_PROPERTY(PAGE);
 
     // TODO: should probably introduce a PAGE_BLOCK when we decide how we want it (we might want to move a two types or
@@ -170,7 +163,6 @@ public enum EntityType
      * @return the list of allowed parent for this entity type
      * @since 10.6RC1
      */
-    @Unstable
     public List<EntityType> getAllowedParents()
     {
         return this.allowedParents;
@@ -181,7 +173,6 @@ public enum EntityType
      * @return true of the passed type is a possible ancestor of the passed type
      * @since 10.6RC1
      */
-    @Unstable
     public boolean isAllowedAncestor(EntityType type)
     {
         return this.allowedAncestors[type.ordinal()];

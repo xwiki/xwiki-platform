@@ -23,13 +23,9 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.descriptor.ComponentRole;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
@@ -37,9 +33,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.CompositeBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.util.ErrorBlockGenerator;
@@ -53,10 +46,6 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 @Component(roles = DefaultBlockAsyncRenderer.class)
 public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
 {
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManager;
-
     @Inject
     private AsyncContext asyncContext;
 
@@ -104,7 +93,7 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
     }
 
     @Override
-    public BlockAsyncRendererResult render(boolean async, boolean cached) throws RenderingException
+    public Block execute(boolean async, boolean cached) throws RenderingException
     {
         Block resultBlock;
 
@@ -141,27 +130,7 @@ public class DefaultBlockAsyncRenderer extends AbstractBlockAsyncRenderer
                 .generateErrorBlocks("Failed to execute asynchronous content", e, this.configuration.isInline()));
         }
 
-        ///////////////////////////////////////
-        // Rendering
-
-        String resultString = null;
-
-        if (async || cached) {
-            Syntax targetSyntax = this.configuration.getTargetSyntax();
-            BlockRenderer renderer;
-            try {
-                renderer = this.componentManager.get().getInstance(BlockRenderer.class, targetSyntax.toIdString());
-            } catch (ComponentLookupException e) {
-                throw new RenderingException("Failed to lookup renderer for syntax [" + targetSyntax + "]", e);
-            }
-
-            WikiPrinter printer = new DefaultWikiPrinter();
-            renderer.render(resultBlock, printer);
-
-            resultString = printer.toString();
-        }
-
-        return new BlockAsyncRendererResult(resultString, resultBlock);
+        return resultBlock;
     }
 
     private Block tranform(XDOM xdom, Block block) throws RenderingException

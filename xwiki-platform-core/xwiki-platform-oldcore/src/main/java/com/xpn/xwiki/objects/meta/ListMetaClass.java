@@ -31,6 +31,8 @@ import com.xpn.xwiki.objects.classes.StringClass;
  */
 public class ListMetaClass extends PropertyMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor. Initializes the default meta properties of all List XClass property.
      */

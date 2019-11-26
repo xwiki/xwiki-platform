@@ -42,7 +42,6 @@ import org.xwiki.test.ui.po.diff.DocumentDiffSummary;
 import org.xwiki.test.ui.po.diff.EntityDiff;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
-import org.xwiki.test.ui.po.editor.WikiEditPage;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -87,25 +86,27 @@ public class CompareVersionsTest extends AbstractTest
         // when the document is moved to a different parent since it means changing the identity of the document for
         // now and thus changing it means getting a new document.
         getUtil().setHierarchyMode("parentchild");
-        getDriver().navigate().refresh();
 
         // Create the test page.
         testPage = getUtil().createPage(getTestClassName(), pageName, "one\ntwo\nthree", "Test");
-
         // Change the content and the meta data.
-        WikiEditPage wikiEditPage = testPage.editWiki();
-        wikiEditPage.setContent("one\n**two**\nfour");
-        wikiEditPage.setTitle("Compare verSions test");
-        wikiEditPage.setParent("Sandbox.WebHome");
-        wikiEditPage.setEditComment("Changed content and meta data.");
-        wikiEditPage.clickSaveAndContinue();
-        wikiEditPage.setTitle("Compare versions test");
-        wikiEditPage.setMinorEdit(true);
-        wikiEditPage.setEditComment("Fix typo in title.");
-        wikiEditPage.clickSaveAndContinue();
+        Map<String, String> queryMap = new HashMap<>();
+        queryMap.put("content", "one\n**two**\nfour");
+        queryMap.put("title", "Compare verSions test");
+        queryMap.put("parent", "Sandbox.WebHome");
+        queryMap.put("commentinput", "Changed content and meta data.");
+        queryMap.put("minorEdit", "true");
+        getUtil().gotoPage(getTestClassName(), pageName, "save", queryMap);
 
+        queryMap = new HashMap<>();
+        queryMap.put("title", "Compare versions test");
+        queryMap.put("commentinput", "Fix typo in title.");
+        queryMap.put("minorEdit", "true");
+        getUtil().gotoPage(getTestClassName(), pageName, "save", queryMap);
+
+        ViewPage viewPage = getUtil().gotoPage(getTestClassName(), pageName);
         // Add objects.
-        ObjectEditPage objectEditPage = wikiEditPage.editObjects();
+        ObjectEditPage objectEditPage = viewPage.editObjects();
         FormContainerElement form = objectEditPage.addObject("XWiki.JavaScriptExtension");
         Map<String, String> assignment = new HashMap<String, String>();
         assignment.put("XWiki.JavaScriptExtension_0_name", "JavaScript code");
@@ -159,7 +160,6 @@ public class CompareVersionsTest extends AbstractTest
     {
         // Put back the default hierarchy mode
         getUtil().setHierarchyMode("reference");
-        getDriver().navigate().refresh();
     }
 
     @Test

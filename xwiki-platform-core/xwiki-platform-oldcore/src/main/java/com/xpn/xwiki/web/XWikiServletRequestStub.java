@@ -157,6 +157,10 @@ public class XWikiServletRequestStub implements XWikiRequest
         }
 
         this.parameters = clone(request.getParameterMap());
+
+        if (request instanceof XWikiServletRequestStub) {
+            this.daemon = ((XWikiServletRequestStub) request).daemon;
+        }
     }
 
     private Map<String, String[]> clone(Map<String, String[]> map)

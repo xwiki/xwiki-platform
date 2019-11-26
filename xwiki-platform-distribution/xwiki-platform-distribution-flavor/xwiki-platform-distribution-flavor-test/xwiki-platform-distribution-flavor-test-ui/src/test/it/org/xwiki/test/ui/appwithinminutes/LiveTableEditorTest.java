@@ -142,8 +142,7 @@ public class LiveTableEditorTest extends AbstractTest
         Assert.assertFalse(editPage.isDeprecatedLiveTableColumnsWarningDisplayed());
 
         // Reload and remove all deprecated columns.
-        getDriver().navigate().refresh();
-        editPage = new ApplicationHomeEditPage().waitUntilPageIsLoaded();
+        editPage = viewPage.editInline();
         editPage.removeAllDeprecatedLiveTableColumns(true);
         Assert.assertFalse(editPage.isDeprecatedLiveTableColumnsWarningDisplayed());
         Assert.assertTrue(editPage.hasLiveTableColumn("Page Name"));

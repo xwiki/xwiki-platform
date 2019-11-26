@@ -61,10 +61,10 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
     private static final List<String> NOTIFICATION_CODE_PATH = Arrays.asList("XWiki", "Notifications", "Code");
 
     private static final LocalDocumentReference OLD_XCLASS_REFERENCE =
-            new LocalDocumentReference(NOTIFICATION_CODE_PATH, "NotificationPreferenceScopeClass");
+        new LocalDocumentReference(NOTIFICATION_CODE_PATH, "NotificationPreferenceScopeClass");
 
     private static final LocalDocumentReference NEW_XCLASS_REFERENCE =
-            new LocalDocumentReference(NOTIFICATION_CODE_PATH, "NotificationFilterPreferenceClass");
+        new LocalDocumentReference(NOTIFICATION_CODE_PATH, "NotificationFilterPreferenceClass");
 
     @Inject
     private QueryManager queryManager;
@@ -83,7 +83,7 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
     public String getDescription()
     {
         return "Move old NotificationPreferenceScopeClass XObjects to the more generic "
-                + "NotificationFilterPreferenceClass XObjects.";
+            + "NotificationFilterPreferenceClass XObjects.";
     }
 
     @Override
@@ -109,10 +109,8 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
 
         try {
             // Get every document having at least one NotificationPreferenceScopeClass XObject attached
-            Query query = queryManager.createQuery(
-                            "select distinct doc.fullName from Document doc, "
-                                + "doc.object(XWiki.Notifications.Code.NotificationPreferenceScopeClass) as obj",
-                            Query.XWQL);
+            Query query = queryManager.createQuery("select distinct doc.fullName from Document doc, "
+                + "doc.object(XWiki.Notifications.Code.NotificationPreferenceScopeClass) as obj", Query.XWQL);
 
             // Migrate each document to use the new XObject
             for (String result : query.<String>execute()) {
@@ -158,8 +156,8 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
 
         XWikiContext context = contextProvider.get();
         context.getWiki().saveDocument(document,
-                "[UPGRADE] XObject migration from ScopeNotificationFilterClass to NotificationPreferenceFilterClass.",
-                context);
+            "[UPGRADE] XObject migration from ScopeNotificationFilterClass to NotificationPreferenceFilterClass.",
+            context);
     }
 
     private BaseObject generateNewXObject(BaseObject oldXObject)
@@ -176,8 +174,8 @@ public class ScopeNotificationFilterClassMigrator extends AbstractHibernateDataM
 
         // We have to generate a filter preference name that should be unique.
         newXObject.setStringValue("filterPreferenceName",
-                String.format("scopeNotificationFilter-%s-%s-%s-%s-%s", oldEventType, oldFilterFormat, oldFilterType,
-                        oldScopeValue, oldScopeReferenceValue));
+            String.format("scopeNotificationFilter-%s-%s-%s-%s-%s", oldEventType, oldFilterFormat, oldFilterType,
+                oldScopeValue, oldScopeReferenceValue));
         newXObject.setStringValue("filterName", "scopeNotificationFilter");
         newXObject.setStringValue("filterType", oldFilterType);
         newXObject.setStringListValue("filterFormats", Collections.singletonList(oldFilterFormat));

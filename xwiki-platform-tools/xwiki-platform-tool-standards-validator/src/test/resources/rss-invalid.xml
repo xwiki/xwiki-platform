@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
+	<wrongchannel>
+		<title>RSS feed for search on wiki</title>
+		<link>http://127.0.0.1:8080/xwiki/bin/view/Main/DatabaseSearch</link>
+		<description>RSS feed for search on wiki</description>
+		<language>en</language>
+		<copyright />
+		<dc:creator>XWiki</dc:creator>
+		<dc:language>en</dc:language>
+		<dc:rights />
+		<item>
+			<title>Database Search: wiki</title>
+			<link>http://127.0.0.1:8080/xwiki/bin/view/Main/DatabaseSearch?language=en</link>
+			<description>Version 1.1 edited by Administrator on Wed May 26
+				17:09:37 GMT+01:00 2010</description>
+			<pubDate>Wed, 26 May 2010 16:08:49 GMT</pubDate>
+			<guid isPermaLink="false">http://127.0.0.1:8080/xwiki/bin/view/Main/DatabaseSearch?language=en</guid>
+			<dc:creator>Administrator</dc:creator>
+			<dc:date>2010-05-26T16:08:49Z</dc:date>
+		</item>
+	</wrongchannel>
+</rss>

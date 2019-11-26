@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.xpn.xwiki.internal.mandatory.AbstractAsyncClassDocumentInitializer;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
@@ -34,21 +35,6 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public abstract class AbstractAsyncBaseObjectWikiComponent extends AbstractBaseObjectWikiComponent
 {
-    /**
-     * Indicate if the asynchronous execution is allowed for this extension.
-     */
-    public static final String XPROPERTY_ASYNC_ENABLED = "async_enabled";
-
-    /**
-     * Indicate if caching is allowed for this UI extension.
-     */
-    public static final String XPROPERTY_ASYNC_CACHED = "async_cached";
-
-    /**
-     * Indicate the list of context elements required by the UI extension execution.
-     */
-    public static final String XPROPERTY_ASYNC_CONTEXT = "async_context";
-
     protected final boolean asyncAllowed;
 
     protected final boolean cacheAllowed;
@@ -64,9 +50,12 @@ public abstract class AbstractAsyncBaseObjectWikiComponent extends AbstractBaseO
     {
         super(baseObject, roleType, roleHint);
 
-        this.asyncAllowed = baseObject.getIntValue(XPROPERTY_ASYNC_ENABLED, 0) == 1;
-        this.cacheAllowed = baseObject.getIntValue(XPROPERTY_ASYNC_CACHED, 0) == 1;
-        List<String> contextEntriesList = baseObject.getListValue(XPROPERTY_ASYNC_CONTEXT);
+        this.asyncAllowed =
+            baseObject.getIntValue(AbstractAsyncClassDocumentInitializer.XPROPERTY_ASYNC_ENABLED, 0) == 1;
+        this.cacheAllowed =
+            baseObject.getIntValue(AbstractAsyncClassDocumentInitializer.XPROPERTY_ASYNC_CACHED, 0) == 1;
+        List<String> contextEntriesList =
+            baseObject.getListValue(AbstractAsyncClassDocumentInitializer.XPROPERTY_ASYNC_CONTEXT);
         this.contextEntries = contextEntriesList != null ? new HashSet<>(contextEntriesList) : null;
     }
 }

@@ -25,15 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-activeinstalls-client</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-activeinstalls-client-api</artifactId>
   <name>XWiki Platform - Active Installs - Client - API</name>
   <packaging>jar</packaging>
   <description>API to store instance UUID and send regular pings notifying that the instance is alive</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>79</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>75</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Active Installs Client API</xwiki.extension.name>
   </properties>

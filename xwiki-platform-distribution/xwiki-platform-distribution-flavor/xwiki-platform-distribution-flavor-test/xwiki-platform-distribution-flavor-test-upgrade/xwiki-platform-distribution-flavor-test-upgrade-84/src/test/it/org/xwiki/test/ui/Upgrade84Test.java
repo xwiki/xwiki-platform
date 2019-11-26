@@ -27,7 +27,7 @@ package org.xwiki.test.ui;
 public class Upgrade84Test extends UpgradeTest
 {
     @Override
-    protected void postUpdateValidate()
+    protected void setupLogs()
     {
         validateConsole.getLogCaptureConfiguration().registerExpected(
             // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses

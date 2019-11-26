@@ -21,7 +21,6 @@ package com.xpn.xwiki.export.html;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -33,7 +32,6 @@ import java.util.zip.ZipOutputStream;
 import javax.inject.Provider;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.NotFileFilter;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -41,7 +39,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -52,6 +49,7 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.url.URLContextManager;
 import org.xwiki.url.filesystem.FilesystemExportContext;
+import org.xwiki.url.internal.filesystem.FilesystemExportContextProvider;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -80,21 +78,6 @@ public class HtmlPackager
      * Name of the context property containing the document.
      */
     private static final String CONTEXT_TDOC = "tdoc";
-
-    /**
-     * Name of the Velocity context property containing the document.
-     */
-    private static final String VCONTEXT_DOC = "doc";
-
-    /**
-     * Name of the Velocity context property containing the document.
-     */
-    private static final String VCONTEXT_CDOC = "cdoc";
-
-    /**
-     * Name of the Velocity context property containing the document.
-     */
-    private static final String VCONTEXT_TDOC = CONTEXT_TDOC;
 
     /**
      * The separator in an internal zip path.
@@ -305,16 +288,15 @@ public class HtmlPackager
      * @throws XWikiException error when render documents.
      * @throws IOException error when render documents.
      */
-    private void renderDocuments(ZipOutputStream zos, ExportURLFactory urlf, XWikiContext context)
-        throws XWikiException, IOException
+    private void renderDocuments(ZipOutputStream zos, ExportURLFactory urlf, FilesystemExportContext exportContext,
+        XWikiContext context) throws XWikiException, IOException
     {
         ExecutionContextManager ecm = Utils.getComponent(ExecutionContextManager.class);
-        Execution execution = Utils.getComponent(Execution.class);
 
         for (DocumentReference pageReference : this.pageReferences) {
             try {
                 // Isolate and initialize Contexts
-                XWikiContext renderContext = initializeContexts(ecm, execution, urlf, context);
+                XWikiContext renderContext = initializeContexts(ecm, urlf, exportContext, context);
 
                 renderDocument(pageReference, zos, urlf.getFilesystemExportContext(), renderContext);
             } catch (ExecutionContextException e) {
@@ -322,32 +304,33 @@ public class HtmlPackager
                     "Failed to initialize Execution Context", e);
             } finally {
                 // Clean up context
-                execution.popContext();
+                ecm.popContext();
             }
         }
     }
 
-    private XWikiContext initializeContexts(ExecutionContextManager ecm, Execution execution, ExportURLFactory urlf,
-        XWikiContext originalContext) throws ExecutionContextException
+    private XWikiContext initializeContexts(ExecutionContextManager ecm, ExportURLFactory urlf,
+        FilesystemExportContext exportContext, XWikiContext originalContext) throws ExecutionContextException
     {
         XWikiContext renderContext = originalContext.clone();
+
+        ExecutionContext executionContext = new ExecutionContext();
+
+        // Bridge with old XWiki Context, required for legacy code.
+        renderContext.declareInExecutionContext(executionContext);
+
+        // Push a clean new Execution Context since we don't want the main Execution Context to be used for
+        // rendering the HTML pages to export. It's cleaner to isolate it as we do.
+        ecm.pushContext(executionContext, false);
+
+        // Set the export context lost by the context push
+        FilesystemExportContextProvider.set(executionContext, exportContext);
 
         // Override the current action to ensure we always render a view action.
         renderContext.put("action", "view");
 
         // Set the URL Factories/Serializer to use
         renderContext.setURLFactory(urlf);
-
-        ExecutionContext executionContext = ecm.clone(execution.getContext());
-
-        // Bridge with old XWiki Context, required for legacy code.
-        executionContext.setProperty("xwikicontext", renderContext);
-
-        // Push a clean new Execution Context since we don't want the main Execution Context to be used for
-        // rendering the HTML pages to export. It's cleaner to isolate it as we do. Note that the new
-        // Execution Context automatically gets initialized with a new Velocity Context by
-        // the VelocityRequestInitializer class.
-        execution.pushContext(executionContext);
 
         // Use the filesystem URL format for all code using the url module to generate URLs (webjars, etc).
         Utils.getComponent(URLContextManager.class).setURLFormatId("filesystem");
@@ -358,6 +341,7 @@ public class HtmlPackager
         // since we can't write to a stream in which a redirect has been done (it's committed) and thus
         // we won't be able to return our zip in this case.
         renderContext.setResponse(new XWikiServletResponseStub());
+
         return renderContext;
     }
 
@@ -397,7 +381,7 @@ public class HtmlPackager
             ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
 
             // Render pages to export
-            renderDocuments(zos, urlf, context);
+            renderDocuments(zos, urlf, exportContext, context);
 
             // Add required skins to ZIP file
             for (String skinName : urlf.getFilesystemExportContext().getNeededSkins()) {
@@ -437,8 +421,8 @@ public class HtmlPackager
             builder.append("        <li><a href=\"");
             builder.append("pages/");
             // Compute the relative URL corresponding to the path.
-            String relativeURL = new File("").toURI().relativize(
-                new File(this.pathEntityReferenceSerializer.serialize(reference)).toURI()).toString();
+            String relativeURL = new File("").toURI()
+                .relativize(new File(this.pathEntityReferenceSerializer.serialize(reference)).toURI()).toString();
             builder.append(relativeURL);
             builder.append(".html");
             builder.append("\">");

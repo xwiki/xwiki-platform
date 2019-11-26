@@ -35,6 +35,8 @@ public class TimezoneClass extends StringClass
      **/
     protected static final String XCLASSNAME = "timezone";
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructor for Timezone Class.
      *

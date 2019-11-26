@@ -36,11 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-{{html}}
-#template('exportinline.vm')
-{{/html}}
-{{/velocity}}</content>
+  <content>{{template name="exportinline.vm" /}}</content>
   <object>
     <name>XWiki.AdminExportSheet</name>
     <number>0</number>
@@ -96,10 +92,10 @@
         <number>3</number>
         <picker>1</picker>
         <prettyName>configurationClass</prettyName>
-        <size>30</size>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
         <separators/>
+        <size>30</size>
         <sort>none</sort>
         <sql/>
         <unmodifiable>0</unmodifiable>

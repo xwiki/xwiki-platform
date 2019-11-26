@@ -368,7 +368,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
 
         // Check for empty passwords
-        if (StringUtils.isBlank(password)) {
+        if (password == null || password.isEmpty()) {
             context.put("message", "nopassword");
             return null;
         }

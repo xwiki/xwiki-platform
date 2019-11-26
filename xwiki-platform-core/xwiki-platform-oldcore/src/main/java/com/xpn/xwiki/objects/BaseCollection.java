@@ -64,6 +64,8 @@ import com.xpn.xwiki.web.Utils;
 public abstract class BaseCollection<R extends EntityReference> extends BaseElement<R>
     implements ObjectInterface, Cloneable
 {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseCollection.class);
 
     /**

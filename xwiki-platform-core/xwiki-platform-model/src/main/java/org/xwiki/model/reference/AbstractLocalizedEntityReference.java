@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.xwiki.model.EntityType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents an entity reference which contains a locale.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.6RC1
  */
-@Unstable
 public abstract class AbstractLocalizedEntityReference extends EntityReference
 {
     /**

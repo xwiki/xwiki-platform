@@ -20,12 +20,14 @@
 package com.xpn.xwiki.web;
 
 import java.util.Arrays;
-import java.util.List;
 
+import javax.inject.Named;
 import javax.servlet.ServletOutputStream;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.xwiki.filter.input.InputFilterStream;
 import org.xwiki.filter.input.InputFilterStreamFactory;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
@@ -35,15 +37,11 @@ import org.xwiki.filter.output.OutputFilterStreamFactory;
 import org.xwiki.filter.type.FilterStreamType;
 import org.xwiki.filter.xar.output.XAROutputProperties;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.query.Query;
-import org.xwiki.query.QueryManager;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.export.DocumentSelectionResolver;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
@@ -52,11 +50,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.anyList;
-import static org.mockito.Mockito.anyMap;
-import static org.mockito.Mockito.anyString;
-import static org.mockito.Mockito.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -71,184 +66,120 @@ import static org.mockito.Mockito.when;
 public class ExportActionTest
 {
     @InjectMockitoOldcore
-    public MockitoOldcore oldcore;
+    private MockitoOldcore oldcore;
 
-    @Test
-    public void exportFullSpaceUsingWildcardsAsXAR() throws Exception
+    @MockComponent
+    private DocumentSelectionResolver documentSelectionResolver;
+
+    @MockComponent
+    @Named("xwiki+instance")
+    InputFilterStreamFactory inputFilterStreamFactory;
+
+    @Mock
+    BeanOutputFilterStreamFactory<XAROutputProperties> xarFilterStreamFactory;
+
+    private ExportAction action = new ExportAction();
+
+    @Mock
+    private XWikiRequest request;
+
+    @Mock
+    private XWikiResponse response;
+
+    @SuppressWarnings("unchecked")
+    @BeforeEach
+    public void configure() throws Exception
     {
-        ExportAction action = new ExportAction();
+        this.oldcore.getXWikiContext().setRequest(this.request);
 
-        XWikiContext context = oldcore.getXWikiContext();
-
-        // Make it a XAR export
-        XWikiRequest request = mock(XWikiRequest.class);
-        when(request.get("format")).thenReturn("xar");
-        context.setRequest(request);
-
-        // Set other request parameters
-        when(request.get("name")).thenReturn("myexport");
-        // Export all pages in the "Space" space
-        when(request.getParameterValues("pages")).thenReturn(new String[] {"Space.%25"});
-        when(request.getCharacterEncoding()).thenReturn("UTF-8");
-
-        // Make the current user have programming rights
-        when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
-
-        // Query Manager-related mocking
-        QueryManager queryManager = oldcore.getMocker().registerMockComponent(QueryManager.class);
-        Query query = mock(Query.class);
-        when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
-        when(query.setWiki("xwiki")).thenReturn(query);
-        when(query.bindValues(any(List.class))).thenReturn(query);
-        when(query.execute()).thenReturn(Arrays.asList("Space.Page1", "Space.Page2"));
-
-        // Register some mock resolver to resolve passed page references
-        AuthorizationManager authorizationManager = oldcore.getMocker().registerMockComponent(AuthorizationManager.class);
-
-        DocumentReference page1Ref = new DocumentReference("xwiki", "Space", "Page1");
-        DocumentReference page2Ref = new DocumentReference("xwiki", "Space", "Page2");
-        when(authorizationManager.hasAccess(Right.VIEW, context.getUserReference(), page1Ref)).thenReturn(true);
-        when(authorizationManager.hasAccess(Right.VIEW, context.getUserReference(), page2Ref)).thenReturn(true);
-
-        DocumentReferenceResolver<String> resolver =
-            oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
-        when(resolver.resolve("xwiki:Space.Page1")).thenReturn(page1Ref);
-        when(resolver.resolve("xwiki:Space.Page2")).thenReturn(page2Ref);
+        ServletOutputStream outputStream = mock(ServletOutputStream.class);
+        when(this.response.getOutputStream()).thenReturn(outputStream);
+        this.oldcore.getXWikiContext().setResponse(this.response);
 
         // Register some mock filters so that the export does nothing.
-        InputFilterStreamFactory inputFilterStreamFactory = oldcore.getMocker().registerMockComponent(
-            InputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
-        when(inputFilterStreamFactory.createInputFilterStream(anyMap())).thenReturn(mock(InputFilterStream.class));
-        BeanOutputFilterStreamFactory beanOutputFilterStreamFactory = mock(BeanOutputFilterStreamFactory.class);
-        oldcore.getMocker().registerComponent(OutputFilterStreamFactory.class,
-            FilterStreamType.XWIKI_XAR_CURRENT.serialize(), beanOutputFilterStreamFactory);
-        when(beanOutputFilterStreamFactory.createOutputFilterStream(any(XAROutputProperties.class))).thenReturn(
-            mock(BeanOutputFilterStream.class));
-
-        // Set response stream
-        XWikiResponse response = mock(XWikiResponse.class);
-        ServletOutputStream outputStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outputStream);
-        context.setResponse(response);
-
-        String result = action.render(oldcore.getXWikiContext());
-
-        // The tests are below this line!
-
-        // Verify null is returned (this means the response has been returned)
-        assertNull(result);
-
-        // Verify that the parameters passed to the input stream factory are defining the correct pages
-        ArgumentCaptor<DocumentInstanceInputProperties> properties =
-            ArgumentCaptor.forClass(DocumentInstanceInputProperties.class);
-        verify(inputFilterStreamFactory).createInputFilterStream(properties.capture());
-        assertFalse(properties.getValue().isVerbose());
-        assertFalse(properties.getValue().isWithJRCSRevisions());
-        assertFalse(properties.getValue().isWithRevisions());
-
-        assertTrue(properties.getValue().getEntities().matches(page1Ref));
-        assertTrue(properties.getValue().getEntities().matches(page2Ref));
+        when(this.inputFilterStreamFactory.createInputFilterStream(anyMap())).thenReturn(mock(InputFilterStream.class));
+        this.oldcore.getMocker().registerComponent(OutputFilterStreamFactory.class,
+            FilterStreamType.XWIKI_XAR_CURRENT.serialize(), this.xarFilterStreamFactory);
+        when(this.xarFilterStreamFactory.createOutputFilterStream(any(XAROutputProperties.class)))
+            .thenReturn(mock(BeanOutputFilterStream.class));
     }
 
     @Test
-    public void exportXARSpaceUsingUncheckedPagesAndOtherPagesArgument() throws Exception
+    public void exportXARForbidden() throws Exception
     {
-        // Scenario:
-        // We want to export all Space.% that contains 3 pages, but with exclusion of Page1 and 2
-        // to export all Foo.% and to export all Bar.Baz.% except Bar.Baz.WebHome
-        //
-        // This test will check the request is properly built and the pages are correctly resolved by checking
-        // result only on Space: we ignore the others for sake of simplicity
-        ExportAction action = new ExportAction();
+        assertEquals("exception", this.action.render(this.oldcore.getXWikiContext()));
+        assertEquals("needadminrights", this.oldcore.getXWikiContext().get("message"));
+    }
 
-        XWikiContext context = oldcore.getXWikiContext();
-        context.setDoc(new XWikiDocument(new DocumentReference("xwiki", "Space",
-            "Page1")));
+    @Test
+    @SuppressWarnings("deprecation")
+    public void exportPartialXAR() throws Exception
+    {
+        // XAR export requires administration right.
+        XWikiContext context = this.oldcore.getXWikiContext();
+        when(this.oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
 
-        // Make it a XAR export
-        XWikiRequest request = mock(XWikiRequest.class);
-        when(request.get("format")).thenReturn("xar");
-        context.setRequest(request);
+        when(this.request.get("format")).thenReturn("xar");
+        when(this.request.get("name")).thenReturn("my export");
+        when(this.request.get("description")).thenReturn("my description");
+        when(this.request.get("version")).thenReturn("my version");
+        when(this.request.get("author")).thenReturn("my author");
+        when(this.request.get("licence")).thenReturn("my license");
+        when(this.request.get("backup")).thenReturn("false");
+        when(this.request.get("history")).thenReturn("true");
 
-        // Set other request parameters
-        when(request.get("name")).thenReturn("myexport");
-        when(request.getCharacterEncoding()).thenReturn("UTF-8");
-        // Export all pages in the "Space" space
-        when(request.getParameterValues("pages")).thenReturn(new String[] {
-            "Space.%25", "Foo.%25", "Bar.Baz.%25"});
-        when(request.getParameterValues("excludes")).thenReturn(new String[] {
-            "Space.Page1&Space.Page2", "", "Bar.Baz.WebHome" });
-
-        // Make the current user have programming rights
-        when(oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
-
-        // Query Manager-related mocking
-        QueryManager queryManager = oldcore.getMocker().registerMockComponent(QueryManager.class);
-        Query query = mock(Query.class);
-        String where = "where ( doc.fullName like ?1 and doc.fullName not like ?2 and doc.fullName not like ?3 ) or "
-            + "( doc.fullName like ?4 ) or ( doc.fullName like ?5 and doc.fullName not like ?6 ) ";
-        when(queryManager.createQuery(anyString(), eq(Query.HQL))).thenReturn(query);
-        when(query.setWiki("xwiki")).thenReturn(query);
-
-        when(query.bindValues(anyList())).thenReturn(query);
-        when(query.execute()).thenReturn(Arrays.asList("Space.Page3"));
-
-        // Register some mock resolver to resolve passed page references
-        AuthorizationManager authorizationManager = oldcore.getMocker().
-            registerMockComponent(AuthorizationManager.class);
+        when(this.documentSelectionResolver.isSelectionSpecified()).thenReturn(true);
 
         DocumentReference page1Ref = new DocumentReference("xwiki", "Space", "Page1");
         DocumentReference page2Ref = new DocumentReference("xwiki", "Space", "Page2");
-        DocumentReference page3Ref = new DocumentReference("xwiki", "Space", "Page3");
-        when(authorizationManager.hasAccess(Right.VIEW, context.getUserReference(), page1Ref)).thenReturn(true);
-        when(authorizationManager.hasAccess(Right.VIEW, context.getUserReference(), page2Ref)).thenReturn(true);
-        when(authorizationManager.hasAccess(Right.VIEW, context.getUserReference(), page3Ref)).thenReturn(true);
+        when(this.documentSelectionResolver.getSelectedDocuments()).thenReturn(Arrays.asList(page1Ref, page2Ref));
 
-        DocumentReferenceResolver<String> resolver =
-                oldcore.getMocker().registerMockComponent(DocumentReferenceResolver.TYPE_STRING, "current");
+        assertNull(this.action.render(context));
 
-        WikiReference wikiReference = new WikiReference("xwiki");
-        when(resolver.resolve("Space.Page1", wikiReference)).thenReturn(page1Ref);
-        when(resolver.resolve("Space.Page2", wikiReference)).thenReturn(page2Ref);
-        when(resolver.resolve("Space.Page3", wikiReference)).thenReturn(page3Ref);
+        // Verify that the parameters passed to the input stream factory are defining the correct pages.
+        ArgumentCaptor<DocumentInstanceInputProperties> inputProperties =
+            ArgumentCaptor.forClass(DocumentInstanceInputProperties.class);
+        verify(this.inputFilterStreamFactory).createInputFilterStream(inputProperties.capture());
+        assertFalse(inputProperties.getValue().isVerbose());
+        assertTrue(inputProperties.getValue().isWithJRCSRevisions());
+        assertFalse(inputProperties.getValue().isWithRevisions());
+        assertTrue(inputProperties.getValue().getEntities().matches(page1Ref));
+        assertTrue(inputProperties.getValue().getEntities().matches(page2Ref));
 
-        // Register some mock filters so that the export does nothing.
-        InputFilterStreamFactory inputFilterStreamFactory = oldcore.getMocker().registerMockComponent(
-                InputFilterStreamFactory.class, FilterStreamType.XWIKI_INSTANCE.serialize());
-        when(inputFilterStreamFactory.createInputFilterStream(anyMap())).thenReturn(mock(InputFilterStream.class));
-        BeanOutputFilterStreamFactory beanOutputFilterStreamFactory = mock(BeanOutputFilterStreamFactory.class);
-        oldcore.getMocker().registerComponent(OutputFilterStreamFactory.class,
-                FilterStreamType.XWIKI_XAR_CURRENT.serialize(), beanOutputFilterStreamFactory);
-        when(beanOutputFilterStreamFactory.createOutputFilterStream(any(XAROutputProperties.class))).thenReturn(
-                mock(BeanOutputFilterStream.class));
+        ArgumentCaptor<XAROutputProperties> xarProperties = ArgumentCaptor.forClass(XAROutputProperties.class);
+        verify(this.xarFilterStreamFactory).createOutputFilterStream(xarProperties.capture());
+        assertEquals("my export", xarProperties.getValue().getPackageName());
+        assertEquals("my description", xarProperties.getValue().getPackageDescription());
+        assertEquals("my version", xarProperties.getValue().getPackageVersion());
+        assertEquals("my author", xarProperties.getValue().getPackageAuthor());
+        assertEquals("my license", xarProperties.getValue().getPackageLicense());
+        assertFalse(xarProperties.getValue().isPackageBackupPack());
+        assertTrue(xarProperties.getValue().isPreserveVersion());
+    }
 
-        // Set response stream
-        XWikiResponse response = mock(XWikiResponse.class);
-        ServletOutputStream outputStream = mock(ServletOutputStream.class);
-        when(response.getOutputStream()).thenReturn(outputStream);
-        context.setResponse(response);
+    @Test
+    @SuppressWarnings("deprecation")
+    public void exportFullXAR() throws Exception
+    {
+        XWikiContext context = this.oldcore.getXWikiContext();
+        WikiReference wikiReference = new WikiReference("mywiki");
+        context.setWikiReference(wikiReference);
 
-        String result = action.render(oldcore.getXWikiContext());
+        // XAR export requires administration right.
+        when(this.oldcore.getMockRightService().hasWikiAdminRights(context)).thenReturn(true);
+        when(this.request.get("format")).thenReturn("xar");
 
-        // The tests are below this line!
+        assertNull(this.action.render(context));
 
-        // Verify null is returned (this means the response has been returned)
-        assertNull(result);
+        // Verify that the parameters passed to the input stream factory are defining the correct pages.
+        ArgumentCaptor<DocumentInstanceInputProperties> inputProperties =
+            ArgumentCaptor.forClass(DocumentInstanceInputProperties.class);
+        verify(this.inputFilterStreamFactory).createInputFilterStream(inputProperties.capture());
+        assertTrue(inputProperties.getValue().getEntities().matches(wikiReference));
+        assertFalse(inputProperties.getValue().isWithJRCSRevisions());
 
-        // Verify that the parameters passed to the input stream factory are defining the correct pages
-        ArgumentCaptor<DocumentInstanceInputProperties> properties =
-                ArgumentCaptor.forClass(DocumentInstanceInputProperties.class);
-        verify(inputFilterStreamFactory).createInputFilterStream(properties.capture());
-
-        ArgumentCaptor<String> argument = ArgumentCaptor.forClass(String.class);
-        verify(queryManager).createQuery(argument.capture(), eq(Query.HQL));
-
-        assertEquals(where, argument.getValue());
-        assertFalse(properties.getValue().isVerbose());
-        assertFalse(properties.getValue().isWithJRCSRevisions());
-        assertFalse(properties.getValue().isWithRevisions());
-        assertTrue(properties.getValue().getEntities().matches(page3Ref));
-        assertFalse(properties.getValue().getEntities().matches(page1Ref));
-        assertFalse(properties.getValue().getEntities().matches(page2Ref));
+        ArgumentCaptor<XAROutputProperties> xarProperties = ArgumentCaptor.forClass(XAROutputProperties.class);
+        verify(this.xarFilterStreamFactory).createOutputFilterStream(xarProperties.capture());
+        assertEquals("backup", xarProperties.getValue().getPackageName());
     }
 }

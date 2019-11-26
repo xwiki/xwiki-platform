@@ -41,16 +41,15 @@
   #set($discard = $response.setContentType('application/json'))
   #set($wikiId = $request.wikiId)
   #set($status = $services.wiki.creationjob.getJobStatus($wikiId))
-  #set($errors = $status.log.getLogs('ERROR'))
+  #set($lastError = $status.logTail.getLastLogEvent('ERROR'))
   #set($hasErrorLog = false)
-  #if ($errors.size() &gt; 0)
+  #if ($lastError)
     #set($hasErrorLog = true)
   #end
   #set($errorMessage = "")
   #if ($status.error)
     ## The last error log is what actually stopped the job
-    #set($lastIndex = $errors.size() - 1)
-    #set($errorMessage = $errors[$lastIndex].getFormattedMessage())
+    #set($errorMessage = $lastError.getFormattedMessage())
   #end
   ## Log
   #template('logging_macros.vm')
@@ -59,7 +58,7 @@
   #set($olddoc = $doc)
   #set($doc = $xwiki.getDocument('XWiki.AddExtensions'))
   #set($loading = $status.state != 'FINISHED')
-  #set($logs = "#printLogs($status.log, $loading)")
+  #set($logs = "#printLogs($status.logTail, $loading)")
   #set($doc = $olddoc)
   #set($map = {'wikiId':$wikiId, 'progress':$status.progress.offset, 'status':$status.state, 'error':$errorMessage, 'hasErrorLog':$hasErrorLog, 'logs':$logs})
   $jsontool.serialize($map)

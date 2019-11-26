@@ -295,8 +295,10 @@ public class XarExtensionHandler extends AbstractExtensionHandler
                     configuration.isInteractive() ? GlobalAction.ASK : GlobalAction.MERGED);
 
                 // If user requested to be asked about conflict behavior
-                if (currentJob.getStatus().getRequest().isInteractive() && getXARExtensionPlan() != null
-                    && getXARExtensionPlan().containsNewPages()) {
+                XarExtensionPlan xarExtensionPlan = getXARExtensionPlan();
+                if (currentJob.getStatus().getRequest().isInteractive() && xarExtensionPlan != null
+                    && xarExtensionPlan.containsNewPages())
+                {
                     XWikiContext xcontext = xcontextProvider.get();
                     // Make sure the context has the right user
                     xcontext.setUserReference(userReference);

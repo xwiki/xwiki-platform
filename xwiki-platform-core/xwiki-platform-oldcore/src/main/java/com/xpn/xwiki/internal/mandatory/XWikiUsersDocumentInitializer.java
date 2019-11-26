@@ -45,6 +45,12 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
+     * Local reference of the XWikiUsers class document.
+     */
+    public static final LocalDocumentReference XWIKI_USERS_DOCUMENT_REFERENCE =
+        new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiUsers");
+
+    /**
      * The name of the field containing the user email.
      */
     private static final String EMAIL_FIELD = "email";
@@ -66,7 +72,7 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
      */
     public XWikiUsersDocumentInitializer()
     {
-        super(new LocalDocumentReference(XWiki.SYSTEM_SPACE, "XWikiUsers"));
+        super(XWIKI_USERS_DOCUMENT_REFERENCE);
     }
 
     @Override

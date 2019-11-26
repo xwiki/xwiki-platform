@@ -55,15 +55,11 @@ Mot 1 | Mot 2
 |Mot 1|Mot 2
 )))
 |Tableau paramétré|(((
-&lt;table style="background-color:
-
-red;align:center"&gt;
+&lt;table style="background-color: red;text-align:center"&gt;
   &lt;tbody&gt;
     &lt;tr&gt;
       &lt;td&gt;Titre 1&lt;/td&gt;
-      &lt;td style="background-color:
-
-yellow"&gt;Titre 2&lt;/td&gt;
+      &lt;td style="background-color: yellow"&gt;Titre 2&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;Mot 1&lt;/td&gt;
@@ -139,9 +135,7 @@ En syntaxe XWiki 2.0, il est également possible d'avoir des paramètres pour le
 |Mot 1|Mot 2
 )))
 |Tableau paramétré|(((
-{{{(% style="background-color:}}}
-
-red;align:center" %)
+(% style="background-color: red;text-align:center" %)
 ~|=Titre 1|=~(% style="background-color: yellow" %)Titre 2
 ~|Mot 1|Mot 2
 )))|(((

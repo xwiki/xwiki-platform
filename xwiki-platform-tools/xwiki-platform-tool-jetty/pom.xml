@@ -25,15 +25,12 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tools</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tool-jetty</artifactId>
   <name>XWiki Platform - Tools - Jetty - Parent POM</name>
   <packaging>pom</packaging>
   <description>Tools for packaging a Jetty installation</description>
-  <properties>
-    <jetty.version>9.4.8.v20171121</jetty.version>
-  </properties>
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-tool-jetty-listener</module>

@@ -26,7 +26,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * Page Object for Comments Tab.
+ * Page Object for Comments Tab (or pane)
  *
  * @version $Id$
  * @since 3.2M3
@@ -42,6 +42,11 @@ public class CommentsTab extends BaseElement
     private ConfirmationModal confirmDelete;
 
     private List<WebElement> commentsList;
+
+    public boolean isOpened()
+    {
+        return getDriver().findElementWithoutWaiting(By.id("commentscontent")).isDisplayed();
+    }
 
     public String getCurrentAuthor()
     {

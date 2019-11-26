@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -80,6 +81,22 @@ public interface XWikiGroupService
      */
     void removeUserOrGroupFromAllGroups(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
         XWikiContext context) throws XWikiException;
+
+    /**
+     * Replace a given member reference by another one in all groups of the wiki.
+     *
+     * @param memberSource the reference of the member that should be replaced
+     * @param memberTarget the reference of the member that is used as replacement
+     * @param context the current context
+     * @throws XWikiException in case of problem when doing the replacement
+     * @since 11.9RC1
+     */
+    @Unstable
+    default void replaceMemberInAllGroups(DocumentReference memberSource, DocumentReference memberTarget,
+        XWikiContext context) throws XWikiException
+    {
+        // void implementation to avoid breaking compatibility.
+    }
 
     /**
      * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.

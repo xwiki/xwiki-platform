@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.objects;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,7 +31,12 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.RegexEntityReference;
+import org.xwiki.stability.Unstable;
 
+import com.xpn.xwiki.internal.event.XObjectAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectEvent;
+import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -155,6 +162,18 @@ public class BaseObjectReference extends ObjectReference
     {
         return new RegexEntityReference(Pattern.compile("([^:]*:)?" + Pattern.quote(classReference) + "\\[\\d*\\]"),
             EntityType.OBJECT, parent);
+    }
+
+    /**
+     * @param classReference the local reference of the class (e.g. "XWiki.XWikiPreferences")
+     * @return all {@link XObjectEvent} to listen to be notified or any modification on a xobject
+     * @since 11.8RC1
+     */
+    @Unstable
+    public static List<XObjectEvent> anyEvents(String classReference)
+    {
+        return Arrays.asList(new XObjectAddedEvent(any(classReference)), new XObjectUpdatedEvent(any(classReference)),
+            new XObjectDeletedEvent(any(classReference)));
     }
 
     private DocumentReference resolveClassReference(EntityReference classReference)

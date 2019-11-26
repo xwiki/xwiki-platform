@@ -25,7 +25,7 @@
   <parent>
     <artifactId>xwiki-platform-search</artifactId>
     <groupId>org.xwiki.platform</groupId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-search-solr</artifactId>
   <packaging>pom</packaging>
@@ -53,20 +53,12 @@
         <artifactId>solr-core</artifactId>
         <version>${solr.version}</version>
         <exclusions>
-          <!-- We use slf4j in XWiki -->
+          <!-- We want a different version of Woodstox and the id changed -->
           <exclusion>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>*</artifactId>
+            <groupId>org.codehaus.woodstox</groupId>
+            <artifactId>woodstox-core-asl</artifactId>
           </exclusion>
           <!-- Exclude the dependencies which are only need by Solr when running as a standalone application -->
-          <exclusion>
-            <groupId>org.restlet.jee</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
           <exclusion>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -83,10 +75,18 @@
             <groupId>io.dropwizard.metrics</groupId>
             <artifactId>metrics-jvm</artifactId>
           </exclusion>
-          <!-- We want a different version of Woodstox and the id changed -->
           <exclusion>
-            <groupId>org.codehaus.woodstox</groupId>
-            <artifactId>woodstox-core-asl</artifactId>
+            <groupId>org.restlet.jee</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+          <!-- We use slf4j in XWiki -->
+          <exclusion>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>*</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

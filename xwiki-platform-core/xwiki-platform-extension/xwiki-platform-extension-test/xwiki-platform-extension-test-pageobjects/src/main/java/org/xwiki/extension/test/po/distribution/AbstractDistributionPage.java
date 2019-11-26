@@ -45,7 +45,7 @@ public class AbstractDistributionPage extends BaseElement
     {
         List<WebElement> listItems = getDriver().findElementsWithoutWaiting(this.icons, By.tagName("li"));
 
-        List<DistributionStepIcon> result = new ArrayList<DistributionStepIcon>(listItems.size());
+        List<DistributionStepIcon> result = new ArrayList<>(listItems.size());
 
         for (WebElement listItem : listItems) {
             result.add(new DistributionStepIcon(listItem));

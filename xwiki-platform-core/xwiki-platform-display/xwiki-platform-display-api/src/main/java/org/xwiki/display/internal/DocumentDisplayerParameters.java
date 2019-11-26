@@ -76,6 +76,8 @@ public class DocumentDisplayerParameters implements Cloneable
      */
     private Syntax targetSyntax;
 
+    private boolean asyncAllowed = true;
+
     /**
      * @return the id of the document section to display
      */
@@ -164,7 +166,7 @@ public class DocumentDisplayerParameters implements Cloneable
      * Set the flag indicating whether the transformation context should be restricted or not.
      *
      * @param transformationContextRestricted {@code true} to indicate that potentially harmful transformations should
-     * not be executed.
+     *            not be executed.
      */
     public void setTransformationContextRestricted(boolean transformationContextRestricted)
     {
@@ -224,6 +226,24 @@ public class DocumentDisplayerParameters implements Cloneable
     public void setTargetSyntax(Syntax targetSyntax)
     {
         this.targetSyntax = targetSyntax;
+    }
+
+    /**
+     * @return false if the document should be always executed synchronously
+     * @since 11.8RC1
+     */
+    public boolean isAsyncAllowed()
+    {
+        return this.asyncAllowed;
+    }
+
+    /**
+     * @param asyncAllowed false if the document should be always executed synchronously
+     * @since 11.8RC1
+     */
+    public void setAsyncAllowed(boolean asyncAllowed)
+    {
+        this.asyncAllowed = asyncAllowed;
     }
 
     @Override

@@ -38,6 +38,8 @@ import com.xpn.xwiki.objects.classes.TimezoneClass;
 @Singleton
 public class TimezoneMetaClass extends StringMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Initializes meta properties.
      */

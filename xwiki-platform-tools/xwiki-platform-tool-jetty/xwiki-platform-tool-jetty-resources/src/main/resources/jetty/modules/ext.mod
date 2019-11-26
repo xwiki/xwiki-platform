@@ -18,9 +18,14 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-#
-# Module to add all lib/ext/**.jar files to classpath
-#
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+
+[description]
+Adds all jar files discovered in $JETTY_HOME/lib/ext
+and $JETTY_BASE/lib/ext to the servers classpath.
+
+[tags]
+classpath
 
 [lib]
 lib/ext/**.jar

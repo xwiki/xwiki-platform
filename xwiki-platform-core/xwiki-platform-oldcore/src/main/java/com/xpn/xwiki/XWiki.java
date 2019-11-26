@@ -84,6 +84,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.apache.http.protocol.HTTP;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -2092,7 +2093,6 @@ public class XWiki implements EventListener
      * @throws XWikiException
      * @since 10.6RC1
      */
-    @Unstable
     public XWikiDocument getDocument(String reference, EntityType type, XWikiContext xcontext) throws XWikiException
     {
         return getDocument(getRelativeEntityReferenceResolver().resolve(reference, type), xcontext);
@@ -2186,7 +2186,6 @@ public class XWiki implements EventListener
      * @param context see {@link XWikiContext}
      * @since 10.6RC1
      */
-    @Unstable
     public XWikiDocument getDocument(PageReference reference, XWikiContext context) throws XWikiException
     {
         DocumentReference documentReference = getCurrentReferenceDocumentReferenceResolver().resolve(reference);
@@ -2215,7 +2214,6 @@ public class XWiki implements EventListener
      * @return the document reference
      * @since 10.6RC1
      */
-    @Unstable
     public DocumentReference getDocumentReference(EntityReference reference, XWikiContext context)
     {
         DocumentReference documentReference = getCurrentGetDocumentResolver().resolve(reference);
@@ -3272,7 +3270,7 @@ public class XWiki implements EventListener
         // Get context language
         String contextLanguage = context.getLanguage();
         // If the language exists in the context, it was previously set by another call
-        if (contextLanguage != null && contextLanguage != "") {
+        if (!StringUtils.isEmpty(contextLanguage)) {
             return contextLanguage;
         }
 
@@ -3438,7 +3436,7 @@ public class XWiki implements EventListener
             }
         }
         // Next we get the language from the context
-        if (contextLanguage != null && contextLanguage != "") {
+        if (!StringUtils.isEmpty(contextLanguage)) {
             language = contextLanguage;
         }
         // Next we get the language from the cookie
@@ -3879,7 +3877,7 @@ public class XWiki implements EventListener
                 }
             }
 
-            if ((!password.equals(password2)) || (password.trim().equals(""))) {
+            if ((!password.equals(password2))) {
                 // TODO: throw wrong password exception
                 return -2;
             }
@@ -4985,9 +4983,9 @@ public class XWiki implements EventListener
 
     public URL getServerURL(String wikiId, XWikiContext xcontext) throws MalformedURLException
     {
-        // In virtual wiki path mode the server is the standard one
-        if ("1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
-            return null;
+        // In path based the base URL is the same for all wikis
+        if (!xcontext.isMainWiki(wikiId) && isPathBased()) {
+            return getServerURL(xcontext.getMainXWiki(), xcontext);
         }
 
         // If main wiki check the main wiki home page configuration
@@ -5013,10 +5011,10 @@ public class XWiki implements EventListener
                         int port = getWikiPort(wikiDescriptor, xcontext);
 
                         if (protocol == null && port == -1) {
-                            // If request is a "real" one keep using the same protocol (if asking for the same wiki)
+                            // If request is a "real" one keep using the same protocol/port (if asking for the same wiki)
                             XWikiRequest request = xcontext.getRequest();
-                            if (wikiDescriptor.getId().equals(xcontext.getOriginalWikiId())
-                                && !(request.getHttpServletRequest() instanceof XWikiServletRequestStub)) {
+                            if (request != null && wikiDescriptor.getId().equals(xcontext.getOriginalWikiId())
+                                && !isDaemon(request)) {
                                 URL sourceURL = HttpServletUtils.getSourceBaseURL(xcontext.getRequest());
 
                                 protocol = sourceURL.getProtocol();
@@ -5027,7 +5025,8 @@ public class XWiki implements EventListener
                             }
                         }
 
-                        return new URL(protocol, server, port, "");
+                        return new URL(protocol != null ? protocol : (port == 443 ? "https" : "http"), server, port,
+                            "");
                     }
                 }
             } catch (WikiManagerException e) {
@@ -5036,6 +5035,12 @@ public class XWiki implements EventListener
         }
 
         return null;
+    }
+
+    private boolean isDaemon(XWikiRequest request)
+    {
+        return request.getHttpServletRequest() instanceof XWikiServletRequestStub
+            && ((XWikiServletRequestStub) request).isDaemon();
     }
 
     private String getWikiProtocol(WikiDescriptor wikiDescriptor)
@@ -5091,7 +5096,7 @@ public class XWiki implements EventListener
     public String getServletPath(String wikiName, XWikiContext context)
     {
         // unless we are in virtual wiki path mode we should return null
-        if (!context.isMainWiki(wikiName) && "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"))) {
+        if (!context.isMainWiki(wikiName) && isPathBased()) {
             try {
                 WikiDescriptor wikiDescriptor = getWikiDescriptorManager().getById(wikiName);
                 if (wikiDescriptor != null) {
@@ -7809,5 +7814,14 @@ public class XWiki implements EventListener
     public long ParamAsLong(String key, long default_value)
     {
         return getConfiguration().getProperty(key, default_value);
+    }
+
+    /**
+     * @return true if the wiki is in path based mode, fale otherwise
+     * @since 11.9RC1
+     */
+    public boolean isPathBased()
+    {
+        return "1".equals(getConfiguration().getProperty("xwiki.virtual.usepath", "1"));
     }
 }

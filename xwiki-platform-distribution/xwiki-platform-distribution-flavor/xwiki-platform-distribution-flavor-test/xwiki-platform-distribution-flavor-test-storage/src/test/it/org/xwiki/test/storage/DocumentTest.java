@@ -107,7 +107,7 @@ public class DocumentTest extends AbstractTest
                 new HashMap<String, String>() {{
                     put("content", content);
                 }});
-        // save forwards the user to view, if it's too big, jetty gives you a 500
+        // save forwards the user to view, if it's too big, jetty gives you some error response code (400+)
         Assert.assertEquals(302, ret.getStatusCode());
     }
 

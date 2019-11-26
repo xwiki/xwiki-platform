@@ -1,0 +1,30 @@
+##!source.syntax=xwiki/2.1
+{{velocity}}
+  #foreach($topExtensionId in $topExtensionIds)
+    #set ($installedExtension = $services.extension.installed.getInstalledExtension($topExtensionId))
+    #if ($installedExtension.isInstalled($NULL))
+      #set($void = $services.extension.installed.repository.installExtension($topExtensionId, $NULL, false))
+    #else
+      #set($void = $services.extension.installed.repository.installExtension($topExtensionId, $currentNamespace, false))
+    #end
+  #end
+{{/velocity}}
+
+{{velocity}}
+#createUninstallJobRequest($uninstalledExtensions $uninstallRequest)
+#set($uninstallJob = $services.job.getJob($uninstallRequest.id))
+#if (!$uninstallJob)
+  #set ($uninstallJob = $extensionManager.uninstall($uninstallRequest))
+#end
+{{html clean="false"}}
+  <form action="" method="get">
+    #displayJobStatus($uninstallJob.status, 'extension.clean.uninstall.status')
+
+    #formHiddenCleanApply()
+
+    <span class="buttonwrapper">
+      <button class="button" type="submit" name="cleanapplyreport" #if($uninstallJob.status.state.name() != 'FINISHED')disabled="disabled"#end>$services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.cleanapplyreport')</button>
+    </span>
+  </form>
+{{/html}}
+{{/velocity}}

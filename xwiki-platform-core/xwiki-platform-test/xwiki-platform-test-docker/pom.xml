@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-test</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-test-docker</artifactId>
   <name>XWiki Platform - Test - Docker UI Test Framework</name>
@@ -34,33 +34,9 @@
   <properties>
     <xwiki.jacoco.instructionRatio>0.19</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>27</xwiki.pitest.mutationThreshold>
-    <testcontainers.version>1.12.0</testcontainers.version>
-
-    <!-- Force a version of Selenium more recent than the one coming from xwiki-platform-test-ui -->
-    <!-- FIXME: upgrade it in xwiki-platform-test-ui to avoid this hack -->
-    <selenium.version>3.141.59</selenium.version>
+    <testcontainers.version>1.12.3</testcontainers.version>
   </properties>
   <dependencies>
-    <!-- Force a version of Selenium more recent than the one coming from xwiki-platform-test-ui -->
-    <!-- FIXME: upgrade it in xwiki-platform-test-ui to avoid this hack -->
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>${selenium.version}</version>
-      <exclusions>
-        <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-        <!-- It has a dependency on testng which we need to exclude to prevent
-             Maven Surefire plugin to think we're executing TestNG tests. -->
-        <exclusion>
-          <groupId>org.testng</groupId>
-          <artifactId>testng</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-test-ui</artifactId>

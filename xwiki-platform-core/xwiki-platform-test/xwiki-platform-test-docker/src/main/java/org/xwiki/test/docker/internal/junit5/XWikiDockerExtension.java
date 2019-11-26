@@ -157,6 +157,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             LOGGER.info("(*) Provision extensions for test...");
             provisionExtensions(artifactResolver, mavenResolver, extensionContext);
         } else {
+            // Set the IP/port for the container since startServletEngine() wasn't called and it's set there normally.
+            testConfiguration.getServletEngine().setIP("localhost");
+            testConfiguration.getServletEngine().setPort(8080);
+            setXWikiURL(testConfiguration, extensionContext);
+
             LOGGER.info("XWiki is already started, using running instance at [{}] to execute the tests...",
                 loadXWikiURL(extensionContext));
 
@@ -169,7 +174,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     @Override
-    public void beforeEach(ExtensionContext extensionContext)
+    public void beforeEach(ExtensionContext extensionContext) throws Exception
     {
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
@@ -218,6 +223,13 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         if (!isLocal()) {
             saveScreenshotAndVideo(extensionContext);
         }
+
+        // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
+        String agentName = System.getProperty("jenkinsAgentName");
+        if (agentName != null) {
+            LOGGER.info("Jenkins Agent: [{}]", agentName);
+        }
+
         throw throwable;
     }
 
@@ -306,7 +318,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     private BrowserWebDriverContainer startBrowser(TestConfiguration testConfiguration,
-        ExtensionContext extensionContext)
+        ExtensionContext extensionContext) throws Exception
     {
         BrowserContainerExecutor browserContainerExecutor = new BrowserContainerExecutor(testConfiguration);
         BrowserWebDriverContainer webDriverContainer = browserContainerExecutor.start();
@@ -344,7 +356,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         return webDriverContainer;
     }
 
-    private void startDatabase(TestConfiguration testConfiguration)
+    private void startDatabase(TestConfiguration testConfiguration) throws Exception
     {
         DatabaseContainerExecutor executor = new DatabaseContainerExecutor();
         executor.start(testConfiguration);
@@ -365,6 +377,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         saveServletContainerExecutor(extensionContext, executor);
         executor.start(sourceWARDirectory);
 
+        setXWikiURL(testConfiguration, extensionContext);
+    }
+
+    private void setXWikiURL(TestConfiguration testConfiguration, ExtensionContext extensionContext)
+    {
         // URL to access XWiki from the host.
         String xwikiURL = computeXWikiURLPrefix(testConfiguration.getServletEngine().getIP(),
             testConfiguration.getServletEngine().getPort());

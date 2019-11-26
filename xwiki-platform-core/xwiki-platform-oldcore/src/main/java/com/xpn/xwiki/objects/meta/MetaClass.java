@@ -43,6 +43,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class MetaClass extends BaseClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * The prefix prepended to the property name when setting or retrieving a property meta class.
      */

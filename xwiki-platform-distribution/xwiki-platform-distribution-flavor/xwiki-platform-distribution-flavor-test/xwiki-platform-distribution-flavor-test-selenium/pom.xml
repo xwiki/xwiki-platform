@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-distribution-flavor-test</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-distribution-flavor-test-selenium</artifactId>
   <name>XWiki Platform - Distribution - Flavor - Functional Tests - Selenium</name>
@@ -36,6 +36,17 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-administration-test-pageobjects</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-leg-rc</artifactId>
+      <version>3.141.59</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.servlet</groupId>
+          <artifactId>javax.servlet-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>

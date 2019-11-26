@@ -21,6 +21,9 @@ package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +44,8 @@ import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.dockerjava.api.command.LogContainerCmd;
+import com.github.dockerjava.api.command.PullImageCmd;
+import com.github.dockerjava.core.command.PullImageResultCallback;
 
 import ch.qos.logback.classic.Level;
 
@@ -64,6 +69,8 @@ public final class DockerTestUtils
     private static final char DASH = '-';
 
     private static final Pattern REPETITION_PATTERN = Pattern.compile("\\[test-template-invocation:#(.*)\\]");
+
+    private static List<String> pulledImages = new ArrayList<>();
 
     private DockerTestUtils()
     {
@@ -112,8 +119,24 @@ public final class DockerTestUtils
         try {
             org.codehaus.plexus.util.FileUtils.copyFileToDirectoryIfModified(source, targetDirectory);
         } catch (IOException e) {
-            throw new Exception(String.format("Failed to copy file [%] to [%]", source, targetDirectory),
+            throw new Exception(String.format("Failed to copy file [%s] to [%s]", source, targetDirectory),
                 e);
+        }
+    }
+
+    /**
+     * @param sourceDirectory the directory to copy
+     * @param targetDirectory the directory into which to copy the files
+     * @throws Exception when an error occurs during the copy
+     */
+    public static void copyDirectory(File sourceDirectory, File targetDirectory) throws Exception
+    {
+        createDirectory(targetDirectory);
+        try {
+            org.codehaus.plexus.util.FileUtils.copyDirectoryStructureIfModified(sourceDirectory, targetDirectory);
+        } catch (IOException e) {
+            throw new Exception(
+                String.format("Failed to copy directory [%s] to [%s]", sourceDirectory, targetDirectory), e);
         }
     }
 
@@ -171,12 +194,27 @@ public final class DockerTestUtils
      * @param container the container to start
      * @param testConfiguration the configuration to build (database, debug mode, etc). Used to verify if we're online
      *        to pull the image
+     * @throws Exception if the container fails to start
      */
-    public static void startContainer(GenericContainer container, TestConfiguration testConfiguration)
+    public static void startContainer(GenericContainer container, TestConfiguration testConfiguration) throws Exception
     {
         // Get the latest image in case the tag has been updated on dockerhub.
-        if (!testConfiguration.isOffline()) {
-            container.getDockerClient().pullImageCmd(container.getDockerImageName());
+        String dockerImageName = container.getDockerImageName();
+
+        // Don't pull if:
+        // - we're offline
+        // - we've already pulled this image in this test run
+        // - the container corresponds to an image that's been dynamically built by the test and thus that doesn't
+        //   exists on dockerhub.
+        if (!testConfiguration.isOffline() && !pulledImages.contains(dockerImageName)
+            && !(container instanceof XWikiLocalGenericContainer))
+        {
+            LOGGER.info("Pulling image [{}]", dockerImageName);
+            PullImageCmd command = container.getDockerClient().pullImageCmd(dockerImageName);
+            PullImageResultCallback response = new PullImageResultCallback();
+            response = command.exec(response);
+            response.awaitCompletion();
+            pulledImages.add(dockerImageName);
         }
 
         container.start();
@@ -284,4 +322,22 @@ public final class DockerTestUtils
         }
         return repetitionIndex;
     }
+
+    /**
+     * @return the current host name
+     * @since 11.9RC1
+     */
+    public static String getHostName()
+    {
+        String hostname;
+        try {
+            InetAddress ip = InetAddress.getLocalHost();
+            hostname = ip.getHostName();
+        } catch (Exception e) {
+            LOGGER.warn("Failed to get hostname", e);
+            hostname = "Unknown";
+        }
+        return hostname;
+    }
+
 }

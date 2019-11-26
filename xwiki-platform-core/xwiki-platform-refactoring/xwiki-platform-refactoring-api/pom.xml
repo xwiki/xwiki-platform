@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-refactoring</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-refactoring-api</artifactId>
   <name>XWiki Platform - Refactoring - API</name>
@@ -83,6 +83,11 @@
       <artifactId>xwiki-commons-tool-test-component</artifactId>
       <version>${commons.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-observation-remote</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>

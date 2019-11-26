@@ -582,11 +582,11 @@
         &lt;/div&gt;
       &lt;/div&gt;
       #end
-      #set($errorlogs = $status.log.getLogs('ERROR'))
+      #set($hasErrors = $status.logTail.hasLogLevel('ERROR'))
       &lt;p class="successmessage box #if($status.error || $state != 'FINISHED')hidden#end" id="successMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.complete', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
-      &lt;p class="warningmessage box #if($errorlogs.isEmpty() || $state != 'FINISHED')hidden#end" id="errorlogMessage"&gt;
+      &lt;p class="warningmessage box #if(!$hasErrors || $state != 'FINISHED')hidden#end" id="errorlogMessage"&gt;
         $services.localization.render('platform.wiki.create.wizard.step.creation.errorlog', ["&lt;strong&gt;$escapetool.xml($request.wikiname)&lt;/strong&gt;"])
       &lt;/p&gt;
       &lt;p class="errormessage box #if(!$status.error || $state != 'FINISHED')hidden#end" id="errorMessage"&gt;
@@ -601,7 +601,7 @@
     #set($doc = $xwiki.getDocument('XWiki.AddExtensions'))
     #set($loading = $status.state != 'FINISHED')
     &lt;div id="creation-log"&gt;
-      #printLogs($status.log, $loading)
+      #printLogs($status.logTail, $loading)
     &lt;/div&gt;
     #set($doc = $olddoc)
     #if($status.state == 'FINISHED')
@@ -610,7 +610,7 @@
         #set($cleanUpHidden = false)
       #else
         #set($finalizeHidden = false)
-        #set($cleanUpHidden = $errorlogs.isEmpty())
+        #set($cleanUpHidden = !$hasErrors)
       #end
     #else
       #set($finalizeHidden = true)

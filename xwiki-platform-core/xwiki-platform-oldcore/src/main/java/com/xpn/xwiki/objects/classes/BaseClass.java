@@ -65,6 +65,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    private static final long serialVersionUID = 1L;
+
     private String customMapping;
 
     private String customClass;

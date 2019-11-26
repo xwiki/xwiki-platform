@@ -403,6 +403,10 @@
   margin-top: -1.2em;
 }
 
+.annotationTools .reply {
+  padding: 1px 3px;
+}
+
 .annotationComment {
   padding: 4px 0;
 }

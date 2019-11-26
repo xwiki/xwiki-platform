@@ -35,9 +35,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.container.Container;
 import org.xwiki.container.servlet.HttpServletUtils;
-import org.xwiki.container.servlet.ServletRequest;
 import org.xwiki.context.internal.concurrent.AbstractContextStore;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.wiki.descriptor.WikiDescriptor;
@@ -50,9 +48,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiServletRequestStub;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Save and restore well known {@link XWikiContext} entries.
@@ -194,10 +189,10 @@ public class XWikiContextContextStore extends AbstractContextStore
     private Provider<XWikiContext> readProvider;
 
     @Inject
-    private Container container;
+    private WikiDescriptorManager wikis;
 
     @Inject
-    private WikiDescriptorManager wikis;
+    private RequestInitializer requestInitializer;
 
     @Inject
     private Logger logger;
@@ -353,7 +348,7 @@ public class XWikiContextContextStore extends AbstractContextStore
         restoreAuthor(contextStore, xcontext);
 
         // Request
-        restoreRequest(storedWikiId, contextStore, xcontext);
+        this.requestInitializer.restoreRequest(storedWikiId, contextStore, xcontext);
     }
 
     private void restoreAuthor(Map<String, Serializable> contextStore, XWikiContext xcontext)
@@ -460,94 +455,4 @@ public class XWikiContextContextStore extends AbstractContextStore
         xcontext.setDoc(document);
     }
 
-    private URL restoreURL(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
-    {
-        // Find and set the wiki corresponding to the request
-        String requestWiki = (String) contextStore.get(PROP_REQUEST_WIKI);
-        if (requestWiki == null) {
-            requestWiki = storedWikiId;
-        } else {
-            xcontext.setOriginalWikiId(requestWiki);
-        }
-
-        // Find the URL to put in the context request
-        URL url = (URL) contextStore.get(PROP_REQUEST_URL);
-        if (url == null) {
-            url = (URL) contextStore.get(PROP_REQUEST_BASE);
-        }
-
-        // Try to deduce missing URL from the request wiki (if provided)
-        if (url == null && requestWiki != null) {
-            try {
-                url = xcontext.getWiki().getServerURL(requestWiki, xcontext);
-            } catch (MalformedURLException e) {
-                this.logger.warn("Failed to get the URL for stored context wiki [{}]", requestWiki);
-            }
-
-            // Assume we always want to behave as a HTTP request when the wiki request is provided
-            if (url == null) {
-                url = HttpServletUtils.getSourceURL(xcontext.getRequest());
-            }
-        }
-
-        return url;
-    }
-
-    private void restoreRequest(String storedWikiId, Map<String, Serializable> contextStore, XWikiContext xcontext)
-    {
-        URL url = restoreURL(storedWikiId, contextStore, xcontext);
-
-        Map<String, String[]> parameters = (Map<String, String[]>) contextStore.get(PROP_REQUEST_PARAMETERS);
-
-        boolean daemon;
-
-        String contextPath = null;
-
-        // Fallback on the first request URL
-        if (url == null) {
-            XWikiRequest request = xcontext.getRequest();
-
-            if (request != null) {
-                url = HttpServletUtils.getSourceURL(request);
-
-                contextPath = request.getContextPath();
-
-                if (parameters == null) {
-                    parameters = request.getParameterMap();
-                }
-            }
-
-            // We don't want to take into account the context request URL when generating URLs
-            daemon = true;
-        } else {
-            // Find the request context path
-            contextPath = (String) contextStore.get(PROP_REQUEST_CONTEXTPATH);
-
-            // We want to take into account the context request URL when generating URLs
-            daemon = false;
-        }
-
-        // Set the context request
-        if (url != null) {
-            restoreRequest(url, contextPath, parameters, daemon, xcontext);
-        }
-    }
-
-    private void restoreRequest(URL url, String contextPath, Map<String, String[]> parameters, boolean daemon,
-        XWikiContext xcontext)
-    {
-        XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(url, contextPath, parameters);
-        xcontext.setRequest(stubRequest);
-        // Indicate that the URL should be taken into account when generating a URL
-        stubRequest.setDaemon(daemon);
-        this.container.setRequest(new ServletRequest(stubRequest));
-
-        // Update to create the URL factory
-        XWikiURLFactory urlFactory = xcontext.getURLFactory();
-        if (urlFactory == null) {
-            urlFactory = new XWikiServletURLFactory();
-            xcontext.setURLFactory(urlFactory);
-        }
-        urlFactory.init(xcontext);
-    }
 }

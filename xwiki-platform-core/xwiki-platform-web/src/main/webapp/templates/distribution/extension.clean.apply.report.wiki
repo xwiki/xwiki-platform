@@ -1,0 +1,32 @@
+##!source.syntax=xwiki/2.1
+{{velocity}}
+#if (!$uninstalledExtensionIds.isEmpty())
+  {{box}}
+    {{translation key="platform.extension.distributionWizard.extension.cleanStep.report.uninstalled"/}}
+
+    #foreach ($uninstalledExtensionId in $uninstalledExtensionIds)
+
+      {{html}}
+        #displayExtension($services.extension.local.repository.getLocalExtension($uninstalledExtensionId), true)
+      {{/html}}
+    #end
+  {{/box}}
+#end
+
+#if (!$topExtensionIds.isEmpty())
+  {{box}}
+    {{translation key="platform.extension.distributionWizard.extension.cleanStep.report.top"/}}
+
+    #foreach ($topExtensionId in $topExtensionIds)
+
+      {{html}}
+        #displayExtension($services.extension.installed.repository.getInstalledExtension($topExtensionId), true)
+      {{/html}}
+    #end
+  {{/box}}
+#end
+{{/velocity}}
+
+{{velocity output="false"}}
+#set ($showCompleteStepButton = true)
+{{/velocity}}

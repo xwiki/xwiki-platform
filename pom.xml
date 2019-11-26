@@ -23,7 +23,7 @@
   <parent>
     <groupId>org.xwiki.commons</groupId>
     <artifactId>xwiki-commons-pom</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
     <!-- Note: Do NOT set the <relativePath> tag here as this can cause issues. For example imagine you're using
          Jenkins and you have the following directory structure:
              workspace/xwiki-commons
@@ -41,7 +41,7 @@
   <artifactId>xwiki-platform</artifactId>
   <name>XWiki Platform - Parent POM</name>
   <packaging>pom</packaging>
-  <version>11.8-SNAPSHOT</version>
+  <version>12.0-SNAPSHOT</version>
   <description>XWiki Platform - Parent POM</description>
   <properties>
     <!-- Useful for external Maven projects that extend the Platform POM. Must not be used by Platform project! -->
@@ -52,13 +52,16 @@
     <hsqldb.version>2.5.0</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.37</ckeditor.version>
+    <ckeditor.version>1.38</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
-    <batik.version>1.11</batik.version>
+    <batik.version>1.12</batik.version>
     <restlet.version>2.3.12</restlet.version>
-    <tika.version>1.21</tika.version>
-    <pdfbox.version>2.0.16</pdfbox.version>
+    <tika.version>1.22</tika.version>
+    <pdfbox.version>2.0.17</pdfbox.version>
     <keypress.version>2.1.5</keypress.version>
+
+    <!-- Jetty version -->
+    <jetty.version>9.4.22.v20191022</jetty.version>
 
     <!-- By default check that unit tests don't output anything to the console -->
     <xwiki.surefire.captureconsole.skip>false</xwiki.surefire.captureconsole.skip>
@@ -79,6 +82,9 @@
 
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
 
+    <!-- Hibernate -->
+    <hibernate.version>5.4.9.Final</hibernate.version>
+
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
     <hsqldb.artifactId>hsqldb</hsqldb.artifactId>
@@ -90,7 +96,7 @@
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
-    <pgsql.version>42.2.6</pgsql.version>
+    <pgsql.version>42.2.8</pgsql.version>
     <oracle.version>12.2.0.1</oracle.version>
     <mariadb.version>2.3.0</mariadb.version>
   </properties>
@@ -115,12 +121,33 @@
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>mchange-commons-java</artifactId>
-        <version>0.2.16</version>
+        <version>0.2.19</version>
       </dependency>
       <dependency>
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
         <version>0.9.5.4</version>
+      </dependency>
+      <!-- Hibernate -->
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>${hibernate.version}</version>
+        <exclusions>
+          <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
+          <exclusion>
+            <groupId>org.jboss.spec.javax.transaction</groupId>
+            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.activation</groupId>
+            <artifactId>javax.activation-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <!-- Jython engine -->
       <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->
@@ -194,12 +221,12 @@
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome</artifactId>
-        <version>1.12.1</version>
+        <version>1.12.2</version>
       </dependency>
       <dependency>
         <groupId>com.rometools</groupId>
         <artifactId>rome-utils</artifactId>
-        <version>1.12.1</version>
+        <version>1.12.2</version>
       </dependency>
       <dependency>
         <!-- Replace the runtime transitive dependency we excluded above with this one which repackages the NekoHTML classes to prevent conflicts. -->
@@ -253,7 +280,7 @@
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>2.10.3</version>
+        <version>2.10.5</version>
       </dependency>
       <!-- Common WebJars -->
       <dependency>
@@ -347,13 +374,13 @@
       <dependency>
         <groupId>net.java.dev.jna</groupId>
         <artifactId>jna</artifactId>
-        <version>5.4.0</version>
+        <version>5.5.0</version>
       </dependency>
 
       <dependency>
         <groupId>org.quartz-scheduler</groupId>
         <artifactId>quartz</artifactId>
-        <version>2.3.1</version>
+        <version>2.3.2</version>
       </dependency>
 
       <dependency>
@@ -398,7 +425,7 @@
       <dependency>
         <groupId>org.apache.xmlgraphics</groupId>
         <artifactId>xmlgraphics-commons</artifactId>
-        <version>2.3</version>
+        <version>2.4</version>
         <exclusions>
           <!-- We want to choose the SLF4J binding only when XWiki is packaged. -->
           <exclusion>
@@ -418,24 +445,24 @@
       <dependency>
         <groupId>com.github.jsqlparser</groupId>
         <artifactId>jsqlparser</artifactId>
-        <version>3.0</version>
+        <version>3.1</version>
       </dependency>
 
       <!-- JNR -->
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jffi</artifactId>
-        <version>1.2.20</version>
+        <version>1.2.22</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-constants</artifactId>
-        <version>0.9.12</version>
+        <version>0.9.14</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-ffi</artifactId>
-        <version>2.1.10</version>
+        <version>2.1.11</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -445,7 +472,7 @@
       <dependency>
         <groupId>com.github.jnr</groupId>
         <artifactId>jnr-posix</artifactId>
-        <version>3.0.50</version>
+        <version>3.0.51</version>
       </dependency>
       <dependency>
         <groupId>com.github.jnr</groupId>
@@ -556,14 +583,14 @@
       <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
-        <version>3.9.1</version>
+        <version>3.10.0</version>
       </dependency>
 
       <!-- Mails -->
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail</artifactId>
-        <version>1.5.10</version>
+        <version>1.5.11</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -571,6 +598,64 @@
             <artifactId>javax.mail</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <!-- Make sure to use a version of the Jetty client libraries matching the Jetty version we package -->
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-alpn-client</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-alpn-java-client</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-client</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-http</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-io</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-util</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.http2</groupId>
+        <artifactId>http2-client</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.http2</groupId>
+        <artifactId>http2-common</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.http2</groupId>
+        <artifactId>http2-hpack</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.jetty.http2</groupId>
+        <artifactId>http2-http-client-transport</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+      <!-- Same for for some reusable Jetty server libraries -->
+      <dependency>
+        <groupId>org.eclipse.jetty.http2</groupId>
+        <artifactId>jetty-websocket</artifactId>
+        <version>${jetty.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -619,12 +704,6 @@
                 <value>${xwiki.surefire.captureconsole.skip}</value>
               </property>
             </systemProperties>
-            <properties>
-              <property>
-                <name>listener</name>
-                <value>org.xwiki.test.CaptureConsoleRunListener</value>
-              </property>
-            </properties>
           </configuration>
           <dependencies>
             <dependency>
@@ -911,6 +990,60 @@
           </plugins>
         </pluginManagement>
       </build>
+    </profile>
+    <profile>
+      <!-- To be executed when building snapshots. This allows to not have to have a special settings.xml file
+           when building snapshots while not incurring the downside of specifying a maven remote repo for releases,
+           see https://blog.sonatype.com/2009/02/why-putting-repositories-in-your-poms-is-a-bad-idea/ -->
+      <id>snapshot</id>
+      <pluginRepositories>
+        <pluginRepository>
+          <id>xwiki-snapshots</id>
+          <name>XWiki Nexus Plugin Snapshot Repository Proxy</name>
+          <url>http://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+          <id>xwiki-releases</id>
+          <name>XWiki Nexus Plugin Releases Repository Proxy</name>
+          <url>http://nexus.xwiki.org/nexus/content/groups/public</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </pluginRepository>
+      </pluginRepositories>
+      <repositories>
+        <repository>
+          <id>xwiki-snapshots</id>
+          <name>XWiki Nexus Snapshot Repository Proxy</name>
+          <url>http://nexus.xwiki.org/nexus/content/groups/public-snapshots</url>
+          <releases>
+            <enabled>false</enabled>
+          </releases>
+          <snapshots>
+            <enabled>true</enabled>
+          </snapshots>
+        </repository>
+        <repository>
+          <id>xwiki-releases</id>
+          <name>XWiki Nexus Releases Repository Proxy</name>
+          <url>http://nexus.xwiki.org/nexus/content/groups/public</url>
+          <releases>
+            <enabled>true</enabled>
+          </releases>
+          <snapshots>
+            <enabled>false</enabled>
+          </snapshots>
+        </repository>
+      </repositories>
     </profile>
   </profiles>
   <distributionManagement>

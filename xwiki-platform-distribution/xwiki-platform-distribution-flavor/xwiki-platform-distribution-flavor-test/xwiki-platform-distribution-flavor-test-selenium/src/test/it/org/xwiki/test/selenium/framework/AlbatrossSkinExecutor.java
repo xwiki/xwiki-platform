@@ -24,6 +24,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 import org.xwiki.test.ui.XWikiWebDriver;
 
 import com.thoughtworks.selenium.webdriven.WebDriverBackedSelenium;
@@ -408,25 +409,27 @@ public class AlbatrossSkinExecutor implements SkinExecutor
     public void pressKeyboardShortcut(String shortcut, boolean withCtrlModifier, boolean withAltModifier,
         boolean withShiftModifier) throws InterruptedException
     {
+        Actions actions = getDriver().createActions();
         if (withCtrlModifier) {
-            getTest().getSelenium().controlKeyDown();
+            actions = actions.keyDown(Keys.CONTROL);
         }
         if (withAltModifier) {
-            getTest().getSelenium().altKeyDown();
+            actions = actions.keyDown(Keys.ALT);
         }
         if (withShiftModifier) {
-            getTest().getSelenium().shiftKeyDown();
+            actions = actions.keyDown(Keys.SHIFT);
         }
-        getTest().getSelenium().keyPress("xwikimaincontainer", shortcut);
+        actions = actions.sendKeys(shortcut);
         if (withCtrlModifier) {
-            getTest().getSelenium().controlKeyUp();
+            actions = actions.keyUp(Keys.CONTROL);
         }
         if (withAltModifier) {
-            getTest().getSelenium().altKeyUp();
+            actions = actions.keyUp(Keys.ALT);
         }
         if (withShiftModifier) {
-            getTest().getSelenium().shiftKeyUp();
+            actions = actions.keyUp(Keys.SHIFT);
         }
+        actions.perform();
     }
 
     @Override

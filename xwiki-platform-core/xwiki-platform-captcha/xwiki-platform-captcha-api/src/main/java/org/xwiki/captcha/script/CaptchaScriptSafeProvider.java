@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
-import org.xwiki.stability.Unstable;
 
 /**
  * Script safe provider for {@link Captcha} instances.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.8RC1
  */
-@Unstable
 @Component
 @Singleton
 public class CaptchaScriptSafeProvider implements ScriptSafeProvider<Captcha>

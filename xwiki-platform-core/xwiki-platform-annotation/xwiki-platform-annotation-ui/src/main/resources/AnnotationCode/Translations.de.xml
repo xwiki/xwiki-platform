@@ -105,12 +105,12 @@ admin.annotations=Anmerkungen
 admin.annotations.description=Seite-Anmerkungen konfigurieren
 
 AnnotationCode.AnnotationConfig_activated=Anmerkungen sind aktiviert
-### Missing: AnnotationCode.AnnotationConfig_activated.hint=Decide if annotations are active on the wiki
+AnnotationCode.AnnotationConfig_activated.hint=Entscheiden Sie, ob Anmerkungen im Wiki aktiv sind.
 AnnotationCode.AnnotationConfig_exceptionSpaces=Außer für die folgenden Bereiche
-### Missing: AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deactivate annotations for the following subset of locations:
+AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Deaktivieren Sie Anmerkungen für die folgende Teilmenge von Positionen:
 AnnotationCode.AnnotationConfig_displayed=Anmerkungen standardmäßig anzeigen
-### Missing: AnnotationCode.AnnotationConfig_displayed.hint=Decide if annotations are displayed by default or only when "Show annotations" is checked on each page
+AnnotationCode.AnnotationConfig_displayed.hint=Entscheiden Sie, ob Anmerkungen standardmäßig angezeigt werden oder nur, wenn "Anmerkungen anzeigen" auf jeder Seite aktiviert ist
 AnnotationCode.AnnotationConfig_displayHighlight=Anmerkungen standardmäßig im Text hervorheben
-### Missing: AnnotationCode.AnnotationConfig_displayHighlight.hint=Decide if highlighting of an annotation should be displayed always or only when hovering over an annotation or a structure of annotations
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Entscheiden Sie, ob die Hervorhebung einer Anmerkung immer oder nur dann angezeigt werden soll, wenn Sie mit der Maus über eine Anmerkung oder eine Struktur von Anmerkungen fahren
 AnnotationCode.AnnotationConfig_annotationClass=XWiki Klasse, welche zum Speichern der Anmerkungen verwendet wird</content>
 </xwikidoc>

@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,29 +20,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
 
 <Configure id="Server" class="org.eclipse.jetty.server.Server">
 
   <!-- =========================================================== -->
-  <!-- Set the java.rmi.server.hostname property in case you've    -->
-  <!-- got a misconfigured /etc/hosts entry or the like.           -->
-  <!-- =========================================================== -->
-  <!--
-  <Call class="java.lang.System" name="setProperty">
-    <Arg>java.rmi.server.hostname</Arg>
-    <Arg>127.0.0.1</Arg>
-  </Call>
-  -->
-
-  <!-- =========================================================== -->
-  <!-- Get the platform mbean server                               -->
+  <!-- Get the platform MBeanServer                                -->
   <!-- =========================================================== -->
   <Call id="MBeanServer" class="java.lang.management.ManagementFactory"
-    name="getPlatformMBeanServer" />
+        name="getPlatformMBeanServer" />
 
   <!-- =========================================================== -->
-  <!-- Initialize the Jetty MBean container -->
+  <!-- Initialize the Jetty MBeanContainer                         -->
   <!-- =========================================================== -->
   <Call name="addBean">
     <Arg>
@@ -57,7 +46,7 @@
   <!-- Add the static log -->
   <Call name="addBean">
     <Arg>
-      <New class="org.eclipse.jetty.util.log.Log" />
+      <Get class="org.eclipse.jetty.util.log.Log" name="Log" />
     </Arg>
   </Call>
 </Configure>

@@ -40,9 +40,26 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
 public class DefaultSolrConfiguration implements SolrConfiguration
 {
     /**
-     * Default component type.
+     * The name of the configuration property containing the batch size.
+     * 
+     * @since 11.9RC1
      */
-    public static final String DEFAULT_SOLR_TYPE = "embedded";
+    public static final String SOLR_TYPE_PROPERTY = "solr.type";
+
+    /**
+     * The name of the configuration property containing the batch size.
+     * 
+     * @since 11.9RC1
+     */
+    public static final String SOLR_TYPE_DEFAULT = "embedded";
+
+    /**
+     * Default component type.
+     * 
+     * @deprecated since 11.9RC1, use {@link #SOLR_TYPE_DEFAULT} instead.
+     */
+    @Deprecated
+    public static final String DEFAULT_SOLR_TYPE = SOLR_TYPE_DEFAULT;
 
     /**
      * The classpath location prefix to use when looking for the default solr configuration files.
@@ -62,7 +79,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     /**
      * Solr home directory file names.
      */
-    public static final String[] HOME_DIRECTORY_FILE_NAMES = {"solr.xml"};
+    public static final String[] HOME_DIRECTORY_FILE_NAMES = { "solr.xml" };
 
     /**
      * The package containing the Solr core configuration files.
@@ -124,7 +141,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public String getServerType()
     {
-        return this.configuration.getProperty("solr.type", DEFAULT_SOLR_TYPE);
+        return this.configuration.getProperty(SOLR_TYPE_PROPERTY, SOLR_TYPE_DEFAULT);
     }
 
     @Override
@@ -149,15 +166,15 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Override
     public int getIndexerBatchMaxLengh()
     {
-        return this.configuration
-            .getProperty(SOLR_INDEXER_BATCH_MAXLENGH_PROPERTY, SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT);
+        return this.configuration.getProperty(SOLR_INDEXER_BATCH_MAXLENGH_PROPERTY,
+            SOLR_INDEXER_BATCH_MAXLENGH_DEFAULT);
     }
 
     @Override
     public int getIndexerQueueCapacity()
     {
-        return this.configuration
-            .getProperty(SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY, SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT);
+        return this.configuration.getProperty(SOLR_INDEXER_QUEUE_CAPACITY_PROPERTY,
+            SOLR_INDEXER_QUEUE_CAPACITY_DEFAULT);
     }
 
     @Override

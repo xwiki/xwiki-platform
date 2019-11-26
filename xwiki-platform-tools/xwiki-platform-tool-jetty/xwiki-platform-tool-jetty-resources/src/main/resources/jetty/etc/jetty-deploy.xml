@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
 
 <!-- =============================================================== -->
 <!-- Create the deployment manager                                   -->
@@ -48,16 +48,35 @@
           <Arg>somethingnotmatching.jar</Arg>
         </Call>
 
-        <Call name="addAppProvider">
+        <Call id="webappprovider" name="addAppProvider">
           <Arg>
             <New class="org.eclipse.jetty.deploy.providers.WebAppProvider">
-              <Set name="monitoredDirName"><Property name="jetty.home" default="." />/contexts</Set>
-              <Set name="defaultsDescriptor"><Property name="jetty.home" default="."/>/etc/webdefault.xml</Set>
+              <Set name="monitoredDirName">
+                <Property>
+                  <Name>jetty.deploy.monitoredPath</Name>
+                  <Default>
+                    <Property name="jetty.home" default="." />/<Property name="jetty.deploy.monitoredDir" deprecated="jetty.deploy.monitoredDirName" default="contexts"/>
+                  </Default>
+                </Property>
+              </Set>
+              <Set name="defaultsDescriptor">
+                <Property>
+                  <Name>jetty.deploy.defaultsDescriptorPath</Name>
+                  <Default>
+                    <Property name="jetty.home" default="." />/etc/webdefault.xml
+                  </Default>
+                </Property>
+              </Set>
+              <Set name="scanInterval"><Property name="jetty.deploy.scanInterval" default="1"/></Set>
+              <Set name="extractWars"><Property name="jetty.deploy.extractWars" default="true"/></Set>
+              <Set name="configurationManager">
+                <New class="org.eclipse.jetty.deploy.PropertiesConfigurationManager">
+                </New>
+              </Set>
             </New>
           </Arg>
         </Call>
       </New>
     </Arg>
   </Call>
-
 </Configure>

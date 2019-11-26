@@ -51,11 +51,29 @@ public class FilesystemExportContextProvider implements Provider<FilesystemExpor
         FilesystemExportContext exportContext = (FilesystemExportContext) ec.getProperty(CONTEXT_KEY);
         if (exportContext == null) {
             exportContext = new FilesystemExportContext();
-            ec.newProperty(CONTEXT_KEY)
-                .inherited()
-                .initial(exportContext)
-                .declare();
+            newProperty(ec, exportContext);
         }
         return exportContext;
+    }
+
+    /**
+     * @param ec the execution context in which to add the export context
+     * @param exportContext the export context
+     * @since 11.9RC1
+     */
+    public static void set(ExecutionContext ec, FilesystemExportContext exportContext)
+    {
+        FilesystemExportContext existingExportContext = (FilesystemExportContext) ec.getProperty(CONTEXT_KEY);
+        if (existingExportContext != null) {
+            // Remove the existing context to create a new property
+            ec.removeProperty(CONTEXT_KEY);
+        }
+
+        newProperty(ec, exportContext);
+    }
+
+    private static void newProperty(ExecutionContext ec, FilesystemExportContext exportContext)
+    {
+        ec.newProperty(CONTEXT_KEY).inherited().initial(exportContext).declare();
     }
 }

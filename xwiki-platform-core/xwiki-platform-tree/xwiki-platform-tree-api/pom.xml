@@ -25,14 +25,15 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-tree</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-tree-api</artifactId>
   <name>XWiki Platform - Tree - API</name>
   <packaging>jar</packaging>
   <description>Provides a generic API for creating tree models that can be displayed using the tree widget.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.24</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>31</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Tree API</xwiki.extension.name>
   </properties>
@@ -46,6 +47,18 @@
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-script</artifactId>
       <version>${commons.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-model</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- Testing Dependencies -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>

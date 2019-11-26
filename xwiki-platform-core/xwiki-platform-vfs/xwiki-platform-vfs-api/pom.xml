@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-vfs</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-vfs-api</artifactId>
   <name>XWiki Platform - VFS - API</name>
   <packaging>jar</packaging>
   <description>Access content of archives (Zip, Tar, Jar, GZip, etc)</description>
   <properties>
-    <truevfs.version>0.12.0</truevfs.version>
+    <truevfs.version>0.12.2</truevfs.version>
     <truecommons.version>2.5.0</truecommons.version>
     <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>67</xwiki.pitest.mutationThreshold>

@@ -37,6 +37,8 @@ import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.ViewPage;
+import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -296,6 +298,11 @@ public class ConfigurableClassIT
     public void testAddConfigurableApplicationInNonexistantSection(TestUtils setup, TestReference testReference)
     {
         String section = testReference.getLastSpaceReference().getName();
+
+        // Ensure the section does not exist yet
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        assertTrue(administrationPage.hasNotSection("Other", section));
+
         // Fixture
         setupConfigurableApplication(setup, testReference,
             "displayInSection", section,
@@ -307,7 +314,8 @@ public class ConfigurableClassIT
         String fullName = setup.serializeReference(testReference).split(":")[1];
 
         // Check it's available in global section.
-        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        administrationPage = AdministrationPage.gotoPage();
+        assertTrue(administrationPage.hasSection("Other", section));
         administrationPage.clickSection("Other", section);
         AdministrationSectionPage asp = new AdministrationSectionPage(section);
         asp.waitUntilActionButtonIsLoaded();
@@ -513,6 +521,7 @@ public class ConfigurableClassIT
 
         // Go to the document, it will create a lock.
         AdministrationSectionPage asp = AdministrationSectionPage.gotoPage(section1);
+        asp.waitUntilPageIsLoaded();
         asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
 
@@ -525,6 +534,7 @@ public class ConfigurableClassIT
         setup.getDriver().switchTo().window(firstTab);
 
         asp = AdministrationSectionPage.gotoPage(section2);
+        asp.waitUntilPageIsLoaded();
         asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
         viewPage = setup.gotoPage(page1);
@@ -555,19 +565,28 @@ public class ConfigurableClassIT
                 testReference.getLastSpaceReference().getName());
         }
 
+        // We always call the editor constructor to properly waits when we need, to avoid locks not being correctly
+        // handled.
         setup.addClassProperty(testReference, "String", "String");
+        new ClassEditPage();
         setup.addClassProperty(testReference, "Boolean", "Boolean");
+        new ClassEditPage();
         setup.addClassProperty(testReference, "TextArea", "TextArea");
+        new ClassEditPage();
 
         // Set the editor to Text and the select to static list
         setup.updateClassProperty(testReference, "TextArea_editor", "Text");
+        new ViewPage();
 
         setup.addClassProperty(testReference, "Select", "StaticList");
+        new ClassEditPage();
 
         // Add a ConfigurableClass xobject.
         setup.addObject(testReference, "XWiki.ConfigurableClass", configurableClassProperties);
+        new ObjectEditPage();
 
         // Add an xobject of the new class.
         setup.addObject(testReference, setup.serializeReference(testReference));
+        new ObjectEditPage();
     }
 }

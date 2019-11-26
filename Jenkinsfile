@@ -28,7 +28,7 @@ def builds = [
   'Main' : {
     build(
       name: 'Main',
-      profiles: 'legacy,integration-tests,snapshotModules',
+      profiles: 'legacy,integration-tests,snapshot',
       properties: '-Dxwiki.checkstyle.skip=true -Dxwiki.surefire.captureconsole.skip=true -Dxwiki.revapi.skip=true',
       daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
     )
@@ -36,7 +36,7 @@ def builds = [
   'Distribution' : {
     build(
       name: 'Distribution',
-      profiles: 'legacy,integration-tests,snapshotModules',
+      profiles: 'legacy,integration-tests,snapshot',
       pom: 'xwiki-platform-distribution/pom.xml'
     )
   },
@@ -103,19 +103,25 @@ def builds = [
       name: 'TestRelease',
       goals: 'clean install',
       profiles: 'hsqldb,jetty,legacy,integration-tests,standalone,flavor-integration-tests,distribution,docker',
-      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true'
+      properties: '-DskipTests -DperformRelease=true -Dgpg.skip=true -Dxwiki.checkstyle.skip=true -Ddoclint=all'
     )
   },
   'Quality' : {
     build(
       name: 'Quality',
-      // TODO call sonar:sonar when we fix the memory issue of executing that goal on platform. Right now we don't have
-      // enough memory on Jenkins Master for that.
-      //   goals: 'clean install jacoco:report',
-      // Note: When we do so, also add:
-      //   sonar: true
       goals: 'clean install jacoco:report',
       profiles: 'quality,legacy'
+    )
+  },
+  'Sonar' : {
+    // Note: ideally, this should be part of the 'Quality' build but last time we tried it was using too much memory
+    // so until we make it work, we're testing Sonar in a separate build to not fail the 'Quality' one.
+    build(
+      name: 'Sonar',
+      goals: 'clean install jacoco:report sonar:sonar',
+      profiles: 'legacy',
+      properties: '-Dxwiki.revapi.skip=true -Dxwiki.spoon.skip=true -Dxwiki.checkstyle.skip=true',
+      sonar: true
     )
   }
 ]
@@ -158,7 +164,7 @@ private void buildStandardAll(builds)
       // can benefit from them even though some quality checks have not yet passed. In // we start a build with the
       // quality profile that executes various quality checks.
       //
-      // Note: We configure the snapshot extension repository in XWiki (-PsnapshotModules) in the generated
+      // Note: We configure the snapshot extension repository in XWiki (-Psnapshots) in the generated
       // distributions to make it easy for developers to install snapshot extensions when they do manual tests.
       builds['Main'].call()
 
@@ -221,6 +227,10 @@ private void buildStandardAll(builds)
     'quality': {
       // Run the quality checks
       builds['Quality'].call()
+    },
+    'sonar': {
+      // Sonar analysis + push to Sonarcloud.io
+      builds['Sonar'].call()
     }
   )
 }
@@ -274,6 +284,7 @@ private void buildInsideNode(map)
 
     xwikiBuild(map.name) {
       mavenOpts = map.mavenOpts ?: "-Xmx2048m -Xms512m ${heapDumpPath}"
+      javadoc = false
       jobProperties = getCustomJobProperties()
       if (map.goals != null) {
         goals = map.goals

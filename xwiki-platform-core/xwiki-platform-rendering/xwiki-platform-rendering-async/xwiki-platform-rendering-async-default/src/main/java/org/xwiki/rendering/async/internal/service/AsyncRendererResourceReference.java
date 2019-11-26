@@ -38,6 +38,8 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
 
     private final long timeout;
 
+    private final String wiki;
+
     /**
      * Default constructor.
      * 
@@ -45,14 +47,20 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
      * @param id the id of the async renderer
      * @param clientId the id of the client associated with the async execution
      * @param timeout how long (in milliseconds) to wait for the job to be finished
+     * @param wiki the identifier of the current wiki
+     * @since 11.8RC1
+     * @since 10.3.5
+     * @since 10.11.10
      */
-    public AsyncRendererResourceReference(ResourceType type, List<String> id, String clientId, long timeout)
+    public AsyncRendererResourceReference(ResourceType type, List<String> id, String clientId, long timeout,
+        String wiki)
     {
         setType(type);
 
         this.id = id;
         this.clientId = clientId;
         this.timeout = timeout;
+        this.wiki = wiki;
     }
 
     /**
@@ -83,5 +91,13 @@ public class AsyncRendererResourceReference extends AbstractResourceReference
     public long getTimeout()
     {
         return this.timeout;
+    }
+
+    /**
+     * @return the identifier of the current wiki
+     */
+    public String getWiki()
+    {
+        return this.wiki;
     }
 }

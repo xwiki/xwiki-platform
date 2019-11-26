@@ -18,21 +18,21 @@
 # 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 # ---------------------------------------------------------------------------
 
-#
-# Jetty Annotation Scanning Module
-#
+DO NOT EDIT - See: https://www.eclipse.org/jetty/documentation/current/startup-modules.html
+
+[description]
+Enables Annotation scanning for deployed webapplications.
 
 [depend]
-# Annotations needs plus, and jndi features
 plus
 
 [lib]
-# Annotations needs jetty annotation jars
 lib/jetty-annotations-${jetty.version}.jar
-# Need annotation processing jars too
-lib/asm-*.jar
 lib/javax.annotation-api-*.jar
 
 [xml]
 # Enable annotation scanning webapp configurations
 etc/jetty-annotations.xml
+
+[jpms]
+add-modules:org.objectweb.asm

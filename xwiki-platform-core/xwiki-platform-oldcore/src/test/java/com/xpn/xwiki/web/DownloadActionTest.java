@@ -42,6 +42,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
 import com.xpn.xwiki.test.MockitoOldcoreRule;
@@ -50,10 +51,12 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -149,6 +152,27 @@ public class DownloadActionTest
 
         verifyResponseExpectations(d.getTime(), this.fileContent.length);
         verifyOutputExpectations(0, this.fileContent.length);
+    }
+
+    @Test
+    public void downloadLongLength() throws XWikiException
+    {
+        XWikiAttachment filetxt = new XWikiAttachment(this.document, DEFAULT_FILE_NAME);
+        XWikiAttachmentContent content = mock(XWikiAttachmentContent.class);
+        when(content.getAttachment()).thenReturn(filetxt);
+        when(content.getContentInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
+        when(content.getLongSize()).thenReturn(Long.MAX_VALUE);
+        filetxt.setAttachment_content(content);
+        filetxt.setLongSize(Long.MAX_VALUE);
+        this.document.getAttachmentList().add(filetxt);
+
+        setRequestExpectations(DEFAULT_URI, null, null, null, -1l, DEFAULT_FILE_NAME);
+
+        assertNull(this.action.render(this.oldcore.getXWikiContext()));
+
+        // FIXME: change when https://jira.xwiki.org/browse/XWIKI-16829 is fixed
+        // Make sure we don't send the size when it's bigger than an integer
+        verify(this.response, times(0)).setContentLength(anyInt());
     }
 
     @Test
@@ -623,7 +647,11 @@ public class DownloadActionTest
         verify(this.response).setHeader("Accept-Ranges", "bytes");
         verify(this.response).addHeader("Content-disposition", disposition);
         verify(this.response).setDateHeader("Last-Modified", modified);
-        verify(this.response).setContentLength(length);
+        if (length > -1) {
+            verify(this.response).setContentLength(length);
+        } else {
+            verify(this.response, times(0)).setContentLength(length);
+        }
     }
 
     private void verifyOutputExpectations(final int start, final int end) throws IOException

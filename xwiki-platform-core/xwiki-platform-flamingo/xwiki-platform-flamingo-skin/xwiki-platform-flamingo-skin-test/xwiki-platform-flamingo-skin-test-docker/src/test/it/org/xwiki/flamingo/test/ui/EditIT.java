@@ -30,6 +30,7 @@ import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.xwiki.flamingo.skin.test.po.EditConflictModal;
@@ -48,6 +49,7 @@ import org.xwiki.test.ui.po.LoginPage;
 import org.xwiki.test.ui.po.ResubmissionPage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.diff.Conflict;
+import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.PreviewEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
 import org.xwiki.test.ui.po.editor.WikiEditPage;
@@ -822,7 +824,7 @@ public class EditIT
             try {
                 return driver.findElement(By.id("content")) != null
                 && driver.findElement(By.id("content")).getText().equals("fourth edit");
-            } catch (NoSuchElementException e) {
+            } catch (NoSuchElementException | StaleElementReferenceException e) {
                 return false;
             }
         });
@@ -1022,6 +1024,9 @@ public class EditIT
 
         String className = setup.serializeReference(testReference).split(":")[1];
         setup.addObject(testReference, className, "prop", "22");
+        // This should be put inside setup#addObject in the future, since addObject leads to the open of
+        // the Object Editor.
+        new ObjectEditPage().waitUntilPageIsLoaded();
         setup.gotoPage(testReference, "save", "xvalidate=1");
         ViewPage viewPage = new ViewPage();
         assertEquals("value: 22", viewPage.getContent());

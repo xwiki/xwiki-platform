@@ -45,6 +45,11 @@ public interface TreeNode
     String PROPERTY_EXCLUSIONS = "exclusions";
 
     /**
+     * The property that specifies the filters to apply on the tree.
+     */
+    String PROPERTY_FILTERS = "filters";
+
+    /**
      * Retrieve the children of the specified node.
      * 
      * @param nodeId the node id

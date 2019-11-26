@@ -47,4 +47,13 @@ public interface AuthenticationConfiguration
      * @return the names of the {@link AuthenticationFailureStrategy} to activate, each name is a strategy hint.
      */
     String[] getFailureStrategies();
+
+    /**
+     * @return {@code true} if the authentication security mechanism is enabled.
+     * @since 11.10
+     */
+    default boolean isAuthenticationSecurityEnabled()
+    {
+        return true;
+    }
 }

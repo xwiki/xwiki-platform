@@ -1,0 +1,429 @@
+## Defines what server generated error messages should look like
+## The error message when a field is entered incorrectly
+#set ($failureMessageParams = {'class': 'LV_validation_message LV_invalid'})
+## 'LV_validation_message LV_invalid' depends on this:
+$xwiki.get('ssfx').use('uicomponents/widgets/validation/livevalidation.css', true)
+##
+## The * next to the fields to denote they are mandatory.
+#set ($fieldMandatoryStar = {'class': 'xRequired'})
+##
+#macro (definePasswordFields, $fields, $passwordFieldName, $confirmPasswordFieldName, $passwordOptions)
+  #set ($passwordRegexes = [])
+  #if ("$!passwordOptions" == "")
+    #set ($passwordLength = 6)
+  #else
+    #set ($passwordLength = $passwordOptions.passwordLength)
+  #end
+  #set ($patternLength = "/.{" + $passwordLength + ",}/")
+  #set ($passwordRegex =
+  {
+    'pattern' : $patternLength,
+    'failureMessage' : $services.localization.render('platform.core.profile.passwd.instructionsPasswordLength', $passwordLength)
+  })
+  #set ($discard = $passwordRegexes.add($passwordRegex))
+  #if ($passwordOptions.passwordRuleOneUpperCaseEnabled)
+    #set ($passwordRegex =
+    {
+      'pattern' : '/[A-Z]+/',
+      'failureMessage' : $services.localization.render('platform.core.profile.passwd.passwordMustContainUppercase')
+    })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #if ($passwordOptions.passwordRuleOneLowerCaseEnabled)
+    #set ($passwordRegex =
+    {
+      'pattern' : '/[a-z]+/',
+      'failureMessage' : $services.localization.render('platform.core.profile.passwd.passwordMustContainLowercase')
+    })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #if ($passwordOptions.passwordRuleOneNumberEnabled)
+    #set ($passwordRegex =
+    {
+      'pattern' : '/[0-9]+/',
+      'failureMessage' : $services.localization.render('platform.core.profile.passwd.passwordMustContainNumber')
+    })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #if ($passwordOptions.passwordRuleOneSymbolEnabled)
+    #set ($passwordRegex =
+    {
+      'pattern' : '/\W+/',
+      'failureMessage' : $services.localization.render('platform.core.profile.passwd.passwordMustContainSymbol')
+    })
+    #set ($discard = $passwordRegexes.add($passwordRegex))
+  #end
+  #set ($discard = $fields.add({
+    'name': $passwordFieldName,
+    'label': $services.localization.render('core.register.password'),
+    'params': {
+      'type': 'password',
+      'autocomplete': 'off',
+      'size': '60'
+    },
+    'validate': {
+      'mandatory': {
+        'failureMessage': $services.localization.render('core.validation.required.message')
+      },
+      'regexes': $passwordRegexes
+    }
+  }))
+##
+## The confirm password field, mandatory, must match password field, and must also be 6+ characters long.
+  #set ($discard = $fields.add({
+    'name': $confirmPasswordFieldName,
+    'label': $services.localization.render('core.register.passwordRepeat'),
+    'params': {
+      'type': 'password',
+      'autocomplete': 'off',
+      'size': '60'
+    },
+    'validate': {
+      'mandatory': {
+        'failureMessage': $services.localization.render('core.validation.required.message')
+      },
+      'mustMatch': {
+        'name': $passwordFieldName,
+        'failureMessage': $services.localization.render('platform.core.profile.passwd.passwordMissmatch')
+      }
+    }
+  }))
+#end
+##
+#*
+ * Generate HTML form.
+ *
+ * @param $fields The array of fields to use for generating HTML code.
+ * @param $request The request that is made by submitting the form.
+ *#
+#macro (generateHtml, $fields, $request)
+  ## Put the same values back into the fields (if is there any problem with a field from the request that is made).
+  #getParams($fields, $request)
+  <dl>
+  #foreach ($field in $fields)
+    #if ($field.name)
+      #set ($fieldName = $field.name)
+      #if ($field.label)
+        #set ($label = $field.label)
+        <dt><label for="$fieldName">$label
+        #if ($field.validate.mandatory)
+          <span ##
+          #foreach ($entry in $fieldMandatoryStar.entrySet())
+            $entry.key="$entry.value" ##
+          #end
+          >$services.localization.render('core.validation.required')</span>
+        #end
+          </label>
+        </dt>
+      #end
+      ## If the field define its own html content, then use it directly.
+      #if ($field.get('type') == 'html')
+        <dd>$field.get('html')</dd>
+      #else
+        ## If no tag then default tag is <input>
+        #if ($field.tag)
+          #set ($tag = $field.tag)
+        #else
+          #set ($tag = 'input')
+        #end
+        <dd><$tag id="$fieldName" ##
+        #set ($params = $field.params)
+        ## If no name parameter is specified, then we use the field name.
+        #if (!$params.name)
+          #set ($discard = $params.put('name', $fieldName))
+        #end
+        #foreach ($entry in $params.entrySet())
+          ## If a parameter is specified as '' then we don't include it.
+          #if ($entry.value != '')
+            $entry.key="$escapetool.xml($entry.value)" ##
+          #end
+        #end
+        />
+        #if ($field.error)
+          <span ##
+          #foreach ($entry in $failureMessageParams.entrySet())
+            $entry.key="$entry.value" ##
+          #end
+          >$field.error</span>
+        #end
+        </dd>
+      #end
+    #else
+      $services.localization.render('xe.admin.registration.fieldWithNoName')
+    #end
+  #end
+  </dl>
+  #generateJavascript($fields)
+#end
+##
+#macro (validateRegexJS $regex $fieldName)
+  #set ($pattern = "")
+  #if ($regex.jsPattern)
+    #set ($pattern = $regex.jsPattern)
+  #elseif ($regex.pattern)
+    #set ($pattern = $regex.pattern)
+  #end
+  #set ($failMessage = "")
+  #if ($regex.jsFailureMessage)
+    #set ($failMessage = $regex.jsFailureMessage)
+  #elseif ($regex.failureMessage)
+    #set ($failMessage = $regex.failureMessage)
+  #end
+  #if ($pattern != '' && $failMessage != '' && !$regex.noscript)
+    ${fieldName}Validator.add(Validate.Format, {pattern: $pattern, failureMessage: "$failMessage"});
+  #end
+#end
+#*
+ * Generate the Javascript for interacting with LiveValidation.
+ *
+ * @param $fields The array of fields which to validate.
+ *###
+#macro (generateJavascript, $fields)
+  ## Load only the JS since the CSS is loaded after the declaration of 'LV_validation_message LV_invalid'.
+  #set ($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
+  <script type='text/javascript'>
+  /* <![CDATA[ */
+  var initRegistrationFormValidation = function() {
+  ##
+  #foreach ($field in $fields)
+    #if ($field.validate && $field.name)
+      #set ($validate = $field.validate)
+      #if (($validate.mandatory && !$validate.mandatory.noscript)
+          || ($validate.regex && !$validate.regex.noscript)
+          || $validate.regexes
+          || ($validate.mustMatch) && !$validate.mustMatch.noscript)
+        #set ($fieldName = $field.name)
+        #if ($validate.fieldOkayMessage)
+          #set ($okayMessage = $validate.fieldOkayMessage)
+        #elseif (!$validate.hideOkayMessage)
+          #set ($okayMessage = $services.localization.render('core.validation.valid.message'))
+          #else
+            #set ($okayMessage = '')
+        #end
+        var ${fieldName}Validator = new LiveValidation("$fieldName", {validMessage: "$okayMessage", wait: 500});
+        ##
+        #if ($validate.mandatory)
+          #set ($mandatory = $validate.mandatory)
+          #if ($mandatory.failureMessage && !$mandatory.noscript)
+            ${fieldName}Validator.add(Validate.Presence, {failureMessage: "$!mandatory.failureMessage"});
+          #end
+        #end
+        ##
+        #if ($validate.mustMatch)
+          #set ($mustMatch = $validate.mustMatch)
+          #if ($mustMatch.name && $mustMatch.failureMessage && !$mustMatch.noscript)
+            ${fieldName}Validator.add(Validate.Confirmation, {match: $$("input[name=$!mustMatch.name]")[0], 
+              failureMessage: "$!mustMatch.failureMessage"});
+          #end
+        #end
+        ##
+        #if ($validate.regex)
+          #set ($regex = $validate.regex)
+          #validateRegexJS($regex $fieldName)
+        #end
+        #if ($validate.regexes)
+          #foreach($regex in $validate.regexes)
+            #validateRegexJS($regex $fieldName)
+          #end
+        #end
+      #end
+    #end
+  #end
+    };
+    document.observe('xwiki:dom:loaded', initRegistrationFormValidation);
+    document.observe('xwiki:dom:updated', function(event) {
+      var container = (event && event.memo && event.memo.elements && event.memo.elements[0]) || $('body');
+      if (container.down('form#register')) {
+        initRegistrationFormValidation();
+      }
+    });// ]]>
+    </script>
+#end
+#*
+ * Get parameters from request so that values will be filled in if there is a mistake
+ * in one of the entries. Entries will be returned to fields[n].params.value
+ * Fields will not be returned if they have either noReturn or error specified.
+ *
+ * @param $fields The array of fields to get parameters for.
+ * @param $request The request that is made, from which the params will be returned.
+ *###
+#macro (getParams $fields, $request)
+  #foreach ($field in $fields)
+    #if ($field.name && $!request.get($field.name))
+      #if (!$field.noReturn && !$field.error)
+        #if (!$field.params)
+          #set ($params = {})
+          #set ($discard = $field.put('params', $params))
+        #else
+          #set ($params = $field.params)
+        #end
+        #set ($discard = $params.put('value', $request.get($field.name)))
+      #end
+    #end
+  #end
+#end
+####### Validation macros #########
+#macro(validateRegex $fieldValue, $fieldName, $regex, $error)
+  #if($regex.get('pattern') && $regex.get('failureMessage'))
+  ## Make Java regexes more compatible with Perl/js style regexes by removing leading and trailing /
+    #if($regex.get('pattern').length() > 1)
+      #set($pattern = $regex.get('pattern'))
+      #if($pattern.lastIndexOf('/') < $pattern.length() - 1)
+      ERROR: In field: ${fieldName}: regex validation does not allow flags after the /, please fix [${pattern}].
+      #end
+      #set($pattern = $pattern.substring($mathtool.add(1, $pattern.indexOf('/')), $pattern.lastIndexOf('/')))
+    #else
+    ## I don't expect this but want to maintain compatibility.
+      #set($pattern = $regex.get('pattern'))
+    #end
+    #if($regextool.find($value, $pattern).isEmpty())
+      #set($error = $regex.get('failureMessage'))
+    #end
+  #elseif($regex.get('pattern'))
+  ERROR: In field: ${fieldName}: regex validation must include failureMessage.
+  #end
+#end
+#*
+ * Server side validation, this is necessary for security and because not everyone has Javascript
+ *
+ * @param $fields The array of fields to validate.
+ * @param $request An XWikiRequest object which made the register request, used to get parameters.
+ *###
+#macro(validateFields, $fields, $request)
+  #set ($allFieldsValid = true)
+  #set ($allFieldsErrors = [])
+  #foreach($field in $fields)
+    #if($field.get('validate') && $field.get('name'))
+      #set($fieldName = $field.get('name'))
+      #set($validate = $field.get('validate'))
+      #set($error = '')
+      #set($value = $request.get($fieldName))
+      #if("$!value" != '' || $field.get('type') == 'html')
+      ##
+      ## mustMatch validation
+        #if($error == '' && $validate.get('mustMatch'))
+          #set($mustMatch = $validate.get('mustMatch'))
+          #if($mustMatch.get('name') && $mustMatch.get('failureMessage'))
+            #if($request.get($fieldName) != $request.get($mustMatch.get('name')))
+              #set($error = $mustMatch.get('failureMessage'))
+            #end
+          #else
+          ERROR: In field: ${fieldName}: mustMatch validation required both name
+          (of field which this field must match) and failureMessage.
+          #end
+        #end
+      ##
+      ## Regex validation
+      ## We won't bother with regex validation if there is no entry, that would defeat the purpose of 'mandatory'
+        #if($error == '' && $validate.get('regex') && $value && $value != '')
+          #set($regex = $validate.get('regex'))
+          #validateRegex($value, $fieldName, $regex, $error)
+        #end
+      ## List of regex validation
+        #if($error == '' && $validate.get('regexes') && $value && $value != '')
+          #set($regexes = $validate.get('regexes'))
+          #foreach ($regex in $regexes)
+            #validateRegex($value, $fieldName, $regex, $error)
+          #end
+        #end
+      ##
+      ## If regex and mustMatch validation passed, try programmatic validation
+        #if($error == '' && $validate.get('programmaticValidation'))
+          #set($pv = $validate.get('programmaticValidation'))
+          #if($pv.get('code') && $pv.get('failureMessage'))
+            #set($pvReturn = "#evaluate($pv.get('code'))")
+            #if($pvReturn.indexOf('failed') != -1)
+              #set($error = $pv.get('failureMessage'))
+            #end
+          #else
+          ERROR: In field: ${fieldName}: programmaticValidation requires code and failureMessage
+          #end
+        #end
+      #else
+      ##
+      ## If no content, check if content is mandatory
+        #if($validate.get('mandatory'))
+          #set($mandatory = $validate.get('mandatory'))
+          #if($mandatory.get('failureMessage'))
+            #set($error = $mandatory.get('failureMessage'))
+          #else
+          ERROR: In field: ${fieldName}: mandatory validation requires a failureMessage
+          #end
+        #end
+      #end
+      #if($error != '')
+        #set($discard = $field.put('error', $error))
+        #set ($discard = $allFieldsErrors.add($error))
+        #set($allFieldsValid = false)
+      #end
+    #elseif(!$field.get('name'))
+    ERROR: Field with no name.
+    #end##if(validate)
+  #end##loop
+#end##macro
+
+#*
+ * Get the configuration from the configuration object.
+ *
+ * @param $configDocumentName The name of the document to get the configuration from.
+ *###
+#macro(loadConfig, $configDocumentName)
+  #set($configurationClassName = 'XWiki.Registration')
+  #set($configDocument = $xwiki.getDocument($configDocumentName))
+  #set ($passwordOptions = {})
+  #if(!$configDocument || !$configDocument.getObject($configurationClassName))
+  ## No config document, load defaults.
+    #set($heading = "$services.localization.render('core.register.title')")
+    #set($welcomeMessage = "$services.localization.render('core.register.welcome')")
+    #set($useLiveValidation = true)
+    #set($defaultFieldOkayMessage = "$services.localization.render('core.validation.valid.message')")
+    #set($loginButton = true)
+    #set($defaultRedirect = "$xwiki.getURL($services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI')))")
+    #set($userFullName = "$request.get('register_first_name') $request.get('register_last_name')")
+    #set($registrationSuccessMessage = '{{info}}$services.localization.render("core.register.successful", ["[[${userFullName}>>${userSpace}${userName}]]", ${userName}]){{/info}}')
+    #set($passwordOptions.passwordLength = 6)
+    #set($passwordOptions.passwordRuleOneLowerCaseEnabled = false)
+    #set($passwordOptions.passwordRuleOneUpperCaseEnabled = false)
+    #set($passwordOptions.passwordRuleOneNumberEnabled = false)
+    #set($passwordOptions.passwordRuleOneSymbolEnabled = false)
+  #else
+    #set($configObject = $configDocument.getObject($configurationClassName))
+    #if ($xcontext.action == 'register')
+      #set ($heading = "(% id='document-title'%)((( = #evaluate($configObject.getProperty('heading').getValue()) = )))(%%)")
+    #else
+      #set ($heading = "= #evaluate($configObject.getProperty('heading').getValue()) =")
+    #end
+    #set($welcomeMessage = "#evaluate($configObject.getProperty('welcomeMessage').getValue())")
+    #if($configObject.getProperty('liveValidation_enabled').getValue() == 1)
+      #set($useLiveValidation = true)
+    #end
+    #set($defaultFieldOkayMessage = "#evaluate($configObject.getProperty('liveValidation_defaultFieldOkMessage').getValue())")
+    #if($configObject.getProperty('loginButton_enabled').getValue() == 1)
+      #set($loginButton = true)
+    #end
+    #if($configObject.getProperty('loginButton_autoLogin_enabled').getValue() == 1)
+      #set($autoLogin = true)
+    #end
+    #set($defaultRedirect = "#evaluate($configObject.getProperty('defaultRedirect').getValue())")
+    #set($registrationSuccessMessage = "$configObject.getProperty('registrationSuccessMessage').getValue()")
+    #if($configObject.getProperty('requireCaptcha').getValue() == 1)
+      #set($requireCaptcha = true)
+    #end
+    #if($configObject.getProperty('passwordRuleOneLowerCaseEnabled').getValue() == 1)
+      #set($passwordOptions.passwordRuleOneLowerCaseEnabled = true)
+    #end
+    #if($configObject.getProperty('passwordRuleOneUpperCaseEnabled').getValue() == 1)
+      #set($passwordOptions.passwordRuleOneUpperCaseEnabled = true)
+    #end
+    #if($configObject.getProperty('passwordRuleOneNumberEnabled').getValue() == 1)
+      #set($passwordOptions.passwordRuleOneNumberEnabled = true)
+    #end
+    #if($configObject.getProperty('passwordRuleOneSymbolEnabled').getValue() == 1)
+      #set($passwordOptions.passwordRuleOneSymbolEnabled = true)
+    #end
+    #set($passwordOptions.passwordLength = $configObject.getProperty('passwordLength').getValue())
+    #if ("$!passwordOptions.passwordLength" == "" || $passwordOptions.passwordLength <= 1)
+      #set ($passwordOptions.passwordLength = 6)
+    #end
+  #end
+#end

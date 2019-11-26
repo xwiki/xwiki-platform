@@ -252,20 +252,59 @@
 }
 
 // Export ---------------------------------------------------------------------
-#exportModal {
-  .modal-body {
-    a, button {
-      margin: 2px;
+.export-tree {
+  border: 1px solid @panel-inner-border;
+  padding: @panel-body-padding;
+
+  .jstree-anchor {
+    // Leave some space between the nodes in order to improve the selection display.
+    margin: 1px 0;
+  }
+}
+
+// Limit the tree height when displayed inside a modal.
+.modal-body .export-tree {
+  max-height: 400px;
+  overflow: auto;
+}
+
+.export-tree-filter {
+  .flat-buttons();
+
+  ul.dropdown-menu {
+    // Increase the minimum width because the hint is displayed on multiple lines.
+    min-width: 320px;
+    // Fixes list padding overwritten by the panel styles.
+    padding: @line-height-computed/4 0;
+
+    li .xHint {
+      // The hint can be displayed on multiple lines.
+      white-space: normal;
     }
   }
 }
 
-.exportModalTreeContainer {
-  border: 1px solid @panel-inner-border;
-  margin-bottom: @line-height-computed / 2;
-  max-height: 400px;
-  overflow: auto;
-  padding: @panel-body-padding;
+.export-tree-legend {
+  margin: @line-height-computed/4 0 0;
+}
+dl.export-tree-legend dt,
+dl.export-tree-legend dd {
+  display: inline;
+  font-weight: normal;
+  margin: 0;
+}
+dl.export-tree-legend dt + dd {
+  margin-right: 1em;
+}
+
+.export-tree-container + .export-buttons {
+  margin-top: 1em;
+}
+
+// Reduce the font size when inside a modal.
+.modal-body .export-tree-filter .dropdown-toggle,
+.modal-body .export-tree-action {
+  font-size: smaller;
 }
 
 // Loading --------------------------------------------------------------------

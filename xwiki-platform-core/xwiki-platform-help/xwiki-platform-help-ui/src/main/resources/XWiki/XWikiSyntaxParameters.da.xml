@@ -55,7 +55,7 @@ I XWiki Syntax 1.0 er der ingen syntaks for at overføre parametre og den eneste
 
 Med XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}} er det muligt at overføre parametre til de forskellig syntaks-elementer eller tekstblokke. Det bruges for eksempel til at style dem. Du kan angive en vilkårlig parameter nøgle/værdi-par du ønsker. XHTML-generatoren vil overfører disse parametre som XHTML-attributter til den underliggende XHTML-repræsentations syntakselement.
 
-|=(% style="width="60%" %)XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Generated XHTML
+|=(% style="width:60%" %)XWiki Syntax {{velocity}}$crtSyntaxVer{{/velocity}}|=Generated XHTML
 |((({{{
 (% class="myClass" style="myStyle" id="myId" %)
 = heading =

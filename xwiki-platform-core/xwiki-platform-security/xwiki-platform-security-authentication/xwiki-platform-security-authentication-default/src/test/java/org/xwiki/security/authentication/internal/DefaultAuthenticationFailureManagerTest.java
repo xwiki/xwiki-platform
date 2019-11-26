@@ -121,6 +121,7 @@ public class DefaultAuthenticationFailureManagerTest
         when(configuration.getFailureStrategies()).thenReturn(new String[] { "strategy1", "strategy2" });
         when(configuration.getMaxAuthorizedAttempts()).thenReturn(3);
         when(configuration.getTimeWindow()).thenReturn(5);
+        when(configuration.isAuthenticationSecurityEnabled()).thenReturn(true);
         when(contextProvider.get()).thenReturn(context);
         when(context.getMainXWiki()).thenReturn("xwiki");
         when(context.getWiki()).thenReturn(xWiki);

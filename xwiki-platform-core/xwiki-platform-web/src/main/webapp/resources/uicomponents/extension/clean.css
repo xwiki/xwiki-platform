@@ -1,0 +1,9 @@
+.extension-clean .jstree-anchor {
+	height: auto !important;
+	white-space: normal;
+	width: 90%
+}
+
+.extension-clean .extension-status {
+    float: right;
+}

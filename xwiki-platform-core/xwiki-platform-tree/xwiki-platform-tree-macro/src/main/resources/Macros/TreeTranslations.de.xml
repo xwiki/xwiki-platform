@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>Macros</web>
+  <name>TreeTranslations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Macros.Tree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.tree.name=Baum
+rendering.macro.tree.description=Zeigt eine Baumhierarchie an, die durch den Makroinhalt oder den Quellparameter definiert ist.
+rendering.macro.tree.parameter.reference.name=Referenz
+rendering.macro.tree.parameter.reference.description=Die Referenz auf die Ressource, die die Baumstruktur und ihr Kontextmenü beschreibt und die aufgerufen wird, um die Aktionen auf den Baumknoten durchzuführen. Diese Ressource wird verwendet, um den Baum dynamisch (bei Bedarf) zu laden, wenn ein Baumknoten geöffnet wird, und um nach dem Kontextmenü zu fragen, wenn der Benutzer mit der rechten Maustaste auf einen Baumknoten klickt, der ihn enthält. Die Ressource ist also nicht statisch. Für statische Bäume sollten Sie stattdessen den Makroinhalt verwenden. Die Referenz kann eine Dokumentenreferenz oder eine URL/Pfad sein.
+rendering.macro.tree.parameter.root.name=Wurzel
+rendering.macro.tree.parameter.root.description=Die Root Node ID. Dies ist nützlich, wenn Sie nur die Nachkommen eines bestimmten Knotens (d.h. der angegebenen Wurzel) anzeigen möchten. Der Baum zeigt die Kinder des Wurzelknotens auf der ersten Ebene an, so dass der Wurzelknoten nicht tatsächlich angezeigt wird. Wenn der Wurzelknoten nicht angegeben ist, wird der gesamte Baum angezeigt.
+rendering.macro.tree.parameter.showRoot.name=Wurzel anzeigen
+rendering.macro.tree.parameter.showRoot.description=Ob der Wurzelknoten angezeigt werden soll oder nicht. Der Wurzelknoten wird standardmäßig nicht angezeigt, da er in der Regel aus dem Kontext stammt, in dem der Baum angezeigt wird (z.B. ein Label vor dem Baum). Es gibt jedoch einige Fälle, in denen Sie den Wurzelknoten anzeigen möchten: um einen neuen Knoten unter der Wurzel anlegen zu können.
+rendering.macro.tree.parameter.dragAndDrop.name=Drag &amp; Drop
+rendering.macro.tree.parameter.dragAndDrop.description=Gibt an, ob der Benutzer in der Lage sein soll, Baumknoten per Drag &amp; Drop zu verschieben.
+rendering.macro.tree.parameter.contextMenu.name=Kontextmenü
+rendering.macro.tree.parameter.contextMenu.description=Ob das Kontextmenü angezeigt werden soll, wenn der Benutzer mit der rechten Maustaste auf einen Baumknoten klickt.
+rendering.macro.tree.parameter.class.name=Klasse
+rendering.macro.tree.parameter.class.description=Zusätzliche CSS-Klassen, die dem HTML-Element der obersten Ebene des Baums hinzugefügt werden können.
+rendering.macro.tree.parameter.icons.name=Icons
+rendering.macro.tree.parameter.icons.description=Ob die Symbole der Baumknoten angezeigt werden sollen oder nicht. Sie können die Symbole ausblenden, wenn alle Baumknoten vom gleichen Typ sind oder wenn Sie einen horizontalen Platz gewinnen möchten.
+rendering.macro.tree.parameter.edges.name=Kanten
+rendering.macro.tree.parameter.edges.description=Ob die Kanten gezeigt werden sollen, die die Knoten des Geschwisterbaums untereinander und mit ihren Eltern verbinden.
+rendering.macro.tree.parameter.links.name=Links
+rendering.macro.tree.parameter.links.description=Gibt an, ob die Knotenbeschriftungen als Links (Anker) aussehen und sich verhalten sollen.
+rendering.macro.tree.parameter.checkboxes.name=Kontrollkästchen
+rendering.macro.tree.parameter.checkboxes.description=Ob ein Kontrollkästchen vor jedem Baumknoten angezeigt werden soll, damit der Benutzer mehrere Baumknoten auswählen kann.
+rendering.macro.tree.parameter.openTo.name=Offen für
+rendering.macro.tree.parameter.openTo.description=Die ID des Knotens, zu dem der Baum geöffnet werden soll. Alle Vorfahren des angegebenen Knotens, bis hin zur Wurzel des Baumes, werden ebenfalls geöffnet.
+rendering.macro.tree.parameter.finder.name=Suchfeld
+rendering.macro.tree.parameter.finder.description=Zeigt eine Texteingabe an, die zum Suchen von Baumknoten verwendet werden kann. Die Eingabe wird über dem Baum angezeigt und bietet Vorschläge während der Eingabe, basierend auf dem Inhalt des Baums. Wenn ein Vorschlag ausgewählt wird, wird der Baum bis zum entsprechenden Knoten aufgeklappt.
+rendering.macro.tree.parameter.limit.name=Limit
+rendering.macro.tree.parameter.limit.description=Die maximale Anzahl der Unterknoten, die beim ersten Aufklappen eines übergeordneten Knotens angezeigt werden sollen. Der Rest der Unterknoten ist über einen "mehr..." Link erreichbar. Dieser Parameter wird im Wesentlichen verwendet, um die Unterknoten zu paginieren und hilft so dem Baum bei einer großen Anzahl von Unterknoten zu skalieren. Der Baum übergibt diesen Parameter an die Baumquelle, so dass er nur mit dynamischen Bäumen funktioniert, deren Quelle die Grenze der Kinderzählung implementiert.
+rendering.macro.tree.content.description=Zur Beschreibung der Baumstruktur können Sie verschachtelte, ungeordnete HTML-Listen verwenden. Weitere Informationen finden Sie unter: http://www.jstree.com/docs/html/
+tree.macro.editModeWarning=Dieser Baum kann im Bearbeitungsmodus nicht angezeigt werden.</content>
+  
+</xwikidoc>

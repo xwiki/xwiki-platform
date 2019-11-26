@@ -18,8 +18,12 @@ com.xpn.xwiki.internal.XWikiStubContextInitializer
 com.xpn.xwiki.internal.cache.DefaultDocumentCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCache
 com.xpn.xwiki.internal.cache.rendering.DefaultRenderingCacheConfiguration
+com.xpn.xwiki.internal.context.RequestInitializer
 com.xpn.xwiki.internal.context.XWikiContextContextStore
+com.xpn.xwiki.internal.converter.DocumentConverter
+com.xpn.xwiki.internal.converter.XWikiDocumentConverter
 com.xpn.xwiki.internal.debug.DebugConfiguration
+com.xpn.xwiki.internal.display.XWikiDocumentContentAsyncParser
 com.xpn.xwiki.internal.doc.DatabaseDocumentRevisionProvider
 com.xpn.xwiki.internal.doc.DefaultDocumentRevisionProvider
 com.xpn.xwiki.internal.doc.DeletedDocumentRevisionProvider
@@ -27,6 +31,7 @@ com.xpn.xwiki.internal.event.AttachmentEventGeneratorListener
 com.xpn.xwiki.internal.event.CommentEventGeneratorListener
 com.xpn.xwiki.internal.event.XClassPropertyEventGeneratorListener
 com.xpn.xwiki.internal.event.XObjectEventGeneratorListener
+com.xpn.xwiki.internal.export.DocumentSelectionResolver
 com.xpn.xwiki.internal.file.TemporaryDeferredFileRepository
 com.xpn.xwiki.internal.filter.DefaultInstanceModel
 com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils
@@ -50,6 +55,7 @@ com.xpn.xwiki.internal.filter.output.XWikiDocumentOutputFilterStream
 com.xpn.xwiki.script.display.DisplayScriptService
 com.xpn.xwiki.internal.job.JobRequestContextInitializer
 com.xpn.xwiki.internal.localization.XWikiLocalizationContext
+com.xpn.xwiki.internal.mandatory.DocumentAsyncClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.EditModeClassDocumentInitializer
 com.xpn.xwiki.internal.mandatory.GlobalRedirectDocumentInitializer
 com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer

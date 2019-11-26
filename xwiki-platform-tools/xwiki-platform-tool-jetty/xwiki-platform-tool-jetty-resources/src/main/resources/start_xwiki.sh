@@ -155,10 +155,10 @@ XWIKI_OPTS="$XWIKI_OPTS -Djetty.home=$JETTY_HOME -Djetty.base=$JETTY_BASE"
 XWIKI_OPTS="$XWIKI_OPTS -Dfile.encoding=UTF8"
 
 # Specify port on which HTTP requests will be handled
-JETTY_OPTS="$JETTY_OPTS jetty.port=$JETTY_PORT"
+JETTY_OPTS="$JETTY_OPTS jetty.http.port=$JETTY_PORT"
 # In order to print a nice friendly message to the user when Jetty has finished loading the XWiki webapp, we pass
 # the port we use as a System Property
-XWIKI_OPTS="$XWIKI_OPTS -Djetty.port=$JETTY_PORT"
+XWIKI_OPTS="$XWIKI_OPTS -Djetty.http.port=$JETTY_PORT"
 
 # Specify port and key to stop a running Jetty instance
 JETTY_OPTS="$JETTY_OPTS STOP.KEY=xwiki STOP.PORT=$JETTY_STOP_PORT"

@@ -8,7 +8,14 @@
 #template('refactoring_macros.vm')
 #template('locationPicker_macros.vm')
 #set ($sourcePageIsTerminal = $doc.documentReference.name != $services.model.getEntityReference('DOCUMENT', 'default').name)
-<form action="?xpage=rename&amp;step=2" method="post" id="rename" class="xform">
+## Warn in case of user/group renaming without programming rights
+#set ($nbUsers = $doc.getObjectNumbers("XWiki.XWikiUsers"))
+#set ($nbGroups = $doc.getObjectNumbers("XWiki.XWikiGroups"))
+#set ($hasAdminRights = $xwiki.hasAccessLevel('admin'))
+#if (($nbUsers > 0 || $nbGroups > 0) && !$hasAdminRights)
+  #warning($services.localization.render('core.rename.warningRenameUser'))
+#end
+  <form action="?xpage=rename&amp;step=2" method="post" id="rename" class="xform">
   <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

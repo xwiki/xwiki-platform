@@ -88,6 +88,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -543,7 +544,10 @@ public abstract class XWikiAction extends Action
                         if (xex.getCode() == XWikiException.ERROR_XWIKI_USER_DISABLED) {
                             context.put("cause", "disabled");
                         }
+                        // In case of user disabled or inactive, the resources are actually forbidden.
+                        context.getResponse().setStatus(HttpServletResponse.SC_FORBIDDEN);
                         Utils.parseTemplate(context.getWiki().Param("xwiki.user_exception", "userinactive"), context);
+
                         return null;
                     } else if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND) {
                         context.put("message", "attachmentdoesnotexist");
@@ -763,8 +767,7 @@ public abstract class XWikiAction extends Action
 
         // Look if the document has a redirect object
         XWikiDocument doc = context.getDoc();
-        BaseObject redirectObj =
-            doc.getXObject(new DocumentReference("RedirectClass", new SpaceReference("XWiki", wikiReference)));
+        BaseObject redirectObj = doc.getXObject(RedirectClassDocumentInitializer.REFERENCE);
         if (redirectObj == null) {
             return false;
         }
@@ -1036,6 +1039,24 @@ public abstract class XWikiAction extends Action
             context.getResponse().getWriter().print(jsonAnswerAsString);
         } catch (IOException e) {
             throw new XWikiException("Error while sending JSON answer.", e);
+        }
+    }
+
+    /**
+     * Make sure to set the right length (or nothing) in the reponse.
+     * 
+     * @param response the response
+     * @param length the length to set in the response
+     * @since 11.10
+     * @since 10.11.10
+     * @since 11.3.6
+     */
+    protected void setContentLength(XWikiResponse response, long length)
+    {
+        // FIXME: call setContentLengthLong directly when https://jira.xwiki.org/browse/XWIKI-16829 is fixed
+        // Set the content length in the response only if it fit in an int
+        if (length <= Integer.MAX_VALUE) {
+            response.setContentLength((int) length);
         }
     }
 }

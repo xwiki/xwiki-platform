@@ -31,10 +31,13 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.async.internal.block.BlockAsyncRendererExecutor;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationManager;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -54,10 +57,20 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @ComponentTest
+@ComponentList({ DefaultDocumentContentAsyncParser.class })
 public class DocumentContentDisplayerTest
 {
     @InjectMockComponents
-    private DocumentContentDisplayer displayer;
+    private DocumentContentAsyncExecutor documentExecutor;
+
+    @InjectMockComponents
+    private DocumentContentAsyncRenderer documentRenderer;
+
+    @InjectMockComponents
+    private DocumentContentDisplayer documentDisplayer;
+
+    @MockComponent
+    private BlockAsyncRendererExecutor executor;
 
     @MockComponent
     private Execution execution;
@@ -77,20 +90,29 @@ public class DocumentContentDisplayerTest
     @Test
     public void baseMetaDataIsSetBeforeExecutingTransformations() throws Exception
     {
+        when(this.executor.execute(any(), any())).then(new Answer<Block>()
+        {
+            @Override
+            public Block answer(InvocationOnMock invocation) throws Throwable
+            {
+                return invocation.<DocumentContentAsyncRenderer>getArgument(0).render(false, false).getBlock();
+            }
+        });
+
         // The execution context is expected to have the "xwikicontext" property set.
         ExecutionContext executionContext = new ExecutionContext();
         executionContext.setProperty("xwikicontext", new HashMap<String, Object>());
-        when(execution.getContext()).thenReturn(executionContext);
+        when(this.execution.getContext()).thenReturn(executionContext);
 
         // The document being displayed.
         XDOM content = new XDOM(Collections.emptyList());
-        when(document.getXDOM()).thenReturn(content);
+        when(this.document.getXDOM()).thenReturn(content);
 
         // The reference of the current document musts be set as the value of the BASE meta data.
         DocumentReference currentDocRef = new DocumentReference("wiki", "Space", "Page");
-        when(documentAccessBridge.getCurrentDocumentReference()).thenReturn(currentDocRef);
+        when(this.documentAccessBridge.getCurrentDocumentReference()).thenReturn(currentDocRef);
 
-        when(serializer.serialize(currentDocRef)).thenReturn("foo");
+        when(this.serializer.serialize(currentDocRef)).thenReturn("foo");
 
         // We can't verify the meta data after the display method is called because we want to make sure the BASE meta
         // data is correctly set before XDOM transformations are executed, not after.
@@ -104,7 +126,7 @@ public class DocumentContentDisplayerTest
                 assertEquals("foo", xdom.getMetaData().getMetaData(MetaData.BASE));
                 return null;
             }
-        }).when(transformationManager).performTransformations(any(XDOM.class), any(TransformationContext.class));
+        }).when(this.transformationManager).performTransformations(any(XDOM.class), any(TransformationContext.class));
 
         // Note: we use a non-isolated tx context simply to simplify the test and avoid having to setup a
         // VelocityManager for the test.
@@ -112,9 +134,10 @@ public class DocumentContentDisplayerTest
         parameters.setTransformationContextIsolated(false);
 
         // Execute the display.
-        assertSame(content, displayer.display(document, parameters));
+        assertSame(content, this.documentDisplayer.display(document, parameters));
 
         // Make sure the transformations are executed exactly once, and on the right content.
-        verify(transformationManager, times(1)).performTransformations(same(content), any(TransformationContext.class));
+        verify(this.transformationManager, times(1)).performTransformations(same(content),
+            any(TransformationContext.class));
     }
 }

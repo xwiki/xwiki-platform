@@ -382,6 +382,9 @@ public class InvitationTest extends AbstractTest
             setSenderPage(InvitationSenderPage.gotoPage());
             Assert.assertFalse("User permission to send not returned by admin action.",
                 getSenderPage().userIsSpammer());
+
+            this.validateConsole.getLogCaptureConfiguration()
+                .registerExcludes("Login cookie validation hash mismatch! Cookies have been tampered with");
         } finally {
             stopGreenMail();
             getUtil().setSession(admin);

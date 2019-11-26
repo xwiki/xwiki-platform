@@ -59,6 +59,9 @@
   ## Parametrized filter part of the query
   #set($whereSql = '')
   ## List of values to use with $whereSql
+  #if (!$filterParams)
+    #set($filterParams = {})
+  #end
   #if ($filterParams.entrySet())
     #set($whereParams = {})
   #else
@@ -449,7 +452,13 @@
     #if(!$propClass.equals($class))
       #set($discard = $itemDoc.use($propClassName))
     #end
-    #set($fieldValue = "$!itemDoc.getValue($colname)")
+    #set($fieldObject = $itemDoc.getFirstObject($colname))
+    #set($fieldProperty = $fieldObject.getProperty($colname))
+    #if ($fieldProperty.getPropertyClass().classType == 'Password')
+      #set($fieldValue = '********')
+    #else
+      #set($fieldValue = "$!fieldProperty.getValue()")
+    #end
     #set($fieldDisplayValue = "$!itemDoc.display($colname, 'view')")
     #if($fieldDisplayValue == '')
       #set($fieldDisplayValue = $services.localization.render("${request.transprefix}emptyvalue"))

@@ -20,7 +20,6 @@
 package org.xwiki.extension.xar;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -31,7 +30,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @since 10.3
  */
 @Role
-@Unstable
 public interface XWikiDocumentMerger
 {
     /**

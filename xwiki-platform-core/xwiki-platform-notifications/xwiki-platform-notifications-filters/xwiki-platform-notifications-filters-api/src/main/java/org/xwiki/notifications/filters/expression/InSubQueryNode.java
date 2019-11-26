@@ -25,7 +25,6 @@ import java.util.Map;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define a IN operation into a given sub query in a filtering expression.
@@ -34,7 +33,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.8RC1
  * @since 9.11.8
  */
-@Unstable
 public final class InSubQueryNode extends AbstractOperatorNode
 {
     private AbstractValueNode leftOperand;

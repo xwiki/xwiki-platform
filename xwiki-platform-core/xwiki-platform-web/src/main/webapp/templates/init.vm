@@ -1,6 +1,5 @@
 #set($jobstatus = $xwiki.currentInitializerJobStatus)
-#set($errors = $jobstatus.log.getLogsFrom('ERROR'))
-#set($hasErrors = !$errors.isEmpty())
+#set($hasErrors = $jobstatus.logTail.hasLogLevel('ERROR'))
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
   <head>
@@ -140,7 +139,7 @@
           #end
         #end
         $services.template.execute('logging_macros.vm')
-        #printLogs($jobstatus.log)
+        #printLogs($jobstatus.logTail)
       #end
     </div>
   </body>

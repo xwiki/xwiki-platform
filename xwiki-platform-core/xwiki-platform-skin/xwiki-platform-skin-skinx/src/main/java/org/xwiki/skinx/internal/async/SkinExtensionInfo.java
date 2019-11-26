@@ -21,6 +21,9 @@ package org.xwiki.skinx.internal.async;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * Contains a skin extension to use.
  * 
@@ -69,5 +72,35 @@ public class SkinExtensionInfo
     public Map<String, Object> getParameters()
     {
         return this.parameters;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (!(obj instanceof SkinExtensionInfo)) {
+            return false;
+        }
+
+        SkinExtensionInfo otherExtensionInfo = (SkinExtensionInfo) obj;
+
+        EqualsBuilder builder = new EqualsBuilder();
+
+        builder.append(this.resource, otherExtensionInfo.resource);
+        builder.append(this.type, otherExtensionInfo.type);
+        builder.append(this.parameters, otherExtensionInfo.parameters);
+
+        return builder.isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.append(this.resource);
+        builder.append(this.type);
+        builder.append(this.parameters);
+
+        return builder.toHashCode();
     }
 }

@@ -20,7 +20,6 @@
 package org.xwiki.xar;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * The type of the {@link XarEntry} which control the behavior to adopt while upgrading, editing, etc.
@@ -29,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.3
  */
 @Role
-@Unstable
 public interface XarEntryType
 {
     /**

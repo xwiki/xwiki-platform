@@ -22,7 +22,9 @@ package org.xwiki.rendering.async;
 import java.lang.reflect.Type;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -32,7 +34,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.10RC1
  */
 @Role
-@Unstable
 public interface AsyncContext
 {
     /**
@@ -82,4 +83,18 @@ public interface AsyncContext
      * @param value the value to associated with the cached result
      */
     void use(String type, Object value);
+
+    /**
+     * @param right the right needed for execution of the action
+     * @param userReference the user to check the right for
+     * @param entityReference the entity on which to check the right
+     * @param allowed the result of the evaluation
+     * @since 11.8RC1
+     */
+    @Unstable
+    default void useRight(Right right, DocumentReference userReference, EntityReference entityReference,
+        boolean allowed)
+    {
+
+    }
 }

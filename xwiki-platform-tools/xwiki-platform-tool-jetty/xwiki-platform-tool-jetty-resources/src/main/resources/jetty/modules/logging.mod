@@ -22,6 +22,9 @@
 # Jetty std err/out logging
 #
 
+[depend]
+server
+
 [xml]
 etc/jetty-logging.xml
 

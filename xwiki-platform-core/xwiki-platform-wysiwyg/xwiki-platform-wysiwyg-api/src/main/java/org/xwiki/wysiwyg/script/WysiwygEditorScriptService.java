@@ -32,13 +32,16 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 import org.xwiki.wysiwyg.converter.HTMLConverter;
 import org.xwiki.wysiwyg.importer.AttachmentImporter;
 
@@ -128,10 +131,31 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param html the HTML fragment to be rendered
      * @param syntaxId the storage syntax identifier
      * @return the XHTML result of rendering the given HTML fragment
+     * @deprecated since 11.9RC1, use {@link #parseAndRender(String, Syntax, EntityReference)} instead
      */
+    @Deprecated
     public String parseAndRender(String html, String syntaxId)
     {
-        XWikiDocument originalSecurityDocument = setSecurityDocument(createSecurityDocument());
+        return parseAndRender(html, getSyntax(syntaxId), null);
+    }
+
+    /**
+     * Parses the given HTML fragment and renders the result in annotated XHTML syntax.
+     * <p>
+     * This method is currently used in {@code wysiwyginput.vm} and its purpose is to refresh the content of the WYSIWYG
+     * editor. This method is called for instance when a macro is inserted or edited.
+     *
+     * @param html the HTML fragment to be rendered
+     * @param syntax the storage syntax identifier
+     * @param sourceReference the reference of the html (where it's coming from)
+     * @return the XHTML result of rendering the given HTML fragment
+     * @since 11.9RC1
+     */
+    @Unstable
+    public String parseAndRender(String html, Syntax syntax, EntityReference sourceReference)
+    {
+        XWikiDocument securityDocument = createSecurityDocument();
+        XWikiDocument originalSecurityDocument = setSecurityDocument(securityDocument);
 
         // Save the value of the "is in rendering engine" context property.
         Object isInRenderingEngine = this.xcontextProvider.get().get(IS_IN_RENDERING_ENGINE);
@@ -142,7 +166,20 @@ public class WysiwygEditorScriptService implements ScriptService
             // templates using only Velocity for example).
             this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, true);
 
-            return this.htmlConverter.parseAndRender(html, syntaxId);
+            // If the source reference is not set, do a best effort by using the security doc reference (i.e. the
+            // current document reference since most of the time the content comes from the current document.
+            // However, callers of this method are expected to provide a non-null source reference for more accurate
+            // results. We do this because the main caller of this method is the CKEditor extension and it needs to
+            // work with several version of XWiki (including versions older than 11.9RC1 - in which this new method
+            // signature was added) and for simplicity reasons is currently passing null.
+            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and reomve this
+            // fallback.
+            EntityReference resolvedSourceReference = sourceReference;
+            if (resolvedSourceReference == null) {
+                resolvedSourceReference = securityDocument.getDocumentReference();
+            }
+
+            return this.htmlConverter.parseAndRender(html, syntax, resolvedSourceReference);
         } catch (Exception e) {
             // Leave the previous HTML in case of an exception.
             return html;
@@ -194,10 +231,29 @@ public class WysiwygEditorScriptService implements ScriptService
      * @param source the text to be converted
      * @param syntaxId the syntax identifier
      * @return the annotated XHTML result of the conversion
+     * @deprecated since 11.9RC1 use
      */
+    @Deprecated
     public String toAnnotatedXHTML(String source, String syntaxId)
     {
-        XWikiDocument originalSecurityDocument = setSecurityDocument(createSecurityDocument());
+        return toAnnotatedXHTML(source, getSyntax(syntaxId), null);
+    }
+
+    /**
+     * Converts the given source text from the specified syntax to annotated XHTML, which can be used as input for the
+     * WYSIWYG editor.
+     *
+     * @param source the text to be converted
+     * @param syntax the syntax of the source
+     * @param sourceReference the reference of the source
+     * @return the annotated XHTML result of the conversion
+     * @since 11.9RC1
+     */
+    @Unstable
+    public String toAnnotatedXHTML(String source, Syntax syntax, EntityReference sourceReference)
+    {
+        XWikiDocument securityDocument = createSecurityDocument();
+        XWikiDocument originalSecurityDocument = setSecurityDocument(securityDocument);
 
         // Save the value of the "is in rendering engine" context property.
         Object isInRenderingEngine = this.xcontextProvider.get().get(IS_IN_RENDERING_ENGINE);
@@ -208,7 +264,20 @@ public class WysiwygEditorScriptService implements ScriptService
             // templates using only Velocity for example).
             this.xcontextProvider.get().put(IS_IN_RENDERING_ENGINE, true);
 
-            return this.htmlConverter.toHTML(source, syntaxId);
+            // If the source reference is not set, do a best effort by using the security doc reference (i.e. the
+            // current document reference since most of the time the content comes from the current document.
+            // However, callers of this method are expected to provide a non-null source reference for more accurate
+            // results. We do this because the main caller of this method is the CKEditor extension and it needs to
+            // work with several version of XWiki (including versions older than 11.9RC1 - in which this new method
+            // signature was added) and for simplicity reasons is currently passing null.
+            // TODO: Fix the CKEditor plugin to call the non-deprecated toAnnotatedXHTML() method and reomve this
+            // fallback.
+            EntityReference resolvedSourceReference = sourceReference;
+            if (resolvedSourceReference == null) {
+                resolvedSourceReference = securityDocument.getDocumentReference();
+            }
+
+            return this.htmlConverter.toHTML(source, syntax, resolvedSourceReference);
         } catch (Exception e) {
             // Return the source text in case of an exception.
             return source;
@@ -304,6 +373,15 @@ public class WysiwygEditorScriptService implements ScriptService
             this.logger.warn("Failed to import office attachment [{}]. Root cause is: {}",
                 this.entityReferenceSerializer.serialize(attachmentReference), ExceptionUtils.getRootCauseMessage(e));
             return null;
+        }
+    }
+
+    private Syntax getSyntax(String syntaxId)
+    {
+        try {
+            return Syntax.valueOf(syntaxId);
+        } catch (ParseException e) {
+            throw new RuntimeException(String.format("Invalid syntax [%s]", syntaxId), e);
         }
     }
 }

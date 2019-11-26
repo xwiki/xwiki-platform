@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.3" reference="WikiManager.WebHome" locale="">
   <web>WikiManager</web>
   <name>WebHome</name>
   <language/>
@@ -59,135 +59,18 @@
 })
 #if(!$isGuest)
   #set($discard = $columns.add('_actions'))
-  #set($discard = $columnsProperties.put('_actions', { 'actions' : ['join', 'requestJoin', 'cancelJoinRequest', 'viewInvitation', 'leave', 'edit', 'delete'] }))
+  #set($discard = $columnsProperties.put('_actions', {
+    'actions': [
+      {'id': 'join', 'icon': 'user_add'},
+      {'id': 'leave', 'icon': 'user_delete'},
+      {'id': 'requestJoin', 'icon': 'bell'},
+      {'id': 'cancelJoinRequest', 'icon': 'bell_delete'},
+      {'id': 'viewInvitation', 'icon': 'envelope'},
+      'edit', 'delete'
+    ]
+  }))
 #end
 #livetable('wikis', $columns, $columnsProperties, $options)
 #set($docextras=[])
 {{/velocity}}</content>
-  <object>
-    <name>WikiManager.WebHome</name>
-    <number>0</number>
-    <className>XWiki.StyleSheetExtension</className>
-    <guid>82861b9a-aff1-49cc-ad6c-8ad1dcc9df38</guid>
-    <class>
-      <name>XWiki.StyleSheetExtension</name>
-      <customClass/>
-      <customMapping/>
-      <defaultViewSheet/>
-      <defaultEditSheet/>
-      <defaultWeb/>
-      <nameField/>
-      <validationScript/>
-      <cache>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>cache</name>
-        <number>5</number>
-        <prettyName>Caching policy</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>long|short|default|forbid</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </cache>
-      <code>
-        <disabled>0</disabled>
-        <name>code</name>
-        <number>2</number>
-        <prettyName>Code</prettyName>
-        <rows>20</rows>
-        <size>50</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-      </code>
-      <contentType>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>contentType</name>
-        <number>6</number>
-        <prettyName>Content Type</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>CSS|LESS</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </contentType>
-      <name>
-        <disabled>0</disabled>
-        <name>name</name>
-        <number>1</number>
-        <prettyName>Name</prettyName>
-        <size>30</size>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
-      </name>
-      <parse>
-        <disabled>0</disabled>
-        <displayFormType>select</displayFormType>
-        <displayType>yesno</displayType>
-        <name>parse</name>
-        <number>4</number>
-        <prettyName>Parse content</prettyName>
-        <unmodifiable>0</unmodifiable>
-        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
-      </parse>
-      <use>
-        <cache>0</cache>
-        <disabled>0</disabled>
-        <displayType>select</displayType>
-        <multiSelect>0</multiSelect>
-        <name>use</name>
-        <number>3</number>
-        <prettyName>Use this extension</prettyName>
-        <relationalStorage>0</relationalStorage>
-        <separator> </separator>
-        <separators>|, </separators>
-        <size>1</size>
-        <unmodifiable>0</unmodifiable>
-        <values>currentPage|onDemand|always</values>
-        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-      </use>
-    </class>
-    <property>
-      <cache>long</cache>
-    </property>
-    <property>
-      <code>.actionjoin {
-  background-image: url("$xwiki.getSkinFile('icons/silk/user_add.png')");
-}
-
-.actionleave {
-  background-image: url("$xwiki.getSkinFile('icons/silk/user_delete.png')");
-}
-
-.actionrequestJoin {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bell.png')");
-}
-
-.actioncancelJoinRequest {
-  background-image: url("$xwiki.getSkinFile('icons/silk/bell_delete.png')");
-}
-
-.actionviewInvitation {
-  background-image: url("$xwiki.getSkinFile('icons/silk/script.png')");
-}</code>
-    </property>
-    <property>
-      <name/>
-    </property>
-    <property>
-      <parse>1</parse>
-    </property>
-    <property>
-      <use>currentPage</use>
-    </property>
-  </object>
 </xwikidoc>

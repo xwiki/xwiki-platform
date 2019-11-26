@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -62,7 +64,9 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import com.xpn.xwiki.doc.DocumentRevisionProvider;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -78,6 +82,7 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -111,6 +116,9 @@ public class XWikiMockitoTest
     @Named("xwikicfg")
     private ConfigurationSource xwikiCfgConfigurationSource;
 
+    @MockComponent
+    private WikiDescriptorManager wikis;
+
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
@@ -135,7 +143,6 @@ public class XWikiMockitoTest
         this.componentManager.registerMockComponent(Environment.class);
         this.componentManager.registerMockComponent(ObservationManager.class);
         this.componentManager.registerMockComponent(StoreConfiguration.class);
-        this.componentManager.registerMockComponent(WikiDescriptorManager.class);
 
         when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
 
@@ -522,7 +529,8 @@ public class XWikiMockitoTest
         ParseGroovyFromString parser = this.componentManager.registerMockComponent(ParseGroovyFromString.class);
 
         this.context.setWikiId("wiki");
-        XWikiDocument document = new XWikiDocument(new DocumentReference(this.context.getWikiId(), "Space", "Document"));
+        XWikiDocument document =
+            new XWikiDocument(new DocumentReference(this.context.getWikiId(), "Space", "Document"));
         document.setContent("source");
 
         this.documents.put(document.getDocumentReference(), document);
@@ -534,7 +542,7 @@ public class XWikiMockitoTest
             @Override
             public Object answer(InvocationOnMock invocation) throws Throwable
             {
-                assertSame(document, ((XWikiContext)invocation.getArgument(1)).get(XWikiDocument.CKEY_SDOC));
+                assertSame(document, ((XWikiContext) invocation.getArgument(1)).get(XWikiDocument.CKEY_SDOC));
 
                 return result;
             }
@@ -542,5 +550,29 @@ public class XWikiMockitoTest
 
         assertEquals(result, this.xwiki.parseGroovyFromPage("Space.Document", this.context));
         assertEquals(result, this.xwiki.parseGroovyFromPage("Space.Document", "page", this.context));
+    }
+
+    @Test
+    public void getServerURLWhenPathBased() throws MalformedURLException, WikiManagerException
+    {
+        this.context.setMainXWiki("mainwiki");
+        this.context.setWikiId("mainwiki");
+
+        when(this.xwikiCfgConfigurationSource.getProperty("xwiki.virtual.usepath", "1")).thenReturn("1");
+
+        assertNull(this.xwiki.getServerURL("subwiki", this.context));
+
+        WikiDescriptor subwikiDescriptor = new WikiDescriptor("subwiki", "subwiki");
+        when(this.wikis.getById(subwikiDescriptor.getId())).thenReturn(subwikiDescriptor);
+        WikiDescriptor mainwikiDescriptor = new WikiDescriptor(this.context.getMainXWiki(), "mainwiki.com");
+        when(this.wikis.getById(mainwikiDescriptor.getId())).thenReturn(mainwikiDescriptor);
+        when(this.wikis.getMainWikiDescriptor()).thenReturn(mainwikiDescriptor);
+
+        assertEquals(new URL("http://mainwiki.com"), this.xwiki.getServerURL("subwiki", this.context));
+
+        mainwikiDescriptor.setSecure(null);
+        mainwikiDescriptor.setPort(8080);
+
+        assertEquals(new URL("http://mainwiki.com:8080"), this.xwiki.getServerURL("subwiki", this.context));
     }
 }

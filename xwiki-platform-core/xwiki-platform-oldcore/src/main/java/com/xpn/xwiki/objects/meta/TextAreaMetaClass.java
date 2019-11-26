@@ -41,6 +41,8 @@ import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 @Singleton
 public class TextAreaMetaClass extends StringMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Unknown value.
      */

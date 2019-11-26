@@ -234,10 +234,10 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
                     // Create a pseudo job status
                     status = new AsyncRendererJobStatus(request, result, contextUse.getReferences(),
-                        contextUse.getRoleTypes(), contextUse.getRoles(), contextUse.getUses());
+                        contextUse.getRoleTypes(), contextUse.getRoles(), contextUse.getRights(), contextUse.getUses());
                 } else {
                     // Create a pseudo job status
-                    status = new AsyncRendererJobStatus(request, result, null, null, null, null);
+                    status = new AsyncRendererJobStatus(request, result, null, null, null, null, null);
                 }
 
                 request.setId(jobId);

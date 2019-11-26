@@ -24,7 +24,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 /**
- * The Report step UI.
+ * The Outdated Extensions step UI.
  * 
  * @version $Id$
  * @since 10.7RC1
@@ -42,8 +42,7 @@ public class ExtensionsDistributionStep extends AbstractDistributionPage
         this.checkForUpdates.click();
 
         // Wait for the result
-        getDriver()
-            .waitUntilElementIsVisible(By.xpath("//div[@class='extensionUpdater']/p[@class='xHint']"));
+        getDriver().waitUntilElementIsVisible(By.xpath("//div[@class='extensionUpdater']/p[@class='xHint']"));
 
         return new ExtensionsDistributionStep();
     }

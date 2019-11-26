@@ -60,7 +60,11 @@ public class CopyOverwritePromptPage extends ViewPage
      */
     public CopyOrRenameOrDeleteStatusPage clickCopyButton()
     {
+        // The WebElement#submit method does not wait anymore for the page to load,
+        // cf: https://github.com/mozilla/geckodriver/issues/1026
+        getDriver().addPageNotYetReloadedMarker();
         this.copyButton.submit();
+        getDriver().waitUntilPageIsReloaded();
         return new CopyOrRenameOrDeleteStatusPage();
     }
 

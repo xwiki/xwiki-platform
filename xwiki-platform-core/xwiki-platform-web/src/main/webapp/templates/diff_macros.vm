@@ -34,7 +34,7 @@
     #displayConflictValue($block.conflict "current")
     #displayConflictValue($block.conflict "previous")
     #displayConflictValue($block.conflict "next")
-    <textarea class="form-control diff-decision" id="conflict_decision_value_custom_$block.conflict.reference"></textarea>
+    <textarea class="form-control diff-decision" name="conflict_decision_value_custom" id="conflict_decision_value_custom_$block.conflict.reference"></textarea>
     <input type="hidden" id="conflict_id_$block.conflict.reference" name="conflict_id" value="$block.conflict.reference" />
     <select class="diff-choices" id="conflict_decision_select_$block.conflict.reference" name="conflict_decision_select">
       <option value="current" selected="selected">$services.localization.render("core.editors.save.previewDiff.versionToCompare.current")</option>
@@ -80,8 +80,14 @@
       </span>
     #end
   </dt>
+  ## TODO: For now we only want to display conflicts if the property is content
+  #if ($propertyName.toLowerCase().equals("content"))
+    #set ($conflictsDiff = $conflicts)
+  #else
+    #set ($conflictsDiff = $NULL)
+  #end
   #if (!$_obfuscate)
-    <dd>#unifiedDiff($previousValue $newValue $conflicts)</dd>
+    <dd>#unifiedDiff($previousValue $newValue $conflictsDiff)</dd>
   #end
   #set ($_obfuscate = $NULL)
 #end

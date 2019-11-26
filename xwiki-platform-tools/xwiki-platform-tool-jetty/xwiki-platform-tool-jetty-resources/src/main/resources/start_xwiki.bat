@@ -95,10 +95,10 @@ REM Specify the encoding to use
 set XWIKI_OPTS=%XWIKI_OPTS% -Dfile.encoding=UTF8
 
 REM Specify port on which HTTP requests will be handled
-set JETTY_OPTS=%JETTY_OPTS% jetty.port=%JETTY_PORT%
+set JETTY_OPTS=%JETTY_OPTS% jetty.http.port=%JETTY_PORT%
 REM In order to print a nice friendly message to the user when Jetty has finished loading the XWiki webapp, we pass
 REM the port we use as a System Property
-set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.port=%JETTY_PORT%
+set XWIKI_OPTS=%XWIKI_OPTS% -Djetty.http.port=%JETTY_PORT%
 
 REM Specify port and key to stop a running Jetty instance
 set JETTY_OPTS=%JETTY_OPTS% STOP.KEY=xwiki STOP.PORT=%JETTY_STOP_PORT%

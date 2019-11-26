@@ -25,12 +25,16 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.converter.AbstractConverter;
+import org.xwiki.properties.converter.ConversionException;
+import org.xwiki.properties.converter.Converter;
 
 /**
  * Converter that converts a value into a {@link DocumentReference} object. Relative references are resolved using
@@ -53,24 +57,39 @@ public class DocumentReferenceConverter extends AbstractConverter<DocumentRefere
 
     @Inject
     @Named("compact")
-    private EntityReferenceSerializer<String> serialier;
+    private EntityReferenceSerializer<String> serializer;
+
+    @Inject
+    private ConverterManager converterManager;
+
+    @Inject
+    private Logger logger;
 
     @Override
     protected DocumentReference convertToType(Type type, Object value)
     {
+        DocumentReference result;
         if (value == null) {
-            return null;
+            result = null;
+        } else if (value instanceof EntityReference) {
+            result = this.referenceResolver.resolve((EntityReference) value);
+        }  else {
+            Converter<Object> converter = this.converterManager.getConverter(value.getClass());
+
+            if (converter != null) {
+                try {
+                    result = converter.convert(DocumentReference.class, value);
+                } catch (ConversionException e) {
+                    logger.warn("The type [{}] cannot be converted natively to DocumentReference, "
+                        + "falling back on using toString to convert it.", value.getClass().getName());
+                    result = this.stringResolver.resolve(value.toString());
+                }
+            } else {
+                result = this.stringResolver.resolve(value.toString());
+            }
         }
 
-        DocumentReference reference;
-
-        if (value instanceof EntityReference) {
-            reference = this.referenceResolver.resolve((EntityReference) value);
-        } else {
-            reference = this.stringResolver.resolve(value.toString());
-        }
-
-        return reference;
+        return result;
     }
 
     @Override
@@ -80,6 +99,6 @@ public class DocumentReferenceConverter extends AbstractConverter<DocumentRefere
             return null;
         }
 
-        return this.serialier.serialize(value);
+        return this.serializer.serialize(value);
     }
 }

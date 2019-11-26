@@ -39,6 +39,7 @@ import org.xwiki.job.JobContext;
 import org.xwiki.job.Request;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.store.merge.MergeConflictDecisionsManager;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
 import org.xwiki.test.annotation.BeforeComponent;
@@ -61,6 +62,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -81,6 +83,9 @@ public class DocumentMergeImporterTest
 
     @MockComponent
     private MergeManager mergeManager;
+
+    @MockComponent
+    private MergeConflictDecisionsManager conflictDecisionsManager;
 
     private DocumentReference documentReference = new DocumentReference("wiki", "space", "page", Locale.ROOT);
 
@@ -155,6 +160,7 @@ public class DocumentMergeImporterTest
         this.configuration = new PackageConfiguration();
 
         this.mergeResult = new MergeDocumentResult(this.currentDocument, this.previousDocument, this.nextDocument);
+        this.mergeResult.setMergeResult(mergedDocument);
         when(this.mergeManager.mergeDocument(same(this.previousDocument), same(this.nextDocument),
             same(this.currentDocument), any(MergeConfiguration.class))).thenReturn(this.mergeResult);
 
@@ -190,7 +196,9 @@ public class DocumentMergeImporterTest
         this.documentMergeImporter.importDocument("comment", this.previousDocument, this.currentDocument,
             this.nextDocument, this.configuration);
 
-        verifyZeroInteractions(this.xwiki, this.xcontext);
+        verify(this.xcontext, times(1)).getUserReference();
+        verifyNoMoreInteractions(this.xcontext);
+        verifyZeroInteractions(this.xwiki);
     }
 
     @Test
@@ -313,7 +321,9 @@ public class DocumentMergeImporterTest
 
         verify(this.jobStatus, times(2)).ask(any());
 
-        verifyZeroInteractions(this.xwiki, this.xcontext);
+        verify(this.xcontext, times(2)).getUserReference();
+        verifyNoMoreInteractions(this.xcontext);
+        verifyZeroInteractions(this.xwiki);
     }
 
     @Test

@@ -36,6 +36,8 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class StaticListClass extends ListClass
 {
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "staticlist";
 
     public StaticListClass(PropertyMetaClass wclass)

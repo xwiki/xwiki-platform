@@ -30,7 +30,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.displayer.HTMLDisplayerException;
 import org.xwiki.displayer.HTMLDisplayerManager;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Exposes {@link org.xwiki.displayer.HTMLDisplayer}s to scripts.
@@ -38,7 +37,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.11RC1
  */
-@Unstable
 @Named("display.html")
 @Component
 @Singleton

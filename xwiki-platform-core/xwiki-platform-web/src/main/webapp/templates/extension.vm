@@ -97,14 +97,14 @@
 #end
 
 #macro (displayExtensionName $extension)
-  #set ($name = "$!{extension.name}")
-  #if ($name == '')
-    #set ($name = "$!{extension.id.id}")
-    #if ($name.indexOf(':') >= 0)
-      #set ($name = $name.substring($mathtool.add($name.indexOf(':'), 1)))
-    #end
-  #end
-  ${name}##
+#set ($name = "$!{extension.name}")
+#if ($name == '')
+#set ($name = "$!{extension.id.id}")
+#if ($name.indexOf(':') >= 0)
+#set ($name = $name.substring($mathtool.add($name.indexOf(':'), 1)))
+#end
+#end
+${name}##
 #end
 
 #macro (displayExtensionActionButtons $extension $readOnly)
@@ -764,6 +764,7 @@ $namespace##
   </div>
   #if ($originalDocument && $revisedDocument)
     <div id="changescontent">
+      #set ($conflictsList = $question.documentConflicts)
       #set ($rev1 = $originalVersion.toLowerCase())
       #set ($rev2 = $revisedVersion.toLowerCase())
       #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
@@ -1141,6 +1142,13 @@ $namespace##
     ## A merge conflict occurred during installation.
     #set ($discard = $question.setGlobalAction($request.versionToKeep))
     #set ($discard = $question.setAlways($request.autoResolve.equals('true')))
+    #set ($allDecisions = $request.getParameterValues("conflict_decision_select"));
+    #set ($allCustoms = $request.getParameterValues("conflict_decision_value_custom"))
+    #foreach($conflictReference in $request.getParameterValues("conflict_id"))
+      #set ($decision = $allDecisions[$foreach.index])
+      #set ($custom = $allCustoms[$foreach.index])
+      #set ($discard = $question.setConflictDecision($conflictReference, $decision, $custom))
+    #end
   #elseif ($questionType.endsWith('.CleanPagesQuestion'))
     #foreach ($entry in $question.pages.entrySet())
       ## Currently there's no string representation of a document reference with parameters (such as locale) that can
@@ -1592,18 +1600,37 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
     'noSx': true
   })
   #paginationPrepareParams($paginationParams)
-  #if ($items.size() > $paginationParams.itemsPerPage)
-    #set ($hasPagination = true)
+  #set ($hasPagination = $items.size() > $paginationParams.itemsPerPage)
+  #set ($indexOutOfRange = $items.size() > 0 && $paginationParams.firstItem >= $items.size())
+  #if ($hasPagination || $indexOutOfRange)
     #set ($paginationParams.totalItems = $items.size())
     #set ($requestParams = {})
     #set ($discard = $requestParams.putAll($request.getParameterMap()))
     #set ($discard = $requestParams.remove($paginationParams.itemParamName))
     #set ($discard = $requestParams.remove($paginationParams.itemsPerPageParamName))
+    #if ($indexOutOfRange)
+      #if ($request.get("${key}PagingReset"))
+        ## it seems we already got redirected. how this?
+        #set ($paginationParams.firstItem = 0)
+      #else
+        #set ($discard = $requestParams.put("${key}PagingReset", "1"))
+        #set ($redirectUrl = $doc.getURL($xcontext.action, $escapetool.url($requestParams)))
+        #set ($discard = $response.sendRedirect($redirectUrl))
+        #stop
+      #end
+    #else
+      #set ($discard = $requestParams.remove("${key}PagingReset"))
+    #end
+  #end
+  #if($hasPagination)
     #set ($paginationParams.url = $doc.getURL($xcontext.action, $escapetool.url($requestParams)))
     #pagination($paginationParams)
   #end
   #set ($lastItem = $mathtool.min($items.size(), $mathtool.add($paginationParams.firstItem,
     $paginationParams.itemsPerPage)))
+  #if ($request.get("${key}PagingReset"))
+     <div class="box infomessage">$escapetool.xml($services.localization.render('platform.extension.updater.pagingrestart'))</div>
+  #end
   #set ($items = $items.subList($paginationParams.firstItem, $lastItem))
   #foreach ($item in $items)
     #if ($foreach.index == 0 || $item.namespace != $extensionNamespace)

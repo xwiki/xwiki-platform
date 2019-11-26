@@ -33,6 +33,7 @@ import org.xwiki.job.annotation.Serializable;
 import org.xwiki.logging.LoggerManager;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.async.internal.DefaultAsyncContext.RightEntry;
 
 /**
  * The status of the {@link AsyncRendererJob}.
@@ -56,6 +57,8 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     private Set<Type> roleTypes;
 
     private Set<ComponentRole<?>> roles;
+
+    private Set<RightEntry> rights;
 
     private Map<String, Collection<Object>> uses;
 
@@ -101,9 +104,11 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
      * @param references the involved references
      * @param roleTypes the involved components types
      * @param roles the involved components
+     * @param rights
+     * @since 11.8RC1
      */
     AsyncRendererJobStatus(AsyncRendererJobRequest request, AsyncRendererResult result, Set<EntityReference> references,
-        Set<Type> roleTypes, Set<ComponentRole<?>> roles, Map<String, Collection<Object>> uses)
+        Set<Type> roleTypes, Set<ComponentRole<?>> roles, Set<RightEntry> rights, Map<String, Collection<Object>> uses)
     {
         super(JOBTYPE, request, null, null, null);
 
@@ -113,6 +118,7 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
         setReferences(references);
         setRoleTypes(roleTypes);
         setRoles(roles);
+        setRights(rights);
         setUses(uses);
 
         setState(State.FINISHED);
@@ -194,6 +200,26 @@ public class AsyncRendererJobStatus extends AbstractJobStatus<AsyncRendererJobRe
     {
         if (roles != null) {
             this.roles = Collections.unmodifiableSet(roles);
+        }
+    }
+
+    /**
+     * @return the right checks to invalidate the cache
+     * @since 11.8RC1
+     */
+    public Set<RightEntry> getRights()
+    {
+        return this.rights != null ? this.rights : Collections.emptySet();
+    }
+
+    /**
+     * @param rights the right checks to invalidate the cache
+     * @since 11.8RC1
+     */
+    void setRights(Set<RightEntry> rights)
+    {
+        if (rights != null) {
+            this.rights = Collections.unmodifiableSet(rights);
         }
     }
 

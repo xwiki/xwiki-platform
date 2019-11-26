@@ -43,6 +43,9 @@ authentication.admin.failureStrategy.captcha.name=CAPTCHA
 authentication.admin.maxAttempts.label=Màxim nombre d'intents permesos
 authentication.admin.maxAttempts.hint=Això representa el nombre màxim d'autenticacions fallides abans que s'activi l'estratègia. Aquest nombre només es té en compte en el context de la següent finestra. Tingueu en compte que el valor 0 significa que la funcionalitat està desactivada.
 authentication.admin.timeWindow.label=Finestra de temps per les fallades d'accés
-authentication.admin.timeWindow.hint=La finestra de temps en segons a tenir en compte els errors d'autenticació per activar l'estratègia.</content>
-  
+authentication.admin.timeWindow.hint=La finestra de temps en segons a tenir en compte els errors d'autenticació per activar l'estratègia.
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.label=Enable or disable the authentication security mechanism
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.hint=Disabling the authentication security mechanism will also reset the authentication failure records.
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.disabled=Disabled
+### Missing: authentication.admin.isAuthenticationSecurityEnabled.enabled=Enabled</content>
 </xwikidoc>

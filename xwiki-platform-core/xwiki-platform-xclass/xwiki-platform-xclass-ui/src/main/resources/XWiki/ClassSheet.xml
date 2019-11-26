@@ -112,6 +112,11 @@
     #set ($classTemplateReference = $services.model.createDocumentReference("${className}Template",
       $doc.documentReference.parent))
   #end
+  ## Determine the template provider using naming convention.
+  #set ($classTemplateProviderReference = $services.model.createDocumentReference("${className}TemplateProvider",
+    $doc.documentReference.parent))
+  #set ($classTemplateProviderDoc = $xwiki.getDocument($classTemplateProviderReference))
+  #set ($hasClassTemplateProvider = !$classTemplateProviderDoc.isNew())
   #set($classTemplateDoc = $xwiki.getDocument($classTemplateReference))
   #set($hasClassSheets = !$classSheetReferences.isEmpty() || $xwiki.exists($defaultClassSheetReference))
   #set($hasClassTemplate = !$classTemplateDoc.isNew())
@@ -317,6 +322,49 @@
     #set ($templatePath = "#hierarchy($classTemplateDoc.documentReference, {'plain': true, 'local': true, 'limit': 4})")
     [[$services.localization.render('platform.xclass.defaultClassSheet.template.view',
       [$templatePath.trim()]) »&gt;&gt;${classTemplateDoc.fullName}]]
+  #end
+  ## Create a template provider only if a template for the current class exists.
+  #if ($classTemplateDoc.getObject(${doc.fullName}))
+    (% id="HClassTemplateProvider" %)
+    = {{translation key="platform.xclass.defaultClassSheet.templateProvider.heading"/}} =
+
+      {{info}}$services.localization.render('platform.xclass.defaultClassSheet.templateProvider.description',
+        ['//']){{/info}}
+
+    #if (!$hasClassTemplateProvider)
+      #set ($templateProviderClassName = 'XWiki.TemplateProviderClass')
+      ## Do the page creation and object addition in one step, providing some default values.
+      ## In order to get the root space of the class and use it as restrictionSpace, we need to be sure that we have
+      ## the expected result for multiple level hierarchies, like MyApplication.Code.MyApplicationClass. In this case,
+      ## the template provider in enabled in MyApplication space.
+      #set ($restrictionSpace = $doc.documentReference.spaceReferences.get(0).name)
+      #set ($createUrlQueryString = $escapetool.url({
+        'classname': $templateProviderClassName,
+        'xredirect': $xwiki.relativeRequestURL,
+        'form_token': $services.csrf.token,
+        "${templateProviderClassName}_name": $className,
+        "${templateProviderClassName}_description":
+          $services.localization.render('platform.xclass.templateProvider.defaultDescription', [$className]),
+        "${templateProviderClassName}_template": $classTemplateDoc,
+        "${templateProviderClassName}_visibilityRestrictions": $restrictionSpace}))
+      #set ($createUrl = $classTemplateProviderDoc.getURL('objectadd', $createUrlQueryString))
+      {{html}}
+        &lt;form action="$classTemplateProviderDoc.getURL('save', 'editor=wiki')" method="post"&gt;
+          &lt;div&gt;
+            &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+            &lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
+            &lt;input type="hidden" name="xredirect" value="$createUrl"/&gt;
+            &lt;input type="hidden" name="title" value="$className Template Provider"/&gt;
+            &lt;span class="buttonwrapper"&gt;&lt;input type="submit" class="button" value="$escapetool.xml(
+              $services.localization.render('platform.xclass.defaultClassSheet.templateProvider.create'))"/&gt;&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/form&gt;
+      {{/html}}
+    #else
+      #set ($templateProviderPath = "#hierarchy($classTemplateProviderDoc.documentReference, {'plain': true, 'local': true, 'limit': 4})")
+      [[$services.localization.render('platform.xclass.defaultClassSheet.templateProvider.view',
+        [$templateProviderPath.trim()]) »&gt;&gt;${classTemplateProviderDoc.fullName}]]
+    #end
   #end
 
 #end## !$isSheet

@@ -30,6 +30,8 @@ import java.util.logging.Level;
 import org.apache.commons.lang3.StringUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Capabilities;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.NotFoundException;
@@ -44,7 +46,6 @@ import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.remote.CommandExecutor;
 import org.openqa.selenium.remote.ErrorHandler;
 import org.openqa.selenium.remote.FileDetector;
-import org.openqa.selenium.remote.RemoteStatus;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -629,11 +630,18 @@ public class XWikiWebDriver extends RemoteWebDriver
             {
                 boolean result = false;
 
-                Object rawResult = executeJavascript(booleanExpression, arguments);
-                if (rawResult instanceof Boolean) {
-                    result = (Boolean) rawResult;
-                } else {
-                    throw new IllegalArgumentException("The executed javascript does not return a boolean value");
+                try {
+                    Object rawResult = executeJavascript(booleanExpression, arguments);
+                    if (rawResult instanceof Boolean) {
+                        result = (Boolean) rawResult;
+                    } else {
+                        throw new IllegalArgumentException("The executed javascript does not return a boolean value");
+                    }
+                } catch (JavascriptException e) {
+                    // We might obtain reference error when checking the presence of some properties during a wait.
+                    if (!e.getMessage().contains("ReferenceError")) {
+                        throw e;
+                    }
                 }
 
                 return result;
@@ -766,12 +774,6 @@ public class XWikiWebDriver extends RemoteWebDriver
     public Capabilities getCapabilities()
     {
         return this.wrappedDriver.getCapabilities();
-    }
-
-    @Override
-    public RemoteStatus getRemoteStatus()
-    {
-        return this.wrappedDriver.getRemoteStatus();
     }
 
     @Override
@@ -1020,6 +1022,39 @@ public class XWikiWebDriver extends RemoteWebDriver
      */
     public void dragAndDrop(WebElement source, WebElement target)
     {
-        new Actions(this.getWrappedDriver()).dragAndDrop(source, target).perform();
+        createActions().dragAndDrop(source, target).perform();
+    }
+
+    /**
+     * Utility method to build a proper instance of {@link Actions}.
+     * @return a new instance of {@link Actions}.
+     * @since 11.9RC1
+     */
+    public Actions createActions()
+    {
+        return new Actions(getWrappedDriver());
+    }
+
+    /**
+     * Same as {@link Actions#moveToElement(WebElement, int, int)} except that the target is the top-left corner of the
+     * target, instead of the center.
+     * @param target the element for which we want to reach the offset from the top-left corner.
+     * @param offsetX the offset on the right of the top-left corner to move to
+     * @param offsetY the offset on the bottom of the top-left corner to move to
+     * @param chainFrom the existing actions to be chain to, or null to create a dedicated chain of actions.
+     * @return an actions with the right move.
+     * @since 11.9RC1
+     */
+    public Actions moveToTopLeftCornerOfTargetWithOffset(WebElement target, int offsetX, int offsetY, Actions chainFrom)
+    {
+        Dimension containerDimension = target.getSize();
+        int newOffsetX = - containerDimension.getWidth() / 2 + offsetX;
+        int newOffsetY = - containerDimension.getHeight() / 2 + offsetY;
+
+        if (chainFrom == null) {
+            return createActions().moveToElement(target, newOffsetX, newOffsetY);
+        } else {
+            return chainFrom.moveToElement(target, newOffsetX, newOffsetY);
+        }
     }
 }

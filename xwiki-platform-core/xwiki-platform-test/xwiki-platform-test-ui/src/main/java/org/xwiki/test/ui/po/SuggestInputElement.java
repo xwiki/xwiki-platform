@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
 /**
  * Represents the actions possible on the suggest input widget.
@@ -36,7 +35,7 @@ import org.openqa.selenium.interactions.Actions;
  */
 public class SuggestInputElement extends BaseElement
 {
-    public static class SuggestionElement extends BaseElement
+    public class SuggestionElement extends BaseElement
     {
         private final WebElement suggestion;
 
@@ -93,9 +92,7 @@ public class SuggestInputElement extends BaseElement
         {
             select();
 
-            // We don't send the keys directly to the text input because it can be hidden.(e.g. when multiple selection
-            // is on and we click on a selected suggestion).
-            getDriver().getKeyboard().sendKeys(Keys.BACK_SPACE);
+            getTextInput().sendKeys(Keys.BACK_SPACE);
         }
 
         /**
@@ -143,7 +140,9 @@ public class SuggestInputElement extends BaseElement
         // If we simply click on the container we risk highlighting one of the selected suggestions (because the default
         // click is performed in the center of the element) and this hides the text input when multiple selection is on.
         // Safest is to click on the top left corner of the suggest input, before the first selected suggestion.
-        new Actions(getDriver().getWrappedDriver()).moveToElement(this.container, 2, 2).click().build().perform();
+        // And selenium only move to the center of the element, so we have to compute the offset for the top-left corner
+        // and we click on (2,2) to avoid missing it.
+        getDriver().moveToTopLeftCornerOfTargetWithOffset(this.container, 2, 2, null).click().build().perform();
         return this;
     }
 
@@ -154,7 +153,9 @@ public class SuggestInputElement extends BaseElement
      */
     public SuggestInputElement clear()
     {
-        getTextInput().clear();
+        // We cannot call WebElement#clear method because it does not fire the right keyboard events,
+        // so better to rely on a key combination to remove the content.
+        getTextInput().sendKeys(Keys.chord(Keys.CONTROL, "a", Keys.BACK_SPACE));
         return this;
     }
 

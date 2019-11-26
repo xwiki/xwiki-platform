@@ -103,6 +103,8 @@ public abstract class ListClass extends PropertyClass
      */
     public static final String FREE_TEXT_ALLOWED = "allowed";
 
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "list";
 
     /**

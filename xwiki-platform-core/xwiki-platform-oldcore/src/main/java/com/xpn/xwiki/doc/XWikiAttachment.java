@@ -59,7 +59,6 @@ import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.tika.internal.TikaUtils;
 
@@ -1225,7 +1224,6 @@ public class XWikiAttachment implements Cloneable
      * @return charset the character encoding associated with the attachment content
      * @since 10.11RC1
      */
-    @Unstable
     public String getCharset()
     {
         return this.charset;
@@ -1235,7 +1233,6 @@ public class XWikiAttachment implements Cloneable
      * @param charset the character encoding associated with the attachment content
      * @since 10.11RC1
      */
-    @Unstable
     public void setCharset(String charset)
     {
         this.charset = charset;

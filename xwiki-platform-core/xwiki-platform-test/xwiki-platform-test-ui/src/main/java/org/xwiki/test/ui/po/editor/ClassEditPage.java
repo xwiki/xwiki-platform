@@ -61,6 +61,7 @@ public class ClassEditPage extends EditPage
     public ClassPropertyEditPane addProperty(String propertyName, String propertyType)
     {
         addPropertyWithoutWaiting(propertyName, propertyType);
+        waitForNotificationSuccessMessage("Property added");
 
         // The following call waits for the element to appear since there's no page refresh.
         return getPropertyEditPane(propertyName);

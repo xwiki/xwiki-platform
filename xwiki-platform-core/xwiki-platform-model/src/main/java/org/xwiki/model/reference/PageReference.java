@@ -29,7 +29,6 @@ import javax.inject.Provider;
 
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Represents a reference to a page. Note that nested pages are supported.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.6RC1
  */
-@Unstable
 public class PageReference extends AbstractLocalizedEntityReference
 {
     /**

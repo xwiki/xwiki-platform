@@ -62,8 +62,6 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
 
     private BaseClass databaseXClass;
 
-    private BaseClass currentXClass;
-
     @Override
     public void initialize() throws InitializationException
     {
@@ -90,7 +88,6 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
 
     private void setCurrentXClass(BaseClass xclass)
     {
-        this.currentXClass = xclass;
         getBasePropertyOutputFilterStream().setCurrentXClass(xclass);
     }
 

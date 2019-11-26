@@ -16,12 +16,9 @@ $services.template.execute('logging_macros.vm')
       #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
       <div class="ui-progress-bar green" style="width:${percent}%"></div>
     </div>
-    #if ($jobStatus && !$jobStatus.log.isEmpty())
-      ## We need the tail of the log queue.
-      #set ($logList = [])
-      #set ($discard = $logList.addAll($jobStatus.log))
+    #if ($jobStatus && $jobStatus.logTail.size() > 0)
       <p class="ui-progress-message">
-        #printLogMessage($logList.get($mathtool.sub($logList.size(), 1)))
+        #printLogMessage($jobStatus.logTail.lastLogEvent)
       </p>
     #end
   </div>
@@ -47,7 +44,7 @@ $services.template.execute('logging_macros.vm')
   #if ($status.state != 'FINISHED')
     #set($loading = true)
   #end
-  #printLogs($status.log $loading)
+  #printLogs($status.logTail $loading)
 #end
 
 #macro (displayJobQuestion $jobStatus)
@@ -62,13 +59,11 @@ $services.template.execute('logging_macros.vm')
     #set ($logOffset = $mathtool.max($logOffset, 0))
   #end
   #set ($log = [])
-  #foreach ($logEvent in $status.log)
-    #if ($foreach.index >= $logOffset)
-      #set ($discard = $log.add({
-        'level': $logEvent.level.toString().toLowerCase(),
-        'renderedMessage': "#printLog($logEvent)"
-      }))
-    #end
+  #foreach ($logEvent in $status.logTail.getLogEvents($logOffset, -1))
+    #set ($discard = $log.add({
+      'level': $logEvent.level.toString().toLowerCase(),
+      'renderedMessage': "#printLog($logEvent)"
+    }))
   #end
   #set ($json = $NULL)
   #setVariable("$json" {
@@ -120,4 +115,58 @@ $services.template.execute('logging_macros.vm')
       #printStatusLog($status)
     #end
   #end
+#end
+
+#macro (outputJobStatusJSON $jobStatus)
+  #getJobStatusJSON($jobStatus $json)
+  #set ($json.message = "#displayJobFinishedMessage($jobStatus)")
+  $response.setContentType('application/json')
+  $jsontool.serialize($json)
+#end
+
+#macro (displayJobStatus $jobStatus $translationPrefix $jobStatusURL)
+  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
+  #set ($jobState = $jobStatus.state)
+  #set ($finished = $jobState == 'FINISHED')
+  #set ($jobRequest = $jobStatus.request)
+  #if (!$jobStatusURL)
+    #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
+      'xpage': 'job_status_json',
+      'outputSyntax': 'plain',
+      'jobId': $jobRequest.id,
+      'translationPrefix': $translationPrefix
+    })))
+  #end
+  <div class="xcontent job-status" data-url="$escapetool.xml($jobStatusURL)">
+    #set($titleKey = "${translationPrefix}.label")
+    #if ($services.localization.get($titleKey))
+      <h2>$services.localization.render($titleKey)</h2>
+      #set($titleHintKey = "${translationPrefix}.hint")
+      #if ($services.localization.get($titleHintKey))
+        <p class="text-muted small">$services.localization.render($titleHintKey)</p>
+      #end
+    #end
+    #if (!$finished)
+      #displayJobProgressBar($jobStatus)
+    #else
+      #if ($jobStatus.error)
+        <div class="box errormessage">
+            $services.localization.render("${translationPrefix}.finish.error")
+        </div>
+      #else
+        #if ($jobStatus.logTail.hasLogLevel('error'))
+          <div class="box warningmessage">
+            $services.localization.render("${translationPrefix}.finish.warning")
+          </div>
+        #else
+          <div class="box successmessage">
+            $services.localization.render("${translationPrefix}.finish.success")
+          </div>
+        #end
+      #end
+    #end
+    #if ($isAdvancedUser || $isSuperAdmin)
+      #displayJobStatusLog($jobStatus true)
+    #end
+  </div>
 #end

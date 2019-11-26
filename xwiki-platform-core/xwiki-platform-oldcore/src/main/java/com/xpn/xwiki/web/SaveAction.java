@@ -44,7 +44,6 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.diff.ConflictDecision;
 import org.xwiki.job.Job;
 import org.xwiki.localization.LocaleUtils;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -63,6 +62,7 @@ import com.xpn.xwiki.doc.MetaDataDiff;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
+import com.xpn.xwiki.internal.mandatory.RedirectClassDocumentInitializer;
 import com.xpn.xwiki.objects.ObjectDiff;
 
 /**
@@ -108,13 +108,6 @@ public class SaveAction extends PreviewAction
     private MergeManager mergeManager;
 
     private MergeConflictDecisionsManager conflictDecisionsManager;
-
-    /**
-     * The redirect class, used to mark pages that are redirect place-holders, i.e. hidden pages that serve only for
-     * redirecting the user to a different page (e.g. when a page has been moved).
-     */
-    private static final EntityReference REDIRECT_CLASS =
-        new EntityReference("RedirectClass", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     public SaveAction()
     {
@@ -237,8 +230,9 @@ public class SaveAction extends PreviewAction
 
         // Remove the redirect object if the save request doesn't update it. This allows users to easily overwrite
         // redirect place-holders that are created when we move pages around.
-        if (tdoc.getXObject(REDIRECT_CLASS) != null && request.getParameter("XWiki.RedirectClass_0_location") == null) {
-            tdoc.removeXObjects(REDIRECT_CLASS);
+        if (tdoc.getXObject(RedirectClassDocumentInitializer.REFERENCE) != null
+            && request.getParameter("XWiki.RedirectClass_0_location") == null) {
+            tdoc.removeXObjects(RedirectClassDocumentInitializer.REFERENCE);
         }
 
         // We only proceed on the check between versions in case of AJAX request, so we currently stay in the edit form
@@ -327,12 +321,11 @@ public class SaveAction extends PreviewAction
     }
 
     /**
-     * Retrieve the conflict decisions made from the request and fill the conflict decision manager with them.
-     * We handle two list of parameters here:
-     *   - mergeChoices: those parameters are on the form [conflict id]=[choice] where the choice is defined by the
-     *                   {@link ConflictDecision.DecisionType} values.
-     *   - customChoices: those parameters are on the form [conflict id]=[encoded string] where the encoded string
-     *                    is actually the desired value to solve the conflict.
+     * Retrieve the conflict decisions made from the request and fill the conflict decision manager with them. We handle
+     * two list of parameters here: - mergeChoices: those parameters are on the form [conflict id]=[choice] where the
+     * choice is defined by the {@link ConflictDecision.DecisionType} values. - customChoices: those parameters are on
+     * the form [conflict id]=[encoded string] where the encoded string is actually the desired value to solve the
+     * conflict.
      */
     private void recordConflictDecisions(XWikiContext context, DocumentReference documentReference)
     {
@@ -362,8 +355,8 @@ public class SaveAction extends PreviewAction
                 String selectedChoice = splittedChoiceInfo[1];
                 List<String> customValue = null;
 
-                ConflictDecision.DecisionType decisionType = ConflictDecision.DecisionType
-                    .valueOf(selectedChoice.toUpperCase());
+                ConflictDecision.DecisionType decisionType =
+                    ConflictDecision.DecisionType.valueOf(selectedChoice.toUpperCase());
 
                 if (decisionType == ConflictDecision.DecisionType.CUSTOM) {
                     customValue = Collections.singletonList(customChoicesMap.get(conflictReference));
@@ -462,9 +455,8 @@ public class SaveAction extends PreviewAction
 
                         // Be sure to not keep the conflict decisions we might have made if new conflicts occurred
                         // we don't want to pollute the list of decisions.
-                        getConflictDecisionsManager()
-                            .removeConflictDecisionList(modifiedDoc.getDocumentReferenceWithLocale(),
-                                context.getUserReference());
+                        getConflictDecisionsManager().removeConflictDecisionList(
+                            modifiedDoc.getDocumentReferenceWithLocale(), context.getUserReference());
 
                         // If we don't get any conflict, or if we want to force the merge even with conflicts,
                         // then we pursue to save the document.
@@ -473,8 +465,8 @@ public class SaveAction extends PreviewAction
                             context.put(MERGED_DOCUMENTS, "true");
                             return false;
 
-                        // If we got merge conflicts and we don't want to force it, then we record the conflict in
-                        // order to allow fixing them independently.
+                            // If we got merge conflicts and we don't want to force it, then we record the conflict in
+                            // order to allow fixing them independently.
                         } else {
                             getConflictDecisionsManager().recordConflicts(modifiedDoc.getDocumentReferenceWithLocale(),
                                 context.getUserReference(),

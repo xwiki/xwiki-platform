@@ -131,11 +131,14 @@ public abstract class AbstractXWikiRunnable implements Runnable
         try {
             // call run
             runInternal();
+        } catch (InterruptedException e) {
+            // Restore interrupted state...
+            Thread.currentThread().interrupt();
         } finally {
             // cleanup execution context
             cleanupExecutionContext();
         }
     }
 
-    protected abstract void runInternal();
+    protected abstract void runInternal() throws InterruptedException;
 }

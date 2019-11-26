@@ -433,7 +433,7 @@ public class SkinAction extends XWikiAction
                 response.getOutputStream().write(data);
             } else {
                 // Otherwise, return the raw content.
-                setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentSize(context));
+                setupHeaders(response, mimetype, attachment.getDate(), attachment.getContentLongSize(context));
                 IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
             }
 
@@ -489,8 +489,26 @@ public class SkinAction extends XWikiAction
      * @param mimetype The mimetype of the file. Used in the "Content-Type" header.
      * @param lastChanged The date of the last change of the file. Used in the "Last-Modified" header.
      * @param length The length of the content (in bytes). Used in the "Content-Length" header.
+     * @deprecated since 11.10RC1, use {@link #setupHeaders(XWikiResponse, String, Date, long)} instead
      */
+    @Deprecated
     protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, int length)
+    {
+        setupHeaders(response, mimetype, lastChanged, (long) length);
+    }
+
+    /**
+     * Sets several headers to properly identify the response.
+     *
+     * @param response The servlet response object, where the headers should be set.
+     * @param mimetype The mimetype of the file. Used in the "Content-Type" header.
+     * @param lastChanged The date of the last change of the file. Used in the "Last-Modified" header.
+     * @param length The length of the content (in bytes). Used in the "Content-Length" header.
+     * @since 11.10
+     * @since 11.3.6
+     * @since 10.11.10
+     */
+    protected void setupHeaders(XWikiResponse response, String mimetype, Date lastChanged, long length)
     {
         if (!StringUtils.isBlank(mimetype)) {
             response.setContentType(mimetype);
@@ -501,6 +519,6 @@ public class SkinAction extends XWikiAction
         // Cache for one month (30 days)
         response.setHeader("Cache-Control", "public");
         response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
-        response.setContentLength(length);
+        setContentLength(response, length);
     }
 }

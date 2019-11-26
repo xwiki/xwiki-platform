@@ -45,6 +45,15 @@ public abstract class AbstractClassEditorTest extends AbstractTest
     public void setUp() throws Exception
     {
         getUtil().deleteSpace(getTestClassName());
+
+        goToEditor();
+    }
+
+    /**
+     * @since 11.9RC1
+     */
+    protected void goToEditor()
+    {
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "edit",
             "editor=inline&template=AppWithinMinutes.ClassTemplate&title=" + getTestMethodName() + " Class");
         editor = new ApplicationClassEditPage();

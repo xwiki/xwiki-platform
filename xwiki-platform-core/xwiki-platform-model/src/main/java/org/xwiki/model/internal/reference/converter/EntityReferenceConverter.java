@@ -26,6 +26,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.EnumUtils;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.Namespace;
 import org.xwiki.component.namespace.NamespaceUtils;
@@ -33,7 +34,10 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.properties.ConverterManager;
 import org.xwiki.properties.converter.AbstractConverter;
+import org.xwiki.properties.converter.ConversionException;
+import org.xwiki.properties.converter.Converter;
 
 /**
  * Converter that converts a value into an {@link EntityReference} object. Reference are not resolved to created
@@ -51,16 +55,37 @@ public class EntityReferenceConverter extends AbstractConverter<EntityReference>
     private EntityReferenceResolver<String> stringResolver;
 
     @Inject
+    private ConverterManager converterManager;
+
+    @Inject
+    private Logger logger;
+
+    @Inject
     private EntityReferenceSerializer<String> serialier;
 
     @Override
     protected EntityReference convertToType(Type type, Object value)
     {
+        EntityReference result;
         if (value == null) {
-            return null;
+            result = null;
+        } else {
+            Converter<Object> converter = this.converterManager.getConverter(value.getClass());
+
+            if (converter != null) {
+                try {
+                    result = converter.convert(EntityReference.class, value);
+                } catch (ConversionException e) {
+                    logger.warn("The type [{}] cannot be converted natively to EntityReference, "
+                        + "falling back on using toString to convert it.", value.getClass().getName());
+                    result = convertToType(type, value.toString());
+                }
+            } else {
+                result = convertToType(type, value.toString());
+            }
         }
 
-        return convertToType(type, value.toString());
+        return result;
     }
 
     private EntityReference convertToType(Type type, String value)

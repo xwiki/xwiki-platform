@@ -26,11 +26,14 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 /**
  * Create specific {@link WebDriver} instances for various Browsers.
@@ -44,17 +47,18 @@ public class WebDriverFactory
     {
         WebDriver driver;
         if (browserName.startsWith("*firefox")) {
-            // Native events are disabled by default for Firefox on Linux as it may cause tests which open many windows
-            // in parallel to be unreliable. However, native events work quite well otherwise and are essential for some
-            // of the new actions of the Advanced User Interaction. We need native events to be enable especially for
-            // testing the WYSIWYG editor. See http://code.google.com/p/selenium/issues/detail?id=2331 .
-            FirefoxProfile profile = new FirefoxProfile();
-            profile.setEnableNativeEvents(true);
-            // Make sure Firefox doesn't upgrade automatically on CI agents.
-            profile.setPreference("app.update.auto", false);
-            profile.setPreference("app.update.enabled", false);
-            profile.setPreference("app.update.silent", false);
-            driver = new FirefoxDriver(profile);
+            // Note: the Gecko driver needs to be set as a system property under the "webdriver.gecko.driver" key for
+            // the Firefox Driver to work with Selenium 3+.
+            // The following line will download and install the latest gecko driver corresponding to the OS and set
+            // this system property.
+            WebDriverManager.firefoxdriver().setup();
+
+            FirefoxOptions options = new FirefoxOptions()
+                // Make sure Firefox doesn't upgrade automatically on CI agents.
+                .addPreference("app.update.auto", false)
+                .addPreference("app.update.enabled", false)
+                .addPreference("app.update.silent", false);
+            driver = new FirefoxDriver(options);
 
             // Hide the Add-on bar (from the bottom of the window, with "WebDriver" written on the right) because it can
             // prevent buttons or links from being clicked when they are beneath it and native events are used.

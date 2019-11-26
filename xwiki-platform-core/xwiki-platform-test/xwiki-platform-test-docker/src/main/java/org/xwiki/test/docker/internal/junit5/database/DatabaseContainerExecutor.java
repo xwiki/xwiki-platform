@@ -48,8 +48,9 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
     /**
      * @param testConfiguration the configuration to build (database, debug mode, etc)
+     * @throws Exception if the container fails to start
      */
-    public void start(TestConfiguration testConfiguration)
+    public void start(TestConfiguration testConfiguration) throws Exception
     {
         switch (testConfiguration.getDatabase()) {
             case MYSQL:
@@ -84,7 +85,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         // Note that we don't need to stop the container as this is taken care of by TestContainers
     }
 
-    private void startMySQLContainer(TestConfiguration testConfiguration)
+    private void startMySQLContainer(TestConfiguration testConfiguration) throws Exception
     {
         // docker run --net=xwiki-nw --name mysql-xwiki -v /my/own/mysql:/var/lib/mysql
         //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
@@ -100,6 +101,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     }
 
     private void startMySQLContainer(JdbcDatabaseContainer databaseContainer, TestConfiguration testConfiguration)
+        throws Exception
     {
         databaseContainer
             .withDatabaseName(DBNAME)
@@ -162,7 +164,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         return Integer.valueOf(StringUtils.substringBefore(version, "."));
     }
 
-    private void startMariaDBContainer(TestConfiguration testConfiguration)
+    private void startMariaDBContainer(TestConfiguration testConfiguration) throws Exception
     {
         JdbcDatabaseContainer databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
@@ -173,7 +175,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         startMySQLContainer(databaseContainer, testConfiguration);
     }
 
-    private void startPostgreSQLContainer(TestConfiguration testConfiguration)
+    private void startPostgreSQLContainer(TestConfiguration testConfiguration) throws Exception
     {
         // docker run --net=xwiki-nw --name postgres-xwiki -v /my/own/postgres:/var/lib/postgresql/data
         //     -e POSTGRES_ROOT_PASSWORD=xwiki -e POSTGRES_USER=xwiki -e POSTGRES_PASSWORD=xwiki
@@ -212,7 +214,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         }
     }
 
-    private void startOracleContainer(TestConfiguration testConfiguration)
+    private void startOracleContainer(TestConfiguration testConfiguration) throws Exception
     {
         JdbcDatabaseContainer databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
@@ -230,7 +232,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     }
 
     private void startDatabaseContainer(JdbcDatabaseContainer databaseContainer, int port,
-        TestConfiguration testConfiguration)
+        TestConfiguration testConfiguration) throws Exception
     {
         databaseContainer
             .withExposedPorts(port)

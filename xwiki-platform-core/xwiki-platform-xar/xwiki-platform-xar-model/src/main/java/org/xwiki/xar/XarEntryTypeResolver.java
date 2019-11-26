@@ -21,7 +21,6 @@ package org.xwiki.xar;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Resolve proper {@link XarEntryType} instance depending on the name and the context.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  */
 @Component
 @Role
-@Unstable
 public interface XarEntryTypeResolver
 {
     /**

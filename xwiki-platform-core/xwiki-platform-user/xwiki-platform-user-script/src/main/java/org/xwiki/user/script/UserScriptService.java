@@ -26,7 +26,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
-import org.xwiki.stability.Unstable;
 
 /**
  * Users related script API.
@@ -37,7 +36,6 @@ import org.xwiki.stability.Unstable;
 @Component
 @Named(UserScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class UserScriptService implements ScriptService
 {
     /**

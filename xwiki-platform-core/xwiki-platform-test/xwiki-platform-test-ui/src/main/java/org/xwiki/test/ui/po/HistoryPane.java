@@ -37,6 +37,11 @@ public class HistoryPane extends BaseElement
     @FindBy(id = "historycontent")
     private WebElement pane;
 
+    public boolean isOpened()
+    {
+        return this.pane.isDisplayed();
+    }
+
     public boolean hasVersionWithSummary(String summary)
     {
         List<WebElement> tableEntries = pane.findElements(By.xpath(".//table/tbody/tr"));

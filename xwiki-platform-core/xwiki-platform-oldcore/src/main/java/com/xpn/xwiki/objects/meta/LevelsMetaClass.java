@@ -37,6 +37,8 @@ import com.xpn.xwiki.objects.classes.PropertyClassInterface;
 @Singleton
 public class LevelsMetaClass extends ListMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor. Initializes the default meta properties of a Access Rights Levels XClass property.
      */

@@ -23,17 +23,20 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 
+import org.xwiki.component.namespace.Namespace;
 import org.xwiki.context.Execution;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
+import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.UninstallException;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.repository.search.ExtensionQuery;
 import org.xwiki.extension.repository.search.SearchException;
+import org.xwiki.extension.tree.ExtensionNode;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
@@ -126,29 +129,27 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
     @Override
     public Collection<InstalledExtension> getBackwardDependencies(String feature, String namespace)
     {
-        setError(null);
+        return safeWrapError(() -> getWrapped().getBackwardDependencies(feature, namespace));
+    }
 
-        try {
-            return safe(getWrapped().getBackwardDependencies(feature, namespace));
-        } catch (Exception e) {
-            setError(e);
-        }
-
-        return null;
+    @Override
+    public Collection<InstalledExtension> getBackwardDependencies(String feature, String namespace,
+        boolean withOptionals) throws ResolveException
+    {
+        return safeWrapError(() -> getWrapped().getBackwardDependencies(feature, namespace, withOptionals));
     }
 
     @Override
     public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId)
     {
-        setError(null);
+        return safeWrapError(() -> getWrapped().getBackwardDependencies(extensionId));
+    }
 
-        try {
-            return safe(getWrapped().getBackwardDependencies(extensionId));
-        } catch (Exception e) {
-            setError(e);
-        }
-
-        return null;
+    @Override
+    public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId,
+        boolean withOptionals) throws ResolveException
+    {
+        return safeWrapError(() -> getWrapped().getBackwardDependencies(extensionId, withOptionals));
     }
 
     @Override
@@ -200,5 +201,11 @@ public class SafeInstalledExtensionRepository<T extends InstalledExtensionReposi
         ExtensionQuery query) throws SearchException
     {
         return safe(getWrapped().searchInstalledExtensions(namespaces, query));
+    }
+
+    @Override
+    public ExtensionNode<InstalledExtension> getOrphanedDependencies(InstalledExtension extension, Namespace namespace)
+    {
+        return safe(getWrapped().getOrphanedDependencies(extension, namespace));
     }
 }

@@ -19,8 +19,13 @@
  */
 package org.xwiki.user.test.po;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.xwiki.test.ui.po.BasePage;
 
 /** User profile, change password action. */
@@ -83,9 +88,41 @@ public class ChangePasswordPage extends BasePage
         return successMessage.getText();
     }
 
-    public void submit()
+    public ChangePasswordPage submit()
     {
         this.changePassword.click();
+
+        // We cannot wait on a page reload because of the live error messages,
+        // so we wait on the various kind of messages we can have, to avoid getting
+        // StaleElementReference afterwards.
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Nullable
+            @Override
+            public Boolean apply(@Nullable WebDriver webDriver)
+            {
+                boolean liveErrorIsDisplayed = false;
+                boolean generalErrorIsDisplayed = false;
+                boolean successIsDisplayed = false;
+                try {
+                    liveErrorIsDisplayed = validationErrorMessage.isDisplayed();
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                }
+
+                try {
+                    generalErrorIsDisplayed = errorMessage.isDisplayed();
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                }
+
+                try {
+                    successIsDisplayed = successMessage.isDisplayed();
+                } catch (StaleElementReferenceException | NoSuchElementException e) {
+                }
+
+                return liveErrorIsDisplayed || generalErrorIsDisplayed || successIsDisplayed;
+            }
+        });
+        return new ChangePasswordPage();
     }
 
     public void cancel()

@@ -52,6 +52,8 @@ public class ComputedFieldClass extends PropertyClass
      **/
     protected static final String FIELD_SCRIPT = "script";
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Constructor for ComputedFieldClass.
      *

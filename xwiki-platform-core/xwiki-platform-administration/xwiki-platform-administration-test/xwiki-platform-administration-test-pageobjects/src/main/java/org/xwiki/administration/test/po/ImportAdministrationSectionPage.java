@@ -57,7 +57,6 @@ public class ImportAdministrationSectionPage extends ViewPage
     public void attachPackage(URL file)
     {
         this.uploadFileInputField.sendKeys(file.getPath());
-        this.uploadFileSubmit.submit();
     }
 
     public boolean isPackagePresent(String packageName)

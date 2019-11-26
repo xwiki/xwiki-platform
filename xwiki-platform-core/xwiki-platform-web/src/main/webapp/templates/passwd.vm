@@ -3,18 +3,10 @@
 ###
 ###
 #template("startpage.vm")
-###
-### Validation script
-###
-<script>
-document.observe('xwiki:dom:loaded', function() {
-  var passwordValidator = new LiveValidation($$("input[name=password]")[0], { validMessage: "$services.localization.render('core.validation.valid.message')", wait: 500} );
-  passwordValidator.add( Validate.Format, { pattern: /.{6,}/, failureMessage: "$services.localization.render('platform.core.profile.passwd.passwordTooShort')"} );
-  var password2Validator = new LiveValidation($$("input[name=password2]")[0], { validMessage: "$services.localization.render('core.validation.valid.message')", wait: 500} );
-  password2Validator.add( Validate.Confirmation, { match: $$("input[name=password]")[0], failureMessage: "$services.localization.render('platform.core.profile.passwd.passwordMissmatch')"} );
-  password2Validator.add( Validate.Format, { pattern: /.{6,}/, failureMessage: "$services.localization.render('platform.core.profile.passwd.passwordTooShort')"} );
-});
-</script>
+#template("register_macros.vm")
+#set ($fields = [])
+#loadConfig('XWiki.RegistrationConfig')
+#definePasswordFields($fields, 'xwikipassword', 'xwikipassword2', $passwordOptions)
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
   <div id="mainContentArea">
@@ -23,60 +15,78 @@ document.observe('xwiki:dom:loaded', function() {
     #set($isCurrentUsersProfile = $doc.documentReference.equals($xcontext.userReference))
     #if($isCurrentUsersProfile || $hasAdmin)
       <div id="document-title"><h1>$services.localization.render('platform.core.profile.passwd.title', [$escapetool.xml($xwiki.getUserName($doc.fullName, false))])</h1></div>
-      #if($request.password && $request.password2)
+      #if($request.xwikipassword && $request.xwikipassword2)
         #set($isValidPassword = true)
-        #set($errorMessage = "")
-        #set($password = $request.password)
-        #set($password2 = $request.password2)
+        #set($errorMessage = [])
+        #set($password = $request.xwikipassword)
+        #set($password2 = $request.xwikipassword2)
+        ## Server-side checking
         #if($isCurrentUsersProfile || !$hasAdmin)
           #set($user = $xwiki.getUser())
-          #set($isOriginalPasswordValid = $user.checkPassword($request.originalpassword))
+          #set($isOriginalPasswordValid = $user.checkPassword($request.xwikioriginalpassword))
           #if(!$isOriginalPasswordValid)
-            #set($errorMessage = $services.localization.render('platform.core.profile.passwd.invalidOriginalPassword'))
+            #set($discard = $errorMessage.add($services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')))
             #set($isValidPassword = false)
           #end
         #end
-        #if($password != $password2)
-          #set($errorMessage = $services.localization.render('platform.core.profile.passwd.passwordMissmatch'))
-          #set($isValidPassword = false)
-        #elseif($password == '')
-          #set($errorMessage = $services.localization.render('platform.core.profile.passwd.passwordCannotBeEmpty'))
-          #set($isValidPassword = false)
-        #elseif($password.length() < 6)
-          #set($errorMessage = $services.localization.render('platform.core.profile.passwd.passwordTooShort'))
-          #set($isValidPassword = false)
-        #end
-        #if($isValidPassword)
+        #validateFields($fields, $request)
+        #set ($isValidPassword = $isValidPassword && $allFieldsValid)
+        #if(!$isValidPassword)
+          #set ($discard = $errorMessage.addAll($allFieldsErrors))
+        #else
+          #set ($isValidPassword = true)
           $doc.set('password', $password, $userObject)
           $doc.save("$services.localization.render('platform.core.profile.passwd.passwordChanged')", true)
         #end
       #end
-      #if($request.password)
-        #if($isValidPassword)
-          <span class='box infomessage'>$services.localization.render('platform.core.profile.passwd.success')</span>
-          <a href = "$doc.getURL("view")">$services.localization.render('platform.core.profile.passwd.return')</a>
-        #else
-          <span class='box errormessage'>$errorMessage</span>
-        #end
+      #if($request.xwikipassword && $isValidPassword)
+        <span class='box infomessage'>$services.localization.render('platform.core.profile.passwd.success')</span>
+        <a href = "$doc.getURL("view")">$services.localization.render('platform.core.profile.passwd.return')</a>
       #end
       #if(!$isValidPassword)
-        #set($discard = $xwiki.jsfx.use('uicomponents/widgets/validation/livevalidation_prototype.js'))
-        #set($discard = $xwiki.ssfx.use('uicomponents/widgets/validation/livevalidation.css', true))
-        $services.localization.render('platform.core.profile.passwd.instructions')
-
-      <form class="xform third" action="" method="post" autocomplete="off">
+        #if ("$!passwordOptions" == "")
+          #set ($passwordLength = 6)
+        #else
+          #set ($passwordLength = $passwordOptions.passwordLength)
+        #end
+        $services.localization.render('platform.core.profile.passwd.instructionsPasswordLength', $passwordLength)
+        ## We won't ask for the original password if the user is admin and not updating his own profile.
+        ## In all other cases, we ask for it.
+        #if (!$hasAdmin || $isCurrentUsersProfile)
+          #set ($discard = $fields.add(0, {
+	          'name': 'xwikioriginalpassword',
+	          'label': $services.localization.render('platform.core.profile.passwd.originalPassword'),
+	          'params': {
+	            'type': 'password',
+	            'size': '60',
+	            'autocomplete': 'off'
+	          },
+	          'validate': {
+	            'mandatory': {
+	              'failureMessage': $services.localization.render('core.validation.required.message')
+	            },
+	            'programmaticValidation': {
+	              'code': '$user.checkPassword($request.xwikioriginalpassword)',
+	              'failureMessage': $services.localization.render('platform.core.profile.passwd.invalidOriginalPassword')
+	            },
+	            'hideOkayMessage': 'true'
+	          }
+	        }))
+        #end
+        ## Change the label for new password fields.
+        ## Even if the user has admin rights or not, the fields for new password will be the last two.
+        #set ($index = $fields.size() - 2)
+        #set ($fields[$index].label = $services.localization.render('platform.core.profile.passwd.newPassword'))
+        #set ($index = $index + 1)
+        ## This key fits better.
+        #set ($fields[$index].label = $services.localization.render('xe.admin.passwordReset.step2.newPasswordVerification.label'))
+        <form class="xform third" action="" method="post" autocomplete="off">
         ## CSRF prevention
         <div class="hidden"><input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /></div>
-        <dl>
-          #if($isCurrentUsersProfile || !$hasAdmin)
-            <dt><label for="xwikioriginalpassword">$services.localization.render('platform.core.profile.passwd.originalPassword')</label></dt>
-            <dd><input id="xwikioriginalpassword" type="password" name="originalpassword" value="$!escapetool.xml($request.originalpassword)" size="60"/></dd>
-          #end
-          <dt><label id="xwikipasswordlabel" for="xwikipassword">$services.localization.render('platform.core.profile.passwd.newPassword')</label></dt>
-          <dd><input id="xwikipassword" type="password" name="password" value="$!escapetool.xml($request.password)" size="60"/></dd>
-          <dt><label id="xwikipassword2label" for="xwikipassword2">$services.localization.render('platform.core.profile.passwd.reenterPassword')</label></dt>
-          <dd><input id="xwikipassword2" type="password" name="password2" value="$!escapetool.xml($request.password2)" size="60"/></dd>
-        </dl>
+        #generateHtml($fields, $NULL)
+        #if ($request.xwikipassword && !$isValidPassword)
+          <span class='box errormessage'>$stringtool.join($errorMessage, "<br/>")</span>
+        #end
         <div class="padded buttons">
           <span class="buttonwrapper"><input type="submit" value="$services.localization.render('platform.core.profile.passwd.submit')" class="button"/></span>
           <span class="buttonwrapper"><a href="$doc.getURL("view")" class="secondary button">$services.localization.render('platform.core.profile.passwd.cancel')</a></span>
@@ -93,6 +103,6 @@ document.observe('xwiki:dom:loaded', function() {
     #xwikimessageboxstart($services.localization.render('platform.core.noticeMessageType') $services.localization.render('platform.core.profile.passwd.notaUser'))
     #xwikimessageboxend()
   #end
-  </div>## mainContentArea
-</div>## main
+  </div>
+</div>
 #template("endpage.vm")

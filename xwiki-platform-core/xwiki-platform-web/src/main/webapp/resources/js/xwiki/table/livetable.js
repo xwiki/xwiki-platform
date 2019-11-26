@@ -1083,7 +1083,7 @@ var LiveTableTagCloud = Class.create({
       for (var i = 0; i < table.tags.size(); i++) {
         this.selectedTags[table.tags[i]] = {};
       }
-      if (typeof tags == "array") {
+      if (Object.isArray(tags)) {
          this.tags = tags;
          if (tags.length > 0) {
            this.updateTagCloud(tags);

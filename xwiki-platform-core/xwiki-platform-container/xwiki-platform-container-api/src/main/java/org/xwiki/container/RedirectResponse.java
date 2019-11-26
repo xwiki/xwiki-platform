@@ -21,8 +21,6 @@ package org.xwiki.container;
 
 import java.io.IOException;
 
-import org.xwiki.stability.Unstable;
-
 /**
  * Decorator for the {@link Response} interface adding the capacity for components using this interface to send
  * redirects.
@@ -30,7 +28,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.0
  */
-@Unstable
 public interface RedirectResponse extends Response
 {
     /**

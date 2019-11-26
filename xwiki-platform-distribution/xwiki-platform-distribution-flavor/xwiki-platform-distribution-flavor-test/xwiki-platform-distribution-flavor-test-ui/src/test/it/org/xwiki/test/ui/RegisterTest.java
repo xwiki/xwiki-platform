@@ -112,7 +112,8 @@ public class RegisterTest extends AbstractTest
     {
         this.registrationPage.fillRegisterForm(null, null, null, "short", "short", null);
         Assert.assertFalse(validateAndRegister());
-        Assert.assertTrue(this.registrationPage.validationFailureMessagesInclude("Please use a longer password."));
+        Assert.assertTrue(this.registrationPage.validationFailureMessagesInclude(
+            "Your new password must be at least 6 characters long."));
     }
 
     @Test
@@ -124,7 +125,7 @@ public class RegisterTest extends AbstractTest
     {
         this.registrationPage.fillRegisterForm(null, null, null, null, "DifferentPassword", null);
         Assert.assertFalse(validateAndRegister());
-        Assert.assertTrue(this.registrationPage.validationFailureMessagesInclude("The passwords do not match."));
+        Assert.assertTrue(this.registrationPage.validationFailureMessagesInclude("The two passwords do not match."));
     }
 
     @Test

@@ -51,6 +51,8 @@ public class JCaptchaCaptcha extends AbstractCaptcha
 {
     private static final List<String> JCAPTCHA_SPACE_LIST = Arrays.asList(XWiki.SYSTEM_SPACE, "Captcha", "JCaptcha");
 
+    private static final String ENGINE = "engine";
+
     private static final LocalDocumentReference CONFIGURATION_DOCUMENT_REFERENCE =
         new LocalDocumentReference(JCAPTCHA_SPACE_LIST, "Configuration");
 
@@ -63,7 +65,7 @@ public class JCaptchaCaptcha extends AbstractCaptcha
     private static final Map<String, Object> DEFAULT_PARAMETERS = new HashMap<>();
     {
         DEFAULT_PARAMETERS.put("type", "image");
-        DEFAULT_PARAMETERS.put("engine", "com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine");
+        DEFAULT_PARAMETERS.put(ENGINE, "com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine");
     }
 
     @Inject
@@ -99,7 +101,8 @@ public class JCaptchaCaptcha extends AbstractCaptcha
         XWikiRequest request = getContext().getRequest();
 
         // Use the parameters to instantiate the correct CAPTCHA factory.
-        CaptchaService captchaService = captchaServiceManager.getCaptchaService(captchaParameters);
+        CaptchaService captchaService =
+            captchaServiceManager.getCaptchaService((String) captchaParameters.get(ENGINE));
 
         // Use the Session ID as CAPTCHA ID. The consequence is that one user can have only 1 CAPTCHA at a time,
         // i.e. getting a new CAPTCHA in one tab will invalidate the CAPTCHA in the previous tabs.

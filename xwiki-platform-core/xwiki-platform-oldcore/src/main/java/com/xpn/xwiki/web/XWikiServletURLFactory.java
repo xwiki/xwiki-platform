@@ -248,6 +248,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             return inputURL;
         }
 
+        // Path based mode we fallback on original default
+        if (context.getWiki().isPathBased() && !StringUtils.equals(context.getOriginalWikiId(), wikiId)) {
+            return getServerURL(context.getOriginalWikiId(), context);
+        }
+
+        // Try to get the URL from the descriptor
         URL url = context.getWiki().getServerURL(wikiId, context);
         if (url != null) {
             return url;

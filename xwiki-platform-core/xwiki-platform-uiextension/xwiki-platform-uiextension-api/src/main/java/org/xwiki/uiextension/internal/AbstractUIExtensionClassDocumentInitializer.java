@@ -19,9 +19,9 @@
  */
 package org.xwiki.uiextension.internal;
 
-import org.xwiki.component.wiki.internal.AbstractAsyncClassDocumentInitializer;
 import org.xwiki.model.reference.EntityReference;
 
+import com.xpn.xwiki.internal.mandatory.AbstractAsyncClassDocumentInitializer;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass.EditorType;
 

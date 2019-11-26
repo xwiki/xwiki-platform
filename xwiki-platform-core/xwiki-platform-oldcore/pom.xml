@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-oldcore</artifactId>
   <name>XWiki Platform - Old Core</name>
@@ -70,12 +70,12 @@
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j</artifactId>
-      <version>1.0.0-rc5</version>
+      <version>1.0.2</version>
     </dependency>
     <dependency>
       <groupId>io.sf.carte</groupId>
       <artifactId>css4j-dom4j</artifactId>
-      <version>1.0.0-rc5</version>
+      <version>1.0.2</version>
     </dependency>
 
     <!-- Standard dependencies found in the central repository -->
@@ -148,28 +148,6 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
-      <version>5.4.4.Final</version>
-      <exclusions>
-        <!-- Use jakarta.transaction:jakarta.transaction-api instead to not have duplicate JARs in generated WARs -->
-        <exclusion>
-          <groupId>org.jboss.spec.javax.transaction</groupId>
-          <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.activation</groupId>
-          <artifactId>javax.activation-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>javax.xml.bind</groupId>
-          <artifactId>jaxb-api</artifactId>
-        </exclusion>
-        <!--  Let's hope Hibernate is fine with Dom4J 2.1.0.
-              Remove when https://jira.xwiki.org/browse/XCOMMONS-1585 is fixed. -->
-        <exclusion>
-          <groupId>org.dom4j</groupId>
-          <artifactId>dom4j</artifactId>
-        </exclusion>
-      </exclusions>
     </dependency>
     <!-- Replace the one from Hibernate -->
     <dependency>
@@ -184,7 +162,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-c3p0</artifactId>
-      <version>5.4.4.Final</version>
+      <version>${hibernate.version}</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
@@ -232,6 +210,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-url-scheme-filesystem</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>xwiki-platform-tree-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

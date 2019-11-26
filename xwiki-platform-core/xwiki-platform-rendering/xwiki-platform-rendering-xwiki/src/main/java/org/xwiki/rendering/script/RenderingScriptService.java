@@ -50,7 +50,6 @@ import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provides Rendering-specific Scripting APIs.
@@ -275,7 +274,6 @@ public class RenderingScriptService implements ScriptService
      * @return the resolved macro id or {@code null} if resolving the given string fails
      * @since 10.10RC1
      */
-    @Unstable
     public MacroId resolveMacroId(String macroIdAsString)
     {
         try {
@@ -292,7 +290,6 @@ public class RenderingScriptService implements ScriptService
      * @return the descriptor of the specified macro if it exists, {@code null} otherwise
      * @since 10.10RC1
      */
-    @Unstable
     public MacroDescriptor getMacroDescriptor(MacroId macroId)
     {
         if (this.macroManager.exists(macroId)) {

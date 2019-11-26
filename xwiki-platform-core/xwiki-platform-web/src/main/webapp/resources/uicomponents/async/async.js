@@ -17,33 +17,59 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-require(["jquery"], function($) {
+require(["jquery", 'xwiki-meta'], function($, xm) {
   var update = function(element, url)
   {
     // TODO: show progress
-    // TODO: error handling
     $.get({
       url : url,
-      statusCode: {
-        200: function(data, textStatus, xhr) {
-          // Replace the element by the asynchronous result
-          element.replaceWith(data);
+      complete: function(xhr, textStatus) {
+        switch (xhr.status) {
+          case 200:
+            // Add asynchronous meta tags
+            var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
+            if (asyncHead) {
+              $('head').append(asyncHead);
+            }
 
-          // Add asynchronous meta tags
-          // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
-          var asyncHead = xhr.getResponseHeader('X-XWIKI-HTML-HEAD');
-          if (asyncHead) {
-            $('head').append(asyncHead);
-          }
-        },
+            // Replace the element by the asynchronous result
+            element.replaceWith(xhr.responseText);
 
-        202: function(data, textStatus, xhr) {
-          update(element, url);
+            // Insert the scripts after the HTML
+            var asyncScripts = xhr.getResponseHeader('X-XWIKI-HTML-SCRIPTS');
+            if (asyncScripts) {
+              // FIXME: injecting <script> elements this way seems to generate a warning in some conditions
+              $('head').append(asyncScripts);
+            }
+
+            break;
+
+          case 202:
+            // Display the spinner only if we wait more than one iteration
+            showSpinner(element);
+
+            update(element, url);
+            break;
+
+          default:
+            // Get rid of the spinner since it's now useless
+            element.remove();
+
+            // TODO: error handling
         }
       }
     });
   }
 
+  var showSpinner = function(element)
+  {
+    if (element.tagName == 'div') {
+      element.html('<div class="fa fa-spinner fa-spin"/>');
+    } else {
+      element.html('<span class="fa fa-spinner fa-spin"/>');
+    }
+  }
+  
   var activateAsyncPlaceHolder = function(element)
   {
     var url = element.dataset.xwikiAsyncUrl;
@@ -65,19 +91,14 @@ require(["jquery"], function($) {
     var clientId = element.dataset.xwikiAsyncClientId;
 
     if (clientId) {
-      url += '?clientId=' + clientId + '&timeout=' + 500;
+      url += '?clientId=' + clientId + '&';
     } else {
-      url += '?timeout=' + 500;
+      url += '?';
     }
+
+    url += 'timeout=' + 500 + '&wiki=' + xm.wiki;
 
     element = $(element);
-
-    // Insert spinner (it will replaced by the result)
-    if (element.tagName == 'div') {
-      element.html('<div class="fa fa-spinner fa-spin"/>');
-    } else {
-      element.html('<span class="fa fa-spinner fa-spin"/>');
-    }
 
     update(element, url);
   }

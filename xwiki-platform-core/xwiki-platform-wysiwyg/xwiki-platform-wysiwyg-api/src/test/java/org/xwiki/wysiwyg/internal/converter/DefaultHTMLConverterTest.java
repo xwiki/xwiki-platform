@@ -22,16 +22,13 @@ package org.xwiki.wysiwyg.internal.converter;
 import java.io.StringReader;
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.transformation.MutableRenderingContext;
 import org.xwiki.rendering.listener.MetaData;
+import org.xwiki.rendering.parser.ContentParser;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.StreamParser;
 import org.xwiki.rendering.renderer.BlockRenderer;
@@ -39,15 +36,19 @@ import org.xwiki.rendering.renderer.PrintRenderer;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.syntax.SyntaxType;
 import org.xwiki.rendering.transformation.RenderingContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.test.annotation.AfterComponent;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.wysiwyg.cleaner.HTMLCleaner;
-import org.xwiki.wysiwyg.converter.HTMLConverter;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
@@ -59,25 +60,25 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
+@ComponentTest
 public class DefaultHTMLConverterTest
 {
-    /**
-     * A component manager that automatically mocks all dependencies of {@link DefaultHTMLConverter}.
-     */
-    @Rule
-    public MockitoComponentMockingRule<HTMLConverter> mocker =
-        new MockitoComponentMockingRule<HTMLConverter>(DefaultHTMLConverter.class);
+    @InjectMockComponents
+    private DefaultHTMLConverter converter;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     @AfterComponent
     public void overrideComponent() throws Exception
     {
-        mocker.registerComponent(RenderingContext.class, mock(MutableRenderingContext.class));
+        this.componentManager.registerComponent(RenderingContext.class, mock(MutableRenderingContext.class));
     }
 
-    @Before
+    @BeforeComponent
     public void configure() throws Exception
     {
-        this.mocker.registerComponent(ComponentManager.class, "context", this.mocker);
+        this.componentManager.registerComponent(ComponentManager.class, "context", this.componentManager);
     }
 
     /**
@@ -90,19 +91,19 @@ public class DefaultHTMLConverterTest
         String syntaxId = "syntax/x.y";
 
         // Verify the HTML is cleaned.
-        HTMLCleaner cleaner = mocker.getInstance(HTMLCleaner.class);
+        HTMLCleaner cleaner = this.componentManager.getInstance(HTMLCleaner.class);
         when(cleaner.clean(html)).thenReturn(html);
 
         PrintRendererFactory printRendererFactory =
-            this.mocker.registerMockComponent(PrintRendererFactory.class, syntaxId);
+            this.componentManager.registerMockComponent(PrintRendererFactory.class, syntaxId);
 
         PrintRenderer printRenderer = mock(PrintRenderer.class);
         when(printRendererFactory.createRenderer(any(WikiPrinter.class))).thenReturn(printRenderer);
 
-        Assert.assertEquals("", mocker.getComponentUnderTest().fromHTML(html, syntaxId));
+        assertEquals("", this.converter.fromHTML(html, syntaxId));
 
         // Verify the HTML is converted to the specified syntax.
-        StreamParser xhtmlStreamParser = mocker.getInstance(StreamParser.class, "xhtml/1.0");
+        StreamParser xhtmlStreamParser = this.componentManager.getInstance(StreamParser.class, "xhtml/1.0");
         verify(xhtmlStreamParser).parse(any(StringReader.class), same(printRenderer));
     }
 
@@ -113,19 +114,18 @@ public class DefaultHTMLConverterTest
     public void toHTML() throws Exception
     {
         String source = "wiki syntax";
-        String syntaxId = "syntax/x.y";
+        Syntax syntax = new Syntax(new SyntaxType("syntax", "Syntax"), "x.y");
 
         // The source should be parsed.
-        Parser parser = this.mocker.registerMockComponent(Parser.class, syntaxId);
+        ContentParser contentParser = this.componentManager.getInstance(ContentParser.class);
+        XDOM xdom = new XDOM(Collections.emptyList());
+        when(contentParser.parse(source, syntax, null)).thenReturn(xdom);
 
-        XDOM xdom = new XDOM(Collections.<Block>emptyList());
-        when(parser.parse(any(StringReader.class))).thenReturn(xdom);
-
-        Assert.assertEquals("", mocker.getComponentUnderTest().toHTML(source, syntaxId));
+        assertEquals("", this.converter.toHTML(source, syntax.toIdString()));
 
         // Verify that the macro transformations have been executed.
-        Transformation macroTransformation = mocker.getInstance(Transformation.class, "macro");
-        RenderingContext renderingContext = mocker.getInstance(RenderingContext.class);
+        Transformation macroTransformation = this.componentManager.getInstance(Transformation.class, "macro");
+        RenderingContext renderingContext = this.componentManager.getInstance(RenderingContext.class);
 
         // It's very important to verify that a transformation context id is set as otherwise if the content being
         // edited has different velocity macros executing, they'll be executed in isolation and thus what's defined in
@@ -136,7 +136,7 @@ public class DefaultHTMLConverterTest
         assertEquals("wysiwygtxid", txContextArgument.getValue().getId());
 
         // Verify the XDOM is rendered to Annotated XHTML.
-        BlockRenderer xhtmlRenderer = mocker.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
+        BlockRenderer xhtmlRenderer = this.componentManager.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
         verify(xhtmlRenderer).render(same(xdom), any(WikiPrinter.class));
     }
 
@@ -150,19 +150,19 @@ public class DefaultHTMLConverterTest
         String syntaxId = "syntax/x.y";
 
         // Verify the HTML is cleaned.
-        HTMLCleaner cleaner = mocker.getInstance(HTMLCleaner.class);
+        HTMLCleaner cleaner = this.componentManager.getInstance(HTMLCleaner.class);
         when(cleaner.clean(html)).thenReturn(html);
 
         // Verify the HTML is parsed into XDOM.
-        XDOM xdom = new XDOM(Collections.<Block>emptyList());
-        Parser xhtmlParser = mocker.getInstance(Parser.class, "xhtml/1.0");
+        XDOM xdom = new XDOM(Collections.emptyList());
+        Parser xhtmlParser = this.componentManager.getInstance(Parser.class, "xhtml/1.0");
         when(xhtmlParser.parse(any(StringReader.class))).thenReturn(xdom);
 
-        Assert.assertEquals("", mocker.getComponentUnderTest().parseAndRender(html, syntaxId));
+        assertEquals("", this.converter.parseAndRender(html, syntaxId));
 
         // Verify that the macro transformations have been executed.
-        Transformation macroTransformation = mocker.getInstance(Transformation.class, "macro");
-        RenderingContext renderingContext = mocker.getInstance(RenderingContext.class);
+        Transformation macroTransformation = this.componentManager.getInstance(Transformation.class, "macro");
+        RenderingContext renderingContext = this.componentManager.getInstance(RenderingContext.class);
 
         // It's very important to verify that a transformation context id is set as otherwise if the content being
         // edited has different velocity macros executing, they'll be executed in isolation and thus what's defined in
@@ -173,12 +173,12 @@ public class DefaultHTMLConverterTest
         assertEquals("wysiwygtxid", txContextArgument.getValue().getId());
 
         // Verify the XDOM is rendered to Annotated XHTML.
-        BlockRenderer xhtmlRenderer = mocker.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
+        BlockRenderer xhtmlRenderer = this.componentManager.getInstance(BlockRenderer.class, "annotatedxhtml/1.0");
         verify(xhtmlRenderer).render(same(xdom), any(WikiPrinter.class));
 
         // Verify that the syntax meta data has been set.
         Syntax syntax = Syntax.valueOf(syntaxId);
-        Assert.assertEquals(syntax, xdom.getMetaData().getMetaData(MetaData.SYNTAX));
+        assertEquals(syntax, xdom.getMetaData().getMetaData(MetaData.SYNTAX));
 
         // Verify that the syntax has been set on the rendering context.
         verify(((MutableRenderingContext) renderingContext)).push(null, null, syntax, null, false, syntax);

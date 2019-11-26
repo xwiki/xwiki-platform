@@ -22,7 +22,6 @@ package org.xwiki.model.reference;
 import java.beans.Transient;
 
 import org.xwiki.model.EntityType;
-import org.xwiki.stability.Unstable;
 
 /**
  * Reference to an object in a page (by classname and index, page, wiki).
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.6RC1
  * @version $Id$
  */
-@Unstable
 public class PageObjectReference extends EntityReference
 {
     /**

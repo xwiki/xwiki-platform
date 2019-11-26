@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -380,5 +381,18 @@ public class EditPage extends BasePage
     public void clickForceSaveCSRFButton()
     {
         this.forceSaveCSRFButton.click();
+    }
+
+    /**
+     * Cancel the edition by using keyboard shortcut.
+     * @return a new {@link ViewPage}
+     * @since 11.9RC1
+     */
+    public ViewPage useShortcutKeyForCancellingEdition()
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().createActions().keyDown(Keys.ALT).sendKeys("c").keyUp(Keys.ALT).perform();
+        getDriver().waitUntilPageIsReloaded();
+        return new ViewPage();
     }
 }

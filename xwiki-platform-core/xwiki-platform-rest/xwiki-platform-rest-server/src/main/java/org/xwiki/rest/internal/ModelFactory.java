@@ -19,16 +19,17 @@
  */
 package org.xwiki.rest.internal;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Formatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -42,8 +43,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.job.DefaultRequest;
 import org.xwiki.job.Request;
 import org.xwiki.logging.LogLevel;
-import org.xwiki.logging.LogQueue;
 import org.xwiki.logging.event.LogEvent;
+import org.xwiki.logging.tail.LogTail;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -275,7 +276,7 @@ public class ModelFactory
         String propertiesUri;
         if (useVersion) {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesAtPageVersionResource.class, doc.getWiki(),
-                Utils.getSpacesFromSpaceId(doc.getSpace()),doc.getDocumentReference().getName(), doc.getVersion(),
+                Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(), doc.getVersion(),
                 xwikiObject.getClassName(), xwikiObject.getNumber()).toString();
         } else {
             propertiesUri = Utils.createURI(baseUri, ObjectPropertiesResource.class, doc.getWiki(),
@@ -354,8 +355,8 @@ public class ModelFactory
             property.setType(propertyClass.getClassType());
             if (hasAccess(property)) {
                 try {
-                    property.setValue(serializePropertyValue(xwikiObject.get(propertyClass.getName()), propertyClass,
-                        xwikiContext));
+                    property.setValue(
+                        serializePropertyValue(xwikiObject.get(propertyClass.getName()), propertyClass, xwikiContext));
                 } catch (XWikiException e) {
                     // Should never happen
                     logger.error("Unexpected exception when accessing property [{}]", propertyClass.getName(), e);
@@ -365,9 +366,11 @@ public class ModelFactory
             String propertyUri;
 
             if (useVersion) {
-                propertyUri = Utils.createURI(baseUri, ObjectPropertyAtPageVersionResource.class, doc.getWiki(),
-                    Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(), doc.getVersion(),
-                    xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName()).toString();
+                propertyUri = Utils
+                    .createURI(baseUri, ObjectPropertyAtPageVersionResource.class, doc.getWiki(),
+                        Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
+                        doc.getVersion(), xwikiObject.getClassName(), xwikiObject.getNumber(), propertyClass.getName())
+                    .toString();
             } else {
                 propertyUri = Utils.createURI(baseUri, ObjectPropertyResource.class, doc.getWiki(),
                     Utils.getSpacesFromSpaceId(doc.getSpace()), doc.getDocumentReference().getName(),
@@ -468,8 +471,9 @@ public class ModelFactory
         space.getLinks().add(pagesLink);
 
         if (home != null) {
-            String homeUri = Utils.createURI(baseUri, PageResource.class, wikiName, spaces,
-                home.getDocumentReference().getName()).toString();
+            String homeUri =
+                Utils.createURI(baseUri, PageResource.class, wikiName, spaces, home.getDocumentReference().getName())
+                    .toString();
             Link homeLink = this.objectFactory.createLink();
             homeLink.setHref(homeUri);
             homeLink.setRel(Relations.HOME);
@@ -501,8 +505,9 @@ public class ModelFactory
                 translation.setLanguage(doc.getDefaultLanguage());
 
                 /* Add the default page with the default translation explicitely */
-                String pageTranslationUri = Utils.createURI(baseUri, PageResource.class, doc.getWiki(), spaces,
-                    doc.getDocumentReference().getName()).toString();
+                String pageTranslationUri = Utils
+                    .createURI(baseUri, PageResource.class, doc.getWiki(), spaces, doc.getDocumentReference().getName())
+                    .toString();
                 Link pageTranslationLink = this.objectFactory.createLink();
                 pageTranslationLink.setHref(pageTranslationUri);
                 pageTranslationLink.setRel(Relations.PAGE);
@@ -982,6 +987,7 @@ public class ModelFactory
     /**
      * Serializes the value of the given XObject property. In case the property is an instance of
      * {@link ComputedFieldClass}, the serialized value is the computed property value.
+     * 
      * @param property an XObject property
      * @param propertyClass the PropertyClass of that XObject proprety
      * @param context the XWikiContext
@@ -992,7 +998,7 @@ public class ModelFactory
     {
         if (propertyClass instanceof ComputedFieldClass) {
             // TODO: the XWikiDocument needs to be explicitely set in the context, otherwise method
-            //  PropertyClass.renderInContext fires a null pointer exception: bug?
+            // PropertyClass.renderInContext fires a null pointer exception: bug?
             XWikiDocument document = context.getDoc();
             try {
                 context.setDoc(property.getObject().getOwnerDocument());
@@ -1000,7 +1006,7 @@ public class ModelFactory
                 return computedFieldClass.getComputedValue(propertyClass.getName(), "", property.getObject(), context);
             } catch (Exception e) {
                 logger.error("Error while computing property value [{}] of [{}]", propertyClass.getName(),
-                        property.getObject(), e);
+                    property.getObject(), e);
                 return serializePropertyValue(property);
             } finally {
                 // Reset the context document to its original value, even if an exception is raised.
@@ -1010,7 +1016,6 @@ public class ModelFactory
             return serializePropertyValue(property);
         }
     }
-
 
     public JobRequest toRestJobRequest(Request request) throws XWikiRestException
     {
@@ -1109,7 +1114,11 @@ public class ModelFactory
 
         // Log
         if (log) {
-            status.setLog(toRestJobLog(jobStatus.getLog(), self, null, logFromLevel));
+            try {
+                status.setLog(toRestJobLog(jobStatus.getLogTail(), self, null, logFromLevel));
+            } catch (IOException e) {
+                this.logger.error("Failed to access the log of job {}", jobStatus.getRequest().getId(), e);
+            }
         }
 
         // Link
@@ -1140,14 +1149,16 @@ public class ModelFactory
         return restJobProgress;
     }
 
-    public JobLog toRestJobLog(LogQueue logQueue, URI self, String level, String fromLevel)
+    public JobLog toRestJobLog(LogTail logQueue, URI self, String level, String fromLevel) throws IOException
     {
         // Filter log
-        Collection<LogEvent> logs;
+        Iterable<LogEvent> logs;
         if (level != null) {
-            logs = logQueue.getLogs(LogLevel.valueOf(level.toUpperCase()));
+            LogLevel logLevel = LogLevel.valueOf(level.toUpperCase());
+            logs = logQueue.getLogEvents(logLevel).stream().filter(log -> log.getLevel() == logLevel)
+                .collect(Collectors.toList());
         } else if (fromLevel != null) {
-            logs = logQueue.getLogsFrom(LogLevel.valueOf(fromLevel.toUpperCase()));
+            logs = logQueue.getLogEvents(LogLevel.valueOf(fromLevel.toUpperCase()));
         } else {
             logs = logQueue;
         }
@@ -1155,7 +1166,7 @@ public class ModelFactory
         return toRestJobLog(logs, self);
     }
 
-    public JobLog toRestJobLog(Collection<LogEvent> logs, URI self)
+    public JobLog toRestJobLog(Iterable<LogEvent> logs, URI self)
     {
         JobLog log = this.objectFactory.createJobLog();
 
@@ -1185,6 +1196,7 @@ public class ModelFactory
 
     /**
      * Check if the given property should be exposed via REST.
+     * 
      * @param restProperty the property to be read/written
      * @return true if the property is considered accessible
      */

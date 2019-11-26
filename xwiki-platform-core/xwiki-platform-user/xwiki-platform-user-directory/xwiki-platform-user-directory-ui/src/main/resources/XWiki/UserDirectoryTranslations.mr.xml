@@ -36,10 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>userdirectory.userScopeFilter=वापरकर्ता व्याप्ती:
+  <content>### Missing: XWiki.UserDirectoryPreferencesClass_columns=Columns to display
+### Missing: XWiki.UserDirectoryPreferencesClass_columns_hint=The list of columns, corresponding to properties of the User class, to be displayed in the user directory
+### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles=Hide disabled user profiles
+### Missing: XWiki.UserDirectoryPreferencesClass_hideDisabledProfiles_hint=Exclude from the user directory the users that have their profile disabled
+
+userdirectory.userScopeFilter=वापरकर्ता व्याप्ती:
 userdirectory.userScopeFilter.hint=आपण प्रदर्शित करू इच्छित वापरकर्त्यांची श्रेणी निवडा.
 userdirectory.userScopeFilter.local=स्थानिक वापरकर्ते
 userdirectory.userScopeFilter.global=या विकीचे सदस्य असलेले वैश्विक वापरकर्ते
+### Missing: userdirectory.configuration.title=Settings
+### Missing: userdirectory.configuration.columns.editHint=Click to select the columns
+
 platform.userdirectory.customizeNotAllowed=आपल्याला ही वापरकर्ता निर्देशिका सानुकूलित करण्याची परवानगी नाही.
 platform.userdirectory.configTitle=वापरकर्ता निर्देशिका कॉन्फिगरेशन
 platform.userdirectory.configSheetTitle=वापरकर्ता निर्देशिका कॉन्फिगरेशन पत्रक

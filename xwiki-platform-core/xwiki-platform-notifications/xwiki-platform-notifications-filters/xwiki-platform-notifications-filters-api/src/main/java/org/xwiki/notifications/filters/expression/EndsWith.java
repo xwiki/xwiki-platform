@@ -21,7 +21,6 @@ package org.xwiki.notifications.filters.expression;
 
 import org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
-import org.xwiki.stability.Unstable;
 
 /**
  * Define a LIKE ("%value") operation in a filtering expression.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.2
  * @since 9.11.4
  */
-@Unstable
 public final class EndsWith extends AbstractBinaryOperatorNode
 {
     /**

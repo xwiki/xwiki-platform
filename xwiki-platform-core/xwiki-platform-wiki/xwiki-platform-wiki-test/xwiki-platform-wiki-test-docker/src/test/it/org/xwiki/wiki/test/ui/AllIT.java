@@ -33,17 +33,18 @@ import org.xwiki.test.docker.junit5.UITest;
     properties = {
         // TODO: Remove once https://jira.xwiki.org/browse/XWIKI-7581 is fixed
         "xwikiCfgSuperadminPassword=pass",
-        // The Mail module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
+        // The Notifications module contributes a Hibernate mapping that needs to be added to hibernate.cfg.xml
         "xwikiDbHbmCommonExtraMappings=notification-filter-preferences.hbm.xml",
         // Disable the DW
-        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false"
+        "xwikiPropertiesAdditionalProperties=distribution.automaticStartOnMainWiki=false",
+        // Enable Hibernate statistics to debug SQL execution times
+        "xwikiDbAdditionalProperties=<property name=\"hibernate.generate_statistics\">true</property>"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
         // we need to provide the JAR inside WEB-INF/lib
         "org.xwiki.platform:xwiki-platform-notifications-filters-default",
         // Required by components located in a core extensions
-        "org.xwiki.platform:xwiki-platform-notifications-preferences-default",
         "org.xwiki.platform:xwiki-platform-wiki-template-default",
         // TODO: improve the docker test framework to indicate xwiki-platform-wiki-ui-wiki instead of all those jars one
         // by one

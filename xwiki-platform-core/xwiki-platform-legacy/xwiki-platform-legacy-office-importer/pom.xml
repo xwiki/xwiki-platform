@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-office-importer</artifactId>
   <name>XWiki Platform - Legacy - Office Importer</name>
@@ -133,26 +133,6 @@
           <classpathDependencyExcludes>
             <classpathDependencyExcludes>org.xwiki.platform:xwiki-platform-office-importer:jar</classpathDependencyExcludes>
           </classpathDependencyExcludes>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.revapi</groupId>
-        <artifactId>revapi-maven-plugin</artifactId>
-        <configuration>
-          <analysisConfiguration><![CDATA[
-            {
-              "revapi": {
-                "ignore" : [
-                  {
-                    "code": "java.method.returnTypeChanged",
-                    "old": "method org.artofsolving.jodconverter.document.DocumentFormatRegistry org.xwiki.officeimporter.converter.OfficeConverter::getFormatRegistry()",
-                    "new": "method org.jodconverter.document.DocumentFormatRegistry org.xwiki.officeimporter.converter.OfficeConverter::getFormatRegistry()",
-                    "justification": "Migration to the official maintained fork of JodConverter which changed the package name."
-                  },
-                ]
-              }
-            }
-          ]]></analysisConfiguration>
         </configuration>
       </plugin>
     </plugins>

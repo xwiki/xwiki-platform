@@ -35,7 +35,7 @@
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
-  <hidden>false</hidden>
+  <hidden>true</hidden>
   <content/>
   <class>
     <name>XWiki.Authentication.ConfigurationClass</name>
@@ -60,6 +60,21 @@
       <validationRegExp/>
       <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
     </failureStrategy>
+    <isAuthenticationSecurityEnabled>
+      <customDisplay/>
+      <defaultValue/>
+      <disabled>0</disabled>
+      <displayFormType>checkbox</displayFormType>
+      <displayType/>
+      <hint>Check to enable the security.</hint>
+      <name>isAuthenticationSecurityEnabled</name>
+      <number>4</number>
+      <prettyName>Enable the Authentication Security</prettyName>
+      <unmodifiable>0</unmodifiable>
+      <validationMessage/>
+      <validationRegExp/>
+      <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+    </isAuthenticationSecurityEnabled>
     <maxAuthorizedAttempts>
       <customDisplay/>
       <disabled>0</disabled>

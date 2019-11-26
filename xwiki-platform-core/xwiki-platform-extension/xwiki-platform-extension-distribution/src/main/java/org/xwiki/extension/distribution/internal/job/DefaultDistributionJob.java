@@ -24,18 +24,19 @@ import java.util.List;
 
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.distribution.internal.job.step.CleanExtensionsDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DefaultUIDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.DistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.FirstAdminUserStep;
 import org.xwiki.extension.distribution.internal.job.step.FlavorDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.OutdatedExtensionsDistributionStep;
 import org.xwiki.extension.distribution.internal.job.step.WikisDefaultUIDistributionStep;
-import org.xwiki.text.StringUtils;
 
 /**
  * @version $Id$
@@ -71,6 +72,9 @@ public class DefaultDistributionJob extends AbstractDistributionJob<Distribution
         // Install/upgrade main wiki UI
         addDefaultUIStep(steps, isMainWiki);
 
+        // Clean leftovers
+        addCleanStep(steps);
+
         // Upgrade other wikis
         if (isMainWiki) {
             ExtensionId wikiUI = this.distributionManager.getWikiUIExtensionId();
@@ -96,6 +100,16 @@ public class DefaultDistributionJob extends AbstractDistributionJob<Distribution
         }
 
         return steps;
+    }
+
+    private void addCleanStep(List<DistributionStep> steps)
+    {
+        try {
+            steps.add(this.componentManager.<DistributionStep>getInstance(DistributionStep.class,
+                CleanExtensionsDistributionStep.ID));
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to get a clean extensions step instance", e);
+        }
     }
 
     private void addDefaultUIStep(List<DistributionStep> steps, boolean isMainWiki)

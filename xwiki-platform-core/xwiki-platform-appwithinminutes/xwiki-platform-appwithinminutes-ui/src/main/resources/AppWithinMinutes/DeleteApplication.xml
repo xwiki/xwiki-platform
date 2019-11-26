@@ -64,12 +64,12 @@
 #end
 
 #macro (bulkDelete $entities)
-  #set ($errors = [])
+  #set ($errorLog = $NULL)
   #set ($deleteJob = $services.refactoring.delete($entities))
   #try()
     #set ($discard = $deleteJob.join())
     #set ($deleteJobStatus = $services.job.getJobStatus($deleteJob.request.id))
-    #set ($errors = $deleteJobStatus.log.getLogs('ERROR'))
+    #set ($errorLog = $deleteJobStatus.logTail.getFirstLogEvents('ERROR'))
   #end
 #end
 
@@ -134,8 +134,8 @@
       #end
       #bulkDelete($pageReferences)
       ##
-      #if ($errors.size() &gt; 0)
-        {{error}}$errors.get(0){{/error}}
+      #if ($errorLog)
+        {{error}}$errorLog{{/error}}
       #elseif ($request.xredirect)
         ## If requested, redirect the UI after the work is complete.
         $response.sendRedirect($request.xredirect)

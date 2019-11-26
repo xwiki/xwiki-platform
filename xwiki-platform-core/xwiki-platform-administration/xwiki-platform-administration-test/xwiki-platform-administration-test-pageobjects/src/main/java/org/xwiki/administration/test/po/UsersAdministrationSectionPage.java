@@ -36,6 +36,9 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
         "//table[@id = 'userstable']//td[contains(@class, 'name') and normalize-space(.) = '%s']"
             + "/following-sibling::td[contains(@class, 'actions')]/a[contains(@class, 'action%s')]";
 
+    private static final String USER_DISABLED_XPATH_FORMAT =
+        "//table[@id = 'userstable']//div[contains(@class, 'disabled') and normalize-space(.) = '%s']";
+
     public static final String ADMINISTRATION_SECTION_ID = "Users";
 
     @FindBy(css = ".btn[data-target='#createUserModal']")
@@ -52,7 +55,7 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     public static UsersAdministrationSectionPage gotoPage()
     {
         AdministrationSectionPage.gotoPage(ADMINISTRATION_SECTION_ID);
-        return new UsersAdministrationSectionPage();
+        return new UsersAdministrationSectionPage().waitUntilPageIsLoaded();
     }
 
     public UsersAdministrationSectionPage()
@@ -102,6 +105,52 @@ public class UsersAdministrationSectionPage extends AdministrationSectionPage
     {
         return !getDriver()
             .findElementsWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "delete")))
+            .isEmpty();
+    }
+
+    public UsersAdministrationSectionPage disableUser(String userName)
+    {
+        getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "disable")))
+            .click();
+        this.waitForNotificationSuccessMessage("User account disabled");
+        this.usersLiveTable.waitUntilReady();
+        return this;
+    }
+
+    public boolean isUserDisabled(String userName)
+    {
+        return !getDriver()
+            .findElementsWithoutWaiting(By.xpath(String.format(USER_DISABLED_XPATH_FORMAT, userName)))
+            .isEmpty();
+    }
+
+    public boolean canDisableUser(String userName)
+    {
+        return !getDriver()
+            .findElementsWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "disable")))
+            .isEmpty();
+    }
+
+    public UsersAdministrationSectionPage enableUser(String userName)
+    {
+        getDriver().findElementWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "enable")))
+            .click();
+        this.waitForNotificationSuccessMessage("User account enabled");
+        this.usersLiveTable.waitUntilReady();
+        return this;
+    }
+
+    public boolean canEnableUser(String userName)
+    {
+        return !getDriver()
+            .findElementsWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "enable")))
+            .isEmpty();
+    }
+
+    public boolean canEditUser(String userName)
+    {
+        return !getDriver()
+            .findElementsWithoutWaiting(By.xpath(String.format(USER_ACTION_XPATH_FORMAT, userName, "edit")))
             .isEmpty();
     }
 

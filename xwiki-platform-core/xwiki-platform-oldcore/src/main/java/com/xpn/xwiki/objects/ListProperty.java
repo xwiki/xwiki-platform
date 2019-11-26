@@ -35,6 +35,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
 
 public class ListProperty extends BaseProperty implements Cloneable
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * We make this a notifying list, because we must propagate any value updates to the owner document.
      */

@@ -152,6 +152,8 @@ public class TextAreaClass extends StringClass
         }
     }
 
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "textarea";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TextAreaClass.class);

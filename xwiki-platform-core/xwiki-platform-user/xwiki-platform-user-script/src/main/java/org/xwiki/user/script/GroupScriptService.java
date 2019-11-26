@@ -28,7 +28,6 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 import org.xwiki.user.group.GroupException;
 import org.xwiki.user.group.GroupManager;
 import org.xwiki.user.group.WikiTarget;
@@ -42,7 +41,6 @@ import org.xwiki.user.group.WikiTarget;
 @Component
 @Named(GroupScriptService.ROLEHINT)
 @Singleton
-@Unstable
 public class GroupScriptService implements ScriptService
 {
     /**

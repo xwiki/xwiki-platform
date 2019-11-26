@@ -43,7 +43,11 @@ authentication.admin.failureStrategy.captcha.name=CAPTCHA
 authentication.admin.maxAttempts.label=Maximum number of authorized attempts
 authentication.admin.maxAttempts.hint=This represents the maximum number of authorized login failures before the strategy is activated. This number is taken into account only in the context of the following time window. Please consider that a 0 value means the feature is disabled.
 authentication.admin.timeWindow.label=Time window for login failures
-authentication.admin.timeWindow.hint=The time window in seconds during which to consider the failing login attempts for activating the strategy.</content>
+authentication.admin.timeWindow.hint=The time window in seconds during which to consider the failing login attempts for activating the strategy.
+authentication.admin.isAuthenticationSecurityEnabled.label=Enable or disable the authentication security mechanism
+authentication.admin.isAuthenticationSecurityEnabled.hint=Disabling the authentication security mechanism will also reset the authentication failure records.
+authentication.admin.isAuthenticationSecurityEnabled.disabled=Disabled
+authentication.admin.isAuthenticationSecurityEnabled.enabled=Enabled</content>
   <object>
     <name>XWiki.Authentication.Translations</name>
     <number>0</number>

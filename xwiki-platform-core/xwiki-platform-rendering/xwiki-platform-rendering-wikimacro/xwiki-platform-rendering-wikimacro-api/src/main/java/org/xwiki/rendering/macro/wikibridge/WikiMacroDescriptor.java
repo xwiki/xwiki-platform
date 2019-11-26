@@ -27,7 +27,6 @@ import org.xwiki.rendering.macro.MacroId;
 import org.xwiki.rendering.macro.descriptor.ContentDescriptor;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.descriptor.ParameterDescriptor;
-import org.xwiki.stability.Unstable;
 
 /**
  * A {@link MacroDescriptor} for describing wiki macros.
@@ -43,7 +42,6 @@ public class WikiMacroDescriptor implements MacroDescriptor
      * @version $Id$
      * @since 10.10RC1
      */
-    @Unstable
     public static class Builder
     {
         private final WikiMacroDescriptor descriptor = new WikiMacroDescriptor();

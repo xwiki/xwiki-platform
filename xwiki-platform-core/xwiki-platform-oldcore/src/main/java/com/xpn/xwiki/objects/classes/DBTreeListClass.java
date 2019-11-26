@@ -46,6 +46,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class DBTreeListClass extends DBListClass
 {
+    private static final long serialVersionUID = 1L;
+
     private static final String XCLASSNAME = "dbtreelist";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBTreeListClass.class);

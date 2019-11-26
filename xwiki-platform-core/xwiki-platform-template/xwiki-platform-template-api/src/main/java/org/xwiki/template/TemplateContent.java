@@ -107,7 +107,6 @@ public interface TemplateContent
      *         execute) or null if the template is not associated with any document (for example filesystem template)
      * @since 10.11RC1
      */
-    @Unstable
     default DocumentReference getDocumentReference()
     {
         return null;

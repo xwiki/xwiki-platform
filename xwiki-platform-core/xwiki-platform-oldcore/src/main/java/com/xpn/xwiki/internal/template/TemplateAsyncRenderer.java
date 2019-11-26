@@ -27,13 +27,9 @@ import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.AsyncContext;
 import org.xwiki.rendering.async.internal.block.AbstractBlockAsyncRenderer;
@@ -42,9 +38,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.RawBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ContentParser;
-import org.xwiki.rendering.renderer.BlockRenderer;
-import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.TransformationContext;
 import org.xwiki.rendering.transformation.TransformationException;
@@ -60,10 +53,6 @@ import org.xwiki.template.TemplateContent;
 @Component(roles = TemplateAsyncRenderer.class)
 public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
 {
-    @Inject
-    @Named("context")
-    private Provider<ComponentManager> componentManager;
-
     @Inject
     private ContentParser parser;
 
@@ -99,7 +88,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         Syntax contextTargetSyntax = this.renderingContext.getTargetSyntax();
         this.targetSyntax = contextTargetSyntax != null ? contextTargetSyntax : Syntax.PLAIN_1_0;
 
-        this.id = Arrays.asList("template", template.getId(), this.targetSyntax.toIdString(), String.valueOf(inline));
+        this.id = createId("template", template.getId(), this.targetSyntax.toIdString(), inline);
 
         return this.content.getContextEntries();
     }
@@ -174,21 +163,10 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         ///////////////////////////////////////
         // Rendering
 
-        String resultString;
-        if (cached || async || !this.xdomMode) {
-            BlockRenderer renderer;
-            try {
-                renderer = this.componentManager.get().getInstance(BlockRenderer.class, this.targetSyntax.toIdString());
-            } catch (ComponentLookupException e) {
-                throw new RenderingException("Failed to lookup renderer for syntax [" + this.targetSyntax + "]", e);
-            }
+        String resultString = null;
 
-            WikiPrinter printer = new DefaultWikiPrinter();
-            renderer.render(xdom, printer);
-
-            resultString = printer.toString();
-        } else {
-            resultString = null;
+        if (async || !this.xdomMode) {
+            resultString = render(xdom);
         }
 
         return new BlockAsyncRendererResult(resultString, xdom);

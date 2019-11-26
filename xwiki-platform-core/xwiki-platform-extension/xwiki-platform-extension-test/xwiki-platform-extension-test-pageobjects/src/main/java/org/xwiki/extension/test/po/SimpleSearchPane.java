@@ -101,7 +101,13 @@ public class SimpleSearchPane extends BaseElement
     public SearchResultsPane search(CharSequence keywords)
     {
         searchInput.clear();
+
+        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
+        // Since sendKeys is not waiting anymore and bulletproof it
+        getDriver().addPageNotYetReloadedMarker();
         searchInput.sendKeys(keywords, Keys.ENTER);
+        getDriver().waitUntilPageIsReloaded();
+
         return new SearchResultsPane();
     }
 }

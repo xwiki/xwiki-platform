@@ -25,14 +25,12 @@ import java.util.Map;
 import org.xwiki.extension.xar.question.ConflictQuestion.ConflictType;
 import org.xwiki.extension.xar.question.ConflictQuestion.GlobalAction;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
 import org.xwiki.xar.XarEntryType.UpgradeType;
 
 /**
  * @version $Id$
  * @since 10.3
  */
-@Unstable
 public class XWikiDocumentMergerConfiguration
 {
     private final Map<ConflictType, GlobalAction> conflictActions = new EnumMap<>(ConflictType.class);

@@ -20,6 +20,7 @@
 package org.xwiki.extension.script;
 
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -35,6 +36,7 @@ import org.xwiki.job.script.JobScriptService;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -103,12 +105,12 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     private ScriptService jobScriptService;
 
     /**
-     * @param <T> the type of the object
+     * @param <S> the type of the safe object version
      * @param unsafe the unsafe object
      * @return the safe version of the passed object
      */
     @SuppressWarnings("unchecked")
-    protected <S, T> S safe(T unsafe)
+    protected <S> S safe(Object unsafe)
     {
         return (S) this.scriptProvider.get(unsafe);
     }
@@ -116,10 +118,12 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     protected <T extends AbstractRequest> void setRightsProperties(T extensionRequest)
     {
         extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS, true);
+        extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_USER, true);
         extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_USERREFERENCE,
             this.documentAccessBridge.getCurrentUserReference());
         XWikiDocument callerDocument = getCallerDocument();
         if (callerDocument != null) {
+            extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CHECKRIGHTS_CALLER, true);
             extensionRequest.setProperty(AbstractExtensionValidator.PROPERTY_CALLERREFERENCE,
                 callerDocument.getContentAuthorReference());
         }
@@ -142,6 +146,8 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     }
 
     /**
+     * @param namespace the namespace
+     * @return the wiki identifier
      * @since 8.1M1
      */
     protected String toWikiId(String namespace)
@@ -154,6 +160,8 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     }
 
     /**
+     * @param wiki the wiki identifier
+     * @return the namespace
      * @since 8.1M1
      */
     protected String fromWikitoNamespace(String wiki)
@@ -195,5 +203,42 @@ public abstract class AbstractExtensionScriptService implements ScriptService
     protected void setError(Exception e)
     {
         this.execution.getContext().setProperty(EXTENSIONERROR_KEY, e);
+    }
+
+    /**
+     * Call the passed callable but try/catch and return null in case of exception (and update the last error).
+     * 
+     * @param <R> the result type of method {@code call}
+     * @param callable a task that returns a result and may throw an exception
+     * @return the computed result
+     * @since 11.10
+     */
+    @Unstable
+    protected <R> R wrapError(Callable<R> callable)
+    {
+        setError(null);
+
+        try {
+            return callable.call();
+        } catch (Exception e) {
+            setError(e);
+        }
+
+        return null;
+    }
+
+    /**
+     * Call the passed callable but try/catch and return null in case of exception (and update the last error). A safe
+     * verison of the result is returned.
+     * 
+     * @param <R> the result type of method {@code call}
+     * @param callable a task that returns a result and may throw an exception
+     * @return the safe version of the computed result
+     * @since 11.10
+     */
+    @Unstable
+    protected <R> R safeWrapError(Callable<R> callable)
+    {
+        return wrapError(() -> safe(callable.call()));
     }
 }

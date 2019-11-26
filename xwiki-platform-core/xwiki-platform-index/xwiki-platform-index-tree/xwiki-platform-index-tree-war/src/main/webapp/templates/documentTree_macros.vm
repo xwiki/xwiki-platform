@@ -5,11 +5,13 @@
 ## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
 #set ($docTreeConfig = {
   'exclusions': $collectionstool.set,
+  'filters': [],
   'filterByClass': '',
   'filterHiddenDocuments': true,
   'hierarchyMode': 'reference',
   'limit': 15,
   'root': '',
+  'sheet': '',
   'showAddAttachment': false,
   'showAddDocument': false,
   'showAttachments': true,
@@ -49,7 +51,15 @@
       #set ($discard = $resourceParams.put($entry.key, $value))
     #end
   #end
-  #set ($macro.options.reference = "path:$doc.getURL('get', $escapetool.url($resourceParams))")
+  ## If the current doc is forbidden in view, the tree won't be displayed because of a 403.
+  ## In that case we fallback on requesting it from the main page of the wiki.
+  #if (!$services.security.authorization.hasAccess("view", $doc.getDocumentReference()))
+    #set ($docForRequestReference = $services.wiki.getCurrentWikiDescriptor().getMainPageReference())
+    #set ($docForRequest = $xwiki.getDocument($docForRequestReference))
+  #else
+    #set ($docForRequest = $doc)
+  #end
+  #set ($macro.options.reference = "path:$docForRequest.getURL('get', $escapetool.url($resourceParams))")
   #set ($editable = $macro.options.remove('readOnly') != 'true')
   #set ($macro.options.dragAndDrop = $editable)
   #set ($macro.options.contextMenu = $editable)

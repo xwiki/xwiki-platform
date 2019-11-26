@@ -25,14 +25,17 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-core</artifactId>
-    <version>11.8-SNAPSHOT</version>
+    <version>12.0-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-mailsender</artifactId>
   <name>XWiki Platform - Mail Sender</name>
   <description>XWiki Platform - Mail Sender</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.23</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>36</xwiki.pitest.mutationThreshold>
+    <!-- TODO: put back previous threshold of 36 which we had to change to 0 because of an issue in PIT/Descartes
+         See https://github.com/STAMP-project/pitest-descartes/issues/106
+         Put back when it's fixed. -->
+    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

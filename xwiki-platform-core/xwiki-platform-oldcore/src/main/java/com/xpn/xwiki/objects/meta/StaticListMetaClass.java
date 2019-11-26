@@ -38,6 +38,8 @@ import com.xpn.xwiki.objects.classes.StringClass;
 @Singleton
 public class StaticListMetaClass extends ListMetaClass
 {
+    private static final long serialVersionUID = 1L;
+
     /**
      * Default constructor. Initializes the default meta properties of a Static List XClass property.
      */

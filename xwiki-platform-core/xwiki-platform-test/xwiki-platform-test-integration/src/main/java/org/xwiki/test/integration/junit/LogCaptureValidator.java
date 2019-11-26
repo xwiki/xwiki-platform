@@ -44,6 +44,11 @@ public class LogCaptureValidator
         "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
 
     private static final List<Line> GLOBAL_EXCLUDES = Arrays.asList(
+        // For now we exclude all Javascript errors since 1) all we've seen so far are coming from the test fwk and
+        // excluding them one by one is painful and 2) we're not yet ready to tackle fixing them. We could decide to
+        // remove this global exclude in the future.
+        new Line("JavaScript error:"),
+
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
         new Line("Could not validate integrity of download from file"),
         // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.
@@ -71,12 +76,6 @@ public class LogCaptureValidator
         new Line("MavenExtensionScanner - [javax.transaction:javax.transaction-api/"),
         // Appears only for PostgreSQL database.
         new Line("WARNING: enabling \"trust\" authentication for local connections"),
-        // Those errors appears from time to time, mainly on the CI, related to various JS resources such as:
-        // jsTree, jQuery, keypress, xwiki-events-bridge, iScroll, etc.
-        // This seems to be related to actions being performed before all the resources have been correctly loaded.
-        new Line("require.min.js?r=1, line 7"),
-        // Cannot reproduce locally but happened on the CI for MenuIT.
-        new Line("jstree.min.js, line 2: TypeError: c is undefined"),
         // See: https://jira.xwiki.org/browse/XWIKI-13609 comments: this log could still happen from time to time.
         new Line("Failed to save job status"),
         // When updating a collection Hibernate start by deleting the existing elements and HSQLDB complains when there
@@ -119,13 +118,41 @@ public class LogCaptureValidator
             + "access operations"),
         new Line("WARNING: All illegal access operations will be denied in a future release"),
 
-        // This warning happens in docker test when using firefox.
+        // This warning happens in tests when using firefox.
         // It seems related to this closed issue https://github.com/SeleniumHQ/docker-selenium/issues/388
         // we might want to fix this using shm_size argument as explained in the thread, but AFAICS it doesn't guarantee
         // to solve the issue and will potentially consume more memory. Moreover the log error doesn't look related
         // to any problem during our tests.
-        new Line("Connection reset by peer: "
-            + "file /builds/worker/workspace/build/src/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 357")
+        // The warning is something such as:
+        // Connection reset by peer:
+        // file /builds/worker/workspace/build/src/ipc/chromium/src/chrome/common/ipc_channel_posix.cc, line 357
+        // But the path might be different from machine to machine, and the error might be localized.
+        // So we keep only the end of the path to match warnings in different configurations.
+        new Line("ipc/chromium/src/chrome/common/ipc_channel_posix.cc"),
+
+        // Warning obtained locally only so far when testing with firefox.
+        // It's related to this issue: https://bugzilla.mozilla.org/show_bug.cgi?id=1132140
+        // It shouldn't have any impact on our tests.
+        new Line(" ../glib/gobject/gsignal.c:3498: signal name 'load_complete' is invalid"),
+
+        // Happened only locally so far, might be related to a bad configuration, anyway it shouldn't have any impact
+        // on our tests.
+        new Line("Unable to open /var/lib/flatpak/exports/share/dconf/profile/user"),
+
+        // Triggered by the HTML5 Validator.
+        // This should be fixed with https://jira.xwiki.org/browse/XWIKI-16791
+        new Line("The “type” attribute is unnecessary for JavaScript resources."),
+
+        // This error apparently occurs because an async resource was still loading when we move to another page
+        // This is most certainly related to some pages for which we don't wait the JS to be loaded properly before
+        // making some assertion or interactions.
+        new Line("java.lang.IllegalStateException: Response is ABORTED"),
+
+        // Warning obtain from time to time in case of slow network, the full warning is:
+        // There was an error managing geckodriver 0.26.0 (github-production-release-asset-2e65be.s3.amazonaws.com:
+        // Temporary failure in name resolution) ... trying again using cache and mirror
+        new Line("There was an error managing geckodriver 0.[0-9]+.0 "
+            + "(.*: Temporary failure in name resolution) ... trying again using cache and mirror", true)
     );
 
     private static final List<Line> GLOBAL_EXPECTED = Arrays.asList(
@@ -145,6 +172,17 @@ public class LogCaptureValidator
      */
     public void validate(String logContent, LogCaptureConfiguration configuration)
     {
+        validate(logContent, configuration, true);
+    }
+
+    /**
+     * @param logContent the log content to validate
+     * @param configuration the user-registered excludes and expected log lines
+     * @param displayMissing true if warning should be logged when excluded/expected logs are not found
+     * @since 11.10
+     */
+    public void validate(String logContent, LogCaptureConfiguration configuration, boolean displayMissing)
+    {
         List<Line> allExcludes = new ArrayList<>();
         allExcludes.addAll(GLOBAL_EXCLUDES);
         allExcludes.addAll(configuration.getExcludedLines());
@@ -155,32 +193,8 @@ public class LogCaptureValidator
 
         List<String> matchingExcludes = new ArrayList<>();
         List<Line> matchingDefinitions = new ArrayList<>();
-        List<String> matchingLines = LOG_PARSER.parse(logContent).stream()
-            .filter(p -> {
-                for (String searchString : SEARCH_STRINGS) {
-                    if (p.contains(searchString)) {
-                        return true;
-                    }
-                }
-                return false;
-            })
-            .filter(p -> {
-                for (Line excludedLine : allExcludes) {
-                    if (isMatching(p, excludedLine)) {
-                        matchingExcludes.add(p);
-                        matchingDefinitions.add(excludedLine);
-                        return false;
-                    }
-                }
-                for (Line expectedLine : allExpected) {
-                    if (isMatching(p, expectedLine)) {
-                        matchingDefinitions.add(expectedLine);
-                        return false;
-                    }
-                }
-                return true;
-            })
-            .collect(Collectors.toList());
+        List<String> matchingLines =
+            getMatchingLines(logContent, allExcludes, allExpected, matchingExcludes, matchingDefinitions);
 
         // At the end of the tests, output warnings for matching excluded lines so that developers can see that
         // there  are excludes that need to be fixed.
@@ -189,18 +203,48 @@ public class LogCaptureValidator
                 StringUtils.join(matchingExcludes, NL));
         }
 
-        // Also display not matching excludes and expected so that developers can notice them and realize that the
-        // issues that existed might have been fixed. Note however that currently we can't have exclude/expected by
-        // configuration (for Docker-based tests) and thus it's possible that there are non matching excludes/expected
-        // simply because they exist only in a different configuration.
-        displayMissingWarning(configuration.getExcludedLines(), matchingDefinitions, "excludes");
-        displayMissingWarning(configuration.getExpectedLines(), matchingDefinitions, "expected");
+        if (displayMissing) {
+            // Also display not matching excludes and expected so that developers can notice them and realize that the
+            // issues that existed might have been fixed. Note however that currently we can't have exclude/expected by
+            // configuration (for Docker-based tests) and thus it's possible that there are non matching
+            // excludes/expected simply because they exist only in a different configuration.
+            displayMissingWarning(configuration.getExcludedLines(), matchingDefinitions, "excludes");
+            displayMissingWarning(configuration.getExpectedLines(), matchingDefinitions, "expected");
+        }
 
         // Fail the test if there are matching lines that have no exclude or no expected.
         if (!matchingLines.isEmpty()) {
             throw new AssertionError(String.format("The following lines were matching forbidden content:[\n%s\n]",
                 matchingLines.stream().collect(Collectors.joining(NL))));
         }
+    }
+
+    private List<String> getMatchingLines(String logContent, List<Line> allExcludes, List<Line> allExpected,
+        List<String> matchingExcludes, List<Line> matchingDefinitions)
+    {
+        return LOG_PARSER.parse(logContent).stream().filter(p -> {
+            for (String searchString : SEARCH_STRINGS) {
+                if (p.contains(searchString)) {
+                    return true;
+                }
+            }
+            return false;
+        }).filter(p -> {
+            for (Line excludedLine : allExcludes) {
+                if (isMatching(p, excludedLine)) {
+                    matchingExcludes.add(p);
+                    matchingDefinitions.add(excludedLine);
+                    return false;
+                }
+            }
+            for (Line expectedLine : allExpected) {
+                if (isMatching(p, expectedLine)) {
+                    matchingDefinitions.add(expectedLine);
+                    return false;
+                }
+            }
+            return true;
+        }).collect(Collectors.toList());
     }
 
     private void displayMissingWarning(List<Line> definitions, List<Line> matchingDefinitions, String missingType)

@@ -239,6 +239,7 @@ public class SolrIndexScriptServiceTest
             String.format("The user '%s' is not allowed to alter the index for the entity '%s'", userReference,
                 wikiReference);
         verify(this.logger).error(eq(errorMessage), any(IllegalAccessException.class));
+        verify(this.mockContext).remove(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION));
         verify(this.mockContext).put(eq(SolrIndexScriptService.CONTEXT_LASTEXCEPTION),
             any(IllegalAccessException.class));
     }

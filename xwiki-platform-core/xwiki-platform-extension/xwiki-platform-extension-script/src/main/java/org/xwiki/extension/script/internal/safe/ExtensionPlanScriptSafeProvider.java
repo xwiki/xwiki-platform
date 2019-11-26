@@ -27,7 +27,7 @@ import org.xwiki.extension.job.plan.ExtensionPlan;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
 
 /**
- * Provide safe Extension.
+ * Provide safe ExtensionPlan.
  * 
  * @version $Id$
  * @since 4.0M2

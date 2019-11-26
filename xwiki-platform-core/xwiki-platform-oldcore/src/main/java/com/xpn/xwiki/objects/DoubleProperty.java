@@ -21,4 +21,5 @@ package com.xpn.xwiki.objects;
 
 public class DoubleProperty extends NumberProperty
 {
+    private static final long serialVersionUID = 1L;
 }

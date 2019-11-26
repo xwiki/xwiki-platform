@@ -22,7 +22,6 @@ package org.xwiki.rendering.async;
 import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Called to give a chance to an handler to do something with the values associated to a cached rendering (inject some
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.10RC1
  */
 @Role
-@Unstable
 public interface AsyncContextHandler
 {
     /**
@@ -47,4 +45,29 @@ public interface AsyncContextHandler
      * @param values the values for which to add HTML meta (if needed)
      */
     void addHTMLHead(StringBuilder head, Collection<Object> values);
+
+    /**
+     * Add to the returned HTML head tags required elements (required js/css, metadatas, etc.).
+     * 
+     * @param head the head to fill
+     * @param values the values for which to add HTML meta (if needed)
+     * @param scripts true if the scripts should be included
+     * @since 11.9RC1
+     */
+    default void addHTMLHead(StringBuilder head, Collection<Object> values, boolean scripts)
+    {
+        addHTMLHead(head, values);
+    }
+
+    /**
+     * Add to the returned HTML the required script elements.
+     * 
+     * @param head the head to fill
+     * @param values the values for which to add HTML meta (if needed)
+     * @since 11.9RC1
+     */
+    default void addHTMLScripts(StringBuilder head, Collection<Object> values)
+    {
+
+    }
 }

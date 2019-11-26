@@ -137,19 +137,7 @@ public class InstalledExtensionScriptService extends AbstractExtensionScriptServ
      */
     public Map<String, Collection<InstalledExtension>> getBackwardDependencies(ExtensionId extensionId)
     {
-        Map<String, Collection<InstalledExtension>> extensions;
-
-        setError(null);
-
-        try {
-            return safe(this.installedExtensionRepository.getBackwardDependencies(extensionId));
-        } catch (Exception e) {
-            setError(e);
-
-            extensions = null;
-        }
-
-        return extensions;
+        return safeWrapError(() -> this.installedExtensionRepository.getBackwardDependencies(extensionId));
     }
 
     /**
@@ -165,18 +153,6 @@ public class InstalledExtensionScriptService extends AbstractExtensionScriptServ
      */
     public Collection<InstalledExtension> getBackwardDependencies(String feature, String namespace)
     {
-        Collection<InstalledExtension> extensions;
-
-        setError(null);
-
-        try {
-            return safe(this.installedExtensionRepository.getBackwardDependencies(feature, namespace));
-        } catch (Exception e) {
-            setError(e);
-
-            extensions = null;
-        }
-
-        return extensions;
+        return safeWrapError(() -> this.installedExtensionRepository.getBackwardDependencies(feature, namespace));
     }
 }

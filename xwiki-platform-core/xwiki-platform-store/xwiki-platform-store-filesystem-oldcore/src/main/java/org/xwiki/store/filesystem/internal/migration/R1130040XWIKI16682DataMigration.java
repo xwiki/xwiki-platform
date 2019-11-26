@@ -28,6 +28,7 @@ import java.util.List;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
@@ -113,11 +114,20 @@ public class R1130040XWIKI16682DataMigration extends AbstractStoreTypeDataMigrat
         List<Long> fileAttachments = new ArrayList<>(attachments.size());
 
         for (Object[] attachment : attachments) {
-            Long id = (Long) attachment[0];
-            String filename = (String) attachment[1];
             String fullName = (String) attachment[2];
 
             DocumentReference documentReference = this.resolver.resolve(fullName, wikiReference);
+
+            String filename = (String) attachment[1];
+
+            if (StringUtils.isEmpty(filename)) {
+                this.logger.warn("Unsupported attachment with empty string as name has been found on document [{}]."
+                    + " Ignoring it.", documentReference);
+
+                continue;
+            }
+
+            Long id = (Long) attachment[0];
 
             AttachmentReference attachmentReference = new AttachmentReference(filename, documentReference);
 

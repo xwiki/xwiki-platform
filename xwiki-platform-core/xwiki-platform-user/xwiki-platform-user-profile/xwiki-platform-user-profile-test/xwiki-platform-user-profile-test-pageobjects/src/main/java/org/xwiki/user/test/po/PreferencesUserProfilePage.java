@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.test.po;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -47,6 +48,7 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
     public PreferencesUserProfilePage(String username)
     {
         super(username);
+        getDriver().waitUntilElementIsVisible(By.id("preferencesPane"));
     }
 
     public String getDefaultEditor()
@@ -66,8 +68,12 @@ public class PreferencesUserProfilePage extends AbstractUserProfilePage
 
     public PreferencesEditPage editPreferences()
     {
+        getDriver().addPageNotYetReloadedMarker();
         this.editPreferences.click();
-        return new PreferencesEditPage();
+        getDriver().waitUntilPageIsReloaded();
+        PreferencesEditPage preferencesEditPage = new PreferencesEditPage();
+        preferencesEditPage.waitUntilPageJSIsLoaded();
+        return preferencesEditPage;
     }
 
     public ChangePasswordPage changePassword()

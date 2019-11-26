@@ -178,7 +178,7 @@ public class UpdateThread extends AbstractXWikiRunnable
     }
 
     @Override
-    protected void runInternal()
+    protected void runInternal() throws InterruptedException
     {
         while (true) {
             update();
@@ -186,11 +186,7 @@ public class UpdateThread extends AbstractXWikiRunnable
                 feedPlugin.removeUpdateThread(space, this, getXWikiContext());
                 break;
             }
-            try {
-                Thread.sleep(scheduleTimer);
-            } catch (InterruptedException e) {
-                break;
-            }
+            Thread.sleep(scheduleTimer);
         }
     }
 }

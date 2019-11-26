@@ -65,8 +65,9 @@ public class BrowserContainerExecutor extends AbstractContainerExecutor
      * Create and start the {@link BrowserWebDriverContainer} based on the test given test configuration.
      *
      * @return the started browser driver container.
+     * @throws Exception if the container fails to start
      */
-    public BrowserWebDriverContainer start()
+    public BrowserWebDriverContainer start() throws Exception
     {
         LOGGER.info("(*) Starting browser [{}]...", this.testConfiguration.getBrowser());
         Browser browser = testConfiguration.getBrowser();

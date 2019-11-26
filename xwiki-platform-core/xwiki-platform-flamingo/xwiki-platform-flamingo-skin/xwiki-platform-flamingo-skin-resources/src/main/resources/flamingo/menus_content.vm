@@ -9,7 +9,16 @@
 ## permissions on the whole wiki (including subwiki) is costly. Thus FTM we
 ## only check for view permissions.
 #set ($canCopy = $canView)
-#set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
+
+#set ($nbUsers = $doc.getObjectNumbers("XWiki.XWikiUsers"))
+#set ($nbGroups = $doc.getObjectNumbers("XWiki.XWikiGroups"))
+#set ($hasAdminRights = $xwiki.hasAccessLevel('admin'))
+
+#if ($nbUsers == 0 && $nbGroups == 0 || $hasAdminRights)
+  #set ($canDelete = !$doc.isNew() && $xwiki.hasAccessLevel('delete'))
+#else
+  #set ($canDelete = false)
+#end
 #set ($canShare = $canView && $xwiki.exists('XWiki.SharePage') && !$isGuest)
 ## Add rel='nofollow' to prevent search crawler from navigating the links and indexing them in search results
 #set ($extraAttributes = 'rel="nofollow"')

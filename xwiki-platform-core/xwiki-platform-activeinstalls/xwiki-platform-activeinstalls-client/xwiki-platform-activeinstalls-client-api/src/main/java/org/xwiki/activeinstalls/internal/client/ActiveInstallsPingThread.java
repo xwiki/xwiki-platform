@@ -44,7 +44,11 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
     /**
      * Once every 24 hours.
      */
-    private static final long WAIT_TIME = 1000L * 60L * 60L * 24L;
+    private static final long WAIT_TIME_FULL = 1000L * 60L * 60L * 24L;
+
+    private static final long WAIT_TIME_RETRY = 1000L * 3L;
+
+    private static final long RETRIES = 3;
 
     /**
      * @see #ActiveInstallsPingThread(org.xwiki.activeinstalls.ActiveInstallsConfiguration, PingSender)
@@ -55,6 +59,8 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
      * @see #ActiveInstallsPingThread(org.xwiki.activeinstalls.ActiveInstallsConfiguration, PingSender)
      */
     private ActiveInstallsConfiguration configuration;
+
+    private long retryTimeout;
 
     /**
      * @param configuration used to nicely display the ping URL in logs if there's an error...
@@ -67,23 +73,55 @@ public class ActiveInstallsPingThread extends AbstractXWikiRunnable
     }
 
     @Override
-    protected void runInternal()
+    protected void runInternal() throws InterruptedException
     {
         while (true) {
+            sendPing();
+            Thread.sleep(WAIT_TIME_FULL);
+        }
+    }
+
+    /**
+     * Send a ping, trying several times in case of failure.
+     *
+     * @throws InterruptedException if the send is still failing after the retries
+     * @since 11.10
+     */
+    void sendPing() throws InterruptedException
+    {
+        int count = 1;
+        while (count <= RETRIES) {
             try {
                 this.manager.sendPing();
-            } catch (Exception e) {
-                // Failed to connect or send the ping to the remote Elastic Search instance, will try again after the
-                // sleep.
-                LOGGER.warn(
-                    "Failed to send Active Installation ping to [{}]. Error = [{}]. Will retry in [{}] seconds...",
-                    this.configuration.getPingInstanceURL(), ExceptionUtils.getRootCauseMessage(e), WAIT_TIME / 1000);
-            }
-            try {
-                Thread.sleep(WAIT_TIME);
-            } catch (InterruptedException e) {
                 break;
+            } catch (Exception e) {
+                String message = String.format("Failed to send Active Installation ping to [%s] (try [%s]). "
+                    + "Error = [%s].", this.configuration.getPingInstanceURL(), count,
+                    ExceptionUtils.getRootCauseMessage(e));
+                if (count == RETRIES) {
+                    message = String.format("%s Will retry in [%s] seconds...", message, WAIT_TIME_FULL / 1000);
+                }
+                LOGGER.warn(message);
+                // Wait a little but before retrying so that it makes a difference.
+                if (count < RETRIES) {
+                    Thread.sleep(getRetryTimeout());
+                }
             }
+            count++;
         }
+    }
+
+    /**
+     * @param milliseconds the number of milliseconds to wait between retries
+     * @since 11.10
+     */
+    void setRetryTimeout(long milliseconds)
+    {
+        this.retryTimeout = milliseconds;
+    }
+
+    private long getRetryTimeout()
+    {
+        return this.retryTimeout > -1 ? this.retryTimeout : WAIT_TIME_RETRY;
     }
 }

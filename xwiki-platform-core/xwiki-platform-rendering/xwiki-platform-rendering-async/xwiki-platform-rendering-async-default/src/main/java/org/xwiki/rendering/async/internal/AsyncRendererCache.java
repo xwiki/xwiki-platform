@@ -42,6 +42,8 @@ import org.xwiki.component.descriptor.DefaultComponentRole;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.rendering.async.internal.DefaultAsyncContext.RightEntry;
+import org.xwiki.security.authorization.AuthorizationManager;
 
 /**
  * Share cache containing the results of the {@link AsyncRenderer} executions.
@@ -54,6 +56,9 @@ import org.xwiki.model.reference.EntityReference;
 public class AsyncRendererCache implements Initializable, CacheEntryListener<AsyncRendererJobStatus>
 {
     @Inject
+    private AuthorizationManager authorization;
+
+    @Inject
     private CacheManager cacheManager;
 
     private Cache<AsyncRendererJobStatus> asyncCache;
@@ -65,6 +70,8 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     private final Map<Type, Set<String>> roleTypeMapping = new ConcurrentHashMap<>();
 
     private final Map<ComponentRole<?>, Set<String>> roleMapping = new ConcurrentHashMap<>();
+
+    private final Map<RightEntry, Set<String>> rightMapping = new ConcurrentHashMap<>();
 
     private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -201,6 +208,10 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
         for (ComponentRole<?> role : status.getRoles()) {
             this.roleMapping.computeIfAbsent(role, k -> ConcurrentHashMap.newKeySet()).add(key);
         }
+
+        for (RightEntry right : status.getRights()) {
+            this.rightMapping.computeIfAbsent(right, k -> ConcurrentHashMap.newKeySet()).add(key);
+        }
     }
 
     @Override
@@ -271,6 +282,29 @@ public class AsyncRendererCache implements Initializable, CacheEntryListener<Asy
     {
         clean(this.roleTypeMapping.remove(roleType));
         clean(this.roleMapping.remove(new DefaultComponentRole<>(roleType, roleHint)));
+    }
+
+    /**
+     * Clean entries for which the right evaluation changed.
+     * 
+     * @since 11.8RC1
+     */
+    public void cleanCacheForRight()
+    {
+        this.rightMapping.forEach(this::checkRight);
+    }
+
+    private void checkRight(RightEntry right, Set<String> keys)
+    {
+        // TODO: we are supposed to make sure the right check result changed here but it seems to trigger a bug in the
+        // security cache that need to be fixed before we can do that.
+        // In the meantime we don't have much other choice than removing all async result which are impacted by a right
+        // check. See https://jira.xwiki.org/browse/XWIKI-16748.
+        // if (this.authorization.hasAccess(right.getRight(), right.getUserReference(),
+        //     right.getEntityReference()) != right.isAllowed()) {
+        //     clean(keys);
+        // }
+        clean(keys);
     }
 
     /**

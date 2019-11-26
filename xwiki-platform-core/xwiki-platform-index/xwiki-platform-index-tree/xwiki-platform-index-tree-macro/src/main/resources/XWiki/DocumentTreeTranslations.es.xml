@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>XWiki</web>
+  <name>DocumentTreeTranslations</name>
+  <language>es</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.DocumentTree</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title>Document Tree Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>rendering.macro.documentTree.name=Jerarquía de página
+rendering.macro.documentTree.description=Muestra la jerarquía de páginas de XWiki.
+rendering.macro.documentTree.parameter.readOnly.name=Solo lectura
+rendering.macro.documentTree.parameter.readOnly.description=¿Debe el usuario poder modificar la estructura del árbol, siempre que tenga los permisos necesarios?
+rendering.macro.documentTree.parameter.showWikis.name=Mostrar Wikis
+rendering.macro.documentTree.parameter.showWikis.description=Indica si mostrar los nodos wiki o no. Esto sólo se puede utilizar en el wiki principal y si la fuente del árbol se ha guardado con derechos de programación.
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Mostrar el nombre amigable del Wiki
+rendering.macro.documentTree.parameter.showWikiPrettyName.description=Mostrar el nombre amigable del wiki en lugar del wiki id cuando se muestra un nodo wiki.
+rendering.macro.documentTree.parameter.showSpaces.name=Mostrar espacios
+rendering.macro.documentTree.parameter.showSpaces.description=Mostrar el nombre amigable del wiki en lugar del wiki id cuando se muestra un nodo wiki.
+rendering.macro.documentTree.parameter.showDocumentTitle.name=Mostrar el título de la página
+rendering.macro.documentTree.parameter.showDocumentTitle.description=Indica si se debe mostrar el título de la página en lugar del nombre de la página al visualizar un nodo de página.
+rendering.macro.documentTree.parameter.showTranslations.name=Mostrar traducciones
+rendering.macro.documentTree.parameter.showTranslations.description=Indica si mostrar las traducciones de la página o no.
+rendering.macro.documentTree.parameter.showAttachments.name=Mostrar archivos adjuntos
+rendering.macro.documentTree.parameter.showAttachments.description=Indica si mostrar o no los archivos adjuntos de la página.
+rendering.macro.documentTree.parameter.showObjects.name=Mostrar objetos
+rendering.macro.documentTree.parameter.showObjects.description=Indica si mostrar o no los objetos de la página.
+rendering.macro.documentTree.parameter.showClassProperties.name=Mostrar propiedades de clase
+rendering.macro.documentTree.parameter.showClassProperties.description=Indica si se muestran las propiedades de la clase para las páginas que definen las clases.
+rendering.macro.documentTree.parameter.root.name=Raíz
+rendering.macro.documentTree.parameter.root.description=El identificador del nodo raíz. Esto es útil si desea visualizar únicamente los descendientes de un nodo determinado (que es la raíz especificada). El árbol muestra los hijos del nodo raíz en el primer nivel, por lo que el nodo raíz no se muestra realmente. Se visualiza el árbol completo si no se especifica el nodo raíz. El formato de un identificador de nodo es entityType:entityReference, donde el tipo de entidad puede ser, por ejemplo, wiki:xwiki, space:xwiki:Main, document:xwiki:Main.WebHome
+rendering.macro.documentTree.parameter.showRoot.name=Mostrar raíz
+rendering.macro.documentTree.parameter.showRoot.description=Indica si mostrar el nodo raíz o no. El nodo raíz no se muestra por defecto porque suele estar implícito en el contexto en el que se muestra el árbol (por ejemplo, una etiqueta delante del árbol). Sin embargo, hay algunos casos en los que puede que desee mostrar el nodo raíz: para poder crear un nuevo nodo bajo la raíz.
+rendering.macro.documentTree.parameter.compact.name=Compacto
+rendering.macro.documentTree.parameter.compact.description=Si usted tiene un espacio horizontal limitado disponible, entonces probablemente debería activarlo. El efecto es que los iconos de los nodos y los bordes que los conectan quedarán ocultos. Algunos estilos especiales también se aplicarán para asegurar que el árbol ocupe menos espacio horizontal mientras mantiene las etiquetas de los nodos completamente visibles.
+rendering.macro.documentTree.parameter.links.name=Enlaces
+rendering.macro.documentTree.parameter.links.description=Especifica si las etiquetas de los nodos deben verse y comportarse como enlaces (anclas).
+rendering.macro.documentTree.parameter.checkboxes.name=Casillas de verificación
+rendering.macro.documentTree.parameter.checkboxes.description=Indica si se visualiza una casilla de verificación delante de cada nodo de árbol para permitir al usuario seleccionar varios nodos de árbol.
+rendering.macro.documentTree.parameter.openTo.name=Abrir a
+rendering.macro.documentTree.parameter.openTo.description=El id del nodo en el que se abrirá el árbol. Todos los antepasados del nodo especificado, hasta la raíz del árbol, también se abrirán. El formato del identificador de nodo es el que se utiliza para el parámetro raíz.
+rendering.macro.documentTree.parameter.showOnlyViewable.name=Mostrar sólo visible
+rendering.macro.documentTree.parameter.showOnlyViewable.description=Mostrar sólo los nodos wiki, espacio y página que el usuario actual tiene derecho a ver. Si esto se establece como falso, entonces los nodos wiki, espacio y página que no son visibles para el usuario actual se listan en el árbol usando sus nombres. El usuario no podrá ver su contenido siguiendo sus enlaces (el usuario sólo será consciente de su existencia).
+rendering.macro.documentTree.parameter.filterByClass.name=Filtrar por clase
+rendering.macro.documentTree.parameter.filterByClass.description=Muestra sólo las páginas que tienen un objeto del tipo especificado. El valor de este parámetro es el nombre completo de una página XWiki que contiene una definición de clase. Por ejemplo,'Blog.CategoryClass' puede usarse para mostrar sólo las páginas que representan categorías de blog. Deje este parámetro vacío si no desea restringir el tipo de páginas que se muestran en el árbol.
+rendering.macro.documentTree.parameter.finder.name=Buscador
+rendering.macro.documentTree.parameter.finder.description=Muestra una entrada de texto que se puede utilizar para encontrar nodos de árbol. La entrada se muestra encima del árbol y ofrece sugerencias a medida que escribe según el contenido del árbol. Cuando se selecciona una sugerencia, el árbol se desglosa hasta el nodo correspondiente.
+rendering.macro.documentTree.parameter.hierarchyMode.name=Modo de jerarquía de páginas
+rendering.macro.documentTree.parameter.hierarchyMode.description=Especifica la jerarquía que se utilizará entre páginas. Los valores posibles son "reference" (por defecto) y "parentchild". Si se utiliza "reference", la jerarquía de páginas se define utilizando únicamente la referencia de página, especialmente el componente de espacios anidados de la referencia de página. Si se utiliza "parentchild", la jerarquía se basa en la relación padre/hijo definida por el campo de página "parent" de la base de datos.
+rendering.macro.documentTree.parameter.filterHiddenDocuments.name=Filtrar documentos ocultos
+rendering.macro.documentTree.parameter.filterHiddenDocuments.description=Establezca este parámetro a false si desea incluir los documentos ocultos en el árbol. De lo contrario, si el valor es verdadero, los documentos ocultos se excluyen o se incluyen según las preferencias del usuario actual.
+rendering.macro.documentTree.parameter.limit.name=Límite
+rendering.macro.documentTree.parameter.limit.description=El número máximo de nodos secundarios que se mostrarán al expandir un nodo padre por primera vez. El resto de los nodos hijo son accesibles a través de un enlace "más...". Este parámetro se utiliza básicamente para paginar los nodos hijo y por lo tanto ayuda a la escala del árbol cuando el número de nodos hijo es grande.
+rendering.macro.documentTree.parameter.exclusions.name=Exclusiones
+rendering.macro.documentTree.parameter.exclusions.description=La lista de nodos a excluir del árbol. Los nodos se especifican por su id y se separan por comas.
+
+index.documentTree.empty=No se han encontrado páginas
+index.documentTree.more={0} más ...
+
+## Deprecated translation keys
+
+## Until 7.2M2
+rendering.macro.documentTree.parameter.showChildDocuments.name=Mostrar documentos hijos
+rendering.macro.documentTree.parameter.showChildDocuments.description=Indica si se deben mostrar los documentos inferiores en función del campo Documento padre.</content>
+  
+</xwikidoc>

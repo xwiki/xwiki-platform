@@ -98,13 +98,18 @@ public class SectionTest extends AbstractTest
 
         // Edit the second section in the wiki editor
         WikiEditPage wikiEditPage = vp.editSection(2).editWiki();
-        Assert.assertEquals("= Section2 = Content2 == Section3 == Content3 "
+        Assert.assertEquals("= Section2 =\n\n"
+            + "Content2\n\n"
+            + "== Section3 ==\n\n"
+            + "Content3\n\n"
             + "{{include document=\"Test.SectionEditingIncluded\"/}}", wikiEditPage.getContent());
         vp = wikiEditPage.clickCancel();
 
         // Edit the third section in the wiki editor
         wikiEditPage = vp.editSection(3).editWiki();
-        Assert.assertEquals("== Section3 == Content3 {{include document=\"Test.SectionEditingIncluded\"/}}",
+        Assert.assertEquals("== Section3 ==\n\n"
+                + "Content3\n\n"
+                + "{{include document=\"Test.SectionEditingIncluded\"/}}",
             wikiEditPage.getContent());
         vp = wikiEditPage.clickCancel();
 
@@ -112,7 +117,8 @@ public class SectionTest extends AbstractTest
         // Note: we prove that included documents don't generate editable sections by checking that the fourth section
         // is "Section7".
         wikiEditPage = vp.editSection(4).editWiki();
-        Assert.assertEquals("= Section7 = Content7", wikiEditPage.getContent());
+        Assert.assertEquals("= Section7 =\n\n"
+            + "Content7", wikiEditPage.getContent());
     }
 
     /**
@@ -129,8 +135,15 @@ public class SectionTest extends AbstractTest
         ViewPage vp = createTestPages("xwiki/2.0");
         vp.editSection(4).editWiki().clickSaveAndView();
         WikiEditPage wep = vp.editWiki();
-        Assert.assertEquals("= Section1 = Content1 = Section2 = Content2 == Section3 == Content3 "
-            + "{{include document=\"Test.SectionEditingIncluded\"/}} = Section7 = Content7", wep.getContent());
+        Assert.assertEquals("= Section1 =\n\n"
+            + "Content1\n\n"
+            + "= Section2 =\n\n"
+            + "Content2\n\n"
+            + "== Section3 ==\n\n"
+            + "Content3\n\n"
+            + "{{include document=\"Test.SectionEditingIncluded\"/}}\n\n"
+            + "= Section7 =\n\n"
+            + "Content7", wep.getContent());
     }
 
     /**

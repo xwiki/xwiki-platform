@@ -44,6 +44,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class DateClass extends PropertyClass
 {
+    private static final long serialVersionUID = 1L;
+
     /** Logging helper object. */
     private static final Logger LOGGER = LoggerFactory.getLogger(DateClass.class);
 

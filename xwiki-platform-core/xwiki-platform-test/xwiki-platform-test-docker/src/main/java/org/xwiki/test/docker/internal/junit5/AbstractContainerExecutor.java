@@ -43,7 +43,7 @@ public abstract class AbstractContainerExecutor
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractContainerExecutor.class);
 
-    protected void start(GenericContainer container, TestConfiguration testConfiguration)
+    protected void start(GenericContainer container, TestConfiguration testConfiguration) throws Exception
     {
         if (testConfiguration.isVerbose()) {
             LOGGER.info(String.format("Docker image used: [%s]", container.getDockerImageName()));

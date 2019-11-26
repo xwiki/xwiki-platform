@@ -38,231 +38,231 @@
   <hidden>true</hidden>
   <content>### Home page
 ### Missing: platform.appwithinminutes.homePageTitle=App Within Minutes
-### Missing: platform.appwithinminutes.description=Create collaborative web applications within minutes, based on XWiki's powerful structured data management system.
+platform.appwithinminutes.description=Crea aplicaciones web colaborativas en cuestión de minutos, basadas en el potente sistema de gestión de datos estructurados de XWiki.
 platform.appwithinminutes.createAppButtonLabel=Crear Aplicación
 platform.appwithinminutes.appsLiveTableHeading=Aplicaciones
-### Missing: platform.appwithinminutes.appsLiveTable.doc.title=Application
+platform.appwithinminutes.appsLiveTable.doc.title=Aplicación
 platform.appwithinminutes.appsLiveTable.doc.author=Ultimo autor
 platform.appwithinminutes.appsLiveTable.doc.date=Fecha de actualización
 platform.appwithinminutes.appsLiveTable._actions=Acciones
-### Missing: platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Grant space administration rights.
+platform.appwithinminutes.grantSpaceAdminRightsSaveComment=Gestionar permisos administrativos para el espacio.
 
 ### AWM Applications panel entry
 platform.appwithinminutes.appPanelCreateEntry=Crea tu propio!
 
 ### Wizard step
-### Missing: platform.appwithinminutes.wizardStepHeading=Step {0} \u2014 {1}
+platform.appwithinminutes.wizardStepHeading=Paso {0} — {1}
 appWithinMinutes.wizardStep.name.name=Nombre
-### Missing: appWithinMinutes.wizardStep.name.title=Name your application
-### Missing: appWithinMinutes.wizardStep.name.description=Choose the application name
+appWithinMinutes.wizardStep.name.title=Nombre su aplicación
+appWithinMinutes.wizardStep.name.description=Seleccione el nombre de la aplicación
 appWithinMinutes.wizardStep.structure.name=Estructura
-### Missing: appWithinMinutes.wizardStep.structure.title=Structure your data
-### Missing: appWithinMinutes.wizardStep.structure.description=Describe the application data
-### Missing: appWithinMinutes.wizardStep.entries.name=Entries
-### Missing: appWithinMinutes.wizardStep.entries.title=Locate your data
-### Missing: appWithinMinutes.wizardStep.entries.description=Choose where to store the data
+appWithinMinutes.wizardStep.structure.title=Estructurar los datos
+appWithinMinutes.wizardStep.structure.description=Describa los datos de la aplicación
+appWithinMinutes.wizardStep.entries.name=Entradas
+appWithinMinutes.wizardStep.entries.title=Localice sus datos
+appWithinMinutes.wizardStep.entries.description=Elija dónde almacenar los datos
 appWithinMinutes.wizardStep.presentation.name=Presentación
-### Missing: appWithinMinutes.wizardStep.presentation.title=Customize your application home page
-### Missing: appWithinMinutes.wizardStep.presentation.description=Customize the application home page
+appWithinMinutes.wizardStep.presentation.title=Personalice la página de inicio de su aplicación
+appWithinMinutes.wizardStep.presentation.description=Personalice la página de inicio de la aplicación
 platform.appwithinminutes.wizardStepNextButtonLabel=Siguiente Paso
 platform.appwithinminutes.wizardStepNextButtonTip=Ir al siguiente paso
 platform.appwithinminutes.wizardStepFinishButtonLabel=Terminar
-### Missing: platform.appwithinminutes.wizardStepFinishButtonTip=Go to the application home page
+platform.appwithinminutes.wizardStepFinishButtonTip=Ir a la página de inicio de la aplicación
 platform.appwithinminutes.wizardStepPreviousButtonLabel=Paso Anterior
 platform.appwithinminutes.wizardStepPreviousButtonTip=Ir al paso anterior
 platform.appwithinminutes.wizardStepHelpTitle=Pasos
-### Missing: platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you through the process of creating an application. These are the steps you'll take:
+platform.appwithinminutes.wizardStepHelpDescription=Este asistente le guiará a través del proceso de creación de una aplicación. Estos son los pasos a seguir:
 
 ### Wizard Step 1: Application Name
-### Missing: appWithinMinutes.createApp.location.label=Location
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
-### Missing: appWithinMinutes.createApp.parent.label=Parent
-### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
-### Missing: appWithinMinutes.codeSpace.title=Code
-### Missing: appWithinMinutes.codeSpace.description=This is the place where the application code is located.
-### Missing: appWithinMinutes.codeSpace.hiddenPagesInfo=The hidden pages are also listed, even though your current user profile settings prevent to do so, otherwise none of the application code pages would be visible because they are all hidden by default.
+appWithinMinutes.createApp.location.label=Ubicación
+appWithinMinutes.createApp.location.hint=La ubicación en la jerarquía de páginas donde se creará la aplicación.
+appWithinMinutes.createApp.parent.label=Padre
+appWithinMinutes.createApp.parent.hint=El padre de la nueva aplicación. Deje este campo vacío si desea crear una aplicación de nivel superior.
+appWithinMinutes.createApp.parent.placeholder=Ruta.Al.Padre
+appWithinMinutes.codeSpace.title=Código
+appWithinMinutes.codeSpace.description=Este es el lugar donde se encuentra el código de la aplicación.
+appWithinMinutes.codeSpace.hiddenPagesInfo=Las páginas ocultas también aparecen en la lista (aunque la configuración actual de su perfil de usuario le impida hacerlo) de lo contrario ninguna de las páginas de código de la aplicación sería visible porque todas están ocultas de forma predeterminada.
 platform.appwithinminutes.appNamePageTitle=Crear Aplicación
 platform.appwithinminutes.appNameLabel=Nombre de la Aplicación
-### Missing: platform.appwithinminutes.appNameHint=The application name determines the homepage URL and the location where the application code is stored.
-### Missing: platform.appwithinminutes.appNamePreviewHomePageUrlLabel=Application homepage URL
-### Missing: platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Application code location
-### Missing: platform.appwithinminutes.appNameIsUsedWarning=This application already exists. If you go to the next step you will be editing the existing application.
-### Missing: platform.appwithinminutes.appNameEmptyError=Please enter the application name.
+platform.appwithinminutes.appNameHint=El nombre de la aplicación determina la URL de la página principal y la ubicación donde se almacena el código de la aplicación.
+platform.appwithinminutes.appNamePreviewHomePageUrlLabel=URL de la página de inicio de la Aplicación
+platform.appwithinminutes.appNamePreviewCodeSpaceLabel=Ubicación del código de la Aplicación
+platform.appwithinminutes.appNameIsUsedWarning=Esta aplicación ya existe. Si pasa al siguiente paso, estará editando la aplicación existente.
+platform.appwithinminutes.appNameEmptyError=Por favor, introduzca el nombre de la aplicación.
 
 ### Wizard Step 2: Application Structure
-### Missing: platform.appwithinminutes.classEditorPaletteTitle=Field Palette
-### Missing: platform.appwithinminutes.classEditorPaletteHint=Drag &amp; drop fields from the palette to create the form that will be used to input your data.
-### Missing: platform.appwithinminutes.classEditorCanvasHint=Drag fields from the palette and drop them in this area.
+platform.appwithinminutes.classEditorPaletteTitle=Paleta de campos
+platform.appwithinminutes.classEditorPaletteHint=Arrastre y suelte los campos de la paleta para crear el formulario que se utilizará para introducir sus datos.
+platform.appwithinminutes.classEditorCanvasHint=Arrastre los campos de la paleta y suéltelos en esta área.
 
-### Missing: platform.appwithinminutes.classEditorUpdateTemplateLabel=Update the template
-### Missing: platform.appwithinminutes.classEditorUpdateTemplateHint=The template ({0}) stores the default field values.
-### Missing: platform.appwithinminutes.classEditorUpdateSheetLabel=Update the sheet
-### Missing: platform.appwithinminutes.classEditorUpdateSheetHint=The sheet ({0}) is used to display and edit the structured data.
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsLabel=Update the translation
-### Missing: platform.appwithinminutes.classEditorUpdateTranslationsHint=Update the translation of field pretty names and list values ({0}).
+platform.appwithinminutes.classEditorUpdateTemplateLabel=Actualizar la plantilla
+platform.appwithinminutes.classEditorUpdateTemplateHint=La plantilla ({0}) almacena los valores predeterminados de los campos.
+platform.appwithinminutes.classEditorUpdateSheetLabel=Actualizar la hoja
+platform.appwithinminutes.classEditorUpdateSheetHint=La hoja ({0}) se utiliza para mostrar y editar los datos estructurados.
+platform.appwithinminutes.classEditorUpdateTranslationsLabel=Actualizar la traducción
+platform.appwithinminutes.classEditorUpdateTranslationsHint=Actualizar la traducción de nombres de campos y valores de lista ({0}).
 
-### Missing: platform.appwithinminutes.classEditorMultipleSheetsWarning=This class has multiple sheets.
-### Missing: platform.appwithinminutes.classEditorDuplicateFieldNameError=The class has two fields with the same name: {0}
-### Missing: platform.appwithinminutes.classEditorTemplateSaveComment=Update default values
-### Missing: platform.appwithinminutes.classEditorBindSheetSaveComment=Bind class sheet
-### Missing: platform.appwithinminutes.classEditorSheetSaveComment=Update class sheet
+platform.appwithinminutes.classEditorMultipleSheetsWarning=Esta clase tiene varias hojas.
+platform.appwithinminutes.classEditorDuplicateFieldNameError=La clase tiene dos campos con el mismo nombre: {0}
+platform.appwithinminutes.classEditorTemplateSaveComment=Actualizar valores propuestos
+platform.appwithinminutes.classEditorBindSheetSaveComment=Ocultar la hoja de clases
+platform.appwithinminutes.classEditorSheetSaveComment=Actualizar la hoja de clases
 platform.appwithinminutes.classEditorTranslationsSaveComment=Actualización de traducciones
 
-### Missing: platform.appwithinminutes.classEditorStandardCategoryName=Standard
-### Missing: platform.appwithinminutes.classEditorPickersCategoryName=Pickers
+platform.appwithinminutes.classEditorStandardCategoryName=Estándar
+platform.appwithinminutes.classEditorPickersCategoryName=Selectores
 platform.appwithinminutes.classEditorDocumentCategoryName=Documento
 platform.appwithinminutes.classEditorAdvancedCategoryName=Avanzado
 
-### Missing: platform.appwithinminutes.classEditorDBListFieldName=Database List
+platform.appwithinminutes.classEditorDBListFieldName=Lista de base de datos
 platform.appwithinminutes.classEditorGroupsFieldName=Grupo
 platform.appwithinminutes.classEditorUsersFieldName=Usuario
 platform.appwithinminutes.classEditorDateFieldName=Fecha
 platform.appwithinminutes.classEditorStaticListFieldName=Lista Estático
-### Missing: platform.appwithinminutes.classEditorBooleanFieldName=Boolean
+platform.appwithinminutes.classEditorBooleanFieldName=Boolean
 platform.appwithinminutes.classEditorNumberFieldName=Número
-### Missing: platform.appwithinminutes.classEditorTextAreaFieldName=Long Text
-### Missing: platform.appwithinminutes.classEditorStringFieldName=Short Text
+platform.appwithinminutes.classEditorTextAreaFieldName=Texto largo
+platform.appwithinminutes.classEditorStringFieldName=Texto corto
 platform.appwithinminutes.classEditorContentFieldName=Contenido
 platform.appwithinminutes.classEditorTitleFieldName=Título
-### Missing: platform.appwithinminutes.classEditorPageFieldName=Page
+platform.appwithinminutes.classEditorPageFieldName=Página
 
 platform.appwithinminutes.classEditorDeleteFieldLabel=Borrar
 platform.appwithinminutes.classEditorConfigureFieldLabel=Configurar
 platform.appwithinminutes.classEditorPreviewFieldLabel=Vista previa
-### Missing: platform.appwithinminutes.classEditorPreviewFieldHint=Hide configuration panel and apply changes
+platform.appwithinminutes.classEditorPreviewFieldHint=Ocultar el panel de configuración y aplicar los cambios
 platform.appwithinminutes.classEditorMoveFieldLabel=Mover
-### Missing: platform.appwithinminutes.classEditorMoveFieldHint=Drag and drop to change the order
+platform.appwithinminutes.classEditorMoveFieldHint=Arrastrar y soltar para cambiar el orden
 
-### Missing: platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Default value
+platform.appwithinminutes.classEditorFieldDefaultValueToolTip=Valor por defecto
 
 ### Date Picker
-### Missing: platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=OK
+platform.appwithinminutes.classEditorDatePickerAcceptSelectedDate=Ok
 platform.appwithinminutes.classEditorDatePickerClearSelectedDate=Limpiar
 platform.appwithinminutes.classEditorDatePickerSelectCurrentTime=Ahora
 platform.appwithinminutes.classEditorDatePickerSelectCurrentDate=Hoy
 
 ### Static List Editor
 platform.appwithinminutes.classEditorStaticListEditorItemValueLabel=Valor
-### Missing: platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=ID
+platform.appwithinminutes.classEditorStaticListEditorItemIDLabel=Id
 platform.appwithinminutes.classEditorStaticListEditorAddItemLabel=Añadir
 platform.appwithinminutes.classEditorStaticListEditorDeleteItemLabel=Borrar
 
-### Missing: appWithinMinutes.templateProviderEditor.hint=Application entries are wiki pages that contain structured data.
-### Missing: appWithinMinutes.templateProviderEditor.icon.hint=The icon associated with an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.description.hint=Short description of an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Where to create the entries from
-### Missing: appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=If no location is selected, the entries can be created from any page.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.name=Where to create the entries
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictions.hint=If no location is selected, the entries can be created anywhere in the wiki.
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=Don't enforce entry location
-### Missing: appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Use the locations specified above only as suggestions, allowing the user to select a different location when creating an application entry.
-### Missing: appWithinMinutes.templateProviderEditor.terminal.hint=Whether the application entries should be terminal pages or not.
+appWithinMinutes.templateProviderEditor.hint=Las entradas de la aplicación son páginas wiki que contienen datos estructurados.
+appWithinMinutes.templateProviderEditor.icon.hint=El icono asociado a una entrada de la aplicación.
+appWithinMinutes.templateProviderEditor.description.hint=Breve descripción de una entrada de aplicación.
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.name=Dónde crear el formulario de entrada
+appWithinMinutes.templateProviderEditor.visibilityRestrictions.hint=Si no se selecciona ninguna ubicación, las entradas se pueden crear desde cualquier página.
+appWithinMinutes.templateProviderEditor.creationRestrictions.name=Dónde crear las entradas
+appWithinMinutes.templateProviderEditor.creationRestrictions.hint=Si no se selecciona ninguna ubicación, las entradas se pueden crear en cualquier parte del wiki.
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.name=No obligar a cubrir la ubicación
+appWithinMinutes.templateProviderEditor.creationRestrictionsAreSuggestions.hint=Utilice las ubicaciones especificadas anteriormente sólo como sugerencias, permitiendo al usuario seleccionar una ubicación diferente al crear una entrada de la aplicación.
+appWithinMinutes.templateProviderEditor.terminal.hint=Establece si las entradas de la aplicación deben ser páginas terminales o no.
 
 ### Wizard Step 3: Application Presentation
-### Missing: platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Application fields
-### Missing: platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Generic columns
-### Missing: platform.appwithinminutes.liveTableEditorHelpTitle=Tip
-### Missing: platform.appwithinminutes.liveTableEditorHelpDescription=Generic live table columns are independent of your application structure. They provide information about the pages that hold your application data.
+platform.appwithinminutes.liveTableEditorClassFieldColumnGroupLabel=Campos de la aplicación
+platform.appwithinminutes.liveTableEditorGenericColumnGroupLabel=Columnas genéricas
+platform.appwithinminutes.liveTableEditorHelpTitle=Consejo
+platform.appwithinminutes.liveTableEditorHelpDescription=Las columnas de tabla activas genéricas son independientes de su estructura de aplicación. Proporcionan información sobre las páginas que contienen los datos de su solicitud.
 platform.appwithinminutes.liveTableEditorDocTitleColumnName=Título de la página
-### Missing: platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=The title of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocTitleColumnDescription=El título de la página que contiene los datos de aplicación
 platform.appwithinminutes.liveTableEditorDocNameColumnName=Nombre de la página
-### Missing: platform.appwithinminutes.liveTableEditorDocNameColumnDescription=The name of the page that contains application data
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnName=Location
-### Missing: platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=The location of the page that contains application data
+platform.appwithinminutes.liveTableEditorDocNameColumnDescription=El nombre de la página que contiene los datos de la aplicación
+platform.appwithinminutes.liveTableEditorDocLocationColumnName=Ubicación
+platform.appwithinminutes.liveTableEditorDocLocationColumnDescription=La ubicación de la página que contiene los datos de la aplicación
 platform.appwithinminutes.liveTableEditorDocAuthorColumnName=Último Autor
-### Missing: platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=The user who last edited the application data
+platform.appwithinminutes.liveTableEditorDocAuthorColumnDescription=El último usuario que editó los datos de la aplicación
 platform.appwithinminutes.liveTableEditorDocCreatorColumnName=Creador
-### Missing: platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=The user who created the application data
-### Missing: platform.appwithinminutes.liveTableEditorDocDateColumnName=Date
-### Missing: platform.appwithinminutes.liveTableEditorDocDateColumnDescription=The date when the application data was last edited
+platform.appwithinminutes.liveTableEditorDocCreatorColumnDescription=El usuario que creó los datos de la aplicación
+platform.appwithinminutes.liveTableEditorDocDateColumnName=Fecha
+platform.appwithinminutes.liveTableEditorDocDateColumnDescription=La fecha en la que los datos de la aplicación se editaron por última vez
 platform.appwithinminutes.liveTableEditorDocCreationDateColumnName=Fecha de creación
-### Missing: platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=The date when the application data was created
+platform.appwithinminutes.liveTableEditorDocCreationDateColumnDescription=La fecha en la que se crearon los datos de la aplicación
 platform.appwithinminutes.liveTableEditorActionsColumnName=Acciones
-### Missing: platform.appwithinminutes.liveTableEditorActionsColumnDescription=A list of actions that can be performed on the application data, such as edit and delete
+platform.appwithinminutes.liveTableEditorActionsColumnDescription=Una lista de acciones que se pueden realizar en los datos de la aplicación, como editar y borrar
 platform.appwithinminutes.liveTableEditorAttachmentsColumnName=Adjuntos
-### Missing: platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=A special column to display links to the attachments of a data page
+platform.appwithinminutes.liveTableEditorAttachmentsColumnDescription=Una columna especial para mostrar enlaces a los archivos adjuntos de una página de datos
 platform.appwithinminutes.liveTableEditorImagesColumnName=Imágenes
-### Missing: platform.appwithinminutes.liveTableEditorImagesColumnDescription=A special column to display the images attached to a data page
-### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
-### Missing: platform.appwithinminutes.liveTableEditorAvatarColumnDescription=A special column to display the user avatar. Works only for a table bound to the XWiki.XWikiUsers class
-### Missing: platform.appwithinminutes.liveTableEditorTitleHint=The application title to be displayed on the application home page, on the applications panel and live table, on the breadcrumb, etc.
-### Missing: platform.appwithinminutes.liveTableEditorDescriptionHint=The content to be displayed on the homepage above the live table with the application data. Use it to describe the application.
-### Missing: platform.appwithinminutes.liveTableEditorColumnsHint=Select the columns you would like to include in the live table displayed on the application home page.
-### Missing: platform.appwithinminutes.liveTableEditorSaveComment=Update LiveTable
-### Missing: platform.appwithinminutes.liveTableEditorMoveColumnHint=Drag and drop to change the order
+platform.appwithinminutes.liveTableEditorImagesColumnDescription=Una columna especial para mostrar las imágenes adjuntas a una página de datos
+platform.appwithinminutes.liveTableEditorAvatarColumnName=Avatar
+platform.appwithinminutes.liveTableEditorAvatarColumnDescription=Una columna especial para mostrar el avatar del usuario. Funciona solamente para una tabla vinculada a la clase XWiki.XWikiUsers
+platform.appwithinminutes.liveTableEditorTitleHint=El título de la aplicación que se mostrará en la página de inicio de la aplicación, en el panel de aplicaciones y en la tabla de aplicaciones, en la miga de pan, etc.
+platform.appwithinminutes.liveTableEditorDescriptionHint=El contenido que se mostrará en la página de inicio encima de la tabla en vivo con los datos de la aplicación. Se usa para describir la aplicación.
+platform.appwithinminutes.liveTableEditorColumnsHint=Seleccione las columnas que desea incluir en la tabla en vivo que se muestra en la página principal de la aplicación.
+platform.appwithinminutes.liveTableEditorSaveComment=Actualizar LiveTable
+platform.appwithinminutes.liveTableEditorMoveColumnHint=Arrastrar y soltar para cambiar el orden
 platform.appwithinminutes.liveTableEditorDeleteColumnHint=Borrar
-platform.appwithinminutes.liveTableEditorAddColumnHint=Añadir
-### Missing: platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Some columns are deprecated, probably because the corresponding application fields have been deleted. Do you want to remove them? &lt;a href=""&gt;Yes&lt;/a&gt; / &lt;a href=""&gt;No&lt;/a&gt;
+platform.appwithinminutes.liveTableEditorAddColumnHint=Añadir columna seleccionada
+platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Algunas columnas están obsoletas, probablemente porque se han eliminado los campos de aplicación correspondientes. ¿Quiere eliminarlas? &lt;a href=""&gt;Sí &lt;/a&gt; / &lt;a href=""&gt;No &lt;/a&gt;
 platform.appwithinminutes.liveTableEditorIcon=Icono
-### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
+platform.appwithinminutes.liveTableEditorIconHintWithPicker=El icono de la aplicación. Puede seleccionar un icono del selector de iconos o puede hacer referencia a una imagen adjunta.
 
 ### Application home page
-### Missing: platform.appwithinminutes.appLiveTableHeading=Entries
+platform.appwithinminutes.appLiveTableHeading=Entradas
 platform.appwithinminutes.appLiveTableEditEntryActionName=Editar
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=Borrar
 platform.appwithinminutes.appHomePageActionsHeading=Acciones
 platform.appwithinminutes.appHomePageAddEntryLabel=Añadir
 platform.appwithinminutes.appHomePageAddEntryHint=Añadir nueva entrada
 platform.appwithinminutes.appHomePageEntryNameLabel=Nombre de entrada:
-### Missing: platform.appwithinminutes.appHomePageDeleteEntriesLabel=Delete all entries
+platform.appwithinminutes.appHomePageDeleteEntriesLabel=Borrar todas las entradas
 platform.appwithinminutes.appHomePageEditAppLabel=Editar aplicación
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traducir aplicación
-### Missing: platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
-### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+platform.appwithinminutes.appHomePageDeleteAppLabel=Borrar aplicación
+platform.appwithinminutes.appHomePageMovedWarning=Es posible que la aplicación no funcione correctamente porque ha sido renombrada o movida sin actualizar el código. Por favor, edite la aplicación y siga los pasos para actualizar el código.
 
 ### Delete application dialog
-### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
-### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
-### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
-### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
-### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+platform.appwithinminutes.deleteAppConfirmation=La aplicación {0} y TODAS sus entradas serán borradas. ¿Seguro que quiere continuar?
+platform.appwithinminutes.deleteAppEntriesConfirmation=Se borrarán TODAS las entradas de la aplicación {0}. ¿Seguro que quiere continuar?
+platform.appwithinminutes.deleteAppDoesNotExistError=La aplicación especificada no existe.
+platform.appwithinminutes.deleteAppInvalidAppError=El nombre especificado no es una aplicación válida de App Within Minutes.
+platform.appwithinminutes.deleteAppNotSpecifiedError=No se especificó ningún nombre de aplicación.
 
 ### Rename Application
-### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
-### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
-### Missing: appWithinMinutes.renameApp.newName.label=New Name
-### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
-### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
-### Missing: appWithinMinutes.renameApp.location.label=New Location
-### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
-### Missing: appWithinMinutes.renameApp.parent.label=New Parent
-### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
-### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
-### Missing: appWithinMinutes.renameApp.done=Application renamed
-### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
+appWithinMinutes.renameApp.changeAppTitleInfo=Puede cambiar el título de la aplicación sin renombrarla tan con sólo editar la página de inicio de la aplicación.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=El código de la aplicación va a ser regenerado si cambia el nombre de la aplicación. Como consecuencia, las personalizaciones de código se sobrescribirán.
+appWithinMinutes.renameApp.newName.label=Nuevo Nombre
+appWithinMinutes.renameApp.pageExistsError=Una página con este nombre ya existe en la ubicación seleccionada.
+appWithinMinutes.renameApp.locationForbiddenError=No se le permite mover la aplicación a la ubicación seleccionada.
+appWithinMinutes.renameApp.location.label=Nueva ubicación
+appWithinMinutes.renameApp.location.hint=La ubicación en la jerarquía de páginas donde mover la aplicación.
+appWithinMinutes.renameApp.parent.label=Nuevo Padre
+appWithinMinutes.renameApp.parent.hint=La nueva página padre. Deje este campo vacío si desea mover la aplicación a la parte superior de la jerarquía de páginas.
+appWithinMinutes.renameApp.inProgress=Renombrando aplicación....
+appWithinMinutes.renameApp.done=Aplicación renombrada
+appWithinMinutes.renameApp.failed=No se ha podido cambiar el nombre de la aplicación
 
 ### Deprecated keys
 ### Since 8.4
-### Missing: platform.appwithinminutes.appNamePreviewClassReferenceLabel=Application class
-### Missing: platform.appwithinminutes.appNamePreviewDataSpaceLabel=Application data location
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=Clase de aplicación
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Ubicación de los datos de aplicación
 
 platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Espacio
-### Missing: platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=The name of the space containing the application entry
-### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Page full name
-### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=The name of the page that contains the application entry, prefixed with the space name
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=El nombre del espacio que contiene la entrada de la solicitud
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Nombre completo de la página
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=El nombre de la página que contiene la entrada de la aplicación, precedido por el nombre del espacio
 
 #@deprecated appWithinMinutes.wizardStep.name.name
 platform.appwithinminutes.wizardStep1Name=Nombre
 #@deprecated appWithinMinutes.wizardStep.name.title
-### Missing: platform.appwithinminutes.wizardStep1Title=Name your application
+platform.appwithinminutes.wizardStep1Title=Nombre su aplicación
 #@deprecated appWithinMinutes.wizardStep.name.description
-### Missing: platform.appwithinminutes.wizardStep1Description=Choose the application name
+platform.appwithinminutes.wizardStep1Description=Seleccione el nombre de la aplicación
 #@deprecated appWithinMinutes.wizardStep.structure.name
 platform.appwithinminutes.wizardStep2Name=Estructura
 #@deprecated appWithinMinutes.wizardStep.structure.title
-### Missing: platform.appwithinminutes.wizardStep2Title=Structure your data
+platform.appwithinminutes.wizardStep2Title=Estructurar los datos
 #@deprecated appWithinMinutes.wizardStep.structure.description
-### Missing: platform.appwithinminutes.wizardStep2Description=Describe the application data
+platform.appwithinminutes.wizardStep2Description=Describa los datos de la aplicación
 #@deprecated appWithinMinutes.wizardStep.presentation.name
 platform.appwithinminutes.wizardStep3Name=Presentación
 #@deprecated appWithinMinutes.wizardStep.presentation.title
-### Missing: platform.appwithinminutes.wizardStep3Title=Customize your application homepage
+platform.appwithinminutes.wizardStep3Title=Personalice la página de inicio de su aplicación
 #@deprecated appWithinMinutes.wizardStep.presentation.description
-### Missing: platform.appwithinminutes.wizardStep3Description=Customize the application homepage
+platform.appwithinminutes.wizardStep3Description=Personalizar la página de inicio de la aplicación
 
 ### Since 11.0
 platform.appwithinminutes.appsLiveTable.doc.space=Nombre de aplicación
-### Missing: appWithinMinutes.classEditor.title={0} Structure
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>
+appWithinMinutes.classEditor.title={0} Estructura
+appWithinMinutes.templateProviderEditor.title={0} Entradas</content>
 </xwikidoc>

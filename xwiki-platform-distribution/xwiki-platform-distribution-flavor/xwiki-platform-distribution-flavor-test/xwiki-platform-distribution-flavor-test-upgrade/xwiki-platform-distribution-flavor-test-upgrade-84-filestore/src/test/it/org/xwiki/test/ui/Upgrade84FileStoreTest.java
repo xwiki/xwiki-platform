@@ -69,7 +69,11 @@ public class Upgrade84FileStoreTest extends UpgradeTest
 
         // wiki1
         assertAttachments("wiki1");
+    }
 
+    @Override
+    protected void setupLogs()
+    {
         validateConsole.getLogCaptureConfiguration().registerExpected(
             // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
             "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]",

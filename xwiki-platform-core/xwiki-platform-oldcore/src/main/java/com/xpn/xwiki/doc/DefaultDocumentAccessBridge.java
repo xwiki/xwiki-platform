@@ -165,6 +165,18 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
     }
 
     @Override
+    public DocumentModelBridge getTranslatedDocumentInstance(DocumentModelBridge document) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+
+        if (document instanceof XWikiDocument) {
+            return ((XWikiDocument) document).getTranslatedDocument(xcontext);
+        } else {
+            return getTranslatedDocumentInstance(document.getDocumentReference());
+        }
+    }
+
+    @Override
     public DocumentReference getCurrentDocumentReference()
     {
         XWikiDocument currentDocument = null;

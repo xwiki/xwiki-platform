@@ -34,9 +34,14 @@ import org.junit.Test;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.internal.ExtensionUtils;
 import org.xwiki.extension.internal.converter.ExtensionIdConverter;
+import org.xwiki.extension.test.ExtensionTestUtils;
 import org.xwiki.extension.test.po.ExtensionPane;
 import org.xwiki.extension.test.po.ExtensionProgressPane;
 import org.xwiki.extension.test.po.LogItemPane;
+import org.xwiki.extension.test.po.distribution.CleanApplyDistributionStep;
+import org.xwiki.extension.test.po.distribution.CleanApplyFinalizeDistributionStep;
+import org.xwiki.extension.test.po.distribution.CleanApplyReportDistributionStep;
+import org.xwiki.extension.test.po.distribution.CleanDistributionStep;
 import org.xwiki.extension.test.po.distribution.DistributionStepIcon;
 import org.xwiki.extension.test.po.distribution.ExtensionsDistributionStep;
 import org.xwiki.extension.test.po.distribution.FlavorDistributionStep;
@@ -46,6 +51,7 @@ import org.xwiki.extension.test.po.flavor.FlavorPane;
 import org.xwiki.extension.test.po.flavor.FlavorPicker;
 import org.xwiki.extension.test.po.flavor.FlavorPickerInstallStep;
 import org.xwiki.logging.LogLevel;
+import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.po.ViewPage;
@@ -63,6 +69,11 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 public class UpgradeTest extends AbstractTest
 {
+    protected static final ExtensionId EXTENSIONID_WATCHLIST_UI =
+        new ExtensionId("org.xwiki.platform:xwiki-platform-watchlist-ui");
+
+    protected static ExtensionTestUtils extensionTestUtil;
+
     private static final String PREVIOUSFLAVOR_NAME = System.getProperty("previousFlavorName");
 
     private static final ExtensionId PREVIOUSFLAVOR_ID =
@@ -86,9 +97,19 @@ public class UpgradeTest extends AbstractTest
 
     private static final String STEP_ADMIN_NAME = "Admin user";
 
+    private static final int STEP_ADMIN_ID = 0;
+
     private static final String STEP_FLAVOR_NAME = "Flavor";
 
+    private static final int STEP_FLAVOR_ID = 1;
+
+    private static final String STEP_ORPHANED_NAME = "Orphaned dependencies";
+
+    private static final int STEP_ORPHANED_ID = 2;
+
     private static final String STEP_EXTENSIONS_NAME = "Extensions";
+
+    private static final int STEP_EXTENSIONS_ID = 3;
 
     /**
      * Automatically register as Admin user.
@@ -127,9 +148,27 @@ public class UpgradeTest extends AbstractTest
         // Init and start
 
         init(Arrays.asList(executor));
+
+        // Use Admin credentials since superadmin is not enabled by default
+        extensionTestUtil = new ExtensionTestUtils(getUtil(), TestUtils.ADMIN_CREDENTIALS);
+    }
+
+    protected void assertInstalledOnMainWiki(ExtensionId extensionId) throws Exception
+    {
+        assertTrue(extensionTestUtil.isInstalled(extensionId, new WikiNamespace("xwiki")));
+    }
+
+    protected void assertNotInstalledOnMainWiki(ExtensionId extensionId) throws Exception
+    {
+        assertFalse(extensionTestUtil.isInstalled(extensionId, new WikiNamespace("xwiki")));
     }
 
     // Test
+
+    protected void setupLogs()
+    {
+        // Extended to ignore expected logs
+    }
 
     /**
      * Execute the Distribution Wizard for an upgrade from previous version to current SNAPSHOT.
@@ -139,8 +178,11 @@ public class UpgradeTest extends AbstractTest
     @Test
     public void upgrade() throws Exception
     {
+        // Setup logs ignores
+        setupLogs();
+
         // Access home page (and be automatically redirected)
-        getUtil().gotoPage("Main", "WebHome");
+        getUtil().gotoPage("Main", "WebHome", "view");
 
         // Make sure we are redirected to the Distribution Wizard
         assertEquals(
@@ -159,7 +201,12 @@ public class UpgradeTest extends AbstractTest
         flavorStep();
 
         ////////////////////
-        // Validate Flavor step
+        // Validate Orphaned Dependencies step
+
+        orphanedDependenciesStep();
+
+        ////////////////////
+        // Validate Outdated Extensions step
 
         extensionsStep();
 
@@ -172,6 +219,12 @@ public class UpgradeTest extends AbstractTest
         ViewPage page = new ViewPage();
 
         assertEquals("xwiki:Main.WebHome", page.getMetaDataValue("reference"));
+
+        ////////////////////
+        // Common Validations
+
+        // Make sure the watchlist UI has been uninstalled
+        assertNotInstalledOnMainWiki(EXTENSIONID_WATCHLIST_UI);
 
         ////////////////////
         // Custom validation
@@ -192,18 +245,25 @@ public class UpgradeTest extends AbstractTest
 
         List<DistributionStepIcon> icons = welcomeStep.getIcons();
 
-        assertFalse(icons.get(0).isDone());
-        assertFalse(icons.get(0).isActive());
-        assertEquals(1, icons.get(0).getNumber());
-        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
-        assertFalse(icons.get(1).isDone());
-        assertFalse(icons.get(1).isActive());
-        assertEquals(2, icons.get(1).getNumber());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
-        assertFalse(icons.get(2).isDone());
-        assertFalse(icons.get(2).isActive());
-        assertEquals(3, icons.get(2).getNumber());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(2).getName());
+        assertFalse(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_ID + 1, icons.get(STEP_ADMIN_ID).getNumber());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isDone());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(2, icons.get(STEP_FLAVOR_ID).getNumber());
+        assertEquals(STEP_FLAVOR_ID + 1, icons.get(STEP_FLAVOR_ID).getNumber());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(3, icons.get(STEP_ORPHANED_ID).getNumber());
+        assertEquals(STEP_ORPHANED_ID + 1, icons.get(STEP_ORPHANED_ID).getNumber());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(4, icons.get(STEP_EXTENSIONS_ID).getNumber());
+        assertEquals(STEP_EXTENSIONS_ID + 1, icons.get(STEP_EXTENSIONS_ID).getNumber());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
         // Go to next step
         welcomeStep.clickCompleteStep();
@@ -216,17 +276,18 @@ public class UpgradeTest extends AbstractTest
         // Steps
         List<DistributionStepIcon> icons = flavorStep.getIcons();
 
-        assertTrue(icons.get(0).isDone());
-        assertFalse(icons.get(0).isActive());
-        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
-        assertEquals(2, icons.get(1).getNumber());
-        assertFalse(icons.get(1).isDone());
-        assertTrue(icons.get(1).isActive());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
-        assertFalse(icons.get(2).isDone());
-        assertFalse(icons.get(2).isActive());
-        assertEquals(3, icons.get(2).getNumber());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(2).getName());
+        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isDone());
+        assertTrue(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
         // Make sure complete step is disabled
         assertFalse(flavorStep.isCompleteStepDisabled());
@@ -302,8 +363,7 @@ public class UpgradeTest extends AbstractTest
             upgradeFlavor = upgradeFlavor.upgrade();
 
             // Make sure there hasn't been any error or warning during the install plan
-            assertNoErrorWarningLog("Unexpected error(s) or warning(s) found in the log during flavor install plan.",
-                upgradeFlavor.openProgressSection());
+            assertNoErrorWarningLog(upgradeFlavor.openProgressSection());
 
             // Confirm upgrade
             upgradeFlavor = upgradeFlavor.confirm();
@@ -322,8 +382,7 @@ public class UpgradeTest extends AbstractTest
             }
 
             // Make sure there hasn't been any error or warning during the install
-            assertNoErrorWarningLog("Unexpected error(s) or warning(s) found in the log during flavor install.",
-                upgradeFlavor.openProgressSection());
+            assertNoErrorWarningLog(upgradeFlavor.openProgressSection());
         } finally {
             getUtil().getDriver().setTimeout(timeout);
         }
@@ -331,7 +390,7 @@ public class UpgradeTest extends AbstractTest
         assertEquals("installed", upgradeFlavor.getStatus());
     }
 
-    private void assertNoErrorWarningLog(String message, ExtensionProgressPane progress)
+    private void assertNoErrorWarningLog(ExtensionProgressPane progress)
     {
         List<LogItemPane> logs = progress.getJobLog(LogLevel.WARN, LogLevel.ERROR);
 
@@ -342,7 +401,49 @@ public class UpgradeTest extends AbstractTest
         }
 
         LogCaptureValidator validator = new LogCaptureValidator();
-        validator.validate(builder.toString(), validateConsole.getLogCaptureConfiguration());
+        validator.validate(builder.toString(), validateConsole.getLogCaptureConfiguration(), false);
+    }
+
+    private void orphanedDependenciesStep()
+    {
+        CleanDistributionStep extensionsStep = new CleanDistributionStep();
+
+        // Steps
+
+        List<DistributionStepIcon> icons = extensionsStep.getIcons();
+
+        // Make sure the extensions step is active
+        if (!icons.get(STEP_ORPHANED_ID).isActive()) {
+            return;
+        }
+
+        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertTrue(icons.get(STEP_FLAVOR_ID).isDone());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isDone());
+        assertTrue(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
+
+        // Confirm the extension to uninstall/make top level
+        CleanApplyDistributionStep cleanApply = extensionsStep.clickContinue();
+
+        // Validate the plan
+        CleanApplyFinalizeDistributionStep cleanApplyFinalize = cleanApply.clickContinue();
+
+        // Wait for uninstall to finish
+        cleanApplyFinalize.waitForUninstallComplete();
+
+        // Get a report
+        CleanApplyReportDistributionStep applyReport = cleanApplyFinalize.clickContinue();
+
+        // Go to next step
+        applyReport.clickCompleteStep();
     }
 
     private void extensionsStep()
@@ -354,20 +455,22 @@ public class UpgradeTest extends AbstractTest
         List<DistributionStepIcon> icons = extensionsStep.getIcons();
 
         // Make sure the extensions step is active
-        if (!icons.get(2).isActive()) {
+        if (!icons.get(STEP_EXTENSIONS_ID).isActive()) {
             return;
         }
 
-        assertTrue(icons.get(0).isDone());
-        assertFalse(icons.get(0).isActive());
-        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
-        assertTrue(icons.get(1).isDone());
-        assertFalse(icons.get(1).isActive());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
-        assertFalse(icons.get(2).isDone());
-        assertTrue(icons.get(2).isActive());
-        assertEquals(3, icons.get(2).getNumber());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(2).getName());
+        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertTrue(icons.get(STEP_FLAVOR_ID).isDone());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertTrue(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertTrue(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
         // Search for extension update
         extensionsStep.checkForUpdates();
@@ -385,15 +488,18 @@ public class UpgradeTest extends AbstractTest
         // Steps
         List<DistributionStepIcon> icons = reportStep.getIcons();
 
-        assertTrue(icons.get(0).isDone());
-        assertFalse(icons.get(0).isActive());
-        assertEquals(STEP_ADMIN_NAME, icons.get(0).getName());
-        assertTrue(icons.get(1).isDone());
-        assertFalse(icons.get(1).isActive());
-        assertEquals(STEP_FLAVOR_NAME, icons.get(1).getName());
-        assertTrue(icons.get(2).isDone());
-        assertFalse(icons.get(2).isActive());
-        assertEquals(STEP_EXTENSIONS_NAME, icons.get(2).getName());
+        assertTrue(icons.get(STEP_ADMIN_ID).isDone());
+        assertFalse(icons.get(STEP_ADMIN_ID).isActive());
+        assertEquals(STEP_ADMIN_NAME, icons.get(STEP_ADMIN_ID).getName());
+        assertTrue(icons.get(STEP_FLAVOR_ID).isDone());
+        assertFalse(icons.get(STEP_FLAVOR_ID).isActive());
+        assertEquals(STEP_FLAVOR_NAME, icons.get(STEP_FLAVOR_ID).getName());
+        assertTrue(icons.get(STEP_ORPHANED_ID).isDone());
+        assertFalse(icons.get(STEP_ORPHANED_ID).isActive());
+        assertEquals(STEP_ORPHANED_NAME, icons.get(STEP_ORPHANED_ID).getName());
+        assertTrue(icons.get(STEP_EXTENSIONS_ID).isDone());
+        assertFalse(icons.get(STEP_EXTENSIONS_ID).isActive());
+        assertEquals(STEP_EXTENSIONS_NAME, icons.get(STEP_EXTENSIONS_ID).getName());
 
         // Finish
         reportStep.clickCompleteStep();

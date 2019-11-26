@@ -23,7 +23,6 @@ import java.util.Collection;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.security.SecurityReference;
-import org.xwiki.stability.Unstable;
 
 /**
  * A component called by the {@link SecurityEntryReader} to gather rules for a passed entity.
@@ -32,7 +31,6 @@ import org.xwiki.stability.Unstable;
  * @since 10.5RC1
  */
 @Role
-@Unstable
 public interface SecurityEntryReaderExtra
 {
     /**

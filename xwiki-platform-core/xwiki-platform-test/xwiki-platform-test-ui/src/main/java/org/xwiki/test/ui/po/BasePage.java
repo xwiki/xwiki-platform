@@ -28,10 +28,12 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
+import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 import org.xwiki.test.ui.po.editor.RightsEditPage;
 import org.xwiki.test.ui.po.editor.WYSIWYGEditPage;
@@ -323,7 +325,10 @@ public class BasePage extends BaseElement
     {
         if (isElementVisible(DRAWER_MATCHER)) {
             // The drawer is visible, so we close it by clicking outside the drawer
-            this.mainContainerDiv.click();
+            // We don't perform directly a click since it could lead to a
+            // org.openqa.selenium.ElementClickInterceptedException because of a drawer-overlay-upper above it.
+            // The click through action is performed with a move and click, which is what we really want.
+            getDriver().createActions().click(this.mainContainerDiv).perform();
             getDriver().waitUntilElementDisappears(DRAWER_MATCHER);
 
             return true;
@@ -588,6 +593,9 @@ public class BasePage extends BaseElement
 
         // Make sure all asynchronous elements have been executed
         getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");
+
+        // Make sure the shortcuts are loaded
+        getDriver().waitUntilJavascriptCondition("return shortcut != null && shortcut != undefined");
     }
 
     /**
@@ -659,5 +667,139 @@ public class BasePage extends BaseElement
     {
         return getDriver().hasElementWithoutWaiting(By.xpath(
             "//div[@id = 'leftPanels']/div/h1[@class = 'xwikipaneltitle' and text() = '" + panelTitle +"']"));
+    }
+
+    public boolean isForbidden()
+    {
+        List<WebElement> messages = getDriver().findElementsWithoutWaiting(By.className("xwikimessage"));
+        for (WebElement message : messages) {
+            if (message.getText().contains("You are not allowed to view this page or perform this action.")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Use the following keyboard shortcut and wait for a new page to load.
+     * This should be only used for shortcuts that indeed loads a new page.
+     * @param shortcut the keyboard key combination to perform.
+     */
+    private void useShortcutKeyAndLoads(CharSequence... shortcut)
+    {
+        getDriver().addPageNotYetReloadedMarker();
+        getDriver().createActions().sendKeys(shortcut).perform();
+        getDriver().waitUntilPageIsReloaded();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to edit page.
+     * @return a new {@link EditPage}
+     * @since 11.9RC1
+     */
+    public EditPage useShortcutKeyForEditing()
+    {
+        useShortcutKeyAndLoads("e");
+        return new EditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to wiki edit page.
+     * @return a new {@link WikiEditPage}
+     * @since 11.9RC1
+     */
+    public WikiEditPage useShortcutKeyForWikiEditing()
+    {
+        useShortcutKeyAndLoads("k");
+        return new WikiEditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to WYSIWYG edit page.
+     * @return a new {@link WYSIWYGEditPage}
+     * @since 11.9RC1
+     */
+    public WYSIWYGEditPage useShortcutKeyForWysiwygEditing()
+    {
+        useShortcutKeyAndLoads("g");
+        return new WYSIWYGEditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to Inline Form edit page.
+     * @return a new {@link InlinePage}
+     * @since 11.9RC1
+     */
+    public InlinePage useShortcutKeyForInlineEditing()
+    {
+        useShortcutKeyAndLoads("f");
+        return new InlinePage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to rights edit page.
+     * @return a new {@link BasePage}: it can be actually either a {@link RightsEditPage} or an AdministrationPage
+     *          depending if the page is terminal or not.
+     * @since 11.9RC1
+     */
+    public BasePage useShortcutKeyForRightsEditing()
+    {
+        useShortcutKeyAndLoads("r");
+        return new BasePage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to object edit page.
+     * @return a new {@link ObjectEditPage}
+     * @since 11.9RC1
+     */
+    public ObjectEditPage useShortcutKeyForObjectEditing()
+    {
+        useShortcutKeyAndLoads("o");
+        return new ObjectEditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to class edit page.
+     * @return a new {@link ClassEditPage}
+     * @since 11.9RC1
+     */
+    public ClassEditPage useShortcutKeyForClassEditing()
+    {
+        useShortcutKeyAndLoads("s");
+        return new ClassEditPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to delete page.
+     * @return a new {@link ConfirmationPage}
+     * @since 11.9RC1
+     */
+    public ConfirmationPage useShortcutKeyForPageDeletion()
+    {
+        useShortcutKeyAndLoads(Keys.DELETE);
+        return new ConfirmationPage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to rename page.
+     * @return a new {@link RenamePage}
+     * @since 11.9RC1
+     */
+    public RenamePage useShortcutKeyForPageRenaming()
+    {
+        useShortcutKeyAndLoads(Keys.F2);
+        return new RenamePage();
+    }
+
+    /**
+     * Use keyboard shortcuts to go to the source view of a page.
+     * @return a new {@link ViewPage}
+     * @since 11.9RC1
+     */
+    public ViewPage useShortcutKeyForSourceViewer()
+    {
+        useShortcutKeyAndLoads("d");
+        return new ViewPage();
     }
 }

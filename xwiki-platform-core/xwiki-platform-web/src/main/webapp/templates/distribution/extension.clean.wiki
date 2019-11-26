@@ -1,0 +1,130 @@
+##!source.syntax=xwiki/2.1
+{{template name="extension.vm" output="false"/}}
+
+{{velocity output="false"}}
+## Globals
+#set ($currentNamespace = "wiki:${services.wiki.currentWikiId}")
+
+#set($orphanedExtensions = [])
+#foreach ($installedExtension in $services.extension.installed.getInstalledExtensions($currentNamespace))
+  #if ($installedExtension.isDependency($currentNamespace))
+    #if ($installedExtension.isInstalled($NULL))
+      #if ($xcontext.isMainWiki())
+        #set($orphanedExtension = $services.extension.installed.repository.getBackwardDependencies($installedExtension.id, true).isEmpty())
+      #end
+    #else
+      #set($orphanedExtension = $services.extension.installed.repository.getBackwardDependencies($installedExtension.id.id, $currentNamespace, true).isEmpty())
+    #end
+    #if ($orphanedExtension)
+      #set ($void = $orphanedExtensions.add($installedExtension))
+    #end
+  #end
+#end
+
+#set($requestUninstalled = $request.getParameterValues('uninstalled_extensions'))
+
+#set($uninstalledExtensions = [])
+#set($topExtensions = [])
+
+#foreach ($orphanedExtension in $orphanedExtensions)
+  #set ($orphanedDependencies = $services.extension.installed.repository.getOrphanedDependencies($orphanedExtension, $currentNamespace))
+  #sortExtensions($orphanedDependencies, $requestUninstalled, $uninstalledExtensions, $topExtensions)
+#end
+
+#set($uninstalledExtensionIds = [])
+#set($topExtensionIds = [])
+#if ($request.uninstalled_extension_ids)
+  #foreach ($uninstalledExtensionId in $request.getParameterValues('uninstalled_extension_ids'))
+    #set($void = $uninstalledExtensionIds.add($uninstalledExtensionId))
+  #end
+
+  $request.getParameterValues('uninstalled_extension_ids')
+
+  #foreach ($topExtensionId in $request.getParameterValues('top_extension_ids'))
+    #set($void = $topExtensionIds.add($topExtensionId))    
+  #end
+#else
+  #foreach ($uninstalledExtension in $uninstalledExtensions)
+    #set($void = $uninstalledExtensionIds.add($uninstalledExtension.extension.id))
+  #end
+
+  #foreach ($topExtension in $topExtensions)
+    #set($void = $topExtensionIds.add($topExtension.extension.id))
+  #end
+#end
+
+#macro(node $extensionNode)
+  #determineExtensionStatus($extensionNode.extension $extensionStatus $extensionStatusMessage)
+
+  <li id="$extensionNode.extension.id.id" data-jstree='{"opened":true#if($uninstalledExtensionIds.contains($extensionNode.extension.id)), "selected":true#end}' class="extension-item-${extensionStatus}">
+    <span class="extension-name">#displayExtensionName($extensionNode.extension)</span>
+    <span class="extension-version">$escapetool.xml($extensionNode.extension.id.version)</span>
+    #if ($extensionStatusMessage)
+      <span class="extension-status">$escapetool.xml($extensionStatusMessage)</span>
+    #end
+
+    #if ($extensionNode.children.size() > 0)
+      <ul>
+      #foreach ($child in $extensionNode.children)
+        #node($child)
+      #end
+      </ul>
+    #end
+  </li>
+#end
+
+#macro(sortExtensions $extensionNode $requestUninstalled $uninstalledExtensions $topExtensions)
+  #if (($requestUninstalled && $requestUninstalled.contains($extensionNode.extension.id.id)) || (!$extensionNode.extension.isValid($currentNamespace)))
+    #set($void = $uninstalledExtensions.add($extensionNode))
+
+    #foreach ($child in $extensionNode.children)
+      #sortExtensions($child $requestUninstalled $uninstalledExtensions $topExtensions)
+    #end
+  #else
+    #set($void = $topExtensions.add($extensionNode))
+  #end
+#end
+
+#macro(formHidden)
+  #if ($request.xredirect)
+    <input type="hidden" name="xredirect" value="$escapetool.xml($request.xredirect)"/>
+  #end
+#end
+{{/velocity}}
+
+{{velocity}}
+#if ($uninstalledExtensions.isEmpty() && $topExtensions.isEmpty())
+  #set ($showCompleteStepButton = true)
+  {{info}}
+    {{translation key="platform.extension.distributionWizard.extension.cleanStep.noOrphaned"/}}
+  {{/info}}
+#else
+#set ($discard = $xwiki.jsfx.use('uicomponents/extension/clean.js', true))
+#set ($discard = $xwiki.ssfx.use('uicomponents/extension/clean.css', true))
+#if ($request.cleanapply)
+  {{template name="distribution/extension.clean.apply.wiki"/}}
+#else
+{{translation key="platform.extension.distributionWizard.extension.cleanStep.orphaned"/}}
+
+{{html clean="false"}}
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('jstree', 'themes/default/style.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+  <div id="extension_clean_tree" class="extension-clean">
+    <ul>
+      #foreach ($orphanedExtension in $orphanedExtensions)
+        #set ($orphanedDependencies = $services.extension.installed.repository.getOrphanedDependencies($orphanedExtension, $currentNamespace))
+        #node($orphanedDependencies)
+      #end
+    </ul>
+  </div>
+
+  <form action="">
+    #formHidden()
+
+    <div id="uninstalled_extensions"></div>
+
+    #em_submitButton($services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.cleanapply'), 'cleanapply', false, '')
+  </form>
+{{/html}}
+#end
+#end
+{{/velocity}}

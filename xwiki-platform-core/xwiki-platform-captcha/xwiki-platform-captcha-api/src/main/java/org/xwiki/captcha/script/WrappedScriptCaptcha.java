@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.xwiki.captcha.Captcha;
 import org.xwiki.script.internal.safe.AbstractSafeObject;
 import org.xwiki.script.internal.safe.ScriptSafeProvider;
-import org.xwiki.stability.Unstable;
 
 /**
  * Wrap a {@link Captcha} implementation for script API access.
@@ -33,7 +32,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 10.8RC1
  */
-@Unstable
 public class WrappedScriptCaptcha extends AbstractSafeObject<Captcha> implements Captcha
 {
     private Logger logger;

@@ -194,16 +194,8 @@
                   },
                   {
                     "code": "java.method.parameterTypeChanged",
-                    "old": "parameter void org.apache.velocity.runtime.resource.loader.ResourceLoader::commonInit(org.apache.velocity.runtime.RuntimeServices, 
+                    "old": "parameter void org.apache.velocity.runtime.resource.loader.ResourceLoader::commonInit(org.apache.velocity.runtime.RuntimeServices, ===org.apache.commons.collections.ExtendedProperties===) @ org.xwiki.velocity.XWikiWebappResourceLoader",
                     "new": "parameter void org.apache.velocity.runtime.resource.loader.ResourceLoader::commonInit(org.apache.velocity.runtime.RuntimeServices, ===org.apache.velocity.util.ExtProperties===) @ org.xwiki.velocity.XWikiWebappResourceLoader",
-                    "oldType": "org.apache.commons.collections.ExtendedProperties",
-                    "newType": "org.apache.velocity.util.ExtProperties",
-                    "package": "org.xwiki.velocity",
-                    "classQualifiedName": "org.xwiki.velocity.XWikiWebappResourceLoader",
-                    "classSimpleName": "XWikiWebappResourceLoader",
-                    "methodName": "commonInit",
-                    "parameterIndex": "1",
-                    "elementKind": "parameter",
                     "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
                   },
                   {

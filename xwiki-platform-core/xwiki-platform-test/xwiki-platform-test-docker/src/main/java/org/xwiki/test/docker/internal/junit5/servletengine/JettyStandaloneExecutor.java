@@ -68,6 +68,12 @@ public class JettyStandaloneExecutor
     private TestConfiguration testConfiguration;
 
     /**
+     * Used to start and stop the Jetty instance. We need to use the same instance to stop it since otherwise the stop
+     * won't do anything as there would be no state about the instance having been started fine.
+     */
+    private XWikiExecutor executor;
+
+    /**
      * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
@@ -152,9 +158,11 @@ public class JettyStandaloneExecutor
 
     private XWikiExecutor getExecutor()
     {
-        System.setProperty("xwikiExecutionDirectory", getJettyDirectory());
-        XWikiExecutor executor = new XWikiExecutor(0);
-        return executor;
+        if (this.executor == null) {
+            System.setProperty("xwikiExecutionDirectory", getJettyDirectory());
+            this.executor = new XWikiExecutor(0);
+        }
+        return this.executor;
     }
 
     private VelocityContext createVelocityContext()

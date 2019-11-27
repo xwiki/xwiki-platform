@@ -131,9 +131,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
         // If the Servlet Engine is external then consider XWiki is already configured, provisioned and running.
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
-            // XWiki is not started
-            LOGGER.info("XWiki is not started, starting all...");
-
             // Start the Database.
             // Note: We start the database before the XWiki WAR is created because we need the IP of the docker
             // container for the database when configuring the JDBC URL, in the case when the servlet container is
@@ -273,9 +270,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         // Only stop DB and Servlet Engine if we have started them
         if (!testConfiguration.getServletEngine().equals(ServletEngine.EXTERNAL)) {
             // Stop the DB
+            LOGGER.info("(*) Stopping database [{}]...", testConfiguration.getDatabase());
             stopDatabase(testConfiguration);
 
             // Stop the Servlet Engine
+            LOGGER.info("(*) Stopping Servlet container [{}]...", testConfiguration.getServletEngine());
             stopServletEngine(extensionContext);
         }
     }

@@ -890,6 +890,10 @@
                   org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec
                 </features>
               </extensionOverride>
+              <extensionOverride>
+                <id>org.ow2.asm:asm</id>
+                <features>asm:asm</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

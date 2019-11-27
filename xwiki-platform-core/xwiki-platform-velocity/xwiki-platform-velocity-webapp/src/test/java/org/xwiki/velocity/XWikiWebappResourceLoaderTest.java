@@ -22,17 +22,22 @@ package org.xwiki.velocity;
 import java.io.StringWriter;
 import java.util.Properties;
 
+import javax.servlet.ServletContext;
+
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.environment.internal.ServletEnvironment;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
 
 /**
  * Integration test for {@link XWikiWebappResourceLoader}.
@@ -44,10 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class XWikiWebappResourceLoaderTest
 {
     @MockComponent
-    private Environment environment;
-
-    @MockComponent
-    private VelocityConfiguration configuration;
+    private ConfigurationSource configuration;
 
     @InjectComponentManager
     private ComponentManager componentManager;
@@ -55,11 +57,15 @@ public class XWikiWebappResourceLoaderTest
     @Test
     public void testVelocityInitialization() throws Exception
     {
+        // Fake the initialization of the Servlet Environment
+        ServletEnvironment environment = (ServletEnvironment) this.componentManager.getInstance(Environment.class);
+        environment.setServletContext(mock(ServletContext.class));
+
         VelocityFactory factory = this.componentManager.getInstance(VelocityFactory.class);
 
         Properties properties = new Properties();
-        properties.setProperty(RuntimeConstants.RESOURCE_LOADER, "xwiki");
-        properties.setProperty("xwiki." + RuntimeConstants.RESOURCE_LOADER + ".class",
+        properties.setProperty(RuntimeConstants.RESOURCE_LOADERS, "xwiki");
+        properties.setProperty(RuntimeConstants.RESOURCE_LOADER + ".xwiki." + RuntimeConstants.RESOURCE_LOADER_CLASS,
             XWikiWebappResourceLoader.class.getName());
 
         VelocityEngine engine = factory.createVelocityEngine("key", properties);

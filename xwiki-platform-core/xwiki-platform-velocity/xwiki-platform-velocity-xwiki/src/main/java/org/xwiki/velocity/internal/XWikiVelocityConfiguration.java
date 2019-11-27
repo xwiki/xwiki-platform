@@ -57,7 +57,7 @@ public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
         this.defaultTools.put("datetool", new XWikiDateTool(this.contextProvider));
         this.defaultTools.put("mathttool", new XWikiMathTool(this.contextProvider));
 
-        this.defaultProperties.setProperty(RuntimeConstants.RESOURCE_LOADER, RESOURCE_LOADER_ID);
+        this.defaultProperties.setProperty(RuntimeConstants.RESOURCE_LOADERS, RESOURCE_LOADER_ID);
         this.defaultProperties.setProperty(RESOURCE_LOADER_ID + '.' + RuntimeConstants.RESOURCE_LOADER + '.'
             + RESOURCE_LOADER_ID + '.' + RuntimeConstants.RESOURCE_LOADER_CLASS,
             XWikiWebappResourceLoader.class.getName());

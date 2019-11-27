@@ -80,7 +80,7 @@ public class LiveTableResultsTest extends PageTest
         // path.
         VelocityConfiguration velocityConfiguration = this.oldcore.getMocker().getInstance(VelocityConfiguration.class);
         Properties velocityConfigProps = velocityConfiguration.getProperties();
-        velocityConfigProps.put(RuntimeConstants.RESOURCE_LOADER, "class");
+        velocityConfigProps.put(RuntimeConstants.RESOURCE_LOADERS, "class");
         velocityConfigProps.put(RuntimeConstants.RESOURCE_LOADER + ".class." + RuntimeConstants.RESOURCE_LOADER_CLASS,
             ClasspathResourceLoader.class.getName());
         velocityConfigProps.put(RuntimeConstants.VM_LIBRARY, "/templates/macros.vm");

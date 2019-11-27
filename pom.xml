@@ -871,10 +871,12 @@
               </extensionOverride>
               <extensionOverride>
                 <id>com.sun.activation:jakarta.activation</id>
-                <features>javax.activation:activation</features>
-                <features>javax.activation:javax.activation-api</features>
-                <features>com.sun.activation:javax.activation</features>
-                <features>jakarta.activation:jakarta.activation-api</features>
+                <features>
+                  javax.activation:activation,
+                  javax.activation:javax.activation-api,
+                  com.sun.activation:javax.activation,
+                  jakarta.activation:jakarta.activation-api
+                </features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.google.code.findbugs:jsr305</id>
@@ -882,9 +884,11 @@
               </extensionOverride>
               <extensionOverride>
                 <id>jakarta.transaction:jakarta.transaction-api</id>
-                <features>javax.transaction:javax.transaction-api</features>
-                <features>javax.transaction:jta</features>
-                <features>org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec</features>
+                <features>
+                  javax.transaction:javax.transaction-api,
+                  javax.transaction:jta,
+                  org.jboss.spec.javax.transaction:jboss-transaction-api_1.2_spec
+                </features>
               </extensionOverride>
             </extensionOverrides>
           </configuration>

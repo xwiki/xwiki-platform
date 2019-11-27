@@ -79,7 +79,7 @@ public class UidStringEntityReferenceSerializerTest
         Assert.assertEquals("4:wiki5:space4:page5:en_US", serializer.serialize(reference));
 
         reference = new DocumentReference("wiki", "space", "page", Locale.ROOT);
-        assertEquals("4:wiki5:space4:page0:", serializer.serialize(reference));
+        Assert.assertEquals("4:wiki5:space4:page0:", serializer.serialize(reference));
 
         reference = new DocumentReference("wiki1.wiki2:wiki3", Arrays.asList("some", "space"), "page", Locale.US);
         Assert.assertEquals("17:wiki1.wiki2:wiki34:some5:space4:page5:en_US", serializer.serialize(reference));

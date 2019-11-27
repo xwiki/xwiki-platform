@@ -45,7 +45,7 @@
   </modules>
   <properties>
     <!-- The version of Maven used during XWiki runtime (more recent than the one used during the build to benefit from bugfixes and improvements)-->
-    <maven.version>3.6.2</maven.version>
+    <maven.version>3.6.3</maven.version>
     <maven.resolver.version>1.4.1</maven.resolver.version>
 
     <!-- Flavors known to be valid with the current distribution -->

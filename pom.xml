@@ -770,10 +770,12 @@
               </extensionOverride>
               <extensionOverride>
                 <id>com.sun.activation:jakarta.activation</id>
-                <features>javax.activation:activation</features>
-                <features>javax.activation:javax.activation-api</features>
-                <features>com.sun.activation:javax.activation</features>
-                <features>jakarta.activation:jakarta.activation-api</features>
+                <features>
+                  javax.activation:activation,
+                  javax.activation:javax.activation-api,
+                  com.sun.activation:javax.activation,
+                  jakarta.activation:jakarta.activation-api
+                </features>
               </extensionOverride>
               <extensionOverride>
                 <id>com.google.code.findbugs:jsr305</id>

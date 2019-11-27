@@ -25,6 +25,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.model.internal.reference.UidStringEntityReferenceSerializer;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.test.annotation.ComponentList;
@@ -96,8 +97,8 @@ public class XWikiCacheStoreTest
             store.loadXWikiDoc(new XWikiDocument(reference), this.oldcore.getXWikiContext());
 
         assertFalse(existingDocument.isNew());
-        verify(this.cache).set(eq("4:wiki5:space4:page"), any(XWikiDocument.class));
-        verify(this.existCache).set("4:wiki5:space4:page", Boolean.TRUE);
+        verify(this.cache).set(eq("4:wiki5:space4:page0:"), any(XWikiDocument.class));
+        verify(this.existCache).set("4:wiki5:space4:page0:", Boolean.TRUE);
         verify(this.cache).get(any());
         verify(this.existCache).get(any());
 
@@ -111,9 +112,9 @@ public class XWikiCacheStoreTest
         assertTrue(notExistingDocument.isNew());
 
         // Make sure only the existing document has been put in the cache
-        verify(this.cache).set(eq("4:wiki5:space4:page"), any(XWikiDocument.class));
-        verify(this.existCache).set("4:wiki5:space4:page", Boolean.TRUE);
-        verify(this.existCache).set("4:wiki5:space6:nopage", Boolean.FALSE);
+        verify(this.cache).set(eq("4:wiki5:space4:page0:"), any(XWikiDocument.class));
+        verify(this.existCache).set("4:wiki5:space4:page0:", Boolean.TRUE);
+        verify(this.existCache).set("4:wiki5:space6:nopage0:", Boolean.FALSE);
         verify(this.cache, times(2)).get(any());
         verify(this.existCache, times(2)).get(any());
 
@@ -139,7 +140,7 @@ public class XWikiCacheStoreTest
 
         assertThrows(XWikiException.class, () -> store.saveXWikiDoc(document, this.oldcore.getXWikiContext(), true));
 
-        verify(this.cache).remove("4:wiki5:space4:page");
-        verify(this.existCache).remove("4:wiki5:space4:page");
+        verify(this.cache).remove("4:wiki5:space4:page0:");
+        verify(this.existCache).remove("4:wiki5:space4:page0:");
     }
 }

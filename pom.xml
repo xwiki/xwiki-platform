@@ -894,6 +894,10 @@
                 <id>org.ow2.asm:asm</id>
                 <features>asm:asm</features>
               </extensionOverride>
+              <extensionOverride>
+                <id>cglib:cglib</id>
+                <features>cglib:cglib-nodep</features>
+              </extensionOverride>
             </extensionOverrides>
           </configuration>
         </plugin>

@@ -53,5 +53,25 @@
       <artifactId>javax.servlet-api</artifactId>
       <scope>compile</scope>
     </dependency>
+
+    <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.2.0</version>
+    </dependency>
+    <!-- To be removed as soon as we get rid of AbstractXWikiComponentTestCase -->
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock-cglib</artifactId>
+      <version>1.2.0</version>
+      <exclusions>
+        <!-- We use cglib:cglig instead -->
+        <exclusion>
+          <groupId>cglib</groupId>
+          <artifactId>cglib-nodep</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 </project>

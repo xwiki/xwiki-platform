@@ -31,5 +31,6 @@
   <modules>
     <module>xwiki-platform-captcha-jcaptcha-api</module>
     <module>xwiki-platform-captcha-jcaptcha-ui</module>
+    <module>xwiki-platform-captcha-jcaptcha-webjar</module>
   </modules>
 </project>

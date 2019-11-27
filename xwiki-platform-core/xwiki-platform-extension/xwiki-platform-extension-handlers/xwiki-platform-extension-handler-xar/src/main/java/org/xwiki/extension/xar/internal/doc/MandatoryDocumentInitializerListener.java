@@ -47,6 +47,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 import org.xwiki.wiki.manager.WikiManagerException;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.MandatoryDocumentInitializer;
 import com.xpn.xwiki.internal.event.MandatoryDocumentsInitializedEvent;
 
@@ -86,6 +87,15 @@ public class MandatoryDocumentInitializerListener extends AbstractEventListener
     @Inject
     @Named("context")
     private Provider<ComponentManager> contextComponentManagerProvider;
+
+    /**
+     * Used to check if the XWiki database is ready when {@link ComponentDescriptorAddedEvent} and
+     * {@link ComponentDescriptorRemovedEvent} are fired, because we need to fetch the list of wikis from the database
+     * when the {@link MandatoryDocumentInitializer} specifies a relative document reference.
+     */
+    @Inject
+    @Named("readonly")
+    private Provider<XWikiContext> readOnlyXWikiContextProvider;
 
     /**
      * Default constructor.
@@ -138,7 +148,9 @@ public class MandatoryDocumentInitializerListener extends AbstractEventListener
         EntityReference wikiReference = relativeDocumentReference.extractReference(EntityType.WIKI);
         if (wikiReference != null) {
             return Collections.singleton(new DocumentReference(relativeDocumentReference));
-        } else {
+        } else if (this.readOnlyXWikiContextProvider.get() != null) {
+            // Skip this mandatory document if the XWiki database is not ready (it's too early to get the list of
+            // wikis). It will be handled later when the MandatoryDocumentsInitializedEvent is fired.
             try {
                 return this.wikiDescriptorManagerProvider.get().getAllIds().stream()
                     .map(wikiId -> this.defaultReferenceDocumentReferenceResolver.resolve(relativeDocumentReference,
@@ -146,8 +158,8 @@ public class MandatoryDocumentInitializerListener extends AbstractEventListener
                     .collect(Collectors.toSet());
             } catch (WikiManagerException e) {
                 this.logger.error("Failed to get the list of wikis.", e);
-                return Collections.emptySet();
             }
         }
+        return Collections.emptySet();
     }
 }

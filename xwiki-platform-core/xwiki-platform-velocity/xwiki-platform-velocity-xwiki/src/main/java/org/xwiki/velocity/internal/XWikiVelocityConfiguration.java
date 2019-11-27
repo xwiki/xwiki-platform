@@ -58,7 +58,8 @@ public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
         this.defaultTools.put("mathttool", new XWikiMathTool(this.contextProvider));
 
         this.defaultProperties.setProperty(RuntimeConstants.RESOURCE_LOADER, RESOURCE_LOADER_ID);
-        this.defaultProperties.setProperty(RESOURCE_LOADER_ID + '.' + RuntimeConstants.RESOURCE_LOADER + ".class",
+        this.defaultProperties.setProperty(RESOURCE_LOADER_ID + '.' + RuntimeConstants.RESOURCE_LOADER + '.'
+            + RESOURCE_LOADER_ID + '.' + RuntimeConstants.RESOURCE_LOADER_CLASS,
             XWikiWebappResourceLoader.class.getName());
         this.defaultProperties.put(RuntimeConstants.VM_LIBRARY, "/templates/macros.vm");
     }

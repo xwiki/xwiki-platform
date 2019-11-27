@@ -26,6 +26,7 @@ import java.util.Properties;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
 import org.apache.velocity.tools.generic.MathTool;
 import org.apache.velocity.tools.generic.NumberTool;
 import org.junit.jupiter.api.BeforeEach;
@@ -80,8 +81,8 @@ public class LiveTableResultsTest extends PageTest
         VelocityConfiguration velocityConfiguration = this.oldcore.getMocker().getInstance(VelocityConfiguration.class);
         Properties velocityConfigProps = velocityConfiguration.getProperties();
         velocityConfigProps.put(RuntimeConstants.RESOURCE_LOADER, "class");
-        velocityConfigProps.put("class.resource.loader.class",
-            "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader");
+        velocityConfigProps.put(RuntimeConstants.RESOURCE_LOADER + ".class." + RuntimeConstants.RESOURCE_LOADER_CLASS,
+            ClasspathResourceLoader.class.getName());
         velocityConfigProps.put(RuntimeConstants.VM_LIBRARY, "/templates/macros.vm");
         velocityConfiguration = this.oldcore.getMocker().registerMockComponent(VelocityConfiguration.class);
         when(velocityConfiguration.getProperties()).thenReturn(velocityConfigProps);

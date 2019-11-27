@@ -30,14 +30,14 @@ import org.xwiki.model.reference.AbstractLocalizedEntityReference;
 import org.xwiki.model.reference.EntityReference;
 
 /**
- * Serialize a reference into a unique identifier string. This is faster compare to the human readable default
- * string serializer and it provide unique reversible string without requiring complex escaping. Compare to default
- * string serializers, it is aimed to be used only by computer and it will be kept stable over time. These strings are
+ * Serialize a reference into a unique identifier string. This is faster compare to the human readable default string
+ * serializer and it provide unique reversible string without requiring complex escaping. Compare to default string
+ * serializers, it is aimed to be used only by computer and it will be kept stable over time. These strings are
  * comparable and could be used when an string identifier is required (ie: hashmap, caches, storage...). These strings
  * are also a better source for hashing algorithms.
- *
- * ie: The string created looks like 4:wiki5:space3:doc for the wiki:space.doc document
- * and 4:wiki5:space3:doc20:wiki:xspace.class[0] for the wiki:space.doc^wiki:xspace.class[0] object.
+ * <p>
+ * ie: The string created looks like {@code 4:wiki5:space3:doc} for the {@code wiki:space.doc} document and
+ * {@code 4:wiki5:space3:doc20:wiki:xspace.class[0]} for the {@code wiki:space.doc^wiki:xspace.class[0]} object.
  *
  * @version $Id$
  * @since 4.0M1
@@ -61,9 +61,7 @@ public class UidStringEntityReferenceSerializer extends AbstractStringEntityRefe
             Locale locale = ((AbstractLocalizedEntityReference) currentReference).getLocale();
             if (locale != null) {
                 String localeString = locale.toString();
-                if (!localeString.isEmpty()) {
-                    representation.append(localeString.length()).append(':').append(localeString);
-                }
+                representation.append(localeString.length()).append(":").append(localeString);
             }
         }
     }

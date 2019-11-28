@@ -856,7 +856,7 @@
                 </features>
               </extensionOverride>
               <extensionOverride>
-                <id>jakarta.annotation:jakarta.annotations-api</id>
+                <id>jakarta.annotation:jakarta.annotation-api</id>
                 <features>
                   javax.annotation:jsr250-api,
                   javax.annotation:javax.annotation-api

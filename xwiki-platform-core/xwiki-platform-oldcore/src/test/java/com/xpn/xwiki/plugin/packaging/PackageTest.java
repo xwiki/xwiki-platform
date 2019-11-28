@@ -19,13 +19,15 @@
  */
 package com.xpn.xwiki.plugin.packaging;
 
-import java.util.Locale;
-
-import org.jmock.Mock;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.packaging.Package} class.
@@ -36,24 +38,15 @@ public class PackageTest extends AbstractPackageTest
 {
     private Package pack;
 
-    private Mock mockXWiki;
-
-    @Override
-    protected void setUp() throws Exception
+    @BeforeEach
+    protected void beforeEach() throws Exception
     {
-        super.setUp();
         this.pack = new Package();
 
-        this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
-        this.mockXWiki.stubs().method("checkAccess").will(returnValue(true));
-
-        // clone calls getVersioningStore but returning null will be satisfactory for the test.
-        this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(null));
-
-        getContext().setWiki((XWiki) this.mockXWiki.proxy());
+        doReturn(true).when(this.oldcore.getSpyXWiki()).checkAccess(any(), any(), any());
     }
 
+    @Test
     public void testImportWithHeterogeneousEncodingInFiles() throws Exception
     {
         String docTitle = "Un \u00e9t\u00e9 36";
@@ -69,7 +62,8 @@ public class PackageTest extends AbstractPackageTest
 
         XWikiDocument docs[] = { doc1, doc2 };
 
-        this.pack.Import(this.createZipFile(docs, new String[] { "ISO-8859-1", "UTF-8" }, null), getContext());
+        this.pack.Import(this.createZipFile(docs, new String[] { "ISO-8859-1", "UTF-8" }, null),
+            this.oldcore.getXWikiContext());
 
         assertEquals(2, this.pack.getFiles().size());
         assertEquals(this.pack.getFiles().get(0).getDoc().getTitle(),
@@ -78,6 +72,7 @@ public class PackageTest extends AbstractPackageTest
             this.pack.getFiles().get(1).getDoc().getContent());
     }
 
+    @Test
     public void testImportWithHeterogeneousEncodingInFilesUsingCommonsCompress() throws Exception
     {
         String docTitle = "Un \u00e9t\u00e9 36";
@@ -94,7 +89,7 @@ public class PackageTest extends AbstractPackageTest
         XWikiDocument docs[] = { doc1, doc2 };
 
         this.pack.Import(this.createZipFileUsingCommonsCompress(docs, new String[] { "ISO-8859-1", "UTF-8" }, null),
-            getContext());
+            this.oldcore.getXWikiContext());
 
         assertEquals(2, this.pack.getFiles().size());
         assertEquals(this.pack.getFiles().get(0).getDoc().getTitle(),

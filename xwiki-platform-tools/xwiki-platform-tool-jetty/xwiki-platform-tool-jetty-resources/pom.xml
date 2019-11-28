@@ -91,6 +91,12 @@
       <artifactId>jetty-annotations</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.annotation</groupId>
+          <artifactId>javax.annotation-api</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
@@ -103,6 +109,12 @@
       <artifactId>jetty-jndi</artifactId>
       <version>${jetty.version}</version>
       <optional>true</optional>
+    </dependency>
+
+    <!-- Include the right version of what's excluded in jetty dependencies -->
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
   </dependencies>
   <build>

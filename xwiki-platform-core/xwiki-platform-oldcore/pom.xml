@@ -480,7 +480,7 @@
     <!-- Used in to prioritize MandatoryDocumentInitializers -->
     <dependency>
       <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotations-api</artifactId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
 
     <!-- Test dependencies -->

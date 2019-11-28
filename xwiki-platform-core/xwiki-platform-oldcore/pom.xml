@@ -479,8 +479,8 @@
 
     <!-- Used in to prioritize MandatoryDocumentInitializers -->
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotations-api</artifactId>
     </dependency>
 
     <!-- Test dependencies -->

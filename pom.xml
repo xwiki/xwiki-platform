@@ -177,6 +177,11 @@
             <groupId>com.sun.activation</groupId>
             <artifactId>javax.activation</artifactId>
           </exclusion>
+          <!-- Artifact id changed -->
+          <exclusion>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <!-- Rome is used in rss macro and feed api modules and in Tika -->
@@ -848,6 +853,13 @@
                   javax.mail:mailapi,
                   com.sun.mail:javax.mail,
                   jakarta.mail:jakarta.mail-api
+                </features>
+              </extensionOverride>
+              <extensionOverride>
+                <id>jakarta.annotation:jakarta.annotations-api</id>
+                <features>
+                  javax.annotation:jsr250-api,
+                  javax.annotation:javax.annotation-api
                 </features>
               </extensionOverride>
               <extensionOverride>

@@ -24,10 +24,13 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.jmock.Expectations;
-import org.jmock.Mockery;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link ServletRequest}.
@@ -35,101 +38,74 @@ import org.junit.Test;
  * @version $Id$
  * @since 3.2M3
  */
+@ExtendWith(MockitoExtension.class)
 public class ServletRequestTest
 {
-    private Mockery mockery = new Mockery();
+    @Mock
+    private HttpServletRequest httpRequest;
 
     @Test
     public void getPropertyWhenNoExistAsRequestParam()
     {
-        final HttpServletRequest httpRequest = mockery.mock(HttpServletRequest.class);
-        this.mockery.checking(new Expectations() {{
-            oneOf(httpRequest).getParameter("key");
-                will(returnValue("value"));
-        }});
+        when(this.httpRequest.getParameter("key")).thenReturn("value");
 
-        ServletRequest request = new ServletRequest(httpRequest);
-        Assert.assertEquals("value", request.getProperty("key"));
+        ServletRequest request = new ServletRequest(this.httpRequest);
+        assertEquals("value", request.getProperty("key"));
     }
 
     @Test
     public void getPropertyWhenNoExistAsAttributeParam()
     {
-        final HttpServletRequest httpRequest = mockery.mock(HttpServletRequest.class);
-        this.mockery.checking(new Expectations() {{
-            oneOf(httpRequest).getParameter("key");
-                will(returnValue(null));
-            oneOf(httpRequest).getAttribute("key");
-                will(returnValue("value"));
-        }});
+        when(this.httpRequest.getParameter("key")).thenReturn(null);
+        when(this.httpRequest.getAttribute("key")).thenReturn("value");
 
-        ServletRequest request = new ServletRequest(httpRequest);
-        Assert.assertEquals("value", request.getProperty("key"));
+        ServletRequest request = new ServletRequest(this.httpRequest);
+        assertEquals("value", request.getProperty("key"));
     }
 
     @Test
     public void getPropertiesWhenNoConflict()
     {
-        final HttpServletRequest httpRequest = mockery.mock(HttpServletRequest.class);
-        this.mockery.checking(new Expectations() {{
-            oneOf(httpRequest).getParameterValues("key");
-                will(returnValue(new String[] {"value1", "value2"}));
-            oneOf(httpRequest).getAttribute("key");
-                will(returnValue("value3"));
-        }});
+        when(this.httpRequest.getParameterValues("key")).thenReturn(new String[]{ "value1", "value2" });
+        when(this.httpRequest.getAttribute("key")).thenReturn("value3");
 
-        ServletRequest request = new ServletRequest(httpRequest);
+        ServletRequest request = new ServletRequest(this.httpRequest);
         List<Object> values = request.getProperties("key");
-        Assert.assertEquals(Arrays.asList("value1", "value2", "value3"), values);
+        assertEquals(Arrays.asList("value1", "value2", "value3"), values);
     }
 
     @Test
     public void getPropertiesWhenConflict()
     {
-        final HttpServletRequest httpRequest = this.mockery.mock(HttpServletRequest.class);
-        this.mockery.checking(new Expectations() {{
-            oneOf(httpRequest).getParameterValues("key");
-                will(returnValue(new String[] {"value"}));
-            oneOf(httpRequest).getAttribute("key");
-                will(returnValue("value"));
-        }});
+        when(this.httpRequest.getParameterValues("key")).thenReturn(new String[]{ "value" });
+        when(this.httpRequest.getAttribute("key")).thenReturn("value");
 
-        ServletRequest request = new ServletRequest(httpRequest);
+        ServletRequest request = new ServletRequest(this.httpRequest);
         List<Object> values = request.getProperties("key");
-        Assert.assertEquals(Arrays.asList("value", "value"), values);
+        assertEquals(Arrays.asList("value", "value"), values);
     }
 
     @Test
     public void getPropertiesWhenNoExistAsRequestParam()
     {
-        final HttpServletRequest httpRequest = this.mockery.mock(HttpServletRequest.class);
-        this.mockery.checking(new Expectations() {{
-            oneOf(httpRequest).getParameterValues("key");
-                will(returnValue(null));
-            oneOf(httpRequest).getAttribute("key");
-                will(returnValue("value"));
-        }});
+        when(this.httpRequest.getParameterValues("key")).thenReturn(null);
+        when(this.httpRequest.getAttribute("key")).thenReturn("value");
 
-        ServletRequest request = new ServletRequest(httpRequest);
+        ServletRequest request = new ServletRequest(this.httpRequest);
         List<Object> result = request.getProperties("key");
-        Assert.assertEquals(1, result.size());
-        Assert.assertEquals("value", result.get(0));
+        assertEquals(1, result.size());
+        assertEquals("value", result.get(0));
     }
 
     @Test
     public void getPropertiesWhenNoValueSetAsRequestAttribute()
     {
-        final HttpServletRequest httpRequest = this.mockery.mock(HttpServletRequest.class);
-        this.mockery.checking(new Expectations() {{
-            oneOf(httpRequest).getParameterValues("key");
-                will(returnValue(new String[] {"value"}));
-            oneOf(httpRequest).getAttribute("key");
-                will(returnValue(null));
-        }});
+        when(this.httpRequest.getParameterValues("key")).thenReturn(new String[]{ "value" });
+        when(this.httpRequest.getAttribute("key")).thenReturn(null);
 
-        ServletRequest request = new ServletRequest(httpRequest);
+        ServletRequest request = new ServletRequest(this.httpRequest);
         List<Object> result = request.getProperties("key");
-        Assert.assertEquals(1, result.size());
-        Assert.assertEquals("value", result.get(0));
+        assertEquals(1, result.size());
+        assertEquals("value", result.get(0));
     }
 }

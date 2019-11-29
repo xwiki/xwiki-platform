@@ -399,7 +399,7 @@ XWiki.SyntaxConverter = Class.create({
     } else {
       if (XWiki.editor=='wysiwyg') {
         // Conversion in WYSIWYG mode does not yet support conversion of the current content
-        if (XWiki.docisnew || confirm("$services.localization.render('panels.documentInformation.confirmChangeSyntaxWysiwyg')")) {
+        if (XWiki.docisnew || confirm($jsontool.serialize($services.localization.render('panels.documentInformation.confirmChangeSyntaxWysiwyg')))) {
           this.disableEditingArea();
           new Ajax.Request(
             "$doc.getURL('get')",
@@ -423,7 +423,7 @@ XWiki.SyntaxConverter = Class.create({
           this.syntaxField.value = this.originalSyntax;
         }
       } else if (!this.contentField.value.blank()) {
-        if (confirm("$services.localization.render('panels.documentInformation.confirmChangeSyntax')")) {
+        if (confirm($jsontool.serialize($services.localization.render('panels.documentInformation.confirmChangeSyntax')))) {
           this.disableEditingArea();
           new Ajax.Request(
             "$doc.getURL('get')",
@@ -491,7 +491,7 @@ XWiki.SyntaxConverter = Class.create({
    *     what exactly prevented the conversion.
    */
   failedConversion : function(response) {
-    alert("$services.localization.render('panels.documentInformation.failedSyntaxConversion')");
+    alert($jsontool.serialize($services.localization.render('panels.documentInformation.failedSyntaxConversion')));
     this.syntaxField.selectedIndex = this.originalSyntaxIndex;
   },
 

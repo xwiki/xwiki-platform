@@ -20,44 +20,48 @@
 package com.xpn.xwiki.doc;
 
 import java.io.Reader;
-import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
-import org.hibernate.cfg.Configuration;
-import org.jmock.Mock;
-import org.jmock.core.Invocation;
-import org.jmock.core.stub.CustomStub;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.display.internal.DisplayConfiguration;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.internal.MockConfigurationSource;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
-import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.test.MockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link XWikiDocument}.
+ * Unit tests for {@link XWikiDocument}'s rendering methods
+ * ({@code getRenderedTitle()} and {@code getRenderedContent()}).
  *
  * @version $Id$
  */
-public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTestCase
+@OldcoreTest
+@AllComponents
+public class XWikiDocumentRenderingTest
 {
     private static final String DOCWIKI = "xwiki";
 
@@ -69,84 +73,42 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
     private static final String CLASSNAME = DOCFULLNAME;
 
+    @InjectMockitoOldcore
+    private MockitoOldcore oldcore;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    private DisplayConfiguration displayConfiguration;
+
     private XWikiDocument document;
-
-    private XWikiDocument translatedDocument;
-
-    private Mock mockXWiki;
-
-    private Mock mockXWikiVersioningStore;
-
-    private Mock mockXWikiStoreInterface;
-
-    private Mock mockXWikiRightService;
-
-    private Mock mockDisplayConfiguration;
 
     private BaseClass baseClass;
 
     private BaseObject baseObject;
 
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
+    private XWiki xwiki;
 
-        // Mock xwiki.cfg
-        getComponentManager().registerComponent(MockConfigurationSource.getDescriptor("xwikicfg"),
-            getConfigurationSource());
+    @BeforeEach
+    public void setupComponents() throws Exception
+    {
+        // Setup display configuration.
+        this.displayConfiguration = this.componentManager.registerMockComponent(DisplayConfiguration.class);
+        when(this.displayConfiguration.getDocumentDisplayerHint()).thenReturn("default");
+        when(this.displayConfiguration.getTitleHeadingDepth()).thenReturn(2);
+    }
+
+    @BeforeEach
+    public void setup() throws Exception
+    {
+        this.xwiki = this.oldcore.getSpyXWiki();
 
         DocumentReference documentReference = new DocumentReference(DOCWIKI, DOCSPACE, DOCNAME);
         this.document = new XWikiDocument(documentReference);
         this.document.setSyntax(Syntax.XWIKI_2_1);
-        this.document.setLanguage("en");
-        this.document.setDefaultLanguage("en");
         this.document.setNew(false);
 
-        getContext().setDoc(this.document);
-
-        this.translatedDocument = new XWikiDocument();
-        this.translatedDocument.setSyntax(Syntax.XWIKI_2_1);
-        this.translatedDocument.setLanguage("fr");
-        this.translatedDocument.setNew(false);
-
-        getContext().put("isInRenderingEngine", true);
-
-        this.mockXWiki = mock(XWiki.class);
-        this.mockXWiki.stubs().method("Param").will(returnValue(null));
-
-        this.mockXWikiVersioningStore = mock(XWikiVersioningStoreInterface.class);
-        this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
-
-        this.mockXWikiRightService = mock(XWikiRightService.class);
-        this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
-
-        this.mockXWikiStoreInterface = mock(XWikiStoreInterface.class);
-        this.mockXWikiStoreInterface.stubs().method("search").will(returnValue(new ArrayList<XWikiDocument>()));
-        
-        Mock hibernateStore = registerMockComponent(HibernateStore.class);
-        hibernateStore.stubs().method("dispose").isVoid();
-        hibernateStore.stubs().method("getConfiguration").will(returnValue(new Configuration()));
-
-        this.document.setStore((XWikiStoreInterface) this.mockXWikiStoreInterface.proxy());
-
-        this.mockXWiki.stubs().method("getVersioningStore").will(returnValue(this.mockXWikiVersioningStore.proxy()));
-        this.mockXWiki.stubs().method("getStore").will(returnValue(this.mockXWikiStoreInterface.proxy()));
-        this.mockXWiki.stubs().method("getRightService").will(returnValue(this.mockXWikiRightService.proxy()));
-        this.mockXWiki.stubs().method("getDocument").will(returnValue(this.document));
-        this.mockXWiki.stubs().method("getDocumentReference").will(returnValue(documentReference));
-        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue("en"));
-        this.mockXWiki.stubs().method("exists").will(returnValue(false));
-        // Called from MessageToolVelocityContextInitializer.
-        this.mockXWiki.stubs().method("prepareResources");
-        // The next 3 stubs are needed to properly initialize the Velocity engine.
-        this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
-        this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));
-        this.mockXWiki.stubs().method("Param").with(eq("xwiki.render.velocity.macrolist")).will(returnValue(""));
-        this.mockXWiki.stubs().method("exists").will(returnValue(false));
-        this.mockXWiki.stubs().method("evaluateTemplate").will(returnValue(""));
-
-        getContext().setWiki((XWiki) this.mockXWiki.proxy());
+        this.oldcore.getXWikiContext().setDoc(this.document);
 
         this.baseClass = this.document.getXClass();
         this.baseClass.addTextField("string", "String", 30);
@@ -159,269 +121,260 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         this.baseClass.addNumberField("int", "Int", 10, "integer");
         this.baseClass.addStaticListField("stringlist", "StringList", "value1, value2");
 
-        this.mockXWiki.stubs().method("getXClass").will(returnValue(this.baseClass));
+        doReturn(this.baseClass).when(this.xwiki).getXClass(any(), any());
 
-        this.baseObject = this.document.newObject(CLASSNAME, getContext());
+        this.baseObject = this.document.newObject(CLASSNAME, this.oldcore.getXWikiContext());
         this.baseObject.setStringValue("string", "string");
         this.baseObject.setLargeStringValue("area", "area");
         this.baseObject.setStringValue("passwd", "passwd");
         this.baseObject.setIntValue("boolean", 1);
         this.baseObject.setIntValue("int", 42);
         this.baseObject.setStringListValue("stringlist", Arrays.asList("VALUE1", "VALUE2"));
+
+        this.oldcore.getXWikiContext().put("isInRenderingEngine", true);
+
+        when(this.oldcore.getMockAuthorizationManager().hasAccess(any(), any(), any())).thenReturn(true);
+        when(this.oldcore.getMockContextualAuthorizationManager().hasAccess(any())).thenReturn(true);
+        when(this.xwiki.getRightService().hasProgrammingRights(any())).thenReturn(true);
+
+        this.componentManager
+            .registerComponent(ConfigurationSource.class, "xwikicfg", this.oldcore.getConfigurationSource());
     }
 
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        // Setup display configuration.
-        this.mockDisplayConfiguration = registerMockComponent(DisplayConfiguration.class);
-        this.mockDisplayConfiguration.stubs().method("getDocumentDisplayerHint").will(returnValue("default"));
-        this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(2));
-    }
-
-    public void testCurrentDocumentVariableIsInjectedBeforeRendering() throws XWikiException
+    @Test
+    public void getRenderedContentWithCurrentDocumentVariableIsInjectedBeforeRendering() throws Exception
     {
         // Verifies we can access the doc variable from a groovy macro.
         this.document.setContent("{{groovy}}print(doc);{{/groovy}}");
-        this.document.setSyntax(Syntax.XWIKI_2_0);
 
-        assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(getContext()));
+        assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
     }
 
-    public void testGetRenderedTitleWithTitle()
+    @Test
+    public void getRenderedTitleWhenTitleIsSet()
     {
-        this.document.setSyntax(Syntax.XWIKI_2_0);
-
+        // Plain title
         this.document.setTitle("title");
+        assertEquals("title", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
-        assertEquals("title", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-
+        // Title with wiki syntax that should not be evaluated
         this.document.setTitle("**title**");
+        assertEquals("**title**", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
-        assertEquals("**title**", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-
+        // Title with HTML syntax that should not be evaluated
         this.document.setTitle("<strong>ti<em>tle</strong>");
-
         // The title is parsed as plain text after the Velocity code is evaluated so the HTML have no meaning.
         assertEquals("&lt;strong&gt;ti&lt;em&gt;tle&lt;/strong&gt;",
-            this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-        assertEquals("<strong>ti<em>tle</strong>", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
+            this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
+        assertEquals("<strong>ti<em>tle</strong>",
+            this.document.getRenderedTitle(Syntax.PLAIN_1_0, this.oldcore.getXWikiContext()));
 
+        // Title with velocity that should be evaluated
         this.document.setTitle("#set($key = \"title\")$key");
-
-        assertEquals("title", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("title", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
     }
 
-    public void testGetRenderedTitleWithoutTitleHTML()
+    @Test
+    public void getRenderedTitleInHTMLWhenExtractedFromContent()
     {
-        this.document.setSyntax(Syntax.XWIKI_2_0);
+        // Configure XWiki to extract title from content
+        this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
 
         this.document.setContent(
             "content not in section\n" + "= header 1=\nheader 1 content\n" + "== header 2==\nheader 2 content");
-
-        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
-
-        assertEquals("header 1", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("header 1", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
         this.document.setContent(
             "content not in section\n" + "= **header 1**=\nheader 1 content\n" + "== header 2==\nheader 2 content");
-
-        assertEquals("<strong>header 1</strong>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("<strong>header 1</strong>",
+            this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
         this.document.setContent(
             "content not in section\n" + "= [[Space.Page]]=\nheader 1 content\n" + "== header 2==\nheader 2 content");
-
-        this.mockXWiki.stubs().method("getURL").will(returnValue("/reference"));
-
-        assertEquals("<span class=\"wikicreatelink\"><a href=\"/reference\"><span class=\"wikigeneratedlinkcontent\">"
-            + "Page" + "</span></a></span>", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("<span class=\"wikiexternallink\"><a href=\"Space.Page\">"
+                + "<span class=\"wikigeneratedlinkcontent\">Space.Page</span></a></span>",
+            this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
         this.document.setContent("content not in section\n" + "= #set($var ~= \"value\")=\nheader 1 content\n"
             + "== header 2==\nheader 2 content");
-
-        assertEquals("#set($var = \"value\")", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("#set($var = \"value\")",
+            this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
         this.document.setContent("content not in section\n"
             + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
-
-        assertEquals("value", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("value", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
 
         this.document.setContent("content not in section\n=== header 3===");
-
-        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
     }
 
-    public void testGetRenderedTitleWithoutTitlePLAIN()
+    @Test
+    public void getRenderedTitleInPlainWhenExtractedFromContent()
     {
-        this.document.setSyntax(Syntax.XWIKI_2_0);
+        this.document.setContent(
+            "content not in section\n" + "= **header 1**=\nheader 1 content\n" + "== header 2==\nheader 2 content");
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.PLAIN_1_0, this.oldcore.getXWikiContext()));
+
+        // Configure XWiki to extract title from content
+        this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
 
         this.document.setContent(
             "content not in section\n" + "= **header 1**=\nheader 1 content\n" + "== header 2==\nheader 2 content");
-
-        assertEquals("Page", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
-
-        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
-
-        this.document.setContent(
-            "content not in section\n" + "= **header 1**=\nheader 1 content\n" + "== header 2==\nheader 2 content");
-
-        assertEquals("header 1", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
+        assertEquals("header 1", this.document.getRenderedTitle(Syntax.PLAIN_1_0, this.oldcore.getXWikiContext()));
 
         this.document.setContent("content not in section\n"
             + "= {{groovy}}print \"value\"{{/groovy}}=\nheader 1 content\n" + "== header 2==\nheader 2 content");
-
-        assertEquals("value", this.document.getRenderedTitle(Syntax.PLAIN_1_0, getContext()));
+        assertEquals("value", this.document.getRenderedTitle(Syntax.PLAIN_1_0, this.oldcore.getXWikiContext()));
     }
 
-    public void testGetRenderedTitleNoTitleAndContent()
+    @Test
+    public void getRenderedTitleWhenNoTitleAndNoContentSet()
     {
-        this.document.setSyntax(Syntax.XWIKI_2_0);
-
-        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
     }
 
     /**
      * Make sure title extracted from content is protected from cycles
      */
-    public void testGetRenderedTitleRecursive()
+    @Test
+    public void getRenderedTitleWhenRecursive()
     {
-        this.document.setSyntax(Syntax.XWIKI_2_0);
+        // Configure XWiki to extract title from content
+        this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
+
         this.document.setContent("= {{groovy}}print doc.getDisplayTitle(){{/groovy}}");
 
-        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    public void getRenderedTitleWhenMatchingTitleHeaderDepth()
+    {
+        // Configure XWiki to extract title from content
+        this.oldcore.getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
+
+        this.document.setContent("=== level3");
+
+        // Overwrite the title heading depth.
+        when(this.displayConfiguration.getTitleHeadingDepth()).thenReturn(3);
+
+        assertEquals("level3", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
+    }
+
+    @Test
+    public void getRenderedTitleWhenNotMatchingTitleHeaderDepth()
+    {
+        this.document.setContent("=== level3");
+
+        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, this.oldcore.getXWikiContext()));
     }
 
     /**
      * See XWIKI-5277 for details.
      */
-    public void testGetRenderedContentCleansVelocityMacroCache() throws Exception
+    @Test
+    public void getRenderedContentCleansVelocityMacroCache() throws Exception
     {
         // Make sure we start not in the rendering engine since this is what happens in real: a document is
         // called by a template thus outside of the rendering engine.
-        getContext().remove("isInRenderingEngine");
+        this.oldcore.getXWikiContext().remove("isInRenderingEngine");
 
         // We display a text area since we know that rendering a text area will call getRenderedContent inside our top
         // level getRenderedContent call, thus testing that velocity macros are not removed during nested calls to
         // getRenderedContent.
         this.baseObject.setLargeStringValue("area", "{{velocity}}#macro(testmacrocache)ok#end{{/velocity}}");
         this.document.setContent("{{velocity}}$doc.display(\"area\")#testmacrocache{{/velocity}}");
-        this.document.setSyntax(Syntax.XWIKI_2_0);
 
         // We need to put the current doc in the Velocity Context since it's normally set before the rendering is
         // called in the execution flow.
-        VelocityManager originalVelocityManager = getComponentManager().getInstance(VelocityManager.class);
+        VelocityManager originalVelocityManager = this.componentManager.getInstance(VelocityManager.class);
         VelocityContext vcontext = originalVelocityManager.getVelocityContext();
-        vcontext.put("doc", new Document(this.document, getContext()));
+        vcontext.put("doc", new Document(this.document, this.oldcore.getXWikiContext()));
 
         // Register a Mock for the VelocityManager to bypass skin APIs that we would need to mock otherwise.
-        Mock mockVelocityManager = registerMockComponent(VelocityManager.class);
-        mockVelocityManager.stubs().method("getCurrentVelocityContext").will(returnValue(vcontext));
+        VelocityManager velocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
+        when(velocityManager.getCurrentVelocityContext()).thenReturn(vcontext);
 
-        VelocityFactory velocityFactory = getComponentManager().getInstance(VelocityFactory.class);
+        VelocityFactory velocityFactory = this.componentManager.getInstance(VelocityFactory.class);
         VelocityEngine vengine = velocityFactory.createVelocityEngine("default", new Properties());
-
-        mockVelocityManager.stubs().method("getVelocityEngine").will(returnValue(vengine));
-        mockVelocityManager.stubs().method("evaluate").will(new CustomStub("evaluate")
-        {
-            @Override
-            public Object invoke(Invocation invocation) throws Throwable
-            {
-                return vengine.evaluate(vcontext, (Writer) invocation.parameterValues.get(0),
-                    (String) invocation.parameterValues.get(1), (Reader) invocation.parameterValues.get(2));
-            }
-        });
-
-        // $doc.display will ask for the syntax of the current document so we need to mock it.
-        this.mockXWiki.stubs().method("getCurrentContentSyntaxId").with(eq("xwiki/2.0"), ANYTHING)
-            .will(returnValue("xwiki/2.0"));
+        when(velocityManager.getVelocityEngine()).thenReturn(vengine);
+        when(velocityManager.evaluate(any(), any(), any()))
+            .thenAnswer(invocation -> vengine.evaluate(vcontext, invocation.getArgument(0),
+                invocation.getArgument(1), (Reader) invocation.getArgument(2)));
 
         // Verify that the macro located inside the TextArea has been taken into account when executing the doc's
         // content.
-        assertEquals("<p>ok</p>", this.document.getRenderedContent(getContext()));
+        assertEquals("<p>ok</p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
     }
 
     @Test
-    public void testGetRenderedTitleWhenMatchingTitleHeaderDepth()
-    {
-        this.document.setContent("=== level3");
-        this.document.setSyntax(Syntax.XWIKI_2_0);
-
-        getConfigurationSource().setProperty("xwiki.title.compatibility", "1");
-
-        // Overwrite the title heading depth.
-        this.mockDisplayConfiguration.stubs().method("getTitleHeadingDepth").will(returnValue(3));
-
-        assertEquals("level3", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-    }
-
-    @Test
-    public void testGetRenderedTitleWhenNotMatchingTitleHeaderDepth()
-    {
-        this.document.setContent("=== level3");
-        this.document.setSyntax(Syntax.XWIKI_2_0);
-
-        assertEquals("Page", this.document.getRenderedTitle(Syntax.XHTML_1_0, getContext()));
-    }
-
-    public void testGetRenderedContent() throws XWikiException
+    public void getRenderedContentWithAndWithoutTranslations() throws Exception
     {
         this.document.setContent("**bold**");
         this.document.setSyntax(Syntax.XWIKI_2_0);
 
-        assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(getContext()));
+        // Check the content from the default document
+        assertEquals("<p><strong>bold</strong></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
 
-        this.translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
-        this.translatedDocument.setContent("//italic//");
-        this.translatedDocument.setSyntax(Syntax.XWIKI_1_0);
-        this.translatedDocument.setNew(false);
+        // Create a translation and set the current language to be that of the translation to verify that the rendered
+        // content is that of the translated document
+        // Note that this also verifies that the translation can have a different syntax than the default doc.
+        XWikiDocument translatedDocument = new XWikiDocument(this.document.getDocumentReference(), Locale.FRENCH);
+        translatedDocument.setContent("//italic//");
+        translatedDocument.setSyntax(Syntax.XWIKI_1_0);
+        translatedDocument.setNew(false);
 
-        this.mockXWiki.stubs().method("getLanguagePreference").will(returnValue(Locale.FRENCH.toString()));
-        this.mockXWiki.stubs().method("getDocument").with(eq(
-            new DocumentReference(this.translatedDocument.getDocumentReference(), this.translatedDocument.getLocale())),
-            ANYTHING).will(returnValue(this.translatedDocument));
+        doReturn(Locale.FRENCH.toString()).when(this.xwiki).getLanguagePreference(any());
+        doReturn(translatedDocument).when(this.xwiki).getDocument(
+            eq(new DocumentReference(translatedDocument.getDocumentReference(), translatedDocument.getLocale())),
+            any());
+        assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
 
-        assertEquals("<p><em>italic</em></p>", this.document.getRenderedContent(getContext()));
-        assertEquals("<p><strong>bold</strong></p>", this.document.displayDocument(getContext()));
+        assertEquals("<p><strong>bold</strong></p>", this.document.displayDocument(this.oldcore.getXWikiContext()));
     }
 
-    public void testGetRenderedContentRights() throws XWikiException
+    @Test
+    public void getRenderedContentIsForcingCurrentDocumentAsTheSecurityDocument() throws Exception
     {
-        getContext().remove("sdoc");
+        // Remove whatever security document there is, to prove that a new security document is forced (it's set as
+        // the current document).
+        this.oldcore.getXWikiContext().remove("sdoc");
 
         this.document.setContent("{{velocity}}$xcontext.sdoc{{/velocity}}");
-        this.document.setSyntax(Syntax.XWIKI_2_1);
 
-        assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(getContext()));
+        // Verifies that a security document is always set,  independently of what was set before the execution of
+        // getRenderedContent().
+        assertEquals("<p>Space.Page</p>", this.document.getRenderedContent(this.oldcore.getXWikiContext()));
     }
 
-    public void testGetRenderedContentTextWithSourceSyntax()
+    @Test
+    public void getRenderedContentTextWithSourceSyntaxSpecified()
     {
         this.document.setSyntax(Syntax.XWIKI_1_0);
 
         assertEquals("<p><strong>bold</strong></p>",
-            this.document.getRenderedContent("**bold**", "xwiki/2.0", getContext()));
+            this.document.getRenderedContent("**bold**", "xwiki/2.0", this.oldcore.getXWikiContext()));
     }
 
-    public void testGetRenderedContentTextRights() throws XWikiException
+    @Test
+    public void getRenderedContentTextRights() throws Exception
     {
         XWikiDocument otherDocument = new XWikiDocument(new DocumentReference("otherwiki", "otherspace", "otherpage"));
         otherDocument.setContentAuthorReference(new DocumentReference("otherwiki", "XWiki", "othercontentauthor"));
         XWikiDocument sdoc = new XWikiDocument(new DocumentReference("callerwiki", "callerspace", "callerpage"));
         sdoc.setContentAuthorReference(new DocumentReference("callerwiki", "XWiki", "calleruser"));
-        Document apiDocument = this.document.newDocument(getContext());
+        Document apiDocument = this.document.newDocument(this.oldcore.getXWikiContext());
 
-        getContext().setDoc(null);
+        this.oldcore.getXWikiContext().setDoc(null);
 
         String content =
-            "{{velocity}}" + "$xcontext.sdoc.contentAuthorReference $xcontext.doc $xcontext.doc.contentAuthorReference"
+            "{{velocity}}$xcontext.sdoc.contentAuthorReference $xcontext.doc $xcontext.doc.contentAuthorReference"
                 + "{{/velocity}}";
 
         this.document.setContentAuthorReference(new DocumentReference("authorwiki", "XWiki", "contentauthor"));
 
         assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), getContext()));
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), this.oldcore.getXWikiContext()));
 
         assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
             apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
@@ -431,12 +384,12 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
 
         assertEquals("<p>otherwiki:XWiki.othercontentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
             this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), false, otherDocument,
-                getContext()));
+                this.oldcore.getXWikiContext()));
 
-        getContext().setDoc(otherDocument);
+        this.oldcore.getXWikiContext().setDoc(otherDocument);
 
         assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), getContext()));
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), this.oldcore.getXWikiContext()));
 
         assertEquals("<p>otherwiki:XWiki.othercontentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
             apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
@@ -444,11 +397,11 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("<p>otherwiki:XWiki.othercontentauthor Space.Page authorwiki:XWiki.contentauthor</p>",
             apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), Syntax.XHTML_1_0.toIdString()));
 
-        getContext().put("sdoc", sdoc);
-        getContext().setDoc(this.document);
+        this.oldcore.getXWikiContext().put("sdoc", sdoc);
+        this.oldcore.getXWikiContext().setDoc(this.document);
 
         assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), getContext()));
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), this.oldcore.getXWikiContext()));
 
         assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
             apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
@@ -456,16 +409,15 @@ public class XWikiDocumentRenderingTest extends AbstractBridgedXWikiComponentTes
         assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
             apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), Syntax.XHTML_1_0.toIdString()));
 
-        getContext().setDoc(otherDocument);
+        this.oldcore.getXWikiContext().setDoc(otherDocument);
 
         assertEquals("<p>$xcontext.sdoc.contentAuthorReference Space.Page authorwiki:XWiki.contentauthor</p>",
-            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), getContext()));
+            this.document.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), this.oldcore.getXWikiContext()));
 
         assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
             apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString()));
 
         assertEquals("<p>callerwiki:XWiki.calleruser Space.Page authorwiki:XWiki.contentauthor</p>",
             apiDocument.getRenderedContent(content, Syntax.XWIKI_2_1.toIdString(), Syntax.XHTML_1_0.toIdString()));
-
     }
 }

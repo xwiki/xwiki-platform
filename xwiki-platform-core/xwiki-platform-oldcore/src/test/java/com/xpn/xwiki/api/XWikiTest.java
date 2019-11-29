@@ -20,9 +20,6 @@
 package com.xpn.xwiki.api;
 
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,13 +52,8 @@ import static org.mockito.Mockito.when;
 @ReferenceComponentList
 public class XWikiTest
 {
-    public static final Random rand = new Random(Calendar.getInstance().getTimeInMillis());
-
     private Document apiDocument;
-
     private XWiki apiXWiki;
-
-    private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
     @BeforeEach
     public void setup(MockitoOldcore mockitoOldcore) throws XWikiException

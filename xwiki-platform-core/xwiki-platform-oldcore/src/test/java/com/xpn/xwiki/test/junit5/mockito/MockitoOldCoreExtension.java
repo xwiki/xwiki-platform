@@ -92,9 +92,14 @@ public class MockitoOldCoreExtension extends MockitoComponentManagerExtension
     protected void initializeMockitoComponentManager(Object testInstance, MockitoComponentManager mcm,
         ExtensionContext context) throws Exception
     {
+        OldcoreTest annotation = testInstance.getClass().getAnnotation(OldcoreTest.class);
+        
         // Create & save MockitoOldCore
         removeMockitoOldcore(context);
+
         MockitoOldcore oldcore = new MockitoOldcore(mcm);
+        oldcore.mockXWiki(annotation.mockXWiki());
+
         saveMockitoOldcore(context, oldcore);
 
         // Inject the MockitoOldcore instance in all fields annotated with @InjectMockitoOldcore

@@ -3049,7 +3049,7 @@ public class XWiki implements EventListener
         }
 
         // If the wiki is non multilingual then the language is the default language.
-        if (!context.getWiki().isMultiLingual(context)) {
+        if (!isMultiLingual(context)) {
             locale = defaultLocale;
             context.setLocale(locale);
             return locale;

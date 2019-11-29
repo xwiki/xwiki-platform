@@ -128,8 +128,7 @@ public class XWikiDocumentTest
         this.xWikiStoreInterface = this.componentManager.registerMockComponent(XWikiStoreInterface.class);
         this.velocityManager = this.componentManager.registerMockComponent(VelocityManager.class);
         VelocityEngine mockVelocityEngine = this.componentManager.registerMockComponent(VelocityEngine.class);
-        ExtendedRenderingConfiguration extendedRenderingConfiguration =
-            this.componentManager.registerMockComponent(ExtendedRenderingConfiguration.class);
+        this.componentManager.registerMockComponent(ExtendedRenderingConfiguration.class);
 
         when(velocityManager.getVelocityEngine()).thenReturn(mockVelocityEngine);
 
@@ -217,8 +216,7 @@ public class XWikiDocumentTest
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
 
-        assertEquals(new HashSet<String>(Arrays.asList("TargetPage", "TargetSpace.TargetPage")),
-            new HashSet<String>(linkedPages));
+        assertEquals(new HashSet<>(Arrays.asList("TargetPage", "TargetSpace.TargetPage")), new HashSet<>(linkedPages));
     }
 
     @Test
@@ -235,7 +233,7 @@ public class XWikiDocumentTest
 
         Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
 
-        assertEquals(new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome",
+        assertEquals(new LinkedHashSet<>(Arrays.asList("Space.TargetPage.WebHome",
             "TargetSpace.TargetPage.WebHome", "targetwiki:TargetSpace.TargetPage.WebHome")), linkedPages);
     }
 
@@ -256,7 +254,7 @@ public class XWikiDocumentTest
         Set<String> linkedPages = this.document.getUniqueLinkedPages(this.oldcore.getXWikiContext());
 
         assertEquals(
-            new LinkedHashSet<String>(Arrays.asList("Space.TargetPage.WebHome", "TargetSpace.TargetPage.WebHome",
+            new LinkedHashSet<>(Arrays.asList("Space.TargetPage.WebHome", "TargetSpace.TargetPage.WebHome",
                 "targetwiki:TargetSpace.TargetPage.WebHome", "OtherPage.WebHome", "AttachSpace.AttachDocument.WebHome",
                 "ImageSpace.ImageDocument.WebHome", "Space.ObjectTargetPage.WebHome")),
             linkedPages);
@@ -739,7 +737,7 @@ public class XWikiDocumentTest
         when(this.xWiki.getDocument(eq(targetReference), any())).thenReturn(targetDocument);
 
         this.document.rename(new DocumentReference("newwikiname", "newspace", "newpage"),
-            Collections.<DocumentReference>emptyList(), Collections.<DocumentReference>emptyList(),
+            Collections.emptyList(), Collections.emptyList(),
             this.oldcore.getXWikiContext());
 
         // Test links
@@ -747,7 +745,7 @@ public class XWikiDocumentTest
     }
 
     /**
-     * @see XWIKI-7515: 'getIncludedPages' in class com.xpn.xwiki.api.Document threw java.lang.NullPointerException
+     * @see "XWIKI-7515: 'getIncludedPages' in class com.xpn.xwiki.api.Document threw java.lang.NullPointerException"
      */
     @Test
     public void getIncludedPages()
@@ -785,14 +783,13 @@ public class XWikiDocumentTest
     {
         final Execution execution = this.oldcore.getMocker().getInstance(Execution.class);
 
-        when(this.velocityManager.getVelocityContext()).then(invocationOnMock -> {
-            return (VelocityContext) execution.getContext().getProperty("velocityContext");
-        });
+        when(this.velocityManager.getVelocityContext())
+            .then(invocationOnMock -> execution.getContext().getProperty("velocityContext"));
 
         VelocityContext oldVelocityContext = new VelocityContext();
         execution.getContext().setProperty("velocityContext", oldVelocityContext);
 
-        Map<String, Object> backup = new HashMap<String, Object>();
+        Map<String, Object> backup = new HashMap<>();
         XWikiDocument.backupContext(backup, this.oldcore.getXWikiContext());
 
         VelocityContext newVelocityContext = (VelocityContext) execution.getContext().getProperty("velocityContext");

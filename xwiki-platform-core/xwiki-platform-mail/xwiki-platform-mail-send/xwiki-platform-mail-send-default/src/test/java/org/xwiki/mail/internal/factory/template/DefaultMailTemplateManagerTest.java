@@ -28,7 +28,6 @@ import java.util.Locale;
 import javax.inject.Provider;
 import javax.mail.MessagingException;
 
-import org.apache.velocity.VelocityContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -48,6 +47,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.velocity.VelocityEvaluator;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.test.reference.ReferenceComponentList;
 import com.xpn.xwiki.web.XWikiRequest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -121,11 +121,11 @@ public class DefaultMailTemplateManagerTest
         VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
         when(this.velocityEvaluator.evaluateVelocity(eq("Hello <b>${name}</b> <br />${email}"), any(),
-            any(VelocityContext.class))).thenReturn("Hello <b>John Doe</b> <br />john@doe.com");
+            any())).thenReturn("Hello <b>John Doe</b> <br />john@doe.com");
 
         String result = this.templateManager.evaluate(documentReference, "html", Collections.emptyMap());
 
-        assertEquals(result, "Hello <b>John Doe</b> <br />john@doe.com");
+        assertEquals("Hello <b>John Doe</b> <br />john@doe.com", result);
     }
 
     @Test
@@ -142,7 +142,7 @@ public class DefaultMailTemplateManagerTest
         VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
         when(this.velocityEvaluator.evaluateVelocity(eq("Salut <b>${name}</b> <br />${email}"), any(),
-            any(VelocityContext.class))).thenReturn("Salut <b>John Doe</b> <br />john@doe.com");
+            any())).thenReturn("Salut <b>John Doe</b> <br />john@doe.com");
 
         // Set the default Locale to be different from the locale we pass to verify we restore it properly
         when(this.xwikiContext.getLocale()).thenReturn(Locale.ITALIAN);
@@ -178,7 +178,7 @@ public class DefaultMailTemplateManagerTest
         VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
         when(this.velocityEvaluator.evaluateVelocity(eq("Salut <b>${name}</b> <br />${email}"), any(),
-            any(VelocityContext.class))).thenReturn("Salut <b>John Doe</b> <br />john@doe.com");
+            any())).thenReturn("Salut <b>John Doe</b> <br />john@doe.com");
 
         String result = this.templateManager.evaluate(documentReference, "html", Collections.emptyMap(),
             Locale.FRENCH);
@@ -208,7 +208,7 @@ public class DefaultMailTemplateManagerTest
         VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
         when(this.velocityEvaluator.evaluateVelocity(eq("Salut <b>${name}</b> <br />${email}"), any(),
-            any(VelocityContext.class))).thenReturn("Salut <b>John Doe</b> <br />john@doe.com");
+            any())).thenReturn("Salut <b>John Doe</b> <br />john@doe.com");
 
         String result = this.templateManager.evaluate(documentReference, "html", Collections.emptyMap(),
             Locale.FRENCH);
@@ -260,7 +260,7 @@ public class DefaultMailTemplateManagerTest
         when(velocityManager.getVelocityEngine()).thenReturn(velocityEngine);
 
         when(this.velocityEvaluator.evaluateVelocity(eq("Hello <b>${name}</b> <br />${email}"), any(),
-            any(VelocityContext.class))).thenThrow(new XWikiException(0, 0, "Error"));
+            any())).thenThrow(new XWikiException(0, 0, "Error"));
 
         Throwable exception = assertThrows(MessagingException.class,
             () -> this.templateManager.evaluate(documentReference, "html", Collections.emptyMap()));

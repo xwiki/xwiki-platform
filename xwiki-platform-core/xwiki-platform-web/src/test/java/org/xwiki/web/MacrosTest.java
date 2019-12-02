@@ -24,11 +24,12 @@ import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
-import org.junit.Before;
-import org.junit.Test;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.velocity.tools.EscapeTool;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for the {@code macros.vm}.
@@ -37,23 +38,20 @@ import static org.junit.Assert.assertEquals;
  */
 public class MacrosTest
 {
-    private static final String BASEDIR =
-        "/media/data/projets/xwiki/src/git/xwiki-platform/xwiki-platform-core/xwiki-platform-web";
+    private static final String TEMPLATES_PATH = "src/main/webapp/templates";
 
     private VelocityEngine ve;
 
     private VelocityContext context;
 
-    @Before
+    @BeforeEach
     public void setup()
     {
         this.ve = new VelocityEngine();
         Properties props = new Properties();
-        String path = String.format("%s/src/main/webapp/templates", BASEDIR);
-        props.setProperty("file.resource.loader.path", path);
-        props.setProperty("directive.set.null.allowed", "true");
-        props.setProperty("velocimacro.permissions.allow.inline.local.scope", "true");
-        props.setProperty("velocimacro.library", "macros.vm");
+        props.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_PATH, TEMPLATES_PATH);
+        props.setProperty(RuntimeConstants.VM_PERM_INLINE_LOCAL, Boolean.TRUE.toString());
+        props.setProperty(RuntimeConstants.VM_LIBRARY, "macros.vm");
         this.ve.init(props);
 
         this.context = new VelocityContext();

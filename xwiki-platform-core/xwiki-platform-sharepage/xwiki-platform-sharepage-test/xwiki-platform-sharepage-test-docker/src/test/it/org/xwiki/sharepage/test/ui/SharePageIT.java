@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @version $Id$
  * @since 7.0RC1
  */
-@UITest(servletEngine = ServletEngine.TOMCAT,
+@UITest(
     sshPorts = {
         // Open the GreenMail port so that the XWiki instance inside a Docker container can use the SMTP server provided
         // by GreenMail running on the host.

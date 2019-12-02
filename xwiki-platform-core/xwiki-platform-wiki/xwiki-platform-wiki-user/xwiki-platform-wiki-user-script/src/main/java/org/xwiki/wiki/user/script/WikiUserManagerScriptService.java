@@ -337,15 +337,17 @@ public class WikiUserManagerScriptService implements ScriptService
 
         // Test if the user is concerned by the candidacy...
         DocumentReference candidacyUser = documentReferenceResolver.resolve(candidacy.getUserId());
-        if (context.getUserReference().equals(candidacyUser)) {
+        DocumentReference userReference = context.getUserReference();
+
+        // userReference can be null in case of guest user
+        if (userReference != null && userReference.equals(candidacyUser)) {
             // Hide the admin private comment
             candidacy.setAdminPrivateComment(null);
             return true;
         }
 
         // Otherwise the user must be an admin.
-        return authorizationManager.hasAccess(Right.ADMIN, context.getUserReference(),
-                new WikiReference(candidacy.getWikiId()));
+        return authorizationManager.hasAccess(Right.ADMIN, userReference, new WikiReference(candidacy.getWikiId()));
     }
 
     /**

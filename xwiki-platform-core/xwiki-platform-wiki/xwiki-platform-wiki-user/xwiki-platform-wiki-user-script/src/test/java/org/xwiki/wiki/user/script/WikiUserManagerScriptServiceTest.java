@@ -599,6 +599,34 @@ public class WikiUserManagerScriptServiceTest
     }
 
     @Test
+    public void getCandidacyWhenGuest() throws Exception
+    {
+        // Mocks
+
+        // The current user is Guest
+        when(xcontext.getUserReference()).thenReturn(null);
+
+        MemberCandidacy candidacy = new MemberCandidacy("subwiki", "mainWiki:XWiki.OtherUser",
+            MemberCandidacy.CandidateType.REQUEST);
+        candidacy.setId(12);
+        when(wikiUserManager.getCandidacy("subwiki", candidacy.getId())).thenReturn(candidacy);
+
+
+        // The current user does not have ADMIN right
+        when(authorizationManager.hasAccess(eq(Right.ADMIN), eq(userDocRef),
+            eq(new WikiReference("subwiki")))).thenReturn(false);
+
+        // Test
+        MemberCandidacy result = mocker.getComponentUnderTest().getCandidacy("subwiki", 12);
+
+        // Asserts
+        assertNull(result);
+        Exception exception = mocker.getComponentUnderTest().getLastError();
+        assertTrue(exception instanceof WikiUserManagerScriptServiceException);
+        assertEquals("You are not allowed to see this candidacy.", exception.getMessage());
+    }
+
+    @Test
     public void getCandidacyWhenError() throws Exception
     {
         // Mocks

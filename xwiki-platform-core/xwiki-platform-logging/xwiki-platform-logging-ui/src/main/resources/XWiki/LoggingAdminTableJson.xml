@@ -43,7 +43,7 @@
 ##==============================
 ## Offset = item # at which to start displaying data
 ##==============================
-#set($offset = $mathtool.toInteger($request.offset))
+#set($offset = $numbertool.toNumber($request.offset).intValue())
 ## If no offset is specified, start at 0
 #if (!$offset)
   #set($offset = 0)
@@ -57,7 +57,7 @@
 ##==================
 ## Limit = # of items to display
 ##==================
-#set($limit = $mathtool.toInteger($request.limit))
+#set($limit = $numbertool.toNumber($request.limit).intValue())
 ## If no limit is specified, limit at 15 items
 #if (!$limit)
   #set ($limit = 15)
@@ -135,10 +135,10 @@
   "matchingtags": {},
   "tags" : [],
   "returnedrows": $resultLog.size(),
-  "offset": $mathtool.toInteger($request.offset),
+  "offset": $numbertool.toNumber($request.offset).intValue(),
   "sort": "$request.sort",
   "dir": "$request.dir",
-  "reqNo": $mathtool.toInteger($request.reqNo),
+  "reqNo": $numbertool.toNumber($request.reqNo).intValue(),
   "rows": [
   #foreach( $logger in $resultLog )
     #if($velocityCount &gt; 1) , #end

@@ -323,7 +323,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #end
   #set ($options = {
     'classname' : ${request.get('classname')},
-    'object' : $!{mathtool.toInteger($request.object)},
+    'object' : $!{numbertool.toNumber($request.object).intValue()},
     'property' : ${request.property},
     'displayImage' : ${displayImage},
     'docAction' : ${docAction},
@@ -1413,7 +1413,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
 #end
 #set ($classname = "$!{xcontext.macro.params.classname}")
 #set ($property = "$!{xcontext.macro.params.property}")
-#set ($object = $mathtool.toInteger("$!{xcontext.macro.params.object}"))
+#set ($object = $numbertool.toNumber("$!{xcontext.macro.params.object}").intValue())
 #if ("$!{object}" != $!{xcontext.macro.params.object})
   #set ($object = ${doc.getObject($classname).number})
   #if ("$!{object}" == '')

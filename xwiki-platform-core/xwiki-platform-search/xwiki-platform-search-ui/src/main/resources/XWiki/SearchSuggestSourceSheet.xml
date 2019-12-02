@@ -40,7 +40,7 @@
 #set ($className = 'XWiki.SearchSuggestSourceClass')
 #set ($class = $xwiki.getDocument($className).xWikiClass)
 #if (!$object &amp;&amp; "$!request.xobjectNumber" != '')
-  #set ($object = $doc.getObject($className, $mathtool.toInteger($request.xobjectNumber)))
+  #set ($object = $doc.getObject($className, $numbertool.toNumber($request.xobjectNumber).intValue()))
 #end
 #if (!$object)
   #set ($object = $doc.getObject($className, true))

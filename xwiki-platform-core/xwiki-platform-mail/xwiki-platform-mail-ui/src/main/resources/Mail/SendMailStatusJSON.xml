@@ -42,7 +42,7 @@
   ##==================================================
   ## Offset = item # at which to start displaying data
   ##==================================================
-  #set($offset = $mathtool.toInteger($request.get('offset')))
+  #set($offset = $numbertool.toNumber($request.get('offset')).intValue())
   ## Offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
   #if(!$offset || $offset &lt; 0)
@@ -51,7 +51,7 @@
   ##==============================
   ## Limit = # of items to display
   ##==============================
-  #set($limit = $mathtool.toInteger($request.get('limit')))
+  #set($limit = $numbertool.toNumber($request.get('limit')).intValue())
   #if(!$limit)
     #set ($limit = 15)
   #end
@@ -112,10 +112,10 @@
     'matchingtags': {},
     'tags' : [],
     'returnedrows': $results.size(),
-    'offset': $mathtool.toInteger($request.offset),
+    'offset': $numbertool.toNumber($request.offset).intValue(),
     'sort': $request.sort,
     'dir': $request.dir,
-    'reqNo': $mathtool.toInteger($request.reqNo),
+    'reqNo': $numbertool.toNumber($request.reqNo).intValue(),
     'rows': $rows })
   #foreach($item in $results)
     #set ($row = {

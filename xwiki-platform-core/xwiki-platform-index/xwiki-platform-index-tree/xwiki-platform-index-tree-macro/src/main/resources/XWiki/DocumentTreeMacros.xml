@@ -157,11 +157,11 @@
     ## Return the children of the specified node.
     #set ($actualNodeId = $nodeId)
   #end
-  #set ($offset = $mathtool.max($mathtool.toInteger($request.offset), 0))
+  #set ($offset = $mathtool.max($numbertool.toNumber($request.offset).intValue(), 0))
   #if ("$!offset" == '')
     #set ($offset = 0)
   #end
-  #set ($limit = $mathtool.max($mathtool.toInteger($request.limit), 1))
+  #set ($limit = $mathtool.max($numbertool.toNumber($request.limit).intValue(), 1))
   #if ("$!limit" == '')
     #set ($limit = 15)
   #end
@@ -715,8 +715,8 @@
   ## Object name is: Space.Class[index]
   #set ($separatorIndex = $objectReference.name.lastIndexOf('['))
   #set ($classId = $objectReference.name.substring(0, $separatorIndex))
-  #set ($objectNumber = $mathtool.toInteger($objectReference.name.substring($mathtool.add($separatorIndex, 1),
-    $mathtool.sub($objectReference.name.length(), 1))))
+  #set ($objectNumber = $numbertool.toNumber($objectReference.name.substring($mathtool.add($separatorIndex, 1),
+    $mathtool.sub($objectReference.name.length(), 1))).intValue())
   #set ($document = $xwiki.getDocument($objectReference))
   #set ($object = $document.getObject($classId, $objectNumber))
 #end

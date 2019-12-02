@@ -71,7 +71,7 @@
 
 #set ($crtCategoryId = "$!{request.category}")
 #if ($crtCategoryId != '')
-  #set ($crtCategoryId = $mathtool.toInteger($crtCategoryId))
+  #set ($crtCategoryId = $numbertool.toNumber($crtCategoryId).intValue())
 #end
 #set ($crtSectionId = "$!{request.section}")
 #set ($crtSyntaxVer = "$!{request.syntax}")

@@ -185,13 +185,13 @@
 * We override the following macro from XWiki.LiveTableResultsMacros to disable the filter on hidden documents and to display wiki ui properties with a custom code
 *#
 #macro(gridresult_buildRowsJSON $map)
-  #set($offset = $mathtool.toInteger($request.get('offset')))
+  #set($offset = $numbertool.toNumber($request.get('offset')).intValue())
   ## offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
   #if (!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
-  #set($limit = $mathtool.toInteger($request.get('limit')))
+  #set($limit = $numbertool.toNumber($request.get('limit')).intValue())
   #if (!$limit)
     #set ($limit = 15)
   #end

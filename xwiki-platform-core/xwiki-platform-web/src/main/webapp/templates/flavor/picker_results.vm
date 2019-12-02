@@ -1,2 +1,2 @@
 #template('flavor/macros.vm')
-#displayFlavorPicker_results($request.fieldName, '', true, $mathtool.toInteger($request.firstIndex), $request.namespace)
+#displayFlavorPicker_results($request.fieldName, '', true, $numbertool.toNumber($request.firstIndex).intValue(), $request.namespace)

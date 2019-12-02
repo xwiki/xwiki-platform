@@ -893,12 +893,12 @@ $xwiki.ssx.use('Main.Activity')##
 ## Number of entries to display
 #readVariableFromRequest('aEntries' 'entries' 20)
 #if ($aEntries == 20 &amp;&amp; $xcontext.macro.params.get('entries'))
-  #set ($aEntries = $mathtool.toInteger($xcontext.macro.params.get('entries')))
+  #set ($aEntries = $numbertool.toNumber($xcontext.macro.params.get('entries')).intValue())
 #end
 ## Number of activities to display for each entry
 #readVariableFromRequest('aSubEntries' 'subentries' 10)
 #if ($aSubEntries == 10 &amp;&amp; $xcontext.macro.params.get('subentries'))
-  #set ($aSubEntries = $mathtool.toInteger($xcontext.macro.params.get('subentries')))
+  #set ($aSubEntries = $numbertool.toNumber($xcontext.macro.params.get('subentries')).intValue())
 #end
 ## Wikis
 #readVariableFromRequest('aWikis' 'wikis' [])
@@ -1269,7 +1269,7 @@ $xwiki.ssx.use('Main.Activity')##
   #isDocumentVersionValid($event)
   #if ($isDocumentVersionValid)
     #set ($pageDocRevision = $xwiki.getDocument($xwiki.getDocument($event.page), $event.version))
-    #set ($commentContent = $!pageDocRevision.getObject('XWiki.XWikiComments', $mathtool.toInteger($event.param2)).getProperty('comment').value)
+    #set ($commentContent = $!pageDocRevision.getObject('XWiki.XWikiComments', $numbertool.toNumber($event.param2).intValue()).getProperty('comment').value)
   #end
 #end
 #**
@@ -1283,7 +1283,7 @@ $xwiki.ssx.use('Main.Activity')##
   #if ($isDocumentVersionValid)
     #set ($pageDocRevision = $xwiki.getDocument($xwiki.getDocument($event.page), $event.version))
     ## FIXME: Should we query the Annotations application's' configuration for the configured annotation class instead of hardcoding the default one? What about custom annotations?
-    #set ($annotationObject = $pageDocRevision.getObject('XWiki.XWikiComments', $mathtool.toInteger($event.param2)))
+    #set ($annotationObject = $pageDocRevision.getObject('XWiki.XWikiComments', $numbertool.toNumber($event.param2).intValue()))
     #set ($annotationSelection = $annotationObject.getProperty('selection').value)
     #set ($annotationText = $annotationObject.getProperty('comment').value)
     #set ($annotationTextSyntaxId = $pageDocRevision.getSyntax().toIdString())

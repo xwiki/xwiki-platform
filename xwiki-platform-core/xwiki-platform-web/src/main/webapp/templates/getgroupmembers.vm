@@ -1,6 +1,6 @@
 #template('xwikivars.vm')
-#set ($offset = $mathtool.toInteger($request.offset))
-#set ($limit = $mathtool.toInteger($request.limit))
+#set ($offset = $numbertool.toNumber($request.offset).intValue())
+#set ($limit = $numbertool.toNumber($request.limit).intValue())
 #set ($order = "$!request.dir" != 'desc')
 ##
 #set ($rm = $xwiki.rightsmanager)

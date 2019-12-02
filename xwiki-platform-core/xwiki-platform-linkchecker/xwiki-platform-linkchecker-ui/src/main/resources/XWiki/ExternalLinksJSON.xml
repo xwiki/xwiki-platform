@@ -43,7 +43,7 @@
 ##==============================
 ## Offset = item # at which to start displaying data
 ##==============================
-#set($offset = $mathtool.toInteger($request.get('offset')))
+#set($offset = $numbertool.toNumber($request.get('offset')).intValue())
 ## offset starts from 0 in velocity and 1 in javascript
 #set($offset = $offset - 1)
 #if (!$offset || $offset &lt; 0)
@@ -52,7 +52,7 @@
 ##==================
 ## Limit = # of items to display
 ##==================
-#set($limit = $mathtool.toInteger($request.get('limit')))
+#set($limit = $numbertool.toNumber($request.get('limit')).intValue())
 #if (!$limit)
   #set ($limit = 15)
 #end
@@ -109,7 +109,7 @@
   'tags': [],
   'returnedrows':  $resultList.size(),
   'offset': $mathtool.add($offset, 1),
-  'reqNo': $mathtool.toInteger($request.reqNo),
+  'reqNo': $numbertool.toNumber($request.reqNo).intValue(),
   'rows': []
 })
 #foreach ($entry in $resultList)

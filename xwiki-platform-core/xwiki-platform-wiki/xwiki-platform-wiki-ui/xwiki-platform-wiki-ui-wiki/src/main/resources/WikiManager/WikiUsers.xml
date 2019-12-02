@@ -254,7 +254,7 @@
     #if ($request.acceptUser || $request.rejectUser)
       ## Handle a candidate members's request.
       ##
-      #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
+      #set ($candidateNumber = $numbertool.toNumber("$!{request.candidateNumber}").intValue())
       #set ($candidacy = $services.wiki.user.getCandidacy($wiki.id, $candidateNumber))
       #if ($candidacy &amp;&amp; $candidacy.status == 'PENDING')
         #if ($request.acceptUser)
@@ -348,7 +348,7 @@
     #elseif ($request.cancelInvitation)
       ##
       ## Handle cancelling an invitation.
-      #set ($candidateNumber = $mathtool.toInteger("$!{request.candidateNumber}"))
+      #set ($candidateNumber = $numbertool.toNumber("$!{request.candidateNumber}").intValue())
       #set ($candidateMember = $services.wiki.user.getCandidacy($wiki.id, $candidateNumber))
       #if ($candidateMember &amp;&amp; $candidateMember.status == 'PENDING')
         ## Remove the invitation

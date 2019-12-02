@@ -69,7 +69,7 @@
   #set ($fieldValue = $request.getParameter($fieldName))
   #if ("$!fieldValue" != '')
     #set ($range = $fieldValue.split('-'))
-    #set ($range = [$mathtool.toInteger($range.get(0)), $mathtool.toInteger($range.get(1))])
+    #set ($range = [$numbertool.toNumber($range.get(0)).intValue(), $numbertool.toNumber($range.get(1)).intValue()])
     #applyRangeFilter($fieldName $range $constraints $queryParameters)
   #end
 #end
@@ -138,13 +138,13 @@
 ## results serialized in JSON format.
 ## ========================================================================================
 #if ($xcontext.action == 'get')
-  #set ($offset = $mathtool.toInteger($request.offset))
+  #set ($offset = $numbertool.toNumber($request.offset).intValue())
   ## The offset sent by the live table starts at 1.
   #set ($offset = $offset - 1)
   #if (!$offset || $offset &lt; 0)
     #set ($offset = 0)
   #end
-  #set ($limit = $mathtool.toInteger($request.limit))
+  #set ($limit = $numbertool.toNumber($request.limit).intValue())
   #if (!$limit)
     #set ($limit = 15)
   #end
@@ -205,7 +205,7 @@
     "totalrows": $query.count(),
     "returnedrows": $mathtool.min($attachmentReferences.size(), $limit),
     "offset": $mathtool.add($offset, 1),
-    "reqNo": $mathtool.toInteger($request.reqNo),
+    "reqNo": $numbertool.toNumber($request.reqNo).intValue(),
     "rows": []
   })
   #foreach ($attachmentReference in $attachmentReferences)

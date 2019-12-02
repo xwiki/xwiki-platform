@@ -291,7 +291,7 @@
           #set ($customObject = "${request.nb}")
         #end
       #end
-      #set ($customObject = $mathtool.toInteger($customObject))
+      #set ($customObject = $numbertool.toNumber($customObject).intValue())
       #set ($q = "${q}&amp;object=${customObject}")
     #end
     #if ($hasCustomField)

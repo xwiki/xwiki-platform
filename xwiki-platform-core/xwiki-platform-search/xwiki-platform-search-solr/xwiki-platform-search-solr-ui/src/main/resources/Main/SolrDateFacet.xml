@@ -224,7 +224,7 @@
     $escapetool.xml($facetValue.label)
   #elseif ($facetValue.start || $facetValue.end)
     ## Compute the client timezone.
-    #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
+    #set ($timezoneOffsetInMinutes = $numbertool.toNumber($request.timezoneOffset).intValue())
     #set ($offsetHours = $timezoneOffsetInMinutes / 60)
     #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
     #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))
@@ -262,7 +262,7 @@
 
 #macro (handleCustomDateInterval)
   ## Compute the client timezone.
-  #set ($timezoneOffsetInMinutes = $mathtool.toInteger($request.timezoneOffset))
+  #set ($timezoneOffsetInMinutes = $numbertool.toNumber($request.timezoneOffset).intValue())
   #set ($offsetHours = $timezoneOffsetInMinutes / 60)
   #set ($offsetMinutes = $mathtool.abs($timezoneOffsetInMinutes) % 60)
   #set ($clientTimezone = $xwiki.jodatime.getTimezone($offsetHours, $offsetMinutes))

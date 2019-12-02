@@ -19,7 +19,7 @@
     #set($elapsedTimePercent = 100)
   #end
 
-  #set($elapsedTimePercentInt = $mathtool.toInteger($elapsedTimePercent))
+  #set($elapsedTimePercentInt = $numbertool.toNumber($elapsedTimePercent).intValue())
   <li#if($progressStep.children.size() > 0)#if ($elapsedTimePercentInt == 0) class="jstree-closed"#else class="jstree-open"#end#end>
   #if($elapsedTimePercent > 50)<strong>#end
     $progressStep.message

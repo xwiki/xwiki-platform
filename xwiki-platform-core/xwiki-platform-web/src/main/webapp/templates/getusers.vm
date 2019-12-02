@@ -44,8 +44,8 @@
 #end
 
 #set ($usersService = $xwiki.rightsmanager.usersApi)
-#set ($offset = $mathtool.toInteger($request.get('offset')))
-#set ($limit = $mathtool.toInteger($request.get('limit')))
+#set ($offset = $numbertool.toNumber($request.get('offset')).intValue())
+#set ($limit = $numbertool.toNumber($request.get('limit')).intValue())
 
 ## If the Rights Manager Plugin is not enabled, then return an empty JSON result.
 #if ("$!usersService" != '')
@@ -70,7 +70,7 @@
   'totalrows': $countUsers,
   'returnedrows': $mathtool.min($countUsers, $limit),
   'offset': $offset,
-  'reqNo': $mathtool.toInteger($request.reqNo),
+  'reqNo': $numbertool.toNumber($request.reqNo).intValue(),
   'rows': []
 })
 #foreach ($user in $users)

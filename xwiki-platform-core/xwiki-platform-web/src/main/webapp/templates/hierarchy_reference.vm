@@ -32,7 +32,7 @@
   #set($discard = $options.put('id', $escapetool.xml($request.id)))
 #end
 #if ("$!request.limit" != '')
-  #set ($limit = $mathtool.toInteger($request.limit))
+  #set ($limit = $numbertool.toNumber($request.limit).intValue())
   #set ($discard = $options.put('limit', $limit))
 #end
 #if ("$!request.local" != '')

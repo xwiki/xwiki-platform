@@ -318,13 +318,13 @@
  * @param $map stores the JSON in memory so that it can be adjusted before serialization
  *#
 #macro(gridresult_buildRowsJSON $map)
-  #set($offset = $mathtool.toInteger($request.get('offset')))
+  #set($offset = $numbertool.toNumber($request.get('offset')).intValue())
   ## Offset starts from 0 in velocity and 1 in javascript
   #set($offset = $offset - 1)
   #if(!$offset || $offset &lt; 0)
     #set($offset = 0)
   #end
-  #set($limit = $mathtool.toInteger($request.get('limit')))
+  #set($limit = $numbertool.toNumber($request.get('limit')).intValue())
   #if(!$limit)
     #set ($limit = 15)
   #end
@@ -491,7 +491,7 @@
     #set($discard = $map.put('sql', $sql))
     #set($discard = $map.put('params', $sqlParams))
   #end
-  #set($discard = $map.put('reqNo', $mathtool.toInteger($request.reqNo)))
+  #set($discard = $map.put('reqNo', $numbertool.toNumber($request.reqNo).intValue()))
   #gridresult_buildTagCloudJSON($map)
   #gridresult_buildRowsJSON($map)
 #end

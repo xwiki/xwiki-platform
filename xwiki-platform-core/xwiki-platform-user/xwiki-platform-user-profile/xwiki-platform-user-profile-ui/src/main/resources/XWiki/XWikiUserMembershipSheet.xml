@@ -73,13 +73,13 @@
       #end
       #set($filteredGroups = $descGroups)
     #end
-    #set($offset = $mathtool.toInteger($request.get('offset')))
+    #set($offset = $numbertool.toNumber($request.get('offset')).intValue())
     ## Offset starts from 0 in velocity and 1 in javascript
     #set($offset = $offset - 1)
     #if (!$offset || $offset &lt; 0)
       #set($offset = 0)
     #end
-    #set($limit = $mathtool.toInteger($request.get('limit')))
+    #set($limit = $numbertool.toNumber($request.get('limit')).intValue())
     #if (!$limit || $limit &lt; 0)
       #set ($limit = 15)
     #end

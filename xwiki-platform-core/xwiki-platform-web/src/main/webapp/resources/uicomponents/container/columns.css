@@ -1,5 +1,5 @@
 #set ($maxColumns = "$!request.maxColumns")
-#set ($maxColumnsNumber = $mathtool.toInteger($maxColumns))
+#set ($maxColumnsNumber = $numbertool.toNumber($maxColumns).intValue())
 #if (!$maxColumnsNumber || $maxColumnsNumber <= 0)
   #set ($maxColumnsNumber = 50)
 #end

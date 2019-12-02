@@ -8,7 +8,7 @@ $response.setStatus(500)##
     ## there's no easy way of getting that internal value, so we just assume it didn't change
     #set ($parameter = 33554432)
   #else
-    #set ($parameter = $mathtool.toInteger($parameter))
+    #set ($parameter = $numbertool.toNumber($parameter).intValue())
   #end
   #set ($parameter = "#dynamicsize($parameter)")
 #else

@@ -577,7 +577,7 @@
           #if (!$percent)
             #set ($percent = 0)
           #end
-          #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
+          #set ($percent = $numbertool.toNumber($mathtool.mul($percent, 100)).intValue())
           &lt;div class="ui-progress-bar green" style="width:${percent}%" id="wikicreation-progress-bar"&gt;&lt;/div&gt;
         &lt;/div&gt;
       &lt;/div&gt;

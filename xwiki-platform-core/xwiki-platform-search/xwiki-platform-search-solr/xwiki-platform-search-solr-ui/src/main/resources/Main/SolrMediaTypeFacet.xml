@@ -133,7 +133,7 @@
 
 #macro (displayMediaTypesWithPagination $categories)
   #set ($limitRequestParameter = "l_$facetField.name")
-  #set ($categoryLimit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
+  #set ($categoryLimit = $numbertool.toNumber($request.getParameter($limitRequestParameter)).intValue())
   #if ("$!categoryLimit" == '')
     #set ($categoryLimit = $solrConfig.facetPaginationStep)
   #end

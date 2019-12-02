@@ -150,7 +150,7 @@
   #foreach($uix in $services.uix.getExtensions($name))
     #if ($services.security.authorization.hasAccess('admin', $uix.authorReference, $services.wiki.currentWikiDescriptor.reference))
       #set ($separator = ("$!uix.getParameters().separator" == 'true'))
-      #set ($order = $mathtool.toInteger($uix.getParameters().order))
+      #set ($order = $numbertool.toNumber($uix.getParameters().order).intValue())
       #if ("$!order" == '')
         ## Fallback for incomplete/invalid extension orders to avoid breaking the display.
         #set ($order = 0)

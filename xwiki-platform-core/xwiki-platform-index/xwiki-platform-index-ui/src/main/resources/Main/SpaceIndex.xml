@@ -169,7 +169,7 @@ $services.localization.render('platform.index.spaceIndexDescription', [$space])
     ## 100 documents displayed by default if no value is specified
     #set ($limit = '100')
   #end
-  #set ($limit = $mathtool.toInteger($limit))
+  #set ($limit = $numbertool.toNumber($limit).intValue())
   ## Compute the XWQL portion related to sorting, based on the passed "sort" parameter
   ## Valid values are "creationDate", "modificationDate" and "docName"
   #set ($sort = $xcontext.macro.params.get('sort'))

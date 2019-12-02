@@ -13,7 +13,7 @@ $services.template.execute('logging_macros.vm')
       #if (!$percent)
         #set ($percent = 0)
       #end
-      #set ($percent = $mathtool.toInteger($mathtool.mul($percent, 100)))
+      #set ($percent = $numbertool.toNumber($mathtool.mul($percent, 100)).intValue())
       <div class="ui-progress-bar green" style="width:${percent}%"></div>
     </div>
     #if ($jobStatus && $jobStatus.logTail.size() > 0)
@@ -52,7 +52,7 @@ $services.template.execute('logging_macros.vm')
 #end
 
 #macro (getJobStatusJSON $status $json)
-  #set ($logOffset = $mathtool.toInteger($request.logOffset))
+  #set ($logOffset = $numbertool.toNumber($request.logOffset).intValue())
   #if (!$logOffset)
     #set ($logOffset = 0)
   #else

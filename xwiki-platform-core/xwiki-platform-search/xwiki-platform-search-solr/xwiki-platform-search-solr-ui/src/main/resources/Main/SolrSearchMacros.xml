@@ -252,7 +252,7 @@
 
 #macro (displaySearchFacetValuesLimited $facetValues $customQueryStringParameters $customValueDisplayer)
   #set ($limitRequestParameter = "l_$facetField.name")
-  #set ($limit = $mathtool.toInteger($request.getParameter($limitRequestParameter)))
+  #set ($limit = $numbertool.toNumber($request.getParameter($limitRequestParameter)).intValue())
   #if ("$!limit" == '')
     #set ($limit = $solrConfig.facetPaginationStep)
   #end
@@ -753,7 +753,7 @@ $services.localization.render('core.users.unknownUser')##
       #set ($discard = $filters.put($fieldName, $escapedValues))
       #if ($prefixFacets.contains($fieldName))
         #set ($parts = $parameter.value.get(0).split('/', 2))
-        #set ($length = $mathtool.toInteger($parts.get(0)) + 1)
+        #set ($length = $numbertool.toNumber($parts.get(0)).intValue() + 1)
         #set ($prefix = "$length/$parts.get(1)")
         #set ($discard = $query.bindValue("f.${fieldName}.facet.prefix", $prefix))
         #set ($discard = $prefixFacets.remove($fieldName))
@@ -817,11 +817,11 @@ $value##
   #end
   ##
   ## Pagination
-  #set ($rows = $mathtool.toInteger($request.rows))
+  #set ($rows = $numbertool.toNumber($request.rows).intValue())
   #if ("$!rows" == '')
     #set ($rows = 10)
   #end
-  #set ($start = $mathtool.toInteger($request.firstIndex))
+  #set ($start = $numbertool.toNumber($request.firstIndex).intValue())
   #if ("$!start" == '')
     #set ($start = 0)
   #end

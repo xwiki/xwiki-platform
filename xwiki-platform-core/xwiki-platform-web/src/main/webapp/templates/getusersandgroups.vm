@@ -4,10 +4,10 @@
 ###
 ###
 $response.setContentType("application/json")
-#set($offset = $mathtool.toInteger($request.get('offset')))
+#set($offset = $numbertool.toNumber($request.get('offset')).intValue())
 ## offset starts from 0 in velocity and 1 in javascript
 #set($off = $offset - 1)
-#set($limit = $mathtool.toInteger($request.get('limit')))
+#set($limit = $numbertool.toNumber($request.get('limit')).intValue())
 #set($rm = $xwiki.rightsmanager)
 ##
 ## Get all the request parameters which are filters
@@ -92,7 +92,7 @@ $response.setContentType("application/json")
 ### json starts
 #set($userGroupsMap = {})
 #set($discard = $userGroupsMap.put("totalrows", $matchedCount))
-#set($discard = $userGroupsMap.put("reqNo"    , $mathtool.toInteger($request.reqNo)))
+#set($discard = $userGroupsMap.put("reqNo"    , $numbertool.toNumber($request.reqNo).intValue()))
 #set($discard = $userGroupsMap.put("returnedrows", $mathtool.min($matchedCount, $limit)))
 #set($discard = $userGroupsMap.put("offset"   , $offset))
 #set($discard = $userGroupsMap.put("clsname"  , $clsname))

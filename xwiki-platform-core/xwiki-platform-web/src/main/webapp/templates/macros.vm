@@ -673,13 +673,13 @@ $fn
   ## Reuse existing variable, in case it is manually overriden somewhere else
   #if(!$itemsPerPage)
     #if($request.ipp)
-      #set($itemsPerPage = $mathtool.toInteger($request.ipp))
+      #set($itemsPerPage = $numbertool.toNumber($request.ipp).intValue())
     #else
       #set($itemsPerPage = $defaultItemsPerPage)
     #end
   #end
   ## Page numbers start at 1 outside this macro, but for internal computations we use 0-indexed values.
-  #set($currentPageNumber = $mathtool.toInteger($request.page) - 1)
+  #set($currentPageNumber = $numbertool.toNumber($request.page).intValue() - 1)
   #if(!$currentPageNumber || $currentPageNumber < 0)
     #set($currentPageNumber = 0)
   #end
@@ -1145,13 +1145,13 @@ $html
       #if ($defaultValue.class == 'class java.lang.Boolean')
         #set ($result = $util.parseBoolean($result))
       #elseif ($defaultValue.class == 'class java.lang.Integer')
-        #set ($result = $mathtool.toInteger($result))
+        #set ($result = $numbertool.toNumber($result).intValue())
       #elseif ($defaultValue.class == 'class java.lang.Float')
-        #set ($result = $mathtool.toNumber($result).floatValue())
+        #set ($result = $numbertool.toNumber($result).floatValue())
       #elseif ($defaultValue.class == 'class java.lang.Long')
-        #set ($result = $mathtool.toNumber($result).longValue())
+        #set ($result = $numbertool.toNumber($result).longValue())
       #elseif ($defaultValue.class == 'class java.lang.Double')
-        #set ($result = $mathtool.toDouble($result))
+        #set ($result = $numbertool.toDouble($result))
       #end
     #end
     #if ("$!result" == '')
@@ -2013,16 +2013,16 @@ function (row, i, table) {
   #end
   ## Get starting item number from request
   #set ($parameters.firstItem = "$!{request.get($parameters.itemParamName)}")
-  #set ($parameters.firstItem = $mathtool.toInteger($parameters.firstItem))
+  #set ($parameters.firstItem = $numbertool.toNumber($parameters.firstItem).intValue())
   #if (!$parameters.firstItem)
     #set ($parameters.firstItem = 0)
   #end
   ## Get number of items per page from request
-  #if (!$parameters.defaultItemsPerPage || $mathtool.toInteger($parameters.defaultItemsPerPage) <= 0)
+  #if (!$parameters.defaultItemsPerPage || $numbertool.toNumber($parameters.defaultItemsPerPage).intValue() <= 0)
     #set ($parameters.defaultItemsPerPage = 20)
   #end
   #set ($parameters.itemsPerPage = "$!{request.get($parameters.itemsPerPageParamName)}")
-  #set ($parameters.itemsPerPage = $mathtool.toInteger($parameters.itemsPerPage))
+  #set ($parameters.itemsPerPage = $numbertool.toNumber($parameters.itemsPerPage).intValue())
   #if (!$parameters.itemsPerPage || $parameters.itemsPerPage <= 0)
     #set ($parameters.itemsPerPage = $parameters.defaultItemsPerPage)
   #end

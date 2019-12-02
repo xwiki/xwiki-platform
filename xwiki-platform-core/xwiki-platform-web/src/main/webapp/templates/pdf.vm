@@ -22,13 +22,13 @@
     #set ($pageDoc = $xwiki.getDocument($page))
     $pageDoc.getRenderedContent()
     #if ($request.includechilds)
-      #set ($clevel = $mathtool.toInteger($request.includechilds))
+      #set ($clevel = $numbertool.toNumber($request.includechilds).intValue())
       #if (!$clevel)
         #set ($clevel = 0)
       #end
       #includeChildren($pageDoc $withPageBreaks)
     #elseif ($request.includelinks)
-      #set ($clevel = $mathtool.toInteger($request.includelinks))
+      #set ($clevel = $numbertool.toNumber($request.includelinks).intValue())
       #if (!$clevel)
         #set ($clevel = 0)
       #end

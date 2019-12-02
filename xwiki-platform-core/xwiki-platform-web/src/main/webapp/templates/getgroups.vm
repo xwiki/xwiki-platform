@@ -3,8 +3,8 @@
 #if ("$!request.name" != '')
   #set ($filterMap.name = $request.name)
 #end
-#set ($limit = $mathtool.toInteger($request.limit))
-#set ($offset = $mathtool.toInteger($request.offset))
+#set ($limit = $numbertool.toNumber($request.limit).intValue())
+#set ($offset = $numbertool.toNumber($request.offset).intValue())
 ## Sort by group page name.
 #set ($orderList = ['name'])
 
@@ -25,7 +25,7 @@
   'totalrows': $countGroups,
   'returnedrows': $mathtool.min($countGroups, $limit),
   'offset': $offset,
-  'reqNo': $mathtool.toInteger($request.reqNo),
+  'reqNo': $numbertool.toNumber($request.reqNo).intValue(),
   'rows': []
 })
 #foreach ($group in $groups)

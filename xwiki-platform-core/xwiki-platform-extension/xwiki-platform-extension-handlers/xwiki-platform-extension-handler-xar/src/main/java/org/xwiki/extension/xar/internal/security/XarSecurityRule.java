@@ -19,6 +19,8 @@
  */
 package org.xwiki.extension.xar.internal.security;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.security.GroupSecurityReference;
@@ -29,7 +31,7 @@ import org.xwiki.security.authorization.SecurityRule;
 
 /**
  * Xar document oriented implementation of {@link XarSecurityRule}.
- * 
+ *
  * @version $Id$
  * @since 10.5RC1
  */
@@ -77,5 +79,28 @@ public class XarSecurityRule implements SecurityRule
     public RuleState getState()
     {
         return RuleState.DENY;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(right).append(simple).toHashCode();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object == this) {
+            return true;
+        }
+        if (!(object instanceof XarSecurityRule)) {
+            return false;
+        }
+
+        XarSecurityRule rhs = (XarSecurityRule) object;
+        return new EqualsBuilder()
+                .append(this.right, rhs.right)
+                .append(this.simple, rhs.simple)
+                .isEquals();
     }
 }

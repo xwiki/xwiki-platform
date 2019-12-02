@@ -191,6 +191,14 @@ ul.diff-summary, .diff-summary ul {
 .html-diff [data-xwiki-html-diff="inserted"] {
   background-color: #AAFFAA;
 }
+/* Not all images have transparent background so using only the background color to mark deleted and inserted images is
+  not enough. */
+.html-diff img[data-xwiki-html-diff="deleted"] {
+  border: 2px solid #FFAAAA;
+}
+.html-diff img[data-xwiki-html-diff="inserted"] {
+  border: 2px solid #AAFFAA;
+}
 .html-diff [data-xwiki-html-diff-block="deleted"] {
   background-color: #FFDDDD;
 }

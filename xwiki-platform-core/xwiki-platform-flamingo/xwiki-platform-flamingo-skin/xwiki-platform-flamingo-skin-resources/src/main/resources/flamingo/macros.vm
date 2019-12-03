@@ -245,7 +245,7 @@
               <th scope="col" class="xwiki-livetable-display-header-text $!colprop.headerClass
                   #if ($!colprop.type == 'hidden')hidden#end
                   #if ($isSortable)sortable #if ($colname == $selectedColumn)selected $defaultOrder#else asc#end#end">
-                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
+                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}">#end
                 #if($isSortable)<a data-rel="${colname}">#end
                 $displayName
                 #if($isSortable)</a>#end

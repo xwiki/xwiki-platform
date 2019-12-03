@@ -82,7 +82,7 @@
     #set($fromSql = "${fromSql} , BaseObject as tobject, DBStringListProperty as tagprop")
     #set($whereSql = "${whereSql} and tobject.className='XWiki.TagClass' and tobject.name=doc.fullName and tobject.id=tagprop.id.id and tagprop.id.name='tags' and (")
     #foreach($tag in $request.getParameterValues('tag'))
-      #if($velocityCount &gt; 1) #set($whereSql = "${whereSql} and ") #end
+      #if($foreach.count &gt; 1) #set($whereSql = "${whereSql} and ") #end
       ## Tags are case insensitive but they are stored unchanged which means we have to normalize them when performing
       ## a query. Unfortunately there's no simple way to match multiple tags (AND operator). If we join the list of
       ## tags in the FROM clause then we match at least one of the tags (OR operator). The only remaining option is to

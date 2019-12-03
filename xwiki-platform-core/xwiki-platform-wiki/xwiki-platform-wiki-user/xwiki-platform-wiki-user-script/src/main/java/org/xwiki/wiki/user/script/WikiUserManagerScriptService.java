@@ -340,7 +340,7 @@ public class WikiUserManagerScriptService implements ScriptService
         DocumentReference userReference = context.getUserReference();
 
         // userReference can be null in case of guest user
-        if (userReference != null && userReference.equals(candidacyUser)) {
+        if (candidacyUser.equals(userReference)) {
             // Hide the admin private comment
             candidacy.setAdminPrivateComment(null);
             return true;

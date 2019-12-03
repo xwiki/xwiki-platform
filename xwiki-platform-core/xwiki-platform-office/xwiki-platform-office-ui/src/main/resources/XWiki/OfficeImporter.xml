@@ -129,7 +129,7 @@
       &lt;dd&gt;
         &lt;select id="headingLevelsToSplitInputId" size="5" multiple="multiple" name="headingLevelsToSplit"&gt;
           #foreach($h in [1..6])
-            &lt;option value="${h}"#if ($velocityCount == 1) selected="selected"#end&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.heading'))-${h}&lt;/option&gt;
+            &lt;option value="${h}"#if ($foreach.count == 1) selected="selected"#end&gt;$escapetool.xml($services.localization.render('xe.officeimporter.import.splitting.heading'))-${h}&lt;/option&gt;
           #end
         &lt;/select&gt;
       &lt;/dd&gt;

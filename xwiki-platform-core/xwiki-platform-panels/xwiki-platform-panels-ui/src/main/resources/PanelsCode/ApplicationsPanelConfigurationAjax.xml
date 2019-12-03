@@ -68,7 +68,7 @@
         #set ($orderObj = $configDoc.newObject('PanelsCode.ApplicationsPanelOrderClass'))
         #set ($discard = $orderObj.set('applicationId', $app))
       #end
-      #set ($discard = $orderObj.set('order', $velocityCount))
+      #set ($discard = $orderObj.set('order', $foreach.count))
     #end
     ## Remove the order objects that are not set
     #foreach($obj in $configDoc.getObjects('PanelsCode.ApplicationsPanelOrderClass').clone())

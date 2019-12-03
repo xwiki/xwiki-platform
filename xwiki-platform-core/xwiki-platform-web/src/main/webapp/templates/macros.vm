@@ -605,8 +605,8 @@ $fn
 #if($page_footnotes && ($page_footnotes.size() > 0))
 <ol class="footnotes">
 #foreach($footnote in $page_footnotes)
-<li id="footnote_${footnote_group_id}_${velocityCount}">
- <a class="footnoteBackRef" title="$services.localization.render('core.footnotes.backtoref')" href="#footnoteref_${footnote_group_id}_${velocityCount}">^</a>
+<li id="footnote_${footnote_group_id}_${foreach.count}">
+ <a class="footnoteBackRef" title="$services.localization.render('core.footnotes.backtoref')" href="#footnoteref_${footnote_group_id}_${foreach.count}">^</a>
   $footnote</li>
 #end
 </ol>
@@ -941,7 +941,7 @@ $html
     #foreach($colId in [0..$lastColumnId])
       <div class="panellayoutcol">
         #foreach($panelName in $panelNameList)
-          #if($panelName && ($panelName != "") && (((($velocityCount - 1) + $nbcolumns) % $nbcolumns) == $colId))
+          #if($panelName && ($panelName != "") && (((($foreach.count - 1) + $nbcolumns) % $nbcolumns) == $colId))
             #displaypanel($panelName)
           #end
         #end
@@ -1082,7 +1082,7 @@ $html
     <ul class="xlist">
       #foreach($document in $documentList)
         #if ($document.getSpace() != $previousSpace && $displaySpaces)
-          #if($velocityCount > 1) </ul></div></li> #end ## Close previous space item if needed
+          #if($foreach.count > 1) </ul></div></li> #end ## Close previous space item if needed
           <li class="xitem space"><div class="xitemcontainer">${escapetool.xml($document.getSpace())}<ul class="xlist"> ## Open new space item
           #set($previousSpace = $document.getSpace())
         #end
@@ -1413,7 +1413,7 @@ $Msz MB##
                   #if ($!colprop.type == 'hidden')hidden#end
                   #if ($isSortable)sortable #if ($colname == $selectedColumn)selected $defaultOrder#else asc#end#end">
                 #if($isSortable)<a rel="${colname}">#end
-                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${velocityCount}">#end
+                #if($isFilterable)<label for="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}">#end
                 $displayName
                 #if($isFilterable)</label>#end
                 #if($isSortable)</a>#end
@@ -1570,7 +1570,7 @@ $Msz MB##
   #set($escapedTitle = $escapetool.xml($services.localization.render('platform.livetable.filtersTitle',
     [$services.localization.render("${transprefix}$column")])))
   #if ($filterType == 'list' || $filterType == 'multilist')
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column"
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column"
       #if ($filterType == 'multilist')
         class="xwiki-livetable-multilist" multiple="multiple">
       #else
@@ -1589,13 +1589,13 @@ $Msz MB##
     #end
     </select>
   #elseif ($filterType == 'boolean')
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column">
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column">
       <option value="">$services.localization.render('platform.livetable.selectAll')</option>
       <option value="0">$services.localization.render('no')</option>
       <option value="1">$services.localization.render('yes')</option>
     </select>
   #elseif ($filterType == 'text' || $filterType == 'number')
-    <input id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$column" type="text"
+    <input id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$column" type="text"
       #if ("$!columnProperties.size" != '')size="$!escapetool.xml($columnProperties.size)"#end
       title="$escapedTitle"/>
   #elseif ($filterType == 'suggest' && $xproperty)
@@ -1604,7 +1604,7 @@ $Msz MB##
     #set ($discard = $xwiki.ssfx.use('uicomponents/suggest/xwiki.selectize.css', true))
     #set ($discard = $xwiki.jsfx.use('uicomponents/suggest/suggestPropertyValues.js',
       {'forceSkinAction' : true, 'language' : $xcontext.locale}))
-    <select id="xwiki-livetable-${htmlLiveTableId}-filter-$velocityCount" name="$!escapetool.xml($column)"
+    <select id="xwiki-livetable-${htmlLiveTableId}-filter-${foreach.count}" name="$!escapetool.xml($column)"
       class="suggest-propertyValues" multiple="multiple" size="1"
       data-className="$!escapetool.xml($xproperty.className)" data-propertyName="$!escapetool.xml($xproperty.name)"
       title="$escapedTitle">

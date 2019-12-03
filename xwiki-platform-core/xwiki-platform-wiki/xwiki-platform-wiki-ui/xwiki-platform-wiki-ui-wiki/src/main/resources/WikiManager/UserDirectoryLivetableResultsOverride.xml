@@ -126,7 +126,7 @@
     #if ($workspaceMemberUsers.size() &gt; 0)
       #set ($extraWhereClause = "${extraWhereClause}CONCAT('${xcontext.mainWikiName}:', doc.fullName) IN (")
       #foreach ($workspaceMemberUser in $workspaceMemberUsers)
-        #if ($velocityCount &gt; 1)
+        #if ($foreach.count &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
         #set ($extraWhereClause = "${extraWhereClause}:workspaceMemberUser_${foreach.count}")
@@ -142,7 +142,7 @@
       #end
       #set ($extraWhereClause = "${extraWhereClause}doc.fullName IN (SELECT prop.value FROM BaseObject as obj, StringProperty as prop WHERE obj.className='XWiki.XWikiGroups' AND prop.id.id=obj.id AND prop.name='member' AND obj.name IN (")
       #foreach ($workspaceMemberGroup in $workspaceMemberGroups)
-        #if ($velocityCount &gt; 1)
+        #if ($foreach.count &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
     #set ($extraWhereClause = "${extraWhereClause}:workspaceMemberGroup_${foreach.count}")

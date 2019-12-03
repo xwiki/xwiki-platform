@@ -170,7 +170,7 @@
   {{translation key="platform.wiki.sheet.aliases"/}}
   #if ($aliases.size() &gt; 1)
     #foreach ($alias in $aliases)
-      #if ($velocityCount &gt; 1)
+      #if ($foreach.count &gt; 1)
         == $alias.display('server', 'view') ==
         {{html wiki="true" clean="false"}}
         &lt;div class="xform"&gt;

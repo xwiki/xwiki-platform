@@ -125,7 +125,7 @@
 #set ($crtCategory = $NULL)
 #foreach ($category in $adminMenu)
   ## "Standard" URLs and icons for categories
-  #set ($category.url = $xwiki.getURL($currentDoc, $adminAction, "category=${mathtool.sub($velocityCount, 1)}"))
+  #set ($category.url = $xwiki.getURL($currentDoc, $adminAction, "category=${mathtool.sub($foreach.count, 1)}"))
   #if ($xwiki.getDocument('XWiki.AdminSheet').getAttachment("${category.id}.png"))
     #set ($category.iconReference = "XWiki.AdminSheet@${category.id}.png")
   #else
@@ -134,7 +134,7 @@
   #set ($category.description = $services.localization.render("admin.${category.id}.description").trim())
   #set ($category.cssClass = "${category.id}Icon")
   #set ($category.name = $services.localization.render("admin.${category.id}").trim())
-  #if ("$!{crtCategoryId}" != '' &amp;&amp; $velocityCount == $mathtool.add($crtCategoryId, 1))
+  #if ("$!{crtCategoryId}" != '' &amp;&amp; $foreach.count == $mathtool.add($crtCategoryId, 1))
     #set ($crtCategory = $category)
   #end
   ##

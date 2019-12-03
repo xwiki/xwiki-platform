@@ -1037,7 +1037,7 @@ $xwiki.ssx.use('Main.Activity')##
     #if ($followedUsers.size() &gt; 0)
       #set ($messageFilter = "$messageFilter or (act.type = 'personalMessage' and act.user in (")
       #foreach ($u in $followedUsers)
-        #if ($velocityCount &gt; 1)
+        #if ($foreach.count &gt; 1)
           #set ($messageFilter = $messageFilter.concat(','))
         #end
         #set ($messageFilter = $messageFilter.concat('?'))
@@ -1051,7 +1051,7 @@ $xwiki.ssx.use('Main.Activity')##
     #if ($usersGroups.size() &gt; 0)
       #set ($messageFilter = "$messageFilter or (act.type = 'groupMessage' and act.param2 in (")
       #foreach ($g in $usersGroups)
-        #if ($velocityCount &gt; 1)
+        #if ($foreach.count &gt; 1)
           #set ($messageFilter = $messageFilter.concat(','))
         #end
         #set ($messageFilter = $messageFilter.concat('?'))
@@ -1640,7 +1640,7 @@ $xwiki.ssx.use('Main.Activity')##
     ##
     ## Open event list + Display first event
     ## -------------------------------------------------------------------
-    #if ($velocityCount == 1)
+    #if ($foreach.count == 1)
       &lt;li class="activityItem activityPage #if($isPageEntryExpandable)collapsed#end"&gt;
         #displayActivityListItemHeader($isPageEntryExpandable true false)
         #if (!$isPageEntryExpandable)
@@ -1657,7 +1657,7 @@ $xwiki.ssx.use('Main.Activity')##
     ##
     ## Close page event list
     ## -------------------------------------------------------------------
-    #if ($velocityCount == $events.size())
+    #if ($foreach.count == $events.size())
           &lt;/ul&gt;
         &lt;/div&gt;
       &lt;/li&gt;

@@ -96,10 +96,10 @@
       #foreach ($step in $steps)
         <li>
           #set ($stepStatus = '')
-          #set ($stepNumber = $velocityCount)
+          #set ($stepNumber = $foreach.count)
           #if ($step.id == $currentStepId)
             #set ($stepStatus = " active")
-          #elseif($velocityCount < $currentStepIndex)
+          #elseif($foreach.count < $currentStepIndex)
             #set ($stepStatus = " done")
             #set ($stepNumber = '&#10004;')
           #end

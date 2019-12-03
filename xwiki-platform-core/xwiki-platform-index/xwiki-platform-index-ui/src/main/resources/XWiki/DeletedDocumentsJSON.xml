@@ -110,7 +110,7 @@ $response.setContentType('application/json')
 "rows": [
 #foreach($item in $items)
   #set($ddoc = $xwiki.getDeletedDocument($item))
-  #if($velocityCount &gt; 1) , #end
+  #if($foreach.count &gt; 1) , #end
   {
      #set($originalDocument = $ddoc.getDocument())
      "fullname"  : "$escapetool.javascript($ddoc.fullName)",

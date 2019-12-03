@@ -119,7 +119,7 @@
     #if ($wikiMemberUsers.size() &gt; 0)
       #set ($extraWhereClause = "${extraWhereClause}CONCAT('${services.wiki.mainWikiId}:', doc.fullName) IN (")
       #foreach ($wikiMemberUser in $wikiMemberUsers)
-        #if ($velocityCount &gt; 1)
+        #if ($foreach.count &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
         #set ($extraWhereClause = "${extraWhereClause}:wikiMemberUser_${foreach.count}")
@@ -135,7 +135,7 @@
       #end
       #set ($extraWhereClause = "${extraWhereClause}doc.fullName IN (SELECT prop.value FROM BaseObject as obj, StringProperty as prop WHERE obj.className='XWiki.XWikiGroups' AND prop.id.id=obj.id AND prop.name='member' AND obj.name IN (")
       #foreach ($wikiMemberGroup in $wikiMemberGroups)
-        #if ($velocityCount &gt; 1)
+        #if ($foreach.count &gt; 1)
           #set ($extraWhereClause = "${extraWhereClause},")
         #end
         #set ($extraWhereClause = "${extraWhereClause}:wikiMemberGroup_${foreach.count}")

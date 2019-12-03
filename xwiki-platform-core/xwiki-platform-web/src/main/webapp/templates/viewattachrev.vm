@@ -13,7 +13,7 @@
         <th>$services.localization.render('author')</th><th>$services.localization.render('date')</th>
     </tr>
 #foreach ($version in $attachment.getVersions())
-    <tr#if($velocityCount % 2 == 1) class="table-odd"#else class="table-even"#end>
+    <tr#if($foreach.count % 2 == 1) class="table-odd"#else class="table-even"#end>
 #set($attachrev = $attachment.getAttachmentRevision($version.toString()))
 #if("$!{request.rid}" != "")
   #set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}, "rid=${request.rid}"))

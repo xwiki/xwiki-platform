@@ -85,7 +85,7 @@
   #set ($count = 0)
   #foreach ($jsonItem in $jsonItems)
     #set ($value = $jsonItem.getAsJsonObject('instanceId_count').getAsJsonPrimitive('value').getAsLong())
-    #if ($velocityCount &lt;= 10)
+    #if ($foreach.count &lt;= 10)
       #set ($version = $jsonItem.getAsJsonPrimitive('key').getAsString())
       |$version|$value
     #else

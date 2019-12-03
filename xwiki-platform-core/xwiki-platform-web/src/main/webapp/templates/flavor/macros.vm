@@ -78,7 +78,7 @@
     #*
     #foreach ($flavor in $flavors)
       #set ($value = "${flavor.id.id}:::${flavor.id.version}")
-      #if ("$!defaultValue" == $value || ($velocityCount == 1 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
+      #if ("$!defaultValue" == $value || ($foreach.count == 1 && $firstIsDefaultIfDefaultNull && "$!defaultValue" == ''))
         #set ($checked = 'checked="checked"')
         #set ($class = 'xwiki-flavor-picker-option-selected')
       #else
@@ -86,12 +86,12 @@
         #set ($class = '')
       #end
       <li class="xwiki-flavor-picker-option $class">
-        <input type="radio" name="${escapetool.xml($fieldName)}" value="$escapetool.xml($value)" id="${escapetool.xml($fieldName)}_${velocityCount}" $checked/>
+        <input type="radio" name="${escapetool.xml($fieldName)}" value="$escapetool.xml($value)" id="${escapetool.xml($fieldName)}_${foreach.count}" $checked/>
         <span class="xwiki-flavor-picker-option-icon">$services.icon.renderHTML('wiki')</span>
         <div>
-          <label for="${escapetool.xml($fieldName)}_${velocityCount}">#if ("$!flavor.website" != '')<a href="$escapetool.xml($flavor.website)" class="popup">#end#if($flavor.name)$escapetool.xml($flavor.name)#else$flavor.id.id#end#if ("$!flavor.website" != '')</a>#end</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end
+          <label for="${escapetool.xml($fieldName)}_${foreach.count}">#if ("$!flavor.website" != '')<a href="$escapetool.xml($flavor.website)" class="popup">#end#if($flavor.name)$escapetool.xml($flavor.name)#else$flavor.id.id#end#if ("$!flavor.website" != '')</a>#end</label> <small>$flavor.id.version</small> #if($mathtool.round($flavor.rating))<small>#foreach($a in [1..$mathtool.round($flavor.rating)])$services.icon.renderHTML('star')#end</small>#end
           #if ($flavor.authors.size() > 0)
-            <p class="authors"><small>$services.localization.render('flavor.picker.authorsBy') #foreach($author in $flavor.authors)#if($velocityCount>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</small></p>
+            <p class="authors"><small>$services.localization.render('flavor.picker.authorsBy') #foreach($author in $flavor.authors)#if($foreach.count>1), #end#if("$!author.url"!='')<a href="$escapetool.xml($author.url)">#end${author.name}#if("$!author.url"!='')</a>#end#end</small></p>
           #end
           #if ("$!flavor.summary" != '')
             <p class="xHint">$flavor.summary</p>

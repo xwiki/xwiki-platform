@@ -125,7 +125,7 @@
     #set($offset = $offset + 1)
     #set($logsSize = $logsSize - 1)
   #else
-    #if ($velocityCount &gt;= $offset)
+    #if ($foreach.count &gt;= $offset)
       #set($void = $resultLog.add($logger))
     #end
   #end
@@ -141,7 +141,7 @@
   "reqNo": $numbertool.toNumber($request.reqNo).intValue(),
   "rows": [
   #foreach( $logger in $resultLog )
-    #if($velocityCount &gt; 1) , #end
+    #if($foreach.count &gt; 1) , #end
     #set($loggLevelName = "$!logger.value")
     ## FIXME: Remove that: workaround a bug in VelocityTool 1.4 which does not properly support sorting on null
     ## properties (it is fixed in VelocityTools 2)

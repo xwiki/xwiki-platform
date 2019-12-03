@@ -56,7 +56,7 @@
     #if ($value.contains($syntax.toIdString()))
       #set ($checked = 'checked')
     #end
-    &lt;label class="xwiki-form-listclass" for="xwiki-form-disabledSyntaxes-$velocityCount"&gt;&lt;input id="xwiki-form-disabledSyntaxes-$velocityCount" value="$syntax.toIdString()" name="Rendering.RenderingConfigClass_0_disabledSyntaxes" type="checkbox" $!checked&gt;$syntax.toString()&lt;/label&gt;
+    &lt;label class="xwiki-form-listclass" for="xwiki-form-disabledSyntaxes-${foreach.count}"&gt;&lt;input id="xwiki-form-disabledSyntaxes-${foreach.count}" value="$syntax.toIdString()" name="Rendering.RenderingConfigClass_0_disabledSyntaxes" type="checkbox" $!checked&gt;$syntax.toString()&lt;/label&gt;
   #end
   &lt;input name="Rendering.RenderingConfigClass_0_disabledSyntaxes" type="hidden" value=""&gt;
   {{/html}}

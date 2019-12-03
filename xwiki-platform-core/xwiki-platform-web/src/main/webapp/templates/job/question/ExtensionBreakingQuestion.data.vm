@@ -56,8 +56,8 @@ $response.setContentType("application/json")
   #foreach ($page in $pages)
     #set ($pageReference = $page.entityReference)
     #if ($foreach.count > $offset + $limit)
-      #set ($howMany = $pages.size() - $velocityCount + 1)
-      #paginationNode($data, $howMany, $velocityCount)
+      #set ($howMany = $pages.size() - $foreach.count + 1)
+      #paginationNode($data, $howMany, $foreach.count)
       #break
     #end
     #if ($foreach.count > $offset)
@@ -94,12 +94,12 @@ $response.setContentType("application/json")
   #end
   #set ($extensions = $collectionstool.sort($extensions, 'name'))
   #foreach ($ext in $extensions)
-    #if ($velocityCount > $offset + $limit)
-      #set ($howMany = $extensions.size() - $velocityCount + 1)
-      #paginationNode($data, $howMany, $velocityCount)
+    #if ($foreach.count > $offset + $limit)
+      #set ($howMany = $extensions.size() - $foreach.count + 1)
+      #paginationNode($data, $howMany, $foreach.count)
       #break
     #end
-    #if ($velocityCount > $offset)
+    #if ($foreach.count > $offset)
       #set ($extension = $ext.extension)
       #set ($discard = $data.add({
         'id': "$extension.id.id",

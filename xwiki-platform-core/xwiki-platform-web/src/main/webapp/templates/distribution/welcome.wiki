@@ -12,7 +12,7 @@
 
   (% class="steps vertical" %)
   #foreach ($step in $steps)
-    * (% class="number" %)$velocityCount(%%)##
+    * (% class="number" %)${foreach.count}(%%)##
       (% class="name" %) {{translation key="platform.extension.distributionWizard.${step.id}StepTitle"/}}(%%)##
       (% class="description" %){{translation key="platform.extension.distributionWizard.${step.id}StepSummary"/}}
   #end

@@ -56,7 +56,7 @@ $string.replace("'", "''")##
       #set ($titleDisplayNamePlaceHolder = $field.translatedPrettyName)
       #set ($field = $NULL)
       #set ($column = 'doc.title')
-      #set ($discard = $columns.set($mathtool.sub($velocityCount, 1), $column))
+      #set ($discard = $columns.set($mathtool.sub($foreach.count, 1), $column))
     #end
     #if ($field)
       #set ($properties = {})
@@ -134,7 +134,7 @@ ${escapetool.h}set (${escapetool.d}options = {
   'selectedColumn': '#escapeSingleQuotes($columns.get(0))',
   'defaultOrder': 'asc'
 })
-${escapetool.h}set (${escapetool.d}columns = [#foreach($column in $columns)#if($velocityCount &gt; 1), #end'#escapeSingleQuotes($column)'#end])
+${escapetool.h}set (${escapetool.d}columns = [#foreach($column in $columns)#if($foreach.count &gt; 1), #end'#escapeSingleQuotes($column)'#end])
 ${escapetool.h}livetable('#escapeSingleQuotes($shortName)' ${escapetool.d}columns ${escapetool.d}columnsProperties ${escapetool.d}options)
 {{/velocity}}##
 }}}

@@ -52,9 +52,9 @@ $response.setContentType("text/xml")
     #set($info = '')
     #set($rs = $res)
     #foreach($r in $res)
-      #if($velocityCount == 1)
+      #if($foreach.count == 1)
         #set($info = $r)
-      #elseif($velocityCount == 2)
+      #elseif($foreach.count == 2)
         #set($rs = $r)
       #end
     #end
@@ -72,7 +72,7 @@ $response.setContentType("text/xml")
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="3">
     #foreach($res in $results)
-      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
+      <rs id="$foreach.count" info="">$!{escapetool.xml($res)}</rs>
     #end
     </results>
   ######################### StringListProperty query
@@ -86,7 +86,7 @@ $response.setContentType("text/xml")
       #set($list = $p.getListFromString($res, $sep, false))
       #set($list = $list.toArray())
       #foreach($word in $list)
-          <rs id="$velocityCount" info="">$!{escapetool.xml($word)}</rs>
+          <rs id="$foreach.count" info="">$!{escapetool.xml($word)}</rs>
       #end
     #end
     </results>
@@ -98,7 +98,7 @@ $response.setContentType("text/xml")
     <?xml version="1.0" encoding="UTF-8"?>
     <results type="8">
     #foreach($res in $results)
-      <rs id="$velocityCount" info="">$!{escapetool.xml($res)}</rs>
+      <rs id="$foreach.count" info="">$!{escapetool.xml($res)}</rs>
     #end
     </results>
   #end

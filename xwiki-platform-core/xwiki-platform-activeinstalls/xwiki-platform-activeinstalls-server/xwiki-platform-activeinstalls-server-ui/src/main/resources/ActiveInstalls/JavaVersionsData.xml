@@ -91,7 +91,7 @@
   #set ($count = 0)
   #foreach ($item in $versionMap.keySet())
     #set ($value = $versionMap.get($item))
-    #if ($velocityCount &lt;= 10)
+    #if ($foreach.count &lt;= 10)
       |$item|$value
     #else
       #set ($count = $mathtool.add($count, $value))

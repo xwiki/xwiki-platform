@@ -183,7 +183,7 @@
         ##
         ## Display the template provider field option in the form.
         ##
-        #set ($inputId = "xwiki-create-form-${velocityCount}")
+        #set ($inputId = "xwiki-create-form-${foreach.count}")
         #set ($icon = $tpobj.getValue('icon'))
         #if ("$!icon" == '')
           #set($icon = 'file-white')

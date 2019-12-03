@@ -38,7 +38,7 @@
 #if ($stylesheets != '')
   #foreach ($stylesheet in $stylesheets.split(','))
     #if (!$stylesheet.equalsIgnoreCase($defaultstyle))
-      <link href="#concatenateQueryParameter($xwiki.getSkinFile($stylesheet, true), $urlParameters)" rel="alternate stylesheet" type="text/css" title="Alternate StyleSheet ${velocityCount}" />
+      <link href="#concatenateQueryParameter($xwiki.getSkinFile($stylesheet, true), $urlParameters)" rel="alternate stylesheet" type="text/css" title="Alternate StyleSheet ${foreach.count}" />
     #end
   #end
 #end

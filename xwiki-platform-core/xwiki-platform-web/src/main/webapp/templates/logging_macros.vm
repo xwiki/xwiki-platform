@@ -52,7 +52,7 @@ Caused by: #printThrowable($throwable.cause true)
   #set ($message = '')
   #set ($messageElements = $log.messageElements)
   #foreach ($messageElement in $messageElements)
-    #if ($velocityCount == $messageElements.size())
+    #if ($foreach.count == $messageElements.size())
       ## Skip the last message element because we always have more message elements than arguments.
       #break
     #end

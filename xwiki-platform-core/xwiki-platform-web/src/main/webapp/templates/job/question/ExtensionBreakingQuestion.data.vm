@@ -55,12 +55,12 @@ $response.setContentType("application/json")
   #end
   #foreach ($page in $pages)
     #set ($pageReference = $page.entityReference)
-    #if ($velocityCount > $offset + $limit)
+    #if ($foreach.count > $offset + $limit)
       #set ($howMany = $pages.size() - $velocityCount + 1)
       #paginationNode($data, $howMany, $velocityCount)
       #break
     #end
-    #if ($velocityCount > $offset)
+    #if ($foreach.count > $offset)
       #set ($pageDoc = $xwiki.getDocument($pageReference))
       #set ($title = $pageDoc.getRenderedTitle('html/5.0'))
       #if ("$!title" == '')

@@ -156,7 +156,7 @@
 #macro(displayVariablesTabs)
   &lt;ul class="nav nav-pills nav-stacked col-xs-4"&gt;
     #foreach($category in $variables.keySet())
-      &lt;li#if($velocityCount==1) class="active"#end&gt;&lt;a href="#cat-${category}" data-toggle="tab"&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/a&gt;&lt;/li&gt;
+      &lt;li#if($foreach.count==1) class="active"#end&gt;&lt;a href="#cat-${category}" data-toggle="tab"&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/a&gt;&lt;/li&gt;
     #end
   &lt;/ul&gt;
 #end
@@ -228,7 +228,7 @@
 #macro(displayVariablesPanes)
   &lt;div class="tab-content col-xs-8" id="bt-variables"&gt;
     #foreach($category in $variables.keySet())
-      &lt;div class="tab-pane fade #if($velocityCount==1)in active#end" id="cat-$category"&gt;
+      &lt;div class="tab-pane fade #if($foreach.count==1)in active#end" id="cat-$category"&gt;
       &lt;h2&gt;$services.localization.render("platform.flamingo.themes.category.${category}")&lt;/h2&gt;
       #set($catVar = $variables.get($category))
       #foreach($var in $catVar.keySet())

@@ -197,9 +197,9 @@ $syntaxMenu.add($cat)
 ##
 #foreach ($category in $syntaxMenu)
   ## "Standard" URLs and icons for categories
-  #set ($category.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;category=${mathtool.sub($velocityCount, 1)}${extraParams}")  
+  #set ($category.url = "?syntax=$escapetool.url(${crtSyntaxVer})&amp;category=${mathtool.sub($foreach.count, 1)}${extraParams}")
   #set ($category.cssClass = "${category.id}Icon")
-  #if ("$!{crtCategoryId}" != '' &amp;&amp; $velocityCount == $mathtool.add($crtCategoryId, 1))
+  #if ("$!{crtCategoryId}" != '' &amp;&amp; $foreach.count == $mathtool.add($crtCategoryId, 1))
     #set ($crtCategory = $category)
   #end
   ##

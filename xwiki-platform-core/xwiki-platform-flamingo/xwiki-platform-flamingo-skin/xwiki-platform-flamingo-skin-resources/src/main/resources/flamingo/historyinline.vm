@@ -114,16 +114,16 @@ $xwiki.ssfx.use('uicomponents/pagination/pagination.css', true)##
     #if ($tdoc.getRCSVersion() == $version)
       <tr class="currentversion odd">
     #else
-       <tr class="#if($velocityCount % 2 == 0) even #else odd #end">
+       <tr class="#if($foreach.count % 2 == 0) even #else odd #end">
     #end
     #if ($displayCompare)
       <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.from'))">
         <label class="hidden" for="rev1_$version">$escapetool.xml($services.localization.render('core.viewers.history.from'))</label>
-        <input type="radio" name="rev1" id="rev1_$version" value="$version" #if ($velocityCount==2) checked="checked" #end/>
+        <input type="radio" name="rev1" id="rev1_$version" value="$version" #if ($foreach.count==2) checked="checked" #end/>
       </td>
       <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.to'))">
         <label class="hidden" for="rev2_$version">$escapetool.xml($services.localization.render('core.viewers.history.to'))</label>
-        <input type="radio" name="rev2" id="rev2_$version" value="$version" #if ($velocityCount==1) checked="checked" #end/>
+        <input type="radio" name="rev2" id="rev2_$version" value="$version" #if ($foreach.count==1) checked="checked" #end/>
       </td>
     #end
     <td data-title="$escapetool.xml($services.localization.render('core.viewers.history.version'))"><a href="$tdoc.getURL('viewrev',"rev=$version")">$version</a></td>

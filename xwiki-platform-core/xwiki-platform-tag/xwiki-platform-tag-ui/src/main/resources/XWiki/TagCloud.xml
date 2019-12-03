@@ -403,7 +403,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #set ($intervalSize = $firstHalfIntervalSize)
   #set ($halfPassed = false)
   #foreach ($popularityLevel in $popularityLevels)
-    #if ($velocityCount &gt; $levelsHalf &amp;&amp; !$halfPassed)
+    #if ($foreach.count &gt; $levelsHalf &amp;&amp; !$halfPassed)
       #set ($intervalSize = $secondHalfIntervalSize)
       #set ($halfPassed = true)
     #end

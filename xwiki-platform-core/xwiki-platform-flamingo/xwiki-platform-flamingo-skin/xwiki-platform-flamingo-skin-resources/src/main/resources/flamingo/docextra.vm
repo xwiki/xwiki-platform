@@ -94,7 +94,7 @@
         ##
         ## Set the extra to load
         ##
-        #if ($velocityCount == 1)
+        #if ($foreach.count == 1)
           var extraInit = function(){ XWiki.displayDocExtra("${extraAnchor}", "${extraTemplate}", false) };
         #end
         if (hashviewer == "${extraAnchor}") {

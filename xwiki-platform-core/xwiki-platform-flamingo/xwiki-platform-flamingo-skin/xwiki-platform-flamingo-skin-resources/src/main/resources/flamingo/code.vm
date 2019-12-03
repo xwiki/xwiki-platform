@@ -84,7 +84,7 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
       #set ($startNewGroup = false)
     #end
 
-    #set ($lineNumber = $velocityCount)
+    #set ($lineNumber = $foreach.count)
 
     #if ($startNewGroup)
       </tbody>
@@ -102,7 +102,7 @@ $xwiki.ssfx.use('uicomponents/viewers/code.css', true)##
   #if ($content.length() > 0)
     #set ($lines = $content.split('\n'))
     #foreach ($line in $lines)
-      #set ($lineNumber = $velocityCount)
+      #set ($lineNumber = $foreach.count)
       <tr class="line" id="$lineNumber">
         <td class="line-number unselectable"><a href="$doc.getURL('view', "viewer=code#${lineNumber}")">$lineNumber</a></td>
         <td class="content">$escapetool.xml($line)</td>

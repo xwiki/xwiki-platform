@@ -140,12 +140,12 @@ ${name}##
 
 #macro (displayExtensionActionButtons_jobTriggers $extension)
   #if(!$extensionStatus)
-    #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
+    #determineExtensionStatus($extension 'extensionStatus' 'extensionStatusMessage')
   #end
   ## Determine if there is an extension job waiting to be resumed or a previously created job plan that can be executed.
   #set ($showContinueButton = $jobState == 'WAITING')
   #if (!$showContinueButton)
-    #isExtensionPlan($jobStatus $showContinueButton)
+    #isExtensionPlan($jobStatus 'showContinueButton')
   #end
   #if ($showContinueButton)
     ## One of the following statements is true:
@@ -162,7 +162,7 @@ ${name}##
   ## able for instance to recompute the install plan.
   #if ($extensionStatus.startsWith('installed'))
     ## The given extension object could be an instance of LocalExtension so make sure we use an InstalledExtension instance.
-    #getInstalledExtension($extension $extensionNamespace $installedExtension)
+    #getInstalledExtension($extension $extensionNamespace 'installedExtension')
     ## If the installed extension might be invalid and need repairing
     #extensionRepairButtons($installedExtension)
     ## This extension can be uninstalled
@@ -188,7 +188,7 @@ ${name}##
   #elseif ($extensionStatus.startsWith('remote-installed'))
     ## An extension that can be either upgraded or downgraded.
     ## Compare this version with the version that is currently installed to determine which button to display.
-    #getInstalledExtension($extension $extensionNamespace $installedExtension)
+    #getInstalledExtension($extension $extensionNamespace 'installedExtension')
     #if ($extension.compareTo($installedExtension) > 0)
       #extensionUpgradeButtons($installedExtension 'upgrade')
     #else
@@ -282,7 +282,7 @@ ${name}##
 
 #macro (displayProgressBar $extension)
   #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
-    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value 'jobStatus')
     #set ($jobState = $jobStatus.state)
   #end
   #if ($jobStatus && $jobState != 'FINISHED')
@@ -298,7 +298,7 @@ ${name}##
 
 #macro (displayExtensionDetails_menu $extension)
 #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
-  #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+  #getExtensionJobStatus($extension.id.id $extension.id.version.value 'jobStatus')
   #set ($jobState = $jobStatus.state)
 #end
 <ul class="innerMenu">
@@ -401,7 +401,7 @@ ${name}##
 #macro (displayExtensionDetails_description_wikis $extension)
   #if (!$extension.namespaces || $extension.namespaces.isEmpty())
     ## The given extension was installed globally.
-    #getInstallInfo($extension $NULL $install)
+    #getInstallInfo($extension $NULL 'install')
     #if ($install.date)
       <dt>$services.localization.render('extensions.info.installedGloballyBy',
         [$xwiki.getUserName($install.userReference), $xwiki.formatDate($install.date)])</dt>
@@ -413,7 +413,7 @@ ${name}##
     <dt>$services.localization.render('extensions.info.namespaces.list')</dt>
     <dd><ul>
       #foreach ($namespace in $extension.namespaces)
-        #getInstallInfo($extension $namespace $install)
+        #getInstallInfo($extension $namespace 'install')
         #if ($install.date)
           <li>$services.localization.render('extensions.info.installedOnNamespaceBy', [
             "#displayExtensionNamespace($namespace)",
@@ -426,7 +426,7 @@ ${name}##
       #end
     </ul></dd>
   #else
-    #getInstallInfo($extension $extensionNamespace $install)
+    #getInstallInfo($extension $extensionNamespace 'install')
     #if ($install.date)
       <dt>$services.localization.render('extensions.info.installedBy',
         [$xwiki.getUserName($install.userReference), $xwiki.formatDate($install.date)])</dt>
@@ -445,7 +445,6 @@ ${name}##
       #set ($install.userReference = $installJobStatus.request.getProperty('user.reference'))
     #end
   #end
-  #set ($return = $NULL)
   #setVariable("$return" $install)
 #end
 
@@ -521,9 +520,7 @@ $namespace##
   #if ($dependencyExtension)
     ## The extension status is determined for the $extensionNamespace . The name of this parameter is very important
     ## because it has to overwrite the global variable with the same name.
-    #set($dependencyStatus = $NULL)
-    #set($dependencyStatusMessage = $NULL)
-    #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage $dependencyOrExtension.versionConstraint)
+    #determineExtensionStatus($dependencyExtension 'dependencyStatus' 'dependencyStatusMessage' $dependencyOrExtension.versionConstraint)
     #set ($dependencyURL = "#getExtensionURL($dependencyId $dependencyVersion)")
     #set ($dependencyName = "<a href=""$dependencyURL"" class=""extension-link"">#displayExtensionName($dependencyExtension)</a>")
   #end
@@ -579,7 +576,7 @@ $namespace##
 
 #macro (displayExtensionDetails_changes $extension)
   #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
-    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value 'jobStatus')
     #set ($jobState = $jobStatus.state)
   #end
   #set ($documentDiffs = $jobStatus.documentDiffs)
@@ -596,7 +593,7 @@ $namespace##
 
 #macro (displayExtensionDetails_progress $extension)
   #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
-    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value 'jobStatus')
     #set ($jobState = $jobStatus.state)
   #end
   #if ($jobStatus)
@@ -613,7 +610,7 @@ $namespace##
 #end
 
 #macro (displayExtensionJobStatus $jobStatus)
-  #isExtensionPlan($jobStatus $isExtensionPlan)
+  #isExtensionPlan($jobStatus 'isExtensionPlan')
   #if ($isExtensionPlan)
     #displayExtensionPlan($jobStatus)
   #else
@@ -634,7 +631,6 @@ $namespace##
 
 #macro (isExtensionPlan $jobStatus $return)
   #set ($isExtensionPlan = $jobStatus.state == 'FINISHED' && $jobStatus.actions && !$jobStatus.error)
-  #set ($return = $NULL)
   #setVariable ("$return" $isExtensionPlan)
 #end
 
@@ -892,7 +888,7 @@ $namespace##
 #end
 
 #macro (getBackwardDependencies $extension $return)
-  #getInstalledExtension($extension $extensionNamespace $installedExtension)
+  #getInstalledExtension($extension $extensionNamespace 'installedExtension')
   #if ($installedExtension.isInstalled($NULL))
     ## The extension is installed in the root namespace so it can have backward dependencies on multiple namespaces.
     #set ($backwardDependencies = $services.extension.installed.getBackwardDependencies($installedExtension.id))
@@ -916,7 +912,6 @@ $namespace##
   #else
     #set ($backwardDependencies = {})
   #end
-  #set ($return = $NULL)
   #setVariable("$return" $backwardDependencies)
 #end
 
@@ -924,7 +919,7 @@ $namespace##
   <div class="extension-body">
     #set ($extensionIdHashCode = "$extensionNamespace/$extension.id.id/$extension.id.version.value")
     #set ($extensionIdHashCode = $extensionIdHashCode.hashCode())
-    #getBackwardDependencies($extension $backwardDependencies)
+    #getBackwardDependencies($extension 'backwardDependencies')
     #displayExtensionDetails_menu($extension)
 
     #displayExtensionDetails_description($extension)
@@ -937,10 +932,8 @@ $namespace##
 #macro (displayExtension $extension $readOnly)
   ## The job status can change while the extension is displayed so we cache it. Let's reset the cache.
   #set ($jobStatus = $NULL)
-  #isShowingExtensionDetails($extension $showExtensionDetails)
-  #set($extensionStatus = $NULL)
-  #set($extensionStatusMessage = $NULL)
-  #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
+  #isShowingExtensionDetails($extension 'showExtensionDetails')
+  #determineExtensionStatus($extension 'extensionStatus' 'extensionStatusMessage')
   <form action="$xwiki.relativeRequestURL" method="post" class="extension-item extension-item-${extensionStatus}">
     <div class="hidden">
       <input name="readOnly" value="$!readOnly" type="hidden" />
@@ -1043,7 +1036,7 @@ $namespace##
         "<strong>$!escapetool.xml($request.extensionVersion)</strong>"])</div>
 
       ## DEBUG START: Check if there is any job status associated with the specified extension.
-      #getExtensionJobStatus($request.extensionId, $request.extensionVersion $jobStatus)
+      #getExtensionJobStatus($request.extensionId, $request.extensionVersion 'jobStatus')
       #if ($jobStatus)
         ## Normally we shouldn't get here.
         <div class="errormessage">We found an extension job associated with the missing extension:</div>
@@ -1104,11 +1097,11 @@ $namespace##
 #end
 
 #macro (continueExtensionJob $extensionId $extensionVersion)
-  #getExtensionJobStatus($extensionId $extensionVersion $jobStatus)
+  #getExtensionJobStatus($extensionId $extensionVersion 'jobStatus')
   #set ($jobState = $jobStatus.state)
   #set ($jobType = $jobStatus.jobType)
   #if ($jobState == 'FINISHED')
-    #isExtensionPlan($jobStatus $isExtensionPlan)
+    #isExtensionPlan($jobStatus 'isExtensionPlan')
     #if ($isExtensionPlan)
       ## Execute the latest extension job plan.
       ## TODO: Would be nice to reuse somehow the job request that was used to create the plan.
@@ -1221,7 +1214,7 @@ $namespace##
 #macro (determineExtensionStatus $extension $_extensionStatus $_extensionStatusMessage $versionConstraint)
   #set ($currentVersion = $NULL)
   #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
-    #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+    #getExtensionJobStatus($extension.id.id $extension.id.version.value 'jobStatus')
     #set ($jobState = $jobStatus.state)
   #end
   #if ($jobStatus && $jobState != 'FINISHED')
@@ -1243,7 +1236,7 @@ $namespace##
       ## Check if a different version of this extension is installed or is a core dependency.
       #set ($currentVersion = $services.extension.core.getCoreExtension($extension.id.id))
       #if (!$currentVersion)
-        #getInstalledExtension($extension $extensionNamespace $currentVersion)
+        #getInstalledExtension($extension $extensionNamespace 'currentVersion')
       #end
       #if ($currentVersion)
         #set ($status = "#determineVersionCompatibility($extension $currentVersion $versionConstraint)")
@@ -1256,9 +1249,7 @@ $namespace##
   #if ($status != 'remote' && $status != 'loading')
     #set ($message = $services.localization.render("extensions.info.status.${status}", [$currentVersion.id.version.value]))
   #end
-  #set ($_extensionStatus = $NULL)
   #setVariable ("$_extensionStatus" $status)
-  #set ($_extensionStatusMessage = $NULL)
   #setVariable ("$_extensionStatusMessage" $message)
 #end
 
@@ -1280,11 +1271,10 @@ ${prefix}${bob.repository.descriptor.id}${suffix}##
 
 #macro (getExtensionJobStatus $extensionId $extensionVersion $return)
   ## Retrieve the job status for the current wiki and for the entire farm (if the current wiki is the main wiki).
-  #getExtensionJobStatusForNamespace($extensionId $extensionVersion $extensionNamespace $jobStatusForWiki)
+  #getExtensionJobStatusForNamespace($extensionId $extensionVersion $extensionNamespace 'jobStatusForWiki')
   #if ($xcontext.isMainWiki())
-    #getExtensionJobStatusForNamespace($extensionId $extensionVersion $NULL $jobStatusForFarm)
+    #getExtensionJobStatusForNamespace($extensionId $extensionVersion $NULL 'jobStatusForFarm')
   #end
-  #set ($return = $NULL)
   #if (!$jobStatusForWiki)
     #setVariable ("$return" $jobStatusForFarm)
   #elseif (!$jobStatusForFarm)
@@ -1308,7 +1298,7 @@ ${prefix}${bob.repository.descriptor.id}${suffix}##
     #if (!$targetVersion)
       ## Some jobs don't require the extension version. Let's determine the currently available version.
       #set ($_extension = $services.extension.resolve($extensionId, $extensionVersion))
-      #getInstalledExtension($_extension $extensionNamespace $installedExtension)
+      #getInstalledExtension($_extension $extensionNamespace 'installedExtension')
       #set ($targetVersion = $installedExtension.id.version)
     #end
     #if ($targetVersion && $extensionVersion != $targetVersion.value)
@@ -1323,14 +1313,13 @@ ${prefix}${bob.repository.descriptor.id}${suffix}##
     #if (!$targetVersion)
       ## Some jobs don't require the extension version. Let's determine the currently available version.
       #set ($_extension = $services.extension.resolve($extensionId, $extensionVersion))
-      #getInstalledExtension($_extension $extensionNamespace $installedExtension)
+      #getInstalledExtension($_extension $extensionNamespace 'installedExtension')
       #set ($targetVersion = $installedExtension.id.version)
     #end
     #if ($targetVersion && $extensionVersion != $targetVersion.value)
       #set ($_plan = $NULL)
     #end
   #end
-  #set ($return = $NULL)
   #if (!$_jobStatus)
     #setVariable ("$return" $_plan)
   #elseif (!$_plan)
@@ -1358,7 +1347,6 @@ ${prefix}${bob.repository.descriptor.id}${suffix}##
       #break
     #end
   #end
-  #set ($installedExtension = $NULL)
   #setVariable("$installedExtension" $return)
 #end
 
@@ -1502,13 +1490,12 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
     && $request.extensionVersion == $extension.id.version.value)
   #if (!$return)
     #if (!$jobStatus || !$jobStatus.request.extensions.contains($extension.id))
-      #getExtensionJobStatus($extension.id.id $extension.id.version.value $jobStatus)
+      #getExtensionJobStatus($extension.id.id $extension.id.version.value 'jobStatus')
       #set ($jobState = $jobStatus.state)
     #end
     ## Always show the extension details if the extension has a job waiting.
     #set ($return = $jobState == 'WAITING')
   #end
-  #set ($_showDetails = $NULL)
   #setVariable("$_showDetails" $return)
 #end
 
@@ -1522,8 +1509,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
     ## Iterate the first level nodes from the upgrade plan tree.
     #foreach ($firstLevelNode in $plan.tree)
       #set ($planAction = $firstLevelNode.action)
-      #set ($status = $NULL)
-      #getInstalledExtension($planAction.extension $planAction.namespace $installedVersion)
+      #getInstalledExtension($planAction.extension $planAction.namespace 'installedVersion')
       #if (!$installedVersion.isValid($planAction.namespace))
         #set ($status = $invalid)
       ## Check if the latest version has been installed after the upgrade plan was created.
@@ -1669,7 +1655,6 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
   #else
     #set ($globalPlan = $NULL)
   #end
-  #set ($_plan = $NULL)
   #if (!$globalPlan)
     #setVariable ("$_plan" $localPlan)
   #elseif (!$localPlan)
@@ -1696,7 +1681,6 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
     #end
     #set ($upgradePlanJob = $extensionManager.createUpgradePlan($upgradePlanRequest))
   #end
-  #set ($_plan = $NULL)
   #setVariable("$_plan" $upgradePlanJob.status)
 #end
 
@@ -1757,7 +1741,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
     #end
   #end
   #if (!$plan)
-    #getExtensionUpdaterPlan($plan)
+    #getExtensionUpdaterPlan('plan')
   #end
   #if (!$isAjaxRequest)
     ## The list of outdated/invalid extensions is paginated so we load the CSS here because the request is not AJAX.

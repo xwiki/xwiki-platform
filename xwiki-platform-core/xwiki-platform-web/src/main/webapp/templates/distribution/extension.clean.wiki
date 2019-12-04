@@ -93,7 +93,9 @@
 {{/velocity}}
 
 {{velocity}}
-#if ($uninstalledExtensions.isEmpty() && $topExtensions.isEmpty())
+#if ($request.cleanapply)
+  {{template name="distribution/extension.clean.apply.wiki"/}}
+#elseif ($uninstalledExtensions.isEmpty() && $topExtensions.isEmpty())
   #set ($showCompleteStepButton = true)
   {{info}}
     {{translation key="platform.extension.distributionWizard.extension.cleanStep.noOrphaned"/}}
@@ -101,9 +103,6 @@
 #else
 #set ($discard = $xwiki.jsfx.use('uicomponents/extension/clean.js', true))
 #set ($discard = $xwiki.ssfx.use('uicomponents/extension/clean.css', true))
-#if ($request.cleanapply)
-  {{template name="distribution/extension.clean.apply.wiki"/}}
-#else
 {{translation key="platform.extension.distributionWizard.extension.cleanStep.orphaned"/}}
 
 {{html clean="false"}}
@@ -125,6 +124,5 @@
     #em_submitButton($services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.cleanapply'), 'cleanapply', false, '')
   </form>
 {{/html}}
-#end
 #end
 {{/velocity}}

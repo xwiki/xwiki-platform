@@ -216,7 +216,7 @@ public class TemplateAsyncRenderer extends AbstractBlockAsyncRenderer
         try {
             this.evaluator.evaluateContent(template, content, writer);
         } catch (Exception e) {
-            throw new RenderingException("Failed to evaluate template", e);
+            throw new RenderingException("Failed to evaluate template with id [" + template.getId() + "]", e);
         }
 
         return writer.toString();

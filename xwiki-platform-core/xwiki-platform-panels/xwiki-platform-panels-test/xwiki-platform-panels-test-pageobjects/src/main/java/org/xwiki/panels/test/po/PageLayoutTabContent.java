@@ -71,6 +71,14 @@ public class PageLayoutTabContent extends BaseElement
         return getDriver().findElementWithoutWaiting(By.id(layout.getId()));
     }
 
+    public PageLayoutTabContent selectNoSideColumnLayout()
+    {
+        getLayout(Layout.NOCOLUMN).click();
+        getDriver().waitUntilElementDisappears(By.id("rightPanels"));
+        getDriver().waitUntilElementDisappears(By.id("leftPanels"));
+        return this;
+    }
+
     public PageLayoutTabContent selectRightColumnLayout()
     {
         getLayout(Layout.RIGHT).click();
@@ -91,6 +99,16 @@ public class PageLayoutTabContent extends BaseElement
         getLayout(Layout.LEFT).click();
         getDriver().waitUntilElementIsVisible(By.id("leftPanels"));
         return this;
+    }
+
+    public boolean isRightPanelVisible()
+    {
+        return this.rightPanels.isDisplayed();
+    }
+
+    public boolean isLeftPanelVisible()
+    {
+        return this.leftPanels.isDisplayed();
     }
 
     public String getRightPanels()

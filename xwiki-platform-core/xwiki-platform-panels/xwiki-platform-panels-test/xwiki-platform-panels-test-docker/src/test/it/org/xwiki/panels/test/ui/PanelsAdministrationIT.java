@@ -20,12 +20,15 @@
 package org.xwiki.panels.test.ui;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.xwiki.administration.test.po.AdministrationMenu;
+import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.panels.test.po.PageLayoutTabContent;
 import org.xwiki.panels.test.po.PageWithPanels;
 import org.xwiki.panels.test.po.PanelsAdministrationPage;
+import org.xwiki.panels.test.po.PanelsHomePage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
 import org.xwiki.test.ui.TestUtils;
@@ -54,6 +57,85 @@ public class PanelsAdministrationIT
         setup.setWikiPreference("leftPanels", "");
     }
 
+    @Order(1)
+    @Test
+    public void verifyPanelWizardPresentInAdministration()
+    {
+        AdministrationPage administrationPage = AdministrationPage.gotoPage();
+        assertTrue(administrationPage.hasSection("Panels.PanelWizard"));
+
+        // Select space administration (XWiki space, since that space exists)
+        AdministrationPage spaceAdministrationPage = AdministrationPage.gotoSpaceAdministrationPage("XWiki");
+
+        // The Panel Wizard should be available in the space administration.
+        assertTrue(spaceAdministrationPage.hasSection("Panels.PanelWizard"));
+    }
+
+    @Order(2)
+    @Test
+    public void tabsExist()
+    {
+        PanelsAdministrationPage panelsAdministrationPage = PanelsAdministrationPage.gotoPage();
+        assertTrue(panelsAdministrationPage.hasPageLayoutTab());
+        assertTrue(panelsAdministrationPage.hasPanelListTab());
+    }
+
+    @Order(3)
+    @Test
+    public void pageLayout()
+    {
+        PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
+        PageLayoutTabContent pageLayoutTabContent = panelsAdminPage.selectPageLayout();
+        pageLayoutTabContent = pageLayoutTabContent.selectNoSideColumnLayout();
+        assertFalse(pageLayoutTabContent.isLeftPanelVisible());
+        assertFalse(pageLayoutTabContent.isRightPanelVisible());
+
+        pageLayoutTabContent = pageLayoutTabContent.selectLeftColumnLayout();
+        assertTrue(pageLayoutTabContent.isLeftPanelVisible());
+        assertFalse(pageLayoutTabContent.isRightPanelVisible());
+
+        pageLayoutTabContent = pageLayoutTabContent.selectRightColumnLayout();
+        assertFalse(pageLayoutTabContent.isLeftPanelVisible());
+        assertTrue(pageLayoutTabContent.isRightPanelVisible());
+
+        pageLayoutTabContent = pageLayoutTabContent.selectBothColumnsLayout();
+        assertTrue(pageLayoutTabContent.isLeftPanelVisible());
+        assertTrue(pageLayoutTabContent.isRightPanelVisible());
+    }
+
+    @Order(4)
+    @Test
+    public void gotoPanels()
+    {
+        PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
+        assertTrue(panelsAdminPage.hasGotoPanelsLink());
+        PanelsHomePage panelsHomePage = panelsAdminPage.clickGotoPanels();
+        assertTrue(panelsHomePage.exists());
+    }
+
+    @Order(5)
+    @Test
+    public void resetPanels()
+    {
+        PanelsAdministrationPage panelsAdminPage = PanelsAdministrationPage.gotoPage();
+        assertTrue(panelsAdminPage.hasResetLink());
+
+        PageLayoutTabContent pageLayoutTabContent = panelsAdminPage.selectPageLayout();
+        pageLayoutTabContent = pageLayoutTabContent.selectLeftColumnLayout().openPanelListSection();
+        assertTrue(pageLayoutTabContent.isLeftPanelVisible());
+        assertFalse(pageLayoutTabContent.isRightPanelVisible());
+        pageLayoutTabContent.dragPanelToColumn("QuickLinks", PageLayoutTabContent.Column.LEFT);
+        assertTrue(new PageWithPanels().hasPanelInLeftColumn("QuickLinks"));
+
+        panelsAdminPage.clickResetLink();
+        pageLayoutTabContent = panelsAdminPage.selectPageLayout();
+        assertTrue(pageLayoutTabContent.isLayoutSelected(PageLayoutTabContent.Layout.NOCOLUMN));
+        assertFalse(pageLayoutTabContent.isLeftPanelVisible());
+        assertFalse(pageLayoutTabContent.isRightPanelVisible());
+        assertFalse(new PageWithPanels().hasPanelInLeftColumn("QuickLinks"));
+    }
+
+    @Order(6)
     @Test
     public void verifyPanelWizard(TestUtils setup, TestReference testReference)
     {

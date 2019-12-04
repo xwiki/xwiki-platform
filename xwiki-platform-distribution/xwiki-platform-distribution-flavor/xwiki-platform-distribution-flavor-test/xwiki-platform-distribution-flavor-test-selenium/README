@@ -1,7 +1,0 @@
-This module is being phased out using this strategy:
-
-* New UI tests should be written using Selenium2 and go in ui-tests/
-* Slowly migrate existing functional tests in this module to ui-tests/ over time
-* Use the PageObject pattern in new tests in ui-tests/ (http://code.google.com/p/selenium/wiki/PageObjects)
-
-For more details see http://markmail.org/message/akvm7pzwddhctmqy

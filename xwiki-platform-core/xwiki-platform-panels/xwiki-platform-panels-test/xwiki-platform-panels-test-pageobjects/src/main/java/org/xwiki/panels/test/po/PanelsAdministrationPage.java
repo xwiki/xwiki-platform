@@ -35,8 +35,17 @@ public class PanelsAdministrationPage extends ViewPage
     @FindBy(xpath = "//a[@role = 'tab' and normalize-space() = 'Page Layout']")
     private WebElement pageLayoutTab;
 
+    @FindBy(xpath = "//a[@role = 'tab' and normalize-space() = 'Panel List']")
+    private WebElement panelListTab;
+
     @FindBy(id = "saveLayout")
     private WebElement saveLink;
+
+    @FindBy(id = "revertLayout")
+    private WebElement resetLink;
+
+    @FindBy(xpath = "//a[normalize-space() = 'Go to Panels']")
+    private WebElement gotoPanelsLink;
 
     public static PanelsAdministrationPage gotoPage()
     {
@@ -48,6 +57,37 @@ public class PanelsAdministrationPage extends ViewPage
     {
         this.pageLayoutTab.click();
         return new PageLayoutTabContent();
+    }
+
+    public boolean hasPageLayoutTab()
+    {
+        return this.pageLayoutTab.isDisplayed();
+    }
+
+    public boolean hasPanelListTab()
+    {
+        return this.panelListTab.isDisplayed();
+    }
+
+    public boolean hasGotoPanelsLink()
+    {
+        return this.gotoPanelsLink.isDisplayed();
+    }
+
+    public PanelsHomePage clickGotoPanels()
+    {
+        this.gotoPanelsLink.click();
+        return new PanelsHomePage();
+    }
+
+    public boolean hasResetLink()
+    {
+        return this.resetLink.isDisplayed();
+    }
+
+    public void clickResetLink()
+    {
+        this.resetLink.click();
     }
 
     public PanelsAdministrationPage clickSave()

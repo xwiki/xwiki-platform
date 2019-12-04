@@ -40,6 +40,7 @@ import org.xwiki.test.ui.po.InformationPane;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -191,5 +192,17 @@ public class NavigationIT
             viewPage = new ViewPage();
             viewPage.waitForDocExtraPaneActive(docExtraPane);
         }
+    }
+
+    /**
+     * Ensure that the base bin URL redirect to the main page of the wiki.
+     */
+    @Order(4)
+    @Test
+    public void simpleBinUrlDoesNotThrowException(TestUtils testUtils)
+    {
+        testUtils.gotoPage(testUtils.getBaseBinURL());
+        ViewPage viewPage = new ViewPage();
+        assertEquals("XWiki - Main - Main", viewPage.getPageTitle());
     }
 }

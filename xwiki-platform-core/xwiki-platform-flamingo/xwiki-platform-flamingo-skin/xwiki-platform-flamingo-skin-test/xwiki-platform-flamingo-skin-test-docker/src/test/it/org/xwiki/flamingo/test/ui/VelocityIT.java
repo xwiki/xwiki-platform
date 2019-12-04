@@ -124,4 +124,18 @@ public class VelocityIT
         viewPage = setup.gotoPage(localMacro1);
         assertEquals("mymacro", viewPage.getContent());
     }
+
+    /**
+     * Tests that the document dates are always of the type java.util.Date, as hibernate returns
+     * java.sql.Timestamp, which is not entirely compatible with java.util.Date. When the cache
+     * storage is enabled, this problem isn't detected until the document is removed from the cache.
+     */
+    @Test
+    public void dateClass(TestUtils testUtils, TestReference testReference)
+    {
+        ViewPage viewPage = testUtils.createPage(testReference,
+            "{{velocity}}$xwiki.flushCache()\n$xwiki.getDocument('Main.WebHome').date.class{{/velocity}}",
+            "TestDateClass");
+        assertEquals("class java.util.Date", viewPage.getContent());
+    }
 }

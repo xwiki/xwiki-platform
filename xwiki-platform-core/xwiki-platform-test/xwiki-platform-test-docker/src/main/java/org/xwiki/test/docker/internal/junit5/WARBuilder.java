@@ -263,33 +263,37 @@ public class WARBuilder
     private File getJDBCDriver(Database database, ArtifactResolver resolver) throws Exception
     {
         Artifact artifact;
+
+        // Note: If the JDBC driver version is specified as "pom" or null then extract the information from the current
+        // POM.
+
         switch (database) {
             case MYSQL:
-                String mysqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                String mysqlDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
                     ? this.testConfiguration.getJDBCDriverVersion()
                     : this.mavenResolver.getPropertyFromCurrentPOM("mysql.version");
                 artifact = new DefaultArtifact("mysql", "mysql-connector-java", JAR, mysqlDriverVersion);
                 break;
             case MARIADB:
-                String mariadbDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                String mariadbDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
                     ? this.testConfiguration.getJDBCDriverVersion()
                     : this.mavenResolver.getPropertyFromCurrentPOM("mariadb.version");
                 artifact = new DefaultArtifact("org.mariadb.jdbc", "mariadb-java-client", JAR, mariadbDriverVersion);
                 break;
             case POSTGRESQL:
-                String pgsqlDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                String pgsqlDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
                     ? this.testConfiguration.getJDBCDriverVersion()
                     : this.mavenResolver.getPropertyFromCurrentPOM("pgsql.version");
                 artifact = new DefaultArtifact("org.postgresql", "postgresql", JAR, pgsqlDriverVersion);
                 break;
             case HSQLDB_EMBEDDED:
-                String hsqldbDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                String hsqldbDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
                     ? this.testConfiguration.getJDBCDriverVersion()
                     : this.mavenResolver.getPropertyFromCurrentPOM("hsqldb.version");
                 artifact = new DefaultArtifact("org.hsqldb", "hsqldb", JAR, hsqldbDriverVersion);
                 break;
             case ORACLE:
-                String oracleDriverVersion = this.testConfiguration.getJDBCDriverVersion() != null
+                String oracleDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
                     ? this.testConfiguration.getJDBCDriverVersion()
                     : this.mavenResolver.getPropertyFromCurrentPOM("oracle.version");
                 artifact = new DefaultArtifact("com.oracle.jdbc", "ojdbc8", JAR, oracleDriverVersion);
@@ -300,6 +304,11 @@ public class WARBuilder
         }
 
         return resolver.resolveArtifact(artifact).getArtifact().getFile();
+    }
+
+    private boolean isJDBCDriverSpecified(String jdbcDriverVersion)
+    {
+        return jdbcDriverVersion != null && !jdbcDriverVersion.equalsIgnoreCase("pom");
     }
 
     private void generateXEDForJAR(Artifact artifact, File targetDirectory, MavenResolver resolver) throws Exception

@@ -48,6 +48,8 @@ import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
@@ -329,7 +331,11 @@ public class PdfExportImpl implements PdfExport
             SAXReader reader = new SAXReader(docFactory);
             // Dom4J 2.1.1 disable external DTD by default which is required here, putting it back
             // See https://github.com/dom4j/dom4j/issues/51
-            reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
+            try {
+                reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
+            } catch (SAXNotSupportedException e) {
+            } catch (SAXNotRecognizedException e) {
+            }
             reader.setEntityResolver(new DefaultEntityResolver());
             XHTMLDocument document = (XHTMLDocument) reader.read(source);
 

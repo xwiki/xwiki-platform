@@ -130,6 +130,7 @@ public class VelocityIT
      * java.sql.Timestamp, which is not entirely compatible with java.util.Date. When the cache
      * storage is enabled, this problem isn't detected until the document is removed from the cache.
      */
+    @Order(4)
     @Test
     public void dateClass(TestUtils testUtils, TestReference testReference)
     {

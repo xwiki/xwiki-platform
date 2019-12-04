@@ -17,7 +17,7 @@
   #set ($uninstallJob = $extensionManager.uninstall($uninstallRequest))
 #end
 {{html clean="false"}}
-  <form action="" method="get">
+  <form action="">
     #displayJobStatus($uninstallJob.status, 'extension.clean.uninstall.status')
 
     #formHiddenCleanApply()

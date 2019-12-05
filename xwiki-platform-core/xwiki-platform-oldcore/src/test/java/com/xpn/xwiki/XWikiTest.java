@@ -45,6 +45,7 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.query.QueryExecutor;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
@@ -98,10 +99,13 @@ public class XWikiTest
     private XWiki xwiki;
 
     @AfterComponent
-    public void afterComponent()
+    public void afterComponent() throws Exception
     {
         // Unregister XWikiCfgConfigurationSource so that it's mocked by MockitoOldcore
         this.oldcore.getMocker().unregisterComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
+
+        // Mock the HQL query executor because we don't need it and it can cause problems
+        this.oldcore.getMocker().registerMockComponent(QueryExecutor.class, "hql");
     }
 
     @BeforeEach

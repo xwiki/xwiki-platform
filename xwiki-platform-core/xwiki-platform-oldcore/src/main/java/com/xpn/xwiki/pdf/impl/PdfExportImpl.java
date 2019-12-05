@@ -47,8 +47,9 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.css.CSSStyleDeclaration;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 import org.xml.sax.XMLReader;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.environment.Environment;
@@ -76,6 +77,7 @@ import io.sf.carte.doc.dom4j.CSSStylableElement;
 import io.sf.carte.doc.dom4j.XHTMLDocument;
 import io.sf.carte.doc.dom4j.XHTMLDocumentFactory;
 import io.sf.carte.doc.style.css.CSSDocument;
+import io.sf.carte.doc.style.css.CSSStyleDeclaration;
 import io.sf.carte.doc.xml.dtd.DefaultEntityResolver;
 
 /**
@@ -322,23 +324,18 @@ public class PdfExportImpl implements PdfExport
     {
         LOGGER.debug("Applying the following CSS [{}] to HTML [{}]", css, html);
         try {
-            //System.setProperty("org.w3c.css.sac.parser", "org.apache.batik.css.parser.Parser");
-
             // Prepare the input
             Reader re = new StringReader(html);
             InputSource source = new InputSource(re);
             XHTMLDocumentFactory docFactory = XHTMLDocumentFactory.getInstance();
-            // Clear the default stylesheet loaded by CSS4J. CSS4J does this to simulate the browser (UA) stylesheet
-            // that is applied but in our case we don't display the resulting HTML in a browser but as input to
-            // transform it into PDF. We want to control all the CSS rules we apply and thus don't need nor want to
-            // have extra ones applied.
-            // See https://groups.google.com/forum/?#!topic/css4j/CVqzjz3ZXXQ for extra details.
-            docFactory.getStyleSheetFactory().getUserAgentStyleSheet(
-                CSSDocument.ComplianceMode.STRICT).getCssRules().clear();
             SAXReader reader = new SAXReader(docFactory);
             // Dom4J 2.1.1 disable external DTD by default which is required here, putting it back
             // See https://github.com/dom4j/dom4j/issues/51
-            reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
+            try {
+                reader.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", true);
+            } catch (SAXNotSupportedException e) {
+            } catch (SAXNotRecognizedException e) {
+            }
             reader.setEntityResolver(new DefaultEntityResolver());
             XHTMLDocument document = (XHTMLDocument) reader.read(source);
 
@@ -346,7 +343,7 @@ public class PdfExportImpl implements PdfExport
             document.setBaseURL(new URL(context.getDoc().getExternalURL("view", context)));
 
             // Apply the style sheet.
-            document.addStyleSheet(new org.w3c.css.sac.InputSource(new StringReader(css)));
+            document.addStyleSheet(new io.sf.carte.doc.style.css.nsac.InputSource(new StringReader(css)));
             applyInlineStyle(document.getRootElement());
 
             OutputFormat outputFormat = new OutputFormat("", false);

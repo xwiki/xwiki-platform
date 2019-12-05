@@ -37,13 +37,13 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Missing: platform.panels.applications.helper=Here, you can select which applications are displayed in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. You can also re-order the applications as you want. Don't forget to save your changes!
-### Missing: platform.panels.applications.displayedapps=Applications in the bar
-### Missing: platform.panels.applications.blacklistedapps=Applications not in the bar
+platform.panels.applications.displayedapps=बार मधील अनुप्रयोग
+platform.panels.applications.blacklistedapps=बारमध्ये नसलेले अनुप्रयोग
 platform.panels.applications.save=जतन करा
 platform.panels.applications.revert=रीसेट करा
 platform.panels.applications.ajax.success=कॉन्फिगरेशन सेव्ह केले गेले आहे.
 platform.panels.applications.ajax.csrf=सीएसआरएफ प्रमाणीकरण अयशस्वी. पृष्ठ रीलोड करून पहा.
-### Missing: platform.panels.applications.ajax.noright=You do not have the right to edit PanelsCode.ApplicationsPanelConfiguration.
+platform.panels.applications.ajax.noright=आपल्याला  PanelsCode.ApplicationsPanelConfiguration संपादित करण्याचा अधिकार नाही.
 platform.panels.applications.ajax.error=Failed to save your changes.
 admin.panels.applications=अनुप्रयोग पॅनेल
 admin.panels.applications.description=अ‍ॅप्लीकेशन पॅनेलमध्ये कोणते अ‍ॅप्लिकेशन्स दाखवले जातात ते व्यवस्थापित करा.

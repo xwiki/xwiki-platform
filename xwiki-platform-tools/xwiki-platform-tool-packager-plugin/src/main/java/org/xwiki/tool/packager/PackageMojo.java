@@ -604,6 +604,10 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-oldcore", getXWikiPlatformVersion(), null, "jar"));
 
+        // Required to load macros.vm by default
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-velocity-webapp", getXWikiPlatformVersion(), null, "jar"));        
+
         // Required Plugins
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-skin-skinx", getXWikiPlatformVersion(), null, "jar"));

@@ -147,6 +147,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-velocity-webapp</artifactId>
       <version>${project.version}</version>
+      <scope>runtime</scope>
     </dependency>
     <!-- This is needed by xwiki-platform-captcha-api which is a dependency of xwiki-platform-oldcore (in CommentsAdd
          and RegisterAction for example). The only reason some Captcha API implementation classes are in

@@ -19,35 +19,24 @@
  */
 package org.xwiki.velocity.internal;
 
-import java.util.Locale;
+import java.util.Properties;
 
-import javax.inject.Inject;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.annotation.InstantiationStrategy;
-import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
-import org.xwiki.localization.LocalizationContext;
-import org.xwiki.velocity.tools.ComparisonDateTool;
+import org.apache.velocity.runtime.resource.loader.ResourceLoader;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Extend the Velocity Tool-provided ComparisonDateTool to use the current context locale.
- *
+ * Allow injecting a custom Velocity {@link ResourceLoader}.
+ * 
  * @version $Id$
- * @since 8.2RC1
+ * @since 12.0RC1
  */
-@Component(roles = XWikiDateTool.class)
-@InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
-public class XWikiDateTool extends ComparisonDateTool
+@Role
+public interface ResourceLoaderInitializer
 {
-    @Inject
-    private LocalizationContext localizationContext;
-
     /**
-     * @return the current locale from the XWiki context
+     * Add Velocity configuration.
+     * 
+     * @param velocityProperties the Velocity configuration to complete
      */
-    @Override
-    public Locale getLocale()
-    {
-        return this.localizationContext.getCurrentLocale();
-    }
+    void initialize(Properties velocityProperties);
 }

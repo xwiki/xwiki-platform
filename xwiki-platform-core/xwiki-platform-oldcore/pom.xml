@@ -311,13 +311,9 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- TODO: This dependency shouldn't be in this module since it means we're tying this module and all other
-         modules using it to the Servlet environment, which is pretty bad. To be able to remove this dependency
-         we first need to be able to split DefaultVelocityManager so that the part that is related to the Servlet
-         environment (the Velocity webapp loader) is moved to its own module. -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-velocity-webapp</artifactId>
+      <artifactId>xwiki-platform-velocity-xwiki</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

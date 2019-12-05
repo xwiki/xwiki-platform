@@ -31,6 +31,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.environment.internal.ServletEnvironment;
+import org.xwiki.localization.LocalizationContext;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -50,6 +51,9 @@ public class XWikiWebappResourceLoaderTest
 {
     @MockComponent
     private ConfigurationSource configuration;
+
+    @MockComponent
+    private LocalizationContext localizationContext;
 
     @InjectComponentManager
     private ComponentManager componentManager;

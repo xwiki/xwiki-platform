@@ -123,13 +123,6 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- Velocity add-on for Platform -->
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-velocity-xwiki</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- XML -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

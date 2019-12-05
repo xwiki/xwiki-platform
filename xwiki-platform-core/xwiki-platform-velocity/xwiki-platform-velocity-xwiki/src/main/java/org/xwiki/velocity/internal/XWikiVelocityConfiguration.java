@@ -20,15 +20,13 @@
 package org.xwiki.velocity.internal;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.velocity.runtime.RuntimeConstants;
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.velocity.XWikiWebappResourceLoader;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Override the default {@link org.xwiki.velocity.VelocityConfiguration} implementation in order to replace some of the
@@ -42,10 +40,20 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
 {
-    private static final String RESOURCE_LOADER_ID = "xwiki";
+    @Inject
+    private XWikiNumberTool numberTool;
 
     @Inject
-    private Provider<XWikiContext> contextProvider;
+    private XWikiDateTool dateTool;
+
+    @Inject
+    private XWikiMathTool mathTool;
+
+    @Inject
+    private ComponentManager componentManager;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public void initialize() throws InitializationException
@@ -53,14 +61,23 @@ public class XWikiVelocityConfiguration extends DefaultVelocityConfiguration
         super.initialize();
 
         // Override some tools
-        this.defaultTools.put("numbertool", new XWikiNumberTool(this.contextProvider));
-        this.defaultTools.put("datetool", new XWikiDateTool(this.contextProvider));
-        this.defaultTools.put("mathttool", new XWikiMathTool(this.contextProvider));
+        this.defaultTools.put("numbertool", this.numberTool);
+        this.defaultTools.put("datetool", this.dateTool);
+        this.defaultTools.put("mathttool", this.mathTool);
 
-        this.defaultProperties.setProperty(RuntimeConstants.RESOURCE_LOADERS, RESOURCE_LOADER_ID);
-        this.defaultProperties.setProperty(
-            RuntimeConstants.RESOURCE_LOADER + '.' + RESOURCE_LOADER_ID + '.' + RuntimeConstants.RESOURCE_LOADER_CLASS,
-            XWikiWebappResourceLoader.class.getName());
-        this.defaultProperties.put(RuntimeConstants.VM_LIBRARY, "/templates/macros.vm");
+        if (this.componentManager.hasComponent(ResourceLoaderInitializer.class)) {
+            try {
+                // Try to find a ResourceLoaderInitializer implementation
+                ResourceLoaderInitializer resourceLoader =
+                    this.componentManager.getInstance(ResourceLoaderInitializer.class);
+
+                // Initialize the ResourceLoader
+                resourceLoader.initialize(this.defaultProperties);
+            } catch (ComponentLookupException e) {
+                throw new InitializationException("Failed to lookup the ResourceLoader implementation", e);
+            }
+        } else {
+            this.logger.debug("Could not find any ResourceLoader implementation");
+        }
     }
 }

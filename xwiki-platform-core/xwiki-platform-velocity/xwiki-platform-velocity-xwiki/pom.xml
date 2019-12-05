@@ -37,7 +37,7 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

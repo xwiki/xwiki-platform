@@ -31,11 +31,14 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   var webHome = "$!services.model.getEntityReference('DOCUMENT', 'default').name" || 'WebHome';
 
   var getSelectizeOptions = function(select) {
-    var space = select.data('suggest-space');
+    // Where to look for pages. The following is supported:
+    // * "wiki:wikiName" look for pages in the specified wiki
+    // * "space:spaceReference": look for pages in the specified space
+    var searchScope = select.data('searchScope') || 'wiki:' + XWiki.currentWiki;
     return {
       create: true,
       load: function(text, callback) {
-        loadPages(text, space).done(function(data) {
+        loadPages(text, searchScope).done(function(data) {
           var pages = [];
           data.searchResults.forEach(function (element) {
             var hierarchy = element.hierarchy.items;
@@ -63,15 +66,40 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
     }
   };
 
-  var loadPages = function(text, space) {
+  var loadPages = function(text, searchScope) {
     var scopes = ['name', 'title'];
-    return $.getJSON(XWiki.Document.getRestSearchURL("", space), $.param({
+    return $.getJSON(getRestSearchURL(searchScope), $.param({
       'q': text,
       'scope': scopes,
       'number': 10,
       'localeAware': true,
       'media': 'json'
     }, true));
+  };
+
+  var getRestSearchURL = function(searchScope) {
+    var entityReference = resolveEntityReference(searchScope);
+    var spaces = entityReference.getReversedReferenceChain().filter(function(component) {
+      return component.type === XWiki.EntityType.SPACE;
+    }).map(function(component) {
+      return component.name;
+    });
+    var wiki = entityReference.extractReferenceValue(XWiki.EntityType.WIKI);
+    return XWiki.Document.getRestSearchURL('', spaces, wiki);
+  };
+
+  /**
+   * Resolves an entity reference from a string representation of the form "entityType:entityReference".
+   */
+  var resolveEntityReference = function(typeAndReference) {
+    if (typeof typeAndReference === 'string') {
+      try {
+        return XWiki.Model.resolve(typeAndReference, null, XWiki.currentDocument.documentReference);
+      } catch (e) {
+        return null;
+      }
+    }
+    return typeAndReference;
   };
 
   $.fn.suggestPages = function() {

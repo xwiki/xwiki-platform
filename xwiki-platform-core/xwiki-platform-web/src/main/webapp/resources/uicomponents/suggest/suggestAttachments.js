@@ -361,12 +361,9 @@ define('xwiki-suggestAttachments', [
    */
   var resolveEntityReference = function(typeAndReference) {
     if (typeof typeAndReference === 'string') {
-      var separatorIndex = typeAndReference.indexOf(':');
-      if (separatorIndex > 0) {
-        var entityType = XWiki.EntityType.byName(typeAndReference.substring(0, separatorIndex));
-        return XWiki.Model.resolve(typeAndReference.substring(separatorIndex + 1), entityType,
-          XWiki.currentDocument.documentReference);
-      } else {
+      try {
+        return XWiki.Model.resolve(typeAndReference, null, XWiki.currentDocument.documentReference);
+      } catch (e) {
         return null;
       }
     }

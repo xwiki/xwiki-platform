@@ -181,6 +181,7 @@
                 <include>uicomponents/widgets/list/xlist.js</include>
                 <include>uicomponents/suggest/suggest.js</include>
                 <include>uicomponents/model/entityReference.js</include>
+                <include>js/xwiki/xwiki.js</include>
               </sourceIncludes>
               <specIncludes>
                 <include>non-amd/**/*.js</include>

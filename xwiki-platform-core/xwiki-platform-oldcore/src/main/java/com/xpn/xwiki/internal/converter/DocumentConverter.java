@@ -22,6 +22,7 @@ package com.xpn.xwiki.internal.converter;
 import java.lang.reflect.Type;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -31,6 +32,7 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.properties.converter.ConversionException;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -47,6 +49,9 @@ public class DocumentConverter extends AbstractConverter<Document>
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
+    @Inject
+    private Provider<XWikiContext> contextProvider;
+
     @Override
     public <G> G convert(Type targetType, Object sourceValue)
     {
@@ -57,6 +62,16 @@ public class DocumentConverter extends AbstractConverter<Document>
             return convertFromType(targetType, sourceValue);
         } else {
             return super.convert(targetType, sourceValue);
+        }
+    }
+
+    @Override
+    public Document convertToType(Type targetType, Object sourceValue)
+    {
+        if (sourceValue instanceof XWikiDocument) {
+            return new Document((XWikiDocument) sourceValue, contextProvider.get());
+        } else {
+            throw new ConversionException(String.format("Unsupported source type [%s]", sourceValue.getClass()));
         }
     }
 

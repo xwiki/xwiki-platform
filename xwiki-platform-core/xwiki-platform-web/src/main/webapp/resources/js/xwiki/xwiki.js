@@ -1440,8 +1440,8 @@ XWiki.Document.SpaceSearchURLStub = "${request.contextPath}/rest/wikis/__wiki__/
 XWiki.Document.getRestSearchURL = function(queryString, space, wiki) {
   wiki = wiki || XWiki.Document.currentWiki;
   var url;
-  if (space) {
-    var spaces = Array.isArray(space) ? space : [space];
+  var spaces = space ? (Array.isArray(space) ? space : [space]) : [];
+  if (spaces.length > 0) {
     spaces = spaces.join('/spaces/');
     url = XWiki.Document.SpaceSearchURLStub.replace("__wiki__", wiki).replace("__space__", spaces);
   } else {

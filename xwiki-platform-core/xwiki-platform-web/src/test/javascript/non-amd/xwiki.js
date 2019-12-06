@@ -40,9 +40,19 @@ describe("XWiki", function() {
       expect("${request.contextPath}/rest/wikis/xwiki/spaces/foo/spaces/bar/search?a=b").toEqual(url);
     });
 
+    it("calls with empty spaces array", function() {
+      var url = XWiki.Document.getRestSearchURL(null, []);
+      expect("${request.contextPath}/rest/wikis/xwiki/search").toEqual(url);
+    });
+
     it("calls with spaces and wiki", function() {
       var url = XWiki.Document.getRestSearchURL('', ['foo', 'bar'], 'test');
       expect("${request.contextPath}/rest/wikis/test/spaces/foo/spaces/bar/search").toEqual(url);
+    });
+
+    it("calls with empty spaces and wiki", function() {
+      var url = XWiki.Document.getRestSearchURL('a=b', [], 'test');
+      expect("${request.contextPath}/rest/wikis/test/search?a=b").toEqual(url);
     });
 
   });

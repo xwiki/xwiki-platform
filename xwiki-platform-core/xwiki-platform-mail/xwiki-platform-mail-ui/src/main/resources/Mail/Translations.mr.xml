@@ -37,13 +37,13 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.email=मेल
-### Missing: admin.email.description=Configure mail sending parameters and view mail statuses.
-### Missing: admin.emailgeneral=Advanced
-### Missing: admin.emailgeneral.description=Configure advanced mail parameters, like mail address obfuscation.
-### Missing: admin.emailsend=Mail Sending
-### Missing: admin.emailsend.description=Configure mail sending parameters.
-### Missing: admin.emailstatus=Mail Sending Status
-### Missing: admin.emailstatus.description=View the statuses of sent mails and resend mails that resulted in failure.
+admin.email.description=मेल पाठविणारे मापदंड कॉन्फिगर करा आणि मेल स्थिती पहा.
+admin.emailgeneral=प्रगत
+admin.emailgeneral.description=प्रगत मेल पॅरामीटर्स कॉन्फिगर करा, जसे की मेल पत्ता अस्पष्टता.
+admin.emailsend=मेल पाठवित आहे
+admin.emailsend.description=मेल पाठविण्याचे मापदंड कॉन्फिगर करा.
+admin.emailstatus=मेल पाठविण्याची स्थिती
+admin.emailstatus.description=पाठविलेल्या मेलची स्थिती पहा आणि अयशस्वी होणारे मेल पुन्हा पाठवा.
 ### Missing: admin.emailstatus.hint=If you can't find the status of a mail then it may be because the property which sent the mail did not specify that mail status should persist.
 ### Missing: Mail.GeneralMailConfigClass_obfuscate=Obfuscate Email Addresses
 ### Missing: Mail.GeneralMailConfigClass_obfuscate.hint=This only affects the email addresses stored in object properties of type Email, as long as the default custom displayer for the Email property type is not overwritten. Example: a...@domain.org

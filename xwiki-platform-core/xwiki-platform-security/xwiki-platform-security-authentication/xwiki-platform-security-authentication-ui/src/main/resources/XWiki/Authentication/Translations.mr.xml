@@ -44,8 +44,8 @@ authentication.admin.maxAttempts.label=अधिकृत प्रयत्न�
 authentication.admin.maxAttempts.hint=हे धोरण सक्रिय होण्यापूर्वी अधिकृत लॉगिन अयशस्वी होणार्‍या अधिकाधिक संख्येचे प्रतिनिधित्व करते. ही संख्या फक्त खालील टाइम विंडोच्या संदर्भात विचारात घेतली जाते. कृपया विचार करा की 0 मूल्य म्हणजे वैशिष्ट्य अक्षम केले आहे.
 authentication.admin.timeWindow.label=लॉगिन अयशस्वी होण्यासाठी वेळ विंडो
 authentication.admin.timeWindow.hint=कार्यनीती कार्यान्वित करण्यासाठी अयशस्वी लॉगिन प्रयत्नांचा विचार करण्यासाठी ज्या सेकंदांमधील वेळ विंडो.
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.label=Enable or disable the authentication security mechanism
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.hint=Disabling the authentication security mechanism will also reset the authentication failure records.
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.disabled=Disabled
-### Missing: authentication.admin.isAuthenticationSecurityEnabled.enabled=Enabled</content>
+authentication.admin.isAuthenticationSecurityEnabled.label=प्रमाणीकरण सुरक्षा यंत्रणा सक्षम किंवा अक्षम करा
+authentication.admin.isAuthenticationSecurityEnabled.hint=प्रमाणीकरण सुरक्षा यंत्रणा अक्षम केल्याने प्रमाणीकरण अयशस्वी रेकॉर्ड देखील रीसेट होईल.
+authentication.admin.isAuthenticationSecurityEnabled.disabled=निष्क्रिय केलेले
+authentication.admin.isAuthenticationSecurityEnabled.enabled=सक्रीय केलेले</content>
 </xwikidoc>

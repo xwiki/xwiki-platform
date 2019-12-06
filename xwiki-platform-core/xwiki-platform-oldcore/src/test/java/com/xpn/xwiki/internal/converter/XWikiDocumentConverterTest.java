@@ -27,6 +27,7 @@ import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -38,6 +39,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 import static org.junit.Assert.assertSame;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -111,5 +113,27 @@ public class XWikiDocumentConverterTest
         when(serializer.serialize(xWikiDocument.getDocumentReference())).thenReturn("reference");
 
         assertSame("reference", documentConverter.convert(String.class, xWikiDocument));
+    }
+
+    @Test
+    public void convertToUnsupportedType()
+    {
+        ConversionException conversionException = assertThrows(ConversionException.class, () -> {
+            documentConverter.convert(Integer.class, this.xWikiDocument);
+        });
+
+        assertEquals("Unsupported target type [class java.lang.Integer]",
+            conversionException.getMessage());
+    }
+
+    @Test
+    public void convertFromUnsupportedType()
+    {
+        ConversionException conversionException = assertThrows(ConversionException.class, () -> {
+            documentConverter.convert(XWikiDocument.class, this.documentReference);
+        });
+
+        assertEquals("Unsupported source type [class org.xwiki.model.reference.DocumentReference]",
+            conversionException.getMessage());
     }
 }

@@ -71,7 +71,7 @@ public class XWikiDocumentConverter extends AbstractConverter<XWikiDocument>
         if (sourceValue instanceof Document) {
             return convertFromDocument((Document) sourceValue);
         } else {
-            throw new ConversionException(String.format("Unsupported target type [%s]", targetType));
+            throw new ConversionException(String.format("Unsupported source type [%s]", sourceValue.getClass()));
         }
     }
 
@@ -89,7 +89,7 @@ public class XWikiDocumentConverter extends AbstractConverter<XWikiDocument>
         } else if (targetType == Document.class) {
             return (G) convertToDocument((XWikiDocument) sourceValue);
         } else {
-            throw new ConversionException(String.format("Unsupported source type [%s]", targetType));
+            throw new ConversionException(String.format("Unsupported target type [%s]", targetType));
         }
     }
 

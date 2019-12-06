@@ -308,7 +308,7 @@ define('xwiki-suggestAttachments', [
     return {
       maxOptions: 10,
       // The document where the selected values are saved and where new files are being uploaded. Stored attachment
-      // references will be relative this document.
+      // references will be relative to this document.
       documentReference: select.data('documentReference'),
       // Where to look for attachments. The following is supported:
       // * "wiki:wikiName" look for attachments in the specified wiki

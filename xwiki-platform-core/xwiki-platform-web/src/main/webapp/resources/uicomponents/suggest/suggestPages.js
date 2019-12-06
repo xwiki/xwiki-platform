@@ -31,61 +31,32 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   var webHome = "$!services.model.getEntityReference('DOCUMENT', 'default').name" || 'WebHome';
 
   var getSelectizeOptions = function(select) {
-    // Where to look for pages. The following is supported:
-    // * "wiki:wikiName" look for pages in the specified wiki
-    // * "space:spaceReference": look for pages in the specified space
-    var searchScope = select.data('searchScope') || 'wiki:' + XWiki.currentWiki;
     return {
       create: true,
+      // The document where the selected values are saved. Stored document references will be relative to this document.
+      documentReference: select.data('documentReference'),
+      // Where to look for pages. The following is supported:
+      // * "wiki:wikiName" look for pages in the specified wiki
+      // * "space:spaceReference": look for pages in the specified space
+      searchScope: select.data('searchScope'),
       load: function(text, callback) {
-        loadPages(text, searchScope).done(function(data) {
-          var pages = [];
-          data.searchResults.forEach(function (element) {
-            var hierarchy = element.hierarchy.items;
-            var label = hierarchy.pop().label;
-            if (element.pageName === webHome) {
-              label = hierarchy.pop().label;
-            }
-            var hint = hierarchy
-              .filter(function(element) { return element.type === 'space'; })
-              .map(function(element) { return element.label; })
-              .join(' / ');
-            var doc = new XWiki.Document(XWiki.Model.resolve(element.id, XWiki.EntityType.DOCUMENT))
-            var url = doc.getURL();
-            pages.push({
-              'value': element.pageFullName,
-              'label': label,
-              'icon': pageIcon,
-              'url': url,
-              'hint': hint
-            });
-          });
-          callback(pages);
-        }).fail(callback);
+        loadPages(text, this.settings).done(callback).fail(callback);
+      },
+      loadSelected: function(text, callback) {
+        loadPage(text, this.settings).done(callback).fail(callback);
       }
     }
   };
 
-  var loadPages = function(text, searchScope) {
-    var scopes = ['name', 'title'];
-    return $.getJSON(getRestSearchURL(searchScope), $.param({
-      'q': text,
-      'scope': scopes,
-      'number': 10,
-      'localeAware': true,
-      'media': 'json'
-    }, true));
-  };
-
-  var getRestSearchURL = function(searchScope) {
-    var entityReference = resolveEntityReference(searchScope);
-    var spaces = entityReference.getReversedReferenceChain().filter(function(component) {
-      return component.type === XWiki.EntityType.SPACE;
-    }).map(function(component) {
-      return component.name;
-    });
-    var wiki = entityReference.extractReferenceValue(XWiki.EntityType.WIKI);
-    return XWiki.Document.getRestSearchURL('', spaces, wiki);
+  var processOptions = function(options) {
+    // Resolve the document reference relative to the current document reference.
+    if (!options.documentReference || typeof options.documentReference === 'string') {
+      options.documentReference = XWiki.Model.resolve(options.documentReference, XWiki.EntityType.DOCUMENT,
+        XWiki.currentDocument.documentReference);
+    }
+    // Resolve the search scope.
+    options.searchScope = resolveEntityReference(options.searchScope || 'wiki:' + XWiki.currentWiki);
+    return options;
   };
 
   /**
@@ -102,9 +73,74 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
     return typeAndReference;
   };
 
-  $.fn.suggestPages = function() {
+  var loadPages = function(text, options) {
+    var scopes = ['name', 'title'];
+    return $.getJSON(getRestSearchURL(options.searchScope), $.param({
+      'q': text,
+      'scope': scopes,
+      'number': 10,
+      'localeAware': true,
+      'media': 'json'
+    }, true)).then($.proxy(processPages, null, options));
+  };
+
+  var loadPage = function(value, options) {
+    var documentReference = XWiki.Model.resolve(value, XWiki.EntityType.DOCUMENT, options.documentReference);
+    var localValue = XWiki.Model.serialize(documentReference.relativeTo(options.searchScope.getRoot()));
+    // TODO: Call the document REST URL instead, when it will include the page hierarchy.
+    return loadPages(localValue, options);
+  };
+
+  var getRestSearchURL = function(searchScope) {
+    var spaces = searchScope.getReversedReferenceChain().filter(function(component) {
+      return component.type === XWiki.EntityType.SPACE;
+    }).map(function(component) {
+      return component.name;
+    });
+    var wiki = searchScope.extractReferenceValue(XWiki.EntityType.WIKI);
+    return XWiki.Document.getRestSearchURL('', spaces, wiki);
+  };
+
+  /**
+   * Adapt the JSON returned by the REST call to the format expected by the Selectize widget.
+   */
+  var processPages = function(options, response) {
+    if ($.isArray(response.searchResults)) {
+      return response.searchResults.map($.proxy(processPage, null, options));
+    } else {
+      return [];
+    }
+  };
+
+  var processPage = function(options, page) {
+    // Value (relative to the current wiki, where it is saved)
+    var documentReference = XWiki.Model.resolve(page.id, XWiki.EntityType.DOCUMENT);
+    var value = XWiki.Model.serialize(documentReference.relativeTo(options.documentReference.getRoot()));
+    // Label
+    var hierarchy = page.hierarchy.items;
+    var label = hierarchy.pop().label;
+    if (page.pageName === webHome) {
+      label = hierarchy.pop().label;
+    }
+    // Hint
+    var hint = hierarchy.filter(function(item) {
+      return item.type === 'space';
+    }).map(function(item) {
+      return item.label;
+    }).join(' / ');
+    return {
+      'value': value,
+      'label': label,
+      'hint': hint,
+      'icon': pageIcon,
+      'url': new XWiki.Document(documentReference).getURL()
+    };
+  };
+
+  $.fn.suggestPages = function(options) {
     return this.each(function() {
-      $(this).xwikiSelectize(getSelectizeOptions($(this)));
+      var actualOptions = $.extend(getSelectizeOptions($(this)), options);
+      $(this).xwikiSelectize(processOptions(actualOptions));
     });
   };
 });

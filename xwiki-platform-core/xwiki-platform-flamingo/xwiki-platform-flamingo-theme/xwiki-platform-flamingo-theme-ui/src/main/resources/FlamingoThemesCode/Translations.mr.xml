@@ -50,30 +50,30 @@ platform.flamingo.themes.home.newThemeName=थीमचे नाव ...
 platform.flamingo.themes.home.create=नवीन थीम तयार करा
 platform.flamingo.themes.home.create.invalid=अवैध थीम नाव!
 platform.flamingo.themes.home.create.csrf=सुरक्षिततेच्या कारणास्तव, कृपया आपण "{0}" नावाची थीम तयार करू इच्छित असल्याची पुष्टी करा.
-### Missing: platform.flamingo.themes.home.create.confirm=Confirm
-### Missing: platform.flamingo.themes.home.set.success=Theme set to "{0}".
-### Missing: platform.flamingo.themes.title.variables=Variables
-### Missing: platform.flamingo.themes.title.preview=Preview
-### Missing: platform.flamingo.themes.autorefresh=Auto refresh
-### Missing: platform.flamingo.themes.refresh=Refresh
-### Missing: platform.flamingo.themes.refreshwarning=The refresh can take several seconds.
-### Missing: platform.flamingo.themes.loading=Loading...
-### Missing: platform.flamingo.themes.category.logos=Logos
-### Missing: platform.flamingo.themes.category.base-colors=Base colors
-### Missing: platform.flamingo.themes.category.typography=Typography
-### Missing: platform.flamingo.themes.category.forms=Forms
-### Missing: platform.flamingo.themes.category.buttons=Buttons
-### Missing: platform.flamingo.themes.category.tables=Tables
-### Missing: platform.flamingo.themes.category.navbar=Navigation Bar
-### Missing: platform.flamingo.themes.category.dropdowns=Drop downs
-### Missing: platform.flamingo.themes.category.panels=Panels
-### Missing: platform.flamingo.themes.category.breadcrumb=Breadcrumb
-### Missing: platform.flamingo.themes.category.advanced=Advanced
-### Missing: platform.flamingo.themes.defaultvalue=Default
-### Missing: platform.flamingo.themes.lessCode.description=In this field, you can directly write LESS code which will be added into the skin.
-### Missing: platform.flamingo.themes.incompatiblebrowser=Sorry, the preview does not work with this version of Internet Explorer. You need to use a newer browser.
-### Missing: platform.flamingo.themes.local=Local
-### Missing: platform.flamingo.themes.global=Global
+platform.flamingo.themes.home.create.confirm=खात्री करा
+platform.flamingo.themes.home.set.success=थीम  "{0}" वर सेट केली.
+platform.flamingo.themes.title.variables=व्हेरिएबल्स
+platform.flamingo.themes.title.preview=पूर्वावलोकन
+platform.flamingo.themes.autorefresh=स्वयं रीफ्रेश
+platform.flamingo.themes.refresh=रीफ्रेश
+platform.flamingo.themes.refreshwarning=रीफ्रेशला काही सेकंद लागू शकतात.
+platform.flamingo.themes.loading=लोड करीत आहे...
+platform.flamingo.themes.category.logos=लोगो
+platform.flamingo.themes.category.base-colors=बेस रंग
+platform.flamingo.themes.category.typography=टायपोग्राफी
+platform.flamingo.themes.category.forms=फॉर्म
+platform.flamingo.themes.category.buttons=बटन
+platform.flamingo.themes.category.tables=सारण्या
+platform.flamingo.themes.category.navbar=पथदर्शक बार
+platform.flamingo.themes.category.dropdowns=ड्रॉप डाउन
+platform.flamingo.themes.category.panels=पॅनेल
+platform.flamingo.themes.category.breadcrumb=ब्रेडक्रंब
+platform.flamingo.themes.category.advanced=प्रगत
+platform.flamingo.themes.defaultvalue=डीफॉल्ट
+platform.flamingo.themes.lessCode.description=या फील्डमध्ये आपण थेट LESS कोड लिहू शकता जो skin मध्ये जोडला जाईल.
+platform.flamingo.themes.incompatiblebrowser=क्षमस्व, इंटरनेट एक्सप्लोररच्या या आवृत्तीसह पूर्वावलोकन कार्य करत नाही. आपल्याला नवीन ब्राउझर वापरण्याची आवश्यकता आहे.
+platform.flamingo.themes.local=लोकॅल
+platform.flamingo.themes.global=वैश्विक
 
 ###############################################################################
 ## Deprecated
@@ -86,7 +86,7 @@ platform.flamingo.themes.home.create.csrf=सुरक्षिततेच्�
 #######################################
 ## until 7.3M1
 #######################################
-### Missing: platform.flamingo.themes.lessCode.warning=Unfortunately, this field is not taken into account in the live preview.
+platform.flamingo.themes.lessCode.warning=दुर्दैवाने, हे फील्ड थेट पूर्वावलोकनात घेतले जात नाही.
 
 #@deprecatedend</content>
 </xwikidoc>

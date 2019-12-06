@@ -36,7 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: platform.panels.applications.helper=Here, you can select which applications are displayed in the Applications Bar (on the left, by default). Any new application will be displayed there. If you want to remove some of them, you just need to drag and drop the icon from the first box to the other. You can also re-order the applications as you want. Don't forget to save your changes!
+  <content>platform.panels.applications.helper=येथे आपण अ‍ॅप्लिकेशन बारमध्ये कोणते अनुप्रयोग प्रदर्शित केले आहेत ते निवडू शकता (डीफॉल्टनुसार डावीकडे). कोणताही नवीन अनुप्रयोग तेथे प्रदर्शित केला जाईल. आपण त्यातील काही काढू इच्छित असल्यास, आपल्याला त्याच्या आयकॉनला पहिल्या बॉक्समधून दुसर्‍याकडे ड्रॅग आणि ड्रॉप करणे आवश्यक आहे. आपण आपल्या इच्छेनुसार अनुप्रयोगांचे ऑर्डर देखील करू शकता. आपले बदल जतन करण्यास विसरू नका!
 platform.panels.applications.displayedapps=बार मधील अनुप्रयोग
 platform.panels.applications.blacklistedapps=बारमध्ये नसलेले अनुप्रयोग
 platform.panels.applications.save=जतन करा
@@ -53,16 +53,16 @@ admin.panels.navigation.description=नॅव्हिगेशन पॅने�
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=उच्च स्तरीय विस्तार पृष्ठे वगळा
 PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=हे डायनॅमिक फिल्टर नेव्हिगेशन ट्रीमधून स्थापित केलेल्या विस्ताराशी संबंधित शीर्ष स्तरीय पृष्ठे हटविते, जर ती सुधारित केली गेली नाहीत तर.
 PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=शीर्ष स्तरीय अनुप्रयोग पृष्ठे वगळा
-### Missing: PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=This dynamic filter removes from the navigation tree the top level pages that belong to an application created with App Within Minutes.
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions=Exclusions
-### Missing: PanelsCode.NavigationConfigurationClass_exclusions.hint=The list of pages to exclude from the navigation tree.
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions=Inclusions
-### Missing: PanelsCode.NavigationConfigurationClass_inclusions.hint=The list of pages to include in the navigation tree even if they were excluded by a previous filter.
-### Missing: platform.panels.navigation.configuration.excludedPages=Excluded Pages
-### Missing: platform.panels.navigation.configuration.excludedPages.hint=Use drag &amp; drop to move pages out of the navigation tree or to put them back.
-### Missing: platform.panels.navigation.configuration.excludedPages.empty=None
-### Missing: platform.panels.navigation.configuration.topLevelExtensionPages=Top Level Extension Pages
-### Missing: platform.panels.navigation.configuration.topLevelApplicationPages=Top Level Application Pages
-### Missing: platform.panels.navigation.configuration.otherPages=Other Pages
-### Missing: platform.panels.navigation.configuration.saveComment=Updated the Navigation Panel configuration from the Administration</content>
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=हे डायनॅमिक फिल्टर नेव्हिगेशन ट्री वरून अव्वल स्तराची पाने जी काही मिनिटांत अ‍ॅपसह तयार केलेल्या अनुप्रयोगाशी संबंधित आहेत ती काढून टाकते.
+PanelsCode.NavigationConfigurationClass_exclusions=अपवाद
+PanelsCode.NavigationConfigurationClass_exclusions.hint=नॅव्हिगेशन ट्रीमधून वगळण्यासाठी पृष्ठांची यादी.
+PanelsCode.NavigationConfigurationClass_inclusions=समावेश
+PanelsCode.NavigationConfigurationClass_inclusions.hint=मागील फिल्टरद्वारे वगळले गेले असले तरीही, नेव्हिगेशन ट्रीमध्ये समाविष्ट करण्यासाठी पृष्ठांची यादी.
+platform.panels.navigation.configuration.excludedPages=वगळलेली पृष्ठे
+platform.panels.navigation.configuration.excludedPages.hint=नेव्हिगेशनच्या झाडाच्या बाहेर पृष्ठे हलविण्यासाठी किंवा ती परत ठेवण्यासाठी ड्रॅग आणि ड्रॉप वापरा.
+platform.panels.navigation.configuration.excludedPages.empty=कोणतेही नाही
+platform.panels.navigation.configuration.topLevelExtensionPages=उच्च स्तरीय विस्तार पृष्ठे
+platform.panels.navigation.configuration.topLevelApplicationPages=शीर्ष स्तरीय अनुप्रयोग पृष्ठे
+platform.panels.navigation.configuration.otherPages=इतर पृष्ठे
+platform.panels.navigation.configuration.saveComment=प्रशासनाकडून नेव्हिगेशन पॅनेल कॉन्फिगरेशन अद्यतनित केले</content>
 </xwikidoc>

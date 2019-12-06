@@ -68,6 +68,7 @@ public class DocumentConverterTest
         this.documentReference = new DocumentReference("xwiki", "Foo", "WebHome");
         when(document.getDocumentReference()).thenReturn(this.documentReference);
         when(document.getDocument()).thenReturn(xWikiDocument);
+        when(xWikiDocument.newDocument(any())).thenReturn(document);
         when(mockitoOldcore.getMockRightService().hasProgrammingRights(any())).thenReturn(true);
     }
 

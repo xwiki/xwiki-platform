@@ -40,6 +40,7 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import static org.junit.Assert.assertSame;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,6 +76,7 @@ public class XWikiDocumentConverterTest
         this.documentReference = new DocumentReference("xwiki", "Foo", "WebHome");
         when(xWikiDocument.getDocumentReference()).thenReturn(this.documentReference);
         when(document.getDocument()).thenReturn(xWikiDocument);
+        when(xWikiDocument.newDocument(any())).thenReturn(document);
 
         when(contextProvider.get()).thenReturn(mockitoOldcore.getXWikiContext());
         when(mockitoOldcore.getMockRightService().hasProgrammingRights(mockitoOldcore.getXWikiContext()))

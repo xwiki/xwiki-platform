@@ -100,7 +100,7 @@ public class XWikiDocumentConverter extends AbstractConverter<XWikiDocument>
 
     private Document convertToDocument(XWikiDocument document)
     {
-        return new Document(document, this.contextProvider.get());
+        return document.newDocument(this.contextProvider.get());
     }
 
     @Override

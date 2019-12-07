@@ -576,6 +576,16 @@ XWiki.Model = {
     return serializer.serialize(entityReference);
   },
   resolve: function(representation, entityType, defaultValueProvider) {
+    if (entityType == undefined && typeof representation === 'string') {
+      // Try to extract the entity type from the representation.
+      var separatorIndex = representation.indexOf(':');
+      if (separatorIndex > 0) {
+        entityType = XWiki.EntityType.byName(representation.substring(0, separatorIndex));
+        if (entityType >= 0) {
+          representation = representation.substring(separatorIndex + 1);
+        }
+      }
+    }
     return resolver.resolve(representation, entityType, defaultValueProvider);
   }
 };

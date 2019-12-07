@@ -179,6 +179,14 @@ describe('EntityReference', function() {
       reference = XWiki.Model.resolve('wiki:page', XWiki.EntityType.DOCUMENT);
       assertReference('DOCUMENT:wiki:page', reference);
 
+      // Resolve without entity type.
+
+      var reference = XWiki.Model.resolve('document:wiki:path.to.page');
+      assertReference('WIKI:wiki SPACE:path SPACE:to DOCUMENT:page', reference);
+
+      reference = XWiki.Model.resolve('document:', null, baseReference);
+      assertReference('WIKI:wiki SPACE:path SPACE:to DOCUMENT:page', reference);
+
       // Test escapes.
 
       reference = XWiki.Model.resolve('\\\\\\.:@\\.', XWiki.EntityType.DOCUMENT);

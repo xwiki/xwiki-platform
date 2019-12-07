@@ -308,7 +308,7 @@ define('xwiki-suggestAttachments', [
     return {
       maxOptions: 10,
       // The document where the selected values are saved and where new files are being uploaded. Stored attachment
-      // references will be relative this document.
+      // references will be relative to this document.
       documentReference: select.data('documentReference'),
       // Where to look for attachments. The following is supported:
       // * "wiki:wikiName" look for attachments in the specified wiki
@@ -361,12 +361,9 @@ define('xwiki-suggestAttachments', [
    */
   var resolveEntityReference = function(typeAndReference) {
     if (typeof typeAndReference === 'string') {
-      var separatorIndex = typeAndReference.indexOf(':');
-      if (separatorIndex > 0) {
-        var entityType = XWiki.EntityType.byName(typeAndReference.substring(0, separatorIndex));
-        return XWiki.Model.resolve(typeAndReference.substring(separatorIndex + 1), entityType,
-          XWiki.currentDocument.documentReference);
-      } else {
+      try {
+        return XWiki.Model.resolve(typeAndReference, null, XWiki.currentDocument.documentReference);
+      } catch (e) {
         return null;
       }
     }

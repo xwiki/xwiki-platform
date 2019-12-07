@@ -165,14 +165,20 @@
                 <bannedDependencies>
                   <excludes>
                     <exclude>org.jmock:*</exclude>
+                    <exclude>jmock:*</exclude>
                     <exclude>junit:*</exclude>
+                    <exclude>org.junit.*:*</exclude>
+                    <exclude>org.mockito:*</exclude>
                     <exclude>javax.servlet:servlet-api:*:*:compile</exclude>
                     <exclude>jakarta.mail:jakarta.mail-api</exclude>
                   </excludes>
                   <includes>
                     <!-- Allow only JUnit and JMock with scope test because -->
                     <include>org.jmock:*:*:*:test</include>
+                    <include>jmock:*:*:*:test</include>
                     <include>junit:*:*:*:test</include>
+                    <include>org.junit.*:*:*:*:test</include>
+                    <include>org.mockito:*:*:*:test</include>
                   </includes>
                 </bannedDependencies>
               </rules>

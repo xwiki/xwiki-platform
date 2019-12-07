@@ -78,13 +78,6 @@ def builds = [
       pom: 'xwiki-platform-distribution-flavor-test-escaping/pom.xml'
     )
   },
-  'Flavor Test - Selenium' : {
-    buildFunctionalTest(
-      name: 'Flavor Test - Selenium',
-      pom: 'xwiki-platform-distribution-flavor-test-selenium/pom.xml',
-      daysToKeepStr: env.BRANCH_NAME == 'master' ? '30' : null
-    )
-  },
   'Flavor Test - Upgrade' : {
     buildFunctionalTest(
       name: 'Flavor Test - Upgrade',

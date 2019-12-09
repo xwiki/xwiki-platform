@@ -74,7 +74,7 @@
 #end
 
 #macro(sortExtensions $extensionNode $requestUninstalled $uninstalledExtensions $topExtensions)
-  #if (($requestUninstalled && $requestUninstalled.contains($extensionNode.extension.id.id)) || (!$extensionNode.extension.isValid($currentNamespace)))
+  #if (($requestUninstalled && $requestUninstalled.contains($extensionNode.extension.id.id)) || (!$requestUninstalled && !$extensionNode.extension.isValid($currentNamespace)))
     #set($void = $uninstalledExtensions.add($extensionNode))
 
     #foreach ($child in $extensionNode.children)

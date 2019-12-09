@@ -93,6 +93,8 @@
 {{/velocity}}
 
 {{velocity}}
+#set ($discard = $xwiki.jsfx.use('uicomponents/extension/clean.js', true))
+#set ($discard = $xwiki.ssfx.use('uicomponents/extension/clean.css', true))
 #if ($request.cleanapply)
   {{template name="distribution/extension.clean.apply.wiki"/}}
 #elseif ($uninstalledExtensions.isEmpty() && $topExtensions.isEmpty())
@@ -101,28 +103,26 @@
     {{translation key="platform.extension.distributionWizard.extension.cleanStep.noOrphaned"/}}
   {{/info}}
 #else
-#set ($discard = $xwiki.jsfx.use('uicomponents/extension/clean.js', true))
-#set ($discard = $xwiki.ssfx.use('uicomponents/extension/clean.css', true))
-{{translation key="platform.extension.distributionWizard.extension.cleanStep.orphaned"/}}
+  {{translation key="platform.extension.distributionWizard.extension.cleanStep.orphaned"/}}
 
-{{html clean="false"}}
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('jstree', 'themes/default/style.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
-  <div id="extension_clean_tree" class="extension-clean">
-    <ul>
-      #foreach ($orphanedExtension in $orphanedExtensions)
-        #set ($orphanedDependencies = $services.extension.installed.repository.getOrphanedDependencies($orphanedExtension, $currentNamespace))
-        #node($orphanedDependencies)
-      #end
-    </ul>
-  </div>
+  {{html clean="false"}}
+    #set ($discard = $xwiki.linkx.use($services.webjars.url('jstree', 'themes/default/style.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+    <div id="extension_clean_tree" class="extension-clean">
+      <ul>
+        #foreach ($orphanedExtension in $orphanedExtensions)
+          #set ($orphanedDependencies = $services.extension.installed.repository.getOrphanedDependencies($orphanedExtension, $currentNamespace))
+          #node($orphanedDependencies)
+        #end
+      </ul>
+    </div>
 
-  <form action="">
-    #formHidden()
+    <form action="">
+      #formHidden()
 
-    <div id="uninstalled_extensions"></div>
+      <div id="uninstalled_extensions"></div>
 
-    #em_submitButton($services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.cleanapply'), 'cleanapply', false, '')
-  </form>
-{{/html}}
+      #em_submitButton($services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.cleanapply'), 'cleanapply', false, '')
+    </form>
+  {{/html}}
 #end
 {{/velocity}}

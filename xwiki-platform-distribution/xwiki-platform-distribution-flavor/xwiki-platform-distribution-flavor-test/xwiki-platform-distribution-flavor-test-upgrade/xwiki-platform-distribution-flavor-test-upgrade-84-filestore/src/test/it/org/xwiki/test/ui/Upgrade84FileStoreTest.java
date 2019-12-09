@@ -88,10 +88,12 @@ public class Upgrade84FileStoreTest extends UpgradeTest
 
             // Previous store contains an index of the deleted attachment based on the absolute filesystem path (testing
             // that migration works despite this very bad old design)
-            "/media/data-hd/test/xwiki-enterprise-jetty-hsqldb-8.4.6/data/storage/xwiki/Attachments/WebHome/~this/"
+            // Keeping only the relative path, since the absolute path might change depending on who upgrading the data
+            // last.
+            "data/storage/xwiki/Attachments/WebHome/~this/"
                 + "deleted-attachments/deletedattachment.txt-1549039065268] does not exist, "
                 + "trying to find the new location",
-            "/media/data-hd/test/xwiki-enterprise-jetty-hsqldb-8.4.6/data/storage/wiki1/Attachments/WebHome/~this/"
+            "data/storage/wiki1/Attachments/WebHome/~this/"
                 + "deleted-attachments/deletedattachment.txt-1551887620946] does not exist, "
                 + "trying to find the new location");
     }

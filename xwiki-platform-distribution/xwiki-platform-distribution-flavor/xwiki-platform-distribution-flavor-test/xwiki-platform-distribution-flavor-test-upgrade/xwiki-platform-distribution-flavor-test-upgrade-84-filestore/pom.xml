@@ -37,13 +37,13 @@
     <upgradetest.previousflavor.artifactId>xwiki-enterprise-ui-mainwiki</upgradetest.previousflavor.artifactId>
     <upgradetest.previousflavor.version>8.4.6</upgradetest.previousflavor.version>
     <upgradetest.previousdata.artifactId>xwiki-enterprise-data-hsqldb</upgradetest.previousdata.artifactId>
-    <upgradetest.previousdata.classifier>custom-filestore-5</upgradetest.previousdata.classifier>
+    <upgradetest.previousdata.classifier>custom-filestore-6</upgradetest.previousdata.classifier>
   </properties>
   <dependencies>
     <dependency>
       <groupId>${upgradetest.previousdata.groupId}</groupId>
       <artifactId>${upgradetest.previousdata.artifactId}</artifactId>
-      <classifier>custom-filestore</classifier>
+      <classifier>${upgradetest.previousdata.classifier}</classifier>
       <version>8.4.6</version>
       <type>zip</type>
       <scope>test</scope>

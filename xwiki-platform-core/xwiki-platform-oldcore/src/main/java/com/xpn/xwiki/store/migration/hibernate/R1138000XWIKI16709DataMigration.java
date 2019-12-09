@@ -81,8 +81,6 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
     @Inject
     private Logger logger;
 
-    private BaseClass userClass;
-
     @Override
     public String getDescription()
     {
@@ -171,12 +169,10 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
 
     private BaseClass getUserClass() throws XWikiException
     {
-        if (this.userClass == null) {
-            XWikiDocument userClassDoc = getXWikiContext().getWiki()
-                .getDocument(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE, getXWikiContext());
-            this.userClass = userClassDoc.getXClass();
-        }
-        return this.userClass;
+        DocumentReference wikiUserClassReference =
+            new DocumentReference(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE,
+                getXWikiContext().getWikiReference());
+        return getXWikiContext().getWiki().getXClass(wikiUserClassReference, getXWikiContext());
     }
 
     private void removeDisableProperty() throws XWikiException

@@ -107,7 +107,7 @@ var XWiki = (function(XWiki) {
         }
       }
       var commentField = form.comment;
-      if (commentField && ($xwiki.isEditCommentSuggested() || $xwiki.isEditCommentMandatory())) {
+      if (commentField && (${xwiki.isEditCommentSuggested()} || $xwiki.isEditCommentMandatory())) {
         while (commentField.value == '') {
           var response = prompt("$services.localization.render('core.comment.prompt')", '');
           if (response === null) {

@@ -549,24 +549,29 @@ public class DefaultWikiMacroRenderer extends AbstractBlockAsyncRenderer
         List<Block> allNonGeneratedContentMetadataBlocks =
             block.getBlocks(NON_GENERATED_CONTENT_METADATA_MATCHER, Block.Axes.DESCENDANT);
 
-        // Before removing the blocks, we need to remove from the lists all those that are inside a wikimacro content
-        // metadata block, so we don't alterate the wikimacro content itself.
-        for (Block allWikiMacroContentMarkerBlock : allWikiMacroContentMetadataBlocks) {
-            allMacroMarkerBlocks
-                .removeAll(allWikiMacroContentMarkerBlock.getBlocks(MACRO_MARKER_MATCHER, Block.Axes.DESCENDANT));
-            allNonGeneratedContentMetadataBlocks.removeAll(allWikiMacroContentMarkerBlock
-                .getBlocks(NON_GENERATED_CONTENT_METADATA_MATCHER, Block.Axes.DESCENDANT_OR_SELF));
-        }
+        // We skip cleaning the macro marker blocks if the macro does not use the wikimacrocontent to support
+        // backward compatibility: some macro might use the MMB in some cases
+        if (!allWikiMacroContentMetadataBlocks.isEmpty()) {
+            // Before removing the blocks, we need to remove from the lists all those that are inside a wikimacro content
+            // metadata block, so we don't alterate the wikimacro content itself.
+            for (Block allWikiMacroContentMarkerBlock : allWikiMacroContentMetadataBlocks) {
+                allMacroMarkerBlocks
+                    .removeAll(allWikiMacroContentMarkerBlock.getBlocks(MACRO_MARKER_MATCHER, Block.Axes.DESCENDANT));
+                allNonGeneratedContentMetadataBlocks.removeAll(allWikiMacroContentMarkerBlock
+                    .getBlocks(NON_GENERATED_CONTENT_METADATA_MATCHER, Block.Axes.DESCENDANT_OR_SELF));
+            }
 
-        // Remove all macro marker blocks that remains (outside the wikimacro content block).
-        for (Block markerBlock : allMacroMarkerBlocks) {
-            markerBlock.getParent().replaceChild(markerBlock.getChildren(), markerBlock);
-        }
+            // Remove all macro marker blocks that remains (outside the wikimacro content block).
+            for (Block markerBlock : allMacroMarkerBlocks) {
+                markerBlock.getParent().replaceChild(markerBlock.getChildren(), markerBlock);
+            }
 
-        // Remove all non generated content metadata block that remains (outisde the wikimacro content block).
-        for (Block nonGeneratedContentMetadataBlock : allNonGeneratedContentMetadataBlocks) {
-            nonGeneratedContentMetadataBlock.getParent().replaceChild(nonGeneratedContentMetadataBlock.getChildren(),
-                nonGeneratedContentMetadataBlock);
+            // Remove all non generated content metadata block that remains (outisde the wikimacro content block).
+            for (Block nonGeneratedContentMetadataBlock : allNonGeneratedContentMetadataBlocks) {
+                nonGeneratedContentMetadataBlock.getParent()
+                    .replaceChild(nonGeneratedContentMetadataBlock.getChildren(),
+                        nonGeneratedContentMetadataBlock);
+            }
         }
     }
 

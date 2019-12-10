@@ -95,6 +95,9 @@ public class Upgrade84FileStoreTest extends UpgradeTest
                 + "trying to find the new location",
             "data/storage/wiki1/Attachments/WebHome/~this/"
                 + "deleted-attachments/deletedattachment.txt-1551887620946] does not exist, "
-                + "trying to find the new location");
+                + "trying to find the new location",
+
+            // The data contains a Solr directory: we want to ensure that it is properly upgraded too.
+            "The Solr home directory at [data/solr] is invalid.");
     }
 }

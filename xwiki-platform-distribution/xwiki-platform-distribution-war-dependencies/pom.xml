@@ -109,6 +109,12 @@
       <version>${commons.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-diff-xml</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Blame Script Services -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

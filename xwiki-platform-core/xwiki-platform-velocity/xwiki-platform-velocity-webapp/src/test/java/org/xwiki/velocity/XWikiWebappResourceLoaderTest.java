@@ -19,6 +19,7 @@
  */
 package org.xwiki.velocity;
 
+import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.util.Properties;
 
@@ -39,6 +40,7 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration test for {@link XWikiWebappResourceLoader}.
@@ -63,7 +65,10 @@ public class XWikiWebappResourceLoaderTest
     {
         // Fake the initialization of the Servlet Environment
         ServletEnvironment environment = (ServletEnvironment) this.componentManager.getInstance(Environment.class);
-        environment.setServletContext(mock(ServletContext.class));
+        ServletContext servletContext = mock(ServletContext.class);
+        environment.setServletContext(servletContext);
+        when(servletContext.getResourceAsStream("/templates/macros.vm"))
+            .thenReturn(new ByteArrayInputStream(new byte[0]));
 
         VelocityFactory factory = this.componentManager.getInstance(VelocityFactory.class);
 

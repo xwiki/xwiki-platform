@@ -50,7 +50,7 @@
   <Resources allowLinking="true" cachingAllowed="true"
              cacheMaxSize="12800" cacheObjectMaxSize="640" />
 
-  <!-- Disable JAR scanning since Xwiki does not need that -->
+  <!-- Disable JAR scanning since XWiki does not need that -->
   <JarScanner scanClassPath="false">
     <JarScanFilter defaultTldScan="false"/>
   </JarScanner>

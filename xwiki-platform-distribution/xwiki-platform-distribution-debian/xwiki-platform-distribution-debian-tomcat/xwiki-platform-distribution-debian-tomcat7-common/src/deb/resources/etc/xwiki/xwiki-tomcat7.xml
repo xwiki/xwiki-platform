@@ -29,6 +29,6 @@
   <!-- Make symlinks work in Tomcat -->
   <Resources className="org.apache.naming.resources.FileDirContext" allowLinking="true" />
 
-  <!-- Disable JAR scanning since Xwiki does not need that -->
+  <!-- Disable JAR scanning since XWiki does not need that -->
   <JarScanner scanClassPath="false"/>
 </Context>

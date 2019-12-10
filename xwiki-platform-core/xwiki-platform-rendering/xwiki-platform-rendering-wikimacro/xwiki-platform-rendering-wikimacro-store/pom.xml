@@ -31,7 +31,7 @@
   <name>XWiki Platform - Rendering - Wiki Macro Bridge - Store</name>
   <description>Defines the ability to store macros into wiki pages</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.61</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.60</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>71</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

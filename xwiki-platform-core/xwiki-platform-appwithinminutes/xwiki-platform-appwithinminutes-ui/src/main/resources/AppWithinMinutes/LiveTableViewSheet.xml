@@ -132,7 +132,7 @@
         * [[$services.localization.render('platform.appwithinminutes.appHomePageEditAppLabel')&gt;&gt;AppWithinMinutes.CreateApplication||queryString="$queryString" class="action edit"]]
       #end
       #if ($hasEditTranslations)
-        * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:$xwiki.getURL($translationsRef, 'edit', 'editor=wiki')||class="action translate"]]
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageTranslateAppLabel')&gt;&gt;path:${xwiki.getURL($translationsRef, 'edit', 'editor=wiki')}||class="action translate"]]
       #end
       #if ($hasDeleteData)
         #set ($deleteDataURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
@@ -141,7 +141,7 @@
           'scope': 'entries',
           'xredirect': $doc.getURL()
         })))
-        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:$deleteDataURL||class="action deleteData"]]
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteEntriesLabel')&gt;&gt;path:${deleteDataURL}||class="action deleteData"]]
       #end
       #if ($hasDeleteApplication)
         #set ($deleteAppURL = $xwiki.getURL('AppWithinMinutes.DeleteApplication', 'view', $escapetool.url({
@@ -149,7 +149,7 @@
           'resolve': true,
           'xredirect': $doc.getURL()
         })))
-        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:$deleteAppURL||class="action delete"]]
+        * [[$services.localization.render('platform.appwithinminutes.appHomePageDeleteAppLabel')&gt;&gt;path:${deleteAppURL}||class="action delete"]]
       #end
     )))
   #end

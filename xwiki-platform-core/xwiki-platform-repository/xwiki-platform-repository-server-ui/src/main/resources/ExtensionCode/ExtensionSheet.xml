@@ -181,18 +181,18 @@
               [[$services.icon.render('download')  Download v$version&gt;&gt;attach:${id}-${version}.${type}||class="btn btn-primary"]]##
             #end
           #else
-            [[$services.icon.render('download')  Download v$version&gt;&gt;$download||class="btn btn-primary"]]##
+            [[$services.icon.render('download')  Download v$version&gt;&gt;${download}||class="btn btn-primary"]]##
           #end
         #end
         ##------- Source --------
         #set($source = $doc.getValue("source"))
         #if ("$!source" != "")
-          [[Sources&gt;&gt;$source||class="btn btn-default"]]##
+          [[Sources&gt;&gt;${source}||class="btn btn-default"]]##
         #end
         ##------- Issues --------
         #set($issues = $doc.getValue("issueManagementURL"))
         #if ("$!issues" != "")
-          [[Issues&gt;&gt;$issues||class="btn btn-default"]]##
+          [[Issues&gt;&gt;${issues}||class="btn btn-default"]]##
         #end
       )))
     {{/box}}

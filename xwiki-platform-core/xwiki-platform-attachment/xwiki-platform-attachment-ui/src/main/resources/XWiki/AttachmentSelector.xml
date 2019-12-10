@@ -150,12 +150,12 @@ $xwiki.jsx.use($attachmentPickerDocName)
     #if ($attachment.isImage() &amp;&amp; $options.displayImage)
       ## We add the version to the query string in order to invalidate the cache when an image attachment is replaced.
       #set ($queryString = $escapetool.url({'version': $attachment.version}))
-      [[[[image:$attachmentStringReference||width=180 queryString="$queryString"]]&gt;&gt;attach:$attachmentStringReference]]
+      [[[[image:${attachmentStringReference}||width=180 queryString="$queryString"]]&gt;&gt;attach:$attachmentStringReference]]
     #else
       * (% class="mime" %){{html wiki=false clean=false}}#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase()){{/html}}(%%) (% class="filename" %)$attachment.getFilename()(% %)
       * v$attachment.getVersion() (#dynamicsize($attachment.longSize))
       * $services.localization.render('core.viewers.attachments.author', [$!{xwiki.getUserName($attachment.author, false)}]) $services.localization.render('core.viewers.attachments.date', [$!{xwiki.formatDate($attachment.date, 'dd/MM/yyyy hh:mm')}])
-      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:$attachmentStringReference||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
+      * (% class="buttonwrapper" %)[[${services.localization.render("${translationPrefix}.actions.download")}&gt;&gt;attach:${attachmentStringReference}||title="$services.localization.render("${translationPrefix}.actions.download")" rel="__blank" class="button"]](%%)
     #end
   #end
 #end
@@ -337,7 +337,7 @@ $xwiki.jsx.use($attachmentPickerDocName)
   #attachmentPicker_displayAttachmentGallery($targetDocument, $targetAttachDocument, $options)
 
   (% class="gallery_buttons buttons" %)(((
-  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;$targetDocument||class="button secondary" id="attachment-picker-close"]]
+  (% class="buttonwrapper secondary" %)[[$services.localization.render("${translationPrefix}.cancel")&gt;&gt;${targetDocument}||class="button secondary" id="attachment-picker-close"]]
   )))
 #end
 {{/velocity}}</content>
@@ -1519,7 +1519,7 @@ $xwiki.jsfx.use('js/scriptaculous/builder.js')##
     #if ($hasTargetDoc)
       #set ($queryString.targetdocname = $targetdoc.fullName)
     #end
-    (% class="buttonwrapper" %)[[$buttontext&gt;&gt;$xcontext.macro.doc.fullName||queryString="$escapetool.url($queryString)"
+    (% class="buttonwrapper" %)[[$buttontext&gt;&gt;${xcontext.macro.doc.fullName}||queryString="$escapetool.url($queryString)"
       class="attachment-picker-start button" title="$buttontext"]](%%)##
   #end
 #end

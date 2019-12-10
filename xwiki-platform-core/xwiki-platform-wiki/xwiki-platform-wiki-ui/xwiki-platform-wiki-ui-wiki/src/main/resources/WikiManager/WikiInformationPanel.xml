@@ -190,13 +190,13 @@
       ## Display
       $joinText
       #if ($membershipType != 'INVITE' || $existingInvitationOrRequest.type == 'INVITATION')
-        (% class='buttonwrapper' %)[[$actionLabel&gt;&gt;path:$actionUrl||class='button']](%%)
+        (% class='buttonwrapper' %)[[$actionLabel&gt;&gt;path:${actionUrl}||class='button']](%%)
       #end
     #elseif (!$hasOwner)
       {{translation key="platform.wiki.currentwiki.currentUserIsMember"/}}
       #set ($leavePageReference = $services.model.createDocumentReference(${services.wiki.mainWikiId}, 'WikiManager', 'LeaveWiki'))
       #set ($leaveUrl = $xwiki.getURL($leavePageReference, 'view', "wikiId=${currentWiki}"))
-      (% class='buttonwrapper' %)[[{{translation key="platform.wiki.currentwiki.leave.label"/}}&gt;&gt;path:$leaveUrl||class='button']](%%)
+      (% class='buttonwrapper' %)[[{{translation key="platform.wiki.currentwiki.leave.label"/}}&gt;&gt;path:${leaveUrl}||class='button']](%%)
     #else
       {{translation key="platform.wiki.currentwiki.currentUserIsOwner"/}}
     #end

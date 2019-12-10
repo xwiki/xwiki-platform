@@ -336,9 +336,9 @@
   (% class="search-options" %)
   * {{translation key="solr.options"/}}
   #if($highlightEnabled)#extendQueryString($url {'highlight': [false]})#else#extendQueryString($url {'highlight': [true]})#end
-  * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:$url||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
+  * [[{{translation key="solr.options.highlight"/}}&gt;&gt;path:${url}||class="options-item#if($highlightEnabled) active#end" title="$services.localization.render('solr.options.highlight.title')"]]
   #if($facetEnabled)#extendQueryString($url {'facet': [false]})#else#extendQueryString($url {'facet': [true]})#end
-  * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:$url||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
+  * [[{{translation key="solr.options.facet"/}}&gt;&gt;path:${url}||class="options-item#if($facetEnabled) active#end" title="$services.localization.render('solr.options.facet.title')"]]
 
   (% class="search-results-sort" %)
   * {{translation key="solr.sortBy"/}}
@@ -353,7 +353,7 @@
       #set ($targetSortOrder = "#if ($sortOrder == 'asc')desc#{else}asc#end")
     #end
     #extendQueryString($url {'sort': [$entry.key], 'sortOrder': [$targetSortOrder]})
-    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:$url||class="$class"]]
+    * [[{{translation key="solr.sortBy.$entry.key"/}}$!sortOrderIndicator&gt;&gt;path:${url}||class="$class"]]
   #end
 #end
 

@@ -102,29 +102,41 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
         logger.info("Migration needed for [{}] users on database [{}].",
             allUsers.size(), getXWikiContext().getWikiId());
 
-        // Remove the old property from XWikiUsers class
-        removeDisableProperty();
+        DocumentReference wikiUserClassReference =
+            new DocumentReference(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE,
+                getXWikiContext().getWikiReference());
+        BaseClass xwikiUserClass = getXWikiContext().getWiki().getXClass(wikiUserClassReference, getXWikiContext());
 
-        int i = 0;
-        int failures = 0;
-        // Migrate all users objects
-        for (String user : allUsers) {
-            try {
-                applyMigrationsOnUser(user);
-            } catch (XWikiException e) {
-                logger.error("Error while migrating information for user [{}] on database [{}]", user,
-                    getXWikiContext().getWikiId(), e);
-                failures++;
+        if (xwikiUserClass != null) {
+            // Remove the old property from XWikiUsers class
+            removeDisableProperty(xwikiUserClass);
+
+            int i = 0;
+            int failures = 0;
+            // Migrate all users objects
+            for (String user : allUsers) {
+                try {
+                    applyMigrationsOnUser(user, xwikiUserClass);
+                } catch (XWikiException e) {
+                    logger.error("Error while migrating information for user [{}] on database [{}]", user,
+                        getXWikiContext().getWikiId(), e);
+                    failures++;
+                }
+                if (++i % 100 == 0) {
+                    logger.info("[{}] users on [{}] have been migrated on database [{}]...", i - failures,
+                        allUsers.size(),
+                        getXWikiContext().getWikiId());
+                }
             }
-            if (++i % 100 == 0) {
-                logger.info("[{}] users on [{}] have been migrated on database [{}]...", i - failures, allUsers.size(),
-                    getXWikiContext().getWikiId());
+            logger.info("[{}] users on [{}] have been migrated on database [{}].", allUsers.size() - failures,
+                allUsers.size(), getXWikiContext().getWikiId());
+            if (failures > 0) {
+                logger.warn("[{}] users have not been properly migrated, please check the logs above.", failures);
             }
-        }
-        logger.info("[{}] users on [{}] have been migrated on database [{}].", allUsers.size() - failures,
-            allUsers.size(), getXWikiContext().getWikiId());
-        if (failures > 0) {
-            logger.warn("[{}] users have not been properly migrated, please check the logs above.", failures);
+        } else {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+                String.format("The XWikiUsers XClass with reference [%s] has not been found, "
+                    + "the migration [%s] cannot be performed.", wikiUserClassReference, getName()));
         }
     }
 
@@ -132,55 +144,51 @@ public class R1138000XWIKI16709DataMigration extends AbstractHibernateDataMigrat
     {
         // We select only XWikiUsers documents that have not been migrated yet:
         // i.e. those that does not have an email_checked property yet.
-        Query<String> query = session.createQuery("select doc.fullName from XWikiDocument doc, BaseObject obj"
-            + " where doc.fullName = obj.name and obj.className = 'XWiki.XWikiUsers'"
+        Query<String> query = session.createQuery("select obj.name from BaseObject obj"
+            + " where obj.className = 'XWiki.XWikiUsers'"
             + " and obj.id not in (select prop.id.id from IntegerProperty prop where prop.id.name='email_checked')",
             String.class);
 
         return query.list();
     }
 
-    private void applyMigrationsOnUser(String docUser) throws XWikiException
+    private void applyMigrationsOnUser(String docUser, BaseClass xwikiUserXClass) throws XWikiException
     {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
         DocumentReference userDocReference = documentReferenceResolver.resolve(docUser);
         XWikiDocument userDocument = xwiki.getDocument(userDocReference, context);
-        BaseObject userObject = userDocument.getXObject(getUserClass().getReference());
+        BaseObject userObject = userDocument.getXObject(xwikiUserXClass.getReference());
 
-        // By default, we consider users are enabled and active.
-        int disable = userObject.getIntValue(OLD_DISABLED_PROPERTY, 0);
-        int active = userObject.getIntValue(XWikiUser.ACTIVE_PROPERTY, 1);
+        // this condition should never happen normally, but we might imagine so DB with stale objects for some reasons
+        // so I won't take the chance.
+        if (userObject != null) {
+            // By default, we consider users are enabled and active.
+            int disable = userObject.getIntValue(OLD_DISABLED_PROPERTY, 0);
+            int active = userObject.getIntValue(XWikiUser.ACTIVE_PROPERTY, 1);
 
-        // If the user was marked as active and enabled, then its new status is necessarily active.
-        // In any other case it should be marked as inactive.
-        int newActive = (active == 1 && disable == 0) ? 1 : 0;
+            // If the user was marked as active and enabled, then its new status is necessarily active.
+            // In any other case it should be marked as inactive.
+            int newActive = (active == 1 && disable == 0) ? 1 : 0;
 
-        // If the user was marked as inactive, it means its mail was not checked: the UI those users were seeing
-        // in that case was indeed the UI to insert email token.
-        userObject.setIntValue(XWikiUser.EMAIL_CHECKED_PROPERTY, active);
-        userObject.setIntValue(XWikiUser.ACTIVE_PROPERTY, newActive);
+            // If the user was marked as inactive, it means its mail was not checked: the UI those users were seeing
+            // in that case was indeed the UI to insert email token.
+            userObject.setIntValue(XWikiUser.EMAIL_CHECKED_PROPERTY, active);
+            userObject.setIntValue(XWikiUser.ACTIVE_PROPERTY, newActive);
 
-        // We remove the deprecated property.
-        userObject.removeField(OLD_DISABLED_PROPERTY);
+            // We remove the deprecated property.
+            userObject.removeField(OLD_DISABLED_PROPERTY);
 
-        xwiki.saveDocument(userDocument, context);
+            xwiki.saveDocument(userDocument, context);
+        }
     }
 
-    private BaseClass getUserClass() throws XWikiException
-    {
-        DocumentReference wikiUserClassReference =
-            new DocumentReference(XWikiUsersDocumentInitializer.XWIKI_USERS_DOCUMENT_REFERENCE,
-                getXWikiContext().getWikiReference());
-        return getXWikiContext().getWiki().getXClass(wikiUserClassReference, getXWikiContext());
-    }
-
-    private void removeDisableProperty() throws XWikiException
+    private void removeDisableProperty(BaseClass xwikiUserXClass) throws XWikiException
     {
         XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
-        getUserClass().removeField(OLD_DISABLED_PROPERTY);
-        xwiki.saveDocument(getUserClass().getOwnerDocument(), context);
+        xwikiUserXClass.removeField(OLD_DISABLED_PROPERTY);
+        xwiki.saveDocument(xwikiUserXClass.getOwnerDocument(), context);
     }
 
 }

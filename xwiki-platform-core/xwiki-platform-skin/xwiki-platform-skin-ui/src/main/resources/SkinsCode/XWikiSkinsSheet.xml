@@ -67,7 +67,7 @@
 #macro(view)
   ## Call getDefaultEditMode() for backward compatibility with existing skins.
   * [[{{translation key="xe.admin.skin.editskin"/}}&gt;&gt;path:${doc.getURL($doc.getDefaultEditMode())}]]
-  * [[{{translation key="xe.admin.skin.testskin"/}}&gt;&gt;$services.model.resolveDocument('', 'default', ${doc.documentReference.extractReference('WIKI'))}||queryString="skin=${doc.fullName}"]]
+  * [[{{translation key="xe.admin.skin.testskin"/}}&gt;&gt;${services.model.resolveDocument('', 'default', $doc.documentReference.extractReference('WIKI'))}||queryString="skin=${doc.fullName}"]]
 #end
 #####################
 ##      EDIT

@@ -321,7 +321,12 @@
     macro = new XWikiNotificationsMacro(container, XWiki.Model.serialize(xm.userReference), notificationsLimit, true, [], true);
     getUnreadNotificationsCount();
     container.on('eventMarkedAsRead', function (notif) {
-      updateNotificationCount(notificationCount - 1);
+      if (notificationCount &lt;= maxCountNumber) {
+        // Update the counter only if we really know how many notifications we have, which is not true if we display the "20+" message.
+        // We could even hide the counter, but I am affraid it would let the user think there is no more notifications. We could also send an
+        // ajax request to get the new count, but I do not want to flood the server.
+        updateNotificationCount(notificationCount - 1);
+      }
     });
 
     /**

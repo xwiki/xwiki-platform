@@ -38,7 +38,7 @@
   <hidden>true</hidden>
   <content>### Home page
 platform.appwithinminutes.homePageTitle=मिनिटांतले अँप
-### Missing: platform.appwithinminutes.description=Create collaborative web applications within minutes, based on XWiki's powerful structured data management system.
+platform.appwithinminutes.description=XWiki च्या शक्तिशाली संरचित डेटा व्यवस्थापन प्रणालीवर आधारित, मिनिटांच्या आत सहयोगी वेब अनुप्रयोग तयार करा.
 platform.appwithinminutes.createAppButtonLabel=अनुप्रयोग बनवा
 platform.appwithinminutes.appsLiveTableHeading=अनुप्रयोग
 platform.appwithinminutes.appsLiveTable.doc.title=अनुप्रयोग
@@ -71,11 +71,11 @@ platform.appwithinminutes.wizardStepFinishButtonTip=अनुप्रयोग 
 platform.appwithinminutes.wizardStepPreviousButtonLabel=मागील पायरी
 platform.appwithinminutes.wizardStepPreviousButtonTip=मागील पायरीवर जा
 platform.appwithinminutes.wizardStepHelpTitle=पायर्‍या
-### Missing: platform.appwithinminutes.wizardStepHelpDescription=This wizard will guide you through the process of creating an application. These are the steps you'll take:
+platform.appwithinminutes.wizardStepHelpDescription=हा विझार्ड अनुप्रयोग तयार करण्याच्या प्रक्रियेमध्ये आपले मार्गदर्शन करेल. त्यासाठी या टप्प्यांचे आपल्याला अनुसरण करावे लागेल:
 
 ### Wizard Step 1: Application Name
 appWithinMinutes.createApp.location.label=स्थान
-### Missing: appWithinMinutes.createApp.location.hint=The location in the page hierarchy where the application will be created.
+appWithinMinutes.createApp.location.hint=पृष्ठ पदानुक्रमातील स्थान जेथे अनुप्रयोग तयार केला जाईल.
 appWithinMinutes.createApp.parent.label=पालक
 ### Missing: appWithinMinutes.createApp.parent.hint=The parent of the new application. Leave this field empty if you want to create a top level application.
 appWithinMinutes.createApp.parent.placeholder=Path.To.Parent

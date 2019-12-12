@@ -52,7 +52,7 @@
  *   limit: 0 // the maximum number of path elements (limit/2 on the left and the rest of the right)
  * }
  *#
-#macro (getHierarchyPath $entityReference $return $options)
+#macro (getHierarchyPath $entityReference $pathReturn $options)
   #if (!$options)
     #set ($options = {})
   #end
@@ -94,8 +94,8 @@
     #set ($discard = $limitedPath.addAll($macro.path.subList($right, $size)))
     #set ($macro.path = $limitedPath)
   #end
-  #set ($return = $NULL)
-  #setVariable("$return" $macro.path)
+  #set ($pathReturn = $NULL)
+  #setVariable("$pathReturn" $macro.path)
 #end
 
 #**
@@ -204,7 +204,7 @@
   #end
 #end
 
-#macro (getHierarchyPathData $path $return $options)
+#macro (getHierarchyPathData $path $pathDataReturn $options)
   #if (!$options)
     #set ($options = {})
   #end
@@ -219,8 +219,8 @@
       'url': $url
     }))
   #end
-  #set ($return = $NULL)
-  #setVariable("$return" $macro.data)
+  #set ($pathDataReturn = $NULL)
+  #setVariable("$pathDataReturn" $macro.data)
 #end
 
 #macro (getHierarchyPathData_url $reference)
@@ -253,7 +253,7 @@
  *   plain: false, // whether to use plain text or HTML
  *   displayTitle: true // whether to display the title of the documents or the reference name
  *#
-#macro (getHierarchyPathLabels $path $return $options)
+#macro (getHierarchyPathLabels $path $pathLabelsReturn $options)
   #if (!$options)
     #set ($options = {})
   #end
@@ -293,8 +293,8 @@
     #end
     #set ($discard = $macro.labels.add($label))
   #end
-  #set ($return = $NULL)
-  #setVariable("$return" $macro.labels)
+  #set ($pathLabelsReturn = $NULL)
+  #setVariable("$pathLabelsReturn" $macro.labels)
 #end
 
 #*

@@ -232,6 +232,89 @@
                     "classSimpleName": "XWikiWebappResourceLoader",
                     "elementKind": "class",
                     "justification": "Velocity 2.0 upgrade. Not a breackage in practice since this class is only manipulated by Velocity."
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter boolean org.apache.velocity.context.AbstractContext::containsKey(===java.lang.Object===) @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "new": "parameter boolean org.apache.velocity.context.AbstractContext::containsKey(===java.lang.String===) @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.returnTypeChangedCovariantly",
+                    "old": "method java.lang.Object[] org.apache.velocity.context.AbstractContext::getKeys() @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "new": "method java.lang.String[] org.apache.velocity.context.AbstractContext::getKeys() @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.returnTypeChangedCovariantly",
+                    "old": "method java.lang.Object[] org.apache.velocity.context.InternalContextBase::getMacroNameStack() @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "new": "method java.lang.String[] org.apache.velocity.context.InternalContextBase::getMacroNameStack() @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.returnTypeChangedCovariantly",
+                    "old": "method java.lang.Object[] org.apache.velocity.context.InternalContextBase::getTemplateNameStack() @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "new": "method java.lang.String[] org.apache.velocity.context.InternalContextBase::getTemplateNameStack() @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter boolean org.apache.velocity.VelocityContext::internalContainsKey(===java.lang.Object===) @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "new": "parameter boolean org.apache.velocity.VelocityContext::internalContainsKey(===java.lang.String===) @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.returnTypeChangedCovariantly",
+                    "old": "method java.lang.Object[] org.apache.velocity.VelocityContext::internalGetKeys() @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "new": "method java.lang.String[] org.apache.velocity.VelocityContext::internalGetKeys() @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter java.lang.Object com.xpn.xwiki.render.ScriptVelocityContext::internalRemove(===java.lang.Object===)",
+                    "new": "parameter java.lang.Object com.xpn.xwiki.render.ScriptVelocityContext::internalRemove(===java.lang.String===)",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter java.lang.Object org.apache.velocity.context.AbstractContext::remove(===java.lang.Object===) @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "new": "parameter java.lang.Object org.apache.velocity.context.AbstractContext::remove(===java.lang.String===) @ com.xpn.xwiki.render.ScriptVelocityContext",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.class.nonFinalClassInheritsFromNewClass",
+                    "old": "class com.xpn.xwiki.render.ScriptVelocityContext",
+                    "new": "class com.xpn.xwiki.render.ScriptVelocityContext",
+                    "superClass": "org.xwiki.velocity.XWikiVelocityContext",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method void org.apache.struts.action.RequestProcessor::log(java.lang.String) @ com.xpn.xwiki.web.XWikiRequestProcessor",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method void org.apache.struts.action.RequestProcessor::log(java.lang.String, java.lang.Throwable) @ com.xpn.xwiki.web.XWikiRequestProcessor",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.exception.checkedAdded",
+                    "old": "method boolean org.apache.struts.action.RequestProcessor::processValidate(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.apache.struts.action.ActionForm, org.apache.struts.action.ActionMapping) throws java.io.IOException, javax.servlet.ServletException @ com.xpn.xwiki.web.XWikiRequestProcessor",
+                    "new": "method boolean org.apache.struts.action.RequestProcessor::processValidate(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.apache.struts.action.ActionForm, org.apache.struts.action.ActionMapping) throws java.io.IOException, javax.servlet.ServletException, org.apache.struts.action.InvalidCancelException @ com.xpn.xwiki.web.XWikiRequestProcessor",
+                    "exception": "org.apache.struts.action.InvalidCancelException",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.field.typeChanged",
+                    "old": "field org.apache.velocity.runtime.resource.ResourceManagerImpl.log @ com.xpn.xwiki.web.XWikiResourceManagerImpl",
+                    "new": "field org.apache.velocity.runtime.resource.ResourceManagerImpl.log @ com.xpn.xwiki.web.XWikiResourceManagerImpl",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method org.apache.velocity.runtime.resource.Resource org.apache.velocity.runtime.resource.ResourceManagerImpl::getResource(java.lang.String, int) throws org.apache.velocity.exception.ResourceNotFoundException, org.apache.velocity.exception.ParseErrorException, java.lang.Exception @ com.xpn.xwiki.web.XWikiResourceManagerImpl",
+                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
                   }
                 ]
               }

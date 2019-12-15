@@ -25,6 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 
@@ -152,6 +154,20 @@ public class ListAttachmentArchiveTest
         assertTrue(archiveAsString.contains("9.2"));
         assertTrue(archiveAsString.contains("12.1"));
         assertTrue(archiveAsString.contains("12.2"));
+
+        // Verify that all authors have been set for the attachment revisions so that the default JRCS author is not
+        // used. By default JRCS uses the "user.name" system property which could contain the dollar symbol and since
+        // JRCS doesn't escape the author name during serialization this would generate some invalid content that JRCS
+        // won't be able to parse back (e.g. XWiki import with history would fail for a XAR containing history).
+        Pattern pattern = Pattern.compile("author ([^\\s;]*)");
+        Matcher matcher = pattern.matcher(archiveAsString);
+        int count = 0;
+        while(matcher.find()) {
+            String author = matcher.group(1);
+            assertEquals("XWiki_2EXWikiGuest", author);
+            count++;
+        }
+        assertEquals(4, count);
 
         XWikiAttachmentArchive xWikiAttachmentArchive = new XWikiAttachmentArchive();
         xWikiAttachmentArchive.setAttachment(new XWikiAttachment(document, "file1"));

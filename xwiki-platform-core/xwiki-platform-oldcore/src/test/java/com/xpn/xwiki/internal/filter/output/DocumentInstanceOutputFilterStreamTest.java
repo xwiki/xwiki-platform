@@ -54,21 +54,8 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 {
     // Tests
 
-    @Test
-    public void testImportDocumentsPreserveVersion() throws FilterException, XWikiException, ParseException
+    private void assertDocument1PreserveVersion(XWikiDocument document) throws XWikiException, ParseException
     {
-        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
-
-        outputProperties.setVersionPreserved(true);
-        outputProperties.setVerbose(false);
-
-        importFromXML("document1", outputProperties);
-
-        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
-            this.oldcore.getXWikiContext());
-
-        assertFalse(document.isNew());
-
         assertEquals(Locale.ENGLISH, document.getDefaultLocale());
         assertEquals(new DocumentReference("wiki", "space", "parent"), document.getParentReference());
         assertEquals("customclass", document.getCustomClass());
@@ -155,7 +142,52 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testImportDocumentsWithoutLocaleAndRevision() throws FilterException, XWikiException, ParseException
+    public void importDocument1WithPreserveVersion() throws FilterException, XWikiException, ParseException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVersionPreserved(true);
+        outputProperties.setVerbose(false);
+
+        importFromXML("document1", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        assertDocument1PreserveVersion(document);
+    }
+
+    @Test
+    public void importDocument1WithDeletePreviousAndPreserveVersion()
+        throws FilterException, XWikiException, ParseException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setPreviousDeleted(true);
+        outputProperties.setVersionPreserved(true);
+        outputProperties.setVerbose(false);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+        this.oldcore.getSpyXWiki().saveDocument(document, this.oldcore.getXWikiContext());
+
+        assertFalse(this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "space", "page"), this.oldcore.getXWikiContext()).isNew());
+
+        importFromXML("document1", outputProperties);
+
+        document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        assertDocument1PreserveVersion(document);
+    }
+
+    @Test
+    public void importDocumentsWithoutLocaleAndRevision() throws FilterException, XWikiException, ParseException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -255,7 +287,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithunexistingobjectproperty() throws FilterException, XWikiException
+    public void documentwithunexistingobjectproperty() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -284,7 +316,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithnumberversion() throws FilterException, XWikiException
+    public void documentwithnumberversion() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -303,7 +335,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithoutauthorandcreator() throws FilterException, XWikiException
+    public void documentwithoutauthorandcreator() throws FilterException, XWikiException
     {
         DocumentReference contextUser = new DocumentReference("wiki", "XWiki", "contextuser");
         this.oldcore.getXWikiContext().setUserReference(contextUser);
@@ -313,7 +345,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         outputProperties.setVerbose(false);
         outputProperties.setAuthorPreserved(true);
 
-        importFromXML("documentwithnumberversion", outputProperties);
+        importFromXML("documentwithoutauthorandcreator", outputProperties);
 
         XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
             this.oldcore.getXWikiContext());
@@ -326,7 +358,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithattachmentwithoutdate() throws FilterException, XWikiException
+    public void documentwithattachmentwithoutdate() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -354,9 +386,8 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         assertEquals("text/plain", attachment.getMimeType());
     }
 
-
     @Test
-    public void testDocumentwithattachmentwithoutcontent() throws FilterException, XWikiException
+    public void documentwithattachmentwithoutcontent() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -378,7 +409,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithunknownclassproperty() throws FilterException, XWikiException
+    public void documentwithunknownClassproperty() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 
@@ -407,7 +438,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
     }
 
     @Test
-    public void testDocumentwithobjectwithoutnumberandclass() throws FilterException, XWikiException
+    public void documentwithobjectwithoutnumberandclass() throws FilterException, XWikiException
     {
         DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
 

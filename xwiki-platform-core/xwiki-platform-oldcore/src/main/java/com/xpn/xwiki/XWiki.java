@@ -1959,6 +1959,14 @@ public class XWiki implements EventListener
     }
 
     /**
+     * Save the passed document in the store.
+     * <p>
+     * If document is not new and metadata and content dirty flags are false, the version/history won't be incremented
+     * (only the current state will be updated).
+     * <p>
+     * Since 11.1, if document#isNew() return true, any pre existing document will be backuped in the deleted documents
+     * store automatically and completely replaced.
+     * 
      * @param document the document to save
      * @param comment the comment to associated to the new version of the saved document
      * @param isMinorEdit true if the new version is a minor version
@@ -2002,10 +2010,12 @@ public class XWiki implements EventListener
             }
 
             // Delete existing document if we replace with a new one
-            if (document.isNew() && !originalDocument.isNew()) {
-                // We don't want to notify about this delete since from outside world point of view it's an update an
-                // not a delete+create
-                deleteDocument(originalDocument, true, false, context);
+            if (document.isNew()) {
+                if (!originalDocument.isNew()) {
+                    // We don't want to notify about this delete since from outside world point of view it's an update
+                    // and not a delete+create
+                    deleteDocument(originalDocument, true, false, context);
+                }
             } else {
                 // Put attachments to remove in recycle bin
                 if (hasAttachmentRecycleBin(context)) {

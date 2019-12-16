@@ -93,8 +93,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     @Inject
     private Logger logger;
 
-    private boolean documentDeleted;
-
     private FilterEventParameters currentLocaleParameters;
 
     private FilterEventParameters currentRevisionParameters;
@@ -129,8 +127,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     @Override
     public void beginWikiDocument(String name, FilterEventParameters parameters) throws FilterException
     {
-        this.documentDeleted = false;
-
         this.currentLocaleParameters = parameters;
         this.currentRevisionParameters = parameters;
     }
@@ -192,46 +188,21 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             XWikiDocument document =
                 xcontext.getWiki().getDocument(inputDocument.getDocumentReferenceWithLocale(), xcontext);
 
-            if (!this.documentDeleted && !document.isNew() && this.properties.isPreviousDeleted()) {
-                XWikiDocument originalDocument = document;
-
-                // Save current context wiki
-                WikiReference currentWiki = xcontext.getWikiReference();
-                try {
-                    // Make sure the store is executed in the right context
-                    xcontext.setWikiReference(document.getDocumentReference().getWikiReference());
-
-                    // Put previous version in recycle bin
-                    if (xcontext.getWiki().hasRecycleBin(xcontext)) {
-                        xcontext.getWiki().getRecycleBinStore().saveToRecycleBin(document, xcontext.getUser(),
-                            new Date(), xcontext, true);
-                    }
-
-                    // Make sure to not generate DocumentDeletedEvent since from listener point of view it's not
-                    xcontext.getWiki().getStore().deleteXWikiDoc(document, xcontext);
-                    this.documentDeleted = true;
-                } finally {
-                    // Restore current context wiki
-                    xcontext.setWikiReference(currentWiki);
-                }
-
-                document = xcontext.getWiki().getDocument(inputDocument.getDocumentReferenceWithLocale(), xcontext);
-
-                // Remember deleted document as the actual previous version of the document (to simulate an update
-                // instead of a creation)
-                document.setOriginalDocument(originalDocument);
-            } else {
-                // Make sure to remember that the document should not be deleted anymore
-                this.documentDeleted = true;
-            }
-
             // Remember if it's a creation or an update
             boolean isnew = document.isNew();
+
+            // Make sure document's attachments content are loaded from the store
+            document.loadAttachmentsContentSafe(xcontext);
 
             // Safer to clone for thread safety and in case the save fail
             document = document.clone();
 
-            document.loadAttachmentsContentSafe(xcontext);
+            if (this.properties.isPreviousDeleted()) {
+                // Indicate we want to completely replace the previous document with the new one (XWiki#saveDocument
+                // will take care of that automatically)
+                document.setNew(true);
+            }
+
             document.apply(inputDocument);
 
             // Get the version from the input document

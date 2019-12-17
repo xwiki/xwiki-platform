@@ -88,6 +88,9 @@
 #macro(formHidden)
   #if ($request.xredirect)
     <input type="hidden" name="xredirect" value="$escapetool.xml($request.xredirect)"/>
+
+    <!-- Make sure not selecting any extension for uninstall is different from startup -->
+    <input type="hidden" name="uninstalled_extensions"/>
   #end
 #end
 {{/velocity}}

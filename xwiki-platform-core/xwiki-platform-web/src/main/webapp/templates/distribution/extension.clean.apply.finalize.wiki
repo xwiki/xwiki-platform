@@ -1,18 +1,18 @@
 ##!source.syntax=xwiki/2.1
 {{velocity}}
   #foreach($topExtensionId in $topExtensionIds)
-    #set ($installedExtension = $services.extension.installed.getInstalledExtension($topExtensionId))
+    #set ($installedExtension = $services.extension.installed.repository.getInstalledExtension($topExtensionId))
     #if ($installedExtension.isInstalled($NULL))
-      #set($void = $services.extension.installed.repository.installExtension($topExtensionId, $NULL, false))
+      #set($void = $services.extension.installed.repository.installExtension($installedExtension, $NULL, false))
     #else
-      #set($void = $services.extension.installed.repository.installExtension($topExtensionId, $currentNamespace, false))
+      #set($void = $services.extension.installed.repository.installExtension($installedExtension, $currentNamespace, false))
     #end
   #end
 {{/velocity}}
 
 {{velocity}}
-#if (!$uninstalledExtensions.isEmpty())
-  #createUninstallJobRequest($uninstalledExtensions $uninstallRequest)
+#if (!$uninstalledExtensionIds.isEmpty())
+  #createUninstallJobRequest($uninstalledExtensionIds $uninstallRequest)
   #set($uninstallJob = $services.job.getJob($uninstallRequest.id))
   #if (!$uninstallJob)
     #set ($uninstallJob = $extensionManager.uninstall($uninstallRequest))

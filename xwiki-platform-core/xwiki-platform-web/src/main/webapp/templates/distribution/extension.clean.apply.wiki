@@ -2,7 +2,7 @@
 = {{translation key="platform.extension.distributionWizard.extension.cleanStep.apply.title"/}}
 
 {{velocity output="false"}}
-#macro(createUninstallJobRequest $uninstalledExtensions $uninstallRequest)
+#macro(createUninstallJobRequest $uninstalledExtensionIds $uninstallRequest)
   #set ($uninstallRequest = $extensionManager.createUninstallRequest())
   #set($void = $uninstallRequest.setId(['extensions', 'distribution', 'clean', 'uninstall']))
   #set($void = $uninstallRequest.setInteractive(false))
@@ -36,8 +36,8 @@
 #elseif ($request.cleanapplyreport)
   {{template name="distribution/extension.clean.apply.report.wiki"/}}
 #else
-  #if (!$uninstalledExtensions.isEmpty())
-    #createUninstallJobRequest($uninstalledExtensions $uninstallRequest)
+  #if (!$uninstalledExtensionIds.isEmpty())
+    #createUninstallJobRequest($uninstalledExtensionIds $uninstallRequest)
     #set ($uninstallPlanJob = $extensionManager.createUninstallPlan($uninstallRequest))
     ## Wait for the job to finish (no need to display a progress since it's fast)
     #set ($void = $uninstallPlanJob.join())

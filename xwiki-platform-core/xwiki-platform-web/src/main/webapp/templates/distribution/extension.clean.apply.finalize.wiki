@@ -11,20 +11,25 @@
 {{/velocity}}
 
 {{velocity}}
-#createUninstallJobRequest($uninstalledExtensions $uninstallRequest)
-#set($uninstallJob = $services.job.getJob($uninstallRequest.id))
-#if (!$uninstallJob)
-  #set ($uninstallJob = $extensionManager.uninstall($uninstallRequest))
+#if (!$uninstalledExtensions.isEmpty())
+  #createUninstallJobRequest($uninstalledExtensions $uninstallRequest)
+  #set($uninstallJob = $services.job.getJob($uninstallRequest.id))
+  #if (!$uninstallJob)
+    #set ($uninstallJob = $extensionManager.uninstall($uninstallRequest))
+  #end
+  {{html clean="false"}}
+    <form action="">
+      #displayJobStatus($uninstallJob.status, 'extension.clean.uninstall.status')
+
+      #formHiddenCleanApply()
+
+      <span class="buttonwrapper">
+        <button class="button" type="submit" name="cleanapplyreport" #if($uninstallJob.status.state.name() != 'FINISHED')disabled="disabled"#end>$services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.cleanapplyreport')</button>
+      </span>
+    </form>
+  {{/html}}
+#else
+  ## Show the report right away since we don't have any uninstall job to wait for
+  {{template name="distribution/extension.clean.apply.report.wiki"/}}
 #end
-{{html clean="false"}}
-  <form action="">
-    #displayJobStatus($uninstallJob.status, 'extension.clean.uninstall.status')
-
-    #formHiddenCleanApply()
-
-    <span class="buttonwrapper">
-      <button class="button" type="submit" name="cleanapplyreport" #if($uninstallJob.status.state.name() != 'FINISHED')disabled="disabled"#end>$services.localization.render('platform.extension.distributionWizard.extension.cleanStep.button.cleanapplyreport')</button>
-    </span>
-  </form>
-{{/html}}
 {{/velocity}}

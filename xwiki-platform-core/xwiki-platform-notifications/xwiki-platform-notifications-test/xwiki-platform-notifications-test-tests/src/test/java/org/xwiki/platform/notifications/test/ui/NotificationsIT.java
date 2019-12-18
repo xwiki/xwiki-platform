@@ -316,8 +316,8 @@ public class NotificationsIT extends AbstractTest
         assertEquals(9, tray.getUnreadNotificationsCount());
         assertEquals(1, tray.getReadNotificationsCount());
 
-        // Make sure it's still OK after a refresh
-        getUtil().gotoPage(getTestClassName(), "WebHome");
+        // Make sure it's still OK after a refresh (change the page so we are sure it refreshes)
+        getUtil().gotoPage("Main", "WebHome");
         tray = new NotificationsTrayPage();
         assertEquals(20, tray.getNotificationsCount());
         assertEquals(9, tray.getUnreadNotificationsCount());

@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.job.event.status.JobProgressManager;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -112,6 +113,9 @@ public class DefaultGadgetSource implements GadgetSource
     @Inject
     private ContentExecutor<MacroTransformationContext> contentExecutor;
 
+    @Inject
+    private JobProgressManager progress;
+
     /**
      * Prepare the parser to parse the title and content of the gadget into blocks.
      */
@@ -137,7 +141,17 @@ public class DefaultGadgetSource implements GadgetSource
             return new ArrayList<>();
         }
 
-        return prepareGadgets(gadgetObjects, sourceDoc.getSyntax(), context);
+        this.progress.startStep(this, "dashboard.progress.prepareGadgets", "Prepare gadgets for documents [] ()",
+            sourceDocRef, gadgetObjects.size());
+
+        this.progress.pushLevelProgress(gadgetObjects.size(), this);
+
+        try {
+            return prepareGadgets(gadgetObjects, sourceDoc.getSyntax(), context);
+        } finally {
+            this.progress.popLevelProgress(this);
+            this.progress.endStep(this);
+        }
     }
 
     /**
@@ -165,33 +179,40 @@ public class DefaultGadgetSource implements GadgetSource
         VelocityEngine velocityEngine = velocityManager.getVelocityEngine();
 
         for (BaseObject xObject : objects) {
-            if (xObject == null) {
-                continue;
+            if (xObject != null) {
+                this.progress.startStep(this, "dashboard.progress.prepareGadget", "Prepare gadget [{}:{}]",
+                    xObject.getDocumentReference(), xObject.getNumber());
+
+                // get the data about the gadget from the object
+                // TODO: filter for dashboard name when that field will be in
+                String title = xObject.getStringValue("title");
+                String content = xObject.getLargeStringValue("content");
+                String position = xObject.getStringValue("position");
+                String id = xObject.getNumber() + "";
+
+                // render title with velocity
+                StringWriter writer = new StringWriter();
+                // FIXME: the engine has an issue with $ and # as last character. To test and fix if it happens
+                velocityEngine.evaluate(velocityContext, writer, key, title);
+                String gadgetTitle = writer.toString();
+
+                // parse both the title and content in the syntax of the transformation context
+                List<Block> titleBlocks =
+                    renderGadgetProperty(gadgetTitle, sourceSyntax, xObject.getDocumentReference(), context);
+                List<Block> contentBlocks =
+                    renderGadgetProperty(content, sourceSyntax, xObject.getDocumentReference(), context);
+
+                // create a gadget will all these and add the gadget to the container of gadgets
+                Gadget gadget = new Gadget(id, titleBlocks, contentBlocks, position);
+                gadget.setTitleSource(title);
+                gadgets.add(gadget);
+            } else {
+                this.progress.startStep(this, "dashboard.progress.skipNullGadget", "Null gadget object");
             }
-            // get the data about the gadget from the object
-            // TODO: filter for dashboard name when that field will be in
-            String title = xObject.getStringValue("title");
-            String content = xObject.getLargeStringValue("content");
-            String position = xObject.getStringValue("position");
-            String id = xObject.getNumber() + "";
 
-            // render title with velocity
-            StringWriter writer = new StringWriter();
-            // FIXME: the engine has an issue with $ and # as last character. To test and fix if it happens
-            velocityEngine.evaluate(velocityContext, writer, key, title);
-            String gadgetTitle = writer.toString();
-
-            // parse both the title and content in the syntax of the transformation context
-            List<Block> titleBlocks =
-                renderGadgetProperty(gadgetTitle, sourceSyntax, xObject.getDocumentReference(), context);
-            List<Block> contentBlocks =
-                renderGadgetProperty(content, sourceSyntax, xObject.getDocumentReference(), context);
-
-            // create a gadget will all these and add the gadget to the container of gadgets
-            Gadget gadget = new Gadget(id, titleBlocks, contentBlocks, position);
-            gadget.setTitleSource(title);
-            gadgets.add(gadget);
+            this.progress.endStep(this);
         }
+
         return gadgets;
     }
 

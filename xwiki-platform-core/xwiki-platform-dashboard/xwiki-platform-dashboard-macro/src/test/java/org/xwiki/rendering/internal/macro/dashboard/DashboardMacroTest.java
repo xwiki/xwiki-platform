@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.macro.dashboard;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,7 +27,6 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.properties.BeanDescriptor;
 import org.xwiki.properties.BeanManager;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.dashboard.DashboardMacroParameters;
 import org.xwiki.rendering.macro.dashboard.DashboardRenderer;

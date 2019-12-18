@@ -786,7 +786,7 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         // Put back legacy feature to the Hibernate session
         if (session instanceof SessionImplementor) {
             session = new LegacySessionImplementor((SessionImplementor) session,
-                this.loggerConfiguration.isDeprecatedLogEnabled());
+                this.loggerConfiguration);
         }
 
         setCurrentSession(session);

@@ -86,105 +86,93 @@ define('export-tree', ['jquery', 'tree'], function($) {
    * @param exportPages: a map of list, keys are pages to include, values are list of pages to exclude
    */
   var collectExportPages = function(tree, parentNode, exportPages) {
-    // Set default value for pagination.
-    var isPaginationExisting = false;
-    var isPaginationChecked = false;
-
-    var nodeId = parentNode.data.id;
-
-    var pageReference = XWiki.Model.resolve(nodeId, XWiki.EntityType.DOCUMENT);
-    var pageJoker = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, pageReference.parent));
-
-    var nodeWithChildren = [];
     var includedPages = [];
     var excludedPages = [];
 
     // First we need to put the parent node in the right list.
-    if (!tree.is_checked(parentNode)) {
-      excludedPages.push(XWiki.Model.serialize(pageReference));
-    } else {
-      includedPages.push(XWiki.Model.serialize(pageReference));
+    var pageId = parentNode.data.type === 'document' && parentNode.data.id;
+    if (pageId) {
+      if (tree.is_checked(parentNode)) {
+        includedPages.push(pageId);
+      } else {
+        excludedPages.push(pageId);
+      }
     }
 
-    // Then process its children.
-    parentNode.children.forEach(function (nodeDom) {
+    // Then process its child nodes.
+    var childNodes = parentNode.children.map(function(childId) {
+      return tree.get_node(childId);
+    });
+    childNodes.filter(function(child) {
+      // We're interested only in document child nodes.
+      return child.data.type === 'document';
+    }).forEach(function (child) {
+      var childPageId = child.data.id;
 
-      var node = tree.get_node(nodeDom);
-      var subNodeId = node.data.id;
-      var subPageReference;
-
-      // if the node does not have children (easy case)
-      if (tree.is_leaf(node)) {
-
-        // pagination node is actually a leaf node
-        if (node.data.type === "pagination") {
-          isPaginationExisting = true;
-          isPaginationChecked = tree.is_checked(node);
-
-        // standard document node
+      // If the child node doesn't have children (easy case)...
+      if (tree.is_leaf(child)) {
+        // ...add the child page reference to the right list.
+        if (tree.is_checked(child)) {
+          includedPages.push(childPageId);
         } else {
-          subPageReference = XWiki.Model.serialize(XWiki.Model.resolve(subNodeId, XWiki.EntityType.DOCUMENT));
-
-          // the page ref in the right list
-          if (tree.is_checked(node)) {
-            includedPages.push(subPageReference);
-          } else {
-            excludedPages.push(subPageReference);
-          }
+          excludedPages.push(childPageId);
         }
 
-      // if the node has children
+      // If the child node has its own children...
       } else {
-        subPageReference = XWiki.Model.resolve(subNodeId, XWiki.EntityType.DOCUMENT);
-        var subPageJoker = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, subPageReference.parent));
+        var childPageReference = XWiki.Model.resolve(childPageId, XWiki.EntityType.DOCUMENT);
+        var childPageJoker = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT,
+          childPageReference.parent));
 
-        // if it's not loaded, we'll manage the entire space
-        if (!tree.is_loaded(node)) {
-
-          // put the space in the right list
-          if (tree.is_checked(node)) {
-            includedPages.push(subPageJoker);
+        // If it's not loaded, we consider the entire sub-tree of pages.
+        if (!tree.is_loaded(child)) {
+          if (tree.is_checked(child)) {
+            // Include the entire sub-tree of pages.
+            includedPages.push(childPageJoker);
           } else {
-            excludedPages.push(subPageJoker);
+            // Exclude the entire sub-tree of pages.
+            excludedPages.push(childPageJoker);
           }
         } else {
-          // in that case the page will be managed within its own space, so we need to exclude it
-          // in the current context to avoid selecting it in the request
-          // e.g. I'm in Foo.% I selected Foo.Bar but only some of its children:
-          // I need Foo.Bar.% to be excluded in the request with Foo.%
-          // then another part of the request will select Foo.Bar.X, X being the selected children.
-          excludedPages.push(subPageJoker);
-          nodeWithChildren.push(node);
+          // Exclude the entire sub-tree at this point, as we will collect the export pages from this sub-tree later on
+          // recursively. E.g. I'm in Foo.% I selected Foo.Bar but only some of its children: I need Foo.Bar.% to be
+          // excluded in the request with Foo.% then another part of the request will select Foo.Bar.X, X being the
+          // selected children.
+          excludedPages.push(childPageJoker);
         }
       }
     });
 
-    // if we don't have a pagination node, or we have one and it's checked:
-    // we manage the export with exporting the space and excluding stuff that needs to be
-    if (!isPaginationExisting || (isPaginationExisting && isPaginationChecked)) {
+    // If we don't have a pagination node, or we have one and it's checked: we manage the export by specifying the
+    // excluded pages (we export the specified parent page without the excluded child pages).
+    var useExcludes = pageId && childNodes.length > 0 && childNodes.every(function(child) {
+      return child.data.type !== 'pagination' || tree.is_checked(child);
+    });
+    if (useExcludes) {
+      var pageReference = XWiki.Model.resolve(pageId, XWiki.EntityType.DOCUMENT);
+      var pageJoker = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT,
+        pageReference.parent));
       exportPages[pageJoker] = excludedPages;
-
-    // a pagination exists but it's not checked:
-    // we need to manage the export by specifying exactly what we include, we don't need to specify exclude
     } else {
-      includedPages.forEach(function (elem) {
-          exportPages[elem] = [];
-        }
-      );
+      // A pagination node exists but it's not checked: we manage the export by specifying exactly what to include (no
+      // excludes specified).
+      includedPages.forEach(function(includedPage) {
+        exportPages[includedPage] = [];
+      });
     }
 
-    // we call the same function for the children
-    nodeWithChildren.forEach(function (node) {
-      collectExportPages(tree, node, exportPages);
+    // Process the loaded non-leaf children recursively.
+    childNodes.forEach(function(child) {
+      if (tree.is_loaded(child) && !tree.is_leaf(child)) {
+        collectExportPages(tree, child, exportPages);
+      }
     });
   };
 
   var exportTreeAPI = {
     getExportPages: function() {
       var exportPages = {};
-      this.get_node($.jstree.root).children.forEach(function(nodeId) {
-        collectExportPages(this, this.get_node(nodeId), exportPages);
-      }, this);
+      collectExportPages(this, this.get_node($.jstree.root), exportPages);
       return exportPages;
     }
   };

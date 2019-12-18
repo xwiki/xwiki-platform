@@ -37,6 +37,7 @@ import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -58,12 +59,12 @@ public class XWikiWebappResourceLoaderTest
     private LocalizationContext localizationContext;
 
     @InjectComponentManager
-    private ComponentManager componentManager;
+    private MockitoComponentManager componentManager;
 
     @Test
     public void testVelocityInitialization() throws Exception
     {
-        when(configuration.getProperty("logging.deprecated.enabled", true)).thenReturn(true);
+        this.componentManager.registerMemoryConfigurationSource();
 
         // Fake the initialization of the Servlet Environment
         ServletEnvironment environment = (ServletEnvironment) this.componentManager.getInstance(Environment.class);

@@ -63,6 +63,8 @@ public class XWikiWebappResourceLoaderTest
     @Test
     public void testVelocityInitialization() throws Exception
     {
+        when(configuration.getProperty("logging.deprecated.enabled", true)).thenReturn(true);
+
         // Fake the initialization of the Servlet Environment
         ServletEnvironment environment = (ServletEnvironment) this.componentManager.getInstance(Environment.class);
         ServletContext servletContext = mock(ServletContext.class);

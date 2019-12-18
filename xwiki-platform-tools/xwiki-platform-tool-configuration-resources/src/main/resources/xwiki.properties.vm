@@ -999,4 +999,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # eventstream.daystokeepevents = 0
 
+#-------------------------------------------------------------------------------------
+# Logging
+#-------------------------------------------------------------------------------------
+
+#-# [Since 12.0RC1]
+#-# Indicate of logging about the use of deprecated APIs/feature should be enabled.
+#-# 
+#-# The default is:
+# logging.deprecated.enabled=true
+
 $!xwikiPropertiesAdditionalProperties

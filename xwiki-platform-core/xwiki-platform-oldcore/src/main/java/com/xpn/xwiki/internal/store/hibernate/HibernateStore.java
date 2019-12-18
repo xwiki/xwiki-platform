@@ -80,6 +80,7 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.environment.Environment;
+import org.xwiki.logging.LoggerConfiguration;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiException;
@@ -144,6 +145,9 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     @Inject
     private Environment environment;
+
+    @Inject
+    private LoggerConfiguration loggerConfiguration;
 
     private DataMigrationManager dataMigrationManager;
 
@@ -781,7 +785,8 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
         // Put back legacy feature to the Hibernate session
         if (session instanceof SessionImplementor) {
-            session = new LegacySessionImplementor((SessionImplementor) session);
+            session = new LegacySessionImplementor((SessionImplementor) session,
+                this.loggerConfiguration.isDeprecatedLogEnabled());
         }
 
         setCurrentSession(session);

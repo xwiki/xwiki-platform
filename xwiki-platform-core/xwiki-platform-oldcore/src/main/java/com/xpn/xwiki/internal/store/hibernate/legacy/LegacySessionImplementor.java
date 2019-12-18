@@ -29,6 +29,7 @@ import org.hibernate.hql.spi.QueryTranslator;
 import org.hibernate.query.spi.QueryImplementor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.logging.LoggerConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.internal.store.hibernate.query.HqlQueryUtils;
@@ -54,12 +55,17 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
 
     private static final Pattern LEGACY_MATCHER = Pattern.compile("\\?($|[^\\d])");
 
+    private final LoggerConfiguration loggerConfiguration;
+
     /**
      * @param delegate the actual session
+     * @param loggerConfiguration use to know if a warning should be logged when deprecated API is used
      */
-    public LegacySessionImplementor(SessionImplementor delegate)
+    public LegacySessionImplementor(SessionImplementor delegate, LoggerConfiguration loggerConfiguration)
     {
         super(delegate);
+
+        this.loggerConfiguration = loggerConfiguration;
     }
 
     /**
@@ -75,10 +81,12 @@ public class LegacySessionImplementor extends SessionDelegatorBaseImpl
     {
         String convertedQueryString = HqlQueryUtils.replaceLegacyQueryParameters(queryString);
 
-        LOGGER.warn(
-            "Deprecated usage legacy-style HQL ordinal parameters (`?`);"
-                + " use JPA-style ordinal parameters (e.g., `?1`) instead. Query [{}] has been converted to [{}]",
-            queryString, convertedQueryString);
+        if (this.loggerConfiguration.isDeprecatedLogEnabled()) {
+            LOGGER.warn(
+                "Deprecated usage legacy-style HQL ordinal parameters (`?`);"
+                    + " use JPA-style ordinal parameters (e.g., `?1`) instead. Query [{}] has been converted to [{}]",
+                queryString, convertedQueryString);
+        }
 
         return convertedQueryString;
     }

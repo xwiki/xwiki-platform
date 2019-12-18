@@ -37,6 +37,7 @@ import org.xwiki.display.internal.DocumentTitleDisplayer;
 import org.xwiki.localization.internal.DefaultContextualLocalizationManager;
 import org.xwiki.localization.internal.DefaultLocalizationManager;
 import org.xwiki.localization.internal.DefaultTranslationBundleContext;
+import org.xwiki.logging.internal.DefaultLoggerConfiguration;
 import org.xwiki.model.internal.DefaultModelContext;
 import org.xwiki.observation.internal.DefaultObservationManager;
 import org.xwiki.properties.internal.DefaultBeanManager;
@@ -181,6 +182,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     DefaultScriptContextManager.class,
     DefaultVelocityFactory.class,
     DefaultVelocityConfiguration.class,
+    DefaultLoggerConfiguration.class,
     DefaultVelocityEngine.class,
     DefaultVelocityContextFactory.class,
     StubVelocityManager.class,

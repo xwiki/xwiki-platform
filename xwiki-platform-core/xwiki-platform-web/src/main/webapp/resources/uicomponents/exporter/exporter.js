@@ -174,6 +174,9 @@ define('export-tree', ['jquery', 'tree'], function($) {
       var exportPages = {};
       collectExportPages(this, this.get_node($.jstree.root), exportPages);
       return exportPages;
+    },
+    hasExportPages: function() {
+      return this.get_checked().length > 0 || this.get_undetermined().length > 0;
     }
   };
 
@@ -236,6 +239,10 @@ define('export-tree', ['jquery', 'tree'], function($) {
         // Pre-select the child nodes by default when the parent selection is undetermined.
         selectNodes(tree, data.nodes);
       }
+    }).on('click', '.jstree-anchor.jstree-disabled', function(event) {
+      // Open / close disabled nodes when clicking on them, in order to let the users know that they can still interact
+      // with these nodes.
+      $(this).jstree('toggle_node', event.target);
     }).one('ready.jstree', function(event, data) {
       var tree = data.instance;
       // Extend the tree API.
@@ -366,10 +373,11 @@ require([
   // Export Form
   //
 
-  // Enable the submit buttons when the export tree is ready.
-  $('.export-tree').on('ready.jstree', function () {
-    $(this).closest('form#export').find('input[type="submit"]').prop('disabled', false);
-  })
+  // Enable / disable the submit buttons whenever the selection changes in the tree.
+  $('.export-tree').on('ready.jstree, changed.jstree', function (event, data) {
+    var tree = data.instance;
+    $(this).closest('form#export').find('input[type="submit"]').prop('disabled', !tree.hasExportPages()); 
+  });
 
   // Create the container for the hidden inputs used to submit the selected pages from the export tree.
   var hiddenContainer = $('<div class="hidden"/>').insertAfter('.export-tree');
@@ -382,10 +390,12 @@ require([
   // Export Modal
   //
 
-  // Enable the submit buttons when the export tree is ready.
-  $('.export-tree').on('ready.jstree', function () {
-    $(this).closest('#exportModalOtherCollapse').find('a.btn.disabled').removeClass('disabled');
-  })
+  // Enable / disable the submit buttons whenever the selection changes in the tree.
+  $('.export-tree').on('ready.jstree, changed.jstree', function (event, data) {
+    var tree = data.instance;
+    $(this).closest('#exportModalOtherCollapse').find('.export-buttons a.btn').toggleClass('disabled',
+      !tree.hasExportPages());
+  });
 
   // Useful to create quickly the right String given an array of page names.
   var aggregatePageNames = function (arrayOfNames) {

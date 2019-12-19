@@ -103,6 +103,9 @@
         #elseif ($iconMetaData.iconSetType == 'FONT')
           #set ($node.icon = "$iconMetaData.cssClass $iconStyle")
         #end
+      #elseif ($node.data.type == 'empty')
+        #set ($node.state = {'disabled': true, 'selected': false})
+        #set ($node.a_attr = {'class': 'jstree-no-checkboxes'})
       #end
     #end
   #end

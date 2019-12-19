@@ -21,7 +21,7 @@
     <label for="name">$services.localization.render('export_packagename')</label>
     <span class="xHint">$services.localization.render('administration.section.export.packageName.hint')</span>
   </dt>
-  <dd><input type="text" name="name" id="name" value="" placeholder="backup"/></dd>
+  <dd><input type="text" name="name" id="name" value="" placeholder="export"/></dd>
   <dt>
     <label for="description">$services.localization.render('export_description')</label>
     <span class="xHint">$services.localization.render('administration.section.export.description.hint')</span>

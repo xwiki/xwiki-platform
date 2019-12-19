@@ -177,6 +177,18 @@ define('export-tree', ['jquery', 'tree'], function($) {
     },
     hasExportPages: function() {
       return this.get_checked().length > 0 || this.get_undetermined().length > 0;
+    },
+    isExportingAllPages: function() {
+      // Check if there are any unselected nodes.
+      return this.get_json(null, {
+        flat: true,
+        no_id: true,
+        no_data: true,
+        no_a_attr: true,
+        no_li_attr: true
+      }).find(function(node) {
+        return node.state.selected === false && node.state.undetermined !== true;
+      }) === undefined;
     }
   };
 
@@ -351,7 +363,7 @@ require([
 
   // Fill the form with the selected pages from the export tree.
   var createHiddenInputsFromExportTree = function(exportTree, container) {
-    var exportPages = $.jstree.reference(exportTree).getExportPages();
+    var exportPages = exportTree.getExportPages();
     for (var pages in exportPages) {
       // Includes
       $('<input/>').attr({
@@ -383,7 +395,11 @@ require([
   var hiddenContainer = $('<div class="hidden"/>').insertAfter('.export-tree');
 
   $('form#export').submit(function() {
-    createHiddenInputsFromExportTree($(this).find('.export-tree'), hiddenContainer.empty());
+    var exportTree = $.jstree.reference($(this).find('.export-tree'));
+    // We submit only the tree filter when all nodes are selected (in order to optimize the final database query).
+    if (exportTree && !exportTree.isExportingAllPages()) {
+      createHiddenInputsFromExportTree(exportTree, hiddenContainer.empty());
+    }
   });
 
   //
@@ -419,7 +435,7 @@ require([
         // Make sure to remove any preselected page from the submit URL since we're going to take the pages from the tree.
         form.empty().attr('action', $(this).attr('href').replace(/pages=.*?(&|$)/g, ''));
         // Fill the form and submit.
-        createHiddenInputsFromExportTree(exportTree, form);
+        createHiddenInputsFromExportTree($.jstree.reference(exportTree), form);
         $(this).closest('#exportModalOtherCollapse').find('input[type="hidden"][name="filter"]').clone().appendTo(form);
         form.submit();
       }

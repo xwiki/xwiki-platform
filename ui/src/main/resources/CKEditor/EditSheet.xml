@@ -280,6 +280,9 @@ define('xwiki-ckeditor', [
     }
   };
   allowedContentBySyntax['xwiki/2.0'] = allowedContentBySyntax['xwiki/2.1'];
+  // This is a hack, increasing the technical debt since the CKEditor module should not know about the Markdown
+  // syntax. Actually it should not know either about the xwiki/2.0 and xwiki/2.1 syntaxes ;)
+  // This should be fixed by implementing https://jira.xwiki.org/browse/CKEDITOR-319
   allowedContentBySyntax['markdown/1.2'] = allowedContentBySyntax['xwiki/2.1'];
 
   // xwiki-meta module is available only since XWiki 6.3M2

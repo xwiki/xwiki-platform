@@ -280,6 +280,7 @@ define('xwiki-ckeditor', [
     }
   };
   allowedContentBySyntax['xwiki/2.0'] = allowedContentBySyntax['xwiki/2.1'];
+  allowedContentBySyntax['markdown/1.2'] = allowedContentBySyntax['xwiki/2.1'];
 
   // xwiki-meta module is available only since XWiki 6.3M2
   xwikiMeta = xwikiMeta || {

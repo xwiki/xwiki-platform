@@ -19,10 +19,14 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.inject.Provider;
 import javax.script.ScriptContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.csrf.CSRFToken;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -90,6 +94,49 @@ public class CreateAction extends XWikiAction
      * Current entity reference resolver hint.
      */
     private static final String CURRENT_MIXED_RESOLVER_HINT = "currentmixed";
+
+    /**
+     * The action to perform when creating a new page from a template.
+     *
+     * @version $Id$
+     */
+    private enum ActionOnCreate
+    {
+        /**
+         * Go to edit mode without saving.
+         */
+        EDIT("edit"),
+
+        /**
+         * Save and then go to edit mode.
+         */
+        SAVE_AND_EDIT("saveandedit"),
+
+        /**
+         * Save and then go to view mode.
+         */
+        SAVE_AND_VIEW("saveandview");
+
+        private static final Map<String, ActionOnCreate> BY_ACTION = new HashMap<>();
+
+        static {
+            for (ActionOnCreate actionOnCreate : values()) {
+                BY_ACTION.put(actionOnCreate.action, actionOnCreate);
+            }
+        }
+
+        private final String action;
+
+        ActionOnCreate(String action)
+        {
+            this.action = action;
+        }
+
+        public static ActionOnCreate valueOfAction(String action)
+        {
+            return BY_ACTION.get(action);
+        }
+    }
 
     /**
      * Default constructor.
@@ -201,12 +248,11 @@ public class CreateAction extends XWikiAction
         // forcing to create a template provider for each template creation
         String template = getTemplate(templateProvider, request);
 
-        // from the template provider, find out if the document should be saved before edited
-        boolean toSave = getSaveBeforeEdit(templateProvider);
+        // Read from the template provide the action to perform when creating the page.
+        ActionOnCreate actionOnCreate = getActionOnCreate(templateProvider);
 
-        String redirectParams = null;
-        String editMode = null;
-        if (toSave) {
+        String action = null;
+        if (actionOnCreate == ActionOnCreate.SAVE_AND_EDIT) {
             XWiki xwiki = context.getWiki();
 
             DocumentReference templateReference = resolver.resolve(template);
@@ -226,17 +272,14 @@ public class CreateAction extends XWikiAction
             context.getWiki().checkSavingDocument(currentUserReference, newDocument, context);
 
             xwiki.saveDocument(newDocument, context);
-            editMode = newDocument.getDefaultEditMode(context);
+            action = newDocument.getDefaultEditMode(context);
         } else {
-            // put all the data in the redirect params, to be passed to the edit mode
-            redirectParams = getRedirectParameters(parent, title, template);
-
-            // Get the edit mode of the document to create from the specified template
-            editMode = getEditMode(template, resolver, context);
+            action = actionOnCreate == ActionOnCreate.SAVE_AND_VIEW ? "save" : getEditMode(template, resolver, context);
         }
 
-        // Perform a redirection to the edit mode of the new document
-        String redirectURL = newDocument.getURL(editMode, redirectParams, context);
+        // Perform a redirection to the selected action of the document to create.
+        String redirectParams = getRedirectParameters(parent, title, template, actionOnCreate);
+        String redirectURL = newDocument.getURL(action, redirectParams, context);
         redirectURL = context.getResponse().encodeRedirectURL(redirectURL);
         if (context.getRequest().getParameterMap().containsKey("ajax")) {
             // If this template is displayed from a modal popup, send a header in the response notifying that a
@@ -248,23 +291,27 @@ public class CreateAction extends XWikiAction
         }
     }
 
-    /**
-     * @param xcontext
-     * @param parent
-     * @param title
-     * @param template
-     * @return
-     */
-    private String getRedirectParameters(String parent, String title, String template)
+    private String getRedirectParameters(String parent, String title, String template, ActionOnCreate actionOnCreate)
     {
-        String redirectParams;
-        redirectParams = "template=" + Util.encodeURI(template, null);
+        if (actionOnCreate == ActionOnCreate.SAVE_AND_EDIT) {
+            // We don't need to pass any parameters because the document is saved before the redirect using the
+            // parameter values.
+            return null;
+        }
+
+        String redirectParams = "template=" + Util.encodeURI(template, null);
         if (parent != null) {
             redirectParams += "&parent=" + Util.encodeURI(parent, null);
         }
         if (title != null) {
             redirectParams += "&title=" + Util.encodeURI(title, null);
         }
+        if (actionOnCreate == ActionOnCreate.SAVE_AND_VIEW) {
+            // Add the CSRF token because we redirect to save action.
+            CSRFToken csrf = Utils.getComponent(CSRFToken.class);
+            redirectParams += "&form_token=" + Util.encodeURI(csrf.getToken(), null);
+        }
+
         return redirectParams;
     }
 
@@ -356,19 +403,18 @@ public class CreateAction extends XWikiAction
      * @param templateProvider the template provider for this creation
      * @return {@code true} if the created document should be saved on create, before editing, {@code false} otherwise
      */
-    boolean getSaveBeforeEdit(BaseObject templateProvider)
+    private ActionOnCreate getActionOnCreate(BaseObject templateProvider)
     {
-        boolean toSave = false;
-
         if (templateProvider != null) {
-            // get the action to execute and compare it to saveandedit value
             String action = templateProvider.getStringValue("action");
-            if ("saveandedit".equals(action)) {
-                toSave = true;
+            ActionOnCreate actionOnCreate = ActionOnCreate.valueOfAction(action);
+            if (actionOnCreate != null) {
+                return actionOnCreate;
             }
         }
 
-        return toSave;
+        // Default action when creating a page from a template.
+        return ActionOnCreate.EDIT;
     }
 
     /**
@@ -383,7 +429,7 @@ public class CreateAction extends XWikiAction
     {
         // Determine the edit action (edit/inline) for the newly created document, if a template is passed it is
         // used to determine the action. Default is 'edit'.
-        String editAction = "edit";
+        String editAction = ActionOnCreate.EDIT.name().toLowerCase();
         XWiki xwiki = context.getWiki();
         if (!StringUtils.isEmpty(template)) {
             DocumentReference templateReference = resolver.resolve(template);

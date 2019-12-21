@@ -74,4 +74,10 @@ public class AllIT
     class NestedNavigationIT extends NavigationIT
     {
     }
+
+    @Nested
+    @DisplayName("Delete Page Tests")
+    class NestedDeletePageIT extends DeletePageIT
+    {
+    }
 }

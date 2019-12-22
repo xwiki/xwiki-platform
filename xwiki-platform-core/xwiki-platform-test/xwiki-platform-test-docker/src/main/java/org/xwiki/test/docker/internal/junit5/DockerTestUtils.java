@@ -19,6 +19,7 @@
  */
 package org.xwiki.test.docker.internal.junit5;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -31,6 +32,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.io.FileUtils;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
+import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -217,7 +219,19 @@ public final class DockerTestUtils
             pulledImages.add(dockerImageName);
         }
 
-        container.start();
+        // Try to work around the following issue: https://github.com/testcontainers/testcontainers-java/issues/2208
+        try {
+            container.start();
+        } catch(Exception e) {
+            if (ExceptionUtils.getRootCause(e) instanceof EOFException) {
+                // Retry once after waiting 5 seconds to increase the odds ;)
+                LOGGER.info("Error starting docker container [{}]. Retrying once", container.getDockerImageName(), e);
+                Thread.sleep(5000L);
+                container.start();
+            } else {
+                throw e;
+            }
+        }
     }
 
     /**

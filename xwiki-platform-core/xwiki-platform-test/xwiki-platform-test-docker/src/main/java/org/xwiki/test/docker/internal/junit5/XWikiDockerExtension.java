@@ -113,7 +113,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
         // Programmatically enable logging for TestContainers code when verbose is on so that we can get the maximum
         // of debugging information.
-        if (testConfiguration.isDebug()) {
+        if (testConfiguration.isVerbose()) {
             setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
             setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
         }

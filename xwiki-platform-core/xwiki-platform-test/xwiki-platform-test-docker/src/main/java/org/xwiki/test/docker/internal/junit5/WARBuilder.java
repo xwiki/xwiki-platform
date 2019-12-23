@@ -27,7 +27,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.RepositoryUtils;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.eclipse.aether.artifact.Artifact;
@@ -35,7 +34,6 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xwiki.test.docker.junit5.ArtifactCoordinate;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.maven.ArtifactResolver;
@@ -43,10 +41,10 @@ import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
 import org.xwiki.tool.extension.util.ExtensionMojoHelper;
 
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.copyDirectory;
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.copyFile;
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.createDirectory;
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.unzip;
+import static org.xwiki.test.docker.internal.junit5.FileTestUtils.copyDirectory;
+import static org.xwiki.test.docker.internal.junit5.FileTestUtils.copyFile;
+import static org.xwiki.test.docker.internal.junit5.FileTestUtils.createDirectory;
+import static org.xwiki.test.docker.internal.junit5.FileTestUtils.unzip;
 
 /**
  * Generates a minimal XWiki WAR that is expanded in the passed target directory.
@@ -131,8 +129,11 @@ public class WARBuilder
 
             // Step: Gather all the required JARs for the minimal WAR
             LOGGER.info("Resolving distribution dependencies ...");
+            List<Artifact> extraArtifacts =
+                this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs());
+            this.mavenResolver.addCloverJAR(extraArtifacts);
             Collection<ArtifactResult> artifactResults = this.artifactResolver.getDistributionDependencies(xwikiVersion,
-                computeExtraArtifacts(this.testConfiguration));
+                extraArtifacts);
             List<File> warDependencies = new ArrayList<>();
             List<Artifact> jarDependencies = new ArrayList<>();
             List<File> skinDependencies = new ArrayList<>();
@@ -184,31 +185,6 @@ public class WARBuilder
             LOGGER.info("... JDBC driver file: {}", jdbcDriverFile);
         }
         copyFile(jdbcDriverFile, libDirectory);
-    }
-
-    private List<Artifact> computeExtraArtifacts(TestConfiguration testConfiguration) throws Exception
-    {
-        List<Artifact> artifacts = new ArrayList<>();
-        if (!testConfiguration.getExtraJARs().isEmpty()) {
-            for (ArtifactCoordinate artifactCoordinate : testConfiguration.getExtraJARs()) {
-                Artifact artifact = artifactCoordinate.toArtifact(
-                    this.mavenResolver.getModelFromCurrentPOM().getVersion());
-                LOGGER.info("Adding extra JAR to WEB-INF/lib: [{}]", artifact);
-                artifacts.add(artifact);
-            }
-        }
-
-        // Add the Clover JAR if it's defined in the current pom.xml since it's needed when the clover profile is
-        // enabled. Note that we need this since by default we don't add any JAR to WEB-INF/lib (since we install
-        // module artifacts as XWiki Extensions).
-        Model model = this.mavenResolver.getModelFromCurrentPOM();
-        for (Dependency dependency : model.getDependencies()) {
-            if (dependency.getArtifactId().equals("clover") && dependency.getGroupId().equals("org.openclover")) {
-                artifacts.add(this.mavenResolver.convertToArtifact(dependency));
-            }
-        }
-
-        return artifacts;
     }
 
     private void copyWebappResources(TestConfiguration testConfiguration, List<File> warDependencies,

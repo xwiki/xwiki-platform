@@ -42,7 +42,7 @@ import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 
-import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.unzip;
+import static org.xwiki.test.docker.internal.junit5.FileTestUtils.unzip;
 
 /**
  * Create a Jetty Standalone packaging on the file system and start/stop Jetty.

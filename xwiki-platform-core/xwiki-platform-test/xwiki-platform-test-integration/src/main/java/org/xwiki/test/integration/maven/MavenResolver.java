@@ -20,6 +20,7 @@
 package org.xwiki.test.integration.maven;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -180,5 +181,45 @@ public class MavenResolver
     {
         return new DefaultArtifact(dependency.getGroupId(), dependency.getArtifactId(),
             dependency.getClassifier(), dependency.getType(), dependency.getVersion());
+    }
+
+    /**
+     * @param artifactCoordinates the Maven artifact coordinates to convert to a resolved list of Artifacts
+     * @return the resolved list of artifacts
+     * @throws Exception in case the POM model cannot be resolved
+     * @since 10.11.2
+     * @since 12.0RC1
+     */
+    public List<Artifact> convertToArtifacts(List<ArtifactCoordinate> artifactCoordinates) throws Exception
+    {
+        List<Artifact> artifacts = new ArrayList<>();
+        if (!artifactCoordinates.isEmpty()) {
+            for (ArtifactCoordinate artifactCoordinate : artifactCoordinates) {
+                Artifact artifact = artifactCoordinate.toArtifact(getModelFromCurrentPOM().getVersion());
+                LOGGER.info("Adding extra JAR to WEB-INF/lib: [{}]", artifact);
+                artifacts.add(artifact);
+            }
+        }
+
+        return artifacts;
+    }
+
+    /**
+     * @param artifacts the list of artifacts to which to add the Clover JAR
+     * @throws Exception in case the POM model cannot be resolved
+     * @since 10.11.2
+     * @since 12.0RC1
+     */
+    public void addCloverJAR(List<Artifact> artifacts) throws Exception
+    {
+        // Add the Clover JAR if it's defined in the current pom.xml since it's needed when the clover profile is
+        // enabled. Note that we need this since by default we don't add any JAR to WEB-INF/lib (since we install
+        // module artifacts as XWiki Extensions).
+        Model model = getModelFromCurrentPOM();
+        for (Dependency dependency : model.getDependencies()) {
+            if (dependency.getArtifactId().equals("clover") && dependency.getGroupId().equals("org.openclover")) {
+                artifacts.add(convertToArtifact(dependency));
+            }
+        }
     }
 }

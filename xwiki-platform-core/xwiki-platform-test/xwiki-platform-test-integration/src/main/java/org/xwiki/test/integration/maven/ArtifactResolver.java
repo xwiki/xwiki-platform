@@ -121,9 +121,8 @@ public class ArtifactResolver
         throws Exception
     {
         // If in cache, serve from the cache for increased performances
-        String artifactAsString = String.format("%s:%s:%s:%s", artifact.getGroupId(), artifact.getArtifactId(),
-            artifact.getExtension(), artifact.getVersion());
-        List<ArtifactResult> artifactResults = this.artifactResultCache.get(artifactAsString);
+        String cacheKey = computeCacheKey(artifact, dependentArtifacts);
+        List<ArtifactResult> artifactResults = this.artifactResultCache.get(cacheKey);
         if (artifactResults == null) {
             DependencyFilter filter = new AndDependencyFilter(Arrays.asList(
                 // Include compile and runtime scopes only (we don't want provided since it's supposed to be available
@@ -176,7 +175,7 @@ public class ArtifactResolver
                 sendError(artifact, dependencyResult.getCollectExceptions());
             }
             artifactResults = dependencyResult.getArtifactResults();
-            this.artifactResultCache.put(artifactAsString, artifactResults);
+            this.artifactResultCache.put(cacheKey, artifactResults);
         }
 
         return artifactResults;
@@ -243,5 +242,20 @@ public class ArtifactResolver
             LOGGER.error("Problem [{}]", exception);
         }
         throw new Exception(String.format("Failed to resolve artifact [%s]", artifact));
+    }
+
+    private String computeCacheKey(Artifact artifact, List<Artifact> dependentArtifacts)
+    {
+        StringBuilder builder = new StringBuilder(computeArtifactKey(artifact));
+        for (Artifact dependentArtifact : dependentArtifacts) {
+            builder.append('-').append(computeArtifactKey(dependentArtifact));
+        }
+        return builder.toString();
+    }
+
+    private String computeArtifactKey(Artifact artifact)
+    {
+        return String.format("%s:%s:%s:%s", artifact.getGroupId(), artifact.getArtifactId(), artifact.getExtension(),
+            artifact.getVersion());
     }
 }

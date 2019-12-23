@@ -20,6 +20,7 @@
 package org.xwiki.test.docker.junit5;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.integration.maven.ArtifactCoordinate;
 
 import static junit.framework.TestCase.assertNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;

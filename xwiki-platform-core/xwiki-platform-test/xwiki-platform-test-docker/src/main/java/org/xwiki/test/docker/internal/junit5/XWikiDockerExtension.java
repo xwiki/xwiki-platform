@@ -152,7 +152,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
             // Provision XWiki by installing all required extensions.
             LOGGER.info("(*) Provision extensions for test...");
-            provisionExtensions(artifactResolver, mavenResolver, extensionContext);
+            provisionExtensions(testConfiguration, artifactResolver, mavenResolver, extensionContext);
         } else {
             // Set the IP/port for the container since startServletEngine() wasn't called and it's set there normally.
             testConfiguration.getServletEngine().setIP("localhost");
@@ -399,12 +399,13 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         }
     }
 
-    private void provisionExtensions(ArtifactResolver artifactResolver, MavenResolver mavenResolver,
-        ExtensionContext context) throws Exception
+    private void provisionExtensions(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+        MavenResolver mavenResolver, ExtensionContext context) throws Exception
     {
         // Install extensions in the running XWiki
         String xwikiRESTURL = String.format("%s/rest", loadXWikiURL(context));
-        ExtensionInstaller extensionInstaller = new ExtensionInstaller(artifactResolver, mavenResolver);
+        ExtensionInstaller extensionInstaller =
+            new ExtensionInstaller(testConfiguration, artifactResolver, mavenResolver);
         extensionInstaller.installExtensions(xwikiRESTURL, SUPERADMIN, "pass", SUPERADMIN);
     }
 

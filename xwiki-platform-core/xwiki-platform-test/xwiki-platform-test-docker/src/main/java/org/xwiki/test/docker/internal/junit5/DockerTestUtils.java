@@ -21,7 +21,6 @@ package org.xwiki.test.docker.internal.junit5;
 
 import java.io.EOFException;
 import java.io.File;
-import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +29,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.io.FileUtils;
-import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.codehaus.plexus.util.ExceptionUtils;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.OutputType;
@@ -55,7 +52,7 @@ import static org.testcontainers.containers.output.OutputFrame.OutputType.STDERR
 import static org.testcontainers.containers.output.OutputFrame.OutputType.STDOUT;
 
 /**
- * Utility methods for setting up the test framework (unzip to directory, create directory, copy file, etc).
+ * Utility methods for setting up the test framework.
  *
  * @version $Id$
  * @since 10.10RC1
@@ -77,69 +74,6 @@ public final class DockerTestUtils
     private DockerTestUtils()
     {
         // Prevents instantiation.
-    }
-
-    /**
-     * @param source the zip file to unzip
-     * @param targetDirectory the directory in which to unzip
-     * @throws Exception when an error occurs during the unzip
-     */
-    public static void unzip(File source, File targetDirectory) throws Exception
-    {
-        createDirectory(targetDirectory);
-        try {
-            ZipUnArchiver unArchiver = new ZipUnArchiver();
-            unArchiver.enableLogging(new ConsoleLogger(org.codehaus.plexus.logging.Logger.LEVEL_ERROR, "Package"));
-            unArchiver.setSourceFile(source);
-            unArchiver.setDestDirectory(targetDirectory);
-            unArchiver.setOverwrite(true);
-            unArchiver.extract();
-        } catch (Exception e) {
-            throw new Exception(
-                String.format("Error unpacking file [%s] into [%s]", source, targetDirectory), e);
-        }
-    }
-
-    /**
-     * @param directory the directory to create. Works even if the directory already exists
-     */
-    public static void createDirectory(File directory)
-    {
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
-    }
-
-    /**
-     * @param source the file to copy into the target directory, but only if the file is not already there or if it's
-     * been modified
-     * @param targetDirectory the directory into which to copy the file
-     * @throws Exception when an error occurs during the copy
-     */
-    public static void copyFile(File source, File targetDirectory) throws Exception
-    {
-        try {
-            org.codehaus.plexus.util.FileUtils.copyFileToDirectoryIfModified(source, targetDirectory);
-        } catch (IOException e) {
-            throw new Exception(String.format("Failed to copy file [%s] to [%s]", source, targetDirectory),
-                e);
-        }
-    }
-
-    /**
-     * @param sourceDirectory the directory to copy
-     * @param targetDirectory the directory into which to copy the files
-     * @throws Exception when an error occurs during the copy
-     */
-    public static void copyDirectory(File sourceDirectory, File targetDirectory) throws Exception
-    {
-        createDirectory(targetDirectory);
-        try {
-            org.codehaus.plexus.util.FileUtils.copyDirectoryStructureIfModified(sourceDirectory, targetDirectory);
-        } catch (IOException e) {
-            throw new Exception(
-                String.format("Failed to copy directory [%s] to [%s]", sourceDirectory, targetDirectory), e);
-        }
     }
 
     /**
@@ -222,7 +156,7 @@ public final class DockerTestUtils
         // Try to work around the following issue: https://github.com/testcontainers/testcontainers-java/issues/2208
         try {
             container.start();
-        } catch(Exception e) {
+        } catch (Exception e) {
             if (ExceptionUtils.getRootCause(e) instanceof EOFException) {
                 // Retry once after waiting 5 seconds to increase the odds ;)
                 LOGGER.info("Error starting docker container [{}]. Retrying once", container.getDockerImageName(), e);

@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.19</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>27</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>26</xwiki.pitest.mutationThreshold>
     <testcontainers.version>1.12.4</testcontainers.version>
   </properties>
   <dependencies>

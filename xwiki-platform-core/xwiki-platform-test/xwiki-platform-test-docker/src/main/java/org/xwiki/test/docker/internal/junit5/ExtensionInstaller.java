@@ -21,7 +21,6 @@ package org.xwiki.test.docker.internal.junit5;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,7 +39,8 @@ import org.xwiki.extension.job.InstallRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.internal.ModelFactory;
 import org.xwiki.rest.model.jaxb.JobRequest;
-import org.xwiki.test.docker.junit5.ArtifactCoordinate;
+import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.integration.maven.ArtifactCoordinate;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 
@@ -68,18 +68,23 @@ public class ExtensionInstaller
 
     private MavenResolver mavenResolver;
 
+    private TestConfiguration testConfiguration;
+
     private MavenTimestampVersionConverter mavenVersionConverter;
 
     /**
      * Initialize the Component Manager which is later needed to perform the REST calls.
      *
+     * @param testConfiguration the configuration to build (database, debug mode, etc)
      * @param artifactResolver the resolver to resolve artifacts from Maven repositories
      * @param mavenResolver the resolver to read Maven POMs
      */
-    public ExtensionInstaller(ArtifactResolver artifactResolver, MavenResolver mavenResolver)
+    public ExtensionInstaller(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
+        MavenResolver mavenResolver)
     {
         this.artifactResolver = artifactResolver;
         this.mavenResolver = mavenResolver;
+        this.testConfiguration = testConfiguration;
 
         // Initialize XWiki Component system
         EmbeddableComponentManager cm = new EmbeddableComponentManager();
@@ -131,8 +136,11 @@ public class ExtensionInstaller
 
         // Step 1: Get XAR extensions from the distribution (ie the mandatory ones), since they're not been installed
         // in WEB-INF/lib.
+        List<Artifact> extraArtifacts =
+            this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs());
+        this.mavenResolver.addCloverJAR(extraArtifacts);
         Collection<ArtifactResult> distributionArtifactResults =
-            this.artifactResolver.getDistributionDependencies(xwikiVersion, Collections.emptyList());
+            this.artifactResolver.getDistributionDependencies(xwikiVersion, extraArtifacts);
         List<ExtensionId> distributionExtensionIds = new ArrayList<>();
         for (ArtifactResult artifactResult : distributionArtifactResults) {
             Artifact artifact = artifactResult.getArtifact();

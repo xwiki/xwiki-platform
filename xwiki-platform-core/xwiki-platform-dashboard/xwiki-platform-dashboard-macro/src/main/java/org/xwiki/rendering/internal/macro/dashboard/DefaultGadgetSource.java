@@ -141,7 +141,7 @@ public class DefaultGadgetSource implements GadgetSource
             return new ArrayList<>();
         }
 
-        this.progress.startStep(this, "dashboard.progress.prepareGadgets", "Prepare gadgets for documents [] ()",
+        this.progress.startStep(this, "dashboard.progress.prepareGadgets", "Prepare gadgets for document [{}] ({})",
             sourceDocRef, gadgetObjects.size());
 
         this.progress.pushLevelProgress(gadgetObjects.size(), this);

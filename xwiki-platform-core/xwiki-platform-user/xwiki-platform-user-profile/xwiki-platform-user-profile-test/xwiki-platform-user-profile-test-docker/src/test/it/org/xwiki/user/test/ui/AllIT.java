@@ -34,13 +34,13 @@ import org.xwiki.test.docker.junit5.UITest;
 public class AllIT
 {
     @Nested
-    @DisplayName("Overall User Profile Tests")
+    @DisplayName("User Profile Tests")
     class NestedUserProfileIT extends UserProfileIT
     {
     }
 
     @Nested
-    @DisplayName("Overall User Change Password Tests")
+    @DisplayName("User Password Changing Tests")
     class NestedUserChangePasswordIT extends UserChangePasswordIT
     {
     }

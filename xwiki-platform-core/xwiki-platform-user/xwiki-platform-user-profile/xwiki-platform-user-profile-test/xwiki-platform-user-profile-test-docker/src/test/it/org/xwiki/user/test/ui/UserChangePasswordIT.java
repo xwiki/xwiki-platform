@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 11.10
  * @version $Id$
  */
-@UITest
+@UITest(extraJARs = { "org.xwiki.platform:xwiki-platform-eventstream-store" })
 public class UserChangePasswordIT
 {
     private static final String DEFAULT_PASSWORD = "testtest";
@@ -159,27 +159,21 @@ public class UserChangePasswordIT
         setup.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,
             "passwordLength", "8",
             "passwordRuleOneNumberEnabled", "1");
-        try {
-            setup.loginAsSuperAdmin();
-            ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
-            PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
-            ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
-            changePasswordPage.changePasswordAsAdmin("foo", "foo");
-            changePasswordPage = changePasswordPage.submit();
-            assertEquals("Your new password must be at least 8 characters long.",
-                changePasswordPage.getValidationErrorMessage());
-            changePasswordPage.changePasswordAsAdmin("foofoofoo", "foofoofoo");
-            changePasswordPage = changePasswordPage.submit();
-            assertEquals("The password must contain at least one number.",
-                changePasswordPage.getValidationErrorMessage());
-            changePasswordPage.changePasswordAsAdmin("foofoofoo42", "foofoofoo42");
-            changePasswordPage = changePasswordPage.submit();
-            assertEquals("Your password has been successfully changed.", changePasswordPage.getSuccessMessage());
-        } finally {
-            // put back standard config
-            setup.updateObject("XWiki", "RegistrationConfig", "XWiki.Registration", 0,
-                "passwordLength", "6",
-                "passwordRuleOneNumberEnabled", "0");
-        }
+
+        setup.loginAsSuperAdmin();
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        PreferencesUserProfilePage preferencesPage = userProfilePage.switchToPreferences();
+        ChangePasswordPage changePasswordPage = preferencesPage.changePassword();
+        changePasswordPage.changePasswordAsAdmin("foo", "foo");
+        changePasswordPage = changePasswordPage.submit();
+        assertEquals("Your new password must be at least 8 characters long.",
+            changePasswordPage.getValidationErrorMessage());
+        changePasswordPage.changePasswordAsAdmin("foofoofoo", "foofoofoo");
+        changePasswordPage = changePasswordPage.submit();
+        assertEquals("The password must contain at least one number.",
+            changePasswordPage.getValidationErrorMessage());
+        changePasswordPage.changePasswordAsAdmin("foofoofoo42", "foofoofoo42");
+        changePasswordPage = changePasswordPage.submit();
+        assertEquals("Your password has been successfully changed.", changePasswordPage.getSuccessMessage());
     }
 }

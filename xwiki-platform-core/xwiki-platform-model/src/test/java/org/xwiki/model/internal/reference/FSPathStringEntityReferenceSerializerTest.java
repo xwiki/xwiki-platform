@@ -19,13 +19,13 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link FSPathStringEntityReferenceSerializer}.
@@ -34,19 +34,19 @@ import static org.junit.Assert.assertEquals;
  * @since 8.4.6
  * @sice 9.4RC1
  */
+@ComponentTest
 public class FSPathStringEntityReferenceSerializerTest
 {
-    @Rule
-    public MockitoComponentMockingRule<FSPathStringEntityReferenceSerializer> mocker =
-        new MockitoComponentMockingRule<>(FSPathStringEntityReferenceSerializer.class);
+    @InjectMockComponents
+    private FSPathStringEntityReferenceSerializer serializer;
 
     @Test
-    public void serialize() throws Exception
+    public void serialize()
     {
         DocumentReference documentReference = new DocumentReference("wik.i", "spac.e", "pag.e");
         AttachmentReference attachmentReference = new AttachmentReference("image.png", documentReference);
 
-        String result = this.mocker.getComponentUnderTest().serialize(attachmentReference);
+        String result = this.serializer.serialize(attachmentReference);
         assertEquals("wik%2Ei/spac%2Ee/pag%2Ee/image.png", result);
     }
 }

@@ -21,12 +21,11 @@ package org.xwiki.model.reference;
 
 import java.util.regex.Pattern;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReference;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link RegexEntityReference} class.
@@ -38,7 +37,7 @@ public class RegexEntityReferenceTest
     private static final DocumentReference REFERENCETOMATCH = new DocumentReference("wiki", "space", "page");
 
     @Test
-    public void testExact()
+    public void equalsWhenExact()
     {
         EntityReference wikiReference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getWikiReference().getName(), Pattern.LITERAL),
@@ -50,51 +49,51 @@ public class RegexEntityReferenceTest
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getName(), Pattern.LITERAL), EntityType.DOCUMENT,
                 spaceReference);
 
-        Assert.assertTrue(reference.equals(REFERENCETOMATCH));
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
-    public void testWithOnlyPage()
+    public void equalsWithOnlyPage()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getName(), Pattern.LITERAL), EntityType.DOCUMENT);
 
-        Assert.assertTrue(reference.equals(REFERENCETOMATCH));
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
-    public void testWithOnlyWiki()
+    public void equalsWithOnlyWiki()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile(REFERENCETOMATCH.getWikiReference().getName(), Pattern.LITERAL),
                 EntityType.WIKI);
 
-        Assert.assertTrue(reference.equals(REFERENCETOMATCH));
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
-    public void testPattern()
+    public void equalsWithPattern()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("p.*"), EntityType.DOCUMENT);
 
-        Assert.assertTrue(reference.equals(REFERENCETOMATCH));
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
-    public void testPatternNotMatching()
+    public void equalsWhenPatternNotMatching()
     {
         EntityReference reference = new RegexEntityReference(Pattern.compile("space"), EntityType.DOCUMENT);
 
-        Assert.assertFalse(reference.equals(REFERENCETOMATCH));
+        assertFalse(reference.equals(REFERENCETOMATCH));
     }
 
     @Test
-    public void testWithNonRegexParent()
+    public void equalsWhenNonRegexParent()
     {
         EntityReference reference =
             new RegexEntityReference(Pattern.compile("space"), EntityType.SPACE, new EntityReference("wiki",
                 EntityType.WIKI));
 
-        Assert.assertTrue(reference.equals(REFERENCETOMATCH));
+        assertTrue(reference.equals(REFERENCETOMATCH));
     }
 }

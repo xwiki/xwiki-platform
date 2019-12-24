@@ -19,15 +19,15 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
  * Unit tests for {@link RelativeStringEntityReferenceResolver}.
@@ -35,48 +35,40 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  * @version $Id$
  * @since 2.2.3
  */
+@ComponentTest
 @ComponentList({
     DefaultSymbolScheme.class
 })
 public class RelativeStringEntityReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<RelativeStringEntityReferenceResolver> mocker =
-        new MockitoComponentMockingRule<>(RelativeStringEntityReferenceResolver.class);
-
-    private EntityReferenceResolver<String> resolver;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        this.resolver = this.mocker.getComponentUnderTest();
-    }
+    @InjectMockComponents
+    private RelativeStringEntityReferenceResolver resolver;
 
     @Test
-    public void resolveDocumentReference() throws Exception
+    public void resolveDocumentReference()
     {
         EntityReference reference = this.resolver.resolve("", EntityType.DOCUMENT);
-        Assert.assertNull(reference);
+        assertNull(reference);
 
         reference = this.resolver.resolve("space.page", EntityType.DOCUMENT);
-        Assert.assertNull(reference.extractReference(EntityType.WIKI));
-        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals("page", reference.getName());
+        assertNull(reference.extractReference(EntityType.WIKI));
+        assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        assertEquals("page", reference.getName());
 
         reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
-        Assert.assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
-        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertEquals("page", reference.getName());
+        assertEquals("wiki", reference.extractReference(EntityType.WIKI).getName());
+        assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        assertEquals("page", reference.getName());
     }
 
     @Test
-    public void resolveDocumentReferenceWithBaseReference() throws Exception
+    public void resolveDocumentReferenceWithBaseReference()
     {
         EntityReference reference =
             this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("space", EntityType.SPACE));
 
-        Assert.assertNull(reference.extractReference(EntityType.WIKI));
-        Assert.assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
-        Assert.assertNull(reference.extractReference(EntityType.DOCUMENT));
+        assertNull(reference.extractReference(EntityType.WIKI));
+        assertEquals("space", reference.extractReference(EntityType.SPACE).getName());
+        assertNull(reference.extractReference(EntityType.DOCUMENT));
     }
 }

@@ -22,10 +22,10 @@ package org.xwiki.model.internal.reference;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link PathStringDocumentReferenceResolver} and {@link PathStringEntityReferenceSerializer}.

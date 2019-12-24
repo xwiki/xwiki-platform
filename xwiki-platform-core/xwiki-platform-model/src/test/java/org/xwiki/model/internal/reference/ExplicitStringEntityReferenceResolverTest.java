@@ -19,16 +19,16 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.ExplicitStringEntityReferenceResolver}.
@@ -36,22 +36,14 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  * @version $Id$
  * @since 2.2.3
  */
+@ComponentTest
 @ComponentList({
     DefaultSymbolScheme.class
 })
 public class ExplicitStringEntityReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ExplicitStringEntityReferenceResolver> mocker =
-        new MockitoComponentMockingRule<>(ExplicitStringEntityReferenceResolver.class);
-
-    private EntityReferenceResolver<String> resolver;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        this.resolver = this.mocker.getComponentUnderTest();
-    }
+    @InjectMockComponents
+    private ExplicitStringEntityReferenceResolver resolver;
 
     @Test
     public void resolveWithExplicitDocumentReference()
@@ -59,12 +51,12 @@ public class ExplicitStringEntityReferenceResolverTest
         EntityReference reference =
             this.resolver.resolve("", EntityType.DOCUMENT, new DocumentReference("wiki", "space", "page"));
 
-        Assert.assertEquals("page", reference.getName());
-        Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
-        Assert.assertEquals("space", reference.getParent().getName());
-        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
-        Assert.assertEquals("wiki", reference.getParent().getParent().getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
+        assertEquals("page", reference.getName());
+        assertEquals(EntityType.DOCUMENT, reference.getType());
+        assertEquals("space", reference.getParent().getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getType());
+        assertEquals("wiki", reference.getParent().getParent().getName());
+        assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
 
     @Test
@@ -73,12 +65,12 @@ public class ExplicitStringEntityReferenceResolverTest
         EntityReference reference =
             this.resolver.resolve("space.page", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI));
 
-        Assert.assertEquals("page", reference.getName());
-        Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
-        Assert.assertEquals("space", reference.getParent().getName());
-        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
-        Assert.assertEquals("wiki", reference.getParent().getParent().getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
+        assertEquals("page", reference.getName());
+        assertEquals(EntityType.DOCUMENT, reference.getType());
+        assertEquals("space", reference.getParent().getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getType());
+        assertEquals("wiki", reference.getParent().getParent().getName());
+        assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
 
     @Test
@@ -86,12 +78,12 @@ public class ExplicitStringEntityReferenceResolverTest
     {
         EntityReference reference = this.resolver.resolve("wiki:space.page", EntityType.DOCUMENT);
 
-        Assert.assertEquals("page", reference.getName());
-        Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
-        Assert.assertEquals("space", reference.getParent().getName());
-        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
-        Assert.assertEquals("wiki", reference.getParent().getParent().getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
+        assertEquals("page", reference.getName());
+        assertEquals(EntityType.DOCUMENT, reference.getType());
+        assertEquals("space", reference.getParent().getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getType());
+        assertEquals("wiki", reference.getParent().getParent().getName());
+        assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
 
     @Test
@@ -100,47 +92,38 @@ public class ExplicitStringEntityReferenceResolverTest
         EntityReference reference = this.resolver.resolve("space.page", EntityType.DOCUMENT,
             new EntityReference("page", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI)));
 
-        Assert.assertEquals("page", reference.getName());
-        Assert.assertEquals(EntityType.DOCUMENT, reference.getType());
-        Assert.assertEquals("space", reference.getParent().getName());
-        Assert.assertEquals(EntityType.SPACE, reference.getParent().getType());
-        Assert.assertEquals("wiki", reference.getParent().getParent().getName());
-        Assert.assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
+        assertEquals("page", reference.getName());
+        assertEquals(EntityType.DOCUMENT, reference.getType());
+        assertEquals("space", reference.getParent().getName());
+        assertEquals(EntityType.SPACE, reference.getParent().getType());
+        assertEquals("wiki", reference.getParent().getParent().getName());
+        assertEquals(EntityType.WIKI, reference.getParent().getParent().getType());
     }
     
     @Test
     public void resolveWithNoExplicitAndPartialReference()
     {
-        try {
-            this.resolver.resolve("", EntityType.DOCUMENT);
-            Assert.fail("Should have raised an exception");
-        } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("The resolver parameter doesn't contain an Entity Reference of type [DOCUMENT]",
-                expected.getMessage());
-        }
+        IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
+            () -> this.resolver.resolve("", EntityType.DOCUMENT));
+        assertEquals("The resolver parameter doesn't contain an Entity Reference of type [DOCUMENT]",
+            expected.getMessage());
     }
 
     @Test
     public void resolveWithInvalidParameterType()
     {
-        try {
-            this.resolver.resolve("", EntityType.DOCUMENT, "wrong type");
-            Assert.fail("Should have raised an exception");
-        } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("The resolver parameter doesn't contain an Entity Reference of type [DOCUMENT]",
-                expected.getMessage());
-        }
+        IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
+            () -> this.resolver.resolve("", EntityType.DOCUMENT, "wrong type"));
+        assertEquals("The resolver parameter doesn't contain an Entity Reference of type [DOCUMENT]",
+            expected.getMessage());
     }
 
     @Test
     public void resolveWithIncompleteExplicitReference()
     {
-        try {
-            this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI));
-            Assert.fail("Should have raised an exception");
-        } catch (IllegalArgumentException expected) {
-            Assert.assertEquals("The resolver parameter doesn't contain an Entity Reference of type [DOCUMENT]",
-                expected.getMessage());
-        }
+        IllegalArgumentException expected = assertThrows(IllegalArgumentException.class,
+            () -> this.resolver.resolve("", EntityType.DOCUMENT, new EntityReference("wiki", EntityType.WIKI)));
+        assertEquals("The resolver parameter doesn't contain an Entity Reference of type [DOCUMENT]",
+            expected.getMessage());
     }
 }

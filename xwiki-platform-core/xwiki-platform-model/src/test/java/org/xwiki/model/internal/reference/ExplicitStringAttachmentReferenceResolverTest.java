@@ -19,16 +19,17 @@
  */
 package org.xwiki.model.internal.reference;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.ComponentList;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link org.xwiki.model.internal.reference.ExplicitStringAttachmentReferenceResolver}.
@@ -36,22 +37,22 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
  * @version $Id$
  * @since 3.0M1
  */
+@ComponentTest
 @ComponentList({
     DefaultSymbolScheme.class
 })
 public class ExplicitStringAttachmentReferenceResolverTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ExplicitStringEntityReferenceResolver> mocker =
-        new MockitoComponentMockingRule<>(ExplicitStringEntityReferenceResolver.class);
+    @InjectMockComponents
+    private ExplicitStringEntityReferenceResolver entityReferenceResolver;
 
     private AttachmentReferenceResolver<String> resolver;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
         this.resolver = new ExplicitStringAttachmentReferenceResolver();
-        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.mocker.getComponentUnderTest());
+        ReflectionUtils.setFieldValue(this.resolver, "entityReferenceResolver", this.entityReferenceResolver);
     }
 
     @Test
@@ -60,7 +61,7 @@ public class ExplicitStringAttachmentReferenceResolverTest
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
         AttachmentReference reference = this.resolver.resolve("", new AttachmentReference("file", documentReference));
 
-        Assert.assertEquals("file", reference.getName());
-        Assert.assertEquals(documentReference, reference.getDocumentReference());
+        assertEquals("file", reference.getName());
+        assertEquals(documentReference, reference.getDocumentReference());
     }
 }

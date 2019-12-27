@@ -164,6 +164,10 @@ public class LogCaptureValidator
         // queries happening on the server side. These are normal errors that can happen for normal users too and
         // we shouldn't consider them faults.
         new Line("Caused by: java.io.IOException: Broken pipe"),
+        // Can happen when the Servlet Container fails to write the response to the socket open with the client
+        // (Browser). This probably means that the docker containers don't see each other anymore, probably because
+        // one is closed (client one) before the server one is stopped.
+        new Line("Caused by: java.io.IOException: Connection reset by peer"),
         // Warning coming from the XWikiDockerExtension when in verbose mode (which is our default on the CI)
         new Line("Failure when attempting to lookup auth config")
     );

@@ -32,9 +32,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Distribution - Debian - Tomcat</description>
   <modules>
-    <module>xwiki-platform-distribution-debian-tomcat7-common</module>
-    <module>xwiki-platform-distribution-debian-tomcat7-mysql</module>
-    <module>xwiki-platform-distribution-debian-tomcat7-pgsql</module>
     <module>xwiki-platform-distribution-debian-tomcat8-common</module>
     <module>xwiki-platform-distribution-debian-tomcat8-mysql</module>
     <module>xwiki-platform-distribution-debian-tomcat8-pgsql</module>

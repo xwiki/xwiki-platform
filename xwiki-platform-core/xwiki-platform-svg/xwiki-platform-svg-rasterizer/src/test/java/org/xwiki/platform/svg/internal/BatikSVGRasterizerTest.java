@@ -29,6 +29,7 @@ import java.io.OutputStream;
 import java.util.Arrays;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
@@ -308,6 +309,18 @@ public class BatikSVGRasterizerTest
         public void write(int b) throws IOException
         {
             this.out.write(b);
+        }
+
+        @Override
+        public boolean isReady()
+        {
+            return true;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener writeListener)
+        {
+            // Not needed
         }
     }
 }

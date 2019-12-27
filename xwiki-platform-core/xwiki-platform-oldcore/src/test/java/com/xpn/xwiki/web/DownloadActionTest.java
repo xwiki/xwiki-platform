@@ -170,9 +170,8 @@ public class DownloadActionTest
 
         assertNull(this.action.render(this.oldcore.getXWikiContext()));
 
-        // FIXME: change when https://jira.xwiki.org/browse/XWIKI-16829 is fixed
-        // Make sure we don't send the size when it's bigger than an integer
-        verify(this.response, times(0)).setContentLength(anyInt());
+        // Make sure we set the right content length
+        verify(this.response, times(1)).setContentLengthLong(Long.MAX_VALUE);
     }
 
     @Test

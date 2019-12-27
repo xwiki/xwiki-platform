@@ -491,12 +491,6 @@
         <artifactId>org.restlet.ext.jaxrs</artifactId>
         <version>${restlet.version}</version>
         <exclusions>
-          <!-- Version too recent.
-               TODO: remove when upgrading to Servlet 3.1+ -->
-          <exclusion>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-          </exclusion>
           <!-- Already part of Java SE 6 -->
           <exclusion>
             <groupId>javax.xml.stream</groupId>

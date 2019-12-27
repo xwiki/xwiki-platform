@@ -1043,7 +1043,7 @@ public abstract class XWikiAction extends Action
     }
 
     /**
-     * Make sure to set the right length (or nothing) in the reponse.
+     * Make sure to set the right length (or nothing) in the response.
      * 
      * @param response the response
      * @param length the length to set in the response
@@ -1053,10 +1053,7 @@ public abstract class XWikiAction extends Action
      */
     protected void setContentLength(XWikiResponse response, long length)
     {
-        // FIXME: call setContentLengthLong directly when https://jira.xwiki.org/browse/XWIKI-16829 is fixed
-        // Set the content length in the response only if it fit in an int
-        if (length <= Integer.MAX_VALUE) {
-            response.setContentLength((int) length);
-        }
+        // Set the content length in the response
+        response.setContentLengthLong(length);
     }
 }

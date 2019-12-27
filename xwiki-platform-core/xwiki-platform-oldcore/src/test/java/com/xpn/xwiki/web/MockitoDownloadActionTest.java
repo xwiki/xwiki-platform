@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -67,6 +68,18 @@ public class MockitoDownloadActionTest
         public void write(int i) throws IOException
         {
             baos.write(i);
+        }
+
+        @Override
+        public boolean isReady()
+        {
+            return true;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener writeListener)
+        {
+            // Nor needed
         }
     }
 

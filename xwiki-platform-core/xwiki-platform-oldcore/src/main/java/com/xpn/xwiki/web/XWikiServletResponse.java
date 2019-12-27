@@ -118,6 +118,12 @@ public class XWikiServletResponse implements XWikiResponse
     }
 
     @Override
+    public void setContentLengthLong(long len)
+    {
+        this.response.setContentLengthLong(len);
+    }
+
+    @Override
     public String getCharacterEncoding()
     {
         return this.response.getCharacterEncoding();

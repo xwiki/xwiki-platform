@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -47,6 +48,18 @@ public class XWikiServletResponseStub implements XWikiResponse
             if (XWikiServletResponseStub.this.outputStream != null) {
                 XWikiServletResponseStub.this.outputStream.write(b);
             }
+        }
+
+        @Override
+        public boolean isReady()
+        {
+            return true;
+        }
+
+        @Override
+        public void setWriteListener(WriteListener writeListener)
+        {
+            // Not needed
         }
     };
 
@@ -187,6 +200,11 @@ public class XWikiServletResponseStub implements XWikiResponse
 
     @Override
     public void setContentLength(int len)
+    {
+    }
+
+    @Override
+    public void setContentLengthLong(long len)
     {
     }
 

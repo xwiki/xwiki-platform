@@ -136,14 +136,14 @@ public class FlamingoThemeIT
         ViewThemePage themePage = themeApplicationWebHomePage.seeTheme(testMethodName);
         // From time-to-time the preview does not load on Firefox certainly because of some JS race condition.
         // Right now we cannot get the javascript console logs because of a geckodriver limitation, so it's hard to
-        // fix properly. In the meantime, I'm trying to force a reload of the page in case it didn't work the first
+        // fix properly. In the< meantime, I'm trying to force a reload of the page in case it didn't work the first
         // time: it should prevent most of the flickers.
         try {
-            editThemePage.waitUntilPreviewIsLoaded();
+            themePage.waitUntilPreviewIsLoaded();
         } catch (TimeoutException e) {
             // try to force a refresh, without using navigate().refresh() which is not working properly...
             setup.getDriver().get(setup.getDriver().getCurrentUrl());
-            editThemePage = new EditThemePage();
+            themePage = new ViewThemePage();
         }
 
         // Switch back to Charcoal

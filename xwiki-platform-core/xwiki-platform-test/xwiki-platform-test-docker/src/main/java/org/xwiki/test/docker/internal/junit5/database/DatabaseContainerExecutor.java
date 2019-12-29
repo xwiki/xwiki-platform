@@ -21,6 +21,8 @@ package org.xwiki.test.docker.internal.junit5.database;
 
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.JdbcDatabaseContainer;
 import org.testcontainers.containers.MariaDBContainer;
@@ -40,6 +42,8 @@ import org.xwiki.text.StringUtils;
  */
 public class DatabaseContainerExecutor extends AbstractContainerExecutor
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(DatabaseContainerExecutor.class);
+
     private static final String DBNAME = "xwiki";
 
     private static final String DBUSERNAME = DBNAME;
@@ -130,21 +134,31 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
         startDatabaseContainer(databaseContainer, 3306, testConfiguration);
 
-        // Allow the XWiki user to create databases
-        try {
-            Container.ExecResult result = databaseContainer.execInContainer("mysql", "-u", "root", "-p" + DBPASSWORD,
-                "-e",
-                String.format("grant all privileges on *.* to '%s'@'%%' identified by '%s'", DBUSERNAME, DBPASSWORD));
+        // Allow the XWiki user to create databases (ie create subwikis)
+        grantMySQLPrivileges(databaseContainer);
+    }
 
-            if (result.getExitCode() != 0) {
-                throw new RuntimeException(String.format(
-                    "Failed to grant all privileges to user [%s] on MySQL with return code [%d] and message [%s]",
-                    DBUSERNAME, result.getExitCode(),
-                    (result.getStderr().isEmpty() ? result.getStdout() : result.getStderr())));
+    private void grantMySQLPrivileges(JdbcDatabaseContainer databaseContainer) throws Exception
+    {
+        // Retry 3 times, as we're getting some flickering from time to time with the message:
+        //   ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
+        LOGGER.info("Setting MySQL permissions to create subwikis");
+        for (int i = 0; i < 3; i++) {
+            Container.ExecResult result = databaseContainer.execInContainer("mysql", "-u", "root", "-p" + DBPASSWORD,
+                "-e", String.format("grant all privileges on *.* to '%s'@'%%' identified by '%s'", DBUSERNAME, DBNAME));
+            if (result.getExitCode() == 0) {
+                break;
+            } else {
+                String errorMessage = result.getStderr().isEmpty() ? result.getStdout() : result.getStderr();
+                if (i == 2) {
+                    throw new RuntimeException(String.format("Failed to grant all privileges to user [%s] on MySQL "
+                        + "with return code [%d] and console logs [%s]", DBUSERNAME, result.getExitCode(),
+                        errorMessage));
+                } else {
+                    LOGGER.info("Failed to set MySQL permissions, retrying ({}/2)... Error: [{}]", i + 1, errorMessage);
+                    Thread.sleep(1000L);
+                }
             }
-        } catch (Exception e) {
-            throw new RuntimeException(
-                String.format("Failed to grant all privileges to user [%s] on MySQL", DBUSERNAME), e);
         }
     }
 

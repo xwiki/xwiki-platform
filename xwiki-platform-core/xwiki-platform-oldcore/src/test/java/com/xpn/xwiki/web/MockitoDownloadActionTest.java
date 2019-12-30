@@ -133,7 +133,7 @@ public class MockitoDownloadActionTest
         verify(response).setHeader("Accept-Ranges", "bytes");
         verify(response).addHeader("Content-disposition", "attachment; filename*=utf-8''file.ext");
         verify(response).setDateHeader("Last-Modified", now.getTime());
-        verify(response).setContentLength(100);
+        verify(response).setContentLengthLong(100);
         assertEquals("test", ssos.baos.toString());
     }
 
@@ -204,7 +204,7 @@ public class MockitoDownloadActionTest
         verify(response).setHeader("Accept-Ranges", "bytes");
         verify(response).addHeader("Content-disposition", "attachment; filename*=utf-8''file.ext");
         verify(response).setDateHeader("Last-Modified", now.getTime());
-        verify(response).setContentLength(100);
+        verify(response).setContentLengthLong(100);
         assertEquals("test", ssos.baos.toString());
     }
 }

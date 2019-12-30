@@ -314,7 +314,29 @@
                   {
                     "code": "java.method.removed",
                     "old": "method org.apache.velocity.runtime.resource.Resource org.apache.velocity.runtime.resource.ResourceManagerImpl::getResource(java.lang.String, int) throws org.apache.velocity.exception.ResourceNotFoundException, org.apache.velocity.exception.ParseErrorException, java.lang.Exception @ com.xpn.xwiki.web.XWikiResourceManagerImpl",
-                    "justification": "Velocity 2.0 upgrade. Should not have any impact on the scripts."
+                    "justification": "Velocity 2.x upgrade. Should not have any impact on the scripts."
+                  },
+
+                  // Servlet 3.1 upgrade
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method java.lang.String javax.servlet.http.HttpServletRequest::changeSessionId() @ com.xpn.xwiki.web.XWikiRequest",
+                    "justification": "Servlet 3.1 introduce new APIs"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method long javax.servlet.ServletRequest::getContentLengthLong() @ com.xpn.xwiki.web.XWikiRequest",
+                    "justification": "Servlet 3.1 introduce new APIs"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method <T extends javax.servlet.http.HttpUpgradeHandler> T javax.servlet.http.HttpServletRequest::upgrade(java.lang.Class<T>) throws java.io.IOException, javax.servlet.ServletException @ com.xpn.xwiki.web.XWikiRequest",
+                    "justification": "Servlet 3.1 introduce new APIs"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void javax.servlet.ServletResponse::setContentLengthLong(long) @ com.xpn.xwiki.web.XWikiResponse",
+                    "justification": "Servlet 3.1 introduce new APIs"
                   }
                 ]
               }

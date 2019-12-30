@@ -30,14 +30,8 @@ import org.xwiki.test.integration.junit.LogCaptureConfiguration;
 import org.xwiki.test.integration.junit.LogCaptureValidator;
 
 /**
- * Captures content sent to stdout/stderr by JUnit5 functional tests and report a failure if the content contains one of
- * the following strings.
- * <ul>
- * <li>Deprecated method calls from Velocity</li>
- * <li>Error messages</li>
- * <li>Warning messages</li>
- * <li>Javascript errors</li>
- * </ul>
+ * Captures content sent to stdout/stderr by JUnit5 functional tests and report a failure if the content contains some
+ * problems in the logs. See {@link LogCaptureValidator}.
  * <p>
  * Tests can register expected failing lines or even exclude failing lines by adding a parameter of type {@link
  * LogCaptureConfiguration} in a test method signature and calling one of the {@code register*()} methods.

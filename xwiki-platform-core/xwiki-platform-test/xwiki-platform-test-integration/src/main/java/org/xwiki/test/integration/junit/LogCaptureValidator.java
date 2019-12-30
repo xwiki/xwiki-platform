@@ -40,15 +40,22 @@ public class LogCaptureValidator
 
     private static final String NL = "\n";
 
-    private static final List<String> SEARCH_STRINGS = Arrays.asList(
-        "Deprecated usage of", "ERROR", "WARN", "JavaScript error");
+    /**
+     * For now we only check for Velocity deprecations. In the future we should put back validations for:
+     * <ul>
+     *     <li>ERROR</li>
+     *     <li>WARN</li>
+     *     <li>JavaScript erro</li>
+     * </ul>
+     * See <a href=" https://forum.xwiki.org/t/remove-log-validation-for-functional-tests/6026">this forum thread</a>
+     * for why these checks were removed.
+     * Also note that we've kept some global excludes below belonging to these removed checks for the future. We also
+     * kept specific checks in the functional tests for the same reason. In the future we'll need to assess is the
+     * strategy can work (i.e. not be swamped by false positives).
+     */
+    private static final List<String> SEARCH_STRINGS = Arrays.asList("Deprecated usage of");
 
     private static final List<Line> GLOBAL_EXCLUDES = Arrays.asList(
-        // For now we exclude all Javascript errors since 1) all we've seen so far are coming from the test fwk and
-        // excluding them one by one is painful and 2) we're not yet ready to tackle fixing them. We could decide to
-        // remove this global exclude in the future.
-        new Line("JavaScript error:"),
-
         // See https://jira.xwiki.org/browse/XCOMMONS-1627
         new Line("Could not validate integrity of download from file"),
         // Warning that can happen on Tomcat when the generation of the random takes a bit long to execute.

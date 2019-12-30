@@ -635,21 +635,21 @@ public class DownloadActionTest
         when(this.resourceReferenceManager.getResourceReference()).thenReturn(rr);
     }
 
-    private void verifyResponseExpectations(long modified, int length)
+    private void verifyResponseExpectations(long modified, long length)
     {
         verifyResponseExpectations(modified, length, "text/plain", "inline; filename*=utf-8''file.txt");
     }
 
-    private void verifyResponseExpectations(long modified, int length, String mime, String disposition)
+    private void verifyResponseExpectations(long modified, long length, String mime, String disposition)
     {
         verify(this.response).setContentType(mime);
         verify(this.response).setHeader("Accept-Ranges", "bytes");
         verify(this.response).addHeader("Content-disposition", disposition);
         verify(this.response).setDateHeader("Last-Modified", modified);
         if (length > -1) {
-            verify(this.response).setContentLength(length);
+            verify(this.response).setContentLengthLong(length);
         } else {
-            verify(this.response, times(0)).setContentLength(length);
+            verify(this.response, times(0)).setContentLengthLong(length);
         }
     }
 

@@ -502,7 +502,8 @@ public class ConfigurableClassIT
 
         // Go to page1 so we can retrieve the link to open a new tab
         String testPageName = page1.getLastSpaceReference().getName();
-        setup.gotoPage(page1);
+        ViewPage viewPage = setup.gotoPage(page1);
+        assertEquals("Is This Page Locked false", viewPage.getContent());
 
         // We have to switch user context without logging out, logging out removes all locks.
         // We have to open a new window because otherwise the lock is removed when we leave the administration page.
@@ -525,7 +526,7 @@ public class ConfigurableClassIT
         asp.waitUntilActionButtonIsLoaded();
         setup.getDriver().switchTo().window(secondTab);
 
-        ViewPage viewPage = setup.gotoPage(page1);
+        viewPage = setup.gotoPage(page1);
         assertEquals("Is This Page Locked true", viewPage.getContent());
 
         viewPage = setup.gotoPage(page2);
@@ -587,6 +588,8 @@ public class ConfigurableClassIT
 
         // Add an xobject of the new class.
         setup.addObject(testReference, setup.serializeReference(testReference));
-        new ObjectEditPage();
+
+        // Click cancel to ensure the lock on the page is deleted: the object should already be added.
+        new ObjectEditPage().clickCancel();
     }
 }

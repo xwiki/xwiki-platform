@@ -79,6 +79,7 @@ import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -4089,7 +4090,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param document the document containing the new identity
      * @throws XWikiException in case of error
      */
-    private void clone(XWikiDocument document)
+    public void clone(XWikiDocument document)
     {
         this.id = document.id;
 
@@ -4139,7 +4140,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     @Override
     public XWikiDocument clone()
     {
-        return cloneInternal(getDocumentReference(), true);
+        return cloneInternal(getDocumentReference(), true, false);
     }
 
     /**
@@ -4149,10 +4150,20 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      */
     public XWikiDocument duplicate(DocumentReference newDocumentReference)
     {
-        return cloneInternal(newDocumentReference, false);
+        return cloneInternal(newDocumentReference, false, false);
     }
 
-    private XWikiDocument cloneInternal(DocumentReference newDocumentReference, boolean keepsIdentity)
+    private void cloneDocumentArchive(XWikiDocument originalDocument) throws XWikiException
+    {
+        XWikiDocumentArchive documentArchive = originalDocument.getDocumentArchive();
+        if (documentArchive != null) {
+            this.setDocumentArchive(documentArchive.clone(this.getId(), getXWikiContext()));
+        }
+    }
+
+    private XWikiDocument cloneInternal(DocumentReference newDocumentReference,
+        boolean keepsIdentity,
+        boolean cloneArchive)
     {
         XWikiDocument doc = null;
 
@@ -4163,7 +4174,11 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             // use version field instead of getRCSVersion because it returns "1.1" if version==null.
             doc.version = this.version;
             doc.id = this.id;
-            doc.setDocumentArchive(getDocumentArchive());
+            if (cloneArchive) {
+                doc.cloneDocumentArchive(this);
+            } else {
+                doc.setDocumentArchive(getDocumentArchive());
+            }
             doc.setAuthorReference(getAuthorReference());
             doc.setContentAuthorReference(getContentAuthorReference());
             doc.setContent(getContent());
@@ -6763,25 +6778,19 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
      * which list the document we are renaming as their parent.
      * <p>
-     * See {@link #rename(String, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
+     * See {@link #rename(DocumentReference, List, List, XWikiContext)} for more details.
      *
      * @param newDocumentReference the new document reference
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      * @since 2.2M2
+     * @deprecated Since 12.5RC1 prefer using
+     *          {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)}.
      */
+    @Deprecated
     public void rename(DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
     {
         rename(newDocumentReference, getBackLinkedReferences(context), context);
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, XWikiContext)}
-     */
-    @Deprecated
-    public void rename(String newDocumentName, XWikiContext context) throws XWikiException
-    {
-        rename(newDocumentName, getBackLinkedPages(context), context);
     }
 
     /**
@@ -6806,21 +6815,14 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      * @since 2.2M2
+     * @deprecated Since 12.5RC1 prefer using
+     *            {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)}.
      */
+    @Deprecated
     public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
         XWikiContext context) throws XWikiException
     {
         rename(newDocumentReference, backlinkDocumentReferences, getChildrenReferences(context), context);
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, java.util.List, com.xpn.xwiki.XWikiContext)}
-     */
-    @Deprecated
-    public void rename(String newDocumentName, List<String> backlinkDocumentNames, XWikiContext context)
-        throws XWikiException
-    {
-        rename(newDocumentName, backlinkDocumentNames, getChildren(context), context);
     }
 
     /**
@@ -6835,7 +6837,10 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      * @since 2.2M2
+     * @deprecated Since 12.5RC1 prefer using
+     *            {@link XWiki#renameDocument(DocumentReference, DocumentReference, boolean, List, List, XWikiContext)}.
      */
+    @Deprecated
     public void rename(DocumentReference newDocumentReference, List<DocumentReference> backlinkDocumentReferences,
         List<DocumentReference> childDocumentReferences, XWikiContext context) throws XWikiException
     {
@@ -6847,147 +6852,27 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (isNew() || getDocumentReference().equals(newDocumentReference)) {
             return;
         }
-
-        // Grab the xwiki object, it gets used a few times.
-        XWiki xwiki = context.getWiki();
-
-        // Step 1: Copy the document and all its translations under a new document with the new reference.
-        xwiki.copyDocument(getDocumentReference(), newDocumentReference, false, context);
-
-        // Step 2: For each child document, update its parent reference.
-        if (childDocumentReferences != null) {
-            for (DocumentReference childDocumentReference : childDocumentReferences) {
-                XWikiDocument childDocument = xwiki.getDocument(childDocumentReference, context);
-                String compactReference = getCompactEntityReferenceSerializer().serialize(newDocumentReference);
-                childDocument.setParent(compactReference);
-                String saveMessage = localizePlainOrKey("core.comment.renameParent", compactReference);
-                childDocument.setAuthorReference(context.getUserReference());
-                xwiki.saveDocument(childDocument, saveMessage, true, context);
-            }
-        }
-
-        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
-        for (DocumentReference backlinkDocumentReference : backlinkDocumentReferences) {
-            XWikiDocument backlinkRootDocument = xwiki.getDocument(backlinkDocumentReference, context);
-
-            // Update default locale instance
-            renameLinks(backlinkRootDocument, getDocumentReference(), newDocumentReference, context);
-
-            // Update translations
-            for (Locale locale : backlinkRootDocument.getTranslationLocales(context)) {
-                XWikiDocument backlinkDocument = backlinkRootDocument.getTranslatedDocument(locale, context);
-
-                renameLinks(backlinkDocument, getDocumentReference(), newDocumentReference, context);
-            }
-        }
-
-        // Get new document
-        XWikiDocument newDocument = xwiki.getDocument(newDocumentReference, context);
-
-        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
-        // document's location.
-        if (Utils.getContextComponentManager().hasComponent(BlockRenderer.class, getSyntax().toIdString())) {
-            // Only support syntax for which a renderer is provided
-
-            LinkedResourceHelper linkedResourceHelper = Utils.getComponent(LinkedResourceHelper.class);
-
-            DocumentReference oldDocumentReference = getDocumentReference();
-
-            XDOM newDocumentXDOM = newDocument.getXDOM();
-            List<Block> blocks = linkedResourceHelper.getBlocks(newDocumentXDOM);
-
-            // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#updateRelativeLinks in
-            // xwiki-platform-refactoring-default
-            boolean modified = false;
-            for (Block block : blocks) {
-                ResourceReference resourceReference = linkedResourceHelper.getResourceReference(block);
-                if (resourceReference == null) {
-                    // Skip invalid blocks.
-                    continue;
-                }
-
-                ResourceType resourceType = resourceReference.getType();
-
-                // TODO: support ATTACHMENT as well.
-                if (!ResourceType.DOCUMENT.equals(resourceType) && !ResourceType.SPACE.equals(resourceType)) {
-                    // We are currently only interested in Document or Space references.
-                    continue;
-                }
-
-                // current link, use the old document's reference to fill in blanks.
-                EntityReference oldLinkReference = getResourceReferenceEntityReferenceResolver()
-                    .resolve(resourceReference, null, oldDocumentReference);
-                // new link, use the new document's reference to fill in blanks.
-                EntityReference newLinkReference = getResourceReferenceEntityReferenceResolver()
-                    .resolve(resourceReference, null, newDocumentReference);
-
-                // If the new and old link references don`t match, then we must update the relative link.
-                if (!newLinkReference.equals(oldLinkReference)) {
-                    modified = true;
-
-                    // Serialize the old (original) link relative to the new document's location, in compact form.
-                    String serializedLinkReference =
-                        getCompactWikiEntityReferenceSerializer().serialize(oldLinkReference, newDocumentReference);
-
-                    // Update the reference in the XDOM.
-                    linkedResourceHelper.setResourceReferenceString(block, serializedLinkReference);
-                }
-            }
-
-            // Set the new content and save document if needed
-            if (modified) {
-                newDocument.setContent(newDocumentXDOM);
-                newDocument.setAuthorReference(context.getUserReference());
-                xwiki.saveDocument(newDocument, context);
-            }
-        }
-
-        // Step 5: Delete the old document
-        xwiki.deleteDocument(this, context);
-
-        // Step 6: The current document needs to point to the renamed document as otherwise it's pointing to an
-        // invalid XWikiDocument object as it's been deleted...
-        clone(newDocument);
-    }
-
-    /**
-     * Rename links in passed document and save it if needed.
-     */
-    private void renameLinks(XWikiDocument backlinkDocument, DocumentReference oldLink, DocumentReference newLink,
-        XWikiContext context) throws XWikiException
-    {
-        // FIXME: Duplicate code. See org.xwiki.refactoring.internal.DefaultLinkRefactoring#renameLinks in
-        // xwiki-platform-refactoring-default
-        getOldRendering().renameLinks(backlinkDocument, oldLink, newLink, context);
-
-        // Save if content changed
-        if (backlinkDocument.isContentDirty()) {
-            String saveMessage =
-                localizePlainOrKey("core.comment.renameLink", getCompactEntityReferenceSerializer().serialize(newLink));
-            backlinkDocument.setAuthorReference(context.getUserReference());
-            context.getWiki().saveDocument(backlinkDocument, saveMessage, true, context);
-        }
-    }
-
-    /**
-     * @deprecated since 2.2M2 use {@link #rename(DocumentReference, List, List, com.xpn.xwiki.XWikiContext)}
-     */
-    @Deprecated
-    public void rename(String newDocumentName, List<String> backlinkDocumentNames, List<String> childDocumentNames,
-        XWikiContext context) throws XWikiException
-    {
-        List<DocumentReference> backlinkDocumentReferences = new ArrayList<DocumentReference>();
-        for (String backlinkDocumentName : backlinkDocumentNames) {
-            backlinkDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(backlinkDocumentName));
-        }
-
-        List<DocumentReference> childDocumentReferences = new ArrayList<DocumentReference>();
-        for (String childDocumentName : childDocumentNames) {
-            childDocumentReferences.add(getCurrentMixedDocumentReferenceResolver().resolve(childDocumentName));
-        }
-
-        rename(getCurrentMixedDocumentReferenceResolver().resolve(newDocumentName), backlinkDocumentReferences,
+        context.getWiki().renameCopyAndDelete(this,
+            newDocumentReference,
+            backlinkDocumentReferences,
             childDocumentReferences, context);
+    }
+
+    /**
+     * Clone a document and change its reference.
+     *
+     * @param newDocumentReference the new reference of the cloned document.
+     * @param context the current context.
+     * @return a clone of the current document with a new reference.
+     * @throws XWikiException in case of problem during the clone operation.
+     * @since 12.5RC1
+     */
+    @Unstable
+    public XWikiDocument cloneRename(DocumentReference newDocumentReference, XWikiContext context) throws XWikiException
+    {
+        loadAttachments(context);
+        loadArchive(context);
+        return this.cloneInternal(newDocumentReference, true, true);
     }
 
     /**
@@ -6999,7 +6884,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         loadAttachments(context);
         loadArchive(context);
 
-        XWikiDocument newdoc = duplicate(newDocumentReference);
+        XWikiDocument newdoc = cloneInternal(newDocumentReference, false, true);
 
         // If the copied document has a title set to the original page name then set the new title to be the new page
         // name.
@@ -7010,11 +6895,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         newdoc.setOriginalDocument(null);
         newdoc.setContentDirty(true);
         newdoc.getXClass().setOwnerDocument(newdoc);
-
-        XWikiDocumentArchive archive = getDocumentArchive();
-        if (archive != null) {
-            newdoc.setDocumentArchive(archive.clone(newdoc.getId(), context));
-        }
 
         return newdoc;
     }

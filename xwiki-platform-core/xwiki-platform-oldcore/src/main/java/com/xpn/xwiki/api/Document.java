@@ -2289,6 +2289,19 @@ public class Document extends Api
         return this.doc.getBackLinkedPages(getXWikiContext());
     }
 
+    /**
+     * Retrieve the references of the page containing a link to the current page.
+     *
+     * @return a list of references of the page containing a link to the current page.
+     * @throws XWikiException in case of problem to perform the query.
+     * @since 12.5RC1
+     */
+    @Unstable
+    public List<DocumentReference> getBackLinkedReferences() throws XWikiException
+    {
+        return this.doc.getBackLinkedReferences(getXWikiContext());
+    }
+
     public List<XWikiLink> getLinks() throws XWikiException
     {
         return new ArrayList<XWikiLink>(this.doc.getUniqueWikiLinkedPages(getXWikiContext()));
@@ -2316,6 +2329,18 @@ public class Document extends Api
     public List<String> getChildren() throws XWikiException
     {
         return this.doc.getChildren(getXWikiContext());
+    }
+
+    /**
+     * Get document children references. Children are documents with the current document as parent.
+     * @return The list of children for the current document.
+     * @throws XWikiException in case of problem to query the children.
+     * @since 12.5RC1
+     */
+    @Unstable
+    public List<DocumentReference> getChildrenReferences() throws XWikiException
+    {
+        return this.doc.getChildrenReferences(getXWikiContext());
     }
 
     /**

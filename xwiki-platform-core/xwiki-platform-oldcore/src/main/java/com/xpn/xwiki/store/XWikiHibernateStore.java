@@ -42,6 +42,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.persistence.criteria.CriteriaUpdate;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -862,12 +863,65 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     @Override
+    public void renameXWikiDoc(XWikiDocument doc, DocumentReference newReference, XWikiContext inputxcontext)
+        throws XWikiException
+    {
+        WikiReference sourceWikiReference = doc.getDocumentReference().getWikiReference();
+        WikiReference targetWikiReference = newReference.getWikiReference();
+        boolean sameSession = sourceWikiReference.equals(targetWikiReference);
+
+        XWikiContext context = getExecutionXContext(inputxcontext, true);
+        XWikiDocument newDocument = doc.cloneRename(newReference, context);
+        newDocument.setNew(true);
+        newDocument.setStore(this);
+        newDocument.setComment("Renamed from " +
+            this.defaultEntityReferenceSerializer.serialize(doc.getDocumentReference()));
+
+        boolean copyPerformed = false;
+
+        try {
+            if (sameSession) {
+                this.execute(context, true, (callBack) -> {
+                    this.saveXWikiDoc(newDocument, context, false);
+                    getSession(context).flush();
+                    this.deleteXWikiDoc(doc, context, false);
+                    return true;
+                });
+            } else {
+                context.setWikiReference(targetWikiReference);
+                this.execute(context, true, (callBack) -> {
+                    this.saveXWikiDoc(newDocument, context, false);
+                    return true;
+                });
+                copyPerformed = true;
+
+                context.setWikiReference(sourceWikiReference);
+                this.execute(context, true, (callBack) -> {
+                    this.deleteXWikiDoc(doc, context, false);
+                    return true;
+                });
+            }
+        } catch (Exception e) {
+            if (!sameSession && copyPerformed) {
+                this.execute(context, true, (callBack) -> {
+                    this.deleteXWikiDoc(newDocument, context, false);
+                    return true;
+                });
+            }
+            Object[] args = { doc.getDocumentReference(), newReference };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_RENAMING_DOC,
+                "Exception while renaming document [{0}] to [{1}]", e,
+                args);
+        }
+    }
+
+    @Override
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            // To change body of implemented methods use Options | File Templates.
             boolean bTransaction = true;
             MonitorPlugin monitor = Util.getMonitorPlugin(context);
             try {
@@ -1037,10 +1091,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     @Override
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext) throws XWikiException
     {
+        deleteXWikiDoc(doc, inputxcontext, true);
+    }
+
+    private void deleteXWikiDoc(XWikiDocument doc, XWikiContext inputxcontext, boolean bTransaction)
+        throws XWikiException
+    {
         XWikiContext context = getExecutionXContext(inputxcontext, true);
 
         try {
-            boolean bTransaction = true;
             MonitorPlugin monitor = Util.getMonitorPlugin(context);
             try {
                 // Start monitoring timer
@@ -1049,7 +1108,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
                 checkHibernate(context);
                 SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
-                bTransaction = bTransaction && beginTransaction(sfactory, context);
+                if (bTransaction) {
+                    bTransaction = beginTransaction(sfactory, context);
+                }
                 Session session = getSession(context);
                 session.setHibernateFlushMode(FlushMode.COMMIT);
 
@@ -1155,15 +1216,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
     private XWikiSpace loadXWikiSpace(SpaceReference spaceReference, Session session)
     {
-        XWikiSpace space = new XWikiSpace(spaceReference, this);
+        XWikiSpace space = session.get(XWikiSpace.class, XWikiSpace.getId(spaceReference));
 
-        try {
-            session.load(space, Long.valueOf(space.getId()));
-        } catch (ObjectNotFoundException e) {
-            // No space
-            return null;
+        if (space != null) {
+            space.setStore(this);
         }
-
         return space;
     }
 

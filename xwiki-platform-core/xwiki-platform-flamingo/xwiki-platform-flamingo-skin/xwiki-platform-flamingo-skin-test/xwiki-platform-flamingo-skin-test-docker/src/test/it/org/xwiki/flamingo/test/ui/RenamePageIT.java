@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.junit.Assert;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -40,7 +39,7 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.tree.test.po.TreeElement;
 import org.xwiki.tree.test.po.TreeNodeElement;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -115,9 +114,9 @@ public class RenamePageIT
         // Check successful Rename confirmation
         assertEquals("Done.", renameStatusPage.getInfoMessage());
         // Test the Rename operation: we need to have 2.WebHome and 2.3.WebHome under A.B
-        Assert.assertTrue("Page A.B.2.WebHome doesn't exist!", setup.pageExists(Arrays.asList("A", "B", "2"), "WebHome"));
-        Assert.assertTrue("Page A.B.2.3.WebHome doesn't exist!",
-            setup.pageExists(Arrays.asList("A", "B", "2", "3"), "WebHome"));
+        assertTrue(setup.pageExists(Arrays.asList("A", "B", "2"), "WebHome"), "Page A.B.2.WebHome doesn't exist!");
+        assertTrue(setup.pageExists(Arrays.asList("A", "B", "2", "3"),
+            "WebHome"), "Page A.B.2.3.WebHome doesn't exist!");
         // Test the Auto Redirect: when visiting the original pages you need to be redirected to the new locations
         setup.gotoPage(Arrays.asList("1", "2"), "WebHome", "view", "");
         assertEquals("/A/B/2", vp.getBreadcrumbContent());
@@ -169,7 +168,7 @@ public class RenamePageIT
 
         // At this point we should have the question job UI
         JobQuestionPane jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
-        Assert.assertFalse(jobQuestionPane.isEmpty());
+        assertFalse(jobQuestionPane.isEmpty());
 
         assertEquals("You are about to rename pages that contain used XClass.", jobQuestionPane.getQuestionTitle());
         TreeElement treeElement = jobQuestionPane.getQuestionTree();
@@ -181,7 +180,7 @@ public class RenamePageIT
         assertEquals(2, topLevelNodes.size());
         TreeNodeElement freePages = topLevelNodes.get(0);
         assertEquals("Pages that do not contain any used XClass", freePages.getLabel());
-        Assert.assertFalse(freePages.isSelected());
+        assertFalse(freePages.isSelected());
 
         freePages = freePages.open().waitForIt();
         List<TreeNodeElement> children = freePages.getChildren();
@@ -195,24 +194,24 @@ public class RenamePageIT
         TreeNodeElement freePage = children.get(0);
         assertEquals(freePageName, freePage.getLabel());
         assertEquals(space + "." + freePageName, freePage.getId());
-        Assert.assertTrue(freePage.isLeaf());
+        assertTrue(freePage.isLeaf());
 
         TreeNodeElement objectPage = children.get(1);
         assertEquals(objectPageName, objectPage.getLabel());
         assertEquals(space + "." + objectPageName, objectPage.getId());
-        Assert.assertTrue(objectPage.isLeaf());
+        assertTrue(objectPage.isLeaf());
 
         TreeNodeElement webHome = children.get(2);
 
         // label = page title
         assertEquals("Parent", webHome.getLabel());
         assertEquals(space + ".WebHome", webHome.getId());
-        Assert.assertTrue(webHome.isLeaf());
+        assertTrue(webHome.isLeaf());
 
         TreeNodeElement classPage = topLevelNodes.get(1);
         assertEquals(classPageName, classPage.getLabel());
         assertEquals(space + "." + classPageName, classPage.getId());
-        Assert.assertFalse(classPage.isSelected());
+        assertFalse(classPage.isSelected());
 
         classPage = classPage.open().waitForIt();
         children = classPage.getChildren();
@@ -222,7 +221,7 @@ public class RenamePageIT
 
         // here it's an object
         assertEquals("object-" + space + "." + objectPageName, children.get(0).getId());
-        Assert.assertTrue(children.get(0).isLeaf());
+        assertTrue(children.get(0).isLeaf());
 
         // current URL with the job ID
         String firstJobUrl = setup.getDriver().getCurrentUrl();
@@ -236,7 +235,7 @@ public class RenamePageIT
         renamePage.getDocumentPicker().setParent(newParentName);
         renamePage.clickRenameButton();
         jobQuestionPane = new JobQuestionPane();
-        Assert.assertTrue(jobQuestionPane.isBlockedJob());
+        assertTrue(jobQuestionPane.isBlockedJob());
         String secondJobUrl = setup.getDriver().getCurrentUrl();
 
         // go back to the first job to cancel it
@@ -244,12 +243,12 @@ public class RenamePageIT
 
         jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
         jobQuestionPane.cancelQuestion();
-        Assert.assertTrue(jobQuestionPane.isCanceled());
+        assertTrue(jobQuestionPane.isCanceled());
 
         // go back to the second job to only rename the freePage
         setup.getDriver().navigate().to(secondJobUrl);
         jobQuestionPane = new JobQuestionPane().waitForQuestionPane();
-        Assert.assertFalse(jobQuestionPane.isBlockedJob());
+        assertFalse(jobQuestionPane.isBlockedJob());
         treeElement = jobQuestionPane.getQuestionTree();
         freePages = treeElement.getTopLevelNodes().get(0);
         freePages = freePages.open().waitForIt();
@@ -263,12 +262,12 @@ public class RenamePageIT
 
         // check that the old one doesn't exist anymore and only the new one exists
         ViewPage viewPage = setup.gotoPage(freeReference);
-        Assert.assertFalse(viewPage.exists());
+        assertFalse(viewPage.exists());
 
         DocumentReference newFreePage = new DocumentReference("xwiki",
             Arrays.asList(newParentName, testReference.getLastSpaceReference().getName()),
             freePageName);
         viewPage = setup.gotoPage(newFreePage);
-        Assert.assertTrue(viewPage.exists());
+        assertTrue(viewPage.exists());
     }
 }

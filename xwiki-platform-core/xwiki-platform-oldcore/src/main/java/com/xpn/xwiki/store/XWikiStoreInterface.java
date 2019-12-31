@@ -38,6 +38,19 @@ public interface XWikiStoreInterface
 {
     void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
+    /**
+     * Atomic operation for renaming a document.
+     * This operation will rename the document in DB by performing updates in all tables the document name is used.
+     *
+     * @param doc the actual document instance to rename.
+     * @param newReference the new reference to use for renaming.
+     * @param context the current context.
+     * @throws XWikiException in case of problem during the rename.
+     * @since 12.5RC1
+     */
+    @Unstable
+    void renameXWikiDoc(XWikiDocument doc, DocumentReference newReference, XWikiContext context) throws XWikiException;
+
     void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;
 
     XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;

@@ -26,6 +26,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.refactoring.internal.event.AbstractEntityCopyOrRenameEvent;
 import org.xwiki.refactoring.job.AbstractCopyOrMoveRequest;
 import org.xwiki.refactoring.job.EntityJobStatus;
 import org.xwiki.refactoring.job.OverwriteQuestion;
@@ -126,10 +127,11 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             if (this.request.isDeep() && isSpaceHomeReference(source)) {
                 process(source.getLastSpaceReference(), destination);
             } else if (destination.getType() == EntityType.SPACE) {
-                maybeCopyOrMove(source, new DocumentReference(source.getName(), new SpaceReference(destination)));
+                maybePerformRefactoring(source,
+                    new DocumentReference(source.getName(), new SpaceReference(destination)));
             } else if (destination.getType() == EntityType.DOCUMENT
                 && isSpaceHomeReference(new DocumentReference(destination))) {
-                maybeCopyOrMove(source,
+                maybePerformRefactoring(source,
                     new DocumentReference(source.getName(), new SpaceReference(destination.getParent())));
             } else {
                 this.logger.error("Unsupported destination entity type [{}] for a document.", destination.getType());
@@ -148,7 +150,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
                     + " and preserve its child documents at the same time.", source, destination);
             }
         } else {
-            maybeCopyOrMove(source, destination);
+            maybePerformRefactoring(source, destination);
         }
     }
 
@@ -177,7 +179,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             public void visit(DocumentReference oldChildReference)
             {
                 DocumentReference newChildReference = oldChildReference.replaceParent(source, destination);
-                maybeCopyOrMove(oldChildReference, newChildReference);
+                maybePerformRefactoring(oldChildReference, newChildReference);
             }
         });
     }
@@ -196,7 +198,7 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         return true;
     }
 
-    protected void maybeCopyOrMove(DocumentReference oldReference, DocumentReference newReference)
+    protected void maybePerformRefactoring(DocumentReference oldReference, DocumentReference newReference)
     {
         // Perform checks that are specific to the document source/destination type.
 
@@ -207,16 +209,27 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
         } else if (!this.modelBridge.exists(oldReference)) {
             this.logger.warn("Skipping [{}] because it doesn't exist.", oldReference);
         } else if (this.checkAllRights(oldReference, newReference)) {
-            copyOrMove(oldReference, newReference);
+            performRefactoring(oldReference, newReference);
         }
     }
 
-    protected boolean copyOrMove(DocumentReference oldReference, DocumentReference newReference)
+    protected abstract void performRefactoring(DocumentReference oldReference, DocumentReference newReference);
+
+    protected boolean copyOrMove(DocumentReference oldReference, DocumentReference newReference,
+        AbstractEntityCopyOrRenameEvent<?> beforeEvent, AbstractEntityCopyOrRenameEvent<?> afterEvent)
     {
-        this.progressManager.pushLevelProgress(3, this);
+        this.progressManager.pushLevelProgress(5, this);
 
         try {
-            // Step 1: Delete the destination document if needed.
+            // Step 1: Send before event.
+            this.progressManager.startStep(this);
+            this.observationManager.notify(beforeEvent, this, this.getRequest());
+            if (beforeEvent.isCanceled()) {
+                return false;
+            }
+            this.progressManager.endStep(this);
+
+            // Step 2: Delete the destination document if needed.
             this.progressManager.startStep(this);
             if (this.modelBridge.exists(newReference)) {
                 if (this.request.isInteractive() && !this.modelBridge.canOverwriteSilently(newReference)
@@ -229,16 +242,21 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             }
             this.progressManager.endStep(this);
 
-            // Step 2: Copy the source document to the destination.
+            // Step 3: Copy the source document to the destination.
             this.progressManager.startStep(this);
-            if (!this.modelBridge.copy(oldReference, newReference)) {
+            if (!this.atomicOperation(oldReference, newReference)) {
                 return false;
             }
             this.progressManager.endStep(this);
 
-            // Step 3: Update the destination document based on the source document parameters.
+            // Step 4: Update the destination document based on the source document parameters.
             this.progressManager.startStep(this);
             this.modelBridge.update(newReference, this.request.getEntityParameters(oldReference));
+            this.progressManager.endStep(this);
+
+            // Step 5: Send after event.
+            this.progressManager.startStep(this);
+            this.observationManager.notify(afterEvent, this, this.getRequest());
             this.progressManager.endStep(this);
 
             return true;
@@ -280,4 +298,12 @@ public abstract class AbstractCopyOrMoveJob<T extends AbstractCopyOrMoveRequest>
             return getCommonParent(entityReferences);
         }
     }
+
+    /**
+     * Atomic operation to perform: should be a rename for Rename/Move and copy for Copy.
+     * @param source the source reference
+     * @param target the target reference
+     * @return {@code true} if the operation worked well.
+     */
+    protected abstract boolean atomicOperation(DocumentReference source, DocumentReference target);
 }

@@ -1069,4 +1069,15 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# user.preferences.guest.displayHiddenDocuments = 1
 #-# user.preferences.guest.editor = Text
 
+#-------------------------------------------------------------------------------------
+# Refactoring
+#-------------------------------------------------------------------------------------
+
+#-# [Since 12.5RC1]
+#-# Indicate to use the old implementation based on copy and delete, or the new implementation
+#-# using an atomic operation on database (which allows efficient rollback).
+#-#
+#-# The default value is:
+# refactoring.rename.useAtomicRename = true
+
 $!xwikiPropertiesAdditionalProperties

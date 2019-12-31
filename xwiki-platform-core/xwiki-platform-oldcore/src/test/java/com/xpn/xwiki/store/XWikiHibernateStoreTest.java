@@ -92,22 +92,22 @@ public class XWikiHibernateStoreTest
     private XWikiHibernateStore store;
 
     @Mock
-    protected XWikiContext xcontext;
+    private XWikiContext xcontext;
 
     /**
      * The Hibernate session.
      */
     @Mock
-    protected Session session;
+    private Session session;
 
     /**
      * The Hibernate transaction.
      */
     @Mock
-    protected Transaction transaction;
+    private Transaction transaction;
 
     @MockComponent
-    protected HibernateStore hibernateStore;
+    private HibernateStore hibernateStore;
 
     @MockComponent
     private Execution execution;
@@ -131,17 +131,17 @@ public class XWikiHibernateStoreTest
 
     @MockComponent
     @Named("currentmixed")
-    protected DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+    private DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
 
     @MockComponent
     @Named("compactwiki")
-    protected EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+    private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
-    public void setUp(MockitoComponentManager componentManager) throws Exception
+    void setUp(MockitoComponentManager componentManager) throws Exception
     {
         // For XWikiHibernateBaseStore#initialize()
 
@@ -171,7 +171,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void getColumnsForSelectStatement() throws Exception
+    void getColumnsForSelectStatement() throws Exception
     {
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
@@ -186,7 +186,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void createSQLQuery()
+    void createSQLQuery()
     {
         assertEquals("select distinct doc.space, doc.name from XWikiDocument as doc",
             store.createSQLQuery("select distinct doc.space, doc.name", ""));
@@ -197,7 +197,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void executeDeleteWikiStatementForPostgreSQLWhenInSchemaMode() throws Exception
+    void executeDeleteWikiStatementForPostgreSQLWhenInSchemaMode() throws Exception
     {
         Statement statement = mock(Statement.class);
         DatabaseProduct databaseProduct = DatabaseProduct.POSTGRESQL;
@@ -208,7 +208,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void executeDeleteWikiStatementForPostgreSQLWhenInDatabaseMode() throws Exception
+    void executeDeleteWikiStatementForPostgreSQLWhenInDatabaseMode() throws Exception
     {
         when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(false);
 
@@ -222,7 +222,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void locksAreReleasedOnLogout() throws Exception
+    void locksAreReleasedOnLogout() throws Exception
     {
         // Capture the event listener.
         ArgumentCaptor<EventListener> eventListenerCaptor = ArgumentCaptor.forClass(EventListener.class);
@@ -244,7 +244,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void createHibernateSequenceIfRequiredWhenNotInUpdateCommands() throws Exception
+    void createHibernateSequenceIfRequiredWhenNotInUpdateCommands() throws Exception
     {
         Session session = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
@@ -264,7 +264,7 @@ public class XWikiHibernateStoreTest
      * We verify that the sequence is not created if it's already in the update script.
      */
     @Test
-    public void createHibernateSequenceIfRequiredWhenInUpdateCommands() throws Exception
+    void createHibernateSequenceIfRequiredWhenInUpdateCommands() throws Exception
     {
         Session session = mock(Session.class);
         Dialect dialect = mock(Dialect.class);
@@ -287,7 +287,7 @@ public class XWikiHibernateStoreTest
      * @see "XWIKI-9716: Error while migrating SearchSuggestConfig page from 4.1.4 to 5.2.1 with DW"
      */
     @Test
-    public void saveObjectWithPropertyTypeChange() throws Exception
+    void saveObjectWithPropertyTypeChange() throws Exception
     {
         // The class must be local.
         DocumentReference classReference = new DocumentReference("myWiki", "mySpace", "myClass");
@@ -340,7 +340,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void existsWithRootLocale() throws Exception
+    void existsWithRootLocale() throws Exception
     {
         String fullName = "foo";
         XWikiDocument doc = mock(XWikiDocument.class);
@@ -358,7 +358,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void existsWithNonRootLocale() throws Exception
+    void existsWithNonRootLocale() throws Exception
     {
         String fullName = "bar";
         XWikiDocument doc = mock(XWikiDocument.class);
@@ -378,7 +378,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void getTranslationList() throws Exception
+    void getTranslationList() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("chess", Arrays.asList("Path", "To"), "Success");
         XWikiDocument doc = mock(XWikiDocument.class);
@@ -399,7 +399,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void loadBacklinksFromSameWiki() throws Exception
+    void loadBacklinksFromSameWiki() throws Exception
     {
         // in this test we simulate load of backlinks from the same wiki context.
         DocumentReference documentReference = new DocumentReference("xwiki", Arrays.asList("B"), "WebHome");
@@ -426,7 +426,7 @@ public class XWikiHibernateStoreTest
     }
 
     @Test
-    public void loadBacklinksFromSubwiki() throws Exception
+    void loadBacklinksFromSubwiki() throws Exception
     {
         // in this test we simulate load of backlinks from a different wiki context.
         DocumentReference documentReference = new DocumentReference("subwiki", Arrays.asList("B"), "WebHome");

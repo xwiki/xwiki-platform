@@ -159,21 +159,17 @@ public class ValidateConsoleExtensionTest
         assertEquals(1, summary.getFailures().size());
         assertEquals(""
             + "The following lines were matching forbidden content:[\n"
-            + "ERROR - in beforeAll\n"
             + "INFO  - Deprecated usage of something\n"
-            + "WARN  - stacktrace\n"
-            + "java.lang.Exception: exception\n"
             + "]", summary.getFailures().get(0).getException().getMessage());
         assertEquals(""
-            + "WARN  - The following lines were matching excluded patterns and need to be fixed: [\n"
-            + "WARN  - caught in beforeAll\n"
-            + "]\n"
-            + "WARN  - The following excludes were not matched and could be candidates for removal (beware of configs):"
-                + " [\n"
+            + "WARN  - The following excludes were not matched and could be candidates for removal "
+                + "(beware of configs): [\n"
+            + "caught in beforeAll\n"
             + "exclude that didn't happen\n"
             + "]\n"
-            + "WARN  - The following expected were not matched and could be candidates for removal (beware of configs):"
-                + " [\n"
+            + "WARN  - The following expected were not matched and could be candidates for removal "
+                + "(beware of configs): [\n"
+            + "expected\n"
             + "expected that didn't happen\n"
             + "]\n", errContent);
     }

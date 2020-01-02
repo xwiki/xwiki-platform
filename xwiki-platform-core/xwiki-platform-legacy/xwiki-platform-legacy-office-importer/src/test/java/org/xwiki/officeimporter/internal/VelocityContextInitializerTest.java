@@ -53,6 +53,8 @@ public class VelocityContextInitializerTest extends AbstractComponentTestCase
         getMockery().checking(new Expectations()
         {
             {
+                oneOf(configurationSource).getProperty("logging.deprecated.enabled", true);
+                will(returnValue(true));
                 oneOf(configurationSource).getProperty("velocity.tools", Properties.class);
                 will(returnValue(new Properties()));
             }

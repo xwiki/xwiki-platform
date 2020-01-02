@@ -143,6 +143,8 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                             throw new FilterException(e);
                         }
                     }
+                } else {
+                    unknownElement(xmlReader);
                 }
             }
         }

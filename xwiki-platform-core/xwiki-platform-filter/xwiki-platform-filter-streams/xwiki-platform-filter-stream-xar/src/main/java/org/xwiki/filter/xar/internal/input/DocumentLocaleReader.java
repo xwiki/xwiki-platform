@@ -57,6 +57,7 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.xar.internal.model.XarDocumentModel;
+import org.xwiki.xml.stax.StAXUtils;
 
 /**
  * @version $Id$
@@ -431,15 +432,13 @@ public class DocumentLocaleReader extends AbstractReader
             } else if (elementName.equals(XARClassModel.ELEMENT_CLASS)) {
                 readClass(xmlReader, filter, proxyFilter);
             } else {
-                String value = xmlReader.getElementText();
-
                 if (XarDocumentModel.ELEMENT_SPACE.equals(elementName)) {
-                    this.currentLegacySpace = value;
+                    this.currentLegacySpace = xmlReader.getElementText();
 
                     if (this.currentDocumentReference == null) {
                         // Its an old thing
                         if (this.currentLegacyDocument == null) {
-                            this.currentSpaceReference = new EntityReference(value, EntityType.SPACE);
+                            this.currentSpaceReference = new EntityReference(this.currentLegacySpace, EntityType.SPACE);
                         } else {
                             this.currentDocumentReference =
                                 new LocalDocumentReference(this.currentLegacySpace, this.currentLegacyDocument);
@@ -450,7 +449,7 @@ public class DocumentLocaleReader extends AbstractReader
                         switchWikiSpace(proxyFilter, false);
                     }
                 } else if (XarDocumentModel.ELEMENT_NAME.equals(elementName)) {
-                    this.currentLegacyDocument = value;
+                    this.currentLegacyDocument = xmlReader.getElementText();
 
                     if (this.currentDocumentReference == null) {
                         // Its an old thing
@@ -462,15 +461,19 @@ public class DocumentLocaleReader extends AbstractReader
                     }
                 } else if (XarDocumentModel.ELEMENT_LOCALE.equals(elementName)) {
                     if (this.localeFromLegacy) {
-                        this.currentDocumentLocale = toLocale(value);
+                        this.currentDocumentLocale = toLocale(xmlReader.getElementText());
+                    } else {
+                        StAXUtils.skipElement(xmlReader);
                     }
                 } else if (XarDocumentModel.ELEMENT_REVISION.equals(elementName)) {
-                    this.currentDocumentRevision = value;
+                    this.currentDocumentRevision = xmlReader.getElementText();
+                } else if (XarDocumentModel.ELEMENT_ISTRANSLATION.equals(elementName)) {
+                    StAXUtils.skipElement(xmlReader);
                 } else {
                     EventParameter parameter = XARDocumentModel.DOCUMENT_PARAMETERS.get(elementName);
 
                     if (parameter != null) {
-                        Object wsValue = convert(parameter.type, value);
+                        Object wsValue = convert(parameter.type, xmlReader.getElementText());
                         if (wsValue != null) {
                             this.currentDocumentParameters.put(parameter.name, wsValue);
                         }
@@ -478,7 +481,7 @@ public class DocumentLocaleReader extends AbstractReader
                         parameter = XARDocumentModel.DOCUMENTLOCALE_PARAMETERS.get(elementName);
 
                         if (parameter != null) {
-                            Object wsValue = convert(parameter.type, value);
+                            Object wsValue = convert(parameter.type, xmlReader.getElementText());
                             if (wsValue != null) {
                                 this.currentDocumentLocaleParameters.put(parameter.name, wsValue);
                             }
@@ -488,17 +491,17 @@ public class DocumentLocaleReader extends AbstractReader
                             if (parameter != null) {
                                 Object objectValue;
                                 if (parameter.type == EntityReference.class) {
-                                    objectValue = this.relativeResolver.resolve(value, EntityType.DOCUMENT);
+                                    objectValue =
+                                        this.relativeResolver.resolve(xmlReader.getElementText(), EntityType.DOCUMENT);
                                 } else {
-                                    objectValue = convert(parameter.type, value);
+                                    objectValue = convert(parameter.type, xmlReader.getElementText());
                                 }
 
                                 if (objectValue != null) {
                                     this.currentDocumentRevisionParameters.put(parameter.name, objectValue);
                                 }
                             } else {
-                                // Unknown property
-                                // TODO: log something ?
+                                unknownElement(xmlReader);
                             }
                         }
                     }

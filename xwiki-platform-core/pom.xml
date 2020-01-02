@@ -337,6 +337,11 @@
                     "code": "java.method.addedToInterface",
                     "new": "method void javax.servlet.ServletResponse::setContentLengthLong(long) @ com.xpn.xwiki.web.XWikiResponse",
                     "justification": "Servlet 3.1 introduce new APIs"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method long javax.servlet.ServletRequest::getContentLengthLong() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
+                    "justification": "Servlet 3.1 introduce new APIs"
                   }
                 ]
               }

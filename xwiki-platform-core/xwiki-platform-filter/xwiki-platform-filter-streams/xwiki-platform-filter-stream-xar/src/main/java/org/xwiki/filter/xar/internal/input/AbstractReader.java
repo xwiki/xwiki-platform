@@ -87,6 +87,9 @@ public abstract class AbstractReader
 
     /**
      * @since 12.0RC1
+     * @since 11.10.3
+     * @since 11.3.7
+     * @since 10.11.11
      */
     protected void unknownElement(XMLStreamReader xmlReader) throws FilterException
     {

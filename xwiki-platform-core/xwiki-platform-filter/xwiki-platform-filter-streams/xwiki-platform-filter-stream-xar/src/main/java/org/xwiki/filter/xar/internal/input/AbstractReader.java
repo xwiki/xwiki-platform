@@ -23,11 +23,17 @@ package org.xwiki.filter.xar.internal.input;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.inject.Inject;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.filter.FilterException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.xml.stax.StAXUtils;
 
 /**
  * @version $Id$
@@ -35,6 +41,9 @@ import org.xwiki.rendering.syntax.Syntax;
  */
 public abstract class AbstractReader
 {
+    @Inject
+    private Logger logger;
+
     protected <T> T convert(Class<?> type, String source) throws FilterException
     {
         Object value = source;
@@ -74,5 +83,21 @@ public abstract class AbstractReader
         }
 
         return locale;
+    }
+
+    /**
+     * @since 12.0RC1
+     */
+    protected void unknownElement(XMLStreamReader xmlReader) throws FilterException
+    {
+        this.logger.warn("Unknown element [{}] at line [{}]", xmlReader.getLocalName(),
+            xmlReader.getLocation().getLineNumber());
+
+        // Skip the element
+        try {
+            StAXUtils.skipElement(xmlReader);
+        } catch (XMLStreamException e) {
+            throw new FilterException("Failed to skip element", e);
+        }
     }
 }

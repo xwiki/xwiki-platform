@@ -20,6 +20,10 @@ chown -R tomcat.tomcat /var/lib/xwiki/data
 # Restart Tomcat
 #########################
 
+# Need to reload systemd for the injected tomcat9 service configuration to be taken into account
+systemctl daemon-reload
+
+# Restart tomcat9 service
 invoke-rc.d --quiet tomcat9 restart || {
     RESULT=$?
     # Ignore if tomcat9 init script does not exist (yet)

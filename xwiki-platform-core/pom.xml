@@ -342,6 +342,24 @@
                     "code": "java.method.addedToInterface",
                     "new": "method long javax.servlet.ServletRequest::getContentLengthLong() @ org.xwiki.wysiwyg.filter.MutableServletRequest",
                     "justification": "Servlet 3.1 introduce new APIs"
+                  },
+                  {
+                    "code": "java.method.parameterTypeParameterChanged",
+                    "old": "parameter boolean javax.servlet.ServletRequestWrapper::isWrapperFor(===java.lang.Class===) @ com.xpn.xwiki.web.XWikiRequestProcessor.RequestProcessorServletRequestWrapper",
+                    "new": "parameter boolean javax.servlet.ServletRequestWrapper::isWrapperFor(===java.lang.Class<?>===) @ com.xpn.xwiki.web.XWikiRequestProcessor.RequestProcessorServletRequestWrapper",
+                    "justification": "Runtime compatible. Servlet 3.1 upgrade"
+                  },
+                  {
+                    "code": "java.method.parameterTypeParameterChanged",
+                    "old": "parameter boolean javax.servlet.ServletRequestWrapper::isWrapperFor(===java.lang.Class===) @ com.xpn.xwiki.web.XWikiServletRequest",
+                    "new": "parameter boolean javax.servlet.ServletRequestWrapper::isWrapperFor(===java.lang.Class<?>===) @ com.xpn.xwiki.web.XWikiServletRequest",
+                    "justification": "Runtime compatible. Servlet 3.1 upgrade"
+                  },
+                  {
+                    "code": "java.method.parameterTypeParameterChanged",
+                    "old": "parameter boolean javax.servlet.ServletResponseWrapper::isWrapperFor(===java.lang.Class===) @ com.xpn.xwiki.web.includeservletasstring.BufferedResponse",
+                    "new": "parameter boolean javax.servlet.ServletResponseWrapper::isWrapperFor(===java.lang.Class<?>===) @ com.xpn.xwiki.web.includeservletasstring.BufferedResponse",
+                    "justification": "Runtime compatible. Servlet 3.1 upgrade"
                   }
                 ]
               }

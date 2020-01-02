@@ -107,59 +107,13 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
         switch (this.testConfiguration.getServletEngine()) {
             case TOMCAT:
-                // Configure Tomcat logging for debugging. Create a logging.properties file
-                File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
-                logFile.createNewFile();
-                try (FileWriter writer = new FileWriter(logFile)) {
-                    IOUtils.write("org.apache.catalina.core.ContainerBase.[Catalina].level = FINE\n"
-                        + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
-                        + "java.util.logging.ConsoleHandler\n", writer);
-                }
-                this.servletContainer = createServletContainer();
-                mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
-                    "/usr/local/tomcat/webapps/xwiki");
-
-                List<String> catalinaOpts = new ArrayList<>();
-                catalinaOpts.add("-Xmx1024m");
-                catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
-                catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
-                catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
-
-                // When executing on the Oracle database, we get the following timezone error unless we pass a system
-                // property to the Oracle JDBC driver:
-                //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
-                //   recursive SQL level 1
-                //   ORA-01882: timezone region not found
-                if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
-                    catalinaOpts.add(ORACLE_TZ_WORKAROUND);
-                }
-
-                this.servletContainer.withEnv("CATALINA_OPTS", StringUtils.join(catalinaOpts, ' '));
-
+                configureTomcat(sourceWARDirectory);
                 break;
             case JETTY:
-                this.servletContainer = createServletContainer();
-                mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
-                    "/var/lib/jetty/webapps/xwiki");
-
-                // When executing on the Oracle database, we get the following timezone error unless we pass a system
-                // property to the Oracle JDBC driver:
-                //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
-                //   recursive SQL level 1
-                //   ORA-01882: timezone region not found
-                if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
-                    List<String> commandPartList =
-                        new ArrayList<>(Arrays.asList(this.servletContainer.getCommandParts()));
-                    commandPartList.add(ORACLE_TZ_WORKAROUND);
-                    this.servletContainer.setCommandParts(commandPartList.toArray(new String[0]));
-                }
-
+                configureJetty(sourceWARDirectory);
                 break;
             case WILDFLY:
-                this.servletContainer = createServletContainer();
-                mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
-                    "/opt/jboss/wildfly/standalone/deployments/xwiki");
-
+                configureWildFly(sourceWARDirectory);
                 break;
             case JETTY_STANDALONE:
                 // Resolve and unzip the xwiki-platform-tool-jetty-resources zip artifact and configure Jetty to
@@ -188,6 +142,75 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         this.testConfiguration.getServletEngine().setPort(xwikiPort);
     }
 
+    private void configureWildFly(File sourceWARDirectory)
+    {
+        this.servletContainer = createServletContainer();
+        mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
+            "/opt/jboss/wildfly/standalone/deployments/xwiki");
+    }
+
+    private void configureJetty(File sourceWARDirectory)
+    {
+        this.servletContainer = createServletContainer();
+        mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
+            "/var/lib/jetty/webapps/xwiki");
+
+        // When executing on the Oracle database, we get the following timezone error unless we pass a system
+        // property to the Oracle JDBC driver:
+        //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
+        //   recursive SQL level 1
+        //   ORA-01882: timezone region not found
+        if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
+            List<String> commandPartList =
+                new ArrayList<>(Arrays.asList(this.servletContainer.getCommandParts()));
+            commandPartList.add(ORACLE_TZ_WORKAROUND);
+            this.servletContainer.setCommandParts(commandPartList.toArray(new String[0]));
+        }
+    }
+
+    private void configureTomcat(File sourceWARDirectory) throws Exception
+    {
+        // Configure Tomcat logging for debugging. Create a logging.properties file
+        File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
+        logFile.createNewFile();
+        try (FileWriter writer = new FileWriter(logFile)) {
+            IOUtils.write("org.apache.catalina.core.ContainerBase.[Catalina].level = FINE\n"
+                + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
+                + "java.util.logging.ConsoleHandler\n", writer);
+        }
+        this.servletContainer = createServletContainer();
+        mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
+            "/usr/local/tomcat/webapps/xwiki");
+
+        List<String> catalinaOpts = new ArrayList<>();
+        catalinaOpts.add("-Xmx1024m");
+        catalinaOpts.add("-Dorg.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH=true");
+        catalinaOpts.add("-Dorg.apache.catalina.connector.CoyoteAdapter.ALLOW_BACKSLASH=true");
+        catalinaOpts.add("-Dsecurerandom.source=file:/dev/urandom");
+
+        // If we're on debug mode, start XWiki in debug mode too so that we can attach a remote debugger to it
+        // in order to debug.
+        // Note: To attach the remote debugger, run "docker ps" to get the local mapped port for 5005, and use
+        // "localhost" as the JVM host to connect to.
+        if (this.testConfiguration.isDebug()) {
+            catalinaOpts.add("-Xdebug");
+            catalinaOpts.add("-Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005");
+            catalinaOpts.add("-Xnoagent");
+            catalinaOpts.add("-Djava.compiler=NONE");
+        }
+
+        // When executing on the Oracle database, we get the following timezone error unless we pass a system
+        // property to the Oracle JDBC driver:
+        //   java.sql.SQLException: Cannot create PoolableConnectionFactory (ORA-00604: error occurred at
+        //   recursive SQL level 1
+        //   ORA-01882: timezone region not found
+        if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
+            catalinaOpts.add(ORACLE_TZ_WORKAROUND);
+        }
+
+        this.servletContainer.withEnv("CATALINA_OPTS", StringUtils.join(catalinaOpts, ' '));
+    }
+
     private void startContainer() throws Exception
     {
         // Note: TestContainers will wait for up to 60 seconds for the container's first mapped network port to
@@ -195,10 +218,18 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         this.servletContainer
             .withNetwork(Network.SHARED)
             .withNetworkAliases(this.testConfiguration.getServletEngine().getInternalIP())
-            .withExposedPorts(this.testConfiguration.getServletEngine().getInternalPort())
             .waitingFor(
                 Wait.forHttp("/xwiki/bin/get/Main/WebHome")
                     .forStatusCode(200).withStartupTimeout(Duration.of(480, SECONDS)));
+
+        List<Integer> exposedPorts = new ArrayList<>();
+        exposedPorts.add(this.testConfiguration.getServletEngine().getInternalPort());
+        // In debug mode, we need to map the debug port so that the host can attach the remote debugger to the JVM
+        // inside the container.
+        if (this.testConfiguration.isDebug()) {
+            exposedPorts.add(5005);
+        }
+        this.servletContainer.withExposedPorts(exposedPorts.toArray(new Integer[exposedPorts.size()]));
 
         if (this.testConfiguration.isOffline()) {
             // Note: This won't work in the DOOD use case. For that to work we would need to copy the data instead

@@ -59,6 +59,13 @@
               <linkName>/etc/tomcat9/Catalina/localhost/xwiki.xml</linkName>
               <linkTarget>/etc/xwiki/xwiki-tomcat9.xml</linkTarget>
             </data>
+            <!-- Inject configuration in tomcat9 systemd service -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>etc/systemd/system/tomcat9.service.d/xwiki-tomcat-systemd.conf</linkName>
+              <linkTarget>/etc/xwiki/xwiki-tomcat9-systemd.conf</linkTarget>
+            </data>
           </dataSet>
         </configuration>
       </plugin>

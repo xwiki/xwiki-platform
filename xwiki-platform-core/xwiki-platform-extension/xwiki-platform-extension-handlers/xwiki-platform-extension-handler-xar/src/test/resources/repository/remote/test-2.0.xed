@@ -7,4 +7,14 @@
   <description>description</description>
   <author>author</author>
   <website>http://website</website>
+  <dependencies>
+    <dependency>
+      <id>dependency</id>
+      <version>2.0</version>
+    </dependency>
+    <dependency>
+      <id>otherdependency</id>
+      <version>2.0</version>
+    </dependency>
+  </dependencies>
 </extension>

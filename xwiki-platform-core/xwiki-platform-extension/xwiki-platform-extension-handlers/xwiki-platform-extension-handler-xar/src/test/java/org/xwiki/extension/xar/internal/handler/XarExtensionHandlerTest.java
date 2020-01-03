@@ -42,7 +42,6 @@ import org.xwiki.extension.job.internal.InstallJob;
 import org.xwiki.extension.job.internal.UninstallJob;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.test.MockitoRepositoryUtilsRule;
-import org.xwiki.extension.xar.XarExtensionConfiguration.DocumentProtection;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtension;
 import org.xwiki.extension.xar.internal.repository.XarInstalledExtensionRepository;
 import org.xwiki.job.Job;
@@ -264,7 +263,7 @@ public class XarExtensionHandlerTest
 
         XarInstalledExtension xarInstalledExtension = install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
-        verifyHasAdminRight(2);
+        verifyHasAdminRight(3);
 
         // validate
 
@@ -408,6 +407,22 @@ public class XarExtensionHandlerTest
             this.installedExtensionRepository.isAllowed(mandatoryconfigurationpage.getDocumentReference(), Right.EDIT));
         assertFalse(this.installedExtensionRepository.isAllowed(mandatoryconfigurationpage.getDocumentReference(),
             Right.DELETE));
+
+        // space.movedpage
+
+        XWikiDocument movedpage = this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "space", "movedpage"), getXWikiContext());
+
+        Assert.assertFalse("Document wiki:space.movedpage has been removed", movedpage.isNew());
+        Assert.assertEquals("content 1.0", movedpage.getContent());
+
+        // space.dependencypage
+
+        XWikiDocument dependencypage = this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "space", "dependencypage"), getXWikiContext());
+
+        Assert.assertFalse("Document wiki:space.dependencypage has been removed", dependencypage.isNew());
+        Assert.assertEquals("otherdependency 1.0", dependencypage.getContent());
     }
 
     @Test
@@ -542,7 +557,7 @@ public class XarExtensionHandlerTest
     {
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
-        verifyHasAdminRight(2);
+        verifyHasAdminRight(3);
 
         // Do some local modifications
 
@@ -567,7 +582,7 @@ public class XarExtensionHandlerTest
 
         install(this.localXarExtensiontId2, "wiki", this.contextUser);
 
-        verifyHasAdminRight(3);
+        verifyHasAdminRight(6);
 
         // validate
 
@@ -644,6 +659,22 @@ public class XarExtensionHandlerTest
         Assert.assertNull("Document wiki:space.pagewithobject does not contain an XWiki.XWikiGroups object",
             pagewithobject.getXObject(new LocalDocumentReference("XWiki", "XWikiGroups")));
 
+        // space.movedpage
+
+        XWikiDocument movedpage = this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "space", "movedpage"), getXWikiContext());
+
+        Assert.assertFalse("Document wiki:space.movedpage has been removed", movedpage.isNew());
+        Assert.assertEquals("content 2.0", movedpage.getContent());
+
+        // space.dependencypage
+
+        XWikiDocument dependencypage = this.oldcore.getSpyXWiki()
+            .getDocument(new DocumentReference("wiki", "space", "dependencypage"), getXWikiContext());
+
+        Assert.assertFalse("Document wiki:space.dependencypage has been removed", dependencypage.isNew());
+        Assert.assertEquals("otherdependency 2.0", dependencypage.getContent());
+
         // space1.modified
 
         XWikiDocument space1modified = this.oldcore.getSpyXWiki()
@@ -659,7 +690,7 @@ public class XarExtensionHandlerTest
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 
-        verifyHasAdminRight(2);
+        verifyHasAdminRight(3);
 
         // Do some local modifications
 
@@ -684,7 +715,7 @@ public class XarExtensionHandlerTest
 
         install(this.localXarExtensiontId2, null, this.contextUser);
 
-        verifyHasAdminRight(3);
+        verifyHasAdminRight(6);
 
         // validate
 
@@ -773,13 +804,13 @@ public class XarExtensionHandlerTest
     {
         install(this.localXarExtensiontId2, "wiki", this.contextUser);
 
-        verifyHasAdminRight(1);
+        verifyHasAdminRight(3);
 
         // upgrade
 
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
-        verifyHasAdminRight(3);
+        verifyHasAdminRight(4);
 
         // validate
 
@@ -830,13 +861,13 @@ public class XarExtensionHandlerTest
     {
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
-        verifyHasAdminRight(2);
+        verifyHasAdminRight(3);
 
         // uninstall
 
         uninstall(this.localXarExtensiontId1, "wiki");
 
-        verifyHasAdminRight(3);
+        verifyHasAdminRight(4);
 
         // validate
 
@@ -864,13 +895,13 @@ public class XarExtensionHandlerTest
 
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
-        verifyHasAdminRight(2);
+        verifyHasAdminRight(3);
 
         // uninstall
 
         uninstall(this.localXarExtensiontId1, "wiki");
 
-        verifyHasAdminRight(3);
+        verifyHasAdminRight(4);
 
         // validate
 
@@ -927,7 +958,7 @@ public class XarExtensionHandlerTest
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 
-        verifyHasAdminRight(2);
+        verifyHasAdminRight(3);
 
         // validate
 
@@ -951,7 +982,7 @@ public class XarExtensionHandlerTest
 
         uninstall(this.localXarExtensiontId1, null);
 
-        verifyHasAdminRight(3);
+        verifyHasAdminRight(4);
 
         // validate
 
@@ -1007,7 +1038,7 @@ public class XarExtensionHandlerTest
 
         install(this.localXarExtensiontId1, null, this.contextUser);
 
-        verifyHasAdminRight(2);
+        verifyHasAdminRight(3);
 
         setHasNoAdminRight();
 
@@ -1021,7 +1052,7 @@ public class XarExtensionHandlerTest
     {
         install(this.localXarExtensiontId1, "wiki", this.contextUser);
 
-        verifyHasAdminRight(2);
+        verifyHasAdminRight(3);
 
         setHasNoAdminRight();
 

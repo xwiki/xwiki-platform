@@ -467,8 +467,6 @@ public class DocumentLocaleReader extends AbstractReader
                     }
                 } else if (XarDocumentModel.ELEMENT_REVISION.equals(elementName)) {
                     this.currentDocumentRevision = xmlReader.getElementText();
-                } else if (XarDocumentModel.ELEMENT_ISTRANSLATION.equals(elementName)) {
-                    StAXUtils.skipElement(xmlReader);
                 } else {
                     EventParameter parameter = XARDocumentModel.DOCUMENT_PARAMETERS.get(elementName);
 
@@ -500,8 +498,10 @@ public class DocumentLocaleReader extends AbstractReader
                                 if (objectValue != null) {
                                     this.currentDocumentRevisionParameters.put(parameter.name, objectValue);
                                 }
-                            } else {
+                            } else if (!XARDocumentModel.DOCUMENT_SKIPPEDPARAMETERS.contains(elementName)) {
                                 unknownElement(xmlReader);
+                            } else {
+                                StAXUtils.skipElement(xmlReader);
                             }
                         }
                     }

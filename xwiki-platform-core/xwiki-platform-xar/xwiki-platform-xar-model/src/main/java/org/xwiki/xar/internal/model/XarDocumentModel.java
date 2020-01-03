@@ -103,6 +103,16 @@ public class XarDocumentModel
 
     public static final String ELEMENT_DEFAULTTEMPLATE = "defaultTemplate";
 
+    /**
+     * TODO: https://jira.xwiki.org/browse/XWIKI-16289
+     * 
+     * @since 12.0RC1
+     * @since 11.10.3
+     * @since 11.3.7
+     * @since 10.11.11
+     */
+    public static final String ELEMENT_TEMPLATE = "template";
+
     public static final String ELEMENT_VALIDATIONSCRIPT = "validationScript";
 
     public static final String ELEMENT_SYNTAX = "syntaxId";

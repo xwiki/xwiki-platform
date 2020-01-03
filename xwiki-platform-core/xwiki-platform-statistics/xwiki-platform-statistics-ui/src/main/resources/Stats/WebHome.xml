@@ -53,7 +53,7 @@
   {{warning}}$services.localization.render('xe.statistics.module.disabled'){{/warning}}
 
   #set ($mono = '##')
-  $services.localization.render('xe.statistics.module.settingvalue') ${mono}xwiki.stats${mono} $services.localization.render('xe.statistics.to') ${mono}1${mono} $services.localization.render('xe.statistics.inthe') ${mono}xwiki.cfg${mono} $services.localization.render('xe.statistics.moredetails') [[xwiki.org&gt;&gt;http://www.xwiki.org]].
+  $services.localization.render('xe.statistics.module.settingvalue') ${mono}xwiki.stats.default${mono} $services.localization.render('xe.statistics.to') ${mono}1${mono} $services.localization.render('xe.statistics.inthe') ${mono}xwiki.cfg${mono} $services.localization.render('xe.statistics.moredetails') [[xwiki.org&gt;&gt;http://www.xwiki.org]].
 
   $services.localization.render('xe.statistics.module.activating')
 

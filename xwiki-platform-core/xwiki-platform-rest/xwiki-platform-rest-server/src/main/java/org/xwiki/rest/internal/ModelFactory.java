@@ -728,6 +728,7 @@ public class ModelFactory
 
         page.setComment(doc.getComment());
         page.setContent(doc.getContent());
+        page.setHierarchy(toRestHierarchy(doc.getDocumentReference(), withPrettyNames));
 
         if (self != null) {
             Link pageLink = this.objectFactory.createLink();

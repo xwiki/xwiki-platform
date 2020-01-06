@@ -126,7 +126,7 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
         return output;
       }
     },
-    searchField: ['value', 'label'],
+    searchField: ['value', 'label', 'hint'],
     onType: function(value) {
       // Mark the picker as loading if the suggestions are retrieved asynchronously and there's no cached result for the
       // given value.

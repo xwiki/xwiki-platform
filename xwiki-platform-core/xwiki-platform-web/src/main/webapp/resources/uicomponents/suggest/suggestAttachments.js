@@ -312,7 +312,7 @@ define('xwiki-suggestAttachments', [
       documentReference: select.data('documentReference'),
       // Where to look for attachments. The following is supported:
       // * "wiki:wikiName" look for attachments in the specified wiki
-      // * "space:spaceReference": look for attachments in the specified space
+      // * "space:spaceReference" look for attachments in the specified space
       // * "document:documentReference" look for attachments in the specified document
       searchScope: select.data('searchScope'),
       // Whether or not to use the attachment name (instead of its relative reference) as value when the search scope is

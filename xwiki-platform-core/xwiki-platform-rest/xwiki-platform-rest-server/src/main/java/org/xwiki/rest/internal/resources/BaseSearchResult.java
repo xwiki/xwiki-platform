@@ -34,6 +34,8 @@ import javax.ws.rs.core.UriBuilderException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.localization.LocalizationContext;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
@@ -86,9 +88,12 @@ public class BaseSearchResult extends XWikiResource
 
     @Inject
     private LocalizationContext localizationContext;
-    
+
     @Inject
     private ModelFactory modelFactory;
+
+    @Inject
+    private EntityReferenceProvider defaultEntityReferenceProvider;
 
     /**
      * Search for keyword in the given scopes. See {@link SearchScope} for more information.
@@ -191,7 +196,9 @@ public class BaseSearchResult extends XWikiResource
                         acceptedScopes++;
                         break;
                     case NAME:
-                        f.format("upper(doc.fullName) like :keywords ");
+                        String matchTerminalPage = "doc.name <> :defaultDocName and upper(doc.fullName) like :keywords";
+                        String matchNestedPage = "doc.name = :defaultDocName and upper(doc.space) like :keywords";
+                        f.format("((%s) or (%s)) ", matchTerminalPage, matchNestedPage);
                         acceptedScopes++;
                         break;
                     case TITLE:
@@ -249,6 +256,11 @@ public class BaseSearchResult extends XWikiResource
 
             if (space != null) {
                 query.bindValue("space", space);
+            }
+
+            if (searchScopes.contains(SearchScope.NAME)) {
+                query.bindValue("defaultDocName",
+                    this.defaultEntityReferenceProvider.getDefaultReference(EntityType.DOCUMENT).getName());
             }
 
             // Search only pages translated in the user locale (e.g. fr_CA)
@@ -340,7 +352,8 @@ public class BaseSearchResult extends XWikiResource
                 pageLink.setRel(Relations.PAGE);
                 searchResult.getLinks().add(pageLink);
 
-                searchResult.setHierarchy(this.modelFactory.toRestHierarchy(doc.getDocumentReference(), true));
+                searchResult
+                    .setHierarchy(this.modelFactory.toRestHierarchy(doc.getDocumentReference(), withPrettyNames));
 
                 result.add(searchResult);
             }

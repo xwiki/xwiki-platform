@@ -46,6 +46,17 @@
     #set ($document = $xwiki.getDocument($request.document))
   #end
   #if ($document &amp;&amp; $document.hasAccessLevel('edit'))
+    ## If the attachment is uploaded to a new document then make sure we create the document with the right default
+    ## locale. See CKEDITOR-316: Document translations are created when uploading a file from the WYSIWYG editor in a
+    ## multi-language wiki. The following code replicates the behavior of the Upload action, but it has the desired
+    ## effect only on XWiki 11.9+
+    #if ($document.isNew())
+      #set ($rootLocale = $services.localization.toLocale(''))
+      #set ($discard = $document.setLocale($rootLocale))
+      #if ($rootLocale.equals($document.getDefaultLocale()))
+        #set ($discard = $document.setDefaultLocale($xwiki.getLocalePreference()))
+      #end
+    #end
     ## FIXME: Get the file content as an input stream instead of a byte array, but for this we need to expose
     ## getFileItemInputStream in the public API of the fileupload plugin (or use a script service).
     #set ($bytes = $xwiki.fileupload.getFileItemData('upload'))

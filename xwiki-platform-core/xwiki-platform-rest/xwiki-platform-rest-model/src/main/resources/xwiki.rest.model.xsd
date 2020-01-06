@@ -138,6 +138,7 @@
           <element name="class" type="xwiki:Class" minOccurs="0" maxOccurs="1"></element>
           <element name="objects" type="xwiki:Objects" minOccurs="0" maxOccurs="1"></element>
           <element name="attachments" type="xwiki:Attachments" minOccurs="0" maxOccurs="1"></element>
+          <element name="hierarchy" type="xwiki:Hierarchy" minOccurs="0"></element>
         </sequence>
       </extension>
     </complexContent>

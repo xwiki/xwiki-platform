@@ -37,8 +37,11 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
       documentReference: select.data('documentReference'),
       // Where to look for pages. The following is supported:
       // * "wiki:wikiName" look for pages in the specified wiki
-      // * "space:spaceReference": look for pages in the specified space
+      // * "space:spaceReference" look for pages in the specified space
       searchScope: select.data('searchScope'),
+      // We overwrite the list of search fields because we don't want to match the technical "WebHome" nested page name
+      // that appears in the value.
+      searchField: ['searchValue', 'label', 'hint'],
       load: function(text, callback) {
         loadPages(text, this.settings).done(callback).fail(callback);
       },
@@ -74,21 +77,24 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   };
 
   var loadPages = function(text, options) {
-    var scopes = ['name', 'title'];
     return $.getJSON(getRestSearchURL(options.searchScope), $.param({
-      'q': text,
-      'scope': scopes,
-      'number': 10,
-      'localeAware': true,
-      'media': 'json'
+      q: text,
+      scope: ['name', 'title'],
+      number: 10,
+      localeAware: true,
+      prettyNames: true
     }, true)).then($.proxy(processPages, null, options));
   };
 
   var loadPage = function(value, options) {
     var documentReference = XWiki.Model.resolve(value, XWiki.EntityType.DOCUMENT, options.documentReference);
-    var localValue = XWiki.Model.serialize(documentReference.relativeTo(options.searchScope.getRoot()));
-    // TODO: Call the document REST URL instead, when it will include the page hierarchy.
-    return loadPages(localValue, options);
+    var documentRestURL = new XWiki.Document(documentReference).getRestURL();
+    return $.getJSON(documentRestURL, $.param({
+      prettyNames: true
+    })).then($.proxy(processPage, null, options)).then(function(page) {
+      // An array is expected in xwiki.selectize.js
+      return [page];
+    });
   };
 
   var getRestSearchURL = function(searchScope) {
@@ -115,12 +121,16 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
   var processPage = function(options, page) {
     // Value (relative to the current wiki, where it is saved)
     var documentReference = XWiki.Model.resolve(page.id, XWiki.EntityType.DOCUMENT);
-    var value = XWiki.Model.serialize(documentReference.relativeTo(options.documentReference.getRoot()));
+    var relativeReference = documentReference.relativeTo(options.documentReference.getRoot());
+    var value = XWiki.Model.serialize(relativeReference);
+    var searchValue = value;
     // Label
     var hierarchy = page.hierarchy.items;
     var label = hierarchy.pop().label;
-    if (page.pageName === webHome) {
+    if (documentReference.name === webHome) {
       label = hierarchy.pop().label;
+      // See XWIKI-16935: Page Picker shouldn't show results matching the technical "WebHome".
+      searchValue = XWiki.Model.serialize(relativeReference.parent);
     }
     // Hint
     var hint = hierarchy.filter(function(item) {
@@ -129,11 +139,12 @@ define('xwiki-suggestPages', ['jquery', 'xwiki-selectize'], function($) {
       return item.label;
     }).join(' / ');
     return {
-      'value': value,
-      'label': label,
-      'hint': hint,
-      'icon': pageIcon,
-      'url': new XWiki.Document(documentReference).getURL()
+      value: value,
+      searchValue: searchValue,
+      label: label,
+      hint: hint,
+      icon: pageIcon,
+      url: new XWiki.Document(documentReference).getURL()
     };
   };
 

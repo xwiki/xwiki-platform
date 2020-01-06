@@ -1141,6 +1141,24 @@ td.cke_dialog_contents_body {
 }
 
 /**
+ * Make sure the footer of the entity resource picker modal is always visible because otherwise the user has to scroll a
+ * lot when the entity tree is expanded in order to click on the modal buttons to select an entity. See CKEDITOR-317:
+ * "Select page" dialog should scroll so that dialog buttons are always visible.
+ */
+.modal.entity-resource-picker-modal .ckeditor-tree {
+  /**
+   * modal margin + header + body padding + tree finder + footer = 268px
+   * modal margin = 2 x 30px
+   * header = 61px
+   * body padding = 2 x 15px
+   * tree finder = 48px
+   * footer = 69px
+   */
+  max-height: calc(100vh - 268px);
+  overflow-y: auto;
+}
+
+/**
  * Link Options Toggle
  */
 

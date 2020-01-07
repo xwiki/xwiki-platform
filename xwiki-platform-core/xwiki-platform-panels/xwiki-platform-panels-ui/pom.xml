@@ -129,8 +129,8 @@
                considered as a content page and thus would require a language of "en" -->
           <contentPages combine.self="override" />
           <technicalPages>
-            <technicalPage>EditTranslations\.xml</technicalPage>
-            <technicalPage>(?!Translation.*\.xml).*\.xml</technicalPage>
+            <technicalPage>.*/EditTranslations\.xml</technicalPage>
+            <technicalPage>(?!.*/Translation.*\.xml).*\.xml</technicalPage>
           </technicalPages>
           <entries>
             <!-- The Quick Links Panel contains demo content and is meant to be modified by users -->

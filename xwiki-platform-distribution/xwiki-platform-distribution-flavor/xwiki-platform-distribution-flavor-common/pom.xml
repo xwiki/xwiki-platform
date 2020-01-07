@@ -217,4 +217,25 @@
       </dependencies>
     </profile>
   </profiles>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <entries>
+            <entry>
+              <document>PanelsCode.ApplicationsPanelConfiguration</document>
+              <type>customizable</type>
+            </entry>
+            <entry>
+              <document>PanelsCode.NavigationConfiguration</document>
+              <type>customizable</type>
+            </entry>
+          </entries>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

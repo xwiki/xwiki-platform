@@ -1,6 +1,6 @@
 /*!
 #set ($minified = '.min')
-#if ($request.minify == 'false')
+#if (!$services.debug.minify)
   #set ($minified = '')
 #end
 */

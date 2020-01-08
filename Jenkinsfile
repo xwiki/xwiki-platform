@@ -197,10 +197,6 @@ private void buildStandardAll(builds)
           // Run the Flavor Escaping tests
           builds['Flavor Test - Escaping'].call()
         },
-        'flavor-test-selenium': {
-          // Run the Flavor Selenium tests
-          builds['Flavor Test - Selenium'].call()
-        },
         'flavor-test-webstandards': {
           // Run the Flavor Webstandards tests
           // Note: -XX:ThreadStackSize=2048 is used to prevent a StackOverflowError error when using the HTML5 Nu

@@ -42,7 +42,7 @@ import org.xwiki.xml.stax.StAXUtils;
 public abstract class AbstractReader
 {
     @Inject
-    private Logger logger;
+    protected Logger logger;
 
     protected <T> T convert(Class<?> type, String source) throws FilterException
     {

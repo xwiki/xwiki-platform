@@ -42,6 +42,7 @@
     <filesize>10</filesize>
   </attachment>
   <class>
+    <unknown><unknown>value</unknown></unknown>
     <name>space.page</name>
     <customClass>customClass</customClass>
     <customMapping>customMapping</customMapping>
@@ -69,6 +70,7 @@
     <className>space.page</className>
     <guid>e2167721-2a64-430c-9520-bac1c0ee68cb</guid>
     <class>
+      <unknown><unknown>value</unknown></unknown>
       <name>space.page</name>
       <customClass>customClass</customClass>
       <customMapping>customMapping</customMapping>

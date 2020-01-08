@@ -87,9 +87,12 @@ public class ClassPropertyReader extends AbstractReader implements XARXMLReader<
             }
         }
 
+        // Skip properties with no type (might be some unknown new class fields and not a property)
         if (wikiClassProperty.type == null) {
-            throw new FilterException(
-                String.format("No <classType> element found for property [%s]", wikiClassProperty.name));
+            this.logger.warn("Unknown element [{}] at line [{}]", xmlReader.getLocalName(),
+                xmlReader.getLocation().getLineNumber());
+
+            return null;
         }
 
         return wikiClassProperty;

@@ -155,10 +155,10 @@ public class OfficeImporterIT
         deletePage(testName);
 
         // Test ODT file with accents
-        resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù <!-_.+*();?:@=.odt");
+        resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù !-_.+*();@=.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
         wikiEditPage = resultPage.editWiki();
-        regex = "(?<imageName>Test_accents & e\\$u <!-_\\.\\+\\*\\(\\);\\?:\\\\@=_html_[\\w]+\\.png)";
+        regex = "(?<imageName>Test_accents & e\\$u !-_\\.\\+\\*\\(\\);\\\\@=_html_[\\w]+\\.png)";
         pattern = Pattern.compile(regex, Pattern.MULTILINE);
         matcher = pattern.matcher(wikiEditPage.getContent());
         assertTrue(matcher.find());
@@ -171,14 +171,14 @@ public class OfficeImporterIT
         deletePage(testName);
 
         // Test power point file with accents
-        resultPage = importFile(testName, "msoffice.97-2003/Test_accents & é$ù <!-_.+*();?:@=.ppt");
+        resultPage = importFile(testName, "msoffice.97-2003/Test_accents & é$ù !-_.+*();@=.ppt");
         attachmentsPane = resultPage.openAttachmentsDocExtraPane();
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u <!-_.+*();?:@=-slide0.jpg"));
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u <!-_.+*();?:@=-slide1.jpg"));
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u <!-_.+*();?:@=-slide2.jpg"));
-        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u <!-_.+*();?:@=-slide3.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+*();@=-slide0.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+*();@=-slide1.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+*();@=-slide2.jpg"));
+        assertTrue(attachmentsPane.attachmentExistsByFileName("Test_accents & e$u !-_.+*();@=-slide3.jpg"));
         wikiEditPage = resultPage.editWiki();
-        assertTrue(wikiEditPage.getContent().contains("[[image:Test_accents & e$u <!-_.+*();?:\\@=-slide0.jpg]]"));
+        assertTrue(wikiEditPage.getContent().contains("[[image:Test_accents & e$u !-_.+*();\\@=-slide0.jpg]]"));
         resultPage = wikiEditPage.clickCancel();
         deletePage(testName);
     }

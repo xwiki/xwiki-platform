@@ -217,8 +217,8 @@ public class ExportAction extends XWikiAction
         String description = request.get("description");
         boolean history = Boolean.valueOf(request.get("history"));
         boolean attachmentJRCS =
-            getBooleanProperty("attachment_jrcs", "xwiki.action.export.xar.attachment.jrcs", false, context);
-        boolean optimized = getBooleanProperty("optimized", "xwiki.action.export.xar.optimized", false, context);
+            getBooleanProperty("attachment_jrcs", "xwiki.action.export.xar.attachment.jrcs", true, context);
+        boolean optimized = getBooleanProperty("optimized", "xwiki.action.export.xar.optimized", true, context);
         boolean backup = Boolean.valueOf(request.get("backup"));
         String author = request.get("author");
         String licence = request.get("licence");

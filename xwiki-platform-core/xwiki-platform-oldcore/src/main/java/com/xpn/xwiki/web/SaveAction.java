@@ -136,6 +136,13 @@ public class SaveAction extends PreviewAction
             sectionNumber = Integer.parseInt(request.getParameter("section"));
         }
 
+        if (doc.isNew() && !this.isEntityReferenceNameValid(doc.getDocumentReference())) {
+            context.put("message", "namestrategies.create.invalidname");
+            context.put("messageParameters",
+                new Object[] { getLocalSerializer().serialize(doc.getDocumentReference())});
+            return true;
+        }
+
         XWikiDocument originalDoc = doc;
 
         // We need to clone this document first, since a cached storage would return the same object for the

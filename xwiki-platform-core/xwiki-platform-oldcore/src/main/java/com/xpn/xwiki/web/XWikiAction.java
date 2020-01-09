@@ -65,6 +65,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.namestrategies.EntityReferenceNameStrategyManager;
+import org.xwiki.namestrategies.NameStrategyConfiguration;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.WrappedThreadEventListener;
 import org.xwiki.rendering.async.AsyncContext;
@@ -155,6 +157,12 @@ public abstract class XWikiAction extends Action
 
     private ScriptContextManager scriptContextManager;
 
+    private EntityReferenceNameStrategyManager entityReferenceNameStrategyManager;
+
+    private NameStrategyConfiguration nameStrategyConfiguration;
+
+    private EntityReferenceSerializer<String> localSerializer;
+
     protected ContextualLocalizationManager getLocalization()
     {
         if (this.localization == null) {
@@ -176,6 +184,31 @@ public abstract class XWikiAction extends Action
         }
 
         return this.progress;
+    }
+
+    protected EntityReferenceNameStrategyManager getEntityReferenceNameStrategyManager()
+    {
+        if (this.entityReferenceNameStrategyManager == null) {
+            this.entityReferenceNameStrategyManager = Utils.getComponent(EntityReferenceNameStrategyManager.class);
+        }
+        return this.entityReferenceNameStrategyManager;
+    }
+
+    protected NameStrategyConfiguration getNameStrategyConfiguration()
+    {
+        if (this.nameStrategyConfiguration == null) {
+            this.nameStrategyConfiguration = Utils.getComponent(NameStrategyConfiguration.class);
+        }
+
+        return this.nameStrategyConfiguration;
+    }
+
+    protected EntityReferenceSerializer<String> getLocalSerializer()
+    {
+        if (this.localSerializer == null) {
+            this.localSerializer = Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        }
+        return this.localSerializer;
     }
 
     /**
@@ -223,6 +256,34 @@ public abstract class XWikiAction extends Action
         }
 
         return actionForward;
+    }
+
+    /**
+     * Ensure that the given entity reference is valid according to the configured name strategy. Always returns true
+     * if the name strategy is not found.
+     *
+     * @param entityReference the entity reference name to validate
+     * @return {@code true} if the entity reference name is valid according to the name strategy.
+     * @since 12.0RC1
+     */
+    @Unstable
+    protected boolean isEntityReferenceNameValid(EntityReference entityReference)
+    {
+        if (this.getEntityReferenceNameStrategyManager().getEntityReferenceNameStrategy() != null
+            && this.getNameStrategyConfiguration().useValidation()) {
+            if (!this.getEntityReferenceNameStrategyManager().getEntityReferenceNameStrategy()
+                .isValid(entityReference)) {
+                Object[] args = { getLocalSerializer().serialize(entityReference) };
+                XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID,
+                    "Cannot create document {0} because its name does not respect the name strategy of the wiki.",
+                    null, args);
+                ScriptContext scontext = getCurrentScriptContext();
+                scontext.setAttribute("createException", invalidNameException, ScriptContext.ENGINE_SCOPE);
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -997,11 +1058,9 @@ public abstract class XWikiAction extends Action
                     // Consider the reference as a Space Reference and Construct a new reference to the home of that
                     // Space. Then generate the URL for it and forward to it
                     SpaceReference spaceReference = new SpaceReference(reference.getName(), reference.getParent());
-                    EntityReferenceSerializer<String> localSerializer =
-                        Utils.getComponent(EntityReferenceSerializer.TYPE_STRING, "local");
                     // Extract the anchor
                     String anchor = new URL(context.getRequest().getRequestURL().toString()).getRef();
-                    URL forwardURL = urlf.createURL(localSerializer.serialize(spaceReference), defaultDocumentName,
+                    URL forwardURL = urlf.createURL(getLocalSerializer().serialize(spaceReference), defaultDocumentName,
                         action, context.getRequest().getQueryString(), anchor,
                         spaceReference.getWikiReference().getName(), context);
                     // Since createURL() contain the webapp context and since RequestDispatcher should not contain it,

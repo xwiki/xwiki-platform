@@ -1,0 +1,681 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.NameStrategies.Administration" locale="">
+  <web>XWiki.NameStrategies</web>
+  <name>Administration</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.NameStrategies.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>true</hidden>
+  <content>{{velocity}}
+#set ($configurationPageReference = $services.model.resolveDocument("XWiki.NameStrategies.Configuration"))
+#set ($manager = $services.namestrategies.manager)
+#set ($config = $services.namestrategies.configuration)
+#set ($replaceCharacterConfig = $services.namestrategies.replaceCharacterNameStrategyConfiguration)
+#set ($configurationPage = $xwiki.getDocument($configurationPageReference))
+#if ($configurationPage.isNew() || !$configurationPage.getObject('XWiki.NameStrategies.ConfigurationClass'))
+    #set($configObject = $configurationPage.newObject('XWiki.NameStrategies.ConfigurationClass'))
+    #set($discard = $configurationPage.save())
+#end
+
+#macro (createReplacementCharacterModal)
+  &lt;div class="modal" id="createReplacementCharacterModal" tabindex="-1" role="dialog" aria-labelledby="createReplacementCharacterModal-label"
+      data-backdrop="static" data-keyboard="false"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title" id="createReplacementCharacterModal-label"&gt;
+            $escapetool.xml($services.localization.render('namestrategies.replacementCharacter.addNewCharacter'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;
+              &lt;label for="newForbiddenCharacter"&gt;$services.localization.render('namestrategies.replacementCharacter.newForbiddenCharacter.label')&lt;/label&gt;
+              &lt;span class='xHint'&gt;$services.localization.render('namestrategies.replacementCharacter.newForbiddenCharacter.hint')&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              &lt;input type="text" placeholder="$services.localization.render('namestrategies.replacementCharacter.newForbiddenCharacter.placeholder')" id="newForbiddenCharacter" /&gt;
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;
+              &lt;label for="newForbiddenCharacter"&gt;$services.localization.render('namestrategies.replacementCharacter.newReplacementCharacter.label')&lt;/label&gt;
+              &lt;span class='xHint'&gt;$services.localization.render('namestrategies.replacementCharacter.newReplacementCharacter.hint')&lt;/span&gt;
+            &lt;/dt&gt;
+            &lt;dd&gt;
+              &lt;input type="text" placeholder="$services.localization.render('namestrategies.replacementCharacter.newReplacementCharacter.placeholder')" id="newReplacementCharacter" /&gt;
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-primary" disabled="disabled"&gt;
+            $escapetool.xml($services.localization.render('namestrategies.replacementCharacter.add'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#macro (removeReplacementCharacterModal)
+  &lt;div class="modal" id="removeReplacementCharacterModal" tabindex="-1" role="dialog" aria-labelledby="removeReplacementCharacterModal-label"
+      data-backdrop="static" data-keyboard="false"&gt;
+    &lt;div class="modal-dialog" role="document"&gt;
+      &lt;div class="modal-content"&gt;
+        &lt;div class="modal-header"&gt;
+          &lt;button type="button" class="close" data-dismiss="modal" aria-label="Close"&gt;
+            &lt;span aria-hidden="true"&gt;&amp;times;&lt;/span&gt;
+          &lt;/button&gt;
+          &lt;div class="modal-title" id="removeReplacementCharacterModal-label"&gt;
+            $escapetool.xml($services.localization.render('namestrategies.replacementCharacter.removeCharacter'))
+          &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="modal-body"&gt;
+          $services.localization.render('namestrategies.replacementCharacter.removeCharacter.warning')
+        &lt;/div&gt;
+        &lt;div class="modal-footer"&gt;
+          &lt;button type="button" class="btn btn-default" data-dismiss="modal"&gt;
+            $escapetool.xml($services.localization.render('cancel'))
+          &lt;/button&gt;
+          &lt;button type="button" class="btn btn-danger"&gt;
+            $escapetool.xml($services.localization.render('namestrategies.replacementCharacter.removeCharacter.remove'))
+          &lt;/button&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+#end
+
+#set ($discard = $xwiki.jsx.use('XWiki.NameStrategies.Administration'))
+#set ($selectedStrategy = $config.getEntityReferenceNameStrategy())
+{{html clean="false"}}
+&lt;form method="post" id="nameStrategiesConfigForm" action="${xwiki.getURL('XWiki.NameStrategies.Configuration', 'save')}" class='xform'&gt;
+  &lt;div class="hidden"&gt;
+    &lt;input type='hidden' name='form_token' value="$!{services.csrf.getToken()}" /&gt;
+    &lt;input type='hidden' name='xredirect' value="$xwiki.getRequestURL()" /&gt;
+  &lt;/div&gt;
+  &lt;dl&gt;
+    &lt;dt&gt;
+      &lt;label for="XWiki.NameStrategies.ConfigurationClass_0_currentStrategy"&gt;$services.localization.render('namestrategies.currentStrategy.label')&lt;/label&gt;
+      &lt;span class='xHint'&gt;$services.localization.render('namestrategies.currentStrategy.hint')&lt;/span&gt;
+    &lt;/dt&gt;
+    &lt;dd&gt;
+      &lt;select name="XWiki.NameStrategies.ConfigurationClass_0_currentStrategy" id="XWiki.NameStrategies.ConfigurationClass_0_currentStrategy"&gt;
+        #foreach ($nameStrategy in $manager.getAvailableEntityReferenceNameStrategies())
+          &lt;option value="${nameStrategy}" #if($nameStrategy == $selectedStrategy)selected='selected'#end&gt;
+            $services.localization.render("namestrategies.${nameStrategy}.name")
+          &lt;/option&gt;
+        #end
+      &lt;/select&gt;
+    &lt;/dd&gt;
+  &lt;/dl&gt;
+   &lt;dl&gt;
+     &lt;dt&gt;
+       &lt;label for="XWiki.NameStrategies.ConfigurationClass_0_useTransformation"&gt;$services.localization.render('namestrategies.useTransformation.label')&lt;/label&gt;
+       &lt;span class='xHint'&gt;$services.localization.render('namestrategies.useTransformation.hint')&lt;/span&gt;
+     &lt;dt&gt;
+     &lt;dd&gt;
+       &lt;select name="XWiki.NameStrategies.ConfigurationClass_0_useTransformation" id="XWiki.NameStrategies.ConfigurationClass_0_useTransformation"&gt;
+         &lt;option value="0" #if(!$config.useTransformation())selected="selected"#end&gt;$services.localization.render('disabled')&lt;/option&gt;
+         &lt;option value="1" #if($config.useTransformation())selected="selected"#end&gt;$services.localization.render('enabled')&lt;/option&gt;
+       &lt;/select&gt;
+     &lt;/dd&gt;
+  &lt;/dl&gt;
+  &lt;dl&gt;
+     &lt;dt&gt;
+       &lt;label for="XWiki.NameStrategies.ConfigurationClass_0_useValidation"&gt;$services.localization.render('namestrategies.useValidation.label')&lt;/label&gt;
+       &lt;span class='xHint'&gt;$services.localization.render('namestrategies.useValidation.hint')&lt;/span&gt;
+     &lt;dt&gt;
+     &lt;dd&gt;
+       &lt;select name="XWiki.NameStrategies.ConfigurationClass_0_useValidation" id="XWiki.NameStrategies.ConfigurationClass_0_useValidation"&gt;
+         &lt;option value="0" #if(!$config.useValidation())selected="selected"#end&gt;$services.localization.render('disabled')&lt;/option&gt;
+         &lt;option value="1" #if($config.useValidation())selected="selected"#end&gt;$services.localization.render('enabled')&lt;/option&gt;
+       &lt;/select&gt;
+     &lt;/dd&gt;
+  &lt;/dl&gt;
+  &lt;div id="character-replacement-options" class="hidden"&gt;
+    &lt;h3&gt;$services.localization.render('namestrategies.replacementCharacter.configuration')&lt;/h3&gt;
+    #set($ltOptions = {
+       "rowCount": 10,
+       "resultPage": "XWiki.NameStrategies.AdministrationJSON",
+       "outputOnlyHtml": true,
+       "translationPrefix" : "namestrategies.replacementCharacter.livetable.",
+       "pageSize": false,
+       "queryFilters": ""
+    })
+    #set($columns = ["forbiddenCharacter", "replacementCharacter", "_actions"])
+    #set($columnsProperties = {
+      "forbiddenCharacter": { "type": "text" },
+      "replacementCharacter": { "type": "text" },
+      "_actions": { "actions": ["delete"] }
+    })
+    #livetable("replacementCharacters" $columns $columnsProperties $ltOptions)
+    #createReplacementCharacterModal()
+    #removeReplacementCharacterModal()
+    &lt;div class='buttonwrapper'&gt;
+      &lt;input id="addNewCharacter" value="$services.localization.render('namestrategies.replacementCharacter.add')" class='button hidden' type='button' data-toggle="modal" data-target="${escapetool.h}createReplacementCharacterModal"&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;dl&gt;
+     &lt;dt&gt;
+       &lt;label for="testNameStrategy"&gt;$services.localization.render('namestrategies.testStrategy.label')&lt;/label&gt;
+       &lt;span class='xHint'&gt;$services.localization.render('namestrategies.testStrategy.hint')&lt;/span&gt;
+     &lt;dt&gt;
+     &lt;dd&gt;
+       &lt;input type="text" placeholder="$services.localization.render('namestrategies.testStrategy.placeholder')" id="testNameStrategy" /&gt;
+     &lt;/dd&gt;
+  &lt;/dl&gt;
+  &lt;dl class="hidden test-strategy"&gt;
+    &lt;dt&gt;
+      $services.localization.render('namestrategies.testStrategy.validName')
+    &lt;/dt&gt;
+     &lt;dd&gt;
+         &lt;span id="testNameStrategyIsValid_true" class="hidden"&gt;$services.localization.render('yes')&lt;/span&gt;
+         &lt;span id="testNameStrategyIsValid_false" class="hidden"&gt;$services.localization.render('no')&lt;/span&gt;
+     &lt;/dd&gt;
+  &lt;/dl&gt;
+  &lt;dl class="hidden test-strategy"&gt;
+     &lt;dt&gt;
+       $services.localization.render('namestrategies.testStrategy.transformedName')
+     &lt;/dt&gt;
+     &lt;dd&gt;
+         &lt;span id="testNameStrategyTransformedName"&gt;&lt;/span&gt;
+     &lt;/dd&gt;
+  &lt;/dl&gt;
+  &lt;div class='buttonwrapper'&gt;
+    &lt;input value="$services.localization.render('admin.save')" class='button' type='submit'&gt;
+    &lt;input id="addNewCharacter" value="$services.localization.render('namestrategies.replacementCharacter.add')" class='btn hidden btn-default' type='button' data-toggle="modal" data-target="${escapetool.h}createReplacementCharacterModal"&gt;
+  &lt;/div&gt;
+&lt;/form&gt;
+{{/html}}
+{{/velocity}}</content>
+  <object>
+    <name>XWiki.NameStrategies.Administration</name>
+    <number>0</number>
+    <className>XWiki.ConfigurableClass</className>
+    <guid>419278a5-1e8a-4770-b5c4-366fc135ebcb</guid>
+    <class>
+      <name>XWiki.ConfigurableClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <categoryIcon>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>categoryIcon</name>
+        <number>11</number>
+        <picker>0</picker>
+        <prettyName>categoryIcon</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </categoryIcon>
+      <codeToExecute>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>codeToExecute</name>
+        <number>7</number>
+        <picker>0</picker>
+        <prettyName>codeToExecute</prettyName>
+        <rows>5</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </codeToExecute>
+      <configurationClass>
+        <cache>0</cache>
+        <classname/>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <hint/>
+        <idField/>
+        <multiSelect>0</multiSelect>
+        <name>configurationClass</name>
+        <number>3</number>
+        <picker>1</picker>
+        <prettyName>configurationClass</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators/>
+        <size>30</size>
+        <sort>none</sort>
+        <sql/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <valueField/>
+        <classType>com.xpn.xwiki.objects.classes.PageClass</classType>
+      </configurationClass>
+      <configureGlobally>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>checkbox</displayFormType>
+        <displayType/>
+        <name>configureGlobally</name>
+        <number>4</number>
+        <prettyName>configureGlobally</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </configureGlobally>
+      <displayBeforeCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayBeforeCategory</name>
+        <number>10</number>
+        <picker>0</picker>
+        <prettyName>displayBeforeCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayBeforeCategory>
+      <displayInCategory>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayInCategory</name>
+        <number>9</number>
+        <picker>0</picker>
+        <prettyName>displayInCategory</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInCategory>
+      <displayInSection>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>displayInSection</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>displayInSection</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </displayInSection>
+      <heading>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>heading</name>
+        <number>2</number>
+        <picker>0</picker>
+        <prettyName>heading</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </heading>
+      <iconAttachment>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>iconAttachment</name>
+        <number>8</number>
+        <picker>0</picker>
+        <prettyName>iconAttachment</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </iconAttachment>
+      <linkPrefix>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>linkPrefix</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>linkPrefix</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </linkPrefix>
+      <propertiesToShow>
+        <cache>0</cache>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <multiSelect>1</multiSelect>
+        <name>propertiesToShow</name>
+        <number>6</number>
+        <picker>0</picker>
+        <prettyName>propertiesToShow</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator> </separator>
+        <separators> ,|</separators>
+        <size>20</size>
+        <sort>none</sort>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </propertiesToShow>
+      <sectionOrder>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <name>sectionOrder</name>
+        <number>12</number>
+        <numberType>integer</numberType>
+        <prettyName>sectionOrder</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.NumberClass</classType>
+      </sectionOrder>
+    </class>
+    <property>
+      <categoryIcon/>
+    </property>
+    <property>
+      <codeToExecute>{{display reference="XWiki.NameStrategies.Administration" /}}</codeToExecute>
+    </property>
+    <property>
+      <configurationClass/>
+    </property>
+    <property>
+      <configureGlobally>1</configureGlobally>
+    </property>
+    <property>
+      <displayBeforeCategory/>
+    </property>
+    <property>
+      <displayInCategory>edit</displayInCategory>
+    </property>
+    <property>
+      <displayInSection>Name Strategies</displayInSection>
+    </property>
+    <property>
+      <heading>Name Strategies</heading>
+    </property>
+    <property>
+      <iconAttachment/>
+    </property>
+    <property>
+      <linkPrefix/>
+    </property>
+    <property>
+      <propertiesToShow/>
+    </property>
+    <property>
+      <sectionOrder/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.NameStrategies.Administration</name>
+    <number>0</number>
+    <className>XWiki.JavaScriptExtension</className>
+    <guid>0e077a40-0a33-4b94-a03f-6c6d393026ad</guid>
+    <class>
+      <name>XWiki.JavaScriptExtension</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <cache>
+        <cache>0</cache>
+        <defaultValue>long</defaultValue>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>cache</name>
+        <number>5</number>
+        <prettyName>Caching policy</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>long|short|default|forbid</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </cache>
+      <code>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>code</name>
+        <number>2</number>
+        <prettyName>Code</prettyName>
+        <rows>20</rows>
+        <size>50</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </code>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>1</number>
+        <prettyName>Name</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parse>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <name>parse</name>
+        <number>4</number>
+        <prettyName>Parse content</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </parse>
+      <use>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>use</name>
+        <number>3</number>
+        <prettyName>Use this extension</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>currentPage|onDemand|always</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </use>
+    </class>
+    <property>
+      <cache>long</cache>
+    </property>
+    <property>
+      <code>require(['jquery', 'xwiki-events-bridge'], function($) {
+  var createCharacterModal = $('#createReplacementCharacterModal');
+  var removeCharacterModal = $('#removeReplacementCharacterModal');
+  var newForbiddenCharacter = $('#newForbiddenCharacter');
+  var newReplacementCharacter = $('#newReplacementCharacter');
+  var createCharacterButton = createCharacterModal.find('.btn-primary')
+  newForbiddenCharacter.on('change', function() {
+    createCharacterButton.prop('disabled', newForbiddenCharacter.val() === "");
+  });
+  var livetable = window.livetable_replacementCharacters;
+
+  createCharacterModal.on('click', '.btn-primary', function(event) {
+    var query = {
+      "outputSyntax": "plain",
+      "action": "addCharacter",
+      "forbiddenCharacter": newForbiddenCharacter.val(),
+      "replacementCharacter": newReplacementCharacter.val(),
+      "csrf": $('input[name=form_token]').val()
+    }
+    var jsonDoc = new XWiki.Document(XWiki.Model.resolve('XWiki.NameStrategies.AdministrationJSON', XWiki.EntityType.DOCUMENT));
+    var notification = new XWiki.widgets.Notification(
+      $jsontool.serialize($services.localization.render('namestrategies.replacementCharacter.create.inProgress')),
+      'inprogress'
+    );
+    $.get(jsonDoc.getURL("get", $.param(query))).done(function (data) {
+      createCharacterModal.modal('hide');
+      window.livetable_replacementCharacters.refresh();
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('namestrategies.replacementCharacter.create.done')),
+        'done'
+      ));
+      resetReplaceCharacterModal();
+    }).fail(function (response) {
+      createCharacterModal.modal('hide');
+      notification.replace(new XWiki.widgets.Notification(
+        $jsontool.serialize($services.localization.render('namestrategies.replacementCharacter.create.failed')),
+        'error'
+      ));
+      resetReplaceCharacterModal();
+    });
+  });
+
+  var resetReplaceCharacterModal = function () {
+    newForbiddenCharacter.val("");
+    newReplacementCharacter.val("");
+    createCharacterButton.prop("disabled", true);
+  };
+
+  var showReplaceCharacterConfiguration = function () {
+    $('#character-replacement-options').removeClass('hidden');
+    $('#addNewCharacter').removeClass('hidden');
+  };
+
+  var hideReplaceCharacterConfiguration = function () {
+    $('#character-replacement-options').addClass('hidden');
+    $('#addNewCharacter').addClass('hidden');
+  };
+
+  var updateTestStrategy = function () {
+    var testText = $('#testNameStrategy').val();
+    if (testText !== "") {
+      $('.test-strategy').removeClass('hidden');
+      var selectedStrategy = $('#XWiki\\.NameStrategies\\.ConfigurationClass_0_currentStrategy').val();
+
+      var queryString = "xpage=entityName_json&amp;outputSyntax=main&amp;name=" + encodeURIComponent(testText) + "&amp;strategy=" + encodeURIComponent(selectedStrategy);
+      var url = new XWiki.Document().getURL("get", queryString);
+      $.get(url).done(function (data) {
+        $('#testNameStrategyIsValid_' + data.isOriginalValid).removeClass('hidden');
+        $('#testNameStrategyIsValid_' + !data.isOriginalValid).addClass('hidden');
+        $('#testNameStrategyTransformedName').text(data.transformedName)
+      });
+    } else {
+      $('.test-strategy').addClass('hidden');
+    }
+  };
+
+  var initLiveTable = function () {
+    $('#replacementCharacters a[class~=actiondelete]').on('click', function (event) {
+      event.preventDefault();
+      // Remove potentially previous call.
+      removeCharacterModal.off('click', '.btn-danger');
+      removeCharacterModal.on('click', '.btn-danger', function(clickevent) {
+        var notification = new XWiki.widgets.Notification(
+          $jsontool.serialize($services.localization.render('namestrategies.replacementCharacter.remove.inProgress')),
+          'inprogress'
+        );
+        $.get(event.currentTarget.href).done(function (data) {
+          removeCharacterModal.modal('hide');
+          window.livetable_replacementCharacters.refresh();
+          notification.replace(new XWiki.widgets.Notification(
+            $jsontool.serialize($services.localization.render('namestrategies.replacementCharacter.remove.done')),
+            'done'
+          ));
+        }).fail(function (response) {
+          removeCharacterModal.modal('hide');
+          notification.replace(new XWiki.widgets.Notification(
+            $jsontool.serialize($services.localization.render('namestrategies.replacementCharacter.remove.failed')),
+            'error'
+          ));
+        });
+      });
+      removeCharacterModal.modal('show');
+    });
+  };
+
+  var initialize = function () {
+    var select = $('#XWiki\\.NameStrategies\\.ConfigurationClass_0_currentStrategy');
+    if (select.val() == "ReplaceCharacterNameStrategy") {
+      showReplaceCharacterConfiguration();
+    } else {
+      hideReplaceCharacterConfiguration();
+    }
+    select.on('change', initialize);
+
+    var testStrategy = $('#testNameStrategy')
+    testStrategy.on('input', updateTestStrategy);
+
+    document.on('xwiki:livetable:newrow', initLiveTable);
+    if (livetable.totalRows &gt; 0) {
+      initLiveTable();
+    }
+  };
+  (XWiki.isInitialized ? initialize() : document.on('xwiki:dom:loaded', initialize));
+});</code>
+    </property>
+    <property>
+      <name>JSX</name>
+    </property>
+    <property>
+      <parse>1</parse>
+    </property>
+    <property>
+      <use>onDemand</use>
+    </property>
+  </object>
+</xwikidoc>

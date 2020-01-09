@@ -1,0 +1,171 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.NameStrategies.Configuration" locale="">
+  <web>XWiki.NameStrategies</web>
+  <name>Configuration</name>
+  <language/>
+  <defaultLanguage/>
+  <translation>0</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <parent>XWiki.NameStrategies.WebHome</parent>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>xwiki/2.1</syntaxId>
+  <hidden>false</hidden>
+  <content/>
+  <object>
+    <name>XWiki.NameStrategies.Configuration</name>
+    <number>0</number>
+    <className>XWiki.NameStrategies.ConfigurationClass</className>
+    <guid>a2f5e12e-f763-4b04-9ee6-31f5a7f67581</guid>
+    <class>
+      <name>XWiki.NameStrategies.ConfigurationClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <currentStrategy>
+        <customDisplay/>
+        <disabled>0</disabled>
+        <hint/>
+        <name>currentStrategy</name>
+        <number>1</number>
+        <picker>0</picker>
+        <prettyName>currentStrategy</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </currentStrategy>
+      <replaceCharacters.forbiddenCharacters>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>replaceCharacters.forbiddenCharacters</name>
+        <number>4</number>
+        <picker>0</picker>
+        <prettyName>replaceCharacters.forbiddenCharacters</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|</separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </replaceCharacters.forbiddenCharacters>
+      <replaceCharacters.replacementCharacters>
+        <cache>0</cache>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>allowed</freeText>
+        <hint/>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>replaceCharacters.replacementCharacters</name>
+        <number>5</number>
+        <picker>0</picker>
+        <prettyName>replaceCharacters.replacementCharacters</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|</separators>
+        <size>1</size>
+        <sort/>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </replaceCharacters.replacementCharacters>
+      <useTransformation>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <hint/>
+        <name>useTransformation</name>
+        <number>3</number>
+        <prettyName>useTransformation</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </useTransformation>
+      <useValidation>
+        <customDisplay/>
+        <defaultValue/>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType>yesno</displayType>
+        <hint/>
+        <name>useValidation</name>
+        <number>2</number>
+        <prettyName>useValidation</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <validationMessage/>
+        <validationRegExp/>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </useValidation>
+    </class>
+    <property>
+      <currentStrategy>ReplaceCharacterNameStrategy</currentStrategy>
+    </property>
+    <property>
+      <replaceCharacters.forbiddenCharacters>
+        <value>\</value>
+        <value>/</value>
+      </replaceCharacters.forbiddenCharacters>
+    </property>
+    <property>
+      <replaceCharacters.replacementCharacters>
+        <value/>
+        <value/>
+      </replaceCharacters.replacementCharacters>
+    </property>
+    <property>
+      <useTransformation>1</useTransformation>
+    </property>
+    <property>
+      <useValidation>0</useValidation>
+    </property>
+  </object>
+</xwikidoc>

@@ -183,9 +183,10 @@ public class CreateAction extends XWikiAction
         // that is where we are creating the new document.
         checkRights(newDocumentReference.getLastSpaceReference(), context);
 
-        // Check if the document to create already exists.
+        // Check if the document to create already exists and if it respects the name strategy
         XWikiDocument newDocument = context.getWiki().getDocument(newDocumentReference, context);
-        if (handler.isDocumentAlreadyExisting(newDocument) || handler.isDocumentPathTooLong(newDocumentReference)) {
+        if (handler.isDocumentAlreadyExisting(newDocument) || handler.isDocumentPathTooLong(newDocumentReference)
+            || !this.isEntityReferenceNameValid(newDocumentReference)) {
             return CREATE_TEMPLATE;
         }
 

@@ -270,6 +270,8 @@ public class XWikiException extends Exception
 
     public static final int ERROR_XWIKI_APP_DOCUMENT_PATH_TOO_LONG = 11017;
 
+    public static final int ERROR_XWIKI_APP_DOCUMENT_NAME_INVALID = 11018;
+
     public static final int ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND = 12001;
 
     public static final int ERROR_XWIKI_EXPORT_PDF_FOP_FAILED = 12002;

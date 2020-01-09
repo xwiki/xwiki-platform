@@ -67,6 +67,14 @@
       )
   </div>
 #end
+## check if the exception is about the document name being invalid
+#if("$!exception" != '' && $exception.code == 11018)
+<div class='box errormessage'>
+  ## Use the 'existingDocumentReference' context binding set by the create action for this case.
+      $services.localization.render('namestrategies.create.invalidname', [$doc.documentReference])
+</div>
+#end
+
 ## check if the exception is about the document having a path too long
 #template('hierarchy_macros.vm')
 #if("$!exception" != '' && $exception.code == 11017)

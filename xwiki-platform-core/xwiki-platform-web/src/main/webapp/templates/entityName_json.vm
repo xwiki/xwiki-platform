@@ -1,0 +1,40 @@
+#template("xwikivars.vm")
+
+#set ($configuration = $services.namestrategies.configuration)
+#if ("$!request.name" != "")
+    #if ("$!request.strategy" != "")
+        #set ($transformedName = $services.namestrategies.transformName($request.name, $request.strategy))
+        #set ($isOriginalValid = $services.namestrategies.isValid($request.name, $request.strategy))
+    #else
+        #set ($transformedName = $services.namestrategies.transformName($request.name))
+        #set ($isOriginalValid = $services.namestrategies.isValid($request.name))
+    #end
+    #setVariable("$json" {
+        'useTransformation': $configuration.useTransformation(),
+        'useValidation': $configuration.useValidation(),
+        'originalName': $request.name,
+        'transformedName': $transformedName,
+        'isOriginalValid': $isOriginalValid
+    })
+#else
+    #set ($originalReferenceSerialized = $request.sourceReference)
+    #set ($sourceReference = $services.model.resolveDocument($originalReferenceSerialized))
+    #if ("$!request.strategy" != "")
+        #set ($transformedReference = $services.namestrategies.transformEntityReference($sourceReference, $request.strategy))
+        #set ($isOriginalValid = $services.namestrategies.isValid($sourceReference, $request.strategy))
+    #else
+        #set ($transformedReference = $services.namestrategies.transformEntityReference($sourceReference))
+        #set ($isOriginalValid = $services.namestrategies.isValid($sourceReference))
+    #end
+    #set ($transformedReferenceSerialized = $services.model.serialize($transformedReference))
+
+    #setVariable("$json" {
+        'useTransformation': $configuration.useTransformation(),
+        'useValidation': $configuration.useValidation(),
+        'originalReference': $originalReferenceSerialized,
+        'tranformedReference': $transformedReferenceSerialized,
+        'isOriginalValid': $isOriginalValid
+    })
+#end
+$response.setContentType('application/json')
+$jsontool.serialize($json)

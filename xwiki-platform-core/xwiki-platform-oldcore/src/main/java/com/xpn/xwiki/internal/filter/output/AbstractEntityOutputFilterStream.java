@@ -33,6 +33,7 @@ import javax.inject.Named;
 import org.apache.commons.lang3.reflect.TypeUtils;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -331,6 +332,46 @@ public abstract class AbstractEntityOutputFilterStream<E> implements EntityOutpu
     @Override
     public void onWikiAttachment(String name, InputStream content, Long size, FilterEventParameters parameters)
         throws FilterException
+    {
+
+    }
+
+    @Override
+    public void beginWikiDocumentAttachment(String name, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+
+    }
+
+    @Override
+    public void endWikiDocumentAttachment(String name, InputSource content, Long size, FilterEventParameters parameters)
+        throws FilterException
+    {
+
+    }
+
+    @Override
+    public void beginWikiAttachmentRevisions(FilterEventParameters parameters) throws FilterException
+    {
+
+    }
+
+    @Override
+    public void endWikiAttachmentRevisions(FilterEventParameters parameters) throws FilterException
+    {
+
+    }
+
+    @Override
+    public void beginWikiAttachmentRevision(String revision, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+
+    }
+
+    @Override
+    public void endWikiAttachmentRevision(String revision, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
     {
 
     }

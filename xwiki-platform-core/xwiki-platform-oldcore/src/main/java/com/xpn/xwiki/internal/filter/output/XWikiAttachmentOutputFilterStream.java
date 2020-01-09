@@ -31,9 +31,13 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiAttachmentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiAttachmentFilter;
+import org.xwiki.filter.input.DefaultInputStreamInputSource;
+import org.xwiki.filter.input.InputSource;
+import org.xwiki.filter.input.InputStreamInputSource;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.internal.doc.ListAttachmentArchive;
 
 /**
  * @version $Id$
@@ -45,15 +49,15 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
 {
     // Events
 
-    private void setVersion(FilterEventParameters parameters)
+    private void setVersion(XWikiAttachment attachment, FilterEventParameters parameters)
     {
         if (parameters.containsKey(WikiAttachmentFilter.PARAMETER_REVISION)) {
             String version = getString(WikiAttachmentFilter.PARAMETER_REVISION, parameters, null);
             if (version != null) {
                 if (VALID_VERSION.matcher(version).matches()) {
-                    this.entity.setVersion(version);
+                    attachment.setVersion(version);
                 } else if (NumberUtils.isDigits(version)) {
-                    this.entity.setVersion(version + ".1");
+                    attachment.setVersion(version + ".1");
                 } else {
                     // TODO: log something, probably a warning
                 }
@@ -65,48 +69,141 @@ public class XWikiAttachmentOutputFilterStream extends AbstractEntityOutputFilte
     public void onWikiAttachment(String name, InputStream content, Long size, FilterEventParameters parameters)
         throws FilterException
     {
+        fillAttachment(name, content != null ? new DefaultInputStreamInputSource(content) : null, size, parameters);
+    }
+
+    @Override
+    public void beginWikiDocumentAttachment(String name, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+        fillAttachment(name, content, size, parameters);
+    }
+
+    @Override
+    public void beginWikiAttachmentRevision(String version, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+        if (this.entity != null && this.properties.isVersionPreserved()) {
+            ListAttachmentArchive archive = getArchive();
+
+            archive.add(createAttachment(this.entity.getFilename(), content, size, parameters));
+        }
+    }
+
+    private ListAttachmentArchive getArchive()
+    {
+        ListAttachmentArchive archive = (ListAttachmentArchive) this.entity.getAttachment_archive();
+
+        if (archive == null) {
+            archive = new ListAttachmentArchive(this.entity);
+            this.entity.setAttachment_archive(archive);
+        }
+
+        return archive;
+    }
+
+    private void fillAttachment(String name, InputSource source, Long size, FilterEventParameters parameters)
+        throws FilterException
+    {
         if (this.entity == null) {
             this.entity = new XWikiAttachment();
         }
 
-        this.entity.setFilename(name);
-        if (size != null) {
-            this.entity.setLongSize(size);
-        }
-        this.entity.setMimeType(getString(WikiAttachmentFilter.PARAMETER_MIMETYPE, parameters, null));
-        this.entity
-            .setCharset(getString(WikiAttachmentFilter.PARAMETER_CHARSET, parameters, null));
+        fillAttachment(this.entity, name, source, size, parameters);
+    }
 
-        if (content != null) {
-            try {
-                this.entity.setContent(content);
-            } catch (IOException e) {
-                throw new FilterException("Failed to set attachment content", e);
-            }
+    private XWikiAttachment createAttachment(String name, InputSource source, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+        XWikiAttachment attachment = new XWikiAttachment();
+
+        fillAttachment(attachment, name, source, size, parameters);
+
+        return attachment;
+    }
+
+    private void fillAttachment(XWikiAttachment attachment, String name, InputSource source, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+        attachment.setFilename(name);
+        if (size != null) {
+            attachment.setLongSize(size);
         }
+        attachment.setMimeType(getString(WikiAttachmentFilter.PARAMETER_MIMETYPE, parameters, null));
+        attachment.setCharset(getString(WikiAttachmentFilter.PARAMETER_CHARSET, parameters, null));
+
+        fillAttachmentContent(attachment, source, parameters);
 
         // Author
 
-        this.entity
+        attachment
             .setAuthorReference(getUserReference(WikiAttachmentFilter.PARAMETER_REVISION_AUTHOR, parameters, null));
 
         // Revision
 
         if (this.properties == null || this.properties.isVersionPreserved()) {
-            setVersion(parameters);
-            this.entity.setComment(getString(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
-            this.entity.setDate(getDate(WikiAttachmentFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
+            setVersion(attachment, parameters);
+            attachment.setComment(getString(WikiAttachmentFilter.PARAMETER_REVISION_COMMENT, parameters, ""));
+            attachment.setDate(getDate(WikiAttachmentFilter.PARAMETER_REVISION_DATE, parameters, new Date()));
 
             String revisions = getString(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS, parameters, null);
             if (revisions != null) {
                 try {
-                    this.entity.setArchive(revisions);
+                    attachment.setArchive(revisions);
                 } catch (XWikiException e) {
                     throw new FilterException("Failed to set attachment archive", e);
                 }
             }
 
-            this.entity.setMetaDataDirty(false);
+            attachment.setMetaDataDirty(false);
+        }
+    }
+
+    private void fillAttachmentContent(XWikiAttachment attachment, InputSource source, FilterEventParameters parameters)
+        throws FilterException
+    {
+        if (source != null) {
+            if (source instanceof InputStreamInputSource) {
+                try (InputStreamInputSource streamSource = (InputStreamInputSource) source) {
+                    attachment.setContent(streamSource.getInputStream());
+                } catch (IOException e) {
+                    throw new FilterException("Failed to set attachment content", e);
+                }
+            } else {
+                throw new FilterException(
+                    "Unsupported input stream type [" + source.getClass() + "] for the attachment content");
+            }
+        } else {
+            // Check if the content is the same as another versions or the current content
+            fillAttachmentContentAlias(attachment, parameters);
+        }
+    }
+
+    private void fillAttachmentContentAlias(XWikiAttachment attachment, FilterEventParameters parameters)
+        throws FilterException
+    {
+        String alias = getString(PARAMETER_REVISION_CONTENT_ALIAS, parameters, null);
+
+        if (alias != null) {
+            if (alias.equals(VALUE_REVISION_CONTENT_ALIAS_CURRENT)) {
+                try (InputStream stream = this.entity.getContentInputStream(null)) {
+                    attachment.setContent(stream);
+                } catch (Exception e) {
+                    throw new FilterException("Failed copy current attachment content", e);
+                }
+            } else {
+                try {
+                    InputStream revisionContent = getArchive().getRevisionContentStream(alias, null);
+
+                    if (revisionContent != null) {
+                        try (InputStream stream = revisionContent) {
+                            attachment.setContent(stream);
+                        }
+                    }
+                } catch (Exception e) {
+                    throw new FilterException("Failed to copy content of attachment revision [" + alias + "]", e);
+                }
+            }
         }
     }
 }

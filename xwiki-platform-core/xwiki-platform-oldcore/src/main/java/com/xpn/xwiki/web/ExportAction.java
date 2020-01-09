@@ -179,12 +179,29 @@ public class ExportAction extends XWikiAction
         String filename = serializer.serialize(doc.getDocumentReference()).replaceAll("/", "_");
         // Make sure we don't go over 255 chars since several filesystems don't support filename longer than that!
         filename = StringUtils.abbreviateMiddle(filename, "__", 255);
-        context.getResponse().addHeader(
-            "Content-disposition",
+        context.getResponse().addHeader("Content-disposition",
             String.format("inline; filename=%s.%s", filename, exportType.getExtension()));
         exporter.export(doc, context.getResponse().getOutputStream(), exportType, context);
 
         return null;
+    }
+
+    private boolean getBooleanProperty(String requestProperty, String cfgProperty, boolean def, XWikiContext context)
+    {
+        boolean value;
+
+        String valueString = context.getRequest().get(requestProperty);
+        if (valueString == null) {
+            if (def) {
+                value = context.getWiki().ParamAsLong(cfgProperty, 1) != 0;
+            } else {
+                value = context.getWiki().ParamAsLong(cfgProperty, 0) == 1;
+            }
+        } else {
+            value = Boolean.parseBoolean(valueString);
+        }
+
+        return value;
     }
 
     private String exportXAR(XWikiContext context) throws XWikiException, IOException, FilterException
@@ -199,6 +216,9 @@ public class ExportAction extends XWikiAction
         String name = request.get("name");
         String description = request.get("description");
         boolean history = Boolean.valueOf(request.get("history"));
+        boolean attachmentJRCS =
+            getBooleanProperty("attachment_jrcs", "xwiki.action.export.xar.attachment.jrcs", false, context);
+        boolean optimized = getBooleanProperty("optimized", "xwiki.action.export.xar.optimized", false, context);
         boolean backup = Boolean.valueOf(request.get("backup"));
         String author = request.get("author");
         String licence = request.get("licence");
@@ -220,6 +240,12 @@ public class ExportAction extends XWikiAction
 
             inputProperties.setWithJRCSRevisions(history);
             inputProperties.setWithRevisions(false);
+            // Retro compatibility: by default attachment history is serialized as JRCS but we disabled it if standard
+            // attachment revisions is enabled
+            if (!attachmentJRCS) {
+                inputProperties.setWithWikiAttachmentsRevisions(!attachmentJRCS);
+                inputProperties.setWithWikiAttachmentJRCSRevisions(attachmentJRCS);
+            }
 
             EntityReferenceSet entities = new EntityReferenceSet();
 
@@ -243,6 +269,9 @@ public class ExportAction extends XWikiAction
 
             // We don't want to log the details
             xarProperties.setVerbose(false);
+            if (optimized) {
+                xarProperties.setOptimized(optimized);
+            }
 
             XWikiResponse response = context.getResponse();
 

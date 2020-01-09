@@ -42,6 +42,7 @@ import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -426,7 +427,19 @@ public class XWikiDocumentOutputFilterStream extends AbstractEntityOutputFilterS
     public void onWikiAttachment(String name, InputStream content, Long size, FilterEventParameters parameters)
         throws FilterException
     {
-        this.entity.addAttachment(getXWikiAttachmentOutputFilterStream().getEntity());
+        endAttachment();
+    }
+
+    @Override
+    public void endWikiDocumentAttachment(String name, InputSource content, Long size, FilterEventParameters parameters)
+        throws FilterException
+    {
+        endAttachment();
+    }
+
+    private void endAttachment()
+    {
+        this.entity.setAttachment(getXWikiAttachmentOutputFilterStream().getEntity());
 
         // Reset attachment
         getXWikiAttachmentOutputFilterStream().setEntity(null);

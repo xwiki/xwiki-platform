@@ -25,6 +25,7 @@ import java.util.Locale;
 
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.input.InputSource;
 
 /**
  * Dispatch event to passed list of filters.
@@ -129,6 +130,58 @@ public class XWikiDocumentFilterCollection implements XWikiDocumentFilter
     {
         for (XWikiDocumentFilter filter : filters) {
             filter.onWikiAttachment(name, content, size, parameters);
+        }
+    }
+
+    @Override
+    public void beginWikiDocumentAttachment(String name, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+        for (XWikiDocumentFilter filter : filters) {
+            filter.beginWikiDocumentAttachment(name, content, size, parameters);
+        }
+    }
+
+    @Override
+    public void endWikiDocumentAttachment(String name, InputSource content, Long size, FilterEventParameters parameters)
+        throws FilterException
+    {
+        for (XWikiDocumentFilter filter : filters) {
+            filter.endWikiDocumentAttachment(name, content, size, parameters);
+        }
+    }
+
+    @Override
+    public void beginWikiAttachmentRevisions(FilterEventParameters parameters) throws FilterException
+    {
+        for (XWikiDocumentFilter filter : filters) {
+            filter.beginWikiAttachmentRevisions(parameters);
+        }
+    }
+
+    @Override
+    public void endWikiAttachmentRevisions(FilterEventParameters parameters) throws FilterException
+    {
+        for (XWikiDocumentFilter filter : filters) {
+            filter.beginWikiAttachmentRevisions(parameters);
+        }
+    }
+
+    @Override
+    public void beginWikiAttachmentRevision(String revision, InputSource content, Long size, FilterEventParameters parameters)
+        throws FilterException
+    {
+        for (XWikiDocumentFilter filter : filters) {
+            filter.beginWikiAttachmentRevision(revision, content, size, parameters);
+        }
+    }
+
+    @Override
+    public void endWikiAttachmentRevision(String revision, InputSource content, Long size, FilterEventParameters parameters)
+        throws FilterException
+    {
+        for (XWikiDocumentFilter filter : filters) {
+            filter.endWikiAttachmentRevision(revision, content, size, parameters);
         }
     }
 

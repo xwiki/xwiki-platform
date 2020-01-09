@@ -22,10 +22,11 @@ package org.xwiki.filter.xar.internal.input;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Singleton;
 import javax.xml.stream.XMLStreamException;
@@ -36,9 +37,12 @@ import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.filter.FilterEventParameters;
 import org.xwiki.filter.FilterException;
+import org.xwiki.filter.input.AbstractInputStreamInputSource;
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.xar.input.XARInputProperties;
 import org.xwiki.filter.xar.internal.XARAttachmentModel;
 import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
+import org.xwiki.xml.stax.StAXUtils;
 
 /**
  * @version $Id$
@@ -48,23 +52,91 @@ import org.xwiki.filter.xar.internal.XARFilterUtils.EventParameter;
 @Singleton
 public class AttachmentReader extends AbstractReader implements XARXMLReader<AttachmentReader.WikiAttachment>
 {
-    public static class WikiAttachment
+    public static class AbstractContent extends AbstractInputStreamInputSource
     {
-        public String name;
+        public DeferredFileOutputStream content;
+
+        public FilterEventParameters parameters = new FilterEventParameters();
+
+        @Override
+        protected InputStream openStream() throws IOException
+        {
+            InputStream stream;
+            if (this.content.isInMemory()) {
+                stream = new ByteArrayInputStream(this.content.getData());
+            } else {
+                stream = new FileInputStream(this.content.getFile());
+            }
+
+            return new Base64InputStream(stream);
+        }
+
+        public void dispose()
+        {
+            if (this.content != null) {
+                File contentFile = this.content.getFile();
+                if (contentFile != null && contentFile.exists()) {
+                    contentFile.delete();
+                }
+            }
+        }
+    }
+
+    public static class WikiAttachmentRevision extends AbstractContent
+    {
+        public String version;
 
         public Long size;
-
-        public DeferredFileOutputStream content;
 
         public FilterEventParameters parameters = new FilterEventParameters();
 
         public void send(XARInputFilter proxyFilter) throws FilterException
         {
+            InputSource inputSource = this.content != null ? this : null;
+
+            try {
+                proxyFilter.beginWikiAttachmentRevision(this.version, inputSource, this.size, this.parameters);
+                proxyFilter.endWikiAttachmentRevision(this.version, inputSource, this.size, this.parameters);
+            } finally {
+                dispose();
+            }
+        }
+    }
+
+    public static class WikiAttachment extends AbstractContent
+    {
+        public String name;
+
+        public Long size;
+
+        public List<WikiAttachmentRevision> revisions = new ArrayList<>();
+
+        public void send(XARInputFilter proxyFilter) throws FilterException
+        {
             if (this.content != null) {
-                try (InputStream is = new Base64InputStream(openStream())) {
-                    proxyFilter.onWikiAttachment(this.name, is, this.size, this.parameters);
-                } catch (IOException e) {
-                    throw new FilterException(e);
+                try {
+                    if (this.revisions.isEmpty()) {
+                        try (InputStream stream = openStream()) {
+                            proxyFilter.onWikiAttachment(this.name, stream, this.size, this.parameters);
+                        } catch (IOException e) {
+                            throw new FilterException(e);
+                        }
+                    } else {
+                        proxyFilter.beginWikiDocumentAttachment(this.name, this, this.size, this.parameters);
+
+                        // Send revisions
+                        if (!this.revisions.isEmpty()) {
+                            proxyFilter.beginWikiAttachmentRevisions(FilterEventParameters.EMPTY);
+
+                            for (WikiAttachmentRevision revision : this.revisions) {
+                                revision.send(proxyFilter);
+                            }
+
+                            proxyFilter.endWikiAttachmentRevisions(FilterEventParameters.EMPTY);
+                        }
+
+                        proxyFilter.endWikiDocumentAttachment(this.name, this, this.size, this.parameters);
+                    }
                 } finally {
                     if (this.content.isInMemory()) {
                         this.content.getFile().delete();
@@ -72,15 +144,6 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                 }
             } else {
                 proxyFilter.onWikiAttachment(this.name, null, this.size, this.parameters);
-            }
-        }
-
-        private InputStream openStream() throws FileNotFoundException
-        {
-            if (this.content.isInMemory()) {
-                return new ByteArrayInputStream(this.content.getData());
-            } else {
-                return new FileInputStream(this.content.getFile());
             }
         }
 
@@ -119,29 +182,13 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
                 } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
                     wikiAttachment.size = Long.valueOf(xmlReader.getElementText());
                 } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
-                    // We copy the attachment content to use it later. We can't directly send it as a stream because XAR
-                    // specification does not force any order for the attachment properties and we need to be sure we
-                    // have everything when sending the event.
-
-                    // Allocate a temporary file in case the attachment content is big
-                    File temporaryFile;
-                    try {
-                        temporaryFile = File.createTempFile("xar/attachments/attachment", ".bin");
-                    } catch (IOException e) {
-                        throw new FilterException(e);
-                    }
-
-                    // Create a deferred file based content (if the content is bigger than 10000 bytes it will end up in
-                    // a file)
-                    wikiAttachment.content = new DeferredFileOutputStream(100000, temporaryFile);
-
-                    // Copy the content to byte array or file depending on its size
-                    for (xmlReader.next(); xmlReader.isCharacters(); xmlReader.next()) {
-                        try {
-                            wikiAttachment.content.write(xmlReader.getText().getBytes(StandardCharsets.UTF_8));
-                        } catch (IOException e) {
-                            throw new FilterException(e);
-                        }
+                    readContent(xmlReader, wikiAttachment);
+                } else if (XARAttachmentModel.ELEMENT_REVISIONS.equals(elementName)) {
+                    // Skip revisions if history is disabled
+                    if (properties.isWithHistory()) {
+                        readRevisions(xmlReader, properties, wikiAttachment);
+                    } else {
+                        StAXUtils.skipElement(xmlReader);
                     }
                 } else {
                     unknownElement(xmlReader);
@@ -150,5 +197,77 @@ public class AttachmentReader extends AbstractReader implements XARXMLReader<Att
         }
 
         return wikiAttachment;
+    }
+
+    private void readRevisions(XMLStreamReader xmlReader, XARInputProperties properties, WikiAttachment wikiAttachment)
+        throws XMLStreamException, FilterException
+    {
+        for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
+            String elementName = xmlReader.getLocalName();
+
+            if (XARAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
+                wikiAttachment.revisions.add(readRevision(xmlReader, properties));
+            }
+        }
+    }
+
+    private WikiAttachmentRevision readRevision(XMLStreamReader xmlReader, XARInputProperties properties)
+        throws XMLStreamException, FilterException
+    {
+        WikiAttachmentRevision wikiAttachmentRevision = new WikiAttachmentRevision();
+
+        for (xmlReader.nextTag(); xmlReader.isStartElement(); xmlReader.nextTag()) {
+            String elementName = xmlReader.getLocalName();
+
+            EventParameter parameter = XARAttachmentModel.ATTACHMENT_PARAMETERS.get(elementName);
+
+            if (parameter != null) {
+                Object wsValue = convert(parameter.type, xmlReader.getElementText());
+                if (wsValue != null) {
+                    wikiAttachmentRevision.parameters.put(parameter.name, wsValue);
+                }
+            } else {
+                if (XARAttachmentModel.ELEMENT_REVISION.equals(elementName)) {
+                    wikiAttachmentRevision.version = xmlReader.getElementText();
+                } else if (XARAttachmentModel.ELEMENT_CONTENT_SIZE.equals(elementName)) {
+                    wikiAttachmentRevision.size = Long.valueOf(xmlReader.getElementText());
+                } else if (XARAttachmentModel.ELEMENT_CONTENT.equals(elementName)) {
+                    readContent(xmlReader, wikiAttachmentRevision);
+                } else {
+                    unknownElement(xmlReader);
+                }
+            }
+        }
+
+        return wikiAttachmentRevision;
+    }
+
+    private void readContent(XMLStreamReader xmlReader, AbstractContent content)
+        throws XMLStreamException, FilterException
+    {
+        // We copy the attachment content to use it later. We can't directly send it as a stream because XAR
+        // specification does not force any order for the attachment properties and we need to be sure we
+        // have everything when sending the event.
+
+        // Allocate a temporary file in case the attachment content is big
+        File temporaryFile;
+        try {
+            temporaryFile = File.createTempFile("xar/attachments/attachment", ".bin");
+        } catch (IOException e) {
+            throw new FilterException(e);
+        }
+
+        // Create a deferred file based content (if the content is bigger than 10000 bytes it will end up in
+        // a file)
+        content.content = new DeferredFileOutputStream(100000, temporaryFile);
+
+        // Copy the content to byte array or file depending on its size
+        for (xmlReader.next(); xmlReader.isCharacters(); xmlReader.next()) {
+            try {
+                content.content.write(xmlReader.getText().getBytes(StandardCharsets.UTF_8));
+            } catch (IOException e) {
+                throw new FilterException(e);
+            }
+        }
     }
 }

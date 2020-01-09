@@ -46,6 +46,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.doc.ListAttachmentArchive;
 import com.xpn.xwiki.web.Utils;
 
 import static org.hamcrest.CoreMatchers.containsString;

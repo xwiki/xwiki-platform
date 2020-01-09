@@ -42,6 +42,9 @@ import org.xwiki.filter.event.model.WikiObjectFilter;
 import org.xwiki.filter.event.model.WikiObjectPropertyFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiAttachmentFilter;
 import org.xwiki.filter.event.xwiki.XWikiWikiDocumentFilter;
+import org.xwiki.filter.input.DefaultInputStreamInputSource;
+import org.xwiki.filter.input.InputSource;
+import org.xwiki.filter.input.InputStreamInputSource;
 import org.xwiki.filter.output.AbstractBeanOutputFilterStream;
 import org.xwiki.filter.output.WriterOutputTarget;
 import org.xwiki.filter.xar.internal.XARAttachmentModel;
@@ -66,7 +69,8 @@ import org.xwiki.xar.internal.model.XarDocumentModel;
  * @version $Id$
  * @since 6.2M1
  */
-@Component(hints = {XARFilterUtils.ROLEHINT_13, XARFilterUtils.ROLEHINT_12, XARFilterUtils.ROLEHINT_11})
+@Component(hints = {XARFilterUtils.ROLEHINT_14, XARFilterUtils.ROLEHINT_13, XARFilterUtils.ROLEHINT_12,
+    XARFilterUtils.ROLEHINT_11})
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROutputProperties> implements XARFilter
 {
@@ -124,29 +128,40 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
         this.properties.getTarget().close();
     }
 
-    public String toString(Object obj)
+    private String toString(Object obj)
     {
         return Objects.toString(obj, null);
     }
 
-    public String toString(Date date)
+    private String toString(Date date)
     {
         return date != null ? String.valueOf(date.getTime()) : null;
     }
 
-    public String toString(Syntax syntax)
+    private String toString(Syntax syntax)
     {
         return syntax != null ? syntax.toIdString() : null;
     }
 
-    public String toString(byte[] bytes)
-    {
-        return Base64.encodeBase64String(bytes);
-    }
-
-    public String toString(EntityReference reference)
+    private String toString(EntityReference reference)
     {
         return this.defaultSerializer.serialize(reference);
+    }
+
+    private void writeStringElement(String pkey, String elementName, FilterEventParameters parameters)
+        throws FilterException
+    {
+        if (parameters.containsKey(pkey)) {
+            this.writer.writeElement(elementName, (String) parameters.get(pkey));
+        }
+    }
+
+    private void writeDateElement(String pkey, String elementName, FilterEventParameters parameters)
+        throws FilterException
+    {
+        if (parameters.containsKey(pkey)) {
+            this.writer.writeElement(elementName, toString((Date) parameters.get(pkey)));
+        }
     }
 
     // events
@@ -387,6 +402,22 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
     public void onWikiAttachment(String name, InputStream content, Long size, FilterEventParameters parameters)
         throws FilterException
     {
+        try {
+            beginWikiDocumentAttachment(name, content != null ? new DefaultInputStreamInputSource(content) : null, size,
+                parameters);
+            endWikiDocumentAttachment(name, null, size, parameters);
+        } catch (Exception e) {
+            throw new FilterException(
+                String.format("Failed to write attachment [%s] from document [%s] with version [%s]", name,
+                    this.currentDocumentReference, this.currentDocumentVersion),
+                e);
+        }
+    }
+
+    @Override
+    public void beginWikiDocumentAttachment(String name, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
         checkXMLWriter();
 
         try {
@@ -395,72 +426,168 @@ public class XAROutputFilterStream extends AbstractBeanOutputFilterStream<XAROut
             this.writer.writeElement(XARAttachmentModel.ELEMENT_NAME, name);
             if (this.properties.isPreserveVersion()
                 && parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS)) {
-                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISIONS,
-                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS));
+                writeStringElement(XWikiWikiAttachmentFilter.PARAMETER_JRCSREVISIONS,
+                    XARAttachmentModel.ELEMENT_JRCSVERSIONS, parameters);
             }
 
-            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE)) {
-                this.writer.writeElement(XARAttachmentModel.ELEMENT_MIMETYPE,
-                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE));
-            }
-            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_CHARSET)) {
-                this.writer.writeElement(XARAttachmentModel.ELEMENT_CHARSET,
-                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_CHARSET));
-            }
-            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR)) {
-                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_AUTHOR,
-                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR));
-            }
-            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE)) {
-                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_DATE,
-                    toString((Date) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE)));
-            }
-            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION)) {
-                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION,
-                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION));
-            }
-            if (parameters.containsKey(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT)) {
-                this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_COMMENT,
-                    (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT));
-            }
+            writeStringElement(XWikiWikiAttachmentFilter.PARAMETER_MIMETYPE, XARAttachmentModel.ELEMENT_MIMETYPE,
+                parameters);
+            writeStringElement(XWikiWikiAttachmentFilter.PARAMETER_CHARSET, XARAttachmentModel.ELEMENT_CHARSET,
+                parameters);
 
-            if (content != null) {
-                long contentSize = 0;
+            // Author
+            writeStringElement(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR,
+                XARAttachmentModel.ELEMENT_REVISION_AUTHOR, parameters);
 
-                this.writer.writeStartElement(XARAttachmentModel.ELEMENT_CONTENT);
-                byte[] buffer = new byte[ATTACHMENT_BUFFER_CHUNK_SIZE];
-                int readSize;
-                do {
-                    try {
-                        readSize = content.read(buffer, 0, ATTACHMENT_BUFFER_CHUNK_SIZE);
-                    } catch (IOException e) {
-                        throw new FilterException("Failed to read content stream", e);
-                    }
+            // Date
+            writeDateElement(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE,
+                XARAttachmentModel.ELEMENT_REVISION_DATE, parameters);
 
-                    if (readSize > 0) {
-                        String chunk;
-                        if (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE) {
-                            chunk = Base64.encodeBase64String(buffer);
-                        } else {
-                            chunk = Base64.encodeBase64String(ArrayUtils.subarray(buffer, 0, readSize));
-                        }
-                        this.writer.writeCharacters(chunk);
-                        contentSize += readSize;
-                    }
-                } while (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE);
-                this.writer.writeEndElement();
+            // Version
+            writeStringElement(XWikiWikiAttachmentFilter.PARAMETER_REVISION, XARAttachmentModel.ELEMENT_VERSION,
+                parameters);
 
-                this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));
-            } else {
-                this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(size));
-            }
+            // Comment
+            writeStringElement(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT,
+                XARAttachmentModel.ELEMENT_REVISION_COMMENT, parameters);
 
+            // Content
+            writeContent(content, size);
+        } catch (Exception e) {
+            throw new FilterException(
+                String.format("Failed to write attachment [%s] from document [%s] with version [%s]", name,
+                    this.currentDocumentReference, this.currentDocumentVersion),
+                e);
+        }
+    }
+
+    @Override
+    public void endWikiDocumentAttachment(String name, InputSource content, Long size, FilterEventParameters parameters)
+        throws FilterException
+    {
+        try {
             this.writer.writeEndElement();
         } catch (Exception e) {
             throw new FilterException(
                 String.format("Failed to write attachment [%s] from document [%s] with version [%s]", name,
                     this.currentDocumentReference, this.currentDocumentVersion),
                 e);
+        }
+    }
+
+    @Override
+    public void beginWikiAttachmentRevisions(FilterEventParameters parameters) throws FilterException
+    {
+        this.writer.writeStartElement(XARAttachmentModel.ELEMENT_REVISIONS);
+    }
+
+    @Override
+    public void endWikiAttachmentRevisions(FilterEventParameters parameters) throws FilterException
+    {
+        this.writer.writeEndElement();
+    }
+
+    @Override
+    public void beginWikiAttachmentRevision(String version, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+        this.writer.writeStartElement(XARAttachmentModel.ELEMENT_REVISION);
+
+        // Author
+        writeStringElement(XWikiWikiAttachmentFilter.PARAMETER_REVISION_AUTHOR,
+            XARAttachmentModel.ELEMENT_REVISION_AUTHOR, parameters);
+
+        // Date
+        writeDateElement(XWikiWikiAttachmentFilter.PARAMETER_REVISION_DATE, XARAttachmentModel.ELEMENT_REVISION_DATE,
+            parameters);
+
+        // Version
+        writeStringElement(XWikiWikiAttachmentFilter.PARAMETER_REVISION, XARAttachmentModel.ELEMENT_VERSION,
+            parameters);
+
+        // Comment
+        writeStringElement(XWikiWikiAttachmentFilter.PARAMETER_REVISION_COMMENT,
+            XARAttachmentModel.ELEMENT_REVISION_COMMENT, parameters);
+
+        // Revision content storage optimization
+        String contentAlias = (String) parameters.get(XWikiWikiAttachmentFilter.PARAMETER_REVISION_CONTENT_ALIAS);
+        if (contentAlias != null) {
+            this.writer.writeElement(XARAttachmentModel.ELEMENT_REVISION_CONTENT_ALIAS, contentAlias);
+        }
+
+        // Content
+        writeContent(content, size, contentAlias);
+    }
+
+    @Override
+    public void endWikiAttachmentRevision(String version, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
+    {
+        this.writer.writeEndElement();
+    }
+
+    private void writeContent(InputSource content, Long size) throws FilterException
+    {
+        writeContent(content, size, null);
+    }
+
+    private void writeContent(InputSource content, Long size, String contentAlias) throws FilterException
+    {
+        if (content != null && (!this.properties.isOptimized() || contentAlias == null)) {
+            writeContent(content);
+        } else if (size != null) {
+            this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(size));
+        }
+    }
+
+    private void writeContent(InputSource content) throws FilterException
+    {
+        this.writer.writeStartElement(XARAttachmentModel.ELEMENT_CONTENT);
+
+        long contentSize = 0;
+
+        try (InputSource source = content) {
+            InputStream stream = getInputStream(source);
+
+            byte[] buffer = new byte[ATTACHMENT_BUFFER_CHUNK_SIZE];
+            int readSize;
+            do {
+                try {
+                    readSize = stream.read(buffer, 0, ATTACHMENT_BUFFER_CHUNK_SIZE);
+                } catch (IOException e) {
+                    throw new FilterException("Failed to read content stream", e);
+                }
+
+                if (readSize > 0) {
+                    String chunk;
+                    if (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE) {
+                        chunk = Base64.encodeBase64String(buffer);
+                    } else {
+                        chunk = Base64.encodeBase64String(ArrayUtils.subarray(buffer, 0, readSize));
+                    }
+                    this.writer.writeCharacters(chunk);
+                    contentSize += readSize;
+                }
+            } while (readSize == ATTACHMENT_BUFFER_CHUNK_SIZE);
+        } catch (IOException e) {
+            throw new FilterException("Failed to close stream", e);
+        }
+
+        this.writer.writeEndElement();
+
+        this.writer.writeElement(XARAttachmentModel.ELEMENT_CONTENT_SIZE, toString(contentSize));
+    }
+
+    private InputStream getInputStream(InputSource content) throws FilterException
+    {
+        if (content instanceof InputStreamInputSource) {
+            try {
+                return ((InputStreamInputSource) content).getInputStream();
+            } catch (IOException e) {
+                throw new FilterException("Failed to get the content input stream", e);
+            }
+        } else {
+            throw new FilterException("Unsupported input source with class [" + content.getClass() + "]");
         }
     }
 

@@ -1,8 +1,8 @@
 .#------------------------------------------------------------------------------
-.input|xwiki+xar/1.3
+.input|xwiki+xar/1.4
 .# Make sure XAR without deprecated stuff works well
 .#------------------------------------------------------------------------------
-<xwikidoc version="1.2" reference="space.page" locale="">
+<xwikidoc version="1.4" reference="space.page" locale="">
   <defaultLanguage>en</defaultLanguage>
   <translation>0</translation>
   <creator>XWiki.creator</creator>
@@ -26,13 +26,28 @@
   <renderedcontent/>
   <attachment>
     <filename>attachment.txt</filename>
-    <versions>jrcsrevisions</versions>
     <author>XWiki.author</author>
     <date>947030400000</date>
-    <version>1.1</version>
+    <version>1.2</version>
     <comment>comment</comment>
     <content>AAECAwQFBgcICQ==</content>
     <filesize>10</filesize>
+    <revisions>
+      <revision>
+        <author>XWiki.author11</author>
+        <date>1577725775000</date>
+        <version>1.1</version>
+        <comment>Comment 1.1</comment>
+        <content>MS4x</content>
+      </revision>
+      <revision>
+        <author>XWiki.author12</author>
+        <date>1577725794000</date>
+        <version>1.2</version>
+        <comment>Comment 1.2</comment>
+        <contentAlias/>
+      </revision>
+    </revisions>
   </attachment>
   <class>
     <name>space.page</name>
@@ -114,7 +129,7 @@
   </object>
 </xwikidoc>
 .#------------------------------------------------------------------------------
-.inputexpect|filter+xml
+.expect|filter+xml
 .#------------------------------------------------------------------------------
 <wikiSpace name="space">
   <wikiDocument name="page">
@@ -217,14 +232,10 @@
             </entry>
           </parameters>
         </p>
-        <wikiAttachment name="attachment.txt" size="10">
+        <wikiDocumentAttachment name="attachment.txt" size="10">
           <p>
             <content>AAECAwQFBgcICQ==</content>
             <parameters>
-              <entry>
-                <string>xwiki_jrcsrevisions</string>
-                <string>jrcsrevisions</string>
-              </entry>
               <entry>
                 <string>revision_author</string>
                 <string>XWiki.author</string>
@@ -235,7 +246,7 @@
               </entry>
               <entry>
                 <string>revision</string>
-                <string>1.1</string>
+                <string>1.2</string>
               </entry>
               <entry>
                 <string>revision_comment</string>
@@ -243,7 +254,58 @@
               </entry>
             </parameters>
           </p>
-        </wikiAttachment>
+          <wikiAttachmentRevisions>
+            <wikiAttachmentRevision>
+              <p>
+                <content>MS4x</content>
+                <parameters>
+                  <entry>
+                    <string>revision_author</string>
+                    <string>XWiki.author11</string>
+                  </entry>
+                  <entry>
+                    <string>revision_date</string>
+                    <date>2019-12-30 17:09:35.0 UTC</date>
+                  </entry>
+                  <entry>
+                    <string>revision</string>
+                    <string>1.1</string>
+                  </entry>
+                  <entry>
+                    <string>revision_comment</string>
+                    <string>Comment 1.1</string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiAttachmentRevision>
+            <wikiAttachmentRevision>
+              <p>
+                <parameters>
+                  <entry>
+                    <string>revision_author</string>
+                    <string>XWiki.author12</string>
+                  </entry>
+                  <entry>
+                    <string>revision_date</string>
+                    <date>2019-12-30 17:09:54.0 UTC</date>
+                  </entry>
+                  <entry>
+                    <string>revision</string>
+                    <string>1.2</string>
+                  </entry>
+                  <entry>
+                    <string>revision_comment</string>
+                    <string>Comment 1.2</string>
+                  </entry>
+                  <entry>
+                    <string>revision_content_alias</string>
+                    <string></string>
+                  </entry>
+                </parameters>
+              </p>
+            </wikiAttachmentRevision>
+          </wikiAttachmentRevisions>
+        </wikiDocumentAttachment>
         <wikiClass>
           <p>
             <parameters>

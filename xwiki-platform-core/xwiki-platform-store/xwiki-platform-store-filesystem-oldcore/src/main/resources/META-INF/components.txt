@@ -9,6 +9,7 @@ org.xwiki.store.filesystem.internal.migration.R1130040XWIKI16682DataMigration
 org.xwiki.store.filesystem.internal.migration.R910000XWIKI14697DataMigration
 org.xwiki.store.filesystem.internal.migration.R910001XWIKI14697DataMigration
 org.xwiki.store.filesystem.internal.migration.R910100XWIKI14871DataMigration
+org.xwiki.store.legacy.store.internal.DeletedDocumentContentFileSerializer
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentRecycleBinContentStore
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentStore
 org.xwiki.store.legacy.store.internal.FilesystemAttachmentVersioningStore

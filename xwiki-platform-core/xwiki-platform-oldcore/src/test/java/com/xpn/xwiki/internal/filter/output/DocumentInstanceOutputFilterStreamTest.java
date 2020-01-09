@@ -19,12 +19,16 @@
  */
 package com.xpn.xwiki.internal.filter.output;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
@@ -82,7 +86,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
         assertEquals("attachment.txt", attachment.getFilename());
         assertEquals(10, attachment.getLongSize());
-        assertTrue(Arrays.equals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 
         assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
@@ -227,7 +231,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
         assertEquals("attachment.txt", attachment.getFilename());
         assertEquals(10, attachment.getLongSize());
-        assertTrue(Arrays.equals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 
         assertEquals("XWiki.attachmentAuthor", attachment.getAuthor());
@@ -377,7 +381,7 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         XWikiAttachment attachment = document.getAttachment("attachment.txt");
         assertEquals("attachment.txt", attachment.getFilename());
         assertEquals(10, attachment.getLongSize());
-        assertTrue(Arrays.equals(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 },
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
             attachment.getContent(this.oldcore.getXWikiContext())));
 
         assertNotNull(attachment.getDate());
@@ -462,5 +466,49 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         assertEquals(0, documentObject.getNumber());
         assertEquals(1, documentObject.getFieldList().size());
         assertEquals("propvalue", documentObject.getStringValue("prop"));
+    }
+
+    @Test
+    public void importAttachmentWithRevisions() throws FilterException, XWikiException, ParseException, IOException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVersionPreserved(true);
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithattachmentrevisions", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        XWikiAttachment attachment = document.getAttachment("attachment.txt");
+
+        assertNotNull(attachment);
+
+        assertEquals(10, attachment.getContentLongSize(null));
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+            attachment.getContent(this.oldcore.getXWikiContext())));
+
+        XWikiAttachment attachment11 = attachment.getAttachmentRevision("1.1", null);
+
+        assertEquals(3, attachment11.getContentLongSize(null));
+        assertContentEquals("1.1", attachment11);
+        assertEquals("", attachment11.getComment());
+
+        XWikiAttachment attachment12 = attachment.getAttachmentRevision("1.2", null);
+
+        assertEquals(10, attachment12.getContentLongSize(null));
+        assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
+            attachment12.getContent(this.oldcore.getXWikiContext())));
+        assertEquals("", attachment12.getComment());
+    }
+
+    private void assertContentEquals(String expected, XWikiAttachment attachment) throws IOException, XWikiException
+    {
+        try (InputStream stream = attachment.getContentInputStream(null)) {
+            assertEquals(expected, IOUtils.toString(stream, StandardCharsets.UTF_8));
+        }
     }
 }

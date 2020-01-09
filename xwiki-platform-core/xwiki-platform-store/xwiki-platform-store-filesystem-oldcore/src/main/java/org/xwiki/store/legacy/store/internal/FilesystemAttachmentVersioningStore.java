@@ -36,13 +36,13 @@ import org.xwiki.store.filesystem.internal.AttachmentFileProvider;
 import org.xwiki.store.filesystem.internal.FilesystemStoreTools;
 import org.xwiki.store.internal.FileSystemStoreUtils;
 import org.xwiki.store.legacy.doc.internal.FilesystemAttachmentContent;
-import org.xwiki.store.legacy.doc.internal.ListAttachmentArchive;
 import org.xwiki.store.serialization.Serializer;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.internal.doc.ListAttachmentArchive;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
 
 /**

@@ -44,6 +44,7 @@ import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.input.InputSource;
+import org.xwiki.filter.input.InputStreamInputSource;
 import org.xwiki.filter.input.StringInputSource;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.filter.output.DefaultWriterOutputTarget;
@@ -776,6 +777,17 @@ public class XWikiAttachment implements Cloneable
         this.contentStoreSet = true;
     }
 
+    /**
+     * @throws XWikiException when failing to load the attachment content
+     * @since 12.0RC1
+     */
+    public XWikiAttachmentContent getAttachmentContent(XWikiContext xcontext) throws XWikiException
+    {
+        loadAttachmentContent(xcontext);
+
+        return getAttachment_content();
+    }
+
     public XWikiAttachmentContent getAttachment_content()
     {
         return this.content;
@@ -816,6 +828,17 @@ public class XWikiAttachment implements Cloneable
     {
         this.archiveStore = archiveStore;
         this.archiveStoreSet = true;
+    }
+
+    /**
+     * @throws XWikiException when failing to load the attachment archive
+     * @since 12.0RC1
+     */
+    public XWikiAttachmentArchive getAttachmentArchive(XWikiContext xcontext) throws XWikiException
+    {
+        loadArchive(xcontext);
+
+        return getAttachment_archive();
     }
 
     public XWikiAttachmentArchive getAttachment_archive()

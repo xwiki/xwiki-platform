@@ -523,4 +523,16 @@ xwiki.stats.default=0
 #-# By default Filter module is used, uncomment to use the old system.
 # xwiki.action.import.xar.usefilter=0
 
+#-# [Since 12.0]
+#-# Indicate if the XAR packages should be optimized (from size point of view) by default.
+#-# Can be overwritten with URL parameter "?optimized=false".
+#-# The default is:
+# xwiki.action.export.xar.optimized=1
+#-# [Since 12.0]
+#-# Indicate if the JRCS format should be used for attachment history in XAR packages by default.
+#-# Enabled by default for retro compatibility reasons.
+#-# Can be overwritten with URL parameter "?attachment_jrcs=false"
+#-# The default is:
+# xwiki.action.export.xar.attachment.jrcs=1
+
 $!xwikiCfgAdditionalProperties

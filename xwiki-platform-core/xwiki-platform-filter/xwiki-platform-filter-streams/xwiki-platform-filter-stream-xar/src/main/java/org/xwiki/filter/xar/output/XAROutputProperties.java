@@ -42,6 +42,11 @@ public class XAROutputProperties extends XMLOutputProperties
     private boolean forceDocument;
 
     /**
+     * @see #isOptimized()
+     */
+    private boolean optimized = true;
+
+    /**
      * @see #getPackageName()
      */
     private String packageName;
@@ -110,6 +115,26 @@ public class XAROutputProperties extends XMLOutputProperties
     public void setForceDocument(boolean forceDocument)
     {
         this.forceDocument = forceDocument;
+    }
+
+    /**
+     * @return true if the output filter should try to optimize the generated XAR to reduce its size
+     * @since 12.0RC1
+     */
+    @PropertyName("Optimize")
+    @PropertyDescription("Try to optimize the generated XAR to reduce its size")
+    public boolean isOptimized()
+    {
+        return this.optimized;
+    }
+
+    /**
+     * @param optimized true if the output filter should try to optimize the generated XAR to reduce its size
+     * @since 12.0RC1
+     */
+    public void setOptimized(boolean optimized)
+    {
+        this.optimized = optimized;
     }
 
     // package.xml

@@ -17,22 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.filter.xar;
+package com.xpn.xwiki.internal.filter.input;
 
-import org.junit.runner.RunWith;
-import org.xwiki.filter.test.integration.FilterTestSuite;
-import org.xwiki.filter.test.integration.FilterTestSuite.Scope;
-import org.xwiki.test.annotation.AllComponents;
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.xwiki.filter.input.AbstractInputStreamInputSource;
+import org.xwiki.filter.input.InputSource;
+
+import com.xpn.xwiki.doc.XWikiAttachmentContent;
 
 /**
- * Run all tests found in the classpath. These {@code *.test} files must follow the conventions described in
- * {@link org.xwiki.filter.test.integration.TestDataParser}.
+ * An implementation of {@link InputSource} for attachments.
  * 
  * @version $Id$
+ * @since 12.0RC1
  */
-@RunWith(FilterTestSuite.class)
-@AllComponents
-@Scope(value = "document", pattern = "new1.test")
-public class DocumentIntegrationTests
+public class XWikiAttachmentContentInputSource extends AbstractInputStreamInputSource
 {
+    private XWikiAttachmentContent content;
+
+    /**
+     * @param content the attachment content
+     */
+    public XWikiAttachmentContentInputSource(XWikiAttachmentContent content)
+    {
+        this.content = content;
+    }
+
+    @Override
+    protected InputStream openStream() throws IOException
+    {
+        return this.content.getContentInputStream();
+    }
 }

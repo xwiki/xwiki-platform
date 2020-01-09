@@ -63,9 +63,14 @@ public final class XARFilterUtils
     public static final String ROLEHINT_13 = "xwiki+xar/1.3";
 
     /**
+     * @since 12.0RC1
+     */
+    public static final String ROLEHINT_14 = "xwiki+xar/1.4";
+
+    /**
      * @since 7.2M1
      */
-    public static final String ROLEHINT_CURRENT = ROLEHINT_13;
+    public static final String ROLEHINT_CURRENT = ROLEHINT_14;
 
     /**
      * @since 6.2M1

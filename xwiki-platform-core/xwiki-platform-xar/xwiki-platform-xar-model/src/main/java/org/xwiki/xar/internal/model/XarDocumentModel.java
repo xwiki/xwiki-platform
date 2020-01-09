@@ -48,11 +48,18 @@ public class XarDocumentModel
     public static final String VERSION_13 = "1.3";
 
     /**
+     * Introduce new way to serialize attachment history.
+     * 
+     * @since 9.0RC1
+     */
+    public static final String VERSION_14 = "1.4";
+
+    /**
      * The current version.
      * 
      * @since 9.0RC1
      */
-    public static final String VERSION_CURRENT = VERSION_13;
+    public static final String VERSION_CURRENT = VERSION_14;
 
     public static final String ELEMENT_DOCUMENT = "xwikidoc";
 

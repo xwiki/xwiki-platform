@@ -53,6 +53,7 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.ParserUtils;
+import org.xwiki.security.authorization.AuthorExecutor;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
@@ -75,7 +76,7 @@ public class DefaultGadgetSource implements GadgetSource
      * The reference to the gadgets class, relative to the current wiki. <br>
      * TODO: to make sure that this class exists before trying to read objects of this type.
      */
-    private static final EntityReference GADGET_CLASS =
+    protected static final EntityReference GADGET_CLASS =
         new EntityReference("GadgetClass", EntityType.DOCUMENT, new EntityReference("XWiki", EntityType.SPACE));
 
     /**
@@ -102,6 +103,9 @@ public class DefaultGadgetSource implements GadgetSource
     @Inject
     @Named("local")
     private EntityReferenceSerializer<String> localReferenceSerializer;
+
+    @Inject
+    private AuthorExecutor authorExecutor;
 
     /**
      * Used to get the Velocity Engine and Velocity Context to use to evaluate the titles of the gadgets.
@@ -133,7 +137,7 @@ public class DefaultGadgetSource implements GadgetSource
         DocumentReference gadgetsClass = currentReferenceEntityResolver.resolve(GADGET_CLASS);
         List<BaseObject> gadgetObjects = sourceDoc.getXObjects(gadgetsClass);
 
-        if (gadgetObjects == null) {
+        if (gadgetObjects == null || gadgetObjects.isEmpty()) {
             return new ArrayList<>();
         }
 
@@ -183,9 +187,11 @@ public class DefaultGadgetSource implements GadgetSource
 
             // parse both the title and content in the syntax of the transformation context
             List<Block> titleBlocks =
-                renderGadgetProperty(gadgetTitle, sourceSyntax, xObject.getDocumentReference(), context);
+                renderGadgetProperty(gadgetTitle, sourceSyntax, xObject.getDocumentReference(),
+                    xObject.getOwnerDocument(), context);
             List<Block> contentBlocks =
-                renderGadgetProperty(content, sourceSyntax, xObject.getDocumentReference(), context);
+                renderGadgetProperty(content, sourceSyntax, xObject.getDocumentReference(),
+                    xObject.getOwnerDocument(), context);
 
             // create a gadget will all these and add the gadget to the container of gadgets
             Gadget gadget = new Gadget(id, titleBlocks, contentBlocks, position);
@@ -196,12 +202,16 @@ public class DefaultGadgetSource implements GadgetSource
     }
 
     private List<Block> renderGadgetProperty(String content, Syntax sourceSyntax, EntityReference sourceReference,
-        MacroTransformationContext context) throws MissingParserException, ParseException, ContentExecutorException
+        XWikiDocument ownerDocument, MacroTransformationContext context)
+        throws Exception
     {
-        XDOM xdom = this.contentExecutor.execute(content, sourceSyntax, sourceReference, context);
-        List<Block> xdomBlocks = xdom.getChildren();
-        this.parserUtils.removeTopLevelParagraph(xdomBlocks);
-        return xdomBlocks;
+        // Ensure that the gadgets are executed with the proper rights.
+        return authorExecutor.call(() -> {
+            XDOM xdom = this.contentExecutor.execute(content, sourceSyntax, sourceReference, context);
+            List<Block> xdomBlocks = xdom.getChildren();
+            this.parserUtils.removeTopLevelParagraph(xdomBlocks);
+            return xdomBlocks;
+        }, ownerDocument.getAuthorReference(), ownerDocument.getDocumentReference());
     }
 
     /**

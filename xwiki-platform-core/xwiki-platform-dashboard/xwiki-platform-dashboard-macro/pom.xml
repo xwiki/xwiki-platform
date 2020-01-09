@@ -33,8 +33,8 @@
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Dashboard Macro</xwiki.extension.name>
-    <xwiki.jacoco.instructionRatio>0.54</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>22</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>41</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

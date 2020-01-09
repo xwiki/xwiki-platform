@@ -19,12 +19,16 @@
  */
 package org.xwiki.rendering.executor;
 
+import java.lang.reflect.ParameterizedType;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.MissingParserException;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.syntax.Syntax;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * Parse the passed content and execute it.
@@ -36,6 +40,14 @@ import org.xwiki.rendering.syntax.Syntax;
 @Role
 public interface ContentExecutor<T>
 {
+    /**
+     * Type instance for {@code ContentExecutor<MacroTransformationContext>}.
+     *
+     * @since 12.0RC1, 11.10.3, 11.3.7
+     */
+    ParameterizedType TYPE_MACRO_TRANSFORMATION = new DefaultParameterizedType(null, ContentExecutor.class,
+        MacroTransformationContext.class);
+
     /**
      * Parse and execute content.
      *

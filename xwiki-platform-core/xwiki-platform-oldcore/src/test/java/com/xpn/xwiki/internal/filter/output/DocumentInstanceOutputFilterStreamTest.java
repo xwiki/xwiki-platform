@@ -495,14 +495,20 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
 
         assertEquals(3, attachment11.getContentLongSize(null));
         assertContentEquals("1.1", attachment11);
-        assertEquals("", attachment11.getComment());
+        assertEquals("Comment 1.1", attachment11.getComment());
 
         XWikiAttachment attachment12 = attachment.getAttachmentRevision("1.2", null);
 
-        assertEquals(10, attachment12.getContentLongSize(null));
+        assertEquals(3, attachment12.getContentLongSize(null));
+        assertContentEquals("1.1", attachment12);
+        assertEquals("Comment 1.2", attachment12.getComment());
+
+        XWikiAttachment attachment13 = attachment.getAttachmentRevision("1.3", null);
+
+        assertEquals(10, attachment13.getContentLongSize(null));
         assertTrue(Arrays.equals(new byte[] {0, 1, 2, 3, 4, 5, 6, 7, 8, 9},
-            attachment12.getContent(this.oldcore.getXWikiContext())));
-        assertEquals("", attachment12.getComment());
+            attachment13.getContent(this.oldcore.getXWikiContext())));
+        assertEquals("Comment 1.3", attachment13.getComment());
     }
 
     private void assertContentEquals(String expected, XWikiAttachment attachment) throws IOException, XWikiException

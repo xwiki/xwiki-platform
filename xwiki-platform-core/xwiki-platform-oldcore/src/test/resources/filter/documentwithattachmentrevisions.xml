@@ -14,7 +14,7 @@
           </entry>
           <entry>
             <string>revision</string>
-            <string>1.2</string>
+            <string>1.4</string>
           </entry>
           <entry>
             <string>revision_comment</string>
@@ -64,6 +64,32 @@
               <entry>
                 <string>revision_comment</string>
                 <string>Comment 1.2</string>
+              </entry>
+              <entry>
+                <string>revision_content_alias</string>
+                <string>1.1</string>
+              </entry>
+            </parameters>
+          </p>
+        </wikiAttachmentRevision>
+        <wikiAttachmentRevision>
+          <p>
+            <parameters>
+              <entry>
+                <string>revision_author</string>
+                <string>XWiki.author13</string>
+              </entry>
+              <entry>
+                <string>revision_date</string>
+                <date>2019-12-30 17:09:54.0 UTC</date>
+              </entry>
+              <entry>
+                <string>revision</string>
+                <string>1.3</string>
+              </entry>
+              <entry>
+                <string>revision_comment</string>
+                <string>Comment 1.3</string>
               </entry>
               <entry>
                 <string>revision_content_alias</string>

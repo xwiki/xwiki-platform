@@ -255,8 +255,8 @@ public class ImportAction extends XWikiAction
 
                     String documentReference = getDocumentReference(pageEntry);
                     if (iAction == DocumentInfo.ACTION_OVERWRITE) {
-                        entities.includes(new LocalDocumentReference(resolver.resolve(documentReference, EntityType.DOCUMENT),
-                            LocaleUtils.toLocale(locale)));
+                        entities.includes(new LocalDocumentReference(
+                            resolver.resolve(documentReference, EntityType.DOCUMENT), LocaleUtils.toLocale(locale)));
                     }
                 }
             }
@@ -357,17 +357,16 @@ public class ImportAction extends XWikiAction
             if (marker != null) {
                 if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_CREATED.getName())
                     || marker.contains(WikiDocumentFilter.LOG_DOCUMENT_UPDATED.getName())) {
-                    oldImporter.getInstalled(context).add(
-                        serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    oldImporter.getInstalled(context)
+                        .add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
                 } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_SKIPPED.getName())) {
-                    oldImporter.getSkipped(context).add(
-                        serializer.serialize((EntityReference) log.getArgumentArray()[0]));
+                    oldImporter.getSkipped(context)
+                        .add(serializer.serialize((EntityReference) log.getArgumentArray()[0]));
                 } else if (marker.contains(WikiDocumentFilter.LOG_DOCUMENT_ERROR.getName())) {
                     Object entity = log.getArgumentArray()[0];
                     if (entity != null) {
-                        oldImporter.getErrors(context).add(
-                            entity instanceof EntityReference ? serializer.serialize((EntityReference) log
-                                .getArgumentArray()[0]) : entity.toString());
+                        oldImporter.getErrors(context).add(entity instanceof EntityReference
+                            ? serializer.serialize((EntityReference) log.getArgumentArray()[0]) : entity.toString());
                     }
                 }
             }

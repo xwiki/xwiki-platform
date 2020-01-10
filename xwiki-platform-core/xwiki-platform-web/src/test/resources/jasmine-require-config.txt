@@ -1,24 +1,26 @@
 paths: {
-  // I assume the '../../../' prefix is needed in order to get out of 'main/webapp/resources', but I'm not 100% sure.
-  // See http://stackoverflow.com/questions/24654534/jasmine-maven-plugin-load-some-other-test-utilities-common-script
-  'jquery': '../../../webjars/jquery',
-  'jQueryNoConflict': '../../../spec/jQueryNoConflict',
-  'prototype': 'js/prototype/prototype',
-  'xwiki-events-bridge': 'js/xwiki/eventsBridge'
+  'jquery': '/webjars/jquery',
+  'jQueryNoConflict': '/spec/jQueryNoConflict',
+
+  'bootstrap': '/webjars/bootstrap',
+
+  // Tree
+  'jsTree': '/webjars/jstree',
+  'JobRunner': '/webjars/jobRunner',
+  'tree-finder': '/webjars/finder',
+  'tree': '/webjars/tree'
 },
 map: {
   // '*' means all modules will get 'jQueryNoConflict' for their 'jquery' dependency.
-  '*': {'jquery': 'jQueryNoConflict'},
+  '*': {
+    'jquery': 'jQueryNoConflict'
+  },
   // 'jQueryNoConflict' wants the real jQuery module though. If this line was not here, there would be an unresolvable
   // cyclic dependency.
-  'jQueryNoConflict': {'jquery': 'jquery'}
+  'jQueryNoConflict': {
+    'jquery': 'jquery'
+  }
 },
 shim: {
-  'prototype': {
-    exports: '$'
-  },
-  'xwiki-events-bridge': {
-    // The dependency on Prototype.js is not declared.
-    deps: ['jquery', 'prototype']
-  }
+  'bootstrap': ['jquery']
 }

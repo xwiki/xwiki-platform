@@ -63,6 +63,17 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>org.webjars</groupId>
+      <artifactId>bootstrap</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-tree-webjar</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-tool-test-simple</artifactId>
       <version>${commons.version}</version>
@@ -171,44 +182,19 @@
         <artifactId>jasmine-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>non-amd</id>
             <goals>
               <goal>test</goal>
             </goals>
-            <configuration>
-              <sourceIncludes>
-                <include>js/prototype/prototype.js</include>
-                <include>uicomponents/widgets/list/xlist.js</include>
-                <include>uicomponents/suggest/suggest.js</include>
-                <include>uicomponents/model/entityReference.js</include>
-                <include>js/xwiki/xwiki.js</include>
-              </sourceIncludes>
-              <specIncludes>
-                <include>non-amd/**/*.js</include>
-              </specIncludes>
-            </configuration>
-          </execution>
-          <execution>
-            <!-- Tests for JavaScript code that follows the Asynchronous Module Definition pattern -->
-            <id>amd</id>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <configuration>
-              <specRunnerTemplate>REQUIRE_JS</specRunnerTemplate>
-              <customRunnerConfiguration>
-                ${project.basedir}/src/test/resources/jasmine-require-config.txt
-              </customRunnerConfiguration>
-              <preloadSources>
-                <source>webjars/require.js</source>
-              </preloadSources>
-              <specIncludes>
-                <include>amd/**/*.js</include>
-              </specIncludes>
-            </configuration>
           </execution>
         </executions>
         <configuration>
+          <specRunnerTemplate>REQUIRE_JS</specRunnerTemplate>
+          <customRunnerConfiguration>
+            ${project.basedir}/src/test/resources/jasmine-require-config.txt
+          </customRunnerConfiguration>
+          <preloadSources>
+            <source>/webjars/require.js</source>
+          </preloadSources>
           <jsSrcDir>${project.basedir}/src/main/webapp/resources</jsSrcDir>
           <timeout>10</timeout>
         </configuration>

@@ -17,6 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+require.config({
+  paths: {
+    'entityReference': 'uicomponents/model/entityReference',
+    'prototype': 'js/prototype/prototype'
+  },
+  shim: {
+    entityReference: ['prototype']
+  }
+});
+
+define(['entityReference'], function() {
+
 describe('EntityReference', function() {
   describe('Serializer', function() {
     function resolveAndSerialize() {
@@ -411,4 +423,6 @@ describe('EntityReferenceTree', function() {
     // Node not found.
     execute(tree, 'NotFound', XWiki.EntityType.SPACE, null);
   })
+});
+
 });

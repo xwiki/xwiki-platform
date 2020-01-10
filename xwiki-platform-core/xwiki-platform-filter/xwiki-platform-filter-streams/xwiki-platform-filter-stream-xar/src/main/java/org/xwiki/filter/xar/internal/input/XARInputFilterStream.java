@@ -77,9 +77,15 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
                 throw new FilterException("Failed to get input stream", e);
             }
 
-            Boolean iszip;
             try {
-                iszip = isZip(stream);
+                // Check if it's a ZIP or not
+                Boolean iszip = isZip(stream);
+
+                if (iszip == Boolean.FALSE) {
+                    readDocument(filter, proxyFilter);
+                } else {
+                    readXAR(filter, proxyFilter);
+                }
             } catch (IOException e) {
                 throw new FilterException("Failed to read input stream", e);
             } finally {
@@ -88,12 +94,6 @@ public class XARInputFilterStream extends AbstractBeanInputFilterStream<XARInput
                 } catch (IOException e) {
                     throw new FilterException("Failed to close the source", e);
                 }
-            }
-
-            if (iszip == Boolean.FALSE) {
-                readDocument(filter, proxyFilter);
-            } else {
-                readXAR(filter, proxyFilter);
             }
         } else {
             throw new FilterException(String.format("Unsupported input source of type [%s]", inputSource.getClass()));

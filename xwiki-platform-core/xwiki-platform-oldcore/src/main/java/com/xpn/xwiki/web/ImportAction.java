@@ -20,7 +20,6 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.UUID;
@@ -34,8 +33,8 @@ import org.xwiki.filter.FilterException;
 import org.xwiki.filter.event.model.WikiDocumentFilter;
 import org.xwiki.filter.input.BeanInputFilterStream;
 import org.xwiki.filter.input.BeanInputFilterStreamFactory;
-import org.xwiki.filter.input.DefaultInputStreamInputSource;
 import org.xwiki.filter.input.InputFilterStreamFactory;
+import org.xwiki.filter.input.InputSource;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.filter.instance.output.InstanceOutputProperties;
 import org.xwiki.filter.output.BeanOutputFilterStream;
@@ -65,6 +64,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XARImportedEvent;
 import com.xpn.xwiki.internal.event.XARImportingEvent;
+import com.xpn.xwiki.internal.filter.input.XWikiAttachmentContentInputSource;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
 import com.xpn.xwiki.plugin.packaging.Package;
@@ -299,8 +299,8 @@ public class ImportAction extends XWikiAction
         // Notify all the listeners about import
         ObservationManager observation = Utils.getComponent(ObservationManager.class);
 
-        InputStream source = packFile.getContentInputStream(context);
-        xarProperties.setSource(new DefaultInputStreamInputSource(source));
+        InputSource source = new XWikiAttachmentContentInputSource(packFile.getAttachmentContent(context));
+        xarProperties.setSource(source);
 
         // Setup log
         xarProperties.setVerbose(true);
@@ -336,7 +336,7 @@ public class ImportAction extends XWikiAction
                 }
             }
 
-            // Close the input source
+            // Make sure to free any resource use by the input source in case the input filter does not do it
             source.close();
 
             observation.notify(new XARImportedEvent(), null, context);

@@ -80,7 +80,8 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
 /**
  * Extend the breadcrumbs with tree navigation.
  */
-require(["$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"], function() {
+require([$jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
+    'require-config.min.js', {'evaluate': true, 'minify': $services.debug.minify}))], function() {
   require(['tree', 'bootstrap'], function($) {
     var enhanceBreadcrumb = function(breadcrumb) {
       breadcrumb.children('li.dropdown').on('shown.bs.dropdown', function(event) {

@@ -107,7 +107,6 @@ public interface WikiAttachmentFilter
      * @param parameters the properties of the attachment
      * @throws FilterException when failing to send event
      */
-    @Unstable
     void onWikiAttachment(String name, InputStream content, Long size,
         @Default(FilterEventParameters.DEFAULT) FilterEventParameters parameters) throws FilterException;
 

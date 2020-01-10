@@ -20,10 +20,12 @@
 require.config({
   paths: {
     'prototype': 'js/prototype/prototype',
+    'entityReference': 'uicomponents/model/entityReference',
     'xwiki': 'js/xwiki/xwiki'
   },
   shim: {
-    'xwiki': ['prototype']
+    'entityReference': ['prototype'],
+    'xwiki': ['entityReference']
   }
 });
 

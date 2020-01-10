@@ -17,6 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+require.config({
+  paths: {
+    'prototype': 'js/prototype/prototype',
+    'xwiki-events-bridge': 'js/xwiki/eventsBridge'
+  },
+  shim: {
+    'prototype': {
+      exports: '$'
+    },
+    'xwiki-events-bridge': {
+      // The dependency on Prototype.js is not declared.
+      deps: ['jquery', 'prototype']
+    }
+  }
+});
+
 define(['jquery', 'prototype', 'xwiki-events-bridge'], function($j, $p) {
   describe('Events Bridge', function() {
     it('Dependencies', function() {

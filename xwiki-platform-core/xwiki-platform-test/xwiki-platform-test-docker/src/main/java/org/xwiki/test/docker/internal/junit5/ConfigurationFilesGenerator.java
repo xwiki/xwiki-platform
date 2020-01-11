@@ -231,7 +231,7 @@ public class ConfigurationFilesGenerator
         } else if (this.testConfiguration.getDatabase().equals(Database.ORACLE)) {
             props.putAll(getDBProperties(Arrays.asList(
                 "oracle",
-                String.format("jdbc:oracle:thin:@%s:%s:XE", ipAddress, port),
+                String.format("jdbc:oracle:thin:@%s:%s/XWIKI", ipAddress, port),
                 DB_USERNAME,
                 DB_PASSWORD,
                 "oracle.jdbc.driver.OracleDriver",

@@ -97,7 +97,7 @@
       <version>${mysql.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.oracle.jdbc</groupId>
+      <groupId>com.oracle.ojdbc</groupId>
       <artifactId>ojdbc8</artifactId>
       <version>${oracle.version}</version>
     </dependency>

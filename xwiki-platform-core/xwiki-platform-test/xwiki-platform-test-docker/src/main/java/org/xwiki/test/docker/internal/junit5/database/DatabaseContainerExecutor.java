@@ -232,15 +232,14 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     {
         JdbcDatabaseContainer databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
-            databaseContainer = new OracleContainer(String.format("oracleinanutshell/oracle-xe-11g:%s",
+            databaseContainer = new OracleContainer(String.format("xwiki/oracle-database:%s",
                 testConfiguration.getDatabaseTag()));
         } else {
-            databaseContainer = new OracleContainer("oracleinanutshell/oracle-xe-11g");
+            databaseContainer = new OracleContainer("xwiki/oracle-database");
         }
         databaseContainer
             .withUsername("system")
-            .withPassword("oracle")
-            .withInitScript("oracle_init.sql");
+            .withPassword("oracle");
 
         startDatabaseContainer(databaseContainer, 1521, testConfiguration);
     }

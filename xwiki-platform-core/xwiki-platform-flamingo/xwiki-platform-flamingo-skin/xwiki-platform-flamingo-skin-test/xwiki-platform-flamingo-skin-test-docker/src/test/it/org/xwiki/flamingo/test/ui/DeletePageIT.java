@@ -89,8 +89,8 @@ public class DeletePageIT
     {
         ConfirmationPage confirmationPage = this.viewPage.delete();
         // This tests for regression of XWIKI-1388
-        assertNotNull("The interface should not show the user as logged out while deleting page",
-            confirmationPage.getCurrentUser());
+        assertNotNull(confirmationPage.getCurrentUser(),
+            "The interface should not show the user as logged out while deleting page");
         confirmationPage.clickYes();
         DeletingPage deletingPage = new DeletingPage();
         deletingPage.waitUntilFinished();

@@ -168,8 +168,8 @@ public class XWikiDocumentFilterCollection implements XWikiDocumentFilter
     }
 
     @Override
-    public void beginWikiAttachmentRevision(String revision, InputSource content, Long size, FilterEventParameters parameters)
-        throws FilterException
+    public void beginWikiAttachmentRevision(String revision, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
     {
         for (XWikiDocumentFilter filter : filters) {
             filter.beginWikiAttachmentRevision(revision, content, size, parameters);
@@ -177,8 +177,8 @@ public class XWikiDocumentFilterCollection implements XWikiDocumentFilter
     }
 
     @Override
-    public void endWikiAttachmentRevision(String revision, InputSource content, Long size, FilterEventParameters parameters)
-        throws FilterException
+    public void endWikiAttachmentRevision(String revision, InputSource content, Long size,
+        FilterEventParameters parameters) throws FilterException
     {
         for (XWikiDocumentFilter filter : filters) {
             filter.endWikiAttachmentRevision(revision, content, size, parameters);

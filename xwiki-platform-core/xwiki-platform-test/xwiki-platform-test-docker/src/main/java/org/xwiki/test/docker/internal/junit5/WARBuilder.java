@@ -272,7 +272,7 @@ public class WARBuilder
                 String oracleDriverVersion = isJDBCDriverSpecified(this.testConfiguration.getJDBCDriverVersion())
                     ? this.testConfiguration.getJDBCDriverVersion()
                     : this.mavenResolver.getPropertyFromCurrentPOM("oracle.version");
-                artifact = new DefaultArtifact("com.oracle.jdbc", "ojdbc8", JAR, oracleDriverVersion);
+                artifact = new DefaultArtifact("com.oracle.ojdbc", "ojdbc8", JAR, oracleDriverVersion);
                 break;
             default:
                 throw new RuntimeException(

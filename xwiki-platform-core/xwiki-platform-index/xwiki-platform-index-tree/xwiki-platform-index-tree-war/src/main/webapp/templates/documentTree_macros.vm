@@ -11,6 +11,7 @@
   'hierarchyMode': 'reference',
   'limit': 15,
   'root': '',
+  'rootData': {},
   'sheet': '',
   'showAddAttachment': false,
   'showAddDocument': false,
@@ -60,6 +61,16 @@
     #set ($docForRequest = $doc)
   #end
   #set ($macro.options.reference = "path:$docForRequest.getURL('get', $escapetool.url($resourceParams))")
+  #if ($macro.options.root && !$macro.options.showRoot && "$!macro.options.rootData" == "$!docTreeConfig.rootData")
+    ## Try to initialize the root node data based on the root node id.
+    #set ($parts = $macro.options.root.split(':', 2))
+    #if ($parts.size() == 2)
+      #set ($macro.options.rootData = {
+        'type': $parts[0],
+        'id': $parts[1]
+      })
+    #end
+  #end
   #set ($editable = $macro.options.remove('readOnly') != 'true')
   #set ($macro.options.dragAndDrop = $editable)
   #set ($macro.options.contextMenu = $editable)

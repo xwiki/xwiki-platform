@@ -12,6 +12,7 @@
   'openTo': '',
   'reference': '',
   'root': '',
+  'rootData': {},
   'showRoot': false
 })
 
@@ -74,6 +75,11 @@
       #set ($resourceURL = $xwiki.getURL($reference, 'get', $escapetool.url($resourceParams)))
     #end
     #set ($discard = $attributes.put('data-url', $resourceURL))
+  #end
+  ## If the root node is shown then the root data is retrieved using data-url. Otherwise, the root data can be specified
+  ## using the rootData option which translates into the data-root attribute.
+  #if (!$macro.options.showRoot)
+    #set ($discard = $attributes.put('data-root', $jsontool.serialize($macro.options.rootData)))
   #end
   #set ($dragAndDrop = $macro.options.dragAndDrop == 'true')
   #set ($discard = $attributes.put('data-dragAndDrop', $dragAndDrop))

@@ -31,16 +31,20 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
   var getChildren = function(node, callback, parameters) {
     // 'this' is the tree instance.
     callback = $.proxy(callback, this);
-    if (node.id === '#' && !node.data) {
-      // If the root node doesn't have any data then infer it from its children.
-      var nestedCallback = callback;
-      callback = function(children) {
-        var validChildren = getNodeTypes(children);
-        if (validChildren.length > 0) {
-          node.data = {validChildren: validChildren};
-        }
-        nestedCallback(children);
-      };
+    if (node.id === $.jstree.root && !node.data) {
+      // Take the root node data from the tree container element.
+      node.data = this.get_container().data('root') || {};
+      // If the root node doesn't specify the valid child nodes then infer this information from its children.
+      if (!node.data.validChildren) {
+        var nestedCallback = callback;
+        callback = function(children) {
+          var validChildren = getNodeTypes(children);
+          if (validChildren.length > 0) {
+            node.data.validChildren = validChildren;
+          }
+          nestedCallback(children);
+        };
+      }
     }
     var childrenURL = node.data && node.data.childrenURL;
     parameters = parameters || {};
@@ -334,7 +338,7 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
     var deferred = $.Deferred();
     // We need to open all the ancestors of the specified node.
     getPath.call(tree, nodeId, function(path) {
-      var root = this.get_node('#');
+      var root = this.get_node($.jstree.root);
       openPath.call(this, root, path, $.proxy(deferred, 'resolve'));
     });
     return deferred.promise();
@@ -430,7 +434,7 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       }).done(callback);
     },
     refreshNode: function(node) {
-      if (node === '#') {
+      if (node === $.jstree.root) {
         // jsTree doesn't want to refresh the root node so we refresh the entire tree.
         this.refresh();
       } else {

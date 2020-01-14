@@ -107,7 +107,7 @@
       'totalrows' : $filteredGroups.size(),
       'returnedrows' : $subGroups.size(),
       'offset' : $mathtool.add($offset, 1),
-      'reqNo' : $mathtool.toNumber($request.reqNo),
+      'reqNo' : $numbertool.toNumber($request.reqNo),
       'rows': $rows
     })
   $jsontool.serialize($result)

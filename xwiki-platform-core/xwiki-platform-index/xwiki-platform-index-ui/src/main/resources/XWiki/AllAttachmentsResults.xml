@@ -79,8 +79,8 @@
   #if ("$!fieldValue" != '')
     #set ($range = $fieldValue.split('-'))
     #set ($range = [
-      $datetool.toDate($mathtool.toNumber($range.get(0))),
-      $datetool.toDate($mathtool.toNumber($range.get(1)))
+      $datetool.toDate($numbertool.toNumber($range.get(0))),
+      $datetool.toDate($numbertool.toNumber($range.get(1)))
     ])
     #applyRangeFilter($fieldName $range $constraints $queryParameters)
   #end

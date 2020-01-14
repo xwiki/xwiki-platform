@@ -793,12 +793,12 @@
   #if ($timestamps.size() == 2)
     #if ($whereParams.entrySet())
       #set ($whereSql = "${whereSql} and $dateProperty &gt;= :${safeDateProperty}1 and $dateProperty &lt;= :${safeDateProperty}2")
-      #set ($discard = $whereParams.put("${safeDateProperty}1", $datetool.toDate($mathtool.toNumber($timestamps[0]))))
-      #set ($discard = $whereParams.put("${safeDateProperty}2", $datetool.toDate($mathtool.toNumber($timestamps[1]))))
+      #set ($discard = $whereParams.put("${safeDateProperty}1", $datetool.toDate($numbertool.toNumber($timestamps[0]))))
+      #set ($discard = $whereParams.put("${safeDateProperty}2", $datetool.toDate($numbertool.toNumber($timestamps[1]))))
     #else
       #set ($whereSql = "${whereSql} and $dateProperty &gt;= ? and $dateProperty &lt;= ?")
-      #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[0]))))
-      #set ($discard = $whereParams.add($datetool.toDate($mathtool.toNumber($timestamps[1]))))
+      #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[0]))))
+      #set ($discard = $whereParams.add($datetool.toDate($numbertool.toNumber($timestamps[1]))))
     #end
   #else
     ## Fall back to the older string matching

@@ -197,6 +197,7 @@
           </preloadSources>
           <jsSrcDir>${project.basedir}/src/main/webapp/resources</jsSrcDir>
           <timeout>10</timeout>
+          <debug>true</debug>
         </configuration>
       </plugin>
     </plugins>

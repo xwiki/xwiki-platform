@@ -34,9 +34,9 @@ define('export-tree', ['jquery', 'tree'], function($) {
       var node = tree.get_node(nodeId);
       // Select the nodes that are enabled or that are disabled but with children (in order to propagate the
       // selection to the descendants, because disabled nodes can have descendants that are enabled).
-      if (!node.state.disabled || node.children.length > 0) {
-        tree.select_node(node, false, true);
-      } else if (node.state.disabled && tree.is_parent(node)) {
+      if (!tree.is_disabled(nodeId) || node.children.length > 0) {
+        tree.select_node(nodeId, false, true);
+      } else if (tree.is_parent(nodeId)) {
         // Leave disabled nodes that are not loaded yet in the undetermined state.
         node.original.state.undetermined = true;
         node.state.undetermined = true;
@@ -47,29 +47,28 @@ define('export-tree', ['jquery', 'tree'], function($) {
   var deselectChildNodes = function(tree, parentNode) {
     parentNode = parentNode || tree.get_node($.jstree.root);
     parentNode.children.forEach(function(childNodeId) {
-      var childNode = tree.get_node(childNodeId);
-      if (childNode.state.disabled && tree.is_undetermined(childNode)) {
+      if (tree.is_disabled(childNodeId) && tree.is_undetermined(childNodeId)) {
         // Mark the child node as selected, otherwise deselect_node has no effect.
-        childNode.state.selected = true;
+        tree.get_node(childNodeId).state.selected = true;
       }
-      tree.deselect_node(childNode);
+      tree.deselect_node(childNodeId);
     });
   };
 
   var deselectDisabledNodes = function(tree, nodeIds) {
     nodeIds.forEach(function(nodeId) {
-      var node = tree.get_node(nodeId);
-      if (node.state.disabled && node.state.selected) {
+      if (tree.is_disabled(nodeId) && tree.is_selected(nodeId)) {
         // Deselect the node without propagating the change.
         var originalTrigger = tree.trigger;
         try {
           tree.trigger = function() {};
           // Leave disabled nodes that are not loaded yet in the undetermined state.
-          if (!tree.is_loaded(node) && tree.is_parent(node)) {
+          if (!tree.is_loaded(nodeId) && tree.is_parent(nodeId)) {
+            var node = tree.get_node(nodeId);
             node.original.state.undetermined = true;
             node.state.undetermined = true;
           }
-          tree.deselect_node(node);
+          tree.deselect_node(nodeId);
         } finally {
           tree.trigger = originalTrigger;
         }
@@ -82,7 +81,7 @@ define('export-tree', ['jquery', 'tree'], function($) {
    * pages to include and exclude from the export package.
    *
    * @param tree: the export tree instance
-   * @param parentNode: the parent node to process
+   * @param parentNode: the parent node to process; the parent node should be loaded and it must not be a leaf node
    * @param exportPages: a map of list, keys are pages to include, values are list of pages to exclude
    */
   var collectExportPages = function(tree, parentNode, exportPages) {
@@ -112,6 +111,7 @@ define('export-tree', ['jquery', 'tree'], function($) {
       // If the child node doesn't have children (easy case)...
       if (tree.is_leaf(child)) {
         // ...add the child page reference to the right list.
+        // Note that a leaf node can't have an undetermined state (it's either checked or unchecked).
         if (tree.is_checked(child)) {
           includedPages.push(childPageId);
         } else {
@@ -124,49 +124,67 @@ define('export-tree', ['jquery', 'tree'], function($) {
         var childPageJoker = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT,
           childPageReference.parent));
 
-        // If it's not loaded, we consider the entire sub-tree of pages.
-        if (!tree.is_loaded(child)) {
-          if (tree.is_checked(child)) {
-            // Include the entire sub-tree of pages.
-            includedPages.push(childPageJoker);
-          } else {
-            // Exclude the entire sub-tree of pages.
-            excludedPages.push(childPageJoker);
-          }
+        if (tree.is_checked(child) && !tree.is_loaded(child)) {
+          // Include the entire sub-tree of pages.
+          includedPages.push(childPageJoker);
         } else {
-          // Exclude the entire sub-tree at this point, as we will collect the export pages from this sub-tree later on
-          // recursively. E.g. I'm in Foo.% I selected Foo.Bar but only some of its children: I need Foo.Bar.% to be
-          // excluded in the request with Foo.% then another part of the request will select Foo.Bar.X, X being the
-          // selected children.
+          // The child node is either unchecked or undetermined or it is loaded, in which case we exclude the entire
+          // sub-tree at this point because we will collect the export pages from this sub-tree later on recursively.
+          // E.g. I'm in Foo.% I selected Foo.Bar but only some of its children: I need Foo.Bar.% to be excluded in the
+          // request with Foo.% then another part of the request will select Foo.Bar.X, X being the selected children.
           excludedPages.push(childPageJoker);
         }
       }
     });
 
-    // If we don't have a pagination node, or we have one and it's checked: we manage the export by specifying the
-    // excluded pages (we export the specified parent page without the excluded child pages).
-    var useExcludes = pageId && childNodes.length > 0 && childNodes.every(function(child) {
-      return child.data.type !== 'pagination' || tree.is_checked(child);
-    });
+    // We can manage the export by specifying either the pages to include or the pages to exclude:
+    // * if the parent node is not loaded and undetermined then we have to use excludes (export the child nodes without
+    //   their parent)
+    // * if the parent node has a child pagination node then we decide based on whether the pagination node is selected
+    //    or not. If the pagination node is selected then we can't use includes because there are child pages we don't
+    //    know yet. If the pagination node is deselected then we can't use excludes for the same reason: there are child
+    //    pages we don't know yet.
+    // * if there's no pagination child node then we decide based on whether the parent node is selected or not. If the
+    //   parent node is selected then we use excludes (select the parent except for ...). Otherwise, we use includes
+    //   (this has the effect that the child pages that don't appear in the tree, for any reason, are not included).
+    var paginationNode = findPaginationNode(childNodes);
+    var useExcludes = (!tree.is_loaded(parentNode) && tree.is_undetermined(parentNode)) ||
+      (paginationNode && tree.is_checked(paginationNode)) ||
+      (!paginationNode && tree.is_checked(parentNode));
     if (useExcludes) {
-      var pageReference = XWiki.Model.resolve(pageId, XWiki.EntityType.DOCUMENT);
-      var pageJoker = XWiki.Model.serialize(new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT,
-        pageReference.parent));
+      var parentReference = XWiki.Model.resolve(parentNode.data.id, XWiki.EntityType.byName(parentNode.data.type));
+      if (parentReference.type === XWiki.EntityType.DOCUMENT) {
+        // Use the space reference.
+        parentReference = parentReference.parent;
+      } else if (parentReference.type === XWiki.EntityType.WIKI) {
+        // Match any space from the specified wiki.
+        parentReference = new XWiki.EntityReference('%', XWiki.EntityType.SPACE, parentReference);
+      }
+      parentReference = new XWiki.EntityReference('%', XWiki.EntityType.DOCUMENT, parentReference);
+      var pageJoker = XWiki.Model.serialize(parentReference);
       exportPages[pageJoker] = excludedPages;
     } else {
-      // A pagination node exists but it's not checked: we manage the export by specifying exactly what to include (no
-      // excludes specified).
       includedPages.forEach(function(includedPage) {
         exportPages[includedPage] = [];
       });
     }
 
-    // Process the loaded non-leaf children recursively.
+    // Process the loaded & undetermined non-leaf children recursively.
     childNodes.forEach(function(child) {
-      if (tree.is_loaded(child) && !tree.is_leaf(child)) {
+      if (!tree.is_leaf(child) && (tree.is_loaded(child) || tree.is_undetermined(child))) {
         collectExportPages(tree, child, exportPages);
       }
     });
+  };
+
+  // Just because IE11 doesn't support Array.find() ...
+  var findPaginationNode = function(nodes) {
+    for (var i = nodes.length - 1; i >= 0; i--) {
+      var node = nodes[i];
+      if (node.data.type === 'pagination') {
+        return node;
+      }
+    }
   };
 
   var exportTreeAPI = {
@@ -179,16 +197,21 @@ define('export-tree', ['jquery', 'tree'], function($) {
       return this.get_checked().length > 0 || this.get_undetermined().length > 0;
     },
     isExportingAllPages: function() {
-      // Check if there are any unselected nodes.
-      return this.get_json(null, {
+      var nodes = this.get_json(null, {
         flat: true,
-        no_id: true,
         no_data: true,
+        no_state: true,
         no_a_attr: true,
         no_li_attr: true
-      }).find(function(node) {
-        return node.state.selected === false && node.state.undetermined !== true;
-      }) === undefined;
+      });
+      // Check if there are any unselected nodes.
+      for (var i = 0; i < nodes.length; i++) {
+        var nodeId = nodes[i].id;
+        if (!this.is_selected(nodeId) && !this.is_undetermined(nodeId)) {
+          return false;
+        }
+      }
+      return true;
     }
   };
 
@@ -215,7 +238,7 @@ define('export-tree', ['jquery', 'tree'], function($) {
             action: function () {
               selectChildNodes(tree, node);
             },
-            _disabled: !node.state.opened
+            _disabled: !tree.is_open(node)
           },
           unselect_children: {
             label: $jsontool.serialize($services.localization.render('core.exporter.unselectChildren')),
@@ -223,7 +246,7 @@ define('export-tree', ['jquery', 'tree'], function($) {
             action: function () {
               deselectChildNodes(tree, node);
             },
-            _disabled: !node.state.opened
+            _disabled: !tree.is_open(node)
           }
         };
       }
@@ -357,7 +380,10 @@ define('export-tree-filter', ['jquery', 'bootstrap', 'export-tree'], function($)
 
 require([
   'jquery',
-  "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {'evaluate': true})"
+  $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {
+    'evaluate': true,
+    'minify': $services.debug.minify
+  }))
 ], function ($) {
   'use strict';
 

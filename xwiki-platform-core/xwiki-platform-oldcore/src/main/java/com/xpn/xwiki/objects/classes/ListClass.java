@@ -362,8 +362,7 @@ public abstract class ListClass extends PropertyClass
                 list.add(currentValue.toString());
                 currentValue = new StringBuilder();
                 inMapValue = false;
-            // then if we are finding a separator in escape mode, we need to output the separator with its escape
-            // in the current value, and leave the escape mode
+            // then if we are finding a separator we need to output the separator and leave the escape mode
             } else if (StringUtils.containsAny(separators, currentChar)) {
                 currentValue.append(currentChar);
                 inEscape = false;
@@ -425,18 +424,15 @@ public abstract class ListClass extends PropertyClass
             for (int i = 0; i < valueElement.length(); i++) {
                 char currentChar = valueElement.charAt(i);
 
-                // if the current char represents an escape, and we're not yet in escape mode
-                // and it's not the final character: we are starting to escape something
-                if (currentChar == SEPARATOR_ESCAPE && !inEscape && i < valueElement.length() - 1) {
+                // if the current char represents an escape, and we're not yet in escape mode, we enter in escape mode
+                if (currentChar == SEPARATOR_ESCAPE && !inEscape) {
                     inEscape = true;
+                    newValue.append(SEPARATOR_ESCAPE);
                 // if we are already in escape mode: we were escaping the escape character
-                // if we were are at the final character: we want to represent an escape, so we need to escape it
+                // so we output it and leave the escape mode
                 } else if (currentChar == SEPARATOR_ESCAPE) {
                     inEscape = false;
                     newValue.append(SEPARATOR_ESCAPE);
-                    if (i == valueElement.length() - 1) {
-                        newValue.append(SEPARATOR_ESCAPE);
-                    }
                 // if the current character represents a separator, we need to escape it no matter what
                 } else if (StringUtils.containsAny(separators, currentChar)) {
                     // if we were in escape mode, it means that the separator was escaped even if it wasn't needed
@@ -445,20 +441,18 @@ public abstract class ListClass extends PropertyClass
                     // character: List[a\b] is serialized in a\b not in a\\b.
                     if (inEscape) {
                         newValue.append(SEPARATOR_ESCAPE);
-                        newValue.append(SEPARATOR_ESCAPE);
                     }
-                    newValue.append(SEPARATOR_ESCAPE);
-                    newValue.append(currentChar);
-                    inEscape = false;
-                // if we were in escape mode for a normal character, we still output the escape
-                // for backward compatibility reason
-                } else if (inEscape) {
                     newValue.append(SEPARATOR_ESCAPE);
                     newValue.append(currentChar);
                     inEscape = false;
                 } else {
                     newValue.append(currentChar);
+                    inEscape = false;
                 }
+            }
+            // if we are still in escape mode, it means the final character is an escape and we should escape it.
+            if (inEscape) {
+                newValue.append(SEPARATOR_ESCAPE);
             }
             escapedValues.add(newValue.toString());
         }

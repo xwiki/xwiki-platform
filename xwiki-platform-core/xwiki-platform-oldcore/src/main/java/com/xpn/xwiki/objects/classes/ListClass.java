@@ -107,29 +107,6 @@ public abstract class ListClass extends PropertyClass
 
     private static final String XCLASSNAME = "list";
 
-    /**
-     * Regex used to split lists stored in a string. Supports escaped separators inside values. The individually
-     * regex-escaped separators string needs to be passed as parameter.
-     */
-    private static final String LIST_ITEM_SEPARATOR_REGEX_FORMAT = "(?<!\\\\)[%s]";
-
-    /**
-     * Regex used to unescape separators inside the actual values of the list. The individually regex-escaped separators
-     * string needs to be passed as parameter.
-     */
-    private static final String ESCAPED_SEPARATORS_REGEX_FORMAT = "\\%s([%s])";
-
-    /**
-     * Regex used to find unescaped separators in a list item's value. Regex-escaped separators string needs to be
-     * passed as parameter.
-     */
-    private static final String UNESCAPED_SEPARATORS_REGEX_FORMAT = "([%s])";
-
-    /**
-     * Replacement string used to escaped a separator found by the String.replace regex.
-     */
-    private static final String UNESCAPED_SEPARATOR_REPLACEMENT = String.format("\\%s$1", SEPARATOR_ESCAPE);
-
     public ListClass(String name, String prettyname, PropertyMetaClass wclass)
     {
         super(name, prettyname, wclass);
@@ -348,45 +325,61 @@ public abstract class ListClass extends PropertyClass
     public static List<String> getListFromString(String value, String separators, boolean withMap)
     {
         List<String> list = new ArrayList<>();
-        if (value == null) {
+        if (StringUtils.isEmpty(value)) {
             return list;
         }
         if (separators == null) {
             separators = DEFAULT_SEPARATOR;
         }
 
-        // Escape the list of separators individually to be safely used in regexes.
-        String regexEscapedSeparatorsRegexPart =
-            SEPARATOR_ESCAPE + StringUtils.join(separators.toCharArray(), SEPARATOR_ESCAPE);
+        // flag to know if we are in an escape
+        boolean inEscape = false;
 
-        String escapedSeparatorsRegex =
-            String.format(ESCAPED_SEPARATORS_REGEX_FORMAT, SEPARATOR_ESCAPE, regexEscapedSeparatorsRegexPart);
+        // flag to know if we are parsing a map value
+        boolean inMapValue = false;
+        StringBuilder currentValue = new StringBuilder();
+        for (int i = 0; i < value.length(); i++) {
+            char currentChar = value.charAt(i);
 
-        // Split the values and process each list item.
-        String listItemSeparatorRegex =
-            String.format(LIST_ITEM_SEPARATOR_REGEX_FORMAT, regexEscapedSeparatorsRegexPart);
-        String[] elements = value.split(listItemSeparatorRegex);
-        for (String element : elements) {
-            // Adjacent separators are treated as one separator.
-            if (StringUtils.isBlank(element)) {
+            // if we are parsing an = not in escape mode and we are parsing with map
+            // then we are starting a map value mode
+            if (currentChar == '=' && withMap && !inEscape) {
+                inMapValue = true;
+            // all time of the map value mode, we are skipping the characters, except if it's a separator
+            } else if (withMap && inMapValue && !StringUtils.containsAny(separators, currentChar)) {
                 continue;
-            }
-
-            // Unescape any escaped separator in the individual list item.
-            String unescapedElement = element.replaceAll(escapedSeparatorsRegex, "$1");
-            String item = unescapedElement;
-
-            // Check if it is a map entry, i.e. "key=value"
-            if (withMap && (unescapedElement.indexOf('=') != -1)) {
-                // Get just the key, ignore the value/label.
-                item = unescapedElement.split("=", 2)[0];
-            }
-
-            // Ignore empty items.
-            if (StringUtils.isNotBlank(item.trim())) {
-                list.add(item);
+            // if we are finding an escape and we are not yet in escape mode, then we entering the escape mode
+            } else if (currentChar == SEPARATOR_ESCAPE && !inEscape) {
+                inEscape = true;
+            // if we were already in escape mode, then we are escaping an escape: we output the escape
+            // and leave the escape mode
+            } else if (currentChar == SEPARATOR_ESCAPE) {
+                currentValue.append(SEPARATOR_ESCAPE);
+                inEscape = false;
+            // if we are finding a separator and we are not in escape mode, then we finished to parse one value
+            // we are adding the value to the result, and start a new value to parse
+            } else if (StringUtils.containsAny(separators, currentChar) && !inEscape) {
+                list.add(currentValue.toString());
+                currentValue = new StringBuilder();
+                inMapValue = false;
+            // then if we are finding a separator in escape mode, we need to output the separator with its escape
+            // in the current value, and leave the escape mode
+            } else if (StringUtils.containsAny(separators, currentChar)) {
+                currentValue.append(currentChar);
+                inEscape = false;
+            // finally if we are still in escape mode: we are actually escaping a normal character,
+            // we still output the escape for backward compatibility reason, and leave the escape mode
+            } else if (inEscape) {
+                currentValue.append(SEPARATOR_ESCAPE);
+                currentValue.append(currentChar);
+                inEscape = false;
+            // else we just output the current character
+            } else {
+                currentValue.append(currentChar);
             }
         }
+        // don't forget to add the latest value in the result.
+        list.add(currentValue.toString());
 
         return list;
     }
@@ -422,17 +415,52 @@ public abstract class ListClass extends PropertyClass
             separators = DEFAULT_SEPARATOR;
         }
 
-        // Escape the list of separators individually to be safely used in regexes.
-        String regexEscapedSeparatorsRegexPart =
-            SEPARATOR_ESCAPE + StringUtils.join(separators.toCharArray(), SEPARATOR_ESCAPE);
-
-        String unescapedSeparatorsRegex =
-            String.format(UNESCAPED_SEPARATORS_REGEX_FORMAT, regexEscapedSeparatorsRegexPart);
-
         List<String> escapedValues = new ArrayList<>();
-        for (String value : list) {
-            String escapedValue = value.replaceAll(unescapedSeparatorsRegex, UNESCAPED_SEPARATOR_REPLACEMENT);
-            escapedValues.add(escapedValue);
+
+        for (String valueElement : list) {
+            // flag to know if we are in escape mode or not
+            boolean inEscape = false;
+            StringBuilder newValue = new StringBuilder();
+
+            for (int i = 0; i < valueElement.length(); i++) {
+                char currentChar = valueElement.charAt(i);
+
+                // if the current char represents an escape, and we're not yet in escape mode
+                // and it's not the final character: we are starting to escape something
+                if (currentChar == SEPARATOR_ESCAPE && !inEscape && i < valueElement.length() - 1) {
+                    inEscape = true;
+                // if we are already in escape mode: we were escaping the escape character
+                // if we were are at the final character: we want to represent an escape, so we need to escape it
+                } else if (currentChar == SEPARATOR_ESCAPE) {
+                    inEscape = false;
+                    newValue.append(SEPARATOR_ESCAPE);
+                    if (i == valueElement.length() - 1) {
+                        newValue.append(SEPARATOR_ESCAPE);
+                    }
+                // if the current character represents a separator, we need to escape it no matter what
+                } else if (StringUtils.containsAny(separators, currentChar)) {
+                    // if we were in escape mode, it means that the separator was escaped even if it wasn't needed
+                    // so we escape the escape to be able to output it.
+                    // Note that we don't do that generically since we don't want to escape the escape for a normal
+                    // character: List[a\b] is serialized in a\b not in a\\b.
+                    if (inEscape) {
+                        newValue.append(SEPARATOR_ESCAPE);
+                        newValue.append(SEPARATOR_ESCAPE);
+                    }
+                    newValue.append(SEPARATOR_ESCAPE);
+                    newValue.append(currentChar);
+                    inEscape = false;
+                // if we were in escape mode for a normal character, we still output the escape
+                // for backward compatibility reason
+                } else if (inEscape) {
+                    newValue.append(SEPARATOR_ESCAPE);
+                    newValue.append(currentChar);
+                    inEscape = false;
+                } else {
+                    newValue.append(currentChar);
+                }
+            }
+            escapedValues.add(newValue.toString());
         }
 
         // Use the first separator to join the list.

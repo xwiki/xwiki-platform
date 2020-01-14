@@ -22,8 +22,9 @@ package com.xpn.xwiki.objects.classes;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for {@link ListClass}.
@@ -38,7 +39,7 @@ public class ListClassTest
     @Test
     public void testGetListFromStringDefaultSeparator()
     {
-        Assert.assertEquals(Arrays.asList("a", "b", "c"), ListClass.getListFromString("a|b|c"));
+        assertEquals(Arrays.asList("a", "b", "c"), ListClass.getListFromString("a|b|c"));
     }
 
     /**
@@ -47,7 +48,7 @@ public class ListClassTest
     @Test
     public void testGetListFromStringSeparatorInValues()
     {
-        Assert.assertEquals(Arrays.asList("a", "|b", "c|", "|"), ListClass.getListFromString("a|\\|b|c\\||\\|"));
+        assertEquals(Arrays.asList("a", "|b", "c|", "|"), ListClass.getListFromString("a|\\|b|c\\||\\|"));
     }
 
     /**
@@ -56,7 +57,7 @@ public class ListClassTest
     @Test
     public void testGetListFromStringNonDefaultSeparator()
     {
-        Assert.assertEquals(Arrays.asList("a", "b", "c"), ListClass.getListFromString("a*b*c", "*", false));
+        assertEquals(Arrays.asList("a", "b", "c"), ListClass.getListFromString("a*b*c", "*", false));
     }
 
     /**
@@ -65,7 +66,7 @@ public class ListClassTest
     @Test
     public void testGetListFromStringMultipleSeparators()
     {
-        Assert.assertEquals(Arrays.asList("a", "b", "c", "d", "e"),
+        assertEquals(Arrays.asList("a", "b", "c", "d", "e"),
             ListClass.getListFromString("a*b,c,d*e", "*,", false));
     }
 
@@ -75,7 +76,7 @@ public class ListClassTest
     @Test
     public void testGetListFromStringMultipleSeparatorsWithSeparatorsInValues()
     {
-        Assert.assertEquals(Arrays.asList("a*b", "c,d", "e*f"),
+        assertEquals(Arrays.asList("a*b", "c,d", "e*f"),
             ListClass.getListFromString("a\\*b,c\\,d*e\\*f", "*,", false));
     }
 
@@ -85,7 +86,7 @@ public class ListClassTest
     @Test
     public void testGetStringFromListDefaultSeparator()
     {
-        Assert.assertEquals("a|b|c", ListClass.getStringFromList(Arrays.asList("a", "b", "c")));
+        assertEquals("a|b|c", ListClass.getStringFromList(Arrays.asList("a", "b", "c")));
     }
 
     /**
@@ -94,7 +95,7 @@ public class ListClassTest
     @Test
     public void testGetStringFromListSeparatorInValues()
     {
-        Assert.assertEquals("a|\\|b|c\\||\\|", ListClass.getStringFromList(Arrays.asList("a", "|b", "c|", "|")));
+        assertEquals("a|\\|b|c\\||\\|", ListClass.getStringFromList(Arrays.asList("a", "|b", "c|", "|")));
     }
 
     /**
@@ -103,7 +104,7 @@ public class ListClassTest
     @Test
     public void testGetStringFromListNonDefaultSeparator()
     {
-        Assert.assertEquals("a*b*c", ListClass.getStringFromList(Arrays.asList("a", "b", "c"), "*"));
+        assertEquals("a*b*c", ListClass.getStringFromList(Arrays.asList("a", "b", "c"), "*"));
     }
 
     /**
@@ -112,7 +113,7 @@ public class ListClassTest
     @Test
     public void testGetStringFromListMultipleSeparators()
     {
-        Assert.assertEquals("a*b*c*d*e", ListClass.getStringFromList(Arrays.asList("a", "b", "c", "d", "e"), "*,"));
+        assertEquals("a*b*c*d*e", ListClass.getStringFromList(Arrays.asList("a", "b", "c", "d", "e"), "*,"));
     }
 
     /**
@@ -121,39 +122,57 @@ public class ListClassTest
     @Test
     public void testGetStringFromListMultipleSeparatorsWithSeparatorsInValues()
     {
-        Assert.assertEquals("a\\*b*c\\,d*e\\*f", ListClass.getStringFromList(Arrays.asList("a*b", "c,d", "e*f"), "*,"));
+        assertEquals("a\\*b*c\\,d*e\\*f", ListClass.getStringFromList(Arrays.asList("a*b", "c,d", "e*f"), "*,"));
     }
 
     @Test
     public void getMapFromString()
     {
         Map<String, ListItem> map = ListClass.getMapFromString("a=1|b");
-        Assert.assertEquals(2, map.size());
-        Assert.assertEquals("a", map.get("a").getId());
-        Assert.assertEquals("1", map.get("a").getValue());
-        Assert.assertEquals("b", map.get("b").getId());
-        Assert.assertEquals("b", map.get("b").getValue());
+        assertEquals(2, map.size());
+        assertEquals("a", map.get("a").getId());
+        assertEquals("1", map.get("a").getValue());
+        assertEquals("b", map.get("b").getId());
+        assertEquals("b", map.get("b").getValue());
     }
 
     @Test
     public void getMapFromStringWithEmptyValue()
     {
         Map<String, ListItem> map = ListClass.getMapFromString("|a");
-        Assert.assertEquals(2, map.size());
-        Assert.assertEquals("", map.get("").getId());
-        Assert.assertEquals("", map.get("").getValue());
-        Assert.assertEquals("a", map.get("a").getId());
-        Assert.assertEquals("a", map.get("a").getValue());
+        assertEquals(2, map.size());
+        assertEquals("", map.get("").getId());
+        assertEquals("", map.get("").getValue());
+        assertEquals("a", map.get("a").getId());
+        assertEquals("a", map.get("a").getValue());
     }
 
     @Test
     public void getMapFromStringWithEmptyValueWithLabel()
     {
         Map<String, ListItem> map = ListClass.getMapFromString("=None|a");
-        Assert.assertEquals(2, map.size());
-        Assert.assertEquals("", map.get("").getId());
-        Assert.assertEquals("None", map.get("").getValue());
-        Assert.assertEquals("a", map.get("a").getId());
-        Assert.assertEquals("a", map.get("a").getValue());
+        assertEquals(2, map.size());
+        assertEquals("", map.get("").getId());
+        assertEquals("None", map.get("").getValue());
+        assertEquals("a", map.get("a").getId());
+        assertEquals("a", map.get("a").getValue());
+    }
+
+    @Test
+    public void listWithBackslash()
+    {
+        assertEquals(Arrays.asList("a\\b", "c"), ListClass.getListFromString("a\\b|c"));
+        assertEquals(Arrays.asList("a", "\\", "c"), ListClass.getListFromString("a|\\\\|c"));
+        assertEquals(Arrays.asList("a", "\\b", "c"), ListClass.getListFromString("a|\\b|c"));
+        assertEquals(Arrays.asList("a", "b\\", "c"), ListClass.getListFromString("a|b\\\\|c"));
+        assertEquals(Arrays.asList("a", "b|c"), ListClass.getListFromString("a|b\\|c"));
+        assertEquals(Arrays.asList("a", "b\\|c"), ListClass.getListFromString("a|b\\\\\\|c"));
+        assertEquals(Arrays.asList("a", "\\|c"), ListClass.getListFromString("a|\\\\\\|c"));
+        assertEquals(Arrays.asList("a", "|c"), ListClass.getListFromString("a|\\|c"));
+        assertEquals(Arrays.asList("\\", "c"), ListClass.getListFromString("\\\\|c"));
+        assertEquals(Arrays.asList("a", "\\"), ListClass.getListFromString("a|\\\\"));
+        assertEquals(Arrays.asList("a", "\\", "c"), ListClass.getListFromString("a,\\\\,c", ",", false));
+        assertEquals(Arrays.asList("a", ",c"), ListClass.getListFromString("a,\\,c", ",", false));
+        assertEquals(Arrays.asList("a", "\\,c"), ListClass.getListFromString("a,\\\\\\,c", ",", false));
     }
 }

@@ -22,27 +22,19 @@ package com.xpn.xwiki.objects;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.junit.jupiter.api.Test;
 
-import com.xpn.xwiki.web.Utils;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test list property.
  * 
  * @version $Id$
  */
-public class ListPropertyTest extends AbstractComponentTestCase
+public class ListPropertyTest
 {
-
-    @Before
-    public void configure() throws Exception
-    {
-        Utils.setComponentManager(getComponentManager());
-    }
-
     @Test
     public void dirtyFlagPropagation() throws Exception
     {
@@ -54,13 +46,13 @@ public class ListPropertyTest extends AbstractComponentTestCase
 
         list.add("foo");
 
-        Assert.assertTrue(p.isValueDirty());
+        assertTrue(p.isValueDirty());
 
         p.setValueDirty(false);
 
         p.setList(null);
 
-        Assert.assertTrue(p.isValueDirty());
+        assertTrue(p.isValueDirty());
     }
 
     @Test
@@ -76,12 +68,12 @@ public class ListPropertyTest extends AbstractComponentTestCase
 
         List<String> cloneList = clone.getList();
 
-        Assert.assertFalse(clone.isValueDirty());
+        assertFalse(clone.isValueDirty());
 
         cloneList.add("foo");
 
-        Assert.assertFalse(p.isValueDirty());
-        Assert.assertTrue(clone.isValueDirty());
+        assertFalse(p.isValueDirty());
+        assertTrue(clone.isValueDirty());
     }
 
     /**
@@ -92,7 +84,7 @@ public class ListPropertyTest extends AbstractComponentTestCase
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("a<b>c", "1\"2'3", "x{y&z"));
-        Assert.assertEquals("a<b>c|1\"2'3|x{y&z", listProperty.getTextValue());
+        assertEquals("a<b>c|1\"2'3|x{y&z", listProperty.getTextValue());
     }
 
     /**
@@ -104,7 +96,7 @@ public class ListPropertyTest extends AbstractComponentTestCase
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("c<b>a", "3\"2'1", "z{y&x"));
-        Assert.assertEquals("c<b>a|3\"2'1|z{y&x", listProperty.toText());
+        assertEquals("c<b>a|3\"2'1|z{y&x", listProperty.toText());
     }
 
     /**
@@ -115,7 +107,7 @@ public class ListPropertyTest extends AbstractComponentTestCase
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("o<n>e", "t\"w'o", "t{h&ree"));
-        Assert.assertEquals("o&#60;n&#62;e|t&#34;w&#39;o|t&#123;h&#38;ree", listProperty.toFormString());
+        assertEquals("o&#60;n&#62;e|t&#34;w&#39;o|t&#123;h&#38;ree", listProperty.toFormString());
     }
 
     /**
@@ -126,6 +118,50 @@ public class ListPropertyTest extends AbstractComponentTestCase
     {
         ListProperty listProperty = new ListProperty();
         listProperty.setValue(Arrays.asList("a|b", "c|d", "e\\|f"));
-        Assert.assertEquals("a\\|b|c\\|d|e\\\\|f", listProperty.toText());
+        assertEquals("a\\|b|c\\|d|e\\\\\\|f", listProperty.toText());
+    }
+
+    @Test
+    public void toListValuesWithBackslash()
+    {
+        ListProperty listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a\\b", "c"));
+        assertEquals("a\\b|c", listProperty.toText());
+
+        listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a", "\\", "c"));
+        assertEquals("a|\\\\|c", listProperty.toText());
+
+        listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a", "\\b", "c"));
+        assertEquals("a|\\b|c", listProperty.toText());
+
+        listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a", "b\\", "c"));
+        assertEquals("a|b\\\\|c", listProperty.toText());
+
+        listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a", "b|c"));
+        assertEquals("a|b\\|c", listProperty.toText());
+
+        listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a", "b\\|c"));
+        assertEquals("a|b\\\\\\|c", listProperty.toText());
+
+        listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a", "|c"));
+        assertEquals("a|\\|c", listProperty.toText());
+
+        listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a", "\\|c"));
+        assertEquals("a|\\\\\\|c", listProperty.toText());
+
+        listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("\\", "c"));
+        assertEquals("\\\\|c", listProperty.toText());
+
+        listProperty = new ListProperty();
+        listProperty.setValue(Arrays.asList("a", "\\"));
+        assertEquals("a|\\\\", listProperty.toText());
     }
 }

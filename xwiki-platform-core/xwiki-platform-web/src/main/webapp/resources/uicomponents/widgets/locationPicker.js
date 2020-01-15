@@ -123,15 +123,18 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     // Input timeouts used to avoid handling too soon each individual letter, as the user types.
     var inputDelay = 500;
     var spaceReferenceInputTimeout;
-    var mainDocument = new XWiki.Document(XWiki.Model.resolve('wiki:Main.WebHome', XWiki.EntityType.DOCUMENT));
 
     /**
      * Compute a page name from a given title.
      **/
     var getPageName = function(title) {
-      var queryString = "xpage=entityName_json&outputSyntax=main&name=" + encodeURIComponent(title);
-      var url = mainDocument.getURL("get", queryString);
-      return $.get(url);
+      var url = XWiki.currentDocument.getURL("get");
+      return $.get(url, {
+        'xpage': 'entityName_json',
+        'outputSyntax': 'plain',
+        'name': title,
+        'csrf': xm.form_token
+      });
     };
 
     /**
@@ -156,6 +159,12 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       // Update the name field.
       getPageName(titleInput.val()).done(function(data) {
         nameInput.val(data.transformedName);
+      }).fail(function (response) {
+        new XWiki.widgets.Notification(
+          "$services.localization.render('namestrategies.nametransformation.error')",
+          'error'
+        );
+        nameInput.val(titleInput.val());
       });
     };
 

@@ -1,7 +1,12 @@
 #template("xwikivars.vm")
 
 #set ($configuration = $services.namestrategies.configuration)
-#if ("$!request.name" != "")
+#if (!$services.csrf.isTokenValid($request.csrf))
+    $response.setStatus(403)
+    #setVariable("$json" {
+        "error": "Wrong CSRF token."
+    })
+#elseif ("$!request.name" != "")
     #if ("$!request.strategy" != "")
         #set ($transformedName = $services.namestrategies.transformName($request.name, $request.strategy))
         #set ($isOriginalValid = $services.namestrategies.isValid($request.name, $request.strategy))
@@ -36,5 +41,4 @@
         'isOriginalValid': $isOriginalValid
     })
 #end
-$response.setContentType('application/json')
-$jsontool.serialize($json)
+#jsonResponse($json)

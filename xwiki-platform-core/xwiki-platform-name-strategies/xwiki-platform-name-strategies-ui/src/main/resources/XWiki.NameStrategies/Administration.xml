@@ -543,7 +543,7 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'xwiki-events-bridge'], function($) {
+      <code>require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
   var createCharacterModal = $('#createReplacementCharacterModal');
   var removeCharacterModal = $('#removeReplacementCharacterModal');
   var newForbiddenCharacter = $('#newForbiddenCharacter');
@@ -560,14 +560,14 @@
       "action": "addCharacter",
       "forbiddenCharacter": newForbiddenCharacter.val(),
       "replacementCharacter": newReplacementCharacter.val(),
-      "csrf": $('input[name=form_token]').val()
+      "csrf": xm.form_token
     }
     var jsonDoc = new XWiki.Document(XWiki.Model.resolve('XWiki.NameStrategies.AdministrationJSON', XWiki.EntityType.DOCUMENT));
     var notification = new XWiki.widgets.Notification(
       $jsontool.serialize($services.localization.render('namestrategies.replacementCharacter.create.inProgress')),
       'inprogress'
     );
-    $.get(jsonDoc.getURL("get", $.param(query))).done(function (data) {
+    $.get(jsonDoc.getURL("get"), query).done(function (data) {
       createCharacterModal.modal('hide');
       window.livetable_replacementCharacters.refresh();
       notification.replace(new XWiki.widgets.Notification(
@@ -607,9 +607,14 @@
       $('.test-strategy').removeClass('hidden');
       var selectedStrategy = $('#XWiki\\.NameStrategies\\.ConfigurationClass_0_currentStrategy').val();
 
-      var queryString = "xpage=entityName_json&amp;outputSyntax=main&amp;name=" + encodeURIComponent(testText) + "&amp;strategy=" + encodeURIComponent(selectedStrategy);
-      var url = new XWiki.Document().getURL("get", queryString);
-      $.get(url).done(function (data) {
+      var url = new XWiki.Document().getURL("get");
+      $.get(url, {
+          'xpage': 'entityName_json',
+          'outputSyntax': 'plain',
+          'name': testText,
+          'strategy': selectedStrategy,
+          'csrf': xm.form_token
+        }).done(function (data) {
         $('#testNameStrategyIsValid_' + data.isOriginalValid).removeClass('hidden');
         $('#testNameStrategyIsValid_' + !data.isOriginalValid).addClass('hidden');
         $('#testNameStrategyTransformedName').text(data.transformedName)

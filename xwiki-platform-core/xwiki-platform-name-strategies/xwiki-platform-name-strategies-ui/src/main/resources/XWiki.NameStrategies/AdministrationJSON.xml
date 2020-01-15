@@ -128,8 +128,7 @@
     })
     $response.setStatus(403)
   #end
-  $response.setContentType('application/json')
-  $jsontool.serialize($json)
+  #jsonResponse($json)
 #end
 {{/velocity}}</content>
 </xwikidoc>

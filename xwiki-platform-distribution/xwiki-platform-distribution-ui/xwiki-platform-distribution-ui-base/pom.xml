@@ -189,7 +189,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-name-strategies-ui</artifactId>
+      <artifactId>xwiki-platform-model-validation-ui</artifactId>
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>

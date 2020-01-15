@@ -137,7 +137,7 @@ public class SaveAction extends PreviewAction
         }
 
         if (doc.isNew() && !this.isEntityReferenceNameValid(doc.getDocumentReference())) {
-            context.put("message", "namestrategies.create.invalidname");
+            context.put("message", "entitynamevalidation.create.invalidname");
             context.put("messageParameters",
                 new Object[] { getLocalSerializer().serialize(doc.getDocumentReference())});
             return true;

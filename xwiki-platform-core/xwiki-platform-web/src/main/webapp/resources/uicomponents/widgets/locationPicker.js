@@ -130,7 +130,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     var getPageName = function(title) {
       var url = XWiki.currentDocument.getURL("get");
       return $.get(url, {
-        'xpage': 'entityName_json',
+        'xpage': 'entitynamevalidation_json',
         'outputSyntax': 'plain',
         'name': title,
         'csrf': xm.form_token
@@ -161,7 +161,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
         nameInput.val(data.transformedName);
       }).fail(function (response) {
         new XWiki.widgets.Notification(
-          "$services.localization.render('namestrategies.nametransformation.error')",
+          "$services.localization.render('entitynamevalidation.nametransformation.error')",
           'error'
         );
         nameInput.val(titleInput.val());

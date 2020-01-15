@@ -1,7 +1,0 @@
-org.xwiki.namestrategies.internal.DefaultEntityReferenceNameStrategyManager
-org.xwiki.namestrategies.internal.DefaultNameStrategyConfiguration
-org.xwiki.namestrategies.internal.NameStrategiesConfigurationSource
-org.xwiki.namestrategies.internal.ReplaceCharacterNameStrategy
-org.xwiki.namestrategies.internal.ReplaceCharacterNameStrategyConfiguration
-org.xwiki.namestrategies.internal.SlugNameStrategy
-org.xwiki.namestrategies.script.NameStrategiesScriptService

@@ -302,7 +302,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-model</artifactId>
+      <artifactId>xwiki-platform-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -581,7 +581,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-name-strategies-api</artifactId>
+      <artifactId>xwiki-platform-model-validation-api</artifactId>
       <version>${project.version}</version>
     </dependency>
 

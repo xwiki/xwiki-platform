@@ -54,8 +54,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.namestrategies.EntityReferenceNameStrategyManager;
-import org.xwiki.namestrategies.NameStrategyConfiguration;
+import org.xwiki.model.validation.EntityNameValidationConfiguration;
+import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
 import org.xwiki.refactoring.internal.LinkRefactoring;
@@ -419,11 +419,11 @@ public class MockitoOldcore
             when(mockUrlConfigComponent.getURLFormatId()).thenReturn("standard");
         }
 
-        if (!this.componentManager.hasComponent(EntityReferenceNameStrategyManager.class)) {
-            this.componentManager.registerMockComponent(EntityReferenceNameStrategyManager.class);
+        if (!this.componentManager.hasComponent(EntityNameValidationManager.class)) {
+            this.componentManager.registerMockComponent(EntityNameValidationManager.class);
         }
-        if (!this.componentManager.hasComponent(NameStrategyConfiguration.class)) {
-            this.componentManager.registerMockComponent(NameStrategyConfiguration.class);
+        if (!this.componentManager.hasComponent(EntityNameValidationConfiguration.class)) {
+            this.componentManager.registerMockComponent(EntityNameValidationConfiguration.class);
         }
 
         getXWikiContext().setLocale(Locale.ENGLISH);

@@ -734,7 +734,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // Name strategies components
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-name-strategies-default", getXWikiPlatformVersion(), null, "jar"));
+            "xwiki-platform-model-validation-default", getXWikiPlatformVersion(), null, "jar"));
 
         // Default component for the merge operation used by oldcore.
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",

@@ -48,7 +48,6 @@ import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
-import org.xwiki.container.servlet.filters.SavedRequestManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.csrf.CSRFToken;
@@ -65,8 +64,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.EntityReferenceValueProvider;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.namestrategies.EntityReferenceNameStrategyManager;
-import org.xwiki.namestrategies.NameStrategyConfiguration;
+import org.xwiki.model.validation.EntityNameValidationConfiguration;
+import org.xwiki.model.validation.EntityNameValidationManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.WrappedThreadEventListener;
 import org.xwiki.rendering.async.AsyncContext;
@@ -157,9 +156,9 @@ public abstract class XWikiAction extends Action
 
     private ScriptContextManager scriptContextManager;
 
-    private EntityReferenceNameStrategyManager entityReferenceNameStrategyManager;
+    private EntityNameValidationManager entityNameValidationManager;
 
-    private NameStrategyConfiguration nameStrategyConfiguration;
+    private EntityNameValidationConfiguration entityNameValidationConfiguration;
 
     private EntityReferenceSerializer<String> localSerializer;
 
@@ -186,21 +185,21 @@ public abstract class XWikiAction extends Action
         return this.progress;
     }
 
-    protected EntityReferenceNameStrategyManager getEntityReferenceNameStrategyManager()
+    protected EntityNameValidationManager getEntityNameValidationManager()
     {
-        if (this.entityReferenceNameStrategyManager == null) {
-            this.entityReferenceNameStrategyManager = Utils.getComponent(EntityReferenceNameStrategyManager.class);
+        if (this.entityNameValidationManager == null) {
+            this.entityNameValidationManager = Utils.getComponent(EntityNameValidationManager.class);
         }
-        return this.entityReferenceNameStrategyManager;
+        return this.entityNameValidationManager;
     }
 
-    protected NameStrategyConfiguration getNameStrategyConfiguration()
+    protected EntityNameValidationConfiguration getEntityNameValidationConfiguration()
     {
-        if (this.nameStrategyConfiguration == null) {
-            this.nameStrategyConfiguration = Utils.getComponent(NameStrategyConfiguration.class);
+        if (this.entityNameValidationConfiguration == null) {
+            this.entityNameValidationConfiguration = Utils.getComponent(EntityNameValidationConfiguration.class);
         }
 
-        return this.nameStrategyConfiguration;
+        return this.entityNameValidationConfiguration;
     }
 
     protected EntityReferenceSerializer<String> getLocalSerializer()
@@ -269,9 +268,9 @@ public abstract class XWikiAction extends Action
     @Unstable
     protected boolean isEntityReferenceNameValid(EntityReference entityReference)
     {
-        if (this.getEntityReferenceNameStrategyManager().getEntityReferenceNameStrategy() != null
-            && this.getNameStrategyConfiguration().useValidation()) {
-            if (!this.getEntityReferenceNameStrategyManager().getEntityReferenceNameStrategy()
+        if (this.getEntityNameValidationManager().getEntityReferenceNameStrategy() != null
+            && this.getEntityNameValidationConfiguration().useValidation()) {
+            if (!this.getEntityNameValidationManager().getEntityReferenceNameStrategy()
                 .isValid(entityReference)) {
                 Object[] args = { getLocalSerializer().serialize(entityReference) };
                 XWikiException invalidNameException = new XWikiException(XWikiException.MODULE_XWIKI_STORE,

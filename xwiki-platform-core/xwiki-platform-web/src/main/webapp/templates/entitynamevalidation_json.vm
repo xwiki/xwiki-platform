@@ -1,0 +1,44 @@
+#template("xwikivars.vm")
+
+#set ($configuration = $services.modelvalidation.configuration)
+#if (!$services.csrf.isTokenValid($request.csrf))
+    $response.setStatus(403)
+    #setVariable("$json" {
+        "error": "Wrong CSRF token."
+    })
+#elseif ("$!request.name" != "")
+    #if ("$!request.strategy" != "")
+        #set ($transformedName = $services.modelvalidation.transformName($request.name, $request.strategy))
+        #set ($isOriginalValid = $services.modelvalidation.isValid($request.name, $request.strategy))
+    #else
+        #set ($transformedName = $services.modelvalidation.transformName($request.name))
+        #set ($isOriginalValid = $services.modelvalidation.isValid($request.name))
+    #end
+    #setVariable("$json" {
+        'useTransformation': $configuration.useTransformation(),
+        'useValidation': $configuration.useValidation(),
+        'originalName': $request.name,
+        'transformedName': $transformedName,
+        'isOriginalValid': $isOriginalValid
+    })
+#else
+    #set ($originalReferenceSerialized = $request.sourceReference)
+    #set ($sourceReference = $services.model.resolveDocument($originalReferenceSerialized))
+    #if ("$!request.strategy" != "")
+        #set ($transformedReference = $services.modelvalidation.transformEntityReference($sourceReference, $request.strategy))
+        #set ($isOriginalValid = $services.modelvalidation.isValid($sourceReference, $request.strategy))
+    #else
+        #set ($transformedReference = $services.modelvalidation.transformEntityReference($sourceReference))
+        #set ($isOriginalValid = $services.modelvalidation.isValid($sourceReference))
+    #end
+    #set ($transformedReferenceSerialized = $services.model.serialize($transformedReference))
+
+    #setVariable("$json" {
+        'useTransformation': $configuration.useTransformation(),
+        'useValidation': $configuration.useValidation(),
+        'originalReference': $originalReferenceSerialized,
+        'tranformedReference': $transformedReferenceSerialized,
+        'isOriginalValid': $isOriginalValid
+    })
+#end
+#jsonResponse($json)

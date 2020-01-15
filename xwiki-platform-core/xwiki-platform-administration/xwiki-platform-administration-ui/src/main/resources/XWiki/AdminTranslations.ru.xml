@@ -62,11 +62,11 @@ XWiki.Registration_loginButton_autoLogin_enabled.hint=Если кнопка вх
 XWiki.Registration_defaultRedirect.hint=URL, на который пользователь будет перенаправлен после нажатия кнопки входа в систему, если не указан параметр xredirect. Можно использовать velocity-код.
 XWiki.Registration_requireCaptcha.hint=Установите это значение true, чтобы требовать от пользователя решения CAPTCHA для регистрации.
 XWiki.Registration_registrationSuccessMessage.hint=Показывается пользователю, когда он успешно зарегистрировался. Можно использовать velocity-код вики-разметку.
-### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
-### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
-### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
-### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
-### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
+XWiki.Registration_passwordLength.hint=Минимальная длина пароля. Более длинный пароль более безопасен, рекомендуется не менее 6 символов.
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=Если этот флажок установлен, пользователь должен выбрать пароль, по крайней мере, с одним символом в нижнем регистре.
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=Если этот флажок установлен, пользователь должен выбрать пароль, по крайней мере, с одним заглавным символом.
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=Если этот флажок установлен, пользователь должен выбрать пароль, по крайней мере, с одним числом.
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Если этот флажок установлен, пользователь должен выбрать пароль, по крайней мере, с одним спецсимволом.
 
 # Look &amp; Feel Sections
 admin.themes=Темы

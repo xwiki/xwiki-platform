@@ -18,8 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 // TODO: Move this file in the WebJar once we add support for loading JavaScript files from WebJars as Skin Extensions.
-require([$jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar',
-    'require-config.min.js', {'evaluate': true, 'minify': $services.debug.minify}))], function() {
+require([
+  /*! #set ($requireConfigParams = {'evaluate': true, 'minify': $services.debug.minify}) */
+  $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
+    $requireConfigParams))
+], function() {
   require(['tree'], function($) {
     $('.xtree').xtree().one('ready.jstree', function(event, data) {
       var tree = data.instance;

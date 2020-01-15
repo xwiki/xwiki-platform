@@ -32,7 +32,7 @@
   <packaging>pom</packaging>
   <description>Debian installer for XWiki SOLR server</description>
   <modules>
-    <module>xwiki-platform-search-solr-server-debian-data</module>
+    <module>xwiki-platform-search-solr-server-debian-core</module>
   </modules>
   <properties>
     <jdeb.version>1.3</jdeb.version>

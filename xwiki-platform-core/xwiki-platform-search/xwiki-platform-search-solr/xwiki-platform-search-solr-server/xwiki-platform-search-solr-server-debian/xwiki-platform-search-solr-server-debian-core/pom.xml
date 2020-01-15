@@ -27,10 +27,10 @@
     <artifactId>xwiki-platform-search-solr-server-debian</artifactId>
     <version>12.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search-solr-server-debian-data</artifactId>
+  <artifactId>xwiki-platform-search-solr-server-debian-core</artifactId>
   <packaging>deb</packaging>
-  <name>XWiki Platform - Search - SOLR - Server - Debian - Data</name>
-  <description>XWiki SOLR server data package</description>
+  <name>XWiki Platform - Search - SOLR - Server - Debian - Core</name>
+  <description>Install a XWiki core in the right location (based on Solr default setup)</description>
   <properties>
     <data.path>${project.build.directory}/data</data.path>
 
@@ -38,13 +38,13 @@
  XWiki is a free wiki software platform written in Java with a design emphasis
  on extensibility.
  .
- This package contains configuration files to use in a SOLR server synchronized with XWiki version.
+ This package contains a pre configured Solr core for XWiki to be used in a standalone Solr setup.
     </debian.solr.description>
   </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+      <artifactId>xwiki-platform-search-solr-server-core</artifactId>
       <version>${project.version}</version>
       <type>jar</type>
       <scope>provided</scope>
@@ -67,7 +67,7 @@
                 <artifactItems>
                   <artifactItem>
                     <groupId>org.xwiki.platform</groupId>
-                    <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+                    <artifactId>xwiki-platform-search-solr-server-core</artifactId>
                     <version>${project.version}</version>
                     <type>jar</type>
                   </artifactItem>
@@ -97,8 +97,22 @@
               <type>directory</type>
               <mapper>
                 <type>perm</type>
-                <prefix>/usr/lib/xwiki-solr</prefix>
+                <prefix>/usr/lib/xwiki-solr-core</prefix>
               </mapper>
+            </data>
+            <!-- Register the XWiki code in Solr -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/var/solr/data/xwiki</linkName>
+              <linkTarget>/usr/lib/xwiki-solr-core</linkTarget>
+            </data>
+            <!-- Insert the date in the XWiki Solr core -->
+            <data>
+              <type>link</type>
+              <symlink>true</symlink>
+              <linkName>/usr/lib/xwiki-solr-core/data</linkName>
+              <linkTarget>/var/lib/xwiki/solr-data</linkTarget>
             </data>
           </dataSet>
         </configuration>

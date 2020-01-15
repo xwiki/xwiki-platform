@@ -4,7 +4,7 @@ set -e
 #set -x
 
 if [ "$1" = "purge"  ]; then
-	rm -rf /var/lib/xwiki/data/solr
+	rm -rf /var/lib/xwiki/solr-data/
 
 	if [ -e /usr/share/debconf/confmodule ]; then
 		. /usr/share/debconf/confmodule

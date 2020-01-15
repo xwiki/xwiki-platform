@@ -1,4 +1,4 @@
-Package: xwiki-solr-data
+Package: xwiki-solr-core
 Version: [[version]]
 Section: java
 Priority: optional

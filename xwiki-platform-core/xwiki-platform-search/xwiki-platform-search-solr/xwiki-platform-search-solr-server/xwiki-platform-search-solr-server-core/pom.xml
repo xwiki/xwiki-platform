@@ -27,10 +27,10 @@
     <artifactId>xwiki-platform-search-solr-server</artifactId>
     <version>12.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search-solr-server-data</artifactId>
-  <name>XWiki Plarform - Search - SOLR - Server - Data</name>
+  <artifactId>xwiki-platform-search-solr-server-core</artifactId>
+  <name>XWiki Plarform - Search - SOLR - Server - Core</name>
   <packaging>jar</packaging>
-  <description>A package containing SOLR configuration for XWiki</description>
+  <description>A package containing a SOLR core for XWiki</description>
   <dependencies>
     <dependency>
       <!-- This is needed at runtime by solrconfig.xml which is why we package below in the lib/ directory of the
@@ -46,7 +46,7 @@
   </dependencies>
   <build>
     <plugins>
-      <!-- Add the xwiki core -->
+      <!-- Add the plugin to the lib/ -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -55,18 +55,18 @@
             <id>attach-plugin</id>
             <phase>prepare-package</phase>
             <goals>
-              <goal>unpack</goal>
+              <goal>copy</goal>
             </goals>
             <configuration>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-core</artifactId>
+                  <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                 </artifactItem>
               </artifactItems>
-              <outputDirectory>${project.build.outputDirectory}/xwiki/</outputDirectory>
+              <outputDirectory>${project.build.outputDirectory}/lib/</outputDirectory>
             </configuration>
           </execution>
         </executions>

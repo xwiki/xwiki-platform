@@ -375,6 +375,11 @@
                     "code": "java.method.removed",
                     "old": "method void com.xpn.xwiki.api.Document::rename(java.lang.String) throws com.xpn.xwiki.XWikiException",
                     "justification": "The method has actually been moved to legacy, so not breaking."
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method boolean com.xpn.xwiki.api.XWiki::renamePage(com.xpn.xwiki.api.Document, java.lang.String)",
+                    "justification": "The method has actually been moved to legacy, so not breaking."
                   }
                   // Add more ignores below...
                 ]

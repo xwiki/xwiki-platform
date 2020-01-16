@@ -36,6 +36,7 @@ import org.testcontainers.containers.Network;
 import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.images.builder.ImageFromDockerfile;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.internal.junit5.XWikiLocalGenericContainer;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
@@ -231,9 +232,10 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         }
         this.servletContainer.withExposedPorts(exposedPorts.toArray(new Integer[exposedPorts.size()]));
 
-        if (this.testConfiguration.isOffline()) {
-            // Note: This won't work in the DOOD use case. For that to work we would need to copy the data instead
-            // of mounting the volume but the time it would take would be too costly.
+        // We want by default to have the local repository mounted, but this won't work in the DOOD use case.
+        // For that to work we would need to copy the data instead of mounting the volume but the time
+        // it would take would be too costly.
+        if (!DockerTestUtils.isInAContainer()) {
             String repoLocation = this.repositoryResolver.getSession().getLocalRepository().getBasedir().toString();
             this.servletContainer.withFileSystemBind(repoLocation, "/root/.m2/repository");
         }

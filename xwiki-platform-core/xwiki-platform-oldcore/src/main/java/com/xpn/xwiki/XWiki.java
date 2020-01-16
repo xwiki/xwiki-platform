@@ -6724,34 +6724,6 @@ public class XWiki implements EventListener
     }
 
     /**
-     * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
-     */
-    @Deprecated
-    public XWikiDocument renamePage(XWikiDocument doc, String newFullName, XWikiContext context) throws XWikiException
-    {
-        if (context.getWiki().exists(newFullName, context)) {
-            XWikiDocument delDoc = context.getWiki().getDocument(newFullName, context);
-            context.getWiki().deleteDocument(delDoc, context);
-        }
-
-        XWikiDocument renamedDoc = doc.copyDocument(newFullName, context);
-        saveDocument(renamedDoc, context);
-        renamedDoc.saveAllAttachments(context);
-        deleteDocument(doc, context);
-
-        return renamedDoc;
-    }
-
-    /**
-     * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
-     */
-    @Deprecated
-    public XWikiDocument renamePage(XWikiDocument doc, XWikiContext context, String newFullName) throws XWikiException
-    {
-        return renamePage(doc, newFullName, context);
-    }
-
-    /**
      * @since 2.2M2
      */
     public BaseClass getXClass(DocumentReference documentReference, XWikiContext context) throws XWikiException
@@ -7084,11 +7056,6 @@ public class XWiki implements EventListener
     public String addTooltip(String html, String message, XWikiContext context)
     {
         return addTooltip(html, message, "this.WIDTH='300'", context);
-    }
-
-    public void renamePage(String fullName, String newFullName, XWikiContext context) throws XWikiException
-    {
-        renamePage(context.getWiki().getDocument(fullName, context), newFullName, context);
     }
 
     public String addMandatory(XWikiContext context)

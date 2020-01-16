@@ -2600,31 +2600,6 @@ public class XWiki extends Api
     }
 
     /**
-     * API to rename a page (experimental) Rights are necessary to edit the source and target page All objects and
-     * attachments ID are modified in the process to link to the new page name
-     *
-     * @param doc page to rename
-     * @param newFullName target page name to move the information to
-     */
-    public boolean renamePage(Document doc, String newFullName)
-    {
-        try {
-            if (this.xwiki.exists(newFullName, getXWikiContext()) && !this.xwiki.getRightService()
-                .hasAccessLevel("delete", getXWikiContext().getUser(), newFullName, getXWikiContext())) {
-                return false;
-            }
-            if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
-                getXWikiContext())) {
-                this.xwiki.renamePage(doc.getFullName(), newFullName, getXWikiContext());
-            }
-        } catch (XWikiException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Retrieves the current editor preference for the request The preference is first looked up in the user preference
      * and then in the space and wiki preference
      *

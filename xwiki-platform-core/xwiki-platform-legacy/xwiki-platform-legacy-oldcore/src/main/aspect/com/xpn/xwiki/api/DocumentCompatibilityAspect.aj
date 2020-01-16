@@ -21,8 +21,9 @@ package com.xpn.xwiki.api;
 
 import java.util.List;
 
+import org.xwiki.model.reference.DocumentReference;
+
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 
 /**
@@ -70,5 +71,20 @@ public privileged aspect DocumentCompatibilityAspect
     public void Document.renameDocument(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
     {
         rename(newDocumentName, backlinkDocumentNames);
+    }
+
+    /**
+     * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
+     * which list the document we are renaming as their parent. See
+     * {@link #rename(String, java.util.List, java.util.List)} for more details.
+     *
+     * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
+     * @throws XWikiException in case of an error
+     * @deprecated since 12.0RC1. Use {@link #rename(DocumentReference)} instead.
+     */
+    @Deprecated
+    public void Document.rename(String newDocumentName) throws XWikiException
+    {
+        rename(this.getCurrentMixedDocumentReferenceResolver().resolve(newDocumentName));
     }
 }

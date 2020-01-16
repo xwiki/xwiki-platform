@@ -2946,19 +2946,6 @@ public class Document extends Api
      * which list the document we are renaming as their parent. See
      * {@link #rename(String, java.util.List, java.util.List)} for more details.
      *
-     * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
-     * @throws XWikiException in case of an error
-     */
-    public void rename(String newDocumentName) throws XWikiException
-    {
-        rename(getCurrentMixedDocumentReferenceResolver().resolve(newDocumentName));
-    }
-
-    /**
-     * Rename the current document and all the backlinks leading to it. Will also change parent field in all documents
-     * which list the document we are renaming as their parent. See
-     * {@link #rename(String, java.util.List, java.util.List)} for more details.
-     *
      * @param newReference the reference to the new document
      * @throws XWikiException in case of an error
      * @since 2.3M2
@@ -2993,10 +2980,7 @@ public class Document extends Api
      */
     public void rename(String newDocumentName, List<String> backlinkDocumentNames) throws XWikiException
     {
-        if (hasAccessLevel("delete") && this.context.getWiki().checkAccess("edit",
-            this.context.getWiki().getDocument(newDocumentName, this.context), this.context)) {
-            this.getDoc().rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
-        }
+        rename(newDocumentName, backlinkDocumentNames, Collections.emptyList());
     }
 
     /**

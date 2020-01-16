@@ -1324,4 +1324,43 @@ public privileged aspect XWikiCompatibilityAspect
 
         return "1".equals(getConfiguration().getProperty("xwiki.usedefaultweb", "0"));
     }
+
+    /**
+     * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
+     */
+    @Deprecated
+    public XWikiDocument XWiki.renamePage(XWikiDocument doc, XWikiContext context, String newFullName)
+        throws XWikiException
+    {
+        return renamePage(doc, newFullName, context);
+    }
+
+    /**
+     * @deprecated Since 12.0RC1: Use {@link XWikiDocument#rename(DocumentReference, XWikiContext)} instead.
+     */
+    @Deprecated
+    public void XWiki.renamePage(String fullName, String newFullName, XWikiContext context) throws XWikiException
+    {
+        renamePage(context.getWiki().getDocument(fullName, context), newFullName, context);
+    }
+
+    /**
+     * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
+     */
+    @Deprecated
+    public XWikiDocument XWiki.renamePage(XWikiDocument doc, String newFullName, XWikiContext context)
+        throws XWikiException
+    {
+        if (context.getWiki().exists(newFullName, context)) {
+            XWikiDocument delDoc = context.getWiki().getDocument(newFullName, context);
+            context.getWiki().deleteDocument(delDoc, context);
+        }
+
+        XWikiDocument renamedDoc = doc.copyDocument(newFullName, context);
+        saveDocument(renamedDoc, context);
+        renamedDoc.saveAllAttachments(context);
+        deleteDocument(doc, context);
+
+        return renamedDoc;
+    }
 }

@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.query.QueryManager;
 import org.xwiki.xml.XMLUtils;
 import org.suigeneris.jrcs.diff.delta.Chunk;
@@ -1156,5 +1157,32 @@ public privileged aspect XWikiCompatibilityAspect
         } catch (Exception e) {
             return buf.toString();
         }
+    }
+
+    /**
+     * API to rename a page (experimental) Rights are necessary to edit the source and target page All objects and
+     * attachments ID are modified in the process to link to the new page name
+     *
+     * @param doc page to rename
+     * @param newFullName target page name to move the information to
+     * @deprecated since 12.0RC1. Use {@link Document#rename(DocumentReference)}.
+     */
+    @Deprecated
+    public boolean XWiki.renamePage(Document doc, String newFullName)
+    {
+        try {
+            if (this.xwiki.exists(newFullName, getXWikiContext()) && !this.xwiki.getRightService()
+                .hasAccessLevel("delete", getXWikiContext().getUser(), newFullName, getXWikiContext())) {
+                return false;
+            }
+            if (this.xwiki.getRightService().hasAccessLevel("edit", getXWikiContext().getUser(), doc.getFullName(),
+                getXWikiContext())) {
+                this.xwiki.renamePage(doc.getFullName(), newFullName, getXWikiContext());
+            }
+        } catch (XWikiException e) {
+            return false;
+        }
+
+        return true;
     }
 }

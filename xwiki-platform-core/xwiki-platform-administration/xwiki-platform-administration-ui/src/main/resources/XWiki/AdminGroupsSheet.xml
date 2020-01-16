@@ -439,8 +439,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal'], function($, xm) {
     var groupDocument = new XWiki.Document(groupReference);
     var editGroupURL = groupDocument.getURL('edit', 'xpage=plain');
     editGroupModal.find('.modal-body').empty().addClass('loading').load(editGroupURL, function() {
-      this.removeClass('loading');
-      $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
+      $(this).removeClass('loading');
+      $(document).trigger('xwiki:dom:updated', {'elements': $(this).toArray()});
     });
   }).on('hide.bs.modal', function() {
     editGroupModal.data('liveTable').refresh();

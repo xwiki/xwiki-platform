@@ -370,6 +370,11 @@
                     "old": "parameter boolean javax.servlet.ServletResponseWrapper::isWrapperFor(===java.lang.Class===) @ com.xpn.xwiki.web.includeservletasstring.BufferedResponse",
                     "new": "parameter boolean javax.servlet.ServletResponseWrapper::isWrapperFor(===java.lang.Class<?>===) @ com.xpn.xwiki.web.includeservletasstring.BufferedResponse",
                     "justification": "Runtime compatible. Servlet 3.1 upgrade"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method void com.xpn.xwiki.api.Document::rename(java.lang.String) throws com.xpn.xwiki.XWikiException",
+                    "justification": "The method has actually been moved to legacy, so not breaking."
                   }
                   // Add more ignores below...
                 ]

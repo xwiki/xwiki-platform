@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class VfsIT
 {
     @Test
-    public void testVfsMacro(TestUtils setup, TestReference reference, XWikiWebDriver driver) throws Exception
+    public void vfsTreeMacroExecution(TestUtils setup, TestReference reference, XWikiWebDriver driver) throws Exception
     {
         setup.loginAsSuperAdmin();
 

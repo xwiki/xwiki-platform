@@ -37,7 +37,7 @@
            generatd JAR which will be used and transformed into a zip file in the xwiki-platform-search-solr-api
            module. -->
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-search-solr-server-plugin</artifactId>
+      <artifactId>xwiki-platform-search-solr-server-core</artifactId>
       <version>${project.version}</version>
       <!-- We use "provided" so that this dep is not used transitively by Maven and thus doesn't find its way into
            our distribution's WEB-INF/lib directory. -->

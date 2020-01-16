@@ -35,6 +35,7 @@
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>57</xwiki.pitest.mutationThreshold>
+    <jodconverter.version>4.2.3</jodconverter.version>
   </properties>
   <dependencies>
     <dependency>
@@ -80,7 +81,12 @@
     <dependency>
       <groupId>org.jodconverter</groupId>
       <artifactId>jodconverter-local</artifactId>
-      <version>4.2.3</version>
+      <version>${jodconverter.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jodconverter</groupId>
+      <artifactId>jodconverter-core</artifactId>
+      <version>${jodconverter.version}</version>
     </dependency>
     <dependency>
       <!--

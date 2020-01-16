@@ -16,7 +16,7 @@
 #template('refactoringStatus_macros.vm')
 
 #controller()
-#macro(displayContent $content)
+#macro(displayContent $deletcontent)
 #template("startpage.vm")
 <div class="main">
   <div id="mainContentArea">
@@ -24,7 +24,7 @@
     #set($titleToDisplay = $services.localization.render('core.delete.title', [$title]))
     <div class="xcontent">
       #template('contentheader.vm')
-      $content
+      $deletcontent
       <div class="clearfloats"></div>
     </div> ## xcontent
   </div>## mainContentArea

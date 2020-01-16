@@ -29,6 +29,7 @@ require.config({
 });
 
 // Mock Velocity bindings.
+var $requireConfigParams;
 var $jsontool = {
   serialize: function() {}
 };

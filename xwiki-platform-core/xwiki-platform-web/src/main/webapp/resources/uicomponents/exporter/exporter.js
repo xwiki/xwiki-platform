@@ -380,10 +380,9 @@ define('export-tree-filter', ['jquery', 'bootstrap', 'export-tree'], function($)
 
 require([
   'jquery',
-  $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js', {
-    'evaluate': true,
-    'minify': $services.debug.minify
-  }))
+  /*! #set ($requireConfigParams = {'evaluate': true, 'minify': $services.debug.minify}) */
+  $jsontool.serialize($services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'require-config.min.js',
+    $requireConfigParams))
 ], function ($) {
   'use strict';
 

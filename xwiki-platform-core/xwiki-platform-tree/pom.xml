@@ -34,8 +34,15 @@
   <modules>
     <module>xwiki-platform-tree-api</module>
     <module>xwiki-platform-tree-macro</module>
-    <module>xwiki-platform-tree-test-pageobjects</module>
     <module>xwiki-platform-tree-war</module>
     <module>xwiki-platform-tree-webjar</module>
   </modules>
+  <profiles>
+    <profile>
+      <id>integration-tests</id>
+      <modules>
+        <module>xwiki-platform-tree-test-pageobjects</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

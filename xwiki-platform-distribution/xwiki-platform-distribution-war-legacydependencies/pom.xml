@@ -155,7 +155,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-legacy-model</artifactId>
+      <artifactId>xwiki-platform-legacy-model-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

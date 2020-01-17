@@ -1692,7 +1692,7 @@ function (row, i, table) {
         if (row['doc_has' + action.id] || action.id === 'view' || (row['doc_has' + action.id] === undefined &&
             (row['doc_hasadmin'] || adminActions.indexOf(action.id) < 0))) {
           var link = new Element('a', {
-            'href': row['doc_' + action.id + '_url'],
+            'href': row['doc_' + action.id + '_url'] || row['doc_url'],
             'class': 'action action' + action.id
           }).update('<span class="action-icon"></span><span class="action-label"></span>');
           link.down('.action-icon').update(action.icon).writeAttribute('title', action.label);
@@ -1823,7 +1823,8 @@ function (row, i, table) {
           'restore': 'refresh',
           'undelete': 'refresh',
           'rights': 'lock',
-          'edit': 'pencil'
+          'edit': 'pencil',
+          'view': 'eye'
         })
         #set ($action.icon = $defaultActionIcons.getOrDefault($action.id, $action.id))
       #end

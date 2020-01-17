@@ -82,6 +82,9 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
         String uniqueMessageId = message.getUniqueMessageId();
         File messageFile = getMessageFile(batchId, uniqueMessageId);
 
+        // Make sure that the directory exists
+        messageFile.getParentFile().mkdirs();
+
         try {
             // Unsaved message may have their message-ID header to be modified during serialization.
             // We ensure that the message was saved, and we save it if not saved yet, getting again the identifier
@@ -125,9 +128,13 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
         File messageFile = null;
         try {
             messageFile = getMessageFile(batchId, uniqueMessageId);
-            messageFile.delete();
+            if (messageFile.exists()) {
+                messageFile.delete();
+            }
             // Also remove the directory. Note that it'll succeed only the directory is empty which is what we want.
-            getBatchDirectory(batchId).delete();
+            if (messageFile.getParentFile().exists()) {
+                messageFile.getParentFile().delete();
+            }
         } catch (Exception e) {
             throw new MailStoreException(String.format(
                 "Failed to delete message (id [%s], batch id [%s]) file [%s]",
@@ -165,7 +172,6 @@ public class FileSystemMailContentStore implements MailContentStore, Initializab
     private File getBatchDirectory(String batchId)
     {
         File batchDirectory = new File(rootDirectory, getURLEncoded(batchId));
-        batchDirectory.mkdirs();
         return batchDirectory;
     }
 

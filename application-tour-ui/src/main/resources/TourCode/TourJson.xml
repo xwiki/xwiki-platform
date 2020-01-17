@@ -39,7 +39,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{include reference="TourCode.Macros"/}}
+
+{{velocity}}
 #if ($xcontext.action == 'get')
   ##--------------------------------------------------------
   ## Get the tour steps corresponding to the target page
@@ -132,7 +134,7 @@
         ##--------------------------------------------------------
         ## Sort the steps
         ##--------------------------------------------------------
-        #set ($tour.steps = $sorttool.sort($tour.steps, 'order'))
+        #set ($tour.steps = $properSortTool.sort($tour.steps, 'order'))
       #end
     #end
   #end

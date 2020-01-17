@@ -63,12 +63,24 @@
     #end
     #set ($discard = $sameKeyObjects.add($object))
   #end
-  #foreach ($key in $sorttool.sort($objectsMap.keySet()))
+  #foreach ($key in $properSortTool.sort($objectsMap.keySet()))
     #set ($sameKeyObjects = $objectsMap.get($key))
     #foreach ($sameKeyObject in $sameKeyObjects)
       #set ($discard = $outputObjects.add($sameKeyObject))
     #end
   #end
 #end
+
+#macro (defineSortTool $sortToolVariable)
+  #set ($versionMinimum = "12.0-SNAPSHOT")
+  #set ($checkedExtension = "org.xwiki.commons:xwiki-commons-velocity")
+  #if ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo($versionMinimum) &gt;= 0)
+    #setVariable ($sortToolVariable, $collectionstool)
+  #else
+    #setVariable ($sortToolVariable, $sorttool)
+  #end
+#end
+
+#defineSortTool("$properSortTool")
 {{/velocity}}</content>
 </xwikidoc>

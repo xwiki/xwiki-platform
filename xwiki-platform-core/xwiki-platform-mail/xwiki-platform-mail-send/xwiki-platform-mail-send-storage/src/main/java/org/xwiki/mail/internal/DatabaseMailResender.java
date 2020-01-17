@@ -41,6 +41,7 @@ import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailResender;
 import org.xwiki.mail.MailSender;
+import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusResult;
 import org.xwiki.mail.MailStatusStore;
@@ -105,10 +106,18 @@ public class DatabaseMailResender implements MailResender
         int count) throws MailStoreException
     {
         List<Pair<MailStatus, MailStatusResult>> results = new ArrayList<>();
-
         List<MailStatus> statuses = this.store.load(filterMap, offset, count, null, true);
-
         for (MailStatus status : statuses) {
+            resendAsynchronouslySingleStatus(status, results);
+        }
+        return results;
+    }
+
+    private void resendAsynchronouslySingleStatus(MailStatus status, List<Pair<MailStatus, MailStatusResult>> results)
+    {
+        // Only try to resend if the mail didn't fail because it couldn't be prepared, as this would mean the message
+        // was never saved and thus we cannot resend it...
+        if (!MailState.PREPARE_ERROR.toString().equals(status.getState())) {
             try {
                 results.add(new ImmutablePair<>(status,
                     resendAsynchronously(status.getBatchId(), status.getMessageId())));
@@ -119,8 +128,6 @@ public class DatabaseMailResender implements MailResender
                     status.getBatchId(), status.getMessageId(), ExceptionUtils.getRootCauseMessage(e));
             }
         }
-
-        return results;
     }
 
     private MimeMessage loadMessage(Session session, String batchId, String mailId) throws MailStoreException

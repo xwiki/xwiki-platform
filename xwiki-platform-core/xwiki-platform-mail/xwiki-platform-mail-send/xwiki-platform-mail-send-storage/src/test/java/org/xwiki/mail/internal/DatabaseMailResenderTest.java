@@ -32,6 +32,7 @@ import org.xwiki.mail.ExtendedMimeMessage;
 import org.xwiki.mail.MailContentStore;
 import org.xwiki.mail.MailListener;
 import org.xwiki.mail.MailSender;
+import org.xwiki.mail.MailState;
 import org.xwiki.mail.MailStatus;
 import org.xwiki.mail.MailStatusStore;
 import org.xwiki.mail.MailStoreException;
@@ -42,6 +43,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -136,10 +138,12 @@ public class DatabaseMailResenderTest
         MailStatus status1 = new MailStatus();
         status1.setBatchId("batch1");
         status1.setMessageId("message1");
+        status1.setState(MailState.SEND_ERROR);
 
         MailStatus status2 = new MailStatus();
         status2.setBatchId("batch2");
         status2.setMessageId("message2");
+        status2.setState(MailState.SEND_FATAL_ERROR);
 
         List<MailStatus> statuses = new ArrayList<>();
         statuses.add(status1);
@@ -163,5 +167,33 @@ public class DatabaseMailResenderTest
             "Failed to resend mail message for batchId [{}], messageId [{}]. Root cause [{}]",
             "batch1", "message1", "MailStoreException: error1");
         verify(sender).sendAsynchronously(eq(Arrays.asList(message2)), any(), any(MailListener.class));
+    }
+
+    @Test
+    public void resendAsynchronouslySeveralMessagesWhenMailFailedPrepare() throws Exception
+    {
+        Map filterMap = Collections.singletonMap("state", "prepare_%");
+
+        MailStatus status1 = new MailStatus();
+        status1.setBatchId("batch1");
+        status1.setMessageId("message1");
+        status1.setState(MailState.PREPARE_ERROR);
+
+        List<MailStatus> statuses = new ArrayList<>();
+        statuses.add(status1);
+
+        MailStatusStore statusStore = this.mocker.getInstance(MailStatusStore.class, "database");
+        when(statusStore.load(filterMap, 0, 0, null, true)).thenReturn(statuses);
+
+        MailContentStore contentStore = this.mocker.getInstance(MailContentStore.class, "filesystem");
+        ExtendedMimeMessage message1 = new ExtendedMimeMessage();
+        when(contentStore.load(any(), eq("batch1"), eq("message1"))).thenReturn(message1);
+
+        MailSender sender = this.mocker.getInstance(MailSender.class);
+
+        this.mocker.getComponentUnderTest().resendAsynchronously(filterMap, 0, 0);
+
+        // The test is here
+        verify(sender, never()).sendAsynchronously(eq(Arrays.asList(message1)), any(), any(MailListener.class));
     }
 }

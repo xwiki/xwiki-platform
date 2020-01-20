@@ -140,6 +140,7 @@ public class CreatePageAndSpaceTest extends AbstractTest
 
         // Clear the title, set a page name and check that the breadcrumb now uses the page name as a fallback.
         createPage.getDocumentPicker().setTitle("");
+        createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/");
         assertEquals("", createPage.getDocumentPicker().getName());
         createPage.getDocumentPicker().setName(newName);
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newName);

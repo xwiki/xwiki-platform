@@ -98,9 +98,9 @@ public class CopyPageTest extends AbstractTest
 
         // Fill the target destination the page to be copied to.
         documentPicker.setTitle(targetPageName);
+        documentPicker.waitForLocation(Arrays.asList("", sourceSpaceName, targetPageName));
         // The target page name is updated based on the entered title.
         Assert.assertEquals(targetPageName, copyPage.getTargetPageName());
-        documentPicker.waitForLocation(Arrays.asList("", sourceSpaceName, targetPageName));
         // Select a new parent document.
         documentPicker.toggleLocationAdvancedEdit().setParent(targetSpaceName);
         documentPicker.waitForLocation(Arrays.asList("", targetSpaceName, targetPageName));

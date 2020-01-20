@@ -122,7 +122,9 @@ public @interface UITest
      * @return true if VNC container is started and recording is done and saved on test exit
      * @since 10.10RC1
      */
-    boolean vnc() default true;
+    // FIXME: Default value should be true, we temporary switch it to false because of CI infra issues:
+    // we should definitely avoid this kind of thing in the future with XWIKI-16983
+    boolean vnc() default false;
 
     /**
      * @return the list of configuration properties to use when generating the XWiki configuration files such as as

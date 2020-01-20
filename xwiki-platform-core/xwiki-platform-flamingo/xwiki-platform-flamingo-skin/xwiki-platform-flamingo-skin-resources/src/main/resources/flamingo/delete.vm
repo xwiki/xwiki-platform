@@ -136,7 +136,7 @@
         #set ($forceAffectChildren = " checked='checked'")
       #end
       #define($heading)
-        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">Affect children</label> ($childCount)
+        <input name="affectChildren" id="affectChildren" type="checkbox" $!{forceAffectChildren}/><label for="affectChildren">$services.localization.render('core.delete.affectChildren')</label> ($childCount)
       #end
       #define($body)
         ##
@@ -199,7 +199,7 @@
   #set($links = $doc.getBacklinks())
   #if($links && $links.size() > 0)
     #define($heading)
-     <strong>Backlinks</strong> ($links.size())
+     <strong>$services.localization.render('core.delete.backlinks')</strong> ($links.size())
     #end
     #define($message)
       <ul>

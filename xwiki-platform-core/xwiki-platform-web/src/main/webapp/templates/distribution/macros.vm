@@ -15,6 +15,7 @@
     #set ($discard = $collectionstool.reverse($stableVersions))
     #set ($discard = $return.put($feature.id, $stableVersions))
   #end
+  #set ($versionsByFeature = $NULL)
   #setVariable("$versionsByFeature" $return)
 #end
 
@@ -53,7 +54,7 @@
             'platform.extension.distributionWizard.uiStepPreviousUIVersionListHint'))</span>
         </dt>
         <dd class="hidden versionSelector">
-          #getVersions($recommendedUIExtension 'versionsByFeature')
+          #getVersions($recommendedUIExtension $versionsByFeature)
           <select id="$id" class="versions">
             <option value=""></option>
             #foreach ($entry in $versionsByFeature.entrySet())
@@ -154,8 +155,8 @@
     #break
   #end
   ## The recommended UI is available to install and we don't know the previous UI.
-  #getExtensionJobStatus($recommendedUIExtension.id.id $recommendedUIExtension.id.version.value 'recommendedUIJobStatus')
-  #getInstalledExtension($recommendedUIExtension "wiki:$wiki" 'installedVersion')
+  #getExtensionJobStatus($recommendedUIExtension.id.id $recommendedUIExtension.id.version.value $recommendedUIJobStatus)
+  #getInstalledExtension($recommendedUIExtension "wiki:$wiki" $installedVersion)
   #if (!$installedVersion && (!$recommendedUIJobStatus || $recommendedUIJobStatus.state == 'FINISHED'))
     ## There is no previous version of the recommended UI installed on the specified wiki and there is no job running
     ## for the recommended UI either.

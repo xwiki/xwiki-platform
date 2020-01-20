@@ -63,7 +63,7 @@
           "outputSyntax": "plain",
           "action": "removeCharacter",
           "forbiddenCharacter": $row.getKey(),
-          "csrf": $services.csrf.token
+          "form_token": $services.csrf.token
       })))
       #set ($rowJson = {
         "doc_viewable": true,
@@ -109,7 +109,7 @@
 #if ($request.outputSyntax == "plain")
   #if ("$!request.action" == "")
     #getReplacementMap()
-  #elseif ($services.csrf.isTokenValid($request.csrf))
+  #elseif ($services.csrf.isTokenValid($request.form_token))
     #if ($request.action == "addCharacter" &amp;&amp; "$request.forbiddenCharacter" != "")
       #addForbiddenCharacter($request.forbiddenCharacter $request.replacementCharacter)
     #elseif ($request.action == "removeCharacter" &amp;&amp; "$request.forbiddenCharacter" != "")

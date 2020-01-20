@@ -1,7 +1,7 @@
 #template("xwikivars.vm")
 
 #set ($configuration = $services.modelvalidation.configuration)
-#if (!$services.csrf.isTokenValid($request.csrf))
+#if (!$services.csrf.isTokenValid($request.form_token))
     $response.setStatus(403)
     #setVariable("$json" {
         "error": "Wrong CSRF token."

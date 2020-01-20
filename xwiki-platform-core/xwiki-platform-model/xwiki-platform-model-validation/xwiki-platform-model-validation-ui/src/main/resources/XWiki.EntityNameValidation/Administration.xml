@@ -559,7 +559,7 @@
       "action": "addCharacter",
       "forbiddenCharacter": newForbiddenCharacter.val(),
       "replacementCharacter": newReplacementCharacter.val(),
-      "csrf": xm.form_token
+      "form_token": xm.form_token
     }
     var jsonDoc = new XWiki.Document(XWiki.Model.resolve('XWiki.EntityNameValidation.AdministrationJSON', XWiki.EntityType.DOCUMENT));
     var notification = new XWiki.widgets.Notification(
@@ -612,7 +612,7 @@
           'outputSyntax': 'plain',
           'name': testText,
           'strategy': selectedStrategy,
-          'csrf': xm.form_token
+          'form_token': xm.form_token
         }).done(function (data) {
         $('#testNameStrategyIsValid_' + data.isOriginalValid).removeClass('hidden');
         $('#testNameStrategyIsValid_' + !data.isOriginalValid).addClass('hidden');

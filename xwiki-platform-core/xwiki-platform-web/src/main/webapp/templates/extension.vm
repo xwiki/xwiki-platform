@@ -521,8 +521,6 @@ $namespace##
   #if ($dependencyExtension)
     ## The extension status is determined for the $extensionNamespace . The name of this parameter is very important
     ## because it has to overwrite the global variable with the same name.
-    #set($dependencyStatus = $NULL)
-    #set($dependencyStatusMessage = $NULL)
     #determineExtensionStatus($dependencyExtension $dependencyStatus $dependencyStatusMessage $dependencyOrExtension.versionConstraint)
     #set ($dependencyURL = "#getExtensionURL($dependencyId $dependencyVersion)")
     #set ($dependencyName = "<a href=""$dependencyURL"" class=""extension-link"">#displayExtensionName($dependencyExtension)</a>")
@@ -938,8 +936,6 @@ $namespace##
   ## The job status can change while the extension is displayed so we cache it. Let's reset the cache.
   #set ($jobStatus = $NULL)
   #isShowingExtensionDetails($extension $showExtensionDetails)
-  #set($extensionStatus = $NULL)
-  #set($extensionStatusMessage = $NULL)
   #determineExtensionStatus($extension $extensionStatus $extensionStatusMessage)
   <form action="$xwiki.relativeRequestURL" method="post" class="extension-item extension-item-${extensionStatus}">
     <div class="hidden">

@@ -133,7 +133,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
         'xpage': 'entitynamevalidation_json',
         'outputSyntax': 'plain',
         'name': title,
-        'csrf': xm.form_token
+        'form_token': xm.form_token
       });
     };
 

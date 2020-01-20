@@ -50,6 +50,12 @@
       <type>war</type>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.48</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -87,6 +93,24 @@
                   </artifactItem>
                 </artifactItems>
                 <outputDirectory>${war.path}</outputDirectory>
+              </configuration>
+            </execution>
+            <!-- Copy MySQL JDBC connector -->
+            <execution>
+              <id>copy-mysql</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                    <version>5.1.48</version>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${war.path}/WEB-INF/lib</outputDirectory>
               </configuration>
             </execution>
           </executions>

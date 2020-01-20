@@ -64,13 +64,6 @@
                 <prefix>/usr/share/xwiki/templates/mysql</prefix>
               </mapper>
             </data>
-            <!-- MySQL connector -->
-            <data>
-              <type>link</type>
-              <symlink>true</symlink>
-              <linkName>/usr/lib/xwiki/WEB-INF/lib/mysql.jar</linkName>
-              <linkTarget>/usr/share/java/mysql.jar</linkTarget>
-            </data>
           </dataSet>
         </configuration>
       </plugin>

@@ -364,9 +364,8 @@ public class InvitationTest extends AbstractTest
             // Prove that the memo left by spam reported is shown.
             String expectedMessage = "Reported as spam with message: It's the email lottery, they have taken over "
                 + "your server!";
-            Assert.assertTrue("The message by the spam reporter is not shown to the admin.\nExpecting:"
-                + expectedMessage + "\n      Got:" + inspect.getStatusAndMemo(),
-                inspect.getStatusAndMemo().equals(expectedMessage));
+            Assert.assertEquals("The message by the spam reporter is not shown to the admin.",
+                expectedMessage, inspect.getStatusAndMemo());
 
             String memo = "Actually the email lottery is quite legitimate.";
             String expectedSuccessMessage = "Invitation successfully marked as not spam. Log entry: " + memo;

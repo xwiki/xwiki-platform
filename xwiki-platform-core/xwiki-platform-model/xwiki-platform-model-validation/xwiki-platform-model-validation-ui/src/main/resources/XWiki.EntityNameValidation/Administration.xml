@@ -220,7 +220,6 @@
   &lt;/dl&gt;
   &lt;div class='buttonwrapper'&gt;
     &lt;input value="$services.localization.render('admin.save')" class='button' type='submit'&gt;
-    &lt;input id="addNewCharacter" value="$services.localization.render('entitynamevalidation.replacementCharacter.add')" class='btn hidden btn-default' type='button' data-toggle="modal" data-target="${escapetool.h}createReplacementCharacterModal"&gt;
   &lt;/div&gt;
 &lt;/form&gt;
 {{/html}}

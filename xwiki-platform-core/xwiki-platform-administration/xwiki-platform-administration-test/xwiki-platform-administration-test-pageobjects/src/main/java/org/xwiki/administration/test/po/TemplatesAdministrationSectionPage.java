@@ -66,11 +66,7 @@ public class TemplatesAdministrationSectionPage extends AdministrationSectionPag
      */
     public DocumentPicker getDocumentPicker()
     {
-        if (this.documentPicker == null) {
-            this.documentPicker = new DocumentPicker(this.documentPickerElement);
-        }
-
-        return this.documentPicker;
+        return new DocumentPicker(this.documentPickerElement);
     }
 
     public TemplateProviderInlinePage createTemplateProvider(String space, String page)

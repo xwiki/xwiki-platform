@@ -58,7 +58,11 @@ public class DocumentPicker extends BaseElement
 
     public DocumentPicker setTitle(String title)
     {
+        String currentName = getName();
         getDriver().setTextInputValue(getTitleInput(), title);
+
+        // Ensure the name is changed
+        getDriver().waitUntilCondition(webDriver -> !currentName.equals(getName()));
         return this;
     }
 

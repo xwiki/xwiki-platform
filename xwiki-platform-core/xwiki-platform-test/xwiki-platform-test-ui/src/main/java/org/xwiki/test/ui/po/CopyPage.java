@@ -65,6 +65,9 @@ public class CopyPage extends ViewPage
     @FindBy(xpath = "//input[@class = 'button' and @value = 'Copy']")
     private WebElement copyButton;
 
+    @FindBy(xpath = "//input[@type='checkbox' and @name = 'terminal']")
+    private WebElement terminalCheckbox;
+
     /**
      * @return the breadcrumb that specified the location of the source document
      * @since 7.2M3
@@ -117,6 +120,15 @@ public class CopyPage extends ViewPage
     public String getTargetPageName()
     {
         return getDocumentPicker().getName();
+    }
+
+    /**
+     * @return {@code true} if the checkbox for copying terminal page is checked.
+     * @since 12.0RC1
+     */
+    public boolean isTerminal()
+    {
+        return this.terminalCheckbox.isSelected();
     }
 
     /**

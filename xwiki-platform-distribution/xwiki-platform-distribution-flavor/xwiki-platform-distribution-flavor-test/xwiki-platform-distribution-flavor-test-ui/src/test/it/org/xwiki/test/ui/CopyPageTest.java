@@ -149,15 +149,19 @@ public class CopyPageTest extends AbstractTest
         viewPage.copy();
         CopyPage copyPage = new CopyPage();
 
+        // We are copying a terminal page so the checkbox should be checked.
+        Assert.assertTrue(copyPage.isTerminal());
+
         // Fill the target destination the page to be copied to.
         DocumentPicker documentPicker = copyPage.getDocumentPicker();
-        documentPicker.setTitle(targetPageName);
         documentPicker.browseDocuments();
         DocumentPickerModal documentPickerModal = new DocumentPickerModal();
         documentPickerModal.waitForDocumentSelected(sourceSpaceName, "WebHome").selectDocument(targetSpaceName,
             "WebHome");
+        documentPicker.setTitle(targetPageName);
         documentPicker.waitForLocation(Arrays.asList("", targetSpaceName, targetPageName));
         Assert.assertEquals(targetSpaceName, copyPage.getTargetSpaceName());
+
 
         // Click copy button
         CopyOverwritePromptPage copyOverwritePrompt = copyPage.clickCopyButtonExpectingOverwritePrompt();

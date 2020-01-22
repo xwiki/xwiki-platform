@@ -201,6 +201,7 @@ public class CreatePagePage extends ViewPage
     {
         if (title != null) {
             getDocumentPicker().setTitle(title);
+            getDocumentPicker().waitForName(title);
         }
 
         if (spaceReference != null) {

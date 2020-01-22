@@ -156,7 +156,7 @@ public class LiveNotificationEmailListener extends AbstractEventListener
                     new ExecutionContextRunnable(new NotificationGraceTimeRunnable(), this.componentManager));
             this.notificationGraceTimeThread.setName("Live E-Mail notifications thread");
             this.notificationGraceTimeThread.setDaemon(true);
-            this.notificationGraceTimeThread.setPriority(Thread.NORM_PRIORITY);
+            this.notificationGraceTimeThread.setPriority(Thread.NORM_PRIORITY - 1);
         }
 
         if (!this.notificationGraceTimeThread.isAlive()) {

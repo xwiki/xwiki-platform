@@ -95,7 +95,7 @@ public class PackageMojo extends AbstractOldCoreMojo
     private File outputClassesDirectory;
 
     /**
-     * Used to look up Artifacts in the remote repository.
+     * * Used to look up Artifacts in the remote repository.
      */
     @Component
     protected RepositorySystem repositorySystem;
@@ -606,7 +606,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // Required to load macros.vm by default
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
-            "xwiki-platform-velocity-webapp", getXWikiPlatformVersion(), null, "jar"));        
+            "xwiki-platform-velocity-webapp", getXWikiPlatformVersion(), null, "jar"));
 
         // Required Plugins
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
@@ -759,8 +759,8 @@ public class PackageMojo extends AbstractOldCoreMojo
             .setManagedVersionMap(getManagedVersionMap()).setResolveRoot(false);
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
         if (resolutionResult.hasExceptions()) {
-            throw new MojoExecutionException(
-                String.format("Failed to resolve artifacts [%s]", artifacts, resolutionResult.getExceptions().get(0)));
+            throw new MojoExecutionException(String.format("Failed to resolve artifacts [%s]", artifacts),
+                resolutionResult.getExceptions().get(0));
         }
 
         return resolutionResult.getArtifacts();
@@ -855,7 +855,7 @@ public class PackageMojo extends AbstractOldCoreMojo
             FileUtils.copyDirectoryStructureIfModified(sourceDirectory, targetDirectory);
         } catch (IOException e) {
             throw new MojoExecutionException(
-                String.format("Failed to copy directory [%] to [%]", sourceDirectory, targetDirectory), e);
+                String.format("Failed to copy directory [%s] to [%s]", sourceDirectory, targetDirectory), e);
         }
     }
 
@@ -864,7 +864,7 @@ public class PackageMojo extends AbstractOldCoreMojo
         try {
             FileUtils.copyFileToDirectoryIfModified(source, targetDirectory);
         } catch (IOException e) {
-            throw new MojoExecutionException(String.format("Failed to copy file [%] to [%]", source, targetDirectory),
+            throw new MojoExecutionException(String.format("Failed to copy file [%s] to [%s]", source, targetDirectory),
                 e);
         }
     }
@@ -903,8 +903,8 @@ public class PackageMojo extends AbstractOldCoreMojo
             .setRemoteRepositories(this.remoteRepositories).setLocalRepository(this.localRepository);
         ArtifactResolutionResult resolutionResult = this.repositorySystem.resolve(request);
         if (resolutionResult.hasExceptions()) {
-            throw new MojoExecutionException(
-                String.format("Failed to resolve artifact [%s]", artifact, resolutionResult.getExceptions().get(0)));
+            throw new MojoExecutionException(String.format("Failed to resolve artifact [%s]", artifact),
+                resolutionResult.getExceptions().get(0));
         }
     }
 

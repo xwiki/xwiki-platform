@@ -154,6 +154,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements EventListener
             // the JVM can exit properly.
             System.setProperty("org.quartz.scheduler.makeSchedulerThreadDaemon", "true");
             System.setProperty("org.quartz.threadPool.makeThreadsDaemons", "true");
+            // Also give priority below normal to scheduler threads by default
+            System.setProperty("org.quartz.threadPool.threadPriority", String.valueOf(Thread.NORM_PRIORITY - 1));
 
             setScheduler(getDefaultSchedulerInstance());
             setStatusListener();

@@ -421,40 +421,42 @@ public abstract class ListClass extends PropertyClass
             boolean inEscape = false;
             StringBuilder newValue = new StringBuilder();
 
-            for (int i = 0; i < valueElement.length(); i++) {
-                char currentChar = valueElement.charAt(i);
+            if (valueElement != null) {
+                for (int i = 0; i < valueElement.length(); i++) {
+                    char currentChar = valueElement.charAt(i);
 
-                // if the current char represents an escape, and we're not yet in escape mode, we enter in escape mode
-                if (currentChar == SEPARATOR_ESCAPE && !inEscape) {
-                    inEscape = true;
-                    newValue.append(SEPARATOR_ESCAPE);
-                // if we are already in escape mode: we were escaping the escape character
-                // so we output it and leave the escape mode
-                } else if (currentChar == SEPARATOR_ESCAPE) {
-                    inEscape = false;
-                    newValue.append(SEPARATOR_ESCAPE);
-                // if the current character represents a separator, we need to escape it no matter what
-                } else if (StringUtils.containsAny(separators, currentChar)) {
-                    // if we were in escape mode, it means that the separator was escaped even if it wasn't needed
-                    // so we escape the escape to be able to output it.
-                    // Note that we don't do that generically since we don't want to escape the escape for a normal
-                    // character: List[a\b] is serialized in a\b not in a\\b.
-                    if (inEscape) {
+                    // if the current char represents an escape, and we're not yet in escape mode, we enter in escape mode
+                    if (currentChar == SEPARATOR_ESCAPE && !inEscape) {
+                        inEscape = true;
                         newValue.append(SEPARATOR_ESCAPE);
+                        // if we are already in escape mode: we were escaping the escape character
+                        // so we output it and leave the escape mode
+                    } else if (currentChar == SEPARATOR_ESCAPE) {
+                        inEscape = false;
+                        newValue.append(SEPARATOR_ESCAPE);
+                        // if the current character represents a separator, we need to escape it no matter what
+                    } else if (StringUtils.containsAny(separators, currentChar)) {
+                        // if we were in escape mode, it means that the separator was escaped even if it wasn't needed
+                        // so we escape the escape to be able to output it.
+                        // Note that we don't do that generically since we don't want to escape the escape for a normal
+                        // character: List[a\b] is serialized in a\b not in a\\b.
+                        if (inEscape) {
+                            newValue.append(SEPARATOR_ESCAPE);
+                        }
+                        newValue.append(SEPARATOR_ESCAPE);
+                        newValue.append(currentChar);
+                        inEscape = false;
+                    } else {
+                        newValue.append(currentChar);
+                        inEscape = false;
                     }
-                    newValue.append(SEPARATOR_ESCAPE);
-                    newValue.append(currentChar);
-                    inEscape = false;
-                } else {
-                    newValue.append(currentChar);
-                    inEscape = false;
                 }
+                // if we are still in escape mode, it means the final character is an escape and we should escape it.
+                if (inEscape) {
+                    newValue.append(SEPARATOR_ESCAPE);
+                }
+                escapedValues.add(newValue.toString());
             }
-            // if we are still in escape mode, it means the final character is an escape and we should escape it.
-            if (inEscape) {
-                newValue.append(SEPARATOR_ESCAPE);
-            }
-            escapedValues.add(newValue.toString());
         }
 
         // Use the first separator to join the list.

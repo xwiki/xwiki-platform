@@ -126,6 +126,13 @@ public class ListClassTest
     }
 
     @Test
+    public void testGetStringFromListWithNullValue()
+    {
+        assertEquals("a.c", ListClass.getStringFromList(Arrays.asList("a", null, "c"), "."));
+        assertEquals("a..c", ListClass.getStringFromList(Arrays.asList("a", "", "c"), "."));
+    }
+
+    @Test
     public void getMapFromString()
     {
         Map<String, ListItem> map = ListClass.getMapFromString("a=1|b");

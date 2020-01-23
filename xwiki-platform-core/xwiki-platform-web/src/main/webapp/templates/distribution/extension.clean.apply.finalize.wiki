@@ -19,7 +19,7 @@
   #end
   {{html clean="false"}}
     <form action="">
-      #displayJobStatus($uninstallJob.status, 'extension.clean.uninstall.status')
+      #displayJobStatus($uninstallJob.status, 'platform.extension.distributionWizard.extension.cleanStep.uninstall')
 
       #formHiddenCleanApply()
 

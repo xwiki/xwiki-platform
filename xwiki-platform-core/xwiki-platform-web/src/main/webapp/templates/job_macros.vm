@@ -51,7 +51,7 @@ $services.template.execute('logging_macros.vm')
   <div class="ui-question"></div>
 #end
 
-#macro (getJobStatusJSON $status $json)
+#macro (getJobStatusJSON $status $json $translationPrefix)
   #set ($logOffset = $numbertool.toNumber($request.logOffset).intValue())
   #if (!$logOffset)
     #set ($logOffset = 0)
@@ -76,12 +76,12 @@ $services.template.execute('logging_macros.vm')
       'offset': $logOffset,
       'items': $log
     },
-    'message' : "#displayJobStatusMessage($status)",
+    'message' : "#displayJobStatusMessage($status, $NULL, $NULL, $NULL, $translationPrefix)",
     'questionTimeLeft' : $status.getQuestionTimeLeft('NANOSECONDS')
   })
 #end
 
-#macro(displayJobStatusMessage $status $successKey $errorKey $canceledKey)
+#macro(displayJobStatusMessage $status $successKey $errorKey $canceledKey $translationPrefix)
   #set ($state = $status.state)
   #set ($finished = $state == 'FINISHED')
   #if (!$finished)
@@ -91,25 +91,32 @@ $services.template.execute('logging_macros.vm')
   #end
 #end
 
-#macro (displayJobFinishedMessage $status $successKey $errorKey $canceledKey)
+#macro (jobFinishedMessage $status $translationPrefix $successKey $errorKey $canceledKey $warningKey)
+  #if ($status.error)
+    #set($messageKeys = [$errorKey, "${translationPrefix}.finish.error", "job.status.${status.jobType}.error", 'job.status.error'])
+    #set($messageClass = 'errormessage')
+  #elseif ($status.canceled)
+    #set($messageKeys = [$canceledKey, "${translationPrefix}.finish.canceled", "job.status.${status.jobType}.canceled", 'job.status.canceled'])
+    #set($messageClass = 'warningmessage')
+  #elseif ($jobStatus.logTail.hasLogLevel('error'))
+    #set($messageKeys = [$warningKey, "${translationPrefix}.finish.warning", "job.status.${status.jobType}.warning", 'job.status.warning'])
+    #set($messageClass = 'warningmessage')
+  #else
+    #set($messageKeys = [$successKey, "${translationPrefix}.finish.success", "job.status.${status.jobType}.success", 'job.status.success'])
+    #set($messageClass = 'successmessage')
+  #end
+  <div class="box $messageClass">
+    $services.localization.render($messageKeys)
+  </div>
+#end
+
+#macro (displayJobFinishedMessage $status $successKey $errorKey $canceledKey $translationPrefix)
   #set ($state = $status.state)
   #set ($finished = $state == 'FINISHED')
   #if (!$finished)
     ## No message.
   #else
-    #if ($status.error)
-      #set($messageKeys = [$errorKey, "job.status.${status.jobType}.error", 'job.status.error'])
-      #set($messageClass = 'errormessage')
-    #elseif ($status.canceled)
-      #set($messageKeys = [$canceledKey, "job.status.${status.jobType}.canceled", 'job.status.canceled'])
-      #set($messageClass = 'warningmessage')
-    #else
-      #set($messageKeys = [$successKey, "job.status.${status.jobType}.success", 'job.status.success'])
-      #set($messageClass = 'successmessage')
-    #end
-    <div class="box $messageClass">
-      $services.localization.render($messageKeys)
-    </div>
+    #jobFinishedMessage($status, $translationPrefix, $successKey, $errorKey, $canceledKey)
     #if ($status.error)
       <h4>$services.localization.render('detailedinformation')</h4>
       #printStatusLog($status)
@@ -117,9 +124,9 @@ $services.template.execute('logging_macros.vm')
   #end
 #end
 
-#macro (outputJobStatusJSON $jobStatus)
+#macro (outputJobStatusJSON $jobStatus $translationPrefix)
   #getJobStatusJSON($jobStatus $json)
-  #set ($json.message = "#displayJobFinishedMessage($jobStatus)")
+  #set ($json.message = "#displayJobFinishedMessage($jobStatus, $NULL, $NULL, $NULL, $translationPrefix)")
   $response.setContentType('application/json')
   $jsontool.serialize($json)
 #end
@@ -149,21 +156,7 @@ $services.template.execute('logging_macros.vm')
     #if (!$finished)
       #displayJobProgressBar($jobStatus)
     #else
-      #if ($jobStatus.error)
-        <div class="box errormessage">
-            $services.localization.render("${translationPrefix}.finish.error")
-        </div>
-      #else
-        #if ($jobStatus.logTail.hasLogLevel('error'))
-          <div class="box warningmessage">
-            $services.localization.render("${translationPrefix}.finish.warning")
-          </div>
-        #else
-          <div class="box successmessage">
-            $services.localization.render("${translationPrefix}.finish.success")
-          </div>
-        #end
-      #end
+      #jobFinishedMessage($status, $translationPrefix)
     #end
     #if ($isAdvancedUser || $isSuperAdmin)
       #displayJobStatusLog($jobStatus true)

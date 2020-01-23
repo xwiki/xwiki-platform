@@ -21,6 +21,7 @@ package org.xwiki.refactoring.internal.job;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.xwiki.bridge.event.DocumentsDeletingEvent;
@@ -107,7 +108,15 @@ public abstract class AbstractEntityJobWithChecks<R extends EntityRequest, S ext
         if (this.request.isDeep() && isSpaceHomeReference(documentReference)) {
             getEntities(documentReference.getLastSpaceReference());
         } else {
-            this.concernedEntities.put(documentReference, new EntitySelection(documentReference));
+            DocumentReference cleanDocumentReference;
+            // We don't want to have locale information for root locale in the reference to not have problems with
+            // the questions
+            if (Locale.ROOT.equals(documentReference.getLocale())) {
+                cleanDocumentReference = new DocumentReference(documentReference, (Locale) null);
+            } else {
+                cleanDocumentReference = documentReference;
+            }
+            this.concernedEntities.put(cleanDocumentReference, new EntitySelection(cleanDocumentReference));
         }
     }
 

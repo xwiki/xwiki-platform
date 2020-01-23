@@ -35,7 +35,7 @@
     <xwiki.revapi.skip>true</xwiki.revapi.skip>
     <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>57</xwiki.pitest.mutationThreshold>
-    <jodconverter.version>4.2.2</jodconverter.version>
+    <jodconverter.version>4.2.4</jodconverter.version>
   </properties>
   <dependencies>
     <dependency>

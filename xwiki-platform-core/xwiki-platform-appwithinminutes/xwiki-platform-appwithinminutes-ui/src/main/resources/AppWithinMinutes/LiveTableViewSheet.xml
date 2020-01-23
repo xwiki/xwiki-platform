@@ -246,9 +246,10 @@
     {{/warning}}
 
   #end
-  #displayApp
+  #displayApp()
+
   {{html clean="false"}}
-  #renameAppModal
+  #renameAppModal()
   {{/html}}
 #end
 {{/velocity}}</content>

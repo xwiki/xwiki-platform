@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -69,7 +70,12 @@ public class DocumentPicker extends BaseElement
      */
     public DocumentPicker waitForName(String name)
     {
-        getDriver().waitUntilCondition(webDriver -> name.equals(getName()));
+        try {
+            getDriver().waitUntilCondition(webDriver -> name.equals(getName()));
+        } catch (TimeoutException e) {
+            throw new WebDriverException(String.format("Expecting name: [%s] and obtained name [%s]", name, getName()),
+                e);
+        }
         return this;
     }
 

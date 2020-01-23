@@ -74,29 +74,6 @@
     </div>
   #end
 #end
-#macro (displayJobStatus $jobStatus)
-  #set ($discard = $xwiki.jsfx.use('uicomponents/job/job.js', true))
-  #set ($jobState = $jobStatus.state)
-  #set ($finished = $jobState == 'FINISHED')
-  #set ($jobRequest = $jobStatus.request)
-  ## FIXME: refactor jobs to use the /rest/jobstatus and /rest/joblog resources.
-  #set ($jobStatusURL = $doc.getURL('get', $escapetool.url({
-    'xpage': 'restore',
-    'outputSyntax': 'plain',
-    'jobId': $stringtool.join($jobRequest.id, '/')
-  })))
-  <div class="job-status" data-url="$jobStatusURL">
-    #if (!$finished)
-      <p>$services.localization.render('core.restore.waitmessage')</p>
-      #displayJobProgressBar($jobStatus)
-    #else
-      #displayJobFinishedMessage($jobStatus)
-    #end
-    #if ($isAdvancedUser || $isSuperAdmin)
-      #displayJobStatusLog($jobStatus true)
-    #end
-  </div>
-#end
 #macro (outputJobStatusJSON $jobStatus)
   #getJobStatusJSON($jobStatus $json)
   #set ($json.message = "#displayJobFinishedMessage($jobStatus)")

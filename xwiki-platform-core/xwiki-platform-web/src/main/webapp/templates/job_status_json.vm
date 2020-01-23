@@ -1,13 +1,15 @@
 #template('job_macros.vm')
 
 #set($jobId = $request.getParameterValues('jobId'))
+#set($translationPrefix = $request.getParameterValues('translationPrefix'))
+
 #set($jobStatus = $services.job.getJobStatus($jobId))
 
 #if ($jobStatus)
-  #outputJobStatusJSON($jobStatus)
+  #outputJobStatusJSON($jobStatus, $translationPrefix)
 #else
   $response.setStatus(404)
   <div class="box errormessage">
-    $services.localization.render("${request.translationPrefix}.notFound")
+    $services.localization.render("${translationPrefix}.notFound")
   </div>
 #end

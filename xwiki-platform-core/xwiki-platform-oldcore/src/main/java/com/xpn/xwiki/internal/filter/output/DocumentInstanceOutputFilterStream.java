@@ -20,7 +20,6 @@
 package com.xpn.xwiki.internal.filter.output;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.Locale;
 
 import javax.inject.Inject;
@@ -43,7 +42,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.WikiReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;

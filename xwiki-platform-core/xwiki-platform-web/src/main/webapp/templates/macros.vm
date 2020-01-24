@@ -1550,7 +1550,7 @@ $Msz MB##
       'Boolean': 'boolean',
       'DBList': 'suggest',
       'DBTreeList': 'suggest',
-      'Date': 'date',
+      'Date': 'text',
       'Email': 'text',
       'Groups': 'suggest',
       'Number': 'number',

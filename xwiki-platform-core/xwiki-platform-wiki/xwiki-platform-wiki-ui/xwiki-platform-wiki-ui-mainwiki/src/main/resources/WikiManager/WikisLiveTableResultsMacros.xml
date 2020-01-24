@@ -201,7 +201,7 @@
   #set($items = $query.execute())
   #if ($sql.contains('GROUP BY doc.fullName'))
     ## The group by we have to use to make sure we get unique documents break $query.count so we remove it
-    #set($countQuery = $services.query.hql($sql.replace('GROUP BY doc.fullName', '')))
+    #set($countQuery = $services.query.hql($sql.replace('GROUP BY doc.fullName', '')).addFilter('unique'))
     #set($void = $countQuery.setWiki($query.wiki))
     #set($void = $countQuery.bindValues($query.namedParameters))
   #else

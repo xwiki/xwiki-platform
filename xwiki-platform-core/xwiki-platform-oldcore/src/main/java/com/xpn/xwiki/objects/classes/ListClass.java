@@ -337,6 +337,10 @@ public abstract class ListClass extends PropertyClass
 
         // flag to know if we are parsing a map value
         boolean inMapValue = false;
+
+        // flag to know if previous character was a separator, since we skip values when separators are concatenated:
+        // e.g. a|b <=> a||b <=> a|||b
+        boolean previousWasSeparator = false;
         StringBuilder currentValue = new StringBuilder();
         for (int i = 0; i < value.length(); i++) {
             char currentChar = value.charAt(i);
@@ -351,30 +355,40 @@ public abstract class ListClass extends PropertyClass
             // if we are finding an escape and we are not yet in escape mode, then we entering the escape mode
             } else if (currentChar == SEPARATOR_ESCAPE && !inEscape) {
                 inEscape = true;
+                previousWasSeparator = false;
             // if we were already in escape mode, then we are escaping an escape: we output the escape
             // and leave the escape mode
             } else if (currentChar == SEPARATOR_ESCAPE) {
                 currentValue.append(SEPARATOR_ESCAPE);
                 inEscape = false;
+                previousWasSeparator = false;
+            // if the current character is a separator and previous value was already a separator then we are in a case
+            // of separator concatenation: we just skip them.
+            } else if (StringUtils.containsAny(separators, currentChar) && previousWasSeparator) {
+                continue;
             // if we are finding a separator and we are not in escape mode, then we finished to parse one value
             // we are adding the value to the result, and start a new value to parse
             } else if (StringUtils.containsAny(separators, currentChar) && !inEscape) {
                 list.add(currentValue.toString());
                 currentValue = new StringBuilder();
                 inMapValue = false;
+                previousWasSeparator = true;
             // then if we are finding a separator we need to output the separator and leave the escape mode
             } else if (StringUtils.containsAny(separators, currentChar)) {
                 currentValue.append(currentChar);
                 inEscape = false;
+                previousWasSeparator = false;
             // finally if we are still in escape mode: we are actually escaping a normal character,
             // we still output the escape for backward compatibility reason, and leave the escape mode
             } else if (inEscape) {
                 currentValue.append(SEPARATOR_ESCAPE);
                 currentValue.append(currentChar);
                 inEscape = false;
+                previousWasSeparator = false;
             // else we just output the current character
             } else {
                 currentValue.append(currentChar);
+                previousWasSeparator = false;
             }
         }
         // don't forget to add the latest value in the result.

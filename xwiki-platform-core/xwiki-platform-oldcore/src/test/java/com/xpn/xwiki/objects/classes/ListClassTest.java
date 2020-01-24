@@ -66,8 +66,20 @@ public class ListClassTest
     @Test
     public void testGetListFromStringMultipleSeparators()
     {
-        assertEquals(Arrays.asList("a", "b", "c", "d", "e"),
-            ListClass.getListFromString("a*b,c,d*e", "*,", false));
+        assertEquals(Arrays.asList("a", "b", "c", "d", "e"), ListClass.getListFromString("a*b,c,d*e", "*,", false));
+    }
+
+    /**
+     * Test the behaviour when multiple separators are used in concatenation.
+     */
+    @Test
+    public void testGetListFromStringConcatenatedSeparators()
+    {
+        assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a, b", ", ", false));
+        assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a ,b", ", ", false));
+        assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a , b", ", ", false));
+        assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a  b", ", ", false));
+        assertEquals(Arrays.asList("a", "b"), ListClass.getListFromString("a,,b", ", ", false));
     }
 
     /**

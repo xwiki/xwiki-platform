@@ -47,14 +47,14 @@
     <dd>
       #if ($isDocumentTreeAvailable)
         #documentPickerModal($options)
-        #locationPickerActions
+        #locationPickerActions()
       #end
       ## The breadcrumb is updated whenever the user changes the parent page. This causes the breadcrumb element to be
       ## constantly replaced, preventing us from displaying the live validation message after it. In order to overcome
       ## this, we wrap the breadcrumb element in a DIV that remains the same.
       <div class="breadcrumb-container">
         ## Note: We display only the parent reference here. The new document part will be added from JavaScript.
-        #hierarchy($options.parent.reference)
+        #hierarchy($options.parent.reference $options)
       </div>
       ##
       ## ---------------------------------------------------------------------------------------------------------

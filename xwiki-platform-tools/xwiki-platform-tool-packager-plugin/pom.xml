@@ -80,11 +80,6 @@
       </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-velocity-webapp</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.commons</groupId>
       <artifactId>xwiki-commons-environment-standard</artifactId>
       <version>${commons.version}</version>
@@ -341,6 +336,15 @@
       <artifactId>xwiki-platform-model-validation-default</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
+    </dependency>
+
+    <!-- Dependencies not needed by the plugin itself but included in the WAR it generates,
+         listed to be sure it's built before the plugin -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-velocity-webapp</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

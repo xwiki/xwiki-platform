@@ -130,6 +130,7 @@ public class CreatePageAndSpaceTest extends AbstractTest
         // Set a new title and check that the page name and the breadcrumb are also updated.
         String newTitle = "New Title";
         createPage.getDocumentPicker().setTitle(newTitle);
+        createPage.getDocumentPicker().waitForName(newTitle);
         createPage.waitForLocationPreviewContent("/" + existingPageTitle + "/" + newTitle);
         assertEquals(newTitle, createPage.getDocumentPicker().getName());
 

@@ -124,7 +124,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
       <li class="reply">
       #displayComment($doc.getObject($xCommentClass, $commentID), $commentDoc)
       <div class="commentthread">
-        #displayThread($commentID, $commentThreads)
+        #displayThread($commentID, $commentThreads, $commentDoc)
       </div>
       </li>
     #end

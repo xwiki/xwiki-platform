@@ -945,6 +945,8 @@ public class XWikiWebDriver extends RemoteWebDriver
         } else {
             textInputElement.clear();
             textInputElement.sendKeys(newTextValue);
+            // To be sure the right events are sent.
+            textInputElement.sendKeys(Keys.TAB);
         }
     }
 

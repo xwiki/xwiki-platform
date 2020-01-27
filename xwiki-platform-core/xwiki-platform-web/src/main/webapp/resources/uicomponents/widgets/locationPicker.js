@@ -114,6 +114,13 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
 require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
   $('.location-picker').each(function() {
     var picker = $(this);
+    var form = picker.closest('form');
+    // We get all buttons but only those not disabled yet, since we will disable and enable them back.
+    var formRealButtons = form.find('input[type=submit]:not([disabled=disabled]),' +
+      'input[type=button]:not([disabled=disabled]),' +
+      'button:not([disabled=disabled])');
+    var formLinkButtons = form.find('a.button:not(.disabled)');
+
     var titleInput = picker.find('input.location-title-field');
     // The wiki field can be either a select (drop down) or an input (text or hidden).
     var wikiField = picker.find('.location-wiki-field');
@@ -150,21 +157,43 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
       lastElement.text(value);
     };
 
+    var disableButtons = function() {
+      formRealButtons.prop("disabled", true);
+      formLinkButtons.addClass("disabled");
+    };
+
+    var enableButtons = function() {
+      formRealButtons.prop("disabled", false);
+      formLinkButtons.addClass("disabled");
+    };
+
     /**
      * Event handler for the title input that updates both the location preview's last element and the name input.
      **/
     var updateLocationAndNameFromTitleInput = function(event) {
-      // Update the location preview.
-      updateLocationFromTitleInput();
+      // ensure the buttons are disabled before we got the name answer
+      disableButtons();
       // Update the name field.
       getPageName(titleInput.val()).done(function(data) {
-        nameInput.val(data.transformedName);
+        // we trigger a change so we can validate the name
+        nameInput.val(data.transformedName).trigger(('change'));
+
+        // Update the location preview.
+        updateLocationFromTitleInput();
+
+        // enable back the buttons
+        enableButtons();
       }).fail(function (response) {
         new XWiki.widgets.Notification(
           "$services.localization.render('entitynamevalidation.nametransformation.error')",
           'error'
         );
-        nameInput.val(titleInput.val());
+        // we trigger a change so we can validate the name
+        nameInput.val(titleInput.val()).trigger('change');
+        // Update the location preview.
+        updateLocationFromTitleInput();
+        // enable back the buttons
+        enableButtons();
       });
     };
 
@@ -264,6 +293,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
 
     // Synchronize the location fields while the user types.
     titleInput.on('input', updateLocationAndNameFromTitleInput);
+    // Ensure that everything's updated when users change fields (particulary useful in our tests)
+    titleInput.on('blur', updateLocationAndNameFromTitleInput);
     wikiField.change(updateLocationFromWikiField);
     nameInput.on('input', updateLocationFromNameInput);
     spaceReferenceInput.on('input xwiki:suggest:selected', updateLocationFromSpaceReference);
@@ -333,6 +364,9 @@ require(['jquery'], function($) {
       setTimeout(function() {
         pageValidator.validate();
       }, 0);
+    });
+    pageInput.on('change', function() {
+      pageValidator.validate();
     });
 
     return pageValidator;

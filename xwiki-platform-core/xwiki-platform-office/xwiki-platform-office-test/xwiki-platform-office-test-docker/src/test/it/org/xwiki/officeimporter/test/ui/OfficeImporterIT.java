@@ -158,7 +158,7 @@ public class OfficeImporterIT
         resultPage = importFile(testName, "ooffice.3.0/Test_accents & é$ù !-_.+();@=.odt");
         assertTrue(StringUtils.contains(resultPage.getContent(), "This is a test document."));
         wikiEditPage = resultPage.editWiki();
-        regex = "(?<imageName>Test_accents & e\\$u !-_\\.\\+\\*\\(\\);\\\\@=_html_[\\w]+\\.png)";
+        regex = "(?<imageName>Test_accents & e\\$u !-_\\.\\+\\(\\);\\\\@=_html_[\\w]+\\.png)";
         pattern = Pattern.compile(regex, Pattern.MULTILINE);
         matcher = pattern.matcher(wikiEditPage.getContent());
         assertTrue(matcher.find());

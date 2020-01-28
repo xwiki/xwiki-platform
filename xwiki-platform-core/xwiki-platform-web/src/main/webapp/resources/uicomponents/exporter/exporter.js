@@ -410,6 +410,14 @@ require([
   // Export Form
   //
 
+  // Enable / disable the corresponding settings when the target XWiki version changes.
+  $('#targetXWikiVersion').change(function() {
+    // Disable all settings.
+    $('#targetXWikiVersionSettings fieldset').prop('disabled', true);
+    // Enable the settings that correspond to the selected value.
+    $('#targetXWikiVersionSettings fieldset[data-version-range="' + $(this).val() + '"]').prop('disabled', false);
+  });
+
   // Enable / disable the submit buttons whenever the selection changes in the tree.
   $('.export-tree').on('ready.jstree, changed.jstree', function (event, data) {
     var tree = data.instance;

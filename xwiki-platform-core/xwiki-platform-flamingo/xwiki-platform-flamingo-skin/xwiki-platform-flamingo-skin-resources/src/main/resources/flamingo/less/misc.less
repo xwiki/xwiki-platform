@@ -307,6 +307,21 @@ dl.export-tree-legend dt + dd {
   font-size: smaller;
 }
 
+#moreExportOptionsToggle {
+  color: @text-muted;
+}
+#moreExportOptionsToggle .more,
+#moreExportOptionsToggle.collapsed .less {
+  display: none;
+}
+#moreExportOptionsToggle.collapsed .more {
+  display: inline;
+}
+#moreExportOptionsToggle .more > span,
+#moreExportOptionsToggle .less > span {
+  margin-left: .3em;
+}
+
 // Loading --------------------------------------------------------------------
 .loading {
   background: transparent url(@xwiki-icon-spinner) no-repeat center;

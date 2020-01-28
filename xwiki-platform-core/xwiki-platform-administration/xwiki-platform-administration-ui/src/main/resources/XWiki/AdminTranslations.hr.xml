@@ -109,12 +109,20 @@ XWiki.XWikiPreferences_timezone.hint=Globalno postavite vremensku zonu za sve da
 administration.section.import.hint=Započnite otpremanjem novog paketa ili odabirom jednog iz liste dostupnih paketa. Sadržaj odabranog paketa bit će prikazan na desnoj strani zajedno s opcijama za uvoz.
 
 # Export Section
-administration.section.export.packageName.hint=Ime datoteke koje se koristi prilikom generiranja arhiva s izvezenim sadržajem.
-administration.section.export.description.hint=Opis paketa koji se prikazuje kod njegovog uvoza.
-administration.section.export.licence.hint=Licenca za sadržaj. Npr.\: LGPL, GPLV2, itd.
-administration.section.export.author.hint=Autor paketa.
-administration.section.export.version.hint=Verzija paketa.
+### Missing: administration.section.export.pages=Pages
+### Missing: administration.section.export.pages.all=All pages
 administration.section.export.withHistory.hint=U izvoz uključi povijest stranice. U protivnome će biti izvezena samo najnovija verzija stranice.
+### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
+### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
+### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
+### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
+administration.section.export.packageName.hint=Ime datoteke koje se koristi prilikom generiranja arhiva s izvezenim sadržajem.
+### Missing: administration.section.export.moreOptions=More options
+### Missing: administration.section.export.lessOptions=Less options
+administration.section.export.description.hint=Opis paketa koji se prikazuje kod njegovog uvoza.
+administration.section.export.author.hint=Autor paketa.
+administration.section.export.licence.hint=Licenca za sadržaj. Npr.\: LGPL, GPLV2, itd.
+administration.section.export.version.hint=Verzija paketa.
 administration.section.export.backupPack.hint=Naznačite hoće li paket biti korišten kao rezervna kopija. Ova opcija ne utječe na izvezeni sadržaj. Jedini učinak je taj da će kod uvoza paketa biti predodabrana opcija "Uvezi kao paket rezervne kopije". Razlika između paketa rezervne kopije i običnog paketa je ta da se u prvom slučaju prilikom uvoza čuva posljednji autor stranice, dok u drugom slučaju posljednji autor svake uvezene stranice postaje onaj korisnik koji obavlja uvoz.
 
 # Users Section

@@ -109,12 +109,20 @@ XWiki.XWikiPreferences_timezone.hint=Глобальные настройки д�
 administration.section.import.hint=Начните с загрузки нового пакета или выбора одного из списка доступных пакетов. Содержимое выбранного пакета будет отображаться справа вместе с параметрами импорта.
 
 # Export Section
-administration.section.export.packageName.hint=Имя файла, используемое при создании архива с экспортируемым содержимым.
-administration.section.export.description.hint=Описание пакета, отображаемое при импорте пакета.
-administration.section.export.licence.hint=Лицензия на содержимое. Например: LGPL, GPLV2 и т.д.
-administration.section.export.author.hint=Автор пакета.
-administration.section.export.version.hint=Версия пакета.
+### Missing: administration.section.export.pages=Pages
+### Missing: administration.section.export.pages.all=All pages
 administration.section.export.withHistory.hint=Включить историю страниц в экспорт. В противном случае экспортируется только последняя версия страницы.
+### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
+### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
+### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
+### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
+administration.section.export.packageName.hint=Имя файла, используемое при создании архива с экспортируемым содержимым.
+### Missing: administration.section.export.moreOptions=More options
+### Missing: administration.section.export.lessOptions=Less options
+administration.section.export.description.hint=Описание пакета, отображаемое при импорте пакета.
+administration.section.export.author.hint=Автор пакета.
+administration.section.export.licence.hint=Лицензия на содержимое. Например: LGPL, GPLV2 и т.д.
+administration.section.export.version.hint=Версия пакета.
 administration.section.export.backupPack.hint=Укажите, будет ли пакет использоваться в качестве резервной копии. Эта опция не влияет на экспортируемый контент. Единственный эффект заключается в том, что при импорте пакета будет предварительно выбран параметр «Импортировать как резервную копию». Разница между пакетом резервного копирования и обычным пакетом заключается в том, что в первом случае последний автор страницы сохраняется во время импорта, а во втором случае пользователь, выполняющий импорт, становится последним автором каждой импортированной страницы.
 
 # Users Section

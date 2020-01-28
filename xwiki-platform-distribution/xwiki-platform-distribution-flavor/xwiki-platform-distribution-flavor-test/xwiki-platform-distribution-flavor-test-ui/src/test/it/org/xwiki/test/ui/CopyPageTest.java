@@ -163,6 +163,7 @@ public class CopyPageTest extends AbstractTest
         documentPicker.waitForName(targetPageName);
         documentPicker.waitForLocation(Arrays.asList("", targetSpaceName, targetPageName));
         Assert.assertEquals(targetSpaceName, copyPage.getTargetSpaceName());
+        Assert.assertEquals(targetPageName, copyPage.getTargetPageName());
 
 
         // Click copy button

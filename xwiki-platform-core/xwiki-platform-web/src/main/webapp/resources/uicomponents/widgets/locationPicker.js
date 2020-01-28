@@ -173,25 +173,31 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     var updateLocationAndNameFromTitleInput = function(event) {
       // ensure the buttons are disabled before we got the name answer
       disableButtons();
+      titleInputVal = titleInput.val();
       // Update the name field.
-      getPageName(titleInput.val()).done(function(data) {
-        // we trigger a change so we can validate the name
-        nameInput.val(data.transformedName).trigger(('change'));
+      getPageName(titleInputVal).done(function(data) {
+        // Ensure that the input didn't change while we were waiting the answer.
+        // It also protects the value if a previous request was slow to arrive.
+        if (titleInputVal === titleInput.val()) {
+          // we trigger a change so we can validate the name
+          nameInput.val(data.transformedName).trigger('change');
 
-        // Update the location preview.
-        updateLocationFromTitleInput();
-
+          // Update the location preview.
+          updateLocationFromTitleInput();
+        }
         // enable back the buttons
         enableButtons();
       }).fail(function (response) {
-        new XWiki.widgets.Notification(
-          "$services.localization.render('entitynamevalidation.nametransformation.error')",
-          'error'
-        );
-        // we trigger a change so we can validate the name
-        nameInput.val(titleInput.val()).trigger('change');
-        // Update the location preview.
-        updateLocationFromTitleInput();
+        if (titleInputVal === titleInput.val()) {
+          new XWiki.widgets.Notification(
+            "$services.localization.render('entitynamevalidation.nametransformation.error')",
+            'error'
+          );
+          // we trigger a change so we can validate the name
+          nameInput.val(titleInputVal).trigger('change');
+          // Update the location preview.
+          updateLocationFromTitleInput();
+        }
         // enable back the buttons
         enableButtons();
       });
@@ -292,12 +298,11 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     };
 
     // Synchronize the location fields while the user types.
-    titleInput.on('input', updateLocationAndNameFromTitleInput);
-    // Ensure that everything's updated when users change fields (particulary useful in our tests)
-    titleInput.on('blur', updateLocationAndNameFromTitleInput);
+    // Blur ensure that everything's updated when users change fields (particulary useful in our tests)
+    titleInput.on('input blur', updateLocationAndNameFromTitleInput);
     wikiField.change(updateLocationFromWikiField);
-    nameInput.on('input', updateLocationFromNameInput);
-    spaceReferenceInput.on('input xwiki:suggest:selected', updateLocationFromSpaceReference);
+    nameInput.on('input blur', updateLocationFromNameInput);
+    spaceReferenceInput.on('input blur xwiki:suggest:selected', updateLocationFromSpaceReference);
 
     // Clean the output of the hierarchy macro when it should display a top level document.
     if (!spaceReferenceInput.val()) {
@@ -305,7 +310,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     }
 
     // Update the location with whatever the initial value of the title is.
-    if (!nameInput.val()) {
+    if (nameInput.val() !== undefined && !nameInput.val()) {
       updateLocationAndNameFromTitleInput();
     } else {
       updateLocationFromTitleInput();

@@ -109,12 +109,20 @@ XWiki.XWikiPreferences_timezone.hint=Sett tidssone brukt på datoer globalt
 administration.section.import.hint=Begynn med å laste opp en ny pakke eller ved å velge en fra listen over tilgjengelige pakker. Innholdet i den valgte pakken vil bli vist til høyre sammen med importalternativene.
 
 # Export Section
-administration.section.export.packageName.hint=Filnavnet som brukes når du genererer arkivet med det eksporterte innholdet.
-administration.section.export.description.hint=Pakkebeskrivelsen, som vises når du importerer pakken.
-administration.section.export.licence.hint=Lisensiering av innholdet. F.eks.: LGPL, GPLV2, osv.
-administration.section.export.author.hint=Pakkeforfatteren.
-administration.section.export.version.hint=Pakkeversjonen.
+### Missing: administration.section.export.pages=Pages
+### Missing: administration.section.export.pages.all=All pages
 administration.section.export.withHistory.hint=Inkluder sidehistorikken i eksporten. Bare den nyeste versjonen av en side blir eksportert ellers.
+### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
+### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
+### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
+### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
+administration.section.export.packageName.hint=Filnavnet som brukes når du genererer arkivet med det eksporterte innholdet.
+### Missing: administration.section.export.moreOptions=More options
+### Missing: administration.section.export.lessOptions=Less options
+administration.section.export.description.hint=Pakkebeskrivelsen, som vises når du importerer pakken.
+administration.section.export.author.hint=Pakkeforfatteren.
+administration.section.export.licence.hint=Lisensiering av innholdet. F.eks.: LGPL, GPLV2, osv.
+administration.section.export.version.hint=Pakkeversjonen.
 administration.section.export.backupPack.hint=Angi om pakken skal brukes som sikkerhetskopi. Dette alternativet påvirker ikke det eksporterte innholdet. Den eneste effekten er at alternativet "Importer som sikkerhetskopi" vil bli forhåndsvalgt når du importerer pakken. Forskjellen mellom en sikkerhetskopipakke og en vanlig pakke er at i det første tilfellet blir sideforfatteren bevart under importen, mens i det andre tilfelle blir brukeren som utfører importen den forrige forfatteren til hver importerte side.
 
 # Users Section

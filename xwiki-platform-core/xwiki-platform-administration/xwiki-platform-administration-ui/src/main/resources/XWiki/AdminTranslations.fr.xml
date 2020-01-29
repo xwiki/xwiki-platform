@@ -109,13 +109,21 @@ XWiki.XWikiPreferences_timezone.hint=Définir globalement le fuseau horaire des 
 administration.section.import.hint=Commencez par télécharger un nouveau package ou par sélectionner un package dans la liste. Le contenu du package sélectionné sera affiché sur la droite avec les options d'import.
 
 # Export Section
-administration.section.export.packageName.hint=Nom du fichier d'archive généré avec le contenu exporté.
-administration.section.export.description.hint=Description du package affiché lors de l'import du package.
-administration.section.export.licence.hint=Licence du contenu. Par exemple : LGPL, GPLV2, etc.
-administration.section.export.author.hint=Auteur du package.
-administration.section.export.version.hint=Version du package.
+administration.section.export.pages=Pages
+administration.section.export.pages.all=Toutes les pages
 administration.section.export.withHistory.hint=Inclure l'historique de la page dans l'export. Sinon seule la dernière version sera exportée.
-administration.section.export.backupPack.hint=Définit si le package est une sauvegarde. Cette option n'influe pas sur le contenu des pages mais, lors de l'import, pré-sélectionne l'option "Importer le package comme une sauvegarde". Dans ce cas, l'auteur est conservé. Au contraire lors de l'import d'un package normal, l'utilisateur effectuant l'import devient automatiquement le dernier auteur des pages importées.
+administration.section.export.targetXWikiVersion=Version XWiki cible
+administration.section.export.targetXWikiVersion.hint=La version de XWiki dans laquelle vous souhaitez importer les pages. La version actuelle est {0}.
+administration.section.export.targetXWikiVersion.12plus=12.0 et plus
+administration.section.export.targetXWikiVersion.below12=Avant la 12.0
+administration.section.export.packageName.hint=Nom du fichier d'archive généré et contenant les pages wiki.
+administration.section.export.moreOptions=Plus d'options
+administration.section.export.lessOptions=Moins d'options
+administration.section.export.description.hint=Description du package affiché lors de l'import du package.
+administration.section.export.author.hint=Auteur du package (il sera affiché lors de l'import).
+administration.section.export.licence.hint=Licence du contenu. Par exemple : LGPL, GPLV2, etc.
+administration.section.export.version.hint=Version du package, stockée dans le package lui-même.
+administration.section.export.backupPack.hint=Conserve l'auteur lors de l'import des pages. Cette option est sans effet sur le contenu exporté et peut-être modifié avant import.
 
 # Users Section
 administration.section.users.enableUser.inProgress=Activation du compte utilisateur…

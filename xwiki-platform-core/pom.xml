@@ -143,19 +143,7 @@
                     "exclude": ["org\\.xwiki\\.commons:.*:.*", "org\\.xwiki\\.rendering:.*:.*"]
                   }
                 },
-                "ignore" : [
-                  {
-                    "code": "java.annotation.attributeValueChanged",
-                    "old": "class org.xwiki.rest.model.jaxb.Page",
-                    "new": "class org.xwiki.rest.model.jaxb.Page",
-                    "annotationType": "javax.xml.bind.annotation.XmlType",
-                    "attribute": "propOrder",
-                    "oldValue": "{\"language\", \"majorVersion\", \"minorVersion\", \"hidden\", \"created\", \"creator\", \"creatorName\", \"modified\", \"modifier\", \"modifierName\", \"comment\", \"content\", \"clazz\", \"objects\", \"attachments\"}",
-                    "newValue": "{\"language\", \"majorVersion\", \"minorVersion\", \"hidden\", \"created\", \"creator\", \"creatorName\", \"modified\", \"modifier\", \"modifierName\", \"comment\", \"content\", \"clazz\", \"objects\", \"attachments\", \"hierarchy\"}",
-                    "justification": "Not an API breakage. The Page REST object has been extended with the 'hierarchy' property."
-                  },
-
-                  // Velocity 2.x upgrade
+                "ignore" : [// Velocity 2.x upgrade
                   {
                     "code": "java.field.typeChanged",
                     "old": "field org.apache.velocity.runtime.resource.loader.ResourceLoader.log @ org.xwiki.velocity.XWikiWebappResourceLoader",

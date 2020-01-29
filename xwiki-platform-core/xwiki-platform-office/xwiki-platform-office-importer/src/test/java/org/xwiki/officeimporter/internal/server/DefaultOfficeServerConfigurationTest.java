@@ -19,10 +19,25 @@
  */
 package org.xwiki.officeimporter.internal.server;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 /**
  * Test case for {@link DefaultOfficeServerConfiguration}.
@@ -30,21 +45,39 @@ import org.xwiki.officeimporter.server.OfficeServerConfiguration;
  * @version $Id$
  * @since 1.8RC3
  */
-public class DefaultOfficeServerConfigurationTest extends AbstractOfficeImporterTest
+@ComponentTest
+public class DefaultOfficeServerConfigurationTest
 {
+    @InjectMockComponents
+    private DefaultOfficeServerConfiguration defaultOfficeServerConfiguration;
+
+    @MockComponent
+    private ConfigurationSource configuration;
+
     /**
      * Test if default configuration values are present.
-     * 
-     * @throws Exception if it fails to get the default {@link OfficeServerConfiguration} implementation
      */
     @Test
-    public void testDefaultConfiguration() throws Exception
+    public void defaultConfiguration()
     {
-        OfficeServerConfiguration configuration = getComponentManager().getInstance(OfficeServerConfiguration.class);
-        Assert.assertEquals(OfficeServerConfiguration.SERVER_TYPE_INTERNAL, configuration.getServerType());
-        Assert.assertEquals(8100, configuration.getServerPort());
-        Assert.assertNull(configuration.getProfilePath());
-        Assert.assertTrue(configuration.getMaxTasksPerProcess() > 0);
-        Assert.assertTrue(configuration.getTaskExecutionTimeout() > 0);
+        when(configuration.getProperty(any(String.class), any(Object.class))).thenAnswer(
+            invocationOnMock -> invocationOnMock.getArgument(1));
+        assertEquals(OfficeServerConfiguration.SERVER_TYPE_INTERNAL, defaultOfficeServerConfiguration.getServerType());
+        assertArrayEquals(new int[] {8100}, defaultOfficeServerConfiguration.getServerPorts());
+        assertNull(defaultOfficeServerConfiguration.getProfilePath());
+        assertTrue(defaultOfficeServerConfiguration.getMaxTasksPerProcess() > 0);
+        assertTrue(defaultOfficeServerConfiguration.getTaskExecutionTimeout() > 0);
+    }
+
+    @Test
+    public void serverPorts()
+    {
+        when(configuration.getProperty("openoffice.serverPort", List.class))
+            .thenReturn(Arrays.asList("10", "12", "8569"));
+        assertArrayEquals(new int[] {10, 12, 8569}, defaultOfficeServerConfiguration.getServerPorts());
+
+        when(configuration.getProperty("openoffice.serverPort", List.class))
+            .thenReturn(Collections.emptyList());
+        assertArrayEquals(new int[] {8100}, defaultOfficeServerConfiguration.getServerPorts());
     }
 }

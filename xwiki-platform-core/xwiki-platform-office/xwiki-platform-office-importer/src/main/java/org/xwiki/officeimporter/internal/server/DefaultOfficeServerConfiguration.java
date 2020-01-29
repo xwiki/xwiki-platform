@@ -20,6 +20,7 @@
 package org.xwiki.officeimporter.internal.server;
 
 import java.io.File;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -52,7 +53,7 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     private static final int DEFAULT_SERVER_TYPE = SERVER_TYPE_INTERNAL;
 
     /**
-     * @see OfficeServerConfiguration#getServerPort()
+     * @see OfficeServerConfiguration#getServerPorts()
      */
     private static final int DEFAULT_SERVER_PORT = 8100;
 
@@ -91,7 +92,23 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     @Override
     public int getServerPort()
     {
-        return this.configuration.getProperty(PREFIX + "serverPort", DEFAULT_SERVER_PORT);
+        return getServerPorts()[0];
+    }
+
+    @Override
+    public int[] getServerPorts()
+    {
+        List<String> serverPorts = this.configuration.getProperty(PREFIX + "serverPort", List.class);
+        int[] result;
+        if (serverPorts != null && serverPorts.size() > 0) {
+            result = new int[serverPorts.size()];
+            for (int i = 0; i < serverPorts.size(); i++) {
+                result[i] = Integer.parseInt(serverPorts.get(i));
+            }
+        } else {
+            result = new int[] {DEFAULT_SERVER_PORT};
+        }
+        return result;
     }
 
     @Override

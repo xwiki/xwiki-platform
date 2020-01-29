@@ -20,6 +20,7 @@
 package org.xwiki.officeimporter.server;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Configuration properties for the {@link OfficeServer}. They are defined in XWiki's global configuration file using
@@ -60,8 +61,22 @@ public interface OfficeServerConfiguration
 
     /**
      * @return the port number used for connecting to the office server instance
+     * @deprecated Since 12.1RC1. Prefer using {@link #getServerPorts()}.
      */
+    @Deprecated
     int getServerPort();
+
+    /**
+     * @return all ports that can be used for connecting to the office server instance. In case of internal office
+     * server, all ports will be use to create the pool of processes, in case of external office server, only the
+     * first one will be used.
+     * @since 12.1RC1
+     */
+    @Unstable
+    default int[] getServerPorts()
+    {
+        return new int[0];
+    }
 
     /**
      * @return whether office server should be started / connected automatically with XWiki Enterprise

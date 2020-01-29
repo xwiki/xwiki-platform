@@ -116,7 +116,7 @@
             $escapetool.xml($services.localization.render('office.config.serverPort.hint'))
           &lt;/span&gt;
         &lt;/dt&gt;
-        &lt;dd&gt;$escapetool.html($services.officemanager.config.serverPort)&lt;/dd&gt;
+        &lt;dd&gt;$escapetool.html($stringtool.join($services.officemanager.config.serverPorts, ","))&lt;/dd&gt;
         ###
         ### Auto Start
         ###

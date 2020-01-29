@@ -28,8 +28,8 @@ import javax.inject.Singleton;
 import org.jodconverter.LocalConverter;
 import org.jodconverter.document.JsonDocumentFormatRegistry;
 import org.jodconverter.filter.text.LinkedImagesEmbedderFilter;
+import org.jodconverter.office.ExternalOfficeManager;
 import org.jodconverter.office.LocalOfficeManager;
-import org.jodconverter.office.ExternalOfficeManagerBuilder;
 import org.jodconverter.office.OfficeManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
@@ -110,7 +110,7 @@ public class DefaultOfficeServer implements OfficeServer
     {
         if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_INTERNAL) {
             LocalOfficeManager.Builder configuration = LocalOfficeManager.builder();
-            configuration.portNumbers(this.config.getServerPort());
+            configuration.portNumbers(this.config.getServerPorts());
 
             String homePath = this.config.getHomePath();
             if (homePath != null) {
@@ -134,9 +134,11 @@ public class DefaultOfficeServer implements OfficeServer
                 throw new OfficeServerException("Failed to start Office server. Reason: " + e.getMessage(), e);
             }
         } else if (this.config.getServerType() == OfficeServerConfiguration.SERVER_TYPE_EXTERNAL_LOCAL) {
-            ExternalOfficeManagerBuilder externalProcessOfficeManager = new ExternalOfficeManagerBuilder();
-            externalProcessOfficeManager.setPortNumber(this.config.getServerPort());
-            externalProcessOfficeManager.setConnectOnStart(true);
+            ExternalOfficeManager.Builder externalProcessOfficeManager = ExternalOfficeManager.builder();
+            if (this.config.getServerPorts().length > 0) {
+                externalProcessOfficeManager.portNumber(this.config.getServerPorts()[0]);
+            }
+            externalProcessOfficeManager.connectOnStart(true);
             this.jodManager = externalProcessOfficeManager.build();
         } else {
             setState(ServerState.CONF_ERROR);

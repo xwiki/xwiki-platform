@@ -265,6 +265,10 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# [Since 1.9M2]
 #-# Port number used for connecting to the openoffice server instance.
 #-# Default port is 8100
+#-# [Since 12.1RC1]
+#-# You can now specify a list of ports separated by commas: if the server is internally managed,
+#-# each port will be used to create a pool of services; if the server is externally managed,
+#-# only first port will be used.
 # openoffice.serverPort=8100
 
 #-# [Since 1.9M2]

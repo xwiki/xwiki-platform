@@ -109,12 +109,20 @@ XWiki.XWikiPreferences_timezone.hint=Legt die Zeitzone für die Daten global fes
 administration.section.import.hint=Beginnen Sie, indem Sie ein neues Paket hochladen oder eines aus der Liste der verfügbaren Pakete auswählen. Der Inhalt des ausgewählten Pakets wird auf der rechten Seite zusammen mit den Importoptionen angezeigt.
 
 # Export Section
-administration.section.export.packageName.hint=Der Dateiname, der beim Erzeugen des Archivs mit dem exportierten Inhalt verwendet wird.
-administration.section.export.description.hint=Die Paketbeschreibung, die beim Importieren des Pakets angezeigt wird.
-administration.section.export.licence.hint=Die Inhaltslizenz. Z.B.: LGPL, GPLV2, etc.
-administration.section.export.author.hint=Der Paketautor.
-administration.section.export.version.hint=Die Paketversion.
+### Missing: administration.section.export.pages=Pages
+### Missing: administration.section.export.pages.all=All pages
 administration.section.export.withHistory.hint=Fügt den Seitenverlauf in den Export ein. Ansonsten wird nur die neueste Version einer Seite exportiert.
+### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
+### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
+### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
+### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
+administration.section.export.packageName.hint=Der Dateiname, der beim Erzeugen des Archivs mit dem exportierten Inhalt verwendet wird.
+### Missing: administration.section.export.moreOptions=More options
+### Missing: administration.section.export.lessOptions=Less options
+administration.section.export.description.hint=Die Paketbeschreibung, die beim Importieren des Pakets angezeigt wird.
+administration.section.export.author.hint=Der Paketautor.
+administration.section.export.licence.hint=Die Inhaltslizenz. Z.B.: LGPL, GPLV2, etc.
+administration.section.export.version.hint=Die Paketversion.
 administration.section.export.backupPack.hint=Geben Sie an, ob das Paket als Backup verwendet werden soll. Diese Option hat keinen Einfluss auf den exportierten Inhalt. Der einzige Effekt ist, dass die Option "Als Backup-Paket importieren" beim Importieren des Pakets vorgewählt ist. Der Unterschied zwischen einem Backup-Paket und einem normalen Paket besteht darin, dass im ersten Fall der letzte Autor der Seite beim Import erhalten bleibt, während im zweiten Fall der Benutzer, der den Import durchführt, zum letzten Autor jeder importierten Seite wird.
 
 # Users Section

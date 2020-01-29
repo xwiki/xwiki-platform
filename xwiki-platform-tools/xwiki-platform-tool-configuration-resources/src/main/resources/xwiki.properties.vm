@@ -328,7 +328,10 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.properties = directive.if.empty_check = false
 #-#   velocity.properties = parser.space_gobbling = bc
 #-#   velocity.properties = parser.allow_hyphen_in_identifiers = true
-#-#   velocity.properties = velocimacro.arguments.preserve_literals = true
+#-#   velocity.properties = velocimacro.enable_bc_mode = true
+#-#   velocity.properties = context.scope_control.template = true
+#-#   velocity.properties = context.scope_control.macro = true
+#-#   velocity.properties = event_handler.include.class = org.xwiki.velocity.internal.util.RestrictParseLocationEventHandler
 #-#   velocity.properties = runtime.introspection.uberspect = org.xwiki.velocity.introspection.SecureUberspector\,org.apache.velocity.util.introspection.DeprecatedCheckUberspector\,org.xwiki.velocity.introspection.MethodArgumentsUberspector
 
 #-------------------------------------------------------------------------------------

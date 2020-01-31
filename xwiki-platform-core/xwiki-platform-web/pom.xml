@@ -200,6 +200,24 @@
           <debug>true</debug>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
+            <exclude>src/**/yui/**/*.js</exclude>
+            <exclude>src/**/scriptaculous/**/*.js</exclude>
+            <exclude>src/**/prototype/**/*.js</exclude>
+            <exclude>src/**/xwiki/accordion/accordion.js</exclude>
+            <exclude>src/**/xwiki/panelwizard/ieemu.js</exclude>
+            <exclude>src/**/xwiki/table/tablefilterNsort.js</exclude>
+            <exclude>src/**/uicomponents/widgets/datepicker/simpleDateFormat.js</exclude>
+            <exclude>src/**/uicomponents/widgets/validation/livevalidation_prototype.js</exclude>
+            <exclude>src/**/uicomponents/widgets/colorpicker/procolor.js</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <profiles>

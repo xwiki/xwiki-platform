@@ -71,6 +71,16 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- Exclude JS files that not under an XWiki license, so that we don't check the license for them -->
+            <exclude>src/**/update-script.js</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -1,16 +1,35 @@
-##---------------------------------------------------------------------------
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+## ---------------------------------------------------------------------------
 ## If the Document to which XARs will be attached to doesn't exist, then
 ## create it.
 ## Note that the upload action could automatically create it but we want to
 ## control the creation so that we can set the parent and thus not make it
 ## orphaned + we set a save comment and make it a minor edit.
-##---------------------------------------------------------------------------
+## ---------------------------------------------------------------------------
 #set($importDoc = $xwiki.getDocument('XWiki.XWikiPreferences'))
 #if($importDoc.isNew())
   $importDoc.setParent('XWiki.WebHome')
   $importDoc.save("Creating document to which to attach XAR files to import", true)
 #end
-##---------------------------------------------------------------------------
+## ---------------------------------------------------------------------------
 #if($request.xredirect)
   #set($redirect = $request.xredirect)
 #else
@@ -19,16 +38,16 @@
 #if(!$redirect)
   #set($redirect = $importDoc.getURL('import', 'section=Import'))
 #end
-##---------------------------------------------------------------------------
+## ---------------------------------------------------------------------------
 ## Import the documents from the selected XAR.
-##---------------------------------------------------------------------------
+## ---------------------------------------------------------------------------
 #if("$!{request.action}" == 'import')
 <p class="legend">$services.localization.render('import') #if("$!{request.withversions}" == '1')$services.localization.render('export_addhistory')#end</p>
 #template("imported.vm")
-##---------------------------------------------------------------------------
+## ---------------------------------------------------------------------------
 ## Browse the XARs and let the user select a XAR and the list of documents
 ## to import from that XAR.
-##---------------------------------------------------------------------------
+## ---------------------------------------------------------------------------
 #else
   #set($baseQueryString = "editor=$!{request.editor}&amp;section=$!{request.section}")
   $xwiki.jsfx.use('js/xwiki/importer/import.js', true)##

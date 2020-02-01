@@ -21,6 +21,7 @@ package org.xwiki.refactoring.internal.job;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -31,7 +32,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.refactoring.job.RefactoringJobs;
 
-import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -65,17 +65,17 @@ public class ReplaceUserJob extends AbstractReplaceUserJob
     {
         List<String> updatedFields = new ArrayList<>();
         if (getRequest().isReplaceDocumentAuthor()
-            && Objects.equal(document.getAuthorReference(), getRequest().getOldUserReference())) {
+            && Objects.equals(document.getAuthorReference(), getRequest().getOldUserReference())) {
             document.setAuthorReference(getRequest().getNewUserReference());
             updatedFields.add("author");
         }
         if (getRequest().isReplaceDocumentContentAuthor()
-            && Objects.equal(document.getContentAuthorReference(), getRequest().getOldUserReference())) {
+            && Objects.equals(document.getContentAuthorReference(), getRequest().getOldUserReference())) {
             document.setContentAuthorReference(getRequest().getNewUserReference());
             updatedFields.add("contentAuthor");
         }
         if (getRequest().isReplaceDocumentCreator()
-            && Objects.equal(document.getCreatorReference(), getRequest().getOldUserReference())) {
+            && Objects.equals(document.getCreatorReference(), getRequest().getOldUserReference())) {
             document.setCreatorReference(getRequest().getNewUserReference());
             updatedFields.add("creator");
         }

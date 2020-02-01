@@ -22,6 +22,7 @@ package org.xwiki.extension.xar.internal.job.diff;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,7 +38,6 @@ import org.xwiki.diff.display.UnifiedDiffBlock;
 import org.xwiki.diff.display.UnifiedDiffConfiguration;
 import org.xwiki.diff.display.UnifiedDiffDisplayer;
 
-import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 
 /**
@@ -87,7 +87,7 @@ public abstract class AbstractUnifiedDiffBuilder
     protected boolean maybeAddDiff(Map<String, List<UnifiedDiffBlock<String, Character>>> diffs, String key,
         Object previousValue, Object nextValue)
     {
-        if (!Objects.equal(previousValue, nextValue)) {
+        if (!Objects.equals(previousValue, nextValue)) {
             List<UnifiedDiffBlock<String, Character>> diff =
                 createUnifiedDiff(previousValue == null ? null : previousValue.toString(), nextValue == null ? null
                     : nextValue.toString());

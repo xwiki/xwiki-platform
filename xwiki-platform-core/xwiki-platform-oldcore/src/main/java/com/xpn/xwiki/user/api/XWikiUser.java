@@ -20,6 +20,7 @@
 package com.xpn.xwiki.user.api;
 
 import java.util.Collection;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -31,7 +32,6 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.stability.Unstable;
 
-import com.google.common.base.Objects;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -437,7 +437,7 @@ public class XWikiUser
         if (obj instanceof XWikiUser) {
             XWikiUser otherUser = (XWikiUser) obj;
 
-            equals = otherUser.main == this.main && Objects.equal(getUserReference(), otherUser.getUserReference());
+            equals = otherUser.main == this.main && Objects.equals(getUserReference(), otherUser.getUserReference());
         } else {
             equals = false;
         }

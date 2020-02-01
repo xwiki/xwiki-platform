@@ -22,6 +22,7 @@ package org.xwiki.extension.distribution.internal;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.inject.Inject;
@@ -55,7 +56,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
-import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.rightsmanager.RightsManager;
@@ -392,7 +392,7 @@ public class DefaultDistributionManager implements DistributionManager, Initiali
 
         // Check if its the user that started the DW (this avoid loosing all access to the DW during an install/upgrade)
         DistributionJob job = getCurrentDistributionJob();
-        if (job != null && Objects.equal(currentUser, job.getRequest().getUserReference())) {
+        if (job != null && Objects.equals(currentUser, job.getRequest().getUserReference())) {
             this.logger.debug("The user [{}] started the DW so he can access it", currentUser);
 
             return true;

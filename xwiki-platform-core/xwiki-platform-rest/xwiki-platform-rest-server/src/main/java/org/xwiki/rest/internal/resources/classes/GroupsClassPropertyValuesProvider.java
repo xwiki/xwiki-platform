@@ -21,6 +21,7 @@ package org.xwiki.rest.internal.resources.classes;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -38,7 +39,6 @@ import org.xwiki.rest.model.jaxb.PropertyValues;
 import org.xwiki.wiki.user.UserScope;
 import org.xwiki.wiki.user.WikiUserManager;
 
-import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
@@ -80,7 +80,7 @@ public class GroupsClassPropertyValuesProvider extends AbstractUsersAndGroupsCla
     protected PropertyValues getAllowedValues(GroupsClass propertyDefinition, int limit, String filter) throws Exception
     {
         String wikiId = propertyDefinition.getOwnerDocument().getDocumentReference().getWikiReference().getName();
-        if (!Objects.equal(wikiId, this.wikiDescriptorManager.getMainWikiId())
+        if (!Objects.equals(wikiId, this.wikiDescriptorManager.getMainWikiId())
             && this.wikiUserManager.getUserScope(wikiId) != UserScope.LOCAL_ONLY)
         {
             return getLocalAndGlobalAllowedValues(propertyDefinition, limit, filter);

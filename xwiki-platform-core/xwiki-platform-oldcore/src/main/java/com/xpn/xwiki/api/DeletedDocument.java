@@ -22,13 +22,13 @@ package com.xpn.xwiki.api;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.Right;
 
-import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -143,7 +143,7 @@ public class DeletedDocument extends Api
     {
         try {
             return hasAccessLevel(ADMIN_RIGHT, getFullName()) || hasAccessLevel("undelete", getFullName())
-                || (Objects.equal(this.context.getUserReference(), getDeleterReference())
+                || (Objects.equals(this.context.getUserReference(), getDeleterReference())
                     && hasAccess(Right.EDIT, getDocumentReference()));
         } catch (XWikiException ex) {
             // Public APIs should not throw exceptions

@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +38,6 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.store.merge.MergeManagerResult;
 
-import com.google.common.base.Objects;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -477,7 +477,7 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
             return false;
         }
 
-        if (!Objects.equal(this.customMapping, bclass.customMapping)
+        if (!Objects.equals(this.customMapping, bclass.customMapping)
             && !getCustomMapping().equals(bclass.getCustomMapping())) {
             return false;
         }

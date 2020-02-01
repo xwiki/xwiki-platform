@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.objects;
 
-import com.google.common.base.Objects;
+import java.util.Objects;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -71,7 +71,7 @@ public class BaseStringProperty extends BaseProperty
             return false;
         }
 
-        return Objects.equal(this.getValue(), ((BaseStringProperty) obj).getValue());
+        return Objects.equals(this.getValue(), ((BaseStringProperty) obj).getValue());
     }
 
     @Override

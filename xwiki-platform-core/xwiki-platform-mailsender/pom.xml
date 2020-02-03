@@ -32,10 +32,7 @@
   <description>XWiki Platform - Mail Sender</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.23</xwiki.jacoco.instructionRatio>
-    <!-- TODO: put back previous threshold of 36 which we had to change to 0 because of an issue in PIT/Descartes
-         See https://github.com/STAMP-project/pitest-descartes/issues/106
-         Put back when it's fixed. -->
-    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
+    <xwiki.pitest.mutationThreshold>44</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

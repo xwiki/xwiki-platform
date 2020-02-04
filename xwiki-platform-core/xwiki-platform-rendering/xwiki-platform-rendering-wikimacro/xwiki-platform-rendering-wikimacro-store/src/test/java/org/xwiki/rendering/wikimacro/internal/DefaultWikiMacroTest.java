@@ -199,7 +199,7 @@ public class DefaultWikiMacroTest
         assertXHTML("<p>This is <strong>bold</strong></p>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
         assertXDOM("<document><p><metadata><metadata><entry><string>syntax</string>"
             + "<org.xwiki.rendering.syntax.Syntax><type><name>XWiki</name><id>xwiki</id></type><version>2.0</version></org.xwiki.rendering.syntax.Syntax></entry></metadata></metadata></p>"
-            + "<macroMarker name=\"wikimacro1\"><p><parameters><m><entry><string>param1</string><string>value1</string></entry><entry><string>param2</string><string>value2</string></entry></m></parameters></p>"
+            + "<macroMarker name=\"wikimacro1\"><p><parameters><entry><string>param1</string><string>value1</string></entry><entry><string>param2</string><string>value2</string></entry></parameters></p>"
             + "<paragraph><word>This</word><space></space><word>is</word><space></space><format format=\"BOLD\"><word>bold</word></format></paragraph>"
             + "</macroMarker></document>", "{{wikimacro1 param1=\"value1\" param2=\"value2\"/}}");
     }

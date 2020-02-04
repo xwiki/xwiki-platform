@@ -34,6 +34,8 @@
   <properties>
     <xwiki.jacoco.instructionRatio>0.52</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>25</xwiki.pitest.mutationThreshold>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Link Checker API</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

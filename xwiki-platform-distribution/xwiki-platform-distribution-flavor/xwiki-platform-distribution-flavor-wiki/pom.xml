@@ -33,13 +33,10 @@
   <description>${xwiki.extension.distribution.wikiui.summary}</description>
   <properties>
     <xwiki.extension.category>flavor</xwiki.extension.category>
-
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>${xwiki.extension.distribution.wikiui.name}</xwiki.extension.name>
-
-    <!-- Should be insalled on a wiki but not main wiki -->
+    <!-- Should be installed on a wiki but not main wiki -->
     <xwiki.extension.namespaces>[wiki:(?!xwiki$).*]</xwiki.extension.namespaces>
-
     <xwiki.extension.features>
         <!-- Make sure to replace the old XE flavor -->
         org.xwiki.enterprise:xwiki-enterprise-ui-wiki
@@ -52,7 +49,6 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-wiki-ui-wiki</artifactId>

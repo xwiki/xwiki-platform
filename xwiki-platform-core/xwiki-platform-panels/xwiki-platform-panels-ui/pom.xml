@@ -33,6 +33,8 @@
   <properties>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-panels</xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Panels Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

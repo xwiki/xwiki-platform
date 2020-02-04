@@ -44,6 +44,8 @@
     </xwiki.extension.features>
     <!-- We bundle legacy modules in the Flavor distribution, thus we allow depending on legacy dependencies. -->
     <xwiki.enforcer.no-legacy-dependencies.skip>true</xwiki.enforcer.no-legacy-dependencies.skip>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>XWiki Standard Common Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

@@ -31,6 +31,10 @@
   <name>XWiki Platform - Scheduler - UI</name>
   <packaging>xar</packaging>
   <description>Manages Scheduler Jobs</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Scheduler Application</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

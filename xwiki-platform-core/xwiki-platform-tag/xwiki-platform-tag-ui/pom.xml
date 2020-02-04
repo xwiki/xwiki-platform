@@ -31,6 +31,10 @@
   <name>XWiki Platform - Tag - UI</name>
   <packaging>xar</packaging>
   <description>Tag application for XWiki</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Tag Application</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

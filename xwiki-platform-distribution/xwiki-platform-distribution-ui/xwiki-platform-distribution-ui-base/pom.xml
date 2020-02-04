@@ -36,6 +36,8 @@
         <!-- Make sure to replace the old platform base flavor -->
         org.xwiki.platform:xwiki-platform-distribution-flavor
     </xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Base Flavor Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <!-- JAR dependencies -->

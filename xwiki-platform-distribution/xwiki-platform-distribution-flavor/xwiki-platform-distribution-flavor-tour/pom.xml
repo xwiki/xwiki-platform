@@ -31,14 +31,14 @@
   <name>XWiki Platform - Distribution - Flavor - Tour</name>
   <packaging>xar</packaging>
   <description>Contains default set of wiki tour pages.</description>
-
   <properties>
     <xwiki.extension.features>
         <!-- Make sure to replace the old XE flavor -->
         org.xwiki.enterprise:xwiki-enterprise-ui-tour
     </xwiki.extension.features>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>XWiki Standard Tour</xwiki.extension.name>
   </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.xwiki.contrib</groupId>

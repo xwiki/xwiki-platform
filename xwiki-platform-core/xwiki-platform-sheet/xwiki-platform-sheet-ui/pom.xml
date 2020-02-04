@@ -31,4 +31,8 @@
   <name>XWiki Platform - Sheet - UI</name>
   <packaging>xar</packaging>
   <description>Sheet application for XWiki. Provides the XWiki classes needed to create and bind sheets.</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Sheet Application</xwiki.extension.name>
+  </properties>
 </project>

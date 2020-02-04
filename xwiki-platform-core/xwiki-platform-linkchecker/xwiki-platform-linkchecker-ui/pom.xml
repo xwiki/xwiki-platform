@@ -31,6 +31,10 @@
   <name>XWiki Platform - LinkChecker - UI</name>
   <packaging>xar</packaging>
   <description>Displays statuses of external links found in the wiki</description>
+  <properties>
+    <!-- Name to display by the Extension Manager -->
+    <xwiki.extension.name>Link Checker Application</xwiki.extension.name>
+  </properties>
   <dependencies>
     <dependency>
       <!-- The LinkChecker UI adds a new tab to the AllDocs page. We make it optional since it works even if the

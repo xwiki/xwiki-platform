@@ -62,11 +62,11 @@ XWiki.Registration_loginButton_autoLogin_enabled.hint=Если кнопка вх
 XWiki.Registration_defaultRedirect.hint=URL, на который пользователь будет перенаправлен после нажатия кнопки входа в систему, если не указан параметр xredirect. Можно использовать velocity-код.
 XWiki.Registration_requireCaptcha.hint=Установите это значение true, чтобы требовать от пользователя решения CAPTCHA для регистрации.
 XWiki.Registration_registrationSuccessMessage.hint=Показывается пользователю, когда он успешно зарегистрировался. Можно использовать velocity-код вики-разметку.
-### Missing: XWiki.Registration_passwordLength.hint=The minimum length of the password. A longer password is more secure, it is recommended to keep it above 6 characters.
-### Missing: XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=If checked, force the user to chose a password with at least one lowercase character.
-### Missing: XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=If checked, force the user to chose a password with at least one uppercase character.
-### Missing: XWiki.Registration_passwordRuleOneNumberEnabled.hint=If checked, force the user to chose a password with at least one number.
-### Missing: XWiki.Registration_passwordRuleOneSymbolEnabled.hint=If checked, force the user to chose a password with at least one symbol character.
+XWiki.Registration_passwordLength.hint=Минимальная длина пароля. Более длинный пароль более безопасен, рекомендуется не менее 6 символов.
+XWiki.Registration_passwordRuleOneLowerCaseEnabled.hint=Если этот флажок установлен, пользователь должен выбрать пароль, по крайней мере, с одним символом в нижнем регистре.
+XWiki.Registration_passwordRuleOneUpperCaseEnabled.hint=Если этот флажок установлен, пользователь должен выбрать пароль, по крайней мере, с одним заглавным символом.
+XWiki.Registration_passwordRuleOneNumberEnabled.hint=Если этот флажок установлен, пользователь должен выбрать пароль, по крайней мере, с одним числом.
+XWiki.Registration_passwordRuleOneSymbolEnabled.hint=Если этот флажок установлен, пользователь должен выбрать пароль, по крайней мере, с одним спецсимволом.
 
 # Look &amp; Feel Sections
 admin.themes=Темы
@@ -109,12 +109,20 @@ XWiki.XWikiPreferences_timezone.hint=Глобальные настройки д�
 administration.section.import.hint=Начните с загрузки нового пакета или выбора одного из списка доступных пакетов. Содержимое выбранного пакета будет отображаться справа вместе с параметрами импорта.
 
 # Export Section
-administration.section.export.packageName.hint=Имя файла, используемое при создании архива с экспортируемым содержимым.
-administration.section.export.description.hint=Описание пакета, отображаемое при импорте пакета.
-administration.section.export.licence.hint=Лицензия на содержимое. Например: LGPL, GPLV2 и т.д.
-administration.section.export.author.hint=Автор пакета.
-administration.section.export.version.hint=Версия пакета.
+### Missing: administration.section.export.pages=Pages
+### Missing: administration.section.export.pages.all=All pages
 administration.section.export.withHistory.hint=Включить историю страниц в экспорт. В противном случае экспортируется только последняя версия страницы.
+### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
+### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
+### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
+### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
+administration.section.export.packageName.hint=Имя файла, используемое при создании архива с экспортируемым содержимым.
+### Missing: administration.section.export.moreOptions=More options
+### Missing: administration.section.export.lessOptions=Less options
+administration.section.export.description.hint=Описание пакета, отображаемое при импорте пакета.
+administration.section.export.author.hint=Автор пакета.
+administration.section.export.licence.hint=Лицензия на содержимое. Например: LGPL, GPLV2 и т.д.
+administration.section.export.version.hint=Версия пакета.
 administration.section.export.backupPack.hint=Укажите, будет ли пакет использоваться в качестве резервной копии. Эта опция не влияет на экспортируемый контент. Единственный эффект заключается в том, что при импорте пакета будет предварительно выбран параметр «Импортировать как резервную копию». Разница между пакетом резервного копирования и обычным пакетом заключается в том, что в первом случае последний автор страницы сохраняется во время импорта, а во втором случае пользователь, выполняющий импорт, становится последним автором каждой импортированной страницы.
 
 # Users Section

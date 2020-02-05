@@ -38,16 +38,14 @@ $services.localization.render('currentdifftype'): $type (
 <a href="$doc.getURL("view", "xpage=changesall&amp;type=source$lang")">$services.localization.render('sourcediff')</a>
 <a href="$doc.getURL("view", "xpage=changesall&amp;type=html$lang")">$services.localization.render('htmldiff')</a>
 )
-#set ($firstrev = $tdoc.getVersion())
-#set ($nextversion = $firstrev)
-#foreach ($version in $tdoc.getRecentRevisions(0))
-  #if ($version != $firstrev)
-    #set ($origdoc = '')
-    #set ($newdoc = '')
-    #set ($origdoc = $xwiki.getDocument($tdoc, $version))
-    #set($newdoc = $xwiki.getDocument($tdoc, $nextversion))
+#set ($rev2 = $tdoc.getVersion())
+## Iterate all revisions in descending order.
+#foreach ($rev1 in $tdoc.getRecentRevisions(0))
+  #if ($rev1 != $rev2)
+    #set ($origdoc = $xwiki.getDocument($tdoc, $rev1))
+    #set ($newdoc = $xwiki.getDocument($tdoc, $rev2))
     #template("changesdoc.vm")
-    #set($nextversion = $version)
+    #set ($rev2 = $rev1)
   #end
 #end
 #set ($newdoc = $origdoc)

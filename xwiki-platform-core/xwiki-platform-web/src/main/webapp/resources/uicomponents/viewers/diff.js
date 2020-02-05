@@ -19,6 +19,25 @@
  */
 require(['jquery', 'xwiki-events-bridge'], function($) {
   //
+  // Toggle between raw and rendered changes.
+  //
+
+  var enhanceDiffTabs = function(container) {
+    container.find('.changes-body a[data-toggle="pill"]').on('show.bs.tab', function (event) {
+      var tabPanel = $($(event.target).attr('href'));
+      if (!tabPanel.hasClass('loading') && tabPanel.html().trim() == '') {
+        var queryString = window.location.search.substring(1).replace('viewer', 'xpage');
+        var url = XWiki.currentDocument.getURL('get', queryString);
+        var fragmentId = tabPanel.attr('id');
+        tabPanel.addClass('loading').load(url + ' #' + fragmentId, {'include': fragmentId}, function() {
+          // Remove the duplicated tab pane div because the loaded tab pane doesn't replace the existing one.
+          tabPanel.removeClass('loading').children('.tab-pane').children().unwrap();
+        });
+      }
+    });
+  };
+
+  //
   // Collapsible diff summary.
   //
 
@@ -93,6 +112,10 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     });
   };
 
+  //
+  // Conflict Decision
+  //
+
   var enhanceConflictDecision = function (container) {
     var changeConflictDecision = function (conflictId) {
       var selectValue = $('#conflict_decision_select_' + conflictId).val();
@@ -130,6 +153,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
   //
 
   var init = function(container) {
+    enhanceDiffTabs(container);
     enhanceDiffSummaryItems(container);
     enhanceHTMLDiff(container);
     enhanceConflictDecision(container);

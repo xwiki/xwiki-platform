@@ -80,6 +80,10 @@
 ##
 ## Changes
 ##
+#set ($includes = $request.getParameterValues('include'))
+#if (!$includes)
+  #set ($includes = ['rawChanges'])
+#end
 <div class="changes-body">
   <ul class="nav nav-pills" role="tablist">
     <li role="presentation" class="active">
@@ -95,20 +99,24 @@
   </ul>
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="rawChanges">
-      #displayDocumentRawChanges($origdoc $newdoc)
+      #if ($includes.contains('rawChanges'))
+        #displayDocumentRawChanges($origdoc $newdoc)
+      #end
     </div>
     <div role="tabpanel" class="tab-pane html-diff" id="renderedChanges">
-      #set ($htmlDiff = $services.diff.html.unified($origdoc.renderedContent, $newdoc.renderedContent))
-      #if ($htmlDiff == '')
-        <div class="infomessage">
-          $escapetool.xml($services.localization.render('web.history.changes.noChanges'))
-        </div>
-      #elseif ("$!htmlDiff" == '')
-        <div class="errormessage">
-          $escapetool.xml($services.localization.render('web.history.changes.failedToCompute'))
-        </div>
-      #else
-        $htmlDiff
+      #if ($includes.contains('renderedChanges'))
+        #set ($htmlDiff = $services.diff.html.unified($origdoc.renderedContent, $newdoc.renderedContent))
+        #if ($htmlDiff == '')
+          <div class="infomessage">
+            $escapetool.xml($services.localization.render('web.history.changes.noChanges'))
+          </div>
+        #elseif ("$!htmlDiff" == '')
+          <div class="errormessage">
+            $escapetool.xml($services.localization.render('web.history.changes.failedToCompute'))
+          </div>
+        #else
+          $htmlDiff
+        #end
       #end
     </div>
   </div>

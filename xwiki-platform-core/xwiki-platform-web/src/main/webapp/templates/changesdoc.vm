@@ -61,52 +61,22 @@
   #end
 #end
 
-<div id="changes-info">
-  <div id="changes-info-boxes">
-    <div id="changes-info-box-from" class="changes-info-box">
-      #if ("$!rev1" == '')
-        <div class="changes-info-title">$services.localization.render('core.viewers.diff.fromNew')</div>
-      #else
-        #set ($fromVersionURL = $origdoc.getURL('view', "rev=$rev1"))
-        #set ($fromVersionLink = "<a href='$fromVersionURL'>$rev1</a>")
-        #set ($fromVersionSpan = "<span class='changes-version'>$!previousOrigdocLink $fromVersionLink $!nextOrigdocLink</span>")
-        <div class="changes-info-title">$services.localization.render('core.viewers.diff.from', [$fromVersionSpan])</div>
-        <div class="changes-info-content">
-        #if($origdoc)
-          $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($origdoc.author)])
-          <br />
-          $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($origdoc.date)])
-        #end
-        </div> ## changes-info-content
-      #end
-    </div> ## changes-info-box-from
-    <div id="changes-info-box-to" class="changes-info-box">
-      #set ($toVersionURL = $newdoc.getURL('view', "rev=$rev2"))
-      #set ($toVersionLink = "<a href='$toVersionURL'>$rev2</a>")
-      #set ($toVersionSpan = "<span class='changes-version'>$!previousNewdocLink $toVersionLink $!nextNewdocLink</span>")
-      <div class="changes-info-title">$services.localization.render('core.viewers.diff.to', [$toVersionSpan])</div>
-      <div class="changes-info-content">
-      #if($newdoc)
-        $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($newdoc.author)])
-        <br />
-        $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($newdoc.date)])
-      #end
-      </div> ## changes-info-content
-    </div> ## changes-info-box-to
-    #if ("$!previousLink" != '')
-      <a href="$previousLink" class="changes-arrow-left" title="$services.localization.render('core.viewers.diff.previousChange')">&lt;</a>
-    #end
-    #if ("$!nextLink" != '')
-      <a href="$nextLink" class="changes-arrow-right" title="$services.localization.render('core.viewers.diff.nextChange')">&gt;</a>
-    #end
-    <div class="clearfloats"></div>
-  </div> ## changes-info-boxes
-  <div class="clearfloats"></div>
-  <div id="changes-info-comment">
-    $services.localization.render('core.viewers.diff.editComment') #if("$!newdoc.comment" == '') $services.localization.render('core.viewers.diff.noEditComment') #else $newdoc.comment #end
-  </div> ## changes-info-comment
-</div> ## changes-info
-<div class="clearfloats"></div>
+#set ($from = {
+  'doc': $origdoc,
+  'version': $rev1,
+  'previousVersionLink': $previousOrigdocLink,
+  'nextVersionLink': $nextOrigdocLink,
+  'previousLink': $previousLink
+})
+#set ($to = {
+  'doc': $newdoc,
+  'version': $rev2,
+  'previousVersionLink': $previousNewdocLink,
+  'nextVersionLink': $nextNewdocLink,
+  'nextLink': $nextLink
+})
+#displayDocumentChangesHeader($from $to)
+
 ##
 ## Changes
 ##
@@ -125,18 +95,7 @@
   </ul>
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane active" id="rawChanges">
-      ## Make the heading level adjustable when including this template.
-      #if (!$headingLevel)
-        #set ($headingLevel = 2)
-      #end
-      #createDocumentDiff($origdoc $newdoc $docDiff)
-      #createDocumentDiffSummary($docDiff $summary)
-      <h$headingLevel>$services.localization.render('web.history.changes.summary')</h$headingLevel>
-      #displayDocumentDiffSummary($summary)
-      #if ($summary.entries.size() > 0)
-        <h$headingLevel>$services.localization.render('web.history.changes.details')</h$headingLevel>
-        #displayDocumentDiff($docDiff $conflictsList)
-      #end
+      #displayDocumentRawChanges($origdoc $newdoc)
     </div>
     <div role="tabpanel" class="tab-pane html-diff" id="renderedChanges">
       #set ($htmlDiff = $services.diff.html.unified($origdoc.renderedContent, $newdoc.renderedContent))

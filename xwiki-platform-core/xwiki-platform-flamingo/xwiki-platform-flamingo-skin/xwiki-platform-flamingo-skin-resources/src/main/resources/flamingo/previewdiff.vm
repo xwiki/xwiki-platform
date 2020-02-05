@@ -17,6 +17,8 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
+#set ($discard = $services.template.execute('diff_macros.vm'))
+
 #set ($origdoc = $xwiki.getDocument($tdoc.getDocumentReference()))
 #set ($previousDoc = $origdoc.getDocumentRevision($request.get("previousVersion")))
 #set ($mergedDocResult = $services.merge.mergeDocument($previousDoc, $tdoc, $origdoc))
@@ -169,20 +171,21 @@
                   #set ($rev1 = $originalDocument.getVersion())
                 #end
                 #if ($revisedVersion == "CURRENT")
-                #set ($rev2 = "Current")
-              #elseif ($revisedVersion == "MERGED")
-                #set ($rev2 = "Merged")
-              #else
-                #set ($rev2 = $revisedDocument.getVersion())
-              #end
+                  #set ($rev2 = "Current")
+                #elseif ($revisedVersion == "MERGED")
+                  #set ($rev2 = "Merged")
+                #else
+                  #set ($rev2 = $revisedDocument.getVersion())
+                #end
                 #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
-                #set ($origdoc = $wrappedDocs.get(0))
-                #set ($newdoc = $wrappedDocs.get(1))
+                #set ($from = {'doc': $wrappedDocs.get(0), 'version': $rev1})
+                #set ($to = {'doc': $wrappedDocs.get(1), 'version': $rev2})
                 #set ($headingLevel = 4)
+                #set ($conflictsList = $NULL)
                 #if ($warningConflictAction == "custom")
                   #set ($conflictsList = $mergedDocResult.contentConflicts)
                 #end
-                #template('changesdoc.vm')
+                #displayDocumentChanges($from $to $conflictsList)
               </div>
             </div>
           </div>

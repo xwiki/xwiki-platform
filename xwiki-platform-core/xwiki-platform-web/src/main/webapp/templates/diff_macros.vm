@@ -550,6 +550,91 @@
   #end
 #end
 
+#macro (displayDocumentVersionInfo $targetDoc $version $previousVersionLink $nextVersionLink)
+  #if ("$!version" == '')
+    <div class="changes-info-title">$escapetool.xml($services.localization.render('core.viewers.diff.fromNew'))</div>
+  #else
+    #try('invalidVersionException')
+      #set ($discard = $targetDoc.getRevisionInfo($version))
+    #end
+    #if ($invalidVersionException)
+      #set ($versionURL = "#$escapetool.url($version)")
+    #else
+      #set ($versionURL = $targetDoc.getURL('view', $escapetool.url({'rev': $version})))
+    #end
+    #set ($versionLink = "<a href='$versionURL'>$escapetool.xml($version)</a>")
+    #set ($versionSpan = "<span class='changes-version'>$!previousVersionLink $versionLink $!nextVersionLink</span>")
+    <div class="changes-info-title">
+      $services.localization.render('core.viewers.diff.from', [$versionSpan])
+    </div>
+    <div class="changes-info-content">
+      #if ($targetDoc)
+        $services.localization.render('core.viewers.diff.editedBy', [$xwiki.getUserName($targetDoc.author)])
+        <br/>
+        $services.localization.render('core.viewers.diff.editedOn', [$xwiki.formatDate($targetDoc.date)])
+      #end
+    </div> ## changes-info-content
+  #end
+#end
+
+#macro (displayDocumentChangesHeader $from $to)
+  <div id="changes-info">
+    <div id="changes-info-boxes">
+      <div id="changes-info-box-from" class="changes-info-box">
+        #displayDocumentVersionInfo($from.doc $from.version $from.previousVersionLink $from.nextVersionLink)
+      </div> ## changes-info-box-from
+      <div id="changes-info-box-to" class="changes-info-box">
+        #displayDocumentVersionInfo($to.doc $to.version $to.previousVersionLink $to.nextVersionLink)
+      </div> ## changes-info-box-to
+      #if ("$!from.previousLink" != '')
+        <a href="$from.previousLink" class="changes-arrow-left"
+          title="$escapetool.xml($services.localization.render('core.viewers.diff.previousChange'))">&lt;</a>
+      #end
+      #if ("$!to.nextLink" != '')
+        <a href="$to.nextLink" class="changes-arrow-right"
+          title="$escapetool.xml($services.localization.render('core.viewers.diff.nextChange'))">&gt;</a>
+      #end
+      <div class="clearfloats"></div>
+    </div> ## changes-info-boxes
+    <div class="clearfloats"></div>
+    <div id="changes-info-comment">
+      $escapetool.xml($services.localization.render('core.viewers.diff.editComment'))
+      #if ("$!to.doc.comment" == '')
+        $escapetool.xml($services.localization.render('core.viewers.diff.noEditComment'))
+      #else
+        $escapetool.xml($to.doc.comment)
+      #end
+    </div> ## changes-info-comment
+  </div> ## changes-info
+  <div class="clearfloats"></div>
+#end
+
+#macro (displayDocumentRawChanges $origdoc $newdoc $conflictsList)
+  ## Make the heading level adjustable when this macro is called.
+  #if (!$headingLevel)
+    #set ($headingLevel = 2)
+  #end
+  #createDocumentDiff($origdoc $newdoc $docDiff)
+  #createDocumentDiffSummary($docDiff $summary)
+  <h$headingLevel>
+    $escapetool.xml($services.localization.render('web.history.changes.summary'))
+  </h$headingLevel>
+  #displayDocumentDiffSummary($summary)
+  #if ($summary.entries.size() > 0)
+    <h$headingLevel>
+      $escapetool.xml($services.localization.render('web.history.changes.details'))
+    </h$headingLevel>
+    #displayDocumentDiff($docDiff $conflictsList)
+  #end
+#end
+
+#macro (displayDocumentChanges $from $to $conflictsList)
+  #displayDocumentChangesHeader($from $to)
+  <div class="changes-body">
+    #displayDocumentRawChanges($from.doc $to.doc $conflictsList)
+  </div>
+#end
+
 ##
 ## New macros used to display differences, in unified format, between two versions of an XWiki entity.
 ##

@@ -9,6 +9,7 @@
 
 #set($discard = $services.template.execute('job_macros.vm'))
 #set($discard = $services.template.execute('rating_macros.vm'))
+#set($discard = $services.template.execute('diff_macros.vm'))
 
 ## Various configuration of extension.vm behavior
 ## * skipCheckRight: skip right validation when executing a action (install plan, install, etc.)
@@ -586,7 +587,6 @@ $namespace##
     <input name="form_token" value="$!services.csrf.getToken()" type="hidden" />
     <div id="extension-body-changes-$extensionIdHashCode"></div>
     <div class="extension-body-changes extension-body-section">
-      #template('diff_macros.vm')
       #displayDocumentUnifiedDiffsWithSummary($documentDiffs 3)
     </div>
   #end
@@ -764,14 +764,12 @@ $namespace##
   </div>
   #if ($originalDocument && $revisedDocument)
     <div id="changescontent">
-      #set ($conflictsList = $question.documentConflicts)
-      #set ($rev1 = $originalVersion.toLowerCase())
-      #set ($rev2 = $revisedVersion.toLowerCase())
       #set ($wrappedDocs = $xwiki.wrapDocs([$originalDocument, $revisedDocument]))
-      #set ($origdoc = $wrappedDocs.get(0))
-      #set ($newdoc = $wrappedDocs.get(1))
+      #set ($from = {'doc': $wrappedDocs.get(0), 'version': $originalVersion.toLowerCase()})
+      #set ($to = {'doc': $wrappedDocs.get(1), 'version': $revisedVersion.toLowerCase()})
+      #set ($conflictsList = $question.documentConflicts)
       #set ($headingLevel = 4)
-      #template('changesdoc.vm')
+      #displayDocumentChanges($from $to $conflictsList)
     </div>
   #end
 #end

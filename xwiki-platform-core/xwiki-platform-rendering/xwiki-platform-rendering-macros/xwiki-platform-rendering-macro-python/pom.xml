@@ -43,7 +43,7 @@
     </dependency>
     <dependency>
       <groupId>org.python</groupId>
-      <artifactId>jython-standalone</artifactId>
+      <artifactId>jython-slim</artifactId>
     </dependency>
     <!-- Testing dependencies -->
     <dependency>

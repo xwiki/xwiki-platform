@@ -153,8 +153,8 @@
       <!-- We use a customized Jython JAR here because the standard one include many library we already get as dependencies -->
       <dependency>
         <groupId>org.python</groupId>
-        <artifactId>jython-standalone</artifactId>
-        <version>2.7.1-xwiki-2</version>
+        <artifactId>jython-slim</artifactId>
+        <version>2.7.2b3</version>
       </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>
@@ -749,8 +749,11 @@
                 </features>
               </extensionOverride>
               <extensionOverride>
-                <id>org.python:jython-standalone</id>
-                <features>org.python:jython</features>
+                <id>org.python:jython-slim</id>
+                <features>
+                  org.python:jython,
+                  org.python:jython-standalone
+                </features>
               </extensionOverride>
               <!-- We've moved to Dom4J 2.0.0+ which has a new groupId (dom4j -> org.dom4j) and thus extensions of XWiki
                    may depend on dom4j:dom4j:1.6 and without this they would install dom4j instead of using the version

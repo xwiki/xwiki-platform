@@ -48,7 +48,7 @@
     </dependency>
     <dependency>
       <groupId>org.python</groupId>
-      <artifactId>jython-standalone</artifactId>
+      <artifactId>jython-slim</artifactId>
     </dependency>
     <dependency>
       <groupId>org.pygments</groupId>

@@ -1,78 +1,95 @@
 #template('export_macros.vm')
-<form id="export" class="xform row" method="post"
-  action="$doc.getURL('export', $escapetool.url($request.parameterMap))">
 #set ($hasExportTree = $xwiki.exists('XWiki.ExportDocumentTree'))
-#if ($hasExportTree)
-  <dl class="col-xs-12">
+<form id="export" class="xform" method="post" action="$doc.getURL('export', $escapetool.url($request.parameterMap))">
+  <dl>
     <dt>
-      <label>Pages</label>
-      <span class="xHint">$escapetool.xml($services.localization.render('core.exporter.selectPages'))</span>
+      <label>
+        $escapetool.xml($services.localization.render('administration.section.export.pages'))
+      </label>
+      #if ($hasExportTree)
+        <span class="xHint">$escapetool.xml($services.localization.render('core.exporter.selectPages'))</span>
+      #end
     </dt>
     <dd>
-      #exportTreeSelector({
-        'filter': 'pristineInstalledExtensionDocument',
-        'root': "wiki:$xcontext.database"
-      })
+      #if ($hasExportTree)
+        #exportTreeSelector({
+          'filter': 'pristineInstalledExtensionDocument',
+          'root': "wiki:$xcontext.database"
+        })
+      #else
+        $escapetool.xml($services.localization.render('administration.section.export.pages.all'))
+      #end
+    </dd>
+    <dt>
+      <label for="history">
+        <input type="checkbox" name="history" id="history" value="true"/>
+        $services.localization.render('export_addhistory')
+      </label>
+      <span class="xHint">$services.localization.render('administration.section.export.withHistory.hint')</span>
+    </dt>
+    <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
+    <dt>
+      <label for="name">$services.localization.render('export_packagename')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.packageName.hint')</span>
+    </dt>
+    <dd>
+      <div class="input-group">
+        <input type="text" class="form-control" name="name" id="name" placeholder="export" />
+        <span class="input-group-addon">.xar</span>
+      </div>
     </dd>
   </dl>
-#end
-<dl class="col-md-6">
-  <dt>
-    <label for="name">$services.localization.render('export_packagename')</label>
-    <span class="xHint">$services.localization.render('administration.section.export.packageName.hint')</span>
-  </dt>
-  <dd><input type="text" name="name" id="name" value="" placeholder="export"/></dd>
-  <dt>
-    <label for="description">$services.localization.render('export_description')</label>
-    <span class="xHint">$services.localization.render('administration.section.export.description.hint')</span>
-  </dt>
-  <dd><textarea name="description" id="description" rows="6" cols="40"></textarea></dd>
-  <dt>
-    <label for="licence">$services.localization.render('export_licence')</label>
-    <span class="xHint">$services.localization.render('administration.section.export.licence.hint')</span>
-  </dt>
-  <dd><input type="text" name="licence" id="licence" value=""/></dd>
-</dl>
-<dl class="col-md-6">
-  <dt>
-    <label for="author">$services.localization.render('export_author')</label>
-    <span class="xHint">$services.localization.render('administration.section.export.author.hint')</span>
-  </dt>
-  <dd>
-    #set ($userPickerParams = {
-      'id': 'author',
-      'name': 'author',
-      'value': $xcontext.user
-    })
-    #userPicker(false $userPickerParams)
-  </dd>
-  <dt>
-    <label for="version">$services.localization.render('export_version')</label>
-    <span class="xHint">$services.localization.render('administration.section.export.version.hint')</span>
-  </dt>
-  <dd><input type="text" name="version" id="version" value=""/></dd>
-  <dt>
-    <label for="history">
-      <input type="checkbox" name="history" id="history" value="true"/>
-      $services.localization.render('export_addhistory')
-    </label>
-    <span class="xHint">$services.localization.render('administration.section.export.withHistory.hint')</span>
-  </dt>
-  <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
-  <dt>
-    <label for="backup">
-      <input type="checkbox" name="backup" id="backup" value="true"/>
-      $services.localization.render('export_backuppack')
-    </label>
-    <span class="xHint">$services.localization.render('administration.section.export.backupPack.hint')</span>
-  </dt>
-  <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
-</dl>
-<div class="buttons col-xs-12">
-  <span class="buttonwrapper">
-    <input type="submit" value="$services.localization.render('export')" class="button"
-      ## Disable the submit button until the export tree is ready, if the export tree is available.
-      #if ($hasExportTree)disabled="disabled"#end/>
-  </span>
-</div>
+  <p>
+    <a href="#moreExportOptions" id="moreExportOptionsToggle" class="collapsed" data-toggle="collapse"
+        aria-expanded="false" aria-controls="moreExportOptions">
+      <span class="more">$escapetool.xml($services.localization.render(
+        'administration.section.export.moreOptions'))$services.icon.renderHTML('caret-right')</span>
+      <span class="less">$escapetool.xml($services.localization.render(
+        'administration.section.export.lessOptions'))$services.icon.renderHTML('caret-down')</span>
+    </a>
+  </p>
+  <dl class="collapse" id="moreExportOptions">
+    <dt>
+      <label for="description">$services.localization.render('export_description')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.description.hint')</span>
+    </dt>
+    <dd><textarea name="description" id="description" rows="4" cols="40"></textarea></dd>
+    <dt>
+      <label for="author">$services.localization.render('export_author')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.author.hint')</span>
+    </dt>
+    <dd>
+      #set ($userPickerParams = {
+        'id': 'author',
+        'name': 'author',
+        'value': $xcontext.user
+      })
+      #userPicker(false $userPickerParams)
+    </dd>
+    <dt>
+      <label for="licence">$services.localization.render('export_licence')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.licence.hint')</span>
+    </dt>
+    <dd><input type="text" name="licence" id="licence" value=""/></dd>
+    <dt>
+      <label for="version">$services.localization.render('export_version')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.version.hint')</span>
+    </dt>
+    <dd><input type="text" name="version" id="version" value=""/></dd>
+    <dt>
+      <label for="backup">
+        <input type="checkbox" name="backup" id="backup" value="true"/>
+        $services.localization.render('export_backuppack')
+      </label>
+      <span class="xHint">$services.localization.render('administration.section.export.backupPack.hint')</span>
+    </dt>
+    <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
+  </dl>
+  <div class="buttons">
+    <span class="buttonwrapper">
+      <input type="submit" value="$services.localization.render('export')" class="button"
+        ## Disable the submit button until the export tree is ready, if the export tree is available.
+        #if ($hasExportTree)disabled="disabled"#end/>
+    </span>
+  </div>
 </form>

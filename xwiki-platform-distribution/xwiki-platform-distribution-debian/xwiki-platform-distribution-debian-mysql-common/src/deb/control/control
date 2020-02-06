@@ -7,7 +7,6 @@ Depends: xwiki-common (= [[version]]), mysql-server | default-mysql-server | mar
 Provides: xwiki-database
 Replaces: xwiki-database, xwiki-enterprise-database
 Conflicts: xwiki-database, xwiki-enterprise-database
-Suggests: xwiki-tomcat7-mysql | xwiki-tomcat8-mysql
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

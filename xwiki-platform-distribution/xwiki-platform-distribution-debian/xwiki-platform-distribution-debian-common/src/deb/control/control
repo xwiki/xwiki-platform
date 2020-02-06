@@ -3,7 +3,6 @@ Version: [[version]]
 Section: java
 Priority: optional
 Provides: xwiki
-Suggests: xwiki-tomcat7-mysql | xwiki-tomcat7-pgsql
 Architecture: all
 Depends: ucf (>= 0.30), dbconfig-common (>= 1.8.0), ttf-dejavu, openjdk-8-jre-headless | java8-runtime-headless | java8-runtime
 Conflicts: xwiki-enterprise-common

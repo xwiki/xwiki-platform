@@ -7,7 +7,6 @@ Depends: xwiki-common (= [[version]]), postgresql, dbconfig-pgsql | dbconfig-com
 Provides: xwiki-database
 Replaces: xwiki-database, xwiki-enterprise-database
 Conflicts: xwiki-database, xwiki-enterprise-database
-Suggests: xwiki-tomcat7-pgsql | xwiki-tomcat8-pgsql
 Maintainer: [[debian.maintainer]]
 License: [[debian.license]]
 Description: [[debian.description]]

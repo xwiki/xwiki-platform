@@ -47,50 +47,44 @@
       <span class="xHint">$services.localization.render('administration.section.export.withHistory.hint')</span>
     </dt>
     <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
+    <dt>
+      <label for="targetXWikiVersion">
+        $escapetool.xml($services.localization.render('administration.section.export.targetXWikiVersion'))
+      </label>
+      #set ($currentXWikiVersion = $services.extension.core.getCoreExtension(
+        'org.xwiki.platform:xwiki-platform-filter-stream-xar').version)
+      <span class="xHint">
+        $services.localization.render('administration.section.export.targetXWikiVersion.hint',
+          ["<strong>$currentXWikiVersion</strong>"])
+      </span>
+    </dt>
+    <dd>
+      <div id="targetXWikiVersionSettings" class="hidden">
+        <fieldset data-version-range="[12.0,)">
+          <input type="hidden" name="attachment_jrcs" value="false" />
+          <input type="hidden" name="optimized" value="true" />
+        </fieldset>
+      </div>
+      <select id="targetXWikiVersion">
+        <option value="[12.0,)">
+          $escapetool.xml($services.localization.render('administration.section.export.targetXWikiVersion.12plus'))
+        </option>
+        <option value="(,12.0)">
+          $escapetool.xml($services.localization.render('administration.section.export.targetXWikiVersion.below12'))
+        </option>
+      </select>
+    </dd>
+    <dt>
+      <label for="name">$services.localization.render('export_packagename')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.packageName.hint')</span>
+    </dt>
+    <dd>
+      <div class="input-group">
+        <input type="text" class="form-control" name="name" id="name" placeholder="export" />
+        <span class="input-group-addon">.xar</span>
+      </div>
+    </dd>
   </dl>
-  <div class="row">
-    <dl class="col-md-6">
-      <dt>
-        <label for="targetXWikiVersion">
-          $escapetool.xml($services.localization.render('administration.section.export.targetXWikiVersion'))
-        </label>
-        #set ($currentXWikiVersion = $services.extension.core.getCoreExtension(
-          'org.xwiki.platform:xwiki-platform-filter-stream-xar').version)
-        <span class="xHint">
-          $services.localization.render('administration.section.export.targetXWikiVersion.hint',
-            ["<strong>$currentXWikiVersion</strong>"])
-        </span>
-      </dt>
-      <dd>
-        <div id="targetXWikiVersionSettings" class="hidden">
-          <fieldset data-version-range="[12.0,)">
-            <input type="hidden" name="attachment_jrcs" value="false" />
-            <input type="hidden" name="optimized" value="true" />
-          </fieldset>
-        </div>
-        <select id="targetXWikiVersion">
-          <option value="[12.0,)">
-            $escapetool.xml($services.localization.render('administration.section.export.targetXWikiVersion.12plus'))
-          </option>
-          <option value="(,12.0)">
-            $escapetool.xml($services.localization.render('administration.section.export.targetXWikiVersion.below12'))
-          </option>
-        </select>
-      </dd>
-    </dl>
-    <dl class="col-md-6">
-      <dt>
-        <label for="name">$services.localization.render('export_packagename')</label>
-        <span class="xHint">$services.localization.render('administration.section.export.packageName.hint')</span>
-      </dt>
-      <dd>
-        <div class="input-group">
-          <input type="text" class="form-control" name="name" id="name" placeholder="export" />
-          <span class="input-group-addon">.xar</span>
-        </div>
-      </dd>
-    </dl>
-  </div>
   <p>
     <a href="#moreExportOptions" id="moreExportOptionsToggle" class="collapsed" data-toggle="collapse"
         aria-expanded="false" aria-controls="moreExportOptions">
@@ -100,47 +94,43 @@
         'administration.section.export.lessOptions'))$services.icon.renderHTML('caret-down')</span>
     </a>
   </p>
-  <div class="row collapse" id="moreExportOptions">
-    <dl class="col-md-6">
-      <dt>
-        <label for="description">$services.localization.render('export_description')</label>
-        <span class="xHint">$services.localization.render('administration.section.export.description.hint')</span>
-      </dt>
-      <dd><textarea name="description" id="description" rows="4" cols="40"></textarea></dd>
-      <dt>
-        <label for="author">$services.localization.render('export_author')</label>
-        <span class="xHint">$services.localization.render('administration.section.export.author.hint')</span>
-      </dt>
-      <dd>
-        #set ($userPickerParams = {
-          'id': 'author',
-          'name': 'author',
-          'value': $xcontext.user
-        })
-        #userPicker(false $userPickerParams)
-      </dd>
-    </dl>
-    <dl class="col-md-6">
-      <dt>
-        <label for="licence">$services.localization.render('export_licence')</label>
-        <span class="xHint">$services.localization.render('administration.section.export.licence.hint')</span>
-      </dt>
-      <dd><input type="text" name="licence" id="licence" value=""/></dd>
-      <dt>
-        <label for="version">$services.localization.render('export_version')</label>
-        <span class="xHint">$services.localization.render('administration.section.export.version.hint')</span>
-      </dt>
-      <dd><input type="text" name="version" id="version" value=""/></dd>
-      <dt>
-        <label for="backup">
-          <input type="checkbox" name="backup" id="backup" value="true"/>
-          $services.localization.render('export_backuppack')
-        </label>
-        <span class="xHint">$services.localization.render('administration.section.export.backupPack.hint')</span>
-      </dt>
-      <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
-    </dl>
-  </div>
+  <dl class="collapse" id="moreExportOptions">
+    <dt>
+      <label for="description">$services.localization.render('export_description')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.description.hint')</span>
+    </dt>
+    <dd><textarea name="description" id="description" rows="4" cols="40"></textarea></dd>
+    <dt>
+      <label for="author">$services.localization.render('export_author')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.author.hint')</span>
+    </dt>
+    <dd>
+      #set ($userPickerParams = {
+        'id': 'author',
+        'name': 'author',
+        'value': $xcontext.user
+      })
+      #userPicker(false $userPickerParams)
+    </dd>
+    <dt>
+      <label for="licence">$services.localization.render('export_licence')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.licence.hint')</span>
+    </dt>
+    <dd><input type="text" name="licence" id="licence" value=""/></dd>
+    <dt>
+      <label for="version">$services.localization.render('export_version')</label>
+      <span class="xHint">$services.localization.render('administration.section.export.version.hint')</span>
+    </dt>
+    <dd><input type="text" name="version" id="version" value=""/></dd>
+    <dt>
+      <label for="backup">
+        <input type="checkbox" name="backup" id="backup" value="true"/>
+        $services.localization.render('export_backuppack')
+      </label>
+      <span class="xHint">$services.localization.render('administration.section.export.backupPack.hint')</span>
+    </dt>
+    <dd>#* A <dd> must be present after a <dt> to be HTML5 valid *#</dd>
+  </dl>
   <div class="buttons">
     <span class="buttonwrapper">
       <input type="submit" value="$services.localization.render('export')" class="button"

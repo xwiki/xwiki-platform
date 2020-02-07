@@ -309,7 +309,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.tools = mathtool = org.xwiki.velocity.internal.XWikiMathTool
 #-#   velocity.tools = escapetool = org.apache.velocity.tools.generic.EscapeTool
 #-#   velocity.tools = regextool = org.xwiki.velocity.tools.RegexTool
-#-#   velocity.tools = collectionstool = org.xwiki.velocity.tools.CollectionsTool
+#-#   velocity.tools = collectiontool = org.xwiki.velocity.tools.CollectionTool
 #-#   velocity.tools = stringtool = org.xwiki.text.StringUtils
 #-#   velocity.tools = jsontool = org.xwiki.velocity.tools.JSONTool
 #-#   velocity.tools = urltool = org.xwiki.velocity.tools.URLTool
@@ -317,6 +317,7 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.tools = niotool = org.xwiki.velocity.tools.nio.NIOTool
 #-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool (deprecated)
 #-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool (deprecated)
+#-#   velocity.tools = collectionstool = org.xwiki.velocity.tools.CollectionsTool (deprecated)
 
 #-# [Since 2.0M1]
 #-# Velocity configuration properties. The format is

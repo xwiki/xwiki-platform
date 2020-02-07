@@ -1363,7 +1363,7 @@ ${prefix}${bob.repository.descriptor.id}${suffix}##
     #set ($discard = $features.addAll($_extension.extensionFeatures))
     #set ($discard = $features.add($_extension.id))
   #end
-  #set ($discard = $collectionstool.reverse($features))
+  #set ($discard = $collectiontool.reverseModifiable($features))
   #set ($return = $NULL)
   #foreach ($feature in $features)
     #set ($return = $services.extension.installed.getInstalledExtension($feature.id, $namespace))
@@ -1605,7 +1605,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
       }))
     #end
   #end
-  #set ($items = $collectionstool.sort($items, ['namespacePrettyName', 'extensionName']))
+  #set ($items = $collectiontool.sort($items, ['namespacePrettyName', 'extensionName']))
   ## Paginate the extensions.
   #set ($hasPagination = false)
   ## We don't load the pagination CSS here (noSx:true) because the upgrade plan can be loaded through AJAX so

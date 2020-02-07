@@ -59,7 +59,7 @@ $xwiki.ssfx.use('js/xwiki/viewers/information.css', true)
       <dl>
         <dt>$services.localization.render('core.viewers.information.backlinks')</dt>
         <dd>
-          #set($blinks = $collectionstool.sort($doc.getBacklinks()))
+          #set($blinks = $collectiontool.sortModifiable($doc.getBacklinks()))
           #if ($blinks.isEmpty())
           ## We display a "no backlinks" message to avoid having a blank information panel when there is nothing
             <span class="noitems">$services.localization.render('core.viewers.information.noBacklinks')</span>

@@ -50,7 +50,7 @@
 
 ## We use an ordered set to collect the live table columns because we want to avoid duplicates (they break the live
 ## table filtering query) and at the same time we want to preserve the column order.
-#set ($columns = $collectionstool.orderedSet)
+#set ($columns = $collectiontool.orderedSet)
 ## Add the fixed columns that we want the user directory to always show.
 #set ($discard = $columns.addAll(['_avatar', 'doc.name']))
 

@@ -23,7 +23,7 @@
 
 ## Configuration options for the Document Tree Source (that is used to retrieve the tree nodes).
 #set ($docTreeConfig = {
-  'exclusions': $collectionstool.set,
+  'exclusions': $collectiontool.set,
   'filters': [],
   'filterByClass': '',
   'filterHiddenDocuments': true,

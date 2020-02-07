@@ -1307,7 +1307,7 @@
   #set ($input = [])
   #foreach ($list in $lists)
     ## We use queues to be able to easily remove items from the start.
-    #set ($queue = $collectionstool.queue)
+    #set ($queue = $collectiontool.queue)
     #set ($discard = $queue.addAll($list))
     #set ($discard = $input.add($queue))
     ## We will add (part of) the items back later.

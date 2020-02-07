@@ -19,11 +19,11 @@
 ## ---------------------------------------------------------------------------
 #macro (getVersions $extension $versionsByFeature)
   ## Retrieve the list of available versions for each of the features (identifiers) of the given extension.
-  #set ($return = $collectionstool.orderedMap)
+  #set ($return = $collectiontool.orderedMap)
   #set ($features = [])
   #set ($discard = $features.addAll($extension.extensionFeatures))
   #set ($discard = $features.add($extension.id))
-  #set ($discard = $collectionstool.reverse($features))
+  #set ($discard = $collectiontool.reverseModifiable($features))
   #foreach ($feature in $features)
     #set ($stableVersions = [])
     #foreach ($version in $services.extension.resolveVersions($feature.id, 0, -1))
@@ -31,7 +31,7 @@
         #set ($discard = $stableVersions.add($version.value))
       #end
     #end
-    #set ($discard = $collectionstool.reverse($stableVersions))
+    #set ($discard = $collectiontool.reverseModifiable($stableVersions))
     #set ($discard = $return.put($feature.id, $stableVersions))
   #end
   #set ($versionsByFeature = $NULL)

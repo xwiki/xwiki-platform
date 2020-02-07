@@ -278,7 +278,7 @@
     #if ($sourceFile.mimeType == 'application/xml')
       #set ($records = $services.extension.history.read($sourceFile.contentInputStream))
       ## Display the most recent records first.
-      #set ($discard = $collectionstool.reverse($records))
+      #set ($discard = $collectiontool.reverseModifiable($records))
     #end
   #else
     ## Local History
@@ -293,7 +293,7 @@
 #macro (getSelectedExtensionHistoryRecords)
   #set ($selectedRecordIds = $request.getParameterValues('extensionHistoryRecord'))
   #if ($selectedRecordIds && $selectedRecordIds.size() > 0)
-    #set ($selectedRecordIdsSet = $collectionstool.set)
+    #set ($selectedRecordIdsSet = $collectiontool.set)
     #set ($discard = $selectedRecordIdsSet.addAll($selectedRecordIds.subList(0, $selectedRecordIds.size())))
     #getExtensionHistoryRecords
     #set ($selectedRecords = [])
@@ -424,7 +424,7 @@
 #macro (createExtensionHistoryReplayPlan)
   #getSelectedExtensionHistoryRecords
   ## The replay plan should include the oldest history records first (because the oldest records are replayed first).
-  #set ($discard = $collectionstool.reverse($selectedRecords))
+  #set ($discard = $collectiontool.reverseModifiable($selectedRecords))
   ## Modify the records based on the replay options.
   #set ($preserveUsers = $request.preserveUsers == 'true')
   #set ($namespaces = [])

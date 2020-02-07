@@ -266,7 +266,7 @@ $xwiki.getUserName("xwiki:${username}")
   #elseif (!$isList)
     #set ($userTag = 'div')
   #end
-  #set ($types = $collectionstool.set)
+  #set ($types = $collectiontool.set)
   #set ($output = [])
   #foreach ($user in $usersList)
     ## Since we accept both a String or an EntityReference as input, we first check if we have an Entity Reference
@@ -2317,7 +2317,7 @@ function (row, i, table) {
  *                          a safety measure because macros can't return values.
  *#
 #macro (sortCollectionOfMapsByField $collection $field $defaultValue $order $outputList)
-  ## If an alement has a null field, $collectionstool.sort() won't return anything.
+  ## If an element has a null field, $collectiontool.sort() won't return anything.
   ## To avoid this situation, we create a new list that contains the elements with a default field if it is missing
   #set ($newList = [])
   #foreach ($element in $collection)
@@ -2330,7 +2330,7 @@ function (row, i, table) {
       #set ($discard = $newList.add($element))
     #end
   #end
-  #set ($discard = $outputList.addAll($collectionstool.sort($newList, "${field}:${order}")))
+  #set ($discard = $outputList.addAll($collectiontool.sort($newList, "${field}:${order}")))
 #end
 
 #**
@@ -2821,17 +2821,17 @@ Recursive title display detected!##
 #end
 
 #macro (classPicker_displayOptions $selectedValues)
-  #set ($selectedClassReferences = $collectionstool.set)
+  #set ($selectedClassReferences = $collectiontool.set)
   #foreach ($selectedValue in $selectedValues)
     #set ($discard = $selectedClassReferences.add($services.model.resolveDocument($selectedValue)))
   #end
-  #set ($optionGroups = $collectionstool.orderedMap)
+  #set ($optionGroups = $collectiontool.orderedMap)
   #classPicker_getOptionGroups($optionGroups $selectedClassReferences)
   #classPicker_displayOptionGroups($optionGroups $selectedClassReferences)
 #end
 
 #macro (classPicker_getOptionGroups $optionGroups $selectedClassReferences)
-  #set ($classReferences = $collectionstool.set)
+  #set ($classReferences = $collectiontool.set)
   ## Make sure the selected classes are listed as options.
   #set ($discard = $classReferences.addAll($selectedClassReferences))
   #foreach ($className in $xwiki.classList)

@@ -120,7 +120,7 @@
     ' order by ' + $stringtool.join($orderByClause, ', '))
   ## We can't remove duplicates using the unique filter because the select clause will be extended with the information
   ## needed by the order by clause. Thus we remove the duplicates after we get the results.
-  #set ($orderedSetOfAppNames = $collectionstool.orderedSet)
+  #set ($orderedSetOfAppNames = $collectiontool.orderedSet)
   #set ($discard = $orderedSetOfAppNames.addAll($services.query.hql($statement).bindValues($params).execute()))
   #set ($discard = $outputList.addAll($orderedSetOfAppNames))
 #end
@@ -267,7 +267,7 @@
       #break
     #end
   #end
-  #set ($adminMenu = $collectionstool.sort($adminMenu, 'score:desc'))
+  #set ($adminMenu = $collectiontool.sort($adminMenu, 'score:desc'))
 #end
 
 

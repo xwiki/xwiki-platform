@@ -18,7 +18,7 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 #if ("$!{request.forceTestRights}" == "1")#template("xwikivars.vm")#end
-#set($attachments = $collectionstool.sort($doc.attachmentList, ['date:desc']))
+#set($attachments = $collectiontool.sort($doc.attachmentList, ['date:desc']))
 #if($attachments.size() > 0)
   <ul class="xlist">
   #foreach ($attach in $attachments)

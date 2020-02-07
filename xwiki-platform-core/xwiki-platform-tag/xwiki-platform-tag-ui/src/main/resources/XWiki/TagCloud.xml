@@ -381,7 +381,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
 #if ($tagCount.size() &gt; 0)
   ##
   ## Store the minimum and maximum number of occurrences.
-  #set ($sortedTagCounts = $collectionstool.sort($tagCount.values()))
+  #set ($sortedTagCounts = $collectiontool.sort($tagCount.values()))
   #set ($maxIndex = $sortedTagCounts.size() - 1)
   #set ($minCount = $sortedTagCounts[0])
   #set ($maxCount = $sortedTagCounts[$maxIndex])
@@ -398,7 +398,7 @@ $xwiki.ssx.use('XWiki.TagCloud')##
   #set ($secondHalfIntervalSize = $mathtool.div($mathtool.sub($maxCount, $countAverage), $levelsHalf))
   ##
   ## Use a sorted map
-  #set ($popularityMap = $collectionstool.getSortedMap())
+  #set ($popularityMap = $collectiontool.sortedMap)
   #set ($previousPopularityMax = $minCount)
   #set ($intervalSize = $firstHalfIntervalSize)
   #set ($halfPassed = false)

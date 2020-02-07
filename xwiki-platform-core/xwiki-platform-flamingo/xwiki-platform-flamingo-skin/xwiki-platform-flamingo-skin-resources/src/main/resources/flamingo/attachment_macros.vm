@@ -33,7 +33,7 @@
     ## Sort everthing else ascending.
     #set ($sortAttachmentsBy = "$sortAttachmentsBy:asc")
   #end
-  #set ($attachments = $collectionstool.sort($attachments, $sortAttachmentsBy))
+  #set ($attachments = $collectiontool.sort($attachments, $sortAttachmentsBy))
 #end
 
 #macro (filterAttachments $attachments $patterns)

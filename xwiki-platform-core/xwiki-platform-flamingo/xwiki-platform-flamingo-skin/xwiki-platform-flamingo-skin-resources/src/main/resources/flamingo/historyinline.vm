@@ -35,7 +35,7 @@
 ## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
 #set ($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria('', $minorVersions))
 #set ($versions = $tdoc.getRevisions($criteria))
-#set ($discard = $collectionstool.reverse($versions))
+#set ($discard = $collectiontool.reverseModifiable($versions))
 #set ($totalVersions = $versions.size())
 #if ($totalVersions == 0)
   #warning ($services.localization.render('core.viewers.history.empty'))
@@ -50,7 +50,7 @@
 ## Reuse the old object, just add the range.
   $criteria.setRange($range)
   #set ($versions = $tdoc.getRevisions($criteria))
-  #set ($discard = $collectionstool.reverse($versions))
+  #set ($discard = $collectiontool.reverseModifiable($versions))
   #if ("$tdoc.realLocale" != '')
     #set ($lang = "&amp;language=${tdoc.realLocale}")
   #else

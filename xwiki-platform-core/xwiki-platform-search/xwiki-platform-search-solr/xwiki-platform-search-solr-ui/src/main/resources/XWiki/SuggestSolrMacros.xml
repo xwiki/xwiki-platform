@@ -90,7 +90,7 @@
   ##
   ## Default filters. Note that using separate filter queries improves the filter cache.
   ## First, let's see which filters have been set from the Search Suggest source.
-  #set ($filterNames = $collectionstool.set)
+  #set ($filterNames = $collectiontool.set)
   #set ($filterQuery = $params.fq)
   #if ($filterQuery)
     #if (!$filterQuery.subList(0, 0))

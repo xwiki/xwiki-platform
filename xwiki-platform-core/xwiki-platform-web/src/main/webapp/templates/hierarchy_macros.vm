@@ -148,7 +148,7 @@
   #end
   <ol #if("$!options.id" != '')id="$options.id"#end class="$breadCrumbClassNames" $breadCrumbParameters><li
     #foreach ($item in $pathData)
-      #set ($classNames = $collectionstool.set)
+      #set ($classNames = $collectiontool.set)
       #set ($discard = $classNames.add($item.reference.type.toString().toLowerCase()))
       #if ($item.classNames)
         #set ($discard = $classNames.addAll($item.classNames))

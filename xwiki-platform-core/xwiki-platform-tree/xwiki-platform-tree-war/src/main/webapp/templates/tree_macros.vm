@@ -23,7 +23,7 @@
   'contextMenu': false,
   'dragAndDrop': false,
   'edges': true,
-  'exclusions': $collectionstool.set,
+  'exclusions': $collectiontool.set,
   'finder': false,
   'icons': true,
   'limit': 15,
@@ -119,7 +119,7 @@
   ## TODO: Add support for escaping the comma in the node id.
   #set ($exclusions = $stringtool.split($options.exclusions, ','))
   #if ($exclusions && $exclusions.size() > 0)
-    #set ($options.exclusions = $collectionstool.set)
+    #set ($options.exclusions = $collectiontool.set)
     ## We need to convert the String[] to a List<String> before calling addAll (which expects a collection).
     #set ($discard = $options.exclusions.addAll($exclusions.subList(0, $exclusions.size())))
   #end

@@ -55,7 +55,7 @@
   #end
   #set ($id = $escapetool.xml("${prefix}${name}"))
   #set ($selectizeSettings = {
-    'options': $collectionstool.sort($options, 'label'),
+    'options': $collectiontool.sort($options, 'label'),
     'items': $value.split('\s+'),
     'delimiter': ' '
   })

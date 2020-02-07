@@ -33,9 +33,7 @@
   <description>XWiki Platform - Rendering - Parser</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.83</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Put back threshold of 100 once https://github.com/STAMP-project/pitest-descartes/issues/117 is fixed,
-         see belpw -->
-    <xwiki.pitest.mutationThreshold>33</xwiki.pitest.mutationThreshold>
+    <xwiki.pitest.mutationThreshold>100</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>
@@ -51,29 +49,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <pluginManagement>
-      <plugins>
-        <!-- Exclude tests breaking pitest, see https://github.com/STAMP-project/pitest-descartes/issues/117
-             TODO: remove when fixed -->
-        <plugin>
-          <groupId>org.pitest</groupId>
-          <artifactId>pitest-maven</artifactId>
-          <executions>
-            <execution>
-              <id>pitest-check</id>
-              <goals>
-                <goal>mutationCoverage</goal>
-              </goals>
-              <configuration>
-                <excludedTestClasses>
-                  <param>org.xwiki.**.DefaultContentParserTest</param>
-                </excludedTestClasses>
-              </configuration>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
 </project>

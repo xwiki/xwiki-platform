@@ -33,7 +33,7 @@
   <description>XWiki Platform - Integration Tests Framework</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.29</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>32</xwiki.pitest.mutationThreshold>
+    <xwiki.pitest.mutationThreshold>30</xwiki.pitest.mutationThreshold>
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>
   <dependencies>

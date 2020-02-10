@@ -1,0 +1,75 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.4" reference="XWiki.EntityNameValidation.Translations" locale="ru">
+  <web>XWiki.EntityNameValidation</web>
+  <name>Translations</name>
+  <language>ru</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.EntityNameValidation.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>entitynamevalidation.currentStrategy.label=Текущая стратегия именования
+entitynamevalidation.currentStrategy.hint=Стратегия именования будет использоваться при создании, переименовании или сохранении документов.
+entitynamevalidation.useTransformation.label=Преобразование имен автоматически
+entitynamevalidation.useTransformation.hint=Если эта опция включена, стратегия именования будет использоваться для автоматической адаптации имени, если это возможно.
+entitynamevalidation.useValidation.label=Проверьте имена перед сохранением
+entitynamevalidation.useValidation.hint=Если этот параметр включен, стратегия именования будет проверять имя перед сохранением: используйте эту функцию с осторожностью, поскольку это может помешать сохранению некоторых существующих документов.
+entitynamevalidation.ReplaceCharacterEntityNameValidation.name=Замена символов
+entitynamevalidation.SlugEntityNameValidation.name=Предварительно отформатированные имена (без акцентов, без пробелов, без специальных символов)
+entitynamevalidation.replacementCharacter.configuration=Конфигурация стратегии замены символов
+entitynamevalidation.testStrategy.label=Проверьте выбранную вами стратегию
+entitynamevalidation.testStrategy.hint=Позволяет проверить поведение выбранной вами стратегии
+entitynamevalidation.testStrategy.placeholder=Введите здесь имя страницы, чтобы проверить
+entitynamevalidation.testStrategy.validName=Это имя подходит для выбранной стратегии?
+entitynamevalidation.testStrategy.transformedName=Имя после преобразования по выбранной стратегии:
+entitynamevalidation.replacementCharacter.livetable.forbiddenCharacter=Запрещенные символы
+entitynamevalidation.replacementCharacter.livetable.replacementCharacter=Замена символов
+entitynamevalidation.replacementCharacter.livetable._actions=Действия
+entitynamevalidation.replacementCharacter.add=Добавить новый символ
+entitynamevalidation.replacementCharacter.addNewCharacter=Добавить новый символ, чтобы запретить или заменить
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.label=Новый запрещенный символ
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.hint=Этот символ будет запрещен в названиях страниц
+entitynamevalidation.replacementCharacter.newForbiddenCharacter.placeholder=Введите здесь новый запрещенный символ
+entitynamevalidation.replacementCharacter.newReplacementCharacter.label=Новый заменяющий символ
+entitynamevalidation.replacementCharacter.newReplacementCharacter.hint=Этот символ заменит запрещенный символ в именах страниц. Если не указан, запрещенный символ будет удален из имен страниц.
+entitynamevalidation.replacementCharacter.newReplacementCharacter.placeholder=Введите здесь новый символ замены или оставьте пустым
+entitynamevalidation.replacementCharacter.create.inProgress=Добавлен новый запрещенный символ ...
+entitynamevalidation.replacementCharacter.create.done=Новый запрещенный символ был успешно добавлен.
+entitynamevalidation.replacementCharacter.create.failed=Ошибка при добавлении нового запрещенного символа.
+entitynamevalidation.replacementCharacter.removeCharacter=Удаление запрещенного символа
+entitynamevalidation.replacementCharacter.removeCharacter.warning=Вы уверены, что хотите удалить этот запрещенный символ?
+entitynamevalidation.replacementCharacter.removeCharacter.remove=Удалить
+entitynamevalidation.replacementCharacter.remove.inProgress=Запрещенный символ удаляется ...
+entitynamevalidation.replacementCharacter.remove.done=Запрещенный символ был удален.
+entitynamevalidation.replacementCharacter.remove.failed=Ошибка при удалении запрещенного символа.
+entitynamevalidation.replacementCharacter.emptyReplacementCharacter=Пусто</content>
+  
+</xwikidoc>

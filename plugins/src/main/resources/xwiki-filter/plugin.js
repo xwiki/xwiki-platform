@@ -32,8 +32,61 @@
  */
 (function() {
   'use strict';
+  var $ = jQuery;
+
+  // Declare the configuration namespace.
+  CKEDITOR.config['xwiki-filter'] = CKEDITOR.config['xwiki-filter'] || {
+    __namespace: true
+  };
+
   CKEDITOR.plugins.add('xwiki-filter', {
-    init : function(editor) {
+    // See CKEDITOR-323: Insertion of &nbsp; in editor when deleting characters
+    hasNonBreakingSpaceIssue: false,
+
+    onLoad: function() {
+      var thisPlugin = this;
+      // Determine if a plain space is converted into a non-breaking space when the character before it is deleted.
+      // See CKEDITOR-323: Insertion of &nbsp; in editor when deleting characters
+      // Note that the editor must be visible in order to reproduce the issue. Make sure it doesn't appear on screen.
+      var container = $('<div id="CKEDITOR-323"/>').css({
+        position: 'absolute',
+        top: '-1000px',
+        left: '-1000px',
+        width: '100px',
+        height: '100px'
+      }).appendTo('body');
+      var textArea = $('<textarea/>').text('<p>ab c</p>').appendTo(container);
+      // We need to create an editor instance, so better wait for all the plugins to be loaded first.
+      setTimeout(function() {
+        CKEDITOR.replace(textArea[0], {
+          'xwiki-filter': {
+            // Check if the problem reproduces without our fix.
+            fixNonBreakingSpace: false
+          }
+        }).on('instanceReady', function(event) {
+          var editor = event.editor;
+          var textNode = editor.editable().getFirst().getFirst();
+          // Split the text node after 'b' to simulate the CKEditor behavior when pressing the delete key.
+          textNode.split(2);
+          // Select the 'b' character.
+          var range = editor.createRange();
+          range.setStart(textNode, 1);
+          range.setEnd(textNode, 2);
+          editor.getSelection().selectRanges([range]);
+          // Delete the selected text. We need to use the low level command because there's no corresponding high level
+          // command in CKEditor.
+          editor.document.$.execCommand('delete');
+          // Destroy the editor after the other 'instanceReady' listeners are called.
+          setTimeout(function() {
+            editor.destroy();
+            thisPlugin.hasNonBreakingSpaceIssue = textArea.val().indexOf('a&nbsp;c') >= 0;
+            container.remove();
+          }, 0);
+        });
+      }, 0);
+    },
+
+    init: function(editor) {
       var replaceEmptyLinesWithEmptyParagraphs = {
         elements: {
           div: function(element) {
@@ -183,6 +236,56 @@
           }
         ]
       ]);
+
+      var config = editor.config['xwiki-filter'] || {};
+      if (config.fixNonBreakingSpace === undefined || config.fixNonBreakingSpace) {
+        this.maybeFixNonBreakingSpace(editor);
+      }
+    },
+
+    maybeFixNonBreakingSpace: function(editor) {
+      var scheduleFix = function(textNode) {
+        setTimeout(function() {
+          var text = textNode.nodeValue;
+          // Double check if the text node still needs to be fixed.
+          if (text.charAt(0) === '\u00A0') {
+            textNode.nodeValue = ' ' + text.substring(1);
+          }
+        }, 0);
+      };
+
+      var isSpaceConvertedToNonBreakingSpace = function(oldValue, newValue) {
+        return oldValue.length > 0 && newValue.length > 0 && newValue.charAt(0) === '\u00A0' &&
+          oldValue.charAt(0) === ' ' && newValue.substring(1) === oldValue.substring(1);
+      };
+
+      var isPrecededByText = function(node) {
+        var previous = node.previousSibling;
+        return previous && previous.nodeType === Node.TEXT_NODE && previous.nodeValue.length > 0 &&
+          previous.nodeValue.charAt(previous.nodeValue.length - 1) !== ' ';
+      };
+
+      var thisPlugin = this;
+      editor.once('instanceReady', function(event) {
+        var mutationObserver = new MutationObserver(function(mutations, mutationObserver) {
+          if (!thisPlugin.hasNonBreakingSpaceIssue) {
+            mutationObserver.disconnect();
+            return;
+          }
+          mutations.forEach(function(mutation) {
+            if (mutation.target.nodeType === Node.TEXT_NODE &&
+                isSpaceConvertedToNonBreakingSpace(mutation.oldValue, mutation.target.nodeValue) &&
+                isPrecededByText(mutation.target)) {
+              scheduleFix(mutation.target);
+            }
+          });
+        });
+        mutationObserver.observe(editor.editable().$, {
+          characterData: true,
+          characterDataOldValue: true,
+          subtree: true
+        });
+      });
     }
   });
 })();

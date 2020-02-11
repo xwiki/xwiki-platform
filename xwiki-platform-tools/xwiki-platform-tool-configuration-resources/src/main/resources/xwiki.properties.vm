@@ -262,14 +262,11 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# 1 - Externally managed (local) server instance.
 # openoffice.serverType=0
 
-#-# [Since 1.9M2]
-#-# Port number used for connecting to the openoffice server instance.
-#-# Default port is 8100
 #-# [Since 12.1RC1]
-#-# You can now specify a list of ports separated by commas: if the server is internally managed,
-#-# each port will be used to create a pool of services; if the server is externally managed,
-#-# only first port will be used.
-# openoffice.serverPort=8100
+#-# Port numbers used for connecting to the openoffice server instance.
+#-# For an internally managed server instance, it will create the process for all ports.
+#-# For an externally managed server instance, only the first server port is taken into account.
+# openoffice.serverPorts=8100,8101
 
 #-# [Since 1.9M2]
 #-# If the openoffice server should be started / connected upon XE start.

@@ -72,12 +72,13 @@ public class DefaultOfficeServerConfigurationTest
     @Test
     public void serverPorts()
     {
-        when(configuration.getProperty("openoffice.serverPort", List.class))
+        when(configuration.getProperty("openoffice.serverPorts", List.class))
             .thenReturn(Arrays.asList("10", "12", "8569"));
         assertArrayEquals(new int[] {10, 12, 8569}, defaultOfficeServerConfiguration.getServerPorts());
 
-        when(configuration.getProperty("openoffice.serverPort", List.class))
+        when(configuration.getProperty("openoffice.serverPorts", List.class))
             .thenReturn(Collections.emptyList());
-        assertArrayEquals(new int[] {8100}, defaultOfficeServerConfiguration.getServerPorts());
+        when(configuration.getProperty("openoffice.serverPort", 8100)).thenReturn(4242);
+        assertArrayEquals(new int[] {4242}, defaultOfficeServerConfiguration.getServerPorts());
     }
 }

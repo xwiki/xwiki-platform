@@ -61,15 +61,13 @@ public interface OfficeServerConfiguration
 
     /**
      * @return the port number used for connecting to the office server instance
-     * @deprecated Since 12.1RC1. Prefer using {@link #getServerPorts()}.
+     * @deprecated Since 12.1RC1. Now use {@link #getServerPorts()}.
      */
     @Deprecated
     int getServerPort();
 
     /**
-     * @return all ports that can be used for connecting to the office server instance. In case of internal office
-     * server, all ports will be use to create the pool of processes, in case of external office server, only the
-     * first one will be used.
+     * @return all ports that can be used for connecting to the office server instance.
      * @since 12.1RC1
      */
     @Unstable

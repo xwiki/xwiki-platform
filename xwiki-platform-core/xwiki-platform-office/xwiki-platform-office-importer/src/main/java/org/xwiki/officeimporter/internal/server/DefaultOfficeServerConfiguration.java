@@ -92,13 +92,13 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
     @Override
     public int getServerPort()
     {
-        return getServerPorts()[0];
+        return this.configuration.getProperty(PREFIX + "serverPort", DEFAULT_SERVER_PORT);
     }
 
     @Override
     public int[] getServerPorts()
     {
-        List<String> serverPorts = this.configuration.getProperty(PREFIX + "serverPort", List.class);
+        List<String> serverPorts = this.configuration.getProperty(PREFIX + "serverPorts", List.class);
         int[] result;
         if (serverPorts != null && serverPorts.size() > 0) {
             result = new int[serverPorts.size()];
@@ -106,7 +106,7 @@ public class DefaultOfficeServerConfiguration implements OfficeServerConfigurati
                 result[i] = Integer.parseInt(serverPorts.get(i));
             }
         } else {
-            result = new int[] {DEFAULT_SERVER_PORT};
+            result = new int[] { getServerPort() };
         }
         return result;
     }

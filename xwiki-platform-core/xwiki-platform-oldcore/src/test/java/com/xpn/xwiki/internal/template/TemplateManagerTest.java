@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.environment.Environment;
@@ -179,7 +178,7 @@ public class TemplateManagerTest
     }
 
     @Test
-    public void testRenderClassloaderTemplate() throws ComponentLookupException, Exception
+    public void testRenderClassloaderTemplate() throws Exception
     {
         mockVelocity("classloader template content", "OK");
 

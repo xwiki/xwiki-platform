@@ -21,14 +21,15 @@ package org.xwiki.store.filesystem.internal;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
 import org.xwiki.test.LogLevel;
 import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -56,26 +57,38 @@ public class FilesystemStoreToolsTest
     private Environment environment;
 
     @RegisterExtension
-    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
+    static LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Test
-    public void initialize() throws IOException, InitializationException
+    void initialize(@XWikiTempDir File configDirectory) throws IOException, InitializationException
     {
-        // initialize() method is triggered by the test framework first for injecting the component
+        // Use Case 1: Null store directory and cleanOnStartup = false
+        // Note: FilesystemStoreTools.initialize() method is first triggered by the test framework when injecting the
+        // component.
+
         assertEquals(new File(new File("."), "store/file").getCanonicalFile(),
             filesystemStoreTools.getStoreRootDirectory());
         verify(this.environment, times(1)).getPermanentDirectory();
 
-        File configDirectory = Files.createTempDirectory("xwikitest").toFile();
+        // Use Case 2: Non-null store directory and cleanOnStartup = true
 
         when(config.getDirectory()).thenReturn(configDirectory);
         when(config.cleanOnStartup()).thenReturn(true);
 
         filesystemStoreTools.initialize();
+
         assertEquals(configDirectory, filesystemStoreTools.getStoreRootDirectory());
         verify(this.environment, times(1)).getPermanentDirectory();
         verify(this.config, times(2)).cleanOnStartup();
         assertEquals(String.format("Using filesystem store directory [%s]", configDirectory.toString()),
-            logCapture.getMessage(0));
+            logCapture.getMessage(1));
+    }
+
+    @AfterAll
+    static void verifyLog() throws Exception
+    {
+        // Assert log happening in the first initialize() call.
+        assertEquals(String.format("Using filesystem store directory [%s]",
+            new File(new File("."), "store/file").getCanonicalFile()), logCapture.getMessage(0));
     }
 }

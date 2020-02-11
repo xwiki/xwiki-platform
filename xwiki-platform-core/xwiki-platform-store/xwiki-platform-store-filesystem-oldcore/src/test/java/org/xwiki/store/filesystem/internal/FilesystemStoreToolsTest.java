@@ -34,14 +34,15 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+/**
+ * Unit tests for {@link FilesystemStoreTools}.
+ *
+ * @version $Id$
+ */
 @ComponentTest
 public class FilesystemStoreToolsTest
 {
@@ -58,7 +59,7 @@ public class FilesystemStoreToolsTest
     LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.INFO);
 
     @Test
-    public void initialize() throws IOException, InitializationException, InterruptedException
+    public void initialize() throws IOException, InitializationException
     {
         // initialize() method is triggered by the test framework first for injecting the component
         assertEquals(new File(new File("."), "store/file").getCanonicalFile(),

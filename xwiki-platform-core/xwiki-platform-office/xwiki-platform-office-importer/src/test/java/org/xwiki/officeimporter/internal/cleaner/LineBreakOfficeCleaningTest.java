@@ -22,13 +22,15 @@ package org.xwiki.officeimporter.internal.cleaner;
 import java.io.StringReader;
 import java.util.Collections;
 
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Test case for cleaning html {@code<br/>} elements in {@link OfficeHTMLCleaner}.
@@ -36,6 +38,7 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
  * @version $Id$
  * @since 1.8
  */
+@ComponentTest
 public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
@@ -43,7 +46,7 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
      * class="wikikmodel-emptyline"/>} elements.
      */
     @Test
-    public void testLineBreaksNextToParagraphElements()
+    public void lineBreaksNextToParagraphElements()
     {
         checkLineBreakReplacements("<div><br/><br/><p>para</p></div>", 0, 2);
         checkLineBreakReplacements("<div><p>para</p><br/><br/></div>", 0, 2);
@@ -55,7 +58,7 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
      * class="wikikmodel-emptyline"/>} elements.
      */
     @Test
-    public void testLineBreaksNextToListElements()
+    public void lineBreaksNextToListElements()
     {
         checkLineBreakReplacements("<div><br/><br/><ol><li>para</li></ol></div>", 0, 2);
         checkLineBreakReplacements("<div><ol><li>para</li></ol><br/><br/></div>", 0, 2);
@@ -71,7 +74,7 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
      * class="wikikmodel-emptyline"/>} elements.
      */
     @Test
-    public void testLineBreaksNextToHeadingElements()
+    public void lineBreaksNextToHeadingElements()
     {
         checkLineBreakReplacements("<div><br/><br/><h1>test</h1></div>", 0, 2);
         checkLineBreakReplacements("<div><h1>test</h1><br/><br/></div>", 0, 2);
@@ -103,7 +106,7 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
      * class="wikikmodel-emptyline"/>} elements.
      */
     @Test
-    public void testLineBreaksNextToTableElements()
+    public void lineBreaksNextToTableElements()
     {
         checkLineBreakReplacements("<div><br/><br/><table><tr><td>test</td></tr></table></div>", 0, 2);
         checkLineBreakReplacements("<div><table><tr><td>test</td></tr></table><br/><br/></div>", 0, 2);
@@ -121,20 +124,15 @@ public class LineBreakOfficeCleaningTest extends AbstractHTMLCleaningTest
      */
     private void checkLineBreakReplacements(String html, int expectedBrCount, int expectedDivCount)
     {
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockDocumentReferenceResolver).resolve("Import.Test");
-                will(returnValue(new DocumentReference("wiki", "Import", "Test")));
-            }
-        });
+        when(this.mockDocumentReferenceResolver.resolve("Import.Test")).thenReturn(
+            new DocumentReference("wiki", "Import", "Test"));
 
         HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap("targetDocument", "Import.Test"));
         Document doc = officeHTMLCleaner.clean(new StringReader(header + html + footer), configuration);
         NodeList lineBreaks = doc.getElementsByTagName("br");
-        Assert.assertEquals(expectedBrCount, lineBreaks.getLength());
+        assertEquals(expectedBrCount, lineBreaks.getLength());
         NodeList divs = doc.getElementsByTagName("div");
-        Assert.assertEquals(expectedDivCount, divs.getLength());
+        assertEquals(expectedDivCount, divs.getLength());
     }
 }

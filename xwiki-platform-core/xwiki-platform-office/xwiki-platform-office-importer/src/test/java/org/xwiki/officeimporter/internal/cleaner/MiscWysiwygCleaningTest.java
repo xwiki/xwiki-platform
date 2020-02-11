@@ -22,11 +22,13 @@ package org.xwiki.officeimporter.internal.cleaner;
 import java.io.StringReader;
 import java.util.Collections;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Miscellaneous cleaning tests for {@link WysiwygHTMLCleaner}.
@@ -34,19 +36,20 @@ import org.xwiki.xml.html.HTMLCleanerConfiguration;
  * @version $Id$
  * @since 1.8
  */
+@ComponentTest
 public class MiscWysiwygCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * Test cleaning of HTML paragraphs with namespaces specified.
      */
     @Test
-    public void testParagraphsWithNamespaces()
+    public void paragraphsWithNamespaces()
     {
         String html = header + "<w:p>paragraph</w:p>" + footer;
         HTMLCleanerConfiguration configuration = this.officeHTMLCleaner.getDefaultConfiguration();
         configuration.setParameters(Collections.singletonMap(HTMLCleanerConfiguration.NAMESPACES_AWARE, "false"));
         Document doc = wysiwygHTMLCleaner.clean(new StringReader(html), configuration);
         NodeList nodes = doc.getElementsByTagName("p");
-        Assert.assertEquals(1, nodes.getLength());
+        assertEquals(1, nodes.getLength());
     }
 }

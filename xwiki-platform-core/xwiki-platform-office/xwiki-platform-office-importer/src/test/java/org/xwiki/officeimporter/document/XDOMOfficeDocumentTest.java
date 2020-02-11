@@ -22,12 +22,13 @@ package org.xwiki.officeimporter.document;
 import java.io.StringReader;
 import java.util.HashMap;
 
-import org.junit.Assert;
-
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.officeimporter.internal.AbstractOfficeImporterTest;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for {@link XDOMOfficeDocument}.
@@ -35,6 +36,7 @@ import org.xwiki.rendering.parser.Parser;
  * @version $Id$
  * @since 2.2.5
  */
+@ComponentTest
 public class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
 {
     /**
@@ -43,26 +45,26 @@ public class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
      * @throws Exception if it fails to extract the title
      */
     @Test
-    public void testTitleExtraction() throws Exception
+    public void titleExtraction() throws Exception
     {
         String content = "content before title\n" + "%s Title %s\n" + "content after title.";
         XDOMOfficeDocument doc = createOfficeDocument(String.format(content, "=", "="), "xwiki/2.0");
-        Assert.assertEquals("Title", doc.getTitle());
+        assertEquals("Title", doc.getTitle());
 
         doc = createOfficeDocument(String.format(content, "==", "=="), "xwiki/2.0");
-        Assert.assertEquals("Title", doc.getTitle());
+        assertEquals("Title", doc.getTitle());
 
         doc = createOfficeDocument(String.format(content, "===", "==="), "xwiki/2.0");
-        Assert.assertEquals("Title", doc.getTitle());
+        assertEquals("Title", doc.getTitle());
 
         doc = createOfficeDocument(String.format(content, "====", "===="), "xwiki/2.0");
-        Assert.assertEquals("Title", doc.getTitle());
+        assertEquals("Title", doc.getTitle());
 
         doc = createOfficeDocument(String.format(content, "=====", "====="), "xwiki/2.0");
-        Assert.assertEquals("Title", doc.getTitle());
+        assertEquals("Title", doc.getTitle());
 
         doc = createOfficeDocument(String.format(content, "======", "======"), "xwiki/2.0");
-        Assert.assertEquals("Title", doc.getTitle());
+        assertEquals("Title", doc.getTitle());
     }
 
     /**
@@ -75,8 +77,8 @@ public class XDOMOfficeDocumentTest extends AbstractOfficeImporterTest
      */
     private XDOMOfficeDocument createOfficeDocument(String content, String syntax) throws Exception
     {
-        Parser parser = getComponentManager().getInstance(Parser.class, syntax);
+        Parser parser = this.componentManager.getInstance(Parser.class, syntax);
         XDOM xdom = parser.parse(new StringReader(content));
-        return new XDOMOfficeDocument(xdom, new HashMap<String, byte[]>(), getComponentManager());
+        return new XDOMOfficeDocument(xdom, new HashMap<>(), this.componentManager);
     }
 }

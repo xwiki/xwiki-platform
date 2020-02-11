@@ -21,10 +21,12 @@ package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.StringReader;
 
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
-import org.junit.Assert;
-import org.junit.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for filtering {@code<p><br/></p>} elements in {@link OfficeHTMLCleaner}.
@@ -32,20 +34,21 @@ import org.junit.Test;
  * @version $Id$
  * @since 1.8
  */
+@ComponentTest
 public class EmptyLineParagraphOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
      * The first {@code<p><br/></p>} element in a sequence of such elements should be removed.
      */
     @Test
-    public void testRemoveFirstEmptyLineParagraph()
+    public void removeFirstEmptyLineParagraph()
     {
         String html = header + "<p><br/></p>" + footer;
         Document doc = officeHTMLCleaner.clean(new StringReader(html));
         NodeList paras = doc.getElementsByTagName("p");
-        Assert.assertEquals(0, paras.getLength());
+        assertEquals(0, paras.getLength());
         NodeList breaks = doc.getElementsByTagName("br");
-        Assert.assertEquals(0, breaks.getLength());
+        assertEquals(0, breaks.getLength());
     }
 
     /**
@@ -53,11 +56,11 @@ public class EmptyLineParagraphOfficeCleaningTest extends AbstractHTMLCleaningTe
      * {@code<br/>} elements.
      */
     @Test
-    public void testReplaceAdditionalEmptyLineParagraphs()
+    public void replaceAdditionalEmptyLineParagraphs()
     {
         String html = header + "<p><br/></p><p><br/></p><p><br/></p><p><br/></p>" + footer;
         Document doc = officeHTMLCleaner.clean(new StringReader(html));
         NodeList breaks = doc.getElementsByTagName("br");
-        Assert.assertEquals(3, breaks.getLength());
+        assertEquals(3, breaks.getLength());
     }
 }

@@ -21,11 +21,13 @@ package org.xwiki.officeimporter.internal.cleaner;
 
 import java.io.StringReader;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Test case for cleaning HTML links ({@code<a/>} elements) in {@link OfficeHTMLCleaner}.
@@ -33,6 +35,7 @@ import org.w3c.dom.NodeList;
  * @version $Id$
  * @since 1.8
  */
+@ComponentTest
 public class LinkOfficeCleaningTest extends AbstractHTMLCleaningTest
 {
     /**
@@ -57,27 +60,27 @@ public class LinkOfficeCleaningTest extends AbstractHTMLCleaningTest
      * (copy-inside) anchor needs to be ripped off.
      */
     @Test
-    public void testDuplicateAnchorRemoving()
+    public void duplicateAnchorRemoving()
     {
         String html = header + "<div><a href=\"www.xwiki.org\">xwiki</a></div>"
             + "<a name=\"table1\"/><h1><a name=\"table1\">Sheet 1: <em>Hello</em></a></h1>"
             + "<div><a href=\"www.xwiki.org\">xwiki</a></div>" + footer;
         Document doc = officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("a");
-        Assert.assertEquals(3, nodes.getLength());
+        assertEquals(3, nodes.getLength());
         Element parent = (Element) nodes.item(1).getParentNode();
-        Assert.assertEquals("p", parent.getNodeName());
+        assertEquals("p", parent.getNodeName());
     }
 
     /**
      * Test duplicate anchor filtering with TOC structures. see: https://jira.xwiki.org/browse/XWIKI-3415
      */
     @Test
-    public void testAnchorFilteringWithTOC()
+    public void anchorFilteringWithTOC()
     {
         String html = header + "<div>some text<h1><a name=\"Topic1\"/>Topic1</h1></div>" + footer;
         Document doc = officeHTMLCleaner.clean(new StringReader(html));
         NodeList nodes = doc.getElementsByTagName("a");
-        Assert.assertEquals(1, nodes.getLength());
+        assertEquals(1, nodes.getLength());
     }
 }

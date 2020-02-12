@@ -108,7 +108,7 @@ notifications.settings.filters.preferences.forGuest=Connectez-vous ou inscrivez-
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.table.name=Nom
 notifications.settings.filters.preferences.table.filterType=Type de filtre
-notifications.settings.filters.preferences.table.eventTypes=Évenements
+notifications.settings.filters.preferences.table.eventTypes=Événements
 notifications.settings.filters.preferences.table.notificationFormats=Formats
 notifications.settings.filters.preferences.table.isEnabled=Est activé ?
 notifications.settings.filters.preferences.table._actions=Actions
@@ -160,7 +160,7 @@ notifications.email.subject={0} événement(s) sur le wiki
 notifications.email.seeChanges=Changements :
 notifications.email.linkDetails=Afficher les détails
 notifications.rss.feedLink=Flux RSS
-notifications.rss.feedLinkDescription=Flux d'évenements
+notifications.rss.feedLinkDescription=Flux d'événements
 notifications.rss.feedTitle=Flux RSS des notifications
 notifications.rss.feedDescription=Ce flux RSS peut être personnalisé dans votre page de profil.
 notifications.rss.seeChanges=Modifications : {0}

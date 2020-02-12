@@ -19,9 +19,7 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.internal.DefaultEvent;
@@ -30,41 +28,44 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import java.net.URL;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import javax.inject.Named;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@ComponentTest
 public class LegacyEventConverterTest {
-    @Rule
-    public final MockitoComponentMockingRule<LegacyEventConverter> mocker =
-            new MockitoComponentMockingRule<>(LegacyEventConverter.class);
+    @InjectMockComponents
+    private DefaultLegacyEventConverter legacyEventConverter;
 
-    private EventFactory eventFactory;
-    private EntityReferenceSerializer<String> serializer;
+    @MockComponent
+    @Named("compactwiki")
     private EntityReferenceSerializer<String> compactSerializer;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> serializer;
+
+    @MockComponent
+    private EventFactory eventFactory;
+
+    @MockComponent
     private EntityReferenceResolver<String> resolver;
+
+    @MockComponent
+    @Named("explicit")
     private EntityReferenceResolver<String> explicitResolver;
-
-    @Before
-    public void setUp() throws Exception {
-        eventFactory = mocker.getInstance(EventFactory.class);
-        serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-
-        compactSerializer = mock(EntityReferenceSerializer.class);
-        mocker.registerComponent(EntityReferenceSerializer.TYPE_STRING, "compactwiki", compactSerializer);
-
-        resolver = mocker.getInstance(EntityReferenceResolver.TYPE_STRING);
-        explicitResolver = mock(EntityReferenceResolver.class);
-        mocker.registerComponent(EntityReferenceResolver.TYPE_STRING, "explicit", explicitResolver);
-    }
 
     @Test
     public void convertEventToLegacyActivity() throws Exception {
@@ -104,7 +105,7 @@ public class LegacyEventConverterTest {
         when(serializer.serialize(wikiReference)).thenReturn("xwiki");
 
         // Test
-        LegacyEvent result = mocker.getComponentUnderTest().convertEventToLegacyActivity(event);
+        LegacyEvent result = legacyEventConverter.convertEventToLegacyActivity(event);
 
         // Verify
         assertNotNull(result);
@@ -126,7 +127,7 @@ public class LegacyEventConverterTest {
         assertEquals("10.2", result.getVersion());
         assertEquals("xwiki", result.getWiki());
         assertEquals(target, result.getTarget());
-        assertEquals(true, result.isHidden());
+        assertTrue(result.isHidden());
     }
 
     @Test
@@ -162,7 +163,7 @@ public class LegacyEventConverterTest {
                 new DocumentReference("xwiki", "XWiki", "User"));
 
         // Test
-        Event result = mocker.getComponentUnderTest().convertLegacyActivityToEvent(event);
+        Event result = legacyEventConverter.convertLegacyActivityToEvent(event);
 
         // Verify
         assertNotNull(result);
@@ -180,7 +181,7 @@ public class LegacyEventConverterTest {
         assertEquals(new DocumentReference("xwiki", "XWiki", "User"), result.getUser());
         assertEquals("10.3", result.getDocumentVersion());
         assertEquals(target, result.getTarget());
-        assertEquals(true, result.getHidden());
+        assertTrue(result.getHidden());
     }
 
 }

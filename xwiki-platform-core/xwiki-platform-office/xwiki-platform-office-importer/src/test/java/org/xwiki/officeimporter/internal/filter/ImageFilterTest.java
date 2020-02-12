@@ -28,8 +28,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.AttachmentReference;
@@ -38,12 +40,12 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.rendering.listener.reference.ResourceReference;
 import org.xwiki.rendering.listener.reference.ResourceType;
 import org.xwiki.rendering.renderer.reference.ResourceReferenceSerializer;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.xml.html.filter.HTMLFilter;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.github.ooxi.jdatauri.DataUri;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 /**
@@ -51,30 +53,28 @@ import static org.mockito.Mockito.*;
  * 
  * @version $Id$
  */
+@ComponentTest
 public class ImageFilterTest extends AbstractHTMLFilterTest
 {
-    @Rule
-    public MockitoComponentMockingRule<HTMLFilter> mocker =
-        new MockitoComponentMockingRule<HTMLFilter>(ImageFilter.class);
-
+    @MockComponent
     private DocumentAccessBridge dab;
 
+    @MockComponent
+    @Named("xhtmlmarker")
     private ResourceReferenceSerializer xhtmlMarkerSerializer;
+
+    @MockComponent
+    @Named("currentmixed")
+    private DocumentReferenceResolver<String> currentMixedResolver;
 
     private DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path.To"), "Page");
 
+    @BeforeEach
     @Override
     public void configure() throws Exception
     {
         super.configure();
-
-        this.filter = this.mocker.getComponentUnderTest();
-        this.dab = this.mocker.getInstance(DocumentAccessBridge.class);
-        this.xhtmlMarkerSerializer = this.mocker.getInstance(ResourceReferenceSerializer.class, "xhtmlmarker");
-
-        DocumentReferenceResolver<String> currentMixedResolver =
-            this.mocker.getInstance(DocumentReferenceResolver.TYPE_STRING, "currentmixed");
-        when(currentMixedResolver.resolve("Path.To.Page")).thenReturn(this.documentReference);
+        when(this.currentMixedResolver.resolve("Path.To.Page")).thenReturn(this.documentReference);
     }
 
     @Test
@@ -161,6 +161,6 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
 
         @SuppressWarnings("unchecked")
         Map<String, byte[]> embeddedImages = (Map<String, byte[]>) document.getUserData("embeddedImages");
-        assertEquals(new HashSet<String>(Arrays.asList("foo.png", fileName)), embeddedImages.keySet());
+        assertEquals(new HashSet<>(Arrays.asList("foo.png", fileName)), embeddedImages.keySet());
     }
 }

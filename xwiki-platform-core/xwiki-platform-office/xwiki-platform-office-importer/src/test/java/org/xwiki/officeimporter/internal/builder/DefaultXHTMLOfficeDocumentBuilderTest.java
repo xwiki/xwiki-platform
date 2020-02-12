@@ -27,21 +27,23 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.w3c.dom.Document;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.officeimporter.builder.XHTMLOfficeDocumentBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.document.XHTMLOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -51,31 +53,33 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 2.1M1
  */
+@ComponentTest
 public class DefaultXHTMLOfficeDocumentBuilderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<XHTMLOfficeDocumentBuilder> mocker =
-        new MockitoComponentMockingRule<XHTMLOfficeDocumentBuilder>(DefaultXHTMLOfficeDocumentBuilder.class);
+    @InjectMockComponents
+    private DefaultXHTMLOfficeDocumentBuilder officeDocumentBuilder;
 
+    @MockComponent
     private OfficeConverter officeConverter;
 
+    @MockComponent
+    @Named("openoffice")
     private HTMLCleaner officeHTMLCleaner;
 
+    @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    @Before
+    @MockComponent
+    private OfficeServer officeServer;
+
+    @BeforeEach
     public void configure() throws Exception
     {
-        this.officeConverter = mock(OfficeConverter.class);
-        OfficeServer officeServer = this.mocker.getInstance(OfficeServer.class);
-        when(officeServer.getConverter()).thenReturn(this.officeConverter);
-
-        this.officeHTMLCleaner = this.mocker.getInstance(HTMLCleaner.class, "openoffice");
-        this.entityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        when(this.officeServer.getConverter()).thenReturn(this.officeConverter);
     }
 
     @Test
-    public void testXHTMLOfficeDocumentBuilding() throws Exception
+    public void xhtmlOfficeDocumentBuilding() throws Exception
     {
         DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
         when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:Path.To.Page");
@@ -96,7 +100,7 @@ public class DefaultXHTMLOfficeDocumentBuilderTest
         when(this.officeHTMLCleaner.clean(any(Reader.class), eq(config))).thenReturn(xhtmlDoc);
 
         XHTMLOfficeDocument result =
-            this.mocker.getComponentUnderTest().build(officeFileStream, "file.odt", documentReference, true);
+            this.officeDocumentBuilder.build(officeFileStream, "file.odt", documentReference, true);
 
         Map<String, String> params = new HashMap<String, String>();
         params.put("targetDocument", "wiki:Path.To.Page");

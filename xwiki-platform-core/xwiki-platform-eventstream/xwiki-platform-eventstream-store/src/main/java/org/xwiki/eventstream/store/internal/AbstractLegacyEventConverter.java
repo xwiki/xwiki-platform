@@ -36,6 +36,13 @@ import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 
+/**
+ * Default implementation to convert from and to LegacyEvents.
+ * Set most of the values, but does not use param3, param4 and param5 which might be used for custom operations.
+ *
+ * @since 12.1RC1
+ * @version $Id$
+ */
 public abstract class AbstractLegacyEventConverter implements LegacyEventConverter
 {
     /** Needed for creating raw events. */

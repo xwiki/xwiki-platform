@@ -24,15 +24,16 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.script.ScriptContext;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.notifiers.NotificationDisplayer;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;
-import org.xwiki.velocity.VelocityManager;
 
 /**
  * Default implementation for (@link {@link NotificationDisplayer}. The displayer try to execute
@@ -51,13 +52,14 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
     private TemplateManager templateManager;
 
     @Inject
-    private VelocityManager velocityManager;
+    private ScriptContextManager scriptContextManager;
 
     @Override
     public Block renderNotification(CompositeEvent eventNotification) throws NotificationException
     {
+        ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
         try {
-            velocityManager.getCurrentVelocityContext().put(EVENT_BINDING_NAME, eventNotification);
+            scriptContext.setAttribute(EVENT_BINDING_NAME, eventNotification, ScriptContext.ENGINE_SCOPE);
 
             String templateName = String.format("notification/%s.vm",
                     eventNotification.getType().replaceAll("\\/", "."));
@@ -69,7 +71,7 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
         } catch (Exception e) {
             throw new NotificationException("Failed to render the notification.", e);
         } finally {
-            velocityManager.getCurrentVelocityContext().remove(EVENT_BINDING_NAME);
+            scriptContext.removeAttribute(EVENT_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
         }
     }
 

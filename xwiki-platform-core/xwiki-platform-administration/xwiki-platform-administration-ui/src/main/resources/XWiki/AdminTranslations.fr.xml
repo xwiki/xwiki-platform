@@ -123,7 +123,7 @@ administration.section.export.description.hint=Description du package affiché l
 administration.section.export.author.hint=Auteur du package (il sera affiché lors de l'import).
 administration.section.export.licence.hint=Licence du contenu. Par exemple : LGPL, GPLV2, etc.
 administration.section.export.version.hint=Version du package, stockée dans le package lui-même.
-administration.section.export.backupPack.hint=Conserve l'auteur lors de l'import des pages. Cette option est sans effet sur le contenu exporté et peut-être modifié avant import.
+administration.section.export.backupPack.hint=Conserve l'auteur lors de l'import des pages. Cette option est sans effet sur le contenu exporté et peut être modifiée avant import.
 
 # Users Section
 administration.section.users.enableUser.inProgress=Activation du compte utilisateur…

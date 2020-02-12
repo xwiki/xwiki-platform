@@ -41,7 +41,7 @@ office.createForm.type.description=Importer des documents Office dans des pages 
 office.form.error.noDocument=Vous devez utiliser l''action {0}"créer une page"{1} pour importer un document Office.
 office.form.append.hint=Ce document existe déjà ! Ajouter à la page existante
 
-office.config.serverType.hint=Type de serveur Office, cela peut-être interne (local) ou externe (distant).
+office.config.serverType.hint=Type de serveur Office. Il peut être interne (local) ou externe (distant).
 office.config.serverPort.hint=Numéro de port pour se connecter au serveur Office
 office.config.autoStart.hint=Indique si le serveur Office doit être démarré / connecté automatiquement au démarrage de XWiki
 office.config.serverPath.hint=Chemin vers l'installation d'Office</content>

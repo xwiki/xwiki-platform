@@ -40,12 +40,6 @@
     <xwiki.checkstyle.skip>true</xwiki.checkstyle.skip>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
-    <!-- START: Required to fix conflicts resolution between XWiki & TestContainers -->
-    <!-- selenium-server requires Guava 25.0-jre+ but XWiki uses Guava 20.0, see xwiki-commons top level POM for more
-      details as to why we cannot use a more recent version. Thus we need to force a more recent version of Guava
-      here. Note that the version needs to be checked when we change the version of selenium-java -->
-    <guava.version>25.0-jre</guava.version>
-    <!-- END: Required to fix conflicts resolution between XWiki & TestContainers -->
   </properties>
   <dependencyManagement>
     <dependencies>

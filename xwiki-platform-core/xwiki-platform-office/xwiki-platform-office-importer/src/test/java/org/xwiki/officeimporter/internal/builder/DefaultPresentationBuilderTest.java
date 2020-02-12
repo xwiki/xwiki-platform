@@ -28,12 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+
 import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.io.IOUtils;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.w3c.dom.Document;
@@ -41,7 +41,6 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.officeimporter.builder.PresentationBuilder;
 import org.xwiki.officeimporter.converter.OfficeConverter;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.officeimporter.server.OfficeServer;
@@ -52,12 +51,16 @@ import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.syntax.Syntax;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.xml.XMLUtils;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.html.HTMLCleanerConfiguration;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -67,33 +70,39 @@ import static org.mockito.Mockito.*;
  * @version $Id$
  * @since 2.1M1
  */
+@ComponentTest
 public class DefaultPresentationBuilderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<PresentationBuilder> mocker =
-        new MockitoComponentMockingRule<PresentationBuilder>(DefaultPresentationBuilder.class);
+    @InjectMockComponents
+    private DefaultPresentationBuilder presentationBuilder;
+
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     /**
      * The component used to parse the presentation HTML.
      */
+    @MockComponent
+    @Named("xhtml/1.0")
     private Parser xhtmlParser;
 
+    @MockComponent
     private OfficeConverter officeConverter;
 
+    @MockComponent
+    @Named("openoffice")
     private HTMLCleaner officeHTMLCleaner;
 
+    @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
-    @Before
+    @MockComponent
+    private OfficeServer officeServer;
+
+    @BeforeEach
     public void configure() throws Exception
     {
-        this.xhtmlParser = this.mocker.getInstance(Parser.class, "xhtml/1.0");
-        this.officeHTMLCleaner = this.mocker.getInstance(HTMLCleaner.class, "openoffice");
-        this.entityReferenceSerializer = this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
-
-        this.officeConverter = mock(OfficeConverter.class);
-        OfficeServer officeServer = this.mocker.getInstance(OfficeServer.class);
-        when(officeServer.getConverter()).thenReturn(this.officeConverter);
+        when(this.officeServer.getConverter()).thenReturn(this.officeConverter);
     }
 
     @Test
@@ -103,7 +112,7 @@ public class DefaultPresentationBuilderTest
         when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:Path.To.Page");
 
         DocumentModelBridge document = mock(DocumentModelBridge.class);
-        DocumentAccessBridge dab = this.mocker.getInstance(DocumentAccessBridge.class);
+        DocumentAccessBridge dab = this.componentManager.getInstance(DocumentAccessBridge.class);
         when(dab.getTranslatedDocumentInstance(documentReference)).thenReturn(document);
         when(document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
 
@@ -132,8 +141,7 @@ public class DefaultPresentationBuilderTest
         XDOM galleryContent = new XDOM(Collections.<Block>emptyList());
         when(this.xhtmlParser.parse(any(Reader.class))).thenReturn(galleryContent);
 
-        XDOMOfficeDocument result =
-            this.mocker.getComponentUnderTest().build(officeFileStream, "file.odp", documentReference);
+        XDOMOfficeDocument result = this.presentationBuilder.build(officeFileStream, "file.odp", documentReference);
 
         verify(config).setParameters(Collections.singletonMap("targetDocument", "wiki:Path.To.Page"));
 
@@ -146,9 +154,9 @@ public class DefaultPresentationBuilderTest
 
         List<ExpandedMacroBlock> macros =
             result.getContentDocument().getBlocks(new ClassBlockMatcher(ExpandedMacroBlock.class), Block.Axes.CHILD);
-        Assert.assertEquals(1, macros.size());
-        Assert.assertEquals("gallery", macros.get(0).getId());
-        Assert.assertEquals(galleryContent, macros.get(0).getChildren().get(0));
+        assertEquals(1, macros.size());
+        assertEquals("gallery", macros.get(0).getId());
+        assertEquals(galleryContent, macros.get(0).getChildren().get(0));
     }
 
     private Answer<Document> returnMatchingDocument(final String content, final Document document)

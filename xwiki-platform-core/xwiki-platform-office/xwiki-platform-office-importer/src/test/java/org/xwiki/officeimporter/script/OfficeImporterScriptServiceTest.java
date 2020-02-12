@@ -19,14 +19,12 @@
  */
 package org.xwiki.officeimporter.script;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.model.reference.AttachmentReference;
@@ -34,36 +32,26 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.officeimporter.document.XDOMOfficeDocument;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.syntax.SyntaxType;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 /**
  * Unit test for {@link org.xwiki.officeimporter.script.OfficeImporterScriptService}.
  * 
  * @version $Id$
  */
+@ComponentTest
 public class OfficeImporterScriptServiceTest
 {
     /**
      * A component manager that automatically mocks all dependencies of the component under test.
      */
-    @Rule
-    public MockitoComponentMockingRule<ScriptService> mocker = new MockitoComponentMockingRule<ScriptService>(
-        OfficeImporterScriptService.class, ScriptService.class, "officeimporter");
-
-    /**
-     * The component being tested.
-     */
+    @InjectMockComponents
     private OfficeImporterScriptService officeImporterScriptService;
 
+    @MockComponent
     private DocumentAccessBridge documentAccessBridge;
-
-    @Before
-    public void setUp() throws Exception
-    {
-        officeImporterScriptService = (OfficeImporterScriptService) mocker.getComponentUnderTest();
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-    }
 
     @Test
     public void saveWithOverwrite() throws Exception

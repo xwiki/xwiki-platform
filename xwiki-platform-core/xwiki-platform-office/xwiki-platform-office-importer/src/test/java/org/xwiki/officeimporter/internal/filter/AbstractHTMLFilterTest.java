@@ -24,14 +24,15 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.w3c.dom.Document;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSInput;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.xml.XMLUtils;
-import org.xwiki.xml.html.filter.HTMLFilter;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Base class for HTML filter tests.
@@ -43,14 +44,15 @@ import org.xwiki.xml.html.filter.HTMLFilter;
  */
 public abstract class AbstractHTMLFilterTest
 {
-    protected HTMLFilter filter;
+    @InjectMockComponents
+    private ImageFilter filter;
 
     /**
      * Helper object for manipulating DOM Level 3 Load and Save APIs.
      */
     private DOMImplementationLS lsImpl;
 
-    @Before
+    @BeforeEach
     public void configure() throws Exception
     {
         this.lsImpl = (DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation("LS 3.0");
@@ -82,7 +84,7 @@ public abstract class AbstractHTMLFilterTest
         String output = XMLUtils.serialize(document, false);
         output = StringUtils.removeStart(output, "<root>");
         output = StringUtils.removeEnd(output, "</root>");
-        Assert.assertEquals(expectedOuput, output);
+        assertEquals(expectedOuput, output);
         return document;
     }
 }

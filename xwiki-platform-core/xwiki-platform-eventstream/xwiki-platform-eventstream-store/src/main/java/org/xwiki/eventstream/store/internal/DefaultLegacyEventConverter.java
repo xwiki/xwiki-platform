@@ -52,10 +52,15 @@ public class DefaultLegacyEventConverter extends AbstractLegacyEventConverter
 
     private LegacyEventConverter getConverterForType(String type)
     {
-        try {
-            return this.componentManager.getInstance(LegacyEventConverter.class, type);
-        } catch (ComponentLookupException e) {
-            logger.debug("Cannot find LegacyEventConverter with hint [{}]", type, e);
+        if (this.componentManager.hasComponent(LegacyEventConverter.class, type)) {
+            try {
+                return this.componentManager.getInstance(LegacyEventConverter.class, type);
+            } catch (ComponentLookupException e) {
+                logger.error("Error while initializing LegacyEventConverter with hint [{}]. "
+                    + "Fallback on default converter.", type, e);
+                return null;
+            }
+        } else {
             return null;
         }
     }

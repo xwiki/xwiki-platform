@@ -197,7 +197,7 @@ platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Een aantal kol
 platform.appwithinminutes.liveTableEditorIcon=Pictogram
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Een referentie naar een pictogram. Dit kan elke afbeelding zijn die is opgeslagen in de wiki, maar u kunt ook een pictogram kiezen via de Kiezer die verschijnt als het veld is geselecteerd.
 
-### Application home page
+### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=Gegevens
 platform.appwithinminutes.appLiveTableEditEntryActionName=Wijzigen
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=Verwijderen
@@ -210,6 +210,8 @@ platform.appwithinminutes.appHomePageEditAppLabel=Applicatie wijzigen
 platform.appwithinminutes.appHomePageTranslateAppLabel=Applicatie vertalen
 platform.appwithinminutes.appHomePageDeleteAppLabel=Applicatie verwijderen
 ### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: AppWithinMinutes.LiveTableClass_description=Description
+### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=De applicatie {0} al zijn gegevens worden verwijderd. Weet u zeker dat u wilt doorgaan?

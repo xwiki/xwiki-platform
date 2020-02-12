@@ -197,7 +197,7 @@ platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Некотор
 platform.appwithinminutes.liveTableEditorIcon=Иконка
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Значок приложения. Вы можете выбрать значок в палитре значков или сослаться на прикрепленное изображение.
 
-### Application home page
+### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=Записи
 platform.appwithinminutes.appLiveTableEditEntryActionName=Правка
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=Удалить
@@ -210,6 +210,8 @@ platform.appwithinminutes.appHomePageEditAppLabel=Редактировать п�
 platform.appwithinminutes.appHomePageTranslateAppLabel=Перевести приложение
 platform.appwithinminutes.appHomePageDeleteAppLabel=Удалить приложение
 platform.appwithinminutes.appHomePageMovedWarning=Приложение может работать неправильно, так как оно было переименовано или перемещено без обновления кода. Пожалуйста, отредактируйте приложение и следуйте инструкциям, чтобы обновить код.
+### Missing: AppWithinMinutes.LiveTableClass_description=Description
+### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Приложение {0} и ВСЕ его записи будут удалены. Вы уверены что хотите продолжить?

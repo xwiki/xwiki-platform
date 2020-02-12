@@ -19,157 +19,104 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import org.apache.commons.lang3.StringUtils;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.EventFactory;
-import org.xwiki.eventstream.EventStatus;
-import org.xwiki.eventstream.internal.DefaultEventStatus;
-import org.xwiki.model.EntityType;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.net.MalformedURLException;
-import java.net.URL;
+
+import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventStatus;
 
 /**
- * Internal helper that convert some objects from the Event Stream module to objects of the Activity Stream module
- * (which is used for the storage) and the opposite.
+ * Default implementation of {@link LegacyEventConverter}.
+ * By default this converter looks for a component {@link LegacyEventConverter} with a hint corresponding to the type of
+ * the event to apply the conversion.
+ * If none is found, it applies default behaviour from {@link AbstractLegacyEventConverter}.
  *
  * @version $Id$
  * @since 11.1RC1
  */
 @Component
 @Singleton
-public class DefaultLegacyEventConverter implements LegacyEventConverter
+public class DefaultLegacyEventConverter extends AbstractLegacyEventConverter
 {
-    /** Needed for creating raw events. */
     @Inject
-    private EventFactory eventFactory;
+    @Named("context")
+    private ComponentManager componentManager;
 
-    /** Needed for serializing document names. */
     @Inject
-    private EntityReferenceSerializer<String> serializer;
+    private Logger logger;
 
-    /** Needed for serializing the wiki and space references. */
-    @Inject
-    @Named("compactwiki")
-    private EntityReferenceSerializer<String> compactSerializer;
-
-    /** Needed for deserializing document names. */
-    @Inject
-    private EntityReferenceResolver<String> resolver;
-
-    /** Needed for deserializing related entities. */
-    @Inject
-    @Named("explicit")
-    private EntityReferenceResolver<String> explicitResolver;
+    private LegacyEventConverter getConverterForType(String type)
+    {
+        try {
+            return this.componentManager.getInstance(LegacyEventConverter.class, type);
+        } catch (ComponentLookupException e) {
+            logger.debug("Cannot find LegacyEventConverter with hint [{}]", type, e);
+            return null;
+        }
+    }
 
     @Override
     public LegacyEvent convertEventToLegacyActivity(Event e)
     {
-        LegacyEvent result = new LegacyEvent();
-        result.setApplication(e.getApplication());
-        result.setBody(e.getBody());
-        result.setDate(e.getDate());
-        result.setEventId(e.getId());
-        result.setPage(this.compactSerializer.serialize(e.getDocument(), e.getWiki()));
-        if (e.getDocumentTitle() != null) {
-            result.setParam1(e.getDocumentTitle());
+        LegacyEventConverter converter = this.getConverterForType(e.getType());
+        LegacyEvent result;
+        if (converter == null) {
+            result = super.convertEventToLegacyActivity(e);
+        } else {
+            result = converter.convertEventToLegacyActivity(e);
         }
-        if (e.getRelatedEntity() != null) {
-            result.setParam2(this.serializer.serialize(e.getRelatedEntity()));
-        }
-        result.setPriority((e.getImportance().ordinal() + 1) * 10);
-
-        result.setRequestId(e.getGroupId());
-        result.setSpace(this.compactSerializer.serialize(e.getSpace(), e.getWiki()));
-        result.setStream(e.getStream());
-        result.setTitle(e.getTitle());
-        result.setType(e.getType());
-        if (e.getUrl() != null) {
-            result.setUrl(e.getUrl().toString());
-        }
-        result.setUser(this.serializer.serialize(e.getUser()));
-        result.setVersion(e.getDocumentVersion());
-        result.setWiki(this.serializer.serialize(e.getWiki()));
-
-        result.setTarget(e.getTarget());
-        result.setHidden(e.getHidden());
-
         return result;
     }
 
     @Override
     public Event convertLegacyActivityToEvent(LegacyEvent e)
     {
-        Event result = this.eventFactory.createRawEvent();
-        result.setApplication(e.getApplication());
-        result.setBody(e.getBody());
-        result.setDate(e.getDate());
-        result.setDocument(new DocumentReference(this.resolver.resolve(e.getPage(), EntityType.DOCUMENT,
-                new WikiReference(e.getWiki()))));
-        result.setId(e.getEventId());
-        result.setDocumentTitle(e.getParam1());
-        if (StringUtils.isNotEmpty(e.getParam2())) {
-            if (StringUtils.endsWith(e.getType(), "Attachment")) {
-                result.setRelatedEntity(this.explicitResolver.resolve(e.getParam2(), EntityType.ATTACHMENT,
-                        result.getDocument()));
-            } else if (StringUtils.endsWith(e.getType(), "Comment")
-                    || StringUtils.endsWith(e.getType(), "Annotation")) {
-                result.setRelatedEntity(this.explicitResolver.resolve(e.getParam2(), EntityType.OBJECT,
-                        result.getDocument()));
-            }
+        LegacyEventConverter converter = this.getConverterForType(e.getType());
+        Event result;
+        if (converter == null) {
+            result = super.convertLegacyActivityToEvent(e);
+        } else {
+            result = converter.convertLegacyActivityToEvent(e);
         }
-        result.setImportance(Event.Importance.MEDIUM);
-        if (e.getPriority() > 0) {
-            int priority = e.getPriority() / 10 - 1;
-            if (priority >= 0 && priority < Event.Importance.values().length) {
-                result.setImportance(Event.Importance.values()[priority]);
-            }
-        }
-
-        result.setGroupId(e.getRequestId());
-        result.setStream(e.getStream());
-        result.setTitle(e.getTitle());
-        result.setType(e.getType());
-        if (StringUtils.isNotBlank(e.getUrl())) {
-            try {
-                result.setUrl(new URL(e.getUrl()));
-            } catch (MalformedURLException ex) {
-                // Should not happen
-            }
-        }
-        result.setUser(new DocumentReference(this.resolver.resolve(e.getUser(), EntityType.DOCUMENT)));
-        result.setDocumentVersion(e.getVersion());
-        result.setHidden(e.isHidden());
-
-        result.setTarget(e.getTarget());
         return result;
     }
 
     @Override
     public LegacyEventStatus convertEventStatusToLegacyActivityStatus(EventStatus eventStatus)
     {
-        LegacyEventStatus legacyEventStatus = new LegacyEventStatus();
-        legacyEventStatus.setActivityEvent(convertEventToLegacyActivity(eventStatus.getEvent()));
-        legacyEventStatus.setEntityId(eventStatus.getEntityId());
-        legacyEventStatus.setRead(eventStatus.isRead());
-        return legacyEventStatus;
+        LegacyEventStatus result = null;
+        if (eventStatus.getEvent() != null) {
+            LegacyEventConverter converter = this.getConverterForType(eventStatus.getEvent().getType());
+            if (converter != null) {
+                result = converter.convertEventStatusToLegacyActivityStatus(eventStatus);
+            }
+        }
+
+        if (result == null) {
+            result = super.convertEventStatusToLegacyActivityStatus(eventStatus);
+        }
+        return result;
     }
 
     @Override
     public EventStatus convertLegacyActivityStatusToEventStatus(LegacyEventStatus eventStatus)
     {
-        return new DefaultEventStatus(
-                convertLegacyActivityToEvent(eventStatus.getActivityEvent()),
-                eventStatus.getEntityId(),
-                eventStatus.isRead()
-        );
+        EventStatus result = null;
+        if (eventStatus.getActivityEvent() != null) {
+            LegacyEventConverter converter = this.getConverterForType(eventStatus.getActivityEvent().getType());
+            if (converter != null) {
+                result = converter.convertLegacyActivityStatusToEventStatus(eventStatus);
+            }
+        }
+
+        if (result == null) {
+            result = super.convertLegacyActivityStatusToEventStatus(eventStatus);
+        }
+        return result;
     }
 }

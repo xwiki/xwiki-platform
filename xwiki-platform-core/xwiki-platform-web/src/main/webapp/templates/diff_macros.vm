@@ -531,7 +531,7 @@
   #end
 #end
 
-#macro (displayDocumentVersionInfo $targetDoc $version $previousVersionLink $nextVersionLink)
+#macro (displayDocumentVersionInfo $targetDoc $version $previousVersionLink $nextVersionLink $title)
   #if ("$!version" == '')
     <div class="changes-info-title">$escapetool.xml($services.localization.render('core.viewers.diff.fromNew'))</div>
   #else
@@ -546,7 +546,7 @@
     #set ($versionLink = "<a href='$versionURL'>$escapetool.xml($version)</a>")
     #set ($versionSpan = "<span class='changes-version'>$!previousVersionLink $versionLink $!nextVersionLink</span>")
     <div class="changes-info-title">
-      $services.localization.render('core.viewers.diff.from', [$versionSpan])
+      $services.localization.render($title, [$versionSpan])
     </div>
     <div class="changes-info-content">
       #if ($targetDoc)
@@ -562,10 +562,10 @@
   <div id="changes-info">
     <div id="changes-info-boxes">
       <div id="changes-info-box-from" class="changes-info-box">
-        #displayDocumentVersionInfo($from.doc $from.version $from.previousVersionLink $from.nextVersionLink)
+        #displayDocumentVersionInfo($from.doc $from.version $from.previousVersionLink $from.nextVersionLink 'core.viewers.diff.from')
       </div> ## changes-info-box-from
       <div id="changes-info-box-to" class="changes-info-box">
-        #displayDocumentVersionInfo($to.doc $to.version $to.previousVersionLink $to.nextVersionLink)
+        #displayDocumentVersionInfo($to.doc $to.version $to.previousVersionLink $to.nextVersionLink 'core.viewers.diff.to')
       </div> ## changes-info-box-to
       #if ("$!from.previousLink" != '')
         <a href="$from.previousLink" class="changes-arrow-left"

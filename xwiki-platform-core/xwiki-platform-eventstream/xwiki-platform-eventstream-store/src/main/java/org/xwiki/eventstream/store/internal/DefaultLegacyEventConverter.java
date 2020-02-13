@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -52,7 +53,7 @@ public class DefaultLegacyEventConverter extends AbstractLegacyEventConverter
 
     private LegacyEventConverter getConverterForType(String type)
     {
-        if (this.componentManager.hasComponent(LegacyEventConverter.class, type)) {
+        if (!StringUtils.isEmpty(type) && this.componentManager.hasComponent(LegacyEventConverter.class, type)) {
             try {
                 return this.componentManager.getInstance(LegacyEventConverter.class, type);
             } catch (ComponentLookupException e) {

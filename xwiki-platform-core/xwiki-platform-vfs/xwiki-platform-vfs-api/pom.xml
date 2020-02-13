@@ -35,7 +35,9 @@
     <truevfs.version>0.12.2</truevfs.version>
     <truecommons.version>2.5.0</truecommons.version>
     <xwiki.jacoco.instructionRatio>0.63</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>67</xwiki.pitest.mutationThreshold>
+    <!-- TODO: Remove once https://github.com/STAMP-project/pitest-descartes/issues/62#issuecomment-585617136 is
+         fixed -->
+    <xwiki.pitest.mutationThreshold>62</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>VFS API</xwiki.extension.name>
     <!-- This extension needs to be installed at the farm level (ie in the root namespace) to work fine.

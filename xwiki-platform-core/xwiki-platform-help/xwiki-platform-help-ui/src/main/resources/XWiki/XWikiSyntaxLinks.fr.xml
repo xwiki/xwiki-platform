@@ -133,7 +133,7 @@ La syntaxe complèted'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 {{{[[image:Espace2.Page2@img.png&gt;&gt;Espace1.Page1]]}}}
 {{info}}La syntaxe Wiki est supportée dans les étiquettes des liens.{{/info}}
 )))|[[image:XWiki.XWikiSyntaxLinks@img.png&gt;&gt;Main.WebHome]]
-|Image Link with image parameters|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||height="26" width="26"]]&gt;&gt;Main.WebHome]]
+|Lien image avec paramètres image|{{{[[[[image:Space2.Page2@img.png||width="26" height="26"]]&gt;&gt;Space1.Page1]]}}}|[[[[image:XWiki.XWikiSyntaxLinks@img.png||height="26" width="26"]]&gt;&gt;Main.WebHome]]
 |Lien vers une pièce jointe à la page courante|{{{[[texte&gt;&gt;attach:img.png]]}}}|[[texte&gt;&gt;attach:img.png]]
 |Lien vers une pièce jointe à une autre page|{{{[[texte&gt;&gt;attach:Space.Page@img.png]]}}}|[[texte&gt;&gt;attach:XWiki.XWikiSyntaxLinks@img.png]]
 |Lien vers une ancre dans une page|{{{[[label&gt;&gt;Space.Page||ancre=ancre]]}}}|[[label&gt;&gt;XWiki.XWikiSyntax||anchor=ancre]]
@@ -145,7 +145,7 @@ La syntaxe complèted'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 $subHeading Spécifications des liens pour la syntaxe XWiki 2.1 $subHeading
 {{/velocity}}
 
-La syntaxe complèted'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
+La syntaxe complète d'un lien est ##(label&gt;&gt;)?(link)(||parameters)*##
 
 * ##label##: L'étiquette du lien qui peut contenir de la syntaxe wiki 
 * ##link##: La cible du lien, c'est-à-dire, où aller après cliquer sur un lien.  La syntaxe ressemble à la syntaxe XWiki 1.0 et peut contenir 2 types de URI: ##mailto~:## et##{{{attach:}}}##pour des liens vers une adresse email et vers une pièce jointe.

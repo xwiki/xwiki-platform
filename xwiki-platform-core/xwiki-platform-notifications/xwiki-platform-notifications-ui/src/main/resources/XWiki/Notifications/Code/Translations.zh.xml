@@ -211,5 +211,4 @@ notifications.switches.tooltip.pageAndChildren=监视该页面及其所有子页
 notifications.switches.tooltip.space=监视父页面及其所有子页面
 notifications.switches.tooltip.wiki=监视该Wiki
 notifications.switches.changeStatusError=无法更改通知的状态。</content>
-  
 </xwikidoc>

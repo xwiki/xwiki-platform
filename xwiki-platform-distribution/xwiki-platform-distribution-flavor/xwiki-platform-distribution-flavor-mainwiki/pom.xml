@@ -46,8 +46,6 @@
         org.xwiki.manager:xwiki-manager-wiki-administrator,
         org.xwiki.manager:xwiki-manager-ui
     </xwiki.extension.features>
-    <!-- Name to display by the Extension Manager -->
-    <xwiki.extension.name>XWiki Standard Main Wiki Application</xwiki.extension.name>
   </properties>
   <dependencies>
     <dependency>

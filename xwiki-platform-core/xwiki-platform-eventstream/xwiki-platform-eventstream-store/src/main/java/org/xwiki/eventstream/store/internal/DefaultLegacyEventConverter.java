@@ -71,7 +71,7 @@ public class DefaultLegacyEventConverter extends AbstractLegacyEventConverter
     {
         LegacyEventConverter converter = this.getConverterForType(e.getType());
         LegacyEvent result;
-        if (converter == null || converter.getClass().equals(this.getClass())) {
+        if (converter == null) {
             result = super.convertEventToLegacyActivity(e);
         } else {
             result = converter.convertEventToLegacyActivity(e);
@@ -84,7 +84,7 @@ public class DefaultLegacyEventConverter extends AbstractLegacyEventConverter
     {
         LegacyEventConverter converter = this.getConverterForType(e.getType());
         Event result;
-        if (converter == null || converter.getClass().equals(this.getClass())) {
+        if (converter == null) {
             result = super.convertLegacyActivityToEvent(e);
         } else {
             result = converter.convertLegacyActivityToEvent(e);
@@ -98,7 +98,7 @@ public class DefaultLegacyEventConverter extends AbstractLegacyEventConverter
         LegacyEventStatus result = null;
         if (eventStatus.getEvent() != null) {
             LegacyEventConverter converter = this.getConverterForType(eventStatus.getEvent().getType());
-            if (converter != null && !converter.getClass().equals(this.getClass())) {
+            if (converter != null) {
                 result = converter.convertEventStatusToLegacyActivityStatus(eventStatus);
             }
         }
@@ -115,7 +115,7 @@ public class DefaultLegacyEventConverter extends AbstractLegacyEventConverter
         EventStatus result = null;
         if (eventStatus.getActivityEvent() != null) {
             LegacyEventConverter converter = this.getConverterForType(eventStatus.getActivityEvent().getType());
-            if (converter != null && !converter.getClass().equals(this.getClass())) {
+            if (converter != null) {
                 result = converter.convertLegacyActivityStatusToEventStatus(eventStatus);
             }
         }

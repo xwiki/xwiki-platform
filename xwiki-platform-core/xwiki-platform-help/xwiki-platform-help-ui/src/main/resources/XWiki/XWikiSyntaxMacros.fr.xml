@@ -73,7 +73,7 @@ En syntaxe XWiki 2.0, il y a aussi deux types de macros:
 Pour accéder à la liste de toutes les macros disponibles, allez à la [[page de référence des macros&gt;&gt;http://extensions.xwiki.org/]].
 {{/info}}
 
-|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Result
+|=Fonctionnalité|=Syntaxe XWiki {{velocity}}$crtSyntaxVer{{/velocity}}|=Résultat
 |Macro|(((
 {{{{{code language="java"}}
 System.out.println("Hello World!");
@@ -89,7 +89,7 @@ Les macros Radeox ne peuvent pas être utilisées en syntaxe XWiki 2.0. C'est la
 Pour accéder à la liste de toutes les macros disponibles, allez sur [[Extensions wiki&gt;&gt;http://extensions.xwiki.org/]].
 {{/info}}
 
-==== Macros in this wiki ====
+==== Macros dans ce wiki ====
 
 {{include reference="XWiki.XWikiSyntaxMacrosList"/}}</content>
 </xwikidoc>

@@ -72,10 +72,14 @@
 #end
 
 #macro (defineSortTool $sortToolVariable)
-  #set ($versionMinimum = "12.0-SNAPSHOT")
   #set ($checkedExtension = "org.xwiki.commons:xwiki-commons-velocity")
-  #if ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo($versionMinimum) &gt;= 0)
+  ## Because of an API collision, $collectionstool has been replaced by $collectiontool in XCOMMONS-1861
+  #if ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.1-SNAPSHOT") &gt;= 0)
+    #setVariable ($sortToolVariable, $collectiontool)
+  ## With the upgrade of Velocity $sorttool has been replaced by $collectionstool (XCOMMONS-1296)
+  #elseif ($services.extension.core.getCoreExtension($checkedExtension).id.version.compareTo("12.0-SNAPSHOT") &gt;= 0)
     #setVariable ($sortToolVariable, $collectionstool)
+  ## Old API for sorting was $sorttool
   #else
     #setVariable ($sortToolVariable, $sorttool)
   #end

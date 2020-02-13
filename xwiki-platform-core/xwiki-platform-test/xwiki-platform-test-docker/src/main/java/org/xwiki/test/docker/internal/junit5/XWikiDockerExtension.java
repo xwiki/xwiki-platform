@@ -99,6 +99,8 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
     private static final String SUPERADMIN = "superadmin";
 
+    private boolean isVncStarted;
+
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception
     {
@@ -187,7 +189,13 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             webDriverContainer.getWebDriver().manage().window().maximize();
             VncRecordingContainer vnc = new VncRecordingContainer(webDriverContainer);
             saveVNC(extensionContext, vnc);
-            startContainer(vnc, testConfiguration);
+            try {
+                startContainer(vnc, testConfiguration);
+                this.isVncStarted = true;
+            } catch (Exception e) {
+                LOGGER.debug("Error when starting VNC container", e);
+                this.isVncStarted = false;
+            }
         }
 
         LOGGER.info("(*) Starting test [{}]", extensionContext.getTestMethod().get().getName());
@@ -205,7 +213,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         }
 
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
-        if (testConfiguration.vnc()) {
+        if (testConfiguration.vnc() && this.isVncStarted) {
             VncRecordingContainer vnc = loadVNC(extensionContext);
             vnc.stop();
 

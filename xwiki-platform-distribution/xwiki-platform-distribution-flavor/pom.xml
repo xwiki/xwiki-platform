@@ -40,7 +40,7 @@
     <xwiki.extension.distribution.ui>${xwiki.extension.distribution.ui.groupId}:${xwiki.extension.distribution.ui.artifactId}</xwiki.extension.distribution.ui>
     <xwiki.extension.distribution.ui.version>${platform.version}</xwiki.extension.distribution.ui.version>
     <xwiki.extension.distribution.ui.id>${xwiki.extension.distribution.ui.groupId}:${xwiki.extension.distribution.ui.artifactId}/${xwiki.extension.distribution.ui.version}</xwiki.extension.distribution.ui.id>
-    <xwiki.extension.distribution.wikiui.name>XWiki Standard Sub Wiki Application</xwiki.extension.distribution.wikiui.name>
+    <xwiki.extension.distribution.wikiui.name>XWiki Standard Flavor - Sub Wiki</xwiki.extension.distribution.wikiui.name>
     <xwiki.extension.distribution.wikiui.summary>Default set of wiki pages containing both content and default applications for XWiki Flavor Sub Wiki</xwiki.extension.distribution.wikiui.summary>
     <xwiki.extension.distribution.wikiui.groupId>${xwiki.extension.distribution.ui.groupId}</xwiki.extension.distribution.wikiui.groupId>
     <xwiki.extension.distribution.wikiui.artifactId>xwiki-platform-distribution-flavor-wiki</xwiki.extension.distribution.wikiui.artifactId>

@@ -53,7 +53,9 @@ public class DefaultLegacyEventConverter extends AbstractLegacyEventConverter
 
     private LegacyEventConverter getConverterForType(String type)
     {
-        if (!StringUtils.isEmpty(type) && this.componentManager.hasComponent(LegacyEventConverter.class, type)) {
+        // check that the type is not empty or default to avoid stackoverflow
+        if (!StringUtils.isEmpty(type) && !"default".equals(type)
+            && this.componentManager.hasComponent(LegacyEventConverter.class, type)) {
             try {
                 return this.componentManager.getInstance(LegacyEventConverter.class, type);
             } catch (ComponentLookupException e) {

@@ -98,6 +98,10 @@ public class Upgrade84FileStoreTest extends UpgradeTest
                 + "trying to find the new location",
 
             // The data contains a Solr directory: we want to ensure that it is properly upgraded too.
-            "The Solr home directory at [data/solr] is invalid.");
+            "The Solr home directory at [data/solr] is invalid.",
+
+            // Deprecated are related to the Velocity upgrade performed in 12.0 (XCOMMONS-1529)
+            "Deprecated usage of method [org.apache.velocity.tools.generic.SortTool.sort]"
+        );
     }
 }

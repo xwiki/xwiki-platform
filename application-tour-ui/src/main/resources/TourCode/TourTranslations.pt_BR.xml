@@ -52,7 +52,7 @@ tour.livetable.doc.title=Nome do Tour
 tour.livetable._actions=Ações
 tour.livetable._actions.edit=Editar
 tour.livetable._actions.delete=Deletar
-### Missing: tour.livetable._actions.launch=Launch
+tour.livetable._actions.launch=Iniciar
 tour.livetable.emptyvalue=-
 
 # Live table specific keys
@@ -69,22 +69,22 @@ tour.popover.show=Mostrar Tour
 tour.popover.show.hint=Você pode recomeçar o tour clicando neste botão a qualquer momento
 
 # Steps
-### Missing: TourCode.StepClass_order=Order
+TourCode.StepClass_order=Ordem
 ### Missing: TourCode.StepClass_element=Element (CSS selector that identify an element)
 TourCode.StepClass_title=Título
 TourCode.StepClass_content=Conteúdo
-### Missing: TourCode.StepClass_backdrop=Backdrop
+TourCode.StepClass_backdrop=Plano de fundo
 ### Missing: TourCode.StepClass_placement=Placement
-### Missing: TourCode.StepClass_targetPage=Target Page
+TourCode.StepClass_targetPage=Página de Destino
 ### Missing: TourCode.StepClass_action=Target Action
-### Missing: TourCode.StepClass_queryString=Query String
+TourCode.StepClass_queryString=String de Consulta
 tour.steps=Passos
 tour.steps.new_step=Novo Passo
 tour.steps.add_step=Adicionar Passo
 tour.steps.edit_step=Editar passo
-### Missing: tour.steps.save_step=Save
+tour.steps.save_step=Salvar
 tour.steps.delete_confirm=Você tem certeza que deseja deletar este passo?
-tour.steps.delete_done=Remoção do passo concluida
+tour.steps.delete_done=Remoção do passo concluída!
 tour.steps.deleting=Deletando passo...
 tour.steps.yes=Sim
 tour.steps.no=Não
@@ -93,10 +93,10 @@ tour.steps.delete=Deletar
 
 # Upgrade
 tour.upgrade.title=Atualizar
-tour.upgrade.successList=As seguintes páginas foram convertidas com sucesso
-tour.upgrade.successNothing=Nada você para atualizar.
+tour.upgrade.successList=As seguintes páginas foram convertidas com sucesso:
+tour.upgrade.successNothing=Você não tem nada para atualizar!
 
 # Template
-### Missing: tour.template.name=Tour
-### Missing: tour.template.description=Step by step tour</content>
+tour.template.name=Tour
+tour.template.description=Tour passo a passo</content>
 </xwikidoc>

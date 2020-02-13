@@ -33,6 +33,11 @@ public class Upgrade1011Test extends UpgradeTest
             // Caused by the fact that we upgrade from an old version of XWiki having these deprecated uses
             "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]",
 
+            // Those deprecated are related to the Velocity upgrade performed in 12.0 (XCOMMONS-1529)
+            "Deprecated usage of method [org.apache.velocity.tools.generic.SortTool.sort]",
+            "Deprecated usage of getter [org.xwiki.velocity.tools.CollectionsTool.getSet]",
+            "Deprecated usage of method [org.apache.velocity.tools.generic.MathTool.toInteger]",
+
             // The currently installed flavor is not valid anymore before the upgrade
             "Invalid extension [org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/10.11.1] on namespace "
                 + "[wiki:xwiki] (InvalidExtensionException: Dependency [org.xwiki.platform:xwiki-platform-oldcore-"

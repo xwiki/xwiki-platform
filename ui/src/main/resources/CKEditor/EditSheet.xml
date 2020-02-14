@@ -1189,7 +1189,8 @@ td.cke_dialog_contents_body {
  */
 a.cke_button.cke_button__xwiki-macro &gt; span.cke_button_icon.cke_button__xwiki-macro_icon,
 a.cke_button.cke_button__xwiki-macro-edit &gt; span.cke_button_icon.cke_button__xwiki-macro-edit_icon,
-a.cke_button.cke_button__officeimporter &gt; span.cke_button_icon.cke_button__officeimporter_icon {
+a.cke_button.cke_button__xwiki-link-open &gt; span.cke_button_icon.cke_button__xwiki-link-open_icon,
+a.cke_button.cke_button__insert &gt; span.cke_button_icon.cke_button__insert_icon {
   /* This is needed for XWiki versions older than 7.1M1 where we overwrite the icons path (see above). */
   background-image: none !important;
   font-family: 'Glyphicons Halflings';
@@ -1198,7 +1199,8 @@ a.cke_button.cke_button__officeimporter &gt; span.cke_button_icon.cke_button__of
 }
 .cke_button_icon.cke_button__xwiki-macro_icon::before,
 .cke_button_icon.cke_button__xwiki-macro-edit_icon::before,
-.cke_button_icon.cke_button__officeimporter_icon::before {
+.cke_button_icon.cke_button__xwiki-link-open_icon::before,
+.cke_button_icon.cke_button__insert_icon::before {
   display: inline-block;
   text-align: center;
   width: 16px;
@@ -1209,8 +1211,11 @@ a.cke_button.cke_button__officeimporter &gt; span.cke_button_icon.cke_button__of
 .cke_button_icon.cke_button__xwiki-macro-edit_icon::before {
   content: "\e032";
 }
-.cke_button_icon.cke_button__officeimporter_icon::before {
-  content: "\e022";
+.cke_button_icon.cke_button__xwiki-link-open_icon::before {
+  content: "\e164";
+}
+.cke_button_icon.cke_button__insert_icon::before {
+  content: "\002b";
 }
 
 /**

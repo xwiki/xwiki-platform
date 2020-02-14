@@ -55,9 +55,7 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
 
     init : function(editor) {
       var officeImporterURL = (editor.config['xwiki-office'] || {}).importer;
-      if (officeImporterURL) {
-        this.enableOfficeImporter(editor, officeImporterURL);
-      }
+      this.enableOfficeImporter(editor, officeImporterURL);
 
       if (editor.config.applyPasteFilterAfterPasteFromWord) {
         this.applyPasteFilterAfterPasteFromWord(editor);
@@ -86,12 +84,15 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
 
       editor.ui.addButton('officeImporter', {
         label: editor.localization.get('xwiki-office.importer.title'),
+        icon: 'pastefromword',
         command: 'officeImporter',
         toolbar: 'insert,50'
       });
 
       editor.addCommand('officeImporter', {
         async: true,
+        contextSensitive: false,
+        startDisabled: !officeImporterURL,
         exec: function(editor) {
           var command = this;
           require(['officeImporterModal'], function(officeImporterModal) {
@@ -112,7 +113,6 @@ define('officeImporterModal', ['jquery', 'modal'], function($, $modal) {
           var notification = editor.showNotification(editor.localization.get('xwiki-office.importer.inProgress'),
             'progress');
           var widget = this;
-          var officeImporterURL = (editor.config['xwiki-office'] || {}).importer;
           $.get(officeImporterURL, {
             fileName: upload.fileName,
             filterStyles: upload.file.filterStyles,

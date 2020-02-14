@@ -90,21 +90,33 @@ CKEDITOR.editorConfig = function(config) {
         }
       }
     },
-    // Remove the features that are not well integrated or that are focused more on the presentation than the content.
-    // Remove the paste buttons because most of the time they only tell you the shortcut key that needs to be used.
-    removeButtons: 'Find,Anchor,Paste,PasteFromWord,PasteText',
-    removePlugins: 'bidi,colorbutton,font,justify,save,specialchar',
+    // We simplify the tool bar by removing:
+    // * the features that are not well integrated (e.g. bidi, save, Anchor, Find)
+    // * the features that are focused more on the presentation than the content (e.g. colorbutton, font, justify,
+    //     CopyFormatting)
+    // * the paste buttons because most of the time they only tell you the shortcut key that needs to be used
+    // * the Copy and Cut buttons because they are available on the context menu
+    // * the SpecialChar, HorizontalRule and officeImporter buttons because they are not used very often and they are
+    //     available in the Insert drop down menu
+    // * the Language dropdown because it causes confusion with the page language
+    // * the Strike, Subscript, Superscript and Remove Format buttons because they are not used very often and they are
+    //     available in the basic styles drop down
+    // * the Underline button because this style should be reserved for links
+    // * the Unlink button because it is available on the context menu and on the balloon toolbar
+    removeButtons: 'Anchor,Copy,CopyFormatting,Cut,Find,HorizontalRule,Language,Paste,PasteFromWord,PasteText,'
+      + 'RemoveFormat,SpecialChar,Strike,Subscript,Superscript,Underline,Unlink,officeImporter',
+    removePlugins: 'bidi,colorbutton,font,justify,save',
     toolbarGroups: [
+      {name: 'format'},
       {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
-      {name: 'paragraph',   groups: ['list', 'indent', 'blocks', 'align', 'bidi']},
-      {name: 'clipboard',   groups: ['clipboard', 'undo']},
-      {name: 'editing',     groups: ['find', 'selection', 'spellchecker']},
-      {name: 'forms'},
-      '/',
+      {name: 'paragraph',   groups: ['list', 'indent', 'align', 'bidi']},
       {name: 'links'},
       {name: 'insert'},
-      {name: 'styles'},
+      {name: 'forms'},
+      {name: 'styles',      groups: ['styles', 'blocks']},
       {name: 'colors'},
+      {name: 'editing',     groups: ['find', 'selection', 'spellchecker']},
+      {name: 'clipboard',   groups: ['clipboard', 'undo']},
       {name: 'document',    groups: ['mode', 'document', 'doctools']},
       {name: 'tools'},
       {name: 'others'},

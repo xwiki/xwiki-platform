@@ -57,11 +57,17 @@ ckeditor.admin.reset=Reset
 ckeditor.admin.reset.hint=Restore the default configuration
 ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.
 
+ckeditor.plugin.basicstyles.label=Basic Styles
+
 ckeditor.plugin.link.options=Options
 ckeditor.plugin.link.anchor=Anchor
 ckeditor.plugin.link.queryString=Query String
 ckeditor.plugin.link.defaultLabel=type the link label
 ckeditor.plugin.link.openInNewTab=Open Link in New Tab
+
+ckeditor.plugin.insert.label=Insert
+ckeditor.plugin.insert.horizontalRule=Horizontal Line
+ckeditor.plugin.insert.specialChar=Special Character
 
 ckeditor.plugin.macro.placeholder=macro:{0}
 ckeditor.plugin.macro.buttonHint=XWiki Macro

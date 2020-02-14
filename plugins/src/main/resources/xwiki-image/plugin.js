@@ -26,7 +26,7 @@
   };
 
   CKEDITOR.plugins.add('xwiki-image', {
-    requires: 'xwiki-marker,xwiki-resource',
+    requires: 'xwiki-marker,xwiki-resource,balloontoolbar',
 
     init: function(editor) {
       editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'image', {
@@ -73,6 +73,11 @@
             image.addClass('wikimodel-freestanding');
           }
         }
+      });
+
+      editor.balloonToolbars.create({
+        buttons: 'Link,Unlink,Image',
+        widgets: 'image'
       });
     },
 

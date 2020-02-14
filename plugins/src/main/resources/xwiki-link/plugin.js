@@ -35,7 +35,7 @@
   };
 
   CKEDITOR.plugins.add('xwiki-link', {
-    requires: 'xwiki-marker,xwiki-resource,xwiki-localization',
+    requires: 'xwiki-marker,xwiki-resource,xwiki-localization,balloontoolbar',
 
     init: function(editor) {
       // Remove the link markers (XML comments used by the XWiki Rendering to detect wiki links) when the content is
@@ -111,8 +111,13 @@
           delete link.attributes['data-freestanding'];
         }
       });
+    },
 
-      editor.on('instanceReady', addSupportForOpeningLinksInNewTab);
+    afterInit: function(editor) {
+      if (CKEDITOR.plugins.link) {
+        addSupportForOpeningLinksInNewTab(editor);
+        addLinkBalloonToolBar(editor);
+      }
     },
 
     onLoad: function() {
@@ -555,13 +560,8 @@
 
   // Adds a context menu entry to open the selected link in a new tab.
   // See https://github.com/mlewand/ckeditor-plugin-openlink
-  var addSupportForOpeningLinksInNewTab = function(event) {
-    var editor = event.editor;
-    if (!CKEDITOR.plugins.link) {
-      return;
-    }
-
-    editor.addCommand('openLink', {
+  var addSupportForOpeningLinksInNewTab = function(editor) {
+    editor.addCommand('xwiki-link-open', {
       exec: function(editor) {
         var anchor = getActiveLink(editor);
         if (anchor) {
@@ -574,9 +574,9 @@
     });
 
     if (typeof editor.addMenuItem === 'function') {
-      editor.addMenuItem('openLink', {
+      editor.addMenuItem('xwiki-link-open', {
         label: editor.localization.get('xwiki-link.openInNewTab'),
-        command: 'openLink',
+        command: 'xwiki-link-open',
         group: 'link',
         order: -1
       });
@@ -587,11 +587,11 @@
         if (startElement) {
           var anchor = getActiveLink(editor);
           if (anchor && anchor.getAttribute('href')) {
-            return {openLink: CKEDITOR.TRISTATE_OFF};
+            return {'xwiki-link-open': CKEDITOR.TRISTATE_OFF};
           }
         }
       });
-      editor.contextMenu._.panelDefinition.css.push('.cke_button__openLink_icon {' +
+      editor.contextMenu._.panelDefinition.css.push('.cke_button__xwiki-link-open_icon {' +
         CKEDITOR.skin.getIconStyle('link') + '}');
     }
 
@@ -608,5 +608,21 @@
       }
       return anchor;
     };
+  };
+
+  // See https://ckeditor.com/docs/ckeditor4/latest/features/balloontoolbar.html
+  var addLinkBalloonToolBar = function(editor) {
+    editor.ui.addButton('xwiki-link-open', {
+      label: editor.localization.get('xwiki-link.openInNewTab'),
+      command: 'xwiki-link-open',
+      // We use a tool bar group that is not shown on the main tool bar so that this button is shown only on the link
+      // balloon tool bar.
+      toolbar: 'xwiki-link'
+    });
+
+    editor.balloonToolbars.create({
+      buttons: 'xwiki-link-open,Link,Unlink',
+      cssSelector: 'a[href]'
+    });
   };
 })();

@@ -90,7 +90,7 @@
       ## list of tags so we use an inner select for this.
       #if ($whereParams.entrySet())
         #set($whereSql = "${whereSql} lower(:wikitag${foreach.count}) in (select lower(tag) from tagprop.list tag)")
-        #set($discard = $whereParams.put("wikitag$foreach.count", "${tag}", "${tag}"))
+        #set($discard = $whereParams.put("wikitag$foreach.count", "${tag}"))
       #else
         #set($whereSql = "${whereSql} lower(?) in (select lower(tag) from tagprop.list tag)")
         #set($discard = $whereParams.add("${tag}"))

@@ -61,6 +61,9 @@ public class AbstractDistributionPage extends BaseElement
 
     public void clickCompleteStep()
     {
+        // FIXME: workaround for https://github.com/mozilla/geckodriver/issues/1026
+        getDriver().addPageNotYetReloadedMarker();
         this.completeStepButton.click();
+        getDriver().waitUntilPageIsReloaded();
     }
 }

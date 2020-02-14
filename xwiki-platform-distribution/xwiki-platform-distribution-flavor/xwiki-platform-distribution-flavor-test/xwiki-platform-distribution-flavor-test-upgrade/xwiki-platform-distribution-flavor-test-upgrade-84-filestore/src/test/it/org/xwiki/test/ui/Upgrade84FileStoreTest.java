@@ -101,7 +101,8 @@ public class Upgrade84FileStoreTest extends UpgradeTest
             "The Solr home directory at [data/solr] is invalid.",
 
             // Deprecated are related to the Velocity upgrade performed in 12.0 (XCOMMONS-1529)
-            "Deprecated usage of method [org.apache.velocity.tools.generic.SortTool.sort]"
+            "Deprecated usage of method [org.apache.velocity.tools.generic.SortTool.sort]",
+            "Deprecated usage of method [org.apache.velocity.tools.generic.MathTool.toInteger]"
         );
     }
 }

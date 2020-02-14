@@ -39,7 +39,8 @@ public class Upgrade84Test extends UpgradeTest
                 + "incompatible with the core extension [org.xwiki.platform:xwiki-platform-legacy-oldcore/",
 
             // Deprecated are related to the Velocity upgrade performed in 12.0 (XCOMMONS-1529)
-            "Deprecated usage of method [org.apache.velocity.tools.generic.SortTool.sort]"
+            "Deprecated usage of method [org.apache.velocity.tools.generic.SortTool.sort]",
+            "Deprecated usage of method [org.apache.velocity.tools.generic.MathTool.toInteger]"
         );
     }
 }

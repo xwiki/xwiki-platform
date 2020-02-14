@@ -68,7 +68,7 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  */
 @OldcoreTest
-@ComponentList(value = { GroupsCache.class, MembersCache.class, EntityReferenceFactory.class })
+@ComponentList(value = { GroupsCache.class, MembersCache.class })
 @ReferenceComponentList
 public class DefaultGroupManagerTest
 {

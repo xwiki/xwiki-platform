@@ -107,9 +107,6 @@ import static org.mockito.Mockito.when;
 public class XWikiMockitoTest
 {
     @MockComponent
-    private EntityReferenceFactory entityReferenceFactory;
-
-    @MockComponent
     private DocumentRevisionProvider documentRevisionProvider;
 
     @MockComponent
@@ -143,8 +140,6 @@ public class XWikiMockitoTest
         this.componentManager.registerMockComponent(Environment.class);
         this.componentManager.registerMockComponent(ObservationManager.class);
         this.componentManager.registerMockComponent(StoreConfiguration.class);
-
-        when(this.entityReferenceFactory.getReference(any())).thenAnswer((invocation) -> invocation.getArgument(0));
 
         Utils.setComponentManager(this.componentManager);
         xwiki = new XWiki();

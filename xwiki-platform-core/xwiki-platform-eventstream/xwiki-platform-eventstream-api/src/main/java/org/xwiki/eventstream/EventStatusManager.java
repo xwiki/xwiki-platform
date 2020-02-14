@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Handle the statuses for the events.
@@ -56,6 +57,7 @@ public interface EventStatusManager
      * @param entityId the id of the entity concerned by the status
      * @since 12.1RC1
      */
+    @Unstable
     default void deleteAllForEntity(Date startDate, String entityId) throws Exception
     {
     }

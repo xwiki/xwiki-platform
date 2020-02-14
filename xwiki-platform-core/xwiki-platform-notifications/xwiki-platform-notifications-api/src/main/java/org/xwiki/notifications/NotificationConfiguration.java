@@ -20,6 +20,7 @@
 package org.xwiki.notifications;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Get the configuration options concerning the Notification module.
@@ -54,6 +55,7 @@ public interface NotificationConfiguration
      * @return true if pre filtering should be used for ALERT user notifications
      * @since 12.1RC1
      */
+    @Unstable
     default boolean isEventPreFilteringEnabled()
     {
         return false;

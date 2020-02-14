@@ -73,11 +73,11 @@ public final class TagQueryUtils
 
         try {
             Query query = context.getWiki().getStore().getQueryManager().createQuery(hql, Query.HQL);
-            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
+            query.addFilter(Utils.getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                String.format("Failed to get all tags", hql), e);
+                String.format("Failed to get all tags for query [%s]", hql), e);
         }
 
         Collections.sort(results, String.CASE_INSENSITIVE_ORDER);
@@ -124,7 +124,7 @@ public final class TagQueryUtils
     private static Map<String, Integer> getTagCountForQuery(String fromHql, String whereHql, Object parameters,
         XWikiContext context) throws XWikiException
     {
-        List<String> results = null;
+        List<String> results;
         Map<String, Integer> tagCount = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
         String from = "select elements(prop.list) from XWikiDocument as doc, BaseObject as tagobject, "
@@ -151,7 +151,7 @@ public final class TagQueryUtils
                     query.bindValues((List) parameters);
                 }
             }
-            query.addFilter(Utils.<QueryFilter>getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
+            query.addFilter(Utils.getComponent(QueryFilter.class, HiddenDocumentFilter.HINT));
             results = query.execute();
         } catch (QueryException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,

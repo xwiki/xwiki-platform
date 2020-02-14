@@ -21,6 +21,7 @@ package org.xwiki.test.docker.internal.junit5;
 
 import java.io.File;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -184,12 +185,19 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             // Use the maximum resolution available so that we have the maximum number of UI elements visible and
             // reduce the risks of false positives due to not visible elements.
             webDriverContainer.getWebDriver().manage().window().maximize();
+
             VncRecordingContainer vnc = new VncRecordingContainer(webDriverContainer);
             saveVNC(extensionContext, vnc);
+
+            // TODO: Remove once we understand and fix flickerings when starting the VNC container on our CI agents.
+            // If it fails to start, we just skip it. It means there'll be no screenshot taken and video recorded
+            // but at least the tests will be able to execute.
             try {
                 startContainer(vnc, testConfiguration);
                 this.isVncStarted = true;
             } catch (Exception e) {
+                LOGGER.warn("Failed to start the VNC container. Skipping it so that tests can execute. Root error [{}]",
+                    ExceptionUtils.getRootCauseMessage(e));
                 LOGGER.debug("Error when starting VNC container", e);
                 this.isVncStarted = false;
             }

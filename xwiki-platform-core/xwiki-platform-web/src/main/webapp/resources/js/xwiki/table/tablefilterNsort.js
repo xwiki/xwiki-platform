@@ -159,7 +159,7 @@ function ts_resortTable(lnk) {
   if (itm.match(/^\d\d[\/-]\d\d[\/-]\d\d$/)) {
     sortfn = ts_sort_date;
   }
-  if (itm.match(/^[�$�?��]/)) {
+  if (itm.match(/^[£$]/)) {
     sortfn = ts_sort_currency;
   }
   if (itm.match(/^[\d\.]+$/)) {

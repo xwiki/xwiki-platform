@@ -34,7 +34,7 @@ public class Upgrade911Test extends UpgradeTest
             "Deprecated usage of getter [com.xpn.xwiki.api.Document.getName]",
 
             // Deprecated are related to the Velocity upgrade performed in 12.0 (XCOMMONS-1529)
-            "Deprecated usage of method [org.apache.velocity.tools.generic.SortTool.sort]",
+            "Deprecated usage of method [org.xwiki.velocity.tools.CollectionsTool.sort]",
 
             // The currently installed flavor is not valid anymore before the upgrade
             "Invalid extension [org.xwiki.platform:xwiki-platform-distribution-flavor-mainwiki/9.11.8] on namespace "

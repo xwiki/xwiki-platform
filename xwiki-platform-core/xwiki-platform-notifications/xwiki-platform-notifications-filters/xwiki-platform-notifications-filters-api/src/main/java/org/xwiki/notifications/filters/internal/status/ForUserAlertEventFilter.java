@@ -19,29 +19,33 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
-import org.xwiki.model.reference.DocumentReference;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.notifications.NotificationFormat;
 
 /**
- * Special node to filter on events that has been read by the given user.
- *
+ * Filter event targeting only a specific user.
+ * 
  * @version $Id$
- * @since 10.1RC1
+ * @since 12.1RC1
  */
-public class InListOfReadEventsNode extends ForUserNode
+@Component
+@Singleton
+@Named(ForUserAlertEventFilter.FILTER_NAME)
+public class ForUserAlertEventFilter extends AbstractForUserEventFilter
 {
     /**
-     * Construct an InListOfReadEventsNode.
-     * 
-     * @param user the user
+     * Name of the filter.
      */
-    public InListOfReadEventsNode(DocumentReference user)
-    {
-        super(user, true);
-    }
+    public static final String FILTER_NAME = "forUserAlertEventFilter";
 
-    @Override
-    public String toString()
+    /**
+     * Construct an {@link ForUserAlertEventFilter}.
+     */
+    public ForUserAlertEventFilter()
     {
-        return "LIST_OF_READ_EVENTS";
+        super(FILTER_NAME, NotificationFormat.ALERT, null);
     }
 }

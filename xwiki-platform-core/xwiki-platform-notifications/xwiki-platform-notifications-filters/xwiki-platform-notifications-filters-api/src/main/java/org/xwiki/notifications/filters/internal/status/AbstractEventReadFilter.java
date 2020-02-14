@@ -19,19 +19,7 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
-import java.util.Collection;
-
-import org.xwiki.eventstream.Event;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilter;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.expression.ExpressionNode;
-import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
-import org.xwiki.notifications.preferences.NotificationPreference;
-
-import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
 
 /**
  * Abstract implementation of EventReadFilter.
@@ -39,64 +27,16 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
  * @version $Id$
  * @since 10.1RC1
  */
-public abstract class AbstractEventReadFilter implements NotificationFilter, ToggleableNotificationFilter
+public abstract class AbstractEventReadFilter extends AbstractForUserEventFilter
 {
-    private String filterName;
-
-    private NotificationFormat format;
-
     /**
      * Construct an AbstractEventReadFilter.
+     * 
      * @param filterName name of the filter
      * @param format format on which the filter applies
      */
     public AbstractEventReadFilter(String filterName, NotificationFormat format)
     {
-        this.filterName = filterName;
-        this.format = format;
-    }
-
-    @Override
-    public FilterPolicy filterEvent(Event event, DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
-    {
-        // We only handle it at the expression level to avoid too much accesses to the database
-        return FilterPolicy.NO_EFFECT;
-    }
-
-    @Override
-    public boolean matchesPreference(NotificationPreference preference)
-    {
-        return false;
-    }
-
-    @Override
-    public ExpressionNode filterExpression(DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences, NotificationPreference preference)
-    {
-        return null;
-    }
-
-    @Override
-    public ExpressionNode filterExpression(DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
-            NotificationFormat format)
-    {
-        if (user != null && type == NotificationFilterType.EXCLUSIVE && format == this.format) {
-            return not(new InListOfReadEventsNode(user));
-        }
-        return null;
-    }
-
-    @Override
-    public String getName()
-    {
-        return filterName;
-    }
-
-    @Override
-    public boolean isEnabledByDefault()
-    {
-        return false;
+        super(filterName, format, false);
     }
 }

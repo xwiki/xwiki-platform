@@ -977,6 +977,13 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.rest.cache=true
 
+#-# [Since 12.1] [Experimental]
+#-# Enabling this option will make user notifications be filtered and stored when the event is generated
+#-# instead of filtered each time they are displayed.
+#-#
+#-# The default is :
+# notifications.eventPreFilteringEnabled = false
+
 #-------------------------------------------------------------------------------------
 # Event Stream
 #-------------------------------------------------------------------------------------

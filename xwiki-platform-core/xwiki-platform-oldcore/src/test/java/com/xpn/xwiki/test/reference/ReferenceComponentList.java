@@ -42,6 +42,7 @@ import org.xwiki.model.internal.reference.DefaultStringPageObjectReferenceResolv
 import org.xwiki.model.internal.reference.DefaultStringPageReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.internal.reference.DefaultWikiReferenceProvider;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.internal.reference.ExplicitReferenceDocumentReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitReferenceEntityReferenceResolver;
 import org.xwiki.model.internal.reference.ExplicitReferencePageReferenceResolver;
@@ -150,7 +151,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
     CurrentReferencePageObjectReferenceResolver.class,
     CurrentReferencePageReferenceResolver.class,
 
-    DefaultModelConfiguration.class
+    DefaultModelConfiguration.class,
+    EntityReferenceFactory.class
 })
 @Inherited
 public @interface ReferenceComponentList

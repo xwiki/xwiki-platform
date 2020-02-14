@@ -19,6 +19,7 @@
  */
 package org.xwiki.eventstream;
 
+import java.util.Date;
 import java.util.List;
 
 import org.xwiki.component.annotation.Role;
@@ -49,4 +50,13 @@ public interface EventStatusManager
      * @throws Exception if an error occurs
      */
     void saveEventStatus(EventStatus eventStatus) throws Exception;
+
+    /**
+     * @param startDate date before which to remove event status
+     * @param entityId the id of the entity concerned by the status
+     * @since 12.1RC1
+     */
+    default void deleteAllForEntity(Date startDate, String entityId) throws Exception
+    {
+    }
 }

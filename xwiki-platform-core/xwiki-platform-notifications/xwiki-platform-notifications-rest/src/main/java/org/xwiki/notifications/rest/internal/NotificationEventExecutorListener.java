@@ -29,6 +29,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
 import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
+import org.xwiki.eventstream.internal.events.EventStatusDeletedEvent;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceAddOrUpdatedEvent;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceDeletedEvent;
 import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceAddedEvent;
@@ -66,7 +67,7 @@ public class NotificationEventExecutorListener extends AbstractEventListener
             new EventStreamDeletedEvent(), new NotificationPreferenceAddedEvent(),
             new NotificationPreferenceUpdatedEvent(), new NotificationPreferenceDeletedEvent(),
             new NotificationFilterPreferenceAddOrUpdatedEvent(), new NotificationFilterPreferenceDeletedEvent(),
-            new EventStatusAddOrUpdatedEvent());
+            new EventStatusAddOrUpdatedEvent(), new EventStatusDeletedEvent());
     }
 
     @Override

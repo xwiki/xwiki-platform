@@ -19,9 +19,16 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
@@ -31,19 +38,16 @@ import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
+import org.xwiki.eventstream.internal.events.EventStatusDeletedEvent;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.text.StringUtils;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * Legacy implementation of {@link EventStatusManager} which use the Activity Stream storage.
@@ -88,15 +92,13 @@ public class LegacyEventStatusManager implements EventStatusManager
 
         // Get the ActivityEventStatus from the database and convert them
         Query query = queryManager.createQuery("select eventStatus from LegacyEventStatus eventStatus "
-                + "where eventStatus.activityEvent.id in :eventIds and eventStatus.entityId in :entityIds", Query.HQL);
+            + "where eventStatus.activityEvent.id in :eventIds and eventStatus.entityId in :entityIds", Query.HQL);
         query.bindValue("eventIds", getEventIds(events));
         query.bindValue("entityIds", entityIds);
         for (LegacyEventStatus legacyEventStatus : query.<LegacyEventStatus>execute()) {
             results.add(new DefaultEventStatus(
-                    eventConverter.convertLegacyActivityToEvent(legacyEventStatus.getActivityEvent()),
-                    legacyEventStatus.getEntityId(),
-                    legacyEventStatus.isRead())
-            );
+                eventConverter.convertLegacyActivityToEvent(legacyEventStatus.getActivityEvent()),
+                legacyEventStatus.getEntityId(), legacyEventStatus.isRead()));
         }
 
         // For status that are not present in the database, we create objects with read = false
@@ -135,7 +137,7 @@ public class LegacyEventStatusManager implements EventStatusManager
     {
         for (EventStatus status : list) {
             if (StringUtils.equals(status.getEvent().getId(), event.getId())
-                    && StringUtils.equals(status.getEntityId(), entityId)) {
+                && StringUtils.equals(status.getEntityId(), entityId)) {
                 return true;
             }
         }
@@ -164,24 +166,79 @@ public class LegacyEventStatusManager implements EventStatusManager
 
     private void saveEventStatusInStore(LegacyEventStatus eventStatus, String wikiId) throws Exception
     {
-        namespaceContextExecutor.execute(new WikiNamespace(wikiId),
-            () -> {
-                XWikiContext context = contextProvider.get();
-                XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-                try {
-                    hibernateStore.beginTransaction(context);
-                    Session session = hibernateStore.getSession(context);
+        namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
+            XWikiContext context = contextProvider.get();
+            XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+            try {
+                hibernateStore.executeWrite(context, session -> {
                     // The event status may already exists, so we use saveOrUpdate
                     session.saveOrUpdate(eventStatus);
-                    hibernateStore.endTransaction(context, true);
-                } catch (XWikiException e) {
-                    hibernateStore.endTransaction(context, false);
-                    throw new EventStreamException(e);
-                }
 
-                this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
-                return null;
+                    return null;
+                });
+            } catch (XWikiException e) {
+                throw new EventStreamException(e);
             }
-        );
+
+            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
+            return null;
+        });
+    }
+
+    @Override
+    public void deleteAllForEntity(Date startDate, String entityId) throws Exception
+    {
+        boolean isSavedOnMainStore = false;
+
+        if (configuration.useLocalStore()) {
+            String currentWiki = wikiDescriptorManager.getCurrentWikiId();
+            deleteAllForEntityInStore(startDate, entityId, currentWiki);
+            isSavedOnMainStore = wikiDescriptorManager.isMainWiki(currentWiki);
+        }
+
+        if (configuration.useMainStore() && !isSavedOnMainStore) {
+            // save event into the main database (if the event was not already be recorded on the main store,
+            // otherwise we would duplicate the event)
+            deleteAllForEntityInStore(startDate, entityId, wikiDescriptorManager.getMainWikiId());
+        }
+    }
+
+    private void deleteAllForEntityInStore(Date startDate, String entityId, String wikiId) throws Exception
+    {
+        namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
+            XWikiContext context = contextProvider.get();
+            XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+
+            try {
+                hibernateStore.executeWrite(context,
+                    session -> deleteAllForEntityInStore(session, startDate, entityId));
+            } catch (XWikiException e) {
+                throw new EventStreamException(e);
+            }
+
+            this.observation.notify(new EventStatusDeletedEvent(), null);
+            return null;
+        });
+    }
+
+    private Object deleteAllForEntityInStore(Session session, Date startDate, String entityId)
+    {
+        StringBuilder statement =
+            new StringBuilder("delete from LegacyEventStatus status where status.entityId = :entityId");
+
+        if (startDate != null) {
+            statement.append(" and status.activityEvent in ");
+            statement.append("(select event from LegacyEvent event where event.date < :startDate)");
+        }
+
+        org.hibernate.query.Query query = session.createQuery(statement.toString());
+        query.setParameter("entityId", entityId);
+        if (startDate != null) {
+            query.setParameter("startDate", startDate);
+        }
+
+        query.executeUpdate();
+
+        return null;
     }
 }

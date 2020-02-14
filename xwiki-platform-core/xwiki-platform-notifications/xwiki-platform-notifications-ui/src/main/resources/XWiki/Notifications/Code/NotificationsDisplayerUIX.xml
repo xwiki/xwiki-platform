@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="XWiki.Notifications.Code.NotificationsDisplayerUIX" locale="">
+<xwikidoc version="1.4" reference="XWiki.Notifications.Code.NotificationsDisplayerUIX" locale="">
   <web>XWiki.Notifications.Code</web>
   <name>NotificationsDisplayerUIX</name>
   <language/>
@@ -67,6 +67,17 @@
   #end
   #set ($discard = $services.notification.preferences.setStartDate($startDate))
   #set ($discard = $services.notification.filters.setStartDate($startDate))
+#********************************************************
+           Clear all event status until a specific date for the user
+********************************************************#
+#elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'clear' == $request.action)
+  #set ($startDate = $datetool.date)
+  #if ("$!request.date" != '')
+    #set ($startDate = $xwiki.jodatime.getDateTime($numbertool.toNumber($request.date).longValue()).toDate())
+  #end
+  #set ($discard = $services.notification.preferences.setStartDate($startDate))
+  #set ($discard = $services.notification.filters.setStartDate($startDate))
+  #set ($discard = $services.notification.clearAllStatus($startDate))
 #********************************************************
              Watch/Unwatch a location
 ********************************************************#
@@ -262,7 +273,7 @@
             var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.clearing'))", 'inprogress');
             // Send the request to change the start date
             $.post(url, {
-              action: 'setStartDate',
+              action: 'clear',
               date: startDate
             }).success(function (){
               // Display the success message

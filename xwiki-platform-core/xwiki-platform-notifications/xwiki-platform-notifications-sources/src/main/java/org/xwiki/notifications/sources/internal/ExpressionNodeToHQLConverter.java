@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.expression.AndNode;
@@ -39,18 +40,17 @@ import org.xwiki.notifications.filters.expression.GreaterThanNode;
 import org.xwiki.notifications.filters.expression.InNode;
 import org.xwiki.notifications.filters.expression.InSubQueryNode;
 import org.xwiki.notifications.filters.expression.LesserThanNode;
-import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.NotEqualsNode;
 import org.xwiki.notifications.filters.expression.NotNode;
 import org.xwiki.notifications.filters.expression.OrNode;
 import org.xwiki.notifications.filters.expression.PropertyValueNode;
+import org.xwiki.notifications.filters.expression.StartsWith;
 import org.xwiki.notifications.filters.expression.StringValueNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractBinaryOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractUnaryOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
-import org.xwiki.notifications.filters.internal.status.InListOfReadEventsNode;
-import org.xwiki.text.StringUtils;
+import org.xwiki.notifications.filters.internal.status.ForUserNode;
 
 import static org.apache.commons.codec.digest.DigestUtils.sha256Hex;
 
@@ -310,14 +310,23 @@ public class ExpressionNodeToHQLConverter
             OrderByNode orderByNode = (OrderByNode) operator;
             returnValue = String.format("%s ORDER BY %s %s", parseBlock(orderByNode.getQuery(), result),
                     parseBlock(orderByNode.getProperty(), result), orderByNode.getOrder().name());
-        } else if (operator instanceof InListOfReadEventsNode) {
-            InListOfReadEventsNode inList = (InListOfReadEventsNode) operator;
+        } else if (operator instanceof ForUserNode) {
+            ForUserNode forUser = (ForUserNode) operator;
 
-            returnValue = String.format("event IN (select status.activityEvent from LegacyEventStatus status "
-                    + "where status.activityEvent = event and status.entityId = :userStatusRead and status.read = true)"
-            );
+            StringBuilder builder = new StringBuilder("event IN (");
 
-            result.getQueryParameters().put("userStatusRead", serializer.serialize(inList.getUser()));
+            builder.append("select status.activityEvent from LegacyEventStatus status");
+            builder.append(" where status.activityEvent = event and status.entityId = :userStatusRead");
+
+            if (forUser.isRead() != null) {
+                builder.append(" and status.read = " + forUser.isRead());
+            }
+
+            builder.append(')');
+
+            returnValue = builder.toString();
+
+            result.getQueryParameters().put("userStatusRead", serializer.serialize(forUser.getUser()));
 
         } else {
             returnValue = StringUtils.EMPTY;

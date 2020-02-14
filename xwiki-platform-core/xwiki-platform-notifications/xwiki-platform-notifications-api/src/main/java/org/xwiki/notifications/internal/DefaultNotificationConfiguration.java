@@ -60,4 +60,10 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
 
         return (graceTime < 0) ? 0 : graceTime;
     }
+
+    @Override
+    public boolean isEventPreFilteringEnabled()
+    {
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "eventPreFilteringEnabled", false);
+    }
 }

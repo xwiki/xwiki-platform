@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - Notifiers - Default bridge</name>
   <description>Default bridge to oldcore for the notifications notifiers API module.</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.19</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>13</xwiki.pitest.mutationThreshold>
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
@@ -61,6 +61,12 @@
       <artifactId>xwiki-platform-component-wiki</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>

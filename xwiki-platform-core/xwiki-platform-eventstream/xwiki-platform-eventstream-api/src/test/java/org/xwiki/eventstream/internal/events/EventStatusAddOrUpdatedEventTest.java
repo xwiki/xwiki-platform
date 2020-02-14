@@ -17,31 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.filters.internal.status;
+package org.xwiki.eventstream.internal.events;
 
-import org.xwiki.model.reference.DocumentReference;
+import org.junit.jupiter.api.Test;
+import org.xwiki.observation.event.ApplicationStartedEvent;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Special node to filter on events that has been read by the given user.
- *
+ * Validate {@link EventStatusAddOrUpdatedEvent}.
+ * 
  * @version $Id$
- * @since 10.1RC1
  */
-public class InListOfReadEventsNode extends ForUserNode
+public class EventStatusAddOrUpdatedEventTest
 {
-    /**
-     * Construct an InListOfReadEventsNode.
-     * 
-     * @param user the user
-     */
-    public InListOfReadEventsNode(DocumentReference user)
+    @Test
+    public void matches()
     {
-        super(user, true);
-    }
+        EventStatusAddOrUpdatedEvent event = new EventStatusAddOrUpdatedEvent();
 
-    @Override
-    public String toString()
-    {
-        return "LIST_OF_READ_EVENTS";
+        assertTrue(event.matches(event));
+        assertTrue(event.matches(new EventStatusAddOrUpdatedEvent()));
+
+        assertFalse(event.matches(new ApplicationStartedEvent()));
     }
 }

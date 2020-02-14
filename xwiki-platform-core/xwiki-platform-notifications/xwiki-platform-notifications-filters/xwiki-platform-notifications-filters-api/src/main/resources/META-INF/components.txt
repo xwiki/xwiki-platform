@@ -6,6 +6,8 @@ org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterLocationSt
 org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreferencesGetter
 org.xwiki.notifications.filters.internal.status.EventReadAlertFilter
 org.xwiki.notifications.filters.internal.status.EventReadEmailFilter
+org.xwiki.notifications.filters.internal.status.ForUserAlertEventFilter
+org.xwiki.notifications.filters.internal.status.ForUserMailEventFilter
 org.xwiki.notifications.filters.internal.user.EventUserFilter
 org.xwiki.notifications.filters.internal.user.EventUserFilterPreferencesGetter
 org.xwiki.notifications.filters.internal.user.OwnEventFilter

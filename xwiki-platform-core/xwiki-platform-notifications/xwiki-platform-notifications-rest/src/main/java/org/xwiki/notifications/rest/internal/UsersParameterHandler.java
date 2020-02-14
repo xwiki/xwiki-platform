@@ -20,14 +20,15 @@
 package org.xwiki.notifications.rest.internal;
 
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
@@ -37,10 +38,9 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
-import org.xwiki.text.StringUtils;
 
 /**
- *  Handle the "users" parameters of the REST API.
+ * Handle the "users" parameters of the REST API.
  *
  * @version $Id$
  * @since 10.4RC1
@@ -66,6 +66,7 @@ public class UsersParameterHandler
 
     /**
      * Handle the "users" parameters of the REST API.
+     * 
      * @param users the parameter
      * @param parameters the notifications parameters to fill
      */

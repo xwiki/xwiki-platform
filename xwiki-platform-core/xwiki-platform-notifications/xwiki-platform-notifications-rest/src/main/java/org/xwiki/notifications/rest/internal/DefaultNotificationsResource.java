@@ -44,8 +44,10 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
@@ -56,6 +58,7 @@ import org.xwiki.notifications.filters.internal.minor.MinorEventAlertNotificatio
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.status.EventReadAlertFilter;
+import org.xwiki.notifications.filters.internal.status.ForUserAlertEventFilter;
 import org.xwiki.notifications.filters.internal.user.OwnEventFilter;
 import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
@@ -121,6 +124,13 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     @Inject
     private NotificationEventExecutor executor;
+
+    @Inject
+    private NotificationConfiguration configuration;
+
+    @Inject
+    @Named(ForUserAlertEventFilter.FILTER_NAME)
+    private NotificationFilter forUserAlertEventFilter;
 
     @Override
     public Response getNotifications(String useUserPreferences, String userId, String untilDate, String blackList,
@@ -246,9 +256,8 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             return null;
         } else {
             List<CompositeEvent> events =
-                (List<CompositeEvent>) getCompositeEvents(useUserPreferences, userId, untilDate,
-                    blackList, pages, spaces, wikis, users, toMaxCount(maxCount, 10), displayOwnEvents,
-                    displayMinorEvents,
+                (List<CompositeEvent>) getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages,
+                    spaces, wikis, users, toMaxCount(maxCount, 10), displayOwnEvents, displayMinorEvents,
                     displaySystemEvents, displayReadEvents, tags, currentWiki, null, null, false, false);
 
             SyndFeedOutput output = new SyndFeedOutput();
@@ -380,13 +389,22 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         handleTagsParameter(parameters, tags, currentWiki);
     }
 
-    private void useUserPreferences(NotificationParameters parameters) throws NotificationException
+    private void useUserPreferences(NotificationParameters parameters)
+        throws NotificationException, EventStreamException
     {
         if (parameters.user != null) {
-            parameters.preferences =
-                notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
-            parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
-            parameters.filterPreferences = notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
+            // Check if we should pre or post filter events
+            if (parameters.format == NotificationFormat.ALERT && this.configuration.isEventPreFilteringEnabled()) {
+                enableAllEventTypes(parameters);
+
+                parameters.filters.add(this.forUserAlertEventFilter);
+            } else {
+                parameters.preferences =
+                    notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
+                parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
+                parameters.filterPreferences =
+                    notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
+            }
         }
     }
 

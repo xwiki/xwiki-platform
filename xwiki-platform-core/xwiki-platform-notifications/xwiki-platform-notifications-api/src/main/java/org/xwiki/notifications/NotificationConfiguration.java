@@ -49,4 +49,13 @@ public interface NotificationConfiguration
      * @since 9.6RC1
      */
     int liveNotificationsGraceTime();
+
+    /**
+     * @return true if pre filtering should be used for ALERT user notifications
+     * @since 12.1RC1
+     */
+    default boolean isEventPreFilteringEnabled()
+    {
+        return false;
+    }
 }

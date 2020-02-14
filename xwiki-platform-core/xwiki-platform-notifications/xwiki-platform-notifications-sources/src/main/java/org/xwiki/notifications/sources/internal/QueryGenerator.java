@@ -212,16 +212,18 @@ public class QueryGenerator
                 continue;
             }
 
-            AbstractOperatorNode preferenceTypeNode = new AndNode(
-                    new EqualsNode(
-                            value(EventProperty.TYPE),
-                            value((String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE))
-                    ),
+            AbstractOperatorNode preferenceTypeNode = new EqualsNode(value(EventProperty.TYPE),
+                value((String) preference.getProperties().get(NotificationPreferenceProperty.EVENT_TYPE)));
+            // All dates in the database are greater than 0 so there is no point id checking it
+            if (preference.getStartDate().getTime() > 0) {
+                preferenceTypeNode = new AndNode(
+                    preferenceTypeNode,
                     new GreaterThanNode(
                             value(EventProperty.DATE),
                             value(preference.getStartDate())
                     )
-            );
+                  );
+            }
 
             // Get the notification filters that can be applied to the current preference
             Iterator<NotificationFilter> filterIterator
@@ -265,7 +267,7 @@ public class QueryGenerator
         for (NotificationFilter filter : parameters.filters) {
             ExpressionNode node = filter.filterExpression(parameters.user, parameters.filterPreferences,
                     NotificationFilterType.EXCLUSIVE, parameters.format);
-            if (node != null && node instanceof AbstractOperatorNode) {
+            if (node instanceof AbstractOperatorNode) {
                 if (globalFiltersNode == null) {
                     globalFiltersNode = (AbstractOperatorNode) node;
                 } else {

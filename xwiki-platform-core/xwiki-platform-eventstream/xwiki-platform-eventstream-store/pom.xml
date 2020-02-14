@@ -109,9 +109,9 @@
                     <execution>
                         <id>default</id>
                         <configuration>
-                            <!-- This legacy class cannot match the cyclomatic complexity constraint. -->
                             <excludes>
-                                org/xwiki/eventstream/store/internal/DocumentEventRecorder.java
+                                org/xwiki/eventstream/store/internal/DocumentEventRecorder.java,
+                                org/xwiki/eventstream/store/internal/LegacyEventStatusManager.java
                             </excludes>
                         </configuration>
                     </execution>

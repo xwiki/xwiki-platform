@@ -20,6 +20,7 @@
 package org.xwiki.notifications.script.internal;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -105,5 +106,18 @@ public class NotificationScriptEventHelper
         event.setId(eventId);
         String userId = entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference());
         eventStatusManager.saveEventStatus(new DefaultEventStatus(event, userId, isRead));
+    }
+
+    /**
+     * Remove all event status entries associated with current user.
+     *
+     * @param startDate date before which to remove event status
+     * @throws Exception if an error occurs
+     * @since 12.1RC1
+     */
+    public void clearAllStatus(Date startDate) throws Exception
+    {
+        String userId = this.entityReferenceSerializer.serialize(this.documentAccessBridge.getCurrentUserReference());
+        this.eventStatusManager.deleteAllForEntity(startDate, userId);
     }
 }

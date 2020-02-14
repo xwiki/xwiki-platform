@@ -20,28 +20,49 @@
 package org.xwiki.notifications.filters.internal.status;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 
 /**
- * Special node to filter on events that has been read by the given user.
+ * Special node to filter on events listened by a specific user.
  *
  * @version $Id$
- * @since 10.1RC1
+ * @since 12.1RC1
  */
-public class InListOfReadEventsNode extends ForUserNode
+public class ForUserNode extends AbstractOperatorNode
 {
+    private final DocumentReference user;
+
+    private final Boolean read;
+
     /**
-     * Construct an InListOfReadEventsNode.
-     * 
      * @param user the user
+     * @param read true if only read status should be included, false for only unread status and null for all
      */
-    public InListOfReadEventsNode(DocumentReference user)
+    public ForUserNode(DocumentReference user, Boolean read)
     {
-        super(user, true);
+        this.user = user;
+        this.read = read;
+    }
+
+    /**
+     * @return the user
+     */
+    public DocumentReference getUser()
+    {
+        return user;
+    }
+
+    /**
+     * @return true if only read status should be included, false for only unread status and null for all
+     */
+    public Boolean isRead()
+    {
+        return this.read;
     }
 
     @Override
     public String toString()
     {
-        return "LIST_OF_READ_EVENTS";
+        return "FOR_USER_EVENTS";
     }
 }

@@ -1,3 +1,8 @@
+org.xwiki.notifications.notifiers.internal.DefaultModelBridge
+org.xwiki.notifications.notifiers.internal.UserEventDispatcher
+org.xwiki.notifications.notifiers.internal.UserEventDispatcherListener
+org.xwiki.notifications.notifiers.internal.UserEventManager
+org.xwiki.notifications.notifiers.internal.UserEventStoreListener
 org.xwiki.notifications.notifiers.internal.email.live.DefaultLiveMimeMessageIterator
 org.xwiki.notifications.notifiers.internal.email.DefaultNotificationEmailRenderer
 org.xwiki.notifications.notifiers.internal.email.DefaultPeriodicMimeMessageIterator
@@ -8,6 +13,5 @@ org.xwiki.notifications.notifiers.internal.email.UserAvatarAttachmentExtractor
 org.xwiki.notifications.notifiers.internal.email.WatchlistLeftoversCleaner
 org.xwiki.notifications.notifiers.internal.email.WikiEmailNotificationRendererComponentBuilder
 org.xwiki.notifications.notifiers.internal.email.WikiEmailNotificationRendererDocumentInitializer
-org.xwiki.notifications.notifiers.internal.DefaultModelBridge
 org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerComponentBuilder
 org.xwiki.notifications.notifiers.internal.WikiNotificationDisplayerDocumentInitializer

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.inject.Named;
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
@@ -30,17 +31,17 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.util.DefaultParameterizedType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.mail.MimeBodyPartFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.properties.ConverterManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
@@ -53,40 +54,46 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1RC1
  */
+@ComponentTest
 public class TemplateMimeMessageFactoryTest
 {
-    @Rule
-    public MockitoComponentMockingRule<TemplateMimeMessageFactory> mocker =
-        new MockitoComponentMockingRule<>(TemplateMimeMessageFactory.class);
+    @InjectMockComponents
+    private TemplateMimeMessageFactory templateMimeMessageFactory;
+
+    @MockComponent
+    private MailTemplateManager mailTemplateManager;
+
+    @MockComponent
+    @Named("xwiki/template")
+    private MimeBodyPartFactory<DocumentReference> templateBodyPartFactory;
+
+    @MockComponent
+    private ConverterManager converterManager;
 
     private DocumentReference templateReference;
 
     private MimeBodyPart mimeBodyPart;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp() throws Exception
     {
         this.templateReference = new DocumentReference("templatewiki", "templatespace", "templatepage");
 
-        MailTemplateManager mailTemplateManager = this.mocker.getInstance(MailTemplateManager.class);
-        when(mailTemplateManager.evaluate(same(this.templateReference), eq("subject"), any(), any()))
+        when(this.mailTemplateManager.evaluate(same(this.templateReference), eq("subject"), any(), any()))
             .thenReturn("XWiki news");
 
-        MimeBodyPartFactory<DocumentReference> templateBodyPartFactory = this.mocker.getInstance(
-            new DefaultParameterizedType(null, MimeBodyPartFactory.class, DocumentReference.class), "xwiki/template");
         this.mimeBodyPart = mock(MimeBodyPart.class);
-        when(templateBodyPartFactory.create(same(this.templateReference), any())).thenReturn(this.mimeBodyPart);
+        when(this.templateBodyPartFactory.create(same(this.templateReference), any())).thenReturn(this.mimeBodyPart);
     }
 
     @Test
-    public void createMessage() throws Exception
+    void createMessage() throws Exception
     {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("language", "fr");
         parameters.put("velocityVariables", Collections.<String, Object>singletonMap("company", "XWiki"));
 
-        MimeMessage message =
-            this.mocker.getComponentUnderTest().createMessage(this.templateReference, parameters);
+        MimeMessage message =this.templateMimeMessageFactory.createMessage(this.templateReference, parameters);
 
         assertEquals("XWiki news", message.getSubject());
 
@@ -95,7 +102,7 @@ public class TemplateMimeMessageFactoryTest
     }
 
     @Test
-    public void createMessageWithToFromCCAndBCCAddressesAsStrings() throws Exception
+    void createMessageWithToFromCCAndBCCAddressesAsStrings() throws Exception
     {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("language", "fr");
@@ -105,14 +112,16 @@ public class TemplateMimeMessageFactoryTest
         parameters.put("bcc", "bcc@doe.com");
         parameters.put("from", "from@doe.com");
 
-        ConverterManager converterManager = this.mocker.getInstance(ConverterManager.class);
-        when(converterManager.convert(Address[].class, "to@doe.com")).thenReturn(InternetAddress.parse("to@doe.com"));
-        when(converterManager.convert(Address[].class, "cc@doe.com")).thenReturn(InternetAddress.parse("cc@doe.com"));
-        when(converterManager.convert(Address[].class, "bcc@doe.com")).thenReturn(InternetAddress.parse("bcc@doe.com"));
-        when(converterManager.convert(Address.class, "from@doe.com")).thenReturn(
+        when(this.converterManager.convert(Address[].class, "to@doe.com")).thenReturn(
+            InternetAddress.parse("to@doe.com"));
+        when(this.converterManager.convert(Address[].class, "cc@doe.com")).thenReturn(
+            InternetAddress.parse("cc@doe.com"));
+        when(this.converterManager.convert(Address[].class, "bcc@doe.com")).thenReturn(
+            InternetAddress.parse("bcc@doe.com"));
+        when(this.converterManager.convert(Address.class, "from@doe.com")).thenReturn(
             InternetAddress.parse("from@doe.com")[0]);
 
-        MimeMessage message = this.mocker.getComponentUnderTest().createMessage(this.templateReference, parameters);
+        MimeMessage message = this.templateMimeMessageFactory.createMessage(this.templateReference, parameters);
 
         assertEquals("XWiki news", message.getSubject());
         assertArrayEquals(InternetAddress.parse("from@doe.com"), message.getFrom());

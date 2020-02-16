@@ -24,6 +24,7 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentMatchers;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,7 +32,10 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.notifiers.email.NotificationEmailInterval;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -39,6 +43,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -52,6 +57,9 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class NotificationUserIteratorTest
 {
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
     @InjectMockComponents
     private NotificationUserIterator userIterator;
 
@@ -81,7 +89,7 @@ public class NotificationUserIteratorTest
         Query query2 = mock(Query.class);
         Query query3 = mock(Query.class);
         when(queryManager.createQuery(ArgumentMatchers.anyString(), eq(Query.XWQL))).thenReturn(query1, query2, query3,
-                query1, query2, query3);
+            query1, query2, query3);
         when(query1.execute()).thenReturn(Arrays.asList("XWiki.UserA", "XWiki.UserB", "XWiki.UserC"));
         when(query2.execute()).thenReturn(Arrays.asList("XWiki.UserD"));
         when(query3.execute()).thenReturn(Collections.emptyList());
@@ -96,7 +104,7 @@ public class NotificationUserIteratorTest
         when(resolver.resolve("XWiki.UserD", new WikiReference("wikiA"))).thenReturn(userD);
 
         DocumentReference classReference = new DocumentReference("wikiA",
-                Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass");
+            Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass");
         when(documentAccessBridge.getProperty(userA, classReference, "interval")).thenReturn("weekly");
         when(documentAccessBridge.getProperty(userB, classReference, "interval")).thenReturn("daily");
         when(documentAccessBridge.getProperty(userC, classReference, "interval")).thenReturn(null);
@@ -130,4 +138,16 @@ public class NotificationUserIteratorTest
         verify(query3, atLeastOnce()).setOffset(100);
     }
 
+    @Test
+    public void iterateWhenException() throws Exception
+    {
+        when(queryManager.createQuery(ArgumentMatchers.anyString(), eq(Query.XWQL))).thenThrow(
+            new QueryException("error", null, null));
+
+        userIterator.initialize(NotificationEmailInterval.DAILY);
+        assertFalse(userIterator.hasNext());
+
+        assertEquals("Failed to retrieve the next notification user. Root error [QueryException: error]",
+            logCapture.getMessage(0));
+    }
 }

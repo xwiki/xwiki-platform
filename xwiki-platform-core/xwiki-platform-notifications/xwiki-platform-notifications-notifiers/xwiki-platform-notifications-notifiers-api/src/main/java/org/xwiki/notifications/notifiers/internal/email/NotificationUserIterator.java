@@ -27,6 +27,7 @@ import java.util.Queue;
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
@@ -129,7 +130,8 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
                 }
             }
         } catch (Exception e) {
-            logger.error("Failed to retrieve the next notification user.", e);
+            logger.warn("Failed to retrieve the next notification user. Root error [{}]",
+                ExceptionUtils.getRootCauseMessage(e));
         }
     }
 

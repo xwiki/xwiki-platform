@@ -30,7 +30,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.mail.Session;
 
-import org.quartz.JobExecutionException;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;

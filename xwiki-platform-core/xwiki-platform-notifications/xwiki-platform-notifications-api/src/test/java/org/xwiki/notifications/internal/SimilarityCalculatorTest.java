@@ -19,30 +19,32 @@
  */
 package org.xwiki.notifications.internal;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link SimilarityCalculator}.
+ *
+ * @version $Id$
  */
 public class SimilarityCalculatorTest
 {
     private SimilarityCalculator sq;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
         this.sq = new SimilarityCalculator();
     }
 
     @Test
-    public void testComputeSimilarity() throws Exception
+    void computeSimilarity()
     {
         DocumentReference document =
                 new DocumentReference("xwiki", "somewhere", "something");
@@ -58,7 +60,8 @@ public class SimilarityCalculatorTest
         when(event1.getGroupId()).thenReturn(group);
         when(event2.getGroupId()).thenReturn(group);
 
-        assertEquals(SimilarityCalculator.SAME_GROUP_ID_AND_DOCUMENT_BUT_DIFFERENT_TYPES, this.sq.computeSimilarity(event1, event2));
+        assertEquals(SimilarityCalculator.SAME_GROUP_ID_AND_DOCUMENT_BUT_DIFFERENT_TYPES,
+            this.sq.computeSimilarity(event1, event2));
 
         when(event2.getGroupId()).thenReturn("somethingElse");
 

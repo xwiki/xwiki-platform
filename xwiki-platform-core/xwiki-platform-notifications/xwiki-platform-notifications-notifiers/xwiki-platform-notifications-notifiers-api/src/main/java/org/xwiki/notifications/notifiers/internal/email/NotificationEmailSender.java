@@ -70,10 +70,8 @@ public class NotificationEmailSender
      * Send notifications emails for specified users.
      * @param fromDate only send notifications about events that happened after this date
      * @param notificationUserIterator iterator for users interested in the notifications emails
-     * @throws JobExecutionException if error happens
      */
     public void sendEmails(Date fromDate, NotificationUserIterator notificationUserIterator)
-            throws JobExecutionException
     {
         Map<String, Object> emailFactoryParameters = new HashMap<>();
 

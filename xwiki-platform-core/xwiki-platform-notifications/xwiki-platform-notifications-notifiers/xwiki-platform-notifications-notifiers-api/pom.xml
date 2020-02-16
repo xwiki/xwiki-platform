@@ -31,7 +31,7 @@
   <name>XWiki Platform - Notifications - Notifiers - API</name>
   <description>Handle how notifications are transmitted to a user</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.49</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.64</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>45</xwiki.pitest.mutationThreshold>
     <!-- TODO: Fix the threading aspect and ensure that the threads are stopped corretly before moving to the next
         test -->

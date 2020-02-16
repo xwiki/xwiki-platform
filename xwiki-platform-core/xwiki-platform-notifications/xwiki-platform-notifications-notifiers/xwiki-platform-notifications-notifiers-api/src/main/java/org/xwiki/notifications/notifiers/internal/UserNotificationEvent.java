@@ -46,7 +46,7 @@ public class UserNotificationEvent implements Event
      */
     public UserNotificationEvent()
     {
-
+        // Voluntarily empty
     }
 
     /**

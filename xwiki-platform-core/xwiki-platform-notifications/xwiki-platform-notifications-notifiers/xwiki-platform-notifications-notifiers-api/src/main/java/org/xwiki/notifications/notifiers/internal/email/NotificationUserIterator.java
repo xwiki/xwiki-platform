@@ -129,7 +129,7 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
                 }
             }
         } catch (Exception e) {
-            logger.error("Fail to get next user.", e);
+            logger.error("Failed to retrieve the next notification user.", e);
         }
     }
 

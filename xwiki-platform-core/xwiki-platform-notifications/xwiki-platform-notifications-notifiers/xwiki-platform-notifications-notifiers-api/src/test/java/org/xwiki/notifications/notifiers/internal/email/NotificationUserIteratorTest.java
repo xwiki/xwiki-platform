@@ -22,9 +22,8 @@ package org.xwiki.notifications.notifiers.internal.email;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentMatchers;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
@@ -33,12 +32,14 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.notifiers.email.NotificationEmailInterval;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
@@ -48,30 +49,32 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
+@ComponentTest
 public class NotificationUserIteratorTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<NotificationUserIterator> mocker =
-            new MockitoComponentMockingRule<>(NotificationUserIterator.class);
+    @InjectMockComponents
+    private NotificationUserIterator userIterator;
 
+    @MockComponent
     private QueryManager queryManager;
+
+    @MockComponent
     private DocumentReferenceResolver<String> resolver;
+
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        queryManager = mocker.getInstance(QueryManager.class);
-        resolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiA");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiA");
     }
 
     @Test
-    public void test() throws Exception
+    public void iterate() throws Exception
     {
         // Mocks
         Query query1 = mock(Query.class);
@@ -100,7 +103,6 @@ public class NotificationUserIteratorTest
         when(documentAccessBridge.getProperty(userD, classReference, "interval")).thenReturn("daily");
 
         // Test with DAILY interval
-        NotificationUserIterator userIterator = mocker.getComponentUnderTest();
         userIterator.initialize(NotificationEmailInterval.DAILY);
 
         assertTrue(userIterator.hasNext());
@@ -112,7 +114,6 @@ public class NotificationUserIteratorTest
         assertFalse(userIterator.hasNext());
 
         // Test with WEEKLY interval
-        userIterator = mocker.getComponentUnderTest();
         userIterator.initialize(NotificationEmailInterval.WEEKLY);
         assertTrue(userIterator.hasNext());
         assertEquals(userA, userIterator.next());

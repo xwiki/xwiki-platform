@@ -97,8 +97,8 @@ public class UserNotificationEvent implements Event
         if (o instanceof UserNotificationEvent) {
             UserNotificationEvent notificationEvent = (UserNotificationEvent) o;
 
-            return (getUserReference() == null || getUserReference().equals(notificationEvent.getUserReference())
-                && (getFormat() == null || getFormat() == notificationEvent.getFormat()));
+            return (getUserReference() == null || getUserReference().equals(notificationEvent.getUserReference()))
+                && (getFormat() == null || getFormat() == notificationEvent.getFormat());
         }
 
         return false;

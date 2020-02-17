@@ -34,52 +34,39 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 public class UserNotificationEventTest
 {
+    private static final UserNotificationEvent EVENT =
+        new UserNotificationEvent(new DocumentReference("wiki", "space", "page"), NotificationFormat.ALERT);
+
     @Test
-    void matchesWhenNoReference()
+    public void matchesAll()
     {
-        UserNotificationEvent event = new UserNotificationEvent();
-        assertTrue(event.matches(new UserNotificationEvent()));
-        assertTrue(event.matches(new UserNotificationEvent(new DocumentReference("wiki", "space", "page"))));
+        assertTrue((new UserNotificationEvent()).matches(EVENT));
     }
 
     @Test
-    void matchesWhenNotAUserNotificationEvent()
+    public void matchesFormat()
     {
-        UserNotificationEvent event = new UserNotificationEvent();
-        assertFalse(event.matches("whatever"));
+        assertTrue(new UserNotificationEvent(NotificationFormat.ALERT).matches(EVENT));
+        assertFalse(new UserNotificationEvent(NotificationFormat.EMAIL).matches(EVENT));
     }
 
     @Test
-    void matchesWhenReferenceSetButFormatEmpty()
+    public void matchesReference()
     {
-        UserNotificationEvent event = new UserNotificationEvent(new DocumentReference("wiki", "space", "page"));
-
-        assertFalse(event.matches(new UserNotificationEvent()));
-        assertTrue(event.matches(new UserNotificationEvent(new DocumentReference("wiki", "space", "page"))));
-        assertFalse(event.matches(new UserNotificationEvent(new DocumentReference("wiki2", "space", "page"))));
+        assertTrue(new UserNotificationEvent(new DocumentReference("wiki", "space", "page")).matches(EVENT));
+        assertFalse(new UserNotificationEvent(new DocumentReference("wiki", "space", "otherpage")).matches(EVENT));
     }
 
     @Test
-    void matchesWhenFormatSetButReferenceEmpty()
+    public void matchesReferenceAndFormat()
     {
-        UserNotificationEvent event = new UserNotificationEvent(NotificationFormat.ALERT);
+        assertTrue(new UserNotificationEvent(new DocumentReference("wiki", "space", "page"), NotificationFormat.ALERT)
+            .matches(EVENT));
 
-        assertTrue(event.matches(new UserNotificationEvent()));
-        assertTrue(event.matches(new UserNotificationEvent(NotificationFormat.ALERT)));
-        assertTrue(event.matches(new UserNotificationEvent(
-            new DocumentReference("wiki2", "space", "page"), NotificationFormat.ALERT)));
-    }
-
-    @Test
-    void matchesWhenReferenceAndFormatSet()
-    {
-        UserNotificationEvent event = new UserNotificationEvent(
-            new DocumentReference("wiki", "space", "page"), NotificationFormat.ALERT);
-
-        assertFalse(event.matches(new UserNotificationEvent(new DocumentReference("wiki", "space", "page"))));
-        assertFalse(event.matches(new UserNotificationEvent(
-            new DocumentReference("wiki", "space", "page"), NotificationFormat.EMAIL)));
-        assertTrue(event.matches(new UserNotificationEvent(
-            new DocumentReference("wiki", "space", "page"), NotificationFormat.ALERT)));
+        assertFalse(
+            new UserNotificationEvent(new DocumentReference("wiki", "space", "otherpage"), NotificationFormat.ALERT)
+                .matches(EVENT));
+        assertFalse(new UserNotificationEvent(new DocumentReference("wiki", "space", "page"), NotificationFormat.EMAIL)
+            .matches(EVENT));
     }
 }

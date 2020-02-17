@@ -78,7 +78,7 @@ appWithinMinutes.createApp.location.label=lokacja
 appWithinMinutes.createApp.location.hint=Lokalizacja w hierarchii stron, w której zostanie utworzona aplikacja.
 appWithinMinutes.createApp.parent.label=rodzic
 appWithinMinutes.createApp.parent.hint=Nadrzędny nowej aplikacji. Pozostaw to pole puste, jeśli chcesz utworzyć aplikację najwyższego poziomu.
-### Missing: appWithinMinutes.createApp.parent.placeholder=Path.To.Parent
+appWithinMinutes.createApp.parent.placeholder=Droga do rodziców
 appWithinMinutes.codeSpace.title=kod
 appWithinMinutes.codeSpace.description=To jest miejsce, w którym znajduje się kod aplikacji.
 appWithinMinutes.codeSpace.hiddenPagesInfo=Ukryte strony również znajdują się na liście, mimo że bieżące ustawienia profilu użytkownika uniemożliwiają to, inaczej żadna ze stron kodu aplikacji nie byłaby widoczna, ponieważ wszystkie są domyślnie ukryte.
@@ -208,64 +208,64 @@ platform.appwithinminutes.appHomePageEntryNameLabel=wpisz nazwę:
 platform.appwithinminutes.appHomePageDeleteEntriesLabel=usuń wszystkie wpisy
 platform.appwithinminutes.appHomePageEditAppLabel=edytuj aplikacje
 platform.appwithinminutes.appHomePageTranslateAppLabel=przetłumacz aplikacje
-### Missing: platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
-### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
-### Missing: AppWithinMinutes.LiveTableClass_description=Description
-### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+platform.appwithinminutes.appHomePageDeleteAppLabel=usuń aplikacje
+platform.appwithinminutes.appHomePageMovedWarning=Aplikacja może nie działać poprawnie, ponieważ została zmieniona jej nazwa lub przeniesiona bez aktualizacji kodu. Edytuj aplikację i postępuj zgodnie z instrukcjami, aby zaktualizować kod.
+AppWithinMinutes.LiveTableClass_description=opis
+AppWithinMinutes.LiveTableClass_columns=Kolumny na żywo
 
 ### Delete application dialog
-### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?
-### Missing: platform.appwithinminutes.deleteAppEntriesConfirmation=ALL the entries of the application {0} will be deleted. Are you sure you want to continue?
-### Missing: platform.appwithinminutes.deleteAppDoesNotExistError=The specified application does not exist.
-### Missing: platform.appwithinminutes.deleteAppInvalidAppError=The specified name is not a valid App Within Minutes application.
-### Missing: platform.appwithinminutes.deleteAppNotSpecifiedError=No application name was specified.
+platform.appwithinminutes.deleteAppConfirmation=Aplikacja {0} i WSZYSTKIE jej wpisy zostaną usunięte. Jesteś pewien, że chcesz kontynuować?
+platform.appwithinminutes.deleteAppEntriesConfirmation=Aplikacja {0} i WSZYSTKIE jej wpisy zostaną usunięte. Jesteś pewien, że chcesz kontynuować?
+platform.appwithinminutes.deleteAppDoesNotExistError=Określona aplikacja nie istnieje.
+platform.appwithinminutes.deleteAppInvalidAppError=Podana nazwa nie jest prawidłową aplikacją App Within Minutes.
+platform.appwithinminutes.deleteAppNotSpecifiedError=Nie podano nazwy aplikacji.
 
 ### Rename Application
-### Missing: appWithinMinutes.renameApp.changeAppTitleInfo=You can change the application title without renaming the application just by editing the application home page.
-### Missing: appWithinMinutes.renameApp.regenerateAppCodeWarning=The application code is going to be regenerated if you rename the application. Code customizations will be overwritten as a consequence.
-### Missing: appWithinMinutes.renameApp.newName.label=New Name
-### Missing: appWithinMinutes.renameApp.pageExistsError=A page with this name already exists at the selected location.
-### Missing: appWithinMinutes.renameApp.locationForbiddenError=You are not allowed to move the application to the selected location.
-### Missing: appWithinMinutes.renameApp.location.label=New Location
-### Missing: appWithinMinutes.renameApp.location.hint=The location in the page hierarchy where to move the application.
-### Missing: appWithinMinutes.renameApp.parent.label=New Parent
-### Missing: appWithinMinutes.renameApp.parent.hint=The new parent page. Leave this field empty if you want to move the application to the top of the page hierarchy.
-### Missing: appWithinMinutes.renameApp.inProgress=Renaming application...
-### Missing: appWithinMinutes.renameApp.done=Application renamed
-### Missing: appWithinMinutes.renameApp.failed=Failed to rename the application
+appWithinMinutes.renameApp.changeAppTitleInfo=Możesz zmienić tytuł aplikacji bez zmiany nazwy aplikacji, po prostu edytując stronę główną aplikacji.
+appWithinMinutes.renameApp.regenerateAppCodeWarning=Kod aplikacji zostanie ponownie wygenerowany, jeśli zmienisz nazwę aplikacji. Dostosowania kodu zostaną w związku z tym zastąpione.
+appWithinMinutes.renameApp.newName.label=nowa nazwa
+appWithinMinutes.renameApp.pageExistsError=Strona o tej nazwie już istnieje w wybranej lokalizacji.
+appWithinMinutes.renameApp.locationForbiddenError=Nie możesz przenieść aplikacji do wybranej lokalizacji.
+appWithinMinutes.renameApp.location.label=nowa lokalizacja
+appWithinMinutes.renameApp.location.hint=Nie masz uprawnień Lokalizacja w hierarchii stron, gdzie przenieść aplikację.\nd, aby przenieść aplikację do wybranej lokalizacji.
+appWithinMinutes.renameApp.parent.label=nowy rodzic
+appWithinMinutes.renameApp.parent.hint=Nowa strona nadrzędna. Pozostaw to pole puste, jeśli chcesz przenieść aplikację na szczyt hierarchii stron.
+appWithinMinutes.renameApp.inProgress=Zmiana nazwy aplikacji ...
+appWithinMinutes.renameApp.done=Zmiana nazwy aplikacji
+appWithinMinutes.renameApp.failed=Nie można zmienić nazwy aplikacji
 
 ### Deprecated keys
 ### Since 8.4
-### Missing: platform.appwithinminutes.appNamePreviewClassReferenceLabel=Application class
-### Missing: platform.appwithinminutes.appNamePreviewDataSpaceLabel=Application data location
+platform.appwithinminutes.appNamePreviewClassReferenceLabel=klasa aplikacji
+platform.appwithinminutes.appNamePreviewDataSpaceLabel=Lokalizacja danych aplikacji
 
-### Missing: platform.appwithinminutes.liveTableEditorDocSpaceColumnName=Space
-### Missing: platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=The name of the space containing the application entry
-### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnName=Page full name
-### Missing: platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=The name of the page that contains the application entry, prefixed with the space name
+platform.appwithinminutes.liveTableEditorDocSpaceColumnName=przestrzeń
+platform.appwithinminutes.liveTableEditorDocSpaceColumnDescription=Nazwa przestrzeni zawierającej wpis aplikacji
+platform.appwithinminutes.liveTableEditorDocFullNameColumnName=pełna nazwa strony
+platform.appwithinminutes.liveTableEditorDocFullNameColumnDescription=Nazwa strony zawierającej wpis aplikacji, poprzedzona nazwą spacji
 
 #@deprecated appWithinMinutes.wizardStep.name.name
-### Missing: platform.appwithinminutes.wizardStep1Name=Name
+platform.appwithinminutes.wizardStep1Name=nazwa
 #@deprecated appWithinMinutes.wizardStep.name.title
-### Missing: platform.appwithinminutes.wizardStep1Title=Name your application
+platform.appwithinminutes.wizardStep1Title=nazwij twoją aplikacje
 #@deprecated appWithinMinutes.wizardStep.name.description
-### Missing: platform.appwithinminutes.wizardStep1Description=Choose the application name
+platform.appwithinminutes.wizardStep1Description=wybierz nazwę aplikacji
 #@deprecated appWithinMinutes.wizardStep.structure.name
-### Missing: platform.appwithinminutes.wizardStep2Name=Structure
+platform.appwithinminutes.wizardStep2Name=struktura
 #@deprecated appWithinMinutes.wizardStep.structure.title
-### Missing: platform.appwithinminutes.wizardStep2Title=Structure your data
+platform.appwithinminutes.wizardStep2Title=uporządkuj swoje dane
 #@deprecated appWithinMinutes.wizardStep.structure.description
-### Missing: platform.appwithinminutes.wizardStep2Description=Describe the application data
+platform.appwithinminutes.wizardStep2Description=Opisz dane aplikacji
 #@deprecated appWithinMinutes.wizardStep.presentation.name
-### Missing: platform.appwithinminutes.wizardStep3Name=Presentation
+platform.appwithinminutes.wizardStep3Name=prezentacja
 #@deprecated appWithinMinutes.wizardStep.presentation.title
-### Missing: platform.appwithinminutes.wizardStep3Title=Customize your application homepage
+platform.appwithinminutes.wizardStep3Title=Dostosuj stronę główną aplikacji
 #@deprecated appWithinMinutes.wizardStep.presentation.description
-### Missing: platform.appwithinminutes.wizardStep3Description=Customize the application homepage
+platform.appwithinminutes.wizardStep3Description=Dostosuj stronę główną aplikacji
 
 ### Since 11.0
-### Missing: platform.appwithinminutes.appsLiveTable.doc.space=Application name
-### Missing: appWithinMinutes.classEditor.title={0} Structure
-### Missing: appWithinMinutes.templateProviderEditor.title={0} Entries</content>
+platform.appwithinminutes.appsLiveTable.doc.space=nazwa aplikacji
+appWithinMinutes.classEditor.title=Struktura {0}
+appWithinMinutes.templateProviderEditor.title=Wpisy {0}</content>
   
 </xwikidoc>

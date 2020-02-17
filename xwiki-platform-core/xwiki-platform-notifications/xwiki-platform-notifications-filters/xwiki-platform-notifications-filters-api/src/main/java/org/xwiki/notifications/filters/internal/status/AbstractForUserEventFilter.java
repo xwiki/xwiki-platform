@@ -33,6 +33,8 @@ import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.internal.ToggleableNotificationFilter;
 import org.xwiki.notifications.preferences.NotificationPreference;
 
+import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.not;
+
 /**
  * Abstract implementation {@link ForUserAlertEventFilter}.
  *
@@ -41,11 +43,13 @@ import org.xwiki.notifications.preferences.NotificationPreference;
  */
 public abstract class AbstractForUserEventFilter implements NotificationFilter, ToggleableNotificationFilter
 {
-    private String filterName;
+    protected String filterName;
 
-    private NotificationFormat format;
+    protected NotificationFormat format;
 
-    private Boolean read;
+    protected Boolean read;
+
+    protected boolean not;
 
     /**
      * Construct an AbstractEventReadFilter.
@@ -53,12 +57,14 @@ public abstract class AbstractForUserEventFilter implements NotificationFilter, 
      * @param filterName name of the filter
      * @param format format on which the filter applies
      * @param read true if only read status should be included, false for only unread
+     * @param not true when a NOT expression should be returned
      */
-    public AbstractForUserEventFilter(String filterName, NotificationFormat format, Boolean read)
+    public AbstractForUserEventFilter(String filterName, NotificationFormat format, Boolean read, boolean not)
     {
         this.filterName = filterName;
         this.format = format;
         this.read = read;
+        this.not = not;
     }
 
     @Override
@@ -88,7 +94,9 @@ public abstract class AbstractForUserEventFilter implements NotificationFilter, 
         NotificationFormat format)
     {
         if (user != null && type == NotificationFilterType.EXCLUSIVE && format == this.format) {
-            return new ForUserNode(user, this.read);
+            ForUserNode node = new ForUserNode(user, this.read);
+
+            return this.not ? not(node) : node;
         }
 
         return null;

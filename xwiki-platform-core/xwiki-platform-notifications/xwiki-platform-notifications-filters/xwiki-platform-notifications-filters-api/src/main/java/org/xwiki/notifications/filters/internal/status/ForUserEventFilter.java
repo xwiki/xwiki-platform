@@ -19,10 +19,6 @@
  */
 package org.xwiki.notifications.filters.internal.status;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.NotificationFormat;
 
 /**
@@ -31,21 +27,16 @@ import org.xwiki.notifications.NotificationFormat;
  * @version $Id$
  * @since 12.1RC1
  */
-@Component
-@Singleton
-@Named(ForUserAlertEventFilter.FILTER_NAME)
-public class ForUserAlertEventFilter extends AbstractForUserEventFilter
+public class ForUserEventFilter extends AbstractForUserEventFilter
 {
     /**
-     * Name of the filter.
-     */
-    public static final String FILTER_NAME = "forUserAlertEventFilter";
-
-    /**
      * Construct an {@link ForUserAlertEventFilter}.
+     * 
+     * @param format format on which the filter applies
+     * @param read true if only read status should be included, false for only unread
      */
-    public ForUserAlertEventFilter()
+    public ForUserEventFilter(NotificationFormat format, Boolean read)
     {
-        super(FILTER_NAME, NotificationFormat.ALERT, null);
+        super("forUserEventFilter", format, read, false);
     }
 }

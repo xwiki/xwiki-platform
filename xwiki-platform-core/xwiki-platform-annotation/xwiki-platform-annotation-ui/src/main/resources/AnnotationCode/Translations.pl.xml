@@ -1,0 +1,117 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="AnnotationCode.Translations" locale="pl">
+  <web>AnnotationCode</web>
+  <name>Translations</name>
+  <language>pl</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>AnnotationCode.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>annotations.title=Komentować
+annotations.menu.loading=Ładowanie ustawień adnotacji
+annotations.menu.loaderror=Niepowodzenie:
+annotations.tab.info.noannotations=Brak adnotacji na tej stronie
+
+annotations.settings.display=Pokaż adnotacje
+annotations.settings.error.wrongsyntax=Adnotacje nie są dostępne dla stron napisanych w składni XWiki / 1.0.
+annotations.settings.error.notarget=Nie podano strony, dla której można uzyskać ustawienia adnotacji.
+
+annotations.annotated.loading=Ładowanie strony z adnotacjami
+annotations.annotated.loaderror=Niepowodzenie:
+annotations.annotated.loaderror.wrongresponse=Niepoprawnie sformatowana odpowiedź serwera
+annotations.annotated.error.noannotatedelement=Nie można załadować adnotacji, ponieważ treść nie jest dostępna.
+annotations.annotated.error.wrongsyntax=Adnotacje nie są dostępne dla stron napisanych w składni XWiki / 1.0.
+
+annotations.action.edit.text=[Edytuj]
+annotations.action.edit.tooltip=Edytuj adnotacje
+annotations.action.edit.submit.text=Aktualizacja
+annotations.action.edit.cancel.text=Anuluj
+annotations.action.edit.success=Adnotacja zaaktualizowana.
+annotations.action.edit.loaderror=Niepowodzenie:
+annotations.action.edit.error.notfound=Ta adnotacja już nie istnieje. Odśwież stronę, aby uzyskać zaktualizowany widok.
+
+annotations.action.delete.text=[Usuń]
+annotations.action.delete.tooltip=Usuń adnotacje
+annotations.action.delete.confirm=Jesteś pewny że chcesz usunąć tą adnotacje?
+annotations.action.delete.inProgress=Usuwanie adnotacji...
+annotations.action.delete.done=Adnotacja usunięta
+annotations.action.delete.failed=Nie udało się usunąć adnotacji:
+
+annotations.action.create.submit.text=Dodaj adnotacje
+annotations.action.create.cancel.text=Anuluj
+annotations.action.create.selection.invalid=Wybierz niepusty tekst w treści strony.
+annotations.action.create.form.loaderror=Niepowodzenie:
+annotations.action.create.success=Adnotacja dodana.
+annotations.action.create.loaderror=Niepowodzenie:
+annotations.action.create.error.unauthorized=Nie masz uprawnień do dodawania adnotacji na tej stronie.
+annotations.action.create.error.unauthorizedguest=Nie masz uprawnień do dodawania adnotacji na tej stronie. Spróbuj się najpierw zalogować.
+annotations.action.create.helpmessage=Aby dodać adnotację do tekstu, zaznacz go i naciśnij {0}.
+annotations.action.create.error.wrongsyntax=Adnotacje nie są dostępne dla stron napisanych w składni XWiki / 1.0.
+annotations.action.create.error.notarget=Nieokreślony cel (strona), dla którego mają zostać utworzone adnotacje.
+
+annotations.action.view.hide.text=Chować
+annotations.action.view.form.loaderror=Niepowodzenie:
+annotations.action.view.error.notfound=Ta adnotacja już nie istnieje. Odśwież stronę, aby uzyskać zaktualizowany widok.
+annotations.action.view.thread=Wyświetl wątek
+
+annotations.altered.text=Nie można wyświetlić tej adnotacji, ponieważ na stronie nie znaleziono tekstu z adnotacjami:
+annotations.updated.text=Adnotacja ta została automatycznie zmieniona po aktualizacji strony. Pierwotnie:
+annotations.action.validate.text=[Zweryfikowano]
+annotations.action.validate.tooltip=Sprawdź poprawność automatycznej aktualizacji wybranego tekstu tej adnotacji
+annotations.action.validate.success=Zweryfikowano adnotację.
+annotations.action.validate.loaderror=Niepowodzenie:
+
+annotations.filters.show=Filtr
+annotations.filters.nooption=Brak wartości do filtrowania dla „{0}”
+annotations.filters.anyvalue=dowolna wartość
+annotations.filters.clearvalue=jasny
+
+annotations.config.title=Panel konfiguracji adnotacji
+annotations.config.display.title=Wyświetlanie adnotacji
+annotations.config.type.title=Typ adnotacji
+annotations.config.activate.title=Adnotacja aktywowana
+annotations.config.activate.explanation=Poniższe dwa ustawienia pozwalają skonfigurować, w których adnotacjach lokalizacje są aktywne. Pierwsze ustawienie określa ogólną regułę, a druga lista określa lokalizacje, do których reguła nie powinna mieć zastosowania. Na przykład aktywowane „tak” i wyjątkowe lokalizacje „XWiki” i „Główny” oznaczają, że adnotacje będą aktywne we wszystkich lokalizacjach oprócz „XWiki” i „Główne”. Jako przeciwny przykład użycie aktywowanych „braków” i wyjątków „Dokumenty” oznacza, że adnotacje będą aktywne tylko dla lokalizacji „Dokumentów”.
+annotations.config.type.explanation=Dodaj właściwości do tej klasy, jeśli chcesz mieć dodatkowe właściwości dla swoich adnotacji.
+admin.annotations=Adnotacje
+admin.annotations.description=Skonfiguruj adnotacje na stronie
+
+AnnotationCode.AnnotationConfig_activated=Adnotacje są aktywne
+AnnotationCode.AnnotationConfig_activated.hint=Zdecyduj, czy adnotacje są aktywne na wiki
+AnnotationCode.AnnotationConfig_exceptionSpaces=Z wyjątkiem następujących lokalizacji
+AnnotationCode.AnnotationConfig_exceptionSpaces.hint=Dezaktywuj adnotacje dla następującego podzbioru lokalizacji:
+AnnotationCode.AnnotationConfig_displayed=Domyślnie wyświetlaj adnotacje
+AnnotationCode.AnnotationConfig_displayed.hint=Zdecyduj, czy adnotacje mają być wyświetlane domyślnie, czy tylko wtedy, gdy na każdej stronie jest zaznaczone „Pokaż adnotacje”
+AnnotationCode.AnnotationConfig_displayHighlight=Domyślnie zaznacz adnotacje
+AnnotationCode.AnnotationConfig_displayHighlight.hint=Zdecyduj, czy wyróżnienie adnotacji powinno być wyświetlane zawsze, czy tylko po najechaniu kursorem na adnotację lub strukturę adnotacji
+AnnotationCode.AnnotationConfig_annotationClass=Klasa XWiki definiująca strukturę adnotacji</content>
+  
+</xwikidoc>

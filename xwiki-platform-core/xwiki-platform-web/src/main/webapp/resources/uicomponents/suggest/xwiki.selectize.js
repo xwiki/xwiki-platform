@@ -255,6 +255,13 @@ define('xwiki-selectize', ['jquery', 'selectize', 'xwiki-events-bridge'], functi
 });
 
 require(['jquery', 'xwiki-selectize', 'xwiki-events-bridge'], function($) {
+  // Make sure we don't initialize the selectize widgets twice because this file can be loaded twice (by RequireJS and as
+  // a JSFX resource).
+  if ($.fn.xwikiSelectize.initialized) {
+    return;
+  }
+  $.fn.xwikiSelectize.initialized = true;
+
   var init = function(event, data) {
     var container = $((data && data.elements) || document);
     container.find('.xwiki-selectize').xwikiSelectize();

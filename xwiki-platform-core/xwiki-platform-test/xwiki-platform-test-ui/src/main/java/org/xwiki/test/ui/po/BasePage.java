@@ -29,9 +29,12 @@ import org.apache.commons.lang3.LocaleUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
@@ -47,6 +50,8 @@ import org.xwiki.test.ui.po.editor.WikiEditPage;
  */
 public class BasePage extends BaseElement
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
+
     private static final By DRAWER_MATCHER = By.id("tmDrawer");
 
     /**
@@ -589,7 +594,19 @@ public class BasePage extends BaseElement
 
         // JQuery and dependencies
         // JQuery dropdown plugin needed for the edit button's dropdown menu.
-        getDriver().waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
+        // TODO: We seem to have a flicker possibly caused by this check taking more than the default 10s timeout from
+        // time to time, see https://jira.xwiki.org/browse/XCOMMONS-1865. Testing this hypothesis by waiting a first
+        // time and if it fails waiting again and logging some message. Remove if the increased timeout doesn't help.
+        // If it helps, then we might need to dive deeper and understand why it can take more than 10s (underpowered
+        // machine, etc).
+        try {
+            getDriver()
+                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
+        } catch (TimeoutException e) {
+            LOGGER.error("Wait for JQuery took more than [{}] seconds", getDriver().getTimeout(), e);
+            getDriver()
+                .waitUntilJavascriptCondition("return window.jQuery != null && window.jQuery().dropdown != null");
+        }
 
         // Make sure all asynchronous elements have been executed
         getDriver().waitUntilJavascriptCondition("return !document.getElementsByClassName('xwiki-async').length");

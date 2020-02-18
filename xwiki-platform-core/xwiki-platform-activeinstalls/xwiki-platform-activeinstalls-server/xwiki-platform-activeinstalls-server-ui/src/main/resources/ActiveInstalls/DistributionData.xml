@@ -37,6 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="ActiveInstalls.QueryVariables"/}}
+
 {{velocity}}
 ## Note: We filter "distributionFeatures" for 2 reasons:
 ## - It allows us to filter all distributions done by the XWiki dev team.

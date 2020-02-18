@@ -104,7 +104,7 @@ $xwiki.ssx.use('ActiveInstalls.Counter')
       </title>
     </class>
     <property>
-      <content>(% id="activeCounter2" class="flip-counter" %)(((
+      <content>(% id="activeCounter2" class="flip-counter" data-source="ActiveCounterValue2" %)(((
 )))
 Total number of XWiki installations that have sent us a ping in the past day (since XWiki 6.1-milestone-1).
 
@@ -176,7 +176,7 @@ Total number of XWiki installations that have sent us a ping in the past day (si
       </title>
     </class>
     <property>
-      <content>(% id="totalCounter2" class="flip-counter" %)(((
+      <content>(% id="totalCounter2" class="flip-counter" data-source="TotalCounterValue2" %)(((
 )))
 Total number of XWiki installations that have ever sent us a ping (since XWiki 6.1-milestone-1). Note that this includes installs used for tests performed by the XWiki dev team.
 
@@ -245,7 +245,7 @@ Total number of XWiki installations that have ever sent us a ping (since XWiki 6
       </title>
     </class>
     <property>
-      <content>(% id="activeCounter1" class="flip-counter" %)(((
+      <content>(% id="activeCounter1" class="flip-counter" data-source="ActiveCounterValue1" %)(((
 )))
 Total number of XWiki installations that have sent us a ping in the past day (from XWiki 5.2-milestone-2 to XWiki 6.0.*).
 
@@ -316,7 +316,7 @@ Total number of XWiki installations that have sent us a ping in the past day (fr
       </title>
     </class>
     <property>
-      <content>(% id="totalCounter1" class="flip-counter" %)(((
+      <content>(% id="totalCounter1" class="flip-counter" data-source="TotalCounterValue1" %)(((
 )))
 Total number of XWiki installations that have ever sent us a ping (from XWiki 5.2-milestone-2 to XWiki 6.0.*). Note that this includes installs used for tests performed by the XWiki dev team.
 

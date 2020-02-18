@@ -37,6 +37,7 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{include reference="ActiveInstalls.QueryVariables"/}}
+
 {{velocity}}
 #**
  * Get the number of Active Installs running with a given Extension.
@@ -65,10 +66,9 @@
     }
   ")
   #set ($searchResult = $services.activeinstalls.searchInstalls("install2", $query, {"search_type": "count"}))
-  ## If there's an error and the "xpage=plain" URL parameter is not passed (ie it's not called by the Counter widget) then display the error if any. Otherwise display the invalid numeric result.
   #if (!$searchResult)
-    #set ($errorText = $!services.activeinstalls.lastError)
-    #if ("$!request.xpage" != 'plain')
+    #if ($xcontext.action != 'get')
+      #set ($errorText = $!services.activeinstalls.lastError)
       {{error}}{{{$errorText}}}{{/error}}
     #else
       #setVariable("$resultVariableName" 0)

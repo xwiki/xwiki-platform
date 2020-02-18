@@ -565,7 +565,8 @@ AFfL2h82RGKXAAAAAElFTkSuQmCC
  * http://www.opensource.org/licenses/mit-license.php
  */
 
-var flipCounter = function(d, options){
+define('flipCounter', function() {
+  return function(d, options) {
 
         // Default values
         var defaults = {
@@ -996,7 +997,8 @@ var flipCounter = function(d, options){
 
         // Start it up
        initialDigitCheck(o.value);
-};</code>
+  };
+});</code>
     </property>
     <property>
       <name>Flip Counter</name>
@@ -1088,65 +1090,36 @@ var flipCounter = function(d, options){
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery'], function($) {
+      <code>require(['jquery', 'flipCounter'], function($, FlipCounter) {
+  // Initialize the counters.
+  $('.flip-counter').each(function() {
+    if (!$(this).data('flipCounter')) {
+      $(this).data('flipCounter', new FlipCounter($(this).attr('id'), {value: 0, auto: false}));
+    }
+  });
 
-var totalCounterValue1 = $.ajax({
-  url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
-  async: false
-}).responseText;
-var totalInstallsCounter1 = new flipCounter("totalCounter1", {value: totalCounterValue1, auto:false});
-
-var totalCounterValue2 = $.ajax({
-  url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
-  async: false
-}).responseText;
-var totalInstallsCounter2 = new flipCounter("totalCounter2", {value: totalCounterValue2, auto:false});
-
-var activeCounterValue1 = $.ajax({
-  url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
-  async: false
-}).responseText;
-var activeInstallsCounter1 = new flipCounter("activeCounter1", {value: activeCounterValue1, auto:false});
-
-var activeCounterValue2 = $.ajax({
-  url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
-  async: false
-}).responseText;
-var activeInstallsCounter2 = new flipCounter("activeCounter2", {value: activeCounterValue2, auto:false});
-
-setInterval(function(){
-  var totalCounterValue1 = $.ajax({
-    url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
-    async: false
-  }).responseText;
-  totalInstallsCounter1.setValue(totalCounterValue1);
-
-  var totalCounterValue2 = $.ajax({
-    url: "$xwiki.getURL('ActiveInstalls.TotalCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
-    async: false
-  }).responseText;
-  totalInstallsCounter2.setValue(totalCounterValue2);
-
-  var activeCounterValue1 = $.ajax({
-    url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue1', 'view', 'xpage=plain&amp;outputSyntax=plain')",
-    async: false
-  }).responseText;
-  activeInstallsCounter1.setValue(activeCounterValue1);
-
-  var activeCounterValue2 = $.ajax({
-    url: "$xwiki.getURL('ActiveInstalls.ActiveCounterValue2', 'view', 'xpage=plain&amp;outputSyntax=plain')",
-    async: false
-  }).responseText;
-  activeInstallsCounter2.setValue(activeCounterValue2);
-}, 5000);
-
+  // Update the counters.
+  var sourceBaseReference = new XWiki.SpaceReference(XWiki.currentWiki, 'ActiveInstalls');
+  setInterval(function() {
+    $('.flip-counter').each(function() {
+      let sourceReference = XWiki.Model.resolve($(this).data('source'), XWiki.EntityType.DOCUMENT, sourceBaseReference);
+      let url = new XWiki.Document(sourceReference).getURL('get');
+      let flipCounter = $(this).data('flipCounter');
+      $.get(url, {outputSyntax: 'plain'}).done(function(value) {
+        let intValue = parseInt(value);
+        if (!isNaN(intValue)) {
+          flipCounter.setValue(intValue);
+        }
+      });
+    });
+  }, 5000);
 });</code>
     </property>
     <property>
       <name>Counter usage</name>
     </property>
     <property>
-      <parse>1</parse>
+      <parse>0</parse>
     </property>
     <property>
       <use>onDemand</use>

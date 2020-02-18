@@ -44,7 +44,6 @@ import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.filter.input.InputSource;
-import org.xwiki.filter.input.InputStreamInputSource;
 import org.xwiki.filter.input.StringInputSource;
 import org.xwiki.filter.instance.input.DocumentInstanceInputProperties;
 import org.xwiki.filter.output.DefaultWriterOutputTarget;

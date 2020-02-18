@@ -269,6 +269,27 @@
         }
       });
 
+      // Command to insert a macro directly without going through the Macro Wizard.
+      editor.addCommand('xwiki-macro-insert', {
+        async: true,
+        exec: function(editor, macroCall) {
+          macroCall = $.extend({parameters: {}}, macroCall);
+          if (!macroCall.name) {
+            return;
+          }
+
+          var command = this;
+          var handler = editor.on('afterCommandExec', function(event) {
+            if (event.data.name === 'xwiki-refresh') {
+              handler.removeListener();
+              editor.fire('afterCommandExec', {name: command.name, command: command});
+            }
+          });
+
+          macroPlugin.insertOrUpdateMacroWidget(editor, macroCall);
+        }
+      });
+
       editor.addCommand('xwiki-refresh', {
         async: true,
         exec: function(editor) {

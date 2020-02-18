@@ -102,9 +102,12 @@ CKEDITOR.editorConfig = function(config) {
     // * the Strike, Subscript, Superscript and Remove Format buttons because they are not used very often and they are
     //     available in the basic styles drop down
     // * the Underline button because this style should be reserved for links
+    // * the List and Indent buttons because they are grouped in the Lists drop down menu
     // * the Unlink button because it is available on the context menu and on the balloon toolbar
-    removeButtons: 'Anchor,Copy,CopyFormatting,Cut,Find,HorizontalRule,Language,Paste,PasteFromWord,PasteText,'
-      + 'RemoveFormat,SpecialChar,Strike,Subscript,Superscript,Underline,Unlink,officeImporter',
+    // * the XWiki Macro button because we have it in the Insert menu
+    removeButtons: 'Anchor,BulletedList,Copy,CopyFormatting,Cut,Find,HorizontalRule,Indent,Language,NumberedList,'
+      + 'Outdent,Paste,PasteFromWord,PasteText,RemoveFormat,SpecialChar,Strike,Subscript,Superscript,Underline,Unlink,'
+      + 'officeImporter,xwiki-macro',
     removePlugins: 'bidi,colorbutton,font,justify,save',
     toolbarGroups: [
       {name: 'format'},
@@ -122,6 +125,96 @@ CKEDITOR.editorConfig = function(config) {
       {name: 'others'},
       {name: 'about'}
     ],
+    toolbarMenus: {
+      basicStyles: {
+        toolbar: 'basicstyles,70',
+        groups: [
+          {id: 'basicStyles', items: ['bold', 'italic', 'strike', 'underline', 'subscript', 'superscript']},
+          {id: 'removeFormat', items: ['removeFormat']}
+        ]
+      },
+      lists: {
+        toolbar: 'list',
+        groups: [
+          {id: 'lists', items: ['bulletedlist', 'numberedlist']},
+          {id: 'indent', items: ['indent', 'outdent']}
+        ]
+      },
+      insert: {
+        icon: 'insert',
+        toolbar: 'insert',
+        groups: [
+          {id: 'insert', items: ['image', 'table', 'horizontalrule', 'specialchar', 'officeImporter']},
+          {id: 'macros', items: ['infoBox', 'successBox', 'warningBox', 'errorBox', 'toc', 'include', 'code']},
+          {id: 'otherMacros', items: ['xwiki-macro']}
+        ]
+      }
+    },
+    toolbarMenuItems: {
+      bold: {label: 'basicstyles.bold'},
+      italic: {label: 'basicstyles.italic'},
+      strike: {label: 'basicstyles.strike'},
+      underline: {label: 'basicstyles.underline'},
+      subscript: {label: 'basicstyles.subscript'},
+      superscript: {label: 'basicstyles.superscript'},
+
+      removeFormat: {label: 'removeformat.toolbar'},
+
+      indent: {label: 'indent.indent'},
+      outdent: {label: 'indent.outdent'},
+
+      image: {label: 'common.image'},
+      table: {label: 'table.toolbar'},
+      officeImporter: {label: 'xwiki-office.importer.title', icon: 'pastefromword'},
+
+      infoBox: {
+        command: 'xwiki-macro-insert',
+        data: {
+          name: 'info',
+          content: 'Type your information message here.'
+        }
+      },
+      successBox: {
+        command: 'xwiki-macro-insert',
+        data: {
+          name: 'success',
+          content: 'Type your success message here.'
+        }
+      },
+      warningBox: {
+        command: 'xwiki-macro-insert',
+        data: {
+          name: 'warning',
+          content: 'Type your warning message here.'
+        }
+      },
+      errorBox: {
+        command: 'xwiki-macro-insert',
+        data: {
+          name: 'error',
+          content: 'Type your error message here.'
+        }
+      },
+      toc: {
+        command: 'xwiki-macro-insert',
+        data: {name: 'toc'}
+      },
+      include: {
+        command: 'xwiki-macro',
+        data: {
+          name: 'include',
+          parameters: {reference: 'Sandbox.TestPage1'}
+        }
+      },
+      code: {
+        command: 'xwiki-macro',
+        data: {
+          name: 'code',
+          parameters: {language: 'none'}
+        }
+      },
+      'xwiki-macro': {label: 'xwiki-toolbar.otherMacros'}
+    },
     'xwiki-macro': {
       // You can restrict here the type of content the users can input when editing the macro content / parameters
       // in-line using nested editables, depending on the macro content / parameter type.

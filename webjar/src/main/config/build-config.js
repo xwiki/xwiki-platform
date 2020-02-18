@@ -120,10 +120,8 @@ var CKBUILDER_CONFIG = {
     uploadfile: 1,
     uploadimage: 1,
     wysiwygarea: 1,
-    'xwiki-basicstyles': 1,
     'xwiki-filter': 1,
     'xwiki-image': 1,
-    'xwiki-insert': 1,
     'xwiki-link': 1,
     'xwiki-localization': 1,
     'xwiki-macro': 1,
@@ -132,6 +130,7 @@ var CKBUILDER_CONFIG = {
     'xwiki-save': 1,
     'xwiki-source': 1,
     'xwiki-table': 1,
+    'xwiki-toolbar': 1,
     'xwiki-upload': 1,
     'xwiki-wysiwygarea': 1
   }

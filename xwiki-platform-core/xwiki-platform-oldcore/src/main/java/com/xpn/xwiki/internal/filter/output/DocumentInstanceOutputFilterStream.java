@@ -201,11 +201,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
                 // But it's still an update from outside world point of view
                 inputDocument.setOriginalDocument(databaseDocument);
-
-                // Copy input document authors if they should be preserved
-                if (this.properties.isAuthorPreserved()) {
-                    setAuthors(document, inputDocument);
-                }
             } else {
                 // Safer to clone for thread safety and in case the save fail
                 document = databaseDocument.clone();
@@ -215,6 +210,11 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
                 // Get the version from the input document
                 document.setMinorEdit(inputDocument.isMinorEdit());
+
+                // Copy input document authors if they should be preserved
+                if (this.properties.isAuthorPreserved()) {
+                    setAuthors(document, inputDocument);
+                }
             }
 
             // Authors

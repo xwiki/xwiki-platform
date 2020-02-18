@@ -314,6 +314,9 @@ public class XWikiAttachmentContent implements Cloneable
         } finally {
             fios.close();
         }
+
+        // Indicate the content has been modified
+        setContentDirty(true);
     }
 
     /**

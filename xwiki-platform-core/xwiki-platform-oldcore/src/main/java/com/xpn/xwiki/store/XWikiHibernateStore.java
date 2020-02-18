@@ -1740,6 +1740,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             query.setParameter("id", attachment.getId());
             boolean exist = query.uniqueResult() != null;
 
+            boolean saveContent;
             if (exist) {
                 // Don't update the attachment version if document metadata dirty is forced false (any modification to
                 // the attachment automatically set document metadata dirty to true)
@@ -1748,6 +1749,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
 
                 session.update(attachment);
+
+                // Save the attachment content if it's marked as "dirty" (out of sync with the database).
+                saveContent = attachment.isContentDirty();
             } else {
                 if (attachment.getContentStore() == null) {
                     // Set content store
@@ -1760,10 +1764,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
 
                 session.save(attachment);
+
+                // Always save the content since it does not exist
+                saveContent = true;
             }
 
-            // Save the attachment content if it's marked as "dirty" (out of sync with the database).
-            if (attachment.isContentDirty()) {
+            if (saveContent) {
                 // updateParent and bTransaction must be false because the content should be saved in the same
                 // transaction as the attachment and if the parent doc needs to be updated, this function will do it.
                 XWikiAttachmentStoreInterface store = getXWikiAttachmentStoreInterface(attachment);

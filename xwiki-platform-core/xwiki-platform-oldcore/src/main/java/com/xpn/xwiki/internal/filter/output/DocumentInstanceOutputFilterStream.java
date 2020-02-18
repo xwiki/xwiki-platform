@@ -185,29 +185,37 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
-            XWikiDocument document =
+            XWikiDocument databaseDocument =
                 xcontext.getWiki().getDocument(inputDocument.getDocumentReferenceWithLocale(), xcontext);
 
             // Remember if it's a creation or an update
-            boolean isnew = document.isNew();
+            boolean isnew = databaseDocument.isNew();
 
             // Make sure document's attachments content are loaded from the store
-            document.loadAttachmentsContentSafe(xcontext);
+            databaseDocument.loadAttachmentsContentSafe(xcontext);
 
-            // Safer to clone for thread safety and in case the save fail
-            document = document.clone();
-
+            XWikiDocument document;
             if (this.properties.isPreviousDeleted()) {
-                // Indicate we want to completely replace the previous document with the new one (XWiki#saveDocument
-                // will take care of that automatically)
-                document.setNew(true);
+                // We want to replace the existing document
+                document = inputDocument;
+
+                // But it's still an update from outside world point of view
+                inputDocument.setOriginalDocument(databaseDocument);
+
+                // Copy input document authors if they should be preserved
+                if (this.properties.isAuthorPreserved()) {
+                    setAuthors(document, inputDocument);
+                }
+            } else {
+                // Safer to clone for thread safety and in case the save fail
+                document = databaseDocument.clone();
+
+                // We want to update the existing document
+                document.apply(inputDocument);
+
+                // Get the version from the input document
+                document.setMinorEdit(inputDocument.isMinorEdit());
             }
-
-            document.apply(inputDocument);
-
-            // Get the version from the input document
-
-            document.setMinorEdit(inputDocument.isMinorEdit());
 
             // Authors
 
@@ -221,8 +229,6 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                 if (document.isNew()) {
                     document.setCreatorReference(document.getAuthorReference());
                 }
-            } else {
-                setAuthors(document, inputDocument);
             }
 
             // Version related information and save
@@ -240,9 +246,10 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
                     document.setDocumentArchive(inputDocument.getDocumentArchive());
                 }
 
-                // Make sure the document won't be modified by the store
+                // Make sure the document is stored exactly as is (don't increment version, etc.)
                 document.setMetaDataDirty(false);
                 document.setContentDirty(false);
+                document.getAttachmentList().forEach(a -> a.setMetaDataDirty(false));
 
                 xcontext.getWiki().saveDocument(document, inputDocument.getComment(), inputDocument.isMinorEdit(),
                     xcontext);

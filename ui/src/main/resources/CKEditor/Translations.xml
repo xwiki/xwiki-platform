@@ -57,17 +57,11 @@ ckeditor.admin.reset=Reset
 ckeditor.admin.reset.hint=Restore the default configuration
 ckeditor.admin.reset.confirmation=Are you sure you want to restore the default configuration? All your changes will be lost.
 
-ckeditor.plugin.basicstyles.label=Basic Styles
-
 ckeditor.plugin.link.options=Options
 ckeditor.plugin.link.anchor=Anchor
 ckeditor.plugin.link.queryString=Query String
 ckeditor.plugin.link.defaultLabel=type the link label
 ckeditor.plugin.link.openInNewTab=Open Link in New Tab
-
-ckeditor.plugin.insert.label=Insert
-ckeditor.plugin.insert.horizontalRule=Horizontal Line
-ckeditor.plugin.insert.specialChar=Special Character
 
 ckeditor.plugin.macro.placeholder=macro:{0}
 ckeditor.plugin.macro.buttonHint=XWiki Macro
@@ -94,6 +88,22 @@ ckeditor.plugin.resource.notSpecified=The {0} is not specified.
 ckeditor.plugin.save.leaveConfirmationMessage=There are unsaved changes. Do you want to discard them?
 ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
 ckeditor.plugin.source.conversionFailed=Failed to perform the conversion.
+
+ckeditor.plugin.toolbar.basicStyles=Basic Styles
+ckeditor.plugin.toolbar.lists=Lists
+ckeditor.plugin.toolbar.bulletedlist=Bulleted List
+ckeditor.plugin.toolbar.numberedlist=Numbered List
+ckeditor.plugin.toolbar.insert=Insert
+ckeditor.plugin.toolbar.horizontalrule=Horizontal Line
+ckeditor.plugin.toolbar.specialchar=Special Character
+ckeditor.plugin.toolbar.infoBox=Info Box
+ckeditor.plugin.toolbar.successBox=Success Box
+ckeditor.plugin.toolbar.warningBox=Warning Box
+ckeditor.plugin.toolbar.errorBox=Error Box
+ckeditor.plugin.toolbar.toc=Table of Contents
+ckeditor.plugin.toolbar.include=Include
+ckeditor.plugin.toolbar.code=Code Snippet
+ckeditor.plugin.toolbar.otherMacros=Other Macros
 
 modal.ok=OK
 modal.cancel=Cancel

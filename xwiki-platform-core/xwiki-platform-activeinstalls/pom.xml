@@ -50,7 +50,9 @@
       <dependency>
         <groupId>com.github.tlrx</groupId>
         <artifactId>elasticsearch-test</artifactId>
-        <version>1.2.1</version>
+        <!-- Note: If we increase the version then we get an Active Installs ping error with an ES error message about
+             "dynamic scripting disabled". -->
+        <version>1.1.0</version>
         <scope>test</scope>
       </dependency>
     </dependencies>

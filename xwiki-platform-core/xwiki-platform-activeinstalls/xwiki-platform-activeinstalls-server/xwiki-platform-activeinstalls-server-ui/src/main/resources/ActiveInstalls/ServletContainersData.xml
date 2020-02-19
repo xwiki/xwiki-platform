@@ -66,9 +66,11 @@
 ")
 #set ($result = $services.activeinstalls.searchInstalls("install2", $query, {"search_type": "count"}))
 #set ($headingLine = "|=Servlet Container|=Active Installs Count")
-#if (!$result)
-  #set ($errorText = $!services.activeinstalls.lastError)
-  {{error}}{{{$errorText}}}{{/error}}
+#if ($objecttool.isNull($result))
+  #set ($exception = $!services.activeinstalls.lastError)
+  {{html clean='false'}}
+    #displayException("Failed to get data: ${exception}. Click for more details" $exception)
+  {{/html}}
 
   ## Still generate an empty table so that the chart macro using it doesn't fail!
   $headingLine

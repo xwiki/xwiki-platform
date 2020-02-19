@@ -53,10 +53,12 @@
 }
 ")
 #set ($result = $services.activeinstalls.searchInstalls("install", $query, {"search_type": "count"}))
-#if (!$result)
+#if ($objecttool.isNull($result))
   #if ($xcontext.action != 'get')
-    #set ($errorText = $!services.activeinstalls.lastError)
-    {{error}}{{{$errorText}}}{{/error}}
+    #set ($exception = $!services.activeinstalls.lastError)
+    {{html clean='false'}}
+      #displayException("Failed to get data: ${exception}. Click for more details" $exception)
+    {{/html}}
   #else
     0
   #end

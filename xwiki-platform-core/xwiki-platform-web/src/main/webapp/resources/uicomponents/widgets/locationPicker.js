@@ -170,7 +170,19 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     /**
      * Event handler for the title input that updates both the location preview's last element and the name input.
      **/
-    var updateLocationAndNameFromTitleInput = function(event) {
+    var titleInputTimeout;
+    var scheduleUpdateOfLocationAndNameFromTitleInput = function(event) {
+      clearTimeout(titleInputTimeout);
+      if (event.type === 'input') {
+        // Delay the update.
+        titleInputTimeout = setTimeout(updateLocationAndNameFromTitleInput, inputDelay);
+      } else {
+        // Update right away.
+        updateLocationAndNameFromTitleInput();
+      }
+    };
+
+    var updateLocationAndNameFromTitleInput = function() {
       // ensure the buttons are disabled before we got the name answer
       disableButtons();
       titleInputVal = titleInput.val();
@@ -299,10 +311,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
 
     // Synchronize the location fields while the user types.
     // Blur ensure that everything's updated when users change fields (particulary useful in our tests)
-    titleInput.on('input blur', updateLocationAndNameFromTitleInput);
+    titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
     wikiField.change(updateLocationFromWikiField);
-    nameInput.on('input blur', updateLocationFromNameInput);
-    spaceReferenceInput.on('input blur xwiki:suggest:selected', updateLocationFromSpaceReference);
+    nameInput.on('input change', updateLocationFromNameInput);
+    spaceReferenceInput.on('input change xwiki:suggest:selected', updateLocationFromSpaceReference);
 
     // Clean the output of the hierarchy macro when it should display a top level document.
     if (!spaceReferenceInput.val()) {

@@ -178,7 +178,7 @@ public class DownloadAction extends XWikiAction
                     // Broken response...
                 }
             }
-            sendContent(attachment, request, response, filename, context);
+            sendContent(attachment, request, response, context);
             return null;
         } finally {
             if (backwardCompatibilityContextObjects != null) {
@@ -277,12 +277,11 @@ public class DownloadAction extends XWikiAction
      * @param attachment the attachment to get content from
      * @param request the current client request
      * @param response the response to write to.
-     * @param filename the filename to show in the message in case an exception needs to be thrown
      * @param context the XWikiContext just in case it is needed to load the attachment content
      * @throws XWikiException if something goes wrong
      */
-    private void sendContent(final XWikiAttachment attachment, final XWikiRequest request, final XWikiResponse response,
-        final String filename, final XWikiContext context) throws XWikiException
+    protected void sendContent(final XWikiAttachment attachment, final XWikiRequest request,
+        final XWikiResponse response, final XWikiContext context) throws XWikiException
     {
         InputStream stream = null;
         try {

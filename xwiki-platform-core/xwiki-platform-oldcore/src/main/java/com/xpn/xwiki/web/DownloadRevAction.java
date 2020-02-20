@@ -21,7 +21,6 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 
-import org.apache.commons.io.IOUtils;
 import org.xwiki.model.EntityType;
 import org.xwiki.resource.ResourceReference;
 import org.xwiki.resource.ResourceReferenceManager;
@@ -87,19 +86,7 @@ public class DownloadRevAction extends DownloadAction
         XWikiPluginManager plugins = context.getWiki().getPluginManager();
         attachment = plugins.downloadAttachment(attachment, context);
 
-        // Choose the right content type
-        String mimetype = attachment.getMimeType(context);
-        response.setContentType(mimetype);
-
-        response.setDateHeader("Last-Modified", attachment.getDate().getTime());
-        // Sending the content of the attachment
-        try {
-            setContentLength(response, attachment.getContentLongSize(context));
-            IOUtils.copy(attachment.getContentInputStream(context), response.getOutputStream());
-        } catch (IOException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
-        }
+        sendContent(attachment, request, response, context);
         return null;
     }
 

@@ -33,6 +33,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import java.net.URL;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,13 +41,20 @@ import java.util.Set;
 import javax.inject.Named;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class LegacyEventConverterTest {
+public class DefaultLegacyEventConverterTest
+{
     @InjectMockComponents
     private DefaultLegacyEventConverter legacyEventConverter;
 
@@ -131,6 +139,59 @@ public class LegacyEventConverterTest {
     }
 
     @Test
+    public void convertEventToLegacyActivityNoDocument()
+    {
+        DocumentReference useReference = new DocumentReference("mywiki", "XWiki", "Foo");
+        Set<String> target = Collections.singleton("mywiki:XWiki.Bar");
+        WikiReference wikiReference = new WikiReference("mywiki");
+        Event event = mock(Event.class);
+        when(event.getImportance()).thenReturn(Event.Importance.MINOR);
+        when(event.getApplication()).thenReturn("app");
+        when(event.getBody()).thenReturn("body");
+        when(event.getDate()).thenReturn(new Date(10));
+        when(event.getId()).thenReturn("eventId");
+        when(event.getWiki()).thenReturn(wikiReference);
+        when(event.getGroupId()).thenReturn("groupId");
+        when(event.getStream()).thenReturn("stream");
+        when(event.getTitle()).thenReturn("title");
+        when(event.getType()).thenReturn("type");
+        when(event.getUser()).thenReturn(useReference);
+        when(event.getTarget()).thenReturn(target);
+        when(event.getHidden()).thenReturn(false);
+
+        when(serializer.serialize(useReference)).thenReturn("mywiki:XWiki.Foo");
+        when(serializer.serialize(wikiReference)).thenReturn("mywiki");
+
+        // Test
+        LegacyEvent result = legacyEventConverter.convertEventToLegacyActivity(event);
+
+        // Verify
+        assertNotNull(result);
+        assertEquals(20, result.getPriority());
+        assertEquals("app", result.getApplication());
+        assertEquals("body", result.getBody());
+        assertEquals(new Date(10), result.getDate());
+        assertEquals("eventId", result.getEventId());
+        assertNull(result.getPage());
+        assertEquals("", result.getParam1());
+        assertEquals("", result.getParam2());
+        assertEquals("groupId", result.getRequestId());
+        assertNull(result.getSpace());
+        assertEquals("stream", result.getStream());
+        assertEquals("title", result.getTitle());
+        assertEquals("type", result.getType());
+        assertNull(result.getUrl());
+        assertEquals("mywiki:XWiki.Foo", result.getUser());
+        assertEquals("", result.getVersion());
+        assertEquals("mywiki", result.getWiki());
+        assertEquals(target, result.getTarget());
+        assertFalse(result.isHidden());
+
+        verify(serializer, times(2)).serialize(any());
+        verify(compactSerializer, never()).serialize(any());
+    }
+
+    @Test
     public void convertLegacyActivityToEvent() throws Exception
     {
         Set<String> target = new HashSet<>();
@@ -157,10 +218,11 @@ public class LegacyEventConverterTest {
 
         // Mockers
         when(eventFactory.createRawEvent()).thenReturn(new DefaultEvent());
+        DocumentReference eventDocReference = new DocumentReference("xwiki", "Some", "Page");
         when(resolver.resolve("Some.Page", EntityType.DOCUMENT, new WikiReference("xwiki")))
-                .thenReturn(new DocumentReference("xwiki", "Some", "Page"));
-        when(resolver.resolve("xwiki:XWiki.User", EntityType.DOCUMENT)).thenReturn(
-                new DocumentReference("xwiki", "XWiki", "User"));
+                .thenReturn(eventDocReference);
+        DocumentReference userDocReference = new DocumentReference("xwiki", "XWiki", "User");
+        when(resolver.resolve("xwiki:XWiki.User", EntityType.DOCUMENT)).thenReturn(userDocReference);
 
         // Test
         Event result = legacyEventConverter.convertLegacyActivityToEvent(event);
@@ -170,7 +232,7 @@ public class LegacyEventConverterTest {
         assertEquals("app", result.getApplication());
         assertEquals("body", result.getBody());
         assertEquals("param1", result.getDocumentTitle());
-        assertEquals(new DocumentReference("xwiki", "Some", "Page"), result.getDocument());
+        assertEquals(eventDocReference, result.getDocument());
         assertEquals("eventId", result.getId());
         assertEquals(Event.Importance.MAJOR, result.getImportance());
         assertEquals("requestId", result.getGroupId());
@@ -178,10 +240,57 @@ public class LegacyEventConverterTest {
         assertEquals("title", result.getTitle());
         assertEquals("type", result.getType());
         assertEquals(new URL("https://www.xwiki.org"), result.getUrl());
-        assertEquals(new DocumentReference("xwiki", "XWiki", "User"), result.getUser());
+        assertEquals(userDocReference, result.getUser());
         assertEquals("10.3", result.getDocumentVersion());
         assertEquals(target, result.getTarget());
         assertTrue(result.getHidden());
     }
 
+    @Test
+    public void convertLegacyEventToEventWithoutDocument()
+    {
+        Set<String> target = new HashSet<>();
+        target.add("mywiki:XWiki.Bar");
+
+        LegacyEvent event = new LegacyEvent();
+        event.setApplication("app");
+        event.setBody("body");
+        event.setDate(new Date(10));
+        event.setWiki("mywiki");
+        event.setEventId("eventId");
+        event.setPriority(20);
+        event.setRequestId("requestId");
+        event.setStream("stream");
+        event.setTitle("title");
+        event.setType("type");
+        event.setUser("mywiki:XWiki.Foo");
+        event.setVersion("10.3");
+        event.setTarget(target);
+        event.setHidden(false);
+
+        // Mockers
+        when(eventFactory.createRawEvent()).thenReturn(new DefaultEvent());
+        DocumentReference userDocReference = new DocumentReference("mywiki", "XWiki", "User");
+        when(resolver.resolve("mywiki:XWiki.Foo", EntityType.DOCUMENT)).thenReturn(userDocReference);
+
+        // Test
+        Event result = legacyEventConverter.convertLegacyActivityToEvent(event);
+
+        // Verify
+        assertNotNull(result);
+        assertEquals("app", result.getApplication());
+        assertEquals("body", result.getBody());
+        assertEquals("eventId", result.getId());
+        assertEquals(Event.Importance.MINOR, result.getImportance());
+        assertEquals("requestId", result.getGroupId());
+        assertEquals("stream", result.getStream());
+        assertEquals("title", result.getTitle());
+        assertEquals("type", result.getType());
+        assertEquals(userDocReference, result.getUser());
+        assertEquals("10.3", result.getDocumentVersion());
+        assertEquals(target, result.getTarget());
+        assertFalse(result.getHidden());
+
+        verify(resolver, times(1)).resolve(any(), any());
+    }
 }

@@ -44,7 +44,11 @@ office.form.append.hint=The document already exists! Append the result to the ex
 office.config.serverType.hint=The Office server type. It can be internally managed (local) or external (remote).
 office.config.serverPort.hint=The port number used for connecting to the Office server instance
 office.config.autoStart.hint=Specify if the Office server should be started / connected automatically at XWiki startup
-office.config.serverPath.hint=The path to the Office installation</content>
+office.config.serverPath.hint=The path to the Office installation
+office.config.serverstate.connected=Connected
+office.config.serverstate.not_connected=Not Connected
+office.config.serverstate.conf_error=Invalid Configuration
+office.config.serverstate.error=Error</content>
   <object>
     <name>XWiki.OfficeImporterTranslations</name>
     <number>0</number>

@@ -84,6 +84,11 @@
       <version>${jodconverter.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-localization-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <!--
         Required by org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry which is used to configure the
         office document conversion.

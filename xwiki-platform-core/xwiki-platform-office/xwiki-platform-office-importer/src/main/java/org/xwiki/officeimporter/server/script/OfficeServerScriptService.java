@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
@@ -35,7 +36,7 @@ import org.xwiki.script.service.ScriptService;
 
 /**
  * Exposes the office manager APIs to server-side scripts.
- * 
+ *
  * @version $Id$
  * @since 4.1M1
  */
@@ -58,6 +59,18 @@ public class OfficeServerScriptService implements ScriptService
      * Error message used to indicate that the current user does not have enough rights to perform the requested action.
      */
     private static final String ERROR_PRIVILEGES = "Inadequate privileges.";
+
+    /**
+     * Prefix of the translation keys for server states.
+     */
+    private static final String TRANSLATION_KEY_SERVER_STATE_PREFIX =
+            "xe.officeimporter.openoffice.serverstate.";
+
+    /**
+     * The object used to translate translation keys.
+     */
+    @Inject
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     /**
      * The object used to log messages.
@@ -97,7 +110,7 @@ public class OfficeServerScriptService implements ScriptService
 
     /**
      * Tries to start the office server process.
-     * 
+     *
      * @return true if the operation succeeds, false otherwise
      */
     public boolean startServer()
@@ -120,7 +133,7 @@ public class OfficeServerScriptService implements ScriptService
 
     /**
      * Tries to stop the office server process.
-     * 
+     *
      * @return true if the operation succeeds, false otherwise
      */
     public boolean stopServer()
@@ -147,7 +160,8 @@ public class OfficeServerScriptService implements ScriptService
     public String getServerState()
     {
         this.officeServer.refreshState();
-        return this.officeServer.getState().toString();
+        return contextualLocalizationManager.getTranslationPlain(
+                TRANSLATION_KEY_SERVER_STATE_PREFIX + this.officeServer.getState().name().toLowerCase());
     }
 
     /**
@@ -169,7 +183,7 @@ public class OfficeServerScriptService implements ScriptService
 
     /**
      * Sets an error message inside the execution context.
-     * 
+     *
      * @param message error message
      */
     private void setErrorMessage(String message)
@@ -179,7 +193,7 @@ public class OfficeServerScriptService implements ScriptService
 
     /**
      * Utility method for checking if current context document is from main wiki.
-     * 
+     *
      * @return true if the current context document is from main wiki
      */
     private boolean isMainXWiki()

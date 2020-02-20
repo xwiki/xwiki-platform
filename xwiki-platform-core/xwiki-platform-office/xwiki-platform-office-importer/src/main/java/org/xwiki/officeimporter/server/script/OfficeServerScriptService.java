@@ -23,10 +23,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.text.CaseUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
+import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.ModelContext;
 import org.xwiki.officeimporter.server.OfficeServer;
 import org.xwiki.officeimporter.server.OfficeServerConfiguration;
@@ -58,6 +60,17 @@ public class OfficeServerScriptService implements ScriptService
      * Error message used to indicate that the current user does not have enough rights to perform the requested action.
      */
     private static final String ERROR_PRIVILEGES = "Inadequate privileges.";
+
+    /**
+     * Prefix of the translation keys for server states.
+     */
+    private static final String TRANSLATION_KEY_SERVER_STATE_PREFIX = "office.config.serverState.";
+
+    /**
+     * The object used to translate translation keys.
+     */
+    @Inject
+    private ContextualLocalizationManager contextualLocalizationManager;
 
     /**
      * The object used to log messages.
@@ -147,7 +160,22 @@ public class OfficeServerScriptService implements ScriptService
     public String getServerState()
     {
         this.officeServer.refreshState();
-        return this.officeServer.getState().toString();
+
+        /*
+         * Translate the name of the {@see org.xwiki.officeimporter.server.OfficeServer.ServerState} enum to lower case.
+         * Then converts it from snake case to camel case to conform with the translation keys convention
+         * (cf https://dev.xwiki.org/xwiki/bin/view/Community/DevelopmentPractices#HTranslationPropertyNaming).
+         *
+         * For instance ServerState.NOT_CONNECTED is consequently converted to "notConnected".
+         *
+         * This result is then used as the suffix of the translation key used to display the localized status to the
+         * end user.
+         */
+        String normalizedStatusKey =
+            CaseUtils.toCamelCase(this.officeServer.getState().name().toLowerCase(), false, '_');
+
+        return this.contextualLocalizationManager
+                   .getTranslationPlain(TRANSLATION_KEY_SERVER_STATE_PREFIX + normalizedStatusKey);
     }
 
     /**

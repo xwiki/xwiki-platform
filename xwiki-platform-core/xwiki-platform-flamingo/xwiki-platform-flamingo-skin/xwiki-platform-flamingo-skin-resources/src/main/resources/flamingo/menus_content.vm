@@ -315,12 +315,14 @@
   ##
   #if ($canView)
     ##
-    ## EXPORT
+    ## EXPORT (only if we are not in the pdfoptions to export the page)
     ##
-    #define ($export)
-      #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download', 'data-toggle="modal" data-target="#exportModal"')
+    #if ("$!request.xpage" != 'pdfoptions')
+      #define ($export)
+        #submenuitem('' $services.localization.render('core.menu.export') 'tmExport', '', 'download', 'data-toggle="modal" data-target="#exportModal"')
+      #end
+      #set ($discard = $staticExtensions.add( { 'content': $export, 'order': 80000}))
     #end
-    #set ($discard = $staticExtensions.add( { 'content': $export, 'order': 80000}))
     ##
     ## PRINT
     ##

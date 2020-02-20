@@ -75,7 +75,9 @@ public abstract class AbstractLegacyEventConverter implements LegacyEventConvert
         result.setBody(e.getBody());
         result.setDate(e.getDate());
         result.setEventId(e.getId());
-        result.setPage(this.compactSerializer.serialize(e.getDocument(), e.getWiki()));
+        if (e.getDocument() != null) {
+            result.setPage(this.compactSerializer.serialize(e.getDocument(), e.getWiki()));
+        }
         if (e.getDocumentTitle() != null) {
             result.setParam1(e.getDocumentTitle());
         }
@@ -109,8 +111,10 @@ public abstract class AbstractLegacyEventConverter implements LegacyEventConvert
         result.setApplication(e.getApplication());
         result.setBody(e.getBody());
         result.setDate(e.getDate());
-        result.setDocument(new DocumentReference(this.resolver.resolve(e.getPage(), EntityType.DOCUMENT,
-            new WikiReference(e.getWiki()))));
+        if (StringUtils.isNotEmpty(e.getPage())) {
+            result.setDocument(new DocumentReference(this.resolver.resolve(e.getPage(), EntityType.DOCUMENT,
+                new WikiReference(e.getWiki()))));
+        }
         result.setId(e.getEventId());
         result.setDocumentTitle(e.getParam1());
         if (StringUtils.isNotEmpty(e.getParam2())) {
@@ -124,11 +128,9 @@ public abstract class AbstractLegacyEventConverter implements LegacyEventConvert
             }
         }
         result.setImportance(Event.Importance.MEDIUM);
-        if (e.getPriority() > 0) {
-            int priority = e.getPriority() / 10 - 1;
-            if (priority >= 0 && priority < Event.Importance.values().length) {
-                result.setImportance(Event.Importance.values()[priority]);
-            }
+        Event.Importance importance = computePriorityFromLegacyEvent(e.getPriority());
+        if (importance != null) {
+            result.setImportance(importance);
         }
 
         result.setGroupId(e.getRequestId());
@@ -148,6 +150,16 @@ public abstract class AbstractLegacyEventConverter implements LegacyEventConvert
 
         result.setTarget(e.getTarget());
         return result;
+    }
+
+    private Event.Importance computePriorityFromLegacyEvent(int originalPriority) {
+        if (originalPriority > 0) {
+            int priority = originalPriority / 10 - 1;
+            if (priority >= 0 && priority < Event.Importance.values().length) {
+                return Event.Importance.values()[priority];
+            }
+        }
+        return null;
     }
 
     @Override

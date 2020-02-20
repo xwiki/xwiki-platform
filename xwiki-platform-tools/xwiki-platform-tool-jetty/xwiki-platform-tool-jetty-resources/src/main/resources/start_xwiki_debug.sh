@@ -26,8 +26,9 @@
 #       JVM to 1GB, use set XWIKI_OPTS=-Xmx1024m
 #   JETTY_OPTS - optional parameters passed to Jetty's start.jar. See
 #       http://www.eclipse.org/jetty/documentation/current/start-jar.html for options.
-#   JETTY_PORT - the port on which to start Jetty.
-#   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command.
+#   JETTY_PORT - the port on which to start Jetty (default: 8080).
+#   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command (default: 8079).
+#   JETTY_DEBUG_PORT - the port to use for debugging purpose (default: 5005).
 # ----------------------------------------------------------------------------------------------------------------
 
 usage() {
@@ -68,6 +69,11 @@ fi
 # The port on which Jetty listens for a Stop command can be defined in an environment variable called JETTY_STOP_PORT
 if [ -z "$JETTY_STOP_PORT" ]; then
   JETTY_STOP_PORT=8079
+fi
+
+# The port on which to listen for debugging operations.
+if [ -z "$JETTY_DEBUG_PORT" ]; then
+  JETTY_DEBUG_PORT=5005
 fi
 
 # The location where to store the process id
@@ -121,7 +127,7 @@ if [ -z "$XWIKI_OPTS" ] ; then
   XWIKI_OPTS="-Xmx1024m"
 fi
 XWIKI_OPTS="$XWIKI_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE"
-XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=5005"
+XWIKI_OPTS="$XWIKI_OPTS -Xrunjdwp:transport=dt_socket,server=y,suspend=${SUSPEND},address=${JETTY_DEBUG_PORT}"
 
 # Check if a lock file already exists for the specified port  which means an XWiki instance is already running
 XWIKI_LOCK_FILE="${XWIKI_LOCK_DIR}/xwiki-${JETTY_PORT}.lck"

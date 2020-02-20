@@ -30,12 +30,18 @@ REM       execute, try setting it to "--list-config". See
 REM       http://www.eclipse.org/jetty/documentation/current/start-jar.html for more options.
 REM   JETTY_PORT - the port on which to start Jetty, 8080 by default
 REM   JETTY_STOP_PORT - the port on which Jetty listens for a Stop command, 8079 by default
+REM   JETTY_DEBUG_PORT - the port to use for debugging purpose (default: 5005).
 REM -------------------------------------------------------------------------
 
 setlocal EnableDelayedExpansion
 
+REM The port on which to listen for debugging operations
+if not defined JETTY_DEBUG_PORT (
+  set JETTY_DEBUG_PORT=5005
+)
+
 if not defined XWIKI_OPTS set XWIKI_OPTS=-Xmx1024m
-set XWIKI_OPTS=%XWIKI_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005
+set XWIKI_OPTS=%XWIKI_OPTS% -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=%JETTY_DEBUG_PORT%
 
 REM The port on which to start Jetty can be defined in an enviroment variable called JETTY_PORT
 if not defined JETTY_PORT (

@@ -242,7 +242,7 @@ public class ExportAction extends XWikiAction
             inputProperties.setWithRevisions(false);
             // Retro compatibility: by default attachment history is serialized as JRCS but we disabled it if standard
             // attachment revisions is enabled
-            if (!attachmentJRCS) {
+            if (history) {
                 inputProperties.setWithWikiAttachmentsRevisions(!attachmentJRCS);
                 inputProperties.setWithWikiAttachmentJRCSRevisions(attachmentJRCS);
             }

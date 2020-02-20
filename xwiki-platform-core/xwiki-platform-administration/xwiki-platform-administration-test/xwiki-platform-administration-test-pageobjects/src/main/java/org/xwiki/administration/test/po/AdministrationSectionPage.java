@@ -106,7 +106,19 @@ public class AdministrationSectionPage extends ViewPage
 
     public void clickSave()
     {
+        // Many administration sections are still submitted synchronously so we can't wait by default. There are also
+        // some administration sections that are submitted asynchronously but they use a custom success message.
+        clickSave(false);
+    }
+
+    public void clickSave(boolean wait)
+    {
         this.saveButton.click();
+
+        if (wait) {
+            // Wait until the page is really saved.
+            waitForNotificationSuccessMessage("Saved");
+        }
     }
 
     /**

@@ -83,7 +83,7 @@ public class InvitationTest extends AbstractTest
             // Make sure that by default we don't allow non admin to send emails to multiple addresses
             config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
                 + "usersMaySendToMultiple"), "false");
-            config.clickSave();
+            config.clickSave(true);
 
             // Make sure the users we're registering in testAcceptInvitation and testAcceptInvitationToCloseWiki don't
             // exist.
@@ -247,7 +247,7 @@ public class InvitationTest extends AbstractTest
         AdministrationSectionPage config = AdministrationSectionPage.gotoPage("Invitation");
         config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
             + "usersMaySendToMultiple"), "false");
-        config.clickSave();
+        config.clickSave(true);
 
         try {
             getUtil().forceGuestUser();
@@ -270,7 +270,7 @@ public class InvitationTest extends AbstractTest
             config = AdministrationSectionPage.gotoPage("Invitation");
             config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
                 + "usersMaySendToMultiple"), "true");
-            config.clickSave();
+            config.clickSave(true);
             getUtil().setSession(nonAdmin);
 
             // Prove that the user can now send to multiple recipients.
@@ -672,7 +672,7 @@ public class InvitationTest extends AbstractTest
             AdministrationSectionPage config = AdministrationSectionPage.gotoPage("Invitation");
             config.getFormContainerElement().setFieldValue(By.id("Invitation.InvitationConfig_Invitation.WebHome_0_"
                 + "usersMaySendToMultiple"), "true");
-            config.clickSave();
+            config.clickSave(true);
 
             // Now switch to a wizeguy user
             getUtil().forceGuestUser();

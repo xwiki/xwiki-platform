@@ -113,7 +113,9 @@ public class DocumentPickerModal extends BaseElement
             @Override
             public Boolean apply(WebDriver driver)
             {
-                return !container.isDisplayed();
+                // Wait for the modal to be hidden and for the backdrop to be removed from the DOM.
+                return !container.isDisplayed()
+                    && getDriver().findElementsWithoutWaiting(By.cssSelector(".modal-backdrop")).isEmpty();
             }
         });
         return this;

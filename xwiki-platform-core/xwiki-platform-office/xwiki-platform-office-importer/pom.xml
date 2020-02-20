@@ -89,6 +89,10 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-text</artifactId>
+    </dependency>
+    <dependency>
       <!--
         Required by org.artofsolving.jodconverter.document.JsonDocumentFormatRegistry which is used to configure the
         office document conversion.

@@ -44,5 +44,9 @@ office.form.append.hint=Документ уже существует! Добав
 office.config.serverType.hint=Тип сервера Office. Может быть внутренним (локальным) или внешним (удаленным).
 office.config.serverPort.hint=Номер порта, используемый для подключения к экземпляру сервера Office
 office.config.autoStart.hint=Укажите, должен ли сервер Office запускаться / подключаться автоматически при запуске XWiki
-office.config.serverPath.hint=Путь к установке Office</content>
+office.config.serverPath.hint=Путь к установке Office
+### Missing: office.config.serverState.connected=Connected
+### Missing: office.config.serverState.notConnected=Not Connected
+### Missing: office.config.serverState.confError=Invalid Configuration
+### Missing: office.config.serverState.error=Error</content>
 </xwikidoc>

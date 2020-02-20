@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.1">
+  <web>WikiManager</web>
+  <name>CommonTranslations</name>
+  <language>pl</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>WikiManager.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>admin.wikis=Wiki
+admin.wikis.descriptor=deskryptor
+admin.wikis.descriptor.description=skonfiguruj deskryptor wiki
+admin.wiki.description=opisz twoją wiki (ładne imię i opis) i ustaw ją jako użytkownika i stronę główną.
+platform.wiki.admin.wiki.ownerProblemConfirmation=Nowy użytkownik właściciela nie istnieje lub może pochodzić z innej wiki.\\nCzy jesteś pewny że chcesz tego użyć i kontynuować operacje zapisu?
+platform.wiki.admin.wiki.csrfInvalidError=Nieprawidłowy token bezpieczeństwa (CSRF). Proszę odświeżyć stronę i spróbować ponownie.
+platform.wiki.admin.wiki.requiredFieldsError=Pole 'Strony głównej' nie może być puste.
+platform.wiki.admin.wiki.ownerWarning=Ostrzeżenie : Gdy raz to zmienisz, poprzedni właściciel straci prawa użytkownika. Jeśli to ty, upewnij się że nie zablokowałeś się w wiki. Jeśli to się stało przez pomyłkę, będziesz musiał skontaktować się z głównym administratorem wiki lub użyć konta superadmina.
+
+###############################################################################
+## Deprecated
+## Note: each element should be removed when the last branch using it is no longer supported
+###############################################################################
+
+## Used to indicate where deprecated keys start
+#@deprecatedstart
+
+#######################################
+## until 6.4RC1
+#######################################
+### Missing: admin.wiki=Wiki
+
+## Used to indicate where deprecated keys end
+#@deprecatedend</content>
+  
+</xwikidoc>

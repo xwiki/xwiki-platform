@@ -310,7 +310,8 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
     };
 
     // Synchronize the location fields while the user types.
-    // Blur ensure that everything's updated when users change fields (particulary useful in our tests)
+    // We catch the change event because we want to make sure everything's updated when the user change fields
+    // (particulary useful in our automated tests).
     titleInput.on('input change', scheduleUpdateOfLocationAndNameFromTitleInput);
     wikiField.change(updateLocationFromWikiField);
     nameInput.on('input change', updateLocationFromNameInput);

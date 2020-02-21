@@ -34,14 +34,12 @@
   <packaging>jar</packaging>
   <description>Tests for the Administration Application</description>
   <properties>
-    <!-- Override in order to add the Packager Plugin -->
     <xwikiCfgPlugins>\
       com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.JsSkinFileExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.CssSkinFileExtensionPlugin,\
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
-      com.xpn.xwiki.plugin.packaging.PackagePlugin,\
       com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin
     </xwikiCfgPlugins>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>

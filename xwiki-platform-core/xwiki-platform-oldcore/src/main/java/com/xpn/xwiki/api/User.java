@@ -42,7 +42,7 @@ import com.xpn.xwiki.web.Utils;
  * the future it should be extended to provide useful methods for working with users.
  *
  * @version $Id$
- * @since Platform-1.0
+ * @since 1.0
  */
 public class User extends Api
 {

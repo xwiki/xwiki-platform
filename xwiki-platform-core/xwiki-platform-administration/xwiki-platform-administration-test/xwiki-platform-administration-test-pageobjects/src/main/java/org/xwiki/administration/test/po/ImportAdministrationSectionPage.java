@@ -19,6 +19,7 @@
  */
 package org.xwiki.administration.test.po;
 
+import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +57,25 @@ public class ImportAdministrationSectionPage extends ViewPage
 
     public void attachPackage(URL file)
     {
-        this.uploadFileInputField.sendKeys(file.getPath());
+        attachPackage(file.getPath());
+    }
+
+    /**
+     * @since 12.1RC1
+     * @since 11.10.4
+     */
+    public void attachPackage(File file)
+    {
+        attachPackage(file.getAbsolutePath());
+    }
+
+    /**
+     * @since 12.1RC1
+     * @since 11.10.4
+     */
+    public void attachPackage(String file)
+    {
+        this.uploadFileInputField.sendKeys(file);
     }
 
     public boolean isPackagePresent(String packageName)
@@ -67,9 +86,8 @@ public class ImportAdministrationSectionPage extends ViewPage
     public List<String> getPackageNames()
     {
         List<String> names = new ArrayList<String>();
-        for (WebElement element : getDriver().findElementsWithoutWaiting(
-            By.xpath("//div[@id='packagelistcontainer']//a[@class='package']")))
-        {
+        for (WebElement element : getDriver()
+            .findElementsWithoutWaiting(By.xpath("//div[@id='packagelistcontainer']//a[@class='package']"))) {
             names.add(element.getText());
         }
         return names;
@@ -88,8 +106,8 @@ public class ImportAdministrationSectionPage extends ViewPage
         // Click on ok button
         ConfirmationModal confirmationModal = new ConfirmationModal();
         confirmationModal.clickOk();
-        getDriver().waitUntilElementIsVisible(
-            By.xpath("//div[contains(@class,'xnotification-done') and text()='Done!']"));
+        getDriver()
+            .waitUntilElementIsVisible(By.xpath("//div[contains(@class,'xnotification-done') and text()='Done!']"));
         getDriver().findElement(By.xpath("//div[contains(@class,'xnotification-done') and text()='Done!']")).click();
     }
 
@@ -111,5 +129,36 @@ public class ImportAdministrationSectionPage extends ViewPage
     public void selectReplaceHistoryOption()
     {
         getDriver().findElement(By.xpath("//input[@name='historyStrategy' and @value='replace']")).click();
+    }
+
+    /**
+     * @since 11.10.4
+     * @since 12.1RC1
+     */
+    public WebElement getImportAsBackupElement()
+    {
+        return getDriver().findElement(By.name("importAsBackup"));
+    }
+
+    /**
+     * @since 11.10.4
+     * @since 12.1RC1
+     */
+    public boolean isImportAsBackup()
+    {
+        return getImportAsBackupElement().isSelected();
+    }
+
+    /**
+     * @since 11.10.4
+     * @since 12.1RC1
+     */
+    public boolean clickImportAsBackup()
+    {
+        WebElement importAsBackup = getImportAsBackupElement();
+
+        importAsBackup.click();
+
+        return importAsBackup.isSelected();
     }
 }

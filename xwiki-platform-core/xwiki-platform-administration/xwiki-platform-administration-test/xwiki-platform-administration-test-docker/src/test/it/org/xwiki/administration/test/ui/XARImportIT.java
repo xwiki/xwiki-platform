@@ -19,46 +19,60 @@
  */
 package org.xwiki.administration.test.ui;
 
-import java.net.URL;
+import java.io.File;
 
-import org.junit.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
 import org.xwiki.administration.test.po.AdministrationPage;
 import org.xwiki.administration.test.po.ImportAdministrationSectionPage;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
-import org.xwiki.test.ui.browser.IgnoreBrowser;
-import org.xwiki.test.ui.browser.IgnoreBrowsers;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.rest.model.jaxb.Page;
+import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.po.AttachmentsPane;
 import org.xwiki.test.ui.po.HistoryPane;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test the Import XAR feature.
  *
  * @version $Id$
- * @since 2.3M1
  */
-public class XARImportIT extends AbstractTest
+@UITest(properties = {
+    // Add the FileUploadPlugin which is needed by the test to upload attachment files
+    "xwikiCfgPlugins=com.xpn.xwiki.plugin.packaging.PackagePlugin"})
+public class XARImportIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     private static final String PACKAGE_WITHOUT_HISTORY = "Main.TestPage-no-history.xar";
 
     private static final String PACKAGE_WITH_HISTORY = "Main.TestPage-with-history.xar";
 
     private static final String BACKUP_PACKAGE = "Main.TestPage-backup.xar";
 
+    private static final LocalDocumentReference TESTPAGE = new LocalDocumentReference("Main", "TestPage");
+
+    private static final String ATTACHE_NAME = "testattachment.txt";
+
     private AdministrationPage adminPage;
 
     private ImportAdministrationSectionPage sectionPage;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    public void setUp(TestUtils setup) throws Exception
     {
+        setup.loginAsSuperAdmin();
+
         // Delete Test Page we import from XAR to ensure to start with a predefined state.
-        getUtil().rest().deletePage("Main", "TestPage");
+        setup.rest().delete(TESTPAGE);
 
         this.adminPage = AdministrationPage.gotoPage();
         this.sectionPage = this.adminPage.clickImportSection();
@@ -75,27 +89,25 @@ public class XARImportIT extends AbstractTest
         }
     }
 
+    private File getFileToUpload(TestConfiguration testConfiguration, String filename)
+    {
+        return new File(testConfiguration.getBrowser().getTestResourcesPath(), "XARImportIT/" + filename);
+    }
+
     /**
      * Verify that the Import page doesn't list any package by default in default XE.
-     *
-     * @since 2.6RC1
      */
     @Test
     public void testImportHasNoPackageByDefault()
     {
-        Assert.assertEquals(0, this.sectionPage.getPackageNames().size());
+        assertEquals(0, this.sectionPage.getPackageNames().size());
     }
 
-    @Test
-    @IgnoreBrowsers({
-        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
-    public void testImportWithHistory()
+    public void testImportWithHistory(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
-        URL fileUrl = this.getClass().getResource("/" + PACKAGE_WITH_HISTORY);
+        File file = getFileToUpload(testConfiguration, PACKAGE_WITH_HISTORY);
 
-        this.sectionPage.attachPackage(fileUrl);
+        this.sectionPage.attachPackage(file);
         this.sectionPage.selectPackage(PACKAGE_WITH_HISTORY);
 
         this.sectionPage.selectReplaceHistoryOption();
@@ -108,21 +120,47 @@ public class XARImportIT extends AbstractTest
         importedPage.openCommentsDocExtraPane();
         HistoryPane history = importedPage.openHistoryDocExtraPane();
 
-        Assert.assertEquals("3.1", history.getCurrentVersion());
-        Assert.assertEquals("A third version of the document", history.getCurrentVersionComment());
-        Assert.assertTrue(history.hasVersionWithSummary("A new version of the document"));
+        assertEquals("3.1", history.getCurrentVersion());
+        assertEquals("A third version of the document", history.getCurrentVersionComment());
+        assertTrue(history.hasVersionWithSummary("A new version of the document"));
+
+        AttachmentsPane attachments = importedPage.openAttachmentsDocExtraPane();
+
+        assertEquals(1, attachments.getNumberOfAttachments());
+        assertEquals("3 bytes", attachments.getSizeOfAttachment(ATTACHE_NAME));
+        assertEquals("1.2", attachments.getLatestVersionOfAttachment(ATTACHE_NAME));
+
+        attachments.getAttachmentLink(ATTACHE_NAME).click();
+        assertEquals("1.2", setup.getDriver().findElement(By.tagName("html")).getText());
     }
 
     @Test
-    @IgnoreBrowsers({
-        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
-    public void testImportWithNewHistoryVersion()
+    public void testImportWithHistoryWhenNoPage(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration)
     {
-        URL fileUrl = this.getClass().getResource("/" + PACKAGE_WITHOUT_HISTORY);
+        testImportWithHistory(setup, testReference, testConfiguration);
+    }
 
-        this.sectionPage.attachPackage(fileUrl);
+    @Test
+    public void testImportWithHistoryWhenPage(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration) throws Exception
+    {
+        Page page = setup.rest().page(TESTPAGE);
+        page.setContent("previous page");
+        setup.rest().save(page);
+        setup.rest().attachFile(new EntityReference("testattachment.txt", EntityType.ATTACHMENT, TESTPAGE),
+            "previous attachment".getBytes(), true);
+
+        testImportWithHistory(setup, testReference, testConfiguration);
+    }
+
+    @Test
+    public void testImportWithNewHistoryVersion(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration)
+    {
+        File file = getFileToUpload(testConfiguration, PACKAGE_WITHOUT_HISTORY);
+
+        this.sectionPage.attachPackage(file);
         this.sectionPage.selectPackage(PACKAGE_WITHOUT_HISTORY);
 
         this.sectionPage.importPackage();
@@ -134,24 +172,19 @@ public class XARImportIT extends AbstractTest
         importedPage.openCommentsDocExtraPane();
         HistoryPane history = importedPage.openHistoryDocExtraPane();
 
-        Assert.assertEquals("1.1", history.getCurrentVersion());
-        Assert.assertEquals("Imported from XAR", history.getCurrentVersionComment());
+        assertEquals("1.1", history.getCurrentVersion());
+        assertEquals("Imported from XAR", history.getCurrentVersionComment());
     }
 
     @Test
-    @IgnoreBrowsers({
-        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
-    public void testImportAsBackup()
+    public void testImportAsBackup(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
-        URL fileUrl = this.getClass().getResource("/" + BACKUP_PACKAGE);
+        File file = getFileToUpload(testConfiguration, BACKUP_PACKAGE);
 
-        this.sectionPage.attachPackage(fileUrl);
+        this.sectionPage.attachPackage(file);
         this.sectionPage.selectPackage(BACKUP_PACKAGE);
 
-        WebElement importAsBackup = getDriver().findElement(By.name("importAsBackup"));
-        Assert.assertTrue(importAsBackup.isSelected());
+        assertTrue(this.sectionPage.isImportAsBackup());
 
         this.sectionPage.importPackage();
 
@@ -162,24 +195,19 @@ public class XARImportIT extends AbstractTest
         importedPage.openCommentsDocExtraPane();
         HistoryPane history = importedPage.openHistoryDocExtraPane();
 
-        Assert.assertEquals("JohnDoe", history.getCurrentAuthor());
+        assertEquals("JohnDoe", history.getCurrentAuthor());
     }
 
     @Test
-    @IgnoreBrowsers({
-        @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
-        @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
-    })
-    public void testImportWhenImportAsBackupIsNotSelected()
+    public void testImportWhenImportAsBackupIsNotSelected(TestUtils setup, TestReference testReference,
+        TestConfiguration testConfiguration)
     {
-        URL fileUrl = this.getClass().getResource("/" + BACKUP_PACKAGE);
+        File file = getFileToUpload(testConfiguration, BACKUP_PACKAGE);
 
-        this.sectionPage.attachPackage(fileUrl);
+        this.sectionPage.attachPackage(file);
         this.sectionPage.selectPackage(BACKUP_PACKAGE);
 
-        WebElement importAsBackup = getDriver().findElement(By.name("importAsBackup"));
-        importAsBackup.click();
-        Assert.assertFalse(importAsBackup.isSelected());
+        assertFalse(this.sectionPage.clickImportAsBackup());
 
         this.sectionPage.importPackage();
 
@@ -190,6 +218,6 @@ public class XARImportIT extends AbstractTest
         importedPage.openCommentsDocExtraPane();
         HistoryPane history = importedPage.openHistoryDocExtraPane();
 
-        Assert.assertEquals("superadmin", history.getCurrentAuthor());
+        assertEquals("superadmin", history.getCurrentAuthor());
     }
 }

@@ -41,7 +41,7 @@ import org.xwiki.test.docker.junit5.UITest;
         // the PR checker.
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.ResetPassword|.*:XWiki\\.ResetPasswordComplete",
         // Add the RightsManagerPlugin needed by the UsersGroupsRightsManagementIT
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin"
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,com.xpn.xwiki.plugin.packaging.PackagePlugin"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus
@@ -78,6 +78,12 @@ public class AllIT
     @Nested
     @DisplayName("Forgot Username")
     class NestedForgotUsernameIT extends ForgotUsernameIT
+    {
+    }
+
+    @Nested
+    @DisplayName("XAR Import")
+    class NestedXARImportIT extends XARImportIT
     {
     }
 }

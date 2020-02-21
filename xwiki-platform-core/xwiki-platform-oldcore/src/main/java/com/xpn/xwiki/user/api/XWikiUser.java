@@ -385,7 +385,7 @@ public class XWikiUser
      * @param context The current {@link XWikiContext context}.
      * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if an exception occurs.
      * @throws XWikiException If an error occurs when checking the groups.
-     * @since Platform-1.3
+     * @since 1.3
      */
     public boolean isUserInGroup(String groupName, XWikiContext context) throws XWikiException
     {

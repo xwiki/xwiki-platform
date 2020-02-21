@@ -28,6 +28,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiRightService;
+
 /**
  * Configuration source taking its data in the User Preferences wiki document (the user profile page) using data from a
  * XWikiUsers object attached to that document.
@@ -66,5 +69,20 @@ public class UserPreferencesConfigurationSource extends AbstractDocumentConfigur
     protected DocumentReference getDocumentReference()
     {
         return this.documentAccessBridge.getCurrentUserReference();
+    }
+
+    @Override
+    protected Object getBaseProperty(String propertyName, boolean text) throws XWikiException
+    {
+        // Treat the superadmin as a special case. Since we currently don't have a proper User API and since we want
+        // the superadmin user to view hidden documents by default, we need to intercept it here, so that all code
+        // checking if the current user should display hidden documents will reply true to show hidden docs.
+        // TODO: See https://forum.xwiki.org/t/add-a-new-xwikiuser-displayhiddendocuments-api/6327 for a better
+        // proposal.
+        if ("displayHiddenDocuments".equals(propertyName) && XWikiRightService.isSuperAdmin(getDocumentReference())) {
+            return 1;
+        } else {
+            return super.getBaseProperty(propertyName, text);
+        }
     }
 }

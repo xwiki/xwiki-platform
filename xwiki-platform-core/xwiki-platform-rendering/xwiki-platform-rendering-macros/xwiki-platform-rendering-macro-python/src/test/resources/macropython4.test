@@ -8,7 +8,7 @@
       <metadata>
         <entry>
           <string>source</string>
-          <string>(((1044)))</string>
+          <string>αa</string>
         </entry>
       </metadata>
     </metadata>
@@ -18,7 +18,7 @@
 .#-----------------------------------------------------
 .expect|event/1.0
 .#-----------------------------------------------------
-beginDocument [[source]=[(((1044)))]]
+beginDocument [[source]=[(((945)))a]]
 beginMacroMarkerStandalone [python] [] [print "<element/>"]
 endMacroMarkerStandalone [python] [] [print "<element/>"]
-endDocument [[source]=[(((1044)))]]
+endDocument [[source]=[(((945)))a]]

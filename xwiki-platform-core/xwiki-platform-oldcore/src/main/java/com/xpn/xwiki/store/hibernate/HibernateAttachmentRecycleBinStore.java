@@ -247,8 +247,8 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
                     DeletedAttachment deletedDocument = loadDeletedAttachment(index, context, false);
 
                     try {
-                        session.createQuery("delete from " + DeletedAttachment.class.getName() + " where id=?")
-                            .setParameter(0, index).executeUpdate();
+                        session.createQuery("delete from " + DeletedAttachment.class.getName() + " where id=:id")
+                            .setParameter("id", index).executeUpdate();
                     } catch (Exception ex) {
                         // Invalid ID?
                     }

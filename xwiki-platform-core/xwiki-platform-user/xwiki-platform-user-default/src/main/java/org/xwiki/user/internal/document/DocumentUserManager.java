@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
+package org.xwiki.user.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,46 +25,53 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.user.User;
+import org.xwiki.user.UserManager;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
- * Configuration source taking its data in the User Preferences wiki document (the user profile page) using data from a
- * XWikiUsers object attached to that document.
- * 
+ * Document-based implementation of {@link UserManager}.
+ *
  * @version $Id$
- * @since 2.0M2
+ * @since 12.2RC1
  */
 @Component
-@Named("user")
 @Singleton
-public class UserPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
+public class DocumentUserManager implements UserManager<DocumentReference>
 {
-    static final String SPACE_NAME = "XWiki";
-
-    /**
-     * The local reference of the class containing user preferences.
-     */
-    static final LocalDocumentReference CLASS_REFERENCE = new LocalDocumentReference(SPACE_NAME, "XWikiUsers");
+    @Inject
+    @Named("current")
+    private DocumentReferenceResolver<EntityReference> currentReferenceResolver;
 
     @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    private DocumentAccessBridge dab;
+
+    @Inject
+    private Execution execution;
+
+    @Inject
+    private EntityReferenceProvider entityReferenceProvider;
 
     @Override
-    protected String getCacheId()
+    public User getUser(DocumentReference userReference)
     {
-        return "configuration.document.user";
+        return new DocumentUser(userReference, this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
     }
 
     @Override
-    protected LocalDocumentReference getClassReference()
+    public User<DocumentReference> getCurrentUser()
     {
-        return CLASS_REFERENCE;
+        return getUser(getXWikiContext().getUserReference());
     }
 
-    @Override
-    protected DocumentReference getDocumentReference()
+    private XWikiContext getXWikiContext()
     {
-        return this.documentAccessBridge.getCurrentUserReference();
+        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

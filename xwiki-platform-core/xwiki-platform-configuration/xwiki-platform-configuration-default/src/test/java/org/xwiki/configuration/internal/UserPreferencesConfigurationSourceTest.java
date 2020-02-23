@@ -19,9 +19,9 @@
  */
 package org.xwiki.configuration.internal;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSource;
@@ -35,9 +35,21 @@ import org.xwiki.model.reference.LocalDocumentReference;
  */
 public class UserPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
+    private static final DocumentReference USER_DOCUMENT = new DocumentReference(CURRENT_WIKI,
+        UserPreferencesConfigurationSource.SPACE_NAME, "user");
+
     public UserPreferencesConfigurationSourceTest()
     {
         super(UserPreferencesConfigurationSource.class);
+    }
+
+    @Override
+    public void before() throws Exception
+    {
+        super.before();
+
+        DocumentAccessBridge documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
+        when(documentAccessBridge.getCurrentUserReference()).thenReturn(USER_DOCUMENT);
     }
 
     @Override
@@ -49,31 +61,10 @@ public class UserPreferencesConfigurationSourceTest extends AbstractTestDocument
     @Test
     public void getPropertyForStringWhenExists() throws Exception
     {
-        DocumentReference userReference = new DocumentReference(CURRENT_WIKI,
-            UserPreferencesConfigurationSource.SPACE_NAME, "user");
-        DocumentAccessBridge documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
-        when(documentAccessBridge.getCurrentUserReference()).thenReturn(userReference);
-
-        setStringProperty(userReference, "key", "value");
+        setStringProperty(USER_DOCUMENT, "key", "value");
 
         String result = this.componentManager.getComponentUnderTest().getProperty("key", String.class);
 
-        assertEquals("value", result);
-    }
-
-    /**
-     * Verify that the superadmin user can always view hidden documents.
-     */
-    @Test
-    public void getDisplayHiddenDocumentsPropertyForSuperadminUser() throws Exception
-    {
-        DocumentReference userReference = new DocumentReference(CURRENT_WIKI,
-            UserPreferencesConfigurationSource.SPACE_NAME, "superadmin");
-        DocumentAccessBridge documentAccessBridge = this.componentManager.getInstance(DocumentAccessBridge.class);
-        when(documentAccessBridge.getCurrentUserReference()).thenReturn(userReference);
-
-        int result =
-            this.componentManager.getComponentUnderTest().getProperty("displayHiddenDocuments", Integer.class);
-        assertEquals(1, result);
+        Assert.assertEquals("value", result);
     }
 }

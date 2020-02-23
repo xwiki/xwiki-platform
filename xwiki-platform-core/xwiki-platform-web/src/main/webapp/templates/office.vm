@@ -29,5 +29,6 @@
 #template("javascript.vm")
 </head>
 #set($attachmentReference = $services.model.createAttachmentReference($doc.documentReference, $request.attachment))
+#set($displayDocExtra = false)
 <body>$services.officeviewer.view($attachmentReference)</body>
 </html>

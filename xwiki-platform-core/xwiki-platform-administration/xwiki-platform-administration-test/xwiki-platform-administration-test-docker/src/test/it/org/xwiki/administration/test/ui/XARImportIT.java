@@ -48,7 +48,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  */
 @UITest(properties = {
-    // Add the FileUploadPlugin which is needed by the test to upload attachment files
     "xwikiCfgPlugins=com.xpn.xwiki.plugin.packaging.PackagePlugin"})
 public class XARImportIT
 {

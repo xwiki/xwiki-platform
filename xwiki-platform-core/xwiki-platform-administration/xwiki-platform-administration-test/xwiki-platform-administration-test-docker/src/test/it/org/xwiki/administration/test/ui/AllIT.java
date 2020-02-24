@@ -40,8 +40,9 @@ import org.xwiki.test.docker.junit5.UITest;
         // Pages created in the tests need to have PR since we ask for PR to send mails so we need to exclude them from
         // the PR checker.
         "xwikiPropertiesAdditionalProperties=test.prchecker.excludePattern=.*:XWiki\\.ResetPassword|.*:XWiki\\.ResetPasswordComplete",
-        // Add the RightsManagerPlugin needed by the UsersGroupsRightsManagementIT
-        "xwikiCfgPlugins=com.xpn.xwiki.plugin.fileupload.FileUploadPlugin,com.xpn.xwiki.plugin.packaging.PackagePlugin"
+        // The RightsManagerPlugin is needed by UsersGroupsRightsManagementIT
+        // The PackagePlugin are needed by NestedXARImportIT
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin,com.xpn.xwiki.plugin.packaging.PackagePlugin"
     },
     extraJARs = {
         // It's currently not possible to install a JAR contributing a Hibernate mapping file as an Extension. Thus

@@ -44,6 +44,10 @@ office.form.append.hint=दस्तऐवज आधीपासून विद
 office.config.serverType.hint=ऑफिस सर्व्हर प्रकार. हे अंतर्गत व्यवस्थापित (स्थानिक) किंवा बाह्य (रिमोट) केले जाऊ शकते.
 office.config.serverPort.hint=Office सर्व्हरच्या उदाहरणाशी कनेक्ट होण्यासाठी वापरलेला पोर्ट क्रमांक
 office.config.autoStart.hint=ऑफिस सर्व्हर Xwiki स्टार्टअपवेळी स्वयंचलितरित्या चालू / कनेक्ट केलेला असेल तर निर्दिष्ट करा
-office.config.serverPath.hint=ऑफिस स्थापनेचा मार्ग</content>
+office.config.serverPath.hint=ऑफिस स्थापनेचा मार्ग
+### Missing: office.config.serverState.connected=Connected
+### Missing: office.config.serverState.notConnected=Not Connected
+### Missing: office.config.serverState.confError=Invalid Configuration
+### Missing: office.config.serverState.error=Error</content>
   
 </xwikidoc>

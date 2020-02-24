@@ -27,7 +27,6 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
@@ -46,6 +45,9 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.user.User;
+import org.xwiki.user.UserManager;
+import org.xwiki.user.UserReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -78,8 +80,8 @@ public class QueryGeneratorTest
     private EntityReferenceSerializer<String> serializer;
     private WikiDescriptorManager wikiDescriptorManager;
     private NotificationFilterManager notificationFilterManager;
-    private DocumentAccessBridge documentAccessBridge;
     private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
+    private UserManager userManager;
 
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
     private Query query;
@@ -98,8 +100,8 @@ public class QueryGeneratorTest
         serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
         recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
+        userManager = mocker.getInstance(UserManager.class);
 
         startDate = new Date(10);
         this.startDateParamName = String.format("date_%s", DigestUtils.sha256Hex(this.startDate.toString()));
@@ -120,13 +122,13 @@ public class QueryGeneratorTest
         fakeFilterPreference = mock(NotificationFilterPreference.class);
         when(fakeFilterPreference.isActive()).thenReturn(true);
 
-        when(documentAccessBridge.getProperty(userReference,
-                new DocumentReference("xwiki", "XWiki", "XWikiUsers"),
-                "displayHiddenDocuments")).thenReturn(0);
-
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("xwiki");
 
         when(recordableEventDescriptorHelper.hasDescriptor(anyString(), any(DocumentReference.class))).thenReturn(true);
+
+        User user = mock(User.class);
+        when(user.displayHiddenDocuments()).thenReturn(false);
+        when(userManager.getUser(any(UserReference.class))).thenReturn(user);
     }
 
     @Test
@@ -169,9 +171,9 @@ public class QueryGeneratorTest
     public void generateQueryWhenHiddenDocsAreEnabled() throws Exception
     {
         // Mock
-        when(documentAccessBridge.getProperty(userReference,
-                new DocumentReference("xwiki", "XWiki", "XWikiUsers"),
-                "displayHiddenDocuments")).thenReturn(1);
+        User user = mock(User.class);
+        when(user.displayHiddenDocuments()).thenReturn(true);
+        when(userManager.getUser(any(UserReference.class))).thenReturn(user);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();

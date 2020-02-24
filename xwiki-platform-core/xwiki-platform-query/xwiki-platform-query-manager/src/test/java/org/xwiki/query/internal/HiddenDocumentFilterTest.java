@@ -24,11 +24,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.xwiki.component.util.ReflectionUtils;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryFilter;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.user.User;
+import org.xwiki.user.UserManager;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,18 +43,20 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
 {
     private QueryFilter filter;
 
-    private ConfigurationSource userConfiguration;
+    private UserManager userManager;
 
     @Before
     public void configure() throws Exception
     {
-        this.userConfiguration = getComponentManager().getInstance(ConfigurationSource.class, "user");
+        this.userManager = getComponentManager().getInstance(UserManager.class);
+        User user = mockery.mock(User.class);
         getMockery().checking(new Expectations()
         {{
                 ignoring(any(Logger.class)).method("debug");
-                // We need to set this expectation here because this call is made during the filter component initialization
-                oneOf(userConfiguration).getProperty("displayHiddenDocuments", Integer.class);
-                will(returnValue(0));
+                oneOf(userManager).getUser(null);
+                will(returnValue(user));
+                oneOf(user).displayHiddenDocuments();
+                will(returnValue(true));
             }});
 
         this.filter = getComponentManager().getInstance(QueryFilter.class, "hidden");

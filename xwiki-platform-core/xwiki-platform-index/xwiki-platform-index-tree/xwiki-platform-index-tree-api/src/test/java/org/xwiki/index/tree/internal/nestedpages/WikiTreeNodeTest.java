@@ -31,7 +31,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.localization.LocalizationContext;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
@@ -49,10 +48,13 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.tree.TreeFilter;
+import org.xwiki.user.User;
+import org.xwiki.user.UserManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,8 +85,7 @@ public class WikiTreeNodeTest
     private LocalizationContext localizationContext;
 
     @MockComponent
-    @Named("user")
-    private ConfigurationSource userPreferencesSource;
+    private UserManager userManager;
 
     @MockComponent
     @Named("topLevelPage/nestedPages")
@@ -147,7 +148,9 @@ public class WikiTreeNodeTest
     {
         // Filter hidden child nodes.
         this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
-        when(this.userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class)).thenReturn(0);
+        User user = mock(User.class);
+        when(user.displayHiddenDocuments()).thenReturn(false);
+        when(this.userManager.getUser(null)).thenReturn(user);
 
         assertEquals(0, this.wikiTreeNode.getChildCount("something"));
         assertEquals(0, this.wikiTreeNode.getChildCount("some:thing"));
@@ -199,7 +202,9 @@ public class WikiTreeNodeTest
     {
         // Filter hidden child nodes.
         this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
-        when(this.userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class)).thenReturn(0);
+        User user = mock(User.class);
+        when(user.displayHiddenDocuments()).thenReturn(false);
+        when(this.userManager.getUser(null)).thenReturn(user);
 
         String statement = "select reference, 0 as terminal from XWikiSpace page order by lower(name), name";
         when(this.queryManager.createQuery(statement, Query.HQL)).thenReturn(this.query);
@@ -220,7 +225,9 @@ public class WikiTreeNodeTest
     {
         // Don't filter hidden child nodes.
         this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
-        when(this.userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class)).thenReturn(1);
+        User user = mock(User.class);
+        when(user.displayHiddenDocuments()).thenReturn(false);
+        when(this.userManager.getUser(null)).thenReturn(user);
 
         this.wikiTreeNode.getProperties().put("orderBy", "title");
         this.wikiTreeNode.getProperties().put("exclusions",

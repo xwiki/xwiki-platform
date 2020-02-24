@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.document;
+package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,15 +25,12 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.user.User;
 import org.xwiki.user.UserManager;
-
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.user.UserReference;
 
 /**
  * Document-based implementation of {@link UserManager}.
@@ -42,8 +39,9 @@ import com.xpn.xwiki.XWikiContext;
  * @since 12.2RC1
  */
 @Component
+@Named("org.xwiki.user.internal.document.DocumentUserReference")
 @Singleton
-public class DocumentUserManager implements UserManager<DocumentReference>
+public class DocumentUserManager implements UserManager
 {
     @Inject
     @Named("current")
@@ -53,25 +51,18 @@ public class DocumentUserManager implements UserManager<DocumentReference>
     private DocumentAccessBridge dab;
 
     @Inject
-    private Execution execution;
-
-    @Inject
     private EntityReferenceProvider entityReferenceProvider;
 
     @Override
-    public User getUser(DocumentReference userReference)
+    public User getUser(UserReference userReference)
     {
-        return new DocumentUser(userReference, this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
+        return new DocumentUser((DocumentUserReference) userReference, this.dab, this.currentReferenceResolver,
+            this.entityReferenceProvider);
     }
 
     @Override
-    public User<DocumentReference> getCurrentUser()
+    public boolean exists(UserReference userReference)
     {
-        return getUser(getXWikiContext().getUserReference());
-    }
-
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        return this.dab.exists(((DocumentUserReference) userReference).getReference());
     }
 }

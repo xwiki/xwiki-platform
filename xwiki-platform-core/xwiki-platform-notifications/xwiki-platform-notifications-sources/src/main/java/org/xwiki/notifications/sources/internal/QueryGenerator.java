@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.model.reference.DocumentReference;
@@ -58,6 +57,8 @@ import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
+import org.xwiki.user.UserManager;
+import org.xwiki.user.internal.document.DocumentUserReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
@@ -72,11 +73,7 @@ import static org.xwiki.notifications.filters.expression.generics.ExpressionBuil
 @Singleton
 public class QueryGenerator
 {
-    private static final LocalDocumentReference USER_CLASS
-            = new LocalDocumentReference("XWiki", "XWikiUsers");
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
+    private static final LocalDocumentReference USER_CLASS = new LocalDocumentReference("XWiki", "XWikiUsers");
 
     @Inject
     private QueryManager queryManager;
@@ -92,6 +89,9 @@ public class QueryGenerator
 
     @Inject
     private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
+
+    @Inject
+    private UserManager userManager;
 
     /**
      * Generate the query.
@@ -379,11 +379,10 @@ public class QueryGenerator
         }
 
         final DocumentReference userClass = new DocumentReference(USER_CLASS, parameters.user.getWikiReference());
-        Object displayHiddenDocuments
-                = documentAccessBridge.getProperty(parameters.user, userClass, "displayHiddenDocuments");
-
         // Don't show hidden events unless the user want to display hidden pages
-        if (displayHiddenDocuments == null || Integer.valueOf(0).equals(displayHiddenDocuments)) {
+        boolean displayHiddenDocuments =
+            this.userManager.getUser(new DocumentUserReference(parameters.user)).displayHiddenDocuments();
+        if (!displayHiddenDocuments) {
             return excludeHiddenEvents(topNode);
         }
 

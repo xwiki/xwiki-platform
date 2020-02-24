@@ -23,12 +23,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.user.User;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
@@ -43,32 +41,42 @@ import com.xpn.xwiki.XWikiContext;
  */
 @Component
 @Singleton
-public class DocumentUserManager implements UserManager
+public class DefaultUserManager implements UserManager
 {
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<EntityReference> currentReferenceResolver;
-
-    @Inject
-    private DocumentAccessBridge dab;
+    @Named("context")
+    private ComponentManager componentManager;
 
     @Inject
     private Execution execution;
 
-    @Inject
-    private EntityReferenceProvider entityReferenceProvider;
-
     @Override
     public User getUser(UserReference userReference)
     {
-        return new DocumentUser((DocumentUserReference) userReference, this.dab, this.currentReferenceResolver,
-            this.entityReferenceProvider);
+        User user;
+        if (userReference == null) {
+            user = getUser(new DocumentUserReference(getXWikiContext().getUserReference()));
+        } else {
+            user = resolveUserManager(userReference).getUser(userReference);
+        }
+        return user;
     }
 
     @Override
-    public User getCurrentUser()
+    public boolean exists(UserReference userReference)
     {
-        return getUser(new DocumentUserReference(getXWikiContext().getUserReference()));
+        return resolveUserManager(userReference).exists(userReference);
+    }
+
+    private UserManager resolveUserManager(UserReference userReference)
+    {
+        try {
+            return this.componentManager.getInstance(UserManager.class, userReference.getClass().getName());
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException(String.format(
+                "Failed to find component implementation for role [%s] and hint [%s]", UserManager.class.getName(),
+                userReference.getClass().getName()));
+        }
     }
 
     private XWikiContext getXWikiContext()

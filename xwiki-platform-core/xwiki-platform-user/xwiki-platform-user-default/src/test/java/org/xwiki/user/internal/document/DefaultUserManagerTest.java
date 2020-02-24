@@ -19,7 +19,10 @@
  */
 package org.xwiki.user.internal.document;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -27,37 +30,49 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.User;
+import org.xwiki.user.UserManager;
 
 import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DocumentUserManager}.
+ * Unit tests for {@link DefaultUserManager}.
  *
  * @version $Id$
  */
 @ComponentTest
-public class DocumentUserManagerTest
+public class DefaultUserManagerTest
 {
     @InjectMockComponents
-    private DocumentUserManager userManager;
+    private DefaultUserManager userManager;
+
+    @MockComponent
+    @Named("context")
+    private ComponentManager contextComponentManager;
 
     @MockComponent
     private Execution execution;
 
     @Test
-    void getUser()
+    void getUser() throws Exception
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "user");
+
+        UserManager documentUserManager = mock(UserManager.class);
+        when(documentUserManager.getUser(new DocumentUserReference(reference))).thenReturn(mock(User.class));
+        when(this.contextComponentManager.getInstance(UserManager.class, DocumentUserReference.class.getName()))
+            .thenReturn(documentUserManager);
+
         User user = this.userManager.getUser(new DocumentUserReference(reference));
         assertNotNull(user);
     }
 
     @Test
-    void getCurrentUser()
+    void getCurrentUser() throws Exception
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "user");
         ExecutionContext executionContext = new ExecutionContext();
@@ -66,7 +81,26 @@ public class DocumentUserManagerTest
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
         when(this.execution.getContext()).thenReturn(executionContext);
 
-        User user = this.userManager.getCurrentUser();
+        UserManager documentUserManager = mock(UserManager.class);
+        when(documentUserManager.getUser(new DocumentUserReference(reference))).thenReturn(mock(User.class));
+        when(this.contextComponentManager.getInstance(UserManager.class, DocumentUserReference.class.getName()))
+            .thenReturn(documentUserManager);
+
+        User user = this.userManager.getUser(null);
         assertNotNull(user);
     }
+
+    @Test
+    void exists() throws Exception
+    {
+        DocumentReference reference = new DocumentReference("wiki", "space", "user");
+
+        UserManager documentUserManager = mock(UserManager.class);
+        when(documentUserManager.exists(new DocumentUserReference(reference))).thenReturn(true);
+        when(this.contextComponentManager.getInstance(UserManager.class, DocumentUserReference.class.getName()))
+            .thenReturn(documentUserManager);
+
+        assertTrue(this.userManager.exists(new DocumentUserReference(reference)));
+    }
+
 }

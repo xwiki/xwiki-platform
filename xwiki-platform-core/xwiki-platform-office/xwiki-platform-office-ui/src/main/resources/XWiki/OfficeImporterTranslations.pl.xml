@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.2" reference="XWiki.OfficeImporterTranslations" locale="pl">
+  <web>XWiki</web>
+  <name>OfficeImporterTranslations</name>
+  <language>pl</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.OfficeImporter</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>office.createForm.type.name=Strona z pakietu Office
+office.createForm.type.description=Importuj dokumenty Office na strony wiki
+office.form.error.noDocument=Aby zaimportować dokument pakietu Office, musisz użyć akcji tworzenia {0} {1}.
+office.form.append.hint=Dokument już istnieje! Dołącz wynik do istniejącej strony wiki
+
+office.config.serverType.hint=Typ serwera Office. Może być zarządzany wewnętrznie (lokalnie) lub zewnętrznie (zdalnie).
+office.config.serverPort.hint=Numer portu używany do łączenia się z instancją serwera Office
+office.config.autoStart.hint=kreśl, czy serwer Office powinien być uruchamiany / podłączony automatycznie podczas uruchamiania XWiki
+office.config.serverPath.hint=Ścieżka do instalacji pakietu Office
+office.config.serverState.connected=Połączony
+office.config.serverState.notConnected=Nie połączony
+office.config.serverState.confError=Niepoprawna konfiguracja
+office.config.serverState.error=Błąd</content>
+  
+</xwikidoc>

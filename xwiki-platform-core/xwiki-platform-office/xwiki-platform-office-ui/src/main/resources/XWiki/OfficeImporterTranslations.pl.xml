@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
-  <web>Index</web>
-  <name>Translations</name>
+<xwikidoc version="1.2" reference="XWiki.OfficeImporterTranslations" locale="pl">
+  <web>XWiki</web>
+  <name>OfficeImporterTranslations</name>
   <language>pl</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Index.WebHome</parent>
+  <parent>XWiki.OfficeImporter</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -36,13 +36,18 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>index.spacesMacro.title=Przestrzenie
-index.spacesMacro.spaceIndex.title=Zobacz indeks przestrzeni
-index.spacesMacro.spaceIndex.alt=Dziennik przestrzeni
-index.spacesMacro.spaceAdministration.title=Zobacz przestrzeń administratora
-index.spacesMacro.spaceAdministration.alt=zarządzaj przestrzenią
-index.spacesMacro.createSpace.link=Utwórz nową przestrzeń
-index.spacesMacro.createSpace.defaultSpaceName=nazwa przestrzeni
-index.spacesMacro.createSpace.submit=stwórz
-index.deletedDocuments.deleteAll=usuń wszystko</content>
+  <content>office.createForm.type.name=Strona z pakietu Office
+office.createForm.type.description=Importuj dokumenty Office na strony wiki
+office.form.error.noDocument=Aby zaimportować dokument pakietu Office, musisz użyć akcji tworzenia {0} {1}.
+office.form.append.hint=Dokument już istnieje! Dołącz wynik do istniejącej strony wiki
+
+office.config.serverType.hint=Typ serwera Office. Może być zarządzany wewnętrznie (lokalnie) lub zewnętrznie (zdalnie).
+office.config.serverPort.hint=Numer portu używany do łączenia się z instancją serwera Office
+office.config.autoStart.hint=kreśl, czy serwer Office powinien być uruchamiany / podłączony automatycznie podczas uruchamiania XWiki
+office.config.serverPath.hint=Ścieżka do instalacji pakietu Office
+office.config.serverState.connected=Połączony
+office.config.serverState.notConnected=Nie połączony
+office.config.serverState.confError=Niepoprawna konfiguracja
+office.config.serverState.error=Błąd</content>
+  
 </xwikidoc>

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.document;
+package org.xwiki.user.internal.document;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.EntityType;
@@ -26,6 +26,7 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.user.User;
+import org.xwiki.user.UserReference;
 import org.xwiki.user.UserType;
 
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -36,13 +37,13 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * @version $Id$
  * @since 12.2RC1
  */
-public class DocumentUser implements User<DocumentReference>
+public class DocumentUser implements User
 {
     private static final EntityReference USERS_CLASS_REFERENCE =
         new EntityReference("XWikiUsers", EntityType.SPACE,
             new EntityReference("XWiki", EntityType.DOCUMENT));
 
-    private DocumentReference userReference;
+    private DocumentUserReference userReference;
 
     private DocumentReferenceResolver<EntityReference> currentReferenceResolver;
 
@@ -50,15 +51,13 @@ public class DocumentUser implements User<DocumentReference>
 
     private EntityReferenceProvider entityReferenceProvider;
 
-    private boolean isGlobal;
-
     /**
      * @param userReference the user reference
      * @param dab the component to retrieve user properties stored as xproperties
      * @param currentReferenceResolver the component to resolve user xclass for the current wiki
      * @param entityReferenceProvider the component to check if the current wiki is the main wiki
      */
-    public DocumentUser(DocumentReference userReference, DocumentAccessBridge dab,
+    public DocumentUser(DocumentUserReference userReference, DocumentAccessBridge dab,
         DocumentReferenceResolver<EntityReference> currentReferenceResolver,
         EntityReferenceProvider entityReferenceProvider)
     {
@@ -71,8 +70,15 @@ public class DocumentUser implements User<DocumentReference>
     @Override
     public boolean displayHiddenDocuments()
     {
-        Integer preference = (Integer) getProperty("displayHiddenDocuments");
-        return preference != null && preference == 1;
+        boolean displayHiddenDocuments;
+        // The superadmin user is always shown hidden documents.
+        if (isSuperAdmin()) {
+            displayHiddenDocuments = true;
+        } else {
+            Integer preference = (Integer) getProperty("displayHiddenDocuments");
+            displayHiddenDocuments = preference != null && preference == 1;
+        }
+        return displayHiddenDocuments;
     }
 
     @Override
@@ -119,29 +125,29 @@ public class DocumentUser implements User<DocumentReference>
     @Override
     public boolean isGuest()
     {
-        return XWikiRightService.isGuest(getReference());
+        return XWikiRightService.isGuest(getInternalReference());
     }
 
     @Override
     public boolean isSuperAdmin()
     {
-        return XWikiRightService.isSuperAdmin(getReference());
+        return XWikiRightService.isSuperAdmin(getInternalReference());
     }
 
     @Override
     public boolean isGlobal()
     {
-        return this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).equals(getReference());
+        return this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).equals(getInternalReference());
     }
 
     @Override
     public Object getProperty(String propertyName)
     {
-        return this.dab.getProperty(getReference(), getUserClassReference(), propertyName);
+        return this.dab.getProperty(getInternalReference(), getUserClassReference(), propertyName);
     }
 
     @Override
-    public DocumentReference getReference()
+    public UserReference getUserReference()
     {
         return this.userReference;
     }
@@ -161,6 +167,11 @@ public class DocumentUser implements User<DocumentReference>
         }
 
         return emailChecked;
+    }
+
+    private DocumentReference getInternalReference()
+    {
+        return getUserReference().getReference();
     }
 
     private DocumentReference getUserClassReference()

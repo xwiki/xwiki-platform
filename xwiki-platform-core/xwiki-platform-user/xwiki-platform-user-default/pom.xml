@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Default</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.66</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>72</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>85</xwiki.pitest.mutationThreshold>
     <xwiki.extension.features>
       <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->
       org.xwiki.contrib.membership:application-membership-default
@@ -60,7 +60,6 @@
       <artifactId>xwiki-platform-wiki-api</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -70,7 +69,6 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>

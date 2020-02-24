@@ -31,7 +31,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -41,6 +40,7 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.tree.AbstractTreeNode;
+import org.xwiki.user.UserManager;
 
 /**
  * Base class for tree nodes that represent entities.
@@ -67,8 +67,7 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
     protected QueryManager queryManager;
 
     @Inject
-    @Named("user")
-    private ConfigurationSource userPreferencesSource;
+    private UserManager userManager;
 
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
@@ -96,8 +95,7 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
     {
         boolean shown = !Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"));
         if (!shown) {
-            Integer value = this.userPreferencesSource.getProperty("displayHiddenDocuments", Integer.class);
-            shown = value != null && value == 1;
+            shown = this.userManager.getUser(null).displayHiddenDocuments();
         }
         return shown;
     }

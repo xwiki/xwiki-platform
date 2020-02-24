@@ -39,7 +39,6 @@ import org.xwiki.annotation.event.AnnotationUpdatedEvent;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
@@ -52,6 +51,7 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
+import org.xwiki.user.UserManager;
 
 import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -614,9 +614,8 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      */
     private void addHiddenEventsFilter(StringBuffer query)
     {
-        ConfigurationSource source = Utils.getComponent(ConfigurationSource.class, "user");
-        Integer preference = source.getProperty("displayHiddenDocuments", Integer.class);
-        if (preference == null || preference != 1) {
+        UserManager userManager = Utils.getComponent(UserManager.class);
+        if (!userManager.getUser(null).displayHiddenDocuments()) {
             if (!query.toString().contains(" where ")) {
                 query.append(" where ");
             }

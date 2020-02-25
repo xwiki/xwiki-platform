@@ -574,6 +574,10 @@ div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
   background-color: $theme.backgroundSecondaryColor;
 }
 
+div#XWiki.XWikiUsers_0_editor {
+  text-transform: uppercase;
+}        
+
 .userInfo {
   -ms-word-break: break-all; /* IE8, IE9 */
 }

@@ -27,10 +27,10 @@ import java.util.Date;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterManager;
@@ -46,8 +46,9 @@ import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.user.User;
-import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -77,13 +78,13 @@ public class QueryGeneratorTest
             new MockitoComponentMockingRule<>(QueryGenerator.class);
 
     private QueryManager queryManager;
-    private EntityReferenceSerializer<String> serializer;
     private WikiDescriptorManager wikiDescriptorManager;
     private NotificationFilterManager notificationFilterManager;
     private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
-    private UserManager userManager;
+    private UserResolver<UserReference> userResolver;
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
-    private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
+    private DocumentReference userDocumentReference = new DocumentReference("xwiki", "XWiki", "UserA");
     private Query query;
     private Date startDate;
     private String startDateParamName;
@@ -97,11 +98,12 @@ public class QueryGeneratorTest
     public void setUp() throws Exception
     {
         queryManager = mocker.getInstance(QueryManager.class);
-        serializer = mocker.getInstance(EntityReferenceSerializer.TYPE_STRING);
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
         recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
-        userManager = mocker.getInstance(UserManager.class);
+        userResolver = mocker.getInstance(UserResolver.TYPE_USER_REFERENCE);
+        userReferenceResolver = mocker.getInstance(
+            new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
 
         startDate = new Date(10);
         this.startDateParamName = String.format("date_%s", DigestUtils.sha256Hex(this.startDate.toString()));
@@ -128,7 +130,8 @@ public class QueryGeneratorTest
 
         User user = mock(User.class);
         when(user.displayHiddenDocuments()).thenReturn(false);
-        when(userManager.getUser(any(UserReference.class))).thenReturn(user);
+        when(userResolver.resolve(any(UserReference.class))).thenReturn(user);
+        when(userReferenceResolver.resolve(userDocumentReference)).thenReturn(mock(UserReference.class));
     }
 
     @Test
@@ -136,7 +139,7 @@ public class QueryGeneratorTest
     {
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userReference;
+        parameters.user = userDocumentReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.preferences = Arrays.asList(pref1);
@@ -173,11 +176,11 @@ public class QueryGeneratorTest
         // Mock
         User user = mock(User.class);
         when(user.displayHiddenDocuments()).thenReturn(true);
-        when(userManager.getUser(any(UserReference.class))).thenReturn(user);
+        when(userResolver.resolve(any(UserReference.class))).thenReturn(user);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userReference;
+        parameters.user = userDocumentReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.preferences = Arrays.asList(pref1);
@@ -210,7 +213,7 @@ public class QueryGeneratorTest
     {
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userReference;
+        parameters.user = userDocumentReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.preferences = Arrays.asList(pref1);
@@ -243,7 +246,7 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userReference;
+        parameters.user = userDocumentReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.endDate = untilDate;
@@ -282,7 +285,7 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userReference;
+        parameters.user = userDocumentReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.endDate = untilDate;
         parameters.blackList = Arrays.asList("event1", "event2");
@@ -306,7 +309,7 @@ public class QueryGeneratorTest
         // Test
         when(wikiDescriptorManager.getMainWikiId()).thenReturn("mainWiki");
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userReference;
+        parameters.user = userDocumentReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.preferences = Arrays.asList(pref1);
@@ -344,7 +347,7 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userReference;
+        parameters.user = userDocumentReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.blackList = Arrays.asList("event1", "event2");
@@ -377,7 +380,7 @@ public class QueryGeneratorTest
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userReference;
+        parameters.user = userDocumentReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.blackList = Arrays.asList("event1", "event2");
@@ -410,11 +413,11 @@ public class QueryGeneratorTest
                 invocationOnMock -> ((Collection)invocationOnMock.getArgument(0)).stream());
 
         // No matching descriptor
-        when(recordableEventDescriptorHelper.hasDescriptor("create", userReference)).thenReturn(false);
+        when(recordableEventDescriptorHelper.hasDescriptor("create", userDocumentReference)).thenReturn(false);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();
-        parameters.user = userReference;
+        parameters.user = userDocumentReference;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = startDate;
         parameters.filters = Arrays.asList(notificationFilter1);

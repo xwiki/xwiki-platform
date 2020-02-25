@@ -25,6 +25,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -57,8 +58,9 @@ import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.user.UserManager;
-import org.xwiki.user.internal.document.DocumentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
@@ -91,7 +93,11 @@ public class QueryGenerator
     private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
 
     @Inject
-    private UserManager userManager;
+    private UserResolver<UserReference> userResolver;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     /**
      * Generate the query.
@@ -381,7 +387,7 @@ public class QueryGenerator
         final DocumentReference userClass = new DocumentReference(USER_CLASS, parameters.user.getWikiReference());
         // Don't show hidden events unless the user want to display hidden pages
         boolean displayHiddenDocuments =
-            this.userManager.getUser(new DocumentUserReference(parameters.user)).displayHiddenDocuments();
+            this.userResolver.resolve(this.userReferenceResolver.resolve(parameters.user)).displayHiddenDocuments();
         if (!displayHiddenDocuments) {
             return excludeHiddenEvents(topNode);
         }

@@ -17,24 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user;
+package org.xwiki.user.internal.document;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.user.UserReference;
 
 /**
- * CRUD operations on users. Note that for retrieving a user you should use a {@link UserResolver}.
+ * Converts a {@link DocumentReference} into a {@link UserReference}.
  *
  * @version $Id$
  * @since 12.2RC1
  */
-@Unstable
-@Role
-public interface UserManager
+@Component
+@Named("document")
+@Singleton
+public class DocumentDocumentReferenceUserReferenceResolver extends AbstractUserReferenceResolver<DocumentReference>
 {
-    /**
-     * @param userReference the reference to the user to check for existence
-     * @return true if the user pointed to by the reference exists, false otherwise
-     */
-    boolean exists(UserReference userReference);
+    @Override
+    public UserReference resolve(DocumentReference rawReference, Object... parameters)
+    {
+        UserReference reference = resolveName(rawReference.getName());
+        if (reference == null) {
+            reference = new DocumentUserReference(rawReference);
+        }
+        return reference;
+    }
 }

@@ -19,10 +19,7 @@
  */
 package org.xwiki.user.internal.document;
 
-import javax.inject.Named;
-
 import org.junit.jupiter.api.Test;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
@@ -30,77 +27,65 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.User;
-import org.xwiki.user.UserManager;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.user.api.XWikiUser;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link DefaultUserManager}.
+ * Unit tests for {@link DocumentXWikiUserUserResolver}.
  *
  * @version $Id$
  */
 @ComponentTest
-public class DefaultUserManagerTest
+public class DocumentXWikiUserUserResolverTest
 {
     @InjectMockComponents
-    private DefaultUserManager userManager;
-
-    @MockComponent
-    @Named("context")
-    private ComponentManager contextComponentManager;
+    private DocumentXWikiUserUserResolver resolver;
 
     @MockComponent
     private Execution execution;
 
     @Test
-    void getUser() throws Exception
+    void resolve()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-
-        UserManager documentUserManager = mock(UserManager.class);
-        when(documentUserManager.getUser(new DocumentUserReference(reference))).thenReturn(mock(User.class));
-        when(this.contextComponentManager.getInstance(UserManager.class, DocumentUserReference.class.getName()))
-            .thenReturn(documentUserManager);
-
-        User user = this.userManager.getUser(new DocumentUserReference(reference));
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        User user = this.resolver.resolve(new XWikiUser(documentReference));
         assertNotNull(user);
+        assertEquals("wiki:space.page", ((DocumentUser) user).getUserReference().getReference().toString());
     }
 
     @Test
-    void getCurrentUser() throws Exception
+    void resolveCurrentUser()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
+        DocumentReference reference = new DocumentReference("wiki", "space", "page");
         ExecutionContext executionContext = new ExecutionContext();
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getUserReference()).thenReturn(reference);
         executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
         when(this.execution.getContext()).thenReturn(executionContext);
 
-        UserManager documentUserManager = mock(UserManager.class);
-        when(documentUserManager.getUser(new DocumentUserReference(reference))).thenReturn(mock(User.class));
-        when(this.contextComponentManager.getInstance(UserManager.class, DocumentUserReference.class.getName()))
-            .thenReturn(documentUserManager);
-
-        User user = this.userManager.getUser(null);
+        User user = this.resolver.resolve(null);
         assertNotNull(user);
+        assertEquals("wiki:space.page", ((DocumentUser) user).getUserReference().getReference().toString());
     }
 
     @Test
-    void exists() throws Exception
+    void resolveGuest()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-
-        UserManager documentUserManager = mock(UserManager.class);
-        when(documentUserManager.exists(new DocumentUserReference(reference))).thenReturn(true);
-        when(this.contextComponentManager.getInstance(UserManager.class, DocumentUserReference.class.getName()))
-            .thenReturn(documentUserManager);
-
-        assertTrue(this.userManager.exists(new DocumentUserReference(reference)));
+        User user = this.resolver.resolve(new XWikiUser(new DocumentReference("wiki", "space", "XWikiGuest")));
+        assertSame(User.GUEST, user);
     }
 
+    @Test
+    void resolveSuperAdmin()
+    {
+        User user = this.resolver.resolve(new XWikiUser(new DocumentReference("wiki", "space", "superadmin")));
+        assertSame(User.SUPERADMIN, user);
+    }
 }

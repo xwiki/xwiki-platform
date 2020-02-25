@@ -28,21 +28,27 @@ import org.xwiki.user.UserReference;
 /**
  * Represent a reference to a user stored in a wiki page.
  *
+ * Always go through a {@link org.xwiki.user.UserReferenceResolver} to get a
+ * {@link DocumentUserReference} object (this is why this class is package-protected). The reason is because the
+ * resolvers know how to handle Guest and SuperAdmin user references properly.
+ *
  * @version $Id$
  */
-public class DocumentUserReference implements UserReference
+class DocumentUserReference implements UserReference
 {
     private DocumentReference reference;
 
     /**
      * @param reference the reference to the wiki page storing the user
      */
-    public DocumentUserReference(DocumentReference reference)
+    DocumentUserReference(DocumentReference reference)
     {
         this.reference = reference;
     }
 
-    @Override
+    /**
+     * @return the reference to the document storing the user
+     */
     public DocumentReference getReference()
     {
         return this.reference;

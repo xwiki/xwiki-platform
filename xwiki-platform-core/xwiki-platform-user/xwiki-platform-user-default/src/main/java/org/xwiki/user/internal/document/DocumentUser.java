@@ -26,18 +26,19 @@ import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.user.User;
-import org.xwiki.user.UserReference;
 import org.xwiki.user.UserType;
-
-import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Document-based implementation of a XWiki user.
  *
+ * Always go through a {@link org.xwiki.user.UserResolver} to get a
+ * {@link DocumentUser} object (this is why this class is package-protected). The reason is because the resolvers
+ * know how to handle Guest and SuperAdmin users properly.
+ *
  * @version $Id$
  * @since 12.2RC1
  */
-public class DocumentUser implements User
+class DocumentUser implements User
 {
     private static final EntityReference USERS_CLASS_REFERENCE =
         new EntityReference("XWikiUsers", EntityType.SPACE,
@@ -57,7 +58,7 @@ public class DocumentUser implements User
      * @param currentReferenceResolver the component to resolve user xclass for the current wiki
      * @param entityReferenceProvider the component to check if the current wiki is the main wiki
      */
-    public DocumentUser(DocumentUserReference userReference, DocumentAccessBridge dab,
+    DocumentUser(DocumentUserReference userReference, DocumentAccessBridge dab,
         DocumentReferenceResolver<EntityReference> currentReferenceResolver,
         EntityReferenceProvider entityReferenceProvider)
     {
@@ -70,31 +71,19 @@ public class DocumentUser implements User
     @Override
     public boolean displayHiddenDocuments()
     {
-        boolean displayHiddenDocuments;
-        // The superadmin user is always shown hidden documents.
-        if (isSuperAdmin()) {
-            displayHiddenDocuments = true;
-        } else {
-            Integer preference = (Integer) getProperty("displayHiddenDocuments");
-            displayHiddenDocuments = preference != null && preference == 1;
-        }
-        return displayHiddenDocuments;
+        Integer preference = (Integer) getProperty("displayHiddenDocuments");
+        return preference != null && preference == 1;
     }
 
     @Override
     public boolean isActive()
     {
         boolean active = true;
-
-        // These users are necessarily active. Note that superadmin might be main-wiki-prefixed when in a subwiki.
-        if (!isGuest() && !isSuperAdmin()) {
-            // Default value of active should be 1 (i.e. active) if not set
-            Integer value = (Integer) getProperty("active");
-            if (value == null || value != 1) {
-                active = false;
-            }
+        // Default value of active should be 1 (i.e. active) if not set
+        Integer value = (Integer) getProperty("active");
+        if (value == null || value != 1) {
+            active = false;
         }
-
         return active;
     }
 
@@ -123,21 +112,10 @@ public class DocumentUser implements User
     }
 
     @Override
-    public boolean isGuest()
-    {
-        return XWikiRightService.isGuest(getInternalReference());
-    }
-
-    @Override
-    public boolean isSuperAdmin()
-    {
-        return XWikiRightService.isSuperAdmin(getInternalReference());
-    }
-
-    @Override
     public boolean isGlobal()
     {
-        return this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).equals(getInternalReference());
+        return this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).equals(
+            getInternalReference().getWikiReference());
     }
 
     @Override
@@ -147,7 +125,7 @@ public class DocumentUser implements User
     }
 
     @Override
-    public UserReference getUserReference()
+    public DocumentUserReference getUserReference()
     {
         return this.userReference;
     }
@@ -156,16 +134,11 @@ public class DocumentUser implements User
     public boolean isEmailChecked()
     {
         boolean emailChecked = true;
-
-        // These users always have their emails checked
-        if (!isGuest() && !isSuperAdmin()) {
-            // Default value of email_checked should be 1 (i.e. checked) if not set.
-            Integer value = (Integer) getProperty("email_checked");
-            if (value == null || value != 1) {
-                emailChecked = false;
-            }
+        // Default value of email_checked should be 1 (i.e. checked) if not set.
+        Integer value = (Integer) getProperty("email_checked");
+        if (value == null || value != 1) {
+            emailChecked = false;
         }
-
         return emailChecked;
     }
 

@@ -34,9 +34,21 @@ import org.xwiki.stability.Unstable;
 public interface UserReference
 {
     /**
-     * @param <T> the internal type of the reference
-     * @return the internal reference (e.g. a {@link org.xwiki.model.reference.DocumentReference} for an implementation
-     *         storing users in wiki pages)
+     * Represents a Guest user reference, i.e. a virtual user that is not logged in. If you need to verify if a given
+     * UserReference is the guest user, you should use {@code if (myRef == UserReference.GUEST_REFERENCE}.
      */
-    <T> T getReference();
+    UserReference GUEST_REFERENCE = new UserReference()
+    {
+        // Empty. This is a tagging object.
+    };
+
+    /**
+     * Represents the Super Admin user reference, i.e. a virtual user that has all permissions. If you need to verify
+     * if a given UserReference is the Super Admin user, you should use
+     * {@code if (myRef == UserReference.SUPERADMIN_REFERENCE}.
+     */
+    UserReference SUPERADMIN_REFERENCE = new UserReference()
+    {
+        // Empty. This is a tagging object.
+    };
 }

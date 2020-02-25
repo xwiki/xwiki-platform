@@ -36,7 +36,7 @@
 #end
 #if ($!editorPanels != '')
   #set ($editorPanels = $editorPanels.split(','))
-  <div id="editPanels" class="panels editor">
+  <div id="editPanels" class="panels editor xform">
 
   ## Convert the list of panels to panel (UIExtension) IDs
   #set ($panelIDList = [])

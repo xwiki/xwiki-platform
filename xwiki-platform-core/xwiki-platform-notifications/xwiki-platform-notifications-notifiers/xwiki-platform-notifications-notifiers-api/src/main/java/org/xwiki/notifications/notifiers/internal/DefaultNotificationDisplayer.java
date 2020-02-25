@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.script.ScriptContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.notifiers.NotificationDisplayer;
@@ -60,19 +61,23 @@ public class DefaultNotificationDisplayer implements NotificationDisplayer
         ScriptContext scriptContext = this.scriptContextManager.getScriptContext();
         try {
             scriptContext.setAttribute(EVENT_BINDING_NAME, eventNotification, ScriptContext.ENGINE_SCOPE);
-
-            String templateName = String.format("notification/%s.vm",
-                    eventNotification.getType().replaceAll("\\/", "."));
-            Template template = templateManager.getTemplate(templateName);
-
-            return (template != null) ? templateManager.execute(template)
-                    : templateManager.execute("notification/default.vm");
+            Template template = getSpecificTemplate(eventNotification);
+            return (template != null) ? this.templateManager.execute(template)
+                : this.templateManager.execute("notification/default.vm");
 
         } catch (Exception e) {
-            throw new NotificationException("Failed to render the notification.", e);
+            throw new NotificationException(String.format("Failed to render the notification for events [%s]",
+                StringUtils.join(eventNotification.getEventIds(), ',')), e);
         } finally {
             scriptContext.removeAttribute(EVENT_BINDING_NAME, ScriptContext.ENGINE_SCOPE);
         }
+    }
+
+    private Template getSpecificTemplate(CompositeEvent eventNotification)
+    {
+        String templateName = String.format("notification/%s.vm",
+            eventNotification.getType().replaceAll("\\/", "."));
+        return this.templateManager.getTemplate(templateName);
     }
 
     @Override

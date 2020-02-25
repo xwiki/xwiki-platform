@@ -28,6 +28,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserType;
@@ -57,39 +58,17 @@ public class DocumentUserTest
     private DocumentReferenceResolver<EntityReference> currentReferenceResolver;
 
     @MockComponent
-    private
-    EntityReferenceProvider entityReferenceProvider;
+    private EntityReferenceProvider entityReferenceProvider;
 
     @Test
-    void isGuest()
+    void isGlobal()
     {
-        DocumentUser user = new DocumentUser(new DocumentUserReference(new DocumentReference("wiki", "space", "user")),
-            this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
-        assertFalse(user.isGuest());
-
-        user = new DocumentUser(new DocumentUserReference(new DocumentReference("wiki", "space", "XWikiGuest")),
-            this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
-        assertTrue(user.isGuest());
-
-        user = new DocumentUser(new DocumentUserReference(new DocumentReference("wiki", "space", "XwIkIGuEsT")),
-            this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
-        assertTrue(user.isGuest());
-    }
-
-    @Test
-    void isSuperAdmin()
-    {
-        DocumentUser user = new DocumentUser(new DocumentUserReference(new DocumentReference("wiki", "space", "user")),
-            this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
-        assertFalse(user.isSuperAdmin());
-
-        user = new DocumentUser(new DocumentUserReference(new DocumentReference("wiki", "space", "superadmin")),
-            this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
-        assertTrue(user.isSuperAdmin());
-
-        user = new DocumentUser(new DocumentUserReference(new DocumentReference("wiki", "space", "SuPeRAdMiN")),
-            this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
-        assertTrue(user.isSuperAdmin());
+        DocumentReference reference = new DocumentReference("mainwiki", "space", "user");
+        when(this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(
+            new WikiReference("mainwiki"));
+        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.dab,
+            this.currentReferenceResolver, this.entityReferenceProvider);
+        assertTrue(user.isGlobal());
     }
 
     @Test
@@ -109,16 +88,6 @@ public class DocumentUserTest
 
         when(this.dab.getProperty(reference, classReference, "active")).thenReturn(null);
         assertFalse(user.isActive());
-
-        reference = new DocumentReference("wiki", "space", "superadmin");
-        user = new DocumentUser(new DocumentUserReference(reference), this.dab, this.currentReferenceResolver,
-            this.entityReferenceProvider);
-        assertTrue(user.isActive());
-
-        reference = new DocumentReference("wiki", "space", "XWikiGuest");
-        user = new DocumentUser(new DocumentUserReference(reference), this.dab, this.currentReferenceResolver,
-            this.entityReferenceProvider);
-        assertTrue(user.isActive());
     }
 
     @Test
@@ -137,16 +106,6 @@ public class DocumentUserTest
         assertFalse(user.displayHiddenDocuments());
 
         when(this.dab.getProperty(reference, classReference, "displayHiddenDocuments")).thenReturn(null);
-        assertFalse(user.displayHiddenDocuments());
-
-        reference = new DocumentReference("wiki", "space", "superadmin");
-        user = new DocumentUser(new DocumentUserReference(reference), this.dab, this.currentReferenceResolver,
-            this.entityReferenceProvider);
-        assertTrue(user.displayHiddenDocuments());
-
-        reference = new DocumentReference("wiki", "space", "XWikiGuest");
-        user = new DocumentUser(new DocumentUserReference(reference), this.dab, this.currentReferenceResolver,
-            this.entityReferenceProvider);
         assertFalse(user.displayHiddenDocuments());
     }
 

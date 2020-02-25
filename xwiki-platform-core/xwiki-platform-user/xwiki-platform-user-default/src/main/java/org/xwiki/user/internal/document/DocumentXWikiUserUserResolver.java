@@ -19,32 +19,43 @@
  */
 package org.xwiki.user.internal.document;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.user.UserManager;
-import org.xwiki.user.UserReference;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.user.User;
+
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
- * Document-based implementation of {@link UserManager}.
+ * Converts an oldcore {@link XWikiUser} into a {@link User}.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
-@Named("org.xwiki.user.internal.document.DocumentUserReference")
+@Named("document")
 @Singleton
-public class DocumentUserManager implements UserManager
+public class DocumentXWikiUserUserResolver extends AbstractDocumentUserResolver<XWikiUser>
 {
-    @Inject
-    private DocumentAccessBridge dab;
-
     @Override
-    public boolean exists(UserReference userReference)
+    public User resolve(XWikiUser xwikiUser, Object... parameters)
     {
-        return this.dab.exists(((DocumentUserReference) userReference).getReference());
+        User user;
+        if (xwikiUser != null) {
+            DocumentReference documentReference = xwikiUser.getUserReference();
+            if (XWikiRightService.isGuest(documentReference)) {
+                user = User.GUEST;
+            } else if (XWikiRightService.isSuperAdmin(documentReference)) {
+                user = User.SUPERADMIN;
+            } else {
+                user = resolveUser(new DocumentUserReference(documentReference));
+            }
+        } else {
+            user = resolveUser(null);
+        }
+        return user;
     }
 }

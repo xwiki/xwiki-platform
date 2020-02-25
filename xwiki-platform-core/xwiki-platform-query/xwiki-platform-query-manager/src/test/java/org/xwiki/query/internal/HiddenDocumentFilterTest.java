@@ -29,7 +29,8 @@ import org.xwiki.query.QueryFilter;
 import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
 import org.xwiki.test.jmock.annotation.MockingRequirement;
 import org.xwiki.user.User;
-import org.xwiki.user.UserManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserResolver;
 
 import static org.junit.Assert.assertEquals;
 
@@ -43,17 +44,17 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
 {
     private QueryFilter filter;
 
-    private UserManager userManager;
+    private UserResolver<UserReference> userResolver;
 
     @Before
     public void configure() throws Exception
     {
-        this.userManager = getComponentManager().getInstance(UserManager.class);
+        this.userResolver = getComponentManager().getInstance(UserResolver.TYPE_USER_REFERENCE);
         User user = mockery.mock(User.class);
         getMockery().checking(new Expectations()
         {{
                 ignoring(any(Logger.class)).method("debug");
-                oneOf(userManager).getUser(null);
+                oneOf(userResolver).resolve(null);
                 will(returnValue(user));
                 oneOf(user).displayHiddenDocuments();
                 will(returnValue(true));

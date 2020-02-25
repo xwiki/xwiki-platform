@@ -19,22 +19,33 @@
  */
 package org.xwiki.user;
 
+import java.lang.reflect.ParameterizedType;
+
 import org.xwiki.component.annotation.Role;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.stability.Unstable;
 
 /**
- * CRUD operations on users. Note that for retrieving a user you should use a {@link UserResolver}.
+ * Convert a raw representation of a user  into a {@link User} object (for example converts a User Reference into a
+ * User).
  *
+ * @param <T> the type of the user representation
  * @version $Id$
  * @since 12.2RC1
  */
 @Unstable
 @Role
-public interface UserManager
+public interface UserResolver<T>
 {
     /**
-     * @param userReference the reference to the user to check for existence
-     * @return true if the user pointed to by the reference exists, false otherwise
+     * Type instance for {@code UserResolver<UserReference>}.
      */
-    boolean exists(UserReference userReference);
+    ParameterizedType TYPE_USER_REFERENCE = new DefaultParameterizedType(null, UserResolver.class, UserReference.class);
+
+    /**
+     * @param userRepresentation the representation of the user (e.g. User Reference, oldcore XWikiUser object etc)
+     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
+     * @return the User object
+     */
+    User resolve(T userRepresentation, Object... parameters);
 }

@@ -25,9 +25,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.user.User;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
@@ -44,14 +42,6 @@ public class DocumentUserManagerTest
 
     @MockComponent
     private DocumentAccessBridge dab;
-
-    @Test
-    void getUser()
-    {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        User user = this.userManager.getUser(new DocumentUserReference(reference));
-        assertNotNull(user);
-    }
 
     @Test
     void exists()

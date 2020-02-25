@@ -23,28 +23,42 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.user.UserManager;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.user.UserReference;
 
 /**
- * Document-based implementation of {@link UserManager}.
+ * Converts a {@link String} representing a user id into a {@link UserReference}.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
-@Named("org.xwiki.user.internal.document.DocumentUserReference")
+@Named("document")
 @Singleton
-public class DocumentUserManager implements UserManager
+public class DocumentStringUserReferenceResolver extends AbstractUserReferenceResolver<String>
 {
+    private static final EntityReference USER_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
+
     @Inject
-    private DocumentAccessBridge dab;
+    private DocumentReferenceResolver<String> resolver;
 
     @Override
-    public boolean exists(UserReference userReference)
+    public UserReference resolve(String userName, Object... parameters)
     {
-        return this.dab.exists(((DocumentUserReference) userReference).getReference());
+        UserReference reference = resolveName(userName);
+        if (reference == null) {
+            EntityReference baseEntityReference;
+            if (parameters.length == 1 && parameters[0] instanceof WikiReference) {
+                baseEntityReference = new EntityReference(USER_SPACE_REFERENCE, (WikiReference) parameters[0]);
+            } else {
+                baseEntityReference = USER_SPACE_REFERENCE;
+            }
+            reference = new DocumentUserReference(this.resolver.resolve(userName, baseEntityReference));
+        }
+        return reference;
     }
 }

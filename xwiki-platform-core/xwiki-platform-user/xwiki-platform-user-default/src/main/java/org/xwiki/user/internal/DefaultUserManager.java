@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal.document;
+package org.xwiki.user.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -26,15 +26,12 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.context.Execution;
-import org.xwiki.user.User;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
- * Document-based implementation of {@link UserManager}.
+ * Document-based implementation of {@link UserManager} which proxies to the specific UserManager implementation
+ * based on the type of the passed {@link UserReference}.
  *
  * @version $Id$
  * @since 12.2RC1
@@ -46,21 +43,6 @@ public class DefaultUserManager implements UserManager
     @Inject
     @Named("context")
     private ComponentManager componentManager;
-
-    @Inject
-    private Execution execution;
-
-    @Override
-    public User getUser(UserReference userReference)
-    {
-        User user;
-        if (userReference == null) {
-            user = getUser(new DocumentUserReference(getXWikiContext().getUserReference()));
-        } else {
-            user = resolveUserManager(userReference).getUser(userReference);
-        }
-        return user;
-    }
 
     @Override
     public boolean exists(UserReference userReference)
@@ -77,10 +59,5 @@ public class DefaultUserManager implements UserManager
                 "Failed to find component implementation for role [%s] and hint [%s]", UserManager.class.getName(),
                 userReference.getClass().getName()));
         }
-    }
-
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

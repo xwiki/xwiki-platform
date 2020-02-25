@@ -23,18 +23,23 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * CRUD operations on users. Note that for retrieving a user you should use a {@link UserResolver}.
+ * Convert a raw representation of a user reference into a {@link UserReference} object (for example converts
+ * a String containing a user name into a Document User Reference).
  *
+ * @param <T> the type of the raw user reference
  * @version $Id$
  * @since 12.2RC1
  */
 @Unstable
 @Role
-public interface UserManager
+public interface UserReferenceResolver<T>
 {
     /**
-     * @param userReference the reference to the user to check for existence
-     * @return true if the user pointed to by the reference exists, false otherwise
+     * @param rawReference the raw representation of a user reference to convert
+     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
+     *                   (for example a Document User Reference resolver accepting a user name as a string will also
+     *                   take as parameter a Wiki Reference defining in which wiki the user belongs to)
+     * @return the resulting User Reference object
      */
-    boolean exists(UserReference userReference);
+    UserReference resolve(T rawReference, Object... parameters);
 }

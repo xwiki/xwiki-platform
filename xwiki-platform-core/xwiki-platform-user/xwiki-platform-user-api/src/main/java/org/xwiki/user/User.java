@@ -32,6 +32,16 @@ import org.xwiki.stability.Unstable;
 public interface User
 {
     /**
+     * Represents the Guest user, see {@link GuestUser}.
+     */
+    User GUEST = GuestUser.INSTANCE;
+
+    /**
+     * Represents the Super Admin user, see {@link SuperAdminUser}.
+     */
+    User SUPERADMIN = SuperAdminUser.INSTANCE;
+
+    /**
      * @return true if the user is configured to display hidden documents in the wiki
      */
     boolean displayHiddenDocuments();
@@ -70,19 +80,9 @@ public interface User
     boolean isEmailChecked();
 
     /**
-     * @return true if this user is the guest user (i.e. not a real user)
-     */
-    boolean isGuest();
-
-    /**
      * @return true if this user is registered in the main wiki (i.e. it's a global user)
      */
     boolean isGlobal();
-
-    /**
-     * @return true if this user is the {@code superadmin} user
-     */
-    boolean isSuperAdmin();
 
     /**
      * @param propertyName the name of the user property to look for

@@ -26,7 +26,8 @@ import javax.inject.Inject;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.user.UserManager;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserResolver;
 
 /**
  * Base class for filtering hidden entities.
@@ -41,7 +42,7 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
      * Used to retrieve user preference regarding hidden documents.
      */
     @Inject
-    private UserManager userManager;
+    private UserResolver<UserReference> userResolver;
 
     /**
      * @see #initialize()
@@ -54,7 +55,7 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
     @Override
     public void initialize()
     {
-        this.isActive = this.userManager.getUser(null).displayHiddenDocuments();
+        this.isActive = this.userResolver.resolve(null).displayHiddenDocuments();
     }
 
     @Override

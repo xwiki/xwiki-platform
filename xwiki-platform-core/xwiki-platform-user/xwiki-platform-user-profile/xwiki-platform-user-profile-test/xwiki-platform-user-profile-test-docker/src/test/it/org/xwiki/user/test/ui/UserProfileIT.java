@@ -71,7 +71,7 @@ public class UserProfileIT
 
     private static final String USER_BLOGFEED = "http://xwiki.org/feed";
 
-    private static final String WYSIWYG_EDITOR = "Wysiwyg";
+    private static final String WYSIWYG_EDITOR = "WYSIWYG";
 
     private static final String TEXT_EDITOR = "Text";
 

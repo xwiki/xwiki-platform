@@ -19,12 +19,15 @@
  */
 package org.xwiki.user.internal.document;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserResolver;
 
 /**
  * Converts a {@link UserReference} into a {@link User}.
@@ -33,15 +36,21 @@ import org.xwiki.user.UserReference;
  * @since 12.2RC1
  */
 @Component
-@Named("document")
+@Named("org.xwiki.user.internal.document.DocumentUserReference")
 @Singleton
 public class DocumentUserReferenceUserResolver extends AbstractDocumentUserResolver<UserReference>
 {
+    @Inject
+    @Named("org.xwiki.user.CurrentUserReference")
+    private UserResolver<CurrentUserReference> currentUserResolver;
+
     @Override
     public User resolve(UserReference userReference, Object... parameters)
     {
         User user;
-        if (UserReference.GUEST_REFERENCE == userReference) {
+        if (userReference == null | UserReference.CURRENT_USER_REFERENCE == userReference) {
+            user = this.currentUserResolver.resolve(null);
+        } else if (UserReference.GUEST_REFERENCE == userReference) {
             user = User.GUEST;
         } else if (UserReference.SUPERADMIN_REFERENCE == userReference) {
             user = User.SUPERADMIN;

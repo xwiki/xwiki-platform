@@ -19,21 +19,22 @@
  */
 package org.xwiki.user.internal.document;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.Test;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
-
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.user.UserResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +50,8 @@ public class DocumentUserReferenceUserResolverTest
     private DocumentUserReferenceUserResolver resolver;
 
     @MockComponent
-    private Execution execution;
+    @Named("org.xwiki.user.CurrentUserReference")
+    private UserResolver<CurrentUserReference> currentUserResolver;
 
     @Test
     void resolve()
@@ -63,16 +65,23 @@ public class DocumentUserReferenceUserResolverTest
     @Test
     void resolveCurrentUser()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "page");
-        ExecutionContext executionContext = new ExecutionContext();
-        XWikiContext xcontext = mock(XWikiContext.class);
-        when(xcontext.getUserReference()).thenReturn(reference);
-        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
-        when(this.execution.getContext()).thenReturn(executionContext);
+        User currentUser = mock(User.class);
+        when(this.currentUserResolver.resolve(any())).thenReturn(currentUser);
+
+        User user = this.resolver.resolve(UserReference.CURRENT_USER_REFERENCE);
+        assertNotNull(user);
+        assertSame(currentUser, user);
+    }
+
+    @Test
+    void resolveCurrentUserWhenNull()
+    {
+        User currentUser = mock(User.class);
+        when(this.currentUserResolver.resolve(any())).thenReturn(currentUser);
 
         User user = this.resolver.resolve(null);
         assertNotNull(user);
-        assertEquals("wiki:space.page", ((DocumentUser) user).getUserReference().getReference().toString());
+        assertSame(currentUser, user);
     }
 
     @Test

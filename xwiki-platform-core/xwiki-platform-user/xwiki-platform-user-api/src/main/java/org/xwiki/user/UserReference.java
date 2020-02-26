@@ -51,4 +51,9 @@ public interface UserReference
     {
         // Empty. This is a tagging object.
     };
+
+    /**
+     * Represents a reference to the current logged-in user.
+     */
+    UserReference CURRENT_USER_REFERENCE = CurrentUserReference.INSTANCE;
 }

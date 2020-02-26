@@ -553,6 +553,10 @@ div.userDashboard, #dashboardPane .dashboard {
   padding: 5px 10px 10px;
 }
 
+div.userInfo {
+  border-radious: 5px;
+}
+
 /* ----- Profile ----- */
 td.recentChangesLeft, .recentChangesMoreActions {
   display:none;

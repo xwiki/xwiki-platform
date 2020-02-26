@@ -96,7 +96,7 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
     {
         boolean shown = !Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"));
         if (!shown) {
-            shown = this.userResolver.resolve(null).displayHiddenDocuments();
+            shown = this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE).displayHiddenDocuments();
         }
         return shown;
     }

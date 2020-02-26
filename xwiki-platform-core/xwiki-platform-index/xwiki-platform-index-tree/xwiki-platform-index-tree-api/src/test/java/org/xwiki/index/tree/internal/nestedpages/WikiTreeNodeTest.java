@@ -151,7 +151,7 @@ public class WikiTreeNodeTest
         this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
         User user = mock(User.class);
         when(user.displayHiddenDocuments()).thenReturn(false);
-        when(this.userResolver.resolve(null)).thenReturn(user);
+        when(this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE)).thenReturn(user);
 
         assertEquals(0, this.wikiTreeNode.getChildCount("something"));
         assertEquals(0, this.wikiTreeNode.getChildCount("some:thing"));
@@ -205,7 +205,7 @@ public class WikiTreeNodeTest
         this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
         User user = mock(User.class);
         when(user.displayHiddenDocuments()).thenReturn(false);
-        when(this.userResolver.resolve(null)).thenReturn(user);
+        when(this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE)).thenReturn(user);
 
         String statement = "select reference, 0 as terminal from XWikiSpace page order by lower(name), name";
         when(this.queryManager.createQuery(statement, Query.HQL)).thenReturn(this.query);
@@ -228,7 +228,7 @@ public class WikiTreeNodeTest
         this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
         User user = mock(User.class);
         when(user.displayHiddenDocuments()).thenReturn(false);
-        when(this.userResolver.resolve(null)).thenReturn(user);
+        when(this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE)).thenReturn(user);
 
         this.wikiTreeNode.getProperties().put("orderBy", "title");
         this.wikiTreeNode.getProperties().put("exclusions",

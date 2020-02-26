@@ -55,7 +55,7 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
     @Override
     public void initialize()
     {
-        this.isActive = this.userResolver.resolve(null).displayHiddenDocuments();
+        this.isActive = this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE).displayHiddenDocuments();
     }
 
     @Override

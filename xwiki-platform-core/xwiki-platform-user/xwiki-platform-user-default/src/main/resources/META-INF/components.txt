@@ -11,3 +11,4 @@ org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceResolver
 org.xwiki.user.internal.document.DocumentStringUserReferenceResolver
 org.xwiki.user.internal.document.DocumentUserReferenceUserResolver
 org.xwiki.user.internal.document.DocumentXWikiUserUserResolver
+org.xwiki.user.internal.document.CurrentUserResolver

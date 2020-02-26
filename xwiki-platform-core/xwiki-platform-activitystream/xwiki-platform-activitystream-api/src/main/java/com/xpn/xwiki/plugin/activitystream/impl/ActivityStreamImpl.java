@@ -616,7 +616,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
     private void addHiddenEventsFilter(StringBuffer query)
     {
         UserResolver<UserReference> userResolver = Utils.getComponent(UserResolver.TYPE_USER_REFERENCE);
-        if (!userResolver.resolve(null).displayHiddenDocuments()) {
+        if (!userResolver.resolve(UserReference.CURRENT_USER_REFERENCE).displayHiddenDocuments()) {
             if (!query.toString().contains(" where ")) {
                 query.append(" where ");
             }

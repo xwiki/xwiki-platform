@@ -27,6 +27,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -67,6 +68,30 @@ public class DefaultUserReferenceUserResolverTest
             TestUserReference.class.getName())).thenReturn(customUserResolver);
 
         assertNotNull(this.resolver.resolve(new TestUserReference()));
+    }
+
+    @Test
+    void resolveForCurrentUser() throws Exception
+    {
+        UserResolver<CurrentUserReference> customUserResolver = mock(UserResolver.class);
+        when(customUserResolver.resolve(any(CurrentUserReference.class))).thenReturn(mock(User.class));
+
+        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+            CurrentUserReference.class.getName())).thenReturn(customUserResolver);
+
+        assertNotNull(this.resolver.resolve(UserReference.CURRENT_USER_REFERENCE));
+    }
+
+    @Test
+    void resolveForCurrentUserWhenNull() throws Exception
+    {
+        UserResolver<CurrentUserReference> customUserResolver = mock(UserResolver.class);
+        when(customUserResolver.resolve(any(CurrentUserReference.class))).thenReturn(mock(User.class));
+
+        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+            CurrentUserReference.class.getName())).thenReturn(customUserResolver);
+
+        assertNotNull(this.resolver.resolve(null));
     }
 
     @Test

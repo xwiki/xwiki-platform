@@ -24,46 +24,35 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.context.Execution;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
-import org.xwiki.user.UserResolver;
 
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.XWikiContext;
 
 /**
- * Converts an oldcore {@link XWikiUser} into a {@link User}.
+ * Resolves the current logged-in user. This is a convenience resolver since the current user should be retrieved from
+ * the Execution Context instead.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
-@Named("com.xpn.xwiki.user.api.XWikiUser")
+@Named("org.xwiki.user.CurrentUserReference")
 @Singleton
-public class DocumentXWikiUserUserResolver extends AbstractDocumentUserResolver<XWikiUser>
+public class CurrentUserResolver extends AbstractDocumentUserResolver<CurrentUserReference>
 {
     @Inject
-    @Named("org.xwiki.user.CurrentUserReference")
-    private UserResolver<CurrentUserReference> currentUserResolver;
+    private Execution execution;
 
     @Override
-    public User resolve(XWikiUser xwikiUser, Object... parameters)
+    public User resolve(CurrentUserReference unused, Object... parameters)
     {
-        User user;
+        return resolveUser(new DocumentUserReference(getXWikiContext().getUserReference()));
+    }
 
-        if (xwikiUser == null) {
-            user = this.currentUserResolver.resolve(null);
-        } else {
-            DocumentReference documentReference = xwikiUser.getUserReference();
-            if (XWikiRightService.isGuest(documentReference)) {
-                user = User.GUEST;
-            } else if (XWikiRightService.isSuperAdmin(documentReference)) {
-                user = User.SUPERADMIN;
-            } else {
-                user = resolveUser(new DocumentUserReference(documentReference));
-            }
-        }
-        return user;
+    private XWikiContext getXWikiContext()
+    {
+        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

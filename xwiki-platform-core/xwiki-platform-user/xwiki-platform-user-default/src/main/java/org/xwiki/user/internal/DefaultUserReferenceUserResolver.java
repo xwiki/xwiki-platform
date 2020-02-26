@@ -48,7 +48,13 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
     @Override
     public User resolve(UserReference userReference, Object... parameters)
     {
-        return resolveUserResolver(userReference).resolve(userReference, parameters);
+        User user;
+        UserReference normalizedUserReference = userReference;
+        if (normalizedUserReference == null) {
+            normalizedUserReference = UserReference.CURRENT_USER_REFERENCE;
+        }
+        user = resolveUserResolver(normalizedUserReference).resolve(normalizedUserReference, parameters);
+        return user;
     }
 
     private UserResolver<UserReference> resolveUserResolver(UserReference userReference)

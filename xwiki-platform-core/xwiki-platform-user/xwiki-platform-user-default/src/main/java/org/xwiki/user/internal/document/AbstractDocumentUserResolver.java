@@ -23,14 +23,11 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.bridge.DocumentAccessBridge;
-import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.user.User;
 import org.xwiki.user.UserResolver;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Helps implement Document-based User Resolvers.
@@ -51,31 +48,12 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
 
-    @Inject
-    private Execution execution;
-
     /**
-     * @param userReference the reference to the user to create. If null then resolves the current user reference
+     * @param userReference the reference to the user to create. Must be non-null.
      * @return the User object
      */
     protected User resolveUser(DocumentUserReference userReference)
     {
-        User user;
-        if (userReference == null) {
-            user = resolveUserInternal(new DocumentUserReference(getXWikiContext().getUserReference()));
-        } else {
-            user = resolveUserInternal(userReference);
-        }
-        return user;
-    }
-
-    private User resolveUserInternal(DocumentUserReference userReference)
-    {
         return new DocumentUser(userReference, this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
-    }
-
-    private XWikiContext getXWikiContext()
-    {
-        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
     }
 }

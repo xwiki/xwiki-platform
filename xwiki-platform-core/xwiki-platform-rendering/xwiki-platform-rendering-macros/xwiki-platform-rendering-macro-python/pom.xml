@@ -32,6 +32,9 @@
   <description>Adds ability to write scripts in Python in wiki pages</description>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+    <!-- TODO: Currently pitest doesn't seem to recognize our tests. Fix when it does. We also had 100% reported
+         before but we think it's a bug, see https://github.com/STAMP-project/pitest-descartes/issues/119 -->
+    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Python Macro</xwiki.extension.name>
   </properties>

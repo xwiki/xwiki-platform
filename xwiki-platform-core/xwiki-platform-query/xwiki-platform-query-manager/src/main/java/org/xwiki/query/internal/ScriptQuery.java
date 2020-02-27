@@ -20,6 +20,7 @@
 package org.xwiki.query.internal;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xwiki.component.manager.ComponentLookupException;
@@ -83,7 +84,8 @@ public class ScriptQuery implements SecureQuery
                 addFilter(queryFilter);
             } catch (ComponentLookupException e) {
                 // We need to avoid throwing exceptions in the wiki if the filter does not exist.
-                LOGGER.warn("Failed to load QueryFilter with component hint [{}]", filter);
+                LOGGER.warn("Failed to load QueryFilter with component hint [{}]. Root error [{}]", filter,
+                    ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
@@ -94,7 +96,7 @@ public class ScriptQuery implements SecureQuery
      * Allow to retrieve the total count of items for the given query instead of the actual results. This method will
      * only work for queries selecting document full names, see {@link CountDocumentFilter} for more information.
      *
-     * @return the total number of results for this query.
+     * @return the total number of results for this query or -1 if an error occurred.
      */
     public long count()
     {
@@ -102,7 +104,7 @@ public class ScriptQuery implements SecureQuery
 
         try {
             // Create a copy of the wrapped query.
-            QueryManager queryManager = (QueryManager) this.componentManager.getInstance(QueryManager.class);
+            QueryManager queryManager = this.componentManager.getInstance(QueryManager.class);
             Query countQuery = queryManager.createQuery(getStatement(), getLanguage());
             countQuery.setWiki(getWiki());
             for (Map.Entry<Integer, Object> entry : getPositionalParameters().entrySet()) {
@@ -116,14 +118,14 @@ public class ScriptQuery implements SecureQuery
             }
 
             // Add the count filter to it.
-            countQuery.addFilter(this.componentManager.<QueryFilter>getInstance(QueryFilter.class, "count"));
+            countQuery.addFilter(this.componentManager.getInstance(QueryFilter.class, "count"));
 
             // Execute and retrieve the count result.
             List<Long> results = countQuery.execute();
             result = results.get(0);
         } catch (Exception e) {
-            LOGGER.warn("Failed to create count query for query [{}]", getStatement());
-            e.printStackTrace();
+            LOGGER.warn("Failed to create count query for query [{}]. Root error: [{}]", getStatement(),
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
         return result;

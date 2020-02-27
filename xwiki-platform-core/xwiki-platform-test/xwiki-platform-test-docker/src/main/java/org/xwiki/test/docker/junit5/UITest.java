@@ -161,8 +161,11 @@ public @interface UITest
     String[] profiles() default {};
 
     /**
-     * @return true if an office docker container must be provided to run the tests.
+     * Note: The version of LibreOffice is read from the current {@code pom.xml}.
+     *
+     * @return true if LibreOffice must be installed in the Servlet Container.
      * @since 10.11RC1
+     * @see org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor
      */
     boolean office() default false;
 

@@ -69,15 +69,11 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private static final String OFFICE_IMAGE_VERSION_LABEL = "image-version";
 
-    /**
-     *  Increment the image version whenever a change is brought to the image so that it can be reconstructed on all
-     *  machines needing it.
-     */
-    private static final String OFFICE_IMAGE_VERSION_LABEL_VALUE = "1";
-
     private JettyStandaloneExecutor jettyStandaloneExecutor;
 
     private RepositoryResolver repositoryResolver;
+
+    private MavenResolver mavenResolver;
 
     private TestConfiguration testConfiguration;
 
@@ -92,6 +88,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     public ServletContainerExecutor(TestConfiguration testConfiguration, ArtifactResolver artifactResolver,
         MavenResolver mavenResolver, RepositoryResolver repositoryResolver)
     {
+        this.mavenResolver = mavenResolver;
         this.testConfiguration = testConfiguration;
         this.jettyStandaloneExecutor = new JettyStandaloneExecutor(testConfiguration, artifactResolver, mavenResolver);
         this.repositoryResolver = repositoryResolver;
@@ -143,14 +140,14 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         this.testConfiguration.getServletEngine().setPort(xwikiPort);
     }
 
-    private void configureWildFly(File sourceWARDirectory)
+    private void configureWildFly(File sourceWARDirectory) throws Exception
     {
         this.servletContainer = createServletContainer();
         mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
             "/opt/jboss/wildfly/standalone/deployments/xwiki");
     }
 
-    private void configureJetty(File sourceWARDirectory)
+    private void configureJetty(File sourceWARDirectory) throws Exception
     {
         this.servletContainer = createServletContainer();
         mountFromHostToContainer(this.servletContainer, sourceWARDirectory.toString(),
@@ -263,7 +260,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
         return testConfiguration.getServletEngineTag() != null ? testConfiguration.getServletEngineTag() : LATEST;
     }
 
-    private GenericContainer createServletContainer()
+    private GenericContainer createServletContainer() throws Exception
     {
         final String baseImageName = String.format("%s:%s",
             this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
@@ -275,9 +272,12 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
             String imageName = String.format("xwiki-%s-office:%s",
                 this.testConfiguration.getServletEngine().name().toLowerCase(), getDockerImageTag(testConfiguration));
 
+            // We rebuild every time the LibreOffice version changes
+            String officeVersion = this.mavenResolver.getPropertyFromCurrentPOM("libreoffice.version");
+            String imageVersion = String.format("LO-%S", officeVersion);
             List<Image> imageSearchResults = DockerClientFactory.instance().client().listImagesCmd()
                 .withImageNameFilter(imageName)
-                .withLabelFilter(Collections.singletonMap(OFFICE_IMAGE_VERSION_LABEL, OFFICE_IMAGE_VERSION_LABEL_VALUE))
+                .withLabelFilter(Collections.singletonMap(OFFICE_IMAGE_VERSION_LABEL, imageVersion))
                 .exec();
 
             if (imageSearchResults.isEmpty()) {
@@ -289,17 +289,25 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                         builder
                             .from(baseImageName)
                             .user("root")
-                            // This command is inspired from XWiki dockerfiles
-                            // see for example:
-                            // https://github.com/xwiki-contrib/docker-xwiki/blob/master/10/mysql-tomcat/Dockerfile
-                            .run("apt-get update && apt-get install -y"
-                                + " curl"
-                                + " libreoffice"
-                                + " unzip"
-                                + " procps")
+                            .env("LIBREOFFICE_VERSION", officeVersion)
+                            .env("LIBREOFFICE_DOWNLOAD_URL", "https://downloadarchive.documentfoundation.org/"
+                                + "libreoffice/old/$LIBREOFFICE_VERSION/deb/x86_64/"
+                                + "LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb.tar.gz")
+                            // Note that we expose libreoffice /usr/local/libreoffice so that it can be found by
+                            // JODConverter: https://bit.ly/2w8B82Q
+                            .run("apt-get update && "
+                                + "apt-get --no-install-recommends -y install curl unzip procps libxinerama1 "
+                                    + "libdbus-glib-1-2 libcairo2 libcups2 libsm6 && "
+                                + "rm -rf /var/lib/apt/lists/* /var/cache/apt/* && "
+                                + "wget --no-verbose -O /tmp/libreoffice.tar.gz $LIBREOFFICE_DOWNLOAD_URL && "
+                                + "mkdir /tmp/libreoffice && "
+                                + "tar -C /tmp/ -xvf /tmp/libreoffice.tar.gz && "
+                                + "cd /tmp/LibreOffice_${LIBREOFFICE_VERSION}_Linux_x86-64_deb/DEBS && "
+                                + "dpkg -i *.deb && "
+                                + "ln -fs `ls -d /opt/libreoffice*` /opt/libreoffice")
                             // Increment the image version whenever a change is brought to the image so that it can
                             // reconstructed on all machines needing it.
-                            .label(OFFICE_IMAGE_VERSION_LABEL, OFFICE_IMAGE_VERSION_LABEL_VALUE);
+                            .label(OFFICE_IMAGE_VERSION_LABEL, imageVersion);
                         if (this.testConfiguration.getServletEngine() == ServletEngine.JETTY) {
                             // Create the right jetty user directory since it doesn't exist
                             builder.run("mkdir -p /home/jetty && chown jetty:jetty /home/jetty")

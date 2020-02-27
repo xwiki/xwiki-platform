@@ -145,7 +145,7 @@ $response.setContentType('application/json')
 #set($dateFilter = $request.get('datt.date'))
 #set($deleterFilter = $request.get('datt.deleter'))
 #set($sql = '')
-#set($params = [])
+#set($params = {})
 #if("$!{filenameFilter}" != '')
   #set($sql = "and lower(datt.filename) like '%${filenameFilter.trim().toLowerCase()}%' ")
 #end
@@ -156,13 +156,13 @@ $response.setContentType('application/json')
   #set($dates = $dateFilter.split('-'))
   #if($dates.size() == 2)
     ## Date range matching
-    #set($sql = "${sql} and datt.date between ? and ? ")
-    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[0]))))
-    #set($discard = $params.add($datetool.toDate($numbertool.toNumber($dates[1]))))
+    #set($sql = "${sql} and datt.date between :start_date and :end_date ")
+    #set($discard = $params.put('start_date', $datetool.toDate($numbertool.toNumber($dates[0]))))
+    #set($discard = $params.put('end_date', $datetool.toDate($numbertool.toNumber($dates[1]))))
   #else
     ## Single value matching
-    #set($sql = "${sql} and upper(str(datt.date)) like upper(str(?)) ")
-    #set($discard = $params.add($dateFilter))
+    #set($sql = "${sql} and upper(str(datt.date)) like upper(str(:date)) ")
+    #set($discard = $params.put('date', $dateFilter))
   #end
 #end
 #if("$!{deleterFilter}" != '')

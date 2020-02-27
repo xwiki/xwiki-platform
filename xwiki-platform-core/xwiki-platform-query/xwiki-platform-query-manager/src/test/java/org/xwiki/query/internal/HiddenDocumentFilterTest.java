@@ -54,7 +54,7 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
         getMockery().checking(new Expectations()
         {{
                 ignoring(any(Logger.class)).method("debug");
-                oneOf(userResolver).resolve(null);
+                oneOf(userResolver).resolve(UserReference.CURRENT_USER_REFERENCE);
                 will(returnValue(user));
                 oneOf(user).displayHiddenDocuments();
                 will(returnValue(true));

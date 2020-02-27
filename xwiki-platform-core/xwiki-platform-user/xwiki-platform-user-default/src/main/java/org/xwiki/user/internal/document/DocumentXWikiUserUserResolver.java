@@ -25,8 +25,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
+import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
 
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -45,7 +45,7 @@ public class DocumentXWikiUserUserResolver extends AbstractDocumentUserResolver<
 {
     @Inject
     @Named("org.xwiki.user.CurrentUserReference")
-    private UserResolver<CurrentUserReference> currentUserResolver;
+    private UserResolver<UserReference> currentUserResolver;
 
     @Override
     public User resolve(XWikiUser xwikiUser, Object... parameters)
@@ -61,7 +61,7 @@ public class DocumentXWikiUserUserResolver extends AbstractDocumentUserResolver<
             } else if (XWikiRightService.isSuperAdmin(documentReference)) {
                 user = User.SUPERADMIN;
             } else {
-                user = resolveUser(new DocumentUserReference(documentReference));
+                user = resolveUser(documentReference);
             }
         }
         return user;

@@ -26,8 +26,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
+import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
 
 import com.xpn.xwiki.user.api.XWikiUser;
@@ -52,7 +52,7 @@ public class DocumentXWikiUserUserResolverTest
 
     @MockComponent
     @Named("org.xwiki.user.CurrentUserReference")
-    private UserResolver<CurrentUserReference> currentUserResolver;
+    private UserResolver<UserReference> currentUserResolver;
 
     @Test
     void resolve()
@@ -64,7 +64,7 @@ public class DocumentXWikiUserUserResolverTest
     }
 
     @Test
-    void resolveCurrentUserWhenNull()
+    void resolveWhenNullReference()
     {
         User currentUser = mock(User.class);
         when(this.currentUserResolver.resolve(any())).thenReturn(currentUser);

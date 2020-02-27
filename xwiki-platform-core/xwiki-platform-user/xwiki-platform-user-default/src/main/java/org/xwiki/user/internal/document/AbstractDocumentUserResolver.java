@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
@@ -49,11 +50,28 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
     private EntityReferenceProvider entityReferenceProvider;
 
     /**
-     * @param userReference the reference to the user to create. Must be non-null.
+     * @param userDocumentReference the reference to the user profile page. If null then consider it's pointing to the
+     *                              Guest user.
      * @return the User object
      */
-    protected User resolveUser(DocumentUserReference userReference)
+    protected User resolveUser(DocumentReference userDocumentReference)
     {
-        return new DocumentUser(userReference, this.dab, this.currentReferenceResolver, this.entityReferenceProvider);
+        User user;
+        if (userDocumentReference == null) {
+            user = User.GUEST;
+        } else {
+            user = resolveUser(new DocumentUserReference(userDocumentReference));
+        }
+        return user;
+    }
+
+    /**
+     * @param documentUserReference the reference to the user. Must not be null.
+     * @return the User object
+     */
+    protected User resolveUser(DocumentUserReference documentUserReference)
+    {
+        return new DocumentUser(documentUserReference, this.dab, this.currentReferenceResolver,
+            this.entityReferenceProvider);
     }
 }

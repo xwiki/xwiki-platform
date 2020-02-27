@@ -85,6 +85,6 @@ rendering.macro.menu.parameter.type.description=Opcjonalny typ menu określa wyg
 rendering.macro.menu.content.description=Zdefiniuj strukturę menu za pomocą składni wiki. Każda pozycja menu powinna być pozycją na liście i powinna zawierać etykietę lub link do pozycji menu. Możesz użyć zagnieżdżonych list do pozycji podmenu.
 
 # Menu WebHome
-### Missing: menu.description=This is a simple application that helps you create navigation menus to be displayed either horizontally as a top bar after the page header or vertically in a side panel.</content>
+menu.description=Jest to prosta aplikacja, która pomaga tworzyć menu nawigacyjne wyświetlane w poziomie jako górny pasek po nagłówku strony lub pionowo w panelu bocznym.</content>
   
 </xwikidoc>

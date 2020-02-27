@@ -65,7 +65,7 @@
     {{html}}
     #set ($currentLocale = $services.localization.currentLocale)
     <ul class="collapsible document-tree">
-      #foreach ($wiki in $collectionstool.sort($modifiedWikis.keySet()))
+      #foreach ($wiki in $collectiontool.sort($modifiedWikis.keySet()))
         <li>
           #set ($wikiPrettyName = $services.wiki.getById($wiki).prettyName)
           #if ("$!wikiPrettyName.trim()" == '')

@@ -459,6 +459,15 @@ return XWiki;
     <property>
       <code>#template("colorThemeInit.vm")
 #set($tabswidth = "130px")
+
+// Variables
+// --------------------------------------------------
+
+//== Components
+//
+
+@border-radius-base:        4px;
+
 /* ----- User menu ----- */
 #user-menu-col{
   float: left;
@@ -572,6 +581,10 @@ div.userDashboard, #dashboardPane .dashboard {
 div.highlighted-profile-section,
 div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
   background-color: $theme.backgroundSecondaryColor;
+}
+
+div.userPreferences {
+  border-radius:  @border-radius-base
 }
 
 .userInfo {

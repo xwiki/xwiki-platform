@@ -312,6 +312,8 @@ rendering.transformations = $xwikiRenderingTransformations
 #-#   velocity.tools = urltool = org.xwiki.velocity.tools.URLTool
 #-#   velocity.tools = exceptiontool = org.apache.commons.lang3.exception.ExceptionUtils
 #-#   velocity.tools = niotool = org.xwiki.velocity.tools.nio.NIOTool
+#-#   velocity.tools = logtool = org.apache.velocity.tools.generic.LogTool
+#-#   velocity.tools = objecttool = org.xwiki.velocity.tools.ObjectTool
 #-#   velocity.tools = listtool = org.apache.velocity.tools.generic.ListTool (deprecated)
 #-#   velocity.tools = sorttool = org.apache.velocity.tools.generic.SortTool (deprecated)
 #-#   velocity.tools = collectionstool = org.xwiki.velocity.tools.CollectionsTool (deprecated)

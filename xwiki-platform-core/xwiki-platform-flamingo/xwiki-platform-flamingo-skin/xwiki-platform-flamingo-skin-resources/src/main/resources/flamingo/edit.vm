@@ -179,26 +179,28 @@
   #end
   #template("hierarchy.vm")
   <div class="row">
-    #if ($displayContentMenu)
-      <div class="col-xs-12 col-md-5 pull-right">
-        #template("menus_content.vm")
-      </div>
-    #end
-    #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
-      <div id="editMeta" class="col-xs-12#if ($displayContentMenu) col-md-7#end">
-        #template('editmeta.vm')
-      </div>
-    #else
-      <div id="document-title" class="col-xs-12#if ($displayContentMenu) col-md-7#end"><h1>
-      #if($editor == 'rights')
-        $services.localization.render('core.editors.rights.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
-      #elseif($editor == 'object')
-        $services.localization.render('core.editors.object.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
-      #elseif($editor == 'class')
-        $services.localization.render('core.editors.class.title', [$escapetool.xml($doc.fullName), $doc.getURL()])
+    <dl>
+      #if ($displayContentMenu)
+        <div class="col-xs-12 col-md-5 pull-right">
+          #template("menus_content.vm")
+        </div>
       #end
-      </h1></div>
-    #end
+      #if (($editor == 'wiki' || $editor == 'wysiwyg') && !$request.section)
+        <div id="editMeta" class="col-xs-12#if ($displayContentMenu) col-md-7#end">
+          #template('editmeta.vm')
+        </div>
+      #else
+        <div id="document-title" class="col-xs-12#if ($displayContentMenu) col-md-7#end"><h1>
+        #if($editor == 'rights')
+          $services.localization.render('core.editors.rights.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+        #elseif($editor == 'object')
+          $services.localization.render('core.editors.object.title', [$escapetool.xml($doc.plainTitle), $doc.getURL()])
+        #elseif($editor == 'class')
+          $services.localization.render('core.editors.class.title', [$escapetool.xml($doc.fullName), $doc.getURL()])
+        #end
+        </h1></div>
+      #end
+    </dl>
   </div> ## row
   #template("edit${editor}.vm")
   ## This javascript must be placed here since it uses velocity variables set in the template above.

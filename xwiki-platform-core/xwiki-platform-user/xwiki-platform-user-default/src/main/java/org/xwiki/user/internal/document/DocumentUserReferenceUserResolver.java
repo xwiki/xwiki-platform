@@ -24,7 +24,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -42,7 +41,7 @@ public class DocumentUserReferenceUserResolver extends AbstractDocumentUserResol
 {
     @Inject
     @Named("org.xwiki.user.CurrentUserReference")
-    private UserResolver<CurrentUserReference> currentUserResolver;
+    private UserResolver<UserReference> currentUserResolver;
 
     @Override
     public User resolve(UserReference userReference, Object... parameters)

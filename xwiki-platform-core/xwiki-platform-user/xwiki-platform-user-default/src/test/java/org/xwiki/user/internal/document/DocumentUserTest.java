@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
+import static org.xwiki.user.internal.document.DocumentUser.USERS_CLASS_REFERENCE;
 
 /**
  * Unit tests for {@link DocumentUser}.
@@ -46,10 +47,6 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class DocumentUserTest
 {
-    private static final EntityReference USERS_CLASS_REFERENCE =
-        new EntityReference("XWikiUsers", EntityType.SPACE,
-            new EntityReference("XWiki", EntityType.DOCUMENT));
-
     @MockComponent
     private DocumentAccessBridge dab;
 
@@ -78,7 +75,7 @@ public class DocumentUserTest
         DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.dab,
             this.currentReferenceResolver, this.entityReferenceProvider);
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
-        when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
+        when(this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
         when(this.dab.getProperty(reference, classReference, "active")).thenReturn(new Integer(1));
         assertTrue(user.isActive());

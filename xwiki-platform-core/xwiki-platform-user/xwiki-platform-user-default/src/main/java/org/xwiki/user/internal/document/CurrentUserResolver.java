@@ -21,12 +21,12 @@ package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.context.Execution;
-import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -40,19 +40,19 @@ import com.xpn.xwiki.XWikiContext;
 @Component
 @Named("org.xwiki.user.CurrentUserReference")
 @Singleton
-public class CurrentUserResolver extends AbstractDocumentUserResolver<CurrentUserReference>
+public class CurrentUserResolver extends AbstractDocumentUserResolver<UserReference>
 {
     @Inject
-    private Execution execution;
+    private Provider<XWikiContext> contextProvider;
 
     @Override
-    public User resolve(CurrentUserReference unused, Object... parameters)
+    public User resolve(UserReference unused, Object... parameters)
     {
-        return resolveUser(new DocumentUserReference(getXWikiContext().getUserReference()));
+        return resolveUser(getXWikiContext().getUserReference());
     }
 
     private XWikiContext getXWikiContext()
     {
-        return (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        return this.contextProvider.get();
     }
 }

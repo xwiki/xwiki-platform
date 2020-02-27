@@ -153,7 +153,7 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
           for (var i=0; i<allowedSpaces.length; i++) {
             var allowedSpace = allowedSpaces[i];
             var prefix = allowedSpace + ".";
-            if (value.indexOf(prefix) == 0 || value == allowedSpace) {
+            if (typeof value === 'string' && (value === allowedSpace || value.indexOf(prefix) == 0)) {
               // When the current value is a child of an existing restriction or actually in the list, use it.
               return true;
             }

@@ -34,13 +34,23 @@
 </div>
 #if ($editor != 'inline')
 <div id="titleinput" class="form-group">
-  <label for="xwikidoctitleinput">$services.localization.render('core.editors.content.titleField.label')</label>
-  <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" class="#if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)required#end"/>
+    <dl>
+        <dt>
+          <label for="xwikidoctitleinput">$services.localization.render('core.editors.content.titleField.label')</label>
+        </dt>
+        <dd>
+          <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" class="#if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)required#end"/>
+        </dd>
+    </dl>
 </div>
 #end
 
 #if($editor == 'wiki')
 <div id="contentMeta">
-  <label for="content">$services.localization.render('core.editors.content.contentField.label')</label>
+    <dl>
+        <dt>
+          <label for="content">$services.localization.render('core.editors.content.contentField.label')</label>
+        </dt>
+    </dl>
 </div>
 #end

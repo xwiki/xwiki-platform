@@ -67,17 +67,23 @@ Use the {{velocity}}$services.icon.render('home'){{/velocity}} breadcrumbs locat
 
 You can also use the [[Sandbox&gt;&gt;Sandbox.WebHome]] for more demo content and generally a place to experiment with your wiki's features. 
 
- {{box}}Learn more on how to use XWiki with the {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
+ {{box}}
+Learn more on how to use XWiki with the {{velocity}}[[Getting Started Guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.
+{{/box}}
 
-(%class="row"%)(((
-(%class="col-xs-12 col-sm-6"%)(((
+(%class="row"%)
+(((
+(%class="col-xs-12 col-sm-6"%)
+(((
 = Extend your wiki =
 
 To extend the power and functionalities of your wiki with the features that //you// need, head over to the {{velocity}}[[Extension Manager&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} where you can search for and install extensions.
 
 To browse through the 900+ community contributed extensions available for XWiki, head over to the [[Extensions Repository&gt;&gt;http://extensions.xwiki.org]].
 )))
-(%class="col-xs-12 col-sm-6"%)(((
+
+(%class="col-xs-12 col-sm-6"%)
+(((
 = Create your application =
 
 Go beyond the available extensions and define the //structure// of your data based on //your// needs, creating //your// own applications with [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM). 

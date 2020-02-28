@@ -91,9 +91,25 @@ public class DocumentUserReferenceUserResolverTest
     }
 
     @Test
+    void resolveGuestWhenSpecifiedAsString()
+    {
+        User user = this.resolver.resolve(new DocumentUserReference(
+            new DocumentReference("wiki", "space", "XWikiGuest")));
+        assertSame(User.GUEST, user);
+    }
+
+    @Test
     void resolveSuperAdmin()
     {
         User user = this.resolver.resolve(UserReference.SUPERADMIN_REFERENCE);
+        assertSame(User.SUPERADMIN, user);
+    }
+
+    @Test
+    void resolveSuperAdminWhenSpecifiedAsString()
+    {
+        User user = this.resolver.resolve(new DocumentUserReference(
+            new DocumentReference("wiki", "space", "superadmin")));
         assertSame(User.SUPERADMIN, user);
     }
 }

@@ -29,7 +29,6 @@ import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
 
-import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
@@ -56,13 +55,7 @@ public class DocumentXWikiUserUserResolver extends AbstractDocumentUserResolver<
             user = this.currentUserResolver.resolve(null);
         } else {
             DocumentReference documentReference = xwikiUser.getUserReference();
-            if (XWikiRightService.isGuest(documentReference)) {
-                user = User.GUEST;
-            } else if (XWikiRightService.isSuperAdmin(documentReference)) {
-                user = User.SUPERADMIN;
-            } else {
-                user = resolveUser(documentReference);
-            }
+            user = resolveUser(documentReference);
         }
         return user;
     }

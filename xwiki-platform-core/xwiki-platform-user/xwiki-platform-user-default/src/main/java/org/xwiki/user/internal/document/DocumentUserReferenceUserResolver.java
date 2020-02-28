@@ -54,8 +54,7 @@ public class DocumentUserReferenceUserResolver extends AbstractDocumentUserResol
         } else if (UserReference.SUPERADMIN_REFERENCE == userReference) {
             user = User.SUPERADMIN;
         } else {
-            DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
-            user = resolveUser(documentUserReference);
+            user = resolveUser((DocumentUserReference) userReference);
         }
         return user;
     }

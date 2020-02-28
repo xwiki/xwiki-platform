@@ -156,9 +156,9 @@ $response.setContentType('application/json')
   #set($dates = $dateFilter.split('-'))
   #if($dates.size() == 2)
     ## Date range matching
-    #set($sql = "${sql} and datt.date between :start_date and :end_date ")
-    #set($discard = $params.put('start_date', $datetool.toDate($numbertool.toNumber($dates[0]))))
-    #set($discard = $params.put('end_date', $datetool.toDate($numbertool.toNumber($dates[1]))))
+    #set($sql = "${sql} and datt.date between :startDate and :endDate ")
+    #set($discard = $params.put('startDate', $datetool.toDate($numbertool.toNumber($dates[0]))))
+    #set($discard = $params.put('endDate', $datetool.toDate($numbertool.toNumber($dates[1]))))
   #else
     ## Single value matching
     #set($sql = "${sql} and upper(str(datt.date)) like upper(str(:date)) ")

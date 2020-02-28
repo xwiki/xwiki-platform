@@ -30,6 +30,8 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.user.User;
 import org.xwiki.user.UserResolver;
 
+import com.xpn.xwiki.user.api.XWikiRightService;
+
 /**
  * Helps implement Document-based User Resolvers.
  *
@@ -56,22 +58,27 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
      */
     protected User resolveUser(DocumentReference userDocumentReference)
     {
-        User user;
-        if (userDocumentReference == null) {
-            user = User.GUEST;
-        } else {
-            user = resolveUser(new DocumentUserReference(userDocumentReference));
-        }
-        return user;
+        return resolveUser(new DocumentUserReference(userDocumentReference));
     }
 
     /**
-     * @param documentUserReference the reference to the user. Must not be null.
+     * @param documentUserReference the reference to the user. If null then consider it's pointing to the Guest user.
      * @return the User object
      */
     protected User resolveUser(DocumentUserReference documentUserReference)
     {
-        return new DocumentUser(documentUserReference, this.dab, this.currentReferenceResolver,
-            this.entityReferenceProvider);
+        User user;
+        // Backward compatibility: recognize guest and superadmin users since they're currently stored as normal users
+        // in the XWikiContext
+        DocumentReference documentReference = documentUserReference.getReference();
+        if (documentReference == null || XWikiRightService.isGuest(documentReference)) {
+            user = User.GUEST;
+        } else if (XWikiRightService.isSuperAdmin(documentReference)) {
+            user = User.SUPERADMIN;
+        } else {
+            user = new DocumentUser(documentUserReference, this.dab, this.currentReferenceResolver,
+                this.entityReferenceProvider);
+        }
+        return user;
     }
 }

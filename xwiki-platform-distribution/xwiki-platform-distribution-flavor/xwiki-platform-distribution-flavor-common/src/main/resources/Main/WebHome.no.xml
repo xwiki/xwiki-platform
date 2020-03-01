@@ -67,7 +67,9 @@ Bruk {{velocity}}$services.icon.render('home'){{/velocity}} brødsmulene som lig
 
 Du kan også bruke [[Sandbox &gt;&gt; Sandbox.WebHome]] for mer demoinnhold og generelt et sted å eksperimentere med wikifunksjonene.
 
- {{box}} Lær mer om hvordan du bruker XWiki med {{velocity}}[[Komme i gang guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}. {{/box}}
+ {{box}}
+Lær mer om hvordan du bruker XWiki med {{velocity}}[[Komme i gang guide&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.
+{{/box}}
 
 (%class="row"%)(((
 (%class="col-xs-12 col-sm-6"%)(((

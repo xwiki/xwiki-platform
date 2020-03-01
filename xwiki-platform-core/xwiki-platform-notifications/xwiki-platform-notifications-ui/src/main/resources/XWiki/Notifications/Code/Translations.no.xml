@@ -157,59 +157,59 @@ notifications.preferences.scope.table.location=Plassering
 notifications.preferences.scope.table.scopeFilterType=Filtertype
 notifications.preferences.scope.table._actions=Handlinger
 notifications.email.title=Hendelse(r) på wikien:
-### Missing: notifications.email.subject={0} event(s) on the wiki
-### Missing: notifications.email.seeChanges=Changes: {0}
-### Missing: notifications.email.linkDetails=See details
-### Missing: notifications.rss.feedLink=RSS Feed
-### Missing: notifications.rss.feedLinkDescription=Event feed for notifications
-### Missing: notifications.rss.feedTitle=Notifications RSS feed
-### Missing: notifications.rss.feedDescription=This RSS feed can be customized on your profile page.
-### Missing: notifications.rss.seeChanges=Changes: {0}
-### Missing: notifications.globalsettings.email=Notifications Email
-### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daily
-### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Hourly
-### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Weekly
-### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Live
-### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Details of the changes
-### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Nothing
-### Missing: XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Standard
-### Missing: XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Inclusive
-### Missing: XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Exclusive
-### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Never
-### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Every time I make a modification
-### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Every time I make a major modification
-### Missing: XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Only when I create a new page
+notifications.email.subject={0} hendelse(r) på wikien
+notifications.email.seeChanges=Endringer: {0}
+notifications.email.linkDetails=Vis detaljer
+notifications.rss.feedLink=RSS-feed
+notifications.rss.feedLinkDescription=Hendelsesfeed for varsler
+notifications.rss.feedTitle=RSS-feed for varsler
+notifications.rss.feedDescription=Denne RSS-feeden kan tilpasses på profilsiden din.
+notifications.rss.seeChanges=Endringer: {0}
+notifications.globalsettings.email=Varsler e-post
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daglig
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Hver time
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Ukentlig
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Direkte
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Detaljer om endringene
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Ingenting
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Standard
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Inklusive
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Eksklusiv
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Aldri
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Hver gang jeg gjør en endring
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Hver gang jeg gjør en større endring
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Bare når jeg oppretter en ny side
 
 ## User profile
-### Missing: notifications.userprofile.following=Following
-### Missing: notifications.userprofile.notfollowing=Not following
-### Missing: notifications.userprofile.follow=Start following
-### Missing: notifications.userprofile.unfollow=Stop following
-### Missing: notifications.userprofile.done=Done
-### Missing: notifications.userprofile.saving=Saving...
-### Missing: notifications.userprofile.error=Error saving the notification setting
+notifications.userprofile.following=Følger
+notifications.userprofile.notfollowing=Følger ikke
+notifications.userprofile.follow=Begynn å følge
+notifications.userprofile.unfollow=Slutt å følge
+notifications.userprofile.done=Ferdig
+notifications.userprofile.saving=Lagrer...
+notifications.userprofile.error=Feil ved lagring av varslingsinnstillingen
 
 ## Macros description
-### Missing: rendering.macro.notificationsApplicationsPreferences.name=Notifications Applications Preferences
-### Missing: rendering.macro.notificationsApplicationsPreferences.description=Display the preferences of the current user about notification applications.
-### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Target
-### Missing: rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+rendering.macro.notificationsApplicationsPreferences.name=Innstillinger for applikasjonsvarsler
+rendering.macro.notificationsApplicationsPreferences.description=Vis innstillinger til gjeldende bruker om varslingsapplikasjoner.
+rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Mål
+rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Målet for makroen (kan være "bruker" for den nåværende brukeren eller "wiki" for den nåværende wiki)
 
-### Missing: rendering.macro.notificationsAutoWatchPreferences.name=Notifications Auto Watch Preferences
-### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
-### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Target
-### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+rendering.macro.notificationsAutoWatchPreferences.name=Varselinnstillinger for automatisk overvåking
+rendering.macro.notificationsAutoWatchPreferences.description=Vis innstillingene til den nåværende brukeren for automatisk overvåkede sider.
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Mål
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Målet for makroen (kan være "bruker" for den nåværende brukeren eller "wiki" for den nåværende wiki)
 
 ## Toggle notification filters labels
-### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
-### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications
-### Missing: notifications.filters.preferences.label.wiki=Toggle Wiki notifications
+notifications.filters.preferences.label.page=Bytt bare om varsler om side
+notifications.filters.preferences.label.space=Bytt varsel om side og undersider
+notifications.filters.preferences.label.wiki=Bytt Wiki-varsler
 
 ## Notifications switches
-### Missing: notifications.switches.tooltip.page=Watch this page
-### Missing: notifications.switches.tooltip.pageAndChildren=Watch this page and its children
-### Missing: notifications.switches.tooltip.space=Watch the parent page and its children
-### Missing: notifications.switches.tooltip.wiki=Watch this wiki
-### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.</content>
+notifications.switches.tooltip.page=Overvåk denne siden
+notifications.switches.tooltip.pageAndChildren=Overvåk denne siden og dens undersider
+notifications.switches.tooltip.space=Overvåk overliggende side og dens undersider
+notifications.switches.tooltip.wiki=Overvåk Wiki
+notifications.switches.changeStatusError=Kunne ikke endre statusen for varslene.</content>
   
 </xwikidoc>

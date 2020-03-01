@@ -210,8 +210,8 @@ platform.appwithinminutes.appHomePageEditAppLabel=Rediger applikasjon
 platform.appwithinminutes.appHomePageTranslateAppLabel=Oversett applikasjon
 platform.appwithinminutes.appHomePageDeleteAppLabel=Slett applikasjon
 platform.appwithinminutes.appHomePageMovedWarning=Applikasjonen fungerer kanskje ikke riktig fordi den er omdøpt eller flyttet uten å oppdatere koden. Vennligst rediger programmet og følg stegene for å oppdatere koden.
-### Missing: AppWithinMinutes.LiveTableClass_description=Description
-### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+AppWithinMinutes.LiveTableClass_description=Beskrivelse
+AppWithinMinutes.LiveTableClass_columns=Livetabell kolonner
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Applikasjonen {0} og ALLE dens oppføringer vil bli slettet. Er du sikker på at du vil fortsette?

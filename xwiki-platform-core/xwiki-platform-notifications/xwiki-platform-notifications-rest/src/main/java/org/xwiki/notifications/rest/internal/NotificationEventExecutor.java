@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.slf4j.Logger;
@@ -49,8 +50,11 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Cache notification request results and limit the number of threads allowed to retrieve notification events.
@@ -77,6 +81,9 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
     @Inject
     private Logger logger;
+
+    @Inject
+    private Provider<XWikiContext> xcontextProvider;
 
     private final AtomicLong counter = new AtomicLong();
 
@@ -113,17 +120,21 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
         private final String initialAsyncId;
 
-        CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count)
+        private final DocumentReference currentUserReference;
+
+        CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count,
+            DocumentReference currentUserReference)
         {
-            this(longCacheKey, callable, count, null);
+            this(longCacheKey, callable, count, currentUserReference, null);
         }
 
-        CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count, String asyncId)
+        CallableEntry(String longCacheKey, Callable<List<CompositeEvent>> callable, boolean count,
+            DocumentReference currentUserReference, String asyncId)
         {
             this.cacheKey = longCacheKey;
             this.callable = callable;
             this.count = count;
-
+            this.currentUserReference = currentUserReference;
             this.initialAsyncId = asyncId;
 
             if (asyncId != null) {
@@ -182,6 +193,10 @@ public class NotificationEventExecutor implements Initializable, Disposable
             try {
                 // Initialize a proper execution context
                 contextManager.initialize(new ExecutionContext());
+
+                // Set the current user in the context so that we can later perform checks that the event are viewable
+                // by the current user.
+                xcontextProvider.get().setUserReference(this.currentUserReference);
 
                 // Execute the callable
                 List<CompositeEvent> events = this.callable.call();
@@ -324,7 +339,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
             } else {
                 // Even when not asynchronous we want to make sure only a configured number of threads is allowed to
                 // search for notifications
-                Future<?> future = this.executor.submit(new CallableEntry(cacheKey, callable, count));
+                Future<?> future = this.executor.submit(new CallableEntry(cacheKey, callable, count,
+                    this.xcontextProvider.get().getUserReference()));
 
                 // Wait for the result
                 return future.get();
@@ -341,7 +357,8 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
             // If not already in the queue, start a new one
             if (entry == null) {
-                entry = new CallableEntry(longCacheKey, callable, count, asyncId);
+                entry = new CallableEntry(longCacheKey, callable, count, this.xcontextProvider.get().getUserReference(),
+                    asyncId);
                 this.queue.put(longCacheKey, entry);
 
                 this.logger.debug("Added [{}] in the queue", entry);

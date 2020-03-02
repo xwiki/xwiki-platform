@@ -337,6 +337,13 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- The default User API implementation, needed by olcore and more -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- Dependencies not needed by the plugin itself but included in the WAR it generates,
          listed to be sure it's built before the plugin -->

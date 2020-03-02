@@ -740,6 +740,10 @@ public class PackageMojo extends AbstractOldCoreMojo
         mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
             "xwiki-platform-store-merge-default", getXWikiPlatformVersion(), null, "jar"));
 
+        // User API implementation required by oldcore and others.
+        mandatoryTopLevelArtifacts.add(this.repositorySystem.createArtifact("org.xwiki.platform",
+            "xwiki-platform-user-default", getXWikiPlatformVersion(), null, "jar"));
+
         return mandatoryTopLevelArtifacts;
     }
 

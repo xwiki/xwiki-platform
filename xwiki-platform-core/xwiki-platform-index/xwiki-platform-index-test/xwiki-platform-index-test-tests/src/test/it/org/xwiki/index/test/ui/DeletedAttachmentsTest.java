@@ -47,7 +47,7 @@ import org.xwiki.test.ui.po.ViewPage;
 
          if (!getUtil().pageExists(getTestClassName(), "TestAttachments")) {
              getUtil().createPageWithAttachment(getTestClassName(), "TestAttachments",
-                 null, "Test Attachments", null, "Main.WebHome", "deletedFile1.txt",
+                 null, "Test Attachments", null, getTestClassName(), "deletedFile1.txt",
                  new ByteArrayInputStream("attachment content1".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
 
              ViewPage testPage = getUtil().gotoPage(getTestClassName(), "TestAttachments");

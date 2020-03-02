@@ -130,34 +130,29 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     {
         // Build the response
         Response.ResponseBuilder response;
-        XWikiUser xWikiUser = getXWikiContext().getWiki().getAuthService().checkAuth(getXWikiContext());
-        if (xWikiUser == null) {
-            response = Response.status(Status.UNAUTHORIZED);
+        Object result = getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
+            users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
+            displayReadEvents, tags, currentWiki, async, asyncId, false, false);
+
+        if (result instanceof String) {
+            response = Response.status(Status.ACCEPTED);
+            response.entity(Collections.singletonMap("asyncId", result));
         } else {
-            Object result = getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
-                users, toMaxCount(maxCount, 21), displayOwnEvents, displayMinorEvents, displaySystemEvents,
-                displayReadEvents, tags, currentWiki, async, asyncId, false, false);
+            // Make sure URLs will be rendered like in any other display (by default REST API forces absolute URLs)
+            XWikiContext xcontext = getXWikiContext();
+            xcontext.setURLFactory(
+                xcontext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, xcontext));
 
-            if (result instanceof String) {
-                response = Response.status(Status.ACCEPTED);
-                response.entity(Collections.singletonMap("asyncId", result));
-            } else {
-                // Make sure URLs will be rendered like in any other display (by default REST API forces absolute URLs)
-                XWikiContext xcontext = getXWikiContext();
-                xcontext.setURLFactory(
-                    xcontext.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_SERVLET, xcontext));
+            Notifications notifications = new Notifications(this.notificationsRenderer
+                .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
 
-                Notifications notifications = new Notifications(this.notificationsRenderer
-                    .renderNotifications((List<CompositeEvent>) result, userId, TRUE.equals(displayReadStatus)));
-
-                response = Response.ok(notifications);
-            }
-
-            // Add the "cache control" header.
-            CacheControl cacheControl = new CacheControl();
-            cacheControl.setNoCache(true);
-            response.cacheControl(cacheControl);
+            response = Response.ok(notifications);
         }
+
+        // Add the "cache control" header.
+        CacheControl cacheControl = new CacheControl();
+        cacheControl.setNoCache(true);
+        response.cacheControl(cacheControl);
 
         return response.build();
     }

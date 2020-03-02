@@ -34,6 +34,7 @@ import org.xwiki.user.UserResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -109,4 +110,15 @@ public class DefaultUserReferenceUserResolverTest
             exception.getMessage());
     }
 
+    @Test
+    void resolveForSuperAdminReference()
+    {
+        assertSame(User.SUPERADMIN, this.resolver.resolve(UserReference.SUPERADMIN_REFERENCE));
+    }
+
+    @Test
+    void resolveForGuestReference()
+    {
+        assertSame(User.GUEST, this.resolver.resolve(UserReference.GUEST_REFERENCE));
+    }
 }

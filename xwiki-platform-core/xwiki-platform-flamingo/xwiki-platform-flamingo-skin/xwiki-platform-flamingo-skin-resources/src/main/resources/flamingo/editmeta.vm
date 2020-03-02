@@ -29,7 +29,8 @@
 ## Title and parent
 ##
 <div id="parentinput" class="form-group">
-  <label for="xwikidocparentinput">$services.localization.render('core.editors.content.parentField.label') <a id='hideEditParentTrigger' href='#'>$services.localization.render('core.editors.content.parentField.edit.hide')</a></label>
+  <label for="xwikidocparentinput">$services.localization.render('core.editors.content.parentField.label') 
+  <a id='hideEditParentTrigger' href='#'>$services.localization.render('core.editors.content.parentField.edit.hide')</a></label>
   <input type="text" id="xwikidocparentinput" name="parent" value="$!{escapetool.xml("$!docParent")}" size="30" class="suggestDocuments "/>
 </div>
 #if ($editor != 'inline')
@@ -38,7 +39,8 @@
     <label for="xwikidoctitleinput">$services.localization.render('core.editors.content.titleField.label')</label>
   </dt>
   <dd>
-    <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" class="#if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)required#end"/>
+    <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" 
+    class="#if($xwiki.getXWikiPreference('xwiki.title.mandatory') == 1)required#end"/>
   </dd>
 </div>
 #end

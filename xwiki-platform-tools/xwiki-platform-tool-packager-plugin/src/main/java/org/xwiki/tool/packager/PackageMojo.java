@@ -203,7 +203,7 @@ public class PackageMojo extends AbstractOldCoreMojo
     }
 
     @Override
-    public void executeInternal() throws MojoExecutionException, MojoFailureException
+    public void executeInternal() throws MojoExecutionException
     {
         LogUtils.configureXWikiLogs();
 
@@ -507,7 +507,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
     private Collection<Artifact> resolveWarArtifacts() throws MojoExecutionException
     {
-        List<Artifact> warArtifacts = new ArrayList<Artifact>();
+        List<Artifact> warArtifacts = new ArrayList<>();
 
         // First look for dependencies of type WAR.
         for (Artifact artifact : this.project.getArtifacts()) {
@@ -586,7 +586,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
         // Remove the non JAR artifacts. Note that we need to include non JAR artifacts before the transitive resolve
         // because for example some XARs mayb depend on JARs and we need those JARs to be packaged!
-        Set<Artifact> jarArtifacts = new HashSet<Artifact>();
+        Set<Artifact> jarArtifacts = new HashSet<>();
         for (Artifact artifact : resolvedArtifacts) {
             // Note: test-jar is used in functional tests from time to time and we need to package them too.
             if (artifact.getType().equals("jar") || artifact.getType().equals("test-jar")) {
@@ -768,7 +768,7 @@ public class PackageMojo extends AbstractOldCoreMojo
 
     private Map<String, Artifact> getManagedVersionMap() throws MojoExecutionException
     {
-        Map<String, Artifact> dependencyManagementMap = new HashMap<String, Artifact>();
+        Map<String, Artifact> dependencyManagementMap = new HashMap<>();
 
         // Add Platform Core's <dependencyManagement> since this is where we keep all our dependencies management
         // information. We absolutely need to include those because Maven 3.x's artifact seems to have a big hole in

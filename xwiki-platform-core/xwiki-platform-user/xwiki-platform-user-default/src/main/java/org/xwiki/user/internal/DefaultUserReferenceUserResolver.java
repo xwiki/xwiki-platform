@@ -49,11 +49,19 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
     public User resolve(UserReference userReference, Object... parameters)
     {
         User user;
+
+        // Handle special cases
         UserReference normalizedUserReference = userReference;
         if (normalizedUserReference == null) {
             normalizedUserReference = UserReference.CURRENT_USER_REFERENCE;
         }
-        user = resolveUserResolver(normalizedUserReference).resolve(normalizedUserReference, parameters);
+        if (UserReference.SUPERADMIN_REFERENCE == normalizedUserReference) {
+            user = User.SUPERADMIN;
+        } else if (UserReference.GUEST_REFERENCE == normalizedUserReference) {
+            user = User.GUEST;
+        } else {
+            user = resolveUserResolver(normalizedUserReference).resolve(normalizedUserReference, parameters);
+        }
         return user;
     }
 

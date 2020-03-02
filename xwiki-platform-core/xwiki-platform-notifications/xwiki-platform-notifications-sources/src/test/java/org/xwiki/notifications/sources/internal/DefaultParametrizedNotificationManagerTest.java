@@ -41,6 +41,7 @@ import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
@@ -55,10 +56,13 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 /**
+ * Unit tests for {@link DefaultParametrizedNotificationManager}.
+ *
  * @version $Id$
  */
 @ComponentList(SimilarityCalculator.class)
@@ -66,11 +70,12 @@ public class DefaultParametrizedNotificationManagerTest
 {
     @Rule
     public final MockitoComponentMockingRule<DefaultParametrizedNotificationManager> mocker =
-            new MockitoComponentMockingRule<>(DefaultParametrizedNotificationManager.class);
+        new MockitoComponentMockingRule<>(DefaultParametrizedNotificationManager.class);
 
     private EventStream eventStream;
     private QueryGenerator queryGenerator;
     private AuthorizationManager authorizationManager;
+    private ContextualAuthorizationManager contextualAuthorizationManager;
     private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
 
     private DocumentReference userReference = new DocumentReference("xwiki", "XWiki", "UserA");
@@ -82,6 +87,7 @@ public class DefaultParametrizedNotificationManagerTest
         eventStream = mocker.getInstance(EventStream.class);
         queryGenerator = mocker.getInstance(QueryGenerator.class);
         authorizationManager = mocker.getInstance(AuthorizationManager.class);
+        contextualAuthorizationManager = mocker.getInstance(ContextualAuthorizationManager.class);
         recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
 
         query = mock(Query.class);
@@ -89,7 +95,8 @@ public class DefaultParametrizedNotificationManagerTest
         when(queryGenerator.generateQuery(any(NotificationParameters.class))).thenReturn(query);
 
         NotificationPreference pref1 = mock(NotificationPreference.class);
-        when(pref1.getProperties()).thenReturn(Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
+        when(pref1.getProperties()).thenReturn(
+            Collections.singletonMap(NotificationPreferenceProperty.EVENT_TYPE, "create"));
         when(pref1.isNotificationEnabled()).thenReturn(true);
 
         when(recordableEventDescriptorHelper.hasDescriptor(anyString(), any(DocumentReference.class))).thenReturn(true);
@@ -114,6 +121,7 @@ public class DefaultParametrizedNotificationManagerTest
         when(event4.getDocument()).thenReturn(doc2);
 
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc1)).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc1)).thenReturn(true);
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(false);
 
         when(event1.getType()).thenReturn("type1");
@@ -234,11 +242,10 @@ public class DefaultParametrizedNotificationManagerTest
         when(eventBob.getDocument()).thenReturn(doc);
 
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
-
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc)).thenReturn(true);
 
         when(eventAlice.getType()).thenReturn("update");
         when(eventBob.getType()).thenReturn("update");
-
 
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(eventAlice, eventBob));
 
@@ -275,6 +282,7 @@ public class DefaultParametrizedNotificationManagerTest
         when(eventUpdate.getDocument()).thenReturn(doc);
 
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc)).thenReturn(true);
 
         when(eventComment.getType()).thenReturn("addComment");
         when(eventUpdate.getType()).thenReturn("update");
@@ -323,6 +331,7 @@ public class DefaultParametrizedNotificationManagerTest
         when(event3.getDocument()).thenReturn(doc);
 
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc)).thenReturn(true);
 
         when(event1.getType()).thenReturn("update");
         when(event2.getType()).thenReturn("addComment");
@@ -368,6 +377,7 @@ public class DefaultParametrizedNotificationManagerTest
         when(event2.getDocument()).thenReturn(doc);
 
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc)).thenReturn(true);
 
         when(event1.getType()).thenReturn("update");
         when(event2.getType()).thenReturn("update");
@@ -415,7 +425,9 @@ public class DefaultParametrizedNotificationManagerTest
         DocumentReference doc1 = new DocumentReference("xwiki", "Main", "Bike");
         DocumentReference doc2 = new DocumentReference("xwiki", "Main", "Guitar");
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc1)).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc1)).thenReturn(true);
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc2)).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc2)).thenReturn(true);
 
         // * Bob updates the page "Bike" (E1)
         Event event1 = createMockedEvent(); when(event1.toString()).thenReturn("event1");
@@ -547,6 +559,7 @@ public class DefaultParametrizedNotificationManagerTest
         when(event3.getDocument()).thenReturn(doc);
 
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc)).thenReturn(true);
 
         when(event1.getType()).thenReturn("update");
         when(event2.getType()).thenReturn("addComment");
@@ -596,6 +609,7 @@ public class DefaultParametrizedNotificationManagerTest
         when(eventAddCommentUpdate.getDocument()).thenReturn(doc); when(eventAddCommentUpdate.toString()).thenReturn("updateComment");
 
         when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc)).thenReturn(true);
 
         when(eventUpdate1.getType()).thenReturn("update");
         when(eventUpdate2.getType()).thenReturn("update");
@@ -666,6 +680,8 @@ public class DefaultParametrizedNotificationManagerTest
 
         when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any(DocumentReference.class)))
                 .thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class)))
+            .thenReturn(true);
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event0, event1, event2, event3,
                 event4, event5, event6, event7, event8, event9), Collections.emptyList());
 
@@ -689,7 +705,9 @@ public class DefaultParametrizedNotificationManagerTest
         Event event2 = createMockedEvent("update", userA, userA, new Date(1510567729000L), "id2");
 
         when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any(DocumentReference.class)))
-                .thenReturn(true);
+            .thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class)))
+            .thenReturn(true);
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2), Collections.emptyList());
 
         // Test
@@ -731,7 +749,9 @@ public class DefaultParametrizedNotificationManagerTest
         Event event2 = createMockedEvent("update", userA, userA, new Date(1510567729000L), "id2");
 
         when(authorizationManager.hasAccess(eq(Right.VIEW), eq(userReference), any(DocumentReference.class)))
-                .thenReturn(true);
+            .thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(DocumentReference.class)))
+            .thenReturn(true);
         when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event1, event2), Collections.emptyList());
 
         when(recordableEventDescriptorHelper.hasDescriptor(eq("customThing"), eq(userA))).thenReturn(false);
@@ -746,5 +766,31 @@ public class DefaultParametrizedNotificationManagerTest
 
         assertEquals(1, results.size());
         assertEquals(event2, results.get(0).getEvents().get(0));
+    }
+
+    @Test
+    public void getEventsWhenCurrentUserNotAuthorized() throws Exception
+    {
+        Event event = createMockedEvent();
+
+        DocumentReference doc = new DocumentReference("xwiki", "Main", "Bike");
+        when(event.getDocument()).thenReturn(doc);
+
+        when(authorizationManager.hasAccess(Right.VIEW, userReference, doc)).thenReturn(true);
+        when(contextualAuthorizationManager.hasAccess(Right.VIEW, doc)).thenReturn(false);
+
+        when(event.getType()).thenReturn("update");
+
+        when(eventStream.searchEvents(query)).thenReturn(Arrays.asList(event));
+
+        // Test
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = new DocumentReference("xwiki", "XWiki", "UserA");
+        parameters.expectedCount = 1;
+        List<CompositeEvent> results = mocker.getComponentUnderTest().getEvents(parameters);
+
+        // Verify
+        assertEquals(0, results.size());
+        verify(contextualAuthorizationManager).hasAccess(Right.VIEW, doc);
     }
 }

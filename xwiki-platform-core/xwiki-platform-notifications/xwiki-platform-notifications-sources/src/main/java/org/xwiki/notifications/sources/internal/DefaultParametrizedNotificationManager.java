@@ -44,6 +44,7 @@ import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.query.Query;
 import org.xwiki.security.authorization.AuthorizationManager;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -69,6 +70,9 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
 
     @Inject
     private AuthorizationManager authorizationManager;
+
+    @Inject
+    private ContextualAuthorizationManager contextualAuthorizationManager;
 
     @Inject
     private SimilarityCalculator similarityCalculator;
@@ -152,9 +156,10 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
         // Add to the results the events the user has the right to see
         for (Event event : batch) {
             DocumentReference document = event.getDocument();
-            // Don't record events concerning a doc the user cannot see
-            if (document != null && !authorizationManager.hasAccess(Right.VIEW, parameters.user,
-                document)) {
+            // 1) Don't include events concerning a doc the passed user cannot see
+            // 2) If the current user is not the passed user, also make sure that the current user has view permissions
+            //    on the document as otherwise any user could forget a REST request and see other user's notifications
+            if (document != null && !isAllowed(parameters.user, document)) {
                 continue;
             }
 
@@ -171,6 +176,15 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
             }
         }
         return done;
+    }
+
+    private boolean isAllowed(DocumentReference passedUser, DocumentReference document)
+    {
+        boolean allowed = this.authorizationManager.hasAccess(Right.VIEW, passedUser, document);
+        if (allowed) {
+            allowed = this.contextualAuthorizationManager.hasAccess(Right.VIEW, document);
+        }
+        return allowed;
     }
 
     private boolean filterEvent(Event event, NotificationParameters parameters) throws EventStreamException

@@ -46,37 +46,19 @@
 ## Setting categories
 #########################
 #set($categories = [])
-#set($discard = $categories.add({'id':'profile', 'sheet':'XWiki.XWikiUserProfileSheet', 'glyphicon': 'user'}))
-#set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
-#if($isMyProfile || $hasAdmin)
-  #set($discard = $categories.add({'id':'preferences', 'sheet':'XWiki.XWikiUserPreferencesSheet', 'glyphicon': 'wrench'}))
-#end
-#set($discard = $categories.add({'id':'groups', 'sheet':'XWiki.XWikiUserMembershipSheet', 'glyphicon': 'group'}))
-## TODO: add APIs to be able to display users watchlists to admins
-#if($isMyProfile &amp;&amp; $hasWatch)
-  #set($discard = $categories.add({'id':'watchlist', 'sheet':'XWiki.XWikiUserWatchListSheet', 'glyphicon': 'eye'}))
-#end
-#if($isMyProfile)
-  #if ("$!services.notification.watch" != '' || $hasWatch)
-    #set($discard = $categories.add({'id':'network', 'sheet':'XWiki.XWikiUserNetworkSheet', 'glyphicon': 'world'}))
+
+## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu.content' UIXP.
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu.content', {
+  'sortByCustomOrder': 'org.xwiki.platform.user.profile.entry.userprofilesheet,org.xwiki.platform.user.profile.entry.userpreferencessheet,org.xwiki.platform.user.profile.entry.usermembershipsheet,org.xwiki.platform.user.profile.entry.userwatchlistsheet,org.xwiki.platform.user.profile.entry.usernetworksheet,org.xwiki.platform.user.profile.entry.usernotificationsheet,org.xwiki.platform.user.profile.entry.userwikisheet,org.xwiki.platform.user.profile.entry.userdashboardsheet'
+}))
+  #if($uix.parameters.get('display') == 'true')
+    #if ($uix.parameters.containsKey('name'))
+        ## the name value is derived by default but can be overloaded with the name key.
+        #set($discard = $categories.add({'id': $uix.parameters.get('id'), 'name': $uix.parameters.get('name'), 'sheet': $uix.parameters.get('sheet'), 'glyphicon': $uix.parameters.get('glyphicon')}))
+    #else
+        #set($discard = $categories.add({'id': $uix.parameters.get('id'), 'sheet': $uix.parameters.get('sheet'), 'glyphicon': $uix.parameters.get('glyphicon')}))
+    #end
   #end
-  ## TODO: add an enhancement system instead
-  #set($notificationsSheet = $services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet'))
-  #if ($xwiki.exists($notificationsSheet))
-    #set($discard = $categories.add({'id':'notifications', 'sheet':'XWiki.Notifications.Code.XWikiUserNotificationsSheet', 'glyphicon': 'bell'}))
-  #end
-#end
-#set($userWikiSheet = 'WikiManager.UserWikiSheet')
-#if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists($userWikiSheet))
-  #set($discard = $categories.add({
-    'id': 'wikis',
-    'name': $services.localization.render('platform.wiki.menu.userwikis'),
-    'sheet': $userWikiSheet,
-    'glyphicon': 'list'
-  }))
-#end
-#if($isMyProfile &amp;&amp; $hasDashboard)
-  #set($discard = $categories.add({'id':'dashboard', 'sheet':'Dashboard.XWikiUserDashboardSheet', 'glyphicon': 'th'}))
 #end
 #########################
 ## Current category
@@ -120,6 +102,7 @@
       ## By specifying the image width we enable server side resizing. The width value we use is greater than the
       ## available space because we don't want to loose too much of the image quality (we rely on the browser to fit the
       ## image in the available space).
+      #set($isMyProfile = ($services.model.resolveDocument($xcontext.user) == $doc.documentReference))
       {{attachmentSelector classname="XWiki.XWikiUsers" object="$obj.number" property="avatar" #if ($isMyProfile) savemode="direct" #end defaultValue="XWiki.XWikiUserSheet@noavatar.png" width="180" alternateText="$xwiki.getUserName($doc.fullName, false)" buttontext="$services.localization.render('platform.core.profile.changePhoto')" displayImage="true" filter="png,jpg,jpeg,gif"/}}
     #end
   )))

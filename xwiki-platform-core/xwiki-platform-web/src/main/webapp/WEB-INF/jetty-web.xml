@@ -40,10 +40,10 @@
        Standalone packaging since we create a custom distribution of Jetty and we don't include the Jetty "mail"
        module. However we have the problem in our functional Docker-based tests where we use the official Jetty
        image. -->
-  <Call name="prependSystemClass">
-    <Arg>-javax.mail.</Arg>
-  </Call>
-  <Call name="prependServerClass">
-    <Arg>javax.mail.</Arg>
-  </Call>
+  <Get name="systemClasspathPattern">
+    <Call name="add"><Arg>-javax.mail.</Arg></Call>
+  </Get>
+  <Get name="serverClasspathPattern">
+    <Call name="add"><Arg>javax.mail.</Arg></Call>
+  </Get>
 </Configure>

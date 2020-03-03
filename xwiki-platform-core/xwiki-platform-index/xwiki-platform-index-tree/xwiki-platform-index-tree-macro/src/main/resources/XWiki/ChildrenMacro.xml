@@ -158,7 +158,7 @@
     </class>
     <property>
       <code>{{velocity}}
-{{documentTree root="document:$services.rendering.escape($doc.documentReference, $doc.syntax.toIdString())" /}}
+{{documentTree root="document:$services.rendering.escape($services.rendering.serialize($doc.documentReference), $doc.syntax.toIdString())" /}}
 {{/velocity}}</code>
     </property>
     <property>

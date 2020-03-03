@@ -179,7 +179,6 @@
   #end
   #template("hierarchy.vm")
   <div class="row">
-    <dl>
       #if ($displayContentMenu)
         <div class="col-xs-12 col-md-5 pull-right">
           #template("menus_content.vm")
@@ -200,7 +199,6 @@
         #end
         </h1></div>
       #end
-    </dl>
   </div> ## row
   #template("edit${editor}.vm")
   ## This javascript must be placed here since it uses velocity variables set in the template above.

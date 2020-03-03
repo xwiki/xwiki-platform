@@ -1,4 +1,4 @@
-<?xml version="1.1" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,28 +20,34 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="Dashboard.Translations" locale="pl">
-  <web>Dashboard</web>
-  <name>Translations</name>
-  <language>pl</language>
+<xwikidoc version="1.2" reference="XWiki.OfficeImporterTranslations" locale="no">
+  <web>XWiki</web>
+  <name>OfficeImporterTranslations</name>
+  <language>no</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Dashboard.WebHome</parent>
+  <parent>XWiki.OfficeImporter</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Translations</title>
+  <title/>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>dashboard.templateProvider.description=Gadżety konfigurowalne
+  <content>office.createForm.type.name=Side fra Office
+office.createForm.type.description=Importer Office-dokumenter til wikisider
+office.form.error.noDocument=Du må bruke {0}opprette handling{1} for å importere et Office-dokument.
+office.form.append.hint=Dokumentet finnes allerede! Legg resultatet til den eksisterende wikisiden
 
-dashboard.gadgetSelector.title=Wybierz gadżet
-dashboard.gadgetEditor.title=Edytuj gadżet
-dashboard.gadgetEditor.changeGadget.label=Zmień gadżet
-dashboard.gadgetEditor.gadgetTitle.label=Tytuł gadżetu
-dashboard.gadgetEditor.gadgetTitle.hint=Tytuł tego gadżetu pojawia się w górnej części panelu gadżetów.
-dashboard.initialization.saveMessage=Zainicjuj domyślną konfigurację użytkownika pulpitu nawigacyjnego</content>
+office.config.serverType.hint=Office-servertypen. Den kan styres internt (lokalt) eller eksternt (eksternt).
+office.config.serverPort.hint=Portnummeret som brukes til å koble til Office-serverforekomsten
+office.config.autoStart.hint=Spesifiser om Office-serveren skal startes / kobles automatisk ved XWiki-oppstart
+office.config.serverPath.hint=Stien til Office-installasjonen
+office.config.serverState.connected=Koblet til
+office.config.serverState.notConnected=Ikke tilkoblet
+office.config.serverState.confError=Ugyldig konfigurasjon
+office.config.serverState.error=Feil</content>
+  
 </xwikidoc>

@@ -581,10 +581,10 @@ function setPanelWidth() {
   }
   var leftPanelsWidth = 'Medium';
   var rightPanelsWidth = 'Medium';
-  if (availableClasses.includes(leftPanelsWidthInput.value)) {
+  if (availableClasses.indexOf(leftPanelsWidthInput.value) >= 0) {
       leftPanelsWidth = leftPanelsWidthInput.value;
   }
-  if (availableClasses.includes(rightPanelsWidthInput.value)) {
+  if (availableClasses.indexOf(rightPanelsWidthInput.value) >= 0) {
       rightPanelsWidth = rightPanelsWidthInput.value;
   }
   mainContainer.addClassName('panel-left-width-'+leftPanelsWidth);

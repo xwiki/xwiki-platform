@@ -490,8 +490,11 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
       $('#tmComment').contents().last()[0].nodeValue=label;
     }
   };
-  // updateCount was moved to jquery from prototype and is fired here when a comment is added.
-  $(document).on('xwiki:docextra:loaded', function() {
-    updateCount();
+  // Update the comments count when the comments tab is reloaded (e.g. because a comment is added). This works right now
+  // only because we don't have pagination for comments.
+  $(document).on('xwiki:docextra:loaded', function(event, data) {
+    if (data.id === 'Comments') {
+      updateCount();
+    }
   });
 });

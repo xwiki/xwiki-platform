@@ -52,7 +52,7 @@
     <hsqldb.version>2.5.0</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.40</ckeditor.version>
+    <ckeditor.version>1.41-SNAPSHOT</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.12</batik.version>
     <restlet.version>2.3.12</restlet.version>
@@ -99,6 +99,11 @@
     <pgsql.version>42.2.10</pgsql.version>
     <oracle.version>19.3.0.0</oracle.version>
     <mariadb.version>2.3.0</mariadb.version>
+
+    <!-- Versions of other software we need in our functional tests -->
+    <!-- The LO version must point to the latest version from "Still" branch (LTS). When upgrading the version make
+         sure the new version is available from https://downloadarchive.documentfoundation.org/libreoffice/old/ -->
+    <libreoffice.version>6.3.5.2</libreoffice.version>
   </properties>
   <scm>
     <connection>scm:git:git://github.com/xwiki/xwiki-platform.git</connection>

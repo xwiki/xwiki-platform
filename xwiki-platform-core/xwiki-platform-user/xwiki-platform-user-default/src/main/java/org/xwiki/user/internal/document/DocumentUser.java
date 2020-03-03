@@ -25,6 +25,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserType;
 
@@ -40,9 +41,7 @@ import org.xwiki.user.UserType;
  */
 class DocumentUser implements User
 {
-    private static final EntityReference USERS_CLASS_REFERENCE =
-        new EntityReference("XWikiUsers", EntityType.SPACE,
-            new EntityReference("XWiki", EntityType.DOCUMENT));
+    static final LocalDocumentReference USERS_CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
 
     private DocumentUserReference userReference;
 

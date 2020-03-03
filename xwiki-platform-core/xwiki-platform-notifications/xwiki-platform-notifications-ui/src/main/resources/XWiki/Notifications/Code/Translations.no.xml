@@ -1,0 +1,215 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="XWiki.Notifications.Code.Translations" locale="no">
+  <web>XWiki.Notifications.Code</web>
+  <name>Translations</name>
+  <language>no</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <parent>XWiki.Notifications.Code.WebHome</parent>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.core.profile.category.notifications=Varsler
+notifications.filters.cancel=Avbryt
+notifications.filters.submit=Lagre
+notifications.filters.type.label=Filtertype:
+notifications.filters.type.hint=Hvordan filteret skal handle mot en hendelse på det gitte stedet
+notifications.filters.location.label=Filteromfang:
+notifications.filters.location.hint=Hvilken del av wikien skal omfattes av filteret?
+
+## Advanced filters options
+notifications.settings.filters.advanced=Avanserte filtreringsalternativer
+notifications.filters.advanced.toggles.hint=Disse filtrene er aktivert som standard, du kan deaktivere dem ved å bruke knappen ved siden av hvert filter.
+notifications.filters.advanced.toggles.table.name=Filternavn
+notifications.filters.advanced.toggles.table.description=Beskrivelse
+notifications.filters.advanced.toggles.table.toggle=Veksle
+notifications.filters.advanced.modal.close=Lukk
+
+## Filters names
+notifications.filters.name.systemUserNotificationFilter=Systemfilter
+notifications.filters.description.systemUserNotificationFilter=Skjul varsler fra systembrukeren
+notifications.filters.name.ownEventsNotificationFilter=Egne hendelsesfilter
+notifications.filters.description.ownEventsNotificationFilter=Skjul varsler om din egen aktivitet
+notifications.filters.name.eventReadAlertFilter=Les hendelsesfilter (varsel)
+notifications.filters.description.eventReadAlertFilter=Skjul varsler du har markert som lest
+notifications.filters.name.eventReadEmailFilter=Les hendelsesfilter (e-post)
+notifications.filters.description.eventReadEmailFilter=Skjul varsler du har markert som lest
+notifications.filters.name.minorEventAlertNotificationFilter=Mindre hendelse (varsel)
+notifications.filters.description.minorEventAlertNotificationFilter=Skjul varsler om mindre endringer på sider
+notifications.filters.name.minorEventEmailNotificationFilter=Mindre hendelse (e-post)
+notifications.filters.description.minorEventEmailNotificationFilter=Skjul varsler om mindre endringer på sider
+
+## Filter Types
+notifications.filters.type.inclusive=Inklusive
+notifications.filters.type.exclusive=Eksklusiv
+
+## Translation keys for the scopeNotificationFilter
+notifications.filters.preferences.scopeNotificationFilter.name=Omfangsvarslingsfilter
+notifications.filters.preferences.scopeNotificationFilter.page=Bare side
+notifications.filters.preferences.scopeNotificationFilter.space=Side og undersider
+notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+
+notifications.filters.preferences.allEvents=-
+
+notifications.filters.preferences.addPreference.filterType.inclusive=Inklusive
+notifications.filters.preferences.addPreference.filterType.exclusive=Eksklusiv
+notifications.filters.preferences.addPreference.notificationFormat.label=Varslingsformat
+notifications.filters.preferences.addPreference.notificationFormat.hint=På hvilket varselformat skal filteret gjelde?
+notifications.filters.preferences.addPreference.eventType.label=Hendelsetype
+notifications.filters.preferences.addPreference.eventType.hint=Hvilken hendelsetype skal filteret omfatte?
+notifications.filters.preferences.addPreference.location.label=Filteromfang
+notifications.filters.preferences.addPreference.location.hint=Hvilken side skal filteret omfatte?
+notifications.filters.preferences.delete.inProgress=Sletter...
+notifications.filters.preferences.delete.done=Filterinnstillinger slettet!
+notifications.filters.preferences.delete.error=Kunne ikke slette filterinnstillingen
+notifications.filters.preferences.setEnabled.inProgress=Lagrer...
+notifications.filters.preferences.setEnabled.done=Filterinnstillinger lagret!
+notifications.filters.preferences.setEnabled.error=Kunne ikke lagre filterinnstillingen
+
+## Notifications toggles
+notifications.toggle.disabled.hint=Du må aktivere varsler i innstillingene dine hvis du ønsker å overvåke disse stedene
+
+## Notifications formats
+notifications.format.alert=Varsel
+notifications.format.email=E-post
+
+## Filter preferences settings
+notifications.settings.filters.preferences.title=Filter
+notifications.settings.filters.preferences.hint=Lag filtre for mer presist å kontrollere når aktive hendelser skal utløse varsler.
+notifications.settings.filters.preferences.forGuest=Logg deg på eller registrer deg for å håndtere varslingsfiltrene dine.
+
+## Header definition for notification filter preferences
+notifications.settings.filters.preferences.table.name=Navn
+notifications.settings.filters.preferences.table.filterType=Filtertype
+notifications.settings.filters.preferences.table.eventTypes=Hendelser
+notifications.settings.filters.preferences.table.notificationFormats=Format
+notifications.settings.filters.preferences.table.isEnabled=Er aktivert?
+notifications.settings.filters.preferences.table._actions=Handlinger
+
+notifications.menu.header=Varsler
+notifications.menu.header.settings=Innstillinger
+notifications.menu.clear=Fjern alt
+notifications.menu.clearing=Tømmer varslene
+notifications.menu.cleared=Varsler er fjernet
+notifications.settings.title=Innstillinger for varsler
+notifications.settings.error.notAdmin=Du må være administrator for å se dette.
+notifications.settings.menu=Varslingsmeny
+notifications.settings.menu.hint=Varslingsmenyen ligger øverst til høyre på siden, og du kan se den ved å klikke på ringeklokken ({0})
+notifications.settings.email=E-post
+notifications.settings.email.forGuest=Logg på eller registrer deg for å håndtere varslingsinnstillingene dine.
+notifications.settings.email.disabled=Varsling på e-post er deaktivert. Vennligst kontakt en administrator.
+notifications.settings.email.hint=En e-post blir regelmessig sendt til deg med et sammendrag av hva som har skjedd på wikien
+notifications.settings.email.title=E-postinnstillinger
+notifications.settings.email.frequency=E-postfrekvens
+notifications.settings.email.frequency.hint=Velg hvor ofte du vil motta en e-post med sammendraget av hva som har skjedd på wikien.
+notifications.settings.email.diffType.hint=Velg detaljnivået av endringer du vil motta på e-post.
+notifications.settings.saving=Innstillingene dine blir lagret...
+notifications.settings.saved=Lagret!
+notifications.settings.savingfailed=Kunne ikke lagre innstillingene
+notifications.settings.filters=Filter ({0})
+notifications.settings.addFilter=Legg til filter
+notifications.settings.errorFilterWiki=Feil: du må velge en wiki, ikke en side
+notifications.settings.preferences=Innstillinger
+notifications.settings.preferences.hint=Fang opp hvilke hendelser som skjer og lever dem i strømmen eller via e-post.
+notifications.settings.applications.title=Applikasjoner
+notifications.settings.applications.hint=Dette er listen over applikasjoner som kan sende varsler. Du kan aktivere eller deaktivere dem.
+notifications.settings.applications.forGuest=Logg på eller registrer deg for å håndtere varslingsinnstillingene dine.
+notifications.settings.applications.appName=Navn
+notifications.settings.events=Hendelser
+notifications.settings.watch.title=Overvåkte sider
+notifications.settings.watch.autowatchmode=Automatisk sideovervåking
+notifications.settings.watch.autowatchmode.hint=Angi om du vil overvåke en side etter at du har jobbet med den
+notifications.settings.watch.forGuest=Logg på eller registrer deg for å håndtere varslingsinnstillingene dine.
+notifications.settings.watch.disabled=De overvåkede elementene er deaktivert. Vennligst kontakt en administrator.
+notifications.events.by=redigert av {0}.
+notifications.events.lastChange=Siste endring: {0}.
+notifications.events.lastComment=Siste kommentar: {0}.
+notifications.preferences.scope.table.scope=Omfang
+notifications.preferences.scope.table.location=Plassering
+notifications.preferences.scope.table.scopeFilterType=Filtertype
+notifications.preferences.scope.table._actions=Handlinger
+notifications.email.title=Hendelse(r) på wikien:
+notifications.email.subject={0} hendelse(r) på wikien
+notifications.email.seeChanges=Endringer: {0}
+notifications.email.linkDetails=Vis detaljer
+notifications.rss.feedLink=RSS-feed
+notifications.rss.feedLinkDescription=Hendelsesfeed for varsler
+notifications.rss.feedTitle=RSS-feed for varsler
+notifications.rss.feedDescription=Denne RSS-feeden kan tilpasses på profilsiden din.
+notifications.rss.seeChanges=Endringer: {0}
+notifications.globalsettings.email=Varsler e-post
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_daily=Daglig
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_hourly=Hver time
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_weekly=Ukentlig
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_interval_live=Direkte
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType=Detaljer om endringene
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_NOTHING=Ingenting
+XWiki.Notifications.Code.NotificationEmailPreferenceClass_diffType_STANDARD=Standard
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_inclusive=Inklusive
+XWiki.Notifications.Code.NotificationPreferenceScopeClass_scopeFilterType_exclusive=Eksklusiv
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NONE=Aldri
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_ALL=Hver gang jeg gjør en endring
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_MAJOR=Hver gang jeg gjør en større endring
+XWiki.Notifications.Code.AutomaticWatchModeClass_automaticWatchMode_NEW=Bare når jeg oppretter en ny side
+
+## User profile
+notifications.userprofile.following=Følger
+notifications.userprofile.notfollowing=Følger ikke
+notifications.userprofile.follow=Begynn å følge
+notifications.userprofile.unfollow=Slutt å følge
+notifications.userprofile.done=Ferdig
+notifications.userprofile.saving=Lagrer...
+notifications.userprofile.error=Feil ved lagring av varslingsinnstillingen
+
+## Macros description
+rendering.macro.notificationsApplicationsPreferences.name=Innstillinger for applikasjonsvarsler
+rendering.macro.notificationsApplicationsPreferences.description=Vis innstillinger til gjeldende bruker om varslingsapplikasjoner.
+rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Mål
+rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Målet for makroen (kan være "bruker" for den nåværende brukeren eller "wiki" for den nåværende wiki)
+
+rendering.macro.notificationsAutoWatchPreferences.name=Varselinnstillinger for automatisk overvåking
+rendering.macro.notificationsAutoWatchPreferences.description=Vis innstillingene til den nåværende brukeren for automatisk overvåkede sider.
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Mål
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Målet for makroen (kan være "bruker" for den nåværende brukeren eller "wiki" for den nåværende wiki)
+
+## Toggle notification filters labels
+notifications.filters.preferences.label.page=Bytt bare om varsler om side
+notifications.filters.preferences.label.space=Bytt varsel om side og undersider
+notifications.filters.preferences.label.wiki=Bytt Wiki-varsler
+
+## Notifications switches
+notifications.switches.tooltip.page=Overvåk denne siden
+notifications.switches.tooltip.pageAndChildren=Overvåk denne siden og dens undersider
+notifications.switches.tooltip.space=Overvåk overliggende side og dens undersider
+notifications.switches.tooltip.wiki=Overvåk Wiki
+notifications.switches.changeStatusError=Kunne ikke endre statusen for varslene.</content>
+  
+</xwikidoc>

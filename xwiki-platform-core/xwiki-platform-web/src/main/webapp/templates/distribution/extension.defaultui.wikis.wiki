@@ -25,7 +25,7 @@
       }))
     #end
   #end
-  #set ($wikis = $collectionstool.sort($wikis, 'prettyName'))
+  #set ($wikis = $collectiontool.sort($wikis, 'prettyName'))
   #set ($hasPagination = false)
   #set ($paginationParams = {
     'defaultItemsPerPage': 10

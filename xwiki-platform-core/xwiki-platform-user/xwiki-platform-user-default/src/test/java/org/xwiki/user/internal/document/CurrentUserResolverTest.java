@@ -19,9 +19,9 @@
  */
 package org.xwiki.user.internal.document;
 
+import javax.inject.Provider;
+
 import org.junit.jupiter.api.Test;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -32,6 +32,7 @@ import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -47,20 +48,31 @@ public class CurrentUserResolverTest
     private CurrentUserResolver resolver;
 
     @MockComponent
-    private Execution execution;
+    private Provider<XWikiContext> contextProvider;
 
     @Test
     void resolve()
     {
         DocumentReference reference = new DocumentReference("wiki", "space", "currentuser");
-        ExecutionContext executionContext = new ExecutionContext();
         XWikiContext xcontext = mock(XWikiContext.class);
         when(xcontext.getUserReference()).thenReturn(reference);
-        executionContext.setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
-        when(this.execution.getContext()).thenReturn(executionContext);
+        when(this.contextProvider.get()).thenReturn(xcontext);
 
         User user = this.resolver.resolve(null);
         assertNotNull(user);
         assertEquals("wiki:space.currentuser", ((DocumentUser) user).getUserReference().getReference().toString());
     }
+
+    @Test
+    void resolveWhenNoCurrentUser()
+    {
+        XWikiContext xcontext = mock(XWikiContext.class);
+        when(xcontext.getUserReference()).thenReturn(null);
+        when(this.contextProvider.get()).thenReturn(xcontext);
+
+        User user = this.resolver.resolve(null);
+        assertNotNull(user);
+        assertSame(User.GUEST, user);
+    }
+
 }

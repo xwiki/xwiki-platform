@@ -26,7 +26,6 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -51,7 +50,7 @@ public class DocumentUserReferenceUserResolverTest
 
     @MockComponent
     @Named("org.xwiki.user.CurrentUserReference")
-    private UserResolver<CurrentUserReference> currentUserResolver;
+    private UserResolver<UserReference> currentUserResolver;
 
     @Test
     void resolve()
@@ -74,7 +73,7 @@ public class DocumentUserReferenceUserResolverTest
     }
 
     @Test
-    void resolveCurrentUserWhenNull()
+    void resolveWhenNullReference()
     {
         User currentUser = mock(User.class);
         when(this.currentUserResolver.resolve(any())).thenReturn(currentUser);
@@ -92,9 +91,25 @@ public class DocumentUserReferenceUserResolverTest
     }
 
     @Test
+    void resolveGuestWhenSpecifiedAsString()
+    {
+        User user = this.resolver.resolve(new DocumentUserReference(
+            new DocumentReference("wiki", "space", "XWikiGuest")));
+        assertSame(User.GUEST, user);
+    }
+
+    @Test
     void resolveSuperAdmin()
     {
         User user = this.resolver.resolve(UserReference.SUPERADMIN_REFERENCE);
+        assertSame(User.SUPERADMIN, user);
+    }
+
+    @Test
+    void resolveSuperAdminWhenSpecifiedAsString()
+    {
+        User user = this.resolver.resolve(new DocumentUserReference(
+            new DocumentReference("wiki", "space", "superadmin")));
         assertSame(User.SUPERADMIN, user);
     }
 }

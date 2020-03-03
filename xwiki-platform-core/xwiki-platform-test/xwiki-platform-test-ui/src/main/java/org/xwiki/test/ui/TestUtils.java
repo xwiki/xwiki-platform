@@ -855,6 +855,28 @@ public class TestUtils
         return vp;
     }
 
+    /**
+     * @since 12.2RC1
+     */
+    public ViewPage createPageWithAttachment(EntityReference reference, String content, String title,
+        String attachmentName, InputStream attachmentData, UsernamePasswordCredentials credentials) throws Exception
+    {
+        ViewPage vp = createPage(reference, content, title);
+        attachFile(reference, attachmentName, attachmentData, false, credentials);
+        return vp;
+    }
+
+    /**
+     * @since 12.2RC1
+     */
+    public ViewPage createPageWithAttachment(EntityReference reference, String content, String title,
+        String attachmentName, InputStream attachmentData) throws Exception
+    {
+        ViewPage vp = createPage(reference, content, title);
+        attachFile(reference, attachmentName, attachmentData, false);
+        return vp;
+    }
+
     public void deletePage(String space, String page)
     {
         getDriver().get(getURLToDeletePage(space, page));
@@ -1641,6 +1663,25 @@ public class TestUtils
     public void attachFile(EntityReference reference, Object is, boolean failIfExists) throws Exception
     {
         rest().attachFile(reference, is, failIfExists);
+    }
+
+    /**
+     * @since 12.2RC1
+     */
+    public void attachFile(EntityReference pageReference, String name, InputStream is, boolean failIfExists,
+        UsernamePasswordCredentials credentials) throws Exception
+    {
+        UsernamePasswordCredentials currentCredentials = getDefaultCredentials();
+        EntityReference reference = new EntityReference(name, EntityType.ATTACHMENT, pageReference);
+
+        try {
+            if (credentials != null) {
+                setDefaultCredentials(credentials);
+            }
+            attachFile(reference, is, failIfExists);
+        } finally {
+            setDefaultCredentials(currentCredentials);
+        }
     }
 
     public void deleteAttachement(EntityReference pageReference, String filename) throws Exception

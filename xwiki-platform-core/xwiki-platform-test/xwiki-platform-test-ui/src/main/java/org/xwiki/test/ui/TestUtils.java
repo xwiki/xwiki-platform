@@ -872,9 +872,7 @@ public class TestUtils
     public ViewPage createPageWithAttachment(EntityReference reference, String content, String title,
         String attachmentName, InputStream attachmentData) throws Exception
     {
-        ViewPage vp = createPage(reference, content, title);
-        attachFile(reference, attachmentName, attachmentData, false);
-        return vp;
+        return createPageWithAttachment(reference, content, title, attachmentName, attachmentData, null);
     }
 
     public void deletePage(String space, String page)

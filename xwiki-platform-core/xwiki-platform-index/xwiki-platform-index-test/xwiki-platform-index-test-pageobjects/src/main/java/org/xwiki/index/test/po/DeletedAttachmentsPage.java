@@ -35,7 +35,7 @@ public class DeletedAttachmentsPage extends ViewPage
         return new DeletedAttachmentsPage();
     }
 
-    public LiveTableElement getDocumentsAttachmentsLiveTable()
+    public LiveTableElement getDeletedAttachmentsLiveTable()
     {
         LiveTableElement lt = new LiveTableElement("attachmentTrash");
         lt.waitUntilReady();

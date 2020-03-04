@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>100</xwiki.pitest.mutationThreshold>
     <xwiki.extension.features>
       <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->

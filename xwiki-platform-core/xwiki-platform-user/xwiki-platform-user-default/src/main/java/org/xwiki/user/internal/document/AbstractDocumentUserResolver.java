@@ -22,7 +22,7 @@ package org.xwiki.user.internal.document;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
@@ -46,7 +46,8 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
     private DocumentReferenceResolver<EntityReference> currentReferenceResolver;
 
     @Inject
-    private DocumentAccessBridge dab;
+    @Named("user")
+    private ConfigurationSource userConfigurationSource;
 
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
@@ -76,8 +77,8 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
         } else if (XWikiRightService.isSuperAdmin(documentReference)) {
             user = User.SUPERADMIN;
         } else {
-            user = new DocumentUser(documentUserReference, this.dab, this.currentReferenceResolver,
-                this.entityReferenceProvider);
+            user = new DocumentUser(documentUserReference, this.currentReferenceResolver,
+                this.entityReferenceProvider, this.userConfigurationSource);
         }
         return user;
     }

@@ -52,7 +52,7 @@ public class HiddenSpaceFilterTest
     public void before()
     {
         User user = mock(User.class);
-        when(user.displayHiddenDocuments()).thenReturn(true);
+        when(user.displayHiddenDocuments()).thenReturn(false);
         when(this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE)).thenReturn(user);
     }
 
@@ -67,8 +67,8 @@ public class HiddenSpaceFilterTest
     void filterHQLStatementWithDisplayHiddenDocumentsInTheUserPreferences()
     {
         // We need to do it that way since the expectation must be set in #configure() and the expectation sets the
-        // isActive property to true
-        ReflectionUtils.setFieldValue(this.filter, "isActive", false);
+        // displayHiddenDocuments property to true
+        ReflectionUtils.setFieldValue(this.filter, "displayHiddenDocuments", true);
 
         // Insertions of distinct
         assertEquals("select space.reference from XWikiSpace space where 1=1",

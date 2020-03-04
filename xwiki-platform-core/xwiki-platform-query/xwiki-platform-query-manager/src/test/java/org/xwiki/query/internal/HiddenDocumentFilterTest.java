@@ -57,7 +57,7 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
                 oneOf(userResolver).resolve(UserReference.CURRENT_USER_REFERENCE);
                 will(returnValue(user));
                 oneOf(user).displayHiddenDocuments();
-                will(returnValue(true));
+                will(returnValue(false));
             }});
 
         this.filter = getComponentManager().getInstance(QueryFilter.class, "hidden");
@@ -75,8 +75,8 @@ public class HiddenDocumentFilterTest extends AbstractMockingComponentTestCase
     public void filterHQLStatementWithDisplayHiddenDocumentsInTheUserPreferences() throws Exception
     {
         // We need to do it that way since the expectation must be set in #configure() and the expectation sets the
-        // isActive property to true
-        ReflectionUtils.setFieldValue(this.filter, "isActive", false);
+        // displayHiddenDocuments property to true
+        ReflectionUtils.setFieldValue(this.filter, "displayHiddenDocuments", true);
 
         // Insertions of distinct
         assertEquals("select doc.fullName from XWikiDocument doc where 1=1",

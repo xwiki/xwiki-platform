@@ -22,15 +22,16 @@ package org.xwiki.panels.test.ui;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.panels.test.po.NavigationPanelAdministrationPage;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
+import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.XWikiWebDriver;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests related to the Navigation panel administration.
@@ -38,24 +39,29 @@ import static org.junit.Assert.assertTrue;
  * @version $Id$
  * @since 10.5RC1
  */
-public class NavigationPanelAdministrationTest extends AbstractTest
+@UITest(servletEngine = ServletEngine.TOMCAT)
+public class NavigationPanelAdministrationIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
-
     @Test
-    public void testNavigationPanelAdministration() throws Exception
+    public void testNavigationPanelAdministration(TestUtils setup, XWikiWebDriver driver)
     {
+        // By default the AdminGroup doesn't have "admin" right, so give it since we're going to create the Admin
+        // user and make it part of the Admin group and we need that Admin to have "admin" rights.
+        setup.setGlobalRightToWiki("XWiki.XWikiAdminGroup", "", "admin", true);
+        setup.createAdminUserAndLogin();
+
         // Reset the configuration.
-        getUtil().deletePage("PanelsCode", "NavigationConfiguration");
+        setup.deletePage("PanelsCode", "NavigationConfiguration");
 
         // Create a top level page that doesn't belong to an extension.
-        getUtil().createPage("Denis", "WebHome", "", "");
+        setup.createPage("Denis", "WebHome", "", "");
 
         NavigationPanelAdministrationPage navPanelAdminPage = NavigationPanelAdministrationPage.gotoPage();
 
-        // Assert the initial state.
-        assertEquals(Arrays.asList("Alice", "Bob", "Denis"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        // Assert the initial state. Note that we have the "XWiki" space listed because we created the Admin user and
+        // the XWikiAdminGroup group, both are located in the "XWiki" space and not hidden.
+        assertEquals(Arrays.asList("Alice", "Bob", "Denis", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
         assertFalse(navPanelAdminPage.isExcludingTopLevelExtensionPages());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getInclusions());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getExclusions());
@@ -63,27 +69,30 @@ public class NavigationPanelAdministrationTest extends AbstractTest
         // Exclude top level extension pages that are not meant to be modified.
         navPanelAdminPage.excludeTopLevelExtensionPages(true);
 
-        assertEquals(Arrays.asList("Alice", "Denis"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        assertEquals(Arrays.asList("Alice", "Denis", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
         assertTrue(navPanelAdminPage.isExcludingTopLevelExtensionPages());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getInclusions());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getExclusions());
 
-        saveAndReload(navPanelAdminPage);
-        assertEquals(Arrays.asList("Alice", "Denis"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        saveAndReload(navPanelAdminPage, driver);
+        assertEquals(Arrays.asList("Alice", "Denis", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
 
         // Include Bob although it's a top level extension page.
         navPanelAdminPage.include("Bob");
 
-        // Exclude Alice and Denis.
+        // Exclude Alice, Denis & XWiki.
         navPanelAdminPage.exclude("Denis");
         navPanelAdminPage.exclude("Alice");
+        navPanelAdminPage.exclude("XWiki");
 
         assertEquals(Collections.singletonList("Bob"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
         assertTrue(navPanelAdminPage.isExcludingTopLevelExtensionPages());
         assertEquals(Collections.singletonList("Bob"), navPanelAdminPage.getInclusions());
-        assertEquals(Arrays.asList("Denis", "Alice"), navPanelAdminPage.getExclusions());
+        assertEquals(Arrays.asList("Denis", "Alice", "XWiki"), navPanelAdminPage.getExclusions());
 
-        saveAndReload(navPanelAdminPage);
+        saveAndReload(navPanelAdminPage, driver);
         assertEquals(Collections.singletonList("Bob"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
 
         // Exclude Bob.
@@ -93,33 +102,36 @@ public class NavigationPanelAdministrationTest extends AbstractTest
             navPanelAdminPage.getNavigationTree().getTopLevelPages());
         assertTrue(navPanelAdminPage.isExcludingTopLevelExtensionPages());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getInclusions());
-        assertEquals(Arrays.asList("Denis", "Alice"), navPanelAdminPage.getExclusions());
+        assertEquals(Arrays.asList("Denis", "Alice", "XWiki"), navPanelAdminPage.getExclusions());
 
-        saveAndReload(navPanelAdminPage);
+        saveAndReload(navPanelAdminPage, driver);
         assertEquals(Collections.singletonList("No pages found"),
             navPanelAdminPage.getNavigationTree().getTopLevelPages());
 
         navPanelAdminPage.include("Alice");
         navPanelAdminPage.excludeTopLevelExtensionPages(false);
         navPanelAdminPage.include("Denis");
+        navPanelAdminPage.include("XWiki");
 
-        assertEquals(Arrays.asList("Alice", "Bob", "Denis"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        assertEquals(Arrays.asList("Alice", "Bob", "Denis", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
         assertFalse(navPanelAdminPage.isExcludingTopLevelExtensionPages());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getInclusions());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getExclusions());
 
-        saveAndReload(navPanelAdminPage);
-        assertEquals(Arrays.asList("Alice", "Bob", "Denis"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        saveAndReload(navPanelAdminPage, driver);
+        assertEquals(Arrays.asList("Alice", "Bob", "Denis", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
 
         // Verify multiple selection.
         navPanelAdminPage.exclude("Bob", "Denis");
-        assertEquals(Collections.singletonList("Alice"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        assertEquals(Arrays.asList("Alice", "XWiki"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
 
         // Enable Top Level Extension Pages filter to check what happens when Bob is duplicated (explicit exclude in
         // "Other Pages" and implicit exclude by the dynamic Top Level Extension Pages filter).
         navPanelAdminPage.excludeTopLevelExtensionPages(true);
 
-        assertEquals(Collections.singletonList("Alice"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        assertEquals(Arrays.asList("Alice", "XWiki"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
         assertTrue(navPanelAdminPage.isExcludingTopLevelExtensionPages());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getInclusions());
         assertEquals(Arrays.asList("Bob", "Denis"), navPanelAdminPage.getExclusions());
@@ -127,16 +139,18 @@ public class NavigationPanelAdministrationTest extends AbstractTest
         // Verify multiple selection and also the fact that Bob is removed from explicit exclusions.
         navPanelAdminPage.include("Denis", "Bob");
 
-        assertEquals(Arrays.asList("Alice", "Bob", "Denis"), navPanelAdminPage.getNavigationTree().getTopLevelPages());
+        assertEquals(Arrays.asList("Alice", "Bob", "Denis", "XWiki"),
+            navPanelAdminPage.getNavigationTree().getTopLevelPages());
         assertTrue(navPanelAdminPage.isExcludingTopLevelExtensionPages());
         assertEquals(Collections.singletonList("Bob"), navPanelAdminPage.getInclusions());
         assertEquals(Collections.emptyList(), navPanelAdminPage.getExclusions());
     }
 
-    private NavigationPanelAdministrationPage saveAndReload(NavigationPanelAdministrationPage navPanelAdminPage)
+    private NavigationPanelAdministrationPage saveAndReload(NavigationPanelAdministrationPage navPanelAdminPage,
+        XWikiWebDriver driver)
     {
         navPanelAdminPage.save();
-        getDriver().navigate().refresh();
+        driver.navigate().refresh();
         return new NavigationPanelAdministrationPage().waitUntilPageIsLoaded();
     }
 }

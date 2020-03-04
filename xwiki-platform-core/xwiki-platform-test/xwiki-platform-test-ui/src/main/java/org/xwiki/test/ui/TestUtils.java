@@ -526,13 +526,46 @@ public class TestUtils
         parameters.put("register_password", password);
         parameters.put("register2_password", password);
         parameters.put("register_email", "");
-        parameters.put("xredirect", redirectURL);
+        if (!StringUtils.isEmpty(redirectURL)) {
+            parameters.put("xredirect", redirectURL);
+        }
         parameters.put("form_token", getSecretToken());
         getDriver().get(getURL("XWiki", "Register", "register", parameters));
         recacheSecretToken();
         if (properties.length > 0) {
             updateObject("XWiki", username, "XWiki.XWikiUsers", 0, properties);
         }
+    }
+
+    /**
+     * Creates the Admin user and add it to the XWikiAdminGroup.
+     *
+     * @since 12.2RC1
+     */
+    public void createAdminUserAndLogin()
+    {
+        createUser(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), null);
+        addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", "XWiki.Admin");
+        loginAsAdmin();
+    }
+
+    /**
+     * Add or update a {@code XWikiGlobalRights} xobject to the current wiki's {@code XWikiPrefrences} document.
+     *
+     * @param groups the comma-separated list of groups that will have the rights (e.g. {@code XWiki.XWikiAdminGroup}.
+     *               Can be empty or null
+     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be
+     *              empty of null
+     * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
+     * @param enabled true if the rights should be allowed, false if they should be disabled
+     * @since 12.2RC1
+     */
+    public void setGlobalRightToWiki(String groups, String users, String rights, boolean enabled)
+    {
+        String normalizedUsers = users == null ? "" : users;
+        String normalizedGroups = groups == null ? "" : groups;
+        addObject("XWiki", "XWikiPreferences", "XWiki.XWikiGlobalRights", "groups", normalizedGroups, "levels", rights,
+            "users", normalizedUsers, "allow", enabled ? "1" : "0");
     }
 
     public ViewPage gotoPage(String space, String page)

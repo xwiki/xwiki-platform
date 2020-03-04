@@ -19,6 +19,7 @@
  */
 package org.xwiki.user;
 
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -29,7 +30,7 @@ import org.xwiki.stability.Unstable;
  * @since 12.2RC1
  */
 @Unstable
-public interface User
+public interface User extends ConfigurationSource
 {
     /**
      * Represents the Guest user, see {@link GuestUser}.
@@ -83,12 +84,6 @@ public interface User
      * @return true if this user is registered in the main wiki (i.e. it's a global user)
      */
     boolean isGlobal();
-
-    /**
-     * @param propertyName the name of the user property to look for
-     * @return the value of the passed user property
-     */
-    Object getProperty(String propertyName);
 
     /**
      * @return the reference to his user (i.e. a way to retrieve this user's data)

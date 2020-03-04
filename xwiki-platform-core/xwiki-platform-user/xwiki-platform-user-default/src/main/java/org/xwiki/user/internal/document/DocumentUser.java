@@ -19,7 +19,9 @@
  */
 package org.xwiki.user.internal.document;
 
-import org.xwiki.bridge.DocumentAccessBridge;
+import java.util.List;
+
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -47,30 +49,30 @@ class DocumentUser implements User
 
     private DocumentReferenceResolver<EntityReference> currentReferenceResolver;
 
-    private DocumentAccessBridge dab;
-
     private EntityReferenceProvider entityReferenceProvider;
+
+    private ConfigurationSource userConfigurationSource;
 
     /**
      * @param userReference the user reference
-     * @param dab the component to retrieve user properties stored as xproperties
      * @param currentReferenceResolver the component to resolve user xclass for the current wiki
      * @param entityReferenceProvider the component to check if the current wiki is the main wiki
+     * @param userConfigurationSource the component to get the user properties
      */
-    DocumentUser(DocumentUserReference userReference, DocumentAccessBridge dab,
+    DocumentUser(DocumentUserReference userReference,
         DocumentReferenceResolver<EntityReference> currentReferenceResolver,
-        EntityReferenceProvider entityReferenceProvider)
+        EntityReferenceProvider entityReferenceProvider, ConfigurationSource userConfigurationSource)
     {
         this.userReference = userReference;
-        this.dab = dab;
         this.currentReferenceResolver = currentReferenceResolver;
         this.entityReferenceProvider = entityReferenceProvider;
+        this.userConfigurationSource = userConfigurationSource;
     }
 
     @Override
     public boolean displayHiddenDocuments()
     {
-        Integer preference = (Integer) getProperty("displayHiddenDocuments");
+        Integer preference = getProperty("displayHiddenDocuments");
         return preference != null && preference == 1;
     }
 
@@ -79,7 +81,7 @@ class DocumentUser implements User
     {
         boolean active = true;
         // Default value of active should be 1 (i.e. active) if not set
-        Integer value = (Integer) getProperty("active");
+        Integer value = getProperty("active");
         if (value == null || value != 1) {
             active = false;
         }
@@ -107,7 +109,7 @@ class DocumentUser implements User
     @Override
     public UserType getType()
     {
-        return UserType.fromString((String) getProperty("usertype"));
+        return UserType.fromString(getProperty("usertype"));
     }
 
     @Override
@@ -115,12 +117,6 @@ class DocumentUser implements User
     {
         return this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).equals(
             getInternalReference().getWikiReference());
-    }
-
-    @Override
-    public Object getProperty(String propertyName)
-    {
-        return this.dab.getProperty(getInternalReference(), getUserClassReference(), propertyName);
     }
 
     @Override
@@ -146,8 +142,45 @@ class DocumentUser implements User
         return getUserReference().getReference();
     }
 
-    private DocumentReference getUserClassReference()
+    @Override
+    public <T> T getProperty(String key, T defaultValue)
     {
-        return this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE);
+        return this.userConfigurationSource.getProperty(key, defaultValue);
+    }
+
+    @Override
+    public <T> T getProperty(String key, Class<T> valueClass)
+    {
+        return this.userConfigurationSource.getProperty(key, valueClass);
+    }
+
+    @Override
+    public List<String> getKeys()
+    {
+        return this.userConfigurationSource.getKeys();
+    }
+
+    @Override
+    public boolean containsKey(String key)
+    {
+        return this.userConfigurationSource.containsKey(key);
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return this.userConfigurationSource.isEmpty();
+    }
+
+    @Override
+    public <T> T getProperty(String key, Class<T> valueClass, T defaultValue)
+    {
+        return this.userConfigurationSource.getProperty(key, valueClass, defaultValue);
+    }
+
+    @Override
+    public <T> T getProperty(String key)
+    {
+        return this.userConfigurationSource.getProperty(key);
     }
 }

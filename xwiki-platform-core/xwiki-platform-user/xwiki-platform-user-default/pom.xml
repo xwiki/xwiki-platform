@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Default</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
     <!-- TODO: Put back value of 88% when
          https://github.com/STAMP-project/pitest-descartes/issues/62#issuecomment-591471399 is fixed -->
     <xwiki.pitest.mutationThreshold>87</xwiki.pitest.mutationThreshold>

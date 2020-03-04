@@ -19,6 +19,8 @@
  */
 package org.xwiki.user;
 
+import java.util.List;
+
 import org.xwiki.stability.Unstable;
 
 /**
@@ -98,5 +100,41 @@ public final class GuestUser implements User
     public UserReference getUserReference()
     {
         return UserReference.GUEST_REFERENCE;
+    }
+
+    @Override
+    public <T> T getProperty(String key, T defaultValue)
+    {
+        return null;
+    }
+
+    @Override
+    public <T> T getProperty(String key, Class<T> valueClass)
+    {
+        return null;
+    }
+
+    @Override
+    public List<String> getKeys()
+    {
+        return null;
+    }
+
+    @Override
+    public boolean containsKey(String key)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return false;
+    }
+
+    @Override
+    public <T> T getProperty(String key, Class<T> valueClass, T defaultValue)
+    {
+        return null;
     }
 }

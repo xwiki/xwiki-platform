@@ -54,7 +54,7 @@ public class DeletedAttachmentsIT
 
         setup.deletePage(testReference);
         setup.createPageWithAttachment(testReference, "", "Test Attachments", "deletedFile1.txt",
-            new ByteArrayInputStream("attachment content1".getBytes()), TestUtils.SUPER_ADMIN_CREDENTIALS);
+            new ByteArrayInputStream("attachment content1".getBytes()));
 
         ViewPage testPage = setup.gotoPage(testReference);
         AttachmentsPane attachmentsPane = testPage.openAttachmentsDocExtraPane();
@@ -65,7 +65,7 @@ public class DeletedAttachmentsIT
     public void filterLivetableByName() throws Exception
     {
         DeletedAttachmentsPage deletedAttachmentsPage = DeletedAttachmentsPage.gotoPage();
-        LiveTableElement livetable = deletedAttachmentsPage.getDocumentsAttachmentsLiveTable();
+        LiveTableElement livetable = deletedAttachmentsPage.getDeletedAttachmentsLiveTable();
 
         livetable.filterColumn(FIRST_LIVETABLE_COLUMN_ID, "deletedFile1");
         assertEquals("deletedFile1.txt", livetable.getCell(livetable.getRow(1), 1).getText());
@@ -75,7 +75,7 @@ public class DeletedAttachmentsIT
     public void filterLivetableByDate() throws Exception
     {
         DeletedAttachmentsPage deletedAttachmentsPage = DeletedAttachmentsPage.gotoPage();
-        LiveTableElement livetable = deletedAttachmentsPage.getDocumentsAttachmentsLiveTable();
+        LiveTableElement livetable = deletedAttachmentsPage.getDeletedAttachmentsLiveTable();
 
         livetable.filterColumn(THIRD_LIVETABLE_COLUMN_ID, getNowDateInterval());
         assertEquals("deletedFile1.txt", livetable.getCell(livetable.getRow(1), 1).getText());

@@ -58,7 +58,8 @@
     #else
       #set($boxTitle = 'error')
     #end
-    #xwikimessageboxstart($services.localization.render('notice') $services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.list"))
+    #xwikimessageboxstart($services.localization.render('notice') 
+      $services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.list"))
     <ul>
       #foreach($extension in $extensions)
         <li>$extension.name ($extension.id.version)</li>
@@ -88,7 +89,8 @@
     #set($newquerystring = "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}"
                          + '&amp;force=1')
     #set($forceEditURL = $tdoc.getURL($xcontext.getAction(), ${newquerystring}))
-    #xwikimessageboxstart($services.localization.render('notice') "$services.localization.render('doclockedby') $xwiki.getUserName($tdoc.getLockingUser())")
+    #xwikimessageboxstart($services.localization.render('notice') 
+      "$services.localization.render('doclockedby') $xwiki.getUserName($tdoc.getLockingUser())")
     <a href="$forceEditURL">$services.localization.render('forcelock')</a>
     #xwikimessageboxend()
     ##
@@ -174,7 +176,9 @@
   #if(($editor == 'wiki' || $editor == 'wysiwyg' || $editor == 'inline') && $services.parentchild.isParentChildMechanismEnabled())
     ## Note: the inline editor never reaches this part since it is handled separately. We add the edit parent button in editinline.vm explicitly.
     <div class='edit-meta-tools'>
-      <a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' title="$services.localization.render('core.editors.content.parentField.edit.title')">[$services.localization.render('core.editors.content.parentField.edit')]</a>
+      <a id='editParentTrigger' class='tool edit-parent' href='#mainEditArea' 
+        title="$services.localization.render('core.editors.content.parentField.edit.title')">
+        [$services.localization.render('core.editors.content.parentField.edit')]</a>
     </div>
   #end
   #template("hierarchy.vm")

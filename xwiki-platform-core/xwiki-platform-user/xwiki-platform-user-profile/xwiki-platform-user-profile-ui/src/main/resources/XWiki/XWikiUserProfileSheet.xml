@@ -89,7 +89,7 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
     #end
     &lt;div class='userInfo'&gt;
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-      &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+      &lt;div class='editProfileCategory'&gt;&lt;a class="xHelp"  href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
     #end
     ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
     #set ($sectionsObject = $sheetDocument.getObject($sectionsObjectClassName))
@@ -111,7 +111,7 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       #set ($sectionPropertiesString = $sectionObject.getProperty('properties').value)
       #set ($sectionProperties = $sectionPropertiesString.split('\s+'))
       #if ($sectionProperties &amp;&amp; $sectionProperties.size() &gt; 0)
-        &lt;h1&gt;$sectionName&lt;/h1&gt;
+        &lt;h2&gt;$sectionName&lt;/h2&gt;
         &lt;dl&gt;
         #foreach ($sectionProperty in $sectionProperties)
           #set ($vCardData = $sectionProperty.split(':'))
@@ -145,9 +145,9 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       #end
       &lt;div class='userRecentChanges'&gt;
       #if ($xcontext.user == $doc.fullName)
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h1&gt;
+        &lt;h2&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h2&gt;
       #else
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
+        &lt;h2&gt;$services.localization.render('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h2&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
         &lt;div class='activity-follow'&gt;

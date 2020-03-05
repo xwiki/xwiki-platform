@@ -42,7 +42,8 @@
 ## Is the document protected?
 ## If yes, warn about it and show a forcing link:
 ##
-#set($protectionLevel = $services.extension.xar.getEditSecurityLevel($xcontext.userReference, $tdoc.documentReferenceWithLocale))
+#set($protectionLevel = $services.extension.xar.getEditSecurityLevel($xcontext.userReference,
+   $tdoc.documentReferenceWithLocale))
 #if ($protectionLevel.name() == 'DENY' || ($protectionLevel.name() != 'NONE' && !$editForced))
   #template("startpage.vm")
   <div class="main">

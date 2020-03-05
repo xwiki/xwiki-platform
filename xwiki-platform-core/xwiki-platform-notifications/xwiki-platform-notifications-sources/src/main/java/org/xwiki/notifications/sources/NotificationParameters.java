@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
@@ -86,4 +88,48 @@ public class NotificationParameters
      * List of filters to apply.
      */
     public Collection<NotificationFilter> filters = new ArrayList<>();
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        NotificationParameters that = (NotificationParameters) o;
+
+        return new EqualsBuilder()
+            .append(expectedCount, that.expectedCount)
+            .append(user, that.user)
+            .append(format, that.format)
+            .append(endDate, that.endDate)
+            .append(fromDate, that.fromDate)
+            .append(onlyUnread, that.onlyUnread)
+            .append(blackList, that.blackList)
+            .append(preferences, that.preferences)
+            .append(filterPreferences, that.filterPreferences)
+            .append(filters, that.filters)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(user)
+            .append(format)
+            .append(expectedCount)
+            .append(endDate)
+            .append(fromDate)
+            .append(onlyUnread)
+            .append(blackList)
+            .append(preferences)
+            .append(filterPreferences)
+            .append(filters)
+            .toHashCode();
+    }
 }

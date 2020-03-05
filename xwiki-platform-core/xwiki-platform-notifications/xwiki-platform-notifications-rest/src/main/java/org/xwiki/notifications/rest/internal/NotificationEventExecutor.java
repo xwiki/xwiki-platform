@@ -53,6 +53,7 @@ import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -85,6 +86,9 @@ public class NotificationEventExecutor implements Initializable, Disposable
     @Inject
     private Provider<XWikiContext> xcontextProvider;
 
+    @Inject
+    private DefaultNotificationCacheManager notificationCacheManager;
+
     private final AtomicLong counter = new AtomicLong();
 
     private final ConcurrentMap<String, CallableEntry> queue = new ConcurrentHashMap<>();
@@ -95,18 +99,6 @@ public class NotificationEventExecutor implements Initializable, Disposable
      * Cache to keep the result of a task until the client have access to it.
      */
     private Cache<Object> shortCache;
-
-    /**
-     * Cache used to store task events result until the result might change (for example when a new notification is
-     * created).
-     */
-    private Cache<List<CompositeEvent>> longEventCache;
-
-    /**
-     * Cache used to store task count result until the result might change (for example when a new notification is
-     * created).
-     */
-    private Cache<Integer> longCountCache;
 
     private class CallableEntry implements Callable<Object>
     {
@@ -185,7 +177,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
         private Object execute() throws Exception
         {
             // Check if the result is already in the event cache
-            Object result = getFromCache(this.cacheKey, this.count);
+            Object result = notificationCacheManager.getFromCache(this.cacheKey, this.count);
             if (result != null) {
                 return result;
             }
@@ -200,7 +192,13 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
                 // Execute the callable
                 List<CompositeEvent> events = this.callable.call();
-                result = setInCache(this.cacheKey, events, this.count);
+                notificationCacheManager.setInCache(this.cacheKey, events, this.count);
+
+                if (this.count) {
+                    result = events.size();
+                } else {
+                    result = events;
+                }
             } finally {
                 // Get rid of the execution context
                 execution.removeContext();
@@ -278,7 +276,6 @@ public class NotificationEventExecutor implements Initializable, Disposable
     public void initialize() throws InitializationException
     {
         int poolSize = this.configurationSource.getProperty("notifications.rest.poolSize", 2);
-        boolean longCacheEnabled = this.configurationSource.getProperty("notifications.rest.cache", true);
 
         if (poolSize > 0) {
             this.executor = new CallableEntryExecutor(poolSize);
@@ -288,22 +285,6 @@ public class NotificationEventExecutor implements Initializable, Disposable
                     .createNewCache(new LRUCacheConfiguration("notification.rest.shortCache", 1000, 6000));
             } catch (CacheException e) {
                 throw new InitializationException("Failed to create short cache", e);
-            }
-        }
-
-        if (longCacheEnabled) {
-            try {
-                this.longEventCache = this.cacheManager
-                    .createNewCache(new LRUCacheConfiguration("notification.rest.longCache.events", 100, 86400));
-            } catch (CacheException e) {
-                throw new InitializationException("Failed to create long event cache", e);
-            }
-
-            try {
-                this.longCountCache = this.cacheManager
-                    .createNewCache(new LRUCacheConfiguration("notification.rest.longCache.count", 10000, 86400));
-            } catch (CacheException e) {
-                throw new InitializationException("Failed to create long count cache", e);
             }
         }
     }
@@ -323,7 +304,7 @@ public class NotificationEventExecutor implements Initializable, Disposable
     public Object submit(String cacheKey, Callable<List<CompositeEvent>> callable, boolean async, boolean count)
         throws Exception
     {
-        Object cached = getFromCache(cacheKey, count);
+        Object cached = this.notificationCacheManager.getFromCache(cacheKey, count);
 
         if (cached != null) {
             return cached;
@@ -393,54 +374,6 @@ public class NotificationEventExecutor implements Initializable, Disposable
         return result;
     }
 
-    /**
-     * @param cacheKey the cache key
-     * @param count true if the value to return is a count instead of a list of events
-     * @return the value associated with the passed cache key
-     */
-    public Object getFromCache(String cacheKey, boolean count)
-    {
-        if (count) {
-            return this.longCountCache != null ? this.longCountCache.get(cacheKey) : null;
-        } else {
-            return this.longEventCache != null ? this.longEventCache.get(cacheKey) : null;
-        }
-    }
-
-    private Object setInCache(String cacheKey, List<CompositeEvent> events, boolean count)
-    {
-        Object result;
-        if (count) {
-            result = events.size();
-
-            if (this.longCountCache != null) {
-                this.longCountCache.set(cacheKey, (Integer) result);
-            }
-        } else {
-            result = events;
-
-            if (this.longEventCache != null) {
-                this.longEventCache.set(cacheKey, events);
-            }
-        }
-
-        return result;
-    }
-
-    /**
-     * Empty the long cache.
-     */
-    public void flushLongCache()
-    {
-        if (this.longEventCache != null) {
-            this.longEventCache.removeAll();
-        }
-
-        if (this.longCountCache != null) {
-            this.longCountCache.removeAll();
-        }
-    }
-
     @Override
     public void dispose() throws ComponentLifecycleException
     {
@@ -450,10 +383,6 @@ public class NotificationEventExecutor implements Initializable, Disposable
 
         if (this.shortCache != null) {
             this.shortCache.dispose();
-        }
-
-        if (this.longCountCache != null) {
-            this.longCountCache.dispose();
         }
     }
 }

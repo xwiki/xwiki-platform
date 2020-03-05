@@ -17,10 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.rest.internal;
+package org.xwiki.notifications.sources.internal;
 
 import java.util.Collection;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -102,4 +104,31 @@ public class FollowedUserOnlyEventFilter implements NotificationFilter
         return 3000;
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        FollowedUserOnlyEventFilter that = (FollowedUserOnlyEventFilter) o;
+
+        return new EqualsBuilder()
+            .append(entityReferenceSerializer, that.entityReferenceSerializer)
+            .append(followedUsers, that.followedUsers)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(entityReferenceSerializer)
+            .append(followedUsers)
+            .toHashCode();
+    }
 }

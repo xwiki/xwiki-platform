@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.rest.internal;
+package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,7 +96,7 @@ public class UsersParameterHandler
     private void addFilterPreference(NotificationParameters parameters, List<String> userList)
     {
         Set<NotificationFormat> formats = new HashSet<>();
-        formats.add(NotificationFormat.ALERT);
+        formats.add(parameters.format);
         for (String userId : userList) {
             DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
             pref.setId(String.format("userRestFilters_%s", userId));

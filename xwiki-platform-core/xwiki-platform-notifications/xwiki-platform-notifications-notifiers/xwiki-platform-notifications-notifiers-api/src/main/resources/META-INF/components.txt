@@ -8,3 +8,7 @@ org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator
 org.xwiki.notifications.notifiers.internal.rss.DefaultNotificationRSSManager
 org.xwiki.notifications.notifiers.internal.rss.DefaultNotificationRSSRenderer
 org.xwiki.notifications.notifiers.script.NotificationNotifiersScriptService
+org.xwiki.notifications.notifiers.internal.InternalHtmlNotificationRenderer
+org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager
+org.xwiki.notifications.notifiers.internal.DefaultAsyncNotificationRenderer
+org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager

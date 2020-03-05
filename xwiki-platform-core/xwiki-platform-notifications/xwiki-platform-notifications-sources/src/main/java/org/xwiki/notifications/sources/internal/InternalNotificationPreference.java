@@ -17,12 +17,14 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.rest.internal;
+package org.xwiki.notifications.sources.internal;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.preferences.NotificationPreference;
@@ -78,12 +80,38 @@ public class InternalNotificationPreference implements NotificationPreference
     @Override
     public String getProviderHint()
     {
-        return "rest";
+        return "factory";
     }
 
     @Override
     public NotificationPreferenceCategory getCategory()
     {
         return NotificationPreferenceCategory.DEFAULT;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        InternalNotificationPreference that = (InternalNotificationPreference) o;
+
+        return new EqualsBuilder()
+            .append(descriptor, that.descriptor)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(descriptor)
+            .toHashCode();
     }
 }

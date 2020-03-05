@@ -32,6 +32,7 @@ import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
 import org.xwiki.eventstream.internal.events.EventStatusDeletedEvent;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceAddOrUpdatedEvent;
 import org.xwiki.notifications.filters.internal.event.NotificationFilterPreferenceDeletedEvent;
+import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
 import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceAddedEvent;
 import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceDeletedEvent;
 import org.xwiki.notifications.preferences.internal.event.NotificationPreferenceUpdatedEvent;
@@ -56,7 +57,7 @@ public class NotificationEventExecutorListener extends AbstractEventListener
     public static final String NAME = "NotificationEventExecutorListener";
 
     @Inject
-    private NotificationEventExecutor cache;
+    private DefaultNotificationCacheManager cache;
 
     /**
      * The default constructor.

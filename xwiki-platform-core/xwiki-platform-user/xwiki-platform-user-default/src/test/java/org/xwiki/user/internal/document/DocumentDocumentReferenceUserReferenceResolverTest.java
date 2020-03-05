@@ -69,4 +69,11 @@ public class DocumentDocumentReferenceUserReferenceResolverTest
         reference = this.resolver.resolve(new DocumentReference("wiki", "space", "sUpErAdMiN"));
         assertSame(UserReference.SUPERADMIN_REFERENCE, reference);
     }
+
+    @Test
+    void resolveWhenNull()
+    {
+        UserReference reference = this.resolver.resolve(null);
+        assertSame(UserReference.CURRENT_USER_REFERENCE, reference);
+    }
 }

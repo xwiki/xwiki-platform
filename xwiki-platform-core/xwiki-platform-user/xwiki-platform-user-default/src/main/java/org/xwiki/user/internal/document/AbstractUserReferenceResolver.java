@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.internal.document;
 
+import org.xwiki.text.StringUtils;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -46,13 +47,16 @@ public abstract class AbstractUserReferenceResolver<T> implements UserReferenceR
     }
 
     /**
-     * @param userName the user id (e.g. for a full reference of {@code xwiki:XWiki.JohnDoe}, the id is {@code JohnDoe})
+     * @param userName the user id (e.g. for a full reference of {@code xwiki:XWiki.JohnDoe}, the id is
+     *                  {@code JohnDoe}). If null or empty then resolve to the current user reference
      * @return the full User reference. Also handles Guest and SuperAdmin users.
      */
     protected UserReference resolveName(String userName)
     {
         UserReference reference = null;
-        if (isGuest(userName)) {
+        if (StringUtils.isEmpty(userName)) {
+            reference = UserReference.CURRENT_USER_REFERENCE;
+        } else if (isGuest(userName)) {
             reference = UserReference.GUEST_REFERENCE;
         } else if (isSuperAdmin(userName)) {
             reference = UserReference.SUPERADMIN_REFERENCE;

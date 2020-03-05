@@ -94,4 +94,18 @@ public class DocumentStringUserReferenceResolverTest
         reference = this.resolver.resolve("sUpErAdMiN");
         assertSame(UserReference.SUPERADMIN_REFERENCE, reference);
     }
+
+    @Test
+    void resolveWhenNull()
+    {
+        UserReference reference = this.resolver.resolve(null);
+        assertSame(UserReference.CURRENT_USER_REFERENCE, reference);
+    }
+
+    @Test
+    void resolveWhenEmpty()
+    {
+        UserReference reference = this.resolver.resolve("");
+        assertSame(UserReference.CURRENT_USER_REFERENCE, reference);
+    }
 }

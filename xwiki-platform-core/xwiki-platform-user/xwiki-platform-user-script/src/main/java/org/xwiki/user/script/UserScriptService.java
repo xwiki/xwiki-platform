@@ -26,6 +26,10 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.User;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserResolver;
 
 /**
  * Users related script API.
@@ -44,6 +48,9 @@ public class UserScriptService implements ScriptService
     public static final String ROLEHINT = "user";
 
     @Inject
+    private UserResolver<UserReference> userResolver;
+
+    @Inject
     private ScriptServiceManager scriptServiceManager;
 
     /**
@@ -55,5 +62,17 @@ public class UserScriptService implements ScriptService
     public <S extends ScriptService> S get(String serviceName)
     {
         return (S) this.scriptServiceManager.get(ROLEHINT + '.' + serviceName);
+    }
+
+    /**
+     * @param userReference the reference to the user to resolve
+     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
+     * @return the User object
+     * @since 12.2RC1
+     */
+    @Unstable
+    public User resolveUser(UserReference userReference, Object... parameters)
+    {
+        return this.userResolver.resolve(userReference, parameters);
     }
 }

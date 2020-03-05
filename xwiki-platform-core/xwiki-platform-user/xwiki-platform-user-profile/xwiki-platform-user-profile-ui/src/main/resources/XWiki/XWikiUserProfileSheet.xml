@@ -121,7 +121,7 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
             #set ($sectionProperty = $vCardData[1])
           #end
           #if ("$!sectionProperty" != '' &amp;&amp; $xwikiUsersClass.get($sectionProperty))
-          &lt;dt class='label'&gt;
+          &lt;dt&gt;
             &lt;label #if($inEditMode)for="${xwikiUsersClassName}_${obj.number}_${sectionProperty}"#{end}&gt;$doc.displayPrettyName("${sectionProperty}")&lt;/label&gt;
           &lt;/dt&gt;
           &lt;dd #if("$!vCardProperty" != '' &amp;&amp; !$inEditMode)class="$vCardProperty"#{end}&gt;$doc.display($sectionProperty)&lt;/dd&gt;

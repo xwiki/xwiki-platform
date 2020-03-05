@@ -19,36 +19,38 @@
  */
 package org.xwiki.user.internal.document;
 
+import java.lang.reflect.Type;
+
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.converter.AbstractConverter;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 /**
- * Converts a {@link DocumentReference} into a {@link UserReference}.
+ * Converts a String to {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
-@Named("document")
 @Singleton
-public class DocumentDocumentReferenceUserReferenceResolver extends AbstractUserReferenceResolver<DocumentReference>
+public class UserReferenceConverter extends AbstractConverter<UserReference>
 {
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<String> userReferenceResolver;
+
     @Override
-    public UserReference resolve(DocumentReference rawReference, Object... parameters)
+    protected UserReference convertToType(Type targetType, Object value)
     {
-        UserReference reference;
-        if (rawReference == null) {
-            reference = UserReference.CURRENT_USER_REFERENCE;
-        } else {
-            reference = resolveName(rawReference.getName());
-            if (reference == null) {
-                reference = new DocumentUserReference(rawReference);
-            }
+        if (value == null) {
+            return null;
         }
-        return reference;
+
+        return this.userReferenceResolver.resolve(value.toString());
     }
 }

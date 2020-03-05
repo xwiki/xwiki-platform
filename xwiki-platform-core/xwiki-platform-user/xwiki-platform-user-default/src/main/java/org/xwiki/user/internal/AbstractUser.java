@@ -55,13 +55,13 @@ public abstract class AbstractUser implements User
     @Override
     public boolean displayHiddenDocuments()
     {
-        return getProperty(DISPLAY_HIDDEN_DOCUMENTS, Boolean.class);
+        return getProperty(DISPLAY_HIDDEN_DOCUMENTS, Boolean.class, false);
     }
 
     @Override
     public boolean isActive()
     {
-        return getProperty(ACTIVE, Boolean.class);
+        return getProperty(ACTIVE, Boolean.class, false);
     }
 
     @Override
@@ -91,7 +91,7 @@ public abstract class AbstractUser implements User
     @Override
     public boolean isEmailChecked()
     {
-        return getProperty(EMAIL_CHECKED, Boolean.class);
+        return getProperty(EMAIL_CHECKED, Boolean.class, false);
     }
 
     @Override

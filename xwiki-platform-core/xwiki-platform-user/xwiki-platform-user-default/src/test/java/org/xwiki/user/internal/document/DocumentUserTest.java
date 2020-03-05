@@ -98,10 +98,10 @@ public class DocumentUserTest
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when(this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
-        when(this.userConfigurationSource.getProperty("active", Boolean.class)).thenReturn(true);
+        when(this.userConfigurationSource.getProperty("active", Boolean.class, false)).thenReturn(true);
         assertTrue(this.user.isActive());
 
-        when(this.userConfigurationSource.getProperty("active", Boolean.class)).thenReturn(false);
+        when(this.userConfigurationSource.getProperty("active", Boolean.class, false)).thenReturn(false);
         assertFalse(this.user.isActive());
     }
 
@@ -111,10 +111,12 @@ public class DocumentUserTest
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
-        when(this.userConfigurationSource.getProperty("displayHiddenDocuments", Boolean.class)).thenReturn(true);
+        when(this.userConfigurationSource.getProperty("displayHiddenDocuments", Boolean.class, false))
+            .thenReturn(true);
         assertTrue(user.displayHiddenDocuments());
 
-        when(this.userConfigurationSource.getProperty("displayHiddenDocuments", Boolean.class)).thenReturn(false);
+        when(this.userConfigurationSource.getProperty("displayHiddenDocuments", Boolean.class, false))
+            .thenReturn(false);
         assertFalse(user.displayHiddenDocuments());
     }
 
@@ -177,10 +179,10 @@ public class DocumentUserTest
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
-        when(this.userConfigurationSource.getProperty("email_checked", Boolean.class)).thenReturn(true);
+        when(this.userConfigurationSource.getProperty("email_checked", Boolean.class, false)).thenReturn(true);
         assertTrue(this.user.isEmailChecked());
 
-        when(this.userConfigurationSource.getProperty("email_checked", Boolean.class)).thenReturn(false);
+        when(this.userConfigurationSource.getProperty("email_checked", Boolean.class, false)).thenReturn(false);
         assertFalse(this.user.isEmailChecked());
     }
 

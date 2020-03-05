@@ -323,7 +323,10 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   text-decoration: underline;
   background-color: $theme.highlightColor;
 }
-
+#add_xobject .buttonwrapper, #add_xproperty .buttonwrapper{
+  position: relative;
+  top: -2px;
+}
 #switch-xclass {
   text-align: right;
   margin: 4px 0 -16px;

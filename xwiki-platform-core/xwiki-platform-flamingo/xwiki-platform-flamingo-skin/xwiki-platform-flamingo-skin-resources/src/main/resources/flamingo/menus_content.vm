@@ -257,11 +257,11 @@
     ##
     ## OBJECTS EDITOR
     ##
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'drive', $extraAttributes)", 'order': 60000}))
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=object') $services.localization.render('core.menu.edit.object') 'tmEditObject', '', 'bricks', $extraAttributes)", 'order': 60000}))
     ##
     ## CLASS EDITOR
     ##
-    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'drive', $extraAttributes)", 'order': 70000}))
+    #set ($discard = $staticExtensions.add( { 'content': "#submenuitem($doc.getURL('edit', 'editor=class') $services.localization.render('core.menu.edit.class') 'tmEditClass', '', 'box', $extraAttributes)", 'order': 70000}))
   #end
   ##
   ## Display all the extensions points, including the static ones

@@ -592,7 +592,7 @@ return XWiki;
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content></content>
+      <content/>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
@@ -601,10 +601,10 @@ return XWiki;
       <name>org.xwiki.platform.user.profile.entry.userwikisheet</name>
     </property>
     <property>
-      <parameters>id=wikis&#xd;
-name=$services.localization.render('platform.wiki.menu.userwikis')&#xd;
-sheet=WikiManager.UserWikiSheet&#xd;
-glyphicon=list&#xd;
+      <parameters>id=wikis
+name=$services.localization.render('platform.wiki.menu.userwikis')
+sheet=WikiManager.UserWikiSheet
+glyphicon=list
 display=#if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists('WikiManager.UserWikiSheet'))true#{else}false#end</parameters>
     </property>
     <property>

@@ -335,7 +335,7 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content></content>
+      <content/>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
@@ -344,9 +344,9 @@
       <name>org.xwiki.platform.user.profile.entry.usernotificationsheet</name>
     </property>
     <property>
-      <parameters>id=notifications&#xd;
-sheet=XWiki.Notifications.Code.XWikiUserNotificationsSheet&#xd;
-glyphicon=bell&#xd;
+      <parameters>id=notifications
+sheet=XWiki.Notifications.Code.XWikiUserNotificationsSheet
+glyphicon=bell
 display=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $xwiki.exists($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet')))true#{else}false#end</parameters>
     </property>
     <property>

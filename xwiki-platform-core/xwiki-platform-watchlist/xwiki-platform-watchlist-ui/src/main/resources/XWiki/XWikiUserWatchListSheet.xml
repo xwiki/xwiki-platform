@@ -244,7 +244,7 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content></content>
+      <content/>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
@@ -253,9 +253,9 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
       <name>org.xwiki.platform.user.profile.entry.userwatchlistsheet</name>
     </property>
     <property>
-      <parameters>id=watchlist&#xd;
-sheet=XWiki.XWikiUserWatchListSheet&#xd;
-glyphicon=eye&#xd;
+      <parameters>id=watchlist
+sheet=XWiki.XWikiUserWatchListSheet
+glyphicon=eye
 display=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasWatch)true#{else}false#end</parameters>
     </property>
     <property>

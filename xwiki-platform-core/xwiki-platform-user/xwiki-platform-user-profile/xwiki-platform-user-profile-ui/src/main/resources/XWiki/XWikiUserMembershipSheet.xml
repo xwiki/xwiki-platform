@@ -254,7 +254,7 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content></content>
+      <content/>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
@@ -263,9 +263,9 @@
       <name>org.xwiki.platform.user.profile.entry.usermembershipsheet</name>
     </property>
     <property>
-      <parameters>id=groups&#xd;
-sheet=XWiki.XWikiUserMembershipSheet&#xd;
-glyphicon=group&#xd;
+      <parameters>id=groups
+sheet=XWiki.XWikiUserMembershipSheet
+glyphicon=group
 display=true</parameters>
     </property>
     <property>

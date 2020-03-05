@@ -27,6 +27,7 @@ import org.xwiki.test.selenium.framework.AbstractXWikiTestCase;
  * 
  * @version $Id$
  */
+UrlMiscTest.java
 public class UrlMiscTest extends AbstractXWikiTestCase
 {
     @Test

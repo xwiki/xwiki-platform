@@ -19,6 +19,8 @@
  */
 package org.xwiki.eventstream.internal.events;
 
+import java.io.Serializable;
+
 import org.xwiki.observation.event.Event;
 
 /**
@@ -28,8 +30,10 @@ import org.xwiki.observation.event.Event;
  * @since 10.11.5
  * @since 11.3RC1
  */
-public class EventStatusAddOrUpdatedEvent implements Event
+public class EventStatusAddOrUpdatedEvent implements Event, Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public boolean matches(Object otherEvent)
     {

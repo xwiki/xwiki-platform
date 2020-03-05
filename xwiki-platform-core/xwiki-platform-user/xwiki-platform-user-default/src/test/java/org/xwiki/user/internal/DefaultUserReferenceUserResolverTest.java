@@ -113,12 +113,14 @@ public class DefaultUserReferenceUserResolverTest
     @Test
     void resolveForSuperAdminReference()
     {
-        assertSame(User.SUPERADMIN, this.resolver.resolve(UserReference.SUPERADMIN_REFERENCE));
+        assertSame(UserReference.SUPERADMIN_REFERENCE,
+            this.resolver.resolve(UserReference.SUPERADMIN_REFERENCE).getUserReference());
     }
 
     @Test
     void resolveForGuestReference()
     {
-        assertSame(User.GUEST, this.resolver.resolve(UserReference.GUEST_REFERENCE));
+        assertSame(UserReference.GUEST_REFERENCE,
+            this.resolver.resolve(UserReference.GUEST_REFERENCE).getUserReference());
     }
 }

@@ -87,7 +87,7 @@ public class DocumentUserReferenceUserResolverTest
     void resolveGuest()
     {
         User user = this.resolver.resolve(UserReference.GUEST_REFERENCE);
-        assertSame(User.GUEST, user);
+        assertSame(UserReference.GUEST_REFERENCE, user.getUserReference());
     }
 
     @Test
@@ -95,14 +95,14 @@ public class DocumentUserReferenceUserResolverTest
     {
         User user = this.resolver.resolve(new DocumentUserReference(
             new DocumentReference("wiki", "space", "XWikiGuest")));
-        assertSame(User.GUEST, user);
+        assertSame(UserReference.GUEST_REFERENCE, user.getUserReference());
     }
 
     @Test
     void resolveSuperAdmin()
     {
         User user = this.resolver.resolve(UserReference.SUPERADMIN_REFERENCE);
-        assertSame(User.SUPERADMIN, user);
+        assertSame(UserReference.SUPERADMIN_REFERENCE, user.getUserReference());
     }
 
     @Test
@@ -110,6 +110,6 @@ public class DocumentUserReferenceUserResolverTest
     {
         User user = this.resolver.resolve(new DocumentUserReference(
             new DocumentReference("wiki", "space", "superadmin")));
-        assertSame(User.SUPERADMIN, user);
+        assertSame(UserReference.SUPERADMIN_REFERENCE, user.getUserReference());
     }
 }

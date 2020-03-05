@@ -19,7 +19,6 @@
  */
 package org.xwiki.user.internal.document;
 
-import java.util.List;
 import java.util.function.Supplier;
 
 import javax.inject.Provider;
@@ -27,12 +26,9 @@ import javax.inject.Provider;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.user.User;
-import org.xwiki.user.UserType;
+import org.xwiki.user.internal.AbstractUser;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -46,80 +42,31 @@ import com.xpn.xwiki.XWikiContext;
  * @version $Id$
  * @since 12.2RC1
  */
-class DocumentUser implements User
+class DocumentUser extends AbstractUser
 {
     static final LocalDocumentReference USERS_CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
 
     private DocumentUserReference userReference;
 
-    private DocumentReferenceResolver<EntityReference> currentReferenceResolver;
-
     private EntityReferenceProvider entityReferenceProvider;
-
-    private ConfigurationSource userConfigurationSource;
 
     private Provider<XWikiContext> contextProvider;
 
     /**
      * @param userReference the user reference
      * @param contextProvider the component to get/set the current user in the context
-     * @param currentReferenceResolver the component to resolve user xclass for the current wiki
-     * @param entityReferenceProvider the component to check if the current wiki is the main wiki
      * @param userConfigurationSource the component to get the user properties
+     * @param entityReferenceProvider the component to check if the current wiki is the main wiki
      * @param
      */
     DocumentUser(DocumentUserReference userReference, Provider<XWikiContext> contextProvider,
-        DocumentReferenceResolver<EntityReference> currentReferenceResolver,
         EntityReferenceProvider entityReferenceProvider, ConfigurationSource userConfigurationSource)
     {
+        super(userConfigurationSource);
+
         this.userReference = userReference;
         this.contextProvider = contextProvider;
-        this.currentReferenceResolver = currentReferenceResolver;
         this.entityReferenceProvider = entityReferenceProvider;
-        this.userConfigurationSource = userConfigurationSource;
-    }
-
-    @Override
-    public boolean displayHiddenDocuments()
-    {
-        Integer preference = getProperty("displayHiddenDocuments");
-        return preference != null && preference == 1;
-    }
-
-    @Override
-    public boolean isActive()
-    {
-        boolean active = true;
-        // Default value of active should be 1 (i.e. active) if not set
-        Integer value = getProperty("active");
-        if (value == null || value != 1) {
-            active = false;
-        }
-        return active;
-    }
-
-    @Override
-    public String getFirstName()
-    {
-        return (String) getProperty("first_name");
-    }
-
-    @Override
-    public String getLastName()
-    {
-        return (String) getProperty("last_name");
-    }
-
-    @Override
-    public String getEmail()
-    {
-        return (String) getProperty("email");
-    }
-
-    @Override
-    public UserType getType()
-    {
-        return UserType.fromString(getProperty("usertype"));
     }
 
     @Override
@@ -135,66 +82,13 @@ class DocumentUser implements User
         return this.userReference;
     }
 
-    @Override
-    public boolean isEmailChecked()
-    {
-        boolean emailChecked = true;
-        // Default value of email_checked should be 1 (i.e. checked) if not set.
-        Integer value = getProperty("email_checked");
-        if (value == null || value != 1) {
-            emailChecked = false;
-        }
-        return emailChecked;
-    }
-
     private DocumentReference getInternalReference()
     {
         return getUserReference().getReference();
     }
 
     @Override
-    public <T> T getProperty(String key, T defaultValue)
-    {
-        return execute(() -> this.userConfigurationSource.getProperty(key, defaultValue));
-    }
-
-    @Override
-    public <T> T getProperty(String key, Class<T> valueClass)
-    {
-        return execute(() -> this.userConfigurationSource.getProperty(key, valueClass));
-    }
-
-    @Override
-    public List<String> getKeys()
-    {
-        return execute(() -> this.userConfigurationSource.getKeys());
-    }
-
-    @Override
-    public boolean containsKey(String key)
-    {
-        return execute(() -> this.userConfigurationSource.containsKey(key));
-    }
-
-    @Override
-    public boolean isEmpty()
-    {
-        return execute(() -> this.userConfigurationSource.isEmpty());
-    }
-
-    @Override
-    public <T> T getProperty(String key, Class<T> valueClass, T defaultValue)
-    {
-        return execute(() -> this.userConfigurationSource.getProperty(key, valueClass, defaultValue));
-    }
-
-    @Override
-    public <T> T getProperty(String key)
-    {
-        return execute(() -> this.userConfigurationSource.getProperty(key));
-    }
-
-    private <T> T execute(Supplier<T> supplier)
+    protected <T> T execute(Supplier<T> supplier)
     {
         XWikiContext xcontext = this.contextProvider.get();
         DocumentReference originalUserReference = xcontext.getUserReference();

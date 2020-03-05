@@ -33,16 +33,6 @@ import org.xwiki.stability.Unstable;
 public interface User extends ConfigurationSource
 {
     /**
-     * Represents the Guest user, see {@link GuestUser}.
-     */
-    User GUEST = GuestUser.INSTANCE;
-
-    /**
-     * Represents the Super Admin user, see {@link SuperAdminUser}.
-     */
-    User SUPERADMIN = SuperAdminUser.INSTANCE;
-
-    /**
      * @return true if the user is configured to display hidden documents in the wiki
      */
     boolean displayHiddenDocuments();

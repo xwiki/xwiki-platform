@@ -17,37 +17,41 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal.document;
+package org.xwiki.user.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.configuration2.BaseConfiguration;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.user.User;
-import org.xwiki.user.UserReference;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.configuration.internal.CommonsConfigurationSource;
 
-import com.xpn.xwiki.XWikiContext;
+import static org.xwiki.user.internal.UserPropertyConstants.ACTIVE;
+import static org.xwiki.user.internal.UserPropertyConstants.DISPLAY_HIDDEN_DOCUMENTS;
+import static org.xwiki.user.internal.UserPropertyConstants.EMAIL_CHECKED;
+import static org.xwiki.user.internal.UserPropertyConstants.FIRST_NAME;
 
 /**
- * Resolves the current logged-in user. This is a convenience resolver since the current user should be retrieved from
- * the Execution Context instead.
+ * Provide configuration data for the Guest user.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
-@Named("org.xwiki.user.CurrentUserReference")
+@Named("guestuser")
 @Singleton
-public class CurrentUserResolver extends AbstractDocumentUserResolver<UserReference>
+public class GuestConfigurationSource extends CommonsConfigurationSource implements Initializable
 {
     @Override
-    public User resolve(UserReference unused, Object... parameters)
+    public void initialize()
     {
-        return resolveUser(getXWikiContext().getUserReference());
-    }
+        BaseConfiguration configuration = new BaseConfiguration();
+        configuration.addProperty(DISPLAY_HIDDEN_DOCUMENTS, "0");
+        configuration.addProperty(ACTIVE, "0");
+        configuration.addProperty(FIRST_NAME, "Guest");
+        configuration.addProperty(EMAIL_CHECKED, "0");
 
-    private XWikiContext getXWikiContext()
-    {
-        return this.contextProvider.get();
+        setConfiguration(configuration);
     }
 }

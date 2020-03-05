@@ -24,6 +24,7 @@ import java.util.Date;
 
 import javax.script.ScriptContext;
 
+import org.apache.commons.lang3.time.DateUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.internal.DefaultEvent;
@@ -107,10 +108,12 @@ public class DefaultNotificationDisplayerTest
         event1.setType("type1");
         event1.setId("id1");
         event1.setDate(new Date());
+
         Event event2 = new DefaultEvent();
         event2.setType("type2");
         event2.setId("id2");
-        event2.setDate(new Date());
+        // Make sure that the second event comes later than the first one so that the order is deterministic
+        event2.setDate(DateUtils.addMinutes(new Date(), 5));
 
         when(this.templateManager.execute("notification/default.vm")).thenThrow(new Exception("error"));
 
@@ -120,6 +123,6 @@ public class DefaultNotificationDisplayerTest
         Throwable exception = assertThrows(NotificationException.class, () -> {
             this.displayer.renderNotification(compositeEvent);
         });
-        assertEquals("Failed to render the notification for events [id1,id2]", exception.getMessage());
+        assertEquals("Failed to render the notification for events [id2,id1]", exception.getMessage());
     }
 }

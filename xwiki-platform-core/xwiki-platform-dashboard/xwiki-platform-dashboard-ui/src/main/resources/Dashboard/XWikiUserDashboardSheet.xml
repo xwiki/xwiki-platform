@@ -160,13 +160,13 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>// ensure that the version is refreshed when saving a document. &#xd;
-        require(['xwiki-meta'], function (xm) {&#xd;
-        xm.refreshVersion();&#xd;
+      <code>// ensure that the version is refreshed when saving a document. 
+        require(['xwiki-meta'], function (xm) {
+        xm.refreshVersion();
         });</code>
     </property>
     <property>
-      <name></name>
+      <name/>
     </property>
     <property>
       <parse>0</parse>
@@ -299,7 +299,7 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content></content>
+      <content/>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
@@ -308,9 +308,9 @@
       <name>org.xwiki.platform.user.profile.entry.userdashboardsheet</name>
     </property>
     <property>
-      <parameters>id=dashboard&#xd;
-sheet=Dashboard.XWikiUserDashboardSheet&#xd;
-glyphicon=th&#xd;
+      <parameters>id=dashboard
+sheet=Dashboard.XWikiUserDashboardSheet
+glyphicon=th
 display=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasDashboard)true#{else}false#end</parameters>
     </property>
     <property>

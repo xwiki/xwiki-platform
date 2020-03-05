@@ -44,5 +44,4 @@ dashboard.gadgetEditor.changeGadget.label=Alterar Gadget
 dashboard.gadgetEditor.gadgetTitle.label=Título do Gadget
 dashboard.gadgetEditor.gadgetTitle.hint=O título deste gadget aparece na parte superior do painel dos gadget do painel de controle (pode incluir código de velocidade).
 dashboard.initialization.saveMessage=Inicializar a configuração padrão de usuário do painel de controle</content>
-  
 </xwikidoc>

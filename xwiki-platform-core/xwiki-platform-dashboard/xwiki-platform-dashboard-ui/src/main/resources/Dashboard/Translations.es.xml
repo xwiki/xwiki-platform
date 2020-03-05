@@ -44,5 +44,4 @@ dashboard.gadgetEditor.changeGadget.label=Cambiar gadget
 dashboard.gadgetEditor.gadgetTitle.label=Título del gadget
 dashboard.gadgetEditor.gadgetTitle.hint=El título de este gadget aparece en la parte superior del panel del gadget en el panel de control(puede contener un código Velocity).
 dashboard.initialization.saveMessage=Inicializar la configuración del usuario del tablero predeterminado</content>
-  
 </xwikidoc>

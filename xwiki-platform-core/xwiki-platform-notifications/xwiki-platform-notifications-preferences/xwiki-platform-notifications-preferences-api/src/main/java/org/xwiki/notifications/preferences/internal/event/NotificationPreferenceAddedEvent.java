@@ -28,5 +28,5 @@ package org.xwiki.notifications.preferences.internal.event;
  */
 public class NotificationPreferenceAddedEvent extends AbstractNotificationPreferenceEvent
 {
-    
+    private static final long serialVersionUID = 1L;
 }

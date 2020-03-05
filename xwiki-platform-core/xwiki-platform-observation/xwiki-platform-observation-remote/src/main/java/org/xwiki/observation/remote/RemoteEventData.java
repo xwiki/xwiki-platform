@@ -51,6 +51,27 @@ public class RemoteEventData implements Serializable
     private Serializable data;
 
     /**
+     * The default constructor.
+     */
+    public RemoteEventData()
+    {
+    }
+
+    /**
+     * @param event the event type.
+     * @param source the event source.
+     * @param data the event data.
+     * @since 12.2RC1
+     * @since 11.10.4
+     */
+    public RemoteEventData(Serializable event, Serializable source, Serializable data)
+    {
+        setEvent(event);
+        setSource(source);
+        setData(data);
+    }
+
+    /**
      * @return the event type.
      */
     public Serializable getEvent()

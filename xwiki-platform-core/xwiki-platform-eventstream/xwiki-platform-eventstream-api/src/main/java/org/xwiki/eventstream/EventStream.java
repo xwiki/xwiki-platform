@@ -67,4 +67,16 @@ public interface EventStream
      * @param e the event to delete
      */
     void deleteEvent(Event e);
+
+    /**
+     * @param eventId the unique identifier of the event
+     * @return the event or null if none could be found
+     * @throws QueryException if failing to get the event
+     * @since 12.2RC1
+     * @since 11.10.4
+     */
+    default Event getEvent(String eventId) throws QueryException
+    {
+        return null;
+    }
 }

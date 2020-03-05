@@ -28,5 +28,5 @@ package org.xwiki.notifications.filters.internal.event;
  */
 public class NotificationFilterPreferenceDeletedEvent extends AbstractNotificationFilterPreferenceEvent
 {
-
+    private static final long serialVersionUID = 1L;
 }

@@ -74,4 +74,10 @@ public class LegacyEventStream implements EventStream
     {
         return legacyEventLoader.searchEvents(query);
     }
+
+    @Override
+    public Event getEvent(String eventId) throws QueryException
+    {
+        return legacyEventLoader.getEvent(eventId);
+    }
 }

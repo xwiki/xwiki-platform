@@ -19,6 +19,13 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
@@ -27,12 +34,6 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Load events from the Legacy Event Store.
@@ -92,8 +93,8 @@ public class LegacyEventLoader
      */
     public List<Event> searchEvents(Query query) throws QueryException
     {
-        Query q = this.queryManager.createQuery("select event from LegacyEvent event "
-            + query.getStatement(), query.getLanguage());
+        Query q = this.queryManager.createQuery("select event from LegacyEvent event " + query.getStatement(),
+            query.getLanguage());
         for (Map.Entry<String, Object> entry : query.getNamedParameters().entrySet()) {
             q.bindValue(entry.getKey(), entry.getValue());
         }
@@ -124,5 +125,44 @@ public class LegacyEventLoader
             result.add(eventConverter.convertLegacyActivityToEvent(e));
         }
         return result;
+    }
+
+    /**
+     * @param eventId the unique identifier of the event
+     * @return the event stored in the database
+     * @throws QueryException when failing to get the event
+     * @since 12.2RC1
+     * @since 11.10.4
+     */
+    public LegacyEvent getLegacyEvent(String eventId) throws QueryException
+    {
+        Query query =
+            this.queryManager.createQuery("select event from LegacyEvent event where eventId = :eventId", Query.HQL);
+
+        if (configuration.useMainStore()) {
+            query.setWiki(wikiDescriptorManager.getMainWikiId());
+        }
+
+        List<LegacyEvent> events = query.execute();
+
+        if (events.isEmpty()) {
+            return null;
+        }
+
+        return events.get(0);
+    }
+
+    /**
+     * @param eventId the event id
+     * @return the event or null if none could be found
+     * @throws QueryException  when failing to get the event
+     * @since 12.2RC1
+     * @since 11.10.4
+     */
+    public Event getEvent(String eventId) throws QueryException
+    {
+        LegacyEvent legacyEvent = getLegacyEvent(eventId);
+
+        return eventConverter.convertLegacyActivityToEvent(legacyEvent);
     }
 }

@@ -17,26 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.preferences.internal.event;
+package org.xwiki.observation.remote;
 
-import java.io.Serializable;
+import org.junit.jupiter.api.Test;
 
-import org.xwiki.observation.event.Event;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
- * Base class for event generated when notification preferences are manipulated.
+ * Validate {@link RemoteEventData}.
  * 
  * @version $Id$
- * @since 10.11.4
- * @since 11.2
  */
-public abstract class AbstractNotificationPreferenceEvent implements Event, Serializable
+public class RemoteEventDataTest
 {
-    private static final long serialVersionUID = 1L;
-
-    @Override
-    public boolean matches(Object otherEvent)
+    @Test
+    public void constructor()
     {
-        return otherEvent.getClass() == getClass();
+        RemoteEventData data = new RemoteEventData("event", "source", "data");
+
+        assertSame("event", data.getEvent());
+        assertSame("source", data.getSource());
+        assertSame("data", data.getData());
     }
 }

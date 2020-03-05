@@ -37,6 +37,7 @@ import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 /**
  * This listener is responsible of starting triggers when specific events occurs in the wiki.
@@ -66,6 +67,9 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     @Inject
     @Named("context")
     private ComponentManager componentManager;
+
+    @Inject
+    private RemoteObservationManagerContext remoteState;
 
     @Inject
     private Logger logger;
@@ -116,7 +120,8 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     {
         // Check if the notifications are enabled in the wiki and if the mail option for the
         // notifications is enabled.
-        if (this.notificationConfiguration.isEnabled() && this.notificationConfiguration.areEmailsEnabled()) {
+        if (!this.remoteState.isRemoteState() && this.notificationConfiguration.isEnabled()
+            && this.notificationConfiguration.areEmailsEnabled()) {
             try {
                 org.xwiki.eventstream.Event eventStreamEvent = (org.xwiki.eventstream.Event) o;
 

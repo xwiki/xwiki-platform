@@ -19,19 +19,23 @@
  */
 package org.xwiki.eventstream.events;
 
+import java.io.Serializable;
+
 /**
  * Abstract class for every event that is related to the {@link org.xwiki.eventstream.EventStream}.
  *
  * @since 9.6RC1
  * @version $Id$
  */
-public abstract class AbstractEventStreamEvent implements org.xwiki.observation.event.Event
+public abstract class AbstractEventStreamEvent implements org.xwiki.observation.event.Event, Serializable
 {
     /**
      * Used to provide a key to a property in the current execution context that avoids stepping into a loop when
      * triggering new events.
      */
     public static final String EVENT_LOOP_CONTEXT_LOCK_PROPERTY = "eventLoopContextLockProperty";
+
+    private static final long serialVersionUID = 1L;
 
     @Override
     public boolean matches(Object o)

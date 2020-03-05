@@ -4,3 +4,4 @@ org.xwiki.eventstream.internal.DefaultUntypedRecordableEventConverter
 org.xwiki.eventstream.internal.EventClassDocumentInitializer
 org.xwiki.eventstream.internal.UntypedEventListener
 org.xwiki.eventstream.internal.UntypedRecordableEventDescriptorComponentBuilder
+org.xwiki.eventstream.internal.observation.EventStreamEventConverter

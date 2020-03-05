@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -213,5 +215,37 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     public void setEnabled(boolean enabled)
     {
         this.filterPreference.setEnabled(enabled);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ScopeNotificationFilterPreference that = (ScopeNotificationFilterPreference) o;
+
+        return new EqualsBuilder()
+            .append(hasParent, that.hasParent)
+            .append(filterPreference, that.filterPreference)
+            .append(scopeReference, that.scopeReference)
+            .append(children, that.children)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(filterPreference)
+            .append(scopeReference)
+            .append(hasParent)
+            .append(children)
+            .toHashCode();
     }
 }

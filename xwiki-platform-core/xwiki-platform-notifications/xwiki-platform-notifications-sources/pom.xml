@@ -61,6 +61,11 @@
       <artifactId>xwiki-platform-user-default</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-notifications-filters-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.commons</groupId>
@@ -86,7 +91,9 @@
             <configuration>
               <excludes>
                 **/ExpressionNodeToHQLConverter.java,
-                **/QueryGenerator.java
+                **/QueryGenerator.java,
+                <!-- Cyclomatic complexity is bad: it should properly be broken in multiple handlers -->
+                **/DefaultNotificationParametersFactory.java
               </excludes>
             </configuration>
           </execution>

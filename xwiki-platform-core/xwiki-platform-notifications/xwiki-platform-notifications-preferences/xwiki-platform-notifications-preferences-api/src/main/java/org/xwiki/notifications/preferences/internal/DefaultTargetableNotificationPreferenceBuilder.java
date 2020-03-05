@@ -22,6 +22,8 @@ package org.xwiki.notifications.preferences.internal;
 import java.util.Date;
 import java.util.Map;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
@@ -54,6 +56,34 @@ public class DefaultTargetableNotificationPreferenceBuilder implements Targetabl
         public EntityReference getTarget()
         {
             return target;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) {
+                return true;
+            }
+
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+
+            TargetablePreference that = (TargetablePreference) o;
+
+            return new EqualsBuilder()
+                .appendSuper(super.equals(o))
+                .append(target, that.target)
+                .isEquals();
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return new HashCodeBuilder(17, 37)
+                .appendSuper(super.hashCode())
+                .append(target)
+                .toHashCode();
         }
     }
 

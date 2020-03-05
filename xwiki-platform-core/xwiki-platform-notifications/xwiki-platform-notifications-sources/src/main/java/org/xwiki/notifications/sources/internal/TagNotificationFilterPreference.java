@@ -17,11 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.rest.internal;
+package org.xwiki.notifications.sources.internal;
 
 import java.util.Date;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -80,7 +82,7 @@ public class TagNotificationFilterPreference implements NotificationFilterPrefer
     @Override
     public String getProviderHint()
     {
-        return "REST";
+        return "FACTORY";
     }
 
     @Override
@@ -147,5 +149,33 @@ public class TagNotificationFilterPreference implements NotificationFilterPrefer
     public void setEnabled(boolean enabled)
     {
 
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        TagNotificationFilterPreference that = (TagNotificationFilterPreference) o;
+
+        return new EqualsBuilder()
+            .append(tag, that.tag)
+            .append(currentWiki, that.currentWiki)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(tag)
+            .append(currentWiki)
+            .toHashCode();
     }
 }

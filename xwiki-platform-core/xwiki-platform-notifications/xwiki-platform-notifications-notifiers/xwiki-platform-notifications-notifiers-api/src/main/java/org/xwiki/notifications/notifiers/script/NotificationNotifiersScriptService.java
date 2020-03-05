@@ -19,22 +19,37 @@
  */
 package org.xwiki.notifications.notifiers.script;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.job.JobException;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.notifiers.NotificationRenderer;
+import org.xwiki.notifications.notifiers.internal.DefaultAsyncNotificationRenderer;
+import org.xwiki.notifications.notifiers.internal.NotificationAsyncRendererConfiguration;
 import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
 import org.xwiki.notifications.sources.NotificationManager;
+import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.rendering.RenderingException;
+import org.xwiki.rendering.async.internal.AsyncRendererExecutor;
+import org.xwiki.rendering.async.internal.AsyncRendererExecutorResponse;
+import org.xwiki.rendering.async.internal.AsyncRendererResult;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 
 import com.rometools.rome.io.SyndFeedOutput;
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Script service for the notification notifiers.
@@ -61,6 +76,16 @@ public class NotificationNotifiersScriptService implements ScriptService
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private AsyncRendererExecutor asyncRendererExecutor;
+
+    @Inject
+    @Named("context")
+    private Provider<ComponentManager> componentManager;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
 
     /**
      * Generate a rendering Block for a given event to display as notification.
@@ -107,6 +132,97 @@ public class NotificationNotifiersScriptService implements ScriptService
                     this.notificationManager.getEvents(userId, entryNumber)));
         } catch (Exception e) {
             throw new NotificationException("Unable to render RSS feed", e);
+        }
+    }
+
+    /**
+     * Compute the HTML fragment for the async placehoder.
+     * @param response the async response containing ID informations for the placeholder
+     * @param inline if {@code true} returns a span else a div.
+     * @return a string containing the HTML for the placeholder.
+     */
+    private String computeAsyncPlaceholder(AsyncRendererExecutorResponse response, boolean inline)
+    {
+        String commonPart = String.format("class=\"xwiki-async\" data-xwiki-async-id=\"%s\" "
+            + "data-xwiki-async-client-id=\"%s\"", response.getJobIdHTTPPath(), response.getAsyncClientId());
+
+        String result;
+        if (inline) {
+            result = String.format("<span %s></span>", commonPart);
+        } else {
+            result = String.format("<div %s></div>", commonPart);
+        }
+        return result;
+    }
+
+    /**
+     * Request asynchronously the notifications for the given parameters to retrieve their number.
+     * This will return a piece of HTML with a placeholder for the asynchronous answer, which will be automatically
+     * filled with the number once the request is done.
+     * @param parameters the {@link NotificationParameters} used to make the request.
+     *                   You can retrieve it by using
+     * {@link org.xwiki.notifications.sources.script.NotificationSourcesScriptService#getNotificationParameters(Map)}.
+     * @return the HTML of an asynchronous placeholder.
+     * @throws NotificationException in case of error during the request.
+     */
+    public String getNotificationCount(NotificationParameters parameters) throws NotificationException
+    {
+        NotificationAsyncRendererConfiguration configuration =
+            new NotificationAsyncRendererConfiguration(parameters, true);
+
+        return this.getAsyncNotification(configuration);
+    }
+
+    /**
+     * Request asynchronously the notifications for the given parameters to display them.
+     * This will return a piece of HTML with a placeholder for the asynchronous answer, which will be automatically
+     * filled with the notifications once the request is done.
+     * @param parameters the {@link NotificationParameters} used to make the request.
+     *                   You can retrieve it by using
+     * {@link org.xwiki.notifications.sources.script.NotificationSourcesScriptService#getNotificationParameters(Map)}.
+     * @return the HTML of an asynchronous placeholder.
+     * @throws NotificationException in case of error during the request.
+     */
+    public String getNotifications(NotificationParameters parameters) throws NotificationException
+    {
+        NotificationAsyncRendererConfiguration configuration =
+            new NotificationAsyncRendererConfiguration(parameters, false);
+
+        return this.getAsyncNotification(configuration);
+    }
+
+    /**
+     * Common code to perform the asynchronous request for {@link #getNotificationCount(NotificationParameters)} and
+     * {@link #getNotifications(NotificationParameters)}.
+     * @param configuration the actual asynchronous configuration to use for the request.
+     * @return the HTML of an asynchronous placeholder.
+     * @throws NotificationException in case of error during the request.
+     */
+    private String getAsyncNotification(NotificationAsyncRendererConfiguration configuration)
+        throws NotificationException
+    {
+        verifyParameterMaxCount(configuration.getNotificationParameters());
+        try {
+            DefaultAsyncNotificationRenderer asyncNotificationRenderer =
+                this.componentManager.get().getInstance(DefaultAsyncNotificationRenderer.class);
+            asyncNotificationRenderer.initialize(configuration);
+            AsyncRendererExecutorResponse response =
+                this.asyncRendererExecutor.render(asyncNotificationRenderer, configuration);
+            AsyncRendererResult result = response.getStatus().getResult();
+            if (result != null) {
+                return result.getResult();
+            } else {
+                return computeAsyncPlaceholder(response, configuration.isCount());
+            }
+        } catch (ComponentLookupException | JobException | RenderingException e) {
+            throw new NotificationException("Unable to retrieve notifications", e);
+        }
+    }
+
+    private void verifyParameterMaxCount(NotificationParameters parameters)
+    {
+        if (parameters.expectedCount == -1) {
+            parameters.expectedCount = 20;
         }
     }
 }

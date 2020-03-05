@@ -99,7 +99,7 @@ public class CommonsConfigurationSource implements ConfigurationSource
             } else {
                 Object value = getProperty(key);
                 if (value != null) {
-                    result = this.converterManager.convert(valueClass, getProperty(key));
+                    result = this.converterManager.convert(valueClass, value);
                 }
             }
         } catch (org.apache.commons.configuration2.ex.ConversionException

@@ -142,7 +142,7 @@
   #end
   #template("header.vm")
   #if($editor == 'wiki' || $editor == 'wysiwyg')
-    <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock form">
+    <form id="edit" method="post" action="$doc.getURL('preview')" class="withLock xform">
     <div class="hidden">
     ## CSRF prevention
     <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

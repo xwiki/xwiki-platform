@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="Help.Code.Translations" locale="pl">
+  <web>Help.Code</web>
+  <name>Translations</name>
+  <language>pl</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <creationDate>1554808978000</creationDate>
+  <parent>Main.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <date>1555071300000</date>
+  <contentUpdateDate>1555070216000</contentUpdateDate>
+  <version>1.1</version>
+  <title>Translations</title>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>### Missing: help.applications.blog.description=Blog Application allows you to publish your information and share it to the world.
+help.applications.blog.title=Blog
+### Missing: help.applications.browse.description=Choose from community contributed applications and install them inside your wiki.
+### Missing: help.applications.browse.tip={0}Extension Manager{1} helps you manage (install, update, uninstall) your applications.
+help.applications.browse.title=Przeglądaj aplikacje
+### Missing: help.applications.create.demo.label=Demo
+### Missing: help.applications.create.description=Define the structure of your data, customize it and create the application you want.
+### Missing: help.applications.create.tip={0}App Within Minutes{1} helps you build applications without having technical knowledge.
+help.applications.create.title=Utwórz swoją aplikacje
+### Missing: help.applications.description=Applications allow to group related structured pages together.
+### Missing: help.applications.description1=Need help or confused with some of our applications? Check out their documentation and find out more about their functionality.
+### Missing: help.applications.fileManager.description=File Manager manages your files, providing a viewer of supported files, tag cloud and allowing filtering.
+help.applications.fileManager.title=Menedżer plików
+### Missing: help.applications.forum.description=Forum Application allows you to create new categories and discuss topics within them.
+help.applications.forum.title=Forum
+### Missing: help.applications.ideas.description=Ideas Application encourage you to submit ideas that can be voted by your team.
+help.applications.ideas.title=Pomysły
+help.applications.link=Zobacz więcej aplikacji
+### Missing: help.applications.meetings.description=Meetings Application manages your meetings mentioning the date, location, participants, etc.
+help.applications.meetings.title=Spotkania
+### Missing: help.applications.menu.description=Menu Application helps you create navigation menus and displayed them in your instance.
+### Missing: help.applications.menu.title=Menu
+help.applications.movie.title=Filmy
+help.applications.title=Aplikacje
+help.applications.title1=Przykłady
+help.browse.label=Przeglądaj
+### Missing: help.description1=XWiki offers a wide range of powerful features that will enable you to create, organize and find content. This section will show you how to use the basic features of XWiki.
+### Missing: help.description2=Congratulations for acquiring your XWiki instance. XWiki is very versatile and can be used to create knowledge bases, intranets or any type of business application you want. This is achievable because of XWiki's customization power, that starts at page level, from a simple to a more advanced usage.
+### Missing: help.edit.description=Use a powerful {0}WYSIWYG{1} content editor or {2}syntax{1} to create rich wiki pages.
+help.edit.title=Edytowanie strony
+help.example.label=Zobacz przykłady
+### Missing: help.history.description=View previous versions of a page, compare different versions or rollback to any past version.
+help.history.title1=Historia
+help.history.title=Kontrola wersji
+help.history.version11.content=Sprawdź
+help.history.version11.comment=Początkowa wersja
+help.history.version21.title=Historia strony
+### Missing: help.history.version21.content=Check mate
+help.history.version22.title=Historia
+### Missing: help.history.version22.content=Check the {0}history{0}.
+help.history.version22.comment=Niewielka zmiana
+### Missing: help.history.version31.content=Check the {0}history{0} tab.
+help.history.version31.content1=Porównaj wersje.
+### Missing: help.import.description=Import content from various sources and export it in an open format (XML, HTML, PDF, ODT).
+help.import.title=Importuj / Eksportuj
+### Missing: help.macros.box=Box Macro
+### Missing: help.macros.box.description=Displays a message in a styled box.
+### Missing: help.macros.box.description1={0}Box Macro{1} displays a message in a styled box.
+### Missing: help.macros.box.description2=There are several specialized box macros:
+help.macros.box.message=To jest pole wiadomości
+help.macros.box.subtitle=Tytuł pola
+help.macros.box.title=Pole
+### Missing: help.macros.browseMacros.description=Choose from community contributed macros and install them inside your wiki.
+### Missing: help.macros.browseMacros.tip=The {0}Macro Index{1} lists the macros that are already installed and ready to be used inside your pages.
+### Missing: help.macros.browseMacros.title=Browse Macros
+### Missing: help.macros.chart={0}Chart Macro{1} displays graphical charts generated from miscellaneous data sources.
+### Missing: help.macros.chart.bar=Bar Chart
+### Missing: help.macros.chart.description=Generates graphical charts from data sources.
+### Missing: help.macros.chart.pie=Pie Chart
+### Missing: help.macros.chart.time=Time Series Chart
+### Missing: help.macros.chart.title=Chart
+### Missing: help.macros.description=Macros are reusable functionality that can be integrated inside a page.
+### Missing: help.macros.error=Error Macro
+help.macros.error.message=To jest komunikat błędu
+help.macros.example=Przykład
+### Missing: help.macros.examples.description=Need help or confused with some of our macros? Check out their documentation and find out more about their functionality.
+help.macros.examples.title=Przykłady
+### Missing: help.macros.gallery={0}Gallery Macro{1} displays a list of images in a slide-show gallery.
+### Missing: help.macros.gallery.description=Displays a list of images in a slide-show gallery.
+help.macros.gallery.title=Galeria
+help.macros.header=Sekcja
+help.macros.header1=Podsekcja
+### Missing: help.macros.info=Info Macro
+help.macros.info.message=To jest komunikat informacyjny
+### Missing: help.macros.more=View more macros
+### Missing: help.macros.notifications.activity.title1=Wiki Activity
+help.macros.notifications.activity.title2=Aktywność danego użytkownika
+### Missing: help.macros.notifications.content={0}Notifications Macro{0} provides information about recent activities done by the users.
+### Missing: help.macros.notifications.description=Displays recent activities done on pages by the users.
+help.macros.notifications.title=Powiadomienia
+### Missing: help.macros.success=Success Macro
+help.macros.success.message=To komunikat o sukcesie
+### Missing: help.macros.title=Macros
+### Missing: help.macros.toc={0}Table of Contents Macro{0} generates a table of contents for the page headings.
+### Missing: help.macros.toc.description.content=The following examples use the current page structure constituted by two sections and three subsections. Learn more about structuring a page with headings {0}on the syntax page.{1}
+### Missing: help.macros.toc.description=Generates a table of contents for the page headings.
+help.macros.toc.description.title=Opis
+### Missing: help.macros.toc.examples.title=Macro Table of Contents Examples
+help.macros.toc.insideBox=Spis treści w polu
+help.macros.toc.simple=Prosty spis treści
+help.macros.toc.startingPoint=Spis treści z punktem początkowym
+### Missing: help.macros.toc.title=Table of Contents
+### Missing: help.macros.tree.description=Displays the hierarchy of pages.
+### Missing: help.macros.tree.subtitle=Tree
+### Missing: help.macros.tree.pageDescription={0}Page Tree Macro{0} displays the hierarchy of pages.
+### Missing: help.macros.tree.title=Page Tree
+### Missing: help.macros.tree.header1=Page Hierarchy Tree
+### Missing: help.macros.tree.header2=Compact Page Hierarchy Tree
+### Missing: help.macros.tree.header3=Wiki {0} Space {0} Page Tree
+### Missing: help.macros.tree.header4=Full Entity Tree
+### Missing: help.macros.useMacros.description=Macros are reusable pieces of functionality that can be integrated inside pages.
+### Missing: help.macros.useMacros.tip=The {0}WYSIWYG Editor{1} allows you to insert macros and to customize their parameters when editing pages. Look for the {2} button on the tool bar.
+### Missing: help.macros.useMacros.title=Use Macros
+### Missing: help.macros.warning=Warning Macro
+### Missing: help.macros.warning.message=This is a warning message
+### Missing: help.more.label=Learn more
+### Missing: help.organization.description=Organize your content in hierarchical pages, grouped in several (sub)wikis.
+### Missing: help.organization.title=Content Organization
+### Missing: help.start.description=Easy steps to get you started with XWiki.
+### Missing: help.start.title=Getting Started
+### Missing: help.templates.article.description=Article page
+### Missing: help.templates.article.title=Article
+### Missing: help.templates.create.description=Integrate structure and macros in an existing page, and transform it in a template.
+### Missing: help.templates.create.tip={0}Template Providers{1}  expose templates on the Create Page dialog so that the users can use them.
+### Missing: help.templates.create.title=Create your template
+### Missing: help.templates.description=Templates are predefined pages that are copied when creating a new page.
+### Missing: help.templates.encyclopedia.description=Encyclopedia page
+### Missing: help.templates.encyclopedia.title=Encyclopedia
+### Missing: help.templates.examples.description=Want to start from a predefined template? Here are some examples of available templates inside XWiki
+### Missing: help.templates.examples.title=Examples
+### Missing: help.templates.meeting.title=Meeting Report
+### Missing: help.templates.meeting.description=Agenda and notes
+### Missing: help.templates.simple.description=With table of contents
+### Missing: help.templates.simple.title=Simple Page
+### Missing: help.templates.more=View more templates
+### Missing: help.templates.title=Templates
+### Missing: help.templates.useTemplates.description=Templates are predefined pages that can be copied when creating a new page.
+### Missing: help.templates.useTemplates.tip={0}Creating pages{1} based on templates makes it faster to adapt predefined content to your needs.
+### Missing: help.templates.useTemplates.title=Use templates
+### Missing: help.title=Help
+### Missing: help.title1=How to use XWiki?
+### Missing: help.title2=Main XWiki features
+### Missing: help.try.label=Try it!
+### Missing: help.videos.description=View our collection of video tutorials.
+### Missing: help.videos.more=View more videos
+### Missing: help.videos.title=Videos
+### Missing: help.videos.videoCard1.title=Homepage Overview
+### Missing: help.videos.videoCard1.topic1=Discover the elements displayed on your homepage
+### Missing: help.videos.videoCard1.topic2=Start browsing your wiki
+### Missing: help.videos.videoCard2.title=Homepage Customization
+### Missing: help.videos.videoCard2.topic1=Learn how to change your wiki colour theme
+### Missing: help.videos.videoCard2.topic2=Learn how to add panels and columns to your wiki look
+### Missing: help.videos.videoCard2.topic3=Learn how to add widgets to a wiki
+### Missing: help.videos.videoCard3.title=Page and Content Creation
+### Missing: help.videos.videoCard3.topic1=Discover how to create a page
+### Missing: help.videos.videoCard3.topic2=Learn how to use the WYSIWYG editor
+### Missing: help.videos.videoCard3.topic3=Discover the view and edit modes
+### Missing: help.videos.videoCard4.title=Importing Office Documents to XWiki
+### Missing: help.videos.videoCard4.topic1=Discover how to import Office Documents to your wiki
+### Missing: help.videos.videoCard4.topic2=Learn how to use a "Table of content" macro'
+### Missing: help.videos.videoCard5.title=App Within Minutes
+### Missing: help.videos.videoCard5.topic1=Discover how to create an application
+### Missing: help.videos.videoCard5.topic2=Learn how to use your application
+### Missing: help.videos.videoCard6.title=Add / Remove Extensions
+### Missing: help.videos.videoCard6.topic1=Discover how to add/remove extensions using the Extension Manager
+### Missing: help.videos.videoCard6.topic2=Discover the XWiki Administration UI
+### Missing: help.videos.watch=Watch</content>
+  
+</xwikidoc>

@@ -21,6 +21,7 @@ package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
@@ -30,6 +31,7 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.user.User;
 import org.xwiki.user.UserResolver;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
@@ -51,6 +53,9 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
 
     @Inject
     private EntityReferenceProvider entityReferenceProvider;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
 
     /**
      * @param userDocumentReference the reference to the user profile page. If null then consider it's pointing to the
@@ -77,7 +82,7 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
         } else if (XWikiRightService.isSuperAdmin(documentReference)) {
             user = User.SUPERADMIN;
         } else {
-            user = new DocumentUser(documentUserReference, this.currentReferenceResolver,
+            user = new DocumentUser(documentUserReference, this.contextProvider, this.currentReferenceResolver,
                 this.entityReferenceProvider, this.userConfigurationSource);
         }
         return user;

@@ -20,6 +20,9 @@
 package org.xwiki.user.internal.document;
 
 import java.util.List;
+import java.util.function.Supplier;
+
+import javax.inject.Provider;
 
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
@@ -30,6 +33,8 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserType;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Document-based implementation of a XWiki user.
@@ -53,17 +58,22 @@ class DocumentUser implements User
 
     private ConfigurationSource userConfigurationSource;
 
+    private Provider<XWikiContext> contextProvider;
+
     /**
      * @param userReference the user reference
+     * @param contextProvider the component to get/set the current user in the context
      * @param currentReferenceResolver the component to resolve user xclass for the current wiki
      * @param entityReferenceProvider the component to check if the current wiki is the main wiki
      * @param userConfigurationSource the component to get the user properties
+     * @param
      */
-    DocumentUser(DocumentUserReference userReference,
+    DocumentUser(DocumentUserReference userReference, Provider<XWikiContext> contextProvider,
         DocumentReferenceResolver<EntityReference> currentReferenceResolver,
         EntityReferenceProvider entityReferenceProvider, ConfigurationSource userConfigurationSource)
     {
         this.userReference = userReference;
+        this.contextProvider = contextProvider;
         this.currentReferenceResolver = currentReferenceResolver;
         this.entityReferenceProvider = entityReferenceProvider;
         this.userConfigurationSource = userConfigurationSource;
@@ -130,7 +140,7 @@ class DocumentUser implements User
     {
         boolean emailChecked = true;
         // Default value of email_checked should be 1 (i.e. checked) if not set.
-        Integer value = (Integer) getProperty("email_checked");
+        Integer value = getProperty("email_checked");
         if (value == null || value != 1) {
             emailChecked = false;
         }
@@ -145,42 +155,54 @@ class DocumentUser implements User
     @Override
     public <T> T getProperty(String key, T defaultValue)
     {
-        return this.userConfigurationSource.getProperty(key, defaultValue);
+        return execute(() -> this.userConfigurationSource.getProperty(key, defaultValue));
     }
 
     @Override
     public <T> T getProperty(String key, Class<T> valueClass)
     {
-        return this.userConfigurationSource.getProperty(key, valueClass);
+        return execute(() -> this.userConfigurationSource.getProperty(key, valueClass));
     }
 
     @Override
     public List<String> getKeys()
     {
-        return this.userConfigurationSource.getKeys();
+        return execute(() -> this.userConfigurationSource.getKeys());
     }
 
     @Override
     public boolean containsKey(String key)
     {
-        return this.userConfigurationSource.containsKey(key);
+        return execute(() -> this.userConfigurationSource.containsKey(key));
     }
 
     @Override
     public boolean isEmpty()
     {
-        return this.userConfigurationSource.isEmpty();
+        return execute(() -> this.userConfigurationSource.isEmpty());
     }
 
     @Override
     public <T> T getProperty(String key, Class<T> valueClass, T defaultValue)
     {
-        return this.userConfigurationSource.getProperty(key, valueClass, defaultValue);
+        return execute(() -> this.userConfigurationSource.getProperty(key, valueClass, defaultValue));
     }
 
     @Override
     public <T> T getProperty(String key)
     {
-        return this.userConfigurationSource.getProperty(key);
+        return execute(() -> this.userConfigurationSource.getProperty(key));
+    }
+
+    private <T> T execute(Supplier<T> supplier)
+    {
+        XWikiContext xcontext = this.contextProvider.get();
+        DocumentReference originalUserReference = xcontext.getUserReference();
+        try {
+            xcontext.setUserReference(getInternalReference());
+            return supplier.get();
+        } finally {
+            xcontext.setUserReference(originalUserReference);
+        }
     }
 }

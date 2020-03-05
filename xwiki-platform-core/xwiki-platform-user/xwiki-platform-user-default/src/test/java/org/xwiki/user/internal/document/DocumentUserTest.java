@@ -20,7 +20,9 @@
 package org.xwiki.user.internal.document;
 
 import javax.inject.Named;
+import javax.inject.Provider;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.EntityType;
@@ -33,9 +35,13 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserType;
 
+import com.xpn.xwiki.XWikiContext;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.user.internal.document.DocumentUser.USERS_CLASS_REFERENCE;
 
@@ -58,42 +64,53 @@ public class DocumentUserTest
     @MockComponent
     private EntityReferenceProvider entityReferenceProvider;
 
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    private DocumentReference reference;
+
+    private DocumentUser user;
+
+    private XWikiContext xcontext;
+
+    @BeforeEach
+    void setup()
+    {
+        this.reference = new DocumentReference("mainwiki", "space", "user");
+        this.user = new DocumentUser(new DocumentUserReference(this.reference), this.contextProvider,
+            this.currentReferenceResolver, this.entityReferenceProvider, this.userConfigurationSource);
+
+        this.xcontext = mock(XWikiContext.class);
+        when(this.contextProvider.get()).thenReturn(this.xcontext);
+    }
+
     @Test
     void isGlobal()
     {
-        DocumentReference reference = new DocumentReference("mainwiki", "space", "user");
         when(this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(
             new WikiReference("mainwiki"));
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
-        assertTrue(user.isGlobal());
+        assertTrue(this.user.isGlobal());
     }
 
     @Test
     void isActive()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when(this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
         when(this.userConfigurationSource.getProperty("active")).thenReturn(new Integer(1));
-        assertTrue(user.isActive());
+        assertTrue(this.user.isActive());
 
         when(this.userConfigurationSource.getProperty("active")).thenReturn(new Integer(0));
-        assertFalse(user.isActive());
+        assertFalse(this.user.isActive());
 
         when(this.userConfigurationSource.getProperty("active")).thenReturn(null);
-        assertFalse(user.isActive());
+        assertFalse(this.user.isActive());
     }
 
     @Test
     void displayHiddenDocuments()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
@@ -110,93 +127,75 @@ public class DocumentUserTest
     @Test
     void getFirstName()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
         when(this.userConfigurationSource.getProperty("first_name")).thenReturn("John");
-        assertEquals("John", user.getFirstName());
+        assertEquals("John", this.user.getFirstName());
     }
 
     @Test
     void getLastName()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
         when(this.userConfigurationSource.getProperty("last_name")).thenReturn("Doe");
-        assertEquals("Doe", user.getLastName());
+        assertEquals("Doe", this.user.getLastName());
     }
 
     @Test
     void getEmail()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
         when(this.userConfigurationSource.getProperty("email")).thenReturn("john@doe.com");
-        assertEquals("john@doe.com", user.getEmail());
+        assertEquals("john@doe.com", this.user.getEmail());
     }
 
     @Test
     void getUserType()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
         when(this.userConfigurationSource.getProperty("usertype")).thenReturn("advanced");
-        assertEquals(UserType.ADVANCED, user.getType());
+        assertEquals(UserType.ADVANCED, this.user.getType());
     }
 
     @Test
     void getProperty()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
         when(this.userConfigurationSource.getProperty("property")).thenReturn("value");
-        assertEquals("value", user.getProperty("property"));
+        assertEquals("value", this.user.getProperty("property"));
+
+        // Verify that the user has been put in the xwiki context so that we don't mess with the current user.
+        verify(this.xcontext).setUserReference(this.reference);
     }
 
     @Test
     void isEmailChecked()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
         when(this.userConfigurationSource.getProperty("email_checked")).thenReturn(new Integer(1));
-        assertTrue(user.isEmailChecked());
+        assertTrue(this.user.isEmailChecked());
 
         when(this.userConfigurationSource.getProperty("email_checked")).thenReturn(new Integer(0));
-        assertFalse(user.isEmailChecked());
+        assertFalse(this.user.isEmailChecked());
 
         when(this.userConfigurationSource.getProperty("email_checked")).thenReturn(null);
-        assertFalse(user.isEmailChecked());
+        assertFalse(this.user.isEmailChecked());
     }
 
     @Test
     void getReference()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "user");
-        DocumentUser user = new DocumentUser(new DocumentUserReference(reference), this.currentReferenceResolver,
-            this.entityReferenceProvider, this.userConfigurationSource);
-        assertEquals(reference, user.getUserReference().getReference());
+        assertEquals(reference, this.user.getUserReference().getReference());
     }
 }

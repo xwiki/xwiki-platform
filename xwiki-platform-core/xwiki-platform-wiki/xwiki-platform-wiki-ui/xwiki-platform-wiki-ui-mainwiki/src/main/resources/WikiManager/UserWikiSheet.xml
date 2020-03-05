@@ -601,6 +601,7 @@ return XWiki;
       <name>org.xwiki.platform.user.profile.entry.userwikisheet</name>
     </property>
     <property>
+      <!-- display: The current wiki is the main wiki and the user sheet document exists.-->
       <parameters>id=wikis
 name=$services.localization.render('platform.wiki.menu.userwikis')
 sheet=WikiManager.UserWikiSheet

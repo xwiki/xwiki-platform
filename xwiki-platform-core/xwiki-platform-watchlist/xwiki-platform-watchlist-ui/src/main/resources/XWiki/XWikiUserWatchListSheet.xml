@@ -253,6 +253,7 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
       <name>org.xwiki.platform.user.profile.entry.userwatchlistsheet</name>
     </property>
     <property>
+      <!-- display: The user is seeing her own profile.-->
       <parameters>id=watchlist
 sheet=XWiki.XWikiUserWatchListSheet
 glyphicon=eye

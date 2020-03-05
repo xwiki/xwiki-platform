@@ -344,6 +344,7 @@
       <name>org.xwiki.platform.user.profile.entry.usernotificationsheet</name>
     </property>
     <property>
+      <!-- display: The user is seeing her own profile -->
       <parameters>id=notifications
 sheet=XWiki.Notifications.Code.XWikiUserNotificationsSheet
 glyphicon=bell

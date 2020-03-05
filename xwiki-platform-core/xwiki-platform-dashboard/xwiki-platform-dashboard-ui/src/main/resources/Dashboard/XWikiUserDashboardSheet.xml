@@ -308,6 +308,7 @@
       <name>org.xwiki.platform.user.profile.entry.userdashboardsheet</name>
     </property>
     <property>
+      <!-- display: The user is seeing her own profile and the dashboard document exists -->
       <parameters>id=dashboard
 sheet=Dashboard.XWikiUserDashboardSheet
 glyphicon=th

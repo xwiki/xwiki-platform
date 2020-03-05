@@ -331,6 +331,7 @@
       <name>org.xwiki.platform.user.profile.entry.userpreferencessheet</name>
     </property>
     <property>
+      <!-- display: The user is seeing her own profile or the user is an admin.-->
       <parameters>id=preferences
 sheet=XWiki.XWikiUserPreferencesSheet
 glyphicon=wrench

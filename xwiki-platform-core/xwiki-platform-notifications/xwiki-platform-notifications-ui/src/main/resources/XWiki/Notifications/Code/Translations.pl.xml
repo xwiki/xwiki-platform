@@ -74,14 +74,14 @@ notifications.filters.type.exclusive=wyłączny
 ## Translation keys for the scopeNotificationFilter
 notifications.filters.preferences.scopeNotificationFilter.name=Filtr powiadomień o zakresie
 notifications.filters.preferences.scopeNotificationFilter.page=tylko strona
-### Missing: notifications.filters.preferences.scopeNotificationFilter.space=Page and children
-### Missing: notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
+notifications.filters.preferences.scopeNotificationFilter.space=Strona i dziecko
+notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
 
-### Missing: notifications.filters.preferences.allEvents=-
+notifications.filters.preferences.allEvents=-
 
-### Missing: notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
-### Missing: notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
-### Missing: notifications.filters.preferences.addPreference.notificationFormat.label=Notification format
+notifications.filters.preferences.addPreference.filterType.inclusive=włącznie
+notifications.filters.preferences.addPreference.filterType.exclusive=Wyłączny
+notifications.filters.preferences.addPreference.notificationFormat.label=Format powiadomienia
 ### Missing: notifications.filters.preferences.addPreference.notificationFormat.hint=On which format of notification the filter should apply?
 ### Missing: notifications.filters.preferences.addPreference.eventType.label=Event Type
 ### Missing: notifications.filters.preferences.addPreference.eventType.hint=Which event type should be targeted by the filter?

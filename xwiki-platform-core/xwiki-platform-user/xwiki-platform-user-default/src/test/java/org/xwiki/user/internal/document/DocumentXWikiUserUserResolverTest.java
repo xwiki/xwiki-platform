@@ -78,13 +78,13 @@ public class DocumentXWikiUserUserResolverTest
     void resolveGuest()
     {
         User user = this.resolver.resolve(new XWikiUser(new DocumentReference("wiki", "space", "XWikiGuest")));
-        assertSame(User.GUEST, user);
+        assertSame(UserReference.GUEST_REFERENCE, user.getUserReference());
     }
 
     @Test
     void resolveSuperAdmin()
     {
         User user = this.resolver.resolve(new XWikiUser(new DocumentReference("wiki", "space", "superadmin")));
-        assertSame(User.SUPERADMIN, user);
+        assertSame(UserReference.SUPERADMIN_REFERENCE, user.getUserReference());
     }
 }

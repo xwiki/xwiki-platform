@@ -17,37 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal.document;
+package org.xwiki.user.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.user.User;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.user.UserReference;
 
-import com.xpn.xwiki.XWikiContext;
-
 /**
- * Resolves the current logged-in user. This is a convenience resolver since the current user should be retrieved from
- * the Execution Context instead.
+ * Represents the Super Admin user (i.e. a virtual user representing an advanced user having all permissions).
  *
  * @version $Id$
  * @since 12.2RC1
  */
-@Component
-@Named("org.xwiki.user.CurrentUserReference")
-@Singleton
-public class CurrentUserResolver extends AbstractDocumentUserResolver<UserReference>
+public class SuperAdminUser extends AbstractSpecialUser
 {
-    @Override
-    public User resolve(UserReference unused, Object... parameters)
+    /**
+     * @param userConfigurationSource the component providing the user configuration data
+     */
+    public SuperAdminUser(ConfigurationSource userConfigurationSource)
     {
-        return resolveUser(getXWikiContext().getUserReference());
+        super(userConfigurationSource);
     }
 
-    private XWikiContext getXWikiContext()
+    @Override
+    public UserReference getUserReference()
     {
-        return this.contextProvider.get();
+        return UserReference.SUPERADMIN_REFERENCE;
     }
 }

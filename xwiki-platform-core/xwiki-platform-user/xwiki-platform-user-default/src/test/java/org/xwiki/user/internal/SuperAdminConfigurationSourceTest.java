@@ -17,37 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal.document;
+package org.xwiki.user.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.user.User;
-import org.xwiki.user.UserReference;
-
-import com.xpn.xwiki.XWikiContext;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Resolves the current logged-in user. This is a convenience resolver since the current user should be retrieved from
- * the Execution Context instead.
+ * Unit tests for {@link SuperAdminConfigurationSource}.
  *
  * @version $Id$
- * @since 12.2RC1
  */
-@Component
-@Named("org.xwiki.user.CurrentUserReference")
-@Singleton
-public class CurrentUserResolver extends AbstractDocumentUserResolver<UserReference>
+@ComponentTest
+public class SuperAdminConfigurationSourceTest
 {
-    @Override
-    public User resolve(UserReference unused, Object... parameters)
-    {
-        return resolveUser(getXWikiContext().getUserReference());
-    }
+    @InjectMockComponents
+    private SuperAdminConfigurationSource source;
 
-    private XWikiContext getXWikiContext()
+    @Test
+    void getFirstName()
     {
-        return this.contextProvider.get();
+        assertEquals("SuperAdmin", this.source.getProperty(UserPropertyConstants.FIRST_NAME));
     }
 }

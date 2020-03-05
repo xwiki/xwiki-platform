@@ -17,37 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal.document;
+package org.xwiki.user.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.user.User;
-import org.xwiki.user.UserReference;
-
-import com.xpn.xwiki.XWikiContext;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Resolves the current logged-in user. This is a convenience resolver since the current user should be retrieved from
- * the Execution Context instead.
+ * Common code for special users (SuperAdmin, Guest).
  *
  * @version $Id$
  * @since 12.2RC1
  */
-@Component
-@Named("org.xwiki.user.CurrentUserReference")
-@Singleton
-public class CurrentUserResolver extends AbstractDocumentUserResolver<UserReference>
+public abstract class AbstractSpecialUser extends AbstractUser
 {
-    @Override
-    public User resolve(UserReference unused, Object... parameters)
+    /**
+     * @param userConfigurationSource the component providing the user configuration data
+     */
+    public AbstractSpecialUser(ConfigurationSource userConfigurationSource)
     {
-        return resolveUser(getXWikiContext().getUserReference());
+        super(userConfigurationSource);
     }
 
-    private XWikiContext getXWikiContext()
+    @Override
+    public boolean isGlobal()
     {
-        return this.contextProvider.get();
+        return true;
     }
 }

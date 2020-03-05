@@ -84,7 +84,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.http.protocol.HTTP;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -169,6 +168,8 @@ import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserResolver;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityManager;
@@ -428,7 +429,7 @@ public class XWiki implements EventListener
 
     private ConfigurationSource wikiConfiguration;
 
-    private ConfigurationSource userConfiguration;
+    private UserResolver<UserReference> userResolver;
 
     private ConfigurationSource spaceConfiguration;
 
@@ -497,13 +498,13 @@ public class XWiki implements EventListener
         return this.spaceConfiguration;
     }
 
-    private ConfigurationSource getUserConfiguration()
+    private UserResolver<UserReference> getUserResolver()
     {
-        if (this.userConfiguration == null) {
-            this.userConfiguration = Utils.getComponent(ConfigurationSource.class, "user");
+        if (this.userResolver == null) {
+            this.userResolver = Utils.getComponent(UserResolver.TYPE_USER_REFERENCE);
         }
 
-        return this.userConfiguration;
+        return this.userResolver;
     }
 
     private EditConfiguration getEditConfiguration()
@@ -2969,7 +2970,8 @@ public class XWiki implements EventListener
 
     public String getUserPreference(String prefname, XWikiContext context)
     {
-        String result = getUserConfiguration().getProperty(prefname, String.class);
+        String result =
+            getUserResolver().resolve(UserReference.CURRENT_USER_REFERENCE).getProperty(prefname, String.class);
 
         if (StringUtils.isEmpty(result)) {
             result = getSpacePreference(prefname, context);

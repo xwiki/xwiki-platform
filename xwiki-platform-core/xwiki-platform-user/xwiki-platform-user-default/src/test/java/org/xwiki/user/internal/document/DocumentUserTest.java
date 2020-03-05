@@ -78,7 +78,7 @@ public class DocumentUserTest
     {
         this.reference = new DocumentReference("mainwiki", "space", "user");
         this.user = new DocumentUser(new DocumentUserReference(this.reference), this.contextProvider,
-            this.currentReferenceResolver, this.entityReferenceProvider, this.userConfigurationSource);
+            this.entityReferenceProvider, this.userConfigurationSource);
 
         this.xcontext = mock(XWikiContext.class);
         when(this.contextProvider.get()).thenReturn(this.xcontext);
@@ -98,13 +98,10 @@ public class DocumentUserTest
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when(this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
-        when(this.userConfigurationSource.getProperty("active")).thenReturn(new Integer(1));
+        when(this.userConfigurationSource.getProperty("active", Boolean.class)).thenReturn(true);
         assertTrue(this.user.isActive());
 
-        when(this.userConfigurationSource.getProperty("active")).thenReturn(new Integer(0));
-        assertFalse(this.user.isActive());
-
-        when(this.userConfigurationSource.getProperty("active")).thenReturn(null);
+        when(this.userConfigurationSource.getProperty("active", Boolean.class)).thenReturn(false);
         assertFalse(this.user.isActive());
     }
 
@@ -114,13 +111,10 @@ public class DocumentUserTest
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
-        when(this.userConfigurationSource.getProperty("displayHiddenDocuments")).thenReturn(new Integer(1));
+        when(this.userConfigurationSource.getProperty("displayHiddenDocuments", Boolean.class)).thenReturn(true);
         assertTrue(user.displayHiddenDocuments());
 
-        when(this.userConfigurationSource.getProperty("displayHiddenDocuments")).thenReturn(new Integer(0));
-        assertFalse(user.displayHiddenDocuments());
-
-        when(this.userConfigurationSource.getProperty("displayHiddenDocuments")).thenReturn(null);
+        when(this.userConfigurationSource.getProperty("displayHiddenDocuments", Boolean.class)).thenReturn(false);
         assertFalse(user.displayHiddenDocuments());
     }
 
@@ -183,13 +177,10 @@ public class DocumentUserTest
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
         when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
 
-        when(this.userConfigurationSource.getProperty("email_checked")).thenReturn(new Integer(1));
+        when(this.userConfigurationSource.getProperty("email_checked", Boolean.class)).thenReturn(true);
         assertTrue(this.user.isEmailChecked());
 
-        when(this.userConfigurationSource.getProperty("email_checked")).thenReturn(new Integer(0));
-        assertFalse(this.user.isEmailChecked());
-
-        when(this.userConfigurationSource.getProperty("email_checked")).thenReturn(null);
+        when(this.userConfigurationSource.getProperty("email_checked", Boolean.class)).thenReturn(false);
         assertFalse(this.user.isEmailChecked());
     }
 

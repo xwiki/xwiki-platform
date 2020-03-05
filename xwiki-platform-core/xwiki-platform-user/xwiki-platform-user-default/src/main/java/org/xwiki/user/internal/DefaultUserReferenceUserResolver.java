@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -45,6 +46,14 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
     @Named("context")
     private ComponentManager componentManager;
 
+    @Inject
+    @Named("superadminuser")
+    private ConfigurationSource superAdminConfigurationSource;
+
+    @Inject
+    @Named("guestuser")
+    private ConfigurationSource guestConfigurationSource;
+
     @Override
     public User resolve(UserReference userReference, Object... parameters)
     {
@@ -56,9 +65,9 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
             normalizedUserReference = UserReference.CURRENT_USER_REFERENCE;
         }
         if (UserReference.SUPERADMIN_REFERENCE == normalizedUserReference) {
-            user = User.SUPERADMIN;
+            user = new SuperAdminUser(this.superAdminConfigurationSource);
         } else if (UserReference.GUEST_REFERENCE == normalizedUserReference) {
-            user = User.GUEST;
+            user = new GuestUser(this.guestConfigurationSource);
         } else {
             user = resolveUserResolver(normalizedUserReference).resolve(normalizedUserReference, parameters);
         }

@@ -24,6 +24,8 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.user.internal.GuestUser;
+import org.xwiki.user.internal.SuperAdminUser;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -50,9 +52,9 @@ public class DocumentUserReferenceUserResolver extends AbstractDocumentUserResol
         if (userReference == null | UserReference.CURRENT_USER_REFERENCE == userReference) {
             user = this.currentUserResolver.resolve(null);
         } else if (UserReference.GUEST_REFERENCE == userReference) {
-            user = User.GUEST;
+            user = new GuestUser(this.guestConfigurationSource);
         } else if (UserReference.SUPERADMIN_REFERENCE == userReference) {
-            user = User.SUPERADMIN;
+            user = new SuperAdminUser(this.superAdminConfigurationSource);
         } else {
             user = resolveUser((DocumentUserReference) userReference);
         }

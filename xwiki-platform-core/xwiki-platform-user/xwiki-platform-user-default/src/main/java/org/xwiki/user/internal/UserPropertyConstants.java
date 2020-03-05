@@ -17,37 +17,50 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal.document;
+package org.xwiki.user.internal;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
 import org.xwiki.user.User;
-import org.xwiki.user.UserReference;
-
-import com.xpn.xwiki.XWikiContext;
 
 /**
- * Resolves the current logged-in user. This is a convenience resolver since the current user should be retrieved from
- * the Execution Context instead.
+ * Constants representing user configuration property names.
  *
  * @version $Id$
  * @since 12.2RC1
  */
-@Component
-@Named("org.xwiki.user.CurrentUserReference")
-@Singleton
-public class CurrentUserResolver extends AbstractDocumentUserResolver<UserReference>
+public interface UserPropertyConstants
 {
-    @Override
-    public User resolve(UserReference unused, Object... parameters)
-    {
-        return resolveUser(getXWikiContext().getUserReference());
-    }
+    /**
+     * See {@link User#displayHiddenDocuments()}.
+     */
+    String DISPLAY_HIDDEN_DOCUMENTS = "displayHiddenDocuments";
 
-    private XWikiContext getXWikiContext()
-    {
-        return this.contextProvider.get();
-    }
+    /**
+     * See {@link User#isActive()}.
+     */
+    String ACTIVE = "active";
+
+    /**
+     * See {@link User#getFirstName()}.
+     */
+    String FIRST_NAME = "first_name";
+
+    /**
+     * See {@link User#getLastName()}.
+     */
+    String LAST_NAME = "last_name";
+
+    /**
+     * See {@link User#getEmail()}.
+     */
+    String EMAIL = "email";
+
+    /**
+     * See {@link User#isEmailChecked()}.
+     */
+    String EMAIL_CHECKED = "email_checked";
+
+    /**
+     * See {@link User#getType()}.
+     */
+    String USER_TYPE = "usertype";
 }

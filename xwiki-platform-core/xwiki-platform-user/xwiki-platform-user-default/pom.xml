@@ -32,10 +32,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Default</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.78</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Put back value of 88% when
-         https://github.com/STAMP-project/pitest-descartes/issues/62#issuecomment-591471399 is fixed -->
-    <xwiki.pitest.mutationThreshold>87</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.77</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>81</xwiki.pitest.mutationThreshold>
     <xwiki.extension.features>
       <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->
       org.xwiki.contrib.membership:application-membership-default

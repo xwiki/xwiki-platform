@@ -48,16 +48,19 @@
 #set($categories = [])
 
 ## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu.content' UIXP.
+#set($list_uix = ["org.xwiki.platform.user.profile.entry.userprofilesheet",
+  "org.xwiki.platform.user.profile.entry.userpreferencessheet",
+  "org.xwiki.platform.user.profile.entry.usermembershipsheet",
+  "org.xwiki.platform.user.profile.entry.userwatchlistsheet",
+  "org.xwiki.platform.user.profile.entry.usernetworksheet",
+  "org.xwiki.platform.user.profile.entry.usernotificationsheet",
+  "org.xwiki.platform.user.profile.entry.userwikisheet",
+  "org.xwiki.platform.user.profile.entry.userdashboardsheet"])
 #foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu.content', {
-  'sortByCustomOrder': 'org.xwiki.platform.user.profile.entry.userprofilesheet,org.xwiki.platform.user.profile.entry.userpreferencessheet,org.xwiki.platform.user.profile.entry.usermembershipsheet,org.xwiki.platform.user.profile.entry.userwatchlistsheet,org.xwiki.platform.user.profile.entry.usernetworksheet,org.xwiki.platform.user.profile.entry.usernotificationsheet,org.xwiki.platform.user.profile.entry.userwikisheet,org.xwiki.platform.user.profile.entry.userdashboardsheet'
+  'sortByCustomOrder': $stringtool.join($list_uix, ',')
 }))
   #if($uix.parameters.get('display') == 'true')
-    #if ($uix.parameters.containsKey('name'))
-        ## the name value is derived by default but can be overloaded with the name key.
-        #set($discard = $categories.add({'id': $uix.parameters.get('id'), 'name': $uix.parameters.get('name'), 'sheet': $uix.parameters.get('sheet'), 'glyphicon': $uix.parameters.get('glyphicon')}))
-    #else
-        #set($discard = $categories.add({'id': $uix.parameters.get('id'), 'sheet': $uix.parameters.get('sheet'), 'glyphicon': $uix.parameters.get('glyphicon')}))
-    #end
+    #set($discard = $categories.add($uix.parameters))
   #end
 #end
 #########################

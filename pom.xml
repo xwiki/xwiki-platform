@@ -159,7 +159,7 @@
       <dependency>
         <groupId>org.python</groupId>
         <artifactId>jython-slim</artifactId>
-        <version>2.7.2b3</version>
+        <version>2.7.2rc1</version>
       </dependency>
       <!-- Apache Tika used by several modules (Lucene, Office, etc) -->
       <dependency>

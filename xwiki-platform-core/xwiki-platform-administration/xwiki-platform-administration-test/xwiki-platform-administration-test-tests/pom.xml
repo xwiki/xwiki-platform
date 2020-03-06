@@ -42,6 +42,10 @@
       com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin,\
       com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin
     </xwikiCfgPlugins>
+    <!-- We need to declare the mail module for Hibernate since the Admin UI depends on the Mail UI which depends on
+         the Mail storage module which tries to resend failed mail at startup and without this, there'll be an error
+         in the logs at XWiki startup, which isn't nice. -->
+    <xwikiDbHbmCommonExtraMappings>mailsender.hbm.xml</xwikiDbHbmCommonExtraMappings>
     <xwikiCfgSuperadminPassword>pass</xwikiCfgSuperadminPassword>
     <!-- Functional tests are allowed to output content to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

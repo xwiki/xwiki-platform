@@ -529,6 +529,13 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
   font-weight: 700;
   margin-bottom: 0.3em;
   text-transform: uppercase;
+}
+        
+/* ----- Profile ----- */
+
+.userInfo h2 {
+    font-size: 16px;
+    font-weight: bold;
 }</code>
     </property>
     <property>

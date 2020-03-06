@@ -25,7 +25,6 @@ import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.xwiki.panels.test.po.NavigationPanelAdministrationPage;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.XWikiWebDriver;
 
@@ -39,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @version $Id$
  * @since 10.5RC1
  */
-@UITest(servletEngine = ServletEngine.TOMCAT)
+@UITest
 public class NavigationPanelAdministrationIT
 {
     @Test

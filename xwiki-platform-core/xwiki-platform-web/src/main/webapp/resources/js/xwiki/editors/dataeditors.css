@@ -337,6 +337,7 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
 .suggest-classes.selectize-control {
   /* Display on the same line as the Add button */
   display: inline-block;
+  /* Align with the Add button */
   vertical-align: middle;
 }
 .suggest-classes > .selectize-dropdown > .selectize-dropdown-content,

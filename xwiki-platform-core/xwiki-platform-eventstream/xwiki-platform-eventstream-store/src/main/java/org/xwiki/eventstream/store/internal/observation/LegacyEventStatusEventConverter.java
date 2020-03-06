@@ -33,7 +33,6 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
-import org.xwiki.eventstream.internal.events.EventStatusDeletedEvent;
 import org.xwiki.eventstream.store.internal.LegacyEvent;
 import org.xwiki.eventstream.store.internal.LegacyEventLoader;
 import org.xwiki.eventstream.store.internal.LegacyEventStatus;
@@ -56,7 +55,7 @@ import org.xwiki.query.QueryException;
 public class LegacyEventStatusEventConverter extends AbstractEventConverter
 {
     private static final Set<Class<? extends Event>> EVENTS =
-        new HashSet<>(Arrays.asList(EventStatusAddOrUpdatedEvent.class, EventStatusDeletedEvent.class));
+        new HashSet<>(Arrays.asList(EventStatusAddOrUpdatedEvent.class));
 
     private static final String PROP_EVENTID = "eventId";
 

@@ -323,9 +323,6 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   text-decoration: underline;
   background-color: $theme.highlightColor;
 }
-#add_xobject .buttonwrapper, #add_xproperty .buttonwrapper{
-  vertical-align:top;
-}
 #add_xobject .buttonwrapper input , #add_xproperty .buttonwrapper input {
     vertical-align: top;
     margin: 0px;

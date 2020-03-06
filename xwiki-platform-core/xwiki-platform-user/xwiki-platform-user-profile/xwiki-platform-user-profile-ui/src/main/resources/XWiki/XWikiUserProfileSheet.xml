@@ -149,7 +149,8 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       #if ($xcontext.user == $doc.fullName)
         &lt;h2&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h2&gt;
       #else
-        &lt;h2&gt;$services.localization.render('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h2&gt;
+        &lt;h2&gt;$services.localization.render('platform.core.profile.section.activityof',
+         [$xwiki.getUserName($doc.fullName, false)])&lt;/h2&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
         &lt;div class='activity-follow'&gt;

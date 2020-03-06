@@ -1678,7 +1678,9 @@ public class TestUtils
             }
             attachFile(reference, is, failIfExists);
         } finally {
-            setDefaultCredentials(currentCredentials);
+            if (credentials != null) {
+                setDefaultCredentials(currentCredentials);
+            }
         }
     }
 

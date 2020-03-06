@@ -324,22 +324,22 @@ div#xwikiobjects input[type="radio"], div#xwikiclassproperties input[type="radio
   background-color: $theme.highlightColor;
 }
 #add_xobject .buttonwrapper, #add_xproperty .buttonwrapper{
-  position: relative;
-  top: -2px;
+  vertical-align:top;
+}
+#add_xobject .buttonwrapper input , #add_xproperty .buttonwrapper input {
+    vertical-align: top;
+    margin: 0px;
 }
 #switch-xclass {
   text-align: right;
   margin: 4px 0 -16px;
 }
-
 #switch-xclass .suggest-classes {
   text-align: left;
 }
 .suggest-classes.selectize-control {
   /* Display on the same line as the Add button */
   display: inline-block;
-  /* Align with the Add button */
-  margin-top: 2px;
   vertical-align: middle;
 }
 .suggest-classes > .selectize-dropdown > .selectize-dropdown-content,

@@ -48,7 +48,7 @@ public class DeletedAttachmentsIT
     private static String THIRD_LIVETABLE_COLUMN_ID = "xwiki-livetable-attachmentTrash-filter-3";
 
     @BeforeEach
-    public void setUp(TestUtils setup, TestReference testReference) throws Exception
+    void setUp(TestUtils setup, TestReference testReference) throws Exception
     {
         setup.loginAsSuperAdmin();
 
@@ -59,10 +59,10 @@ public class DeletedAttachmentsIT
         ViewPage testPage = setup.gotoPage(testReference);
         AttachmentsPane attachmentsPane = testPage.openAttachmentsDocExtraPane();
         attachmentsPane.deleteAttachmentByFileByName("deletedFile1.txt");
-    }   
+    }
 
     @Test
-    public void filterLivetableByName() throws Exception
+    void filterLivetableByName() throws Exception
     {
         DeletedAttachmentsPage deletedAttachmentsPage = DeletedAttachmentsPage.gotoPage();
         LiveTableElement livetable = deletedAttachmentsPage.getDeletedAttachmentsLiveTable();
@@ -72,7 +72,7 @@ public class DeletedAttachmentsIT
     }
 
     @Test
-    public void filterLivetableByDate() throws Exception
+    void filterLivetableByDate() throws Exception
     {
         DeletedAttachmentsPage deletedAttachmentsPage = DeletedAttachmentsPage.gotoPage();
         LiveTableElement livetable = deletedAttachmentsPage.getDeletedAttachmentsLiveTable();

@@ -2930,7 +2930,7 @@ public class XWiki implements EventListener
      * If the property is not set on any level then <code>defaultValue</code> is returned.
      * 
      * @param preferenceKey the name of the preference key
-     * @param spaceReference the reference of the space
+     * @param spaceReference the reference of the space. If null then the current space is used
      * @param defaultValue the value to return if the preference can't be found
      * @param context see {@link XWikiContext}
      * @return the value of the preference or <code>defaultValue</code> if it could not be found

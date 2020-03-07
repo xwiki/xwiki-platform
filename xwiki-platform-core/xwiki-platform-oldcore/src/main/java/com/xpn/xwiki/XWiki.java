@@ -2925,12 +2925,13 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * Get the preference key for the space and fallback on parent space or wiki in case nothing is found.
      * <p>
      * If the property is not set on any level then <code>defaultValue</code> is returned.
      * 
      * @param preferenceKey the name of the preference key
-     * @param spaceReference the reference of the space. If null then the current space is used
+     * @param spaceReference the reference of the space. If null and there's a current document then the current space
+     *                       is used. If null and there's no current document then fall back to the wiki preferences.
      * @param defaultValue the value to return if the preference can't be found
      * @param context see {@link XWikiContext}
      * @return the value of the preference or <code>defaultValue</code> if it could not be found

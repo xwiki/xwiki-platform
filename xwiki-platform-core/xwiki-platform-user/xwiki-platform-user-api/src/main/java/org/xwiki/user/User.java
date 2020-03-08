@@ -64,6 +64,11 @@ public interface User extends ConfigurationSource
     UserType getType();
 
     /**
+     * @return the default editor to use when editing content for this user (text editor, wysiwyg editor)
+     */
+    Editor getEditor();
+
+    /**
      * @return true if the user's email has been checked. In some configurations, users must have had their emails
      *         verified before they can access the wiki. Also, disabled users must have their emails checked to be
      *         able to view pages.

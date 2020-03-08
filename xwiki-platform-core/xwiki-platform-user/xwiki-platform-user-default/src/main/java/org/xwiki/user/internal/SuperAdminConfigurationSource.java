@@ -29,8 +29,10 @@ import org.xwiki.configuration.internal.CommonsConfigurationSource;
 
 import static org.xwiki.user.internal.UserPropertyConstants.ACTIVE;
 import static org.xwiki.user.internal.UserPropertyConstants.DISPLAY_HIDDEN_DOCUMENTS;
+import static org.xwiki.user.internal.UserPropertyConstants.EDITOR;
 import static org.xwiki.user.internal.UserPropertyConstants.EMAIL_CHECKED;
 import static org.xwiki.user.internal.UserPropertyConstants.FIRST_NAME;
+import static org.xwiki.user.internal.UserPropertyConstants.USER_TYPE;
 
 /**
  * Provide configuration data for the SuperAdmin user.
@@ -51,6 +53,8 @@ public class SuperAdminConfigurationSource extends CommonsConfigurationSource im
         configuration.addProperty(ACTIVE, "1");
         configuration.addProperty(FIRST_NAME, "SuperAdmin");
         configuration.addProperty(EMAIL_CHECKED, "1");
+        configuration.addProperty(USER_TYPE, "advanced");
+        configuration.addProperty(EDITOR, "Text");
 
         setConfiguration(configuration);
     }

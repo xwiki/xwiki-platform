@@ -33,6 +33,7 @@ import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.Editor;
 import org.xwiki.user.UserType;
 
 import com.xpn.xwiki.XWikiContext;
@@ -158,6 +159,16 @@ public class DocumentUserTest
 
         when(this.userConfigurationSource.getProperty("usertype")).thenReturn("advanced");
         assertEquals(UserType.ADVANCED, this.user.getType());
+    }
+
+    @Test
+    void getEditor()
+    {
+        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
+        when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
+
+        when(this.userConfigurationSource.getProperty("editor")).thenReturn("Wysiwyg");
+        assertEquals(Editor.WYSIWYG, this.user.getEditor());
     }
 
     @Test

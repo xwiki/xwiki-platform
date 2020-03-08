@@ -23,11 +23,13 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.user.Editor;
 import org.xwiki.user.User;
 import org.xwiki.user.UserType;
 
 import static org.xwiki.user.internal.UserPropertyConstants.ACTIVE;
 import static org.xwiki.user.internal.UserPropertyConstants.DISPLAY_HIDDEN_DOCUMENTS;
+import static org.xwiki.user.internal.UserPropertyConstants.EDITOR;
 import static org.xwiki.user.internal.UserPropertyConstants.EMAIL;
 import static org.xwiki.user.internal.UserPropertyConstants.EMAIL_CHECKED;
 import static org.xwiki.user.internal.UserPropertyConstants.FIRST_NAME;
@@ -86,6 +88,12 @@ public abstract class AbstractUser implements User
     public UserType getType()
     {
         return UserType.fromString(getProperty(USER_TYPE));
+    }
+
+    @Override
+    public Editor getEditor()
+    {
+        return Editor.fromString(getProperty(EDITOR));
     }
 
     @Override

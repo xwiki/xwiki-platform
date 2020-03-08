@@ -63,4 +63,9 @@ public interface UserPropertyConstants
      * See {@link User#getType()}.
      */
     String USER_TYPE = "usertype";
+
+    /**
+     * See {@link User#getEditor()}.
+     */
+    String EDITOR = "editor";
 }

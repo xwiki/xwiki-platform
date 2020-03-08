@@ -22,37 +22,36 @@ package org.xwiki.user;
 import org.xwiki.stability.Unstable;
 
 /**
- * The type of the user (simple user, advanced user).
+ * The default editor that should be used for a user, when editing content.
  *
- * @see <a href="https://bit.ly/37TUlCp">user profile</a>
  * @version $Id$
  * @since 12.2RC1
  */
 @Unstable
-public enum UserType
+public enum Editor
 {
     /**
-     * Simple user (hides complex actions in the UI for simplicity).
+     * Text editor (wiki editor).
      */
-    SIMPLE,
+    TEXT,
 
     /**
-     * Advanced user (sees all possible actions in the UI).
+     * WYSIWYG editor.
      */
-    ADVANCED;
+    WYSIWYG;
 
     /**
-     * @param typeAsString the user type represented as a string ("simple", "advanced")
-     * @return the {@link UserType} object matching the passed string representation. All values different than
-     *         {@code advanced} are considered to represent a simple user
+     * @param editorAsString the editor represented as a string ("Text", "Wysiwyg")
+     * @return the {@link Editor} object matching the passed string representation. All values different than
+     *         {@code Text} (case ignored) are considered to represent the WYSIWYG editor.
      */
-    public static UserType fromString(String typeAsString)
+    public static Editor fromString(String editorAsString)
     {
-        UserType result;
-        if (typeAsString != null && "advanced".equalsIgnoreCase(typeAsString)) {
-            result = ADVANCED;
+        Editor result;
+        if (editorAsString != null && "text".equalsIgnoreCase(editorAsString)) {
+            result = TEXT;
         } else {
-            result = SIMPLE;
+            result = WYSIWYG;
         }
         return result;
     }

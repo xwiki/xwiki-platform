@@ -19,41 +19,22 @@
  */
 package org.xwiki.user;
 
-import org.xwiki.stability.Unstable;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * The type of the user (simple user, advanced user).
+ * Unit tests for {@link Editor}.
  *
- * @see <a href="https://bit.ly/37TUlCp">user profile</a>
  * @version $Id$
- * @since 12.2RC1
  */
-@Unstable
-public enum UserType
+public class EditorTest
 {
-    /**
-     * Simple user (hides complex actions in the UI for simplicity).
-     */
-    SIMPLE,
-
-    /**
-     * Advanced user (sees all possible actions in the UI).
-     */
-    ADVANCED;
-
-    /**
-     * @param typeAsString the user type represented as a string ("simple", "advanced")
-     * @return the {@link UserType} object matching the passed string representation. All values different than
-     *         {@code advanced} are considered to represent a simple user
-     */
-    public static UserType fromString(String typeAsString)
+    @Test
+    void fromString()
     {
-        UserType result;
-        if (typeAsString != null && "advanced".equalsIgnoreCase(typeAsString)) {
-            result = ADVANCED;
-        } else {
-            result = SIMPLE;
-        }
-        return result;
+        assertEquals(Editor.TEXT, Editor.fromString("Text"));
+        assertEquals(Editor.WYSIWYG, Editor.fromString("Wysiwyg"));
+        assertEquals(Editor.WYSIWYG, Editor.fromString("nottext"));
     }
 }

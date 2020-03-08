@@ -19,6 +19,7 @@
  */
 package org.xwiki.model.internal.reference;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -30,6 +31,11 @@ import org.xwiki.model.reference.LocalDocumentReference;
  * @version $Id$
  * @since 4.2M3
  */
+// TODO: Work around the fact that LocalEntityResolver is a Component while org.xwiki.xml.internal.LocalEntityResolver
+//  is not supposed to be one. This is a bad design since a non-component should not extend a component (it's dangerous
+//  - @Inject-ed component will not be injected, and the extending class will inherit the @Component annotation, which
+//  is bad - imagine for example that in the future we auto-generate components.txt based on the @Component annotation).
+@Component(staticRegistration = false)
 public class LocalizedStringEntityReferenceSerializer extends DefaultStringEntityReferenceSerializer
 {
     /**

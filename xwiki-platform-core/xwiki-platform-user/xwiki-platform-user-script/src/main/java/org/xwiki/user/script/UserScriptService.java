@@ -81,23 +81,33 @@ public class UserScriptService implements ScriptService
     }
 
     /**
-     * @return the Guest User object
+     * @return the Guest User reference
      * @since 12.2RC1
      */
     @Unstable
-    public User resolveGuestUser()
+    public UserReference getGuestUserReference()
     {
-        return this.userResolver.resolve(UserReference.GUEST_REFERENCE);
+        return UserReference.GUEST_REFERENCE;
     }
 
     /**
-     * @return the SuperAdmin User object
+     * @return the SuperAdmin User reference
      * @since 12.2RC1
      */
     @Unstable
-    public User resolveSuperAdminUser()
+    public UserReference getSuperAdminUserReference()
     {
-        return this.userResolver.resolve(UserReference.SUPERADMIN_REFERENCE);
+        return UserReference.SUPERADMIN_REFERENCE;
+    }
+
+    /**
+     * @return the current User reference
+     * @since 12.2RC1
+     */
+    @Unstable
+    public UserReference getCurrentUserReference()
+    {
+        return UserReference.CURRENT_USER_REFERENCE;
     }
 
     /**
@@ -105,9 +115,9 @@ public class UserScriptService implements ScriptService
      * @since 12.2RC1
      */
     @Unstable
-    public User resolveCurrentUser()
+    public User getCurrentUser()
     {
-        return this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE);
+        return resolveUser(getCurrentUserReference());
     }
 
     /**

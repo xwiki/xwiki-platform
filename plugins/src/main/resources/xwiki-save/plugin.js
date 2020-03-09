@@ -118,24 +118,31 @@
       var success = true;
       fullData = fullData === true;
       this.editors.forEach(function(editor) {
-        var oldFullData;
-        if (fullData) {
-          oldFullData = editor.config.fullData;
-          editor.config.fullData = true;
-        }
-        try {
-          editor.updateElement();
-        } catch (e) {
+        if (editor.elementMode === CKEDITOR.ELEMENT_MODE_REPLACE && !this.updateContent(editor, fullData)) {
           success = false;
-          editor.showNotification(editor.localization.get('xwiki-save.failed'), 'warning');
-          console.log(e);
-        }
-        if (fullData) {
-          editor.config.fullData = oldFullData;
         }
         this.updateContentType(editor);
       }, this);
       return success;
+    },
+
+    updateContent: function(editor, fullData) {
+      var oldFullData;
+      if (fullData) {
+        oldFullData = editor.config.fullData;
+        editor.config.fullData = true;
+      }
+      try {
+        return editor.updateElement();
+      } catch (e) {
+        editor.showNotification(editor.localization.get('xwiki-save.failed'), 'warning');
+        console.log(e);
+        return false;
+      } finally {
+        if (fullData) {
+          editor.config.fullData = oldFullData;
+        }
+      }
     },
 
     updateContentType: function(editor) {

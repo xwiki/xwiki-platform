@@ -19,6 +19,8 @@
  */
 package org.xwiki.query.internal;
 
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.query.Query;
@@ -31,6 +33,7 @@ import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -146,5 +149,12 @@ public class HiddenDocumentFilterTest
             "select doc.web, doc.name from XWikiDocument doc where (doc.hidden <> true or doc.hidden is null) " +
                 "group by doc.web",
             filter.filterStatement("select doc.web, doc.name from XWikiDocument doc group by doc.web", Query.HQL));
+    }
+
+    @Test
+    void filterResults()
+    {
+        List list = mock(List.class);
+        assertSame(list, filter.filterResults(list));
     }
 }

@@ -587,8 +587,8 @@ div.userInfo, div.userPreferences, div.watchlistManagement, div.userDashboard {
 }
         
 .userInfo h2 {
-  font-size: large;
-  font-weight: bold;
+  font-size: larger;
+  font-weight: bolder;
 }
         
 div.userInfo input[type="text"], div.userInfo input[type="password"], div.userInfo textarea, div.userInfo select, div.userPreferences select {

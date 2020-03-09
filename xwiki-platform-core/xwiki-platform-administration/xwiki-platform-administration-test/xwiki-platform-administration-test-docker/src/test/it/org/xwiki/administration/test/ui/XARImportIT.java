@@ -53,7 +53,7 @@ public class XARImportIT
 {
     private static final String PACKAGE_WITHOUT_HISTORY = "Main.TestPage-no-history.xar";
 
-    private static final String PACKAGE_WITH_HISTORY13 = "Main.TestPage-with-history-1.3.xar";
+    private static final String PACKAGE_WITH_HISTORY = "Main.TestPage-with-history.xar";
 
     private static final String BACKUP_PACKAGE = "Main.TestPage-backup.xar";
 
@@ -77,8 +77,8 @@ public class XARImportIT
         this.sectionPage = this.adminPage.clickImportSection();
 
         // Remove our packages if they're there already, to ensure to start with a predefined state.
-        if (this.sectionPage.isPackagePresent(PACKAGE_WITH_HISTORY13)) {
-            this.sectionPage.deletePackage(PACKAGE_WITH_HISTORY13);
+        if (this.sectionPage.isPackagePresent(PACKAGE_WITH_HISTORY)) {
+            this.sectionPage.deletePackage(PACKAGE_WITH_HISTORY);
         }
         if (this.sectionPage.isPackagePresent(PACKAGE_WITHOUT_HISTORY)) {
             this.sectionPage.deletePackage(PACKAGE_WITHOUT_HISTORY);
@@ -102,12 +102,12 @@ public class XARImportIT
         assertEquals(0, this.sectionPage.getPackageNames().size());
     }
 
-    public void testImportWithHistory13(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    public void testImportWithHistory(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
     {
-        File file = getFileToUpload(testConfiguration, PACKAGE_WITH_HISTORY13);
+        File file = getFileToUpload(testConfiguration, PACKAGE_WITH_HISTORY);
 
         this.sectionPage.attachPackage(file);
-        this.sectionPage.selectPackage(PACKAGE_WITH_HISTORY13);
+        this.sectionPage.selectPackage(PACKAGE_WITH_HISTORY);
 
         this.sectionPage.selectReplaceHistoryOption();
         this.sectionPage.importPackage();

@@ -53,8 +53,6 @@ public class XARImportIT
 {
     private static final String PACKAGE_WITHOUT_HISTORY = "Main.TestPage-no-history.xar";
 
-    private static final String PACKAGE_WITH_HISTORY = "Main.TestPage-with-history.xar";
-
     private static final String PACKAGE_WITH_HISTORY13 = "Main.TestPage-with-history-1.3.xar";
 
     private static final String BACKUP_PACKAGE = "Main.TestPage-backup.xar";
@@ -79,8 +77,8 @@ public class XARImportIT
         this.sectionPage = this.adminPage.clickImportSection();
 
         // Remove our packages if they're there already, to ensure to start with a predefined state.
-        if (this.sectionPage.isPackagePresent(PACKAGE_WITH_HISTORY)) {
-            this.sectionPage.deletePackage(PACKAGE_WITH_HISTORY);
+        if (this.sectionPage.isPackagePresent(PACKAGE_WITH_HISTORY13)) {
+            this.sectionPage.deletePackage(PACKAGE_WITH_HISTORY13);
         }
         if (this.sectionPage.isPackagePresent(PACKAGE_WITHOUT_HISTORY)) {
             this.sectionPage.deletePackage(PACKAGE_WITHOUT_HISTORY);
@@ -102,37 +100,6 @@ public class XARImportIT
     public void testImportHasNoPackageByDefault()
     {
         assertEquals(0, this.sectionPage.getPackageNames().size());
-    }
-
-    public void testImportWithHistory(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
-    {
-        File file = getFileToUpload(testConfiguration, PACKAGE_WITH_HISTORY);
-
-        this.sectionPage.attachPackage(file);
-        this.sectionPage.selectPackage(PACKAGE_WITH_HISTORY);
-
-        this.sectionPage.selectReplaceHistoryOption();
-        this.sectionPage.importPackage();
-
-        ViewPage importedPage = this.sectionPage.clickImportedPage("Main.TestPage");
-
-        // Since the page by default opens the comments pane, if we instantly click on the history, the two tabs
-        // will race for completion. Let's wait for comments first.
-        importedPage.openCommentsDocExtraPane();
-        HistoryPane history = importedPage.openHistoryDocExtraPane();
-
-        assertEquals("3.1", history.getCurrentVersion());
-        assertEquals("A third version of the document", history.getCurrentVersionComment());
-        assertTrue(history.hasVersionWithSummary("A new version of the document"));
-
-        AttachmentsPane attachments = importedPage.openAttachmentsDocExtraPane();
-
-        assertEquals(1, attachments.getNumberOfAttachments());
-        assertEquals("3 bytes", attachments.getSizeOfAttachment(ATTACHE_NAME));
-        assertEquals("1.2", attachments.getLatestVersionOfAttachment(ATTACHE_NAME));
-
-        attachments.getAttachmentLink(ATTACHE_NAME).click();
-        assertEquals("1.2", setup.getDriver().findElement(By.tagName("html")).getText());
     }
 
     public void testImportWithHistory13(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)

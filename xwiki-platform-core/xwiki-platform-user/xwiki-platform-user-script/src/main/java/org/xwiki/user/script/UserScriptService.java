@@ -75,4 +75,24 @@ public class UserScriptService implements ScriptService
     {
         return this.userResolver.resolve(userReference, parameters);
     }
+
+    /**
+     * @return the Guest User object
+     * @since 12.2RC1
+     */
+    @Unstable
+    public User resolveGuestUser()
+    {
+        return this.userResolver.resolve(UserReference.GUEST_REFERENCE);
+    }
+
+    /**
+     * @return the SuperAdmin User object
+     * @since 12.2RC1
+     */
+    @Unstable
+    public User resolveSuperAdminUser()
+    {
+        return this.userResolver.resolve(UserReference.SUPERADMIN_REFERENCE);
+    }
 }

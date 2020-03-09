@@ -123,6 +123,7 @@ var CKBUILDER_CONFIG = {
     'xwiki-filter': 1,
     'xwiki-image': 1,
     'xwiki-link': 1,
+    'xwiki-loading': 1,
     'xwiki-localization': 1,
     'xwiki-macro': 1,
     'xwiki-maximize': 1,

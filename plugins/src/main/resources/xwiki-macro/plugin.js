@@ -66,7 +66,7 @@
   };
 
   CKEDITOR.plugins.add('xwiki-macro', {
-    requires: 'widget,balloontoolbar,notification,xwiki-marker,xwiki-source,xwiki-localization',
+    requires: 'widget,balloontoolbar,notification,xwiki-marker,xwiki-loading,xwiki-localization',
 
     init: function(editor) {
       var macroPlugin = this;
@@ -294,7 +294,7 @@
         async: true,
         exec: function(editor) {
           var command = this;
-          editor.plugins['xwiki-source'].setLoading(editor, true);
+          editor.setLoading(true);
           var config = editor.config['xwiki-source'] || {};
           $.post(config.htmlConverter, {
             fromHTML: true,
@@ -305,7 +305,7 @@
           }).fail($.proxy(this, 'done'));
         },
         done: function(success) {
-          editor.plugins['xwiki-source'].setLoading(editor, false);
+          editor.setLoading(false);
           if (!success) {
             editor.showNotification(editor.localization.get('xwiki-macro.refreshFailed'), 'warning');
           }

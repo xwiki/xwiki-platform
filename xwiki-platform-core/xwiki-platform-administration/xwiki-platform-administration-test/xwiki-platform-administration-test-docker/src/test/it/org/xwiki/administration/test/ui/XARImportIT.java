@@ -55,6 +55,8 @@ public class XARImportIT
 
     private static final String PACKAGE_WITH_HISTORY = "Main.TestPage-with-history.xar";
 
+    private static final String PACKAGE_WITH_HISTORY13 = "Main.TestPage-with-history-1.3.xar";
+
     private static final String BACKUP_PACKAGE = "Main.TestPage-backup.xar";
 
     private static final LocalDocumentReference TESTPAGE = new LocalDocumentReference("Main", "TestPage");
@@ -108,6 +110,37 @@ public class XARImportIT
 
         this.sectionPage.attachPackage(file);
         this.sectionPage.selectPackage(PACKAGE_WITH_HISTORY);
+
+        this.sectionPage.selectReplaceHistoryOption();
+        this.sectionPage.importPackage();
+
+        ViewPage importedPage = this.sectionPage.clickImportedPage("Main.TestPage");
+
+        // Since the page by default opens the comments pane, if we instantly click on the history, the two tabs
+        // will race for completion. Let's wait for comments first.
+        importedPage.openCommentsDocExtraPane();
+        HistoryPane history = importedPage.openHistoryDocExtraPane();
+
+        assertEquals("3.1", history.getCurrentVersion());
+        assertEquals("A third version of the document", history.getCurrentVersionComment());
+        assertTrue(history.hasVersionWithSummary("A new version of the document"));
+
+        AttachmentsPane attachments = importedPage.openAttachmentsDocExtraPane();
+
+        assertEquals(1, attachments.getNumberOfAttachments());
+        assertEquals("3 bytes", attachments.getSizeOfAttachment(ATTACHE_NAME));
+        assertEquals("1.2", attachments.getLatestVersionOfAttachment(ATTACHE_NAME));
+
+        attachments.getAttachmentLink(ATTACHE_NAME).click();
+        assertEquals("1.2", setup.getDriver().findElement(By.tagName("html")).getText());
+    }
+
+    public void testImportWithHistory13(TestUtils setup, TestReference testReference, TestConfiguration testConfiguration)
+    {
+        File file = getFileToUpload(testConfiguration, PACKAGE_WITH_HISTORY13);
+
+        this.sectionPage.attachPackage(file);
+        this.sectionPage.selectPackage(PACKAGE_WITH_HISTORY13);
 
         this.sectionPage.selectReplaceHistoryOption();
         this.sectionPage.importPackage();

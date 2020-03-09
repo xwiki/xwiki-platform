@@ -384,6 +384,12 @@ define('xwiki-ckeditor', [
     return oldReplace.call(this, element, ckeditor.tools.extend(getConfig(element), config || {}, true));
   };
 
+  var oldInline = ckeditor.inline;
+  ckeditor.inline = function(element, config) {
+    // Take into account the configuration options specified on the target element.
+    return oldInline.call(this, element, ckeditor.tools.extend(getConfig(element), config || {}, true));
+  };
+
   //
   // Add support for configuration namespaces.
   //

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.configuration.internal;
+package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -25,20 +25,21 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.internal.AbstractDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
 
 /**
- * Configuration source taking its data in the User Preferences wiki document (the user profile page) using data from a
- * XWikiUsers object attached to that document.
+ * Configuration source for normal users (i.e. not superadmin, nor guest users) taking its data in the User Preferences
+ * wiki document (the user profile page) using data from a XWikiUsers object attached to that document.
  * 
  * @version $Id$
  * @since 2.0M2
  */
 @Component
-@Named("user")
+@Named("normaluser")
 @Singleton
-public class UserPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
+public class NormalUserPreferencesConfigurationSource extends AbstractDocumentConfigurationSource
 {
     static final String SPACE_NAME = "XWiki";
 

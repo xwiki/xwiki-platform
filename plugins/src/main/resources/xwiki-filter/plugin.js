@@ -39,53 +39,46 @@
     __namespace: true
   };
 
+  // Determine if a plain space is converted into a non-breaking space when the character before it is deleted. For this
+  // we create a test editor instance, try to reproduce the problem and then destroy it. We do this as soon as the first
+  // editor instance is created, in order to be sure all the required resources are loaded.
+  // See CKEDITOR-323: Insertion of &nbsp; in editor when deleting characters
+  var hasNonBreakingSpaceIssue = false;
+  CKEDITOR.once('instanceCreated', function() {
+    // Note that the editor must be visible in order to reproduce the issue. Make sure it doesn't appear on screen.
+    var container = $('<div id="CKEDITOR-323" contenteditable="true"><p>ab c</p></div>').css({
+      position: 'fixed',
+      top: '-1000px',
+      left: '-1000px'
+    }).appendTo('body');
+    CKEDITOR.inline(container[0], {
+      'xwiki-filter': {
+        // Check if the problem reproduces without our fix.
+        fixNonBreakingSpace: false
+      }
+    }).once('instanceReady', function(event) {
+      var editor = event.editor;
+      var textNode = editor.editable().getFirst().getFirst();
+      // Split the text node after 'b' to simulate the CKEditor behavior when pressing the delete key.
+      textNode.split(2);
+      // Select the 'b' character.
+      var range = editor.createRange();
+      range.setStart(textNode, 1);
+      range.setEnd(textNode, 2);
+      editor.getSelection().selectRanges([range]);
+      // Delete the selected text. We need to use the low level command because there's no corresponding high level
+      // command in CKEditor.
+      editor.document.$.execCommand('delete');
+      // Destroy the test editor and check the produced HTML.
+      editor.destroy();
+      hasNonBreakingSpaceIssue = container.html().indexOf('a&nbsp;c') >= 0;
+      container.remove();
+    // This listener destroys the test editor so make sure it is called last.
+    }, null, null, 1000);
+  // Make sure this listener is called as early as possible.
+  }, null, null, 1);
+
   CKEDITOR.plugins.add('xwiki-filter', {
-    // See CKEDITOR-323: Insertion of &nbsp; in editor when deleting characters
-    hasNonBreakingSpaceIssue: false,
-
-    onLoad: function() {
-      var thisPlugin = this;
-      // Determine if a plain space is converted into a non-breaking space when the character before it is deleted.
-      // See CKEDITOR-323: Insertion of &nbsp; in editor when deleting characters
-      // Note that the editor must be visible in order to reproduce the issue. Make sure it doesn't appear on screen.
-      var container = $('<div id="CKEDITOR-323"/>').css({
-        position: 'absolute',
-        top: '-1000px',
-        left: '-1000px',
-        width: '100px',
-        height: '100px'
-      }).appendTo('body');
-      var textArea = $('<textarea/>').text('<p>ab c</p>').appendTo(container);
-      // We need to create an editor instance, so better wait for all the plugins to be loaded first.
-      setTimeout(function() {
-        CKEDITOR.replace(textArea[0], {
-          'xwiki-filter': {
-            // Check if the problem reproduces without our fix.
-            fixNonBreakingSpace: false
-          }
-        }).on('instanceReady', function(event) {
-          var editor = event.editor;
-          var textNode = editor.editable().getFirst().getFirst();
-          // Split the text node after 'b' to simulate the CKEditor behavior when pressing the delete key.
-          textNode.split(2);
-          // Select the 'b' character.
-          var range = editor.createRange();
-          range.setStart(textNode, 1);
-          range.setEnd(textNode, 2);
-          editor.getSelection().selectRanges([range]);
-          // Delete the selected text. We need to use the low level command because there's no corresponding high level
-          // command in CKEditor.
-          editor.document.$.execCommand('delete');
-          // Destroy the editor after the other 'instanceReady' listeners are called.
-          setTimeout(function() {
-            editor.destroy();
-            thisPlugin.hasNonBreakingSpaceIssue = textArea.val().indexOf('a&nbsp;c') >= 0;
-            container.remove();
-          }, 0);
-        });
-      }, 0);
-    },
-
     init: function(editor) {
       var replaceEmptyLinesWithEmptyParagraphs = {
         elements: {
@@ -265,10 +258,9 @@
           previous.nodeValue.charAt(previous.nodeValue.length - 1) !== ' ';
       };
 
-      var thisPlugin = this;
       editor.once('instanceReady', function(event) {
         var mutationObserver = new MutationObserver(function(mutations, mutationObserver) {
-          if (!thisPlugin.hasNonBreakingSpaceIssue) {
+          if (!hasNonBreakingSpaceIssue) {
             mutationObserver.disconnect();
             return;
           }

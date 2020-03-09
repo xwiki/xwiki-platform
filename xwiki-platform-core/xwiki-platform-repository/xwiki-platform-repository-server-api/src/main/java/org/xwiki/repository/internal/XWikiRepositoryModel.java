@@ -412,7 +412,7 @@ public class XWikiRepositoryModel
         // URI
         URI uri = new URI(repository.substring(index + 1, repository.length()));
 
-        return factory.getExtensionRepositoryDescriptor(id, type, uri, null);
+        return factory.getExtensionRepositoryDescriptor(id, type, uri);
     }
 
     /**

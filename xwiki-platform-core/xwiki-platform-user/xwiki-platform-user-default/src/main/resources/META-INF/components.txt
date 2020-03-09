@@ -15,3 +15,5 @@ org.xwiki.user.internal.document.DocumentUserReferenceUserResolver
 org.xwiki.user.internal.document.DocumentXWikiUserUserResolver
 org.xwiki.user.internal.document.CurrentUserResolver
 org.xwiki.user.internal.document.UserReferenceConverter
+org.xwiki.user.internal.document.NormalUserPreferencesConfigurationSource
+org.xwiki.user.internal.document.UserPreferencesConfigurationSource

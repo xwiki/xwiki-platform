@@ -19,6 +19,9 @@
  */
 package org.xwiki.user;
 
+import java.util.Properties;
+
+import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -28,10 +31,21 @@ import org.xwiki.stability.Unstable;
  * @since 12.2RC1
  */
 @Unstable
+@Role
 public interface UserConfiguration
 {
     /**
      * @return the hint of the implementation components used to store users (defaults to {@code document}
      */
     String getStoreHint();
+
+    /**
+     * @return the overriding preferences for the superadmin user
+     */
+    Properties getSuperAdminPreferences();
+
+    /**
+     * @return the overriding preferences for the guest user
+     */
+    Properties getGuestPreference();
 }

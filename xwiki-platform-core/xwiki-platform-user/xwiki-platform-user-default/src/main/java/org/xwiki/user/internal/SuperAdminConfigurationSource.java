@@ -19,6 +19,7 @@
  */
 package org.xwiki.user.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -26,6 +27,7 @@ import org.apache.commons.configuration2.BaseConfiguration;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.configuration.internal.CommonsConfigurationSource;
+import org.xwiki.user.UserConfiguration;
 
 import static org.xwiki.user.internal.UserPropertyConstants.ACTIVE;
 import static org.xwiki.user.internal.UserPropertyConstants.DISPLAY_HIDDEN_DOCUMENTS;
@@ -45,9 +47,13 @@ import static org.xwiki.user.internal.UserPropertyConstants.USER_TYPE;
 @Singleton
 public class SuperAdminConfigurationSource extends CommonsConfigurationSource implements Initializable
 {
+    @Inject
+    private UserConfiguration userConfiguration;
+
     @Override
     public void initialize()
     {
+        // Default preferences
         BaseConfiguration configuration = new BaseConfiguration();
         configuration.addProperty(DISPLAY_HIDDEN_DOCUMENTS, "1");
         configuration.addProperty(ACTIVE, "1");
@@ -55,6 +61,10 @@ public class SuperAdminConfigurationSource extends CommonsConfigurationSource im
         configuration.addProperty(EMAIL_CHECKED, "1");
         configuration.addProperty(USER_TYPE, "advanced");
         configuration.addProperty(EDITOR, "Text");
+
+        // User-defined and overriding preferences
+        this.userConfiguration.getSuperAdminPreferences().forEach((key, value)
+            -> configuration.setProperty((String) key, value));
 
         setConfiguration(configuration);
     }

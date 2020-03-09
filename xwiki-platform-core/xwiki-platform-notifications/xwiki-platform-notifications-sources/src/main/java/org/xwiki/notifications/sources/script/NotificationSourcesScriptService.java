@@ -33,7 +33,6 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.sources.NotificationManager;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;

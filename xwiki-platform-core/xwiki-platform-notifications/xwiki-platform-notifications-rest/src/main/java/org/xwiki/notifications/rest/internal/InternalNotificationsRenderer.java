@@ -27,12 +27,16 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
 import org.xwiki.notifications.CompositeEventStatusManager;
-import org.xwiki.notifications.notifiers.internal.InternalHtmlNotificationRenderer;
+import org.xwiki.notifications.notifiers.NotificationRenderer;
 import org.xwiki.notifications.rest.model.Notification;
+import org.xwiki.rendering.renderer.BlockRenderer;
+import org.xwiki.rendering.renderer.printer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.printer.WikiPrinter;
 import org.xwiki.text.StringUtils;
 
 /**
@@ -49,10 +53,13 @@ public class InternalNotificationsRenderer
     private CompositeEventStatusManager compositeEventStatusManager;
 
     @Inject
+    private ComponentManager componentManager;
+
+    @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
-    private InternalHtmlNotificationRenderer notificationRenderer;
+    private NotificationRenderer notificationRenderer;
 
     @Inject
     private Logger logger;
@@ -89,12 +96,20 @@ public class InternalNotificationsRenderer
         String html = null;
         String exception = null;
         try {
-            html = this.notificationRenderer.render(event);
+            html = render(event);
         } catch (Exception e) {
             this.logger.error("Error while rendering notification", e);
             exception = e.toString();
         }
 
         return new Notification(event, status, html, exception, entityReferenceSerializer);
+    }
+
+    private String render(CompositeEvent compositeEvent) throws Exception
+    {
+        WikiPrinter printer = new DefaultWikiPrinter();
+        BlockRenderer renderer = componentManager.getInstance(BlockRenderer.class, "html/5.0");
+        renderer.render(notificationRenderer.render(compositeEvent), printer);
+        return printer.toString();
     }
 }

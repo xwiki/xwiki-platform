@@ -36,9 +36,6 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.filters.NotificationFilter;
-import org.xwiki.notifications.filters.NotificationFilterPreference;
-import org.xwiki.notifications.preferences.NotificationPreference;
 import org.xwiki.notifications.sources.NotificationParameters;
 
 /**
@@ -70,7 +67,7 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
     private boolean isCacheEnabled;
 
     /**
-     * Cache used to store task events result until the result might change (for example when a new notification is
+     * Cache used to store events result until the result might change (for example when a new notification is
      * created).
      */
     private Cache<List<CompositeEvent>> longEventCache;

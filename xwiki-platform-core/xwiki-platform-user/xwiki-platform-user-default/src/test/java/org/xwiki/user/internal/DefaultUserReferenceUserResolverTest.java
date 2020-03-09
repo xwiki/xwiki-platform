@@ -21,6 +21,7 @@ package org.xwiki.user.internal;
 
 import javax.inject.Named;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -104,10 +105,11 @@ public class DefaultUserReferenceUserResolverTest
         Throwable exception = assertThrows(RuntimeException.class, () -> {
             this.resolver.resolve(new TestUserReference());
         });
-        assertEquals("Failed to find component implementation for role "
+        assertEquals("Failed to find user resolver for role "
             + "[org.xwiki.user.UserResolver<org.xwiki.user.UserReference>] and hint "
             + "[org.xwiki.user.internal.DefaultUserReferenceUserResolverTest$TestUserReference]",
             exception.getMessage());
+        assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));
     }
 
     @Test

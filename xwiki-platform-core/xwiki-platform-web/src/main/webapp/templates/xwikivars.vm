@@ -98,7 +98,7 @@
 ##   SuperAdmin user
 ## - guest users who have admin rights (i.e. when the wiki is empty with no rights set)
 ## =====================================================================================
-#set ($isAdvancedUser = (($isGuest && $hasAdmin) || $services.user.resolveUser('').type == 'ADVANCED'))
+#set ($isAdvancedUser = (($isGuest && $hasAdmin) || $services.user.resolveCurrentUser().type == 'ADVANCED'))
 ## ======================================================================================
 ## Compute list of spaces to blacklist so that simple users don't see them.
 ## TODO : replace this list by a hidden space feature.

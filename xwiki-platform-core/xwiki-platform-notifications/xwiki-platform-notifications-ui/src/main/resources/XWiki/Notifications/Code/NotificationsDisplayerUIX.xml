@@ -42,8 +42,17 @@
 ********************************************************#
 #if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
   #set ($discard = $response.setHeader('Cache-Control', 'no-cache'))
-  #set ($discard = $response.setHeader('Content-Type', 'application/json'))
-  $jsontool.serialize({'unread': $services.notification.sources.getEventsCount(21)})
+  #set ($discard = $response.setHeader('Content-Type', 'text/html'))
+  #set($parameters = {
+    "userId": $xcontext.user,
+    "useUserPreferences": "true",
+    "currentWiki": $xcontext.wiki,
+    "maxCount": "10",
+    "onlyUnread": "true"
+  })
+  #set($notifParameters = $services.notification.sources.getNotificationParameters($parameters))
+  #set($counterPlaceholder = $services.notification.notifiers.getNotificationCount($notifParameters))
+$counterPlaceholder
 #********************************************************
              Mark a notification as read
 ********************************************************#
@@ -192,17 +201,11 @@
       </use>
     </class>
     <property>
-      <cache>long</cache>
+      <cache>forbid</cache>
     </property>
     <property>
       <code>require(['jquery', 'XWikiNotificationsMacro', 'xwiki-meta'], function ($, XWikiNotificationsMacro, xm) {
   'use strict';
-
-  /**
-   * The notification batch' size
-   */
-  var notificationsLimit = 10;
-
   /**
    * Maximum number of events to count
    */
@@ -298,27 +301,14 @@
   /**
    * Get the number of unread notifications.
    */
-  var getUnreadNotificationsCount = function (asyncId) {
-    var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications/count?media=json';
-    var params = {
-      'userId':              XWiki.Model.serialize(xm.userReference),
-      'useUserPreferences':  true,
-      'currentWiki':         xm.documentReference.extractReferenceValue(XWiki.EntityType.WIKI),
-      'async':               true
-    };
-    if (asyncId) {
-      params.asyncId = asyncId;
-    }
-    $.ajax(restURL, {cache: false, data: params}).done(function (data, textStatus, jqXHR) {
-      switch (jqXHR.status) {
-          case 200:
-            // 200 means that the search is done, we displayer the count notifications
-            updateNotificationCount(data.unread);
-            break;
-          case 202:
-            // 202 means that the background search is still running, we wait 1 second and ask again if it's done this time
-            setTimeout(getUnreadNotificationsCount, 1000, data.asyncId);
-            break;
+  var getUnreadNotificationsCount = function () {
+    var unreadCounterURL = new XWiki.Document('NotificationsDisplayerUIX', 'XWiki.Notifications.Code').getURL('get', 'action=getUnreadCount&amp;outputSyntax=plain');
+    
+    $.ajax(unreadCounterURL, {cache: false}).done(function (data, textStatus, jqXHR) {
+      if ($(data).find('notification-count')) {
+        updateNotificationCount($(data).first('notification-count').text())
+      } else {
+        $('#tmNotifications &gt; a.icon-navbar').after($(data));
       }
     });
   };
@@ -329,7 +319,6 @@
   $(document).ready(function () {
 
     var container = $('.notifications-area');
-    macro = new XWikiNotificationsMacro(container, XWiki.Model.serialize(xm.userReference), notificationsLimit, true, [], true);
     getUnreadNotificationsCount();
     container.on('eventMarkedAsRead', function (notif) {
       if (notificationCount &lt;= maxCountNumber) {
@@ -346,22 +335,26 @@
     $('#tmNotifications .dropdown-menu').click(function(event) {
       event.stopPropagation();
     });
+    
+    var processEvents = function (mutations) {
+      for (var i = 0; i &lt; mutations.length; i++) {
+        var mutation = mutations[i];
+        for (var j = 0; j &lt; mutation.addedNodes.length; j++) {
+          var element = mutation.addedNodes[j];
 
-    /**
-     * Load the notifications content when the user open the notification menu (lazy loading to have better scalability).
-     */
-    var notificationsMenusHasBeenOpened = false;
-    $('#tmNotifications').on('show.bs.dropdown', function () {
-      // Don't load the notifications if the menu has already be opened before.
-      if (!notificationsMenusHasBeenOpened) {
-        macro.load(0).done(function (notifications) {
-          if (notifications.length &gt; 0) {
-            createCleanButton(notifications[0].date);
+          if ($(element).hasClass('notification-event')) {
+            // We don't specify the date since we want to fallback on the current date in the end.
+            createCleanButton();
           }
-        });
+          if ($(element).hasClass('notifications-count')) {
+            // We call the method to handle the special cases like 0 notif etc.
+            updateNotificationCount($(element).text());
+          }
+        }
       }
-      notificationsMenusHasBeenOpened = true;
-    });
+    };
+    var observer = new MutationObserver(processEvents);
+    observer.observe(document, { childList: true, subtree : true});
   });
 
 });
@@ -889,7 +882,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       </scope>
     </class>
     <property>
-      <async_cached>1</async_cached>
+      <async_cached>0</async_cached>
     </property>
     <property>
       <async_context>
@@ -907,7 +900,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
   &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
   &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
 #end
-{{html clean="false"}} ## we need clean="false" because we want to display the raw content
+{{html clean="false" wiki="true"}} ## we need clean="false" because we want to display the raw content
 #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
   &lt;li&gt;
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
@@ -953,8 +946,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       &lt;div class="notifications-header-uix col-xs-12"&gt;
       &lt;/div&gt;
     &lt;/div&gt;
-    &lt;div class="notifications-area loading clearfix"&gt;
-    &lt;/div&gt;
+&lt;div class="notifications-area"&gt;
+
+{{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
+
+&lt;/div&gt;
   &lt;/li&gt;
 #end
 {{/html}}

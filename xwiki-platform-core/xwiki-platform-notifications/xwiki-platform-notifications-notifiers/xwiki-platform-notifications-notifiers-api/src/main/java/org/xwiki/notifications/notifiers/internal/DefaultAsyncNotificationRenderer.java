@@ -27,8 +27,12 @@ import javax.inject.Inject;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.CompositeEventStatus;
+import org.xwiki.notifications.CompositeEventStatusManager;
 import org.xwiki.notifications.NotificationException;
+import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
 import org.xwiki.rendering.RenderingException;
 import org.xwiki.rendering.async.internal.AsyncRenderer;
@@ -53,7 +57,13 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
     private InternalHtmlNotificationRenderer htmlNotificationRenderer;
 
     @Inject
+    private CompositeEventStatusManager compositeEventStatusManager;
+
+    @Inject
     private ParametrizedNotificationManager notificationManager;
+
+    @Inject
+    private EntityReferenceSerializer<String> documentReferenceSerializer;
 
     private String cacheKey;
 
@@ -88,11 +98,12 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
         Object fromCache =
             this.notificationCacheManager.getFromCache(this.cacheKey, this.configuration.isCount());
 
+        NotificationParameters notificationParameters = this.configuration.getNotificationParameters();
         List<CompositeEvent> events = null;
         Integer count = null;
         if (fromCache == null) {
             try {
-                events = this.notificationManager.getEvents(this.configuration.getNotificationParameters());
+                events = this.notificationManager.getEvents(notificationParameters);
                 count = events.size();
                 this.notificationCacheManager.setInCache(this.cacheKey, events, this.configuration.isCount());
             } catch (NotificationException e) {
@@ -107,21 +118,20 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
         }
         String stringResult;
         if (this.configuration.isCount()) {
-            String displayCount = String.valueOf(count);
-            // if the count is actually max, we display it with a "+" to inform that we might have more.
-            if (count >= this.configuration.getNotificationParameters().expectedCount) {
-                displayCount = String.format("%s+", count);
-            }
-            stringResult = getCountResult(displayCount);
+            stringResult = this.htmlNotificationRenderer.render(count);
         } else {
-            stringResult = this.htmlNotificationRenderer.render(events);
+            try {
+                boolean loadMore = events.size() == notificationParameters.expectedCount;
+                List<CompositeEventStatus> compositeEventStatuses =
+                    this.compositeEventStatusManager.getCompositeEventStatuses(events,
+                        documentReferenceSerializer.serialize(notificationParameters.user));
+                stringResult = this.htmlNotificationRenderer.render(events, compositeEventStatuses, loadMore);
+            } catch (Exception e) {
+                throw new RenderingException("Error while retrieving the event status", e);
+            }
+
         }
         return new AsyncRendererResult(stringResult);
-    }
-
-    private String getCountResult(String count)
-    {
-        return String.format("<span class=\"notifications-count badge\">%s</span>", count);
     }
 
     /**

@@ -34,7 +34,6 @@ import org.xwiki.job.JobException;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.notifiers.NotificationRenderer;
 import org.xwiki.notifications.notifiers.internal.DefaultAsyncNotificationRenderer;
 import org.xwiki.notifications.notifiers.internal.NotificationAsyncRendererConfiguration;
@@ -49,7 +48,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
 
 import com.rometools.rome.io.SyndFeedOutput;
-import com.xpn.xwiki.XWikiContext;
 
 /**
  * Script service for the notification notifiers.
@@ -83,9 +81,6 @@ public class NotificationNotifiersScriptService implements ScriptService
     @Inject
     @Named("context")
     private Provider<ComponentManager> componentManager;
-
-    @Inject
-    private Provider<XWikiContext> contextProvider;
 
     /**
      * Generate a rendering Block for a given event to display as notification.

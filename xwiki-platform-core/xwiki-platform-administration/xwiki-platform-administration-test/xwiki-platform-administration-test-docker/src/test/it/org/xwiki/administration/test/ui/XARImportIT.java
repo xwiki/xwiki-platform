@@ -82,6 +82,9 @@ public class XARImportIT
         if (this.sectionPage.isPackagePresent(PACKAGE_WITH_HISTORY)) {
             this.sectionPage.deletePackage(PACKAGE_WITH_HISTORY);
         }
+        if (this.sectionPage.isPackagePresent(PACKAGE_WITH_HISTORY13)) {
+            this.sectionPage.deletePackage(PACKAGE_WITH_HISTORY13);
+        }
         if (this.sectionPage.isPackagePresent(PACKAGE_WITHOUT_HISTORY)) {
             this.sectionPage.deletePackage(PACKAGE_WITHOUT_HISTORY);
         }

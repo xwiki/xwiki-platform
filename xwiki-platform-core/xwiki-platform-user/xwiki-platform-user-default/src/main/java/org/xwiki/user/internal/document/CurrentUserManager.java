@@ -17,61 +17,60 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal;
+package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
- * Document-based implementation of {@link UserManager} which proxies to the specific UserManager implementation
- * based on the type of the passed {@link UserReference}.
+ * CRUD operations for the current user.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
+@Named("org.xwiki.user.CurrentUserReference")
 @Singleton
-public class DefaultUserManager implements UserManager
+public class CurrentUserManager implements UserManager
 {
     @Inject
-    @Named("context")
-    private ComponentManager componentManager;
+    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+
+    @Inject
+    @Named("org.xwiki.user.internal.document.DocumentUserReference")
+    private UserManager documentUserManager;
+
+    @Inject
+    private Provider<XWikiContext> contextProvider;
 
     @Override
     public boolean exists(UserReference userReference)
     {
         boolean exists;
-
-        // Handle special cases
-        UserReference normalizedUserReference = userReference;
-        if (normalizedUserReference == null) {
-            normalizedUserReference = UserReference.CURRENT_USER_REFERENCE;
-        }
-        if (UserReference.GUEST_REFERENCE == normalizedUserReference
-            || UserReference.SUPERADMIN_REFERENCE == normalizedUserReference)
+        UserReference resolvedUserReference = this.userReferenceResolver.resolve(getXWikiContext().getUserReference());
+        if (UserReference.SUPERADMIN_REFERENCE == resolvedUserReference
+            || UserReference.GUEST_REFERENCE == resolvedUserReference)
         {
             exists = false;
         } else {
-            exists = resolveUserManager(normalizedUserReference).exists(normalizedUserReference);
+            exists = this.documentUserManager.exists(resolvedUserReference);
         }
         return exists;
     }
 
-    private UserManager resolveUserManager(UserReference userReference)
+    private XWikiContext getXWikiContext()
     {
-        try {
-            return this.componentManager.getInstance(UserManager.class, userReference.getClass().getName());
-        } catch (ComponentLookupException e) {
-            throw new RuntimeException(String.format(
-                "Failed to find user manager for role [%s] and hint [%s]", UserManager.class.getName(),
-                userReference.getClass().getName()), e);
-        }
+        return this.contextProvider.get();
     }
+
 }

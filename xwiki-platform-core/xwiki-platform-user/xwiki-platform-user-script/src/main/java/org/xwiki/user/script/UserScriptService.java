@@ -28,6 +28,7 @@ import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.user.User;
+import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
 
@@ -52,6 +53,9 @@ public class UserScriptService implements ScriptService
 
     @Inject
     private ScriptServiceManager scriptServiceManager;
+
+    @Inject
+    private UserManager userManager;
 
     /**
      * @param <S> the type of the {@link ScriptService}
@@ -94,5 +98,28 @@ public class UserScriptService implements ScriptService
     public User resolveSuperAdminUser()
     {
         return this.userResolver.resolve(UserReference.SUPERADMIN_REFERENCE);
+    }
+
+    /**
+     * @return the current User object
+     * @since 12.2RC1
+     */
+    @Unstable
+    public User resolveCurrentUser()
+    {
+        return this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE);
+    }
+
+    /**
+     * @param userReference the reference to the user to test for existence (i.e. if the user pointed to by the
+     *                      reference exists or not - for example the superadmin users or the guest users don't exist,
+     *                      and a "document"-based User can be constructed and have no profile page and thus not exist)
+     * @return true if the user exists in the store or false otherwise
+     * @since 12.2RC1
+     */
+    @Unstable
+    public boolean exists(UserReference userReference)
+    {
+        return this.userManager.exists(userReference);
     }
 }

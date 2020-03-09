@@ -1,7 +1,10 @@
+org.xwiki.user.internal.DefaultUserConfiguration
 org.xwiki.user.internal.DefaultUserManager
 org.xwiki.user.internal.DefaultUserReferenceUserResolver
 org.xwiki.user.internal.SuperAdminConfigurationSource
 org.xwiki.user.internal.GuestConfigurationSource
+org.xwiki.user.internal.ConfiguredStringUserReferenceResolver
+org.xwiki.user.internal.UserReferenceConverter
 org.xwiki.user.internal.group.DefaultGroupManager
 org.xwiki.user.internal.group.GroupCacheInvalidationListener
 org.xwiki.user.internal.group.GroupsCache
@@ -9,11 +12,11 @@ org.xwiki.user.internal.group.MembersCache
 org.xwiki.user.internal.group.UsersCache
 org.xwiki.user.internal.group.UsersCacheInvalidationListener
 org.xwiki.user.internal.document.DocumentUserManager
+org.xwiki.user.internal.document.CurrentUserManager
 org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceResolver
 org.xwiki.user.internal.document.DocumentStringUserReferenceResolver
 org.xwiki.user.internal.document.DocumentUserReferenceUserResolver
 org.xwiki.user.internal.document.DocumentXWikiUserUserResolver
 org.xwiki.user.internal.document.CurrentUserResolver
-org.xwiki.user.internal.document.UserReferenceConverter
 org.xwiki.user.internal.document.NormalUserPreferencesConfigurationSource
 org.xwiki.user.internal.document.UserPreferencesConfigurationSource

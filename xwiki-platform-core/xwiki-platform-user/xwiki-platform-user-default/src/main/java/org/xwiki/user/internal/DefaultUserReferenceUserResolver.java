@@ -81,8 +81,8 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
                 userReference.getClass().getName());
         } catch (ComponentLookupException e) {
             throw new RuntimeException(String.format(
-                "Failed to find component implementation for role [%s] and hint [%s]", UserResolver.TYPE_USER_REFERENCE,
-                userReference.getClass().getName()));
+                "Failed to find user resolver for role [%s] and hint [%s]", UserResolver.TYPE_USER_REFERENCE,
+                userReference.getClass().getName()), e);
         }
     }
 }

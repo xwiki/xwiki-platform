@@ -1023,4 +1023,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is:
 # logging.deprecated.enabled=true
 
+#-------------------------------------------------------------------------------------
+# User
+#-------------------------------------------------------------------------------------
+
+#-# [Since 12.2RC1]
+#-# Indicate where users are stored.
+#-#
+#-# The default (and currently the only supported option) is:
+# user.store.hint = document
+
 $!xwikiPropertiesAdditionalProperties

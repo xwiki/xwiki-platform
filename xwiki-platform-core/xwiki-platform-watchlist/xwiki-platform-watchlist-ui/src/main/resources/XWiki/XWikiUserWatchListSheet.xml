@@ -247,20 +247,19 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.entry.userwatchlistsheet</name>
+      <name>org.xwiki.platform.watchlist.menu</name>
     </property>
     <property>
-      <!-- display: The user is seeing her own profile.-->
       <parameters>id=watchlist
 sheet=XWiki.XWikiUserWatchListSheet
 glyphicon=eye
-display=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasWatch)true#{else}false#end</parameters>
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasWatch)true#{else}false#end</parameters>
     </property>
     <property>
-      <scope>global</scope>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

@@ -595,21 +595,20 @@ return XWiki;
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.entry.userwikisheet</name>
+      <name>org.xwiki.platform.wiki.ui.mainwiki.menu</name>
     </property>
     <property>
-      <!-- display: The current wiki is the main wiki and the user sheet document exists.-->
       <parameters>id=wikis
 name=$services.localization.render('platform.wiki.menu.userwikis')
 sheet=WikiManager.UserWikiSheet
 glyphicon=list
-display=#if($xcontext.isMainWiki() &amp;&amp; $xwiki.exists('WikiManager.UserWikiSheet'))true#{else}false#end</parameters>
+isActive=#if($xcontext.isMainWiki())true#{else}false#end</parameters>
     </property>
     <property>
-      <scope>global</scope>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

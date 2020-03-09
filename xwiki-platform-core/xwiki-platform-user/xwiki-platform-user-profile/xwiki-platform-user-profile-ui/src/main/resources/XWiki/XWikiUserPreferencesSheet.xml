@@ -325,20 +325,19 @@
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.entry.userpreferencessheet</name>
+      <name>org.xwiki.platform.user.profile.menu.xWikiUserPreferences</name>
     </property>
     <property>
-      <!-- display: The user is seeing her own profile or the user is an admin.-->
       <parameters>id=preferences
 sheet=XWiki.XWikiUserPreferencesSheet
 glyphicon=wrench
-display=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) || $hasAdmin)true#{else}false#end</parameters>
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) || $hasAdmin)true#{else}false#end</parameters>
     </property>
     <property>
-      <scope>global</scope>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

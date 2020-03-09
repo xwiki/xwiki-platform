@@ -257,19 +257,19 @@
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.entry.usermembershipsheet</name>
+      <name>org.xwiki.platform.user.profile.menu.xWikiUserMembership</name>
     </property>
     <property>
       <parameters>id=groups
 sheet=XWiki.XWikiUserMembershipSheet
 glyphicon=group
-display=true</parameters>
+isActive=true</parameters>
     </property>
     <property>
-      <scope>global</scope>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

@@ -302,20 +302,19 @@
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.entry.userdashboardsheet</name>
+      <name>org.xwiki.platform.dashboard.menu</name>
     </property>
     <property>
-      <!-- display: The user is seeing her own profile and the dashboard document exists -->
       <parameters>id=dashboard
 sheet=Dashboard.XWikiUserDashboardSheet
 glyphicon=th
-display=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasDashboard)true#{else}false#end</parameters>
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasDashboard)true#{else}false#end</parameters>
     </property>
     <property>
-      <scope>global</scope>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

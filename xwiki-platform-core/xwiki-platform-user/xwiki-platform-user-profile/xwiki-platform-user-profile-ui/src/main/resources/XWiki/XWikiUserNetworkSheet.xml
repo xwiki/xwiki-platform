@@ -648,20 +648,19 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       <content/>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.user.profile.menu.content</extensionPointId>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.entry.usernetworksheet</name>
+      <name>org.xwiki.platform.user.profile.menu.xWikiUserNetwork</name>
     </property>
     <property>
-      <!-- display: The user is seeing her own profile and the watch service is available.-->
       <parameters>id=network
 sheet=XWiki.XWikiUserNetworkSheet
 glyphicon=world
-display=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; ("$!services.notification.watch" != '' || $hasWatch))true#{else}false#end</parameters>
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; ("$!services.notification.watch" != '' || $hasWatch))true#{else}false#end</parameters>
     </property>
     <property>
-      <scope>global</scope>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

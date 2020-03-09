@@ -47,7 +47,7 @@
 #########################
 #set($categories = [])
 
-## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu.content' UIXP.
+## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu' UIXP.
 #set($list_uix = ["org.xwiki.platform.user.profile.entry.userprofilesheet",
   "org.xwiki.platform.user.profile.entry.userpreferencessheet",
   "org.xwiki.platform.user.profile.entry.usermembershipsheet",
@@ -56,10 +56,10 @@
   "org.xwiki.platform.user.profile.entry.usernotificationsheet",
   "org.xwiki.platform.user.profile.entry.userwikisheet",
   "org.xwiki.platform.user.profile.entry.userdashboardsheet"])
-#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu.content', {
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {
   'sortByCustomOrder': $stringtool.join($list_uix, ',')
 }))
-  #if($uix.parameters.get('display') == 'true')
+  #if($uix.parameters.get('isActive') == 'true')
     #set($discard = $categories.add($uix.parameters))
   #end
 #end

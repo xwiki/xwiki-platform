@@ -19,11 +19,17 @@
  */
 package org.xwiki.user.internal;
 
+import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
+import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.UserConfiguration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link SuperAdminConfigurationSource}.
@@ -35,6 +41,15 @@ public class SuperAdminConfigurationSourceTest
 {
     @InjectMockComponents
     private SuperAdminConfigurationSource source;
+
+    @MockComponent
+    private UserConfiguration userConfiguration;
+
+    @BeforeComponent
+    public void setup()
+    {
+        when(this.userConfiguration.getSuperAdminPreferences()).thenReturn(new Properties());
+    }
 
     @Test
     void getFirstName()

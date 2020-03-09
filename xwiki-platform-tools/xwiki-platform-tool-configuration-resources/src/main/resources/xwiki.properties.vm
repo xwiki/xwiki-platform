@@ -1033,4 +1033,24 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default (and currently the only supported option) is:
 # user.store.hint = document
 
+#-# [Since 12.2RC1]
+#-# Define preferences for the SuperAdmin user.
+#-#
+#-# The format is:
+#-# user.preferences.superadmin.<preference name> = <value>
+#-#
+#-# Examples:
+#-# user.preferences.superadmin.displayHiddenDocuments = 0
+#-# user.preferences.superadmin.editor = Wysiwyg
+
+#-# [Since 12.2RC1]
+#-# Define preferences for the Guest user.
+#-#
+#-# The format is:
+#-# user.preferences.guest.<preference name> = <value>
+#-#
+#-# Examples:
+#-# user.preferences.guest.displayHiddenDocuments = 1
+#-# user.preferences.guest.editor = Text
+
 $!xwikiPropertiesAdditionalProperties

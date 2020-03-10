@@ -28,7 +28,7 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 12.2RC1
  */
-public class SuperAdminUser extends AbstractSpecialUser
+public class SuperAdminUser extends AbstractUser
 {
     /**
      * @param userConfigurationSource the component providing the user configuration data

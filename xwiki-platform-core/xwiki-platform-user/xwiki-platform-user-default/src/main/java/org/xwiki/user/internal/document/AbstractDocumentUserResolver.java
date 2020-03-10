@@ -68,7 +68,7 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
      */
     protected User resolveUser(DocumentReference userDocumentReference)
     {
-        return resolveUser(new DocumentUserReference(userDocumentReference));
+        return resolveUser(new DocumentUserReference(userDocumentReference, this.entityReferenceProvider));
     }
 
     /**
@@ -86,8 +86,7 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
         } else if (XWikiRightService.isSuperAdmin(documentReference)) {
             user = new SuperAdminUser(this.superAdminConfigurationSource);
         } else {
-            user = new DocumentUser(documentUserReference, this.contextProvider, this.entityReferenceProvider,
-                this.userConfigurationSource);
+            user = new DocumentUser(documentUserReference, this.contextProvider, this.userConfigurationSource);
         }
         return user;
     }

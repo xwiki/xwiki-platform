@@ -58,6 +58,11 @@ public class DefaultUserManagerTest
 
     private class TestUserReference implements UserReference
     {
+        @Override
+        public boolean isGlobal()
+        {
+            return false;
+        }
     }
 
     @Test

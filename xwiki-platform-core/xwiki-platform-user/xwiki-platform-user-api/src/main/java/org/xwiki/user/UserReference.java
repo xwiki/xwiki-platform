@@ -37,23 +37,22 @@ public interface UserReference
      * Represents a Guest user reference, i.e. a virtual user that is not logged in. If you need to verify if a given
      * UserReference is the guest user, you should use {@code if (myRef == UserReference.GUEST_REFERENCE}.
      */
-    UserReference GUEST_REFERENCE = new UserReference()
-    {
-        // Empty. This is a tagging object.
-    };
+    UserReference GUEST_REFERENCE = () -> true;
 
     /**
      * Represents the Super Admin user reference, i.e. a virtual user that has all permissions. If you need to verify
      * if a given UserReference is the Super Admin user, you should use
      * {@code if (myRef == UserReference.SUPERADMIN_REFERENCE}.
      */
-    UserReference SUPERADMIN_REFERENCE = new UserReference()
-    {
-        // Empty. This is a tagging object.
-    };
+    UserReference SUPERADMIN_REFERENCE = () -> true;
 
     /**
      * Represents a reference to the current logged-in user.
      */
     UserReference CURRENT_USER_REFERENCE = CurrentUserReference.INSTANCE;
+
+    /**
+     * @return true if this reference points to a global user
+     */
+    boolean isGlobal();
 }

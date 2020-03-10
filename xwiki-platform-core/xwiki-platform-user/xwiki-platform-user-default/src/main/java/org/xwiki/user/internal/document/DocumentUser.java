@@ -24,9 +24,7 @@ import java.util.function.Supplier;
 import javax.inject.Provider;
 
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.user.internal.AbstractUser;
 
@@ -48,32 +46,21 @@ class DocumentUser extends AbstractUser
 
     private DocumentUserReference userReference;
 
-    private EntityReferenceProvider entityReferenceProvider;
-
     private Provider<XWikiContext> contextProvider;
 
     /**
      * @param userReference the user reference
      * @param contextProvider the component to get/set the current user in the context
      * @param userConfigurationSource the component to get the user properties
-     * @param entityReferenceProvider the component to check if the current wiki is the main wiki
      * @param
      */
     DocumentUser(DocumentUserReference userReference, Provider<XWikiContext> contextProvider,
-        EntityReferenceProvider entityReferenceProvider, ConfigurationSource userConfigurationSource)
+        ConfigurationSource userConfigurationSource)
     {
         super(userConfigurationSource);
 
         this.userReference = userReference;
         this.contextProvider = contextProvider;
-        this.entityReferenceProvider = entityReferenceProvider;
-    }
-
-    @Override
-    public boolean isGlobal()
-    {
-        return this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).equals(
-            getInternalReference().getWikiReference());
     }
 
     @Override

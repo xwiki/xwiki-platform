@@ -25,12 +25,10 @@ import javax.inject.Provider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.Editor;
@@ -78,19 +76,11 @@ public class DocumentUserTest
     void setup()
     {
         this.reference = new DocumentReference("mainwiki", "space", "user");
-        this.user = new DocumentUser(new DocumentUserReference(this.reference), this.contextProvider,
-            this.entityReferenceProvider, this.userConfigurationSource);
+        this.user = new DocumentUser(new DocumentUserReference(this.reference, this.entityReferenceProvider),
+            this.contextProvider, this.userConfigurationSource);
 
         this.xcontext = mock(XWikiContext.class);
         when(this.contextProvider.get()).thenReturn(this.xcontext);
-    }
-
-    @Test
-    void isGlobal()
-    {
-        when(this.entityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(
-            new WikiReference("mainwiki"));
-        assertTrue(this.user.isGlobal());
     }
 
     @Test

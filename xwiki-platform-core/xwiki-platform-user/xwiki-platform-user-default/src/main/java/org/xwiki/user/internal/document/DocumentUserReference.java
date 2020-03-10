@@ -21,7 +21,9 @@ package org.xwiki.user.internal.document;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.text.XWikiToStringBuilder;
 import org.xwiki.user.UserReference;
 
@@ -36,14 +38,18 @@ import org.xwiki.user.UserReference;
  */
 class DocumentUserReference implements UserReference
 {
+    private EntityReferenceProvider entityReferenceProvider;
+
     private DocumentReference reference;
 
     /**
      * @param reference the reference to the wiki page storing the user
+     * @param entityReferenceProvider the component to check if the current wiki is the main wiki
      */
-    DocumentUserReference(DocumentReference reference)
+    DocumentUserReference(DocumentReference reference, EntityReferenceProvider entityReferenceProvider)
     {
         this.reference = reference;
+        this.entityReferenceProvider = entityReferenceProvider;
     }
 
     /**
@@ -52,6 +58,13 @@ class DocumentUserReference implements UserReference
     public DocumentReference getReference()
     {
         return this.reference;
+    }
+
+    @Override
+    public boolean isGlobal()
+    {
+        return this.entityReferenceProvider.getDefaultReference(EntityType.WIKI).equals(
+            getReference().getWikiReference());
     }
 
     @Override

@@ -23,6 +23,7 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -52,11 +53,14 @@ public class DocumentUserReferenceUserResolverTest
     @Named("org.xwiki.user.CurrentUserReference")
     private UserResolver<UserReference> currentUserResolver;
 
+    @MockComponent
+    protected EntityReferenceProvider entityReferenceProvider;
+
     @Test
     void resolve()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        User user = this.resolver.resolve(new DocumentUserReference(documentReference));
+        User user = this.resolver.resolve(new DocumentUserReference(documentReference,this.entityReferenceProvider));
         assertNotNull(user);
         assertEquals("wiki:space.page", ((DocumentUser) user).getUserReference().getReference().toString());
     }
@@ -94,7 +98,7 @@ public class DocumentUserReferenceUserResolverTest
     void resolveGuestWhenSpecifiedAsString()
     {
         User user = this.resolver.resolve(new DocumentUserReference(
-            new DocumentReference("wiki", "space", "XWikiGuest")));
+            new DocumentReference("wiki", "space", "XWikiGuest"), this.entityReferenceProvider));
         assertSame(UserReference.GUEST_REFERENCE, user.getUserReference());
     }
 
@@ -109,7 +113,7 @@ public class DocumentUserReferenceUserResolverTest
     void resolveSuperAdminWhenSpecifiedAsString()
     {
         User user = this.resolver.resolve(new DocumentUserReference(
-            new DocumentReference("wiki", "space", "superadmin")));
+            new DocumentReference("wiki", "space", "superadmin"), this.entityReferenceProvider));
         assertSame(UserReference.SUPERADMIN_REFERENCE, user.getUserReference());
     }
 }

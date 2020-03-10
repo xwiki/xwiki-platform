@@ -240,9 +240,13 @@
       <content>{{velocity}}{{html clean="false"}} ## we need clean="false" because we want to display the raw content
   #if ($displayQuickSearch &amp;&amp; ($xwiki.exists('Main.Search') || $xwiki.exists('Main.WebSearch')))
     #set ($discard = $xwiki.jsx.use('XWiki.QuickSearchUIX'))
+        #if ($xwiki.exists('Main.Search'))
+          #set ($searchUrl = $xwiki.getURL('Main.Search'))
+        #else
+          #set ($searchUrl = $xwiki.getURL('Main.WebSearch'))
+        #end
     &lt;li&gt;
-      &lt;form class="navbar-form globalsearch globalsearch-close form-inline" id="globalsearch" 
-        action="#if($xwiki.exists('Main.Search'))$xwiki.getURL('Main.Search')#else$xwiki.getURL('Main.WebSearch')#end" role="search"&gt;
+      &lt;form class="navbar-form globalsearch globalsearch-close form-inline" id="globalsearch" action="$searchUrl" role="search"&gt;
         &lt;label class="hidden" for="headerglobalsearchinput"&gt;$services.localization.render('search')&lt;/label&gt;
         &lt;input type="text" name="text" placeholder="$services.localization.render('panels.search.inputText')" id="headerglobalsearchinput" /&gt;
         &lt;button type="submit" class="btn" title="$services.localization.render('search')"&gt;$services.icon.renderHTML('search')&lt;/button&gt;

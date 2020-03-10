@@ -33,9 +33,9 @@ import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
+import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.sources.NotificationParameters;
 
 /**
@@ -56,15 +56,13 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
     private static final String CACHE_KEY_SEPARATOR = "/";
 
     @Inject
-    private ConfigurationSource configurationSource;
+    private NotificationConfiguration configuration;
 
     @Inject
     private CacheManager cacheManager;
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
-
-    private boolean isCacheEnabled;
 
     /**
      * Cache used to store events result until the result might change (for example when a new notification is
@@ -81,9 +79,7 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
     @Override
     public void initialize() throws InitializationException
     {
-        this.isCacheEnabled = this.configurationSource.getProperty("notifications.rest.cache", true);
-
-        if (this.isCacheEnabled) {
+        if (this.configuration.isRestCacheEnabled()) {
             try {
                 this.longEventCache = this.cacheManager
                     .createNewCache(new LRUCacheConfiguration("notification.rest.longCache.events", 100, 86400));
@@ -148,7 +144,7 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
     public Object getFromCache(String cacheKey, boolean count)
     {
         Object result = null;
-        if (this.isCacheEnabled) {
+        if (this.configuration.isRestCacheEnabled()) {
             if (count) {
                 result = this.longCountCache.get(cacheKey);
             } else {
@@ -167,7 +163,7 @@ public class DefaultNotificationCacheManager implements Initializable, Disposabl
      */
     public void setInCache(String cacheKey, List<CompositeEvent> events, boolean count)
     {
-        if (this.isCacheEnabled) {
+        if (this.configuration.isRestCacheEnabled()) {
             if (count) {
                 this.longCountCache.set(cacheKey, events.size());
             } else {

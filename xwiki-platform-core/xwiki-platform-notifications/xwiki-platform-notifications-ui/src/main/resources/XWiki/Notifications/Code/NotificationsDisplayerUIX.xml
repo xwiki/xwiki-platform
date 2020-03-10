@@ -47,7 +47,7 @@
     "userId": $xcontext.user,
     "useUserPreferences": "true",
     "currentWiki": $xcontext.wiki,
-    "maxCount": "10",
+    "maxCount": "21",
     "onlyUnread": "true"
   })
   #set($notifParameters = $services.notification.sources.getNotificationParameters($parameters))

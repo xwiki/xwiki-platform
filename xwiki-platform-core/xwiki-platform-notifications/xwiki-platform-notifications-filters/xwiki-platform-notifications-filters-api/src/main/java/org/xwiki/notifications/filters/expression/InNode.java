@@ -21,6 +21,8 @@ package org.xwiki.notifications.filters.expression;
 
 import java.util.Collection;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.notifications.filters.expression.generics.AbstractNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 import org.xwiki.notifications.filters.expression.generics.AbstractValueNode;
@@ -68,13 +70,29 @@ public final class InNode extends AbstractOperatorNode
     @Override
     public boolean equals(Object o)
     {
-        return (o instanceof InNode && super.equals(o));
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        InNode inNode = (InNode) o;
+
+        return new EqualsBuilder()
+            .append(leftOperand, inNode.leftOperand)
+            .append(values, inNode.values)
+            .isEquals();
     }
 
     @Override
     public int hashCode()
     {
-        return this.getClass().getTypeName().hashCode() * 571 + super.hashCode();
+        return new HashCodeBuilder(17, 37)
+            .append(leftOperand)
+            .append(values)
+            .toHashCode();
     }
 
     @Override

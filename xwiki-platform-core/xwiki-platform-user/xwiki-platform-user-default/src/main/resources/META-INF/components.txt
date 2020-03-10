@@ -4,6 +4,7 @@ org.xwiki.user.internal.DefaultUserReferenceUserResolver
 org.xwiki.user.internal.SuperAdminConfigurationSource
 org.xwiki.user.internal.GuestConfigurationSource
 org.xwiki.user.internal.ConfiguredStringUserReferenceResolver
+org.xwiki.user.internal.ConfiguredStringUserReferenceSerializer
 org.xwiki.user.internal.UserReferenceConverter
 org.xwiki.user.internal.group.DefaultGroupManager
 org.xwiki.user.internal.group.GroupCacheInvalidationListener
@@ -15,6 +16,7 @@ org.xwiki.user.internal.document.DocumentUserManager
 org.xwiki.user.internal.document.CurrentUserManager
 org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceResolver
 org.xwiki.user.internal.document.DocumentStringUserReferenceResolver
+org.xwiki.user.internal.document.DocumentStringUserReferenceSerializer
 org.xwiki.user.internal.document.DocumentUserReferenceUserResolver
 org.xwiki.user.internal.document.DocumentXWikiUserUserResolver
 org.xwiki.user.internal.document.CurrentUserResolver

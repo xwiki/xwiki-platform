@@ -30,7 +30,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserConfiguration;
-import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceSerializer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -39,15 +40,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link ConfiguredStringUserReferenceResolver}.
+ * Unit tests for {@link ConfiguredStringUserReferenceSerializer}.
  *
  * @version $Id$
  */
 @ComponentTest
-public class ConfiguredStringUserReferenceResolverTest
+public class ConfiguredStringUserReferenceSerializerTest
 {
     @InjectMockComponents
-    private ConfiguredStringUserReferenceResolver resolver;
+    private ConfiguredStringUserReferenceSerializer serializer;
 
     @MockComponent
     @Named("context")
@@ -57,29 +58,31 @@ public class ConfiguredStringUserReferenceResolverTest
     private UserConfiguration userConfiguration;
 
     @Test
-    void resolve() throws Exception
+    void serialize() throws Exception
     {
         when(this.userConfiguration.getStoreHint()).thenReturn("storehint");
-        UserReferenceResolver customUserReferenceResolver = mock(UserReferenceResolver.class);
-        when(this.componentManager.getInstance(new DefaultParameterizedType(null, UserReferenceResolver.class,
-            String.class), "storehint")).thenReturn(customUserReferenceResolver);
+        UserReferenceSerializer customUserReferenceSerializer = mock(UserReferenceSerializer.class);
+        when(this.componentManager.getInstance(new DefaultParameterizedType(null, UserReferenceSerializer.class,
+            String.class), "storehint")).thenReturn(customUserReferenceSerializer);
 
-        this.resolver.resolve("userreference");
+        UserReference userReference = mock(UserReference.class);
+        this.serializer.serialize(userReference);
 
-        verify(customUserReferenceResolver).resolve("userreference");
+        verify(customUserReferenceSerializer).serialize(userReference);
     }
 
     @Test
-    void resolveWhenNoResolver() throws Exception
+    void serializeWhenNoSerializer() throws Exception
     {
         when(this.userConfiguration.getStoreHint()).thenReturn("storehint");
-        when(this.componentManager.getInstance(new DefaultParameterizedType(null, UserReferenceResolver.class,
+        when(this.componentManager.getInstance(new DefaultParameterizedType(null, UserReferenceSerializer.class,
             String.class), "storehint")).thenThrow(new ComponentLookupException("error"));
 
         Throwable exception = assertThrows(RuntimeException.class,
-            () -> this.resolver.resolve("userreference"));
-        assertEquals("Failed to find user reference resolver for role "
-            + "[org.xwiki.user.UserReferenceResolver<java.lang.String>] and hint [storehint]", exception.getMessage());
+            () -> this.serializer.serialize(mock(UserReference.class)));
+        assertEquals("Failed to find user reference serializer for role "
+            + "[org.xwiki.user.UserReferenceSerializer<java.lang.String>] and hint [storehint]",
+            exception.getMessage());
         assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));
     }
 }

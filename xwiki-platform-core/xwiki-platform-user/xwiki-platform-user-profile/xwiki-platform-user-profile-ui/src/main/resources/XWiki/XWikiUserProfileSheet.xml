@@ -676,8 +676,9 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
     <property>
       <parameters>id=profile
 sheet=XWiki.XWikiUserProfileSheet
-glyphicon=user
-isActive=true</parameters>
+icon=user
+isActive=true
+priority=10</parameters>
     </property>
     <property>
       <scope>wiki</scope>

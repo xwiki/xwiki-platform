@@ -255,8 +255,9 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
     <property>
       <parameters>id=watchlist
 sheet=XWiki.XWikiUserWatchListSheet
-glyphicon=eye
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasWatch)true#{else}false#end</parameters>
+icon=eye
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasWatch)true#{else}false#end
+priority=40</parameters>
     </property>
     <property>
       <scope>wiki</scope>

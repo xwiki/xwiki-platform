@@ -311,7 +311,8 @@
       <parameters>id=dashboard
 sheet=Dashboard.XWikiUserDashboardSheet
 glyphicon=th
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasDashboard)true#{else}false#end</parameters>
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasDashboard)true#{else}false#end
+priority=80</parameters>
     </property>
     <property>
       <scope>wiki</scope>

@@ -333,8 +333,9 @@
     <property>
       <parameters>id=preferences
 sheet=XWiki.XWikiUserPreferencesSheet
-glyphicon=wrench
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) || $hasAdmin)true#{else}false#end</parameters>
+icon=wrench
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) || $hasAdmin)true#{else}false#end
+priority=20</parameters>
     </property>
     <property>
       <scope>wiki</scope>

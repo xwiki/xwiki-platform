@@ -656,8 +656,9 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     <property>
       <parameters>id=network
 sheet=XWiki.XWikiUserNetworkSheet
-glyphicon=world
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; ("$!services.notification.watch" != '' || $hasWatch))true#{else}false#end</parameters>
+icon=world
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; ("$!services.notification.watch" != '' || $hasWatch))true#{else}false#end
+priority=50</parameters>
     </property>
     <property>
       <scope>wiki</scope>

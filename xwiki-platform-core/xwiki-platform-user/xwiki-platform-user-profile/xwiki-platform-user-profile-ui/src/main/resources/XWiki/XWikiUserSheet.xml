@@ -48,7 +48,7 @@
 #set($categories = [])
 
 ## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu' UIXP.
-#set($list_uix = ["org.xwiki.platform.user.profile.entry.userprofilesheet",
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {'sortByParameter': 'order'}))
   "org.xwiki.platform.user.profile.entry.userpreferencessheet",
   "org.xwiki.platform.user.profile.entry.usermembershipsheet",
   "org.xwiki.platform.user.profile.entry.userwatchlistsheet",
@@ -60,6 +60,9 @@
   'sortByCustomOrder': $stringtool.join($list_uix, ',')
 }))
   #if($uix.parameters.get('isActive') == 'true')
+    #if ($uix.parameters.containsKey('icon'))
+      #set ($discard = $uix.parameters.put('glyphicon', $uix.parameters.get('icon')))
+    #end
     #set($discard = $categories.add($uix.parameters))
   #end
 #end

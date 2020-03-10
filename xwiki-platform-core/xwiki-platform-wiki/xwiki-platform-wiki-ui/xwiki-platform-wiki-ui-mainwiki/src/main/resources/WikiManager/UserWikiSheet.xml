@@ -604,8 +604,9 @@ return XWiki;
       <parameters>id=wikis
 name=$services.localization.render('platform.wiki.menu.userwikis')
 sheet=WikiManager.UserWikiSheet
-glyphicon=list
-isActive=#if($xcontext.isMainWiki())true#{else}false#end</parameters>
+icon=list
+isActive=#if($xcontext.isMainWiki())true#{else}false#end
+priority=70</parameters>
     </property>
     <property>
       <scope>wiki</scope>

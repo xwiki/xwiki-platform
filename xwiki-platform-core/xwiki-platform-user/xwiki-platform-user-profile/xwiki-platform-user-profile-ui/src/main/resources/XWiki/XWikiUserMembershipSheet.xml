@@ -265,8 +265,9 @@
     <property>
       <parameters>id=groups
 sheet=XWiki.XWikiUserMembershipSheet
-glyphicon=group
-isActive=true</parameters>
+icon=group
+isActive=true
+priority=30</parameters>
     </property>
     <property>
       <scope>wiki</scope>

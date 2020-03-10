@@ -346,8 +346,9 @@
     <property>
       <parameters>id=notifications
 sheet=XWiki.Notifications.Code.XWikiUserNotificationsSheet
-glyphicon=bell
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $xwiki.exists($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet')))true#{else}false#end</parameters>
+icon=bell
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $xwiki.exists($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet')))true#{else}false#end
+priority=60</parameters>
     </property>
     <property>
       <scope>wiki</scope>

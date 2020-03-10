@@ -31,17 +31,17 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.user.UserConfiguration;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceSerializer;
 
 /**
- * Finds the User Reference Resolver based on the configured User store hint.
+ * Converts a {@link UserReference} into a String representation, based on the configured User store hint.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
 @Singleton
-public class ConfiguredStringUserReferenceResolver implements UserReferenceResolver<String>
+public class ConfiguredStringUserReferenceSerializer implements UserReferenceSerializer<String>
 {
     @Inject
     @Named("context")
@@ -51,19 +51,19 @@ public class ConfiguredStringUserReferenceResolver implements UserReferenceResol
     private UserConfiguration userConfiguration;
 
     @Override
-    public UserReference resolve(String userName, Object... parameters)
+    public String serialize(UserReference userReference)
     {
-        return resolveUserReferenceResolver().resolve(userName, parameters);
+        return resolveUserReferenceSerializer().serialize(userReference);
     }
 
-    private UserReferenceResolver<String> resolveUserReferenceResolver()
+    private UserReferenceSerializer<String> resolveUserReferenceSerializer()
     {
-        Type type = new DefaultParameterizedType(null, UserReferenceResolver.class, String.class);
+        Type type = new DefaultParameterizedType(null, UserReferenceSerializer.class, String.class);
         try {
             return this.componentManager.getInstance(type, this.userConfiguration.getStoreHint());
         } catch (ComponentLookupException e) {
             throw new RuntimeException(String.format(
-                "Failed to find user reference resolver for role [%s] and hint [%s]", type,
+                "Failed to find user reference serializer for role [%s] and hint [%s]", type,
                 this.userConfiguration.getStoreHint()), e);
         }
     }

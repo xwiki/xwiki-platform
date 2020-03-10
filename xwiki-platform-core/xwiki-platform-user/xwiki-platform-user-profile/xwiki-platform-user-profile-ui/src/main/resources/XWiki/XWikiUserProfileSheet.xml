@@ -90,9 +90,9 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
     &lt;div class='userInfo'&gt;
     #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
       &lt;div class='editProfileCategory'&gt;
-       &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))" 
-        href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;
-        &lt;span class='sr-only'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;
+        &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))" 
+              href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;
+        &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))&lt;/span&gt;
        &lt;/a&gt;
       &lt;/div&gt;
     #end
@@ -153,8 +153,8 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
         &lt;h2&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h2&gt;
       #else
         &lt;h2&gt;
-         $services.localization.render('platform.core.profile.section.activityof',
-         [$xwiki.getUserName($doc.fullName, false)])
+          $services.localization.render('platform.core.profile.section.activityof',
+            [$xwiki.getUserName($doc.fullName, false)])
         &lt;/h2&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##

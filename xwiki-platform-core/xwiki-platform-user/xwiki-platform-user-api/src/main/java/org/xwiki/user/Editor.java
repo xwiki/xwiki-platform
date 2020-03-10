@@ -19,8 +19,8 @@
  */
 package org.xwiki.user;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.stability.Unstable;
-import org.xwiki.text.StringUtils;
 
 /**
  * The default editor that should be used for a user, when editing content.

@@ -76,11 +76,6 @@ public interface User extends ConfigurationSource
     boolean isEmailChecked();
 
     /**
-     * @return true if this user is registered in the main wiki (i.e. it's a global user)
-     */
-    boolean isGlobal();
-
-    /**
      * @return the reference to his user (i.e. a way to retrieve this user's data)
      */
     UserReference getUserReference();

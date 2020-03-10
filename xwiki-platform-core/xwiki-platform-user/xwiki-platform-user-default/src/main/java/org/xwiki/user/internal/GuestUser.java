@@ -28,7 +28,7 @@ import org.xwiki.user.UserReference;
  * @version $Id$
  * @since 12.2RC1
  */
-public class GuestUser extends AbstractSpecialUser
+public class GuestUser extends AbstractUser
 {
     /**
      * @param userConfigurationSource the component providing the user configuration data

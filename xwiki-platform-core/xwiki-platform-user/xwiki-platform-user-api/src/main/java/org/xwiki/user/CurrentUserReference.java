@@ -39,4 +39,10 @@ public final class CurrentUserReference implements UserReference
     {
         // Voluntarily empty. We want to have a single instance of this class (hence the private part).
     }
+
+    @Override
+    public boolean isGlobal()
+    {
+        throw new RuntimeException("You need to resolve the current user first to find if it's a global user or not.");
+    }
 }

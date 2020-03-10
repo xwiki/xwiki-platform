@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.user.UserReference;
 
@@ -44,6 +45,9 @@ public class DocumentStringUserReferenceResolver extends AbstractUserReferenceRe
     private static final EntityReference USER_SPACE_REFERENCE = new EntityReference("XWiki", EntityType.SPACE);
 
     @Inject
+    private EntityReferenceProvider entityReferenceProvider;
+
+    @Inject
     private DocumentReferenceResolver<String> resolver;
 
     @Override
@@ -57,7 +61,8 @@ public class DocumentStringUserReferenceResolver extends AbstractUserReferenceRe
             } else {
                 baseEntityReference = USER_SPACE_REFERENCE;
             }
-            reference = new DocumentUserReference(this.resolver.resolve(userName, baseEntityReference));
+            reference = new DocumentUserReference(this.resolver.resolve(userName, baseEntityReference),
+                this.entityReferenceProvider);
         }
         return reference;
     }

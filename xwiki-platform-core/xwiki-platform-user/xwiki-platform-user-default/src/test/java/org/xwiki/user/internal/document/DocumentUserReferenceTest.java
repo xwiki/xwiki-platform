@@ -20,10 +20,17 @@
 package org.xwiki.user.internal.document;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.model.reference.WikiReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentUserReference}.
@@ -35,8 +42,10 @@ public class DocumentUserReferenceTest
     @Test
     void identity()
     {
-        DocumentUserReference reference1 = new DocumentUserReference(new DocumentReference("wiki1", "space1", "page1"));
-        DocumentUserReference reference2 = new DocumentUserReference(new DocumentReference("wiki2", "space2", "page2"));
+        DocumentUserReference reference1 =
+            new DocumentUserReference(new DocumentReference("wiki1", "space1", "page1"), null);
+        DocumentUserReference reference2 =
+            new DocumentUserReference(new DocumentReference("wiki2", "space2", "page2"), null);
         assertEquals(reference1, reference1);
         assertNotEquals(reference2, reference1);
         assertNotEquals(reference1, null);
@@ -49,7 +58,7 @@ public class DocumentUserReferenceTest
     void getReference()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        DocumentUserReference userReference = new DocumentUserReference(documentReference);
+        DocumentUserReference userReference = new DocumentUserReference(documentReference, null);
         assertEquals(documentReference, userReference.getReference());
     }
 
@@ -57,7 +66,29 @@ public class DocumentUserReferenceTest
     void stringRepresentation()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        DocumentUserReference userReference = new DocumentUserReference(documentReference);
+        DocumentUserReference userReference = new DocumentUserReference(documentReference, null);
         assertEquals("reference = [wiki:space.page]", userReference.toString());
+    }
+
+    @Test
+    void isGlobalWhenTrue()
+    {
+        DocumentReference documentReference = new DocumentReference("mainwiki", "space", "page");
+        EntityReferenceProvider entityReferenceProvider = mock(EntityReferenceProvider.class);
+        when(entityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(new WikiReference("mainwiki"));
+        DocumentUserReference userReference = new DocumentUserReference(documentReference, entityReferenceProvider);
+
+        assertTrue(userReference.isGlobal());
+    }
+
+    @Test
+    void isGlobalWhenFalse()
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        EntityReferenceProvider entityReferenceProvider = mock(EntityReferenceProvider.class);
+        when(entityReferenceProvider.getDefaultReference(EntityType.WIKI)).thenReturn(new WikiReference("mainwiki"));
+        DocumentUserReference userReference = new DocumentUserReference(documentReference, entityReferenceProvider);
+
+        assertFalse(userReference.isGlobal());
     }
 }

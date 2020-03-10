@@ -17,29 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal;
+package org.xwiki.user;
 
-import org.xwiki.configuration.ConfigurationSource;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Common code for special users (SuperAdmin, Guest).
+ * Unit tests for {@link UserReference}.
  *
  * @version $Id$
- * @since 12.2RC1
  */
-public abstract class AbstractSpecialUser extends AbstractUser
+public class UserReferenceTest
 {
-    /**
-     * @param userConfigurationSource the component providing the user configuration data
-     */
-    public AbstractSpecialUser(ConfigurationSource userConfigurationSource)
+    @Test
+    void isGuestReferenceGlobal()
     {
-        super(userConfigurationSource);
+        assertTrue(UserReference.GUEST_REFERENCE.isGlobal());
     }
 
-    @Override
-    public boolean isGlobal()
+    @Test
+    void isSuperAdminReferenceGlobal()
     {
-        return true;
+        assertTrue(UserReference.SUPERADMIN_REFERENCE.isGlobal());
+    }
+
+    @Test
+    void isCurrentUserReferenceGlobal()
+    {
+        Throwable exception = assertThrows(RuntimeException.class,
+            () -> UserReference.CURRENT_USER_REFERENCE.isGlobal());
+        assertEquals("You need to resolve the current user first to find if it's a global user or not.",
+            exception.getMessage());
     }
 }

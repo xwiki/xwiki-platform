@@ -36,100 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set($obj = $doc.getObject('XWiki.XWikiUsers'))
-#if(!$obj)
-  {{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}##
-#elseif ($xcontext.action == 'get')
-  #if ($xcontext.isMainWiki())
-    ## Main wiki users can be located in any wiki
-    #set($groups = $services.user.group.getGroupsFromAllWikis($doc.documentReference))
-  #else
-    ## Subwiki users are usually located only in the local wiki
-    #set($groups = $services.user.group.getGroupsFromMemberWiki($doc.documentReference))
-  #end
-  ## Filter
-  #set($filterValue = "$!{request.get('group')}")
-  #if ($filterValue != '')
-    #set ($filteredGroups = [])
-    #foreach($group in $groups)
-      #set($groupString = $services.model.serialize($group, 'default'))
-      #if ($groupString.toLowerCase().contains($filterValue.toLowerCase()))
-        #set($void = $filteredGroups.add($group))
-      #end
-    #end
-  #else
-    #set ($filteredGroups = $groups)
-  #end
-  #if ($filteredGroups.size() &gt; 0)
-    #set ($filteredGroups = $collectiontool.sort($filteredGroups))
-    #set($order = "$!request.sort")
-    #if ($order == 'group' &amp;&amp; $request.get('dir').toLowerCase() == 'desc')
-      ## Reverse order
-      #set($descGroups = [])
-      #set($max = $filteredGroups.size() - 1)
-      #foreach($i in [ $max ..  0 ])
-        #set($void = $descGroups.add($filteredGroups[$i]))
-      #end
-      #set($filteredGroups = $descGroups)
-    #end
-    #set($offset = $numbertool.toNumber($request.get('offset')).intValue())
-    ## Offset starts from 0 in velocity and 1 in javascript
-    #set($offset = $offset - 1)
-    #if (!$offset || $offset &lt; 0)
-      #set($offset = 0)
-    #end
-    #set($limit = $numbertool.toNumber($request.get('limit')).intValue())
-    #if (!$limit || $limit &lt; 0)
-      #set ($limit = 15)
-    #end
-    #set($toIndex = $offset + $limit)
-    #if ($toIndex &gt; $filteredGroups.size())
-      #set($toIndex = $filteredGroups.size())
-    #end
-    #set($subGroups = $filteredGroups.subList($offset, $toIndex))
-  #else
-    #set($subGroups = [])
-  #end
-  #set($rows = [])
-  #foreach ($group in $subGroups)
-    #set ($title = $xwiki.getDocument($group).title)
-    #if ("$!title" == '')
-      #set ($title = $group.name)
-    #end
-    #set($void = $rows.add({
-        'doc_viewable' : true,
-        'group' : $title,
-        'group_url' : $xwiki.getURL($group)
-      }))
-  #end
-  #set($result = {
-      'totalrows' : $filteredGroups.size(),
-      'returnedrows' : $subGroups.size(),
-      'offset' : $mathtool.add($offset, 1),
-      'reqNo' : $numbertool.toNumber($request.reqNo),
-      'rows': $rows
-    })
-  $jsontool.serialize($result)
-  $response.setContentType('application/json')
-#else
-  (% id="Huser.profile.groups.title" %)
-  = {{translation key="user.profile.groups.title"/}}
-
-  {{translation key="user.profile.groups.description"/}}
-
-  #set($columns = [ 'group' ])
-  #set($columnsProperties = {
-      'group' : { 'type' : 'text', 'link' : 'field' }
-    })
-  #set($options = {
-      'translationPrefix' : 'user.profile.groups.table.',
-      'resultPage' : $doc.fullName,
-      'extraParams' : '&amp;sheet=XWiki.XWikiUserMembershipSheet'
-    })
-  #livetable("user.profile.group.table" $columns $columnsProperties $options)
-#end## User object exists
-{{/velocity}}</content>
+  <content/>
   <object>
     <name>XWiki.XWikiUserMembershipSheet</name>
     <number>0</number>
@@ -254,7 +161,100 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content/>
+      <content>{{velocity}}
+      #set($obj = $doc.getObject('XWiki.XWikiUsers'))
+      #if(!$obj)
+      {{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}##
+      #elseif ($xcontext.action == 'get')
+  #if ($xcontext.isMainWiki())
+    ## Main wiki users can be located in any wiki
+    #set($groups = $services.user.group.getGroupsFromAllWikis($doc.documentReference))
+  #else
+    ## Subwiki users are usually located only in the local wiki
+    #set($groups = $services.user.group.getGroupsFromMemberWiki($doc.documentReference))
+  #end
+  ## Filter
+  #set($filterValue = "$!{request.get('group')}")
+  #if ($filterValue != '')
+    #set ($filteredGroups = [])
+    #foreach($group in $groups)
+      #set($groupString = $services.model.serialize($group, 'default'))
+      #if ($groupString.toLowerCase().contains($filterValue.toLowerCase()))
+        #set($void = $filteredGroups.add($group))
+      #end
+    #end
+  #else
+    #set ($filteredGroups = $groups)
+  #end
+  #if ($filteredGroups.size() &gt; 0)
+    #set ($filteredGroups = $collectiontool.sort($filteredGroups))
+    #set($order = "$!request.sort")
+    #if ($order == 'group' &amp;&amp; $request.get('dir').toLowerCase() == 'desc')
+      ## Reverse order
+      #set($descGroups = [])
+      #set($max = $filteredGroups.size() - 1)
+      #foreach($i in [ $max ..  0 ])
+        #set($void = $descGroups.add($filteredGroups[$i]))
+      #end
+      #set($filteredGroups = $descGroups)
+    #end
+    #set($offset = $numbertool.toNumber($request.get('offset')).intValue())
+    ## Offset starts from 0 in velocity and 1 in javascript
+    #set($offset = $offset - 1)
+    #if (!$offset || $offset &lt; 0)
+      #set($offset = 0)
+    #end
+    #set($limit = $numbertool.toNumber($request.get('limit')).intValue())
+    #if (!$limit || $limit &lt; 0)
+      #set ($limit = 15)
+    #end
+    #set($toIndex = $offset + $limit)
+    #if ($toIndex &gt; $filteredGroups.size())
+      #set($toIndex = $filteredGroups.size())
+    #end
+    #set($subGroups = $filteredGroups.subList($offset, $toIndex))
+  #else
+    #set($subGroups = [])
+  #end
+  #set($rows = [])
+  #foreach ($group in $subGroups)
+    #set ($title = $xwiki.getDocument($group).title)
+    #if ("$!title" == '')
+      #set ($title = $group.name)
+    #end
+    #set($void = $rows.add({
+        'doc_viewable' : true,
+        'group' : $title,
+        'group_url' : $xwiki.getURL($group)
+      }))
+  #end
+  #set($result = {
+      'totalrows' : $filteredGroups.size(),
+      'returnedrows' : $subGroups.size(),
+      'offset' : $mathtool.add($offset, 1),
+      'reqNo' : $numbertool.toNumber($request.reqNo),
+      'rows': $rows
+    })
+  $jsontool.serialize($result)
+  $response.setContentType('application/json')
+      #else
+      (% id="Huser.profile.groups.title" %)
+      = {{translation key="user.profile.groups.title"/}}
+
+      {{translation key="user.profile.groups.description"/}}
+
+        #set($columns = [ 'group' ])
+        #set($columnsProperties = {
+          'group' : { 'type' : 'text', 'link' : 'field' }
+        })
+        #set($options = {
+          'translationPrefix' : 'user.profile.groups.table.',
+          'resultPage' : $doc.fullName,
+          'extraParams' : '&amp;sheet=XWiki.XWikiUserMembershipSheet'
+        })
+        #livetable("user.profile.group.table" $columns $columnsProperties $options)
+      #end## User object exists
+      {{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
@@ -264,7 +264,6 @@
     </property>
     <property>
       <parameters>id=groups
-sheet=XWiki.XWikiUserMembershipSheet
 icon=group
 isActive=true
 priority=30</parameters>

@@ -36,176 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#if ($request.action == "disable" ||$request.action == "enable")
-#set ($disabled = ($request.action == "disable"))
-#set ($discard = $xwiki.getUser($request.userId).setDisabledStatus($disabled))
-#else
-#set ($discard = $xwiki.ssx.use('XWiki.XWikiUserSheet'))
-##
-#set ($inEditMode = $xcontext.action == 'edit' || $xcontext.action == 'inline')
-#set ($xwikiUsersClassName = 'XWiki.XWikiUsers')
-#set ($obj = $doc.getObject($xwikiUsersClassName))
-##
-#if (!$obj)
-= $services.localization.render('xe.admin.users.sheet') =
-
-{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
-
-#else
-## Make sure we only care about properties of the user object and don't get polluted by other objects that might be in the user's profile page.
-#set ($discard = $doc.use($obj))
-##
-#set ($sheetDocumentReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'AdminUserProfileSheet'))
-#set ($sheetDocument = $xwiki.getDocument($sheetDocumentReference))
-#set ($xwikiUsersClass = $xwiki.getClass($xwikiUsersClassName))
-##
-#set ($sectionsObjectClassName = 'XWiki.UserProfileSectionsClass')
-#set ($sectionObjectClassName = 'XWiki.UserProfileSectionClass')
-#set ($isDisabled = $xwiki.getUser($doc.fullName).isDisabled())
-##
-#if ($hasAdmin &amp;&amp; $isDisabled)
-{{warning}}
-$services.localization.render('platform.core.profile.category.profile.disabled')
-{{/warning}}
-#end
-
-{{html clean='false' wiki='true'}}
-#if (!$inEditMode)
-  &lt;div class="vcard"&gt;
-  &lt;span class="fn hidden"&gt;$xwiki.getUserName($doc.fullName, false)&lt;/span&gt;
-#end
-  &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
-    #if ($hasAdmin &amp;&amp; !$inEditMode &amp;&amp; !$isMyProfile)
-      #if ($isDisabled)
-        #set ($enableClass = "")
-        #set ($disableClass = "hidden")
-      #else
-        #set ($enableClass = "hidden")
-        #set ($disableClass = "")
-      #end
-      &lt;a href="#" id="enable" class="btn btn-success $enableClass"&gt;$services.icon.renderHTML('unlock') $services.localization.render('platform.core.profile.category.profile.enableAccount')&lt;/a&gt;
-      &lt;a href="#" id="disable" class="btn btn-warning $disableClass"&gt;$services.icon.renderHTML('lock') $services.localization.render('platform.core.profile.category.profile.disableAccount')&lt;/a&gt;
-    #end
-    &lt;div class='userInfo'&gt;
-    #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-      &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-    #end
-    ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
-    #set ($sectionsObject = $sheetDocument.getObject($sectionsObjectClassName))
-    #set ($sectionsToDisplayString = $sectionsObject.getProperty('sections').value)
-    #set ($sectionsToDisplay = $sectionsToDisplayString.split('\s+'))
-    #foreach ($sectionId in $sectionsToDisplay)
-      #set ($sectionObject = $sheetDocument.getObject($sectionObjectClassName, 'id', $sectionId))
-      #set ($sectionName = "$!sectionObject.getProperty('name').value")
-      ## The section name will be evaluated. The admin can specify a static string or a call to $msg(...) to provide internationalization support.
-      #set ($sectionName = "#evaluate($!sectionName)")
-      ## If there is no section name specified, use the default translations prefix for the user profile, maybe we get lucky.
-      #if ("$!sectionName" == '')
-        #set ($sectionName = $services.localization.render("platform.core.profile.section.${sectionId}"))
-      #end
-      ## If that does not work either, just display the sectionID.
-      #if ("$!sectionName" == "platform.core.profile.section.${sectionId}")
-        #set ($sectionName = $sectionId)
-      #end
-      #set ($sectionPropertiesString = $sectionObject.getProperty('properties').value)
-      #set ($sectionProperties = $sectionPropertiesString.split('\s+'))
-      #if ($sectionProperties &amp;&amp; $sectionProperties.size() &gt; 0)
-        &lt;h1&gt;$sectionName&lt;/h1&gt;
-        &lt;dl&gt;
-        #foreach ($sectionProperty in $sectionProperties)
-          #set ($vCardData = $sectionProperty.split(':'))
-          #set ($vCardProperty = '')
-          #if ($vCardData.size() == 2)
-            #set ($vCardProperty = $vCardData[0])
-            #set ($sectionProperty = $vCardData[1])
-          #end
-          #if ("$!sectionProperty" != '' &amp;&amp; $xwikiUsersClass.get($sectionProperty))
-          &lt;dt class='label'&gt;
-            &lt;label #if($inEditMode)for="${xwikiUsersClassName}_${obj.number}_${sectionProperty}"#{end}&gt;$doc.displayPrettyName("${sectionProperty}")&lt;/label&gt;
-          &lt;/dt&gt;
-          &lt;dd #if("$!vCardProperty" != '' &amp;&amp; !$inEditMode)class="$vCardProperty"#{end}&gt;$doc.display($sectionProperty)&lt;/dd&gt;
-          #end
-        #end
-        &lt;/dl&gt;
-      #end
-    #end
-    &lt;/div&gt;
-  &lt;/div&gt;
-  #if (!$inEditMode)
-    &lt;div class='half column'&gt;
-      #set ($isMessageStreamActive = $services.messageStream.isActive())
-      #if ($isMessageStreamActive &amp;&amp; !$isGuest)
-      &lt;div class='userMessage profile-section'&gt;
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.sendMessage')&lt;/h1&gt;
-
-          {{messageSender /}}
-
-      &lt;/div&gt;
-      #end
-      &lt;div class='userRecentChanges'&gt;
-      #if ($xcontext.user == $doc.fullName)
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h1&gt;
-      #else
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
-        #if ($hasWatch)
-        $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
-        &lt;div class='activity-follow'&gt;
-          #set ($xredirect = $doc.getURL($xcontext.action, $request.queryString))
-          #if ($services.watchlist.isWatched(${doc.prefixedFullName}, "USER"))
-          &lt;span class='following'&gt;$services.localization.render('xe.activity.messages.following')&lt;/span&gt;
-          &lt;a class='action unfollow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$services.localization.render('xe.activity.messages.unfollow')&lt;/a&gt;
-          #else
-          &lt;a class='action follow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=adduser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$services.localization.render('xe.activity.messages.follow')&lt;/a&gt;
-          #end
-        &lt;/div&gt;
-        #end
-        &lt;div class="activity-follow"&gt;
-        #if("$!services.notification.watch" != '' &amp;&amp; $services.notification.watch.isEnabled() &amp;&amp; !$isGuest &amp;&amp; !$isSuperAdmin)
-          ## TODO: replace it, somehow, by a UIX or a custom user sheet
-          #set ($discard = $xwiki.ssx.use('XWiki.XWikiUserProfileSheet'))
-          #set ($discard = $xwiki.jsx.use('XWiki.XWikiUserProfileSheet'))
-          &lt;div class="notificationWatchUser"&gt;
-            &lt;p&gt;$services.icon.renderHTML('bell') $escapetool.xml($services.localization.render('user.profile.notifications'))&lt;/p&gt;
-            #set ($userId = $services.model.serialize($doc.documentReference, 'default'))
-            #set ($isUserWatched = $services.notification.watch.isUserWatched($userId))
-            &lt;div class="notificationWatchUserFollowing #if(!$isUserWatched)hidden#end"&gt;
-              &lt;button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"&gt;
-                $services.icon.renderHTML('check') $escapetool.xml($services.localization.render('user.profile.network.following')) &lt;span class="caret"&gt;&lt;/span&gt;
-              &lt;/button&gt;
-              &lt;ul class="dropdown-menu"&gt;
-                &lt;li&gt;&lt;a href="#" class="notificationWatchUserRemove"&gt;$services.icon.renderHTML('cross') $escapetool.xml($services.localization.render('user.profile.network.unfollow'))&lt;/a&gt;&lt;/li&gt;
-              &lt;/ul&gt;
-            &lt;/div&gt;
-            &lt;div class="notificationWatchUserNotFollowing  #if($isUserWatched)hidden#end"&gt;
-              &lt;button type="button" class="btn btn-danger dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"&gt;
-                $escapetool.xml($services.localization.render('user.profile.network.notfollowing')) &lt;span class="caret"&gt;&lt;/span&gt;
-              &lt;/button&gt;
-              &lt;ul class="dropdown-menu"&gt;
-                &lt;li&gt;&lt;a href="#" class="notificationWatchUserAdd"&gt;$services.icon.renderHTML('eye') $escapetool.xml($services.localization.render('user.profile.network.follow'))&lt;/a&gt;&lt;/li&gt;
-              &lt;/ul&gt;
-            &lt;/div&gt;
-          &lt;/div&gt;
-        #end
-        &lt;/div&gt;
-      #end
-{{/html}}
-
-{{notifications useUserPreferences="false" displayOwnEvents="true" users="${doc.prefixedFullName}" displayRSSLink="false" /}}
-
-{{html clean='false'}}
-      &lt;/div&gt;
-    &lt;/div&gt;
-  #end
-  &lt;div class='clearfloats'&gt;&amp;nbsp;&lt;/div&gt;
-#if(!$inEditMode)
-  ## Close the vcard
-  &lt;/div&gt;
-#end
-{{/html}}##
-#end
-#end
-{{/velocity}}</content>
+  <content/>
   <object>
     <name>XWiki.XWikiUserProfileSheet</name>
     <number>0</number>
@@ -665,7 +496,176 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content/>
+      <content>{{velocity}}
+      #if ($request.action == "disable" ||$request.action == "enable")
+#set ($disabled = ($request.action == "disable"))
+#set ($discard = $xwiki.getUser($request.userId).setDisabledStatus($disabled))
+#else
+#set ($discard = $xwiki.ssx.use('XWiki.XWikiUserSheet'))
+##
+#set ($inEditMode = $xcontext.action == 'edit' || $xcontext.action == 'inline')
+#set ($xwikiUsersClassName = 'XWiki.XWikiUsers')
+#set ($obj = $doc.getObject($xwikiUsersClassName))
+##
+#if (!$obj)
+= $services.localization.render('xe.admin.users.sheet') =
+
+{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
+
+#else
+## Make sure we only care about properties of the user object and don't get polluted by other objects that might be in the user's profile page.
+#set ($discard = $doc.use($obj))
+##
+#set ($sheetDocumentReference = $services.model.createDocumentReference($xcontext.database, 'XWiki', 'AdminUserProfileSheet'))
+#set ($sheetDocument = $xwiki.getDocument($sheetDocumentReference))
+#set ($xwikiUsersClass = $xwiki.getClass($xwikiUsersClassName))
+##
+#set ($sectionsObjectClassName = 'XWiki.UserProfileSectionsClass')
+#set ($sectionObjectClassName = 'XWiki.UserProfileSectionClass')
+#set ($isDisabled = $xwiki.getUser($doc.fullName).isDisabled())
+##
+#if ($hasAdmin &amp;&amp; $isDisabled)
+{{warning}}
+$services.localization.render('platform.core.profile.category.profile.disabled')
+{{/warning}}
+#end
+
+{{html clean='false' wiki='true'}}
+#if (!$inEditMode)
+  &lt;div class="vcard"&gt;
+  &lt;span class="fn hidden"&gt;$xwiki.getUserName($doc.fullName, false)&lt;/span&gt;
+#end
+  &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
+    #if ($hasAdmin &amp;&amp; !$inEditMode &amp;&amp; !$isMyProfile)
+      #if ($isDisabled)
+        #set ($enableClass = "")
+        #set ($disableClass = "hidden")
+      #else
+        #set ($enableClass = "hidden")
+        #set ($disableClass = "")
+      #end
+      &lt;a href="#" id="enable" class="btn btn-success $enableClass"&gt;$services.icon.renderHTML('unlock') $services.localization.render('platform.core.profile.category.profile.enableAccount')&lt;/a&gt;
+      &lt;a href="#" id="disable" class="btn btn-warning $disableClass"&gt;$services.icon.renderHTML('lock') $services.localization.render('platform.core.profile.category.profile.disableAccount')&lt;/a&gt;
+    #end
+    &lt;div class='userInfo'&gt;
+    #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
+      &lt;div class='editProfileCategory'&gt;&lt;a href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;&lt;span class='hidden'&gt;$services.localization.render('platform.core.profile.category.profile.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+    #end
+    ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
+    #set ($sectionsObject = $sheetDocument.getObject($sectionsObjectClassName))
+    #set ($sectionsToDisplayString = $sectionsObject.getProperty('sections').value)
+    #set ($sectionsToDisplay = $sectionsToDisplayString.split('\s+'))
+    #foreach ($sectionId in $sectionsToDisplay)
+      #set ($sectionObject = $sheetDocument.getObject($sectionObjectClassName, 'id', $sectionId))
+      #set ($sectionName = "$!sectionObject.getProperty('name').value")
+      ## The section name will be evaluated. The admin can specify a static string or a call to $msg(...) to provide internationalization support.
+      #set ($sectionName = "#evaluate($!sectionName)")
+      ## If there is no section name specified, use the default translations prefix for the user profile, maybe we get lucky.
+      #if ("$!sectionName" == '')
+        #set ($sectionName = $services.localization.render("platform.core.profile.section.${sectionId}"))
+      #end
+      ## If that does not work either, just display the sectionID.
+      #if ("$!sectionName" == "platform.core.profile.section.${sectionId}")
+        #set ($sectionName = $sectionId)
+      #end
+      #set ($sectionPropertiesString = $sectionObject.getProperty('properties').value)
+      #set ($sectionProperties = $sectionPropertiesString.split('\s+'))
+      #if ($sectionProperties &amp;&amp; $sectionProperties.size() &gt; 0)
+        &lt;h1&gt;$sectionName&lt;/h1&gt;
+        &lt;dl&gt;
+        #foreach ($sectionProperty in $sectionProperties)
+          #set ($vCardData = $sectionProperty.split(':'))
+          #set ($vCardProperty = '')
+          #if ($vCardData.size() == 2)
+            #set ($vCardProperty = $vCardData[0])
+            #set ($sectionProperty = $vCardData[1])
+          #end
+          #if ("$!sectionProperty" != '' &amp;&amp; $xwikiUsersClass.get($sectionProperty))
+          &lt;dt class='label'&gt;
+            &lt;label #if($inEditMode)for="${xwikiUsersClassName}_${obj.number}_${sectionProperty}"#{end}&gt;$doc.displayPrettyName("${sectionProperty}")&lt;/label&gt;
+          &lt;/dt&gt;
+          &lt;dd #if("$!vCardProperty" != '' &amp;&amp; !$inEditMode)class="$vCardProperty"#{end}&gt;$doc.display($sectionProperty)&lt;/dd&gt;
+          #end
+        #end
+        &lt;/dl&gt;
+      #end
+    #end
+    &lt;/div&gt;
+  &lt;/div&gt;
+  #if (!$inEditMode)
+    &lt;div class='half column'&gt;
+      #set ($isMessageStreamActive = $services.messageStream.isActive())
+      #if ($isMessageStreamActive &amp;&amp; !$isGuest)
+      &lt;div class='userMessage profile-section'&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.sendMessage')&lt;/h1&gt;
+
+          {{messageSender /}}
+
+      &lt;/div&gt;
+      #end
+      &lt;div class='userRecentChanges'&gt;
+      #if ($xcontext.user == $doc.fullName)
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h1&gt;
+      #else
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.activityof', [$xwiki.getUserName($doc.fullName, false)])&lt;/h1&gt;
+        #if ($hasWatch)
+        $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##
+        &lt;div class='activity-follow'&gt;
+          #set ($xredirect = $doc.getURL($xcontext.action, $request.queryString))
+          #if ($services.watchlist.isWatched(${doc.prefixedFullName}, "USER"))
+          &lt;span class='following'&gt;$services.localization.render('xe.activity.messages.following')&lt;/span&gt;
+          &lt;a class='action unfollow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$services.localization.render('xe.activity.messages.unfollow')&lt;/a&gt;
+          #else
+          &lt;a class='action follow' href="$doc.getURL('view', "xpage=watch&amp;amp;do=adduser&amp;amp;xredirect=${escapetool.url($xredirect)}")"&gt;$services.localization.render('xe.activity.messages.follow')&lt;/a&gt;
+          #end
+        &lt;/div&gt;
+        #end
+        &lt;div class="activity-follow"&gt;
+        #if("$!services.notification.watch" != '' &amp;&amp; $services.notification.watch.isEnabled() &amp;&amp; !$isGuest &amp;&amp; !$isSuperAdmin)
+          ## TODO: replace it, somehow, by a UIX or a custom user sheet
+          #set ($discard = $xwiki.ssx.use('XWiki.XWikiUserProfileSheet'))
+          #set ($discard = $xwiki.jsx.use('XWiki.XWikiUserProfileSheet'))
+          &lt;div class="notificationWatchUser"&gt;
+            &lt;p&gt;$services.icon.renderHTML('bell') $escapetool.xml($services.localization.render('user.profile.notifications'))&lt;/p&gt;
+            #set ($userId = $services.model.serialize($doc.documentReference, 'default'))
+            #set ($isUserWatched = $services.notification.watch.isUserWatched($userId))
+            &lt;div class="notificationWatchUserFollowing #if(!$isUserWatched)hidden#end"&gt;
+              &lt;button type="button" class="btn btn-success dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"&gt;
+                $services.icon.renderHTML('check') $escapetool.xml($services.localization.render('user.profile.network.following')) &lt;span class="caret"&gt;&lt;/span&gt;
+              &lt;/button&gt;
+              &lt;ul class="dropdown-menu"&gt;
+                &lt;li&gt;&lt;a href="#" class="notificationWatchUserRemove"&gt;$services.icon.renderHTML('cross') $escapetool.xml($services.localization.render('user.profile.network.unfollow'))&lt;/a&gt;&lt;/li&gt;
+              &lt;/ul&gt;
+            &lt;/div&gt;
+            &lt;div class="notificationWatchUserNotFollowing  #if($isUserWatched)hidden#end"&gt;
+              &lt;button type="button" class="btn btn-danger dropdown-toggle btn-xs" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"&gt;
+                $escapetool.xml($services.localization.render('user.profile.network.notfollowing')) &lt;span class="caret"&gt;&lt;/span&gt;
+              &lt;/button&gt;
+              &lt;ul class="dropdown-menu"&gt;
+                &lt;li&gt;&lt;a href="#" class="notificationWatchUserAdd"&gt;$services.icon.renderHTML('eye') $escapetool.xml($services.localization.render('user.profile.network.follow'))&lt;/a&gt;&lt;/li&gt;
+              &lt;/ul&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+        #end
+        &lt;/div&gt;
+      #end
+{{/html}}
+
+{{notifications useUserPreferences="false" displayOwnEvents="true" users="${doc.prefixedFullName}" displayRSSLink="false" /}}
+
+{{html clean='false'}}
+      &lt;/div&gt;
+    &lt;/div&gt;
+  #end
+  &lt;div class='clearfloats'&gt;&amp;nbsp;&lt;/div&gt;
+#if(!$inEditMode)
+  ## Close the vcard
+  &lt;/div&gt;
+#end
+{{/html}}##
+#end
+#end
+      {{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
@@ -675,7 +675,6 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
     </property>
     <property>
       <parameters>id=profile
-sheet=XWiki.XWikiUserProfileSheet
 icon=user
 isActive=true
 priority=10</parameters>

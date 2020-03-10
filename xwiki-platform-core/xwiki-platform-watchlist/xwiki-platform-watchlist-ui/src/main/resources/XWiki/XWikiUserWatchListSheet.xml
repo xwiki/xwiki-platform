@@ -36,90 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set($obj = $doc.getObject("XWiki.XWikiUsers"))
-#if(!$obj)
-= $services.localization.render('xe.admin.users.sheet') =
-
-{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
-#else
-#macro (getNotifierPrettyName $notifier)
-  #set ($translationKey = "XWiki.WatchListClass_interval_${notifier}")
-  ## Look for a translation
-  #if ($services.localization.get($translationKey))
-    #set ($notifierPrettyName = $services.localization.render($translationKey))
-  #else
-    ## Look for a document's title
-    #set ($notifierReference = $services.model.resolveDocument($notifier, [$services.wiki.mainWikiId]))
-    #set ($notifierDoc = $xwiki.getDocument($notifierReference))
-    #set ($notifierPrettyName = $notifierDoc.plainTitle)
-    #if ("$!notifierPrettyName" == '')
-      ## Fallback on the actual value
-      #set ($notifierPrettyName = $notifier)
-    #end
-  #end##
-$notifierPrettyName##
-#end
-#set($watchOject = $doc.getObject('XWiki.WatchListClass'))
-{{html clean="false" wiki="true"}}
-$xwiki.ssx.use("XWiki.XWikiUserSheet")##
-  &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
-    &lt;div class="watchlistManagement"&gt;
-      #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('edit', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-      #end
-      &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
-      &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
-        #set($notifiers = $services.watchlist.getIntervals())
-        #set($currentNotifier = $services.watchlist.getInterval($xcontext.user))
-        &lt;dd&gt;
-          #if($xcontext.action=='view')
-            #if("$!currentNotifier" != "")
-              #foreach($notifier in $notifiers)
-                #if($notifier == $currentNotifier)
-                  #getNotifierPrettyName($notifier)
-                #end
-              #end
-            #end
-          #else
-            &lt;select name="XWiki.WatchListClass_0_interval"&gt;
-              &lt;option value=""&gt;&amp;nbsp;&lt;/option&gt;
-              #foreach($notifier in $notifiers)
-                &lt;option value="$notifier"#if($notifier == $currentNotifier) selected='selected'#end&gt;#getNotifierPrettyName($notifier)&lt;/option&gt;
-              #end
-            &lt;/select&gt;
-          #end
-        &lt;/dd&gt;
-        &lt;dt class="label"&gt;&lt;label#if($xcontext.action != 'view') for="XWiki.WatchListClass_0_automaticwatch"#end&gt;$services.localization.render('XWiki.WatchListClass_automaticwatch')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd&gt;
-          $watchOject.automaticwatch
-        &lt;/dd&gt;
-      &lt;/dl&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-  #if ($xcontext.action == 'view')
-    ## The live table display of the watchlist entries doesn't adapt i.e. in case of long page names
-    ## when the available width is limited so we need to ensure this column takes at least half of the container width
-    ## (unlike the rest of the columns). The result is that this column will be displayed below the previous one when
-    ## the page width is reduced.
-    &lt;div class="min-half column"&gt;
-      &lt;div class="watchlistRss"&gt;
-        &lt;h1&gt;$services.localization.render('watchlist.staytuned.rss')&lt;/h1&gt;
-        &lt;a id="watchlistRssLink" target="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
-      &lt;/div&gt;
-      &lt;div class="watchlistElements"&gt;
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
-
-        {{watchlist /}}
-
-      &lt;/div&gt;
-    &lt;/div&gt;
-  #end
-  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-{{/html}}##
-#end
-{{/velocity}}</content>
+  <content/>
   <object>
     <name>XWiki.XWikiUserWatchListSheet.WebHome</name>
     <number>0</number>
@@ -244,7 +161,90 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content/>
+      <content>{{velocity}}
+      #set($obj = $doc.getObject("XWiki.XWikiUsers"))
+      #if(!$obj)
+      = $services.localization.render('xe.admin.users.sheet') =
+
+      {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
+      #else
+        #macro (getNotifierPrettyName $notifier)
+          #set ($translationKey = "XWiki.WatchListClass_interval_${notifier}")
+          ## Look for a translation
+          #if ($services.localization.get($translationKey))
+            #set ($notifierPrettyName = $services.localization.render($translationKey))
+          #else
+            ## Look for a document's title
+            #set ($notifierReference = $services.model.resolveDocument($notifier, [$services.wiki.mainWikiId]))
+            #set ($notifierDoc = $xwiki.getDocument($notifierReference))
+            #set ($notifierPrettyName = $notifierDoc.plainTitle)
+            #if ("$!notifierPrettyName" == '')
+      ## Fallback on the actual value
+      #set ($notifierPrettyName = $notifier)
+    #end
+          #end##
+          $notifierPrettyName##
+        #end
+        #set($watchOject = $doc.getObject('XWiki.WatchListClass'))
+      {{html clean="false" wiki="true"}}
+        $xwiki.ssx.use("XWiki.XWikiUserSheet")##
+      &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
+        &lt;div class="watchlistManagement"&gt;
+          #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
+            &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('edit', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+          #end
+          &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
+          &lt;dl&gt;
+            &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
+              #set($notifiers = $services.watchlist.getIntervals())
+              #set($currentNotifier = $services.watchlist.getInterval($xcontext.user))
+            &lt;dd&gt;
+                #if($xcontext.action=='view')
+                #if("$!currentNotifier" != "")
+                  #foreach($notifier in $notifiers)
+                    #if($notifier == $currentNotifier)
+                      #getNotifierPrettyName($notifier)
+                    #end
+                  #end
+                #end
+                #else
+                &lt;select name="XWiki.WatchListClass_0_interval"&gt;
+                  &lt;option value=""&gt;&amp;nbsp;&lt;/option&gt;
+                  #foreach($notifier in $notifiers)
+                    &lt;option value="$notifier"#if($notifier == $currentNotifier) selected='selected'#end&gt;#getNotifierPrettyName($notifier)&lt;/option&gt;
+                  #end
+                &lt;/select&gt;
+                #end
+            &lt;/dd&gt;
+            &lt;dt class="label"&gt;&lt;label#if($xcontext.action != 'view') for="XWiki.WatchListClass_0_automaticwatch"#end&gt;$services.localization.render('XWiki.WatchListClass_automaticwatch')&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;
+                $watchOject.automaticwatch
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+        #if ($xcontext.action == 'view')
+    ## The live table display of the watchlist entries doesn't adapt i.e. in case of long page names
+    ## when the available width is limited so we need to ensure this column takes at least half of the container width
+    ## (unlike the rest of the columns). The result is that this column will be displayed below the previous one when
+    ## the page width is reduced.
+    &lt;div class="min-half column"&gt;
+      &lt;div class="watchlistRss"&gt;
+        &lt;h1&gt;$services.localization.render('watchlist.staytuned.rss')&lt;/h1&gt;
+        &lt;a id="watchlistRssLink" target="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
+      &lt;/div&gt;
+      &lt;div class="watchlistElements"&gt;
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
+
+        {{watchlist /}}
+
+      &lt;/div&gt;
+    &lt;/div&gt;
+  #end
+      &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+      {{/html}}##
+      #end
+      {{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
@@ -254,7 +254,6 @@ $xwiki.ssx.use("XWiki.XWikiUserSheet")##
     </property>
     <property>
       <parameters>id=watchlist
-sheet=XWiki.XWikiUserWatchListSheet
 icon=eye
 isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasWatch)true#{else}false#end
 priority=40</parameters>

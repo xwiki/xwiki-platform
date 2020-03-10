@@ -36,65 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-######################################################
-### CSS and JAVASCRIPTS
-######################################################
-#set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.XWikiUserNotificationsSheet'))
-## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
-#set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
-######################################################
-### TITLE
-######################################################
-= $services.localization.render('notifications.settings.title') =
-######################################################
-### EMAIL PREFERENCES
-######################################################
-#if ($services.notification.areEmailsEnabled())
-(% class="profile-section highlighted-profile-section notification-top-panel column half" %)
-(((
-  (% id="Hnotifications.settings.email.title" %)
-  = {{translation key="notifications.settings.email.title" /}} =
-  {{notificationsEmailPreferences /}}
-)))
-#end
-######################################################
-### AUTOWATCH PREFERENCES
-######################################################
-#if ($services.notification.watch.isEnabled())
-(% class="profile-section highlighted-profile-section notification-top-panel column half" %)
-(((
-  (% id="Hnotifications.settings.watch.title" %)
-  = {{translation key="notifications.settings.watch.title" /}} =
-  {{notificationsAutoWatchPreferences /}}
-)))
-#end
-######################################################
-### APPLICATIONS
-######################################################
-(% class="profile-section highlighted-profile-section column full" %)
-(((
-  (% id="Hnotifications.settings.applications.title" %)
-  = {{translation key="notifications.settings.applications.title" /}} =
-  {{notificationsApplicationsPreferences /}}
-)))
-######################################################
-### FILTERS
-######################################################
-## The filters preferences section uses a modal to add a new filter and confirmation boxes (modals) to delete the
-## filters. As a consequence it doen't work out of the box when displayed inside another modal. Extra development work
-## is required to make the "nested" modals work and I'm not sure it's worth the effort. Let's hide this section for now
-## when inside the Edit User modal.
-#if ($request.xpage != 'edituser')
-(% class="profile-section highlighted-profile-section column full" %)
-(((
-  (% id="Hnotifications.settings.filters.preferences.title" %)
-  = {{translation key="notifications.settings.filters.preferences.title" /}} =
-  {{notificationsFiltersPreferences /}}
-)))
-#end
-{{/velocity}}
-</content>
+  <content/>
   <object>
     <name>XWiki.Notifications.Code.XWikiUserNotificationsSheet</name>
     <number>1</number>
@@ -335,7 +277,65 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content/>
+      <content>{{velocity}}
+      ######################################################
+      ### CSS and JAVASCRIPTS
+      ######################################################
+      #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.XWikiUserNotificationsSheet'))
+      ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
+      #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+      ######################################################
+      ### TITLE
+      ######################################################
+      = $services.localization.render('notifications.settings.title') =
+      ######################################################
+      ### EMAIL PREFERENCES
+      ######################################################
+      #if ($services.notification.areEmailsEnabled())
+      (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
+      (((
+      (% id="Hnotifications.settings.email.title" %)
+      = {{translation key="notifications.settings.email.title" /}} =
+      {{notificationsEmailPreferences /}}
+      )))
+      #end
+      ######################################################
+      ### AUTOWATCH PREFERENCES
+      ######################################################
+      #if ($services.notification.watch.isEnabled())
+      (% class="profile-section highlighted-profile-section notification-top-panel column half" %)
+      (((
+      (% id="Hnotifications.settings.watch.title" %)
+      = {{translation key="notifications.settings.watch.title" /}} =
+      {{notificationsAutoWatchPreferences /}}
+      )))
+      #end
+      ######################################################
+      ### APPLICATIONS
+      ######################################################
+      (% class="profile-section highlighted-profile-section column full" %)
+      (((
+      (% id="Hnotifications.settings.applications.title" %)
+      = {{translation key="notifications.settings.applications.title" /}} =
+      {{notificationsApplicationsPreferences /}}
+      )))
+      ######################################################
+      ### FILTERS
+      ######################################################
+      ## The filters preferences section uses a modal to add a new filter and confirmation boxes (modals) to delete the
+      ## filters. As a consequence it doen't work out of the box when displayed inside another modal. Extra development work
+      ## is required to make the "nested" modals work and I'm not sure it's worth the effort. Let's hide this section for now
+      ## when inside the Edit User modal.
+      #if ($request.xpage != 'edituser')
+(% class="profile-section highlighted-profile-section column full" %)
+(((
+  (% id="Hnotifications.settings.filters.preferences.title" %)
+  = {{translation key="notifications.settings.filters.preferences.title" /}} =
+  {{notificationsFiltersPreferences /}}
+)))
+#end
+      {{/velocity}}
+      </content>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
@@ -345,7 +345,6 @@
     </property>
     <property>
       <parameters>id=notifications
-sheet=XWiki.Notifications.Code.XWikiUserNotificationsSheet
 icon=bell
 isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $xwiki.exists($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet')))true#{else}false#end
 priority=60</parameters>

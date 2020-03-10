@@ -48,21 +48,16 @@
 #set($categories = [])
 
 ## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu' UIXP.
-#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {'sortByParameter': 'order'}))
-  "org.xwiki.platform.user.profile.entry.userpreferencessheet",
-  "org.xwiki.platform.user.profile.entry.usermembershipsheet",
-  "org.xwiki.platform.user.profile.entry.userwatchlistsheet",
-  "org.xwiki.platform.user.profile.entry.usernetworksheet",
-  "org.xwiki.platform.user.profile.entry.usernotificationsheet",
-  "org.xwiki.platform.user.profile.entry.userwikisheet",
-  "org.xwiki.platform.user.profile.entry.userdashboardsheet"])
-#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {
-  'sortByCustomOrder': $stringtool.join($list_uix, ',')
-}))
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {'sortByParameter': 'priority'}))
   #if($uix.parameters.get('isActive') == 'true')
+    #if (!$uix.parameters.containsKey('id'))
+      ## when no id is explicitly provided, we use the id of the UIX.
+      #set ($discard = $uix.parameters.put('id', $uix.id))
+    #end
     #if ($uix.parameters.containsKey('icon'))
       #set ($discard = $uix.parameters.put('glyphicon', $uix.parameters.get('icon')))
     #end
+    #set ($discard = $uix.parameters.put('uix', $uix))
     #set($discard = $categories.add($uix.parameters))
   #end
 #end
@@ -130,8 +125,7 @@
       #set($tabKey = $subcategory.get('id')) 
       (% id="${tabKey}Pane" class="user-page-pane#if($tabKey != $currentCategory) hidden#end" %)
       (((
-        #set($tabInclude = $subcategory.get('sheet'))
-        {{include reference="${tabInclude}" /}}
+        {{html}}$services.rendering.render($subcategory.uix.execute(), 'html/5.0'){{/html}}
       )))
     #end
   #end

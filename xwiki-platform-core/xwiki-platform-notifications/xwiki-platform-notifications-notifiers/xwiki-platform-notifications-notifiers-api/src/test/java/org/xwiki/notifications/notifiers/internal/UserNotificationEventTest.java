@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal;
+package org.xwiki.notifications.notifiers.internal;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;

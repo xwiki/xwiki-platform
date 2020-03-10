@@ -19,8 +19,8 @@
  */
 package org.xwiki.notifications.filters.internal.scope;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -30,8 +30,10 @@ import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -60,7 +62,7 @@ public class ScopeNotificationFilterPreferenceTest
     private ScopeNotificationFilterPreference sp2;
     private ScopeNotificationFilterPreference sp3;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception
     {
         referenceResolver = (EntityReferenceResolver<String>) mock(EntityReferenceResolver.class);
@@ -114,6 +116,38 @@ public class ScopeNotificationFilterPreferenceTest
         assertEquals(sp1.getScopeReference(), WIKI_REFERENCE);
         assertEquals(sp2.getScopeReference(), SPACE_REFERENCE);
         assertEquals(sp3.getScopeReference(), DOCUMENT_REFERENCE);
+    }
+
+    @Test
+    public void equals()
+    {
+        assertNotEquals(sp1, sp2);
+        assertNotEquals(sp1.hashCode(), sp2.hashCode());
+
+        ScopeNotificationFilterPreference sp1Bis = new ScopeNotificationFilterPreference(p1, referenceResolver);
+        assertEquals(sp1, sp1Bis);
+        assertEquals(sp1.hashCode(), sp1Bis.hashCode());
+
+        sp1Bis.setEnabled(true);
+        verify(p1).setEnabled(true);
+        assertEquals(sp1, sp1Bis);
+        assertEquals(sp1.hashCode(), sp1Bis.hashCode());
+
+        sp1Bis.setHasParent(true);
+        assertNotEquals(sp1, sp1Bis);
+        assertNotEquals(sp1.hashCode(), sp1Bis.hashCode());
+
+        sp1.setHasParent(true);
+        sp1Bis.addChild(sp2);
+        assertNotEquals(sp1, sp1Bis);
+        assertNotEquals(sp1.hashCode(), sp1Bis.hashCode());
+
+        sp1.addChild(sp2);
+        assertEquals(sp1, sp1Bis);
+        assertEquals(sp1.hashCode(), sp1Bis.hashCode());
+
+        assertNotEquals(sp2, sp3);
+        assertNotEquals(sp1, sp3);
     }
 
 }

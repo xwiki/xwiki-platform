@@ -250,7 +250,8 @@ public class DefaultNotificationParametersFactory
         static ParametersKey valueOfIgnoreCase(String name)
         {
             for (ParametersKey key : ParametersKey.values()) {
-                if (CaseUtils.toCamelCase(key.name(), false, '_').equalsIgnoreCase(name)) {
+                if (CaseUtils.toCamelCase(key.name(), false, '_')
+                    .equalsIgnoreCase(CaseUtils.toCamelCase(name, false, '_'))) {
                     return key;
                 }
             }
@@ -427,7 +428,7 @@ public class DefaultNotificationParametersFactory
 
     private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)
     {
-        if (org.xwiki.text.StringUtils.isNotBlank(tags)) {
+        if (StringUtils.isNotBlank(tags)) {
             String[] tagArray = tags.split(",");
             for (int i = 0; i < tagArray.length; ++i) {
                 parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i], currentWiki));

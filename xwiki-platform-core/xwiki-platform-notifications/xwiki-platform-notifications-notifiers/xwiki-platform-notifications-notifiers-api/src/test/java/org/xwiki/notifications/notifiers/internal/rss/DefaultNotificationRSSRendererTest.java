@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.internal.rss;
+package org.xwiki.notifications.notifiers.internal.rss;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -34,7 +34,6 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.notifiers.internal.rss.DefaultNotificationRSSRenderer;
 import org.xwiki.script.ScriptContextManager;
 import org.xwiki.template.Template;
 import org.xwiki.template.TemplateManager;

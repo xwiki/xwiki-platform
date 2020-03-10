@@ -30,7 +30,7 @@ import org.xwiki.notifications.NotificationFormat;
 public class ForUserEventFilter extends AbstractForUserEventFilter
 {
     /**
-     * Construct an {@link ForUserAlertEventFilter}.
+     * Construct an {@link ForUserEventFilter}.
      * 
      * @param format format on which the filter applies
      * @param read true if only read status should be included, false for only unread

@@ -974,7 +974,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 
 #-# [Since 10.11.8]
 #-# [Since 11.3]
-#-# Enable or disable caching of notification search result in the REST API.
+#-# Enable or disable caching of notification search result in the REST or async API.
 #-# 
 #-# The default is :
 # notifications.rest.cache=true

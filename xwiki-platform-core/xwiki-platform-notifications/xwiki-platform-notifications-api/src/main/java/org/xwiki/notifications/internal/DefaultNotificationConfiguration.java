@@ -66,4 +66,10 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "eventPreFilteringEnabled", false);
     }
+
+    @Override
+    public boolean isRestCacheEnabled()
+    {
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "rest.cache", true);
+    }
 }

@@ -19,6 +19,9 @@
  */
 package org.xwiki.rendering.async.internal;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 /**
  * The result of the {@link AsyncRenderer} execution.
  * 
@@ -43,5 +46,31 @@ public class AsyncRendererResult
     public String getResult()
     {
         return this.result;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AsyncRendererResult that = (AsyncRendererResult) o;
+
+        return new EqualsBuilder()
+            .append(result, that.result)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(result)
+            .toHashCode();
     }
 }

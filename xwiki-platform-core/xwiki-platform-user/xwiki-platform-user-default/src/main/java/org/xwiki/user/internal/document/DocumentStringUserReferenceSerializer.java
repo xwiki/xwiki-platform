@@ -49,9 +49,9 @@ public class DocumentStringUserReferenceSerializer implements UserReferenceSeria
         if (userReference == null) {
             result = null;
         } else if (UserReference.SUPERADMIN_REFERENCE == userReference) {
-            result = "superadmin";
+            result = "XWiki.superadmin";
         } else if (UserReference.GUEST_REFERENCE == userReference) {
-            result = "XWikiGuest";
+            result = "XWiki.XWikiGuest";
         } else if (UserReference.CURRENT_USER_REFERENCE == userReference) {
             result = "";
         } else if (!(userReference instanceof DocumentUserReference)) {

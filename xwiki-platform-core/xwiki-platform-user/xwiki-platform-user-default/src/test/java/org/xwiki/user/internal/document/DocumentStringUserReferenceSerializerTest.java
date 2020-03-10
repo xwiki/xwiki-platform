@@ -75,13 +75,13 @@ public class DocumentStringUserReferenceSerializerTest
     @Test
     void serializeSuperAdminReference()
     {
-        assertEquals("superadmin", this.serializer.serialize(UserReference.SUPERADMIN_REFERENCE));
+        assertEquals("XWiki.superadmin", this.serializer.serialize(UserReference.SUPERADMIN_REFERENCE));
     }
 
     @Test
     void serializeGuestReference()
     {
-        assertEquals("XWikiGuest", this.serializer.serialize(UserReference.GUEST_REFERENCE));
+        assertEquals("XWiki.XWikiGuest", this.serializer.serialize(UserReference.GUEST_REFERENCE));
     }
 
     @Test

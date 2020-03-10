@@ -19,6 +19,8 @@
  */
 package org.xwiki.user.internal.document;
 
+import java.util.Locale;
+
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -38,6 +40,7 @@ import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -142,6 +145,16 @@ public class DocumentUserTest
     }
 
     @Test
+    void getEmailWhenNull()
+    {
+        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
+        when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
+
+        when(this.userConfigurationSource.getProperty("email")).thenReturn(null);
+        assertNull(this.user.getEmail());
+    }
+
+    @Test
     void getUserType()
     {
         DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
@@ -159,6 +172,26 @@ public class DocumentUserTest
 
         when(this.userConfigurationSource.getProperty("editor")).thenReturn("Wysiwyg");
         assertEquals(Editor.WYSIWYG, this.user.getEditor());
+    }
+
+    @Test
+    void getLocale()
+    {
+        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
+        when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
+
+        when(this.userConfigurationSource.getProperty("default_language")).thenReturn("en");
+        assertEquals(new Locale("en"), this.user.getLocale());
+    }
+
+    @Test
+    void getLocaleWhenNull()
+    {
+        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
+        when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
+
+        when(this.userConfigurationSource.getProperty("default_language")).thenReturn(null);
+        assertNull(this.user.getLocale());
     }
 
     @Test

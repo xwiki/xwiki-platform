@@ -36,5 +36,7 @@ public class EditorTest
         assertEquals(Editor.TEXT, Editor.fromString("Text"));
         assertEquals(Editor.WYSIWYG, Editor.fromString("Wysiwyg"));
         assertEquals(Editor.WYSIWYG, Editor.fromString("nottext"));
+        assertEquals(Editor.UNDEFINED, Editor.fromString(null));
+        assertEquals(Editor.UNDEFINED, Editor.fromString(""));
     }
 }

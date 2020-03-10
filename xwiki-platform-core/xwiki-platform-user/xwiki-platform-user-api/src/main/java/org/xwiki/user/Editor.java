@@ -20,6 +20,7 @@
 package org.xwiki.user;
 
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.StringUtils;
 
 /**
  * The default editor that should be used for a user, when editing content.
@@ -38,7 +39,13 @@ public enum Editor
     /**
      * WYSIWYG editor.
      */
-    WYSIWYG;
+    WYSIWYG,
+
+    /**
+     * The editor is not explictly defined which means it'll dedcided based on some context information (for example
+     * based on the wiki's default editor).
+     */
+    UNDEFINED;
 
     /**
      * @param editorAsString the editor represented as a string ("Text", "Wysiwyg")
@@ -47,12 +54,14 @@ public enum Editor
      */
     public static Editor fromString(String editorAsString)
     {
-        Editor result;
-        if (editorAsString != null && "text".equalsIgnoreCase(editorAsString)) {
-            result = TEXT;
+        Editor editor;
+        if (StringUtils.isEmpty(editorAsString)) {
+            editor = UNDEFINED;
+        } else if ("text".equalsIgnoreCase(editorAsString)) {
+            editor = TEXT;
         } else {
-            result = WYSIWYG;
+            editor = WYSIWYG;
         }
-        return result;
+        return editor;
     }
 }

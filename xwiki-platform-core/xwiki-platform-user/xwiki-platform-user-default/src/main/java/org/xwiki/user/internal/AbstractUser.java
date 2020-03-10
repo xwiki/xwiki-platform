@@ -20,6 +20,7 @@
 package org.xwiki.user.internal;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Supplier;
 
 import org.xwiki.configuration.ConfigurationSource;
@@ -28,6 +29,7 @@ import org.xwiki.user.User;
 import org.xwiki.user.UserType;
 
 import static org.xwiki.user.internal.UserPropertyConstants.ACTIVE;
+import static org.xwiki.user.internal.UserPropertyConstants.DEFAULT_LANGUAGE;
 import static org.xwiki.user.internal.UserPropertyConstants.DISPLAY_HIDDEN_DOCUMENTS;
 import static org.xwiki.user.internal.UserPropertyConstants.EDITOR;
 import static org.xwiki.user.internal.UserPropertyConstants.EMAIL;
@@ -94,6 +96,17 @@ public abstract class AbstractUser implements User
     public Editor getEditor()
     {
         return Editor.fromString(getProperty(EDITOR));
+    }
+
+    @Override
+    public Locale getLocale()
+    {
+        Locale locale = null;
+        String defaultLanguage = getProperty(DEFAULT_LANGUAGE);
+        if (defaultLanguage != null) {
+            locale = new Locale(defaultLanguage);
+        }
+        return locale;
     }
 
     @Override

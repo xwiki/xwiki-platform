@@ -19,6 +19,8 @@
  */
 package org.xwiki.user;
 
+import java.util.Locale;
+
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.stability.Unstable;
 
@@ -74,6 +76,12 @@ public interface User extends ConfigurationSource
      *         able to view pages.
      */
     boolean isEmailChecked();
+
+    /**
+     * @return the Locale that the user would like to use in the XWiki UI, and null if not set (the defaut Locale will
+     *         then be used).
+     */
+    Locale getLocale();
 
     /**
      * @return the reference to his user (i.e. a way to retrieve this user's data)

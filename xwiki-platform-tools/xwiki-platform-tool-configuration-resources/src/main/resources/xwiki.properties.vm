@@ -1041,7 +1041,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-#
 #-# Examples:
 #-# user.preferences.superadmin.displayHiddenDocuments = 0
-#-# user.preferences.superadmin.editor = Wysiwyg
+#-# user.preferences.superadmin.editor = Text
 
 #-# [Since 12.2RC1]
 #-# Define preferences for the Guest user.

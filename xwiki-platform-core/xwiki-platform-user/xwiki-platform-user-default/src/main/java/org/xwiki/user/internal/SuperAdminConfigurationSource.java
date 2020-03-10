@@ -31,7 +31,6 @@ import org.xwiki.user.UserConfiguration;
 
 import static org.xwiki.user.internal.UserPropertyConstants.ACTIVE;
 import static org.xwiki.user.internal.UserPropertyConstants.DISPLAY_HIDDEN_DOCUMENTS;
-import static org.xwiki.user.internal.UserPropertyConstants.EDITOR;
 import static org.xwiki.user.internal.UserPropertyConstants.EMAIL_CHECKED;
 import static org.xwiki.user.internal.UserPropertyConstants.FIRST_NAME;
 import static org.xwiki.user.internal.UserPropertyConstants.USER_TYPE;
@@ -60,7 +59,6 @@ public class SuperAdminConfigurationSource extends CommonsConfigurationSource im
         configuration.addProperty(FIRST_NAME, "SuperAdmin");
         configuration.addProperty(EMAIL_CHECKED, "1");
         configuration.addProperty(USER_TYPE, "advanced");
-        configuration.addProperty(EDITOR, "Text");
 
         // User-defined and overriding preferences
         this.userConfiguration.getSuperAdminPreferences().forEach((key, value)

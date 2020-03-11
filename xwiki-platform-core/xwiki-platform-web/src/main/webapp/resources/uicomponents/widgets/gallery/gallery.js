@@ -135,15 +135,22 @@ XWiki.Gallery = Class.create({
   }
 });
 
-function init() {
-  $$('.gallery').each(function(gallery) {
-    new XWiki.Gallery(gallery);
+function init(event) {
+  var elements = (event && event.memo.elements) || [$('body')];
+  elements.forEach(function(element) {
+    var galleries = element.hasClassName('gallery') ? [element] : element.select('.gallery');
+    galleries.forEach(function (gallery) {
+      new XWiki.Gallery(gallery);
+    });
   });
 }
 
 // When the document is loaded, install galleries
 (XWiki.isInitialized && init())
 || document.observe('xwiki:dom:loading', init);
+
+// Initialize the gallery when it is added after the page is loaded.
+document.observe('xwiki:dom:updated', init);
 
 // End XWiki augmentation.
 return XWiki;

@@ -2,34 +2,46 @@
 // Headers
 // --------------------------------------------------
 
+@edit-section-width: 1em;
+
+#xwikicontent > h1,
+#xwikicontent > h2,
+#xwikicontent > h3,
+#xwikicontent > h4,
+#xwikicontent > h5,
+#xwikicontent > h6 {
+  // Leave space for the section edit link.
+  padding-right: @edit-section-width;
+}
+
+// The height of the section edit link relative to the height of the parent heading.
+@edit-section-relative-height: .7;
+
 .edit_section {
-  display: block;
-  height: @font-size-h1;
-  line-height: @font-size-h1;
-  margin: -@font-size-h1 0 0;
-  overflow: hidden;
-  position: relative;
-  visibility:hidden;
-}
-
-.edit_section a, .edit_section span {
-  background-color: @xwiki-page-content-bg;
-  background: @xwiki-page-content-bg linear-gradient(45deg, @xwiki-page-content-bg 50%, @xwiki-background-secondary-color 50%);
-  color: @text-color;
-  height: 20px;
-  margin: 0;
-  overflow: hidden;
-  padding: 3px 5px;
+  color: inherit;
+  font-size: percentage(@edit-section-relative-height);
+  // We can have many section edit links on a page so they should have a low profile.
+  opacity: .3;
+  // Place the section edit link on the far right of the parent heading.
   position: absolute;
-  right: 0;
-  text-indent: 0;
-  top: 0;
-  visibility:visible;
-  width: 20px;
+  right: @edit-section-width;
 }
 
-.edit_section a:before {
-  content: @xwiki-icon-edit-section;
-  font: normal normal normal 12px/1 FontAwesome;
-  display: block;
+.edit_section:not(.disabled):hover {
+  opacity: 1;
 }
+
+.editSection(@level) when (@level > 0) {
+  .editSection((@level - 1));
+  @heading-font-size: "font-size-h@{level}";
+  // This is the top margin relative to the height of the parent heading.
+  @edit-section-relative-margin: (1 - @edit-section-relative-height) / 2;
+  h@{level} > .edit_section {
+    // The section edit link is aligned by default with the top of the line due to absolute positioning, so we need to
+    // move it a bit down.
+    margin-top: floor(@edit-section-relative-margin * @@heading-font-size * @headings-line-height);
+  }
+}
+
+// Generate the styles recursively for all 6 heading levels.
+.editSection(6);

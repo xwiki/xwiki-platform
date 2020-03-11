@@ -14,8 +14,11 @@ fieldset.xwikimessage { // Used by: Login form, Delete messages
   overflow-x: auto;
 }
 
-.box > *:last-child { // Remove space added by last elements inside box, like paragraphs
-    margin-bottom: 0;
+// Remove space added by last elements inside box, like paragraphs.
+.box > *:last-child,
+// Do the same when the box macro is edited in-line.
+.box > .xwiki-metadata-container > *:last-child {
+  margin-bottom: 0;
 }
 
 .plainmessage {

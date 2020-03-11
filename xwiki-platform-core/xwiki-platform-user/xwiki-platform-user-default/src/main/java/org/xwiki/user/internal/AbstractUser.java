@@ -109,9 +109,6 @@ public abstract class AbstractUser implements User
         String language = Util.normalizeLanguage(getProperty(DEFAULT_LANGUAGE));
         if (StringUtils.isNotEmpty(language)) {
             locale = LocaleUtils.toLocale(language);
-            if (!LocaleUtils.isAvailableLocale(locale)) {
-                locale = null;
-            }
         }
         return locale;
     }

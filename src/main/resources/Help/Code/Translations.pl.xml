@@ -39,14 +39,14 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>### Missing: help.applications.blog.description=Blog Application allows you to publish your information and share it to the world.
+  <content>help.applications.blog.description=Aplikacja Blog pozwala publikować informacje i udostępniać je światu.
 help.applications.blog.title=Blog
-### Missing: help.applications.browse.description=Choose from community contributed applications and install them inside your wiki.
-### Missing: help.applications.browse.tip={0}Extension Manager{1} helps you manage (install, update, uninstall) your applications.
+help.applications.browse.description=Wybierz aplikacje społecznościowe i zainstaluj je na swojej wiki.
+help.applications.browse.tip={0}Extension Manager{1} pomaga zarządzać (instalować, aktualizować, odinstalowywać) aplikacjami.
 help.applications.browse.title=Przeglądaj aplikacje
-### Missing: help.applications.create.demo.label=Demo
-### Missing: help.applications.create.description=Define the structure of your data, customize it and create the application you want.
-### Missing: help.applications.create.tip={0}App Within Minutes{1} helps you build applications without having technical knowledge.
+help.applications.create.demo.label=Demo
+help.applications.create.description=Zdefiniuj strukturę swoich danych, dostosuj ją i utwórz żądaną aplikację.
+help.applications.create.tip={0}Aplikacja w kilka minut{1} pomaga tworzyć aplikacje bez wiedzy technicznej.
 help.applications.create.title=Utwórz swoją aplikacje
 ### Missing: help.applications.description=Applications allow to group related structured pages together.
 ### Missing: help.applications.description1=Need help or confused with some of our applications? Check out their documentation and find out more about their functionality.

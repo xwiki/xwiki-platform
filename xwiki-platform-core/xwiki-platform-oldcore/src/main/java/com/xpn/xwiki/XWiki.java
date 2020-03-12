@@ -3050,8 +3050,6 @@ public class XWiki implements EventListener
      *     If the language value is {@code default} use the wiki default locale. If a parameter is found sets a
      *     {@code language} cookie to remember the language in use.</li>
      *     <li>Try to get the locale from the {@code language} cookie</li>
-     *     <li>If the user has a default language ({@code default_language} xproperty in the {@code XWikiUsers}
-     *     xobject) then use it</li>
      *     <li>If the default language is preferred ({@code xwiki.language.preferDefault} from {@code xwiki.cfg}
      *     or {@code preferDefaultLanguage} property from the space preferences ({@code WebPreferences} xobject) or
      *     wiki preferences ({@code XWikiPreferences} xobject})), and since the user didn't explicitly ask for a
@@ -3129,24 +3127,6 @@ public class XWiki implements EventListener
                 }
             }
         } catch (Exception e) {
-        }
-
-        // Next from the default user preference
-        try {
-            String user = context.getUser();
-            XWikiDocument userdoc;
-            userdoc = getDocument(user, context);
-            if (userdoc != null) {
-                String language =
-                    Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
-                if (StringUtils.isNotEmpty(language)) {
-                    locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
-                    if (LocaleUtils.isAvailableLocale(locale)) {
-                        return locale;
-                    }
-                }
-            }
-        } catch (XWikiException e) {
         }
 
         // If the default language is preferred, and since the user didn't explicitly ask for a

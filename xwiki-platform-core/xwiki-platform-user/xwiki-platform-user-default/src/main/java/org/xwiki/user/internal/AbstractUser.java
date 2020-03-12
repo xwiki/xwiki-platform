@@ -20,20 +20,14 @@
 package org.xwiki.user.internal;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.StringUtils;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.localization.LocaleUtils;
 import org.xwiki.user.Editor;
 import org.xwiki.user.User;
 import org.xwiki.user.UserType;
 
-import com.xpn.xwiki.util.Util;
-
 import static org.xwiki.user.internal.UserPropertyConstants.ACTIVE;
-import static org.xwiki.user.internal.UserPropertyConstants.DEFAULT_LANGUAGE;
 import static org.xwiki.user.internal.UserPropertyConstants.DISPLAY_HIDDEN_DOCUMENTS;
 import static org.xwiki.user.internal.UserPropertyConstants.EDITOR;
 import static org.xwiki.user.internal.UserPropertyConstants.EMAIL;
@@ -100,17 +94,6 @@ public abstract class AbstractUser implements User
     public Editor getEditor()
     {
         return Editor.fromString(getProperty(EDITOR));
-    }
-
-    @Override
-    public Locale getLocale()
-    {
-        Locale locale = null;
-        String language = Util.normalizeLanguage(getProperty(DEFAULT_LANGUAGE));
-        if (StringUtils.isNotEmpty(language)) {
-            locale = LocaleUtils.toLocale(language);
-        }
-        return locale;
     }
 
     @Override

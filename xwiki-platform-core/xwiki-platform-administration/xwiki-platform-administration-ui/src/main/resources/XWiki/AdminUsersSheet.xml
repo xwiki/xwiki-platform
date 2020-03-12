@@ -474,9 +474,10 @@ require(['jquery', 'xwiki-meta', 'xwiki-livetable-modal', 'xwiki-events-bridge']
       parameters.force = 1;
     }
     editUserModal.find('.modal-body').first().empty().addClass('loading').load(editUserURL, parameters, function() {
-      this.removeClass('loading');
-      this.find('.column.half').removeClass('half').addClass('full');
-      $(document).trigger('xwiki:dom:updated', {'elements': this.toArray()});
+      var self = $(this);
+      self.removeClass('loading');
+      self.find('.column.half').removeClass('half').addClass('full');
+      $(document).trigger('xwiki:dom:updated', {'elements': self.toArray()});
       var editUserForm = editUserModal.find('form#edituser');
       editUserForm.find(':input').filter(':visible').first().focus();
       saveButton.prop('disabled', editUserForm.size() === 0);

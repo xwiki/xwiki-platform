@@ -3039,11 +3039,31 @@ public class XWiki implements EventListener
     }
 
     /**
-     * First try to find the current locale in use from the XWiki context. If none is used and if the wiki is not
-     * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get the
-     * locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists then use
-     * the user default locale and barring that use the browser's "Accept-Language" header sent in HTTP request. If none
-     * is defined use the default locale.
+     * The algorithm to find the locale to use is the following, in this order:
+     *
+     * <ul>
+     *   <li>Try to find the current locale in use from the XWiki contex</li>
+     *   <li>If the wiki is not multilingual use the wiki default locale ({@code default_language} xproperty in
+     *   {@code XWikiPreferences} xobject or English if not found)</li>
+     *   <li>If the wiki is multilingual<ul>
+     *     <li>Try to get the locale passed in the request (looking for a {@code language} query string parameter).
+     *     If the language value is {@code default} use the wiki default locale. If a parameter is found sets a
+     *     {@code language} cookie to remember the language in use.</li>
+     *     <li>Try to get the locale from the {@code language} cookie</li>
+     *     <li>If the user has a default language ({@code default_language} xproperty in the {@code XWikiUsers}
+     *     xobject) then use it</li>
+     *     <li>If the default language is preferred ({@code xwiki.language.preferDefault} from {@code xwiki.cfg}
+     *     or {@code preferDefaultLanguage} property from the space preferences ({@code WebPreferences} xobject) or
+     *     wiki preferences ({@code XWikiPreferences} xobject})), and since the user didn't explicitly ask for a
+     *     language already, then use the wiki default locale.</li>
+     *     <li>Try to use the browser's {@code Accept-Language} header sent in HTTP request.<li>
+     *     <li>Fallback to the wiki default locale</li>
+     *   </ul></li>
+     * </ul>
+     *
+     * In addition the {code xwiki.language.forceSupported} configuration property is enabled by default and means that
+     * if at any step above the locale found is not in the list of supported locales, then the locale is not set and
+     * the algorithm moves to the next step.
      *
      * @return the locale to use
      * @since 8.0M1

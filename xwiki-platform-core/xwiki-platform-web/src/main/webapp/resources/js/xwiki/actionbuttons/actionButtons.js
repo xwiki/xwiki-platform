@@ -340,6 +340,9 @@ var XWiki = (function(XWiki) {
         this.form.template.value = "";
       }
 
+      // Reset the comment after a successful save and continue action.
+      $("commentinput").value = '';
+
       // don't force save twice
       if ($('forceSave')) {
         $('forceSave').remove();

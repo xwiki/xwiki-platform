@@ -19,8 +19,6 @@
  */
 package org.xwiki.user.internal.document;
 
-import java.util.Locale;
-
 import javax.inject.Named;
 import javax.inject.Provider;
 
@@ -172,26 +170,6 @@ public class DocumentUserTest
 
         when(this.userConfigurationSource.getProperty("editor")).thenReturn("Wysiwyg");
         assertEquals(Editor.WYSIWYG, this.user.getEditor());
-    }
-
-    @Test
-    void getLocale()
-    {
-        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
-        when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
-
-        when(this.userConfigurationSource.getProperty("default_language")).thenReturn("en");
-        assertEquals(new Locale("en"), this.user.getLocale());
-    }
-
-    @Test
-    void getLocaleWhenNull()
-    {
-        DocumentReference classReference = new DocumentReference("xwiki", "XWiki", "XWikiUsers");
-        when (this.currentReferenceResolver.resolve(USERS_CLASS_REFERENCE)).thenReturn(classReference);
-
-        when(this.userConfigurationSource.getProperty("default_language")).thenReturn(null);
-        assertNull(this.user.getLocale());
     }
 
     @Test

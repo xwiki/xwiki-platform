@@ -84,7 +84,6 @@ public class XWikiUsersDocumentInitializer extends AbstractMandatoryClassInitial
         xclass.addPasswordField("password", "Password", 10);
         xclass.addPasswordField("validkey", "Validation Key", 10);
         xclass.addBooleanField("active", "Active", "active");
-        xclass.addTextField("default_language", "Default Language", 30);
         xclass.addTextField("company", "Company", 30);
         xclass.addTextField("blog", "Blog", 60);
         xclass.addTextField("blogfeed", "Blog Feed", 60);

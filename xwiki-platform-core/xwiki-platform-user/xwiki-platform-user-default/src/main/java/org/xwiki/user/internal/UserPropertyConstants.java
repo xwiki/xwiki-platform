@@ -68,9 +68,4 @@ public interface UserPropertyConstants
      * See {@link User#getEditor()}.
      */
     String EDITOR = "editor";
-
-    /**
-     * See {@link User#getLocale()}.
-     */
-    String DEFAULT_LANGUAGE = "default_language";
 }

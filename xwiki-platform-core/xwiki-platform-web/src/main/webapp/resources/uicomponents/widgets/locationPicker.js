@@ -164,7 +164,7 @@ require(['jquery', 'xwiki-meta', 'xwiki-events-bridge'], function($, xm) {
 
     var enableButtons = function() {
       formRealButtons.prop("disabled", false);
-      formLinkButtons.addClass("disabled");
+      formLinkButtons.removeClass("disabled");
     };
 
     /**

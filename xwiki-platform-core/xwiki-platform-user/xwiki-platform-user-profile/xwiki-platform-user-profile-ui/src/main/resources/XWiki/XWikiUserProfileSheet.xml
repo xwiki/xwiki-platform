@@ -142,7 +142,7 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       #set ($isMessageStreamActive = $services.messageStream.isActive())
       #if ($isMessageStreamActive &amp;&amp; !$isGuest)
       &lt;div class='userMessage profile-section'&gt;
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.sendMessage')&lt;/h1&gt;
+        &lt;h1&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.sendMessage'))&lt;/h1&gt;
 
           {{messageSender /}}
 
@@ -150,11 +150,11 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       #end
       &lt;div class='userRecentChanges'&gt;
       #if ($xcontext.user == $doc.fullName)
-        &lt;h2&gt;$services.localization.render('platform.core.profile.section.activity')&lt;/h2&gt;
+        &lt;h2&gt;$escapetool.xml($services.localization.render('platform.core.profile.section.activity'))&lt;/h2&gt;
       #else
         &lt;h2&gt;
-          $services.localization.render('platform.core.profile.section.activityof',
-            [$xwiki.getUserName($doc.fullName, false)])
+          $escapetool.xml($services.localization.render('platform.core.profile.section.activityof',
+            [$xwiki.getUserName($doc.fullName, false)]))
         &lt;/h2&gt;
         #if ($hasWatch)
         $xwiki.ssx.use('XWiki.XWikiUserProfileSheet')##

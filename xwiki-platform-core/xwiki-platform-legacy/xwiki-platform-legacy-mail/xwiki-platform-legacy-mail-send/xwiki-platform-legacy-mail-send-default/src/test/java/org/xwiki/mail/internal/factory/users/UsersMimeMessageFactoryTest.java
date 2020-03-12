@@ -69,8 +69,7 @@ public class UsersMimeMessageFactoryTest
         DocumentReference userReference = new DocumentReference("wiki", "space", "page");
 
         try {
-            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference),
-                Collections.<String, Object>emptyMap());
+            this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference), Collections.emptyMap());
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("The parameter [hint] is mandatory.", expected.getMessage());
@@ -84,7 +83,7 @@ public class UsersMimeMessageFactoryTest
 
         try {
             this.mocker.getComponentUnderTest().createMessage(Arrays.asList(userReference),
-                Collections.<String, Object>singletonMap("hint", "factoryHint"));
+                Collections.singletonMap("hint", "factoryHint"));
             fail("Should have thrown an exception");
         } catch (MessagingException expected) {
             assertEquals("The parameter [source] is mandatory.", expected.getMessage());

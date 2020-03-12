@@ -92,8 +92,8 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       &lt;div class='editProfileCategory'&gt;
         &lt;a title="$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))" 
               href="$doc.getURL('edit', 'editor=inline&amp;amp;category=profile')"&gt;
-        &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))&lt;/span&gt;
-       &lt;/a&gt;
+          &lt;span class='sr-only'&gt;$escapetool.xml($services.localization.render('platform.core.profile.category.profile.edit'))&lt;/span&gt;
+        &lt;/a&gt;
       &lt;/div&gt;
     #end
     ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)

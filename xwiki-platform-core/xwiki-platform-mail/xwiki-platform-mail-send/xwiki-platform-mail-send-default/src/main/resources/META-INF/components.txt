@@ -34,5 +34,4 @@ org.xwiki.mail.internal.factory.template.SecureMailTemplateManager
 org.xwiki.mail.internal.factory.template.DefaultAttachmentConverter
 org.xwiki.mail.internal.factory.files.SerializedFilesMimeMessageFactory
 org.xwiki.mail.internal.factory.group.GroupMimeMessageFactory
-org.xwiki.mail.internal.factory.users.UsersMimeMessageFactory
 org.xwiki.mail.internal.factory.usersandgroups.UsersAndGroupsMimeMessageFactory

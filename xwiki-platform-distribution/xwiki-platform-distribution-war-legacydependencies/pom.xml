@@ -227,5 +227,10 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-legacy-mail-send-default</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 </project>

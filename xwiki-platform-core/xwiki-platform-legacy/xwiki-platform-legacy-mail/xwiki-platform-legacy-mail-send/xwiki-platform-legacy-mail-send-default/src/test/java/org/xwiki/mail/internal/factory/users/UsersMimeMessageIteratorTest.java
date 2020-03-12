@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Properties;
 
 import javax.mail.Message;
-import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
@@ -42,8 +41,8 @@ import org.xwiki.model.reference.DocumentReference;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -66,14 +65,7 @@ public class UsersMimeMessageIteratorTest
 
         Session session = Session.getInstance(new Properties());
 
-        MimeMessageFactory factory = new MimeMessageFactory()
-        {
-            @Override public MimeMessage createMessage(Object source, Map parameters)
-                throws MessagingException
-            {
-                return new ExtendedMimeMessage();
-            }
-        };
+        MimeMessageFactory factory = (source, parameters) -> new ExtendedMimeMessage();
 
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("parameters", Collections.EMPTY_MAP);

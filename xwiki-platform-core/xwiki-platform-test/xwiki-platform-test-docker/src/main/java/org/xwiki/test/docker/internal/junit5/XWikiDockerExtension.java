@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.VncRecordingContainer;
+import org.testcontainers.utility.DockerLoggerFactory;
+import org.testcontainers.utility.TestcontainersConfiguration;
 import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
@@ -124,6 +126,14 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             // found), since this is not a problem and it's optional.
             // See https://github.com/testcontainers/testcontainers-java/issues/2253
             setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
+        }
+        if (testConfiguration.isDebug()) {
+            // Debug: get logs when starting the sshd container
+            setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
+                TestcontainersConfiguration.getInstance().getSSHdImage()).getName(), Level.TRACE);
+            // Debug: get logs when starting the vnc container
+            setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
+                TestcontainersConfiguration.getInstance().getVncRecordedContainerImage()).getName(), Level.TRACE);
         }
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the

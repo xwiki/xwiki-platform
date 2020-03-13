@@ -40,6 +40,7 @@ import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.output.FrameConsumerResultCallback;
 import org.testcontainers.containers.output.OutputFrame;
 import org.testcontainers.containers.output.Slf4jLogConsumer;
+import org.testcontainers.utility.DockerLoggerFactory;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 
 import com.github.dockerjava.api.command.LogContainerCmd;
@@ -151,6 +152,11 @@ public final class DockerTestUtils
             response = command.exec(response);
             response.awaitCompletion();
             pulledImages.add(dockerImageName);
+        }
+
+        // In debug mode, get container debug logs to try to diagnose container failing errors
+        if (testConfiguration.isDebug()) {
+            setLogbackLoggerLevel(DockerLoggerFactory.getLogger(container.getDockerImageName()).getName(), Level.DEBUG);
         }
 
         // Try to work around the following issue: https://github.com/testcontainers/testcontainers-java/issues/2208

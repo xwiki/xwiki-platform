@@ -19,7 +19,7 @@
  */
 package org.xwiki.user.internal.document;
 
-import org.xwiki.text.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;

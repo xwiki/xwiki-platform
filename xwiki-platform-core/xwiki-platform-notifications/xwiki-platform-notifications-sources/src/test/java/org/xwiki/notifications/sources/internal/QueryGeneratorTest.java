@@ -48,6 +48,7 @@ import org.xwiki.test.mockito.MockitoComponentMockingRule;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
+import org.xwiki.user.UserReferenceUserResolverType;
 import org.xwiki.user.UserResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
@@ -101,7 +102,7 @@ public class QueryGeneratorTest
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
         recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
-        userResolver = mocker.getInstance(UserResolver.TYPE_USER_REFERENCE);
+        userResolver = mocker.getInstance(UserReferenceUserResolverType.INSTANCE);
         userReferenceResolver = mocker.getInstance(
             new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
 

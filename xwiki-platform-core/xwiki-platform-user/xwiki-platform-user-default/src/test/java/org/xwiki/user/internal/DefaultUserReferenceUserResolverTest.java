@@ -33,6 +33,7 @@ import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceUserResolverType;
 import org.xwiki.user.UserResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -73,7 +74,7 @@ public class DefaultUserReferenceUserResolverTest
         UserResolver<TestUserReference> customUserResolver = mock(UserResolver.class);
         when(customUserResolver.resolve(any(TestUserReference.class))).thenReturn(mock(User.class));
 
-        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+        when(this.contextComponentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
             TestUserReference.class.getName())).thenReturn(customUserResolver);
 
         assertNotNull(this.resolver.resolve(new TestUserReference()));
@@ -85,7 +86,7 @@ public class DefaultUserReferenceUserResolverTest
         UserResolver<CurrentUserReference> customUserResolver = mock(UserResolver.class);
         when(customUserResolver.resolve(any(CurrentUserReference.class))).thenReturn(mock(User.class));
 
-        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+        when(this.contextComponentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
             CurrentUserReference.class.getName())).thenReturn(customUserResolver);
 
         assertNotNull(this.resolver.resolve(CurrentUserReference.INSTANCE));
@@ -97,7 +98,7 @@ public class DefaultUserReferenceUserResolverTest
         UserResolver<CurrentUserReference> customUserResolver = mock(UserResolver.class);
         when(customUserResolver.resolve(any(CurrentUserReference.class))).thenReturn(mock(User.class));
 
-        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+        when(this.contextComponentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
             CurrentUserReference.class.getName())).thenReturn(customUserResolver);
 
         assertNotNull(this.resolver.resolve(null));
@@ -106,7 +107,7 @@ public class DefaultUserReferenceUserResolverTest
     @Test
     void resolveWhenNoUserResolver() throws Exception
     {
-        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+        when(this.contextComponentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
             TestUserReference.class.getName())).thenThrow(new ComponentLookupException("error"));
 
         Throwable exception = assertThrows(RuntimeException.class, () -> {

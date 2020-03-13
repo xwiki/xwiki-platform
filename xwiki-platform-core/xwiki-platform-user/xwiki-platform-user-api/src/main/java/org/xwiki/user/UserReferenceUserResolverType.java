@@ -19,25 +19,28 @@
  */
 package org.xwiki.user;
 
-import org.xwiki.component.annotation.Role;
+import java.lang.reflect.ParameterizedType;
+
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.stability.Unstable;
 
 /**
- * Convert a raw representation of a user  into a {@link User} object (for example converts a User Reference into a
- * User).
+ * Represents the {@code UserResolver<UserReference>} {@link java.lang.reflect.Type}.
  *
- * @param <T> the type of the user representation
  * @version $Id$
  * @since 12.2RC1
  */
 @Unstable
-@Role
-public interface UserResolver<T>
+public final class UserReferenceUserResolverType
 {
     /**
-     * @param userRepresentation the representation of the user (e.g. User Reference, oldcore XWikiUser object etc)
-     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
-     * @return the User object
+     * Type instance for {@code UserResolver<UserReference>}.
      */
-    User resolve(T userRepresentation, Object... parameters);
+    public static final ParameterizedType INSTANCE =
+        new DefaultParameterizedType(null, UserResolver.class, UserReference.class);
+
+    private UserReferenceUserResolverType()
+    {
+        // Voluntarily empty. We want to have a single instance of this class (hence the private part).
+    }
 }

@@ -27,45 +27,50 @@ import org.xwiki.user.User;
  * @version $Id$
  * @since 12.2RC1
  */
-public interface UserPropertyConstants
+public final class UserPropertyConstants
 {
     /**
      * See {@link User#displayHiddenDocuments()}.
      */
-    String DISPLAY_HIDDEN_DOCUMENTS = "displayHiddenDocuments";
+    public static final String DISPLAY_HIDDEN_DOCUMENTS = "displayHiddenDocuments";
 
     /**
      * See {@link User#isActive()}.
      */
-    String ACTIVE = "active";
+    public static final String ACTIVE = "active";
 
     /**
      * See {@link User#getFirstName()}.
      */
-    String FIRST_NAME = "first_name";
+    public static final String FIRST_NAME = "first_name";
 
     /**
      * See {@link User#getLastName()}.
      */
-    String LAST_NAME = "last_name";
+    public static final String LAST_NAME = "last_name";
 
     /**
      * See {@link User#getEmail()}.
      */
-    String EMAIL = "email";
+    public static final String EMAIL = "email";
 
     /**
      * See {@link User#isEmailChecked()}.
      */
-    String EMAIL_CHECKED = "email_checked";
+    public static final String EMAIL_CHECKED = "email_checked";
 
     /**
      * See {@link User#getType()}.
      */
-    String USER_TYPE = "usertype";
+    public static final String USER_TYPE = "usertype";
 
     /**
      * See {@link User#getEditor()}.
      */
-    String EDITOR = "editor";
+    public static final String EDITOR = "editor";
+
+    private UserPropertyConstants()
+    {
+        // Utility classes should not have a public or default constructor.
+    }
 }

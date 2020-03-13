@@ -26,6 +26,7 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 
@@ -74,6 +75,6 @@ public class CurrentUserResolverTest
 
         User user = this.resolver.resolve(null);
         assertNotNull(user);
-        assertSame(UserReference.GUEST_REFERENCE, user.getUserReference());
+        assertSame(GuestUserReference.INSTANCE, user.getUserReference());
     }
 }

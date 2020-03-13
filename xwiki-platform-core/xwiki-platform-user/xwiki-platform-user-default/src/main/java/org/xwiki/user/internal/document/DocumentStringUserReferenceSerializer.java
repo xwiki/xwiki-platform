@@ -25,6 +25,9 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceSerializer;
 
@@ -48,11 +51,11 @@ public class DocumentStringUserReferenceSerializer implements UserReferenceSeria
         String result;
         if (userReference == null) {
             result = null;
-        } else if (UserReference.SUPERADMIN_REFERENCE == userReference) {
+        } else if (SuperAdminUserReference.INSTANCE == userReference) {
             result = "XWiki.superadmin";
-        } else if (UserReference.GUEST_REFERENCE == userReference) {
+        } else if (GuestUserReference.INSTANCE == userReference) {
             result = "XWiki.XWikiGuest";
-        } else if (UserReference.CURRENT_USER_REFERENCE == userReference) {
+        } else if (CurrentUserReference.INSTANCE == userReference) {
             result = "";
         } else if (!(userReference instanceof DocumentUserReference)) {
             throw new IllegalArgumentException("Only DocumentUserReference are handled");

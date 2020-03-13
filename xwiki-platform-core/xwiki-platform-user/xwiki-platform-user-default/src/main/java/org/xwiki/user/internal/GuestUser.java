@@ -20,6 +20,7 @@
 package org.xwiki.user.internal;
 
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.UserReference;
 
 /**
@@ -41,6 +42,6 @@ public class GuestUser extends AbstractUser
     @Override
     public UserReference getUserReference()
     {
-        return UserReference.GUEST_REFERENCE;
+        return GuestUserReference.INSTANCE;
     }
 }

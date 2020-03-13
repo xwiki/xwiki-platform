@@ -29,6 +29,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -86,7 +88,7 @@ public class DefaultUserReferenceUserResolverTest
         when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
             CurrentUserReference.class.getName())).thenReturn(customUserResolver);
 
-        assertNotNull(this.resolver.resolve(UserReference.CURRENT_USER_REFERENCE));
+        assertNotNull(this.resolver.resolve(CurrentUserReference.INSTANCE));
     }
 
     @Test
@@ -120,14 +122,14 @@ public class DefaultUserReferenceUserResolverTest
     @Test
     void resolveForSuperAdminReference()
     {
-        assertSame(UserReference.SUPERADMIN_REFERENCE,
-            this.resolver.resolve(UserReference.SUPERADMIN_REFERENCE).getUserReference());
+        assertSame(SuperAdminUserReference.INSTANCE,
+            this.resolver.resolve(SuperAdminUserReference.INSTANCE).getUserReference());
     }
 
     @Test
     void resolveForGuestReference()
     {
-        assertSame(UserReference.GUEST_REFERENCE,
-            this.resolver.resolve(UserReference.GUEST_REFERENCE).getUserReference());
+        assertSame(GuestUserReference.INSTANCE,
+            this.resolver.resolve(GuestUserReference.INSTANCE).getUserReference());
     }
 }

@@ -25,6 +25,9 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -75,18 +78,18 @@ public class DocumentStringUserReferenceSerializerTest
     @Test
     void serializeSuperAdminReference()
     {
-        assertEquals("XWiki.superadmin", this.serializer.serialize(UserReference.SUPERADMIN_REFERENCE));
+        assertEquals("XWiki.superadmin", this.serializer.serialize(SuperAdminUserReference.INSTANCE));
     }
 
     @Test
     void serializeGuestReference()
     {
-        assertEquals("XWiki.XWikiGuest", this.serializer.serialize(UserReference.GUEST_REFERENCE));
+        assertEquals("XWiki.XWikiGuest", this.serializer.serialize(GuestUserReference.INSTANCE));
     }
 
     @Test
     void serializeCurrentUserReference()
     {
-        assertEquals("", this.serializer.serialize(UserReference.CURRENT_USER_REFERENCE));
+        assertEquals("", this.serializer.serialize(CurrentUserReference.INSTANCE));
     }
 }

@@ -27,6 +27,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.script.service.ScriptServiceManager;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
@@ -87,7 +90,7 @@ public class UserScriptService implements ScriptService
     @Unstable
     public UserReference getGuestUserReference()
     {
-        return UserReference.GUEST_REFERENCE;
+        return GuestUserReference.INSTANCE;
     }
 
     /**
@@ -97,7 +100,7 @@ public class UserScriptService implements ScriptService
     @Unstable
     public UserReference getSuperAdminUserReference()
     {
-        return UserReference.SUPERADMIN_REFERENCE;
+        return SuperAdminUserReference.INSTANCE;
     }
 
     /**
@@ -107,7 +110,7 @@ public class UserScriptService implements ScriptService
     @Unstable
     public UserReference getCurrentUserReference()
     {
-        return UserReference.CURRENT_USER_REFERENCE;
+        return CurrentUserReference.INSTANCE;
     }
 
     /**

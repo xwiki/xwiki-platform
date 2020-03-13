@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 
 /**
@@ -47,7 +48,7 @@ public class DocumentDocumentReferenceUserReferenceResolver extends AbstractUser
     {
         UserReference reference;
         if (rawReference == null) {
-            reference = UserReference.CURRENT_USER_REFERENCE;
+            reference = CurrentUserReference.INSTANCE;
         } else {
             reference = resolveName(rawReference.getName());
             if (reference == null) {

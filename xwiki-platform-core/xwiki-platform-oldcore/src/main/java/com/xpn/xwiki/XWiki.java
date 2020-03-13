@@ -168,6 +168,7 @@ import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
 import org.xwiki.velocity.VelocityContextFactory;
@@ -2972,7 +2973,7 @@ public class XWiki implements EventListener
     public String getUserPreference(String prefname, XWikiContext context)
     {
         String result =
-            getUserResolver().resolve(UserReference.CURRENT_USER_REFERENCE).getProperty(prefname, String.class);
+            getUserResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
 
         if (StringUtils.isEmpty(result)) {
             result = getSpacePreference(prefname, context);

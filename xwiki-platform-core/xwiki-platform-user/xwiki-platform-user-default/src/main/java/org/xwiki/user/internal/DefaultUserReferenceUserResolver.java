@@ -27,6 +27,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -62,11 +65,11 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
         // Handle special cases
         UserReference normalizedUserReference = userReference;
         if (normalizedUserReference == null) {
-            normalizedUserReference = UserReference.CURRENT_USER_REFERENCE;
+            normalizedUserReference = CurrentUserReference.INSTANCE;
         }
-        if (UserReference.SUPERADMIN_REFERENCE == normalizedUserReference) {
+        if (SuperAdminUserReference.INSTANCE == normalizedUserReference) {
             user = new SuperAdminUser(this.superAdminConfigurationSource);
-        } else if (UserReference.GUEST_REFERENCE == normalizedUserReference) {
+        } else if (GuestUserReference.INSTANCE == normalizedUserReference) {
             user = new GuestUser(this.guestConfigurationSource);
         } else {
             user = resolveUserResolver(normalizedUserReference).resolve(normalizedUserReference, parameters);

@@ -48,6 +48,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.tree.TreeFilter;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -151,7 +152,7 @@ public class WikiTreeNodeTest
         this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
         User user = mock(User.class);
         when(user.displayHiddenDocuments()).thenReturn(false);
-        when(this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE)).thenReturn(user);
+        when(this.userResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(user);
 
         assertEquals(0, this.wikiTreeNode.getChildCount("something"));
         assertEquals(0, this.wikiTreeNode.getChildCount("some:thing"));
@@ -205,7 +206,7 @@ public class WikiTreeNodeTest
         this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
         User user = mock(User.class);
         when(user.displayHiddenDocuments()).thenReturn(false);
-        when(this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE)).thenReturn(user);
+        when(this.userResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(user);
 
         String statement = "select reference, 0 as terminal from XWikiSpace page order by lower(name), name";
         when(this.queryManager.createQuery(statement, Query.HQL)).thenReturn(this.query);
@@ -228,7 +229,7 @@ public class WikiTreeNodeTest
         this.wikiTreeNode.getProperties().put("filterHiddenDocuments", true);
         User user = mock(User.class);
         when(user.displayHiddenDocuments()).thenReturn(false);
-        when(this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE)).thenReturn(user);
+        when(this.userResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(user);
 
         this.wikiTreeNode.getProperties().put("orderBy", "title");
         this.wikiTreeNode.getProperties().put("exclusions",

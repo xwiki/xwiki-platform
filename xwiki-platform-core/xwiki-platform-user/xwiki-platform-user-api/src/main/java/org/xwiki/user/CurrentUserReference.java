@@ -31,9 +31,9 @@ import org.xwiki.stability.Unstable;
 public final class CurrentUserReference implements UserReference
 {
     /**
-     * Package-level visibility so that it can be used in the UserReference class (located in the same package.
+     * The unique instance of this class.
      */
-    static final CurrentUserReference INSTANCE = new CurrentUserReference();
+    public static final CurrentUserReference INSTANCE = new CurrentUserReference();
 
     private CurrentUserReference()
     {

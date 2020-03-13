@@ -17,31 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal;
+package org.xwiki.user;
 
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.user.SuperAdminUserReference;
-import org.xwiki.user.UserReference;
+import org.xwiki.stability.Unstable;
 
 /**
- * Represents the Super Admin user (i.e. a virtual user representing an advanced user having all permissions).
+ * Represents the Super Admin user reference, i.e. a virtual user that has all permissions. If you need to verify
+ * if a given UserReference is the Super Admin user, you should use
+ * {@code if (myRef == SuperAdminUserReference.INSTANCE)}.
  *
  * @version $Id$
  * @since 12.2RC1
  */
-public class SuperAdminUser extends AbstractUser
+@Unstable
+public final class SuperAdminUserReference implements UserReference
 {
     /**
-     * @param userConfigurationSource the component providing the user configuration data
+     * The unique instance of this class.
      */
-    public SuperAdminUser(ConfigurationSource userConfigurationSource)
+    public static final SuperAdminUserReference INSTANCE = new SuperAdminUserReference();
+
+    private SuperAdminUserReference()
     {
-        super(userConfigurationSource);
+        // Voluntarily empty. We want to have a single instance of this class (hence the private part).
     }
 
     @Override
-    public UserReference getUserReference()
+    public boolean isGlobal()
     {
-        return SuperAdminUserReference.INSTANCE;
+        return true;
     }
 }

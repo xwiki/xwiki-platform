@@ -23,6 +23,9 @@ import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,26 +57,26 @@ public class DocumentDocumentReferenceUserReferenceResolverTest
     void resolveGuest()
     {
         UserReference reference = this.resolver.resolve(new DocumentReference("wiki", "space", "XWikiGuest"));
-        assertSame(UserReference.GUEST_REFERENCE, reference);
+        assertSame(GuestUserReference.INSTANCE, reference);
 
         reference = this.resolver.resolve(new DocumentReference("wiki", "space", "xWiKiGuEsT"));
-        assertSame(UserReference.GUEST_REFERENCE, reference);
+        assertSame(GuestUserReference.INSTANCE, reference);
     }
 
     @Test
     void resolveSuperAdmin()
     {
         UserReference reference = this.resolver.resolve(new DocumentReference("wiki", "space", "superadmin"));
-        assertSame(UserReference.SUPERADMIN_REFERENCE, reference);
+        assertSame(SuperAdminUserReference.INSTANCE, reference);
 
         reference = this.resolver.resolve(new DocumentReference("wiki", "space", "sUpErAdMiN"));
-        assertSame(UserReference.SUPERADMIN_REFERENCE, reference);
+        assertSame(SuperAdminUserReference.INSTANCE, reference);
     }
 
     @Test
     void resolveWhenNull()
     {
         UserReference reference = this.resolver.resolve(null);
-        assertSame(UserReference.CURRENT_USER_REFERENCE, reference);
+        assertSame(CurrentUserReference.INSTANCE, reference);
     }
 }

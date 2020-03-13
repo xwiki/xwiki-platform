@@ -29,6 +29,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 
@@ -80,13 +82,13 @@ public class DefaultUserManagerTest
     @Test
     void existsWhenSuperAdmin()
     {
-        assertFalse(this.userManager.exists(UserReference.SUPERADMIN_REFERENCE));
+        assertFalse(this.userManager.exists(SuperAdminUserReference.INSTANCE));
     }
 
     @Test
     void existsWhenGuest()
     {
-        assertFalse(this.userManager.exists(UserReference.GUEST_REFERENCE));
+        assertFalse(this.userManager.exists(GuestUserReference.INSTANCE));
     }
 
     @Test
@@ -98,7 +100,7 @@ public class DefaultUserManagerTest
 
         this.userManager.exists(null);
 
-        verify(currentUserManager).exists(UserReference.CURRENT_USER_REFERENCE);
+        verify(currentUserManager).exists(CurrentUserReference.INSTANCE);
     }
 
     @Test
@@ -108,9 +110,9 @@ public class DefaultUserManagerTest
         when(this.contextComponentManager.getInstance(UserManager.class, CurrentUserReference.class.getName()))
             .thenReturn(currentUserManager);
 
-        this.userManager.exists(UserReference.CURRENT_USER_REFERENCE);
+        this.userManager.exists(CurrentUserReference.INSTANCE);
 
-        verify(currentUserManager).exists(UserReference.CURRENT_USER_REFERENCE);
+        verify(currentUserManager).exists(CurrentUserReference.INSTANCE);
     }
 
     @Test

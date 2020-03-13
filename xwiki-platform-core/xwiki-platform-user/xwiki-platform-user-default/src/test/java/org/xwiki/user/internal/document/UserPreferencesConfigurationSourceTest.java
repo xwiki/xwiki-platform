@@ -28,6 +28,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -70,7 +72,7 @@ public class UserPreferencesConfigurationSourceTest
     {
         DocumentReference userDocumentReference = new DocumentReference("wiki", "space", "XWikiGuest");
         when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(userDocumentReference);
-        when(this.userReferenceResolver.resolve(userDocumentReference)).thenReturn(UserReference.GUEST_REFERENCE);
+        when(this.userReferenceResolver.resolve(userDocumentReference)).thenReturn(GuestUserReference.INSTANCE);
 
         this.source.getProperty("key");
 
@@ -83,7 +85,7 @@ public class UserPreferencesConfigurationSourceTest
     {
         DocumentReference userDocumentReference = new DocumentReference("wiki", "space", "superadmin");
         when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(userDocumentReference);
-        when(this.userReferenceResolver.resolve(userDocumentReference)).thenReturn(UserReference.SUPERADMIN_REFERENCE);
+        when(this.userReferenceResolver.resolve(userDocumentReference)).thenReturn(SuperAdminUserReference.INSTANCE);
 
         this.source.getProperty("key");
 

@@ -17,31 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal;
+package org.xwiki.user;
 
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.user.SuperAdminUserReference;
-import org.xwiki.user.UserReference;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Represents the Super Admin user (i.e. a virtual user representing an advanced user having all permissions).
+ * Unit tests for {@link CurrentUserReference}.
  *
  * @version $Id$
- * @since 12.2RC1
  */
-public class SuperAdminUser extends AbstractUser
+public class CurrentUserReferenceTest
 {
-    /**
-     * @param userConfigurationSource the component providing the user configuration data
-     */
-    public SuperAdminUser(ConfigurationSource userConfigurationSource)
+    @Test
+    void isGlobal()
     {
-        super(userConfigurationSource);
-    }
-
-    @Override
-    public UserReference getUserReference()
-    {
-        return SuperAdminUserReference.INSTANCE;
+        Throwable exception = assertThrows(RuntimeException.class,
+            () -> CurrentUserReference.INSTANCE.isGlobal());
+        assertEquals("You need to resolve the current user first to find if it's a global user or not.",
+            exception.getMessage());
     }
 }

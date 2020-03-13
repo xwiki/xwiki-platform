@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
 
@@ -56,7 +57,7 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
     public void initialize()
     {
         this.displayHiddenDocuments =
-            this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE).displayHiddenDocuments();
+            this.userResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments();
     }
 
     @Override

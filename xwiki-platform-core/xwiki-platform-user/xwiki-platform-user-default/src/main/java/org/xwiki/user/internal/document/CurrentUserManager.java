@@ -26,6 +26,8 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
@@ -58,8 +60,8 @@ public class CurrentUserManager implements UserManager
     {
         boolean exists;
         UserReference resolvedUserReference = this.userReferenceResolver.resolve(getXWikiContext().getUserReference());
-        if (UserReference.SUPERADMIN_REFERENCE == resolvedUserReference
-            || UserReference.GUEST_REFERENCE == resolvedUserReference)
+        if (SuperAdminUserReference.INSTANCE == resolvedUserReference
+            || GuestUserReference.INSTANCE == resolvedUserReference)
         {
             exists = false;
         } else {

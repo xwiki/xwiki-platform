@@ -17,31 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal;
+package org.xwiki.user;
 
-import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.user.SuperAdminUserReference;
-import org.xwiki.user.UserReference;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Represents the Super Admin user (i.e. a virtual user representing an advanced user having all permissions).
+ * Unit tests for {@link GuestUserReference}.
  *
  * @version $Id$
- * @since 12.2RC1
  */
-public class SuperAdminUser extends AbstractUser
+public class GuestUserReferenceTest
 {
-    /**
-     * @param userConfigurationSource the component providing the user configuration data
-     */
-    public SuperAdminUser(ConfigurationSource userConfigurationSource)
+    @Test
+    void isGlobal()
     {
-        super(userConfigurationSource);
-    }
-
-    @Override
-    public UserReference getUserReference()
-    {
-        return SuperAdminUserReference.INSTANCE;
+        assertTrue(GuestUserReference.INSTANCE.isGlobal());
     }
 }

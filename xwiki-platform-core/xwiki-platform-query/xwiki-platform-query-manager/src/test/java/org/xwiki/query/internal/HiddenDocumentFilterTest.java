@@ -28,6 +28,7 @@ import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -56,7 +57,7 @@ public class HiddenDocumentFilterTest
     {
         User user = mock(User.class);
         when(user.displayHiddenDocuments()).thenReturn(false);
-        when(this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE)).thenReturn(user);
+        when(this.userResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(user);
     }
 
     @Test

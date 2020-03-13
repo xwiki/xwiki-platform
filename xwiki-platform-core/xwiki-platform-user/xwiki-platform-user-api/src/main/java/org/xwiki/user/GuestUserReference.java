@@ -19,37 +19,31 @@
  */
 package org.xwiki.user;
 
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.xwiki.stability.Unstable;
 
 /**
- * Unit tests for {@link UserReference}.
+ * Represents the Super Admin user reference, i.e. a virtual user that is not logged in. If you need to verify
+ * if a given UserReference is the Guest user, you should use {@code if (myRef == GuestUserReference.INSTANCE)}.
  *
  * @version $Id$
+ * @since 12.2RC1
  */
-public class UserReferenceTest
+@Unstable
+public final class GuestUserReference implements UserReference
 {
-    @Test
-    void isGuestReferenceGlobal()
+    /**
+     * The unique instance of this class.
+     */
+    public static final GuestUserReference INSTANCE = new GuestUserReference();
+
+    private GuestUserReference()
     {
-        assertTrue(UserReference.GUEST_REFERENCE.isGlobal());
+        // Voluntarily empty. We want to have a single instance of this class (hence the private part).
     }
 
-    @Test
-    void isSuperAdminReferenceGlobal()
+    @Override
+    public boolean isGlobal()
     {
-        assertTrue(UserReference.SUPERADMIN_REFERENCE.isGlobal());
-    }
-
-    @Test
-    void isCurrentUserReferenceGlobal()
-    {
-        Throwable exception = assertThrows(RuntimeException.class,
-            () -> UserReference.CURRENT_USER_REFERENCE.isGlobal());
-        assertEquals("You need to resolve the current user first to find if it's a global user or not.",
-            exception.getMessage());
+        return true;
     }
 }

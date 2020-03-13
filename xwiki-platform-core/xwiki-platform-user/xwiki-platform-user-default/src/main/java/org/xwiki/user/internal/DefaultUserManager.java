@@ -26,6 +26,9 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 
@@ -52,10 +55,10 @@ public class DefaultUserManager implements UserManager
         // Handle special cases
         UserReference normalizedUserReference = userReference;
         if (normalizedUserReference == null) {
-            normalizedUserReference = UserReference.CURRENT_USER_REFERENCE;
+            normalizedUserReference = CurrentUserReference.INSTANCE;
         }
-        if (UserReference.GUEST_REFERENCE == normalizedUserReference
-            || UserReference.SUPERADMIN_REFERENCE == normalizedUserReference)
+        if (GuestUserReference.INSTANCE == normalizedUserReference
+            || SuperAdminUserReference.INSTANCE == normalizedUserReference)
         {
             exists = false;
         } else {

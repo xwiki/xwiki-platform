@@ -26,6 +26,8 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -78,13 +80,13 @@ public class DocumentXWikiUserUserResolverTest
     void resolveGuest()
     {
         User user = this.resolver.resolve(new XWikiUser(new DocumentReference("wiki", "space", "XWikiGuest")));
-        assertSame(UserReference.GUEST_REFERENCE, user.getUserReference());
+        assertSame(GuestUserReference.INSTANCE, user.getUserReference());
     }
 
     @Test
     void resolveSuperAdmin()
     {
         User user = this.resolver.resolve(new XWikiUser(new DocumentReference("wiki", "space", "superadmin")));
-        assertSame(UserReference.SUPERADMIN_REFERENCE, user.getUserReference());
+        assertSame(SuperAdminUserReference.INSTANCE, user.getUserReference());
     }
 }

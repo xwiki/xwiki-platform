@@ -20,6 +20,9 @@
 package org.xwiki.user.internal.document;
 
 import org.xwiki.text.StringUtils;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -55,11 +58,11 @@ public abstract class AbstractUserReferenceResolver<T> implements UserReferenceR
     {
         UserReference reference = null;
         if (StringUtils.isEmpty(userName)) {
-            reference = UserReference.CURRENT_USER_REFERENCE;
+            reference = CurrentUserReference.INSTANCE;
         } else if (isGuest(userName)) {
-            reference = UserReference.GUEST_REFERENCE;
+            reference = GuestUserReference.INSTANCE;
         } else if (isSuperAdmin(userName)) {
-            reference = UserReference.SUPERADMIN_REFERENCE;
+            reference = SuperAdminUserReference.INSTANCE;
         }
         return reference;
     }

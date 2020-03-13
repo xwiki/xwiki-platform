@@ -30,6 +30,8 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.AbstractConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
@@ -111,9 +113,9 @@ public class UserPreferencesConfigurationSource extends AbstractConfigurationSou
     {
         ConfigurationSource configurationSource;
         UserReference userReference = this.userReferenceResolver.resolve(getDocumentReference());
-        if (UserReference.SUPERADMIN_REFERENCE == userReference) {
+        if (SuperAdminUserReference.INSTANCE == userReference) {
             configurationSource = this.superAdminConfigurationSource;
-        } else if (UserReference.GUEST_REFERENCE == userReference) {
+        } else if (GuestUserReference.INSTANCE == userReference) {
             configurationSource = this.guestConfigurationSource;
         } else {
             configurationSource = this.normalUserConfigurationSource;

@@ -53,6 +53,7 @@ import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceUserResolverType;
 import org.xwiki.user.UserResolver;
 
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -616,7 +617,7 @@ public class ActivityStreamImpl implements ActivityStream, EventListener
      */
     private void addHiddenEventsFilter(StringBuffer query)
     {
-        UserResolver<UserReference> userResolver = Utils.getComponent(UserResolver.TYPE_USER_REFERENCE);
+        UserResolver<UserReference> userResolver = Utils.getComponent(UserReferenceUserResolverType.INSTANCE);
         if (!userResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments()) {
             if (!query.toString().contains(" where ")) {
                 query.append(" where ");

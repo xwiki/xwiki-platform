@@ -32,6 +32,7 @@ import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceUserResolverType;
 import org.xwiki.user.UserResolver;
 
 /**
@@ -80,13 +81,13 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
     private UserResolver<UserReference> resolveUserResolver(UserReference userReference)
     {
         try {
-            return this.componentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+            return this.componentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
                 userReference.getClass().getName());
         } catch (ComponentLookupException e) {
             // If there's no resolver for the passed UserReference type, then the XWiki instance cannot work and thus
             // we need to fail hard and fast. Hence the runtime exception.
             throw new RuntimeException(String.format(
-                "Failed to find user resolver for role [%s] and hint [%s]", UserResolver.TYPE_USER_REFERENCE,
+                "Failed to find user resolver for role [%s] and hint [%s]", UserReferenceUserResolverType.INSTANCE,
                 userReference.getClass().getName()), e);
         }
     }

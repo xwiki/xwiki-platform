@@ -170,6 +170,7 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceUserResolverType;
 import org.xwiki.user.UserResolver;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.url.URLConfiguration;
@@ -502,7 +503,7 @@ public class XWiki implements EventListener
     private UserResolver<UserReference> getUserResolver()
     {
         if (this.userResolver == null) {
-            this.userResolver = Utils.getComponent(UserResolver.TYPE_USER_REFERENCE);
+            this.userResolver = Utils.getComponent(UserReferenceUserResolverType.INSTANCE);
         }
 
         return this.userResolver;

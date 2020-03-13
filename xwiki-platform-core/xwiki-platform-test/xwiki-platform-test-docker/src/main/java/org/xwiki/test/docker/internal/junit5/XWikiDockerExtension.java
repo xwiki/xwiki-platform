@@ -138,7 +138,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the
         // "host.testcontainers.internal" host name.
-        Testcontainers.exposeHostPorts(Ints.toArray(testConfiguration.getSSHPorts()));
+        exposeHostPorts(testConfiguration);
 
         // Initialize resolvers.
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration.isOffline());
@@ -470,4 +470,23 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
         }
     }
+
+    private void exposeHostPorts(TestConfiguration testConfiguration) throws Exception
+    {
+        try {
+            Testcontainers.exposeHostPorts(Ints.toArray(testConfiguration.getSSHPorts()));
+        } catch (Exception e) {
+            // This is to help in debugging the following issue that we get frequently:
+            //
+            // Caused by: java.lang.IllegalStateException: Can not connect to Ryuk
+            //   at org.testcontainers.utility.ResourceReaper.start(ResourceReaper.java:158)
+            //
+            // See https://gist.github.com/vmassol/9220adc4fd225a8a6332d73ad213127b for details
+            LOGGER.info(RuntimeUtils.run("docker ps -a"));
+            LOGGER.info(RuntimeUtils.run("docker events --since '15m' --until '0m'"));
+            LOGGER.info(RuntimeUtils.run("top -b -n 1"));
+            throw e;
+        }
+    }
+
 }

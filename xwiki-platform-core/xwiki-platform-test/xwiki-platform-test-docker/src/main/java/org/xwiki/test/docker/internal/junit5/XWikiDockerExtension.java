@@ -119,6 +119,11 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         if (testConfiguration.isVerbose()) {
             setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
             setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
+            // Don't display the stack trace that TC displays when it cannot find a config file override
+            // ("Testcontainers config override was found on file:/root/.testcontainers.properties but the file was not
+            // found), since this is not a problem and it's optional.
+            // See https://github.com/testcontainers/testcontainers-java/issues/2253
+            setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
         }
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the

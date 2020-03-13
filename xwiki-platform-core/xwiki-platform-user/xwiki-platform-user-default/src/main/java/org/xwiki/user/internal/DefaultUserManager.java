@@ -69,6 +69,8 @@ public class DefaultUserManager implements UserManager
         try {
             return this.componentManager.getInstance(UserManager.class, userReference.getClass().getName());
         } catch (ComponentLookupException e) {
+            // If there's no manager for the passed UserReference type, then the XWiki instance cannot work and thus
+            // we need to fail hard and fast. Hence the runtime exception.
             throw new RuntimeException(String.format(
                 "Failed to find user manager for role [%s] and hint [%s]", UserManager.class.getName(),
                 userReference.getClass().getName()), e);

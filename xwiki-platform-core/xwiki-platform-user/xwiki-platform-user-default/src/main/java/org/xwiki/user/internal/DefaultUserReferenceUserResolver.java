@@ -80,6 +80,8 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
             return this.componentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
                 userReference.getClass().getName());
         } catch (ComponentLookupException e) {
+            // If there's no resolver for the passed UserReference type, then the XWiki instance cannot work and thus
+            // we need to fail hard and fast. Hence the runtime exception.
             throw new RuntimeException(String.format(
                 "Failed to find user resolver for role [%s] and hint [%s]", UserResolver.TYPE_USER_REFERENCE,
                 userReference.getClass().getName()), e);

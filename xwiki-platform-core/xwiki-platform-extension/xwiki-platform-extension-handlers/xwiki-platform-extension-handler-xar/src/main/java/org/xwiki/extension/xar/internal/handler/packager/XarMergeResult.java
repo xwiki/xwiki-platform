@@ -25,19 +25,26 @@ import java.util.Map;
 import org.xwiki.xar.XarEntry;
 
 /**
+ * Contains the result of the merge of a set of XAR entries.
  * 
  * @version $Id$
  * @since 4.0M1
  */
 public class XarMergeResult
 {
-    private Map<XarEntry, XarEntryMergeResult> mergeResults = new LinkedHashMap<XarEntry, XarEntryMergeResult>();
+    private Map<XarEntry, XarEntryMergeResult> mergeResults = new LinkedHashMap<>();
 
+    /**
+     * @return The result of the merge per XAR entry.
+     */
     public Map<XarEntry, XarEntryMergeResult> getMergeResults()
     {
         return this.mergeResults;
     }
 
+    /**
+     * @param mergeResult the result of the merge of a XAR entry
+     */
     public void addMergeResult(XarEntryMergeResult mergeResult)
     {
         this.mergeResults.put(mergeResult.getEntry(), mergeResult);

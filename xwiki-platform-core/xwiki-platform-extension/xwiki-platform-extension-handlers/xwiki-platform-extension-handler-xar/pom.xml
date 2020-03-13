@@ -144,33 +144,20 @@
             <configuration>
               <excludes>
                 **/ConflictQuestion.java,
-                **/UnsupportedNamespaceException.java,
                 **/XarExtensionHandler.java,
                 **/XarExtensionJobFinishedListener.java,
-                **/DefaultPackageConfiguration.java,
-                **/NotADocumentException.java,
                 **/PackageConfiguration.java,
                 **/Packager.java,
-                **/PackagerException.java,
-                **/XarEntry.java,
                 **/XarEntryMergeResult.java,
-                **/XarFile.java,
-                **/XarMergeResult.java,
                 **/AbstractHandler.java,
-                **/AttachmentHandler.java,
-                **/DocumentHandler.java,
-                **/DocumentImporterHandler.java,
-                **/RootHandler.java,
-                **/UnknownRootElement.java,
-                **/XarPageLimitedHandler.java,
                 **/XarInstalledExtension.java,
                 **/XarInstalledExtensionRepository.java,
-                **/DocumentScriptSafeProvider.java,
                 **/SafeConflictQuestion.java,
                 **/DefaultXWikiDocumentMerger.java,
                 **/WikiEventListener.java,
                 **/XarExtensionPlan.java,
-                **/XarExtensionScriptService.java
+                **/XarExtensionScriptService.java,
+                **/RepairXarJob.java
               </excludes>
             </configuration>
           </execution>

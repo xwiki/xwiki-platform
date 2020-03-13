@@ -981,7 +981,7 @@ public class ExtensionManagerScriptService extends AbstractExtensionScriptServic
 
         try {
             return this.factory.getExtensionDependency(id, this.factory.getVersionConstraint(versionConstraint),
-                optional, null);
+                optional, null, null, null);
         } catch (Exception e) {
             setError(e);
         }

@@ -30,8 +30,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -103,20 +101,14 @@ public class DefaultInstanceIdManager implements InstanceIdManager, Initializabl
         context.setWikiId(context.getMainXWiki());
 
         try {
-            InstanceId id = store.failSafeExecuteRead(context,
-                new XWikiHibernateBaseStore.HibernateCallback<InstanceId>()
-                {
-                    @Override
-                    public InstanceId doInHibernate(Session session) throws HibernateException
-                    {
-                        // Retrieve the id from the database
-                        CriteriaBuilder builder = session.getCriteriaBuilder();
-                        CriteriaQuery<InstanceId> query = builder.createQuery(InstanceId.class);
-                        Root<InstanceId> root = query.from(InstanceId.class);
-                        query.select(root);
-                        return session.createQuery(query).getSingleResult();
-                    }
-                });
+            InstanceId id = store.failSafeExecuteRead(context, session -> {
+                // Retrieve the id from the database
+                CriteriaBuilder builder = session.getCriteriaBuilder();
+                CriteriaQuery<InstanceId> query = builder.createQuery(InstanceId.class);
+                Root<InstanceId> root = query.from(InstanceId.class);
+                query.select(root);
+                return session.createQuery(query).getSingleResult();
+            });
 
             // If the database doesn't hold the UUID then compute one and save it
             if (id == null) {
@@ -125,15 +117,10 @@ public class DefaultInstanceIdManager implements InstanceIdManager, Initializabl
                 // Store it. Note that this can fail in which case no UUID is saved in the DB and the operation
                 // will be retried again next time the wiki is restarted.
                 try {
-                    store.executeWrite(context, new XWikiHibernateBaseStore.HibernateCallback<Object>()
-                    {
-                        @Override
-                        public Object doInHibernate(Session session) throws HibernateException
-                        {
-                            session.createQuery("delete from " + InstanceId.class.getName()).executeUpdate();
-                            session.save(newId);
-                            return null;
-                        }
+                    store.executeWrite(context, session -> {
+                        session.createQuery("delete from " + InstanceId.class.getName()).executeUpdate();
+                        session.save(newId);
+                        return null;
                     });
                 } catch (XWikiException e) {
                     this.logger.warn("Failed to save Instance id to database. Reason: [{}]",

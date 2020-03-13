@@ -62,6 +62,8 @@ public class ConfiguredStringUserReferenceResolver implements UserReferenceResol
         try {
             return this.componentManager.getInstance(type, this.userConfiguration.getStoreHint());
         } catch (ComponentLookupException e) {
+            // If the configured user store hint is invalid (i.e. there's no resolver for it, then the XWiki instance
+            // cannot work and thus we need to fail hard and fast. Hence the runtime exception.
             throw new RuntimeException(String.format(
                 "Failed to find user reference resolver for role [%s] and hint [%s]", type,
                 this.userConfiguration.getStoreHint()), e);

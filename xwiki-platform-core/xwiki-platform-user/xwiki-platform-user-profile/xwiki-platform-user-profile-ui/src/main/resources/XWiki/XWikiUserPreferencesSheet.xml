@@ -333,6 +333,7 @@
     <property>
       <parameters>id=preferences
 icon=wrench
+## isActive: The user is seeing her own profile or the user is an admin.
 isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) || $hasAdmin)true#{else}false#end
 priority=20</parameters>
     </property>

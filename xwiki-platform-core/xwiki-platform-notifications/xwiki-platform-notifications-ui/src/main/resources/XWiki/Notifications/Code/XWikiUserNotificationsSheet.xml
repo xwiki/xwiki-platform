@@ -346,6 +346,7 @@
     <property>
       <parameters>id=notifications
 icon=bell
+## isActive: The user is seeing her own profile
 isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $xwiki.exists($services.model.createDocumentReference('', ['XWiki', 'Notifications', 'Code'], 'XWikiUserNotificationsSheet')))true#{else}false#end
 priority=60</parameters>
     </property>

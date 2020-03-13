@@ -125,9 +125,12 @@ public class WikiUIExtensionParameters
     {
         Map<String, String> result = new HashMap<String, String>();
         for (String line : rawParameters.split("[\\r\\n]+")) {
-            String[] pair = line.split("=", 2);
-            if (pair.length == 2 && !"".equals(pair[0]) && !"".equals(pair[1])) {
-                result.put(pair[0], pair[1]);
+            // lines starting with ## are considered as comment
+            if (!line.startsWith("##")) {
+                String[] pair = line.split("=", 2);
+                if (pair.length == 2 && !"".equals(pair[0]) && !"".equals(pair[1])) {
+                    result.put(pair[0], pair[1]);
+                }
             }
         }
 

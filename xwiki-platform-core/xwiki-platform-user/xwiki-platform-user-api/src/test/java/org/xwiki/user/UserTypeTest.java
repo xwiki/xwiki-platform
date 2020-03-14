@@ -35,7 +35,7 @@ public class UserTypeTest
     {
         assertEquals(UserType.ADVANCED, UserType.fromString("advanced"));
         assertEquals(UserType.SIMPLE, UserType.fromString("simple"));
-        assertEquals(UserType.ADVANCED, UserType.fromString("notsimple"));
-        assertEquals(UserType.ADVANCED, UserType.fromString(null));
+        assertEquals(UserType.SIMPLE, UserType.fromString("notadvanced"));
+        assertEquals(UserType.SIMPLE, UserType.fromString(null));
     }
 }

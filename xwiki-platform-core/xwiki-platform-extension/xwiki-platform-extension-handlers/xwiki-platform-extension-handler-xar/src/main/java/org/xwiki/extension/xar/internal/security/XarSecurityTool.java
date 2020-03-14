@@ -24,8 +24,6 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
 import org.xwiki.extension.xar.XarExtensionConfiguration;
@@ -36,10 +34,9 @@ import org.xwiki.extension.xar.security.ProtectionLevel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.UserResolver;
+import org.xwiki.user.UserType;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
@@ -63,10 +60,8 @@ public class XarSecurityTool
     private Provider<AuthorizationManager> authorizationProvider;
 
     @Inject
-    private Provider<XWikiContext> xcontextProvider;
-
-    @Inject
-    private Logger logger;
+    @Named("org.xwiki.user.internal.document.DocumentUserReference")
+    private UserResolver<DocumentReference> userResolver;
 
     // Not injected directly to not create a loop
     private AuthorizationManager authorization;
@@ -122,29 +117,6 @@ public class XarSecurityTool
      */
     public boolean isSimpleUser(DocumentReference userReference)
     {
-        if (XWikiRightService.isGuest(userReference)) {
-            return true;
-        }
-
-        if (XWikiRightService.isSuperAdmin(userReference)) {
-            return false;
-        }
-
-        XWikiContext xcontext = this.xcontextProvider.get();
-
-        if (xcontext != null) {
-            try {
-                XWikiDocument userDocument = xcontext.getWiki().getDocument(userReference, xcontext);
-
-                if (!userDocument.isNew() && !StringUtils.equals(userDocument.getStringValue("usertype"), "Advanced")) {
-                    // The user is not an advanced user
-                    return true;
-                }
-            } catch (XWikiException e) {
-                this.logger.error("Failed to access document of user [{}]. Assuming advanced user.", userReference);
-            }
-        }
-
-        return false;
+        return UserType.SIMPLE == this.userResolver.resolve(userReference).getType();
     }
 }

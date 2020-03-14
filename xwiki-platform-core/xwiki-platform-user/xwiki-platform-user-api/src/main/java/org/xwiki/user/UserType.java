@@ -49,10 +49,10 @@ public enum UserType
     public static UserType fromString(String typeAsString)
     {
         UserType result;
-        if (typeAsString != null && "advanced".equalsIgnoreCase(typeAsString)) {
-            result = ADVANCED;
-        } else {
+        if ("simple".equalsIgnoreCase(typeAsString)) {
             result = SIMPLE;
+        } else {
+            result = ADVANCED;
         }
         return result;
     }

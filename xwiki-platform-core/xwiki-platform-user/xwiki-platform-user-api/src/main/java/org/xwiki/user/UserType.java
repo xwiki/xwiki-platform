@@ -42,7 +42,7 @@ public enum UserType
     ADVANCED;
 
     /**
-     * @param typeAsString the user type represented as a string ("simple", "advanced")
+     * @param typeAsString the user type represented as a string ("Simple", "Advanced"). The case is ignored.
      * @return the {@link UserType} object matching the passed string representation. All values different than
      *         {@code advanced} are considered to represent a simple user
      */

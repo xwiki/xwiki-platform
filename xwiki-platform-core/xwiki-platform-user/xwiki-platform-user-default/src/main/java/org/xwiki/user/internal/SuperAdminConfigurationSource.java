@@ -58,7 +58,7 @@ public class SuperAdminConfigurationSource extends CommonsConfigurationSource im
         configuration.addProperty(ACTIVE, "1");
         configuration.addProperty(FIRST_NAME, "SuperAdmin");
         configuration.addProperty(EMAIL_CHECKED, "1");
-        configuration.addProperty(USER_TYPE, "advanced");
+        configuration.addProperty(USER_TYPE, "Advanced");
 
         // User-defined and overriding preferences
         this.userConfiguration.getSuperAdminPreferences().forEach((key, value)

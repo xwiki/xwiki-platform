@@ -48,7 +48,7 @@ public enum Editor
     UNDEFINED;
 
     /**
-     * @param editorAsString the editor represented as a string ("Text", "Wysiwyg")
+     * @param editorAsString the editor represented as a string ("Text", "Wysiwyg"). The case is ignored.
      * @return the {@link Editor} object matching the passed string representation. All values different than
      *         {@code Text} (case ignored) are considered to represent the WYSIWYG editor.
      */

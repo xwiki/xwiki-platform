@@ -35,7 +35,9 @@
 #if ($editor != 'inline')
 <dl id="titleinput" class="form-group">
   <dt>
-    <label for="xwikidoctitleinput">$escapetool.xml($services.localization.render('core.editors.content.titleField.label'))</label>
+    <label for="xwikidoctitleinput">
+      $escapetool.xml($services.localization.render('core.editors.content.titleField.label'))
+    </label>
   </dt>
   <dd>
     <input type="text" id="xwikidoctitleinput" name="title" value="$escapetool.xml("$!docTitle")" 
@@ -47,7 +49,9 @@
 #if($editor == 'wiki')
 <dl id="contentMeta">
   <dt>
-    <label for="content">$escapetool.xml($services.localization.render('core.editors.content.contentField.label'))</label>
+    <label for="content">
+      $escapetool.xml($services.localization.render('core.editors.content.contentField.label'))
+    </label>
   </dt>
   ## Content area has an empty <dd> because the content text area is far below and couldn't be moved here,
   ## and the HTML needs to remain valid.

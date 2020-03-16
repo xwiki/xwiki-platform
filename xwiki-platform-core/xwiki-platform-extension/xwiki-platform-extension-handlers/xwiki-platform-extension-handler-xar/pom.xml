@@ -170,7 +170,8 @@
                 **/DefaultXWikiDocumentMerger.java,
                 **/WikiEventListener.java,
                 **/XarExtensionPlan.java,
-                **/XarExtensionScriptService.java
+                **/XarExtensionScriptService.java,
+                **/RepairXarJob.java
               </excludes>
             </configuration>
           </execution>

@@ -36,17 +36,17 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>office.createForm.type.name=Страницы из Office
-office.createForm.type.description=Импорт документов Office на вики-страницы
-office.form.error.noDocument=Вы должны использовать {0} создать {1} для импорта документа Office.
-office.form.append.hint=Документ уже существует! Добавить результат к существующей вики-странице
+  <content>office.createForm.type.name=Страница из Office
+office.createForm.type.description=Импорт документов Office в wiki-страницы
+office.form.error.noDocument=Вы должны использовать {0}создать{1} для импорта документа Office.
+office.form.append.hint=Документ уже существует! Добавить результат к существующей wiki-странице
 
 office.config.serverType.hint=Тип сервера Office. Может быть внутренним (локальным) или внешним (удаленным).
 office.config.serverPort.hint=Номер порта, используемый для подключения к экземпляру сервера Office
 office.config.autoStart.hint=Укажите, должен ли сервер Office запускаться / подключаться автоматически при запуске XWiki
 office.config.serverPath.hint=Путь к установке Office
-### Missing: office.config.serverState.connected=Connected
-### Missing: office.config.serverState.notConnected=Not Connected
-### Missing: office.config.serverState.confError=Invalid Configuration
-### Missing: office.config.serverState.error=Error</content>
+office.config.serverState.connected=Подключен
+office.config.serverState.notConnected=Не подключен
+office.config.serverState.confError=Неправильные настройки
+office.config.serverState.error=Ошибка</content>
 </xwikidoc>

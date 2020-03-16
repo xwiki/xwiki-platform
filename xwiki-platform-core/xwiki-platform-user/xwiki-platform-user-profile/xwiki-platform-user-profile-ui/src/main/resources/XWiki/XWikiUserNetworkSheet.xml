@@ -656,7 +656,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     <property>
       <parameters>id=network
 icon=world
-## isActive: The user is seeing her own profile and the watch service is available.
+# isActive: The user is seeing her own profile and the watch service is available.
 isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; ("$!services.notification.watch" != '' || $hasWatch))true#{else}false#end
 priority=50</parameters>
     </property>

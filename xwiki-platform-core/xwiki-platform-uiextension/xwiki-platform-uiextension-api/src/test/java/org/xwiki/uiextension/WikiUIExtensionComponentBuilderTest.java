@@ -155,7 +155,7 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
     public void buildComponents(ComponentManager componentManager) throws Exception
     {
         BaseObject extensionObject = createExtensionObject("name", "extensionPointId", "content",
-            "key=value=foo\nkey2=value2\ninvalid=\n\n=invalid", "user");
+            "key=value=foo\nkey2=value2\nempty=\n\n=invalid", "user");
 
         ContentParser contentParser = componentManager.getInstance(ContentParser.class);
         VelocityManager velocityManager = componentManager.getInstance(VelocityManager.class);
@@ -168,11 +168,14 @@ public class WikiUIExtensionComponentBuilderTest implements WikiUIExtensionConst
         UIExtension uiExtension = (UIExtension) components.get(0);
         Map<String, String> parameters = uiExtension.getParameters();
 
-        assertEquals(2, parameters.size());
+        assertEquals(3, parameters.size());
         verify(velocityManager.getVelocityEngine()).evaluate(any(VelocityContext.class), any(StringWriter.class),
             eq("name:key"), eq("value=foo"));
         verify(velocityManager.getVelocityEngine()).evaluate(any(VelocityContext.class), any(StringWriter.class),
             eq("name:key2"), eq("value2"));
+        verify(velocityManager.getVelocityEngine()).evaluate(any(VelocityContext.class), any(StringWriter.class),
+            eq("name:empty"), eq(""));
+
     }
 
     private BaseObject createExtensionObject(String id, String extensionPointId, String content, String parameters,

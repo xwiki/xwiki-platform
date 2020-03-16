@@ -19,9 +19,13 @@
  */
 package org.xwiki.uiextension.internal;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
@@ -53,7 +57,7 @@ public class WikiUIExtensionParameters
     private String id;
 
     /**
-     * @see #WikiUIExtensionParameters(String, org.xwiki.component.manager.ComponentManager)
+     * @see #WikiUIExtensionParameters(String, String, ComponentManager)
      */
     private Map<String, String> parameters;
 
@@ -75,7 +79,7 @@ public class WikiUIExtensionParameters
     private String previousWiki;
 
     /**
-     * @see #WikiUIExtensionParameters(String, org.xwiki.component.manager.ComponentManager)
+     * @see #WikiUIExtensionParameters(String, String, ComponentManager)
      */
     private VelocityManager velocityManager;
 
@@ -123,15 +127,18 @@ public class WikiUIExtensionParameters
      */
     private Map<String, String> parseParameters(String rawParameters)
     {
-        Map<String, String> result = new HashMap<String, String>();
-        for (String line : rawParameters.split("[\\r\\n]+")) {
-            // lines starting with ## are considered as comment
-            if (!line.startsWith("##")) {
-                String[] pair = line.split("=", 2);
-                if (pair.length == 2 && !"".equals(pair[0]) && !"".equals(pair[1])) {
-                    result.put(pair[0], pair[1]);
+        Map<String, String> result;
+        Properties properties = new Properties();
+        try {
+            properties.load(new StringReader(rawParameters));
+            result = new HashMap<>();
+            for (String key : properties.stringPropertyNames()) {
+                if (!Objects.equals(key, "")) {
+                    result.put(key, properties.getProperty(key));
                 }
             }
+        } catch (IOException e) {
+            result = new HashMap<>();
         }
 
         return result;

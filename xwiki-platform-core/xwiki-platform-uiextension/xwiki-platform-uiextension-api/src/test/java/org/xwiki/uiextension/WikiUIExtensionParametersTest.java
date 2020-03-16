@@ -112,10 +112,10 @@ public class WikiUIExtensionParametersTest
     {
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
 
-        String paramsStr = "## a = 1\n" +
+        String paramsStr = "# a = 1\n" +
                                "x=1\n" +
-                               "y=3\n" +
-                               "## ...\n" +
+                               "y=2\n" +
+                               "# ...\n" +
                                "z=3";
         WikiUIExtensionParameters parameters =
             new WikiUIExtensionParameters("id", paramsStr, componentManager);
@@ -133,8 +133,9 @@ public class WikiUIExtensionParametersTest
         when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
 
         String paramsStr = "x=1##b\n" +
-                "y=2####x\n" +
-                "z=3 ## xyz";
+                               "y=2####x\n" +
+                               "z=3 ## xyz\n" 
+                               + "";
         WikiUIExtensionParameters parameters =
             new WikiUIExtensionParameters("id", paramsStr, componentManager);
         parameters.get();

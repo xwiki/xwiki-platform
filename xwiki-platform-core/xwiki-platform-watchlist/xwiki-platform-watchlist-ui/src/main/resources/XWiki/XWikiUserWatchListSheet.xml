@@ -255,7 +255,7 @@
     <property>
       <parameters>id=watchlist
 icon=eye
-## isActive: The user is seeing her own profile.
+# isActive: The user is seeing her own profile.
 isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasWatch)true#{else}false#end
 priority=40</parameters>
     </property>

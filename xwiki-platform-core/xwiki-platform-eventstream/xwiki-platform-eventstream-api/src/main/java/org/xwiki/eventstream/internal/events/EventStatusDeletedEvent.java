@@ -19,6 +19,8 @@
  */
 package org.xwiki.eventstream.internal.events;
 
+import java.io.Serializable;
+
 import org.xwiki.observation.event.Event;
 
 /**
@@ -27,8 +29,10 @@ import org.xwiki.observation.event.Event;
  * @version $Id$
  * @since 12.1RC1
  */
-public class EventStatusDeletedEvent implements Event
+public class EventStatusDeletedEvent implements Event, Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public boolean matches(Object otherEvent)
     {

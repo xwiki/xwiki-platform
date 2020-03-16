@@ -31,6 +31,7 @@ import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 /**
  * Receive events and dispatch them for each user.
@@ -55,6 +56,9 @@ public class UserEventDispatcherListener extends AbstractEventListener
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
 
     @Inject
+    private RemoteObservationManagerContext remoteState;
+
+    @Inject
     private Logger logger;
 
     /**
@@ -69,7 +73,8 @@ public class UserEventDispatcherListener extends AbstractEventListener
     public void onEvent(Event event, Object source, Object data)
     {
         // Make sure the notification module is enabled
-        if (this.notificationConfiguration.isEnabled() && this.notificationConfiguration.isEventPreFilteringEnabled()) {
+        if (!this.remoteState.isRemoteState() && this.notificationConfiguration.isEnabled()
+            && this.notificationConfiguration.isEventPreFilteringEnabled()) {
             org.xwiki.eventstream.Event eventStreamEvent = (org.xwiki.eventstream.Event) source;
 
             try {

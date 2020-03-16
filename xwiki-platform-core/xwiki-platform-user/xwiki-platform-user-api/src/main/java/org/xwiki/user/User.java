@@ -19,6 +19,7 @@
  */
 package org.xwiki.user;
 
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -29,18 +30,8 @@ import org.xwiki.stability.Unstable;
  * @since 12.2RC1
  */
 @Unstable
-public interface User
+public interface User extends ConfigurationSource
 {
-    /**
-     * Represents the Guest user, see {@link GuestUser}.
-     */
-    User GUEST = GuestUser.INSTANCE;
-
-    /**
-     * Represents the Super Admin user, see {@link SuperAdminUser}.
-     */
-    User SUPERADMIN = SuperAdminUser.INSTANCE;
-
     /**
      * @return true if the user is configured to display hidden documents in the wiki
      */
@@ -73,22 +64,16 @@ public interface User
     UserType getType();
 
     /**
+     * @return the default editor to use when editing content for this user (text editor, wysiwyg editor)
+     */
+    Editor getEditor();
+
+    /**
      * @return true if the user's email has been checked. In some configurations, users must have had their emails
      *         verified before they can access the wiki. Also, disabled users must have their emails checked to be
      *         able to view pages.
      */
     boolean isEmailChecked();
-
-    /**
-     * @return true if this user is registered in the main wiki (i.e. it's a global user)
-     */
-    boolean isGlobal();
-
-    /**
-     * @param propertyName the name of the user property to look for
-     * @return the value of the passed user property
-     */
-    Object getProperty(String propertyName);
 
     /**
      * @return the reference to his user (i.e. a way to retrieve this user's data)

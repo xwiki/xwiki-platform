@@ -40,6 +40,7 @@ import org.xwiki.extension.ExtensionManager;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.ResolveException;
 import org.xwiki.extension.job.internal.AbstractInstallPlanJob;
+import org.xwiki.extension.job.internal.ExtensionPlanContext;
 import org.xwiki.extension.job.plan.internal.DefaultExtensionPlanTree;
 import org.xwiki.extension.repository.result.IterableResult;
 import org.xwiki.extension.version.IncompatibleVersionConstraintException;
@@ -149,7 +150,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
      */
     @Override
     protected void installMandatoryExtensionDependency(ExtensionDependency extensionDependency, String namespace,
-        List<ModifableExtensionPlanNode> parentBranch, Map<String, ExtensionDependency> managedDependencies,
+        List<ModifableExtensionPlanNode> parentBranch, ExtensionPlanContext extensionContext,
         Set<String> parents) throws InstallException, IncompatibleVersionConstraintException, ResolveException
     {
         // Cheating a bit to speed up resolution:
@@ -160,7 +161,7 @@ public class FlavorSearchJob extends AbstractInstallPlanJob<FlavorSearchRequest>
             if (this.validatedExtensions.get(extensionDependency) == Boolean.TRUE
                 && this.configuration.getRecomendedVersionConstraint(extensionDependency.getId()) == null) {
                 super.installMandatoryExtensionDependency(extensionDependency, namespace, parentBranch,
-                    managedDependencies, parents);
+                    extensionContext, parents);
             }
 
             valid = Boolean.TRUE;

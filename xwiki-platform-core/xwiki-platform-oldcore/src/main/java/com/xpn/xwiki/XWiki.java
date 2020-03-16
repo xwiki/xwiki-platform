@@ -84,7 +84,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
-import org.apache.http.protocol.HTTP;
 import org.apache.velocity.VelocityContext;
 import org.hibernate.HibernateException;
 import org.slf4j.Logger;
@@ -169,6 +168,10 @@ import org.xwiki.skin.SkinManager;
 import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceUserResolverType;
+import org.xwiki.user.UserResolver;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityManager;
@@ -428,7 +431,7 @@ public class XWiki implements EventListener
 
     private ConfigurationSource wikiConfiguration;
 
-    private ConfigurationSource userConfiguration;
+    private UserResolver<UserReference> userResolver;
 
     private ConfigurationSource spaceConfiguration;
 
@@ -497,13 +500,13 @@ public class XWiki implements EventListener
         return this.spaceConfiguration;
     }
 
-    private ConfigurationSource getUserConfiguration()
+    private UserResolver<UserReference> getUserResolver()
     {
-        if (this.userConfiguration == null) {
-            this.userConfiguration = Utils.getComponent(ConfigurationSource.class, "user");
+        if (this.userResolver == null) {
+            this.userResolver = Utils.getComponent(UserReferenceUserResolverType.INSTANCE);
         }
 
-        return this.userConfiguration;
+        return this.userResolver;
     }
 
     private EditConfiguration getEditConfiguration()
@@ -2924,12 +2927,13 @@ public class XWiki implements EventListener
     }
 
     /**
-     * Get the reference of the space and fallback on parent space or wiki in case nothing is found.
+     * Get the preference key for the space and fallback on parent space or wiki in case nothing is found.
      * <p>
      * If the property is not set on any level then <code>defaultValue</code> is returned.
      * 
      * @param preferenceKey the name of the preference key
-     * @param spaceReference the reference of the space
+     * @param spaceReference the reference of the space. If null and there's a current document then the current space
+     *                       is used. If null and there's no current document then fall back to the wiki preferences.
      * @param defaultValue the value to return if the preference can't be found
      * @param context see {@link XWikiContext}
      * @return the value of the preference or <code>defaultValue</code> if it could not be found
@@ -2969,7 +2973,8 @@ public class XWiki implements EventListener
 
     public String getUserPreference(String prefname, XWikiContext context)
     {
-        String result = getUserConfiguration().getProperty(prefname, String.class);
+        String result =
+            getUserResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
 
         if (StringUtils.isEmpty(result)) {
             result = getSpacePreference(prefname, context);
@@ -3036,11 +3041,29 @@ public class XWiki implements EventListener
     }
 
     /**
-     * First try to find the current locale in use from the XWiki context. If none is used and if the wiki is not
-     * multilingual use the default locale defined in the XWiki preferences. If the wiki is multilingual try to get the
-     * locale passed in the request. If none was passed try to get it from a cookie. If no locale cookie exists then use
-     * the user default locale and barring that use the browser's "Accept-Language" header sent in HTTP request. If none
-     * is defined use the default locale.
+     * The algorithm to find the locale to use is the following, in this order:
+     *
+     * <ul>
+     *   <li>Try to find the current locale in use from the XWiki contex</li>
+     *   <li>If the wiki is not multilingual use the wiki default locale ({@code default_language} xproperty in
+     *   {@code XWikiPreferences} xobject or English if not found)</li>
+     *   <li>If the wiki is multilingual<ul>
+     *     <li>Try to get the locale passed in the request (looking for a {@code language} query string parameter).
+     *     If the language value is {@code default} use the wiki default locale. If a parameter is found sets a
+     *     {@code language} cookie to remember the language in use.</li>
+     *     <li>Try to get the locale from the {@code language} cookie</li>
+     *     <li>If the default language is preferred ({@code xwiki.language.preferDefault} from {@code xwiki.cfg}
+     *     or {@code preferDefaultLanguage} property from the space preferences ({@code WebPreferences} xobject) or
+     *     wiki preferences ({@code XWikiPreferences} xobject})), and since the user didn't explicitly ask for a
+     *     language already, then use the wiki default locale.</li>
+     *     <li>Try to use the browser's {@code Accept-Language} header sent in HTTP request.<li>
+     *     <li>Fallback to the wiki default locale</li>
+     *   </ul></li>
+     * </ul>
+     *
+     * In addition the {code xwiki.language.forceSupported} configuration property is enabled by default and means that
+     * if at any step above the locale found is not in the list of supported locales, then the locale is not set and
+     * the algorithm moves to the next step.
      *
      * @return the locale to use
      * @since 8.0M1
@@ -3106,24 +3129,6 @@ public class XWiki implements EventListener
                 }
             }
         } catch (Exception e) {
-        }
-
-        // Next from the default user preference
-        try {
-            String user = context.getUser();
-            XWikiDocument userdoc;
-            userdoc = getDocument(user, context);
-            if (userdoc != null) {
-                String language =
-                    Util.normalizeLanguage(userdoc.getStringValue("XWiki.XWikiUsers", "default_language"));
-                if (StringUtils.isNotEmpty(language)) {
-                    locale = setLocale(LocaleUtils.toLocale(language), context, availableLocales, forceSupported);
-                    if (LocaleUtils.isAvailableLocale(locale)) {
-                        return locale;
-                    }
-                }
-            }
-        } catch (XWikiException e) {
         }
 
         // If the default language is preferred, and since the user didn't explicitly ask for a

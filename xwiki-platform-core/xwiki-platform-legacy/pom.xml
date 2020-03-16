@@ -41,6 +41,7 @@
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-legacy-annotation</module>
     <module>xwiki-platform-legacy-instance</module>
+    <module>xwiki-platform-legacy-mail</module>
     <module>xwiki-platform-legacy-model-api</module>
     <module>xwiki-platform-legacy-notification-activitymacro</module>
     <module>xwiki-platform-legacy-observation</module>

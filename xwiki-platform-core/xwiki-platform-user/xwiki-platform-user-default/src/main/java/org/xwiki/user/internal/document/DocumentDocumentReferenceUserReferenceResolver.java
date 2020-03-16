@@ -19,11 +19,14 @@
  */
 package org.xwiki.user.internal.document;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 
 /**
@@ -37,12 +40,20 @@ import org.xwiki.user.UserReference;
 @Singleton
 public class DocumentDocumentReferenceUserReferenceResolver extends AbstractUserReferenceResolver<DocumentReference>
 {
+    @Inject
+    private EntityReferenceProvider entityReferenceProvider;
+
     @Override
     public UserReference resolve(DocumentReference rawReference, Object... parameters)
     {
-        UserReference reference = resolveName(rawReference.getName());
-        if (reference == null) {
-            reference = new DocumentUserReference(rawReference);
+        UserReference reference;
+        if (rawReference == null) {
+            reference = CurrentUserReference.INSTANCE;
+        } else {
+            reference = resolveName(rawReference.getName());
+            if (reference == null) {
+                reference = new DocumentUserReference(rawReference, this.entityReferenceProvider);
+            }
         }
         return reference;
     }

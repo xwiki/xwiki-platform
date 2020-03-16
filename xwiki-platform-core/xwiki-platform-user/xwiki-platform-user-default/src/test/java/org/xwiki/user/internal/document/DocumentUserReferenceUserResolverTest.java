@@ -23,9 +23,13 @@ import javax.inject.Named;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceProvider;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
@@ -52,11 +56,14 @@ public class DocumentUserReferenceUserResolverTest
     @Named("org.xwiki.user.CurrentUserReference")
     private UserResolver<UserReference> currentUserResolver;
 
+    @MockComponent
+    protected EntityReferenceProvider entityReferenceProvider;
+
     @Test
     void resolve()
     {
         DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
-        User user = this.resolver.resolve(new DocumentUserReference(documentReference));
+        User user = this.resolver.resolve(new DocumentUserReference(documentReference,this.entityReferenceProvider));
         assertNotNull(user);
         assertEquals("wiki:space.page", ((DocumentUser) user).getUserReference().getReference().toString());
     }
@@ -67,7 +74,7 @@ public class DocumentUserReferenceUserResolverTest
         User currentUser = mock(User.class);
         when(this.currentUserResolver.resolve(any())).thenReturn(currentUser);
 
-        User user = this.resolver.resolve(UserReference.CURRENT_USER_REFERENCE);
+        User user = this.resolver.resolve(CurrentUserReference.INSTANCE);
         assertNotNull(user);
         assertSame(currentUser, user);
     }
@@ -86,30 +93,30 @@ public class DocumentUserReferenceUserResolverTest
     @Test
     void resolveGuest()
     {
-        User user = this.resolver.resolve(UserReference.GUEST_REFERENCE);
-        assertSame(User.GUEST, user);
+        User user = this.resolver.resolve(GuestUserReference.INSTANCE);
+        assertSame(GuestUserReference.INSTANCE, user.getUserReference());
     }
 
     @Test
     void resolveGuestWhenSpecifiedAsString()
     {
         User user = this.resolver.resolve(new DocumentUserReference(
-            new DocumentReference("wiki", "space", "XWikiGuest")));
-        assertSame(User.GUEST, user);
+            new DocumentReference("wiki", "space", "XWikiGuest"), this.entityReferenceProvider));
+        assertSame(GuestUserReference.INSTANCE, user.getUserReference());
     }
 
     @Test
     void resolveSuperAdmin()
     {
-        User user = this.resolver.resolve(UserReference.SUPERADMIN_REFERENCE);
-        assertSame(User.SUPERADMIN, user);
+        User user = this.resolver.resolve(SuperAdminUserReference.INSTANCE);
+        assertSame(SuperAdminUserReference.INSTANCE, user.getUserReference());
     }
 
     @Test
     void resolveSuperAdminWhenSpecifiedAsString()
     {
         User user = this.resolver.resolve(new DocumentUserReference(
-            new DocumentReference("wiki", "space", "superadmin")));
-        assertSame(User.SUPERADMIN, user);
+            new DocumentReference("wiki", "space", "superadmin"), this.entityReferenceProvider));
+        assertSame(SuperAdminUserReference.INSTANCE, user.getUserReference());
     }
 }

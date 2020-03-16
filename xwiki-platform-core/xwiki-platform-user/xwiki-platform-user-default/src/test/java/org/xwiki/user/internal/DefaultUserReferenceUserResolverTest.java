@@ -21,6 +21,7 @@ package org.xwiki.user.internal;
 
 import javax.inject.Named;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
@@ -28,8 +29,11 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceUserResolverType;
 import org.xwiki.user.UserResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,6 +61,11 @@ public class DefaultUserReferenceUserResolverTest
 
     private class TestUserReference implements UserReference
     {
+        @Override
+        public boolean isGlobal()
+        {
+            return false;
+        }
     }
 
     @Test
@@ -65,7 +74,7 @@ public class DefaultUserReferenceUserResolverTest
         UserResolver<TestUserReference> customUserResolver = mock(UserResolver.class);
         when(customUserResolver.resolve(any(TestUserReference.class))).thenReturn(mock(User.class));
 
-        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+        when(this.contextComponentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
             TestUserReference.class.getName())).thenReturn(customUserResolver);
 
         assertNotNull(this.resolver.resolve(new TestUserReference()));
@@ -77,10 +86,10 @@ public class DefaultUserReferenceUserResolverTest
         UserResolver<CurrentUserReference> customUserResolver = mock(UserResolver.class);
         when(customUserResolver.resolve(any(CurrentUserReference.class))).thenReturn(mock(User.class));
 
-        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+        when(this.contextComponentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
             CurrentUserReference.class.getName())).thenReturn(customUserResolver);
 
-        assertNotNull(this.resolver.resolve(UserReference.CURRENT_USER_REFERENCE));
+        assertNotNull(this.resolver.resolve(CurrentUserReference.INSTANCE));
     }
 
     @Test
@@ -89,7 +98,7 @@ public class DefaultUserReferenceUserResolverTest
         UserResolver<CurrentUserReference> customUserResolver = mock(UserResolver.class);
         when(customUserResolver.resolve(any(CurrentUserReference.class))).thenReturn(mock(User.class));
 
-        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+        when(this.contextComponentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
             CurrentUserReference.class.getName())).thenReturn(customUserResolver);
 
         assertNotNull(this.resolver.resolve(null));
@@ -98,27 +107,30 @@ public class DefaultUserReferenceUserResolverTest
     @Test
     void resolveWhenNoUserResolver() throws Exception
     {
-        when(this.contextComponentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+        when(this.contextComponentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
             TestUserReference.class.getName())).thenThrow(new ComponentLookupException("error"));
 
         Throwable exception = assertThrows(RuntimeException.class, () -> {
             this.resolver.resolve(new TestUserReference());
         });
-        assertEquals("Failed to find component implementation for role "
+        assertEquals("Failed to find user resolver for role "
             + "[org.xwiki.user.UserResolver<org.xwiki.user.UserReference>] and hint "
             + "[org.xwiki.user.internal.DefaultUserReferenceUserResolverTest$TestUserReference]",
             exception.getMessage());
+        assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));
     }
 
     @Test
     void resolveForSuperAdminReference()
     {
-        assertSame(User.SUPERADMIN, this.resolver.resolve(UserReference.SUPERADMIN_REFERENCE));
+        assertSame(SuperAdminUserReference.INSTANCE,
+            this.resolver.resolve(SuperAdminUserReference.INSTANCE).getUserReference());
     }
 
     @Test
     void resolveForGuestReference()
     {
-        assertSame(User.GUEST, this.resolver.resolve(UserReference.GUEST_REFERENCE));
+        assertSame(GuestUserReference.INSTANCE,
+            this.resolver.resolve(GuestUserReference.INSTANCE).getUserReference());
     }
 }

@@ -48,7 +48,7 @@
       ## config document. This however should not happen.
       #set ($annotationCount = $services.annotations.getAnnotations($doc).size())
     #end
-    #set ($discard = $docextralinks.add(['annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'pushpin']))
+    #set ($discard = $docextralinks.add(['annotations', $services.localization.render('docextra.annotations'), $annotationCount, 'note', '', 'tmAnnotation']))
   #end
   #if($viewer != 'attachments' && $showattachments && !$doc.isNew())
     #set ($discard = $docextralinks.add(['attachments', $services.localization.render('docextra.attachments'), $doc.getAttachmentList().size(), 'attach', '', 'tmAttachments']))

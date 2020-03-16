@@ -19,6 +19,8 @@
  */
 package org.xwiki.notifications.preferences.internal.event;
 
+import java.io.Serializable;
+
 import org.xwiki.observation.event.Event;
 
 /**
@@ -28,8 +30,10 @@ import org.xwiki.observation.event.Event;
  * @since 10.11.4
  * @since 11.2
  */
-public abstract class AbstractNotificationPreferenceEvent implements Event
+public abstract class AbstractNotificationPreferenceEvent implements Event, Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public boolean matches(Object otherEvent)
     {

@@ -92,22 +92,13 @@
 #set ($isReadOnly = $xwiki.isReadOnly())
 #set ($spaceViewUrl = $spaceDoc.getURL('view'))
 #set ($viewUrl = $doc.getURL('view'))
-#set ($userObj = $!crtUserDoc.getObject('XWiki.XWikiUsers', 0))
 ## =====================================================================================
 ## Advanced users are:
-## - super admin
-## - user documents who have their usertype property set to "Advanced"
+## - users who have their "usertype" property set to "Advanced". This includes the
+##   SuperAdmin user
 ## - guest users who have admin rights (i.e. when the wiki is empty with no rights set)
 ## =====================================================================================
-#if ($isSuperAdmin)
-  #set ($isAdvancedUser = true)
-#elseif ($isGuest && $hasAdmin)
-  #set ($isAdvancedUser = true)
-#elseif (!$userObj.getProperty('usertype').value)
-  #set ($isAdvancedUser = false)
-#else
-  #set ($isAdvancedUser = ($userObj.getProperty('usertype').value == 'Advanced'))
-#end
+#set ($isAdvancedUser = (($isGuest && $hasAdmin) || $services.user.currentUser.type == 'ADVANCED'))
 ## ======================================================================================
 ## Compute list of spaces to blacklist so that simple users don't see them.
 ## TODO : replace this list by a hidden space feature.

@@ -22,6 +22,7 @@ package org.xwiki.configuration.internal;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -62,21 +63,20 @@ public abstract class AbstractSpacesConfigurationSource extends AbstractComposit
         @Override
         public ConfigurationSource next()
         {
-            SpaceReference next = this.reference;
-
-            if (this.reference != null) {
-                // Move reference to parent
-                if (this.reference.getParent() instanceof SpaceReference) {
-                    this.reference = (SpaceReference) this.reference.getParent();
-                } else {
-                    this.reference = null;
-                }
-
-                // Return wrapped space configuration associated to the space reference
-                return new SpaceConfigurationSource(next);
+            if (!hasNext()) {
+                throw new NoSuchElementException();
             }
 
-            return null;
+            SpaceReference next = this.reference;
+            // Move reference to parent
+            if (this.reference.getParent() instanceof SpaceReference) {
+                this.reference = (SpaceReference) this.reference.getParent();
+            } else {
+                this.reference = null;
+            }
+
+            // Return wrapped space configuration associated to the space reference
+            return new SpaceConfigurationSource(next);
         }
 
         @Override
@@ -84,7 +84,6 @@ public abstract class AbstractSpacesConfigurationSource extends AbstractComposit
         {
             throw new UnsupportedOperationException();
         }
-
     }
 
     private class SpaceConfigurationSource implements ConfigurationSource

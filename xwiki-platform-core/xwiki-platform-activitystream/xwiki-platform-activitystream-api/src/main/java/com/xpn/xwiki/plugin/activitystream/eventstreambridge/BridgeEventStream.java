@@ -130,6 +130,25 @@ public class BridgeEventStream implements EventStream
         return convertActivitiesToEvents(events);
     }
 
+    @Override
+    public Event getEvent(String eventId) throws QueryException
+    {
+        Query q = this.qm.createQuery("select event from ActivityEventImpl event where eventId = :eventId", Query.HQL);
+        q.bindValue("eventId", eventId);
+
+        if (activityStreamConfiguration.useMainStore()) {
+            q.setWiki(wikiDescriptorManager.getMainWikiId());
+        }
+
+        List<ActivityEvent> events = q.execute();
+
+        if (events.isEmpty()) {
+            return null;
+        }
+
+        return eventConverter.convertActivityToEvent(events.get(0));
+    }
+
     /**
      * Retrieve the old {@link XWikiContext} from the {@link org.xwiki.context.ExecutionContext execution context}.
      *

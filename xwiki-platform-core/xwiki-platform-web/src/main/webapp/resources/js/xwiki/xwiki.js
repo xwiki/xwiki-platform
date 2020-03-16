@@ -375,7 +375,7 @@ Object.extend(XWiki, {
       if ( $xwiki.hasSectionEdit() && XWiki.docsyntax != "xwiki/1.0" && XWiki.contextaction == "view" && XWiki.hasEdit) {
 
           // Section count starts at one, not zero.
-          var sectioncount = 1;
+          var sectionCount = 1;
 
           container = $(container || 'body');
           container = container.id == 'xwikicontent' ? container : container.down('#xwikicontent');
@@ -388,34 +388,41 @@ Object.extend(XWiki, {
           // Only allow section editing for the specified depth level (2 by default)
           var headerPattern = new RegExp("H[1-" + $xwiki.getSectionEditingDepth() + "]");
 
-          // For all non-generated headers, add a SPAN and A element in order to be able to edit the section.
+          // For all non-generated headers insert a link in order to be able to edit the section.
           for (var i = 0; i < nodes.length; i++) {
 
               var node = $(nodes[i]);
 
-              if (headerPattern.test(node.nodeName) && node.className.include("wikigeneratedheader") == false) {
-                  var editspan = document.createElement("SPAN");
-                  editspan.className = "edit_section";
-                  // Hide the section editing link if the section heading is hidden.
-                  (!node.visible() || node.hasClassName('hidden')) && editspan.hide();
+              if (headerPattern.test(node.nodeName) && !node.classList.contains('wikigeneratedheader') &&
+                      !node.down('a.edit_section')) {
+                  var editSectionLink = document.createElement('a');
+                  editSectionLink.className = 'edit_section';
+                  // Show the section editing link only if the section heading is visible.
+                  editSectionLink.toggle(node.visible() && !node.hasClassName('hidden'));
+                  editSectionLink.setAttribute('role', 'button');
+                  editSectionLink.title = $jsontool.serialize($services.localization.render('edit'));
+                  editSectionLink.innerHTML = $jsontool.serialize($services.icon.renderHTML('pencil'));
 
-                  // If there's no Syntax Renderer for the current document's syntax then make sure the section edit
-                  // button will be displayed inactive since editing a section requires a Syntax Renderer.
-                  var editlink;
+                  var editSectionLinkLabel = document.createElement('span');
+                  editSectionLinkLabel.className = 'sr-only';
+                  editSectionLinkLabel.textContent = $jsontool.serialize($services.localization.render('edit'));
+                  editSectionLink.appendChild(editSectionLinkLabel);
+
+                  // Disable the section editing link if there's no Syntax Renderer for the current document's syntax
+                  // because editing a section requires a Syntax Renderer.
                   if (!XWiki.hasRenderer) {
-                      editlink = document.createElement("SPAN");
-                      editspan.className = editspan.className + " disabled";
-                      editlink.title = "$escapetool.javascript($services.localization.render('platform.core.rendering.noRendererForSectionEdit'))";
+                      editSectionLink.className = editSectionLink.className + ' disabled';
+                      editSectionLink.setAttribute('aria-disabled', 'true');
+                      editSectionLink.setAttribute('tabindex', '-1');
+                      editSectionLink.title = $jsontool.serialize($services.localization.render(
+                        'platform.core.rendering.noRendererForSectionEdit'));
+                      editSectionLink.href = '#' + (node.id || '');
                   } else {
-                      editlink = document.createElement("A");
-                      editlink.href = window.docediturl + "?section=" + sectioncount;
-                      editlink.style.textDecoration = "none";
-                      editlink.innerHTML = "$escapetool.javascript($services.localization.render('edit'))";
+                      editSectionLink.href = window.docediturl + "?section=" + sectionCount;
                   }
 
-                  editspan.appendChild(editlink);
-                  node.insert( { 'after': editspan } );
-                  sectioncount++;
+                  node.appendChild(editSectionLink);
+                  sectionCount++;
               }
           }
       }
@@ -1182,12 +1189,12 @@ shortcut = new Object({
             var newListener = new keypress.Listener(target);
 
             if (group === this._listeners.disabled_in_inputs) {
-                // Disable the created listener when focus goes on an input, a textarea field or on the
-                // CodeMirror div (syntax highlighting).
+                // Disable the created listener when focus goes on an input, a textarea field, an editable element or on
+                // the CodeMirror div (syntax highlighting).
                 jQuery(document)
-                    .on('focus', 'input, textarea, .CodeMirror-code',
+                    .on('focus', 'input, textarea, [contenteditable=true], .CodeMirror-code',
                         function() { newListener.stop_listening(); })
-                    .on('blur', 'input, textarea, .CodeMirror-code',
+                    .on('blur', 'input, textarea, [contenteditable=true], .CodeMirror-code',
                         function() { newListener.listen(); });
             }
 

@@ -19,65 +19,57 @@
  */
 package org.xwiki.query.internal;
 
-import org.jmock.Expectations;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
+import org.junit.jupiter.api.Test;
 import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.query.Query;
-import org.xwiki.query.QueryFilter;
-import org.xwiki.test.jmock.AbstractMockingComponentTestCase;
-import org.xwiki.test.jmock.annotation.MockingRequirement;
+import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link HiddenDocumentFilter}
+ * Tests for {@link HiddenSpaceFilter}
  *
  * @version $Id$
  */
-@MockingRequirement(HiddenSpaceFilter.class)
-public class HiddenSpaceFilterTest extends AbstractMockingComponentTestCase
+@ComponentTest
+public class HiddenSpaceFilterTest
 {
-    private QueryFilter filter;
+    @InjectMockComponents
+    private HiddenSpaceFilter filter;
 
+    @MockComponent
     private UserResolver<UserReference> userResolver;
 
-    @Before
-    public void configure() throws Exception
+    @BeforeComponent
+    public void before()
     {
-        this.userResolver = getComponentManager().getInstance(UserResolver.TYPE_USER_REFERENCE);
-        User user = mockery.mock(User.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                ignoring(any(Logger.class)).method("debug");
-                oneOf(userResolver).resolve(UserReference.CURRENT_USER_REFERENCE);
-                will(returnValue(user));
-                oneOf(user).displayHiddenDocuments();
-                will(returnValue(true));
-            }
-        });
-
-        this.filter = getComponentManager().getInstance(QueryFilter.class, "hidden/space");
+        User user = mock(User.class);
+        when(user.displayHiddenDocuments()).thenReturn(false);
+        when(this.userResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(user);
     }
 
     @Test
-    public void filterHQLStatementWithDoNotDisplayHiddenDocumentsInTheUserPreferences() throws Exception
+    void filterHQLStatementWithDoNotDisplayHiddenDocumentsInTheUserPreferences()
     {
         assertEquals("select space.reference from XWikiSpace space where space.hidden <> true and (1=1)",
             filter.filterStatement("select space.reference from XWikiSpace space where 1=1", Query.HQL));
     }
 
     @Test
-    public void filterHQLStatementWithDisplayHiddenDocumentsInTheUserPreferences() throws Exception
+    void filterHQLStatementWithDisplayHiddenDocumentsInTheUserPreferences()
     {
         // We need to do it that way since the expectation must be set in #configure() and the expectation sets the
-        // isActive property to true
-        ReflectionUtils.setFieldValue(this.filter, "isActive", false);
+        // displayHiddenDocuments property to true
+        ReflectionUtils.setFieldValue(this.filter, "displayHiddenDocuments", true);
 
         // Insertions of distinct
         assertEquals("select space.reference from XWikiSpace space where 1=1",
@@ -85,7 +77,7 @@ public class HiddenSpaceFilterTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void filterIncorrectHQLStatement() throws Exception
+    void filterIncorrectHQLStatement()
     {
         // Insertions of distinct
         assertEquals("select space.reference from XWikiSpace mydoc where 1=1",
@@ -93,14 +85,14 @@ public class HiddenSpaceFilterTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void filterXWQLStatement() throws Exception
+    void filterXWQLStatement()
     {
         assertEquals("select space.reference from XWikiSpace space where 1=1",
             filter.filterStatement("select space.reference from XWikiSpace space where 1=1", Query.XWQL));
     }
 
     @Test
-    public void filterHQLStatementWithWhereAndOrderBy()
+    void filterHQLStatementWithWhereAndOrderBy()
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true and "
@@ -109,7 +101,7 @@ public class HiddenSpaceFilterTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void filterHQLStatementWithWhereAndGroupBy()
+    void filterHQLStatementWithWhereAndGroupBy()
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true and "
@@ -118,7 +110,7 @@ public class HiddenSpaceFilterTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void filterHQLStatementWithWhereAndOrderByAndGroupBy()
+    void filterHQLStatementWithWhereAndOrderByAndGroupBy()
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true and "
@@ -128,7 +120,7 @@ public class HiddenSpaceFilterTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void filterHQLStatementWithoutWhere()
+    void filterHQLStatementWithoutWhere()
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true",
@@ -136,7 +128,7 @@ public class HiddenSpaceFilterTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void filterHQLStatementWithoutWhereWithOrderBy()
+    void filterHQLStatementWithoutWhereWithOrderBy()
     {
         // Insertions of distinct
         assertEquals("select space.name from XWikiSpace space where space.hidden <> true order by " + "space.name asc",
@@ -144,7 +136,7 @@ public class HiddenSpaceFilterTest extends AbstractMockingComponentTestCase
     }
 
     @Test
-    public void filterHQLStatementWithoutWhereWithGroupBy()
+    void filterHQLStatementWithoutWhereWithGroupBy()
     {
         // Insertions of distinct
         assertEquals("select space.web, space.name from XWikiSpace space where space.hidden <> true "

@@ -22,6 +22,7 @@ package org.xwiki.notifications.sources.script;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -33,6 +34,8 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.sources.NotificationManager;
+import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
 import org.xwiki.script.service.ScriptService;
 
 /**
@@ -54,6 +57,9 @@ public class NotificationSourcesScriptService implements ScriptService
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    private DefaultNotificationParametersFactory notificationParametersFactory;
 
     /**
      * @param expectedCount number of expected events
@@ -119,5 +125,18 @@ public class NotificationSourcesScriptService implements ScriptService
                 entityReferenceSerializer.serialize(documentAccessBridge.getCurrentUserReference()),
                 maxCount
         );
+    }
+
+    /**
+     * Create a {@link NotificationParameters} object to be used to retrieve the notifications of the given user.
+     *
+     * @param parameters a map of parameters to use, see the documentation from
+     * {@link DefaultNotificationParametersFactory.ParametersKey} to see the available parameters and accepted values.
+     * @return an instance of {@link NotificationParameters} that can be used to retrieve events.
+     * @throws NotificationException in case of errors.
+     */
+    public NotificationParameters getNotificationParameters(Map<String, String> parameters) throws NotificationException
+    {
+        return this.notificationParametersFactory.createNotificationParametersWithStringMap(parameters);
     }
 }

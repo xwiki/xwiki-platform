@@ -21,20 +21,26 @@ package org.xwiki.user.internal;
 
 import javax.inject.Named;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -54,6 +60,11 @@ public class DefaultUserManagerTest
 
     private class TestUserReference implements UserReference
     {
+        @Override
+        public boolean isGlobal()
+        {
+            return false;
+        }
     }
 
     @Test
@@ -69,6 +80,42 @@ public class DefaultUserManagerTest
     }
 
     @Test
+    void existsWhenSuperAdmin()
+    {
+        assertFalse(this.userManager.exists(SuperAdminUserReference.INSTANCE));
+    }
+
+    @Test
+    void existsWhenGuest()
+    {
+        assertFalse(this.userManager.exists(GuestUserReference.INSTANCE));
+    }
+
+    @Test
+    void existsWhenNull() throws Exception
+    {
+        UserManager currentUserManager = mock(UserManager.class);
+        when(this.contextComponentManager.getInstance(UserManager.class, CurrentUserReference.class.getName()))
+            .thenReturn(currentUserManager);
+
+        this.userManager.exists(null);
+
+        verify(currentUserManager).exists(CurrentUserReference.INSTANCE);
+    }
+
+    @Test
+    void existsWhenCurrentUser() throws Exception
+    {
+        UserManager currentUserManager = mock(UserManager.class);
+        when(this.contextComponentManager.getInstance(UserManager.class, CurrentUserReference.class.getName()))
+            .thenReturn(currentUserManager);
+
+        this.userManager.exists(CurrentUserReference.INSTANCE);
+
+        verify(currentUserManager).exists(CurrentUserReference.INSTANCE);
+    }
+
+    @Test
     void existsWhenNoUserManager() throws Exception
     {
         when(this.contextComponentManager.getInstance(UserManager.class, TestUserReference.class.getName()))
@@ -77,7 +124,8 @@ public class DefaultUserManagerTest
         Throwable exception = assertThrows(RuntimeException.class, () -> {
             this.userManager.exists(new TestUserReference());
         });
-        assertEquals("Failed to find component implementation for role [org.xwiki.user.UserManager] and hint "
+        assertEquals("Failed to find user manager for role [org.xwiki.user.UserManager] and hint "
             + "[org.xwiki.user.internal.DefaultUserManagerTest$TestUserReference]", exception.getMessage());
+        assertEquals("ComponentLookupException: error", ExceptionUtils.getRootCauseMessage(exception));
     }
 }

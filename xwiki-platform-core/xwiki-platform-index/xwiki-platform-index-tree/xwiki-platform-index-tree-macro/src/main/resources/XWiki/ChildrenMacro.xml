@@ -158,7 +158,7 @@
     </class>
     <property>
       <code>{{velocity}}
-{{documentTree root="document:$doc.documentReference.toString().replaceAll('([~""])', '~$1')" /}}
+{{documentTree root="document:" /}}
 {{/velocity}}</code>
     </property>
     <property>

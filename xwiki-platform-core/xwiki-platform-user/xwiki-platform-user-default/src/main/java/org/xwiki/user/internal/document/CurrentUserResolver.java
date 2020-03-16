@@ -19,9 +19,7 @@
  */
 package org.xwiki.user.internal.document;
 
-import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -42,9 +40,6 @@ import com.xpn.xwiki.XWikiContext;
 @Singleton
 public class CurrentUserResolver extends AbstractDocumentUserResolver<UserReference>
 {
-    @Inject
-    private Provider<XWikiContext> contextProvider;
-
     @Override
     public User resolve(UserReference unused, Object... parameters)
     {

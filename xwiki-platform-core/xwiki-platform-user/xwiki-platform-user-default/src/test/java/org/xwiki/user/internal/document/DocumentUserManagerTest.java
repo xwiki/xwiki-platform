@@ -49,6 +49,6 @@ public class DocumentUserManagerTest
         DocumentReference reference = new DocumentReference("wiki", "space", "user");
         when(this.dab.exists(reference)).thenReturn(true);
 
-        assertTrue(this.userManager.exists(new DocumentUserReference(reference)));
+        assertTrue(this.userManager.exists(new DocumentUserReference(reference, null)));
     }
 }

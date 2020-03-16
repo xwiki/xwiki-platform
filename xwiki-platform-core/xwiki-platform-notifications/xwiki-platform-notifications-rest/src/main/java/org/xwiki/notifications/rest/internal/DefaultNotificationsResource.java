@@ -19,14 +19,10 @@
  */
 package org.xwiki.notifications.rest.internal;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -37,37 +33,19 @@ import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.RecordableEventDescriptor;
-import org.xwiki.eventstream.RecordableEventDescriptorManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceResolver;
 import org.xwiki.notifications.CompositeEvent;
-import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
-import org.xwiki.notifications.NotificationFormat;
-import org.xwiki.notifications.filters.NotificationFilterManager;
-import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
-import org.xwiki.notifications.filters.NotificationFilterProperty;
-import org.xwiki.notifications.filters.NotificationFilterType;
-import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
-import org.xwiki.notifications.filters.internal.SystemUserNotificationFilter;
-import org.xwiki.notifications.filters.internal.minor.MinorEventAlertNotificationFilter;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
-import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
-import org.xwiki.notifications.filters.internal.status.EventReadAlertFilter;
-import org.xwiki.notifications.filters.internal.status.ForUserEventFilter;
-import org.xwiki.notifications.filters.internal.user.OwnEventFilter;
+import org.xwiki.notifications.notifiers.internal.DefaultNotificationCacheManager;
 import org.xwiki.notifications.notifiers.rss.NotificationRSSManager;
-import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.rest.NotificationsResource;
 import org.xwiki.notifications.rest.model.Notifications;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.notifications.sources.ParametrizedNotificationManager;
+import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory;
+import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory.ParametersKey;
 import org.xwiki.rest.XWikiResource;
-import org.xwiki.text.StringUtils;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.rometools.rome.io.SyndFeedOutput;
 import com.xpn.xwiki.XWikiContext;
@@ -84,8 +62,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 @Named("org.xwiki.notifications.rest.internal.DefaultNotificationsResource")
 public class DefaultNotificationsResource extends XWikiResource implements NotificationsResource
 {
-    private static final String FIELD_SEPARATOR = ",";
-
     private static final String TRUE = "true";
 
     @Inject
@@ -95,37 +71,19 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
     @Inject
-    private NotificationPreferenceManager notificationPreferenceManager;
-
-    @Inject
-    private NotificationFilterManager notificationFilterManager;
-
-    @Inject
-    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
-
-    @Inject
     private InternalNotificationsRenderer notificationsRenderer;
-
-    @Inject
-    private EntityReferenceResolver<String> entityReferenceResolver;
-
-    @Inject
-    private RecordableEventDescriptorManager recordableEventDescriptorManager;
-
-    @Inject
-    private UsersParameterHandler usersParameterHandler;
 
     @Inject
     private NotificationRSSManager notificationRSSManager;
 
     @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
+    private DefaultNotificationCacheManager cacheManager;
 
     @Inject
     private NotificationEventExecutor executor;
 
     @Inject
-    private NotificationConfiguration configuration;
+    private DefaultNotificationParametersFactory notificationParametersFactory;
 
     @Override
     public Response getNotifications(String useUserPreferences, String userId, String untilDate, String blackList,
@@ -173,6 +131,10 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         String currentWiki, String async, String asyncId, boolean onlyUnread, boolean count) throws Exception
     {
         Object result = null;
+        NotificationParameters notificationParameters =
+            getNotificationParameters(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis, users,
+                maxCount, displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
+                currentWiki, onlyUnread);
 
         // 1. Check current asynchronous execution
         if (asyncId != null) {
@@ -186,19 +148,21 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
         if (result == null) {
             // 2. Generate the cache key
-            String cacheKey = createCacheKey(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis,
-                users, maxCount, displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
-                currentWiki, onlyUnread);
+            String cacheKey = this.cacheManager.createCacheKey(notificationParameters);
 
             // 3. Search events
             result = this.executor.submit(cacheKey,
-                () -> getCompositeEvents(useUserPreferences, userId, untilDate, blackList, pages, spaces, wikis, users,
-                    maxCount, displayOwnEvents, displayMinorEvents, displaySystemEvents, displayReadEvents, tags,
-                    currentWiki, onlyUnread),
+                () -> getCompositeEvents(notificationParameters),
                 Boolean.parseBoolean(async), count);
         }
 
         return result;
+    }
+
+    private List<CompositeEvent> getCompositeEvents(NotificationParameters notificationParameters)
+        throws NotificationException
+    {
+        return this.newNotificationManager.getEvents(notificationParameters);
     }
 
     @Override
@@ -270,215 +234,29 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             request.get("asyncId"));
     }
 
-    private String createCacheKey(String useUserPreferences, String userId, String untilDate, String blackList,
-        String pages, String spaces, String wikis, String users, int maxCount, String displayOwnEvents,
-        String displayMinorEvents, String displaySystemEvents, String displayReadEvents, String tags,
-        String currentWiki, boolean onlyUnread)
-    {
-        StringBuilder cacheKeyBuilder = new StringBuilder();
-
-        addCacheKeyElement(cacheKeyBuilder, useUserPreferences);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, userId);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, untilDate);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, blackList);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, pages);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, spaces);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, wikis);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, users);
-        cacheKeyBuilder.append('/');
-        cacheKeyBuilder.append(maxCount);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, displayOwnEvents);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, displayMinorEvents);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, displaySystemEvents);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, displayReadEvents);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, tags);
-        cacheKeyBuilder.append('/');
-        addCacheKeyElement(cacheKeyBuilder, currentWiki);
-        cacheKeyBuilder.append('/');
-        cacheKeyBuilder.append(onlyUnread);
-
-        return cacheKeyBuilder.toString();
-    }
-
-    private void addCacheKeyElement(StringBuilder cacheKeyBuilder, String value)
-    {
-        if (value != null) {
-            cacheKeyBuilder.append(value.length());
-            cacheKeyBuilder.append(value);
-        }
-    }
-
-    private List<CompositeEvent> getCompositeEvents(String useUserPreferences, String userId, String untilDate,
+    private NotificationParameters getNotificationParameters(String useUserPreferences, String userId, String untilDate,
         String blackList, String pages, String spaces, String wikis, String users, int maxCount,
         String displayOwnEvents, String displayMinorEvents, String displaySystemEvents, String displayReadEvents,
-        String tags, String currentWiki, boolean onlyUnread) throws NotificationException, EventStreamException
+        String tags, String currentWiki, boolean onlyUnread) throws NotificationException
     {
-        NotificationParameters parameters = new NotificationParameters();
-        parameters.format = NotificationFormat.ALERT;
-        parameters.expectedCount = maxCount;
-        parameters.onlyUnread = onlyUnread;
+        Map<ParametersKey, String> parametersMap = new HashMap<>();
+        parametersMap.put(ParametersKey.USE_USER_PREFERENCES, useUserPreferences);
+        parametersMap.put(ParametersKey.USER_ID, userId);
+        parametersMap.put(ParametersKey.UNTIL_DATE, untilDate);
+        parametersMap.put(ParametersKey.BLACKLIST, blackList);
+        parametersMap.put(ParametersKey.PAGES, pages);
+        parametersMap.put(ParametersKey.SPACES, spaces);
+        parametersMap.put(ParametersKey.WIKIS, wikis);
+        parametersMap.put(ParametersKey.USERS, users);
+        parametersMap.put(ParametersKey.MAX_COUNT, String.valueOf(maxCount));
+        parametersMap.put(ParametersKey.DISPLAY_OWN_EVENTS, displayOwnEvents);
+        parametersMap.put(ParametersKey.DISPLAY_MINOR_EVENTS, displayMinorEvents);
+        parametersMap.put(ParametersKey.DISPLAY_SYSTEM_EVENTS, displaySystemEvents);
+        parametersMap.put(ParametersKey.DISPLAY_READ_EVENTS, displayReadEvents);
+        parametersMap.put(ParametersKey.TAGS, tags);
+        parametersMap.put(ParametersKey.CURRENT_WIKI, currentWiki);
+        parametersMap.put(ParametersKey.ONLY_UNREAD, String.valueOf(onlyUnread));
 
-        if (StringUtils.isNotBlank(userId)) {
-            parameters.user = documentReferenceResolver.resolve(userId);
-        }
-        if (StringUtils.isNotBlank(blackList)) {
-            parameters.blackList.addAll(Arrays.asList(blackList.split(FIELD_SEPARATOR)));
-        }
-        if (StringUtils.isNotBlank(untilDate)) {
-            parameters.endDate = new Date(Long.parseLong(untilDate));
-        }
-        if (TRUE.equals(useUserPreferences)) {
-            useUserPreferences(parameters);
-        } else {
-            dontUseUserPreferences(pages, spaces, wikis, users, parameters, displayOwnEvents, displayMinorEvents,
-                displaySystemEvents, displayReadEvents, tags, currentWiki);
-        }
-
-        return getCompositeEvents(parameters);
-    }
-
-    private void dontUseUserPreferences(String pages, String spaces, String wikis, String users,
-        NotificationParameters parameters, String displayOwnEvents, String displayMinorEvents,
-        String displaySystemEvents, String displayReadEvents, String tags, String currentWiki)
-        throws NotificationException, EventStreamException
-    {
-        List<String> excludedFilters = new ArrayList<>();
-        if (TRUE.equals(displayOwnEvents)) {
-            excludedFilters.add(OwnEventFilter.FILTER_NAME);
-        }
-        if (TRUE.equals(displayMinorEvents)) {
-            excludedFilters.add(MinorEventAlertNotificationFilter.FILTER_NAME);
-        }
-        if (TRUE.equals(displaySystemEvents)) {
-            excludedFilters.add(SystemUserNotificationFilter.FILTER_NAME);
-        }
-        if (TRUE.equals(displayReadEvents)) {
-            excludedFilters.add(EventReadAlertFilter.FILTER_NAME);
-        }
-        parameters.filters = notificationFilterManager.getAllFilters(true).stream()
-            .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toList());
-
-        enableAllEventTypes(parameters);
-        handlePagesParameter(pages, parameters);
-        handleSpacesParameter(spaces, parameters);
-        handleWikisParameter(wikis, parameters, currentWiki);
-        usersParameterHandler.handleUsersParameter(users, parameters);
-
-        handleTagsParameter(parameters, tags, currentWiki);
-    }
-
-    private void useUserPreferences(NotificationParameters parameters)
-        throws NotificationException, EventStreamException
-    {
-        if (parameters.user != null) {
-            // Check if we should pre or post filter events
-            if (parameters.format == NotificationFormat.ALERT && this.configuration.isEventPreFilteringEnabled()) {
-                enableAllEventTypes(parameters);
-
-                parameters.filters.add(new ForUserEventFilter(NotificationFormat.ALERT, null));
-            } else {
-                parameters.preferences =
-                    notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);
-                parameters.filters = notificationFilterManager.getAllFilters(parameters.user, true);
-                parameters.filterPreferences =
-                    notificationFilterPreferenceManager.getFilterPreferences(parameters.user);
-            }
-        }
-    }
-
-    private List<CompositeEvent> getCompositeEvents(NotificationParameters parameters) throws NotificationException
-    {
-        return this.newNotificationManager.getEvents(parameters);
-    }
-
-    private void handlePagesParameter(String pages, NotificationParameters parameters)
-    {
-        handleLocationParameter(pages, parameters, NotificationFilterProperty.PAGE);
-    }
-
-    private void handleSpacesParameter(String spaces, NotificationParameters parameters)
-    {
-        handleLocationParameter(spaces, parameters, NotificationFilterProperty.SPACE);
-    }
-
-    private void handleWikisParameter(String wikis, NotificationParameters parameters, String currentWiki)
-    {
-        handleLocationParameter(wikis, parameters, NotificationFilterProperty.WIKI);
-
-        // When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
-        // other wikis (except if the "wikis" parameter is set).
-        // The concept of the subwiki is to restrict a given domain of interest into a given wiki, this is why it does
-        // not make sense to show events from other wikis in a "timeline" such as the notifications macro.
-        // TODO: add a "handleAllWikis" parameter to disable this behaviour
-        // Note that on the main wiki, which is often a "portal" for all the others wikis, we assure it's OK to display
-        // events from other wikis.
-        if (StringUtils.isBlank(wikis) && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
-            handleLocationParameter(currentWiki, parameters, NotificationFilterProperty.WIKI);
-        }
-    }
-
-    private void handleLocationParameter(String locations, NotificationParameters parameters,
-        NotificationFilterProperty property)
-    {
-        if (StringUtils.isNotBlank(locations)) {
-            Set<NotificationFormat> formats = new HashSet<>();
-            formats.add(NotificationFormat.ALERT);
-
-            String[] locationArray = locations.split(FIELD_SEPARATOR);
-            for (int i = 0; i < locationArray.length; ++i) {
-                DefaultNotificationFilterPreference pref = new DefaultNotificationFilterPreference();
-                pref.setId(String.format("%s_%s_%s", ScopeNotificationFilter.FILTER_NAME, property, i));
-                pref.setEnabled(true);
-                pref.setFilterName(ScopeNotificationFilter.FILTER_NAME);
-                pref.setFilterType(NotificationFilterType.INCLUSIVE);
-                pref.setNotificationFormats(formats);
-                pref.setProviderHint("REST");
-                switch (property) {
-                    case WIKI:
-                        pref.setWiki(locationArray[i]);
-                        break;
-                    case SPACE:
-                        pref.setPage(locationArray[i]);
-                        break;
-                    case PAGE:
-                        pref.setPageOnly(locationArray[i]);
-                        break;
-                    default:
-                        break;
-                }
-                parameters.filterPreferences.add(new ScopeNotificationFilterPreference(pref, entityReferenceResolver));
-            }
-        }
-    }
-
-    private void enableAllEventTypes(NotificationParameters parameters) throws EventStreamException
-    {
-        parameters.preferences.clear();
-        for (RecordableEventDescriptor descriptor : recordableEventDescriptorManager
-            .getRecordableEventDescriptors(true)) {
-            parameters.preferences.add(new InternalNotificationPreference(descriptor));
-        }
-    }
-
-    private void handleTagsParameter(NotificationParameters parameters, String tags, String currentWiki)
-    {
-        if (StringUtils.isNotBlank(tags)) {
-            String[] tagArray = tags.split(",");
-            for (int i = 0; i < tagArray.length; ++i) {
-                parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i], currentWiki));
-            }
-        }
+        return this.notificationParametersFactory.createNotificationParameters(parametersMap);
     }
 }

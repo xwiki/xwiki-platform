@@ -34,24 +34,31 @@ table {
 
 // Rendering ==================================================================
 
-.wikicreatelink { /* Non-exiting links */
+/* Non-exiting links */
+.wikicreatelink,
+[contenteditable="true"] a[data-linktype="create"] {
   text-decoration: underline;
-  a:after { /* Mark with a rounded question mark */
-    background-color: @link-color;
-    border-radius: 8px;
-    color: @xwiki-page-content-bg;
-    content: "?";
-    display: inline-block;
-    font-size: 80%;
-    margin-left: 4px;
-    padding: 0 4px;
-    text-decoration: none;
-  }
 }
 
-.wikiexternallink { /* Differentiate external link from internal link using an icon */
-    background: url(@xwiki-icon-link-external) no-repeat scroll right center transparent;
-    padding-right: 12px;
+/* Mark with a rounded question mark */
+.wikicreatelink a:after,
+[contenteditable="true"] a[data-linktype="create"]:after {
+  background-color: @link-color;
+  border-radius: 8px;
+  color: @xwiki-page-content-bg;
+  content: "?";
+  display: inline-block;
+  font-size: 80%;
+  margin-left: 4px;
+  padding: 0 4px;
+  text-decoration: none;
+}
+
+/* Differentiate external link from internal link using an icon */
+.wikiexternallink,
+[contenteditable="true"] a[data-linktype="external"] {
+  background: url(@xwiki-icon-link-external) no-repeat scroll right center transparent;
+  padding-right: 12px;
 }
 
 .wikimodel-emptyline {

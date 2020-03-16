@@ -59,7 +59,7 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
         }
       }
     });
-  }
+  };
 
   var showSpinner = function(element)
   {
@@ -68,7 +68,7 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
     } else {
       element.html('<span class="fa fa-spinner fa-spin"/>');
     }
-  }
+  };
   
   var activateAsyncPlaceHolder = function(element)
   {
@@ -101,7 +101,7 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
     element = $(element);
 
     update(element, url);
-  }
+  };
 
   var onMutations = function(mutations)
   {
@@ -111,16 +111,16 @@ require(["jquery", 'xwiki-meta'], function($, xm) {
       for (var j = 0; j < mutation.addedNodes.length; j++) {
         var element = mutation.addedNodes[j];
 
-        if (element.className == 'xwiki-async') {
+        if (element.className == 'xwiki-async' && $(element).is(":visible")) {
           activateAsyncPlaceHolder(element);
         }
       }
     }
-  }
+  };
 
   // Register a callback for when inserting an async placeholder in the DOM
   var observer = new MutationObserver(onMutations);
-  observer.observe(document, { childList: true, subtree : true});
+  observer.observe(document, { childList: true, subtree : true, attributes : true});
 
   // Activate all the place holders already in the DOM
   $(".xwiki-async").each(function(index, element) {

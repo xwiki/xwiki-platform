@@ -445,12 +445,12 @@ rendering.transformations = $xwikiRenderingTransformations
 # extension.repositories=maven-local:maven:file://${userHome}/.m2/repository
 #-#
 #-# And an example to add the XWiki Maven Snapshot Repository
-# extension.repositories=maven-xwiki-snapshot:maven:http://nexus.xwiki.org/nexus/content/groups/public-snapshots
+# extension.repositories=maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots
 #-#
 #-# When not set the following is taken (in this order):
-# extension.repositories=maven-xwiki:maven:http://nexus.xwiki.org/nexus/content/groups/public
+# extension.repositories=maven-xwiki:maven:https://nexus.xwiki.org/nexus/content/groups/public
 # extension.repositories=store.xwiki.com:xwiki:https://store.xwiki.com/xwiki/rest/
-# extension.repositories=extensions.xwiki.org:xwiki:http://extensions.xwiki.org/xwiki/rest/
+# extension.repositories=extensions.xwiki.org:xwiki:https://extensions.xwiki.org/xwiki/rest/
 #-#
 #-# To not have any repository enabled (including disabling default repositories) you can explicitly make this list empty:
 # extension.repositories=
@@ -974,7 +974,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 
 #-# [Since 10.11.8]
 #-# [Since 11.3]
-#-# Enable or disable caching of notification search result in the REST API.
+#-# Enable or disable caching of notification search result in the REST or async API.
 #-# 
 #-# The default is :
 # notifications.rest.cache=true
@@ -1022,5 +1022,35 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# 
 #-# The default is:
 # logging.deprecated.enabled=true
+
+#-------------------------------------------------------------------------------------
+# User
+#-------------------------------------------------------------------------------------
+
+#-# [Since 12.2RC1]
+#-# Indicate where users are stored.
+#-#
+#-# The default (and currently the only supported option) is:
+# user.store.hint = document
+
+#-# [Since 12.2RC1]
+#-# Define preferences for the SuperAdmin user.
+#-#
+#-# The format is:
+#-# user.preferences.superadmin.<preference name> = <value>
+#-#
+#-# Examples:
+#-# user.preferences.superadmin.displayHiddenDocuments = 0
+#-# user.preferences.superadmin.editor = Text
+
+#-# [Since 12.2RC1]
+#-# Define preferences for the Guest user.
+#-#
+#-# The format is:
+#-# user.preferences.guest.<preference name> = <value>
+#-#
+#-# Examples:
+#-# user.preferences.guest.displayHiddenDocuments = 1
+#-# user.preferences.guest.editor = Text
 
 $!xwikiPropertiesAdditionalProperties

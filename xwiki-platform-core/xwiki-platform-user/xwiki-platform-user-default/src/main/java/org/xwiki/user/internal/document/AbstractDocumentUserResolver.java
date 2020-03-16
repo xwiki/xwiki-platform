@@ -21,15 +21,17 @@ package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 
-import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceProvider;
+import org.xwiki.user.internal.GuestUser;
+import org.xwiki.user.internal.SuperAdminUser;
 import org.xwiki.user.User;
 import org.xwiki.user.UserResolver;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
@@ -42,14 +44,22 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
 {
     @Inject
-    @Named("current")
-    private DocumentReferenceResolver<EntityReference> currentReferenceResolver;
+    @Named("user")
+    protected ConfigurationSource userConfigurationSource;
 
     @Inject
-    private DocumentAccessBridge dab;
+    @Named("superadminuser")
+    protected ConfigurationSource superAdminConfigurationSource;
 
     @Inject
-    private EntityReferenceProvider entityReferenceProvider;
+    @Named("guestuser")
+    protected ConfigurationSource guestConfigurationSource;
+
+    @Inject
+    protected EntityReferenceProvider entityReferenceProvider;
+
+    @Inject
+    protected Provider<XWikiContext> contextProvider;
 
     /**
      * @param userDocumentReference the reference to the user profile page. If null then consider it's pointing to the
@@ -58,7 +68,7 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
      */
     protected User resolveUser(DocumentReference userDocumentReference)
     {
-        return resolveUser(new DocumentUserReference(userDocumentReference));
+        return resolveUser(new DocumentUserReference(userDocumentReference, this.entityReferenceProvider));
     }
 
     /**
@@ -72,12 +82,11 @@ public abstract class AbstractDocumentUserResolver<T> implements UserResolver<T>
         // in the XWikiContext
         DocumentReference documentReference = documentUserReference.getReference();
         if (documentReference == null || XWikiRightService.isGuest(documentReference)) {
-            user = User.GUEST;
+            user = new GuestUser(this.guestConfigurationSource);
         } else if (XWikiRightService.isSuperAdmin(documentReference)) {
-            user = User.SUPERADMIN;
+            user = new SuperAdminUser(this.superAdminConfigurationSource);
         } else {
-            user = new DocumentUser(documentUserReference, this.dab, this.currentReferenceResolver,
-                this.entityReferenceProvider);
+            user = new DocumentUser(documentUserReference, this.contextProvider, this.userConfigurationSource);
         }
         return user;
     }

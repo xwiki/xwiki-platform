@@ -30,4 +30,5 @@ package org.xwiki.eventstream.events;
  */
 public class EventStreamDeletedEvent extends AbstractEventStreamEvent
 {
+    private static final long serialVersionUID = 1L;
 }

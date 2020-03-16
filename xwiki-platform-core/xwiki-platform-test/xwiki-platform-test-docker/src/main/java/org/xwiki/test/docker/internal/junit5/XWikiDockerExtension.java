@@ -37,6 +37,8 @@ import org.slf4j.LoggerFactory;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.containers.VncRecordingContainer;
+import org.testcontainers.utility.DockerLoggerFactory;
+import org.testcontainers.utility.TestcontainersConfiguration;
 import org.xwiki.test.docker.internal.junit5.browser.BrowserContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.database.DatabaseContainerExecutor;
 import org.xwiki.test.docker.internal.junit5.servletengine.ServletContainerExecutor;
@@ -119,11 +121,24 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         if (testConfiguration.isVerbose()) {
             setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
             setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
+            // Don't display the stack trace that TC displays when it cannot find a config file override
+            // ("Testcontainers config override was found on file:/root/.testcontainers.properties but the file was not
+            // found), since this is not a problem and it's optional.
+            // See https://github.com/testcontainers/testcontainers-java/issues/2253
+            setLogbackLoggerLevel("org.testcontainers.utility.TestcontainersConfiguration", Level.WARN);
+        }
+        if (testConfiguration.isDebug()) {
+            // Debug: get logs when starting the sshd container
+            setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
+                TestcontainersConfiguration.getInstance().getSSHdImage()).getName(), Level.TRACE);
+            // Debug: get logs when starting the vnc container
+            setLogbackLoggerLevel(DockerLoggerFactory.getLogger(
+                TestcontainersConfiguration.getInstance().getVncRecordedContainerImage()).getName(), Level.TRACE);
         }
 
         // Expose ports for SSH port forwarding so that containers can communicate with the host using the
         // "host.testcontainers.internal" host name.
-        Testcontainers.exposeHostPorts(Ints.toArray(testConfiguration.getSSHPorts()));
+        exposeHostPorts(testConfiguration);
 
         // Initialize resolvers.
         RepositoryResolver repositoryResolver = new RepositoryResolver(testConfiguration.isOffline());
@@ -455,4 +470,23 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
         }
     }
+
+    private void exposeHostPorts(TestConfiguration testConfiguration) throws Exception
+    {
+        try {
+            Testcontainers.exposeHostPorts(Ints.toArray(testConfiguration.getSSHPorts()));
+        } catch (Exception e) {
+            // This is to help in debugging the following issue that we get frequently:
+            //
+            // Caused by: java.lang.IllegalStateException: Can not connect to Ryuk
+            //   at org.testcontainers.utility.ResourceReaper.start(ResourceReaper.java:158)
+            //
+            // See https://gist.github.com/vmassol/9220adc4fd225a8a6332d73ad213127b for details
+            LOGGER.info(RuntimeUtils.run("docker ps -a"));
+            LOGGER.info(RuntimeUtils.run("docker events --since '15m' --until '0m'"));
+            LOGGER.info(RuntimeUtils.run("top -b -n 1"));
+            throw e;
+        }
+    }
+
 }

@@ -31,12 +31,18 @@ import org.xwiki.stability.Unstable;
 public final class CurrentUserReference implements UserReference
 {
     /**
-     * Package-level visibility so that it can be used in the UserReference class (located in the same package.
+     * The unique instance of this class.
      */
-    static final CurrentUserReference INSTANCE = new CurrentUserReference();
+    public static final CurrentUserReference INSTANCE = new CurrentUserReference();
 
     private CurrentUserReference()
     {
         // Voluntarily empty. We want to have a single instance of this class (hence the private part).
+    }
+
+    @Override
+    public boolean isGlobal()
+    {
+        throw new RuntimeException("You need to resolve the current user first to find if it's a global user or not.");
     }
 }

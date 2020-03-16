@@ -32,8 +32,8 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Configuration - Default</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.81</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>81</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>78</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

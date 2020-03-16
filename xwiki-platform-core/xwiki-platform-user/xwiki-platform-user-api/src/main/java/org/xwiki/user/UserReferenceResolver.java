@@ -35,7 +35,8 @@ import org.xwiki.stability.Unstable;
 public interface UserReferenceResolver<T>
 {
     /**
-     * @param rawReference the raw representation of a user reference to convert
+     * @param rawReference the raw representation of a user reference to convert. If null then resolves to the current
+     *                     user reference
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
      *                   (for example a Document User Reference resolver accepting a user name as a string will also
      *                   take as parameter a Wiki Reference defining in which wiki the user belongs to)

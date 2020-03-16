@@ -23,6 +23,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.NotificationFormat;
@@ -118,5 +120,37 @@ public abstract class AbstractForUserEventFilter implements NotificationFilter, 
     public boolean isEnabledByDefault()
     {
         return false;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        AbstractForUserEventFilter that = (AbstractForUserEventFilter) o;
+
+        return new EqualsBuilder()
+            .append(not, that.not)
+            .append(filterName, that.filterName)
+            .append(format, that.format)
+            .append(read, that.read)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(filterName)
+            .append(format)
+            .append(read)
+            .append(not)
+            .toHashCode();
     }
 }

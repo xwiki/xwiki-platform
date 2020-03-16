@@ -230,6 +230,7 @@ public class RepositoryManager implements Initializable, Disposable
     public void dispose() throws ComponentLifecycleException
     {
         this.observation.removeListener(listener.getName());
+        this.documentReferenceCache.dispose();
     }
 
     public <T> XWikiDocument getDocument(T[] data) throws XWikiException

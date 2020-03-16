@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserResolver;
 
@@ -47,7 +48,7 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
     /**
      * @see #initialize()
      */
-    private boolean isActive;
+    private boolean displayHiddenDocuments;
 
     /**
      * Sets the #isActive property, based on the user configuration.
@@ -55,14 +56,15 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
     @Override
     public void initialize()
     {
-        this.isActive = this.userResolver.resolve(UserReference.CURRENT_USER_REFERENCE).displayHiddenDocuments();
+        this.displayHiddenDocuments =
+            this.userResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments();
     }
 
     @Override
     public String filterStatement(String statement, String language)
     {
         String result = statement;
-        if (this.isActive) {
+        if (!this.displayHiddenDocuments) {
             result = filterHidden(statement, language);
         }
         return result;

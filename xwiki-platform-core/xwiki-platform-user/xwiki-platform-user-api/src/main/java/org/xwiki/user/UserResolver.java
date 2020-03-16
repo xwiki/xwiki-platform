@@ -19,10 +19,7 @@
  */
 package org.xwiki.user;
 
-import java.lang.reflect.ParameterizedType;
-
 import org.xwiki.component.annotation.Role;
-import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -37,11 +34,6 @@ import org.xwiki.stability.Unstable;
 @Role
 public interface UserResolver<T>
 {
-    /**
-     * Type instance for {@code UserResolver<UserReference>}.
-     */
-    ParameterizedType TYPE_USER_REFERENCE = new DefaultParameterizedType(null, UserResolver.class, UserReference.class);
-
     /**
      * @param userRepresentation the representation of the user (e.g. User Reference, oldcore XWikiUser object etc)
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used

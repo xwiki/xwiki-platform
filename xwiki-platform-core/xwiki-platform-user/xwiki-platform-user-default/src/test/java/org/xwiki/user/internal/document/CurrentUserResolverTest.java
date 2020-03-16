@@ -26,7 +26,9 @@ import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.User;
+import org.xwiki.user.UserReference;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -67,12 +69,12 @@ public class CurrentUserResolverTest
     void resolveWhenNoCurrentUser()
     {
         XWikiContext xcontext = mock(XWikiContext.class);
+        // No current user in the context
         when(xcontext.getUserReference()).thenReturn(null);
         when(this.contextProvider.get()).thenReturn(xcontext);
 
         User user = this.resolver.resolve(null);
         assertNotNull(user);
-        assertSame(User.GUEST, user);
+        assertSame(GuestUserReference.INSTANCE, user.getUserReference());
     }
-
 }

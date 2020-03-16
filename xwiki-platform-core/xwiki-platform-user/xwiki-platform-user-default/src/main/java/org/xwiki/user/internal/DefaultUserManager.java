@@ -26,6 +26,9 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 
@@ -47,7 +50,21 @@ public class DefaultUserManager implements UserManager
     @Override
     public boolean exists(UserReference userReference)
     {
-        return resolveUserManager(userReference).exists(userReference);
+        boolean exists;
+
+        // Handle special cases
+        UserReference normalizedUserReference = userReference;
+        if (normalizedUserReference == null) {
+            normalizedUserReference = CurrentUserReference.INSTANCE;
+        }
+        if (GuestUserReference.INSTANCE == normalizedUserReference
+            || SuperAdminUserReference.INSTANCE == normalizedUserReference)
+        {
+            exists = false;
+        } else {
+            exists = resolveUserManager(normalizedUserReference).exists(normalizedUserReference);
+        }
+        return exists;
     }
 
     private UserManager resolveUserManager(UserReference userReference)
@@ -55,9 +72,11 @@ public class DefaultUserManager implements UserManager
         try {
             return this.componentManager.getInstance(UserManager.class, userReference.getClass().getName());
         } catch (ComponentLookupException e) {
+            // If there's no manager for the passed UserReference type, then the XWiki instance cannot work and thus
+            // we need to fail hard and fast. Hence the runtime exception.
             throw new RuntimeException(String.format(
-                "Failed to find component implementation for role [%s] and hint [%s]", UserManager.class.getName(),
-                userReference.getClass().getName()));
+                "Failed to find user manager for role [%s] and hint [%s]", UserManager.class.getName(),
+                userReference.getClass().getName()), e);
         }
     }
 }

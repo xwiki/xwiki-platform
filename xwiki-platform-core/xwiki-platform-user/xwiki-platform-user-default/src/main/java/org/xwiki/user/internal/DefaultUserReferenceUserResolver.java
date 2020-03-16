@@ -26,8 +26,13 @@ import javax.inject.Singleton;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.user.CurrentUserReference;
+import org.xwiki.user.GuestUserReference;
+import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceUserResolverType;
 import org.xwiki.user.UserResolver;
 
 /**
@@ -45,6 +50,14 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
     @Named("context")
     private ComponentManager componentManager;
 
+    @Inject
+    @Named("superadminuser")
+    private ConfigurationSource superAdminConfigurationSource;
+
+    @Inject
+    @Named("guestuser")
+    private ConfigurationSource guestConfigurationSource;
+
     @Override
     public User resolve(UserReference userReference, Object... parameters)
     {
@@ -53,12 +66,12 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
         // Handle special cases
         UserReference normalizedUserReference = userReference;
         if (normalizedUserReference == null) {
-            normalizedUserReference = UserReference.CURRENT_USER_REFERENCE;
+            normalizedUserReference = CurrentUserReference.INSTANCE;
         }
-        if (UserReference.SUPERADMIN_REFERENCE == normalizedUserReference) {
-            user = User.SUPERADMIN;
-        } else if (UserReference.GUEST_REFERENCE == normalizedUserReference) {
-            user = User.GUEST;
+        if (SuperAdminUserReference.INSTANCE == normalizedUserReference) {
+            user = new SuperAdminUser(this.superAdminConfigurationSource);
+        } else if (GuestUserReference.INSTANCE == normalizedUserReference) {
+            user = new GuestUser(this.guestConfigurationSource);
         } else {
             user = resolveUserResolver(normalizedUserReference).resolve(normalizedUserReference, parameters);
         }
@@ -68,12 +81,14 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
     private UserResolver<UserReference> resolveUserResolver(UserReference userReference)
     {
         try {
-            return this.componentManager.getInstance(UserResolver.TYPE_USER_REFERENCE,
+            return this.componentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
                 userReference.getClass().getName());
         } catch (ComponentLookupException e) {
+            // If there's no resolver for the passed UserReference type, then the XWiki instance cannot work and thus
+            // we need to fail hard and fast. Hence the runtime exception.
             throw new RuntimeException(String.format(
-                "Failed to find component implementation for role [%s] and hint [%s]", UserResolver.TYPE_USER_REFERENCE,
-                userReference.getClass().getName()));
+                "Failed to find user resolver for role [%s] and hint [%s]", UserReferenceUserResolverType.INSTANCE,
+                userReference.getClass().getName()), e);
         }
     }
 }

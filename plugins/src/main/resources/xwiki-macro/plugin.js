@@ -216,6 +216,15 @@
           data.inline = this.inline;
           // Update the macro widget data.
           this.setData(data);
+          // Allow JavaScript code to update the macro output after the widget is ready. We have to do this only once
+          // (when the edited content is loaded initially or reloaded because a macro was updated or inserted),
+          // otherwise we break the Undo/Redo history (because the Undo/Redo actions will create new history entries).
+          if (this.element.getAttribute('data-xwiki-dom-updated') !== 'true') {
+            this.once('ready', function() {
+              this.element.setAttribute('data-xwiki-dom-updated', 'true');
+              $(editor.document.$).trigger('xwiki:dom:updated', {'elements': [this.element.$]});
+            });
+          }
         },
         scrollIntoViewAndFocus: function() {
           this.wrapper.scrollIntoView();

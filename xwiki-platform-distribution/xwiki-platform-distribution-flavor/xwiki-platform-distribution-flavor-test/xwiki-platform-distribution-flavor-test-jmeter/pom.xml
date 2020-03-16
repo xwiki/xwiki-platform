@@ -53,6 +53,14 @@
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>serializer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -71,6 +79,14 @@
         <exclusion>
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>serializer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -91,6 +107,14 @@
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>serializer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -109,6 +133,14 @@
         <exclusion>
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>serializer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -129,6 +161,14 @@
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>serializer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -147,6 +187,14 @@
         <exclusion>
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>serializer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -167,6 +215,14 @@
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>serializer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -185,6 +241,14 @@
         <exclusion>
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>serializer</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>xalan</groupId>
+          <artifactId>xalan</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

@@ -367,8 +367,9 @@
       // We're going to refresh the edited content after inserting / updating the macro widget so we mark the macro in
       // order to be able to select it afterwards.
       data.parameters[selectedMacroMarker] = true;
-      // Prevent the editor from recording a history entry where the macro data is updated but the macro output is not
-      // refreshed. The lock is removed by the call to setLoading(false) after the macro output is refreshed.
+      // Prevent the editor from recording Undo/Redo history entries while the edited content is being refreshed:
+      // * if the macro is inserted then we need to wait for the macro markers to be replaced by the actual macro output
+      // * if the macro is updated then we need to wait for the macro output to be updated to match the new macro data
       editor.fire('lockSnapshot', {dontUpdate: true});
       var expectedElementName = data.inline ? 'span' : 'div';
       if (widget && widget.element && widget.element.getName() === expectedElementName) {
@@ -381,6 +382,14 @@
         // preserve the HTML validity, so we have to replace the existing macro widget.
         this.createMacroWidget(editor, data);
       }
+      // Unlock the Undo/Redo history after the edited content is updated.
+      var handler = editor.on('afterCommandExec', function(event) {
+        var command = event.data.name;
+        if (event.data.name === 'xwiki-refresh') {
+          handler.removeListener();
+          editor.fire('unlockSnapshot');
+        }
+      });
       // Refresh all the macros because a change in one macro can affect the output of the other macros.
       setTimeout($.proxy(editor, 'execCommand', 'xwiki-refresh'), 0);
     },

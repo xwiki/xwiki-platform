@@ -35,8 +35,6 @@
         editor.on('beforeSetMode', jQuery.proxy(this.onBeforeSetMode, this));
         editor.on('beforeModeUnload', jQuery.proxy(this.onBeforeModeUnload, this));
         editor.on('mode', jQuery.proxy(this.onMode, this));
-        editor.on('startLoading', jQuery.proxy(this.onStartLoading, this));
-        editor.on('endLoading', jQuery.proxy(this.onEndLoading, this));
 
         // The default source command is not asynchronous so it becomes (re)enabled right after the editing mode is
         // changed. In our case switching between WYSIWYG and Source mode is asynchronous because we need to convert the
@@ -52,7 +50,7 @@
 
     onBeforeSetMode: function(event) {
       if (this.isModeSupported(event.data)) {
-        this.setLoading(event.editor, true);
+        this.startLoading(event.editor);
       }
     },
 
@@ -95,7 +93,7 @@
         // Convert from HTML to wiki syntax.
         this.maybeConvertHTML(editor, false);
       } else if (this.isModeSupported(editor.mode)) {
-        this.setLoading(editor, false);
+        this.endLoading(editor);
       }
     },
 
@@ -106,7 +104,7 @@
         this.convertHTML(editor, toHTML);
       } else {
         editor.setData(newMode.data, {
-          callback: jQuery.proxy(this.setLoading, this, editor, false)
+          callback: jQuery.proxy(this.endLoading, this, editor)
         });
       }
     },
@@ -123,27 +121,37 @@
           callback: function() {
             // Take a snapshot after the data has been set, in order to be able to detect changes.
             editor._.modes[editor.mode].data = thisPlugin.getFullData(editor);
-            thisPlugin.setLoading(editor, false);
+            thisPlugin.endLoading(editor);
           }
         });
       }).fail(function() {
         // Switch back to the previous edit mode without performing a conversion.
         editor._.modes[editor.mode].failed = true;
         editor.setMode(editor._.previousMode, function() {
-          thisPlugin.setLoading(editor, false);
+          thisPlugin.endLoading(editor);
           editor.showNotification(editor.localization.get('xwiki-source.conversionFailed'), 'warning');
         });
       });
     },
 
-    setLoading: function(editor, loading) {
+    startLoading: function(editor) {
+      editor.setLoading(true);
       // Prevent the source command from being enabled while the conversion takes place.
-      editor.getCommand('source').running = loading;
-      editor.setLoading(loading);
-    },
-
-    onStartLoading: function(event) {
-      var editor = event.editor;
+      var sourceCommand = editor.getCommand('source');
+      // We have to set the flag before setting the command state in order to be taken into account.
+      sourceCommand.running = true;
+      sourceCommand.setState(CKEDITOR.TRISTATE_DISABLED);
+      if (editor.mode === 'source') {
+        // When switching from Source mode to WYSIWYG mode the wiki syntax is converted to HTML on the server side.
+        // Before we receive the result the Source plugin sets the source (wiki syntax) as the data for the WYSIWYG
+        // mode. This adds an entry (snapshot) in the undo history for the WYSIWYG mode. In order to prevent this we
+        // lock the undo history until the conversion is done.
+        // See CKEDITOR-58: Undo operation can replace the rich text content with wiki syntax
+        editor.fire('lockSnapshot');
+      }
+      if (editor.editable()) {
+        editor.container.findOne('.cke_button__source_icon').addClass('loading');
+      }
       // A bug in Internet Explorer 11 prevents the user from typing into the Source text area if the WYSIWYG text
       // area is focused and the selection is collapsed before switching to Source mode. In order to avoid this
       // problem we have to either remove the focus from the WYSIWYG text area or to make sure the selection is not
@@ -158,23 +166,9 @@
         // except Edge (that doesn't have the problem).
         editor.document.$.execCommand('SelectAll', false, null);
       }
-      if (editor.editable()) {
-        editor.container.findOne('.cke_button__source_icon').addClass('loading');
-      }
-      if (editor.mode === 'source') {
-        // When switching from Source mode to WYSIWYG mode the wiki syntax is converted to HTML on the server side.
-        // Before we receive the result the Source plugin sets the source (wiki syntax) as the data for the WYSIWYG
-        // mode. This adds an entry (snapshot) in the undo history for the WYSIWYG mode. In order to prevent this we
-        // lock the undo history until the conversion is done.
-        // See CKEDITOR-58: Undo operation can replace the rich text content with wiki syntax
-        editor.fire('lockSnapshot');
-      }
-      // Disable the switch while the conversion takes place.
-      editor.getCommand('source').setState(CKEDITOR.TRISTATE_DISABLED);
     },
 
-    onEndLoading: function(event) {
-      var editor = event.editor;
+    endLoading: function(editor) {
       if (editor.editable()) {
         editor.container.findOne('.cke_button__source_icon').removeClass('loading');
       }
@@ -182,7 +176,11 @@
         // Unlock the undo history after the conversion is done and the WYSIWYG mode data is set.
         editor.fire('unlockSnapshot');
       }
-      editor.getCommand('source').setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
+      var sourceCommand = editor.getCommand('source');
+      // We have to set the flag before setting the command state in order to be taken into account.
+      sourceCommand.running = false;
+      sourceCommand.setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
+      editor.setLoading(false);
     }
   });
 })();

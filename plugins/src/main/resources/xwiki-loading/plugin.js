@@ -22,11 +22,18 @@
 
   CKEDITOR.plugins.add('xwiki-loading', {
     init: function(editor) {
+      var loadingCounter = 0;
       editor.setLoading = function(loading) {
         if (loading) {
-          this.fire('startLoading');
-        } else {
-          this.fire('endLoading');
+          loadingCounter++;
+          if (loadingCounter === 1) {
+            this.fire('startLoading');
+          }
+        } else if (loadingCounter > 0) {
+          loadingCounter--;
+          if (loadingCounter === 0) {
+            this.fire('endLoading');
+          }
         }
       };
 
@@ -42,13 +49,13 @@
       });
 
       editor.on('endLoading', function(event) {
-        if (this.editable()) {
-          // End the read-only mode.
-          this.setReadOnly(false);
-        }
         var contentsSpace = this.ui.space('contents');
         if (contentsSpace) {
           contentsSpace.removeStyle('visibility');
+        }
+        if (this.editable()) {
+          // End the read-only mode.
+          this.setReadOnly(false);
         }
       });
     }

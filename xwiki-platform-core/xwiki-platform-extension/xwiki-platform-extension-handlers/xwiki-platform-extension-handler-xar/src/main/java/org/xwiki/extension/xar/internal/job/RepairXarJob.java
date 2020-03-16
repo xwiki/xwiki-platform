@@ -98,7 +98,7 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
     private CoreExtensionRepository coreRepository;
 
     @Inject
-    protected ExtensionManagerConfiguration configuration;
+    private ExtensionManagerConfiguration configuration;
 
     @Override
     public String getType()

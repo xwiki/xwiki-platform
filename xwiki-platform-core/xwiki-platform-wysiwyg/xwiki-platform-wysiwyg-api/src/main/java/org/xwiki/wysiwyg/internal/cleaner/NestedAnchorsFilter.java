@@ -24,9 +24,11 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
-import org.apache.xpath.XPathAPI;
 import org.slf4j.Logger;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
@@ -40,7 +42,7 @@ import org.xwiki.component.annotation.Component;
  * 
  * @version $Id$
  */
-@Component(roles = { HTMLFilter.class })
+@Component(roles = {HTMLFilter.class})
 @Named("nestedAnchors")
 @Singleton
 public class NestedAnchorsFilter extends AbstractHTMLFilter
@@ -55,13 +57,15 @@ public class NestedAnchorsFilter extends AbstractHTMLFilter
     public void filter(Document document, Map<String, String> parameters)
     {
         try {
+            XPath xpath = XPathFactory.newInstance().newXPath();
+
             // all anchors descendants of other anchors
-            NodeList nestedAnchors = XPathAPI.selectNodeList(document, "//a//a");
+            NodeList nestedAnchors = (NodeList) xpath.compile("//a//a").evaluate(document, XPathConstants.NODESET);
             for (int i = 0; i < nestedAnchors.getLength(); i++) {
                 Element nestedAnchor = (Element) nestedAnchors.item(i);
                 unwrap(nestedAnchor);
             }
-        } catch (TransformerException e) {
+        } catch (XPathExpressionException e) {
             logger.error("Exception while filtering nested anchors.", e);
         }
     }

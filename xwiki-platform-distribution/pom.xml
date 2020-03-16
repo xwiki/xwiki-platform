@@ -333,26 +333,6 @@
                 <checkCompileClasspath>false</checkCompileClasspath>
                 <checkTestClasspath>false</checkTestClasspath>
                 <exceptions>
-                  <!-- Xalan bundles a lot of other projects: org/apache/xml/**, org/apache/bcel/**, JLex/**,
-                       java_cup/**, org/apache/regexp/**. In addition, it even has these jars in its source tree without
-                       any indication about their versions... Thus there's isn't much we can do ATM but it means there's
-                       an uncertainty about which version of those classes are used at runtime.
-                       TODO: Find an alternative to Xalan or find a good maven packaging of it -->
-                  <exception>
-                    <conflictingDependencies>
-                      <dependency>
-                        <groupId>xalan</groupId>
-                        <artifactId>xalan</artifactId>
-                      </dependency>
-                      <dependency>
-                        <groupId>jakarta-regexp</groupId>
-                        <artifactId>jakarta-regexp</artifactId>
-                      </dependency>
-                    </conflictingDependencies>
-                    <packages>
-                      <package>org.apache.regexp</package>
-                    </packages>
-                  </exception>
                   <!-- None of these should bundle org.w3c classes but at least they seem compatible.
                        See https://issues.apache.org/bugzilla/show_bug.cgi?id=49897,
                        https://issues.apache.org/bugzilla/show_bug.cgi?id=49206 and http://bugs.jython.org/issue2121 -->

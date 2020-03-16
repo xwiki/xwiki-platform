@@ -380,6 +380,17 @@
         <artifactId>batik-awt-util</artifactId>
         <version>${batik.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.xmlgraphics</groupId>
+        <artifactId>batik-dom</artifactId>
+        <version>${batik.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>xalan</groupId>
+            <artifactId>xalan</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
 
       <dependency>
         <groupId>net.java.dev.jna</groupId>

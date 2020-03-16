@@ -24,9 +24,11 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
-import org.apache.xpath.XPathAPI;
 import org.slf4j.Logger;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -39,7 +41,7 @@ import org.xwiki.component.annotation.Component;
  * 
  * @version $Id$
  */
-@Component(roles = { HTMLFilter.class })
+@Component(roles = {HTMLFilter.class})
 @Named("emptyAttribute")
 @Singleton
 public class EmptyAttributeFilter extends AbstractHTMLFilter
@@ -54,13 +56,16 @@ public class EmptyAttributeFilter extends AbstractHTMLFilter
     public void filter(Document document, Map<String, String> parameters)
     {
         try {
-            NodeList emptyAttributes = XPathAPI.selectNodeList(document, "//@*[. = '']");
+            XPath xpath = XPathFactory.newInstance().newXPath();
+
+            NodeList emptyAttributes =
+                (NodeList) xpath.compile("//@*[. = '']").evaluate(document, XPathConstants.NODESET);
             for (int i = emptyAttributes.getLength() - 1; i >= 0; i--) {
                 Attr emptyAttribute = (Attr) emptyAttributes.item(i);
                 emptyAttribute.getOwnerElement().removeAttributeNode(emptyAttribute);
             }
-        } catch (TransformerException e) {
-            logger.error("Exception while filtering empty attributes.", e);
+        } catch (XPathExpressionException e) {
+            this.logger.error("Exception while filtering empty attributes.", e);
         }
     }
 }

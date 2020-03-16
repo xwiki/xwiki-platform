@@ -37,7 +37,7 @@ div.loading {
   background: transparent url("$xwiki.getSkinFile('icons/silk/package.png')") no-repeat scroll 5px 0.5em;
   font-size: .85em;
   margin-bottom: .2em;
-  padding: .3em 0 .3em 1em;
+  padding: .3em 0 .3em 2.5em;
 }
 
 #packagelist .active {

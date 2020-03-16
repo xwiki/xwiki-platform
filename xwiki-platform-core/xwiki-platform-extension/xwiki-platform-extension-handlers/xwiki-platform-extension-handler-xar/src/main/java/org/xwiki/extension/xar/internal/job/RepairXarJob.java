@@ -28,6 +28,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.extension.Extension;
 import org.xwiki.extension.ExtensionDependency;
 import org.xwiki.extension.ExtensionId;
+import org.xwiki.extension.ExtensionManagerConfiguration;
 import org.xwiki.extension.InstallException;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.LocalExtension;
@@ -95,6 +96,9 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
 
     @Inject
     private CoreExtensionRepository coreRepository;
+
+    @Inject
+    protected ExtensionManagerConfiguration configuration;
 
     @Override
     public String getType()
@@ -266,6 +270,11 @@ public class RepairXarJob extends AbstractExtensionJob<InstallRequest, DefaultJo
                 try {
                     for (ExtensionDependency extensionDependency : dependencies) {
                         this.progressManager.startStep(dependencies);
+
+                        // Is ignored
+                        if (this.configuration.isIgnoredDependency(extensionDependency)) {
+                            continue;
+                        }
 
                         // Replace with managed dependency if any
                         ExtensionDependency resolvedDependency =

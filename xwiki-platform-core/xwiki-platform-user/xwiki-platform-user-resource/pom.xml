@@ -27,70 +27,41 @@
     <artifactId>xwiki-platform-user</artifactId>
     <version>12.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-user-default</artifactId>
-  <name>XWiki Platform - User - Default</name>
+  <artifactId>xwiki-platform-user-resource</artifactId>
+  <name>XWiki Platform - User - Resource</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Default</description>
+  <description>XWiki Platform - Resource</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>71</xwiki.pitest.mutationThreshold>
-    <xwiki.extension.features>
-      <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->
-      org.xwiki.contrib.membership:application-membership-default
-    </xwiki.extension.features>
+    <xwiki.jacoco.instructionRatio>0.48</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>67</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-cache-api</artifactId>
-      <version>${commons.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-oldcore</artifactId>
+      <artifactId>xwiki-platform-user-default</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-user-api</artifactId>
+      <artifactId>xwiki-platform-resource-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-wiki-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-configuration-default</artifactId>
+      <artifactId>xwiki-platform-url-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Test dependencies -->
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-test-oldcore</artifactId>
-      <version>${project.version}</version>
-      <type>pom</type>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-tool-test-component</artifactId>
+      <version>${commons.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <executions>
-          <execution>
-            <!-- Specify the "default" execution id so that the "blocker" one is always executed -->
-            <id>default</id>
-            <configuration>
-              <excludes>
-                org/xwiki/user/internal/group/DefaultGroupManager.java,
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

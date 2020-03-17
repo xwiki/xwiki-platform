@@ -208,7 +208,7 @@ notifications.filters.preferences.label.wiki=Benachrichtigungen für das ganze W
 ## Notifications switches
 notifications.switches.tooltip.page=Diese Seite abonnieren
 notifications.switches.tooltip.pageAndChildren=Diese Seite mitsamt Unterseiten abonnieren
-### Missing: notifications.switches.tooltip.space=Watch the parent page and its children
+notifications.switches.tooltip.space=Die übergeordnete Seite und deren Unterseiten abonnieren
 ### Missing: notifications.switches.tooltip.wiki=Watch this wiki
 ### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.</content>
 </xwikidoc>

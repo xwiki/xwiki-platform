@@ -341,7 +341,9 @@ var XWiki = (function(XWiki) {
       }
 
       // Reset the comment after a successful save and continue action.
-      $("commentinput").value = '';
+      if ($("commentinput")) {
+        $("commentinput").value = '';
+      }
 
       // don't force save twice
       if ($('forceSave')) {

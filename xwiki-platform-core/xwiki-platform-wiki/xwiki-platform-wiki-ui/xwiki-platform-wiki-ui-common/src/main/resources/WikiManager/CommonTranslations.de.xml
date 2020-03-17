@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.wikis=Wikis
-admin.wikis.descriptor=Bezeichreibung
+admin.wikis.descriptor=Bezeichner
 admin.wikis.descriptor.description=Konfigurieren der Wiki-Beschreibung
 admin.wiki.description=Beschreibt das Wiki (Name und Beschreibung) und setzt seinen Besitzer und seine Homepage.
 platform.wiki.admin.wiki.ownerProblemConfirmation=Der Benutzer des neuen Besitzers existiert nicht oder er kann von einem anderen Wiki stammen.\\nSind Sie sicher, dass Sie ihn verwenden und mit dem Speichervorgang fortfahren möchten?

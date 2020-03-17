@@ -56,11 +56,11 @@ notifications.filters.advanced.modal.close=Schließen
 ## Filters names
 notifications.filters.name.systemUserNotificationFilter=Systemfilter
 notifications.filters.description.systemUserNotificationFilter=Benachrichtigungen vom System-Benutzer verbergen
-notifications.filters.name.ownEventsNotificationFilter=Eigene Ereignisfilter
+notifications.filters.name.ownEventsNotificationFilter=Filter zu eigenen Ereignissen
 notifications.filters.description.ownEventsNotificationFilter=Verberge Benachrichtigungen über meine eigenen Aktivitäten
-notifications.filters.name.eventReadAlertFilter=Filter Gelesene Benachrichtigungen (Alarm)
+notifications.filters.name.eventReadAlertFilter=Gelesene Benachrichtigungen filtern (Alarm)
 notifications.filters.description.eventReadAlertFilter=Benachrichtigungen verbergen, die als gelesen gekennzeichnet wurden
-notifications.filters.name.eventReadEmailFilter=Filter Gelesene Benachrichtigungen (E-Mail)
+notifications.filters.name.eventReadEmailFilter=Gelesene Benachrichtigungen filtern (E-Mail)
 notifications.filters.description.eventReadEmailFilter=Benachrichtigungen verbergen, die als gelesen gekennzeichnet wurden
 notifications.filters.name.minorEventAlertNotificationFilter=Kleines Ereignis (Alarm)
 notifications.filters.description.minorEventAlertNotificationFilter=Verberge Benachrichtigungen betreffend kleinen Änderungen von Seiten
@@ -83,7 +83,7 @@ notifications.filters.preferences.addPreference.filterType.inclusive=Eingeschlos
 notifications.filters.preferences.addPreference.filterType.exclusive=Ausgeschlossen
 notifications.filters.preferences.addPreference.notificationFormat.label=Benachrichtigungsformat
 notifications.filters.preferences.addPreference.notificationFormat.hint=Auf welches Format von Benachrichtigung soll der Filter angewendet werden?
-notifications.filters.preferences.addPreference.eventType.label=Ereignis Kategorie
+notifications.filters.preferences.addPreference.eventType.label=Ereignisart
 notifications.filters.preferences.addPreference.eventType.hint=Welche Art(en) von Ereignis soll der Filter beachten?
 notifications.filters.preferences.addPreference.location.label=Filter Geltungsbereich
 notifications.filters.preferences.addPreference.location.hint=Welche Seite(n) soll der Filter beachten?
@@ -95,7 +95,7 @@ notifications.filters.preferences.setEnabled.done=Filtereinstellung gespeichert!
 notifications.filters.preferences.setEnabled.error=Fehler beim Speichern der Filtereinstellung
 
 ## Notifications toggles
-notifications.toggle.disabled.hint=Sie müssen Benachrichtigungen in Ihren Einstellungen aktivieren, wenn Sie diese Seiten verfolgen möchten
+notifications.toggle.disabled.hint=Sie müssen Benachrichtigungen in Ihren Einstellungen aktivieren, wenn Sie diese Seiten abonnieren möchten
 
 ## Notifications formats
 notifications.format.alert=Alarm
@@ -103,12 +103,12 @@ notifications.format.email=E-Mail
 
 ## Filter preferences settings
 notifications.settings.filters.preferences.title=Filter
-### Missing: notifications.settings.filters.preferences.hint=Create filters to more precisely control when the active events should trigger notifications.
+notifications.settings.filters.preferences.hint=Legen Sie Filter an, um genauer anzugeben, wann Ereignisse Benachrichtigungen erzeugen.
 notifications.settings.filters.preferences.forGuest=Melden Sie sich an, um Ihre Benachrichtigungen zu konfigurieren.
 
 ## Header definition for notification filter preferences
 notifications.settings.filters.preferences.table.name=Name
-notifications.settings.filters.preferences.table.filterType=Filter Typ
+notifications.settings.filters.preferences.table.filterType=Filter Art
 notifications.settings.filters.preferences.table.eventTypes=Ereignisse
 notifications.settings.filters.preferences.table.notificationFormats=Format
 notifications.settings.filters.preferences.table.isEnabled=Aktiv?
@@ -152,7 +152,7 @@ notifications.settings.watch.disabled=Abonnements sind deaktiviert. Bitte kontak
 notifications.events.by=bearbeitet von {0}.
 notifications.events.lastChange=Letzte Änderung: {0}.
 notifications.events.lastComment=Letzter Kommentar: {0}.
-### Missing: notifications.preferences.scope.table.scope=Scope
+notifications.preferences.scope.table.scope=Geltungsbereich
 notifications.preferences.scope.table.location=Bereich
 notifications.preferences.scope.table.scopeFilterType=Filter Typ
 notifications.preferences.scope.table._actions=Aktionen
@@ -209,6 +209,6 @@ notifications.filters.preferences.label.wiki=Benachrichtigungen für das ganze W
 notifications.switches.tooltip.page=Diese Seite abonnieren
 notifications.switches.tooltip.pageAndChildren=Diese Seite mitsamt Unterseiten abonnieren
 notifications.switches.tooltip.space=Die übergeordnete Seite und deren Unterseiten abonnieren
-### Missing: notifications.switches.tooltip.wiki=Watch this wiki
-### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.</content>
+notifications.switches.tooltip.wiki=Dieses Wiki abonnieren
+notifications.switches.changeStatusError=Fehler beim Ändern des Status der Benachrichtigungen.</content>
 </xwikidoc>

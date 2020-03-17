@@ -18,6 +18,7 @@ org.xwiki.user.internal.document.AllDocumentUserPropertiesResolver
 org.xwiki.user.internal.document.CurrentUserReferenceResolver
 org.xwiki.user.internal.document.UserDocumentUserPropertiesResolver
 org.xwiki.user.internal.document.XWikiUserUserReferenceResolver
+org.xwiki.user.internal.document.DocumentDocumentReferenceUserReferenceSerializer
 org.xwiki.user.internal.group.DefaultGroupManager
 org.xwiki.user.internal.group.GroupCacheInvalidationListener
 org.xwiki.user.internal.group.GroupsCache

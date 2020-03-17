@@ -1,0 +1,2 @@
+org.xwiki.user.resource.internal.document.DocumentUserResourceReferenceSerializer
+org.xwiki.user.resource.internal.ConfiguredUserResourceReferenceSerializer

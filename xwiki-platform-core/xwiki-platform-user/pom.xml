@@ -38,5 +38,6 @@
     <module>xwiki-platform-user-directory</module>
     <module>xwiki-platform-user-profile</module>
     <module>xwiki-platform-user-script</module>
+    <module>xwiki-platform-user-resource</module>
   </modules>
 </project>

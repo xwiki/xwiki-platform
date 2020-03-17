@@ -45,11 +45,10 @@ import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-import org.xwiki.user.User;
+import org.xwiki.user.UserProperties;
+import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserReferenceUserResolverType;
-import org.xwiki.user.UserResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -82,7 +81,7 @@ public class QueryGeneratorTest
     private WikiDescriptorManager wikiDescriptorManager;
     private NotificationFilterManager notificationFilterManager;
     private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
-    private UserResolver<UserReference> userResolver;
+    private UserPropertiesResolver userPropertiesResolver;
     private UserReferenceResolver<DocumentReference> userReferenceResolver;
 
     private DocumentReference userDocumentReference = new DocumentReference("xwiki", "XWiki", "UserA");
@@ -102,7 +101,7 @@ public class QueryGeneratorTest
         wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
         notificationFilterManager = mocker.getInstance(NotificationFilterManager.class);
         recordableEventDescriptorHelper = mocker.getInstance(RecordableEventDescriptorHelper.class);
-        userResolver = mocker.getInstance(UserReferenceUserResolverType.INSTANCE);
+        userPropertiesResolver = mocker.getInstance(UserPropertiesResolver.class);
         userReferenceResolver = mocker.getInstance(
             new DefaultParameterizedType(null, UserReferenceResolver.class, DocumentReference.class), "document");
 
@@ -129,9 +128,9 @@ public class QueryGeneratorTest
 
         when(recordableEventDescriptorHelper.hasDescriptor(anyString(), any(DocumentReference.class))).thenReturn(true);
 
-        User user = mock(User.class);
-        when(user.displayHiddenDocuments()).thenReturn(false);
-        when(userResolver.resolve(any(UserReference.class))).thenReturn(user);
+        UserProperties userProperties = mock(UserProperties.class);
+        when(userProperties.displayHiddenDocuments()).thenReturn(false);
+        when(userPropertiesResolver.resolve(any(UserReference.class))).thenReturn(userProperties);
         when(userReferenceResolver.resolve(userDocumentReference)).thenReturn(mock(UserReference.class));
     }
 
@@ -175,9 +174,9 @@ public class QueryGeneratorTest
     public void generateQueryWhenHiddenDocsAreEnabled() throws Exception
     {
         // Mock
-        User user = mock(User.class);
-        when(user.displayHiddenDocuments()).thenReturn(true);
-        when(userResolver.resolve(any(UserReference.class))).thenReturn(user);
+        UserProperties userProperties = mock(UserProperties.class);
+        when(userProperties.displayHiddenDocuments()).thenReturn(true);
+        when(userPropertiesResolver.resolve(any(UserReference.class))).thenReturn(userProperties);
 
         // Test
         NotificationParameters parameters = new NotificationParameters();

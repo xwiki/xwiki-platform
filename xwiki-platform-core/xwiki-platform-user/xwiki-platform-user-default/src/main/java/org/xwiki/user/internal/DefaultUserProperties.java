@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.user.Editor;
-import org.xwiki.user.User;
+import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserType;
 
 import static org.xwiki.user.internal.UserPropertyConstants.ACTIVE;
@@ -37,19 +37,19 @@ import static org.xwiki.user.internal.UserPropertyConstants.LAST_NAME;
 import static org.xwiki.user.internal.UserPropertyConstants.USER_TYPE;
 
 /**
- * Common code for implementing Users.
+ * Common code for implementing user properties.
  *
  * @version $Id$
  * @since 12.2RC1
  */
-public abstract class AbstractUser implements User
+public class DefaultUserProperties implements UserProperties
 {
     private ConfigurationSource userConfigurationSource;
 
     /**
-     * @param userConfigurationSource the component providing the user configuration data
+     * @param userConfigurationSource the component providing the user properties
      */
-    public AbstractUser(ConfigurationSource userConfigurationSource)
+    public DefaultUserProperties(ConfigurationSource userConfigurationSource)
     {
         this.userConfigurationSource = userConfigurationSource;
     }

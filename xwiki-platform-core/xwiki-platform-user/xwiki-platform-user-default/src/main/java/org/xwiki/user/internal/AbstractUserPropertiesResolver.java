@@ -21,30 +21,26 @@ package org.xwiki.user.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
-import org.xwiki.user.User;
+import org.xwiki.user.UserProperties;
+import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceUserResolverType;
-import org.xwiki.user.UserResolver;
+import org.xwiki.user.UserReferenceResolver;
 
 /**
- * Document-based implementation of {@link UserResolver} which proxies to the specific UserResolver implementation
- * based on the type of the passed {@link UserReference}.
+ * Generic implementation of {@link UserPropertiesResolver} which proxies to the specific implementation based on the
+ * type of the passed {@link UserReference}.
  *
  * @version $Id$
  * @since 12.2RC1
  */
-@Component
-@Singleton
-public class DefaultUserReferenceUserResolver implements UserResolver<UserReference>
+public abstract class AbstractUserPropertiesResolver implements UserPropertiesResolver
 {
     @Inject
     @Named("context")
@@ -58,37 +54,44 @@ public class DefaultUserReferenceUserResolver implements UserResolver<UserRefere
     @Named("guestuser")
     private ConfigurationSource guestConfigurationSource;
 
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
+
     @Override
-    public User resolve(UserReference userReference, Object... parameters)
+    public UserProperties resolve(UserReference userReference, Object... parameters)
     {
-        User user;
+        UserProperties userProperties;
 
         // Handle special cases
         UserReference normalizedUserReference = userReference;
-        if (normalizedUserReference == null) {
-            normalizedUserReference = CurrentUserReference.INSTANCE;
+        if (normalizedUserReference == null || CurrentUserReference.INSTANCE == normalizedUserReference) {
+            normalizedUserReference = this.currentUserReferenceUserReferenceResolver.resolve(null, parameters);
         }
         if (SuperAdminUserReference.INSTANCE == normalizedUserReference) {
-            user = new SuperAdminUser(this.superAdminConfigurationSource);
+            userProperties = new DefaultUserProperties(this.superAdminConfigurationSource);
         } else if (GuestUserReference.INSTANCE == normalizedUserReference) {
-            user = new GuestUser(this.guestConfigurationSource);
+            userProperties = new DefaultUserProperties(this.guestConfigurationSource);
         } else {
-            user = resolveUserResolver(normalizedUserReference).resolve(normalizedUserReference, parameters);
+            userProperties =
+                findUserPropertiesResolver(normalizedUserReference).resolve(normalizedUserReference, parameters);
         }
-        return user;
+        return userProperties;
     }
 
-    private UserResolver<UserReference> resolveUserResolver(UserReference userReference)
+    private UserPropertiesResolver findUserPropertiesResolver(UserReference userReference)
     {
+        String hint =
+            String.format("%s/%s", getUnderlyingConfigurationSourceHint(), userReference.getClass().getName());
         try {
-            return this.componentManager.getInstance(UserReferenceUserResolverType.INSTANCE,
-                userReference.getClass().getName());
+            return this.componentManager.getInstance(UserPropertiesResolver.class, hint);
         } catch (ComponentLookupException e) {
             // If there's no resolver for the passed UserReference type, then the XWiki instance cannot work and thus
             // we need to fail hard and fast. Hence the runtime exception.
             throw new RuntimeException(String.format(
-                "Failed to find user resolver for role [%s] and hint [%s]", UserReferenceUserResolverType.INSTANCE,
-                userReference.getClass().getName()), e);
+                "Failed to find user properties resolver for role [%s] and hint [%s]",
+                UserPropertiesResolver.class.getName(), hint), e);
         }
     }
+
+    protected abstract String getUnderlyingConfigurationSourceHint();
 }

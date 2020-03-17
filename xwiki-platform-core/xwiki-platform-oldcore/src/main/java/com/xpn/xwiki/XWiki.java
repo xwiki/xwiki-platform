@@ -169,9 +169,7 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.template.TemplateManager;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceUserResolverType;
-import org.xwiki.user.UserResolver;
+import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.url.URLConfiguration;
 import org.xwiki.velocity.VelocityManager;
@@ -431,7 +429,7 @@ public class XWiki implements EventListener
 
     private ConfigurationSource wikiConfiguration;
 
-    private UserResolver<UserReference> userResolver;
+    private UserPropertiesResolver userPropertiesResolver;
 
     private ConfigurationSource spaceConfiguration;
 
@@ -500,13 +498,13 @@ public class XWiki implements EventListener
         return this.spaceConfiguration;
     }
 
-    private UserResolver<UserReference> getUserResolver()
+    private UserPropertiesResolver getUserPropertiesResolver()
     {
-        if (this.userResolver == null) {
-            this.userResolver = Utils.getComponent(UserReferenceUserResolverType.INSTANCE);
+        if (this.userPropertiesResolver == null) {
+            this.userPropertiesResolver = Utils.getComponent(UserPropertiesResolver.class);
         }
 
-        return this.userResolver;
+        return this.userPropertiesResolver;
     }
 
     private EditConfiguration getEditConfiguration()
@@ -2974,7 +2972,7 @@ public class XWiki implements EventListener
     public String getUserPreference(String prefname, XWikiContext context)
     {
         String result =
-            getUserResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
+            getUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
 
         if (StringUtils.isEmpty(result)) {
             result = getSpacePreference(prefname, context);

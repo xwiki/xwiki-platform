@@ -26,21 +26,21 @@ import javax.inject.Provider;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.user.internal.AbstractUser;
+import org.xwiki.user.internal.DefaultUserProperties;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Document-based implementation of a XWiki user.
+ * Document-based implementation of a XWiki user properties.
  *
- * Always go through a {@link org.xwiki.user.UserResolver} to get a
- * {@link DocumentUser} object (this is why this class is package-protected). The reason is because the resolvers
- * know how to handle Guest and SuperAdmin users properly.
+ * Always go through a {@link org.xwiki.user.UserPropertiesResolver} to get a
+ * {@link DocumentUserProperties} object (this is why this class is package-protected). The reason is because the
+ * resolvers know how to handle Guest and SuperAdmin users properly.
  *
  * @version $Id$
  * @since 12.2RC1
  */
-class DocumentUser extends AbstractUser
+class DocumentUserProperties extends DefaultUserProperties
 {
     static final LocalDocumentReference USERS_CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
 
@@ -54,24 +54,13 @@ class DocumentUser extends AbstractUser
      * @param userConfigurationSource the component to get the user properties
      * @param
      */
-    DocumentUser(DocumentUserReference userReference, Provider<XWikiContext> contextProvider,
+    DocumentUserProperties(DocumentUserReference userReference, Provider<XWikiContext> contextProvider,
         ConfigurationSource userConfigurationSource)
     {
         super(userConfigurationSource);
 
         this.userReference = userReference;
         this.contextProvider = contextProvider;
-    }
-
-    @Override
-    public DocumentUserReference getUserReference()
-    {
-        return this.userReference;
-    }
-
-    private DocumentReference getInternalReference()
-    {
-        return getUserReference().getReference();
     }
 
     @Override
@@ -85,5 +74,15 @@ class DocumentUser extends AbstractUser
         } finally {
             xcontext.setUserReference(originalUserReference);
         }
+    }
+
+    private DocumentUserReference getUserReference()
+    {
+        return this.userReference;
+    }
+
+    private DocumentReference getInternalReference()
+    {
+        return getUserReference().getReference();
     }
 }

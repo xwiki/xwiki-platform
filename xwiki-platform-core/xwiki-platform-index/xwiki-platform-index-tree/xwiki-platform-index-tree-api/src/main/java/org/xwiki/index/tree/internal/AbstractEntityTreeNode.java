@@ -41,8 +41,7 @@ import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
 import org.xwiki.tree.AbstractTreeNode;
 import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserResolver;
+import org.xwiki.user.UserPropertiesResolver;
 
 /**
  * Base class for tree nodes that represent entities.
@@ -69,7 +68,7 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
     protected QueryManager queryManager;
 
     @Inject
-    private UserResolver<UserReference> userResolver;
+    private UserPropertiesResolver userPropertiesResolver;
 
     @Inject
     private EntityReferenceProvider defaultEntityReferenceProvider;
@@ -97,7 +96,7 @@ public abstract class AbstractEntityTreeNode extends AbstractTreeNode
     {
         boolean shown = !Boolean.TRUE.equals(getProperties().get("filterHiddenDocuments"));
         if (!shown) {
-            shown = this.userResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments();
+            shown = this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments();
         }
         return shown;
     }

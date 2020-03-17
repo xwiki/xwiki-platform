@@ -19,62 +19,51 @@
  */
 package org.xwiki.user.internal.document;
 
-import javax.inject.Provider;
-
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.user.GuestUserReference;
-import org.xwiki.user.User;
+import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserReference;
-
-import com.xpn.xwiki.XWikiContext;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link CurrentUserResolver}.
+ * Unit tests for {@link UserDocumentUserPropertiesResolver}.
  *
  * @version $Id$
  */
 @ComponentTest
-public class CurrentUserResolverTest
+public class UserDocumentUserPropertiesResolverTest
 {
     @InjectMockComponents
-    private CurrentUserResolver resolver;
-
-    @MockComponent
-    private Provider<XWikiContext> contextProvider;
+    private UserDocumentUserPropertiesResolver resolver;
 
     @Test
     void resolve()
     {
-        DocumentReference reference = new DocumentReference("wiki", "space", "currentuser");
-        XWikiContext xcontext = mock(XWikiContext.class);
-        when(xcontext.getUserReference()).thenReturn(reference);
-        when(this.contextProvider.get()).thenReturn(xcontext);
-
-        User user = this.resolver.resolve(null);
-        assertNotNull(user);
-        assertEquals("wiki:space.currentuser", ((DocumentUser) user).getUserReference().getReference().toString());
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        UserProperties userProperties = this.resolver.resolve(new DocumentUserReference(documentReference, null));
+        assertNotNull(userProperties);
     }
 
     @Test
-    void resolveWhenNoCurrentUser()
+    void resolveWhenNotDocumentReference()
     {
-        XWikiContext xcontext = mock(XWikiContext.class);
-        // No current user in the context
-        when(xcontext.getUserReference()).thenReturn(null);
-        when(this.contextProvider.get()).thenReturn(xcontext);
+        UserReference userReference = mock(UserReference.class);
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> this.resolver.resolve(userReference));
+        assertEquals("You need to pass a user reference of type "
+            + "[org.xwiki.user.internal.document.DocumentUserReference]", exception.getMessage());
+    }
 
-        User user = this.resolver.resolve(null);
-        assertNotNull(user);
-        assertSame(GuestUserReference.INSTANCE, user.getUserReference());
+    @Test
+    void resolveWhenNullReference()
+    {
+        Throwable exception = assertThrows(IllegalArgumentException.class, () -> this.resolver.resolve(null));
+        assertEquals("You need to pass a user reference of type "
+            + "[org.xwiki.user.internal.document.DocumentUserReference]", exception.getMessage());
     }
 }

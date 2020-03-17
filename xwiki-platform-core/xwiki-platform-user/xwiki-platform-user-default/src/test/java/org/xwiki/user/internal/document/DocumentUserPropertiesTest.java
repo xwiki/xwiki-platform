@@ -43,15 +43,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.xwiki.user.internal.document.DocumentUser.USERS_CLASS_REFERENCE;
+import static org.xwiki.user.internal.document.DocumentUserProperties.USERS_CLASS_REFERENCE;
 
 /**
- * Unit tests for {@link DocumentUser}.
+ * Unit tests for {@link DocumentUserProperties}.
  *
  * @version $Id$
  */
 @ComponentTest
-public class DocumentUserTest
+public class DocumentUserPropertiesTest
 {
     @MockComponent
     @Named("user")
@@ -69,7 +69,7 @@ public class DocumentUserTest
 
     private DocumentReference reference;
 
-    private DocumentUser user;
+    private DocumentUserProperties user;
 
     private XWikiContext xcontext;
 
@@ -77,7 +77,7 @@ public class DocumentUserTest
     void setup()
     {
         this.reference = new DocumentReference("mainwiki", "space", "user");
-        this.user = new DocumentUser(new DocumentUserReference(this.reference, this.entityReferenceProvider),
+        this.user = new DocumentUserProperties(new DocumentUserReference(this.reference, this.entityReferenceProvider),
             this.contextProvider, this.userConfigurationSource);
 
         this.xcontext = mock(XWikiContext.class);
@@ -196,11 +196,5 @@ public class DocumentUserTest
 
         when(this.userConfigurationSource.getProperty("email_checked", Boolean.class, false)).thenReturn(false);
         assertFalse(this.user.isEmailChecked());
-    }
-
-    @Test
-    void getReference()
-    {
-        assertEquals(reference, this.user.getUserReference().getReference());
     }
 }

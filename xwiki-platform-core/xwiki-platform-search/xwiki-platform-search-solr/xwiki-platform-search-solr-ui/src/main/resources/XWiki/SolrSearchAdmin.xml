@@ -105,10 +105,11 @@
   #set ($discard = $xwiki.jsx.use('XWiki.SolrSearchAdmin'))
   == $services.localization.render('solr.admin.status.title') ==
 
-  (% class="xform" %)
-  ; {{html clean="false"}}&lt;label&gt;$services.localization.render('solr.admin.status.queueSize.label')&lt;/label&gt;{{/html}}##
+  (% class="xform" %)(((
+  ; {{html clean="false"}}<label>$services.localization.render('solr.admin.status.queueSize.label')</label>{{/html}}##
     (% class="xHint" %)$services.localization.render('solr.admin.status.queueSize.hint')
   : (% class="solrQueueSize" %)$services.solr.queueSize
+  )))
 
   == $services.localization.render('solr.admin.indexing.title') ==
 

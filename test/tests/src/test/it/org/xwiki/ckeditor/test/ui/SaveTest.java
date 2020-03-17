@@ -67,7 +67,7 @@ public class SaveTest
     {
         WYSIWYGEditPage editPage = WYSIWYGEditPage.gotoPage(testInfo.getTestClass().get().getSimpleName(),
             testInfo.getTestMethod().get().getName());
-        CKEditor editor = new CKEditor().waitToLoad();
+        CKEditor editor = new CKEditor("content").waitToLoad();
         RichTextAreaElement textArea = editor.getRichTextArea();
         textArea.clear();
         textArea.sendKeys("xyz");

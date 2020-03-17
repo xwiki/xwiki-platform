@@ -38,15 +38,7 @@ public class CKEditor extends BaseElement
     /**
      * The editor field name.
      */
-    private String name;
-
-    /**
-     * Creates a new instance that can be used to interact with the first CKEditor detected on the page. Use this
-     * constructor only when the page has a single CKEditor instance.
-     */
-    public CKEditor()
-    {
-    }
+    private final String name;
 
     /**
      * Create a new instance that can be used to interact with the specified CKEditor instance.
@@ -65,34 +57,28 @@ public class CKEditor extends BaseElement
      */
     public CKEditor waitToLoad()
     {
-        XWikiWebDriver driver = getDriver();
-        driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
         StringBuilder script = new StringBuilder();
         script.append("var name = arguments[0];\n");
         script.append("var callback = arguments[1];\n");
         script.append("require(['deferred!ckeditor'], function(ckeditorPromise) {\n");
         script.append("  ckeditorPromise.done(function(ckeditor) {\n");
-        script.append("    var listener = function(event) {\n");
-        script.append("      if (!name || name === event.editor.name) {\n");
-        script.append("        ckeditor.removeListener('instanceReady', listener);\n");
-        script.append("        callback(event.editor.name);\n");
-        script.append("      };\n");
-        script.append("    };\n");
-        script.append("    ckeditor.on('instanceReady', listener);\n");
-        script.append("    if (name) {\n");
-        script.append("      var instance = ckeditor.instances[name];\n");
-        script.append("      instance && instance.status === 'ready' && listener({editor: instance});\n");
-        script.append("    } else {\n");
-        script.append("      for (var key in ckeditor.instances) {\n");
-        script.append("        if (ckeditor.instances.hasOwnProperty(key)) {\n");
-        script.append("          var instance = ckeditor.instances[key];\n");
-        script.append("          instance && instance.status === 'ready' && listener({editor: instance});\n");
-        script.append("        }\n");
+        script.append("    // In case the editor instance is not ready yet.\n");
+        script.append("    var handler = ckeditor.on('instanceReady', function(event) {\n");
+        script.append("      if (name === event.editor.name) {\n");
+        script.append("        handler.removeListener();\n");
+        script.append("        callback();\n");
         script.append("      }\n");
-        script.append("    }\n");
+        script.append("    });\n");
+        script.append("    // In case the editor instance is ready.\n");
+        script.append("    var instance = ckeditor.instances[name];\n");
+        script.append("    instance && instance.status === 'ready' && callback();\n");
         script.append("  });\n");
         script.append("});\n");
-        this.name = (String) driver.executeAsyncScript(script.toString(), this.name);
+
+        XWikiWebDriver driver = getDriver();
+        driver.manage().timeouts().setScriptTimeout(5, TimeUnit.SECONDS);
+        driver.executeAsyncScript(script.toString(), this.name);
+
         return this;
     }
 

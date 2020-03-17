@@ -44,7 +44,7 @@ XWiki.widgets.LiveTable = Class.create({
     */
   initialize: function(url, domNodeName, handler, options)
   {
-    options = options || {};
+    this.options = options || {};
 
     // id of the root element that encloses this livetable
     this.domNodeName = domNodeName;
@@ -124,7 +124,7 @@ XWiki.widgets.LiveTable = Class.create({
     this.loadingStatus = $(this.domNodeName + '-ajax-loader') || $('ajax-loader');
     this.limitsDisplays = $(this.domNodeName).select('.xwiki-livetable-limits') || [];
     this.filters = "";
-    this.handler = handler || function(){};
+    this.handler = handler || this.handler;
     this.totalRows = -1;
     this.fetchedRows = new Array();
     this.getUrl = url;
@@ -328,6 +328,118 @@ XWiki.widgets.LiveTable = Class.create({
     document.fire("xwiki:livetable:displayComplete", {
       "tableId" : this.domNodeName
     });
+  },
+
+  /**
+   * Default handler for displaying live table rows.
+   */
+  handler: function(row, i, table) {
+    if (!row['doc_viewable']) {
+      $(table.domNodeName + '-inaccessible-docs').removeClassName('hidden');
+    }
+    var showFilterNote = false;
+    if (table.options.columns.indexOf('doc.title') >= 0) {
+      var titleColumnDescriptor = table.options.columnDescriptors['doc.title'] || {};
+      if (titleColumnDescriptor.filterable !== false || titleColumnDescriptor.sortable !== false) {
+        showFilterNote = true;
+        if (row['doc_title_raw'] !== undefined) {
+          $(table.domNodeName + '-computed-title-docs').removeClassName('hidden');
+        }
+      }
+    }
+    var tr = new Element('tr');
+    table.options.columns.forEach(function(column) {
+      var descriptor = table.options.columnDescriptors[column] || {};
+      if (descriptor.type === 'hidden') {
+        return;
+      }
+      // The column's display name to be used when displaying the reponsive version.
+      var displayName = descriptor.displayName || column;
+      var fieldName = column.replace(/^doc\./, 'doc_');
+      if (column === '_actions') {
+        var adminActions = ['admin', 'rename', 'rights'];
+        var td = new Element('td', {
+          'class': 'actions',
+          'data-title': displayName
+        });
+        td.toggleClassName('hide-labels', descriptor.labels === false);
+        (descriptor.actions || []).forEach(function(action, index) {
+          if (row['doc_has' + action.id] || action.id === 'view' || (row['doc_has' + action.id] === undefined &&
+              (row['doc_hasadmin'] || adminActions.indexOf(action.id) < 0))) {
+            var link = new Element('a', {
+              'href': row['doc_' + action.id + '_url'] || row['doc_url'],
+              'class': 'action action' + action.id
+            }).update('<span class="action-icon"></span><span class="action-label"></span>');
+            link.down('.action-icon').update(action.icon).writeAttribute('title', action.label);
+            link.down('.action-label').update(action.label.escapeHTML());
+            if (action.async) {
+              link.observe('click', function(event) {
+                event.stop();
+                new Ajax.Request(this.href, {
+                  onSuccess: function() {
+                    eval(action.callback);
+                  }
+                });
+              }.bindAsEventListener(link));
+            }
+            td.insert(link);
+          }
+        });
+        tr.appendChild(td);
+      } else {
+        var td = new Element('td', {
+          'class': [
+            fieldName,
+            'link' + (descriptor.link || ''),
+            'type' + (descriptor.type || '')
+          ].join(' '),
+          'data-title': displayName
+        });
+        var container = td;
+        if (descriptor.link && row['doc_viewable']) {
+          var link = new Element(descriptor.link === 'editor' ? 'span' : 'a');
+          // Automatic: the link URL is in JSON results, with the '_url' sufix.
+          if (descriptor.link === 'auto') {
+            link.href = row[fieldName + '_url'] || row['doc_url'];
+          } else if (descriptor.link === 'field') {
+            if (row[fieldName + '_url']) {
+              link.href = row[fieldName + '_url'];
+            }
+          // Property editor
+          } else if (descriptor.link === 'editor') {
+            var propertyClassName = descriptor['class'] || table.options.xclass;
+            td.observe('click', function(event) {
+              var tag = event.element().down('span') || event.element();
+              editProperty(row['doc_fullName'], propertyClassName, column, function(value) {
+                tag.innerHTML = value;
+              });
+            });
+          // Author, space or wiki link.
+          } else if (row['doc_' + descriptor.link + '_url']) {
+            link.href = row['doc_' + descriptor.link + '_url'];
+          } else {
+            link.href = row['doc_url'];
+          }
+          td.appendChild(link);
+          container = link;
+        }
+        // The value can be passed as a string..
+        if (descriptor.html + '' === 'true') {
+          container.innerHTML = row[fieldName] || '';
+        } else if (row[fieldName] !== undefined && row[fieldName] !== null) {
+          var text = row[fieldName] + '';
+          if (fieldName === 'doc_name' && !row['doc_viewable']) {
+            text += '*';
+          }
+          if (showFilterNote && fieldName === 'doc_title' && row['doc_title_raw'] !== undefined) {
+            container.addClassName('docTitleComputed');
+          }
+          container.update(text.escapeHTML());
+        }
+        tr.appendChild(td);
+      }
+    });
+    return tr;
   },
 
   /**
@@ -1227,14 +1339,49 @@ var LiveTableTagCloud = Class.create({
    }
 });
 
+var maybeCreateLiveTable = function(liveTableElement) {
+  if (liveTableElement.__liveTable) {
+    // Live table already created.
+    return;
+  }
+  var settings = JSON.parse(liveTableElement.getAttribute('data-settings'));
+  settings.name = settings.name || 'livetable_' + liveTableElement.id;
+  settings.maxPages = settings.maxPages || 10;
+  settings.limit = settings.limit || 15;
+  settings.selectedTags = settings.selectedTags || [];
+  if (settings.hasTopFilters) {
+    settings.filterNodes = [
+      liveTableElement.querySelector('.xwiki-livetable-display-filters'),
+      document.getElementById(liveTableElement.id + '-topfilters')
+    ];
+  }
+  window[settings.name] = liveTableElement.__liveTable = new XWiki.widgets.LiveTable(settings.url, liveTableElement.id,
+    eval(settings.callback), settings);
+  if (settings.hasPageSize) {
+    document.observe('xwiki:livetable:' + liveTableElement.id + ':loadingEntries', function() {
+      document.getElementById(liveTableElement.id + '-pagesize').classList.add('hidden');
+    });
+    document.observe('xwiki:livetable:' + liveTableElement.id + ':loadingComplete', function() {
+      document.getElementById(liveTableElement.id + '-pagesize').classList.remove('hidden');
+    });
+  }
+};
 
-// Trigger table loading when document and scripts are ready
-function init() {
-  document.fire("xwiki:livetable:loading");
-}
+var init = function(event) {
+  var elements = (event && event.memo.elements) || [document.body];
+  elements.forEach(function(element) {
+    var liveTableElements = element.classList.contains('xwiki-livetable') ? [element] :
+      element.querySelectorAll('.xwiki-livetable');
+    liveTableElements.forEach(maybeCreateLiveTable);
+  });
+};
 
+// Initialize the live tables we find after the document is loaded.
 (XWiki.isInitialized && init())
-|| document.observe("xwiki:dom:loading", init);
+|| document.observe('xwiki:dom:loading', init);
+
+// Initialize the live tables we find when the DOM is updated.
+document.observe('xwiki:dom:updated', init);
 
 // End XWiki augmentation.
 return XWiki;

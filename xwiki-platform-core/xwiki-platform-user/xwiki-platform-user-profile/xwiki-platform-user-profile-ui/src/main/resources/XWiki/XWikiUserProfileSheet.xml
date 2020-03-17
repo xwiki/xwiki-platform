@@ -679,7 +679,7 @@ $services.localization.render('platform.core.profile.category.profile.disabled')
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.menu.xWikiUserProfile</name>
+      <name>org.xwiki.platform.user.profile.menu.userProfile</name>
     </property>
     <property>
       <parameters>id=profile

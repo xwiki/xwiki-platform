@@ -328,7 +328,7 @@
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.menu.xWikiUserPreferences</name>
+      <name>org.xwiki.platform.user.profile.menu.userPreferences</name>
     </property>
     <property>
       <parameters>id=preferences

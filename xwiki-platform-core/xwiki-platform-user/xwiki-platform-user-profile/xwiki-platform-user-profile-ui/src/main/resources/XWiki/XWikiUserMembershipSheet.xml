@@ -260,7 +260,7 @@
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.menu.xWikiUserMembership</name>
+      <name>org.xwiki.platform.user.profile.menu.userMembership</name>
     </property>
     <property>
       <parameters>id=groups

@@ -651,7 +651,7 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.user.profile.menu.xWikiUserNetwork</name>
+      <name>org.xwiki.platform.user.profile.menu.userNetwork</name>
     </property>
     <property>
       <parameters>id=network

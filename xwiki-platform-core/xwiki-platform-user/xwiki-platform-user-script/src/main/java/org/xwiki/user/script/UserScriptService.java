@@ -55,6 +55,10 @@ public class UserScriptService implements ScriptService
     private UserPropertiesResolver userPropertiesResolver;
 
     @Inject
+    @Named("all")
+    private UserPropertiesResolver allUserPropertiesResolver;
+
+    @Inject
     private ScriptServiceManager scriptServiceManager;
 
     @Inject
@@ -91,7 +95,50 @@ public class UserScriptService implements ScriptService
     @Unstable
     public UserProperties getProperties(Object... parameters)
     {
-        return this.userPropertiesResolver.resolve(GuestUserReference.INSTANCE, parameters);
+        return this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE, parameters);
+    }
+
+    /**
+     * @return the User Properties object for the current user
+     * @since 12.2RC1
+     */
+    @Unstable
+    public UserProperties getProperties()
+    {
+        return this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE);
+    }
+
+    /**
+     * @param userReference the reference to the user properties to resolve
+     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
+     * @return the User Properties object
+     * @since 12.2RC1
+     */
+    @Unstable
+    public UserProperties getAllProperties(UserReference userReference, Object... parameters)
+    {
+        return this.allUserPropertiesResolver.resolve(userReference, parameters);
+    }
+
+    /**
+     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
+     * @return the User Properties object for the current user
+     * @since 12.2RC1
+     */
+    @Unstable
+    public UserProperties getAllProperties(Object... parameters)
+    {
+        return this.allUserPropertiesResolver.resolve(CurrentUserReference.INSTANCE, parameters);
+    }
+
+    /**
+     * @return the User Properties object for the current user
+     * @since 12.2RC1
+     */
+    @Unstable
+    public UserProperties getAllProperties()
+    {
+        return this.allUserPropertiesResolver.resolve(CurrentUserReference.INSTANCE);
     }
 
     /**

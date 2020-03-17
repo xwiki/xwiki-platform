@@ -28,8 +28,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.resource.ResourceReferenceSerializer;
-import org.xwiki.resource.SerializeResourceReferenceException;
-import org.xwiki.resource.UnsupportedResourceReferenceException;
 import org.xwiki.url.ExtendedURL;
 import org.xwiki.url.URLNormalizer;
 
@@ -50,7 +48,6 @@ public class WebjarsResourceReferenceSerializer
 
     @Override
     public ExtendedURL serialize(WebJarsResourceReference resourceReference)
-        throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
         List<String> segments = new ArrayList<>();
 

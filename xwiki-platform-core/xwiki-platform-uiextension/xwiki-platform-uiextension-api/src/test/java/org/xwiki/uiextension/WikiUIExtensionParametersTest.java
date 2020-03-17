@@ -27,7 +27,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.InOrder;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.ModelContext;
@@ -41,7 +40,6 @@ import org.xwiki.velocity.XWikiVelocityException;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -121,10 +119,9 @@ public class WikiUIExtensionParametersTest
             new WikiUIExtensionParameters("id", paramsStr, componentManager);
         parameters.get();
 
-        InOrder ordered = inOrder(velocityEngine);
-        ordered.verify(velocityEngine).evaluate(any(), any(), eq("id:x"), eq("1"));
-        ordered.verify(velocityEngine).evaluate(any(), any(), eq("id:y"), eq("2"));
-        ordered.verify(velocityEngine).evaluate(any(), any(), eq("id:z"), eq("3"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:x"), eq("1"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:y"), eq("2"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:z"), eq("3"));
     }
 
     @Test
@@ -140,10 +137,9 @@ public class WikiUIExtensionParametersTest
             new WikiUIExtensionParameters("id", paramsStr, componentManager);
         parameters.get();
 
-        InOrder ordered = inOrder(velocityEngine);
-        ordered.verify(velocityEngine).evaluate(any(), any(), eq("id:x"), eq("1##b"));
-        ordered.verify(velocityEngine).evaluate(any(), any(), eq("id:y"), eq("2####x"));
-        ordered.verify(velocityEngine).evaluate(any(), any(), eq("id:z"), eq("3 ## xyz"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:x"), eq("1##b"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:y"), eq("2####x"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:z"), eq("3 ## xyz"));
     }
 
     @Test

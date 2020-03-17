@@ -24,9 +24,9 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -133,11 +133,12 @@ public class WikiUIExtensionParameters
             properties.load(new StringReader(rawParameters));
             result = new HashMap<>();
             for (String key : properties.stringPropertyNames()) {
-                if (!Objects.equals(key, "")) {
+                if (!StringUtils.isBlank(key)) {
                     result.put(key, properties.getProperty(key));
                 }
             }
         } catch (IOException e) {
+            LOGGER.error("UIX parameters could not be read", e);
             result = new HashMap<>();
         }
 

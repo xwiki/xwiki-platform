@@ -23,7 +23,8 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
 /**
- * CRUD operations on users. Note that for retrieving a user you should use a {@link UserResolver}.
+ * CRUD operations on users. Note that for retrieving a user's prooperties you should use a
+ * {@link UserPropertiesResolver}.
  *
  * @version $Id$
  * @since 12.2RC1

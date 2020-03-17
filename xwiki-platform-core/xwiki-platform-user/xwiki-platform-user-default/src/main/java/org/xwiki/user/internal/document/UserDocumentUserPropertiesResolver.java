@@ -17,31 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user.internal;
+package org.xwiki.user.internal.document;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
-import org.xwiki.user.GuestUserReference;
-import org.xwiki.user.UserReference;
 
 /**
- * Represents the Guest user (i.e. a virtual user representing a non-logged in user).
+ * Get the direct user properties for a {@link DocumentUserReference}, by extracting them from the
+ * {@code XWiki.XWikiUsers} object.
  *
  * @version $Id$
  * @since 12.2RC1
  */
-public class GuestUser extends AbstractUser
+@Component
+@Named("user/org.xwiki.user.internal.document.DocumentUserReference")
+@Singleton
+public class UserDocumentUserPropertiesResolver extends AbstractDocumentUserPropertiesResolver
 {
-    /**
-     * @param userConfigurationSource the component providing the user configuration data
-     */
-    public GuestUser(ConfigurationSource userConfigurationSource)
-    {
-        super(userConfigurationSource);
-    }
+    @Inject
+    @Named("user")
+    protected ConfigurationSource configurationSource;
 
     @Override
-    public UserReference getUserReference()
+    protected ConfigurationSource getConfigurationSource()
     {
-        return GuestUserReference.INSTANCE;
+        return this.configurationSource;
     }
 }

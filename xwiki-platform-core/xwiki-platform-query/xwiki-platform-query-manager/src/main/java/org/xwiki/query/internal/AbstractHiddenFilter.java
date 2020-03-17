@@ -27,8 +27,7 @@ import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserResolver;
+import org.xwiki.user.UserPropertiesResolver;
 
 /**
  * Base class for filtering hidden entities.
@@ -43,7 +42,7 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
      * Used to retrieve user preference regarding hidden documents.
      */
     @Inject
-    private UserResolver<UserReference> userResolver;
+    private UserPropertiesResolver userPropertiesResolver;
 
     /**
      * @see #initialize()
@@ -57,7 +56,7 @@ public abstract class AbstractHiddenFilter extends AbstractWhereQueryFilter impl
     public void initialize()
     {
         this.displayHiddenDocuments =
-            this.userResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments();
+            this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE).displayHiddenDocuments();
     }
 
     @Override

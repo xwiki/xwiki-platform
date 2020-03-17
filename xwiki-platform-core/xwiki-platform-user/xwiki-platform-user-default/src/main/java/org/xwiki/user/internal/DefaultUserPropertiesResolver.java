@@ -17,27 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user;
+package org.xwiki.user.internal;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Convert a raw representation of a user  into a {@link User} object (for example converts a User Reference into a
- * User).
+ * Looks in the "user" {@link ConfigurationSource} to get User properties (i.e. no fallbacks).
  *
- * @param <T> the type of the user representation
  * @version $Id$
  * @since 12.2RC1
  */
-@Unstable
-@Role
-public interface UserResolver<T>
+@Component
+@Singleton
+public class DefaultUserPropertiesResolver extends AbstractUserPropertiesResolver
 {
-    /**
-     * @param userRepresentation the representation of the user (e.g. User Reference, oldcore XWikiUser object etc)
-     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
-     * @return the User object
-     */
-    User resolve(T userRepresentation, Object... parameters);
+    @Override
+    protected String getUnderlyingConfigurationSourceHint()
+    {
+        return "user";
+    }
 }

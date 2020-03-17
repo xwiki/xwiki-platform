@@ -23,14 +23,15 @@ import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.stability.Unstable;
 
 /**
- * Represents an XWiki user. Note that it's independent from where users are stored, and should remain that way, so
- * that we can switch the user store in the future.
+ * Represents all the properties of an XWiki user. It can represent direct properites or inherited properties.
+ * Note that it's independent from where users are stored, and should remain that way, so that we can switch the user
+ * store in the future.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Unstable
-public interface User extends ConfigurationSource
+public interface UserProperties extends ConfigurationSource
 {
     /**
      * @return true if the user is configured to display hidden documents in the wiki
@@ -74,9 +75,4 @@ public interface User extends ConfigurationSource
      *         able to view pages.
      */
     boolean isEmailChecked();
-
-    /**
-     * @return the reference to his user (i.e. a way to retrieve this user's data)
-     */
-    UserReference getUserReference();
 }

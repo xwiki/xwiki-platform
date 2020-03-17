@@ -58,9 +58,8 @@ import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.user.UserReference;
+import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserResolver;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.xwiki.notifications.filters.expression.generics.ExpressionBuilder.value;
@@ -93,7 +92,7 @@ public class QueryGenerator
     private RecordableEventDescriptorHelper recordableEventDescriptorHelper;
 
     @Inject
-    private UserResolver<UserReference> userResolver;
+    private UserPropertiesResolver userPropertiesResolver;
 
     @Inject
     @Named("document")
@@ -386,8 +385,8 @@ public class QueryGenerator
 
         final DocumentReference userClass = new DocumentReference(USER_CLASS, parameters.user.getWikiReference());
         // Don't show hidden events unless the user want to display hidden pages
-        boolean displayHiddenDocuments =
-            this.userResolver.resolve(this.userReferenceResolver.resolve(parameters.user)).displayHiddenDocuments();
+        boolean displayHiddenDocuments = this.userPropertiesResolver.resolve(
+            this.userReferenceResolver.resolve(parameters.user)).displayHiddenDocuments();
         if (!displayHiddenDocuments) {
             return excludeHiddenEvents(topNode);
         }

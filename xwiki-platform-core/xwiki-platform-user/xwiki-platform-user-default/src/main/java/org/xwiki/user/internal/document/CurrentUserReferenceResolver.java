@@ -21,46 +21,51 @@ package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
-import org.xwiki.user.SuperAdminUserReference;
-import org.xwiki.user.internal.GuestUser;
-import org.xwiki.user.internal.SuperAdminUser;
-import org.xwiki.user.User;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserResolver;
+import org.xwiki.user.UserReferenceResolver;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
- * Converts a {@link UserReference} into a {@link User}.
+ * Resolve a current user reference to a {@link DocumentReference} for the user in the context.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
-@Named("org.xwiki.user.internal.document.DocumentUserReference")
 @Singleton
-public class DocumentUserReferenceUserResolver extends AbstractDocumentUserResolver<UserReference>
+public class CurrentUserReferenceResolver implements UserReferenceResolver<CurrentUserReference>
 {
     @Inject
-    @Named("org.xwiki.user.CurrentUserReference")
-    private UserResolver<UserReference> currentUserResolver;
+    private Provider<XWikiContext> contextProvider;
+
+    @Inject
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     @Override
-    public User resolve(UserReference userReference, Object... parameters)
+    public UserReference resolve(CurrentUserReference unused, Object... parameters)
     {
-        User user;
-        if (userReference == null | CurrentUserReference.INSTANCE == userReference) {
-            user = this.currentUserResolver.resolve(null);
-        } else if (GuestUserReference.INSTANCE == userReference) {
-            user = new GuestUser(this.guestConfigurationSource);
-        } else if (SuperAdminUserReference.INSTANCE == userReference) {
-            user = new SuperAdminUser(this.superAdminConfigurationSource);
+        UserReference userReference;
+        DocumentReference currentDocumentReference = getXWikiContext().getUserReference();
+        // If there's no user in the context then we consider the current user is the Guest user.
+        if (currentDocumentReference == null) {
+            userReference = GuestUserReference.INSTANCE;
         } else {
-            user = resolveUser((DocumentUserReference) userReference);
+            userReference = this.documentReferenceUserReferenceResolver.resolve(currentDocumentReference);
         }
-        return user;
+        return userReference;
+    }
+
+    private XWikiContext getXWikiContext()
+    {
+        return this.contextProvider.get();
     }
 }

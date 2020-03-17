@@ -19,10 +19,10 @@
  */
 package org.xwiki.user.internal;
 
-import org.xwiki.user.User;
+import org.xwiki.user.UserProperties;
 
 /**
- * Constants representing user configuration property names.
+ * Constants representing user property names.
  *
  * @version $Id$
  * @since 12.2RC1
@@ -30,42 +30,42 @@ import org.xwiki.user.User;
 public final class UserPropertyConstants
 {
     /**
-     * See {@link User#displayHiddenDocuments()}.
+     * See {@link UserProperties#displayHiddenDocuments()}.
      */
     public static final String DISPLAY_HIDDEN_DOCUMENTS = "displayHiddenDocuments";
 
     /**
-     * See {@link User#isActive()}.
+     * See {@link UserProperties#isActive()}.
      */
     public static final String ACTIVE = "active";
 
     /**
-     * See {@link User#getFirstName()}.
+     * See {@link UserProperties#getFirstName()}.
      */
     public static final String FIRST_NAME = "first_name";
 
     /**
-     * See {@link User#getLastName()}.
+     * See {@link UserProperties#getLastName()}.
      */
     public static final String LAST_NAME = "last_name";
 
     /**
-     * See {@link User#getEmail()}.
+     * See {@link UserProperties#getEmail()}.
      */
     public static final String EMAIL = "email";
 
     /**
-     * See {@link User#isEmailChecked()}.
+     * See {@link UserProperties#isEmailChecked()}.
      */
     public static final String EMAIL_CHECKED = "email_checked";
 
     /**
-     * See {@link User#getType()}.
+     * See {@link UserProperties#getType()}.
      */
     public static final String USER_TYPE = "usertype";
 
     /**
-     * See {@link User#getEditor()}.
+     * See {@link UserProperties#getEditor()}.
      */
     public static final String EDITOR = "editor";
 

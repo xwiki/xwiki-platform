@@ -20,34 +20,40 @@
 package org.xwiki.user.internal.document;
 
 import javax.inject.Named;
-import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.user.User;
+import org.junit.jupiter.api.Test;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
-import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.user.api.XWikiUser;
+
+import static org.mockito.Mockito.verify;
 
 /**
- * Resolves the current logged-in user. This is a convenience resolver since the current user should be retrieved from
- * the Execution Context instead.
+ * Unit tests for {@link XWikiUserUserReferenceResolver}.
  *
  * @version $Id$
- * @since 12.2RC1
  */
-@Component
-@Named("org.xwiki.user.CurrentUserReference")
-@Singleton
-public class CurrentUserResolver extends AbstractDocumentUserResolver<UserReference>
+@ComponentTest
+public class XWikiUserUserReferenceResolverTest
 {
-    @Override
-    public User resolve(UserReference unused, Object... parameters)
-    {
-        return resolveUser(getXWikiContext().getUserReference());
-    }
+    @InjectMockComponents
+    private XWikiUserUserReferenceResolver resolver;
 
-    private XWikiContext getXWikiContext()
+    @MockComponent
+    @Named("document")
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
+
+    @Test
+    void resolve()
     {
-        return this.contextProvider.get();
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "page");
+        UserReference userReference = this.resolver.resolve(new XWikiUser(documentReference));
+
+        verify(this.documentReferenceUserReferenceResolver).resolve(documentReference);
     }
 }

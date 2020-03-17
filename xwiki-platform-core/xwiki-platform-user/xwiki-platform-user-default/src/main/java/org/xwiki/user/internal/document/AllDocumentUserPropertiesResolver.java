@@ -24,39 +24,27 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.user.User;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserResolver;
-
-import com.xpn.xwiki.user.api.XWikiUser;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Converts an oldcore {@link XWikiUser} into a {@link User}.
+ * Get the user properties (including all inherited ones) for a {@link DocumentUserReference}, by extracting them from
+ * the {@code XWiki.XWikiUsers} object.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
-@Named("com.xpn.xwiki.user.api.XWikiUser")
+@Named("all/org.xwiki.user.internal.document.DocumentUserReference")
 @Singleton
-public class DocumentXWikiUserUserResolver extends AbstractDocumentUserResolver<XWikiUser>
+public class AllDocumentUserPropertiesResolver extends AbstractDocumentUserPropertiesResolver
 {
     @Inject
-    @Named("org.xwiki.user.CurrentUserReference")
-    private UserResolver<UserReference> currentUserResolver;
+    @Named("all")
+    protected ConfigurationSource configurationSource;
 
     @Override
-    public User resolve(XWikiUser xwikiUser, Object... parameters)
+    protected ConfigurationSource getConfigurationSource()
     {
-        User user;
-
-        if (xwikiUser == null) {
-            user = this.currentUserResolver.resolve(null);
-        } else {
-            DocumentReference documentReference = xwikiUser.getUserReference();
-            user = resolveUser(documentReference);
-        }
-        return user;
+        return this.configurationSource;
     }
 }

@@ -27,9 +27,8 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.user.CurrentUserReference;
-import org.xwiki.user.User;
-import org.xwiki.user.UserReference;
-import org.xwiki.user.UserResolver;
+import org.xwiki.user.UserProperties;
+import org.xwiki.user.UserPropertiesResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -47,14 +46,14 @@ public class HiddenSpaceFilterTest
     private HiddenSpaceFilter filter;
 
     @MockComponent
-    private UserResolver<UserReference> userResolver;
+    private UserPropertiesResolver userPropertiesResolver;
 
     @BeforeComponent
     public void before()
     {
-        User user = mock(User.class);
-        when(user.displayHiddenDocuments()).thenReturn(false);
-        when(this.userResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(user);
+        UserProperties userProperties = mock(UserProperties.class);
+        when(userProperties.displayHiddenDocuments()).thenReturn(false);
+        when(this.userPropertiesResolver.resolve(CurrentUserReference.INSTANCE)).thenReturn(userProperties);
     }
 
     @Test

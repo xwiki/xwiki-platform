@@ -30,10 +30,10 @@ import org.xwiki.stability.Unstable;
 import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
-import org.xwiki.user.User;
 import org.xwiki.user.UserManager;
+import org.xwiki.user.UserProperties;
+import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserResolver;
 
 /**
  * Users related script API.
@@ -52,7 +52,7 @@ public class UserScriptService implements ScriptService
     public static final String ROLEHINT = "user";
 
     @Inject
-    private UserResolver<UserReference> userResolver;
+    private UserPropertiesResolver userPropertiesResolver;
 
     @Inject
     private ScriptServiceManager scriptServiceManager;
@@ -72,15 +72,26 @@ public class UserScriptService implements ScriptService
     }
 
     /**
-     * @param userReference the reference to the user to resolve
+     * @param userReference the reference to the user properties to resolve
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
-     * @return the User object
+     * @return the User Properties object
      * @since 12.2RC1
      */
     @Unstable
-    public User resolveUser(UserReference userReference, Object... parameters)
+    public UserProperties getProperties(UserReference userReference, Object... parameters)
     {
-        return this.userResolver.resolve(userReference, parameters);
+        return this.userPropertiesResolver.resolve(userReference, parameters);
+    }
+
+    /**
+     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
+     * @return the User Properties object for the current user
+     * @since 12.2RC1
+     */
+    @Unstable
+    public UserProperties getProperties(Object... parameters)
+    {
+        return this.userPropertiesResolver.resolve(GuestUserReference.INSTANCE, parameters);
     }
 
     /**
@@ -111,16 +122,6 @@ public class UserScriptService implements ScriptService
     public UserReference getCurrentUserReference()
     {
         return CurrentUserReference.INSTANCE;
-    }
-
-    /**
-     * @return the current User object
-     * @since 12.2RC1
-     */
-    @Unstable
-    public User getCurrentUser()
-    {
-        return resolveUser(getCurrentUserReference());
     }
 
     /**

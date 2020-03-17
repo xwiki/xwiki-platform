@@ -17,30 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user;
+package org.xwiki.user.internal;
 
-import java.lang.reflect.ParameterizedType;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
-import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Represents the {@code UserResolver<UserReference>} {@link java.lang.reflect.Type}.
+ * Looks in the "all" {@link ConfigurationSource} to get User properties (i.e. with full fallbacks)..
  *
  * @version $Id$
  * @since 12.2RC1
  */
-@Unstable
-public final class UserReferenceUserResolverType
+@Component
+@Named("all")
+@Singleton
+public class AllUserPropertiesResolver extends AbstractUserPropertiesResolver
 {
-    /**
-     * Type instance for {@code UserResolver<UserReference>}.
-     */
-    public static final ParameterizedType INSTANCE =
-        new DefaultParameterizedType(null, UserResolver.class, UserReference.class);
-
-    private UserReferenceUserResolverType()
+    @Override
+    protected String getUnderlyingConfigurationSourceHint()
     {
-        // Voluntarily empty. We want to have a single instance of this class (hence the private part).
+        return "all";
     }
+
 }

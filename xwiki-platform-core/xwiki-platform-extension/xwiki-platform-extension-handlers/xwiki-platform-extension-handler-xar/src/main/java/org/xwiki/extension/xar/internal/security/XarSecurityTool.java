@@ -34,9 +34,8 @@ import org.xwiki.extension.xar.security.ProtectionLevel;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.user.UserReference;
+import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReferenceResolver;
-import org.xwiki.user.UserResolver;
 import org.xwiki.user.UserType;
 
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -62,7 +61,7 @@ public class XarSecurityTool
     private Provider<AuthorizationManager> authorizationProvider;
 
     @Inject
-    private UserResolver<UserReference> userResolver;
+    private UserPropertiesResolver userPropertiesResolver;
 
     @Inject
     @Named("document")
@@ -122,7 +121,7 @@ public class XarSecurityTool
      */
     public boolean isSimpleUser(DocumentReference userReference)
     {
-        return UserType.SIMPLE == this.userResolver.resolve(
+        return UserType.SIMPLE == this.userPropertiesResolver.resolve(
             this.userReferenceResolver.resolve(userReference)).getType();
     }
 }

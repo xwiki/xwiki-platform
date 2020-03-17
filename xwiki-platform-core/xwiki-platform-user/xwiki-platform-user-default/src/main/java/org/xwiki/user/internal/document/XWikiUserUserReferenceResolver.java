@@ -21,59 +21,32 @@ package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.user.GuestUserReference;
-import org.xwiki.user.SuperAdminUserReference;
-import org.xwiki.user.UserManager;
 import org.xwiki.user.UserReference;
 import org.xwiki.user.UserReferenceResolver;
 
-import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
- * CRUD operations for the current user.
+ * Converts an oldcore {@link XWikiUser} into a {@link UserReference}.
  *
  * @version $Id$
  * @since 12.2RC1
  */
 @Component
-@Named("org.xwiki.user.CurrentUserReference")
 @Singleton
-public class CurrentUserManager implements UserManager
+public class XWikiUserUserReferenceResolver implements UserReferenceResolver<XWikiUser>
 {
     @Inject
     @Named("document")
-    private UserReferenceResolver<DocumentReference> userReferenceResolver;
-
-    @Inject
-    @Named("org.xwiki.user.internal.document.DocumentUserReference")
-    private UserManager documentUserManager;
-
-    @Inject
-    private Provider<XWikiContext> contextProvider;
+    private UserReferenceResolver<DocumentReference> documentReferenceUserReferenceResolver;
 
     @Override
-    public boolean exists(UserReference userReference)
+    public UserReference resolve(XWikiUser xwikiUser, Object... parameters)
     {
-        boolean exists;
-        UserReference resolvedUserReference = this.userReferenceResolver.resolve(getXWikiContext().getUserReference());
-        if (SuperAdminUserReference.INSTANCE == resolvedUserReference
-            || GuestUserReference.INSTANCE == resolvedUserReference)
-        {
-            exists = false;
-        } else {
-            exists = this.documentUserManager.exists(resolvedUserReference);
-        }
-        return exists;
+        return this.documentReferenceUserReferenceResolver.resolve(xwikiUser.getUserReference(), parameters);
     }
-
-    private XWikiContext getXWikiContext()
-    {
-        return this.contextProvider.get();
-    }
-
 }

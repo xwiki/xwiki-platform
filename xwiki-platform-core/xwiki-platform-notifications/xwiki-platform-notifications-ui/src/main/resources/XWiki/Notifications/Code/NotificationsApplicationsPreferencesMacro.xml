@@ -340,7 +340,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       // Enable bootstrap switches
       $([self.switchAlert, self.switchEmail]).bootstrapSwitch({
         size: 'mini',
-        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
+        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))',
+        onText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.on'))',
+        offText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.off'))'
       });
     };
 
@@ -512,7 +514,9 @@ require(['jquery', 'xwiki-meta', 'ApplicationWidget', 'bootstrap', 'bootstrap-sw
       // Enable bootstrap switch.
       $([self.switchAlert, self.switchEmail]).bootstrapSwitch({
         size: 'small',
-        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
+        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))',
+        onText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.on'))',
+        offText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.off'))'
       });
       // Set initial state for the switches
       self.updateSwitches();

@@ -59,7 +59,7 @@ $counterPlaceholder
 #elseif('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'read' == $request.action)
   #set ($eventIds = $request.eventIds.split(','))
   #set ($read = "$!request.read")
-  #if ($eventIds.lenght == 0 || $read.isEmpty())
+  #if ($eventIds.length == 0 || $read.isEmpty())
     #set ($discard = $response.setStatus(400))
   #else
     #foreach ($eventId in $eventIds)
@@ -490,6 +490,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     watchPageSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('page'))');
     watchSpaceSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('chart-organisation'))');
     watchWikiSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('wiki'))');
+
+    allWatchSwitches.each(function(index, elem) {
+        elem.bootstrapSwitch('onText', '$escapetool.javascript($services.localization.render('notifications.toggle.label.on'))');
+        elem.bootstrapSwitch('offText', '$escapetool.javascript($services.localization.render('notifications.toggle.label.off'))');
+    });
 
     ///
     /// Disabled switches if there is no enabled notification preferences

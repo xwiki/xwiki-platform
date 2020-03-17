@@ -337,10 +337,16 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
-    <!-- The default User API implementation, needed by olcore and more -->
+    <!-- The default User API + script implementations, needed by oldcore, platform web and more -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-user-default</artifactId>
+      <version>${project.version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-user-script</artifactId>
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>

@@ -46,6 +46,7 @@ import org.xwiki.rendering.async.internal.AsyncRendererExecutorResponse;
 import org.xwiki.rendering.async.internal.AsyncRendererResult;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 
 import com.rometools.rome.io.SyndFeedOutput;
 
@@ -159,7 +160,9 @@ public class NotificationNotifiersScriptService implements ScriptService
      * {@link org.xwiki.notifications.sources.script.NotificationSourcesScriptService#getNotificationParameters(Map)}.
      * @return the HTML of an asynchronous placeholder.
      * @throws NotificationException in case of error during the request.
+     * @since 12.2RC1
      */
+    @Unstable
     public String getNotificationCount(NotificationParameters parameters) throws NotificationException
     {
         NotificationAsyncRendererConfiguration configuration =
@@ -177,7 +180,9 @@ public class NotificationNotifiersScriptService implements ScriptService
      * {@link org.xwiki.notifications.sources.script.NotificationSourcesScriptService#getNotificationParameters(Map)}.
      * @return the HTML of an asynchronous placeholder.
      * @throws NotificationException in case of error during the request.
+     * @since 12.2RC1
      */
+    @Unstable
     public String getNotifications(NotificationParameters parameters) throws NotificationException
     {
         NotificationAsyncRendererConfiguration configuration =

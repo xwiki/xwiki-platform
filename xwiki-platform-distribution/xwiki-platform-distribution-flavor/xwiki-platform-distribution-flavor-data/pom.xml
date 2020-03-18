@@ -67,6 +67,12 @@
             <hibernateConfig>
               ${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml
             </hibernateConfig>
+            <disabledComponents>
+              <disabledComponent>
+                <type>com.xpn.xwiki.doc.MandatoryDocumentInitializer</type>
+                <role>XWiki.XWikiServerXwiki</role>
+              </disabledComponent>
+            </disabledComponents>
           </configuration>
           <dependencies>
             <!-- Since we're building XWiki Standard, we need to add the Event Stream Store as a dependency,

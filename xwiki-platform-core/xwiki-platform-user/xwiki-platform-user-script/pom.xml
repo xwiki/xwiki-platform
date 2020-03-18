@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-user-script</artifactId>
   <name>XWiki Platform - User - Script</name>
   <packaging>jar</packaging>
-  <description>XWiki Platform - Script</description>
+  <description>Provide script-oriented APIs to manipulate users and groups</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.00</xwiki.jacoco.instructionRatio>
     <xwiki.extension.name>User Scripting API</xwiki.extension.name>

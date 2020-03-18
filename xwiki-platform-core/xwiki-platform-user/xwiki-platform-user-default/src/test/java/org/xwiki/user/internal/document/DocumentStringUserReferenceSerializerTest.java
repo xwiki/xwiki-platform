@@ -29,12 +29,14 @@ import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DocumentStringUserReferenceSerializer}.
@@ -49,6 +51,9 @@ public class DocumentStringUserReferenceSerializerTest
 
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @MockComponent
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
 
     @Test
     void serialize()
@@ -90,6 +95,12 @@ public class DocumentStringUserReferenceSerializerTest
     @Test
     void serializeCurrentUserReference()
     {
-        assertEquals("", this.serializer.serialize(CurrentUserReference.INSTANCE));
+        DocumentUserReference userReference = mock(DocumentUserReference.class);
+        DocumentReference documentReference = new DocumentReference("wiki", "space", "user");
+        when(userReference.getReference()).thenReturn(documentReference);
+        when(this.currentUserReferenceUserReferenceResolver.resolve(null)).thenReturn(userReference);
+        when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("wiki:space.user");
+
+        assertEquals("wiki:space.user", this.serializer.serialize(CurrentUserReference.INSTANCE));
     }
 }

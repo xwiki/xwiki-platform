@@ -29,6 +29,7 @@ import org.xwiki.user.CurrentUserReference;
 import org.xwiki.user.GuestUserReference;
 import org.xwiki.user.SuperAdminUserReference;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 import org.xwiki.user.UserReferenceSerializer;
 
 /**
@@ -45,6 +46,9 @@ public class DocumentStringUserReferenceSerializer implements UserReferenceSeria
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private UserReferenceResolver<CurrentUserReference> currentUserReferenceUserReferenceResolver;
+
     @Override
     public String serialize(UserReference userReference)
     {
@@ -56,8 +60,17 @@ public class DocumentStringUserReferenceSerializer implements UserReferenceSeria
         } else if (GuestUserReference.INSTANCE == userReference) {
             result = "XWiki.XWikiGuest";
         } else if (CurrentUserReference.INSTANCE == userReference) {
-            result = "";
-        } else if (!(userReference instanceof DocumentUserReference)) {
+            result = serializeInternal(this.currentUserReferenceUserReferenceResolver.resolve(null));
+        } else {
+            result = serializeInternal(userReference);
+        }
+        return result;
+    }
+
+    private String serializeInternal(UserReference userReference)
+    {
+        String result;
+        if (!(userReference instanceof DocumentUserReference)) {
             throw new IllegalArgumentException("Only DocumentUserReference are handled");
         } else {
             DocumentUserReference documentUserReference = (DocumentUserReference) userReference;

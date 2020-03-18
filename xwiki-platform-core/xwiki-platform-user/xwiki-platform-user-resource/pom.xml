@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-user-resource</artifactId>
   <name>XWiki Platform - User - Resource</name>
   <packaging>jar</packaging>
-  <description>Provide Resource APIs for users and groups</description>
+  <description>Resource APIs for users and groups</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.48</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>67</xwiki.pitest.mutationThreshold>

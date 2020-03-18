@@ -1340,8 +1340,8 @@ var LiveTableTagCloud = Class.create({
 });
 
 var maybeCreateLiveTable = function(liveTableElement) {
-  if (liveTableElement.__liveTable) {
-    // Live table already created.
+  if (liveTableElement.__liveTable || !liveTableElement.hasAttribute('data-settings')) {
+    // The live table is already created or is self-managed.
     return;
   }
   var settings = JSON.parse(liveTableElement.getAttribute('data-settings'));
@@ -1368,6 +1368,11 @@ var maybeCreateLiveTable = function(liveTableElement) {
 };
 
 var init = function(event) {
+  if (!event || event.eventName === 'xwiki:dom:loading') {
+    // Trigger the loading of self-managed live tables, when document and scripts are ready.
+    // We have to keep firing this event for backward compatibility reasons (e.g. rightsUI.vm).
+    document.fire('xwiki:livetable:loading');
+  }
   var elements = (event && event.memo.elements) || [document.body];
   elements.forEach(function(element) {
     var liveTableElements = element.classList.contains('xwiki-livetable') ? [element] :

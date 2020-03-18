@@ -89,9 +89,10 @@ public class MockitoOldCoreExtension extends MockitoComponentManagerExtension
         ExtensionContext.Namespace.create(MockitoOldCoreExtension.class);
 
     @Override
-    protected void initializeMockitoComponentManager(Object testInstance, MockitoComponentManager mcm,
-        ExtensionContext context) throws Exception
+    protected void initializeMockitoComponentManager(MockitoComponentManager mcm, ExtensionContext context)
+        throws Exception
     {
+        Object testInstance = context.getTestInstance().get();
         OldcoreTest annotation = testInstance.getClass().getAnnotation(OldcoreTest.class);
         
         // Create & save MockitoOldCore

@@ -861,7 +861,7 @@
   #set ($whereSql = "${whereSql} and ($filterQuery.trim())")
   #foreach ($filterValue in $filterValues)
     #if ($whereParams.entrySet())
-      #set ($discard = $whereParams.put("${$paramPrefix}${foreach.count}", "%|$filterValue|%"))
+      #set ($discard = $whereParams.put("${paramPrefix}${foreach.count}", "%|$filterValue|%"))
     #else
       #set ($discard = $whereParams.add("%|$filterValue|%"))
     #end

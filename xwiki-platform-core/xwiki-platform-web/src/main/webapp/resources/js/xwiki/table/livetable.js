@@ -1349,6 +1349,10 @@ var maybeCreateLiveTable = function(liveTableElement) {
   settings.maxPages = settings.maxPages || 10;
   settings.limit = settings.limit || 15;
   settings.selectedTags = settings.selectedTags || [];
+  // The callback is passed as a string and is usually either the name of a global variable or some anonymous function.
+  // We have to wrap the callback expression in an array in order to be able to evaluate anonymous functions cross
+  // browser. Otherwise we get "SyntaxError: function statement requires a name".
+  settings.callback = eval('[' + settings.callback + ']')[0];
   if (settings.hasTopFilters) {
     settings.filterNodes = [
       liveTableElement.querySelector('.xwiki-livetable-display-filters'),
@@ -1356,7 +1360,7 @@ var maybeCreateLiveTable = function(liveTableElement) {
     ];
   }
   window[settings.name] = liveTableElement.__liveTable = new XWiki.widgets.LiveTable(settings.url, liveTableElement.id,
-    eval(settings.callback), settings);
+    settings.callback, settings);
   if (settings.hasPageSize) {
     document.observe('xwiki:livetable:' + liveTableElement.id + ':loadingEntries', function() {
       document.getElementById(liveTableElement.id + '-pagesize').classList.add('hidden');

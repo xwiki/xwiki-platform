@@ -67,6 +67,12 @@
         <version>${project.version}</version>
         <configuration>
           <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
+          <disabledComponents>
+            <disabledComponent>
+              <type>com.xpn.xwiki.doc.MandatoryDocumentInitializer</type>
+              <role>XWiki.XWikiServerXwiki</role>
+            </disabledComponent>
+          </disabledComponents>
         </configuration>
         <executions>
           <execution>

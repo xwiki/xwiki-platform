@@ -17,35 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.search.solr;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.apache.solr.client.solrj.SolrClient;
+import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
- * Provider for {@link SolrInstance} that, based on the current configuration, returns the right component.
+ * The central entry point to access a Solr core.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 12.2RC1
  */
-@Component
-@Singleton
-@Deprecated
-public class SolrInstanceProvider implements Provider<SolrInstance>
+@Role
+@Unstable
+public interface Solr
 {
     /**
-     * Solr configuration.
+     * @param name the name of the Solr core
+     * @return the cached {@link SolrClient} instance to use to manipulate the core
+     * @throws SolrException when failing to create the solr client
      */
-    @Inject
-    private SolrInstance solrInstance;
-
-    @Override
-    public SolrInstance get()
-    {
-        return this.solrInstance;
-    }
+    SolrClient getClient(String name) throws SolrException;
 }

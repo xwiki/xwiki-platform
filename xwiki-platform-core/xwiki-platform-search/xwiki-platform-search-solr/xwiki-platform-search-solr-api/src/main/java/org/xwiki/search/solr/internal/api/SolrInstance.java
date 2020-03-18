@@ -32,7 +32,7 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.component.phase.Initializable;
 
 /**
- * Component in charge of communicating with the actual Solr server. This is direct access and consistency is not
+ * Component in charge of communicating with the actual Solr server core. This is direct access and consistency is not
  * enforced at this level.
  * <p>
  * Note: This is also useful for testing since it can be replaced with a mock, this way allowing us to test just our
@@ -42,6 +42,7 @@ import org.xwiki.component.phase.Initializable;
  * @since 4.3M2
  */
 @Role
+@Deprecated
 public interface SolrInstance extends Initializable
 {
     /**
@@ -68,6 +69,7 @@ public interface SolrInstance extends Initializable
 
     /**
      * Retrieves a {@link SolrDocument} by its id.
+     * 
      * @param id a SolrDocument id.
      * @return SolrDocument matching the given id, if found, null otherwise.
      * @throws IOException if problems occur.

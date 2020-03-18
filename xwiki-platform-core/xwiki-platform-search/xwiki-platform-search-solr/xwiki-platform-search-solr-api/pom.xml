@@ -141,7 +141,8 @@
               <excludes>
                 **/DefaultSolrIndexer.java,
                 **/SolrIndexEventListener.java,
-                **/AbstractSolrMetadataExtractor.java
+                **/AbstractSolrMetadataExtractor.java,
+                **/EmbeddedSolr.java
               </excludes>
             </configuration>
           </execution>

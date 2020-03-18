@@ -79,7 +79,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     /**
      * Solr home directory file names.
      */
-    public static final String[] HOME_DIRECTORY_FILE_NAMES = { "solr.xml" };
+    public static final String[] HOME_DIRECTORY_FILE_NAMES = {"solr.xml"};
 
     /**
      * The package containing the Solr core configuration files.

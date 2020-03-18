@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -37,25 +38,30 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.lucene.util.Version;
+import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Disposable;
+import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
+import org.xwiki.search.solr.SolrCoreInitializer;
+import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
- * Embedded Solr instance running in the same JVM.
+ * Embedded Solr server running in the same JVM.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 12.2RC1
  */
 @Component
-@Named(EmbeddedSolrInstance.TYPE)
+@Named(EmbeddedSolr.TYPE)
 @Singleton
-public class EmbeddedSolrInstance extends AbstractSolrInstance implements Disposable
+public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializable
 {
     /**
      * Solr instance type for this implementation.
@@ -98,9 +104,6 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
 
             // Initialize the SOLR back-end using an embedded server.
             this.container = createCoreContainer(solrHome);
-            // If we get here then there is at least one core found. We there are more, we use the first one.
-            String coreName = this.container.getCores().iterator().next().getName();
-            this.server = new EmbeddedSolrServer(container, coreName);
 
             this.logger.info("Started embedded Solr server.");
         } catch (Exception e) {
@@ -116,23 +119,21 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
         if (coreContainer.getCores().isEmpty()) {
             throw new SolrServerException(
                 "Failed to initialize the Solr core. Please check the configuration and log messages.");
-        } else if (coreContainer.getCores().size() > 1) {
-            this.logger.warn("Multiple Solr cores detected: [{}]. Using the first one.",
-                coreContainer.getAllCoreNames());
         }
+
         return coreContainer;
+    }
+
+    @Override
+    protected SolrClient createSolrClient(String coreName) throws SolrException
+    {
+        return new EmbeddedSolrServer(this.container, coreName);
     }
 
     @Override
     public void dispose()
     {
-        if (this.server != null) {
-            try {
-                this.server.close();
-            } catch (IOException e) {
-                this.logger.error("Failed to close server", e);
-            }
-        }
+        super.dispose();
 
         if (this.container != null) {
             this.container.shutdown();
@@ -167,6 +168,59 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
             }
         } else {
             createHomeDirectory(solrHomeDirectory);
+        }
+
+        // Create cores files
+        this.logger.info("Initializing solr cores...");
+        try {
+            for (SolrCoreInitializer coreInitializer : this.componentManager
+                .<SolrCoreInitializer>getInstanceList(SolrCoreInitializer.class)) {
+                try {
+                    initializeCore(coreInitializer, solrHomeDirectory);
+                } catch (Exception e) {
+                    this.logger.error("Failed to initialize a Solr core", e);
+                }
+            }
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to initialize Solr cores", e);
+        }
+    }
+
+    private void initializeCore(SolrCoreInitializer coreInitializer, File solrHomeDirectory) throws IOException
+    {
+        String coreName = coreInitializer.getCoreName();
+
+        this.logger.info("  Initializing solr core [{}]...", coreName);
+
+        File coreDirectory = new File(solrHomeDirectory, coreName);
+
+        if (!coreDirectory.exists()) {
+            this.logger.info("  The core [{}] does not exist, creating it", coreName);
+
+            // Create the core directory
+            coreDirectory.mkdir();
+
+            // Create the minimum core content
+            File corePropertiesFile = new File(coreDirectory, "core.properties");
+            corePropertiesFile.createNewFile();
+
+            FileUtils.write(new File(coreDirectory, "solrconfig.xml"),
+                "<config><luceneMatchVersion>" + Version.LATEST + "</luceneMatchVersion></config>",
+                StandardCharsets.UTF_8);
+
+            FileUtils.write(new File(coreDirectory, "managed-schema"),
+                "<schema name=\"" + coreName + "\" version=\"1.6\">"
+                    + "<field name=\"id\" type=\"string\" required=\"true\" indexed=\"true\" stored=\"true\" />"
+                    + "<uniqueKey>id</uniqueKey>"
+                    + "<fieldType name=\"string\" class=\"solr.StrField\" sortMissingLast=\"true\" docValues=\"true\"/>"
+                    + "</schema>",
+                StandardCharsets.UTF_8);
+
+            new File(coreDirectory, "conf").mkdir();
+
+            this.logger.info("  The core [{}] has been created", coreName);
+        } else {
+            this.logger.debug("  The core [{}] already exist", coreName);
         }
     }
 
@@ -267,7 +321,7 @@ public class EmbeddedSolrInstance extends AbstractSolrInstance implements Dispos
     {
         String defaultValue = getDefaultHomeDirectory();
 
-        return this.solrConfiguration.getInstanceConfiguration(TYPE, "home", defaultValue);
+        return this.solrConfiguration.getInstanceConfiguration(EmbeddedSolr.TYPE, "home", defaultValue);
     }
 
     /**

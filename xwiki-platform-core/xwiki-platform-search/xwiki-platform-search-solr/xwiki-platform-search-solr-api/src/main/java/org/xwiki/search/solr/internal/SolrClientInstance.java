@@ -20,32 +20,34 @@
 package org.xwiki.search.solr.internal;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.search.solr.Solr;
+import org.xwiki.search.solr.SolrException;
 
 /**
- * Provider for {@link SolrInstance} that, based on the current configuration, returns the right component.
+ * A wrapper around the new {@link Solr} API.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 12.2RC1
  */
 @Component
 @Singleton
 @Deprecated
-public class SolrInstanceProvider implements Provider<SolrInstance>
+public class SolrClientInstance extends AbstractSolrInstance
 {
-    /**
-     * Solr configuration.
-     */
     @Inject
-    private SolrInstance solrInstance;
+    private Solr solr;
 
     @Override
-    public SolrInstance get()
+    public void initialize() throws InitializationException
     {
-        return this.solrInstance;
+        try {
+            this.server = this.solr.getClient("xwiki");
+        } catch (SolrException e) {
+            throw new InitializationException("Failed to create the solr client for core [xwiki]", e);
+        }
     }
 }

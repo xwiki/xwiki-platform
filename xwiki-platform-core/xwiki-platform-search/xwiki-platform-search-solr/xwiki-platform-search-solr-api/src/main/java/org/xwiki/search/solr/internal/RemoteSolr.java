@@ -20,32 +20,44 @@
 package org.xwiki.search.solr.internal;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.search.solr.internal.api.SolrInstance;
+import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
- * Provider for {@link SolrInstance} that, based on the current configuration, returns the right component.
+ * Remote Solr instance communicating over HTTP.
  * 
  * @version $Id$
  * @since 4.3M2
  */
 @Component
+@Named(RemoteSolr.TYPE)
 @Singleton
-@Deprecated
-public class SolrInstanceProvider implements Provider<SolrInstance>
+public class RemoteSolr extends AbstractSolr
 {
     /**
-     * Solr configuration.
+     * Solr instance type for this implementation.
      */
+    public static final String TYPE = "remote";
+
+    /**
+     * Default URL to use when none is specified.
+     */
+    public static final String DEFAULT_REMOTE_URL = "http://localhost:8983/solr/";
+
     @Inject
-    private SolrInstance solrInstance;
+    private SolrConfiguration configuration;
 
     @Override
-    public SolrInstance get()
+    protected SolrClient createSolrClient(String coreName)
     {
-        return this.solrInstance;
+        String remoteURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
+
+        // Initialize the remote Solr server.
+        return new HttpSolrClient.Builder(remoteURL + '#' + coreName).build();
     }
 }

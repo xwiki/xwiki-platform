@@ -35,8 +35,8 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
-import org.xwiki.search.solr.internal.api.SolrInstance;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.XWikiTempDir;
@@ -60,10 +60,9 @@ import static org.mockito.Mockito.when;
  */
 @AllComponents
 @ComponentTest
-public class EmbeddedSolrInstanceInitializationTest
+public class EmbeddedSolrInitializationTest
 {
-    private final static String SOLRHOME_PROPERTY =
-        String.format("%s.%s.%s", "solr", EmbeddedSolrInstance.TYPE, "home");
+    private final static String SOLRHOME_PROPERTY = String.format("%s.%s.%s", "solr", EmbeddedSolr.TYPE, "home");
 
     @XWikiTempDir
     private File permanentDirectory;
@@ -101,10 +100,10 @@ public class EmbeddedSolrInstanceInitializationTest
      */
     private void getInstanceAndAssertHomeDirectory(String expected) throws ComponentLookupException, Exception
     {
-        SolrInstance instance = this.componentManager.getInstance(SolrInstance.class, EmbeddedSolrInstance.TYPE);
+        Solr instance = this.componentManager.getInstance(Solr.class, EmbeddedSolr.TYPE);
         assertNotNull(instance);
 
-        EmbeddedSolrInstance implementation = ((EmbeddedSolrInstance) instance);
+        EmbeddedSolr implementation = ((EmbeddedSolr) instance);
         CoreContainer container = implementation.getContainer();
 
         if (expected == null) {

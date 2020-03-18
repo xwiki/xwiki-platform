@@ -17,35 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.search.solr.internal.api.SolrInstance;
+package org.xwiki.search.solr;
 
 /**
- * Provider for {@link SolrInstance} that, based on the current configuration, returns the right component.
+ * Solr component exception.
  * 
  * @version $Id$
- * @since 4.3M2
+ * @since 12.2RC1
  */
-@Component
-@Singleton
-@Deprecated
-public class SolrInstanceProvider implements Provider<SolrInstance>
+public class SolrException extends Exception
 {
     /**
-     * Solr configuration.
+     * Serialization identifier.
      */
-    @Inject
-    private SolrInstance solrInstance;
+    private static final long serialVersionUID = 1L;
 
-    @Override
-    public SolrInstance get()
+    /**
+     * Constructor.
+     * 
+     * @param message the exception message
+     * @param cause the exception that caused this exception
+     */
+    public SolrException(String message, Exception cause)
     {
-        return this.solrInstance;
+        super(message, cause);
+    }
+
+    /**
+     * Constructor.
+     * 
+     * @param message the exception message
+     */
+    public SolrException(String message)
+    {
+        super(message);
     }
 }

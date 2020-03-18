@@ -95,6 +95,8 @@ notifications.filters.name.ownEventsNotificationFilter=Filtre d'esdeveniments pr
 
 ## Notifications toggles
 ### Missing: notifications.toggle.disabled.hint=You need to enable notifications in your settings if you wish to watch these locations
+### Missing: notifications.toggle.label.off=OFF
+### Missing: notifications.toggle.label.on=ON
 
 ## Notifications formats
 ### Missing: notifications.format.alert=Alert

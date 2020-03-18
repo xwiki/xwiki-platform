@@ -44,7 +44,7 @@ import org.xwiki.url.URLNormalizer;
 @Component
 @Named("contextpath")
 @Singleton
-public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
+public class ContextExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
 {
     private static final String URL_SEGMENT_DELIMITER = "/";
 
@@ -52,7 +52,9 @@ public class ExtendedURLURLNormalizer implements URLNormalizer<ExtendedURL>
     @Named("xwikicfg")
     private ConfigurationSource configurationSource;
 
-    /** Provides access to the application context configuration. */
+    /**
+     * Provides access to the application context configuration.
+     */
     @Inject
     private Environment environment;
 

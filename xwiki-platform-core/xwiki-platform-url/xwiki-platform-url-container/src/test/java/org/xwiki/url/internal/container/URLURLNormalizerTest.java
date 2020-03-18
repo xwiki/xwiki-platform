@@ -21,38 +21,28 @@ package org.xwiki.url.internal.container;
 
 import java.net.URL;
 
-import javax.inject.Named;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.url.URLNormalizer;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.url.ExtendedURL;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 /**
- * Normalizes the passed Relative URL into an absolute {@link java.net.URL}, adding the Server and port portions. It is
- * assumed that the webapp's context is already included in the partial URL passed.
+ * Unit tests for {@link URLURLNormalizer}.
  *
  * @version $Id$
- * @since 6.1M2
  */
-@Component
-@Named("url")
-@Singleton
-public class URLURLNormalizer implements URLNormalizer<URL>
+@ComponentTest
+public class URLURLNormalizerTest
 {
-    @Override
-    public URL normalize(ExtendedURL partialURL)
-    {
-        URL result;
+    @InjectMockComponents
+    private URLURLNormalizer normalizer;
 
-        // If the passed ExtendedURL wraps a full URL then return it.
-        URL wrappedURL = partialURL.getWrappedURL();
-        if (wrappedURL != null) {
-            result = wrappedURL;
-        } else {
-            // TODO: Implement it!
-            result = null;
-        }
-        return result;
+    @Test
+    void normalize() throws Exception
+    {
+        ExtendedURL extendedURL = new ExtendedURL(new URL("https://localhost:8080/context/path"), null);
+        assertEquals("https://localhost:8080/context/path", normalizer.normalize(extendedURL).toExternalForm());
     }
 }

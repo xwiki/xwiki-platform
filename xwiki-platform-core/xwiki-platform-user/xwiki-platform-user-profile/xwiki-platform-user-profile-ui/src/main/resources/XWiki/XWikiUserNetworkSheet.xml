@@ -36,105 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set($obj = $doc.getObject('XWiki.XWikiUsers'))
-#if(!$obj)
-= $services.localization.render('xe.admin.users.sheet') =
-
-{{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
-#else
-  $doc.use($obj)
-  #set($isMyProfile = ($xcontext.user == $doc.fullName))
-  ## Code if the notifications app is installed (we don't depend on notifications, we only display some info if the
-  ## app is here).
-  ## TODO: also look if the "notifications" macro is installed too.
-  #if ($isMyProfile &amp;&amp; "$!services.notification.watch" != '')
-    #set ($followedUsers = $services.notification.watch.watchedUsers)
-    #set ($discard = $xwiki.jsx.use("XWiki.XWikiUserNetworkSheet"))
-    #set ($discard = $xwiki.ssx.use("XWiki.XWikiUserNetworkSheet"))
-    {{html}}
-    &lt;h1&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h1&gt;
-    #if ($followedUsers.size() &gt; 0)
-      &lt;ul class="followed-users"&gt;
-        #foreach ($followedUser in $followedUsers)
-          #set ($userDocument = $xwiki.getDocument($followedUser))
-          &lt;li class="vcard"&gt;
-            #set ($userID = $userDocument.documentReference.name)
-            #smallUserAvatar($followedUser)
-            &lt;span class="user-info"&gt;&lt;span class="fn"&gt;$xwiki.getUserName($followedUser)&lt;/span&gt; &lt;span class="user-id"&gt;($userID)&lt;/span&gt;&lt;/span&gt;
-            &lt;a class="btn btn-xs btn-danger userstatus-follow" data-userid="$escapetool.xml($followedUser)"&gt;$services.icon.renderHTML('cross') $escapetool.xml($services.localization.render('xe.activity.messages.unfollow'))&lt;/a&gt;
-          &lt;/li&gt;
-        #end
-      &lt;/ul&gt;
-    #else
-      $services.localization.render('platform.core.profile.section.following.none')
-    #end
-    {{/html}}
-    #if ($followedUsers.size() &gt; 0)
-      = $services.localization.render('platform.core.profile.section.networkActivity') =
-
-      {{notifications displayWatchedUsersOnly="true"}}
-
-    #end
-  #elseif ($isMyProfile &amp;&amp; $hasWatch)
-    #set($followedUsers = $services.watchlist.getWatchedElements("USER"))
-    ## FIXME: This is an ugly workaround for an even uglier bug in the watchlist
-    ##        plugin: the first item in the list is an empty string
-    #if ($followedUsers.size() &gt; 0 &amp;&amp; "$!followedUsers.get(0)" == '')
-      #set ($discard = $followedUsers.remove(0))
-    #end
-    {{html clean="false" wiki="true"}}
-    #set($username = $xwiki.getUserName($doc.fullName, false))
-    $xwiki.ssx.use("XWiki.XWikiUserSheet")##
-    $xwiki.ssx.use("XWiki.XWikiUserProfileSheet")##
-    $xwiki.jsx.use("XWiki.XWikiUserNetworkSheet")##
-    &lt;div class="half column"&gt;
-      &lt;div class="following profile-section highlighted-profile-section"&gt;
-        ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h1&gt;
-        #if (!$followedUsers || $followedUsers.size() == 0)
-          $services.localization.render('platform.core.profile.section.following.none')
-        #else
-          &lt;ul&gt;
-          #set ($authorsParam = $services.model.serialize($services.model.resolveDocument($xcontext.user), 'default'))
-          #foreach ($followedUser in $followedUsers)
-            #set ($userDocument = $xwiki.getDocument($followedUser))
-            ## Prepare the list of followed users as it appears in the activity macro parameter
-            ## (do it here to avoid another foreach loop later)
-            #set ($authorsParam = "$!{authorsParam},${userDocument.prefixedFullName}")
-            ## Display the user info
-            &lt;li class="vcard"&gt;
-            #set ($userID = $userDocument.documentReference.name)
-            #smallUserAvatar($followedUser)
-            &lt;span class="user-info"&gt;&lt;span class="fn"&gt;$xwiki.getUserName($followedUser)&lt;/span&gt; &lt;span class="user-id"&gt;($userID)&lt;/span&gt;&lt;/span&gt;
-            &lt;span class="userstatus-follow"&gt;
-              #set ($xredirect = $doc.getURL($xcontext.action, $request.queryString))
-              &lt;a class="action unfollow" href="$userDocument.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")" title="$services.localization.render('xe.activity.messages.unfollow')"&gt;$services.localization.render('xe.activity.messages.unfollow')&lt;/a&gt;
-            &lt;/span&gt;
-            &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-            &lt;/li&gt;
-          #end
-          &lt;/ul&gt;
-        #end
-      &lt;/div&gt;
-    &lt;/div&gt;
-    #if ($followedUsers.size() &gt; 0)
-      &lt;div class="half column"&gt;
-        &lt;div class="networkActivity profile-section"&gt;
-          &lt;h1&gt;$services.localization.render('platform.core.profile.section.networkActivity')&lt;/h1&gt;
-    {{/html}}
-
-{{activity authors="$!{authorsParam}" /}}
-
-    {{html clean="false"}}
-        &lt;/div&gt;
-      &lt;/div&gt;
-    #end## $followedUsers.size() &gt; 0
-    &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-    {{/html}}##
-  #end## isMyProfile &amp;&amp; $isMessageStreamActive &amp;&amp; $hasWatch
-#end## User object exists
-{{/velocity}}</content>
+  <content/>
   <object>
     <name>XWiki.XWikiUserNetworkSheet</name>
     <number>0</number>
@@ -519,6 +421,247 @@ require(['jquery', 'xwiki-meta'], function ($, xm) {
     </property>
     <property>
       <use/>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.XWikiUserNetworkSheet</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>14c27a28-3dcf-44fb-9f98-c87daa451e46</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+      #set($obj = $doc.getObject('XWiki.XWikiUsers'))
+      #if(!$obj)
+      = $services.localization.render('xe.admin.users.sheet') =
+
+      {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
+      #else
+        $doc.use($obj)
+        #set($isMyProfile = ($xcontext.user == $doc.fullName))
+        ## Code if the notifications app is installed (we don't depend on notifications, we only display some info if the
+        ## app is here).
+        ## TODO: also look if the "notifications" macro is installed too.
+        #if ($isMyProfile &amp;&amp; "$!services.notification.watch" != '')
+    #set ($followedUsers = $services.notification.watch.watchedUsers)
+    #set ($discard = $xwiki.jsx.use("XWiki.XWikiUserNetworkSheet"))
+    #set ($discard = $xwiki.ssx.use("XWiki.XWikiUserNetworkSheet"))
+    {{html}}
+    &lt;h1&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h1&gt;
+    #if ($followedUsers.size() &gt; 0)
+      &lt;ul class="followed-users"&gt;
+        #foreach ($followedUser in $followedUsers)
+          #set ($userDocument = $xwiki.getDocument($followedUser))
+          &lt;li class="vcard"&gt;
+            #set ($userID = $userDocument.documentReference.name)
+            #smallUserAvatar($followedUser)
+            &lt;span class="user-info"&gt;&lt;span class="fn"&gt;$xwiki.getUserName($followedUser)&lt;/span&gt; &lt;span class="user-id"&gt;($userID)&lt;/span&gt;&lt;/span&gt;
+            &lt;a class="btn btn-xs btn-danger userstatus-follow" data-userid="$escapetool.xml($followedUser)"&gt;$services.icon.renderHTML('cross') $escapetool.xml($services.localization.render('xe.activity.messages.unfollow'))&lt;/a&gt;
+          &lt;/li&gt;
+        #end
+      &lt;/ul&gt;
+    #else
+      $services.localization.render('platform.core.profile.section.following.none')
+    #end
+    {{/html}}
+    #if ($followedUsers.size() &gt; 0)
+      = $services.localization.render('platform.core.profile.section.networkActivity') =
+
+      {{notifications displayWatchedUsersOnly="true"}}
+
+    #end
+  #elseif ($isMyProfile &amp;&amp; $hasWatch)
+    #set($followedUsers = $services.watchlist.getWatchedElements("USER"))
+    ## FIXME: This is an ugly workaround for an even uglier bug in the watchlist
+    ##        plugin: the first item in the list is an empty string
+    #if ($followedUsers.size() &gt; 0 &amp;&amp; "$!followedUsers.get(0)" == '')
+      #set ($discard = $followedUsers.remove(0))
+    #end
+    {{html clean="false" wiki="true"}}
+    #set($username = $xwiki.getUserName($doc.fullName, false))
+    $xwiki.ssx.use("XWiki.XWikiUserSheet")##
+    $xwiki.ssx.use("XWiki.XWikiUserProfileSheet")##
+    $xwiki.jsx.use("XWiki.XWikiUserNetworkSheet")##
+    &lt;div class="half column"&gt;
+      &lt;div class="following profile-section highlighted-profile-section"&gt;
+        ## Please do not insert extra empty lines here (as it affects the validity of the rendered xhtml)
+        &lt;h1&gt;$services.localization.render('platform.core.profile.section.following')&lt;/h1&gt;
+        #if (!$followedUsers || $followedUsers.size() == 0)
+          $services.localization.render('platform.core.profile.section.following.none')
+        #else
+          &lt;ul&gt;
+          #set ($authorsParam = $services.model.serialize($services.model.resolveDocument($xcontext.user), 'default'))
+          #foreach ($followedUser in $followedUsers)
+            #set ($userDocument = $xwiki.getDocument($followedUser))
+            ## Prepare the list of followed users as it appears in the activity macro parameter
+            ## (do it here to avoid another foreach loop later)
+            #set ($authorsParam = "$!{authorsParam},${userDocument.prefixedFullName}")
+            ## Display the user info
+            &lt;li class="vcard"&gt;
+            #set ($userID = $userDocument.documentReference.name)
+            #smallUserAvatar($followedUser)
+            &lt;span class="user-info"&gt;&lt;span class="fn"&gt;$xwiki.getUserName($followedUser)&lt;/span&gt; &lt;span class="user-id"&gt;($userID)&lt;/span&gt;&lt;/span&gt;
+            &lt;span class="userstatus-follow"&gt;
+              #set ($xredirect = $doc.getURL($xcontext.action, $request.queryString))
+              &lt;a class="action unfollow" href="$userDocument.getURL('view', "xpage=watch&amp;amp;do=removeuser&amp;amp;xredirect=${escapetool.url($xredirect)}")" title="$services.localization.render('xe.activity.messages.unfollow')"&gt;$services.localization.render('xe.activity.messages.unfollow')&lt;/a&gt;
+            &lt;/span&gt;
+            &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+            &lt;/li&gt;
+          #end
+          &lt;/ul&gt;
+        #end
+      &lt;/div&gt;
+    &lt;/div&gt;
+    #if ($followedUsers.size() &gt; 0)
+      &lt;div class="half column"&gt;
+        &lt;div class="networkActivity profile-section"&gt;
+          &lt;h1&gt;$services.localization.render('platform.core.profile.section.networkActivity')&lt;/h1&gt;
+    {{/html}}
+
+{{activity authors="$!{authorsParam}" /}}
+
+    {{html clean="false"}}
+        &lt;/div&gt;
+      &lt;/div&gt;
+    #end## $followedUsers.size() &gt; 0
+    &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+    {{/html}}##
+  #end## isMyProfile &amp;&amp; $isMessageStreamActive &amp;&amp; $hasWatch
+      #end## User object exists
+      {{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.user.profile.menu.userNetwork</name>
+    </property>
+    <property>
+      <parameters>id=network
+icon=world
+# isActive: The user is seeing her own profile and the watch service is available.
+isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; ("$!services.notification.watch" != '' || $hasWatch))true#{else}false#end
+priority=50</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

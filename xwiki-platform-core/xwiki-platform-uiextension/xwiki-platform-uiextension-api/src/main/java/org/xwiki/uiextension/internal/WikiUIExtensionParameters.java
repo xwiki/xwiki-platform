@@ -19,10 +19,15 @@
  */
 package org.xwiki.uiextension.internal;
 
+import java.io.IOException;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.velocity.VelocityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,9 +58,9 @@ public class WikiUIExtensionParameters
     private String id;
 
     /**
-     * @see #WikiUIExtensionParameters(String, org.xwiki.component.manager.ComponentManager)
+     * @see #WikiUIExtensionParameters(String, String, ComponentManager)
      */
-    private Map<String, String> parameters;
+    private Properties parameters;
 
     /**
      * Parameters are evaluated through the velocity engine, to improve performance this variable is used as a cache,
@@ -75,7 +80,7 @@ public class WikiUIExtensionParameters
     private String previousWiki;
 
     /**
-     * @see #WikiUIExtensionParameters(String, org.xwiki.component.manager.ComponentManager)
+     * @see #WikiUIExtensionParameters(String, String, ComponentManager)
      */
     private VelocityManager velocityManager;
 
@@ -121,17 +126,17 @@ public class WikiUIExtensionParameters
      * @param rawParameters the string to parse
      * @return a map of parameters
      */
-    private Map<String, String> parseParameters(String rawParameters)
+    private Properties parseParameters(String rawParameters)
     {
-        Map<String, String> result = new HashMap<String, String>();
-        for (String line : rawParameters.split("[\\r\\n]+")) {
-            String[] pair = line.split("=", 2);
-            if (pair.length == 2 && !"".equals(pair[0]) && !"".equals(pair[1])) {
-                result.put(pair[0], pair[1]);
-            }
+        Properties properties = new Properties();
+        try {
+            properties.load(new StringReader(rawParameters));
+        } catch (IOException e) {
+            LOGGER.warn("Failed to parse UIX parameters [{}]. Cause [{}].", rawParameters,
+                ExceptionUtils.getRootCauseMessage(e));
         }
 
-        return result;
+        return properties;
     }
 
     /**
@@ -147,29 +152,33 @@ public class WikiUIExtensionParameters
         int currentContextId = this.execution.getContext().hashCode();
         String currentWiki = modelContext.getCurrentEntityReference().extractReference(EntityType.WIKI).getName();
         if (currentContextId == this.previousContextId
-            && currentWiki.equals(previousWiki) && this.evaluatedParameters != null) {
+                && currentWiki.equals(previousWiki) && this.evaluatedParameters != null)
+        {
             isCacheValid = true;
         }
 
         if (!isCacheValid) {
-            this.evaluatedParameters = new HashMap<String, String>();
+            this.evaluatedParameters = new HashMap<>();
 
             if (this.parameters.size() > 0) {
                 try {
                     VelocityEngine velocityEngine = this.velocityManager.getVelocityEngine();
                     VelocityContext velocityContext = this.velocityManager.getVelocityContext();
 
-                    for (Map.Entry<String, String> entry : this.parameters.entrySet()) {
-                        StringWriter writer = new StringWriter();
-                        try {
-                            String namespace = this.id + ':' + entry.getKey();
-                            velocityEngine.evaluate(new XWikiVelocityContext(velocityContext), writer, namespace,
-                                entry.getValue());
-                            this.evaluatedParameters.put(entry.getKey(), writer.toString());
-                        } catch (XWikiVelocityException e) {
-                            LOGGER.warn(String.format(
-                                "Failed to evaluate UI extension data value, key [%s], value [%s]. Reason: [%s]",
-                                entry.getKey(), entry.getValue(), e.getMessage()));
+                    for (String propertyKey : this.parameters.stringPropertyNames()) {
+                        if (!StringUtils.isBlank(propertyKey)) {
+                            String propertyValue = this.parameters.getProperty(propertyKey);
+                            StringWriter writer = new StringWriter();
+                            try {
+                                String namespace = this.id + ':' + propertyKey;
+                                velocityEngine.evaluate(new XWikiVelocityContext(velocityContext), writer, namespace,
+                                    propertyValue);
+                                this.evaluatedParameters.put(propertyKey, writer.toString());
+                            } catch (XWikiVelocityException e) {
+                                LOGGER.warn(String.format(
+                                    "Failed to evaluate UI extension data value, key [%s], value [%s]. Reason: [%s]",
+                                    propertyKey, propertyValue, e.getMessage()));
+                            }
                         }
                     }
                 } catch (XWikiVelocityException ex) {

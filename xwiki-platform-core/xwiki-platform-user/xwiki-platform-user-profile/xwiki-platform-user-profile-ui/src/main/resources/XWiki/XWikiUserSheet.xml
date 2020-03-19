@@ -49,7 +49,7 @@
 
 ## load the user menu from the 'org.xwiki.plaftorm.user.profile.menu' UIXP.
 #foreach ($uix in $services.uix.getExtensions('org.xwiki.plaftorm.user.profile.menu', {'sortByParameter': 'priority'}))
-  #if($uix.parameters.get('isActive') == 'true')
+  #if(!$uix.parameters.containsKey('isActive') || $uix.parameters.get('isActive') != 'false')
     #if (!$uix.parameters.containsKey('id'))
       ## when no id is explicitly provided, we use the id of the UIX.
       #set ($discard = $uix.parameters.put('id', $uix.id))

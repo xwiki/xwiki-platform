@@ -265,7 +265,6 @@
     <property>
       <parameters>id=groups
 icon=group
-isActive=true
 priority=30</parameters>
     </property>
     <property>

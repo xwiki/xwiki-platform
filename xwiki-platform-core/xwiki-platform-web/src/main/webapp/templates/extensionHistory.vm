@@ -507,7 +507,7 @@
   ## reliable because there can be error logs like "Collision found on object [...]" that don't prevent the replay job
   ## from finishing successfully. The last log message cannot be used either because it is always an info log like this
   ## "Finished job of type [...] with identifier [...]".
-  #set ($success = $finished && $replayJobStatus.log.getLogs('ERROR').isEmpty())
+  #set ($success = $finished && !$replayJobStatus.logTail.hasLogLevel('ERROR'))
   #set ($userReference = $replayJobStatus.request.getProperty('user.reference'))
   #getExtensionHistoryURL($extensionHistoryURL 'get' {})
   <div class="extension-history-replay-status" data-jobId="$replayJobId" data-jobState="$replayJobState"

@@ -121,12 +121,14 @@
   #if ($parameters.attributes.get('data-sourceDocumentReference'))
     #set ($sourceDocument = $xwiki.getDocument($parameters.attributes.get('data-sourceDocumentReference')))
   #end
-  #set ($source = {
-    'documentReference': $sourceDocument.documentReference,
-    'syntax': $sourceDocument.syntax,
-    'content': $parameters.content
-  })
-  #set ($content = "#renderContentSheet")
+  #set ($escapedName = $escapetool.xml($parameters.attributes.name))
+  &lt;input value="$!escapedName" name="RequiresHTMLConversion" type="hidden"/&gt;
+  &lt;input value="$!escapetool.xml($sourceDocument.syntax.toIdString())" name="$!{escapedName}_syntax" type="hidden"/&gt;
+  ## Chrome doesn't cache the enabled/disabled state of the form fields so we must store this state in the value of
+  ## another form field. For instance, the enabled/disabled state of the RequiresHTMLConversion hidden input
+  ## determines which editor mode (WYSIWYG vs. Source) is loaded initially.
+  ## See CKEDITOR-34: Wiki syntax gets escaped when you click "Back" in the browser
+  &lt;input value="" name="$!{escapedName}_cache" type="hidden" class="cache"/&gt;
   ## Verify if the office import feature is supported.
   ##
   ## It's not enough to check if the Office server is connected because the 'importOfficeAttachment' API is available
@@ -152,15 +154,14 @@
     #foreach ($entry in $parameters.attributes.entrySet())
       $entry.key="$!escapetool.xml($entry.value)"
     #end
+  ## We render the content sheet at the end because the edited content can overwrite the variables used by this macro.
+  #set ($source = {
+    'documentReference': $sourceDocument.documentReference,
+    'syntax': $sourceDocument.syntax,
+    'content': $parameters.content
+  })
+  #set ($content = "#renderContentSheet")
   &gt;$!escapetool.xml($content)&lt;/textarea&gt;
-  #set ($escapedName = $escapetool.xml($parameters.attributes.name))
-  &lt;input value="$!escapedName" name="RequiresHTMLConversion" type="hidden"/&gt;
-  &lt;input value="$!escapetool.xml($sourceDocument.syntax.toIdString())" name="$!{escapedName}_syntax" type="hidden"/&gt;
-  ## Chrome doesn't cache the enabled/disabled state of the form fields so we must store this state in the value of
-  ## another form field. For instance, the enabled/disabled state of the RequiresHTMLConversion hidden input
-  ## determines which editor mode (WYSIWYG vs. Source) is loaded initially.
-  ## See CKEDITOR-34: Wiki syntax gets escaped when you click "Back" in the browser
-  &lt;input value="" name="$!{escapedName}_cache" type="hidden" class="cache"/&gt;
 #end
 
 #macro (displayCKEditorConfigProperty $configDoc $propName $action)

@@ -84,7 +84,6 @@ describe('XWiki Macro Plugin for CKEditor', function() {
       '<!--startmacro:html|-||-|--><!--stopmacro-->' +
       '<p>' +
         '<!--startmacro:id|-|name="foo"-->' +
-        '<span id="foo"></span>' +
         '<!--stopmacro-->' +
       '</p>', {
       callback: function() {
@@ -327,6 +326,54 @@ describe('XWiki Macro Plugin for CKEditor', function() {
       // CKEDITOR-48: Wiki Page source gets into bad state when macro that produces no output is used with CKEditor
       '<!--startmacro:html|-||-|--><!--stopmacro--><p>text</p>'
     ].map(jQuery.proxy(testUtils.assertNoChangeAfterDataRoundTrip, testUtils, editor))).then(done);
+  });
+
+  it('protects empty elements in macro output', function(done) {
+    testUtils.assertData(
+      editor,
+      [
+        '<p>1<span></span>2<!--startmacro:outer|-|-->3<span></span>4<!--startmacro:inner|-|-->',
+          '5<strong></strong>6<!--stopmacro-->7<i></i>8<!--stopmacro-->9<i></i>0</p>',
+        '<!--startmacro:test|-|-->',
+        '<div>',
+          '1<em></em>2',
+          '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;" ',
+              'data-xwiki-parameter-name="title">',
+            '<p>3<strong></strong>4</p>',
+          '</div>',
+          '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
+            '<p>5<em></em>6</p>',
+          '</div>',
+        '</div>',
+        '<!--stopmacro-->'
+      ].join(''),
+      [
+        '<p>',
+          '12',
+          '<!--startmacro:outer|-|-->',
+          '3<span></span>4',
+          '<span class="macro" data-macro="startmacro:inner|-|">',
+            '5<strong></strong>6',
+          '</span>',
+          '7<i></i>8',
+          '<!--stopmacro-->',
+          '90',
+        '</p>',
+        '<!--startmacro:test|-|-->',
+        '<div>',
+          '1<em></em>2',
+          '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;" ',
+              'data-xwiki-parameter-name="title">',
+            '<p>34</p>',
+          '</div>',
+          '<div data-xwiki-non-generated-content="java.util.List&lt;org.xwiki.rendering.block.Block&gt;">',
+            '<p>56</p>',
+          '</div>',
+        '</div>',
+        '<!--stopmacro-->'
+      ].join(''),
+      true
+    ).then(done);
   });
 
   var serializeAndParseMacroCall = function(macroCall) {

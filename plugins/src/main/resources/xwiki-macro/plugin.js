@@ -145,6 +145,7 @@
         startMacroComment.replaceWith(wrapper);
       };
 
+      // Replace the macro marker comments with a DIV or SPAN in order to be able to initialize the macro widgets.
       editor.plugins['xwiki-marker'].addMarkerHandler(editor, 'macro', {
         toHtml: wrapMacroOutput
       });
@@ -557,5 +558,70 @@
         return nestingLevel > 0;
       });
     }
+  };
+
+  // Overwrite CKEditor's HTML parser in order to prevent it from removing empty elements from generated macro output.
+  // It's important to preserve the generated macro output as is, because these empty elements are often used:
+  // * to display font icons (even on the default wiki home page)
+  // * as placeholders that are replaced or enhanced by JavaScript code (e.g. the live table)
+  var originalHTMLParserParse = CKEDITOR.htmlParser.prototype.parse;
+  CKEDITOR.htmlParser.prototype.parse = function() {
+    // The initial parsing context.
+    var contextStack = [{
+      // The number of start macro comments that have not been paired yet with a stop macro comment in this context.
+      startMacro: 0
+    }];
+
+    var originalOnComment = this.onComment;
+    this.onComment = function(comment) {
+      // Update the parsing context when we encounter macro marker comments.
+      if (comment === 'stopmacro') {
+        // Macro output end.
+        contextStack[contextStack.length - 1].startMacro--;
+      } else if (comment.substring(0, 11) === 'startmacro:') {
+        // Macro output start.
+        contextStack[contextStack.length - 1].startMacro++;
+      }
+
+      return originalOnComment.apply(this, arguments);
+    };
+
+    var originalOnTagOpen = this.onTagOpen;
+    this.onTagOpen = function(tagName, attributes, selfClosing) {
+      var parentContext = contextStack[contextStack.length - 1];
+      // Force the parser to preserve this tag if:
+      // * it is on the list of tags that are not allowed to be empty AND
+      // * itself or one of its parents are wrapped by macro marker comments AND
+      // * it is not editable (some parts of a macro output can be editable)
+      if (CKEDITOR.dtd.$removeEmpty[tagName] && (parentContext.startMacro > 0 ||
+          (parentContext.inMacroOutput && !parentContext.editable))) {
+        attributes['data-cke-survive'] = true;
+      }
+
+      // Push a new context whenever a tag is opened.
+      contextStack.push({
+        // Reset the number of start macro comments.
+        startMacro: 0,
+        // If this tag is part of a macro output then its child nodes are part of a macro output also.
+        inMacroOutput: parentContext.inMacroOutput || parentContext.startMacro > 0,
+        // The editable flag doesn't propagate down to nested macros (nested macros can be read-only).
+        editable: (parentContext.editable && parentContext.startMacro <= 0) ||
+          // We look only for block-level nested editables because the in-line nested editables are not well supported.
+          // See https://github.com/ckeditor/ckeditor-dev/issues/1091
+          (tagName === 'div' && attributes[nestedEditableTypeAttribute])
+      });
+
+      return originalOnTagOpen.apply(this, arguments);
+    };
+
+    var originalOnTagClose = this.onTagClose;
+    this.onTagClose = function(tagName) {
+      // Go back to the parent context.
+      contextStack.pop();
+
+      return originalOnTagClose.apply(this, arguments);
+    };
+
+    return originalHTMLParserParse.apply(this, arguments);
   };
 })();

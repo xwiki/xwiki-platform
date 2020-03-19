@@ -118,7 +118,7 @@
         #try()
           #set ($discard = $copyAsJob.join())
           #set ($copyAsJobStatus = $services.job.getJobStatus($copyAsJob.request.id))
-          #set ($success = $copyAsJobStatus.log.getLogs('ERROR').isEmpty())
+          #set ($success = !$copyAsJobStatus.logTail.hasLogLevel('ERROR'))
         #end
         #if ($success)
           #if($escapedLanguage)

@@ -1566,7 +1566,7 @@ $doc.getURL($xcontext.action, $escapetool.url($parameters))##
 
 #macro(displayExtensionUpdaterPlanStatus $status)
   ## The status is null after the job is created, until the job is scheduled.
-  #set ($isLoading = !$status || ($status.log.isEmpty() && $status.state != 'FINISHED'))
+  #set ($isLoading = !$status || ($status.logTail.size() == 0 && $status.state != 'FINISHED'))
   <div class="extension-body-progress#if ($isLoading) loading#end">
     #if ($status)
       #printStatusLog($status)

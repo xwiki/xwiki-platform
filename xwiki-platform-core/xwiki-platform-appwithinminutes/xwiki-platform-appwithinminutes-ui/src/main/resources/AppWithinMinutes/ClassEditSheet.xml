@@ -475,7 +475,7 @@ xcontext.put('propertyCustomDisplayer', new PropertyCustomDisplayer(xcontext))
     #try()
       #set ($discard = $copyAsJob.join())
       #set ($copyAsJobStatus = $services.job.getJobStatus($copyAsJob.request.id))
-      #set ($errorMessage = $copyAsJobStatus.logTail.getFirstLogEvents('ERROR').toString())
+      #set ($errorMessage = $copyAsJobStatus.logTail.getFirstLogEvent('ERROR').toString())
     #end
   #end
 #end

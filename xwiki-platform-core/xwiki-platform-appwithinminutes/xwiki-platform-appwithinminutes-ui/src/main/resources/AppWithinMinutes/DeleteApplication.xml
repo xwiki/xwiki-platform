@@ -69,7 +69,7 @@
   #try()
     #set ($discard = $deleteJob.join())
     #set ($deleteJobStatus = $services.job.getJobStatus($deleteJob.request.id))
-    #set ($errorLog = $deleteJobStatus.logTail.getFirstLogEvents('ERROR'))
+    #set ($errorLog = $deleteJobStatus.logTail.getFirstLogEvent('ERROR'))
   #end
 #end
 

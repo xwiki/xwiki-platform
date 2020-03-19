@@ -36,60 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set ($obj = $doc.getObject('XWiki.XWikiUsers'))
-#if (!$obj)
-{{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
-#else
-  #set($temp = $xwiki.ssx.use('WikiManager.UserWikiSheet'))
-  #set($temp = $xwiki.jsx.use('WikiManager.UserWikiSheet'))
-  #set($temp = $doc.use($obj))
-  #set ($currentUser = $xcontext.user)
-  #if (!$currentUser.startsWith("${services.wiki.mainWikiId}:"))
-    #set ($currentUser = "${services.wiki.mainWikiId}:${currentUser}")
-  #end
-  #set($documentUser = $doc.prefixedFullName)
-  #set($isMyProfile = ($currentUser == $documentUser))
-  {{html clean='false'}}
-  &lt;div class='half column'&gt;
-    &lt;div class='profile-section highlighted-profile-section'&gt;
-      &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
-      #set ($joinedWikis = [])
-      #set ($wikis = $services.wiki.getAll())
-      #foreach ($wiki in $wikis)
-        #if($services.wiki.user.isMember($documentUser, $wiki.id))
-          #set($temp = $joinedWikis.add($wiki))
-        #end
-      #end
-      #if ($joinedWikis.size() == 0)
-        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki')#end&lt;/span&gt;
-      #else
-        #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
-        &lt;ul id='wikis'&gt;
-        #foreach ($wiki in $joinedWikis)
-          &lt;li id='$wiki.id'&gt;
-            &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
-            &lt;span class='wikiActivity'&gt;&lt;a href='$doc.getURL('view', "category=wikis&amp;amp;wikiName=$wiki.id")'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
-          &lt;/li&gt;
-        #end
-        &lt;/ul&gt;
-      #end
-    &lt;/div&gt;
-  &lt;/div&gt;
-  {{/html}}
-
-  {{html clean='false' wiki='true'}}
-  &lt;div id='wikiActivity' class='half column'&gt;
-    &lt;div id='wikiActivityColumn'&gt;
-    #if("$!request.wikiName" != '')
-      {{include reference="WikiManager.WikiActivityServiceCode" /}}
-    #end
-    &lt;/div&gt;
-  &lt;/div&gt;
-  &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-  {{/html}}
-#end## User object exists
-{{/velocity}}</content>
+  <content/>
   <object>
     <name>WikiManager.UserWikiSheet</name>
     <number>0</number>
@@ -466,6 +413,203 @@ return XWiki;
     </property>
     <property>
       <use>onDemand</use>
+    </property>
+  </object>
+  <object>
+    <name>WikiManager.UserWikiSheet</name>
+    <number>0</number>
+    <className>XWiki.UIExtensionClass</className>
+    <guid>4ca0b86d-5f31-453f-b116-3d1e67d2d01a</guid>
+    <class>
+      <name>XWiki.UIExtensionClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <async_cached>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_cached</name>
+        <number>3</number>
+        <prettyName>Cached</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_cached>
+      <async_context>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>async_context</name>
+        <number>4</number>
+        <prettyName>Context elements</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>5</size>
+        <unmodifiable>0</unmodifiable>
+        <values>doc.reference=Document|icon.theme=Icon theme|locale=Language|rendering.defaultsyntax=Default syntax|rendering.restricted=Restricted|rendering.targetsyntax=Target syntax|request.base=Request base URL|request.parameters=Request parameters|request.url=Request URL|request.wiki=Request wiki|user=User|wiki=Wiki</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </async_context>
+      <async_enabled>
+        <defaultValue>0</defaultValue>
+        <disabled>0</disabled>
+        <displayFormType>select</displayFormType>
+        <displayType/>
+        <name>async_enabled</name>
+        <number>2</number>
+        <prettyName>Asynchronous rendering</prettyName>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+      </async_enabled>
+      <content>
+        <disabled>0</disabled>
+        <editor>Text</editor>
+        <name>content</name>
+        <number>1</number>
+        <prettyName>Executed Content</prettyName>
+        <rows>25</rows>
+        <size>120</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </content>
+      <extensionPointId>
+        <disabled>0</disabled>
+        <name>extensionPointId</name>
+        <number>5</number>
+        <prettyName>Extension Point ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </extensionPointId>
+      <name>
+        <disabled>0</disabled>
+        <name>name</name>
+        <number>6</number>
+        <prettyName>Extension ID</prettyName>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+      </name>
+      <parameters>
+        <contenttype>PureText</contenttype>
+        <disabled>0</disabled>
+        <editor>PureText</editor>
+        <name>parameters</name>
+        <number>7</number>
+        <prettyName>Extension Parameters</prettyName>
+        <rows>10</rows>
+        <size>40</size>
+        <unmodifiable>0</unmodifiable>
+        <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+      </parameters>
+      <scope>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>0</multiSelect>
+        <name>scope</name>
+        <number>8</number>
+        <prettyName>Extension Scope</prettyName>
+        <relationalStorage>0</relationalStorage>
+        <separator> </separator>
+        <separators>|, </separators>
+        <size>1</size>
+        <unmodifiable>0</unmodifiable>
+        <values>wiki=Current Wiki|user=Current User|global=Global</values>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </scope>
+    </class>
+    <property>
+      <async_cached>0</async_cached>
+    </property>
+    <property>
+      <async_context/>
+    </property>
+    <property>
+      <async_enabled>0</async_enabled>
+    </property>
+    <property>
+      <content>{{velocity}}
+      #set ($obj = $doc.getObject('XWiki.XWikiUsers'))
+      #if (!$obj)
+      {{info}}{{translation key="xe.admin.users.applyonusers"/}}{{/info}}
+      #else
+        #set($temp = $xwiki.ssx.use('WikiManager.UserWikiSheet'))
+        #set($temp = $xwiki.jsx.use('WikiManager.UserWikiSheet'))
+        #set($temp = $doc.use($obj))
+        #set ($currentUser = $xcontext.user)
+        #if (!$currentUser.startsWith("${services.wiki.mainWikiId}:"))
+          #set ($currentUser = "${services.wiki.mainWikiId}:${currentUser}")
+        #end
+        #set($documentUser = $doc.prefixedFullName)
+        #set($isMyProfile = ($currentUser == $documentUser))
+      {{html clean='false'}}
+      &lt;div class='half column'&gt;
+        &lt;div class='profile-section highlighted-profile-section'&gt;
+          &lt;h1&gt;$services.localization.render('platform.wiki.users.profile.joinedwikis.label')&lt;/h1&gt;
+            #set ($joinedWikis = [])
+            #set ($wikis = $services.wiki.getAll())
+            #foreach ($wiki in $wikis)
+            #if($services.wiki.user.isMember($documentUser, $wiki.id))
+              #set($temp = $joinedWikis.add($wiki))
+            #end
+            #end
+            #if ($joinedWikis.size() == 0)
+        &lt;span&gt;#if ($isMyProfile)$services.localization.render('platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki')#{else}$services.localization.render('platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki')#end&lt;/span&gt;
+      #else
+        #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
+        &lt;ul id='wikis'&gt;
+        #foreach ($wiki in $joinedWikis)
+          &lt;li id='$wiki.id'&gt;
+            &lt;span class='wikiHomepage'&gt;&lt;a href='$xwiki.getURL($wiki.mainPageReference)'&gt;$wiki.prettyName&lt;/a&gt;&lt;/span&gt;
+            &lt;span class='wikiActivity'&gt;&lt;a href='$doc.getURL('view', "category=wikis&amp;amp;wikiName=$wiki.id")'&gt;$services.localization.render('platform.wiki.users.profile.activity.show') &amp;#187;&lt;/a&gt;&lt;/span&gt;
+          &lt;/li&gt;
+        #end
+        &lt;/ul&gt;
+      #end
+        &lt;/div&gt;
+      &lt;/div&gt;
+      {{/html}}
+
+      {{html clean='false' wiki='true'}}
+      &lt;div id='wikiActivity' class='half column'&gt;
+        &lt;div id='wikiActivityColumn'&gt;
+          #if("$!request.wikiName" != '')
+            {{include reference="WikiManager.WikiActivityServiceCode" /}}
+          #end
+        &lt;/div&gt;
+      &lt;/div&gt;
+      &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
+      {{/html}}
+      #end## User object exists
+      {{/velocity}}</content>
+    </property>
+    <property>
+      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
+    </property>
+    <property>
+      <name>org.xwiki.platform.wiki.ui.mainwiki.menu</name>
+    </property>
+    <property>
+      <parameters>id=wikis
+name=$services.localization.render('platform.wiki.menu.userwikis')
+icon=list
+# isActive: The current wiki is the main wiki.
+isActive=#if($xcontext.isMainWiki())true#{else}false#end
+priority=70</parameters>
+    </property>
+    <property>
+      <scope>wiki</scope>
     </property>
   </object>
 </xwikidoc>

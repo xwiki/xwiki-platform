@@ -19,13 +19,6 @@
  */
 package org.xwiki.uiextension;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.io.StringWriter;
 
 import org.apache.commons.collections.MapUtils;
@@ -44,6 +37,13 @@ import org.xwiki.uiextension.internal.WikiUIExtensionParameters;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
+
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link WikiUIExtensionParametersTest}.
@@ -103,6 +103,43 @@ public class WikiUIExtensionParametersTest
 
         // Since the StringWriter is created within the method, the value is "" and not "value".
         Assert.assertEquals("", parameters.get().get("key"));
+    }
+
+    @Test
+    public void getParametersWithCommentAloneOnLine() throws Exception
+    {
+        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
+
+        String paramsStr = "# a = 1\n" +
+                               "x=1\n" +
+                               "y=2\n" +
+                               "# ...\n" +
+                               "z=3";
+        WikiUIExtensionParameters parameters =
+            new WikiUIExtensionParameters("id", paramsStr, componentManager);
+        parameters.get();
+
+        verify(velocityEngine).evaluate(any(), any(), eq("id:x"), eq("1"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:y"), eq("2"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:z"), eq("3"));
+    }
+
+    @Test
+    public void getParametersWithCommentEndOfLine() throws Exception
+    {
+        when(modelContext.getCurrentEntityReference()).thenReturn(new WikiReference("xwiki"));
+
+        String paramsStr = "x=1##b\n" +
+                               "y=2####x\n" +
+                               "z=3 ## xyz\n" 
+                               + "";
+        WikiUIExtensionParameters parameters =
+            new WikiUIExtensionParameters("id", paramsStr, componentManager);
+        parameters.get();
+
+        verify(velocityEngine).evaluate(any(), any(), eq("id:x"), eq("1##b"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:y"), eq("2####x"));
+        verify(velocityEngine).evaluate(any(), any(), eq("id:z"), eq("3 ## xyz"));
     }
 
     @Test

@@ -40,9 +40,8 @@
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
-#macro (convert $text $toHTML $fromHTML)
+#macro (convert $text $toHTML $fromHTML $stripHTMLEnvelope)
   #if ($toHTML)
-    ## The $source variable is used inside the content sheet.
     #set ($source = {
       'documentReference': $doc.documentReference,
       'syntax': $doc.syntax
@@ -52,7 +51,17 @@
     #else
       #set ($source.content = $text)
     #end
-    #set ($output = "#renderContentSheet")
+    #if ($stripHTMLEnvelope)
+      ## Don't wrap the rendered content with the HTML and BODY tags. This is needed when the HTML fragment is injected
+      ## directly in the current page so it doesn't need separate style sheets or JavaScript files. This is the case
+      ## when CKEditor is used in-line (no iframe).
+      #set ($output = "#getRenderedContent($source)$!html")
+    #else
+      ## Returns a full HTML page, including the HEAD tag with the style sheets and possibly the JavaScript includes.
+      ## This is needed when the edited content is loaded in an iframe, which is the case when CKEditor replaces a text
+      ## area (classical editor).
+      #set ($output = "#renderContentSheet($source)")
+    #end
   #else
     #set ($output = $services.wysiwyg.fromAnnotatedXHTML($text, $doc.syntax.toIdString()))
     #if ("$!output" == '' &amp;&amp; $output != '')
@@ -69,7 +78,8 @@
   #end
 #end
 
-#macro (renderContentSheet)
+#macro (renderContentSheet $source)
+  ## The $source variable is used inside the content sheet.
   #set ($output = $services.wysiwyg.render('CKEditor.ContentSheet'))
   #if ("$!output" == '' &amp;&amp; $output != '')
     ## $output is null, probably because $services.wysiwyg.render() is not available (before 7.4.1)
@@ -86,6 +96,27 @@
   #end
   ## Unescape {{ which happened in CKEditor.ContentSheet for protecting the {{html}} macro.
   $!output.replace('&amp;amp;#123;&amp;amp;#123;', '{{')##
+#end
+
+#macro (getRenderedContent $source)
+  #if ($source.html)
+    #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference))
+    #if ("$!html" == '' &amp;&amp; $html != '')
+      ## Before XWiki 11.9RC1 (see XWIKI-16737)
+      #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString()))
+    #end
+  #else
+    #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReference))
+    #if ("$!html" == '' &amp;&amp; $html != '')
+      ## Before XWiki 11.9RC1 (see XWIKI-16737)
+      #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString()))
+    #end
+  #end
+  #if ("$!html" == '')
+    ## Prevent Firefox from inserting bogus whitespace when the text area is empty.
+    ## CKEDITOR-185: Whitespace is generated in Firefox when creating a page without typing the content
+    #set ($html = '&lt;p&gt;&lt;/p&gt;')
+  #end
 #end
 
 #macro (importCSS $groupId $artifactId $version $path $evaluate)
@@ -160,7 +191,7 @@
     'syntax': $sourceDocument.syntax,
     'content': $parameters.content
   })
-  #set ($content = "#renderContentSheet")
+  #set ($content = "#renderContentSheet($source)")
   &gt;$!escapetool.xml($content)&lt;/textarea&gt;
 #end
 

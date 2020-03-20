@@ -46,7 +46,8 @@
 #set ($fromHTML = $request.fromHTML == 'true')
 #if ($toHTML || $fromHTML)
   #set ($text = "$!request.text")
-  #set ($output = "#convert($text $toHTML $fromHTML)")
+  #set ($stripHTMLEnvelope = $request.stripHTMLEnvelope == 'true')
+  #set ($output = "#convert($text $toHTML $fromHTML $stripHTMLEnvelope)")
   #set ($characterEncoding = 'utf-8')
   ## Make sure the Character Encoding response header matches the character encoding used to write the response and
   ## compute its length. See CKEDITOR-162: Cannot convert to source code

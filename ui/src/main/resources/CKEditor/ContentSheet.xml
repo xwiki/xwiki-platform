@@ -39,7 +39,9 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
+  <content>{{include reference="CKEditor.VelocityMacros" /}}
+
+{{velocity}}
 #if ($doc.fullName == 'CKEditor.ContentSheet')
   This is the sheet used to obtain the content that is passed to the [[CKEditor&gt;&gt;http://ckeditor.com/]].
 #else
@@ -65,30 +67,11 @@
     #set ($serializedSpaceReference = $services.model.serialize($source.documentReference.parent, 'local'))
     &lt;body id="body" class="skin-flamingo viewbody main wiki-$xcontext.database
         space-$escapetool.xml($serializedSpaceReference.replaceAll(' ', '_'))"&gt;##
-      #if ($source.html)
-        #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax, $source.documentReference))
-        #if ("$!html" == '' &amp;&amp; $html != '')
-          ## Before XWiki 11.9RC1 (see XWIKI-16737)
-          #set ($html = $services.wysiwyg.parseAndRender($source.html, $source.syntax.toIdString()))
-        #end
-      #else
-        #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax, $source.documentReference))
-        #if ("$!html" == '' &amp;&amp; $html != '')
-          ## Before XWiki 11.9RC1 (see XWIKI-16737)
-          #set ($html = $services.wysiwyg.toAnnotatedXHTML($source.content, $source.syntax.toIdString()))
-        #end
-      #end
+      #getRenderedContent($source)
       ## Escape {{ in the rendered content to be sure that the HTML macro is not closed unintentionally.
       ## The result must be unescaped before being passed to the CKEditor as input.
       ## CKEDITOR-134: Unclosed {{html}} results in addition of closing tag even when macro isn't actually evaluated
-      #set ($output = $html.replace('{{', '&amp;amp;#123;&amp;amp;#123;'))
-      #if ("$!output" != '')
-        $output##
-      #else
-        ## Prevent Firefox from inserting bogus whitespace when the text area is empty.
-        ## CKEDITOR-185: Whitespace is generated in Firefox when creating a page without typing the content
-        &lt;p&gt;&lt;/p&gt;##
-      #end
+      $!html.replace('{{', '&amp;amp;#123;&amp;amp;#123;')##
     &lt;/body&gt;
   &lt;/html&gt;
   {{/html}}

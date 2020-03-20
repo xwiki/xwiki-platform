@@ -1,0 +1,15 @@
+This package is part of the noto project.  Visit
+google.com/get/noto for more information.
+
+Built on 2017-10-24 from the following noto repository:
+-----
+Repo: noto-emoji
+Tag: v2017-09-13-design-refresh
+Date: 2017-09-20 10:08:23 GMT
+Commit: d5ac67b140cc63aa512bbb3d164e15737dd97564
+
+Update color emoji font and assets for new design.
+
+This design is the one used in Android O.
+
+The blobs are dead.  Long live the blobs.

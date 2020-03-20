@@ -61,6 +61,13 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <!-- language -->
     <xsl:param name="language" select="//html:head/html:meta[@name='language']/@content"></xsl:param>
 
+    <!-- font family -->
+    <xsl:param name="font-family-sans">FreeSans, AR PL UMing CN, Noto Emoji, sans-serif</xsl:param>
+    <xsl:param name="font-family-sans-ja">FreeSans, IPAMincho, AR PL UMing CN, Noto Emoji, sans-serif</xsl:param>
+    <xsl:param name="font-family-sans-ko">FreeSans, Baekmuk Gulim, AR PL UMing CN, Noto Emoji, sans-serif</xsl:param>
+    <xsl:param name="font-family-mono">FreeMono, AR PL UMing CN, Noto Emoji, monospace</xsl:param>
+    <xsl:param name="font-family-mono-ja">FreeMono, IPAMincho, Noto Emoji, monospace</xsl:param>
+    <xsl:param name="font-family-mono-ko">FreeMono, Baekmuk Gulim, Noto Emoji, monospace</xsl:param>
 
     <!--======================================================================
     Attribute Sets
@@ -76,9 +83,11 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="text-align"><xsl:value-of select="$text-align"/></xsl:attribute>
         <xsl:attribute name="font-family">
           <xsl:choose>
-            <xsl:when test="starts-with($language, 'ja')">FreeSans, IPAMincho, AR PL UMing CN, sans-serif</xsl:when>
-            <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">FreeSans, Baekmuk Gulim, AR PL UMing CN, sans-serif</xsl:when>
-            <xsl:otherwise>FreeSans, AR PL UMing CN, sans-serif</xsl:otherwise>
+            <xsl:when test="starts-with($language, 'ja')"><xsl:value-of select="$font-family-sans-ja"/></xsl:when>
+            <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">
+              <xsl:value-of select="$font-family-sans-ko"/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="$font-family-sans"/></xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
         <!-- specified on fo:root to change the properties' initial values -->
@@ -203,9 +212,11 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
         <xsl:attribute name="font-size">0.83em</xsl:attribute>
         <xsl:attribute name="font-family">
           <xsl:choose>
-            <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
-            <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
-            <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+            <xsl:when test="starts-with($language, 'ja')"><xsl:value-of select="$font-family-mono-ja"/></xsl:when>
+            <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">
+              <xsl:value-of select="$font-family-mono-ko"/>
+            </xsl:when>
+            <xsl:otherwise><xsl:value-of select="$font-family-mono"/></xsl:otherwise>
           </xsl:choose>
         </xsl:attribute>
         <xsl:attribute name="white-space">pre</xsl:attribute>
@@ -391,36 +402,44 @@ WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING O
     <xsl:attribute-set name="tt">
       <xsl:attribute name="font-family">
         <xsl:choose>
-          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
-          <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
-          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+          <xsl:when test="starts-with($language, 'ja')"><xsl:value-of select="$font-family-mono-ja"/></xsl:when>
+          <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">
+            <xsl:value-of select="$font-family-mono-ko"/>
+          </xsl:when>
+          <xsl:otherwise><xsl:value-of select="$font-family-mono"/></xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="code">
       <xsl:attribute name="font-family">
         <xsl:choose>
-          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
-          <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
-          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+          <xsl:when test="starts-with($language, 'ja')"><xsl:value-of select="$font-family-mono-ja"/></xsl:when>
+          <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">
+            <xsl:value-of select="$font-family-mono-ko"/>
+          </xsl:when>
+          <xsl:otherwise><xsl:value-of select="$font-family-mono"/></xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="kbd">
       <xsl:attribute name="font-family">
         <xsl:choose>
-          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
-          <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
-          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+          <xsl:when test="starts-with($language, 'ja')"><xsl:value-of select="$font-family-mono-ja"/></xsl:when>
+          <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">
+            <xsl:value-of select="$font-family-mono-ko"/>
+          </xsl:when>
+          <xsl:otherwise><xsl:value-of select="$font-family-mono"/></xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="samp">
       <xsl:attribute name="font-family">
         <xsl:choose>
-          <xsl:when test="starts-with($language, 'ja')">FreeMono, IPAMincho, monospace</xsl:when>
-          <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">FreeMono, Baekmuk Gulim, monospace</xsl:when>
-          <xsl:otherwise>FreeMono, AR PL UMing CN, monospace</xsl:otherwise>
+          <xsl:when test="starts-with($language, 'ja')"><xsl:value-of select="$font-family-mono-ja"/></xsl:when>
+          <xsl:when test="starts-with($language, 'ko') or starts-with($language, 'kr')">
+            <xsl:value-of select="$font-family-mono-ko"/>
+          </xsl:when>
+          <xsl:otherwise><xsl:value-of select="$font-family-mono"/></xsl:otherwise>
         </xsl:choose>
       </xsl:attribute>
     </xsl:attribute-set>

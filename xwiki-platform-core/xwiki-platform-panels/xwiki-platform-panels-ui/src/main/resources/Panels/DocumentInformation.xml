@@ -256,7 +256,7 @@
 : [[$services.localization.render('panels.documentInformation.configureSyntaxes')&gt;&gt;path:$xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'editor=globaladmin&amp;section=Syntaxes')]]
 #end
 ##--------------------------------------------------------------------------
-; (% class="checkbox" %){{html}}
+; {{html}}
 &lt;label for="xhidden"&gt;&lt;input id="xhidden" type="checkbox" name="xhidden" #if($tdoc.isHidden()) checked="checked"#end value="1"/&gt;$services.localization.render('panels.documentInformation.hiddenDocument')&lt;/label&gt;
 &lt;input name="xhidden" type="hidden" value="0" /&gt;
 {{/html}}

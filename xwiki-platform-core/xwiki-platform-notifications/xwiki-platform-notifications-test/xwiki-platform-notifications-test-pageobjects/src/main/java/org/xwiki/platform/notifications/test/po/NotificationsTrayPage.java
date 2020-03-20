@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.xwiki.test.ui.po.BootstrapSwitch;
@@ -167,7 +168,16 @@ public class NotificationsTrayPage extends ViewPage
 
     private void waitUntilNotificationsAreLoaded()
     {
-        getDriver().waitUntilCondition(webDriver -> !notificationsArea.getAttribute(CLASS).contains("loading"));
+        getDriver().waitUntilCondition(webDriver -> {
+            if (!notificationsArea.getAttribute(CLASS).contains("loading")) {
+                try {
+                    getDriver().findElementWithoutWaiting(notificationsArea, By.className("xwiki-async"));
+                } catch (NoSuchElementException e) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 
     private List<WebElement> getNotifications()

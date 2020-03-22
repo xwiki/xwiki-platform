@@ -381,52 +381,51 @@ define('xwiki-ckeditor', [
   var oldReplace = ckeditor.replace;
   ckeditor.replace = function(element, config) {
     // Take into account the configuration options specified on the target element.
-    return oldReplace.call(this, element, ckeditor.tools.extend(getConfig(element), config || {}, true));
+    return oldReplace.call(this, element, ckeditor.tools.extend(getConfig(element), config, true));
   };
 
   var oldInline = ckeditor.inline;
   ckeditor.inline = function(element, config) {
     // Take into account the configuration options specified on the target element.
-    return oldInline.call(this, element, ckeditor.tools.extend(getConfig(element), config || {}, true));
+    return oldInline.call(this, element, ckeditor.tools.extend(getConfig(element), config, true));
   };
 
   //
-  // Add support for configuration namespaces.
+  // Overwrite in order to add support for configuration namespaces.
   //
   ckeditor.tools.extend = function(target) {
     var argsLength = arguments.length, overwrite, propertiesList;
-    if (typeof (overwrite = arguments[argsLength - 1]) == 'boolean') {
+    if (typeof (overwrite = arguments[argsLength - 1]) === 'boolean') {
       argsLength--;
-    } else if (typeof (overwrite = arguments[argsLength - 2]) == 'boolean') {
+    } else if (typeof (overwrite = arguments[argsLength - 2]) === 'boolean') {
       propertiesList = arguments[argsLength - 1];
       argsLength -= 2;
     }
     for (var i = 1; i &lt; argsLength; i++) {
-      var source = arguments[i];
-      extendObject(target, arguments[i], overwrite, propertiesList);
+      var source = arguments[i] || {};
+      ckeditor.tools.array.forEach(ckeditor.tools.object.keys(source), function(propertyName) {
+        // Only copy existing fields if in overwrite mode.
+        if (overwrite === true || target[propertyName] == null) {
+          // Only copy specified fields if list is provided.
+          if (!propertiesList || (propertyName in propertiesList)) {
+            // NOTE: This is the only part we overwrite.
+            setObjectProperty(target, propertyName, source[propertyName]);
+          }
+        }
+      });
     }
     return target;
   };
 
-  var extendObject = function(target, source, overwrite, propertiesList) {
-    for (var propertyName in source) {
-      // Only copy existing fields if in overwrite mode.
-      if (overwrite === true || target[propertyName] == null) {
-        // Only copy specified fields if list is provided.
-        if (!propertiesList || (propertyName in propertiesList)) {
-          extendProperty(target, source, propertyName);
-        }
-      }
+  var setObjectProperty = function(object, key, value) {
+    var oldValue = object[key];
+    var newValue = value;
+    // Merge the old value with the new value if both are objects and the old value is a configuration namespace.
+    if ($.isPlainObject(oldValue) &amp;&amp; oldValue.__namespace === true &amp;&amp; $.isPlainObject(newValue)) {
+      // We don't modify directly the old value because it may be inherited (e.g. global configuration).
+      newValue = ckeditor.tools.extend({}, oldValue, newValue, true);
     }
-  };
-
-  var extendProperty = function(target, source, propertyName) {
-    if ($.isPlainObject(target[propertyName]) &amp;&amp; target[propertyName].__namespace === true &amp;&amp;
-      $.isPlainObject(source[propertyName])) {
-      ckeditor.tools.extend(target[propertyName], source[propertyName], true);
-    } else {
-      target[propertyName] = source[propertyName];
-    }
+    object[key] = newValue;
   };
 
   require([

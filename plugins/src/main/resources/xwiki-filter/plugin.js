@@ -46,12 +46,14 @@
   var hasNonBreakingSpaceIssue = false;
   CKEDITOR.once('instanceCreated', function() {
     // Note that the editor must be visible in order to reproduce the issue. Make sure it doesn't appear on screen.
-    var container = $('<div id="CKEDITOR-323" contenteditable="true"><p>ab c</p></div>').css({
+    var container = $('<div id="CKEDITOR-323"/>').css({
       position: 'fixed',
       top: '-1000px',
-      left: '-1000px'
+      height: '100px',
+      overflow: 'hidden'
     }).appendTo('body');
-    CKEDITOR.inline(container[0], {
+    var textArea = $('<textarea/>').text('<p>ab c</p>').appendTo(container);
+    CKEDITOR.replace(textArea[0], {
       'xwiki-filter': {
         // Check if the problem reproduces without our fix.
         fixNonBreakingSpace: false
@@ -71,7 +73,7 @@
       editor.document.$.execCommand('delete');
       // Destroy the test editor and check the produced HTML.
       editor.destroy();
-      hasNonBreakingSpaceIssue = container.html().indexOf('a&nbsp;c') >= 0;
+      hasNonBreakingSpaceIssue = textArea.val().indexOf('a&nbsp;c') >= 0;
       container.remove();
     // This listener destroys the test editor so make sure it is called last.
     }, null, null, 1000);

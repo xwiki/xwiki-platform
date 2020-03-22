@@ -27,13 +27,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Named;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -64,6 +71,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNotNull;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -103,6 +111,13 @@ public class DefaultNotificationParametersFactoryTest
 
     @MockComponent
     private EntityReferenceResolver<String> entityReferenceResolver;
+
+    @MockComponent
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver;
+
+    @MockComponent
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @MockComponent
     private UsersParameterHandler usersParameterHandler;
@@ -168,6 +183,38 @@ public class DefaultNotificationParametersFactoryTest
 
         when(recordableEventDescriptorManager.getRecordableEventDescriptors(true))
             .thenReturn(recordableEventDescriptors);
+
+        when(relativeEntityReferenceResolver.resolve(isNotNull(), isNotNull()))
+            .thenAnswer(new Answer<EntityReference>() {
+                public EntityReference answer(InvocationOnMock invocation) throws Throwable {
+                    String pageName = invocation.getArgument(0, String.class);
+                    EntityType type = invocation.getArgument(1, EntityType.class);
+                    return new EntityReference(pageName, type);
+                }
+            });
+
+        when(entityReferenceResolver.resolve(isNotNull(), isNotNull(), isNotNull()))
+        .thenAnswer(new Answer<EntityReference>() {
+            public EntityReference answer(InvocationOnMock invocation) throws Throwable {
+                String pageName = invocation.getArgument(0, String.class);
+                EntityType type = invocation.getArgument(1, EntityType.class);
+                EntityReference parent = invocation.getArgument(2, EntityReference.class);
+                return new EntityReference(pageName, type, parent);
+            }
+        });
+
+        when(entityReferenceSerializer.serialize(isNotNull()))
+            .thenAnswer(new Answer<String>() {
+                public String answer(InvocationOnMock invocation) throws Throwable {
+                    EntityReference param = invocation.getArgument(0, EntityReference.class);
+                    EntityReference parent = param.getParent();
+                    if (parent != null) {
+                        assertEquals(EntityType.WIKI, parent.getType());
+                        return parent.getName() + "@@" + param.getName();
+                    }
+                    return param.getName();
+                }
+            });
     }
 
     @Test
@@ -251,27 +298,27 @@ public class DefaultNotificationParametersFactoryTest
 
         List<NotificationFilterPreference> notificationFilterPreferences = new ArrayList<>();
         DefaultNotificationFilterPreference filterPref = getFilterPreference("PAGE", 0);
-        filterPref.setPageOnly("a");
+        filterPref.setPageOnly("mywiki@@a");
         notificationFilterPreferences.add(new ScopeNotificationFilterPreference(filterPref,
             this.entityReferenceResolver));
 
         filterPref = getFilterPreference("PAGE", 1);
-        filterPref.setPageOnly("b");
+        filterPref.setPageOnly("mywiki@@b");
         notificationFilterPreferences.add(new ScopeNotificationFilterPreference(filterPref,
             this.entityReferenceResolver));
 
         filterPref = getFilterPreference("PAGE", 2);
-        filterPref.setPageOnly("c");
+        filterPref.setPageOnly("mywiki@@c");
         notificationFilterPreferences.add(new ScopeNotificationFilterPreference(filterPref,
             this.entityReferenceResolver));
 
         filterPref = getFilterPreference("SPACE", 0);
-        filterPref.setPage("space1");
+        filterPref.setPage("mywiki@@space1");
         notificationFilterPreferences.add(new ScopeNotificationFilterPreference(filterPref,
             this.entityReferenceResolver));
 
         filterPref = getFilterPreference("SPACE", 1);
-        filterPref.setPage("space2");
+        filterPref.setPage("mywiki@@space2");
         notificationFilterPreferences.add(new ScopeNotificationFilterPreference(filterPref,
             this.entityReferenceResolver));
 

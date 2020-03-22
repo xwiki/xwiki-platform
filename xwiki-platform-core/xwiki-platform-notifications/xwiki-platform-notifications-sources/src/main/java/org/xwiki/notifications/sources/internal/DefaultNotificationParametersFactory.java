@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
@@ -39,8 +40,11 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -58,7 +62,6 @@ import org.xwiki.notifications.filters.internal.status.ForUserEventFilter;
 import org.xwiki.notifications.filters.internal.user.OwnEventFilter;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.sources.NotificationParameters;
-import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * This component aims at producing {@link org.xwiki.notifications.sources.NotificationParameters} instances
@@ -82,6 +85,13 @@ public class DefaultNotificationParametersFactory
     private EntityReferenceResolver<String> entityReferenceResolver;
 
     @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
     private NotificationConfiguration configuration;
 
     @Inject
@@ -95,9 +105,6 @@ public class DefaultNotificationParametersFactory
 
     @Inject
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
-
-    @Inject
-    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private UsersParameterHandler usersParameterHandler;
@@ -217,6 +224,7 @@ public class DefaultNotificationParametersFactory
          * This is used in case of multiple wikis.
          */
         // TODO: not sure we should keep it, I put it since it was already in the REST API.
+        // if we are sure we can always get the current wiki from the context, we should do it.
         CURRENT_WIKI(false);
 
         private boolean isDirectlyUsed;
@@ -266,8 +274,8 @@ public class DefaultNotificationParametersFactory
     /**
      * Create a notification parameters with a map of parameters indexed by strings.
      * The keys of the map should be any variant of {@link ParametersKey} names: camel case is accepted.
-     * The {@link NotificationParameters} is created then using {@link #createNotificationParameters(Map)} i
-     * mplementation. This method is mainly provided as a helper in order to be allowed to use this factory with
+     * The {@link NotificationParameters} is created then using {@link #createNotificationParameters(Map)}
+     * implementation. This method is mainly provided as a helper in order to be allowed to use this factory with
      * velocity scripts easily.
      *
      * @param parameters the map of parameters with String as indexes.
@@ -402,24 +410,14 @@ public class DefaultNotificationParametersFactory
             .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toList());
 
         enableAllEventTypes(notificationParameters);
-        handleLocationParameter(parameters.get(ParametersKey.PAGES),
-            notificationParameters, NotificationFilterProperty.PAGE);
-        handleLocationParameter(parameters.get(ParametersKey.SPACES),
-            notificationParameters, NotificationFilterProperty.SPACE);
 
-        String wikis = parameters.get(ParametersKey.WIKIS);
-        String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
-        handleLocationParameter(wikis, notificationParameters, NotificationFilterProperty.WIKI);
-        // When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
-        // other wikis (except if the "wikis" parameter is set).
-        // The concept of the subwiki is to restrict a given domain of interest into a given wiki, this is why it does
-        // not make sense to show events from other wikis in a "timeline" such as the notifications macro.
-        // TODO: add a "handleAllWikis" parameter to disable this behaviour
-        // Note that on the main wiki, which is often a "portal" for all the others wikis, we assure it's OK to display
-        // events from other wikis.
-        if (StringUtils.isBlank(wikis) && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
-            handleLocationParameter(currentWiki, notificationParameters, NotificationFilterProperty.WIKI);
-        }
+        final String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
+        handleLocationParameter(parameters.get(ParametersKey.PAGES),
+            notificationParameters, NotificationFilterProperty.PAGE, currentWiki);
+        handleLocationParameter(parameters.get(ParametersKey.SPACES),
+            notificationParameters, NotificationFilterProperty.SPACE, currentWiki);
+        handleLocationParameter(parameters.get(ParametersKey.WIKIS),
+            notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
 
         usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
 
@@ -437,7 +435,7 @@ public class DefaultNotificationParametersFactory
     }
 
     private void handleLocationParameter(String locations, NotificationParameters parameters,
-        NotificationFilterProperty property)
+        NotificationFilterProperty property, String currentWiki)
     {
         if (StringUtils.isNotBlank(locations)) {
             Set<NotificationFormat> formats = new HashSet<>();
@@ -457,10 +455,10 @@ public class DefaultNotificationParametersFactory
                         pref.setWiki(locationArray[i]);
                         break;
                     case SPACE:
-                        pref.setPage(locationArray[i]);
+                        pref.setPage(makeReferenceAbsolute(locationArray[i], EntityType.SPACE, currentWiki));
                         break;
                     case PAGE:
-                        pref.setPageOnly(locationArray[i]);
+                        pref.setPageOnly(makeReferenceAbsolute(locationArray[i], EntityType.PAGE, currentWiki));
                         break;
                     default:
                         break;
@@ -468,6 +466,28 @@ public class DefaultNotificationParametersFactory
                 parameters.filterPreferences.add(new ScopeNotificationFilterPreference(pref, entityReferenceResolver));
             }
         }
+    }
+
+    /**
+     * add the current wiki to the reference if it is missing an explicit wiki reference.
+     * @param entityRefStr the reference to check
+     * @param entityType the (expected) type of the reference
+     * @param currentWiki the wiki to add to the reference, if missing
+     * @return a string representation if a reference with an explicit wiki
+     */
+    private String makeReferenceAbsolute(String entityRefStr, EntityType entityType, String currentWiki)
+    {
+        if (relativeEntityReferenceResolver == null) {
+            throw new NullPointerException("relativeEntityReferenceResolver");
+        }
+        EntityReference entityRef = relativeEntityReferenceResolver.resolve(entityRefStr, entityType);
+        if (entityRef == null) {
+            throw new NullPointerException("relativeEntityReferenceResolver.resolve(" + entityRefStr + "," + entityType+")");
+        }
+        if (entityRef.extractReference(EntityType.WIKI) == null) {
+            entityRef = entityReferenceResolver.resolve(entityRefStr, entityType, new EntityReference(currentWiki, EntityType.WIKI));
+        }
+        return entityReferenceSerializer.serialize(entityRef);
     }
 
     private void enableAllEventTypes(NotificationParameters parameters) throws EventStreamException

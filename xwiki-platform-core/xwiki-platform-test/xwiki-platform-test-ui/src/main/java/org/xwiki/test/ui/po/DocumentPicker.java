@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -45,11 +46,13 @@ public class DocumentPicker extends BaseElement
     public DocumentPicker()
     {
         this.container = getDriver().findElementByClassName("location-picker");
+        waitUntilReady();
     }
 
     public DocumentPicker(WebElement container)
     {
         this.container = container;
+        waitUntilReady();
     }
 
     public String getTitle()
@@ -148,7 +151,7 @@ public class DocumentPicker extends BaseElement
 
     /**
      * Wait for the Breadcrumb to display the passed path string and throw an exception if the timeout is reached. Note
-     * that we need to wait since the Breadcrumb is udated live and asserting its content without waiting would lead to
+     * that we need to wait since the Breadcrumb is updated live and asserting its content without waiting would lead to
      * false positives.
      * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
@@ -190,7 +193,7 @@ public class DocumentPicker extends BaseElement
 
     /**
      * Wait for the Breadcrumb to display the passed path and throw an exception if the timeout is reached. Note that we
-     * need to wait since the Breadcrumb is udated live and asserting its content without waiting would lead to false
+     * need to wait since the Breadcrumb is updated live and asserting its content without waiting would lead to false
      * positives.
      * <p>
      * Note: This method can not be implemented inside {@link BreadcrumbElement} because a change of parent replaces
@@ -227,5 +230,24 @@ public class DocumentPicker extends BaseElement
             // Display a nicer error message than would be displayed otherwise
             throw new WebDriverException(String.format("Found %s, was expecting %s", currentPath, expectedPath), e);
         }
+    }
+
+    /**
+     * In order to use the document picker we need to wait for the JavaScript code to initialize it (e.g. to add its
+     * event listeners).
+     */
+    private void waitUntilReady()
+    {
+        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
+        {
+            @Override
+            public @Nullable Boolean apply(@Nullable WebDriver driver)
+            {
+                // Wait until the button that opens the document tree picker has at least 2 click listeners.
+                return (Boolean) getDriver()
+                    .executeScript("var trigger = arguments[0].querySelector('.location-action-pick');\n"
+                        + "return jQuery && jQuery._data(trigger, 'events').click.length > 1;", container);
+            }
+        });
     }
 }

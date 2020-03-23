@@ -534,6 +534,16 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# * forcedDenySimple = EDIT/DELETE right is denied for all simple users, simple admins can't force edit/delete
 # extension.xar.protection=warning
 
+#-# [Since 12.2RC and 11.10.4]
+#-# Indicate a list of extension dependencies to ignore
+#-# 
+#-# The default list is:
+# extension.ignoredDependencies=stax:stax
+# extension.ignoredDependencies=javax.xml.stream:stax-api
+# extension.ignoredDependencies=stax:stax-api
+# extension.ignoredDependencies=xalan:xalan
+# extension.ignoredDependencies=xalan:serializer
+
 #-------------------------------------------------------------------------------------
 # Distribution Wizard
 #-------------------------------------------------------------------------------------

@@ -36,47 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.0</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity}}
-#set($userObj = $doc.getObject("XWiki.XWikiUsers"))
-#if(!$userObj)
-  {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
-#else
-  #set($dashboardPrefs = $doc.getObject("Dashboard.UserDashboardPreferencesClass"))
-  #if(!$dashboardPrefs)
-    ## add the object to teh temporary document to reuse the displayer
-    #set($dashboardPrefs = $doc.newObject("Dashboard.UserDashboardPreferencesClass"))
-    ## get the default value of the property that we're interested in
-    #set($dbPrefsClass = $dashboardPrefs.xWikiClass)
-    #set($displayOnMainPageProp = $dbPrefsClass.get('displayOnMainPage'))
-    #set($defaultValue = $displayOnMainPageProp.getProperty('defaultValue').value)
-    #set($ok = $dashboardPrefs.set('displayOnMainPage', $defaultValue ))
-    #if ($xcontext.action == 'edit')
-      #set($ok = $doc.save($services.localization.render('dashboard.initialization.saveMessage')))
-      ## Send the proper event when saving the profile
-      #set ($discard = $xwiki.jsx.use('Dashboard.XWikiUserDashboardSheet'))
-    #end
-  #end
-  {{html clean="false" wiki="true"}}
-  &lt;div class="full column xform"&gt;
-    &lt;div class="userDashboard"&gt;
-      #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-        &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('edit', 'category=dashboard')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.dashboard.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-      #end  
-      &lt;h1&gt;$services.localization.render('platform.dashboard.user.preferences')&lt;/h1&gt;
-      &lt;dl&gt;
-        &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.dashboard.user.displayOnMainPage')&lt;/label&gt;&lt;/dt&gt;
-        &lt;dd&gt;$doc.display('displayOnMainPage', $dashboardPrefs)&lt;/dd&gt;
-      &lt;/dl&gt;
-    &lt;/div&gt;
-  &lt;/div&gt;
-  {{/html}}
-  #if ("$!{request.xpage}" != 'edituser')
-
-    {{dashboard/}}
-  #end
-#end
-{{/velocity}}
-</content>
+  <content/>
   <object>
     <name>Dashboard.XWikiUserDashboardSheet</name>
     <number>0</number>
@@ -299,7 +259,47 @@
       <async_enabled>0</async_enabled>
     </property>
     <property>
-      <content/>
+      <content>{{velocity}}
+      #set($userObj = $doc.getObject("XWiki.XWikiUsers"))
+      #if(!$userObj)
+      {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}
+      #else
+        #set($dashboardPrefs = $doc.getObject("Dashboard.UserDashboardPreferencesClass"))
+        #if(!$dashboardPrefs)
+          ## add the object to teh temporary document to reuse the displayer
+          #set($dashboardPrefs = $doc.newObject("Dashboard.UserDashboardPreferencesClass"))
+          ## get the default value of the property that we're interested in
+          #set($dbPrefsClass = $dashboardPrefs.xWikiClass)
+          #set($displayOnMainPageProp = $dbPrefsClass.get('displayOnMainPage'))
+          #set($defaultValue = $displayOnMainPageProp.getProperty('defaultValue').value)
+          #set($ok = $dashboardPrefs.set('displayOnMainPage', $defaultValue ))
+          #if ($xcontext.action == 'edit')
+      #set($ok = $doc.save($services.localization.render('dashboard.initialization.saveMessage')))
+      ## Send the proper event when saving the profile
+      #set ($discard = $xwiki.jsx.use('Dashboard.XWikiUserDashboardSheet'))
+    #end
+        #end
+      {{html clean="false" wiki="true"}}
+      &lt;div class="full column xform"&gt;
+        &lt;div class="userDashboard"&gt;
+          #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
+            &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('edit', 'category=dashboard')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.dashboard.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
+          #end
+          &lt;h1&gt;$services.localization.render('platform.dashboard.user.preferences')&lt;/h1&gt;
+          &lt;dl&gt;
+            &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.dashboard.user.displayOnMainPage')&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;$doc.display('displayOnMainPage', $dashboardPrefs)&lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      {{/html}}
+        #if ("$!{request.xpage}" != 'edituser')
+
+    {{dashboard/}}
+  #end
+      #end
+      {{/velocity}}
+      </content>
     </property>
     <property>
       <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>

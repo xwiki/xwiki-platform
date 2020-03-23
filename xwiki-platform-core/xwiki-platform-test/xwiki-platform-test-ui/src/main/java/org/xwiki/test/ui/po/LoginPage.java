@@ -22,6 +22,7 @@ package org.xwiki.test.ui.po;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.test.ui.TestUtils;
 
 /**
@@ -44,10 +45,18 @@ public class LoginPage extends ViewPage
     @FindBy(xpath = "//input[@type='submit' and @value='Log-in']")
     private WebElement submitButton;
 
+    private static final LocalDocumentReference LOCAL_DOCUMENT_REFERENCE =
+        new LocalDocumentReference("XWiki", "XWikiLogin");
+
     public static LoginPage gotoPage()
     {
-        getUtil().gotoPage("XWiki", "XWikiLogin", "login");
+        getUtil().gotoPage(LOCAL_DOCUMENT_REFERENCE, "login");
         return new LoginPage();
+    }
+
+    public void assertOnPage()
+    {
+        getUtil().assertOnPage(LOCAL_DOCUMENT_REFERENCE);
     }
 
     public void loginAsAdmin()

@@ -51,8 +51,9 @@ public class NavigationPanelAdministrationIT
         setup.loginAsSuperAdmin();
         // By default the AdminGroup doesn't have "admin" right, so give it since we're going to create the Admin
         // user and make it part of the Admin group and we need that Admin to have "admin" rights.
-        setup.setGlobalRightToWiki("XWiki.XWikiAdminGroup", "", "admin", true);
-        setup.createAdminUserAndLogin();
+        setup.setGlobalRights("XWiki.XWikiAdminGroup", "", "admin", true);
+        setup.createAdminUser();
+        setup.loginAsAdmin();
 
         // Reset the configuration.
         setup.deletePage("PanelsCode", "NavigationConfiguration");

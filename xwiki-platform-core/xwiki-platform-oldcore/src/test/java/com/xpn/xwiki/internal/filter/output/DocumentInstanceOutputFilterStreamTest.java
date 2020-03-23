@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.jupiter.api.Test;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.filter.FilterException;
 import org.xwiki.filter.instance.output.DocumentInstanceOutputProperties;
 import org.xwiki.model.reference.DocumentReference;
@@ -39,6 +40,7 @@ import org.xwiki.rendering.syntax.SyntaxType;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.internal.filter.AbstractInstanceFilterStreamTest;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -516,5 +518,41 @@ public class DocumentInstanceOutputFilterStreamTest extends AbstractInstanceFilt
         try (InputStream stream = attachment.getContentInputStream(null)) {
             assertEquals(expected, IOUtils.toString(stream, StandardCharsets.UTF_8));
         }
+    }
+
+    @Test
+    public void importDocumentWithRevisionsAndPreserveVersion() throws FilterException, XWikiException
+    {
+        DocumentInstanceOutputProperties outputProperties = new DocumentInstanceOutputProperties();
+
+        outputProperties.setVersionPreserved(true);
+        outputProperties.setVerbose(false);
+
+        importFromXML("documentwithrevisions", outputProperties);
+
+        XWikiDocument document = this.oldcore.getSpyXWiki().getDocument(new DocumentReference("wiki", "space", "page"),
+            this.oldcore.getXWikiContext());
+
+        assertFalse(document.isNew());
+
+        assertEquals("42.3", document.getVersion());
+
+        Version[] versions = document.getRevisions(this.oldcore.getXWikiContext());
+
+        assertEquals(3, versions.length);
+
+        XWikiDocumentArchive archive = document.getDocumentArchive(this.oldcore.getXWikiContext());
+
+        XWikiDocument document1 = archive.loadDocument(versions[0], this.oldcore.getXWikiContext());
+
+        assertEquals("42.1", document1.getVersion());
+
+        XWikiDocument document2 = archive.loadDocument(versions[1], this.oldcore.getXWikiContext());
+
+        assertEquals("42.2", document2.getVersion());
+
+        XWikiDocument document3 = archive.loadDocument(versions[2], this.oldcore.getXWikiContext());
+
+        assertEquals("42.3", document3.getVersion());
     }
 }

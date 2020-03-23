@@ -1,0 +1,128 @@
+<wikiFarm>
+  <wiki name="wiki">
+    <wikiSpace name="space">
+      <wikiDocument name="page">
+        <wikiDocumentLocale>
+          <p>
+            <parameters>
+              <entry>
+                <string>creation_author</string>
+                <string>XWiki.creator</string>
+              </entry>
+              <entry>
+                <string>creation_date</string>
+                <date>2000-01-01 00:00:00.0 UTC</date>
+              </entry>
+              <entry>
+                <string>lastrevision</string>
+                <string>42.3</string>
+              </entry>
+            </parameters>
+          </p>
+          <wikiDocumentRevision revision="42.1">
+            <p>
+              <parameters>
+                <entry>
+                  <string>title</string>
+                  <string>title1</string>
+                </entry>
+                <entry>
+                  <string>revision_author</string>
+                  <string>XWiki.author1</string>
+                </entry>
+                <entry>
+                  <string>revision_comment</string>
+                  <string>comment1</string>
+                </entry>
+                <entry>
+                  <string>revision_date</string>
+                  <date>2000-01-01 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>content_author</string>
+                  <string>XWiki.contentAuthor1</string>
+                </entry>
+                <entry>
+                  <string>content_date</string>
+                  <date>2000-01-01 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>content</string>
+                  <string>content1</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiDocumentRevision>
+          <wikiDocumentRevision revision="42.2">
+            <p>
+              <parameters>
+                <entry>
+                  <string>title</string>
+                  <string>title2</string>
+                </entry>
+                <entry>
+                  <string>revision_author</string>
+                  <string>XWiki.author2</string>
+                </entry>
+                <entry>
+                  <string>revision_comment</string>
+                  <string>comment2</string>
+                </entry>
+                <entry>
+                  <string>revision_date</string>
+                  <date>2000-01-02 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>content_author</string>
+                  <string>XWiki.contentAuthor2</string>
+                </entry>
+                <entry>
+                  <string>content_date</string>
+                  <date>2000-01-02 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>content</string>
+                  <string>content2</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiDocumentRevision>
+          <wikiDocumentRevision revision="42.3">
+            <p>
+              <parameters>
+                <entry>
+                  <string>title</string>
+                  <string>title3</string>
+                </entry>
+                <entry>
+                  <string>revision_author</string>
+                  <string>XWiki.author3</string>
+                </entry>
+                <entry>
+                  <string>revision_comment</string>
+                  <string>comment3</string>
+                </entry>
+                <entry>
+                  <string>revision_date</string>
+                  <date>2000-01-03 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>content_author</string>
+                  <string>XWiki.contentAuthor3</string>
+                </entry>
+                <entry>
+                  <string>content_date</string>
+                  <date>2000-01-03 00:00:00.0 UTC</date>
+                </entry>
+                <entry>
+                  <string>content</string>
+                  <string>content3</string>
+                </entry>
+              </parameters>
+            </p>
+          </wikiDocumentRevision>
+        </wikiDocumentLocale>
+      </wikiDocument>
+    </wikiSpace>
+  </wiki>
+</wikiFarm>

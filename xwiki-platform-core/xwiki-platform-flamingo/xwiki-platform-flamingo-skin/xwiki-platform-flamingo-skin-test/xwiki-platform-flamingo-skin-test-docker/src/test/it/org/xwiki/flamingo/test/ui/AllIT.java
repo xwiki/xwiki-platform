@@ -59,7 +59,7 @@ public class AllIT
 
     @Nested
     @DisplayName("Login Tests")
-    class NestedLoginIT extends LoginIT
+    class NestedLoginProtectionIT extends LoginProtectionIT
     {
     }
 

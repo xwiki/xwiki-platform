@@ -71,7 +71,9 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.opentest4j.AssertionFailedError;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.DocumentReference;
@@ -92,11 +94,13 @@ import org.xwiki.rest.resources.objects.ObjectsResource;
 import org.xwiki.rest.resources.pages.PageResource;
 import org.xwiki.rest.resources.pages.PageTranslationResource;
 import org.xwiki.test.integration.XWikiExecutor;
+import org.xwiki.test.ui.po.BasePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
 import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Helper methods for testing, not related to a specific Page Object. Also made available to tests classes.
@@ -188,6 +192,8 @@ public class TestUtils
 
     private static EntityReferenceResolver<String> referenceResolver;
 
+    private static EntityReferenceSerializer<String> localReferenceSerializer;
+
     /**
      * Used to convert Java object into its REST XML representation.
      */
@@ -269,6 +275,8 @@ public class TestUtils
             TestUtils.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING, "relative");
         TestUtils.referenceResolver = TestUtils.componentManager.getInstance(EntityReferenceResolver.TYPE_STRING);
         TestUtils.referenceSerializer = TestUtils.componentManager.getInstance(EntityReferenceSerializer.TYPE_STRING);
+        TestUtils.localReferenceSerializer = TestUtils.componentManager.getInstance(
+            new DefaultParameterizedType(null, EntityReferenceSerializer.class, String.class), "local");
     }
 
     public XWikiWebDriver getDriver()
@@ -384,9 +392,9 @@ public class TestUtils
             String destUrl = getURL("XWiki", "Register", "register");
             getDriver().get(getURLToLoginAndGotoPage(username, password, destUrl));
 
-            if (checkLoginSuccess && !destUrl.equals(getDriver().getCurrentUrl())) {
-                throw
-                    new RuntimeException(String.format("Login failed with credentials: %s / %s.", username, password));
+            if (checkLoginSuccess && !getDriver().getCurrentUrl().startsWith(destUrl)) {
+                throw new RuntimeException(
+                    String.format("Login failed with credentials: %s / %s.", username, password));
             }
             recacheSecretTokenWhenOnRegisterPage();
             if (pageURL != null) {
@@ -542,7 +550,7 @@ public class TestUtils
      *
      * @since 12.2RC1
      */
-    public void createAdminUserAndLogin()
+    public void createAdminUser()
     {
         createUser(ADMIN_CREDENTIALS.getUserName(), ADMIN_CREDENTIALS.getPassword(), null);
         addObject("XWiki", "XWikiAdminGroup", "XWiki.XWikiGroups", "member", "XWiki.Admin");
@@ -560,11 +568,36 @@ public class TestUtils
      * @param enabled true if the rights should be allowed, false if they should be disabled
      * @since 12.2RC1
      */
-    public void setGlobalRightToWiki(String groups, String users, String rights, boolean enabled)
+    public void setGlobalRights(String groups, String users, String rights, boolean enabled)
+    {
+        EntityReference xwikiPreferencesReference = new EntityReference("XWikiPreferences", EntityType.DOCUMENT,
+            new EntityReference("XWiki", EntityType.SPACE));
+        setRights(xwikiPreferencesReference, "XWiki.XWikiGlobalRights", groups, users, rights, enabled);
+    }
+
+    /**
+     * Add or update a {@code XWikiRights} xobject to the document specified in the passed entity reference.
+     *
+     * @param entityReference the reference to the document for which to set rights for
+     * @param groups the comma-separated list of groups that will have the rights (e.g. {@code XWiki.XWikiAdminGroup}.
+     *               Can be empty or null
+     * @param users the comma-separated list of users that will have the rights (e.g. {@code XWiki.Admin}. Can be
+     *              empty of null
+     * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
+     * @param enabled true if the rights should be allowed, false if they should be disabled
+     * @since 12.2RC1
+     */
+    public void setRights(EntityReference entityReference, String groups, String users, String rights, boolean enabled)
+    {
+        setRights(entityReference, "XWiki.XWikiRights", groups, users, rights, enabled);
+    }
+
+    private void setRights(EntityReference entityReference, String rightClassName, String groups, String users,
+        String rights, boolean enabled)
     {
         String normalizedUsers = users == null ? "" : users;
         String normalizedGroups = groups == null ? "" : groups;
-        addObject("XWiki", "XWikiPreferences", "XWiki.XWikiGlobalRights", "groups", normalizedGroups, "levels", rights,
+        addObject(entityReference, rightClassName, "groups", normalizedGroups, "levels", rights,
             "users", normalizedUsers, "allow", enabled ? "1" : "0");
     }
 
@@ -991,6 +1024,14 @@ public class TestUtils
     }
 
     /**
+     * @since 12.2RC1
+     */
+    public String getURL(EntityReference reference)
+    {
+        return getURL(reference, "view", "");
+    }
+
+    /**
      * @since 7.2M2
      */
     public String getURL(EntityReference reference, String action, String queryString)
@@ -1340,6 +1381,23 @@ public class TestUtils
     public boolean isInAdminMode()
     {
         return getDriver().getCurrentUrl().contains("/admin/");
+    }
+
+    /**
+     * Verify if the passed reference corresponds to the current page, independently of the wiki.
+     * Throws an {@link AssertionFailedError} if it's not the case.
+     *
+     * @param reference the reference to the document to check
+     * @since 12.2RC1
+     */
+    public void assertOnPage(EntityReference reference)
+    {
+        if (EntityType.DOCUMENT.equals(reference.getType())) {
+            BasePage bp = new BasePage();
+            assertEquals(localReferenceSerializer.serialize(reference), bp.getMetaDataValue("document"));
+        } else {
+            throw new IllegalArgumentException("You should pass a reference to a document");
+        }
     }
 
     /**

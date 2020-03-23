@@ -19,96 +19,186 @@
  */
 package org.xwiki.flamingo.test.ui;
 
-import java.util.Arrays;
-
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.administration.test.po.GlobalRightsAdministrationSectionPage;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.junit.LogCaptureConfiguration;
-import org.xwiki.test.integration.junit.LogCaptureValidator;
 import org.xwiki.test.ui.TestUtils;
+import org.xwiki.test.ui.XWikiWebDriver;
 import org.xwiki.test.ui.po.LoginPage;
+import org.xwiki.test.ui.po.ResubmissionPage;
+import org.xwiki.test.ui.po.ViewPage;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Test related to login form on flamingo skin.
+ * Test the Login feature.
  *
  * @version $Id$
- * @since 11.6RC1
+ * @since 2.3M1
  */
-@UITest
+@UITest(servletEngine = ServletEngine.EXTERNAL,
+    properties = {
+        // The RightsManagerPlugin is needed to change rights in the UI
+        "xwikiCfgPlugins=com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin"
+    }
+)
 public class LoginIT
 {
-    private static DocumentReference AUTHENTICATION_CONFIGURATION =
-        new DocumentReference("xwiki", Arrays.asList("XWiki", "Authentication"), "Configuration");
-
     @BeforeAll
-    public void setup(TestUtils setup)
+    static void beforeAll(TestUtils setup, XWikiWebDriver driver)
     {
-        setup.createPage(AUTHENTICATION_CONFIGURATION, "");
-        setup.addObject(AUTHENTICATION_CONFIGURATION, "XWiki.Authentication.ConfigurationClass",
-            "failureStrategy", "captcha",
-            "maxAuthorizedAttempts", 3,
-            "timeWindowAttempts", 300);
+        // By default the minimal distribution used for the tests doesn't have any rights setup. For this test class
+        // we'll need:
+        // - Make sure that only authenticated users can edit/save content (for test dataIsPreservedAfterLogin below).
+        // - Create an Admin user part of the Admin Group and make sure that this Admin Group has admin rights in the
+        //   wiki. We could also have given that Admin user the admin right directly but the solution we chose is closer
+        //   to the XS distribution.
+        setup.loginAsSuperAdmin();
+        setup.setGlobalRights("XWiki.XWikiAllGroup", "", "edit", true);
+        setup.setGlobalRights("XWiki.XWikiAdminGroup", "", "admin", true);
+        setup.createAdminUser();
     }
 
-    @AfterAll
-    public void tearDown(TestUtils setup)
+    @Test
+    @Order(1)
+    void loginLogoutAsAdmin(TestUtils setup, TestReference testReference)
     {
-        setup.deletePage(AUTHENTICATION_CONFIGURATION);
+        // Go to any page in view mode. We choose to go to a non-existing page so that it loads as fast as possible
+        // Note: since the page doesn't exist, we need to disable the space redirect feature so that we end up on the
+        // terminal page and not on WebHome in the space.
+        setup.deletePage(testReference);
+        setup.gotoPage(testReference, "view", "spaceRedirect=false");
+
+        // Force log out (we're using the fast way since this is not part of what we want to test)
+        setup.forceGuestUser();
+
+        // Test the click on the login button in the UI and log in as Admin
+        ViewPage vp = new ViewPage();
+        LoginPage loginPage = vp.login();
+        loginPage.loginAsAdmin();
+
+        // Verify that after logging in we're redirected to the page on which the login button was clicked, i.e. the
+        // non existent page here.
+        setup.assertOnPage(testReference);
+        assertTrue(vp.isAuthenticated());
+
+        // Also verify that we display the logged-in user name in the UI (in the drawer menu)
+        assertEquals("Admin", vp.getCurrentUser());
+
+        // Test Logout and verify we stay on the same page
+        vp.logout();
+        assertFalse(vp.isAuthenticated());
+        setup.assertOnPage(testReference);
+    }
+
+    @Test
+    @Order(2)
+    void loginWithInvalidCredentials(LogCaptureConfiguration logCaptureConfiguration)
+    {
+        LoginPage.gotoPage();
+        LoginPage loginPage = new LoginPage();
+        loginPage.loginAs("Admin", "wrong password");
+        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        logCaptureConfiguration.registerExpected("Authentication failure with login [Admin]");
+
+        loginPage.loginAs("non existent user", "admin");
+        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
+        logCaptureConfiguration.registerExpected("Authentication failure with login [non existent user]");
     }
 
     /**
-     * Ensure that the repeated authentication failure mechanism is triggered.
+     * Verify that the initial URL is not lost after logging in when the session has expired.
+     * See XWIKI-5317.
      */
     @Test
-    public void repeatedAuthenticationFailure(TestUtils setup, TestInfo testInfo, TestReference testReference,
+    @Order(3)
+    void redirectBackAfterLogin(TestUtils setup, XWikiWebDriver driver, TestReference testReference)
+    {
+        try {
+            // Test setup: disallow view right for unauthenticated users. Note that we use the UI to perform this
+            // since this allows us to verify that the UI works.
+            setup.loginAsAdmin();
+            GlobalRightsAdministrationSectionPage grasp = GlobalRightsAdministrationSectionPage.gotoPage();
+            grasp.forceAuthenticatedView();
+
+            // Go to a page, log out and expire session by removing cookies, log in again and verify that the user is
+            // redirected to the initial page.
+            setup.deletePage(testReference);
+            ViewPage page = setup.gotoPage(testReference);
+            page.logout();
+            // Since view is disallowed for unauthenticated users, at this point we see a log in page.
+            LoginPage loginPage = new LoginPage();
+            loginPage.assertOnPage();
+            // Remove all cookies to simulate a session expiry
+            driver.manage().deleteAllCookies();
+
+            // Log in again and verify we're redirected to the right page.
+            loginPage.loginAsAdmin();
+            setup.assertOnPage(testReference);
+        } finally {
+            // Make sure we're logged-in since the test could fail when we're not logged in and we need to be admin
+            // to go to the Rights UI.
+            setup.loginAsAdmin();
+            GlobalRightsAdministrationSectionPage grasp = GlobalRightsAdministrationSectionPage.gotoPage();
+            grasp.unforceAuthenticatedView();
+        }
+    }
+
+    @Test
+    @Order(4)
+    void correctUrlIsAccessedAfterLogin(TestUtils setup, TestReference testReference)
+    {
+        // Create a page that can only be viewed by logged-in users
+        setup.deletePage(testReference);
+        setup.createPage(testReference, "whatever");
+        setup.setRights(testReference, "XWiki.XWikiAllGroup", "", "view", true);
+        setup.forceGuestUser();
+
+        // Navigate to it and verify we're asked to log in and that we're not logged-in.
+        setup.gotoPage(testReference);
+        LoginPage loginPage = new LoginPage();
+        loginPage.assertOnPage();
+        assertFalse(loginPage.isAuthenticated());
+
+        // Log in
+        loginPage.loginAsAdmin();
+
+        // We should be redirected back to the page. Verify we're on the right page.
+        setup.assertOnPage(testReference);
+    }
+
+    @Test
+    @Order(5)
+    void dataIsPreservedAfterLogin(TestUtils setup, TestReference testReference,
         LogCaptureConfiguration logCaptureConfiguration)
     {
-        // fixture:
-        // create login and fails login with it: we don't want Admin to be blocked for authentication in
-        // further tests.
-        String username = testInfo.getTestMethod().get().getName();
-        String password = testInfo.getTestMethod().get().getName();
-
-        // We don't need to be logged in for that.
+        // Force guest user so that the save will redirect to the login page
         setup.forceGuestUser();
-        setup.createUser(username, password, setup.getBaseURL());
-        LoginPage loginPage = LoginPage.gotoPage();
+        setup.createPage(testReference, "some content");
+        LoginPage loginPage = new LoginPage();
+        loginPage.assertOnPage();
 
-        // first wrong auth
-        loginPage.loginAs(username, "foo");
-        loginPage = new LoginPage();
-        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
-        assertFalse(loginPage.hasCaptchaErrorMessage());
+        // Now login
+        loginPage.loginAsAdmin();
 
-        // second wrong auth
-        loginPage.loginAs(username, "foo");
-        loginPage = new LoginPage();
-        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
-        assertFalse(loginPage.hasCaptchaErrorMessage());
+        // Since we switched user (from guest to Admin), the CSRF protection will ask for confirmation
+        ResubmissionPage resubmissionPage = new ResubmissionPage();
+        resubmissionPage.resubmit();
 
-        // third wrong auth: captcha is triggered
-        loginPage.loginAs(username, "foo");
-        loginPage = new LoginPage();
-        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
-        assertTrue(loginPage.hasCaptchaErrorMessage());
-        assertTrue(loginPage.hasCaptchaChallenge());
+        // Verify that the page we tried to create is now created (thanks to the automatic redirect) with the proper
+        // content.
+        ViewPage viewPage = new ViewPage();
+        setup.assertOnPage(testReference);
+        assertEquals("some content", viewPage.getContent());
 
-        // fourth good auth: captcha is still triggered
-        loginPage.loginAs(username, password);
-        loginPage = new LoginPage();
-        assertTrue(loginPage.hasInvalidCredentialsErrorMessage());
-        assertTrue(loginPage.hasCaptchaErrorMessage());
-        assertTrue(loginPage.hasCaptchaChallenge());
-
-        logCaptureConfiguration.registerExpected(
-            "Authentication failure with login [repeatedAuthenticationFailure]");
+        // Since we got a CSRF warning, we expect it to be in the logs too.
+        logCaptureConfiguration.registerExpected("CSRFToken: Secret token verification failed, token:");
     }
 }

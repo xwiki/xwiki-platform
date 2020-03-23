@@ -21,7 +21,9 @@ package com.xpn.xwiki.test;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,6 +38,7 @@ import org.hibernate.cfg.Configuration;
 import org.mockito.internal.util.MockUtil;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.suigeneris.jrcs.rcs.Version;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
@@ -76,6 +79,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -145,6 +150,8 @@ public class MockitoOldcore
     private WikiDescriptorManager wikiDescriptorManager;
 
     protected Map<DocumentReference, XWikiDocument> documents = new ConcurrentHashMap<>();
+
+    protected Map<DocumentReference, XWikiDocumentArchive> documentArchives = new ConcurrentHashMap<>();
 
     private boolean notifyDocumentCreatedEvent;
 
@@ -539,23 +546,98 @@ public class MockitoOldcore
         }).when(getSpyXWiki()).saveDocument(anyXWikiDocument(), any(String.class), anyBoolean(), anyXWikiContext());
         doNothing().when(getSpyXWiki()).checkSavingDocument(any(DocumentReference.class), anyXWikiDocument(),
             any(String.class), anyBoolean(), anyXWikiContext());
+
+        // XWikiVersioningStoreInterface
+
+        when(getMockVersioningStore().getXWikiDocumentArchive(anyXWikiDocument(), anyXWikiContext()))
+            .then(new Answer<XWikiDocumentArchive>()
+            {
+                @Override
+                public XWikiDocumentArchive answer(InvocationOnMock invocation) throws Throwable
+                {
+                    XWikiDocument document = invocation.getArgument(0);
+
+                    // The store is based on the context for the wiki
+                    DocumentReference reference = document.getDocumentReferenceWithLocale();
+
+                    XWikiDocumentArchive archiveDoc = documentArchives.get(reference);
+
+                    if (archiveDoc == null) {
+                        XWikiContext xcontext = invocation.getArgument(1);
+                        String db = xcontext.getWikiId();
+                        try {
+                            if (reference.getWikiReference().getName() != null) {
+                                xcontext.setWikiId(reference.getWikiReference().getName());
+                            }
+                            archiveDoc = new XWikiDocumentArchive(document.getId());
+                            document.setDocumentArchive(archiveDoc);
+                            documentArchives.put(reference, archiveDoc);
+                        } finally {
+                            xcontext.setWikiId(db);
+                        }
+                    }
+
+                    return archiveDoc;
+                }
+            });
+        when(getMockVersioningStore().getXWikiDocVersions(anyXWikiDocument(), anyXWikiContext()))
+            .then(new Answer<Version[]>()
+            {
+                @Override
+                public Version[] answer(InvocationOnMock invocation) throws Throwable
+                {
+                    XWikiDocumentArchive archive = getMockVersioningStore()
+                        .getXWikiDocumentArchive(invocation.getArgument(0), invocation.getArgument(1));
+
+                    if (archive == null) {
+                        return new Version[0];
+                    }
+                    Collection<XWikiRCSNodeInfo> nodes = archive.getNodes();
+                    Version[] versions = new Version[nodes.size()];
+                    Iterator<XWikiRCSNodeInfo> it = nodes.iterator();
+                    for (int i = 0; i < versions.length; i++) {
+                        XWikiRCSNodeInfo node = it.next();
+                        versions[versions.length - 1 - i] = node.getId().getVersion();
+                    }
+
+                    return versions;
+                }
+            });
         doAnswer(new Answer<Void>()
         {
             @Override
             public Void answer(InvocationOnMock invocation) throws Throwable
             {
                 XWikiDocument document = invocation.getArgument(0);
+                XWikiContext xcontext = invocation.getArgument(2);
 
-                documents.remove(document.getDocumentReferenceWithLocale());
-
-                if (notifyDocumentDeletedEvent) {
-                    getObservationManager().notify(new DocumentDeletedEvent(document.getDocumentReference()), document,
-                        getXWikiContext());
-                }
+                XWikiDocumentArchive archiveDoc = getMockVersioningStore().getXWikiDocumentArchive(document, xcontext);
+                archiveDoc.updateArchive(document, document.getAuthor(), document.getDate(), document.getComment(),
+                    document.getRCSVersion(), xcontext);
+                document.setRCSVersion(archiveDoc.getLatestVersion());
 
                 return null;
             }
-        }).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
+        }).when(getMockVersioningStore()).updateXWikiDocArchive(any(), anyBoolean(), any());
+
+        // XWiki
+
+        doAnswer(new Answer<XWikiDocument>()
+        {
+            @Override
+            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiDocument doc = invocation.getArgument(0);
+                String revision = invocation.getArgument(1);
+
+                if (StringUtils.equals(revision, doc.getVersion())) {
+                    return doc;
+                }
+
+                // TODO: implement version store mocking
+                return new XWikiDocument(doc.getDocumentReference());
+            }
+        }).when(getSpyXWiki()).getDocument(anyXWikiDocument(), any(), anyXWikiContext());
         doNothing().when(getSpyXWiki()).checkDeletingDocument(any(DocumentReference.class), anyXWikiDocument(),
             anyXWikiContext());
         doAnswer(new Answer<BaseClass>()

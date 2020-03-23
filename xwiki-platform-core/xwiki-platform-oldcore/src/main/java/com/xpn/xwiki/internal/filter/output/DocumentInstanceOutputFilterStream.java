@@ -49,6 +49,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
 /**
  * @version $Id$
@@ -93,6 +94,8 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     @Inject
     private Logger logger;
 
+    private boolean firstVersion;
+
     private FilterEventParameters currentLocaleParameters;
 
     private FilterEventParameters currentRevisionParameters;
@@ -129,6 +132,9 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     {
         this.currentLocaleParameters = parameters;
         this.currentRevisionParameters = parameters;
+
+        // Init the first version marker
+        this.firstVersion = true;
     }
 
     @Override
@@ -139,6 +145,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
         // Reset
         this.currentRevisionParameters = null;
         this.currentLocaleParameters = null;
+        this.firstVersion = false;
     }
 
     @Override
@@ -146,6 +153,9 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
     {
         this.currentLocaleParameters = parameters;
         this.currentRevisionParameters = parameters;
+
+        // Init the first version marker
+        this.firstVersion = true;
     }
 
     @Override
@@ -156,6 +166,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
         // Reset
         this.currentRevisionParameters = null;
         this.currentLocaleParameters = null;
+        this.firstVersion = false;
     }
 
     @Override
@@ -182,6 +193,8 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             return;
         }
 
+        boolean hasJRCSHistory = inputDocument.getDocumentArchive() != null;
+
         XWikiContext xcontext = this.xcontextProvider.get();
 
         try {
@@ -195,12 +208,12 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
             databaseDocument.loadAttachmentsContentSafe(xcontext);
 
             XWikiDocument document;
-            if (this.properties.isPreviousDeleted()) {
+            if (this.firstVersion && this.properties.isPreviousDeleted()) {
                 // We want to replace the existing document
                 document = inputDocument;
 
                 // But it's still an update from outside world point of view
-                inputDocument.setOriginalDocument(databaseDocument);
+                document.setOriginalDocument(databaseDocument);
             } else {
                 // Safer to clone for thread safety and in case the save fail
                 document = databaseDocument.clone();
@@ -253,6 +266,16 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
                 xcontext.getWiki().saveDocument(document, inputDocument.getComment(), inputDocument.isMinorEdit(),
                     xcontext);
+
+                if (!hasJRCSHistory) {
+                    // Not a JRCS based history document
+                    // Explicitly update the history because the store won't do it automatically (because
+                    // metadata/content dirty is false)
+                    XWikiVersioningStoreInterface versioningStore = document.getVersioningStore(xcontext);
+                    if (versioningStore != null) {
+                        versioningStore.updateXWikiDocArchive(document, true, xcontext);
+                    }
+                }
             } else {
                 // Forget the input history to let the store do its standard job
                 document.setDocumentArchive((XWikiDocumentArchive) null);

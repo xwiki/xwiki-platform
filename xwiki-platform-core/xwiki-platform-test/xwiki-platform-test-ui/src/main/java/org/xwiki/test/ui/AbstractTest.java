@@ -38,6 +38,7 @@ import org.xwiki.model.internal.reference.DefaultEntityReferenceProvider;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceResolver;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
+import org.xwiki.model.internal.reference.LocalStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.RelativeStringEntityReferenceResolver;
 import org.xwiki.test.integration.XWikiExecutor;
 import org.xwiki.test.integration.junit4.ValidateConsoleRule;
@@ -102,6 +103,7 @@ public abstract class AbstractTest
         componentDeclarations.add(new ComponentDeclaration(DefaultEntityReferenceProvider.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultModelConfiguration.class.getName()));
         componentDeclarations.add(new ComponentDeclaration(DefaultSymbolScheme.class.getName()));
+        componentDeclarations.add(new ComponentDeclaration(LocalStringEntityReferenceSerializer.class.getName()));
         loader.initialize(AbstractTest.componentManager, AbstractTest.class.getClassLoader(), componentDeclarations);
 
         TestUtils.initializeComponent(AbstractTest.componentManager);

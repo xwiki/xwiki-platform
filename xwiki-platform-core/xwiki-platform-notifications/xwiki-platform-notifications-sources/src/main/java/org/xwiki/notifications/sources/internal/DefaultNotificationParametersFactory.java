@@ -62,6 +62,7 @@ import org.xwiki.notifications.filters.internal.status.ForUserEventFilter;
 import org.xwiki.notifications.filters.internal.user.OwnEventFilter;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.sources.NotificationParameters;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * This component aims at producing {@link org.xwiki.notifications.sources.NotificationParameters} instances
@@ -105,6 +106,9 @@ public class DefaultNotificationParametersFactory
 
     @Inject
     private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @Inject
     private UsersParameterHandler usersParameterHandler;
@@ -416,8 +420,23 @@ public class DefaultNotificationParametersFactory
             notificationParameters, NotificationFilterProperty.PAGE, currentWiki);
         handleLocationParameter(parameters.get(ParametersKey.SPACES),
             notificationParameters, NotificationFilterProperty.SPACE, currentWiki);
-        handleLocationParameter(parameters.get(ParametersKey.WIKIS),
+
+        String wikis = parameters.get(ParametersKey.WIKIS);
+        handleLocationParameter(wikis,
             notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
+
+        // When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
+        // other wikis (except if the "wikis" parameter is set).
+        // The concept of the subwiki is to restrict a given domain of interest into a given wiki, this is why it does
+        // not make sense to show events from other wikis in a "timeline" such as the notifications macro.
+        // TODO: add a "handleAllWikis" parameter to disable this behaviour
+        // Note that on the main wiki, which is often a "portal" for all the others wikis, we assure it's OK to display
+        // events from other wikis.
+        if (StringUtils.isBlank(wikis) && StringUtils.isBlank(parameters.get(ParametersKey.PAGES)) && StringUtils.isBlank(parameters.get(ParametersKey.SPACES))
+            && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
+            handleLocationParameter(currentWiki,
+                notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
+        }
 
         usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
 
@@ -477,13 +496,10 @@ public class DefaultNotificationParametersFactory
      */
     private String makeReferenceAbsolute(String entityRefStr, EntityType entityType, String currentWiki)
     {
-        if (relativeEntityReferenceResolver == null) {
-            throw new NullPointerException("relativeEntityReferenceResolver");
+        if (StringUtils.isBlank(currentWiki)) {
+            return entityRefStr;
         }
         EntityReference entityRef = relativeEntityReferenceResolver.resolve(entityRefStr, entityType);
-        if (entityRef == null) {
-            throw new NullPointerException("relativeEntityReferenceResolver.resolve(" + entityRefStr + "," + entityType+")");
-        }
         if (entityRef.extractReference(EntityType.WIKI) == null) {
             entityRef = entityReferenceResolver.resolve(entityRefStr, entityType, new EntityReference(currentWiki, EntityType.WIKI));
         }

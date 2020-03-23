@@ -57,17 +57,6 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- TODO: Remove once we upgrade slf4j in the top level commons pom -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-    </dependency>
-    <!-- TODO: Remove once we upgrade commons compress in the top level commons pom -->
-   <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-compress</artifactId>
-      <version>1.20</version>
-    </dependency>
     <!-- Replace the version triggered by testcontainers by a more accurate one -->
     <dependency>
       <groupId>jakarta.xml.bind</groupId>

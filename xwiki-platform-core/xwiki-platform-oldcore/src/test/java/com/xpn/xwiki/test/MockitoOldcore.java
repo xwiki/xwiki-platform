@@ -230,11 +230,12 @@ public class MockitoOldcore
         this.mockGroupService = mock(XWikiGroupService.class);
 
         doReturn(new Configuration()).when(this.mockHibernateStore).getConfiguration();
-        doReturn(this.mockXWikiHibernateStore).when(this.spyXWiki).getStore();
-        doReturn(this.mockXWikiHibernateStore).when(this.spyXWiki).getHibernateStore();
-        doReturn(this.mockVersioningStore).when(this.spyXWiki).getVersioningStore();
-        doReturn(this.mockRightService).when(this.spyXWiki).getRightService();
-        doReturn(this.mockGroupService).when(this.spyXWiki).getGroupService(getXWikiContext());
+
+        this.spyXWiki.setStore(this.mockXWikiHibernateStore);
+        this.spyXWiki.setVersioningStore(this.mockVersioningStore);
+        this.spyXWiki.setRightService(this.mockRightService);
+        this.spyXWiki.setAuthService(this.mockAuthService);
+        this.spyXWiki.setGroupService(this.mockGroupService);
 
         // We need to initialize the Component Manager so that the components can be looked up
         getXWikiContext().put(ComponentManager.class.getName(), getMocker());

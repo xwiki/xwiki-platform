@@ -110,17 +110,18 @@ public class XWikiServletContextListener implements ServletContextListener
             throw new RuntimeException("Failed to find the Observation Manager component", e);
         }
 
-        // Now that the Application Context is set up, send the Component instance creation events we had stacked up.
-        eventManager.setObservationManager(observationManager);
-        eventManager.shouldStack(false);
-        eventManager.flushEvents();
-
         // Make sure installed extensions are initialized before sending ApplicationStartedEvent
         try {
             this.componentManager.getInstance(ExtensionInitializer.class);
         } catch (ComponentLookupException e) {
             throw new RuntimeException("Failed to initialize installed extensions", e);
         }
+
+        // Now that the Application Context is set up and the component are registered, send the Component instance
+        // creation events we had stacked up.
+        eventManager.setObservationManager(observationManager);
+        eventManager.shouldStack(false);
+        eventManager.flushEvents();
 
         // Indicate to the various components that XWiki is ready
         observationManager.notify(new ApplicationStartedEvent(), this);

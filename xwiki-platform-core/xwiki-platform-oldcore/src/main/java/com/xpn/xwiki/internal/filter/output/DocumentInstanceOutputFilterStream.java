@@ -182,6 +182,7 @@ public class DocumentInstanceOutputFilterStream extends AbstractBeanOutputFilter
 
         // Reset
         this.currentRevisionParameters = null;
+        this.firstVersion = false;
     }
 
     private void maybeSaveDocument() throws FilterException

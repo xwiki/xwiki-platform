@@ -239,17 +239,22 @@ public class DocumentPicker extends BaseElement
     private void waitUntilReady()
     {
         StringBuilder script = new StringBuilder();
-        // This is the icon used to open the document tree modal. It should be present all the time.
+        // This is the icon used to open the document tree modal. It is available only if the document tree is
+        // available.
         script.append("var pickAction = arguments[0].querySelector('.location-action-pick');\n");
         // This is the icon used to toggle the advanced edit form. It is available only for advanced users.
         script.append("var editAction = arguments[0].querySelector('.location-action-edit');\n");
         // At the moment there's no better way to tell if the picker is ready than counting the registered listeners.
         script.append("var countClickListeners = function(element) {\n");
-        // This is internal jQuery API but we'll notice if they change it: the test will fail. 
-        script.append("  return jQuery._data(element, 'events').click.length;\n");
+        script.append("  if (window.jQuery) {\n");
+        // This is internal jQuery API but we'll notice if they change it: the test will fail.
+        script.append("    return jQuery._data(element, 'events').click.length;\n");
+        script.append("  } else {\n");
+        script.append("    return 0;\n");
+        script.append("  }\n");
         script.append("};\n");
-        // Wait for jQuery to be loaded and for the pick action to have at least 2 click listeners registered.
-        script.append("return window.jQuery && pickAction && countClickListeners(pickAction) > 1 &&");
+        // If the pick action is present then we need to wait for it to have at least 2 click listeners registered.
+        script.append("return (!pickAction || countClickListeners(pickAction) > 1) &&\n");
         // If the advanced edit action is present then we need to also wait for it to have at least 1 click listener.
         script.append("  (!editAction || countClickListeners(editAction) > 0);");
 

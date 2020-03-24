@@ -72,7 +72,6 @@ public class XWikiDocumentArchive
     /** @param id = {@link XWikiDocument#getId()} */
     public XWikiDocumentArchive(long id)
     {
-        this();
         setId(id);
     }
 

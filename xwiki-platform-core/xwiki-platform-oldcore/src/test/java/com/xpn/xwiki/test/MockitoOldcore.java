@@ -546,6 +546,46 @@ public class MockitoOldcore
         }).when(getSpyXWiki()).saveDocument(anyXWikiDocument(), any(String.class), anyBoolean(), anyXWikiContext());
         doNothing().when(getSpyXWiki()).checkSavingDocument(any(DocumentReference.class), anyXWikiDocument(),
             any(String.class), anyBoolean(), anyXWikiContext());
+        doAnswer(new Answer<Void>()
+        {
+            @Override
+            public Void answer(InvocationOnMock invocation) throws Throwable
+            {
+                XWikiDocument document = invocation.getArgument(0);
+
+                documents.remove(document.getDocumentReferenceWithLocale());
+
+                if (notifyDocumentDeletedEvent) {
+                    getObservationManager().notify(new DocumentDeletedEvent(document.getDocumentReference()), document,
+                        getXWikiContext());
+                }
+
+                return null;
+            }
+        }).when(getSpyXWiki()).deleteDocument(anyXWikiDocument(), any(Boolean.class), anyXWikiContext());
+        doNothing().when(getSpyXWiki()).checkDeletingDocument(any(DocumentReference.class), anyXWikiDocument(),
+            anyXWikiContext());
+        doAnswer(new Answer<BaseClass>()
+        {
+            @Override
+            public BaseClass answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getSpyXWiki()
+                    .getDocument((DocumentReference) invocation.getArguments()[0], invocation.getArgument(1))
+                    .getXClass();
+            }
+        }).when(getSpyXWiki()).getXClass(any(DocumentReference.class), anyXWikiContext());
+        doAnswer(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return getXWikiContext().getLanguage();
+            }
+        }).when(getSpyXWiki()).getLanguagePreference(anyXWikiContext());
+
+        getXWikiContext().setLocale(Locale.ENGLISH);
+
 
         // XWikiVersioningStoreInterface
 
@@ -619,47 +659,6 @@ public class MockitoOldcore
                 return null;
             }
         }).when(getMockVersioningStore()).updateXWikiDocArchive(any(), anyBoolean(), any());
-
-        // XWiki
-
-        doAnswer(new Answer<XWikiDocument>()
-        {
-            @Override
-            public XWikiDocument answer(InvocationOnMock invocation) throws Throwable
-            {
-                XWikiDocument doc = invocation.getArgument(0);
-                String revision = invocation.getArgument(1);
-
-                if (StringUtils.equals(revision, doc.getVersion())) {
-                    return doc;
-                }
-
-                // TODO: implement version store mocking
-                return new XWikiDocument(doc.getDocumentReference());
-            }
-        }).when(getSpyXWiki()).getDocument(anyXWikiDocument(), any(), anyXWikiContext());
-        doNothing().when(getSpyXWiki()).checkDeletingDocument(any(DocumentReference.class), anyXWikiDocument(),
-            anyXWikiContext());
-        doAnswer(new Answer<BaseClass>()
-        {
-            @Override
-            public BaseClass answer(InvocationOnMock invocation) throws Throwable
-            {
-                return getSpyXWiki()
-                    .getDocument((DocumentReference) invocation.getArguments()[0], invocation.getArgument(1))
-                    .getXClass();
-            }
-        }).when(getSpyXWiki()).getXClass(any(DocumentReference.class), anyXWikiContext());
-        doAnswer(new Answer<String>()
-        {
-            @Override
-            public String answer(InvocationOnMock invocation) throws Throwable
-            {
-                return getXWikiContext().getLanguage();
-            }
-        }).when(getSpyXWiki()).getLanguagePreference(anyXWikiContext());
-
-        getXWikiContext().setLocale(Locale.ENGLISH);
 
         // XWikiStoreInterface
 

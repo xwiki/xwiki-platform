@@ -2290,7 +2290,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
             XWikiDocumentArchive arch;
             // A document not comming from the database cannot have an archive stored in the database
             if (this.isNew()) {
-                arch = new XWikiDocumentArchive();
+                arch = new XWikiDocumentArchive(getId());
             } else {
                 arch = getVersioningStore(context).getXWikiDocumentArchive(this, context);
             }
@@ -2327,7 +2327,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
 
         // A document not comming from the database cannot have an archive stored in the database
         if (this.isNew()) {
-            arch = new XWikiDocumentArchive();
+            arch = new XWikiDocumentArchive(getId());
             setDocumentArchive(arch);
             return arch;
         }

@@ -508,6 +508,7 @@ public class MockitoOldcore
                 }
 
                 documents.remove(reference);
+                documentArchives.remove(reference);
 
                 return null;
             }

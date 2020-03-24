@@ -234,7 +234,6 @@ public class MockitoOldcore
         this.spyXWiki.setStore(this.mockXWikiHibernateStore);
         this.spyXWiki.setVersioningStore(this.mockVersioningStore);
         this.spyXWiki.setRightService(this.mockRightService);
-        this.spyXWiki.setAuthService(this.mockAuthService);
         this.spyXWiki.setGroupService(this.mockGroupService);
 
         // We need to initialize the Component Manager so that the components can be looked up

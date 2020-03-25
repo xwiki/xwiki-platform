@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * if a given UserReference is the Guest user, you should use {@code if (myRef == GuestUserReference.INSTANCE)}.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Unstable
 public final class GuestUserReference implements UserReference

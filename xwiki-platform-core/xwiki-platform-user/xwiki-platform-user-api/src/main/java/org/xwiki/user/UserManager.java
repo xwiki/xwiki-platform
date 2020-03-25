@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * {@link UserPropertiesResolver}.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Unstable
 @Role

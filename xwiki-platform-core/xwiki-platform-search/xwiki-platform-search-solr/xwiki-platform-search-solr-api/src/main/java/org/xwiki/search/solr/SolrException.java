@@ -23,7 +23,7 @@ package org.xwiki.search.solr;
  * Solr component exception.
  * 
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 public class SolrException extends Exception
 {

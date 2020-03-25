@@ -33,7 +33,7 @@ import com.xpn.xwiki.XWikiContext;
  * Commons code for all Document-based user properties resolvers.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 public abstract class AbstractDocumentUserPropertiesResolver implements UserPropertiesResolver
 {

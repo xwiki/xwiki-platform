@@ -48,7 +48,7 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 /**
  * Render {@link org.xwiki.notifications.CompositeEvent} to HTML5 by using the right displayers first.
  *
- * @since 12.2RC1
+ * @since 12.2
  * @version $Id$
  */
 @Component(roles = InternalHtmlNotificationRenderer.class)

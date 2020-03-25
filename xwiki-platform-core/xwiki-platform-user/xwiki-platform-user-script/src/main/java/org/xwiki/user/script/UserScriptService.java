@@ -79,7 +79,7 @@ public class UserScriptService implements ScriptService
      * @param userReference the reference to the user properties to resolve
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
      * @return the User Properties object
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public UserProperties getProperties(UserReference userReference, Object... parameters)
@@ -90,7 +90,7 @@ public class UserScriptService implements ScriptService
     /**
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
      * @return the User Properties object for the current user
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public UserProperties getProperties(Object... parameters)
@@ -100,7 +100,7 @@ public class UserScriptService implements ScriptService
 
     /**
      * @return the User Properties object for the current user
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public UserProperties getProperties()
@@ -112,7 +112,7 @@ public class UserScriptService implements ScriptService
      * @param userReference the reference to the user properties to resolve
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
      * @return the User Properties object
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public UserProperties getAllProperties(UserReference userReference, Object... parameters)
@@ -123,7 +123,7 @@ public class UserScriptService implements ScriptService
     /**
      * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
      * @return the User Properties object for the current user
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public UserProperties getAllProperties(Object... parameters)
@@ -133,7 +133,7 @@ public class UserScriptService implements ScriptService
 
     /**
      * @return the User Properties object for the current user
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public UserProperties getAllProperties()
@@ -143,7 +143,7 @@ public class UserScriptService implements ScriptService
 
     /**
      * @return the Guest User reference
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public UserReference getGuestUserReference()
@@ -153,7 +153,7 @@ public class UserScriptService implements ScriptService
 
     /**
      * @return the SuperAdmin User reference
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public UserReference getSuperAdminUserReference()
@@ -163,7 +163,7 @@ public class UserScriptService implements ScriptService
 
     /**
      * @return the current User reference
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public UserReference getCurrentUserReference()
@@ -176,7 +176,7 @@ public class UserScriptService implements ScriptService
      *                      reference exists or not - for example the superadmin users or the guest users don't exist,
      *                      and a "document"-based User can be constructed and have no profile page and thus not exist)
      * @return true if the user exists in the store or false otherwise
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public boolean exists(UserReference userReference)

@@ -38,7 +38,7 @@ import com.xpn.xwiki.XWikiContext;
  * CRUD operations for the current user.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Named("org.xwiki.user.CurrentUserReference")

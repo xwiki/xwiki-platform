@@ -71,7 +71,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
  * notification REST API.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component(roles = DefaultNotificationParametersFactory.class)
 @Singleton

@@ -36,7 +36,7 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
  * Default implementation of {@link Solr} which dispatch on the right component (embedded, remote, etc.).
  * 
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Singleton

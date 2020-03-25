@@ -61,7 +61,7 @@ public class RemoteEventData implements Serializable
      * @param event the event type.
      * @param source the event source.
      * @param data the event data.
-     * @since 12.2RC1
+     * @since 12.2
      * @since 11.10.4
      */
     public RemoteEventData(Serializable event, Serializable source, Serializable data)

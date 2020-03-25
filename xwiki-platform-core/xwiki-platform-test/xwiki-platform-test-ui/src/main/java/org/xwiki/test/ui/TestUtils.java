@@ -548,7 +548,7 @@ public class TestUtils
     /**
      * Creates the Admin user and add it to the XWikiAdminGroup.
      *
-     * @since 12.2RC1
+     * @since 12.2
      */
     public void createAdminUser()
     {
@@ -566,7 +566,7 @@ public class TestUtils
      *              empty of null
      * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
      * @param enabled true if the rights should be allowed, false if they should be disabled
-     * @since 12.2RC1
+     * @since 12.2
      */
     public void setGlobalRights(String groups, String users, String rights, boolean enabled)
     {
@@ -585,7 +585,7 @@ public class TestUtils
      *              empty of null
      * @param rights the comma-separated list of rights to give (e.g. {@code edit,admin})
      * @param enabled true if the rights should be allowed, false if they should be disabled
-     * @since 12.2RC1
+     * @since 12.2
      */
     public void setRights(EntityReference entityReference, String groups, String users, String rights, boolean enabled)
     {
@@ -889,7 +889,7 @@ public class TestUtils
     }
 
     /**
-     * @since 12.2RC1
+     * @since 12.2
      */
     public ViewPage createPageWithAttachment(EntityReference reference, String content, String title,
         String attachmentName, InputStream attachmentData, UsernamePasswordCredentials credentials) throws Exception
@@ -900,7 +900,7 @@ public class TestUtils
     }
 
     /**
-     * @since 12.2RC1
+     * @since 12.2
      */
     public ViewPage createPageWithAttachment(EntityReference reference, String content, String title,
         String attachmentName, InputStream attachmentData) throws Exception
@@ -1024,7 +1024,7 @@ public class TestUtils
     }
 
     /**
-     * @since 12.2RC1
+     * @since 12.2
      */
     public String getURL(EntityReference reference)
     {
@@ -1388,7 +1388,7 @@ public class TestUtils
      * Throws an {@link AssertionFailedError} if it's not the case.
      *
      * @param reference the reference to the document to check
-     * @since 12.2RC1
+     * @since 12.2
      */
     public void assertOnPage(EntityReference reference)
     {
@@ -1722,7 +1722,7 @@ public class TestUtils
     }
 
     /**
-     * @since 12.2RC1
+     * @since 12.2
      */
     public void attachFile(EntityReference pageReference, String name, InputStream is, boolean failIfExists,
         UsernamePasswordCredentials credentials) throws Exception

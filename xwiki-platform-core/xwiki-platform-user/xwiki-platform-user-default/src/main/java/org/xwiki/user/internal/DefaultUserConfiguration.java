@@ -34,7 +34,7 @@ import org.xwiki.user.UserConfiguration;
  * Look for use configuration data in {@code xwiki.prorperties}, under {@code user.*} keys.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Singleton

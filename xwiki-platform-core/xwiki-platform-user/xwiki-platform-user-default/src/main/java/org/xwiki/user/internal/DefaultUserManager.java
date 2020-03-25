@@ -37,7 +37,7 @@ import org.xwiki.user.UserReference;
  * based on the type of the passed {@link UserReference}.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Singleton

@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * The central entry point to access a Solr core.
  * 
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Role
 @Unstable

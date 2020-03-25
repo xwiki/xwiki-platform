@@ -47,7 +47,7 @@ import org.xwiki.query.QueryException;
  * Convert all event status events to remote events and back to local events.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  * @since 11.10.4
  */
 @Component

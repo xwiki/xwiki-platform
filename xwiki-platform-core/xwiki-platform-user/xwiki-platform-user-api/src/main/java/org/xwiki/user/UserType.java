@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  *
  * @see <a href="https://bit.ly/37TUlCp">user profile</a>
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Unstable
 public enum UserType

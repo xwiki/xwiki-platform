@@ -38,7 +38,7 @@ import com.xpn.xwiki.XWikiContext;
  * resolvers know how to handle Guest and SuperAdmin users properly.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 class DocumentUserProperties extends DefaultUserProperties
 {

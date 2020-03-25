@@ -37,7 +37,7 @@ import org.xwiki.user.UserReferenceResolver;
  * Finds the User Reference Resolver based on the configured User store hint.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Singleton

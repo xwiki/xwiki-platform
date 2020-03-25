@@ -28,7 +28,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * Looks in the "user" {@link ConfigurationSource} to get User properties (i.e. no fallbacks).
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Singleton

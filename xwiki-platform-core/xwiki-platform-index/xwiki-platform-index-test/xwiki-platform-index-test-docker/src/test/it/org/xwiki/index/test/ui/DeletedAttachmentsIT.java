@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * Tests for the DeletedAttachments page.
  *
- * @since 12.2RC1
+ * @since 12.2
  */
 @UITest
 public class DeletedAttachmentsIT

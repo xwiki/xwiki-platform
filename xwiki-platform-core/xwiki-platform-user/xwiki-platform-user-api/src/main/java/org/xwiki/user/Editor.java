@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * The default editor that should be used for a user, when editing content.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Unstable
 public enum Editor

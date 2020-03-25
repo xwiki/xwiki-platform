@@ -41,7 +41,7 @@ import org.xwiki.rendering.async.internal.AsyncRendererResult;
 /**
  * An async implementation of Notification rendering.
  *
- * @since 12.2RC1
+ * @since 12.2
  * @version $Id$
  */
 @Component(roles = DefaultAsyncNotificationRenderer.class)

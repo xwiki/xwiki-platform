@@ -38,7 +38,7 @@ import static org.xwiki.user.internal.UserPropertyConstants.FIRST_NAME;
  * Provide configuration data for the Guest user.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Named("guestuser")

@@ -33,7 +33,7 @@ import org.xwiki.user.UserReferenceResolver;
  * Converts a String to {@link UserReference}. Useful from Velocity scripts for example when resolving a user.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Singleton

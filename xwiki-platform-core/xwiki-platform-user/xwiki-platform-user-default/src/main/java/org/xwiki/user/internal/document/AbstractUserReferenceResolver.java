@@ -31,7 +31,7 @@ import org.xwiki.user.UserReferenceResolver;
  *
  * @param <T> the type of the raw user reference
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 public abstract class AbstractUserReferenceResolver<T> implements UserReferenceResolver<T>
 {

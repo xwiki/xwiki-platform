@@ -25,7 +25,7 @@ import org.xwiki.test.ui.po.ViewPage;
 /**
  * Represents the actions possible on the DeletedAttachments Page.
  *
- * @since 12.2RC1
+ * @since 12.2
  */
 public class DeletedAttachmentsPage extends ViewPage
 {

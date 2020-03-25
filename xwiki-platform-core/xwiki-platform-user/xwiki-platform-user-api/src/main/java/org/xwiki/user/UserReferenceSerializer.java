@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  *
  * @param <T> the type into which to serialize the user reference (e.g. String)
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Unstable
 @Role

@@ -41,7 +41,7 @@ import org.xwiki.user.UserReferenceResolver;
  * used otherwise.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Named("user")

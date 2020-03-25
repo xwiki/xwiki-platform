@@ -39,7 +39,7 @@ import static org.xwiki.user.internal.UserPropertyConstants.USER_TYPE;
  * Provide configuration data for the SuperAdmin user.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Named("superadminuser")

@@ -135,7 +135,7 @@ public class NotificationSourcesScriptService implements ScriptService
      * {@link DefaultNotificationParametersFactory.ParametersKey} to see the available parameters and accepted values.
      * @return an instance of {@link NotificationParameters} that can be used to retrieve events.
      * @throws NotificationException in case of errors.
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     public NotificationParameters getNotificationParameters(Map<String, String> parameters) throws NotificationException

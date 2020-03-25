@@ -38,7 +38,7 @@ import org.xwiki.user.UserReferenceSerializer;
  * Converts a {@link UserReference} into a {@link DocumentReference}.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Named("document")

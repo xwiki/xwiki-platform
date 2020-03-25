@@ -40,7 +40,7 @@ import static org.xwiki.user.internal.UserPropertyConstants.USER_TYPE;
  * Common code for implementing user properties.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 public class DefaultUserProperties implements UserProperties
 {

@@ -46,7 +46,7 @@ import org.xwiki.notifications.sources.NotificationParameters;
  *
  * Note that this component is useless if the property {@code notifications.rest.cache} is set to true.
  *
- * @since 12.2RC1
+ * @since 12.2
  * @version $Id$
  */
 @Component(roles = DefaultNotificationCacheManager.class)

@@ -72,7 +72,7 @@ public interface EventStream
      * @param eventId the unique identifier of the event
      * @return the event or null if none could be found
      * @throws QueryException if failing to get the event
-     * @since 12.2RC1
+     * @since 12.2
      * @since 11.10.4
      */
     default Event getEvent(String eventId) throws QueryException

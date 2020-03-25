@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Configuration options for the User module.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Unstable
 @Role

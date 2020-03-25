@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  *
  * @param <T> the type of the raw user reference
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Unstable
 @Role

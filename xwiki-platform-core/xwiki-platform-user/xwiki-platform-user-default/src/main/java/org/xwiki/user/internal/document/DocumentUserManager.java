@@ -32,7 +32,7 @@ import org.xwiki.user.UserReference;
  * Document-based implementation of {@link UserManager}.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Named("org.xwiki.user.internal.document.DocumentUserReference")

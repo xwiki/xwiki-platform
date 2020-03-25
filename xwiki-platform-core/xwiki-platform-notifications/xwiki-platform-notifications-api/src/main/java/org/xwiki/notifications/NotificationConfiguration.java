@@ -63,7 +63,7 @@ public interface NotificationConfiguration
 
     /**
      * @return true if the REST/async cache is enabled.
-     * @since 12.2RC1
+     * @since 12.2
      */
     @Unstable
     default boolean isRestCacheEnabled() {

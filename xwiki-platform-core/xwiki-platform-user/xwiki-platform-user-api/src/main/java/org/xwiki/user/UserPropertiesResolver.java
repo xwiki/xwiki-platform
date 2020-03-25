@@ -26,7 +26,7 @@ import org.xwiki.stability.Unstable;
  * Gets the properties for a user (represented by a {@link UserReference}).
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Unstable
 @Role

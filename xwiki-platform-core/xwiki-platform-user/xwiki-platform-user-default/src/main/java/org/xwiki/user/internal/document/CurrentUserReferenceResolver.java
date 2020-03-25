@@ -37,7 +37,7 @@ import com.xpn.xwiki.XWikiContext;
  * Resolve a current user reference to a {@link DocumentReference} for the user in the context.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Singleton

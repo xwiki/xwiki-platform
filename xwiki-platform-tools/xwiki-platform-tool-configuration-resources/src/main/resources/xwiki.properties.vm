@@ -1037,13 +1037,13 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 # User
 #-------------------------------------------------------------------------------------
 
-#-# [Since 12.2RC1]
+#-# [Since 12.2]
 #-# Indicate where users are stored.
 #-#
 #-# The default (and currently the only supported option) is:
 # user.store.hint = document
 
-#-# [Since 12.2RC1]
+#-# [Since 12.2]
 #-# Define preferences for the SuperAdmin user.
 #-#
 #-# The format is:
@@ -1053,7 +1053,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# user.preferences.superadmin.displayHiddenDocuments = 0
 #-# user.preferences.superadmin.editor = Text
 
-#-# [Since 12.2RC1]
+#-# [Since 12.2]
 #-# Define preferences for the Guest user.
 #-#
 #-# The format is:

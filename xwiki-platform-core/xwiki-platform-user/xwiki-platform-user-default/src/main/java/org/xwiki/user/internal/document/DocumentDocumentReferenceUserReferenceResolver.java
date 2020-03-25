@@ -33,7 +33,7 @@ import org.xwiki.user.UserReference;
  * Converts a {@link DocumentReference} into a {@link UserReference}.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Named("document")

@@ -43,7 +43,7 @@ import org.xwiki.user.UserReferenceResolver;
  * Converts a {@link UserResourceReference} into a relative {@link ExtendedURL} (with the Context Path added).
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Singleton

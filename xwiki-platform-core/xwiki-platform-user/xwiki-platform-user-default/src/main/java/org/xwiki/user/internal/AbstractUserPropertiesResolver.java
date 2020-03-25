@@ -38,7 +38,7 @@ import org.xwiki.user.UserReferenceResolver;
  * type of the passed {@link UserReference}.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 public abstract class AbstractUserPropertiesResolver implements UserPropertiesResolver
 {

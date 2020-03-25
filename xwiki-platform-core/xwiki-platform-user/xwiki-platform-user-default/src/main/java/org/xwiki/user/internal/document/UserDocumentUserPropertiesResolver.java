@@ -31,7 +31,7 @@ import org.xwiki.configuration.ConfigurationSource;
  * {@code XWiki.XWikiUsers} object.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Named("user/org.xwiki.user.internal.document.DocumentUserReference")

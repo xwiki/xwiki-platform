@@ -56,7 +56,7 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
  * Embedded Solr server running in the same JVM.
  * 
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Named(EmbeddedSolr.TYPE)

@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * {@code if (myRef == SuperAdminUserReference.INSTANCE)}.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Unstable
 public final class SuperAdminUserReference implements UserReference

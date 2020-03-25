@@ -31,7 +31,7 @@ import org.xwiki.search.solr.SolrException;
  * A wrapper around the new {@link Solr} API.
  * 
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Component
 @Singleton

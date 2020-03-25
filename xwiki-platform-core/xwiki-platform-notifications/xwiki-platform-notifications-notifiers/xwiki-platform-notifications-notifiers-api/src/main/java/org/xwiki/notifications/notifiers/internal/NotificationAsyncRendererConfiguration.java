@@ -28,7 +28,7 @@ import org.xwiki.rendering.async.internal.AsyncRendererConfiguration;
 /**
  * A configuration for the {@link DefaultAsyncNotificationRenderer}.
  *
- * @since 12.2RC1
+ * @since 12.2
  * @version $Id$
  */
 public class NotificationAsyncRendererConfiguration extends AsyncRendererConfiguration

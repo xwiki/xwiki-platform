@@ -131,7 +131,7 @@ public class LegacyEventLoader
      * @param eventId the unique identifier of the event
      * @return the event stored in the database
      * @throws QueryException when failing to get the event
-     * @since 12.2RC1
+     * @since 12.2
      * @since 11.10.4
      */
     public LegacyEvent getLegacyEvent(String eventId) throws QueryException
@@ -156,7 +156,7 @@ public class LegacyEventLoader
      * @param eventId the event id
      * @return the event or null if none could be found
      * @throws QueryException  when failing to get the event
-     * @since 12.2RC1
+     * @since 12.2
      * @since 11.10.4
      */
     public Event getEvent(String eventId) throws QueryException

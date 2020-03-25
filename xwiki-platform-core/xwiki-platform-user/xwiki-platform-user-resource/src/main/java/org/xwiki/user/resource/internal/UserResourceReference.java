@@ -29,7 +29,7 @@ import org.xwiki.user.UserReference;
  * Represents a User resource (a.k.a. URI), i.e. a URI to the a user profile page.
  *
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 public class UserResourceReference extends AbstractResourceReference
 {

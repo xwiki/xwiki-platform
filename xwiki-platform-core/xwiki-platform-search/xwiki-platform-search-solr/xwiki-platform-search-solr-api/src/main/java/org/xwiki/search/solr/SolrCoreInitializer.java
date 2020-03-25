@@ -27,7 +27,7 @@ import org.xwiki.stability.Unstable;
  * An extension point used to inject mandatory Solr cores.
  * 
  * @version $Id$
- * @since 12.2RC1
+ * @since 12.2
  */
 @Role
 @Unstable

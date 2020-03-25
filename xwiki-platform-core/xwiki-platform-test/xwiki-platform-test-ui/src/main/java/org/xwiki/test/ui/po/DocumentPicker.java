@@ -238,34 +238,35 @@ public class DocumentPicker extends BaseElement
      */
     private void waitUntilReady()
     {
-        StringBuilder script = new StringBuilder();
-        // This is the icon used to open the document tree modal. It is available only if the document tree is
-        // available.
-        script.append("var pickAction = arguments[0].querySelector('.location-action-pick');\n");
-        // This is the icon used to toggle the advanced edit form. It is available only for advanced users.
-        script.append("var editAction = arguments[0].querySelector('.location-action-edit');\n");
-        // At the moment there's no better way to tell if the picker is ready than counting the registered listeners.
-        script.append("var countClickListeners = function(element) {\n");
-        script.append("  if (window.jQuery) {\n");
-        // This is internal jQuery API but we'll notice if they change it: the test will fail.
-        script.append("    return jQuery._data(element, 'events').click.length;\n");
-        script.append("  } else {\n");
-        script.append("    return 0;\n");
-        script.append("  }\n");
-        script.append("};\n");
-        // If the pick action is present then we need to wait for it to have at least 2 click listeners registered.
-        script.append("return (!pickAction || countClickListeners(pickAction) > 1) &&\n");
-        // If the advanced edit action is present then we need to also wait for it to have at least 1 click listener.
-        script.append("  (!editAction || countClickListeners(editAction) > 0);");
-
+        List<WebElement> pickAction =
+            getDriver().findElementsWithoutWaiting(this.container, By.className("location-action-pick"));
+        List<WebElement> editAction =
+            getDriver().findElementsWithoutWaiting(this.container, By.className("location-action-edit"));
         getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
         {
             @Override
             public @Nullable Boolean apply(@Nullable WebDriver driver)
             {
-                // Wait until the document tree picker JavaScript initialization code is executed.
-                return (Boolean) getDriver().executeScript(script.toString(), container);
+                // Wait until the document picker JavaScript initialization code is executed.
+                // The pick action is available only if the document tree is available.
+                return (pickAction.isEmpty() || getJQueryListenerCount(pickAction.get(0), "click") > 1)
+                    // The edit action is available only for advanced users.
+                    && (editAction.isEmpty() || getJQueryListenerCount(editAction.get(0), "click") > 0);
             }
         });
+    }
+
+    private int getJQueryListenerCount(WebElement element, String event)
+    {
+        StringBuilder script = new StringBuilder();
+        script.append("var element = arguments[0];\n");
+        script.append("var event = arguments[1];\n");
+        script.append("var callback = arguments[2];\n");
+        script.append("require(['jquery'], function($) {\n");
+        // This is internal jQuery API but we'll notice if they change it: the test will fail.
+        script.append("  var listeners = $._data(element, 'events') || {};\n");
+        script.append("  callback((listeners[event] || []).length);\n");
+        script.append("});\n");
+        return ((Long) getDriver().executeAsyncScript(script.toString(), element, event)).intValue();
     }
 }

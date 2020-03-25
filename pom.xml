@@ -737,6 +737,25 @@
             </systemProperties>
           </configuration>
           <dependencies>
+            <!-- Used to automatically register our custom JUnit5 Extensions using the service loader mechanism.
+                 We also need to have the JAR containing our extensions visible to JUnit5's ClassLoader. This is
+                 done here and not in the top level commons pom.xml, as otherwise it would cause a cyclic dependency.
+            -->
+            <dependency>
+              <groupId>org.xwiki.commons</groupId>
+              <artifactId>xwiki-commons-tool-test-simple</artifactId>
+              <version>${commons.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <dependencies>
+            <!-- Used to automatically register our custom JUnit5 Extensions using the service loader mechanism.
+                 We also need to have the JAR containing our extensions visible to JUnit5's ClassLoader. This is
+                 done here and not in the top level commons pom.xml, as otherwise it would cause a cyclic dependency.
+            -->
             <dependency>
               <groupId>org.xwiki.commons</groupId>
               <artifactId>xwiki-commons-tool-test-simple</artifactId>

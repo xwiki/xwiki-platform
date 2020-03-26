@@ -154,8 +154,13 @@ public final class DockerTestUtils
             pulledImages.add(dockerImageName);
         }
 
-        // In debug mode, get container debug logs to try to diagnose container failing errors
-        if (testConfiguration.isDebug()) {
+        // Get container debug logs to try to diagnose container failing errors
+        //
+        // TODO: We should only log this in debug mode normally but because of
+        //  https://github.com/testcontainers/testcontainers-java/issues/2483 we want to see the retry debug message
+        // from TC so that when the container fails to start on the first try but succeed on the following tries, we
+        // can know that the displayed stack trace is not a sign of a problem and should be ignored.
+        if (testConfiguration.isVerbose()) {
             setLogbackLoggerLevel(DockerLoggerFactory.getLogger(container.getDockerImageName()).getName(), Level.DEBUG);
         }
 

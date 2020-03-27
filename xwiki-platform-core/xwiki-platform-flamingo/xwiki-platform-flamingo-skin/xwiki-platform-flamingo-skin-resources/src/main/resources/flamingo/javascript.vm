@@ -119,33 +119,66 @@ $xwiki.jsfx.use("flamingo$jsExtension", {'forceSkinAction' : true, 'language' : 
 #end
 ##
 ## Start the requirejs config.
+## See https://requirejs.org/docs/api.html#config
 ##
-require.config({
-  paths: {
-    'jquery': '#removeJsSuffix($services.webjars.url("jquery", "jquery${jsExtension}"))',
-    'bootstrap': '#removeJsSuffix($services.webjars.url("bootstrap", "js/bootstrap${jsExtension}"))',
-    'xwiki-meta': '$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js')',
-    'xwiki-events-bridge': "$stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/eventsBridge.js'), '.js')",
-    'iscroll': '#removeJsSuffix($services.webjars.url('iscroll/5.1.3/build/iscroll-lite.js'))',
-    'drawer': '#removeJsSuffix($services.webjars.url('drawer', "js/jquery.drawer${jsExtension}"))',
-    'deferred': "$stringtool.removeEnd($xwiki.getSkinFile('uicomponents/require/deferred.js'), '.js')"
+#set ($requireConfig = {
+  'paths': {
+    'jquery': "#removeJsSuffix($services.webjars.url('jquery', ""jquery${jsExtension}""))",
+    'bootstrap': "#removeJsSuffix($services.webjars.url('bootstrap', ""js/bootstrap${jsExtension}""))",
+    'xwiki-meta': $stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/meta.js'), '.js'),
+    'xwiki-events-bridge': $stringtool.removeEnd($xwiki.getSkinFile('js/xwiki/eventsBridge.js'), '.js'),
+    'iscroll': "#removeJsSuffix($services.webjars.url('iscroll/5.1.3/build/iscroll-lite.js'))",
+    'drawer': "#removeJsSuffix($services.webjars.url('drawer', ""js/jquery.drawer${jsExtension}""))",
+    'deferred': $stringtool.removeEnd($xwiki.getSkinFile('uicomponents/require/deferred.js'), '.js')
   },
-  shim: {
+  'shim': {
     'bootstrap' : ['jquery'],
     'drawer': ['jquery', 'iscroll']
   },
-  ## see: http://requirejs.org/docs/jquery.html#noconflictmap to see why this works.
-  map: {
-    '*': {
-      'jquery': 'jQueryNoConflict'
-    },
-    'jQueryNoConflict': {
-      'jquery': 'jquery'
-    },
+  'bundles': {},
+  'config': {}
+})
+## See http://requirejs.org/docs/jquery.html#noconflictmap to understand why this works.
+#set ($requireConfig.map = {
+  '*': {
+    'jquery': 'jQueryNoConflict'
+  },
+  'jQueryNoConflict': {
+    'jquery': 'jquery'
   }
-});
+})
+## Extend the RequireJS configuration.
+#foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.requirejs.module'))
+  #set ($module = $uix.parameters)
+  #if ("$!module.id" != '')
+    #if ("$!module.path" != '')
+      #set ($discard = $requireConfig.paths.put($module.id, $module.path))
+    #end
+    #if ("$!module.bundles" != '')
+      #set ($discard = $requireConfig.bundles.put($module.id, $module.bundles.split('\s*,\s*')))
+    #end
+    #if ("$!module.deps" != '' || "$!module.exports" != '')
+      #set ($shim = $requireConfig.shim.getOrDefault($module.id, {}))
+      ## The shim value can be the list of module dependencies. We need to normalize the shim in this case.
+      #if (!$shim.entrySet())
+        #set ($shim = {'deps': $shim})
+      #end
+      #if ("$!module.deps" != '')
+        #set ($shim.deps = $module.deps.split('\s*,\s*'))
+      #end
+      #if ("$!module.exports" != '')
+        #set ($shim.exports = $module.exports)
+      #end
+      #set ($discard = $requireConfig.shim.put($module.id, $shim))
+    #end
+    #if ("$!module.config" != '')
+      #set ($discard = $requireConfig.config.put($module.id, $jsontool.fromString($module.config)))
+    #end
+  #end
+#end
+require.config($jsontool.serialize($requireConfig));
 define('jQueryNoConflict', ['jquery'], function ($) {
-    return $.noConflict();
+  return $.noConflict();
 });
 if (window.Prototype && Prototype.BrowserFeatures.ElementExtensions) {
   require(['jquery', 'bootstrap'], function ($) {

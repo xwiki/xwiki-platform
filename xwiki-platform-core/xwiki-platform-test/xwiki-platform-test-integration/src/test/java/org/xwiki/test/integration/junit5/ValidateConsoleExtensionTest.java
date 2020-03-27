@@ -31,6 +31,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.platform.launcher.Launcher;
 import org.junit.platform.launcher.LauncherDiscoveryRequest;
+import org.junit.platform.launcher.core.LauncherConfig;
 import org.junit.platform.launcher.core.LauncherDiscoveryRequestBuilder;
 import org.junit.platform.launcher.core.LauncherFactory;
 import org.junit.platform.launcher.listeners.SummaryGeneratingListener;
@@ -141,7 +142,12 @@ public class ValidateConsoleExtensionTest
             LauncherDiscoveryRequest request = LauncherDiscoveryRequestBuilder.request()
                 .selectors(selectClass(SampleTestCase.class))
                 .build();
-            Launcher launcher = LauncherFactory.create();
+            // Do not auto load TestExecutionListener since that would load our
+            // FailingTestDebuggingTestExecutionListener which would print things in the console since we test test
+            // failures in this test class, and in turn it would fail the test since we verify what's printed in the
+            // console...
+            LauncherConfig config = LauncherConfig.builder().enableTestExecutionListenerAutoRegistration(false).build();
+            Launcher launcher = LauncherFactory.create(config);
             SummaryGeneratingListener summaryListener = new SummaryGeneratingListener();
             launcher.execute(request, summaryListener);
 

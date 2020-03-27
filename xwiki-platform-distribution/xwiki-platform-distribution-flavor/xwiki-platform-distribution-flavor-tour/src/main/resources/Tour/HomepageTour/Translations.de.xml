@@ -63,5 +63,5 @@ tour.homepageTour.header.contentA=Sie können nach Inhalten suchen, nach Seiten�
 tour.homepageTour.header.contentB=Die Schaltfläche {0} öffnet eine Schublade, die Wiki-bezogene Aktionen wie Administration und Indizes enthält.
 tour.homepageTour.tourComplete.title=Tour abgeschlossen
 tour.homepageTour.tourComplete.contentA=Damit ist Ihre Tour über die Benutzeroberfläche und die grundlegenden Funktionalitäten von XWiki abgeschlossen.
-tour.homepageTour.tourComplete.contentB=Weitere Informationen zu den einzelnen Funktionen finden Sie in der Dokumentation{1}.</content>
+tour.homepageTour.tourComplete.contentB=Weitere Informationen zu den einzelnen Funktionen finden Sie in der {0}Dokumentation{1}.</content>
 </xwikidoc>

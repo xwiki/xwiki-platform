@@ -44,6 +44,10 @@ office.form.append.hint=¡El documento ya existe! Añada el resultado a la pági
 office.config.serverType.hint=El tipo de servidor de Office. Puede ser gestionado internamente (local) o externamente (remoto).
 office.config.serverPort.hint=El número de puerto utilizado para conectarse al servidor de Office
 office.config.autoStart.hint=Especifique si el servidor de Office debe iniciarse o conectarse automáticamente al inicio de XWiki
-office.config.serverPath.hint=La ruta a la instalación de Office</content>
+office.config.serverPath.hint=La ruta a la instalación de Office
+### Missing: office.config.serverState.connected=Connected
+### Missing: office.config.serverState.notConnected=Not Connected
+### Missing: office.config.serverState.confError=Invalid Configuration
+### Missing: office.config.serverState.error=Error</content>
   
 </xwikidoc>

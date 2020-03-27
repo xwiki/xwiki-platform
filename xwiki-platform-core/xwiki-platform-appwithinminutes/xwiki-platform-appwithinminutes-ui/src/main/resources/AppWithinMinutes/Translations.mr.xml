@@ -197,7 +197,7 @@ platform.appwithinminutes.liveTableEditorAddColumnHint=निवडलेला 
 platform.appwithinminutes.liveTableEditorIcon=आयकॉन
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 
-### Application home page
+### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=नोंदी
 platform.appwithinminutes.appLiveTableEditEntryActionName=संपादित करा
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=हटवा
@@ -210,6 +210,8 @@ platform.appwithinminutes.appHomePageEditAppLabel=अनुप्रयोग �
 platform.appwithinminutes.appHomePageTranslateAppLabel=अनुप्रयोगाचा अनुवाद करा
 platform.appwithinminutes.appHomePageDeleteAppLabel=अनुप्रयोग हटवा
 ### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: AppWithinMinutes.LiveTableClass_description=Description
+### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
 ### Delete application dialog
 ### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?

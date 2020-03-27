@@ -197,7 +197,7 @@ platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Některé slou
 ### Missing: platform.appwithinminutes.liveTableEditorIcon=Icon
 ### Missing: platform.appwithinminutes.liveTableEditorIconHintWithPicker=The application icon. You can select an icon from the icon picker or you can reference an attached image.
 
-### Application home page
+### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=Položky
 platform.appwithinminutes.appLiveTableEditEntryActionName=Upravit
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=Smazat
@@ -210,6 +210,8 @@ platform.appwithinminutes.appHomePageEntryNameLabel=Název položky\:
 ### Missing: platform.appwithinminutes.appHomePageTranslateAppLabel=Translate application
 ### Missing: platform.appwithinminutes.appHomePageDeleteAppLabel=Delete application
 ### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: AppWithinMinutes.LiveTableClass_description=Description
+### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
 ### Delete application dialog
 ### Missing: platform.appwithinminutes.deleteAppConfirmation=The application {0} and ALL its entries will be deleted. Are you sure you want to continue?

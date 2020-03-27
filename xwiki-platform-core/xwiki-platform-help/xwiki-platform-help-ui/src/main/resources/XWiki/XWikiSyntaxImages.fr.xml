@@ -74,5 +74,5 @@ width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||height="25"
 |Image avec des paramètres|{{{[[image:img.png||
 width="25" height="25"]]}}}|[[image:XWiki.XWikiSyntaxImages@img.png||height="25" width="25"]]
 |Images localisées dans un URL|{{{image:http://some/url/img.png}}}|[[image:XWiki.XWikiSyntaxImages@img.png]]
-|Icons|{{{image:icon:accept}}}|image:icon:accept</content>
+|Icônes|{{{image:icon:accept}}}|image:icon:accept</content>
 </xwikidoc>

@@ -197,7 +197,7 @@ platform.appwithinminutes.liveTableEditorDeprecatedColumnsWarning=Dažas kolonna
 platform.appwithinminutes.liveTableEditorIcon=Ikona
 platform.appwithinminutes.liveTableEditorIconHintWithPicker=Saite uz ikonu. Jūs varat norādīt jebkuru attēlu no ikonu izvēles zem šī lauka (kad tas ir aktivizēts), vai arī norādīt saiti uz jebkuru citu viki attēlu.
 
-### Application home page
+### Wizard Step 4: Application home page
 platform.appwithinminutes.appLiveTableHeading=Ieraksti
 platform.appwithinminutes.appLiveTableEditEntryActionName=Mainīt
 platform.appwithinminutes.appLiveTableDeleteEntryActionName=Dzēst
@@ -210,6 +210,8 @@ platform.appwithinminutes.appHomePageEditAppLabel=Mainīt lietotni
 platform.appwithinminutes.appHomePageTranslateAppLabel=Tulkot lietotni
 platform.appwithinminutes.appHomePageDeleteAppLabel=Dzēst lietotni
 ### Missing: platform.appwithinminutes.appHomePageMovedWarning=The application might not function correctly because it has been renamed or moved without updating the code. Please edit the application and follow the steps in order to update the code.
+### Missing: AppWithinMinutes.LiveTableClass_description=Description
+### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=Lietotne {0} un VISI tās ieraksti tiks izdzēsti. Vai tiešām vēlaties turpināt?

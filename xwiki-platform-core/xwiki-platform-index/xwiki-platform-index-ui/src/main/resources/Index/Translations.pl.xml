@@ -37,12 +37,12 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>index.spacesMacro.title=Przestrzenie
-### Missing: index.spacesMacro.spaceIndex.title=See Space Index
-### Missing: index.spacesMacro.spaceIndex.alt=Space Index
-### Missing: index.spacesMacro.spaceAdministration.title=See Space Administration
-### Missing: index.spacesMacro.spaceAdministration.alt=Administer Space
-### Missing: index.spacesMacro.createSpace.link=Create a new space
-### Missing: index.spacesMacro.createSpace.defaultSpaceName=Space name
-### Missing: index.spacesMacro.createSpace.submit=Create
-### Missing: index.deletedDocuments.deleteAll=Delete all</content>
+index.spacesMacro.spaceIndex.title=Zobacz indeks przestrzeni
+index.spacesMacro.spaceIndex.alt=Dziennik przestrzeni
+index.spacesMacro.spaceAdministration.title=Zobacz przestrzeń administratora
+index.spacesMacro.spaceAdministration.alt=zarządzaj przestrzenią
+index.spacesMacro.createSpace.link=Utwórz nową przestrzeń
+index.spacesMacro.createSpace.defaultSpaceName=nazwa przestrzeni
+index.spacesMacro.createSpace.submit=stwórz
+index.deletedDocuments.deleteAll=usuń wszystko</content>
 </xwikidoc>

@@ -48,8 +48,8 @@ administration.menu.search.hint=Искать...
 administration.menu.search.noResults=Ничего не найдено.
 
 # Registration Section
-XWiki.XWikiPreferences_use_email_verification.hint=Если установлено значение "да", то письмо будет отправлено на адрес электронной почты, указанный при заполнении регистрационной формы.
-XWiki.XWikiPreferences_validation_email_content.hint=Шаблон письма, которое будет отправлено пользователям для проверки их адреса электронной почты.
+XWiki.XWikiPreferences_use_email_verification.hint=Если установлено значение "да", то письмо будет отправлено на email-адрес, который был указан при заполнении регистрационной формы.
+XWiki.XWikiPreferences_validation_email_content.hint=Шаблон письма, которое будет отправляться пользователям для подтверждения email-адреса.
 XWiki.XWikiPreferences_confirmation_email_content.hint=Шаблон письма, которое будет отправлено после того, как пользователь подтвердит свою учётную запись, перейдя по ссылке, полученной в первом письме.
 XWiki.XWikiPreferences_invitation_email_content.hint=Шаблон письма, которое будет отправлено пользователям, приглашенным зарегистрироваться.
 
@@ -109,21 +109,21 @@ XWiki.XWikiPreferences_timezone.hint=Глобальные настройки д�
 administration.section.import.hint=Начните с загрузки нового пакета или выбора одного из списка доступных пакетов. Содержимое выбранного пакета будет отображаться справа вместе с параметрами импорта.
 
 # Export Section
-### Missing: administration.section.export.pages=Pages
-### Missing: administration.section.export.pages.all=All pages
+administration.section.export.pages=Страницы
+administration.section.export.pages.all=Все страницы
 administration.section.export.withHistory.hint=Включить историю страниц в экспорт. В противном случае экспортируется только последняя версия страницы.
-### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
-### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
-### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
-### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
-administration.section.export.packageName.hint=Имя файла, используемое при создании архива с экспортируемым содержимым.
-### Missing: administration.section.export.moreOptions=More options
-### Missing: administration.section.export.lessOptions=Less options
+administration.section.export.targetXWikiVersion=Целевая версия XWiki
+administration.section.export.targetXWikiVersion.hint=Версия XWiki, в которую Вы хотите импортировать страницы. Текущая версия {0}.
+administration.section.export.targetXWikiVersion.12plus=12.0 и выше
+administration.section.export.targetXWikiVersion.below12=До 12.0
+administration.section.export.packageName.hint=Имя файла, используемое при создании архива с экспортируемыми wiki-страницами.
+administration.section.export.moreOptions=Больше опций
+administration.section.export.lessOptions=Меньше опций
 administration.section.export.description.hint=Описание пакета, отображаемое при импорте пакета.
-administration.section.export.author.hint=Автор пакета.
-administration.section.export.licence.hint=Лицензия на содержимое. Например: LGPL, GPLV2 и т.д.
-administration.section.export.version.hint=Версия пакета.
-administration.section.export.backupPack.hint=Укажите, будет ли пакет использоваться в качестве резервной копии. Эта опция не влияет на экспортируемый контент. Единственный эффект заключается в том, что при импорте пакета будет предварительно выбран параметр «Импортировать как резервную копию». Разница между пакетом резервного копирования и обычным пакетом заключается в том, что в первом случае последний автор страницы сохраняется во время импорта, а во втором случае пользователь, выполняющий импорт, становится последним автором каждой импортированной страницы.
+administration.section.export.author.hint=Автор пакета, который будет отображен при импорте.
+administration.section.export.licence.hint=Лицензия содержимого. Например: LGPL, GPLV2 и т.д.
+administration.section.export.version.hint=Версия пакета, хранимая в его дескрипторе.
+administration.section.export.backupPack.hint=Сохранять автора страницы при импорте. Эта опция не оказывает влияния на экспортируемое содержимое и может быть изменена перед импортом.
 
 # Users Section
 administration.section.users.enableUser.inProgress=Включение учетной записи пользователя ...

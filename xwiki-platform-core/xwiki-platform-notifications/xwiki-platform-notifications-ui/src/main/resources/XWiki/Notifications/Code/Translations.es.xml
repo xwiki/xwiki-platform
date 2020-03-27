@@ -96,6 +96,8 @@ notifications.filters.preferences.setEnabled.error=No se pudo guardar la prefere
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Necesita habilitar las notificaciones en su configuración si desea ver estas ubicaciones
+### Missing: notifications.toggle.label.off=OFF
+### Missing: notifications.toggle.label.on=ON
 
 ## Notifications formats
 notifications.format.alert=Alerta
@@ -211,5 +213,4 @@ rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Objetivo
 ### Missing: notifications.switches.tooltip.space=Watch the parent page and its children
 ### Missing: notifications.switches.tooltip.wiki=Watch this wiki
 ### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.</content>
-  
 </xwikidoc>

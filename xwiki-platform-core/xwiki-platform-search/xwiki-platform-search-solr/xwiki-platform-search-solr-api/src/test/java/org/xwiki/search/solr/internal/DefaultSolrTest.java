@@ -20,18 +20,20 @@
 package org.xwiki.search.solr.internal;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.inject.Named;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.request.schema.SchemaRequest;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.core.CoreContainer;
-import org.apache.solr.core.SolrCore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.Solr;
@@ -46,7 +48,6 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -67,6 +68,7 @@ public class DefaultSolrTest
     private Environment mockEnvironment;
 
     @MockComponent
+    @Named("test")
     private SolrCoreInitializer testCore;
 
     @InjectComponentManager
@@ -99,34 +101,6 @@ public class DefaultSolrTest
         this.permanentDirectory.mkdirs();
     }
 
-    /**
-     * TODO DOCUMENT ME!
-     * 
-     * @param expected
-     * @throws ComponentLookupException
-     * @throws Exception
-     */
-    private void getInstanceAndAssertHomeDirectory(String expected) throws ComponentLookupException, Exception
-    {
-        Solr instance = this.componentManager.getInstance(Solr.class, EmbeddedSolr.TYPE);
-        assertNotNull(instance);
-
-        EmbeddedSolr implementation = ((EmbeddedSolr) instance);
-        CoreContainer container = implementation.getContainer();
-
-        if (expected == null) {
-            expected = implementation.getDefaultHomeDirectory();
-        }
-
-        assertEquals(expected, container.getSolrHome());
-        assertEquals(1, container.getCores().size());
-        SolrCore core = container.getCores().iterator().next();
-        File coreBaseDirectory = new File(container.getSolrHome(), core.getName());
-        File configDirectory = new File(coreBaseDirectory, DefaultSolrConfiguration.CONF_DIRECTORY);
-        assertTrue(new File(configDirectory, core.getSchemaResource()).exists());
-        assertTrue(new File(configDirectory, core.getConfigResource()).exists());
-    }
-
     // Tests
 
     @Test
@@ -134,7 +108,7 @@ public class DefaultSolrTest
     {
         Solr instance = this.componentManager.getInstance(Solr.class);
 
-        SolrClient client = instance.getClient("xwiki");
+        SolrClient client = instance.getClient("search");
 
         assertNotNull(client);
 
@@ -152,14 +126,22 @@ public class DefaultSolrTest
 
         SolrClient client = instance.getClient("test");
 
+        Map<String, Object> fieldAttributes = new HashMap<>();
+        fieldAttributes.put("name", "content");
+        fieldAttributes.put("type", "string");
+        new SchemaRequest.AddField(fieldAttributes).process(client);
+
         assertNotNull(client);
 
-        client.add(new SolrInputDocument("id", "42"));
+        client.add(new SolrInputDocument("id", "42", "content", "content1"));
 
         client.commit();
 
         SolrDocument storedDocument = client.getById("42");
 
+        assertEquals("42", storedDocument.get("id"));
+        assertEquals("content1", storedDocument.get("content"));
+        
         assertNotNull(storedDocument);
     }
 }

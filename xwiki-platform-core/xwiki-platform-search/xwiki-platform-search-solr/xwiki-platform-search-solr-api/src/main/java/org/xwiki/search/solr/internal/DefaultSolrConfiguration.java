@@ -19,14 +19,17 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.io.File;
 import java.io.InputStream;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
@@ -138,6 +141,9 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     @Named("xwikiproperties")
     private ConfigurationSource configuration;
 
+    @Inject
+    private Environment environment;
+
     @Override
     public String getServerType()
     {
@@ -152,9 +158,9 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     }
 
     @Override
-    public InputStream getHomeDirectoryConfiguration()
+    public InputStream getSearchCoreDefaultContent()
     {
-        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-data.zip");
+        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core.zip");
     }
 
     @Override
@@ -181,5 +187,23 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     public boolean synchronizeAtStartup()
     {
         return this.configuration.getProperty(SOLR_SYNCHRONIZE_AT_STARTUP, SOLR_SYNCHRONIZE_AT_STARTUP_DEFAULT);
+    }
+
+    @Override
+    public String getHomeDirectory()
+    {
+        String defaultValue = getDefaultHomeDirectory();
+
+        String home = getInstanceConfiguration(EmbeddedSolr.TYPE, "home", defaultValue);
+
+        return StringUtils.isEmpty(home) ? defaultValue : home;
+    }
+
+    @Override
+    public String getDefaultHomeDirectory()
+    {
+        File solrStoreDirectory = new File(this.environment.getPermanentDirectory(), "store/solr");
+
+        return solrStoreDirectory.getPath();
     }
 }

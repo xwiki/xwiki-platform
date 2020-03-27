@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!--
  *
@@ -23,8 +23,12 @@
 -->
 
 <!-- Prepares an XHTML document to be converted to an office format -->
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0" xmlns="http://www.w3.org/1999/xhtml"
-  xmlns:xhtml="http://www.w3.org/1999/xhtml" exclude-result-prefixes="xhtml">
+<xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:xhtml="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="xhtml">
+
   <!-- OpenOffice does not support XHTML so we remove the XML marker and let it parse the output as if it was HTML content -->
   <xsl:output method="html" encoding="UTF-8" omit-xml-declaration="yes" doctype-public="-//W3C//DTD XHTML 1.0 Strict//EN"
     doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" indent="no" />
@@ -44,7 +48,7 @@
   </xsl:template>
 
   <!-- Remove the id attribute from the body element because the office conversion fails when it is present -->
-  <xsl:template match="//xhtml:body/@id" />
+  <xsl:template match="xhtml:body/@id" />
 
   <!-- Table of contents -->
   <xsl:template match="*[@class = 'pdftoc']">
@@ -85,20 +89,20 @@
     from the image URL because the src attribute must match the image file name. Normally the office export URL factory removes
     the query string but some URLs are modified outside of the URL factory (e.g. the rendering module can add the image dimensions
     to the query string). -->
-  <xsl:template match="//xhtml:img/@src[contains(., '?') and not(contains(., '://'))]">
+  <xsl:template match="xhtml:img/@src[contains(., '?') and not(contains(., '://'))]">
     <xsl:attribute name="{local-name()}">
       <xsl:value-of select="substring-before(., '?')" />
     </xsl:attribute>
   </xsl:template>
 
   <!-- It seems the Office server doesn't understand the INS and DEL HTML elements so we have to use CSS instead. -->
-  <xsl:template match="//xhtml:ins">
+  <xsl:template match="xhtml:ins">
     <xsl:element name="span">
       <xsl:attribute name="style">text-decoration:underline</xsl:attribute>
       <xsl:apply-templates select="@*|node()" />
     </xsl:element>
   </xsl:template>
-  <xsl:template match="//xhtml:del">
+  <xsl:template match="xhtml:del">
     <xsl:element name="span">
       <xsl:attribute name="style">text-decoration:line-through</xsl:attribute>
       <xsl:apply-templates select="@*|node()" />

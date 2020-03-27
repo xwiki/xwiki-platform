@@ -24,4 +24,6 @@
 -->
 <config>
   <luceneMatchVersion>${lucene.version}</luceneMatchVersion>
+
+  <requestHandler name="/select" class="solr.SearchHandler"/>
 </config>

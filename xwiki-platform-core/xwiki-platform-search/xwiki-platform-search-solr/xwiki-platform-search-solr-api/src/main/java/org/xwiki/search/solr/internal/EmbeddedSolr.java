@@ -24,7 +24,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -35,20 +39,22 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.text.StringSubstitutor;
 import org.apache.lucene.util.Version;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.embedded.EmbeddedSolrServer;
 import org.apache.solr.core.CoreContainer;
+import org.apache.solr.core.SolrCore;
+import org.apache.solr.core.SolrResourceLoader;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.environment.Environment;
-import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
@@ -69,11 +75,6 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     public static final String TYPE = "embedded";
 
     /**
-     * Default directory name for Solr's configuration and index files.
-     */
-    public static final String DEFAULT_SOLR_DIRECTORY_NAME = "solr";
-
-    /**
      * Solr configuration.
      */
     @Inject
@@ -85,36 +86,52 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     @Inject
     private Environment environment;
 
-    /**
-     * Solr CoreContainer.
-     */
     private CoreContainer container;
+
+    private Path solrHomePath;
+
+    private Path solrSearchCorePath;
 
     @Override
     public void initialize() throws InitializationException
     {
-        String solrHome = determineHomeDirectory();
+        this.solrHomePath = Paths.get(this.solrConfiguration.getHomeDirectory());
+        this.solrSearchCorePath = this.solrHomePath.resolve("search");
+
         try {
-            // Validate and initialize the home directory if needed.
-            validateAndInitializeHomeDirectory(solrHome);
+            // Create the Solr home if it does not already exist
+            if (!Files.exists(this.solrHomePath)) {
+                createHomeDirectory();
+            }
+
+            // Validate and create the search core
+            if (Files.exists(this.solrSearchCorePath)) {
+                // Make sure the core setup is up to date
+                if (!isSearchCoreValid()) {
+                    // Recreate the home folder
+                    recreateSearchCore();
+                }
+            } else {
+                createSearchCore();
+            }
 
             // Start embedded Solr server.
             this.logger.info("Starting embedded Solr server...");
-            this.logger.info("Using Solr home directory: [{}]", solrHome);
+            this.logger.info("Using Solr home directory: [{}]", this.solrHomePath);
 
             // Initialize the SOLR back-end using an embedded server.
-            this.container = createCoreContainer(solrHome);
+            this.container = createCoreContainer();
 
             this.logger.info("Started embedded Solr server.");
         } catch (Exception e) {
-            throw new InitializationException(String
-                .format("Failed to initialize the Solr embedded server with home directory set to [%s]", solrHome), e);
+            throw new InitializationException(String.format(
+                "Failed to initialize the Solr embedded server with home directory set to [%s]", this.solrHomePath), e);
         }
     }
 
-    private CoreContainer createCoreContainer(String solrHome) throws SolrServerException
+    private CoreContainer createCoreContainer() throws SolrServerException
     {
-        CoreContainer coreContainer = new CoreContainer(solrHome);
+        CoreContainer coreContainer = new CoreContainer(new SolrResourceLoader(this.solrHomePath));
         coreContainer.load();
         if (coreContainer.getCores().isEmpty()) {
             throw new SolrServerException(
@@ -125,9 +142,61 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     }
 
     @Override
-    protected SolrClient createSolrClient(String coreName) throws SolrException
+    protected SolrClient getInternalSolrClient(String coreName) throws SolrException
     {
-        return new EmbeddedSolrServer(this.container, coreName);
+        SolrCore core = this.container.getCore(coreName);
+
+        return core != null ? new EmbeddedSolrServer(core) : null;
+    }
+
+    @Override
+    protected SolrClient createCore(String coreName, Map<String, String> parameters) throws SolrException
+    {
+        // Prepare the filesystem
+        // TODO: get rid of that we we find out how to have Solr fully create the core as it should...
+        try {
+            prepareCore(coreName);
+        } catch (IOException e) {
+            throw new SolrException("Failed to prepare the Solr core storage", e);
+        }
+
+        // Create the actual core
+        SolrCore core = this.container.create(coreName, parameters);
+
+        // Return a usable SolrClient instance
+        return new EmbeddedSolrServer(core);
+    }
+
+    private void prepareCore(String coreName) throws IOException
+    {
+        Path corePath = this.container.getConfig().getCoreRootDirectory().resolve(coreName);
+
+        // Create the core directory
+        Files.createDirectory(corePath);
+
+        Path confPath = corePath.resolve("conf");
+
+        // Create the conf directory (required to write custom schema configuration)
+        Files.createDirectory(confPath);
+
+        // The default solrconfig.xml
+        storeResourceFile("/solr/defaultcore/conf/solrconfig.xml", confPath.resolve("solrconfig.xml").toFile());
+
+        // The default schema configuration
+        storeResourceFile("/solr/defaultcore/conf/managed-schema.xml", confPath.resolve("managed-schema").toFile());
+    }
+
+    private void storeResourceFile(String resource, File target) throws IOException
+    {
+        String content = IOUtils.toString(getClass().getResourceAsStream(resource), StandardCharsets.UTF_8);
+
+        // Resolve variables
+        Map<String, String> variables = new HashMap<>();
+        variables.put("lucene.version", Version.LATEST.toString());
+        StringSubstitutor substitutor = new StringSubstitutor(variables);
+        content = substitutor.replace(content);
+
+        FileUtils.write(target, content, StandardCharsets.UTF_8);
     }
 
     @Override
@@ -148,80 +217,6 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     protected CoreContainer getContainer()
     {
         return this.container;
-    }
-
-    /**
-     * Checks rights, creates paths and adds default config XML files if they don`t already exist.
-     * 
-     * @param solrHome the directory to use as Solr home.
-     * @throws IllegalArgumentException if the provided directory is not usable (is a file, is not writable, etc.).
-     * @throws IOException if the XML files are not copied successfully.
-     */
-    private void validateAndInitializeHomeDirectory(String solrHome) throws IllegalArgumentException, IOException
-    {
-        // Validate and create the directory if it does not already exist.
-        File solrHomeDirectory = new File(solrHome);
-        if (solrHomeDirectory.exists()) {
-            if (!isValid(solrHomeDirectory)) {
-                // Recreate the home folder
-                recreateHomeDirectory(solrHomeDirectory);
-            }
-        } else {
-            createHomeDirectory(solrHomeDirectory);
-        }
-
-        // Create cores files
-        this.logger.info("Initializing solr cores...");
-        try {
-            for (SolrCoreInitializer coreInitializer : this.componentManager
-                .<SolrCoreInitializer>getInstanceList(SolrCoreInitializer.class)) {
-                try {
-                    initializeCore(coreInitializer, solrHomeDirectory);
-                } catch (Exception e) {
-                    this.logger.error("Failed to initialize a Solr core", e);
-                }
-            }
-        } catch (ComponentLookupException e) {
-            this.logger.error("Failed to initialize Solr cores", e);
-        }
-    }
-
-    private void initializeCore(SolrCoreInitializer coreInitializer, File solrHomeDirectory) throws IOException
-    {
-        String coreName = coreInitializer.getCoreName();
-
-        this.logger.info("  Initializing solr core [{}]...", coreName);
-
-        File coreDirectory = new File(solrHomeDirectory, coreName);
-
-        if (!coreDirectory.exists()) {
-            this.logger.info("  The core [{}] does not exist, creating it", coreName);
-
-            // Create the core directory
-            coreDirectory.mkdir();
-
-            // Create the minimum core content
-            File corePropertiesFile = new File(coreDirectory, "core.properties");
-            corePropertiesFile.createNewFile();
-
-            FileUtils.write(new File(coreDirectory, "solrconfig.xml"),
-                "<config><luceneMatchVersion>" + Version.LATEST + "</luceneMatchVersion></config>",
-                StandardCharsets.UTF_8);
-
-            FileUtils.write(new File(coreDirectory, "managed-schema"),
-                "<schema name=\"" + coreName + "\" version=\"1.6\">"
-                    + "<field name=\"id\" type=\"string\" required=\"true\" indexed=\"true\" stored=\"true\" />"
-                    + "<uniqueKey>id</uniqueKey>"
-                    + "<fieldType name=\"string\" class=\"solr.StrField\" sortMissingLast=\"true\" docValues=\"true\"/>"
-                    + "</schema>",
-                StandardCharsets.UTF_8);
-
-            new File(coreDirectory, "conf").mkdir();
-
-            this.logger.info("  The core [{}] has been created", coreName);
-        } else {
-            this.logger.debug("  The core [{}] already exist", coreName);
-        }
     }
 
     private boolean isExpectedSolrVersion(File solrconfigFile)
@@ -248,87 +243,89 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         return false;
     }
 
-    private boolean isValid(File solrHomeDirectory)
+    private boolean isSearchCoreValid()
     {
         // Exists but is unusable.
-        if (!solrHomeDirectory.isDirectory() || !solrHomeDirectory.canWrite() || !solrHomeDirectory.canRead()) {
-            throw new IllegalArgumentException(
-                String.format("The given path [%s] must be a readable and writable directory", solrHomeDirectory));
+        if (!Files.isDirectory(this.solrSearchCorePath) || !Files.isWritable(this.solrSearchCorePath)
+            || !Files.isReadable(this.solrSearchCorePath)) {
+            throw new IllegalArgumentException(String
+                .format("The given path [%s] must be a readable and writable directory", this.solrSearchCorePath));
         }
 
         // Check solrconfig.xml
-        File solrconfigFile = new File(solrHomeDirectory, "xwiki/conf/solrconfig.xml");
+        File solrconfigFile = this.solrSearchCorePath.resolve("conf/solrconfig.xml").toFile();
         return solrconfigFile.exists() && isExpectedSolrVersion(solrconfigFile);
     }
 
-    private void recreateHomeDirectory(File solrHomeDirectory) throws IOException
+    private void recreateSearchCore() throws IOException
     {
-        // Archive solr home
-        if (solrHomeDirectory.exists()) {
-            File newDirectory = archiveHomeDirectory(solrHomeDirectory);
+        // Delete search core
+        if (Files.exists(this.solrSearchCorePath)) {
+            this.logger.warn("The Solr search core directory at [{}] is invalid. Deleting it and creating a new one.",
+                this.solrSearchCorePath);
 
-            this.logger.warn("The Solr home directory at [{}] is invalid. Archiving it at [{}] and creating a new one.",
-                solrHomeDirectory, newDirectory);
+            // Delete the core directory
+            FileUtils.deleteDirectory(this.solrSearchCorePath.toFile());
+
+            // Delete the data directory
+            FileUtils.deleteDirectory(resolveSearchCoreDataPath().toFile());
         }
 
         // Recreate
-        createHomeDirectory(solrHomeDirectory);
+        createSearchCore();
     }
 
-    private File archiveHomeDirectory(File solrHomeDirectory) throws IOException
+    private void createHomeDirectory() throws IOException
     {
-        // Append the date to the home directory to archive it
-        File archiveDirectory = solrHomeDirectory.getParentFile();
-        archiveDirectory = new File(archiveDirectory, solrHomeDirectory.getName() + "-" + new Date().getTime());
-
-        FileUtils.moveDirectoryToDirectory(solrHomeDirectory, archiveDirectory, true);
-
-        return archiveDirectory;
-    }
-
-    private void createHomeDirectory(File solrHomeDirectory) throws IOException
-    {
-        // Create the home directory
-        if (!solrHomeDirectory.mkdirs()) {
-            // Does not exist and can not be created.
-            throw new IllegalArgumentException(String.format("The given path [%s] could not be created due to an "
-                + "invalid value or to insufficient filesystem permissions", solrHomeDirectory));
-        }
-
         // Initialize the Solr Home with the default configuration files if the folder does not already exist.
         // Add the configuration files required by Solr.
 
-        this.logger.info("Generating a new Solr home directory at [{}]", solrHomeDirectory);
+        this.logger.info("Generating a new Solr home directory at [{}]", this.solrHomePath);
 
-        InputStream stream = this.solrConfiguration.getHomeDirectoryConfiguration();
-        try (ZipInputStream zstream = new ZipInputStream(stream)) {
-            for (ZipEntry entry = zstream.getNextEntry(); entry != null; entry = zstream.getNextEntry()) {
-                if (entry.isDirectory()) {
-                    File destinationDirectory = new File(solrHomeDirectory, entry.getName());
-                    destinationDirectory.mkdirs();
-                } else {
-                    File destinationFile = new File(solrHomeDirectory, entry.getName());
-                    FileUtils.copyInputStreamToFile(new CloseShieldInputStream(zstream), destinationFile);
+        // Create the home directory
+        Files.createDirectories(this.solrHomePath);
+
+        // Copy the default solr.xml configuration file
+        FileUtils.write(this.solrHomePath.resolve("solr.xml").toFile(), "<solr/>", StandardCharsets.UTF_8);
+
+        // [RETRO COMPATIBILITY for < 12.3]
+        // Check if the solr home is not already at the old location (/solr) and move things
+        File oldHome = new File(this.environment.getPermanentDirectory(), "solr");
+        if (oldHome.exists()) {
+            // Move old cores to the new location
+            for (File core : oldHome.listFiles()) {
+                // We don't care about the "xwiki" core since it needs to be recreated anyway
+                if (!core.getName().equals("xwiki") && !core.getName().equals("META-INF")) {
+                    // Move the folder in the new location
+                    FileUtils.moveDirectoryToDirectory(core, this.solrHomePath.toFile(), false);
                 }
             }
         }
     }
 
-    /**
-     * @return the configured home directory location or the default value if no configuration is present.
-     */
-    private String determineHomeDirectory()
+    private void createSearchCore() throws IOException
     {
-        String defaultValue = getDefaultHomeDirectory();
+        // Copy configuration
+        InputStream stream = this.solrConfiguration.getSearchCoreDefaultContent();
+        try (ZipInputStream zstream = new ZipInputStream(stream)) {
+            for (ZipEntry entry = zstream.getNextEntry(); entry != null; entry = zstream.getNextEntry()) {
+                Path targetPath = this.solrSearchCorePath.resolve(entry.getName());
+                if (entry.isDirectory()) {
+                    Files.createDirectories(targetPath);
+                } else {
+                    FileUtils.copyInputStreamToFile(new CloseShieldInputStream(zstream), targetPath.toFile());
+                }
+            }
+        }
 
-        return this.solrConfiguration.getInstanceConfiguration(EmbeddedSolr.TYPE, "home", defaultValue);
+        // Indicate the path of the data
+        Path dataPath = resolveSearchCoreDataPath().relativize(this.solrSearchCorePath);
+        FileUtils.write(this.solrSearchCorePath.resolve("core.properties").toFile(), "dataDir=" + dataPath,
+            StandardCharsets.UTF_8, true);
     }
 
-    /**
-     * @return the default home directory located inside the environment's permanent directory.
-     */
-    String getDefaultHomeDirectory()
+    private Path resolveSearchCoreDataPath()
     {
-        return new File(this.environment.getPermanentDirectory(), DEFAULT_SOLR_DIRECTORY_NAME).getPath();
+        return this.environment.getPermanentDirectory().toPath().resolve("cache/solr/search");
     }
 }

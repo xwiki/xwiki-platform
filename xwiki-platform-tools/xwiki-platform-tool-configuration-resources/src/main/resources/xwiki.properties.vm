@@ -579,9 +579,9 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # solr.type=embedded
 
 #-# [Since 4.5M1]
-#-# The location where the embedded Solr instance stores its configuration and the indexed data.
-#-# The default is the subfolder "solr" inside the folder defined by the property "environment.permanentDirectory".
-# solr.embedded.home=/var/local/xwiki/solr
+#-# The location where the embedded Solr instance home folder is located.
+#-# The default is the subfolder "store/solr" inside folder defined by the property "environment.permanentDirectory".
+# solr.embedded.home=/var/local/xwiki/store/solr
 
 #-# [Since 4.5M1]
 #-# The URL to use to connect to the remote solr server.

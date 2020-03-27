@@ -47,11 +47,11 @@ public interface SolrConfiguration
     <T> T getInstanceConfiguration(String instanceType, String propertyName, T defaultValue);
 
     /**
-     * Retrieves the configuration files required by the Solr instance's home directory in order to initialize.
+     * Retrieves the configuration files required by the Solr XWiki core in order to initialize.
      * 
-     * @return a map of (fileName, fileURL) to be used to initialize the Solr instance.
+     * @return an input stream of a zip package containing the default core setup
      */
-    InputStream getHomeDirectoryConfiguration();
+    InputStream getSearchCoreDefaultContent();
 
     // Indexer
 
@@ -78,4 +78,16 @@ public interface SolrConfiguration
      * @since 6.1M2
      */
     boolean synchronizeAtStartup();
+
+    /**
+     * @return the configured home directory location or the default value if no configuration is present.
+     * @since 12.3RC1
+     */
+    String getHomeDirectory();
+
+    /**
+     * @return the default home directory located inside the environment's permanent directory.
+     * @since 12.3RC1
+     */
+    String getDefaultHomeDirectory();
 }

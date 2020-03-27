@@ -105,6 +105,8 @@ ckeditor.plugin.toolbar.include=Include
 ckeditor.plugin.toolbar.code=Code Snippet
 ckeditor.plugin.toolbar.otherMacros=Other Macros
 
+ckeditor.inline.failedToInit=Failed to initialize CKEditor.
+
 modal.ok=OK
 modal.cancel=Cancel
 modal.close=Close

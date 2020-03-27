@@ -35,7 +35,7 @@
        that you fully re-index after changing this setting as it can
        affect both how text is indexed and queried.
   -->
-  <luceneMatchVersion>8.1.1</luceneMatchVersion>
+  <luceneMatchVersion>8.5.0</luceneMatchVersion>
 
   <!-- <lib/> directives can be used to instruct Solr to load any Jars
        identified and use them to resolve any "plugins" specified in
@@ -404,9 +404,12 @@
 
     <!-- Solr Internal Query Caches
 
-         There are two implementations of cache available for Solr,
-         LRUCache, based on a synchronized LinkedHashMap, and
-         FastLRUCache, based on a ConcurrentHashMap.
+         There are four implementations of cache available for Solr:
+         LRUCache, based on a synchronized LinkedHashMap, 
+         LFUCache and FastLRUCache, based on a ConcurrentHashMap, and CaffeineCache -
+         a modern and robust cache implementation. Note that in Solr 9.0
+         only CaffeineCache will be available, other implementations are now
+         deprecated.
 
          FastLRUCache has faster gets and slower puts in single
          threaded operation and thus is generally faster than LRUCache

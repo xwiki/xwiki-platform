@@ -34,7 +34,6 @@
   <modules>
     <module>xwiki-platform-search-solr-server-plugin</module>
     <module>xwiki-platform-search-solr-server-core</module>
-    <module>xwiki-platform-search-solr-server-data</module>
     <module>xwiki-platform-search-solr-server-debian</module>
   </modules>
 </project>

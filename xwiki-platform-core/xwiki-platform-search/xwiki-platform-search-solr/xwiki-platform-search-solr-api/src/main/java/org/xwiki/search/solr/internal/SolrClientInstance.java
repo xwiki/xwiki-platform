@@ -45,9 +45,9 @@ public class SolrClientInstance extends AbstractSolrInstance
     public void initialize() throws InitializationException
     {
         try {
-            this.server = this.solr.getClient("xwiki");
+            this.server = this.solr.getClient("search");
         } catch (SolrException e) {
-            throw new InitializationException("Failed to create the solr client for core [xwiki]", e);
+            throw new InitializationException("Failed to create the solr client for core [search]", e);
         }
     }
 }

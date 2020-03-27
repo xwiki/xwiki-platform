@@ -22,6 +22,7 @@ package org.xwiki.search.solr.internal;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -31,8 +32,9 @@ import org.apache.solr.core.CoreContainer;
 import org.apache.solr.core.SolrCore;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
 import org.xwiki.search.solr.Solr;
@@ -48,7 +50,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -89,15 +90,17 @@ public class EmbeddedSolrInitializationTest
 
         FileUtils.deleteDirectory(this.permanentDirectory);
         this.permanentDirectory.mkdirs();
+
+        when(this.mockXWikiProperties.getProperty(eq(SOLRHOME_PROPERTY), anyString())).then(new Answer<String>()
+        {
+            @Override
+            public String answer(InvocationOnMock invocation) throws Throwable
+            {
+                return invocation.getArgument(1);
+            }
+        });
     }
 
-    /**
-     * TODO DOCUMENT ME!
-     * 
-     * @param expected
-     * @throws ComponentLookupException
-     * @throws Exception
-     */
     private void getInstanceAndAssertHomeDirectory(String expected) throws ComponentLookupException, Exception
     {
         Solr instance = this.componentManager.getInstance(Solr.class, EmbeddedSolr.TYPE);
@@ -107,7 +110,8 @@ public class EmbeddedSolrInitializationTest
         CoreContainer container = implementation.getContainer();
 
         if (expected == null) {
-            expected = implementation.getDefaultHomeDirectory();
+            SolrConfiguration configuration = this.componentManager.getInstance(SolrConfiguration.class);
+            expected = configuration.getDefaultHomeDirectory();
         }
 
         assertEquals(expected, container.getSolrHome());
@@ -124,28 +128,31 @@ public class EmbeddedSolrInitializationTest
     @Test
     public void testInitializationWhenValid() throws Exception
     {
+        // Create the Solr home
+        File solrHomeDirectory = new File(this.permanentDirectory, "store/solr");
+        solrHomeDirectory.mkdirs();
+        FileUtils.write(new File(solrHomeDirectory, "solr.xml"), "<solr/>", StandardCharsets.UTF_8);
+
         // Unzip the standard Solr home
-        File solrHomeDirectory = new File(this.permanentDirectory, "solr");
+        File solrSearchCoreDirectory = new File(solrHomeDirectory, "search");
         SolrConfiguration solrConfiguration = this.componentManager.getInstance(SolrConfiguration.class);
-        InputStream stream = solrConfiguration.getHomeDirectoryConfiguration();
+        InputStream stream = solrConfiguration.getSearchCoreDefaultContent();
         try (ZipInputStream zstream = new ZipInputStream(stream)) {
             for (ZipEntry entry = zstream.getNextEntry(); entry != null; entry = zstream.getNextEntry()) {
                 if (entry.isDirectory()) {
-                    File destinationDirectory = new File(solrHomeDirectory, entry.getName());
+                    File destinationDirectory = new File(solrSearchCoreDirectory, entry.getName());
                     destinationDirectory.mkdirs();
                 } else {
-                    File destinationFile = new File(solrHomeDirectory, entry.getName());
+                    File destinationFile = new File(solrSearchCoreDirectory, entry.getName());
                     FileUtils.copyInputStreamToFile(new CloseShieldInputStream(zstream), destinationFile);
                 }
             }
         }
-        when(this.mockXWikiProperties.getProperty(eq(SOLRHOME_PROPERTY), anyString()))
-            .thenReturn(solrHomeDirectory.toString());
 
         getInstanceAndAssertHomeDirectory(solrHomeDirectory.toString());
 
         // Modify the configuration file
-        File solrconfigFile = new File(solrHomeDirectory, "xwiki/conf/solrconfig.xml");
+        File solrconfigFile = new File(solrSearchCoreDirectory, "conf/solrconfig.xml");
         String modifiedContent = FileUtils.readFileToString(solrconfigFile, StandardCharsets.UTF_8) + "/n";
         FileUtils.write(solrconfigFile, modifiedContent, StandardCharsets.UTF_8);
 
@@ -157,26 +164,29 @@ public class EmbeddedSolrInitializationTest
     @Test
     public void testInitializationWhenInvalid() throws Exception
     {
+        // Create the Solr home
+        File solrHomeDirectory = new File(this.permanentDirectory, "store/solr");
+        solrHomeDirectory.mkdirs();
+        FileUtils.write(new File(solrHomeDirectory, "solr.xml"), "<solr/>", StandardCharsets.UTF_8);
+
         // Unzip the standard Solr home
-        File solrHomeDirectory = new File(this.permanentDirectory, "solr");
+        File solrSearchCoreDirectory = new File(solrHomeDirectory, "search");
         SolrConfiguration solrConfiguration = this.componentManager.getInstance(SolrConfiguration.class);
-        InputStream stream = solrConfiguration.getHomeDirectoryConfiguration();
+        InputStream stream = solrConfiguration.getSearchCoreDefaultContent();
         try (ZipInputStream zstream = new ZipInputStream(stream)) {
             for (ZipEntry entry = zstream.getNextEntry(); entry != null; entry = zstream.getNextEntry()) {
                 if (entry.isDirectory()) {
-                    File destinationDirectory = new File(solrHomeDirectory, entry.getName());
+                    File destinationDirectory = new File(solrSearchCoreDirectory, entry.getName());
                     destinationDirectory.mkdirs();
                 } else {
-                    File destinationFile = new File(solrHomeDirectory, entry.getName());
+                    File destinationFile = new File(solrSearchCoreDirectory, entry.getName());
                     FileUtils.copyInputStreamToFile(new CloseShieldInputStream(zstream), destinationFile);
                 }
             }
         }
-        when(this.mockXWikiProperties.getProperty(eq(SOLRHOME_PROPERTY), anyString()))
-            .thenReturn(solrHomeDirectory.toString());
 
         // Make the configuration too old
-        File solrconfigFile = new File(solrHomeDirectory, "xwiki/conf/solrconfig.xml");
+        File solrconfigFile = new File(solrSearchCoreDirectory, "conf/solrconfig.xml");
         String modifiedContent = FileUtils.readFileToString(solrconfigFile, StandardCharsets.UTF_8)
             .replaceAll("<luceneMatchVersion>.*</luceneMatchVersion>", "<luceneMatchVersion>old</luceneMatchVersion>");
         FileUtils.write(solrconfigFile, modifiedContent, StandardCharsets.UTF_8);
@@ -195,21 +205,5 @@ public class EmbeddedSolrInitializationTest
         when(this.mockXWikiProperties.getProperty(eq(SOLRHOME_PROPERTY), anyString())).thenReturn(newHome);
 
         getInstanceAndAssertHomeDirectory(newHome);
-    }
-
-    @Test
-    public void testInstantiationWhenEmpty() throws ComponentLookupException, Exception
-    {
-        when(this.mockXWikiProperties.getProperty(eq(SOLRHOME_PROPERTY), anyString())).thenReturn("");
-
-        // Not actually expecting anything. This will throw an exception.
-        try {
-            getInstanceAndAssertHomeDirectory(null);
-
-            fail("Specify a valid directory. Empty values are not accepted.");
-        } catch (ComponentLookupException e) {
-            assertTrue(e.getCause() instanceof InitializationException);
-            assertTrue(e.getCause().getCause() instanceof IllegalArgumentException);
-        }
     }
 }

@@ -165,10 +165,10 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.xwiki.platform</groupId>
-                  <artifactId>xwiki-platform-search-solr-server-data</artifactId>
+                  <artifactId>xwiki-platform-search-solr-server-core</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
-                  <destFileName>xwiki-platform-search-solr-server-data.zip</destFileName>
+                  <destFileName>xwiki-platform-search-solr-server-core.zip</destFileName>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.outputDirectory}/</outputDirectory>

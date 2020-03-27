@@ -19,13 +19,19 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.util.Map;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
+import org.apache.solr.client.solrj.request.CoreAdminRequest;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.search.solr.SolrException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
@@ -37,7 +43,7 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
 @Component
 @Named(RemoteSolr.TYPE)
 @Singleton
-public class RemoteSolr extends AbstractSolr
+public class RemoteSolr extends AbstractSolr implements Initializable
 {
     /**
      * Solr instance type for this implementation.
@@ -52,12 +58,35 @@ public class RemoteSolr extends AbstractSolr
     @Inject
     private SolrConfiguration configuration;
 
+    private HttpSolrClient rootClient;
+
     @Override
-    protected SolrClient createSolrClient(String coreName)
+    public void initialize() throws InitializationException
     {
         String remoteURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
 
-        // Initialize the remote Solr server.
-        return new HttpSolrClient.Builder(remoteURL + '#' + coreName).build();
+        this.rootClient = new HttpSolrClient.Builder(remoteURL).build();
+    }
+
+    @Override
+    protected SolrClient getInternalSolrClient(String coreName)
+    {
+        return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + coreName).build();
+    }
+
+    @Override
+    protected SolrClient createCore(String coreName, Map<String, String> parameters) throws SolrException
+    {
+        CoreAdminRequest coreAdminRequest = new CoreAdminRequest.Create();
+
+        coreAdminRequest.setCoreName(coreName);
+
+        try {
+            coreAdminRequest.process(this.rootClient);
+        } catch (Exception e) {
+            throw new SolrException("Failed to create a new core", e);
+        }
+
+        return getInternalSolrClient(coreName);
     }
 }

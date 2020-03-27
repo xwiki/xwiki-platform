@@ -20,6 +20,7 @@
 package org.xwiki.search.solr.internal;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -75,7 +76,7 @@ public abstract class AbstractSolr implements Solr, Disposable
     {
         try {
             // Create the client
-            SolrClient solrClient = createSolrClient(coreName);
+            SolrClient solrClient = getInternalSolrClient(coreName);
 
             // Initialize the client
             if (this.componentManager.hasComponent(SolrCoreInitializer.class, coreName)) {
@@ -86,6 +87,12 @@ public abstract class AbstractSolr implements Solr, Disposable
                     throw new SolrException("Failed to get the SolrCoreInitializer for core name [{}]", e);
                 }
 
+                // If no core already exist create a new core
+                if (solrClient == null) {
+                    solrClient = createCore(coreName, Collections.emptyMap());
+                }
+
+                // Custom initialization of the core
                 initializer.initialize(solrClient);
             }
 
@@ -99,8 +106,10 @@ public abstract class AbstractSolr implements Solr, Disposable
 
     /**
      * @param id the identifier of the core
-     * @return the new core or the existing one as a {@link SolrClient} if another thread created one in the meantime
+     * @return the new core or null if no core exist by this name
      * @throws SolrException when failing to create the solr client
      */
-    protected abstract SolrClient createSolrClient(String coreName) throws SolrException;
+    protected abstract SolrClient getInternalSolrClient(String coreName) throws SolrException;
+
+    protected abstract SolrClient createCore(String coreName, Map<String, String> parameters) throws SolrException;
 }

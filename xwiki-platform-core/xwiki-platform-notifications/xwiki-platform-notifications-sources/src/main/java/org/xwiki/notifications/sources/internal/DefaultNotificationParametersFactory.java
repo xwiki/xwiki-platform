@@ -45,6 +45,7 @@ import org.xwiki.notifications.NotificationConfiguration;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterManager;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterProperty;
 import org.xwiki.notifications.filters.NotificationFilterType;
@@ -55,6 +56,7 @@ import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilter;
 import org.xwiki.notifications.filters.internal.scope.ScopeNotificationFilterPreference;
 import org.xwiki.notifications.filters.internal.status.EventReadAlertFilter;
 import org.xwiki.notifications.filters.internal.status.ForUserEventFilter;
+import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.filters.internal.user.OwnEventFilter;
 import org.xwiki.notifications.preferences.NotificationPreferenceManager;
 import org.xwiki.notifications.sources.NotificationParameters;
@@ -421,7 +423,19 @@ public class DefaultNotificationParametersFactory
             handleLocationParameter(currentWiki, notificationParameters, NotificationFilterProperty.WIKI);
         }
 
-        usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
+        if (StringUtils.isNotBlank(parameters.get(ParametersKey.USERS))) {
+            usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
+        } else if (notificationParameters.user != null) {
+            // if we have a user, then we should also display personal messages from followed users.
+            // the other types of messages get included, but for personal messages the filter needs a matching filter preference
+            // so we loop though preferences to see if they have a preference for this (as a copy to guard against unwanted modifications)
+            for (NotificationFilterPreference filterPref : notificationFilterPreferenceManager.getFilterPreferences(notificationParameters.user)) {
+                if (EventUserFilter.FILTER_NAME.equals(filterPref.getFilterName())) {
+                    DefaultNotificationFilterPreference personalPref = new DefaultNotificationFilterPreference(filterPref);
+                    notificationParameters.filterPreferences.add(personalPref);
+                }
+            }
+        }
 
         handleTagsParameter(notificationParameters, parameters.get(ParametersKey.TAGS), currentWiki);
     }

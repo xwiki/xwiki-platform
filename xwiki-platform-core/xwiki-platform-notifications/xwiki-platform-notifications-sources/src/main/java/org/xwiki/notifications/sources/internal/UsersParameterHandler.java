@@ -29,14 +29,19 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
+import org.xwiki.notifications.filters.NotificationFilterPreference;
+import org.xwiki.notifications.filters.NotificationFilterPreferenceManager;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.notifications.filters.internal.DefaultNotificationFilterPreference;
+import org.xwiki.notifications.filters.internal.user.EventUserFilter;
 import org.xwiki.notifications.sources.NotificationParameters;
 
 /**
@@ -64,6 +69,13 @@ public class UsersParameterHandler
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
 
+    @Inject
+    private NotificationFilterPreferenceManager notificationFilterPreferenceManager;
+
+    @Inject
+    private Logger logger;
+
+
     /**
      * Handle the "users" parameters of the REST API.
      * 
@@ -90,6 +102,24 @@ public class UsersParameterHandler
             parameters.filters.add(new FollowedUserOnlyEventFilter(entityReferenceSerializer, userList));
 
             addFilterPreference(parameters, userList);
+        } else if (parameters.user != null) {
+            // if we have a user (but no "users") then we should also display personal messages from followed users.
+            // the other types of messages get included, but for personal messages the filter needs
+            // a matching filter preference so we loop though preferences to see if they have
+            // a preference for this (using a copy to guard against unwanted modifications)
+            try {
+                for (NotificationFilterPreference filterPref
+                    : notificationFilterPreferenceManager.getFilterPreferences(parameters.user)) {
+                    if (EventUserFilter.FILTER_NAME.equals(filterPref.getFilterName())) {
+                        DefaultNotificationFilterPreference personalPref
+                            = new DefaultNotificationFilterPreference(filterPref);
+                        parameters.filterPreferences.add(personalPref);
+                    }
+                }
+            } catch (NotificationException e) {
+                logger.error("failed to fetch the notification preferences for user [{}]:",
+                    entityReferenceSerializer.serialize(parameters.user), e);
+            }
         }
     }
 

@@ -34,6 +34,7 @@ import org.xwiki.user.UserManager;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.UserReferenceResolver;
 
 /**
  * Users related script API.
@@ -64,6 +65,9 @@ public class UserScriptService implements ScriptService
     @Inject
     private UserManager userManager;
 
+    @Inject
+    private UserReferenceResolver<String> userReferenceResolver;
+
     /**
      * @param <S> the type of the {@link ScriptService}
      * @param serviceName the name of the sub {@link ScriptService}
@@ -85,6 +89,23 @@ public class UserScriptService implements ScriptService
     public UserProperties getProperties(UserReference userReference, Object... parameters)
     {
         return this.userPropertiesResolver.resolve(userReference, parameters);
+    }
+
+    /**
+     * Note that we have a {@code UserReferenceConverter} component to automatically convert from
+     * String to {@link UserReference} but since in the signature we accept a vararg of Object, the
+     * {@link #getProperties(Object...)} is called instead when a single string is passed. This is the reason for this
+     * method, so that it's called when a String is passed.
+     *
+     * @param userReference the reference to the user properties to resolve.
+     * @param parameters optional parameters that have a meaning only for the specific resolver implementation used
+     * @return the User Properties object
+     * @since 12.3RC1
+     */
+    @Unstable
+    public UserProperties getProperties(String userReference, Object... parameters)
+    {
+        return this.userPropertiesResolver.resolve(this.userReferenceResolver.resolve(userReference), parameters);
     }
 
     /**

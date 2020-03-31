@@ -25,7 +25,7 @@
 <!--
   Context configuration file for the XWiki Web App
 
-  This file is used only for Tomcat8 deployment of XWiki via debian packages.
+  This file is used only for Tomcat9 deployment of XWiki via debian packages.
   It is equivalent to, and needs to be kept up to date with traditional
   deployment file:
   xwiki-platform/xwiki-platform-core/xwiki-platform-web/src/main/webapp/META-INF/context.xml
@@ -48,7 +48,7 @@
        size. 
   -->
   <Resources allowLinking="true" cachingAllowed="true"
-             cacheMaxSize="12800" cacheObjectMaxSize="640" />
+             cacheMaxSize="20480" cacheObjectMaxSize="640" />
 
   <!-- Disable JAR scanning since XWiki does not need that -->
   <JarScanner scanClassPath="false">

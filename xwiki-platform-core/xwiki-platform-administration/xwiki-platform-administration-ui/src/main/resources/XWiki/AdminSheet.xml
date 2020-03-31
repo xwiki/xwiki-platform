@@ -403,10 +403,7 @@
         ##------------------------------------------------------------------------------------------------------------
         ## The Administration allows editing other pages from different applications inside the admin context (UI)
         ##------------------------------------------------------------------------------------------------------------
-        #if ("$!{request.editmode}" == 'inline' &amp;&amp; $xwiki.exists($section))
-          #set ($discard = $xcontext.setDisplayMode('edit'))
-          {{html clean="false"}}{{include reference="XWiki.AdminInlineSheet" /}}{{/html}}
-        #elseif ($xwiki.exists("XWiki.Admin${section}Sheet"))
+        #if ($xwiki.exists("XWiki.Admin${section}Sheet"))
           ## Custom XE administration section
           {{include reference="XWiki.Admin${section}Sheet" /}}
         #elseif ($xwiki.exists($section))

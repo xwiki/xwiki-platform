@@ -2780,3 +2780,22 @@ Recursive title display detected!##
   #colorPicker_import
   #colorPicker_input($parameters)
 #end
+
+#**
+ * Returns the editor that should be used to edit the current document by default (if no other editor is specified).
+ * This macro is called both in view mode (to determine the in-place editor to load) and in edit mode (to determine the
+ * classical editor to use).
+ *#
+#macro (getDefaultDocumentEditor $return)
+  ## Determine the sheets using the default document translation because objects are accessible only from the default
+  ## translation.
+  #if (!$services.sheet.getSheets($doc, $xcontext.action).isEmpty())
+    #set ($defaultDocumentEditor = 'inline')
+  #elseif ($xwiki.editorPreference == 'wysiwyg' && $services.wysiwyg.isSyntaxSupported($tdoc.syntax.toIdString()))
+    #set ($defaultDocumentEditor = 'wysiwyg')
+  #else
+    #set ($defaultDocumentEditor = 'wiki')
+  #end
+  #set ($return = $NULL)
+  #setVariable ("$return" $defaultDocumentEditor)
+#end

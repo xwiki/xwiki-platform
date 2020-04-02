@@ -35,11 +35,14 @@ define(['jquery'], function($) {
     } else if (typeof(event) === 'string') {
       eventName = event;
     }
-    var propagationStopped = jQueryEvent && typeof(jQueryEvent.isPropagationStopped) === 'function'
-      && jQueryEvent.isPropagationStopped();
-    if (!propagationStopped && element && shouldBridgeEvent(eventName)) {
+    var immediatePropagationStopped = jQueryEvent && typeof(jQueryEvent.isImmediatePropagationStopped) === 'function'
+      && jQueryEvent.isImmediatePropagationStopped();
+    if (!immediatePropagationStopped && element && shouldBridgeEvent(eventName)) {
       var memo = $.isArray(data) ? data[0] : data;
-      var bubble = !onlyHandlers;
+      var propagationStopped = jQueryEvent && typeof(jQueryEvent.isPropagationStopped) === 'function'
+        && jQueryEvent.isPropagationStopped();
+      // Execute only the event listeners registered directly on the event target if the jQuery event was stopped.
+      var bubble = !propagationStopped && !onlyHandlers;
       var prototypeEvent = oldPrototypeFire(element, eventName, memo, bubble);
       // Make sure the jQuery event can be canceled from Prototype.
       if (prototypeEvent.stopped && jQueryEvent && typeof(jQueryEvent.preventDefault) === 'function') {
@@ -51,13 +54,14 @@ define(['jquery'], function($) {
 
   var newPrototypeFire = function(element, eventName, memo, bubble) {
     var prototypeEvent = oldPrototypeFire(element, eventName, memo, bubble);
-    if (!prototypeEvent.stopped && shouldBridgeEvent(eventName)) {
+    if (shouldBridgeEvent(eventName)) {
       var jQueryEvent = $.Event(eventName);
       var data = memo ? [memo] : null;
-      var onlyHandlers = bubble === undefined ? false : !bubble;
+      // Execute only the event listeners registered directly on the event target if the prototype event was stopped.
+      var onlyHandlers = prototypeEvent.stopped || bubble === false;
       oldJQueryTrigger(jQueryEvent, data, element, onlyHandlers);
       // Make sure the Prototype event can be canceled from jQuery.
-      if (jQueryEvent.isDefaultPrevented()) {
+      if (jQueryEvent.isDefaultPrevented() || jQueryEvent.isPropagationStopped()) {
         prototypeEvent.stop();
       }
     }

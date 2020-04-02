@@ -89,7 +89,7 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
         } else {
             queryType = "display";
         }
-        return Arrays.asList("notifications", queryType, this.cacheKey);
+        return Arrays.asList("notifications", queryType, this.cacheKey.replaceAll("/", "_"));
     }
 
     @Override

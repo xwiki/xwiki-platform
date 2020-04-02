@@ -37,6 +37,7 @@ import org.apache.commons.fileupload.servlet.ServletRequestContext;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xwiki.environment.Environment;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -44,6 +45,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Plugin that offers access to uploaded files. The uploaded files are automatically parsed and preserved as a list of
@@ -95,6 +97,8 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
      * <tt>upload_sizethreshold</tt> XWiki preference.
      */
     private static final long UPLOAD_DEFAULT_SIZETHRESHOLD = 100000L;
+
+    private Environment environment;
 
     /**
      * @param name the plugin name
@@ -181,7 +185,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
         loadFileList(
             xwiki.getSpacePreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context),
             (int) xwiki.getSpacePreferenceAsLong(UPLOAD_SIZETHRESHOLD_PARAMETER, UPLOAD_DEFAULT_SIZETHRESHOLD, context),
-            xwiki.Param("xwiki.upload.tempdir"), context);
+            xwiki.Param("xwiki.upload.tempdir", getEnvironment().getTemporaryDirectory().getAbsolutePath()), context);
     }
 
     /**
@@ -453,5 +457,13 @@ public class FileUploadPlugin extends XWikiDefaultPlugin
         }
 
         return fileitem;
+    }
+
+    private Environment getEnvironment()
+    {
+        if (this.environment == null) {
+            this.environment = Utils.getComponent(Environment.class);
+        }
+        return this.environment;
     }
 }

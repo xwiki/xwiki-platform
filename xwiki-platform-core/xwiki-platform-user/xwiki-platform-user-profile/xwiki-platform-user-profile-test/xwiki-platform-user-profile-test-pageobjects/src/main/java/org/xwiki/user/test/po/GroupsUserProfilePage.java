@@ -27,7 +27,8 @@ import org.xwiki.test.ui.po.LiveTableElement;
  * Represents the User Profile Preferences Tab.
  *
  * @version $Id$
- * @since 12.3
+ * @since 12.3RC1
+ * @since 12.2.1
  */
 public class GroupsUserProfilePage extends AbstractUserProfilePage
 {

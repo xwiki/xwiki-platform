@@ -24,16 +24,16 @@ import java.io.File;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
-import org.xwiki.test.integration.junit.LogCaptureConfiguration;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.HistoryPane;
+import org.xwiki.test.ui.po.LiveTableElement;
 import org.xwiki.test.ui.po.editor.EditPage;
 import org.xwiki.user.test.po.ChangeAvatarPage;
+import org.xwiki.user.test.po.GroupsUserProfilePage;
 import org.xwiki.user.test.po.PreferencesEditPage;
 import org.xwiki.user.test.po.PreferencesUserProfilePage;
 import org.xwiki.user.test.po.ProfileEditPage;
@@ -41,6 +41,8 @@ import org.xwiki.user.test.po.ProfileUserProfilePage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Test the User Profile.
@@ -245,5 +247,18 @@ public class UserProfileIT
         HistoryPane historyPane = userProfilePage.openHistoryDocExtraPane();
         assertEquals("Initialize default dashboard user setup", historyPane.getCurrentVersionComment());
         assertEquals("2.1", historyPane.getCurrentVersion());
+    }
+
+    @Test
+    @Order(7)
+    public void verifyGroupTab()
+    {
+        GroupsUserProfilePage preferencesPage = GroupsUserProfilePage.gotoPage(this.userName);
+
+        assertEquals("Groups", preferencesPage.getPreferencesTitle());
+        LiveTableElement groupsPaneLiveTable = preferencesPage.getGroupsPaneLiveTable();
+
+        assertEquals(1, groupsPaneLiveTable.getRowCount());
+        assertEquals("XWikiAllGroup", groupsPaneLiveTable.getCell(1, 1).getText());
     }
 }

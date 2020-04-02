@@ -24,6 +24,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.web.XWikiServletRequest;
 
@@ -35,6 +36,7 @@ import com.xpn.xwiki.web.XWikiServletRequest;
  * @since 12.2.1
  * @since 11.10.5
  */
+@Unstable
 public class ScriptXWikiServletRequest extends XWikiServletRequest
 {
     private final ContextualAuthorizationManager authorization;

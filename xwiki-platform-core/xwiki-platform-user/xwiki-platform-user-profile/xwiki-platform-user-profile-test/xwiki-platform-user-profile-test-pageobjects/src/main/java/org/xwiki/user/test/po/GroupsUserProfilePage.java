@@ -27,13 +27,13 @@ import org.xwiki.test.ui.po.LiveTableElement;
  * Represents the User Profile Preferences Tab.
  *
  * @version $Id$
+ * @since 12.3
  */
 public class GroupsUserProfilePage extends AbstractUserProfilePage
 {
-    @FindBy(id = "Huser.profile.groups.title")
+    @FindBy(id = "user.profile.groups.title")
     private WebElement groupsTitle;
     
-    // @FindBy(xpath = "//div[@id='groupsPane']//table[@class='xwiki-livetable']")
     private LiveTableElement liveTable = new LiveTableElement("user.profile.group.table");
 
     public static GroupsUserProfilePage gotoPage(String username)

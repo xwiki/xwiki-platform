@@ -44,12 +44,6 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>xwiki-platform-eventstream-store</artifactId>
-      <version>${project.version}</version>
-      <scope>runtime</scope>
-    </dependency>
     <!-- The dashboard might change the behaviour of the profile, so we want to test with it -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

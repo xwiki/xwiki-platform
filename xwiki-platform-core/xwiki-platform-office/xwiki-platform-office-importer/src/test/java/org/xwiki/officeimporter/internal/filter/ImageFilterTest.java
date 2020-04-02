@@ -101,7 +101,7 @@ public class ImageFilterTest extends AbstractHTMLFilterTest
     @Test
     public void filterAddsImageMarkersSpecialCharacters() throws UnsupportedEncodingException
     {
-        String imageNameUrl = "foo&amp;amp;+_b%61r@.png";
+        String imageNameUrl = "foo&amp;+_b%61r@.png";
         String imageName = "foo&+_bar\\@.png";
         String encodedImageName = URLEncoder.encode(imageName, "UTF-8");
         AttachmentReference attachmentReference = new AttachmentReference(imageName, this.documentReference);

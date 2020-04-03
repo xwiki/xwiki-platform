@@ -135,6 +135,24 @@
           </classpathDependencyExcludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <configuration>
+          <processorProperties combine.children="append">
+            <processorProperty>
+              <name>org.xwiki.tool.spoon.ComponentAnnotationProcessor</name>
+              <properties>
+                <property>
+                  <!-- Skip foreign declaration checks since we merge the components.txt -->
+                  <name>skipForeignDeclarations</name>
+                  <value>true</value>
+                </property>
+              </properties>
+            </processorProperty>
+          </processorProperties>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -22,8 +22,10 @@ package org.xwiki.notifications.notifiers.internal;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
@@ -39,6 +41,8 @@ import org.xwiki.observation.remote.RemoteObservationManagerContext;
  * @version $Id$
  * @since 12.1RC1
  */
+@Component
+@Singleton
 public class UserEventDispatcherListener extends AbstractEventListener
 {
     /**

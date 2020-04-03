@@ -39,7 +39,7 @@
   <content>{{velocity output="false"}}
 #macro (databaseSearchForm)
   {{html clean="false"}}
-  &lt;form action="$doc.getURL()" id="searchBar"&gt;
+  &lt;form action="$doc.getURL()" id="searchBar" role="search"&gt;
     &lt;div&gt;
       &lt;label for="text" class="hidden"&gt;$services.localization.render('search.page.query.label')&lt;/label&gt;
       &lt;input type="text" id="text" name="text" class="searchQuery" value="$!escapetool.xml($request.text)"

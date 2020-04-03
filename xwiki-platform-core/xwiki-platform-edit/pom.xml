@@ -34,5 +34,6 @@
   <modules>
     <module>xwiki-platform-edit-api</module>
     <module>xwiki-platform-edit-default</module>
+    <module>xwiki-platform-edit-ui</module>
   </modules>
 </project>

@@ -24,6 +24,7 @@ import java.io.IOException;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.job.event.status.JobStatus;
 import org.xwiki.rest.XWikiJobResource;
 import org.xwiki.rest.XWikiRestException;
@@ -35,6 +36,7 @@ import org.xwiki.rest.resources.job.JobLogResource;
  * @version $Id$
  * @since 7.2M3
  */
+@Component
 @Named("org.xwiki.rest.internal.resources.job.JobLogResourceImpl")
 public class JobLogResourceImpl extends XWikiJobResource implements JobLogResource
 {

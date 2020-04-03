@@ -33,7 +33,7 @@ import org.xwiki.annotation.AnnotationConfiguration;
 import org.xwiki.annotation.event.AnnotationAddedEvent;
 import org.xwiki.annotation.event.AnnotationDeletedEvent;
 import org.xwiki.annotation.event.AnnotationUpdatedEvent;
-import org.xwiki.component.annotation.Role;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -58,7 +58,7 @@ import com.xpn.xwiki.objects.BaseObjectReference;
  * @version $Id$
  * @since 4.0RC1
  */
-@Role
+@Component
 @Named("AnnotationEventGeneratorEventListener")
 @Singleton
 public class AnnotationEventGeneratorEventListener implements EventListener

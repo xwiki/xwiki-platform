@@ -583,10 +583,10 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# The default is the subfolder "store/solr" inside folder defined by the property "environment.permanentDirectory".
 # solr.embedded.home=/var/local/xwiki/store/solr
 
-#-# [Since 4.5M1]
-#-# The URL to use to connect to the remote solr server.
+#-# [Since 12.2]
+#-# The URL of the Solr server (the root server and not the URL of a core).
 #-# The default value assumes that the remote Solr server is started in a different process on the same machine, using the default port.
-# solr.remote.url=http://localhost:8983/solr
+# solr.remote.baseURL=http://localhost:8983/solr
 
 #-# [Since 5.1M1]
 #-# Elements to index are not sent to the Solr server one by one but in batch to improve performances.

@@ -26,6 +26,8 @@ import javax.inject.Singleton;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.impl.HttpSolrClient;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
 
 /**
@@ -37,7 +39,7 @@ import org.xwiki.search.solr.internal.api.SolrConfiguration;
 @Component
 @Named(RemoteSolr.TYPE)
 @Singleton
-public class RemoteSolr extends AbstractSolr
+public class RemoteSolr extends AbstractSolr implements Initializable
 {
     /**
      * Solr instance type for this implementation.
@@ -52,12 +54,25 @@ public class RemoteSolr extends AbstractSolr
     @Inject
     private SolrConfiguration configuration;
 
+    private HttpSolrClient rootClient;
+
+    @Override
+    public void initialize() throws InitializationException
+    {
+        String baseURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
+
+        this.rootClient = new HttpSolrClient.Builder(baseURL).build();
+
+        // RETRO COMPATIBILITY: the seach core used to be configured using "solr.remote.url" property
+        String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
+        if (searchCoreURL != null) {
+            this.clients.put("search", new HttpSolrClient.Builder(searchCoreURL).build());
+        }
+    }
+
     @Override
     protected SolrClient createSolrClient(String coreName)
     {
-        String remoteURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
-
-        // Initialize the remote Solr server.
-        return new HttpSolrClient.Builder(remoteURL + '#' + coreName).build();
+        return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + coreName).build();
     }
 }

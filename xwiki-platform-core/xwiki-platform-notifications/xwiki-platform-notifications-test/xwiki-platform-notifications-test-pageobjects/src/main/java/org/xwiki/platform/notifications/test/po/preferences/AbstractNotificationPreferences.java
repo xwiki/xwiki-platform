@@ -21,6 +21,7 @@ package org.xwiki.platform.notifications.test.po.preferences;
 
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.XWikiWebDriver;
+import org.xwiki.test.ui.po.BaseElement;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 
 /**
@@ -29,7 +30,7 @@ import org.xwiki.test.ui.po.BootstrapSwitch;
  * @version $Id$
  * @since 9.7RC1
  */
-public abstract class AbstractNotificationPreferences
+public abstract class AbstractNotificationPreferences extends BaseElement
 {
     protected WebElement webElement;
 
@@ -76,6 +77,8 @@ public abstract class AbstractNotificationPreferences
      */
     public void setAlertState(BootstrapSwitch.State state) throws Exception
     {
+        // ensure the element is visible.
+        getDriver().scrollTo(this.webElement);
         alertSwitch.setState(state);
     }
 
@@ -86,6 +89,8 @@ public abstract class AbstractNotificationPreferences
      */
     public void setEmailState(BootstrapSwitch.State state) throws Exception
     {
+        // ensure the element is visible.
+        getDriver().scrollTo(this.webElement);
         emailSwitch.setState(state);
     }
 

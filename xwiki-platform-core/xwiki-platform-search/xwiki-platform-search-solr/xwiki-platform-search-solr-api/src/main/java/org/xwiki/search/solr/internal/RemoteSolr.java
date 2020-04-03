@@ -66,7 +66,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         // RETRO COMPATIBILITY: the seach core used to be configured using "solr.remote.url" property
         String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
         if (searchCoreURL != null) {
-            this.clients.put("search", new HttpSolrClient.Builder(searchCoreURL).build());
+            this.clients.put("xwiki", new HttpSolrClient.Builder(searchCoreURL).build());
         }
     }
 

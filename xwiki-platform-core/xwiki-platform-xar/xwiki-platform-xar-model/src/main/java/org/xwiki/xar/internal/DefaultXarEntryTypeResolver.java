@@ -22,8 +22,10 @@ package org.xwiki.xar.internal;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 
 import org.slf4j.Logger;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -37,6 +39,8 @@ import org.xwiki.xar.XarEntryTypeResolver;
  * @version $Id$
  * @since 10.3
  */
+@Component
+@Singleton
 public class DefaultXarEntryTypeResolver implements XarEntryTypeResolver
 {
     @Inject

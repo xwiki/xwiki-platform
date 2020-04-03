@@ -36,7 +36,6 @@
   </properties>
   <modules>
     <module>xwiki-platform-notifications-test-pageobjects</module>
-    <module>xwiki-platform-notifications-test-tests</module>
   </modules>
   <profiles>
     <profile>

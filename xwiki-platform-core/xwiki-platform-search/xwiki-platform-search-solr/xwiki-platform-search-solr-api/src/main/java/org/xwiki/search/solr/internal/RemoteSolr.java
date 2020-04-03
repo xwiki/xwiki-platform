@@ -63,9 +63,15 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     @Override
     public void initialize() throws InitializationException
     {
-        String remoteURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
+        String baseURL = this.configuration.getInstanceConfiguration(TYPE, "baseURL", DEFAULT_REMOTE_URL);
 
-        this.rootClient = new HttpSolrClient.Builder(remoteURL).build();
+        this.rootClient = new HttpSolrClient.Builder(baseURL).build();
+
+        // RETRO COMPATIBILITY: the seach core used to be configured using "solr.remote.url" property
+        String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
+        if (searchCoreURL != null) {
+            this.clients.put("search", new HttpSolrClient.Builder(searchCoreURL).build());
+        }
     }
 
     @Override

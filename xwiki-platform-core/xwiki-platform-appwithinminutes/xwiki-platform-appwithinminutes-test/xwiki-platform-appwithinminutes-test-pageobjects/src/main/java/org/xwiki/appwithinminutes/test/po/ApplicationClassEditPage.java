@@ -122,7 +122,7 @@ public class ApplicationClassEditPage extends ApplicationEditPage
      */
     public void moveFieldBefore(String fieldToMove, String beforeField)
     {
-        new ClassFieldEditPane(fieldToMove).dragTo(fieldsCanvas.findElement(By.id("field-" + beforeField)), 0, 0);
+        new ClassFieldEditPane(fieldToMove).dragTo(fieldsCanvas.findElement(By.id("field-" + beforeField)), 0, -5);
     }
 
     /**

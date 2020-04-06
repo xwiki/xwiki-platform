@@ -404,7 +404,7 @@
         ## The Administration allows editing other pages from different applications inside the admin context (UI)
         ##------------------------------------------------------------------------------------------------------------
         #if ($xwiki.exists("XWiki.Admin${section}Sheet"))
-          ## Custom XE administration section
+          ## Handle known XWiki administration sections
           {{include reference="XWiki.Admin${section}Sheet" /}}
         #elseif ($xwiki.exists($section))
           {{html clean="false"}}#includeForm($section){{/html}}

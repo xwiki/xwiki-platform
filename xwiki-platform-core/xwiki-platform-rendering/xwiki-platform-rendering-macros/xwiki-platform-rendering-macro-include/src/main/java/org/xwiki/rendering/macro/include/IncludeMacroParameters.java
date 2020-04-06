@@ -60,13 +60,18 @@ public class IncludeMacroParameters
      * @see #getType()
      */
     private EntityType type = EntityType.DOCUMENT;
-
+    
     /**
      * Defines whether the included page is executed in its separated execution context or whether it's executed in the
      * context of the current page.
      */
     private Context context = Context.CURRENT;
-
+     
+    /**
+     * @see #excludeHeading()
+     */
+    private boolean excludeHeading;
+    
     /**
      * @see #getSection()
      */
@@ -151,7 +156,26 @@ public class IncludeMacroParameters
     {
         return this.section;
     }
-
+    
+    /**
+     * exclude the heading from the section if true.
+     * 
+     * @param excludeHeading {@code true} whether the heading from the section is
+     *                       excluded, {@code false} otherwise
+     */
+    @PropertyName("Exclude Heading")
+    @PropertyDescription("Exclude any top-level heading from the included section")
+    public void setExcludeHeading(boolean excludeHeading) {
+        this.excludeHeading = excludeHeading;
+    }
+    
+    /**
+     * @return {@code true} exclude the heading, {@code false} otherwise
+     */
+    public boolean isExcludeHeading() {
+        return excludeHeading;
+    }
+    
     /**
      * @param page the reference of the page to include
      * @since 10.6RC1

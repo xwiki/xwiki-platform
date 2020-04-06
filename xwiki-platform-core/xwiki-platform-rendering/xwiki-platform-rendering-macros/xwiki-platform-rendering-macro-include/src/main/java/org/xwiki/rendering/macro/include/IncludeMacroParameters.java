@@ -161,7 +161,7 @@ public class IncludeMacroParameters
      * exclude the heading from the section if true.
      * 
      * @param excludeHeading {@code true} whether the heading from the section is
-     *                       excluded, {@code false} otherwise
+     *        excluded, {@code false} otherwise
      */
     @PropertyName("Exclude Heading")
     @PropertyDescription("Exclude any top-level heading from the included section")
@@ -171,6 +171,7 @@ public class IncludeMacroParameters
     
     /**
      * @return {@code true} exclude the heading, {@code false} otherwise
+     *          include the heading
      */
     public boolean isExcludeHeading() {
         return excludeHeading;

@@ -41,6 +41,7 @@ import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;

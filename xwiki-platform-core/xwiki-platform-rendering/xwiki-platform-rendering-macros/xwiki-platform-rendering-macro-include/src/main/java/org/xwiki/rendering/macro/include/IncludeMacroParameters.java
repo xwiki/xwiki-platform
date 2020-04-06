@@ -174,7 +174,7 @@ public class IncludeMacroParameters
      *          include the heading
      */
     public boolean isExcludeHeading() {
-        return excludeHeading;
+        return this.excludeHeading;
     }
     
     /**

@@ -160,7 +160,7 @@
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
     <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 
-    <property name="hibernate.connection.charSet">UTF-8</property>
+    <property name="hibernate.connection.charSet">utf8mb4</property>
     <property name="hibernate.connection.useUnicode">true</property>
     <property name="hibernate.connection.characterEncoding">utf8</property>
 

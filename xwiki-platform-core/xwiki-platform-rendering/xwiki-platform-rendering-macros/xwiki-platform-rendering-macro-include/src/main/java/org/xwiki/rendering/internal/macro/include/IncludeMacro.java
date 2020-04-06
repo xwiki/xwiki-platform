@@ -212,7 +212,18 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 references.pop();
             }
         }
-
+        
+        // Exclude the heading from the content
+        if (parameters.isExcludeHeading()) {
+            HeaderBlock heading =
+                    result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT_OR_SELF);
+            if (heading != null) {
+                result.removeBlock(heading);
+            } else {
+                throw new MacroExecutionException("The included section doesn't contain main heading");
+            }
+        }
+        
         // Step 5: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());

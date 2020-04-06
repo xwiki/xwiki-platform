@@ -26,7 +26,8 @@ import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
-
+import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
  * 
@@ -162,7 +163,9 @@ public class IncludeMacroParameters
      * 
      * @param excludeHeading {@code true} whether the heading from the section is
      *        excluded, {@code false} otherwise 
+     * @since 12.3RC1 
      */
+    @Unstable
     @PropertyName("Exclude Heading")
     @PropertyDescription("Exclude any top-level heading from the included section")
     public void setExcludeHeading(boolean excludeHeading) {
@@ -171,7 +174,9 @@ public class IncludeMacroParameters
     
     /**
      * @return exclude the heading from the section
+     * @since 12.3RC1 
      */
+    @Unstable
     public boolean isExcludeHeading() {
         return this.excludeHeading;
     }

@@ -104,7 +104,18 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     private boolean isVncStarted;
 
     @Override
-    public void beforeAll(ExtensionContext extensionContext) throws Exception
+    public void beforeAll(ExtensionContext extensionContext)
+    {
+        try {
+            beforeAllInternal(extensionContext);
+        } catch (Exception e) {
+            String extraMessage = getAgentName() == null ? "" : String.format(" on agent [%s]", getAgentName());
+            throw new RuntimeException(
+                String.format("Error setting up the XWiki testing environment %s", extraMessage), e);
+        }
+    }
+
+    private void beforeAllInternal(ExtensionContext extensionContext) throws Exception
     {
         // If the current tests has parents and one of them has the @UITest annotation, it means all containers are
         // already started and we should not do anything.
@@ -191,7 +202,18 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     }
 
     @Override
-    public void beforeEach(ExtensionContext extensionContext) throws Exception
+    public void beforeEach(ExtensionContext extensionContext)
+    {
+        try {
+            beforeEachInternal(extensionContext);
+        } catch (Exception e) {
+            String extraMessage = getAgentName() == null ? "" : String.format(" on agent [%s]", getAgentName());
+            throw new RuntimeException(
+                String.format("Error setting up the XWiki testing environment %s", extraMessage), e);
+        }
+    }
+
+    private void beforeEachInternal(ExtensionContext extensionContext)
     {
         TestConfiguration testConfiguration = loadTestConfiguration(extensionContext);
         if (testConfiguration.vnc()) {
@@ -248,10 +270,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         }
 
         // Display the current jenkins agent name to have debug information printed in the Jenkins page for the test.
-        String agentName = System.getProperty("jenkinsAgentName");
-        if (agentName != null) {
-            LOGGER.info("Jenkins Agent: [{}]", agentName);
-        }
+        displayAgentName();
 
         throw throwable;
     }
@@ -462,5 +481,18 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
             vnc.saveRecordingToFile(recordingFile);
             LOGGER.info("(*) VNC recording of test has been saved to [{}]", recordingFile);
         }
+    }
+
+    private void displayAgentName()
+    {
+        String agentName = getAgentName();
+        if (agentName != null) {
+            LOGGER.info("Jenkins Agent: [{}]", agentName);
+        }
+    }
+
+    private String getAgentName()
+    {
+        return System.getProperty("jenkinsAgentName");
     }
 }

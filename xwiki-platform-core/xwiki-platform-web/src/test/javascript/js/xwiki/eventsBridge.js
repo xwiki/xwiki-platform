@@ -70,18 +70,39 @@ define(['jquery', 'prototype', 'xwiki-events-bridge'], function($j, $p) {
       });
 
       it('event.stop', function() {
-        var counter = 1;
-        document.observe('xwiki:test', function(event) {
-          document.stopObserving('xwiki:test');
-          event.stop();
-          counter += event.memo.delta;
-        });
-        $j(document).on('xwiki:test', function(event, data) {
-          counter += data.delta;
-        });
-        document.fire('xwiki:test', {'delta': 3});
+        var names = [];
+
+        var registerPrototypeEventListener = function(node, name) {
+          $p(node).observe('xwiki:test', function(event) {
+            $p(node).stopObserving('xwiki:test');
+            event.stop();
+            names.push(name);
+          });
+        };
+
+        var registerJQueryEventListener = function(node, name) {
+          $j(node).one('xwiki:test', function(event, data) {
+            names.push(name);
+          });
+        };
+
+        registerPrototypeEventListener(document, 'pDoc');
+        registerPrototypeEventListener(document.body, 'pBody');
+
+        registerJQueryEventListener(document, 'jDoc');
+        registerJQueryEventListener(document.body, 'jBody');
+
+        document.body.fire('xwiki:test');
+
+        // Clean up.
+        $p(document).stopObserving('xwiki:test');
+        $p(document.body).stopObserving('xwiki:test');
         $j(document).off('xwiki:test');
-        expect(counter).toBe(4);
+        $j(document.body).off('xwiki:test');
+
+        // Stopping an event prevents it from propagating in the DOM but it shouldn't prevent the other event listeners
+        // that were registered directly on the target node to be called.
+        expect(names).toEqual(['pBody', 'jBody']);
       });
 
       it('event.preventDefault', function() {
@@ -136,17 +157,73 @@ define(['jquery', 'prototype', 'xwiki-events-bridge'], function($j, $p) {
       });
 
       it('event.stopPropagation', function() {
-        var counter = 1;
-        $j(document).one('xwiki:test', function(event, data) {
-          event.stopPropagation();
-          counter += data.delta;
-        });
-        document.observe('xwiki:test', function(event) {
-          counter *= event.memo.delta;
-        });
-        $j(document).trigger($j.Event('xwiki:test'), [{'delta': 3}]);
-        document.stopObserving('xwiki:test');
-        expect(counter).toBe(4);
+        var names = [];
+
+        var registerPrototypeEventListener = function(node, name) {
+          $p(node).observe('xwiki:test', function(event) {
+            $p(node).stopObserving('xwiki:test');
+            names.push(name);
+          });
+        };
+
+        var registerJQueryEventListener = function(node, name) {
+          $j(node).one('xwiki:test', function(event, data) {
+            event.stopPropagation();
+            names.push(name);
+          });
+        };
+
+        registerPrototypeEventListener(document, 'pDoc');
+        registerPrototypeEventListener(document.body, 'pBody');
+
+        registerJQueryEventListener(document, 'jDoc');
+        registerJQueryEventListener(document.body, 'jBody');
+      
+        $j(document.body).trigger($j.Event('xwiki:test'));
+
+        // Clean up.
+        $p(document).stopObserving('xwiki:test');
+        $p(document.body).stopObserving('xwiki:test');
+        $j(document).off('xwiki:test');
+        $j(document.body).off('xwiki:test');
+
+        // stopPropagation should still allow the event listeners registered directly on the target node to be called.
+        expect(names).toEqual(['jBody', 'pBody']);
+      });
+      
+      it('event.stopImmediatePropagation', function() {
+        var names = [];
+
+        var registerPrototypeEventListener = function(node, name) {
+          $p(node).observe('xwiki:test', function(event) {
+            $p(node).stopObserving('xwiki:test');
+            names.push(name);
+          });
+        };
+
+        var registerJQueryEventListener = function(node, name) {
+          $j(node).one('xwiki:test', function(event, data) {
+            event.stopImmediatePropagation();
+            names.push(name);
+          });
+        };
+
+        registerPrototypeEventListener(document, 'pDoc');
+        registerPrototypeEventListener(document.body, 'pBody');
+
+        registerJQueryEventListener(document, 'jDoc');
+        registerJQueryEventListener(document.body, 'jBody');
+      
+        $j(document.body).trigger($j.Event('xwiki:test'));
+
+        // Clean up.
+        $p(document).stopObserving('xwiki:test');
+        $p(document.body).stopObserving('xwiki:test');
+        $j(document).off('xwiki:test');
+        $j(document.body).off('xwiki:test');
+
+        // stopImmediatePropagation prevents the remaining event listeners to be called.
+        expect(names).toEqual(['jBody']);
       });
 
       it('event.stop', function() {

@@ -109,9 +109,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         try {
             beforeAllInternal(extensionContext);
         } catch (Exception e) {
-            String extraMessage = getAgentName() == null ? "" : String.format(" on agent [%s]", getAgentName());
-            throw new RuntimeException(
-                String.format("Error setting up the XWiki testing environment %s", extraMessage), e);
+            raiseException(e);
         }
     }
 
@@ -207,9 +205,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         try {
             beforeEachInternal(extensionContext);
         } catch (Exception e) {
-            String extraMessage = getAgentName() == null ? "" : String.format(" on agent [%s]", getAgentName());
-            throw new RuntimeException(
-                String.format("Error setting up the XWiki testing environment %s", extraMessage), e);
+            raiseException(e);
         }
     }
 
@@ -494,5 +490,12 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     private String getAgentName()
     {
         return System.getProperty("jenkinsAgentName");
+    }
+
+    private void raiseException(Exception e)
+    {
+        String extraMessage = getAgentName() == null ? "" : String.format(" on agent [%s]", getAgentName());
+        throw new RuntimeException(
+            String.format("Error setting up the XWiki testing environment %s", extraMessage), e);
     }
 }

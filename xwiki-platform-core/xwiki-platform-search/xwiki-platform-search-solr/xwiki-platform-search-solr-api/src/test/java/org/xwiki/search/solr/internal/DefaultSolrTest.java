@@ -23,11 +23,10 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Named;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.request.schema.SchemaRequest;
+import org.apache.solr.client.solrj.response.schema.SchemaResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,14 +35,13 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
-import org.xwiki.search.solr.SolrCoreInitializer;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.AllComponents;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
-import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,10 +65,6 @@ public class DefaultSolrTest
 
     private Environment mockEnvironment;
 
-    @MockComponent
-    @Named("test")
-    private SolrCoreInitializer testCore;
-
     @InjectComponentManager
     private MockitoComponentManager componentManager;
 
@@ -88,8 +82,6 @@ public class DefaultSolrTest
                 return invocation.getArgument(1);
             }
         });
-
-        when(this.testCore.getCoreName()).thenReturn("test");
     }
 
     @BeforeEach
@@ -126,12 +118,12 @@ public class DefaultSolrTest
 
         SolrClient client = instance.getClient("test");
 
+        assertNotNull(client);
+
         Map<String, Object> fieldAttributes = new HashMap<>();
         fieldAttributes.put("name", "content");
         fieldAttributes.put("type", "string");
         new SchemaRequest.AddField(fieldAttributes).process(client);
-
-        assertNotNull(client);
 
         client.add(new SolrInputDocument("id", "42", "content", "content1"));
 
@@ -141,7 +133,14 @@ public class DefaultSolrTest
 
         assertEquals("42", storedDocument.get("id"));
         assertEquals("content1", storedDocument.get("content"));
-        
+
         assertNotNull(storedDocument);
+
+        SchemaResponse.FieldTypeResponse response = new SchemaRequest.FieldType("__xversion").process(client);
+        assertEquals(String.valueOf(AbstractSolrCoreInitializer.SCHEMA_BASE_VERSION),
+            response.getFieldType().getAttributes().get("defVal"));
+        response = new SchemaRequest.FieldType("__cversion").process(client);
+        assertEquals(String.valueOf(TestSolrCoreInitializer.VERSION),
+            response.getFieldType().getAttributes().get("defVal"));
     }
 }

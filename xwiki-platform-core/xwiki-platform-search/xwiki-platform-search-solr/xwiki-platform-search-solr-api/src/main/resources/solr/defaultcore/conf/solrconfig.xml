@@ -25,5 +25,7 @@
 <config>
   <luceneMatchVersion>${lucene.version}</luceneMatchVersion>
 
+  <jmx />
+
   <requestHandler name="/select" class="solr.SearchHandler"/>
 </config>

@@ -42,7 +42,6 @@ import org.xwiki.component.phase.Initializable;
  * @since 4.3M2
  */
 @Role
-@Deprecated
 public interface SolrInstance extends Initializable
 {
     /**

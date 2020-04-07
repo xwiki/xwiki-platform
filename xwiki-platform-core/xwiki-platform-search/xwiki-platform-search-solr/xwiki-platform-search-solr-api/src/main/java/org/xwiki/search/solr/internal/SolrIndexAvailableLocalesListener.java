@@ -97,7 +97,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
      * Provider for the {@link SolrInstance} that allows communication with the Solr server.
      */
     @Inject
-    private Provider<SolrInstance> solrInstanceProvider;
+    private SolrInstance solrInstance;
 
     /**
      * The solr index.
@@ -179,7 +179,7 @@ public class SolrIndexAvailableLocalesListener implements EventListener
                             // Do nothing.
                         }
                     };
-                    this.solrInstanceProvider.get().queryAndStreamResponse(solrQuery, callback);
+                    this.solrInstance.queryAndStreamResponse(solrQuery, callback);
                 }
             }
         } catch (Exception e) {

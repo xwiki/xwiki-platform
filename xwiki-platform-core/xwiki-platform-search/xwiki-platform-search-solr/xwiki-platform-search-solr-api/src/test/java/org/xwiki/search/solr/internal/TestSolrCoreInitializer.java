@@ -19,34 +19,39 @@
  */
 package org.xwiki.search.solr.internal;
 
-import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.search.solr.Solr;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 
 /**
- * A wrapper around the new {@link Solr} API for the search core.
+ * Test core.
  * 
  * @version $Id$
- * @since 12.2
+ * @since 12.3RC1
  */
 @Component
+@Named("test")
 @Singleton
-public class SolrClientInstance extends AbstractSolrInstance
+public class TestSolrCoreInitializer extends AbstractSolrCoreInitializer
 {
-    @Inject
-    private Solr solr;
+    public static long VERSION = 42;
+    
+    @Override
+    protected void createSchema() throws SolrException
+    {
+    }
 
     @Override
-    public void initialize() throws InitializationException
+    protected void migrateSchema(Long cversion)
     {
-        try {
-            this.server = this.solr.getClient("search");
-        } catch (SolrException e) {
-            throw new InitializationException("Failed to create the solr client for core [search]", e);
-        }
+    }
+
+    @Override
+    protected long getVersion()
+    {
+        return VERSION;
     }
 }

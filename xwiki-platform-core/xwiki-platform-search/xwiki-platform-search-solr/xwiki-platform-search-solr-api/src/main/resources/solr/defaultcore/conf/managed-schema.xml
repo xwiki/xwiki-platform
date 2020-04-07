@@ -20,7 +20,22 @@
   Default Solr schema for a new core.
 -->
 <schema name="default" version="1.6">
-  <field name="id" type="string" multiValued="false" required="true" indexed="true" stored="true" />
-  <uniqueKey>id</uniqueKey>
-  <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true"/>
+    <!--  -->
+    <!-- TYPES -->
+    <!--  -->
+
+    <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
+    <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true" />
+
+    <!--  -->
+    <!-- FIELDS -->
+    <!--  -->
+
+    <!-- Used by all Solr id related API (getById, etc.) -->
+    <field name="id" type="string" multiValued="false" required="true" indexed="true" stored="true" />
+
+    <!-- Make id unique -->
+    <uniqueKey>id</uniqueKey>
+
+    <!-- The rest is initialized programmatically -->
 </schema>

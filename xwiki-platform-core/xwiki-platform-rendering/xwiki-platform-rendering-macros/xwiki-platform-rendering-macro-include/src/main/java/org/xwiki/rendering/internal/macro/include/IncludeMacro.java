@@ -215,13 +215,13 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
         
         // Exclude the heading from the content
-        if (parameters.isExcludeHeading()) {
+        if (parameters.excludeHeading()) {
             HeaderBlock heading =
                     result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT_OR_SELF);
             if (heading != null) {
                 result.removeBlock(heading);
             } else {
-                throw new MacroExecutionException("The included section doesn't contain main heading");
+                throw new MacroExecutionException("The included section doesn't contain any heading");
             }
         }
         

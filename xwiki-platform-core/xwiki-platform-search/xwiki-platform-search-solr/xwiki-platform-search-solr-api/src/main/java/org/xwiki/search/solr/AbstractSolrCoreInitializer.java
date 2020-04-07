@@ -41,6 +41,7 @@ import org.apache.solr.schema.IntPointField;
 import org.apache.solr.schema.LongPointField;
 import org.apache.solr.schema.StrField;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.stability.Unstable;
 
 /**
  * Base helper class to implement {@link SolrCoreInitializer}.
@@ -48,6 +49,7 @@ import org.xwiki.component.descriptor.ComponentDescriptor;
  * @version $Id$
  * @since 12.3RC1
  */
+@Unstable
 public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 {
     /**

@@ -215,13 +215,13 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
         
         // Exclude the first heading from the content
-        if (parameters.excludeHeading()) {
+        if (parameters.excludeFirstHeading()) {
             HeaderBlock heading =
                     result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT_OR_SELF);
             if (heading != null) {
                 result.removeBlock(heading);
             } else {
-                throw new MacroExecutionException("The included document doesn't contain any heading");
+                throw new MacroExecutionException("The included document or section doesn't contain first heading");
             }
         }
         

@@ -214,7 +214,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             }
         }
         
-        // Exclude the heading from the content
+        // Exclude the first heading from the content
         if (parameters.excludeHeading()) {
             HeaderBlock heading =
                     result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT_OR_SELF);

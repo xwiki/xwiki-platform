@@ -402,7 +402,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addBooleanField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, SOLR_TYPE_BOOLEAN, dynamic);
+        addField(name, multiValued ? SOLR_TYPE_BOOLEANS : SOLR_TYPE_BOOLEAN, dynamic);
     }
 
     /**
@@ -417,7 +417,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPIntField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, SOLR_TYPE_PINT, dynamic);
+        addField(name, multiValued ? SOLR_TYPE_PINTS : SOLR_TYPE_PINT, dynamic);
     }
 
     /**
@@ -432,7 +432,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPFloatField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, SOLR_TYPE_PFLOAT, dynamic);
+        addField(name, multiValued ? SOLR_TYPE_PFLOATS : SOLR_TYPE_PFLOAT, dynamic);
     }
 
     /**
@@ -447,7 +447,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPLongField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, SOLR_TYPE_PLONG, dynamic);
+        addField(name, multiValued ? SOLR_TYPE_PLONGS : SOLR_TYPE_PLONG, dynamic);
     }
 
     /**
@@ -462,7 +462,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPDoubleField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, SOLR_TYPE_PDOUBLE, dynamic);
+        addField(name, multiValued ? SOLR_TYPE_PDOUBLES : SOLR_TYPE_PDOUBLE, dynamic);
     }
 
     /**
@@ -477,7 +477,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPDateField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, SOLR_TYPE_PDATE, dynamic);
+        addField(name, multiValued ? SOLR_TYPE_PDATES : SOLR_TYPE_PDATE, dynamic);
     }
 
     /**

@@ -17,36 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.search.solr.Solr;
-import org.xwiki.search.solr.SolrException;
+package org.xwiki.search.solr;
 
 /**
- * A wrapper around the new {@link Solr} API for the search core.
  * 
  * @version $Id$
- * @since 12.2
  */
-@Component
-@Singleton
-public class SolrClientInstance extends AbstractSolrInstance
+public interface SolrCoreMigration
 {
-    @Inject
-    private Solr solr;
 
-    @Override
-    public void initialize() throws InitializationException
-    {
-        try {
-            this.server = this.solr.getClient("search");
-        } catch (SolrException e) {
-            throw new InitializationException("Failed to create the solr client for core [search]", e);
-        }
-    }
 }

@@ -24,7 +24,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -75,7 +74,7 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
      * Provider for the {@link SolrInstance} that allows communication with the Solr server.
      */
     @Inject
-    private Provider<SolrInstance> solrInstanceProvider;
+    private SolrInstance solrInstance;
 
     /**
      * Used to obtain the query corresponding to the configured root entity.
@@ -119,7 +118,7 @@ public class SolrDocumentIterator extends AbstractDocumentIterator<String>
             try {
                 // Cursor-based pagination.
                 String cursorMark = getQuery().get(CursorMarkParams.CURSOR_MARK_PARAM);
-                QueryResponse response = this.solrInstanceProvider.get().query(query);
+                QueryResponse response = this.solrInstance.query(query);
                 if (cursorMark.equals(response.getNextCursorMark())) {
                     results = Collections.emptyList();
                 } else {

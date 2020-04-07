@@ -24,8 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
-import javax.inject.Provider;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,7 +31,6 @@ import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.localization.LocaleUtils;
 import org.xwiki.model.reference.DocumentReference;
@@ -66,23 +63,13 @@ public class SolrDocumentIteratorTest
     private SolrReferenceResolver resolver;
 
     @MockComponent
-    private Provider<SolrInstance> solrInstanceProvider;
+    private SolrInstance solrInstance;
 
     @MockComponent
     private DocumentReferenceResolver<SolrDocument> solrDocumentReferenceResolver;
 
     @InjectMockComponents
     private SolrDocumentIterator solrIterator;
-
-    private SolrInstance solr;
-
-    @BeforeEach
-    public void configure() throws Exception
-    {
-        this.solr = mock(SolrInstance.class);
-
-        when(this.solrInstanceProvider.get()).thenReturn(this.solr);
-    }
 
     @Test
     public void size() throws Exception
@@ -93,7 +80,7 @@ public class SolrDocumentIteratorTest
         QueryResponse response = mock(QueryResponse.class);
         when(response.getResults()).thenReturn(results);
 
-        when(solr.query(any(SolrQuery.class))).thenReturn(response);
+        when(this.solrInstance.query(any(SolrQuery.class))).thenReturn(response);
 
         DocumentIterator<String> iterator = this.solrIterator;
 
@@ -129,7 +116,7 @@ public class SolrDocumentIteratorTest
         when(secondResponse.getNextCursorMark()).thenReturn("bar");
         when(secondResponse.getResults()).thenReturn(secondResults);
 
-        when(solr.query(any(SolrQuery.class))).thenReturn(firstResponse, secondResponse, secondResponse);
+        when(this.solrInstance.query(any(SolrQuery.class))).thenReturn(firstResponse, secondResponse, secondResponse);
 
         DocumentIterator<String> iterator = this.solrIterator;
 

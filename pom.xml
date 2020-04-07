@@ -888,7 +888,8 @@
                   org.bouncycastle:bcprov-jdk15,
                   org.bouncycastle:bcprov-jdk14,
                   org.bouncycastle:bcprov-jdk13,
-                  org.bouncycastle:bcprov-jdk12
+                  org.bouncycastle:bcprov-jdk12,
+                  org.bouncycastle:bcprov-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>
@@ -903,7 +904,8 @@
                   org.bouncycastle:bcpkix-jdk15,
                   org.bouncycastle:bcpkix-jdk14,
                   org.bouncycastle:bcpkix-jdk13,
-                  org.bouncycastle:bcpkix-jdk12
+                  org.bouncycastle:bcpkix-jdk12,
+                  org.bouncycastle:bcpkix-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>
@@ -918,7 +920,8 @@
                   org.bouncycastle:bcmail-jdk15,
                   org.bouncycastle:bcmail-jdk14,
                   org.bouncycastle:bcmail-jdk13,
-                  org.bouncycastle:bcmail-jdk12
+                  org.bouncycastle:bcmail-jdk12,
+                  org.bouncycastle:bcmail-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>

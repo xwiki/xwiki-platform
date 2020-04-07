@@ -166,18 +166,19 @@ public class IncludeMacroParameters
     @Unstable
     @PropertyName("Exclude Heading")
     @PropertyGroup("Section")
-    @PropertyDescription("Exclude the heading from the included section.")
-    public void setExcludeHeading(boolean excludeHeading) {
+    @PropertyDescription("Exclude the first heading from the included section.")
+    public void setExcludeHeading(boolean excludeHeading)
+    {
         this.excludeHeading = excludeHeading;
     }
     
     /**
-     * @return exclude the first heading from the included section. If the section 
-     *         doesn't contain the first heading nothing will be excluded.
+     * @return whether the user want to exclude the section headline.
      * @since 12.3RC1 
      */
     @Unstable
-    public boolean excludeHeading() {
+    public boolean excludeHeading()
+    {
         return this.excludeHeading;
     }
     

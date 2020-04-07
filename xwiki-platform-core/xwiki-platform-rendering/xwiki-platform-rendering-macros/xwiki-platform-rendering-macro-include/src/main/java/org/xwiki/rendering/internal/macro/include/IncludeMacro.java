@@ -221,7 +221,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             if (heading != null) {
                 result.removeBlock(heading);
             } else {
-                throw new MacroExecutionException("The included section doesn't contain any heading");
+                throw new MacroExecutionException("The included document doesn't contain any heading");
             }
         }
         

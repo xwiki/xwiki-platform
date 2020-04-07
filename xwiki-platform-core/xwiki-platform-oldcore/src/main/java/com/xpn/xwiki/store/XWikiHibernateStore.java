@@ -288,29 +288,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     statement.execute("CREATE SCHEMA " + escapedSchema + " AUTHORIZATION DBA");
                 } else if (DatabaseProduct.MYSQL == databaseProduct) {
                     StringBuilder statementBuilder = new StringBuilder("create database " + escapedSchema);
-
-                    // Use utf8mb4 so that users can insert emojis in content.
-                    String charset = "utf8mb4";
-                    String collation = "utf8mb4_bin";
-
-                    // Get main wiki encoding
-                    if (!context.isMainWiki(wikiName)) {
-                        NativeQuery<Object[]> selectQuery = session.createSQLQuery(
-                            "select DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME from INFORMATION_SCHEMA.SCHEMATA"
-                                + " where SCHEMA_NAME='" + getSchemaFromWikiName(context.getMainXWiki(), context)
-                                + "'");
-                        Object[] result = selectQuery.uniqueResult();
-                        if (result != null) {
-                            charset = (String) result[0];
-                            collation = (String) result[1];
-                        }
-                    }
-
+                    String[] charsetAndCollation = getCharsetAndCollation(wikiName, session, context);
                     statementBuilder.append(" CHARACTER SET ");
-                    statementBuilder.append(charset);
+                    statementBuilder.append(charsetAndCollation[0]);
                     statementBuilder.append(" COLLATE ");
-                    statementBuilder.append(collation);
-
+                    statementBuilder.append(charsetAndCollation[1]);
                     statement.execute(statementBuilder.toString());
                 } else if (DatabaseProduct.POSTGRESQL == databaseProduct) {
                     if (isInSchemaMode()) {
@@ -345,6 +327,35 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } catch (Exception e) {
             }
         }
+    }
+
+    /**
+     * @return the MySQL charset and collation to use when creating a new database. They are retrieved by finding the
+     * ones used for the main wiki and if that fails, the {@code utf8mb4} charset and {@code utf8mb4_bin} collation
+     * are used (We use {@code utf8mb4} and not {@code utf8} so that by default, users can insert emojis in content).
+     */
+    private String[] getCharsetAndCollation(String wikiName, Session session, XWikiContext context)
+    {
+        String[] result = new String[2];
+        String charset = "utf8mb4";
+        String collation = "utf8mb4_bin";
+
+        // Get main wiki encoding
+        if (!context.isMainWiki(wikiName)) {
+            NativeQuery<Object[]> selectQuery = session.createSQLQuery(
+                "select DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME from INFORMATION_SCHEMA.SCHEMATA"
+                    + " where SCHEMA_NAME='" + getSchemaFromWikiName(context.getMainXWiki(), context)
+                    + "'");
+            Object[] queryResult = selectQuery.uniqueResult();
+            if (queryResult != null) {
+                charset = (String) queryResult[0];
+                collation = (String) queryResult[1];
+            }
+        }
+
+        result[0] = charset;
+        result[1] = collation;
+        return result;
     }
 
     @Override

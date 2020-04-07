@@ -289,6 +289,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 } else if (DatabaseProduct.MYSQL == databaseProduct) {
                     StringBuilder statementBuilder = new StringBuilder("create database " + escapedSchema);
 
+                    // Use utf8mb4 so that users can insert emojis in content.
                     String charset = "utf8mb4";
                     String collation = "utf8mb4_bin";
 

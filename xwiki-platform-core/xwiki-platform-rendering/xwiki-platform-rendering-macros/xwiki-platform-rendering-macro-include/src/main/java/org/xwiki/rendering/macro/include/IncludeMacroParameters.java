@@ -161,23 +161,25 @@ public class IncludeMacroParameters
     /**
      * Exclude the heading from the section if true.
      * 
-     * @param excludeHeading {@code true} whether the heading from the section is
-     *        excluded, {@code false} otherwise 
+     * @param excludeHeading {@code true} to remove the first heading found inside
+     *         the specified section, {@code false} to keep it 
      * @since 12.3RC1 
      */
     @Unstable
     @PropertyName("Exclude Heading")
-    @PropertyDescription("Exclude any top-level heading from the included section")
+    @PropertyDescription("Exclude the first heading from the included section."
+        + " If the section doesn't have first block as heading, simply ignore it")
     public void setExcludeHeading(boolean excludeHeading) {
         this.excludeHeading = excludeHeading;
     }
     
     /**
-     * @return exclude the heading from the section
+     * @return exclude the first heading from the included section. If the section 
+     *         doesn't contain the first heading nothing will be excluded.
      * @since 12.3RC1 
      */
     @Unstable
-    public boolean isExcludeHeading() {
+    public boolean excludeHeading() {
         return this.excludeHeading;
     }
     

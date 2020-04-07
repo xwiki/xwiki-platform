@@ -239,27 +239,7 @@
     },
 
     maybeFixNonBreakingSpace: function(editor) {
-      var scheduleFix = function(textNode) {
-        setTimeout(function() {
-          var text = textNode.nodeValue;
-          // Double check if the text node still needs to be fixed.
-          if (text.charAt(0) === '\u00A0') {
-            textNode.nodeValue = ' ' + text.substring(1);
-          }
-        }, 0);
-      };
-
-      var isSpaceConvertedToNonBreakingSpace = function(oldValue, newValue) {
-        return oldValue.length > 0 && newValue.length > 0 && newValue.charAt(0) === '\u00A0' &&
-          oldValue.charAt(0) === ' ' && newValue.substring(1) === oldValue.substring(1);
-      };
-
-      var isPrecededByText = function(node) {
-        var previous = node.previousSibling;
-        return previous && previous.nodeType === Node.TEXT_NODE && previous.nodeValue.length > 0 &&
-          previous.nodeValue.charAt(previous.nodeValue.length - 1) !== ' ';
-      };
-
+      // Listen to text mutations in the edited content.
       editor.once('instanceReady', function(event) {
         var mutationObserver = new MutationObserver(function(mutations, mutationObserver) {
           if (!hasNonBreakingSpaceIssue) {
@@ -267,10 +247,8 @@
             return;
           }
           mutations.forEach(function(mutation) {
-            if (mutation.target.nodeType === Node.TEXT_NODE &&
-                isSpaceConvertedToNonBreakingSpace(mutation.oldValue, mutation.target.nodeValue) &&
-                isPrecededByText(mutation.target)) {
-              scheduleFix(mutation.target);
+            if (mutation.target.nodeType === Node.TEXT_NODE) {
+              onTextMutation(mutation);
             }
           });
         });
@@ -280,6 +258,92 @@
           subtree: true
         });
       });
+
+      // Detect when a plain space is converted to a non-breaking space at the start or end of a text node.
+      var onTextMutation = function(mutation) {
+        var newLength = mutation.target.nodeValue.length;
+        if (newLength === 0 || mutation.oldValue.length !== newLength) {
+          // Nothing to fix.
+          return;
+        }
+        [0, newLength - 1].some(function(position) {
+          if (isSpaceConvertedAt(mutation.oldValue, mutation.target.nodeValue, position) &&
+              !isNearSpace(mutation.target, position)) {
+            scheduleFixNonBreakingSpace(mutation.target, position);
+            return true;
+          }
+        });
+      };
+
+      var isSpaceConvertedAt = function(oldValue, newValue, position) {
+        return newValue.charAt(position) === '\u00A0' && oldValue.charAt(position) === ' ' &&
+          newValue.substring(0, position) === oldValue.substring(0, position) &&
+          newValue.substring(position + 1) === oldValue.substring(position + 1);
+      };
+
+      var isNearSpace = function(textNode, position) {
+        return isPrecededBySpace(textNode, position) || isFollowedBySpace(textNode, position);
+      };
+
+      var isPrecededBySpace = function(textNode, position) {
+        if (position > 0) {
+          return textNode.nodeValue.charAt(position - 1) === ' ';
+        } else {
+          var previousNode = getAdjacentLeafNode(textNode, 'previousSibling', 'leftChild');
+          return previousNode && previousNode.nodeType === Node.TEXT_NODE && previousNode.nodeValue.length > 0 &&
+            previousNode.nodeValue.charAt(previousNode.nodeValue.length - 1) === ' ';
+        }
+      };
+
+      var isFollowedBySpace = function(textNode, position) {
+        if (position < textNode.nodeValue.length - 1) {
+          return textNode.nodeValue.charAt(position + 1) === ' ';
+        } else {
+          var nextNode = getAdjacentLeafNode(textNode, 'nextSibling', 'firstChild');
+          return nextNode && nextNode.nodeType === Node.TEXT_NODE && nextNode.nodeValue.length > 0 &&
+            nextNode.nodeValue.charAt(0) === ' ';
+        }
+      };
+
+      var getAdjacentLeafNode = function(node, whichSibling, whichChild) {
+        if (node[whichSibling]) {
+          var leaf = node[whichSibling];
+          // Go down but don't leave the current block.
+          while (leaf[whichChild] && CKEDITOR.dtd.$inline[leaf.nodeName.toLowerCase()]) {
+            leaf = leaf[whichChild];
+          }
+          if (!leaf[whichChild]) {
+            return leaf;
+          }
+        // Go up but don't leave the current block.
+        } else if (CKEDITOR.dtd.$inline[node.parentNode.nodeName.toLowerCase()]) {
+          return getAdjacentLeafNode(node.parentNode);
+        }
+      };
+
+      var scheduleFixNonBreakingSpace = function(textNode, position) {
+        setTimeout(function() {
+          // Double check if the text node still needs to be fixed.
+          if (textNode.nodeValue.charAt(position) === '\u00A0') {
+            fixNonBreakingSpace(textNode, position);
+          }
+        }, 0);
+      };
+
+      var fixNonBreakingSpace = function(textNode, position) {
+        var selection = editor.getSelection().getNative();
+        var selectionOffsetBefore = selection && selection.isCollapsed && selection.anchorNode === textNode &&
+          selection.anchorOffset;
+        textNode.replaceData(position, 1, ' ');
+        if (typeof selectionOffsetBefore === 'number') {
+          var selectionOffsetAfter = selection.isCollapsed && selection.anchorNode === textNode &&
+            selection.anchorOffset;
+          if (selectionOffsetAfter !== selectionOffsetBefore) {
+            // The selection shouldn't change. Let's fix that.
+            selection.collapse(textNode, selectionOffsetBefore);
+          }
+        }
+      };
     }
   });
 })();

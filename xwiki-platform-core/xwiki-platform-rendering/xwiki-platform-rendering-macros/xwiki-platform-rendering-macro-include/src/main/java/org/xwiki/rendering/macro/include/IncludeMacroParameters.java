@@ -71,7 +71,7 @@ public class IncludeMacroParameters
     /**
      * @see #excludeHeading()
      */
-    private boolean excludeHeading;
+    private boolean excludeFirstHeading;
     
     /**
      * @see #getSection()
@@ -160,25 +160,25 @@ public class IncludeMacroParameters
     
     /**
      * @param excludeHeading {@code true} to remove the first heading found inside
-     *         the document, {@code false} to keep it 
+     *         the document or a section, {@code false} to keep it 
      * @since 12.3RC1 
      */
     @Unstable
-    @PropertyName("Exclude Heading")
-    @PropertyDescription("Exclude the first heading from the included document/section.")
-    public void setExcludeHeading(boolean excludeHeading)
+    @PropertyName("Exclude First Heading")
+    @PropertyDescription("Exclude the first heading from the included document or section.")
+    public void setExcludeFirstHeading(boolean excludeFirstHeading)
     {
-        this.excludeHeading = excludeHeading;
+        this.excludeFirstHeading = excludeFirstHeading;
     }
     
     /**
-     * @return whether the user want to exclude the document/section headline.
+     * @return whether the user wants to exclude the first heading from the included document or section.
      * @since 12.3RC1 
      */
     @Unstable
-    public boolean excludeHeading()
+    public boolean excludeFirstHeading()
     {
-        return this.excludeHeading;
+        return this.excludeFirstHeading;
     }
     
     /**

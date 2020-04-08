@@ -69,7 +69,7 @@ public class IncludeMacroParameters
     private Context context = Context.CURRENT;
      
     /**
-     * @see #excludeHeading()
+     * @see #excludeFirstHeading()
      */
     private boolean excludeFirstHeading;
     
@@ -159,8 +159,8 @@ public class IncludeMacroParameters
     }
     
     /**
-     * @param excludeHeading {@code true} to remove the first heading found inside
-     *         the document or a section, {@code false} to keep it 
+     * @param excludeFirstHeading {@code true} to remove the first heading found inside
+     *        the document or the section, {@code false} to keep it 
      * @since 12.3RC1 
      */
     @Unstable
@@ -172,7 +172,7 @@ public class IncludeMacroParameters
     }
     
     /**
-     * @return whether the user wants to exclude the first heading from the included document or section.
+     * @return whether to exclude the first heading from the included document or section, or not.
      * @since 12.3RC1 
      */
     @Unstable

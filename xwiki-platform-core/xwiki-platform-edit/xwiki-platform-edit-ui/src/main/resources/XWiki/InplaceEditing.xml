@@ -668,7 +668,8 @@ require(['jquery'], function($) {
   var preloadEditor = function() {
     require(['editInPlace', wysiwygEditorModule], function(editInPlace) {
       editInPlace.preload();
-    });
+    // Fallback on the standalone edit mode if we fail to load the required modules.
+    }, disableInPlaceEditing);
   };
 
   // Preload the WYSIWYG editor code without slowing down the page view.
@@ -681,7 +682,7 @@ require(['jquery'], function($) {
   }
 
   var editButton = $('#tmEdit &gt; a');
-  editButton.click(function(event) {
+  editButton.on('click.inPlaceEditing', function(event) {
     event.preventDefault();
     // Make sure the user doesn't try to re-activate the edit mode while we are in edit mode.
     editButton.addClass('disabled');
@@ -690,9 +691,12 @@ require(['jquery'], function($) {
       editInPlace.editPage().always(function() {
         editButton.removeClass('disabled');
       });
-    });
+    // Fallback on the standalone edit mode if we fail to load the required modules.
+    }, $.proxy(disableInPlaceEditing, event.target));
   });
-  $('#xwikicontent').on('click', '&gt; :header &gt; a.edit_section:not(.disabled)', function(event) {
+
+  // Section in-place editing.
+  $('#xwikicontent').on('click.inPlaceEditing', '&gt; :header &gt; a.edit_section:not(.disabled)', function(event) {
     event.preventDefault();
     // Make sure the user doesn't try to re-activate the edit mode while we are in edit mode.
     editButton.addClass('disabled');
@@ -706,8 +710,17 @@ require(['jquery'], function($) {
       editInPlace.editSection(heading.attr('id')).always(function() {
         editButton.removeClass('disabled');
       });
-    });
+    // Fallback on the standalone edit mode if we fail to load the required modules.
+    }, $.proxy(disableInPlaceEditing, event.target));
   });
+
+  var disableInPlaceEditing = function() {
+    editButton.off('click.inPlaceEditing').removeClass('disabled');
+    $('#xwikicontent').off('click.inPlaceEditing').removeAttr('tabindex').children(':header').children('.edit_section')
+      .removeClass('hidden');
+    // Fallback on the standalone edit mode.
+    $(this).click();
+  };
 });</code>
     </property>
     <property>

@@ -22,7 +22,7 @@ package org.xwiki.rendering.internal.macro;
 import org.junit.jupiter.api.Test;
 import org.xwiki.model.EntityType;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
-
+import org.xwiki.stability.Unstable;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
@@ -42,6 +42,7 @@ public class IncludeMacroParametersTest
         assertSame(EntityType.PAGE, parameters.getType());
     }
     
+    @Unstable
     @Test
     public void setExcludeFirstHeading()
     {

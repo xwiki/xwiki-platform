@@ -38,10 +38,13 @@ import org.xwiki.search.solr.SolrException;
 public class TestSolrCoreInitializer extends AbstractSolrCoreInitializer
 {
     public static long VERSION = 42;
-    
+
+    public static String FIELD_TESTMAP = "testmap";
+
     @Override
     protected void createSchema() throws SolrException
     {
+        addMapField(FIELD_TESTMAP);
     }
 
     @Override

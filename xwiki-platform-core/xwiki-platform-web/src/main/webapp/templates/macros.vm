@@ -1212,6 +1212,7 @@ $html
  *#
 #macro(submitButton $name $shortcut $value)
 <span class="buttonwrapper"><input class="button" type="submit" name="$name"#if($keyboardShortcutsEnabled) title="$shortcut"#end value="$value"/></span>
+<input type="hidden" name="xaction" value="$action" />
 #end
 #**
  * Displays a submit button for the editor. This macro calls submitButton,

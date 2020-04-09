@@ -21,6 +21,8 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -84,16 +86,25 @@ public class ActionFilter implements Filter
     @SuppressWarnings("unchecked")
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-        ServletException
+            ServletException
     {
         // Only HTTP requests can be dispatched.
         if (request instanceof HttpServletRequest
-            && !Boolean.valueOf((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED))) {
+                && !Boolean.parseBoolean((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED)))
+        {
+            String[] xactions = request.getParameterValues("xaction");
             HttpServletRequest hrequest = (HttpServletRequest) request;
             Enumeration<String> parameterNames = hrequest.getParameterNames();
             while (parameterNames.hasMoreElements()) {
                 String parameter = parameterNames.nextElement();
-                if (parameter.startsWith(ACTION_PREFIX)) {
+                /*
+                 * If some xactions are passed as parameter, the parameters prefixed with 'action_' are only taken
+                 * into account if they are part of the xaction list.
+                 * Otherwise, all the parameters prefixed with 'action_' are accepted.
+                 */
+                if (parameter.startsWith(ACTION_PREFIX) && (xactions == null || Stream.of(xactions)
+                        .anyMatch(it -> Objects.equals(parameter, String.format("action_%s", it)))))
+                {
                     String targetURL = getTargetURL(hrequest, parameter);
                     RequestDispatcher dispatcher = hrequest.getRequestDispatcher(targetURL);
                     if (dispatcher != null) {

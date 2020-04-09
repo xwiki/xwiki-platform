@@ -19,12 +19,13 @@
  */
 package org.xwiki.xclass.test.ui;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.ui.AbstractTest;
-import org.xwiki.test.ui.SuperAdminAuthenticationRule;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.docker.junit5.TestReference;
+import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.InlinePage;
 import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
@@ -33,31 +34,37 @@ import org.xwiki.xclass.test.po.DataTypesPage;
 
 /**
  * Tests the default class sheet (XWiki.ClassSheet).
- * 
+ *
  * @version $Id$
- * @since 4.5
+ * @since 12.3
  */
-public class ClassSheetTest extends AbstractTest
+@UITest
+public class AllIT
 {
-    @Rule
-    public SuperAdminAuthenticationRule authenticationRule = new SuperAdminAuthenticationRule(getUtil());
 
+    @BeforeAll
+    public void setup(TestUtils setup)
+    {
+        setup.loginAsSuperAdmin();
+    }
+    
     /**
      * Tests the process of creating a class, its template, its sheet and an instance.
      */
     @Test
-    public void createClass()
+    @Order(1)
+    public void createClass(TestUtils setup, TestReference reference)
     {
         //TODO: rewrite the test to not rely on the breadcrumb based on parent/child mechanism.
-        getUtil().setHierarchyMode("parentchild");
+        setup.setHierarchyMode("parentchild");
         try {
-            String spaceName = getTestClassName();
-            String className = RandomStringUtils.randomAlphabetic(5);
+            String spaceName = reference.getLastSpaceReference().getName();
+            String className = reference.getClass().getSimpleName();
             String classDocName = className + "Class";
             String classTitle = className + " Class";
-            String pageName = getTestMethodName();
+            String pageName = "createClass";
             // Make sure the document doesn't exist.
-            getUtil().deletePage(spaceName, pageName);
+            setup.deletePage(spaceName, pageName);
 
             // Create the class document.
             DataTypesPage dataTypesPage = DataTypesPage.gotoPage().waitUntilPageIsLoaded();
@@ -89,7 +96,7 @@ public class ClassSheetTest extends AbstractTest
 
             // Create and bind a sheet.
             classSheetPage = classSheetPage.clickCreateSheetButton().waitUntilPageIsLoaded()
-                .clickBindSheetLink().waitUntilPageIsLoaded();
+                    .clickBindSheetLink().waitUntilPageIsLoaded();
             ViewPage sheetPage = classSheetPage.clickSheetLink();
             Assert.assertEquals(className + " Sheet", sheetPage.getDocumentTitle());
             sheetPage.clickBreadcrumbLink(classTitle);
@@ -97,7 +104,7 @@ public class ClassSheetTest extends AbstractTest
 
             // Create the template.
             classSheetPage = classSheetPage.clickCreateTemplateButton().waitUntilPageIsLoaded()
-                .clickAddObjectToTemplateLink().waitUntilPageIsLoaded();
+                    .clickAddObjectToTemplateLink().waitUntilPageIsLoaded();
             ViewPage templatePage = classSheetPage.clickTemplateLink();
             Assert.assertEquals(className + " Template", templatePage.getDocumentTitle());
             // The default edit button should take us to the In-line edit mode.
@@ -129,7 +136,22 @@ public class ClassSheetTest extends AbstractTest
             // Assert the created document is listed.
             Assert.assertTrue(classSheetPage.hasDocument(pageName));
         } finally {
-            getUtil().setHierarchyMode("reference");
+            setup.setHierarchyMode("reference");
         }
+    }
+
+    /**
+     * Integration test fop <a href="https://jira.xwiki.org/browse/XWIKI-6936">XWIKI-6936</a>. The test is successful if
+     * the page save without error when a class with a field named "action" is defined in the class.
+     */
+    @Test
+    @Order(2)
+    public void createClassWithFieldNamedAction(TestUtils setup, TestReference reference)
+    {
+        setup.gotoPage(reference);
+        ClassSheetPage csp = new ClassSheetPage();
+        ClassEditPage ec = csp.editClass();
+        ec.addProperty("action", "String");
+        ec.clickSaveAndContinue(true);
     }
 }

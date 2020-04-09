@@ -41,6 +41,7 @@ import org.apache.solr.schema.IntPointField;
 import org.apache.solr.schema.LongPointField;
 import org.apache.solr.schema.StrField;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.search.solr.internal.DefaultSolrUtils;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -53,9 +54,19 @@ import org.xwiki.stability.Unstable;
 public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 {
     /**
+     * The name of the field containing the identifier of the document.
+     */
+    public static final String SOLR_FIELD_ID = "id";
+
+    /**
+     * The base schema version for XWiki 12.3.
+     */
+    public static final long SCHEMA_VERSION_12_3 = 120300000;
+
+    /**
      * The base schema version.
      */
-    public static final long SCHEMA_BASE_VERSION = 120300000;
+    public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_12_3;
 
     /**
      * The name of the attribute containing the name of the Solr field.
@@ -88,81 +99,6 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * structure.
      */
     protected static final String SOLR_FIELD_DOCVALUES = "docValues";
-
-    /**
-     * The name of the type string.
-     */
-    private static final String SOLR_TYPE_STRING = "string";
-
-    /**
-     * The name of the type strings.
-     */
-    private static final String SOLR_TYPE_STRINGS = "strings";
-
-    /**
-     * The name of the type boolean.
-     */
-    private static final String SOLR_TYPE_BOOLEAN = "boolean";
-
-    /**
-     * The name of the type booleans.
-     */
-    private static final String SOLR_TYPE_BOOLEANS = "booleans";
-
-    /**
-     * The name of the type pint.
-     */
-    private static final String SOLR_TYPE_PINT = "pint";
-
-    /**
-     * The name of the type pints.
-     */
-    private static final String SOLR_TYPE_PINTS = "pints";
-
-    /**
-     * The name of the type pfloat.
-     */
-    private static final String SOLR_TYPE_PFLOAT = "pfloat";
-
-    /**
-     * The name of the type pfloats.
-     */
-    private static final String SOLR_TYPE_PFLOATS = "pfloats";
-
-    /**
-     * The name of the type plong.
-     */
-    private static final String SOLR_TYPE_PLONG = "plong";
-
-    /**
-     * The name of the type plong.
-     */
-    private static final String SOLR_TYPE_PLONGS = "plongs";
-
-    /**
-     * The name of the type pdouble.
-     */
-    private static final String SOLR_TYPE_PDOUBLE = "pdouble";
-
-    /**
-     * The name of the type pdoubles.
-     */
-    private static final String SOLR_TYPE_PDOUBLES = "pdoubles";
-
-    /**
-     * The name of the type pdate.
-     */
-    private static final String SOLR_TYPE_PDATE = "pdate";
-
-    /**
-     * The name of the type pdates.
-     */
-    private static final String SOLR_TYPE_PDATES = "pdates";
-
-    /**
-     * The name of the type binary.
-     */
-    private static final String SOLR_TYPE_BINARY = "binary";
 
     private static final String SOLR_TYPENAME_XVERSION = "__xversion";
 
@@ -225,41 +161,44 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
             // TYPES
             //////////
 
-            addFieldType(SOLR_TYPE_STRINGS, StrField.class.getName(), SOLR_FIELD_SORTMISSINGLAST, true,
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_STRINGS, StrField.class.getName(), SOLR_FIELD_SORTMISSINGLAST, true,
                 SOLR_FIELD_MULTIVALUED, true, SOLR_FIELD_DOCVALUES, true);
 
-            addFieldType(SOLR_TYPE_BOOLEAN, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST, true);
-            addFieldType(SOLR_TYPE_BOOLEANS, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST, true,
-                SOLR_FIELD_MULTIVALUED, true);
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEAN, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST,
+                true);
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_BOOLEANS, BoolField.class.getName(), SOLR_FIELD_SORTMISSINGLAST,
+                true, SOLR_FIELD_MULTIVALUED, true);
 
             // Numeric field types that index values using KD-trees.
             // Point fields don't support FieldCache, so they must have docValues="true" if needed for sorting,
             // faceting, functions, etc.
-            addFieldType(SOLR_TYPE_PINT, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
-            addFieldType(SOLR_TYPE_PFLOAT, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
-            addFieldType(SOLR_TYPE_PLONG, LongPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
-            addFieldType(SOLR_TYPE_PDOUBLE, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PINT, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOAT, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES,
+                true);
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PLONG, LongPointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLE, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES,
+                true);
 
-            addFieldType(SOLR_TYPE_PINTS, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PINTS, IntPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
                 SOLR_FIELD_MULTIVALUED, true);
-            addFieldType(SOLR_TYPE_PFLOATS, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PFLOATS, FloatPointField.class.getName(), SOLR_FIELD_DOCVALUES,
+                true, SOLR_FIELD_MULTIVALUED, true);
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PLONGS, LongPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
                 SOLR_FIELD_MULTIVALUED, true);
-            addFieldType(SOLR_TYPE_PLONGS, LongPointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-                SOLR_FIELD_MULTIVALUED, true);
-            addFieldType(SOLR_TYPE_PDOUBLES, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
-                SOLR_FIELD_MULTIVALUED, true);
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PDOUBLES, DoublePointField.class.getName(), SOLR_FIELD_DOCVALUES,
+                true, SOLR_FIELD_MULTIVALUED, true);
 
             // Since fields of this type are by default not stored or indexed, any data added to them will be ignored
             // outright
             addFieldType("ignored", "solr.StrField", SOLR_FIELD_STORED, false, SOLR_FIELD_INDEXED, false,
                 SOLR_FIELD_MULTIVALUED, true);
 
-            addFieldType(SOLR_TYPE_PDATE, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
-            addFieldType(SOLR_TYPE_PDATES, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATE, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true);
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_PDATES, DatePointField.class.getName(), SOLR_FIELD_DOCVALUES, true,
                 SOLR_FIELD_MULTIVALUED, true);
 
             // Binary data type. The data should be sent/retrieved in as Base64 encoded Strings
-            addFieldType(SOLR_TYPE_BINARY, BinaryField.class.getName());
+            addFieldType(DefaultSolrUtils.SOLR_TYPE_BINARY, BinaryField.class.getName());
 
             //////////
             // FIELDS
@@ -267,7 +206,8 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
             // Used for partial update
             // docValues are enabled by default for long type so we don't need to index the version field
-            addField("_version", SOLR_TYPE_PLONG, false, SOLR_FIELD_INDEXED, false, SOLR_FIELD_STORED, false);
+            addField("_version_", DefaultSolrUtils.SOLR_TYPE_PLONG, false, SOLR_FIELD_INDEXED, false, SOLR_FIELD_STORED,
+                false);
 
             // Save scheme version
             setCurrentXWikiVersion(true);
@@ -386,7 +326,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addStringField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, multiValued ? SOLR_TYPE_STRINGS : SOLR_TYPE_STRING, dynamic);
+        addField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_STRINGS : DefaultSolrUtils.SOLR_TYPE_STRING, dynamic);
     }
 
     /**
@@ -402,7 +342,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addBooleanField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, multiValued ? SOLR_TYPE_BOOLEANS : SOLR_TYPE_BOOLEAN, dynamic);
+        addField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_BOOLEANS : DefaultSolrUtils.SOLR_TYPE_BOOLEAN, dynamic);
     }
 
     /**
@@ -417,7 +357,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPIntField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, multiValued ? SOLR_TYPE_PINTS : SOLR_TYPE_PINT, dynamic);
+        addField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PINTS : DefaultSolrUtils.SOLR_TYPE_PINT, dynamic);
     }
 
     /**
@@ -432,7 +372,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPFloatField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, multiValued ? SOLR_TYPE_PFLOATS : SOLR_TYPE_PFLOAT, dynamic);
+        addField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PFLOATS : DefaultSolrUtils.SOLR_TYPE_PFLOAT, dynamic);
     }
 
     /**
@@ -447,7 +387,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPLongField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, multiValued ? SOLR_TYPE_PLONGS : SOLR_TYPE_PLONG, dynamic);
+        addField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PLONGS : DefaultSolrUtils.SOLR_TYPE_PLONG, dynamic);
     }
 
     /**
@@ -462,7 +402,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPDoubleField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, multiValued ? SOLR_TYPE_PDOUBLES : SOLR_TYPE_PDOUBLE, dynamic);
+        addField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PDOUBLES : DefaultSolrUtils.SOLR_TYPE_PDOUBLE, dynamic);
     }
 
     /**
@@ -477,7 +417,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addPDateField(String name, boolean multiValued, boolean dynamic) throws SolrException
     {
-        addField(name, multiValued ? SOLR_TYPE_PDATES : SOLR_TYPE_PDATE, dynamic);
+        addField(name, multiValued ? DefaultSolrUtils.SOLR_TYPE_PDATES : DefaultSolrUtils.SOLR_TYPE_PDATE, dynamic);
     }
 
     /**
@@ -489,7 +429,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addBinaryField(String name, boolean dynamic) throws SolrException
     {
-        addField(name, SOLR_TYPE_BINARY, dynamic);
+        addField(name, DefaultSolrUtils.SOLR_TYPE_BINARY, dynamic);
     }
 
     /**
@@ -500,23 +440,23 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      */
     protected void addMapField(String name) throws SolrException
     {
-        String prefix = name + "_*_";
+        addStringField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_STRING), false, true);
+        addStringField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_STRINGS), true, true);
+        addBooleanField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_BOOLEAN), false, true);
+        addBooleanField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_BOOLEANS), true, true);
+        addPIntField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PINT), false, true);
+        addPIntField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PINTS), true, true);
+        addPFloatField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PFLOAT), false, true);
+        addPFloatField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PFLOATS), true, true);
+        addPLongField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PLONG), false, true);
+        addPLongField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PLONGS), true, true);
+        addPDoubleField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PDOUBLE), false, true);
+        addPDoubleField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PDOUBLES), true, true);
+        addPDateField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PDATE), false, true);
+        addPDateField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_PDATES), true, true);
+        addBinaryField(DefaultSolrUtils.getMapDynamicFieldName(name, DefaultSolrUtils.SOLR_TYPE_BINARY), true);
 
-        addStringField(prefix + SOLR_TYPE_STRING, false, true);
-        addStringField(prefix + SOLR_TYPE_STRINGS, true, true);
-        addBooleanField(prefix + SOLR_TYPE_BOOLEAN, false, true);
-        addBooleanField(prefix + SOLR_TYPE_BOOLEANS, true, true);
-        addPIntField(prefix + SOLR_TYPE_PINT, false, true);
-        addPIntField(prefix + SOLR_TYPE_PINTS, true, true);
-        addPFloatField(prefix + SOLR_TYPE_PFLOAT, false, true);
-        addPFloatField(prefix + SOLR_TYPE_PFLOATS, true, true);
-        addPLongField(prefix + SOLR_TYPE_PLONG, false, true);
-        addPLongField(prefix + SOLR_TYPE_PLONGS, true, true);
-        addPDoubleField(prefix + SOLR_TYPE_PDOUBLE, false, true);
-        addPDoubleField(prefix + SOLR_TYPE_PDOUBLES, true, true);
-        addPDateField(prefix + SOLR_TYPE_PDATE, false, true);
-        addPDateField(prefix + SOLR_TYPE_PDATES, true, true);
-        addBinaryField(prefix + SOLR_TYPE_BINARY, true);
+        // TODO: storage of unsupported types
     }
 
     /**

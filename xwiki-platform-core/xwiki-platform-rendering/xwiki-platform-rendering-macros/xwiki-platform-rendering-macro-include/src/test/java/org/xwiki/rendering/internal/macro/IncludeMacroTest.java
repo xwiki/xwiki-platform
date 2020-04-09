@@ -63,7 +63,7 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
-
+import org.xwiki.stability.Unstable;
 import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
 import static org.xwiki.rendering.test.BlockAssert.assertBlocksStartsWith;
 
@@ -411,6 +411,61 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
 
         assertBlocks(expected, blocks, this.rendererFactory);
+    }
+    
+    @Unstable
+    @Test
+    public void testIncludeMacroWhenExcludeHeadingSpecified() throws Exception
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
+            + "onWord [content2]\n"
+            + "endParagraph\n"
+            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("document");
+        parameters.setExcludeFirstHeading(true);
+        final MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        final DocumentModelBridge mockDocument = getMockery().mock(DocumentModelBridge.class);
+        getMockery().checking(new Expectations()
+        {
+            {
+                oneOf(mockEntityReferenceResolver).resolve("document", EntityType.DOCUMENT,
+                    macroContext.getCurrentMacroBlock());
+                will(returnValue(resolvedReference));
+                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(resolvedReference));
+                will(returnValue(true));
+                oneOf(mockSetup.bridge).getDocumentInstance((EntityReference) resolvedReference);
+                will(returnValue(mockDocument));
+                oneOf(mockSetup.bridge).getTranslatedDocumentInstance(mockDocument);
+                will(returnValue(mockDocument));
+                oneOf(mockSetup.bridge).getCurrentDocumentReference();
+                will(returnValue(new DocumentReference("wiki", "Space", "IncludingPage")));
+                allowing(mockDocument).getDocumentReference();
+                will(returnValue(resolvedReference));
+                allowing(mockDocument).getSyntax();
+                will(returnValue(Syntax.XWIKI_2_0));
+                oneOf(mockDocument).getXDOM();
+                will(returnValue(parameters.excludeFirstHeading()));
+                will(returnValue(getXDOM("content")));
+                allowing(mockDocument).getRealLanguage();
+                will(returnValue(""));
+            }
+        });
+        try {
+            List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+            assertBlocks(expected, blocks, this.rendererFactory);
+        } catch (MacroExecutionException e) {
+            String includeType = parameters.getSection()!=null ? "section" : "document";
+            Assert.assertEquals("The included " + includeType + " doesn't contain any heading",
+                e.getMessage());
+        }
     }
 
     @Test

@@ -24,16 +24,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-core</artifactId>
+    <artifactId>xwiki-platform-eventstream</artifactId>
     <version>12.3-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-eventstream</artifactId>
-  <name>XWiki Platform - Event Stream - Parent POM</name>
+  <artifactId>xwiki-platform-eventstream-stores</artifactId>
+  <name>XWiki Platform - Event Stream - Stores</name>
   <packaging>pom</packaging>
-  <description>Modules related to the Event Stream</description>
+  <description>Various implementations of the event store API</description>
   <modules>
-    <module>xwiki-platform-eventstream-api</module>
-    <module>xwiki-platform-eventstream-default</module>
-    <module>xwiki-platform-eventstream-stores</module>
+    <module>xwiki-platform-eventstream-store-hibernate</module>
+    <module>xwiki-platform-eventstream-store-solr</module>
   </modules>
 </project>

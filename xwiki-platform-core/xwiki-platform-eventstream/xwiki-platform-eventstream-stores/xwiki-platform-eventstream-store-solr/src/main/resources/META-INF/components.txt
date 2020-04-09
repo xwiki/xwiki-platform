@@ -1,0 +1,2 @@
+org.xwiki.eventstream.store.solr.internal.EventsSolrCoreInitializer
+org.xwiki.eventstream.store.solr.internal.SolrEventStore

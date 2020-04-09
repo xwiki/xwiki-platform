@@ -38,6 +38,7 @@ public class DefaultEventStatus implements EventStatus
 
     /**
      * Construct a DefaultEventStatus.
+     * 
      * @param event the event concerned by the status
      * @param entityId the id of the entity concerned by the status
      * @param isRead either or not the entity as read the given entity

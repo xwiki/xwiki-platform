@@ -26,17 +26,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hamcrest.collection.IsArray;
-import org.jmock.Expectations;
-import org.jmock.api.Invocation;
-import org.jmock.lib.action.CustomAction;
-import org.junit.Assert;
-import org.junit.Test;
+import javax.inject.Named;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.stubbing.Answer;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
+import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.internal.MemoryConfigurationSource;
 import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.AttachmentReferenceResolver;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -46,26 +51,41 @@ import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.internal.macro.include.IncludeMacro;
+import org.xwiki.rendering.internal.transformation.macro.CurrentMacroEntityReferenceResolver;
 import org.xwiki.rendering.internal.transformation.macro.MacroTransformation;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
-import org.xwiki.rendering.macro.script.ScriptMockSetup;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRendererFactory;
 import org.xwiki.rendering.syntax.Syntax;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.wiki.WikiModel;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.DefaultAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityManager;
 
-import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
-import static org.xwiki.rendering.test.BlockAssert.assertBlocksStartsWith;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocks;
+import static org.xwiki.rendering.test.integration.junit5.BlockAssert.assertBlocksStartsWith;
 
 /**
  * Unit tests for {@link IncludeMacro}.
@@ -73,9 +93,36 @@ import static org.xwiki.rendering.test.BlockAssert.assertBlocksStartsWith;
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacroTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents(excludes = {
+    CurrentMacroEntityReferenceResolver.class,
+    DefaultAuthorizationManager.class
+})
+public class IncludeMacroTest
 {
-    private ScriptMockSetup mockSetup;
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
+
+    @MockComponent
+    private DocumentModelBridge document;
+
+    @MockComponent
+    private DocumentAccessBridge dab;
+
+    // Make sure to not load the standard AuthorizationManager which trigger too many things
+    @MockComponent
+    private AuthorizationManager authorizationManager;
+
+    @MockComponent
+    private ContextualAuthorizationManager contextualAuthorizationManager;
+
+    @MockComponent
+    @Named("current")
+    private AttachmentReferenceResolver<String> currentAttachmentReferenceResolver;
+
+    // Register a WikiModel mock so that we're in wiki mode (otherwise links will be considered as URLs for ex).
+    @MockComponent
+    private WikiModel wikiModel;
 
     private IncludeMacro includeMacro;
 
@@ -84,41 +131,33 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     /**
      * Mocks the component that is used to resolve the 'reference' parameter.
      */
-    private EntityReferenceResolver<String> mockEntityReferenceResolver;
+    @MockComponent
+    @Named("macro")
+    private EntityReferenceResolver<String> macroEntityReferenceResolver;
 
-    private ContextualAuthorizationManager mockContextualAuthorization;
-
-    private DocumentModelBridge mockDocument;
-
-    @Override
+    @BeforeEach
     public void setUp() throws Exception
     {
-        super.setUp();
+        MemoryConfigurationSource memoryConfigurationSource = new MemoryConfigurationSource();
+        this.componentManager.registerComponent(ConfigurationSource.class, memoryConfigurationSource);
+        this.componentManager.registerComponent(ConfigurationSource.class, "xwikicfg", memoryConfigurationSource);
+
+        this.includeMacro = this.componentManager.getInstance(Macro.class, "include");
+        this.rendererFactory = this.componentManager.getInstance(PrintRendererFactory.class, "event/1.0");
 
         // Put a fake XWiki context on the execution context.
-        Execution execution = getComponentManager().getInstance(Execution.class);
-        execution.getContext().setProperty("xwikicontext", new HashMap<Object, Object>());
-    }
+        Execution execution = this.componentManager.getInstance(Execution.class);
+        ExecutionContextManager ecm = this.componentManager.getInstance(ExecutionContextManager.class);
+        ExecutionContext ec = new ExecutionContext();
+        ecm.initialize(ec);
+        execution.getContext().setProperty("xwikicontext", new HashMap<>());
 
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        this.mockSetup = new ScriptMockSetup(getMockery(), getComponentManager());
-
-        this.mockEntityReferenceResolver =
-            registerMockComponent(EntityReferenceResolver.TYPE_STRING, "macro", "macroDocumentReferenceResolver");
-        // Make sure to not load the standard AuthorizationManager which trigger too many things
-        registerMockComponent(AuthorizationManager.class);
-
-        this.mockContextualAuthorization = getComponentManager().getInstance(ContextualAuthorizationManager.class);
-        this.includeMacro = getComponentManager().getInstance(Macro.class, "include");
-        this.rendererFactory = getComponentManager().getInstance(PrintRendererFactory.class, "event/1.0");
+        when(this.contextualAuthorizationManager.hasAccess(Right.SCRIPT)).thenReturn(true);
+        when(this.contextualAuthorizationManager.hasAccess(Right.PROGRAM)).thenReturn(true);
     }
 
     @Test
-    public void testIncludeMacro() throws Exception
+    void executeIncludeMacro() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -136,7 +175,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testIncludeMacroWithNewContextShowsVelocityMacrosAreIsolated() throws Exception
+    void executeIncludeMacroWithNewContextShowsVelocityMacrosAreIsolated() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -159,7 +198,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testIncludeMacroWithNewContextShowsPassingOnRestrictedFlag() throws Exception
+    void executeIncludeMacroWithNewContextShowsPassingOnRestrictedFlag() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -180,11 +219,10 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         List<Block> blocks = runIncludeMacro(Context.NEW, "{{velocity}}$foo{{/velocity}}", true);
 
         assertBlocksStartsWith(expected, blocks, this.rendererFactory);
-
     }
 
     @Test
-    public void testIncludeMacroWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
+    void executeIncludeMacroWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -202,24 +240,21 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testIncludeMacroWithNoDocumentSpecified() throws Exception
+    void executeIncludeMacroWithNoDocumentSpecified()
     {
         IncludeMacroParameters parameters = new IncludeMacroParameters();
 
-        try {
-            this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
-            Assert.fail("An exception should have been thrown");
-        } catch (MacroExecutionException expected) {
-            Assert.assertEquals("You must specify a 'reference' parameter pointing to the entity to include.",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class,
+            () -> this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false)));
+        assertEquals("You must specify a 'reference' parameter pointing to the entity to include.",
+            exception.getMessage());
     }
 
     /**
      * Verify that relative links returned by the Include macro as wrapped with a MetaDataBlock.
      */
     @Test
-    public void testIncludeMacroWhenIncludingDocumentWithRelativeReferences() throws Exception
+    void executeIncludeMacroWhenIncludingDocumentWithRelativeReferences() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -239,22 +274,13 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             + "endDocument";
         // @formatter:on
 
-        final DocumentReference includedDocumentReference =
+        DocumentReference includedDocumentReference =
             new DocumentReference("includedWiki", "includedSpace", "includedPage");
         setUpDocumentMock("includedWiki:includedSpace.includedPage", includedDocumentReference,
             "[[page]] [[attach:test.png]] image:test.png");
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(any(EntityReference.class)));
-                will(returnValue(true));
-                oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)),
-                    with(any(DocumentModelBridge.class)));
-                oneOf(mockSetup.bridge).getCurrentDocumentReference();
-                will(returnValue(includedDocumentReference));
-                oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
-            }
-        });
+        when(this.contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(EntityReference.class)))
+            .thenReturn(true);
+        when(this.dab.getCurrentDocumentReference()).thenReturn(includedDocumentReference);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("includedWiki:includedSpace.includedPage");
@@ -264,43 +290,32 @@ public class IncludeMacroTest extends AbstractComponentTestCase
             this.includeMacro.execute(parameters, null, createMacroTransformationContext("whatever", false));
 
         assertBlocks(expected, blocks, this.rendererFactory);
+        verify(this.dab).pushDocumentInContext(any(Map.class), any(DocumentModelBridge.class));
+        verify(this.dab).popDocumentFromContext(any(Map.class));
     }
 
     @Test
-    public void testIncludeMacroWithRecursiveIncludeContextCurrent() throws Exception
+    void executeIncludeMacroWithRecursiveIncludeContextCurrent() throws Exception
     {
-        this.includeMacro.setDocumentAccessBridge(mockSetup.bridge);
-
-        final MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
+        MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
         // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have
         // happened if an Include macro is included in another Include macro.
-        final MacroMarkerBlock includeMacroMarker =
+        MacroMarkerBlock includeMacroMarker =
             new MacroMarkerBlock("include", Collections.singletonMap("reference", "space.page"),
-                Collections.<Block>singletonList(macroContext.getCurrentMacroBlock()), false);
+                Collections.singletonList(macroContext.getCurrentMacroBlock()), false);
 
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockEntityReferenceResolver).resolve("wiki:space.page", EntityType.DOCUMENT,
-                    macroContext.getCurrentMacroBlock());
-                will(returnValue(new DocumentReference("wiki", "space", "page")));
-                allowing(mockEntityReferenceResolver).resolve("space.page", EntityType.DOCUMENT, includeMacroMarker);
-                will(returnValue(new DocumentReference("wiki", "space", "page")));
-            }
-        });
+        when(this.macroEntityReferenceResolver.resolve("wiki:space.page", EntityType.DOCUMENT,
+            macroContext.getCurrentMacroBlock())).thenReturn(new DocumentReference("wiki", "space", "page"));
+        when(this.macroEntityReferenceResolver.resolve("space.page", EntityType.DOCUMENT, includeMacroMarker))
+            .thenReturn(new DocumentReference("wiki", "space", "page"));
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("wiki:space.page");
         parameters.setContext(Context.CURRENT);
 
-        try {
-            this.includeMacro.execute(parameters, null, macroContext);
-            Assert.fail("The include macro hasn't checked the recursive inclusion");
-        } catch (MacroExecutionException expected) {
-            if (!expected.getMessage().startsWith("Found recursive inclusion")) {
-                throw expected;
-            }
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class,
+            () -> this.includeMacro.execute(parameters, null, macroContext));
+        assertTrue(exception.getMessage().startsWith("Found recursive inclusion"));
     }
 
     private static class ExpectedRecursiveInclusionException extends RuntimeException
@@ -308,59 +323,43 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testIncludeMacroWithRecursiveIncludeContextNew() throws Exception
+    void executeIncludeMacroWithRecursiveIncludeContextNew() throws Exception
     {
-        final DocumentDisplayer mockDocumentDisplayer = getMockery().mock(DocumentDisplayer.class);
+        DocumentDisplayer documentDisplayer = mock(DocumentDisplayer.class);
 
-        this.includeMacro.setDocumentAccessBridge(mockSetup.bridge);
-        this.includeMacro.setDocumentDisplayer(mockDocumentDisplayer);
+        this.includeMacro.setDocumentDisplayer(documentDisplayer);
 
-        final MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
+        MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
 
-        final IncludeMacroParameters parameters = new IncludeMacroParameters();
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("wiki:space.page");
         parameters.setContext(Context.NEW);
 
-        final DocumentReference includedDocumentReference = new DocumentReference("wiki", "space", "page");
+        DocumentReference includedDocumentReference = new DocumentReference("wiki", "space", "page");
         setUpDocumentMock("wiki:space.page", includedDocumentReference, "");
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(any(EntityReference.class)));
-                will(returnValue(true));
+        when(this.contextualAuthorizationManager.hasAccess(eq(Right.VIEW), any(EntityReference.class)))
+            .thenReturn(true);
 
-                allowing(mockDocumentDisplayer).display(with(same(mockDocument)),
-                    with(any(DocumentDisplayerParameters.class)));
-                will(new CustomAction("recursively call the include macro again")
-                {
-                    @Override
-                    public Object invoke(Invocation invocation) throws Throwable
-                    {
-                        try {
-                            includeMacro.execute(parameters, null, macroContext);
-                        } catch (Exception expected) {
-                            if (expected.getMessage().contains("Found recursive inclusion")) {
-                                throw new ExpectedRecursiveInclusionException();
-                            }
-                        }
-                        return true;
+        when(documentDisplayer.display(same(this.document), any(DocumentDisplayerParameters.class))).thenAnswer(
+            (Answer) invocation -> {
+                try {
+                    this.includeMacro.execute(parameters, null, macroContext);
+                } catch (Exception expected) {
+                    if (expected.getMessage().contains("Found recursive inclusion")) {
+                        throw new ExpectedRecursiveInclusionException();
                     }
-                });
+                }
+                return true;
             }
-        });
+        );
 
-        try {
-            this.includeMacro.execute(parameters, null, macroContext);
-            Assert.fail("The include macro hasn't checked the recursive inclusion");
-        } catch (MacroExecutionException expected) {
-            if (!(expected.getCause() instanceof ExpectedRecursiveInclusionException)) {
-                throw expected;
-            }
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class,
+            () -> this.includeMacro.execute(parameters, null, macroContext));
+        assertTrue(exception.getCause() instanceof ExpectedRecursiveInclusionException);
     }
 
     @Test
-    public void testIncludeMacroInsideSourceMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
+    void executeIncludeMacroInsideSourceMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -375,38 +374,23 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("relativePage");
 
-        final MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
         // Add a Source MetaData Block as a parent of the include Macro block.
         new MetaDataBlock(Collections.<Block>singletonList(macroContext.getCurrentMacroBlock()),
-            new MetaData(Collections.<String, Object>singletonMap(MetaData.BASE, "wiki:space.page")));
+            new MetaData(Collections.singletonMap(MetaData.BASE, "wiki:space.page")));
 
-        final DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
-        final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "relativePage");
-        final DocumentModelBridge mockDocument = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockEntityReferenceResolver).resolve("relativePage", EntityType.DOCUMENT,
-                    macroContext.getCurrentMacroBlock());
-                will(returnValue(resolvedReference));
-                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(resolvedReference));
-                will(returnValue(true));
-                oneOf(mockSetup.bridge).getDocumentInstance((EntityReference) resolvedReference);
-                will(returnValue(mockDocument));
-                oneOf(mockSetup.bridge).getTranslatedDocumentInstance(mockDocument);
-                will(returnValue(mockDocument));
-                oneOf(mockSetup.bridge).getCurrentDocumentReference();
-                will(returnValue(sourceReference));
-                oneOf(mockDocument).getXDOM();
-                will(returnValue(getXDOM("content")));
-                allowing(mockDocument).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_0));
-                allowing(mockDocument).getDocumentReference();
-                will(returnValue(resolvedReference));
-                allowing(mockDocument).getRealLanguage();
-                will(returnValue(""));
-            }
-        });
+        DocumentReference sourceReference = new DocumentReference("wiki", "space", "page");
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "relativePage");
+        when(this.macroEntityReferenceResolver.resolve("relativePage", EntityType.DOCUMENT,
+            macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.dab.getTranslatedDocumentInstance(this.document)).thenReturn(this.document);
+        when(this.dab.getCurrentDocumentReference()).thenReturn(sourceReference);
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM("content"));
+        when(this.document.getRealLanguage()).thenReturn("");
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
 
@@ -414,7 +398,7 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testIncludeMacroWhenSectionSpecified() throws Exception
+    void executeIncludeMacroWhenSectionSpecified() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -433,33 +417,19 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         parameters.setReference("document");
         parameters.setSection("Hsection");
 
-        final MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
-        final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
-        final DocumentModelBridge mockDocument = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockEntityReferenceResolver).resolve("document", EntityType.DOCUMENT,
-                    macroContext.getCurrentMacroBlock());
-                will(returnValue(resolvedReference));
-                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(resolvedReference));
-                will(returnValue(true));
-                oneOf(mockSetup.bridge).getDocumentInstance((EntityReference) resolvedReference);
-                will(returnValue(mockDocument));
-                oneOf(mockSetup.bridge).getTranslatedDocumentInstance(mockDocument);
-                will(returnValue(mockDocument));
-                oneOf(mockSetup.bridge).getCurrentDocumentReference();
-                will(returnValue(new DocumentReference("wiki", "Space", "IncludingPage")));
-                allowing(mockDocument).getDocumentReference();
-                will(returnValue(resolvedReference));
-                allowing(mockDocument).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_0));
-                oneOf(mockDocument).getXDOM();
-                will(returnValue(getXDOM("content1\n\n= section =\ncontent2")));
-                allowing(mockDocument).getRealLanguage();
-                will(returnValue(""));
-            }
-        });
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        when(this.macroEntityReferenceResolver.resolve("document", EntityType.DOCUMENT,
+            macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.dab.getTranslatedDocumentInstance(this.document)).thenReturn(this.document);
+        when(this.dab.getCurrentDocumentReference()).thenReturn(
+            new DocumentReference("wiki", "Space", "IncludingPage"));
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM("content1\n\n= section =\ncontent2"));
+        when(this.document.getRealLanguage()).thenReturn("");
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
 
@@ -467,47 +437,29 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testIncludeMacroWhenInvalidSectionSpecified() throws Exception
+    void executeIncludeMacroWhenInvalidSectionSpecified() throws Exception
     {
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");
         parameters.setSection("unknown");
 
-        final MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
-        final DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
-        final DocumentModelBridge mockDocument = getMockery().mock(DocumentModelBridge.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockEntityReferenceResolver).resolve("document", EntityType.DOCUMENT,
-                    macroContext.getCurrentMacroBlock());
-                will(returnValue(resolvedReference));
-                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(resolvedReference));
-                will(returnValue(true));
-                oneOf(mockSetup.bridge).getDocumentInstance((EntityReference) resolvedReference);
-                will(returnValue(mockDocument));
-                allowing(mockSetup.bridge).getTranslatedDocumentInstance(mockDocument);
-                will(returnValue(mockDocument));
-                oneOf(mockSetup.bridge).getCurrentDocumentReference();
-                will(returnValue(new DocumentReference("wiki", "Space", "IncludingPage")));
-                oneOf(mockDocument).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_0));
-                oneOf(mockDocument).getXDOM();
-                will(returnValue(getXDOM("content")));
-                allowing(mockDocument).getDocumentReference();
-                will(returnValue(resolvedReference));
-                allowing(mockDocument).getRealLanguage();
-                will(returnValue(""));
-            }
-        });
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        when(this.macroEntityReferenceResolver.resolve("document", EntityType.DOCUMENT,
+            macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.dab.getTranslatedDocumentInstance(this.document)).thenReturn(this.document);
+        when(this.dab.getCurrentDocumentReference()).thenReturn(
+            new DocumentReference("wiki", "Space", "IncludingPage"));
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM("content"));
+        when(this.document.getRealLanguage()).thenReturn("");
 
-        try {
-            this.includeMacro.execute(parameters, null, macroContext);
-            Assert.fail("Should have raised an exception");
-        } catch (MacroExecutionException expected) {
-            Assert.assertEquals("Cannot find section [unknown] in document [wiki:space.document]",
-                expected.getMessage());
-        }
+        Throwable exception = assertThrows(MacroExecutionException.class,
+            () -> this.includeMacro.execute(parameters, null, macroContext));
+        assertEquals("Cannot find section [unknown] in document [wiki:space.document]", exception.getMessage());
     }
 
     private MacroTransformationContext createMacroTransformationContext(String documentName, boolean isInline)
@@ -519,42 +471,28 @@ public class IncludeMacroTest extends AbstractComponentTestCase
         return context;
     }
 
-    private void setUpDocumentMock(final String resolve, final DocumentReference reference, final String content)
-        throws Exception
+    private void setUpDocumentMock(String resolve, DocumentReference reference, String content) throws Exception
     {
-        this.mockDocument = getMockery().mock(DocumentModelBridge.class, resolve);
-        getMockery().checking(new Expectations()
-        {
-            {
-                allowing(mockEntityReferenceResolver).resolve(with(resolve), with(EntityType.DOCUMENT),
-                    with(IsArray.array(any(MacroBlock.class))));
-                will(returnValue(reference));
-                allowing(mockSetup.bridge).getDocumentInstance((EntityReference) reference);
-                will(returnValue(mockDocument));
-                allowing(mockSetup.bridge).getTranslatedDocumentInstance(mockDocument);
-                will(returnValue(mockDocument));
-                allowing(mockDocument).getSyntax();
-                will(returnValue(Syntax.XWIKI_2_0));
-                allowing(mockDocument).getXDOM();
-                will(returnValue(getXDOM(content)));
-                allowing(mockDocument).getDocumentReference();
-                will(returnValue(reference));
-                allowing(mockDocument).getRealLanguage();
-                will(returnValue(""));
-            }
-        });
+        when(this.macroEntityReferenceResolver.resolve(eq(resolve), eq(EntityType.DOCUMENT), any(MacroBlock.class)))
+            .thenReturn(reference);
+        when(this.dab.getDocumentInstance((EntityReference) reference)).thenReturn(this.document);
+        when(this.dab.getTranslatedDocumentInstance(this.document)).thenReturn(this.document);
+        when(this.document.getDocumentReference()).thenReturn(reference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM(content));
+        when(this.document.getRealLanguage()).thenReturn("");
     }
 
     private XDOM getXDOM(String content) throws Exception
     {
-        Parser parser = getComponentManager().getInstance(Parser.class, "xwiki/2.0");
+        Parser parser = this.componentManager.getInstance(Parser.class, "xwiki/2.0");
         return parser.parse(new StringReader(content));
     }
 
     private List<Block> runIncludeMacroWithPreVelocity(Context context, String velocity, String includedContent)
         throws Exception
     {
-        VelocityManager velocityManager = getComponentManager().getInstance(VelocityManager.class);
+        VelocityManager velocityManager = this.componentManager.getInstance(VelocityManager.class);
         StringWriter writer = new StringWriter();
         velocityManager.getVelocityEngine().evaluate(velocityManager.getVelocityContext(), writer,
             "wiki:Space.IncludingPage", velocity);
@@ -570,27 +508,11 @@ public class IncludeMacroTest extends AbstractComponentTestCase
     private List<Block> runIncludeMacro(final Context context, String includedContent, boolean restricted)
         throws Exception
     {
-        final DocumentReference includedDocumentReference = new DocumentReference("wiki", "Space", "IncludedPage");
+        DocumentReference includedDocumentReference = new DocumentReference("wiki", "Space", "IncludedPage");
         String includedDocStringRef = "wiki:space.page";
         setUpDocumentMock(includedDocStringRef, includedDocumentReference, includedContent);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(mockContextualAuthorization).hasAccess(with(Right.VIEW), with(same(includedDocumentReference)));
-                will(returnValue(true));
-                // Verify that push/pop are called when context is NEW
-                if (context == Context.NEW) {
-                    oneOf(mockSetup.bridge).pushDocumentInContext(with(any(Map.class)), with(same(mockDocument)));
-                    oneOf(mockSetup.bridge).getCurrentDocumentReference();
-                    will(returnValue(includedDocumentReference));
-                    oneOf(mockSetup.bridge).popDocumentFromContext(with(any(Map.class)));
-                } else {
-                    oneOf(mockSetup.bridge).getCurrentDocumentReference();
-                    will(returnValue(new DocumentReference("wiki", "Space", "IncludingPage")));
-                }
-            }
-        });
-        this.includeMacro.setDocumentAccessBridge(this.mockSetup.bridge);
+
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, includedDocumentReference)).thenReturn(true);
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference(includedDocStringRef);
@@ -598,12 +520,20 @@ public class IncludeMacroTest extends AbstractComponentTestCase
 
         // Create a Macro transformation context with the Macro transformation object defined so that the include
         // macro can transform included page which is using a new context.
-        MacroTransformation macroTransformation = getComponentManager().getInstance(Transformation.class, "macro");
+        MacroTransformation macroTransformation = this.componentManager.getInstance(Transformation.class, "macro");
         MacroTransformationContext macroContext = createMacroTransformationContext(includedDocStringRef, false);
         macroContext.setId("wiki:Space.IncludingPage");
         macroContext.setTransformation(macroTransformation);
         macroContext.getTransformationContext().setRestricted(restricted);
 
-        return this.includeMacro.execute(parameters, null, macroContext);
+        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+
+        // Verify that push/pop are called when context is NEW
+        if (context == Context.NEW) {
+            verify(this.dab).pushDocumentInContext(any(Map.class), same(this.document));
+            verify(this.dab).popDocumentFromContext(any(Map.class));
+        }
+
+        return blocks;
     }
 }

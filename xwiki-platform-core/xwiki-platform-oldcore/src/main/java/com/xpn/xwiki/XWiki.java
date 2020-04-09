@@ -5053,7 +5053,7 @@ public class XWiki implements EventListener
     private boolean isDaemon(XWikiRequest request)
     {
         return request.getHttpServletRequest() instanceof XWikiServletRequestStub
-            && ((XWikiServletRequestStub) request).isDaemon();
+            && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
     }
 
     private String getWikiProtocol(WikiDescriptor wikiDescriptor)

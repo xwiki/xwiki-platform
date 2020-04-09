@@ -221,8 +221,9 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             if (heading != null) {
                 result.removeBlock(heading);
             } else {
-                throw new MacroExecutionException("The included document or section doesn't contain any heading");
-            }
+                String includeType = parameters.getSection() != null ? "section" : "document";
+                throw new MacroExecutionException(String.format("The included " + includeType + " doesn't contain any heading"));
+           }
         }
         
         // Step 5: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the

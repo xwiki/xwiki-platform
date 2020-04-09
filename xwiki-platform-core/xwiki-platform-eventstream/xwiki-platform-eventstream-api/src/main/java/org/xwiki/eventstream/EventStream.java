@@ -30,8 +30,10 @@ import org.xwiki.query.QueryException;
  * 
  * @version $Id$
  * @since 3.0M2
+ * @deprecated since 12.3RC1, use {@link EventStore} instead
  */
 @Role
+@Deprecated
 public interface EventStream
 {
     /**

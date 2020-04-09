@@ -27,18 +27,14 @@
         <artifactId>xwiki-platform-eventstream</artifactId>
         <version>12.3-SNAPSHOT</version>
     </parent>
-    <artifactId>xwiki-platform-eventstream-store</artifactId>
-    <name>XWiki Platform - Event Stream - Store</name>
-    <description>Store for Event Stream Events</description>
+    <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
+    <name>XWiki Platform - Event Stream - Store - Solr</name>
+    <description>Solr based events storage</description>
     <properties>
-        <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
-        <xwiki.pitest.mutationThreshold>8</xwiki.pitest.mutationThreshold>
+        <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
+        <xwiki.pitest.mutationThreshold>100</xwiki.pitest.mutationThreshold>
         <!-- Name to display by the Extension Manager -->
-        <xwiki.extension.name>Event Stream Store</xwiki.extension.name>
-
-        <!-- Impossible to have both xwiki-platform-eventstream and xwiki-platform-activitystream-api
-             because they use the same table name (activitystream_events) -->
-        <xwiki.extension.features>org.xwiki.platform:xwiki-platform-activitystream-api</xwiki.extension.features>
+        <xwiki.extension.name>Solr Event Stream Store</xwiki.extension.name>
     </properties>
     <dependencies>
         <dependency>
@@ -59,7 +55,7 @@
         </dependency>
         <dependency>
             <groupId>org.xwiki.platform</groupId>
-            <artifactId>xwiki-platform-oldcore</artifactId>
+            <artifactId>xwiki-platform-search-solr-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

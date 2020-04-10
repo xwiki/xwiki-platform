@@ -98,7 +98,7 @@ public class VfsResourceReferenceHandler extends AbstractContentResourceReferenc
             Path path = new TPath(trueVFSURI);
             try (InputStream in = Files.newInputStream(path)) {
                 List<String> pathSegments = vfsResourceReference.getPathSegments();
-                serveResource(pathSegments.get(pathSegments.size() - 1), in);
+                serveResource(pathSegments.get(pathSegments.size() - 1), in, vfsResourceReference.getContentType());
             }
         } catch (Exception e) {
             throw new ResourceReferenceHandlerException(

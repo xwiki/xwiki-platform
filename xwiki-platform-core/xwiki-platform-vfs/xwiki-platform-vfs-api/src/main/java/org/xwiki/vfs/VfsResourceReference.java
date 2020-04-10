@@ -47,6 +47,8 @@ public class VfsResourceReference extends EntityResourceReference
      */
     public static final ResourceType TYPE = new ResourceType("vfs");
 
+    private static final String PARAMETER_CONTENTTYPE = "content-type";
+
     private static final String RESOURCE_PATH_SEPARATOR = "/";
 
     private URI uri;
@@ -163,5 +165,14 @@ public class VfsResourceReference extends EntityResourceReference
     public URI toURI()
     {
         return URI.create(String.format("%s/%s", getURI().toString(), getPath()));
+    }
+
+    /**
+     * @return the Content-Type to return with the response
+     * @since 12.3RC1
+     */
+    public String getContentType()
+    {
+        return getParameterValue(PARAMETER_CONTENTTYPE);
     }
 }

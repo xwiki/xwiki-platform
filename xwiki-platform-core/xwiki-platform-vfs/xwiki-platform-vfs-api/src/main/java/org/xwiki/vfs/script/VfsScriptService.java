@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
 import org.xwiki.vfs.VfsManager;
 import org.xwiki.vfs.VfsResourceReference;
 
@@ -69,6 +70,7 @@ public class VfsScriptService implements ScriptService
      *         or null if the URL couldn't be constructed
      * @since 12.3RC1
      */
+    @Unstable
     public String url(VfsResourceReference reference, String contentType)
     {
         VfsResourceReference finalReference = new VfsResourceReference(reference);

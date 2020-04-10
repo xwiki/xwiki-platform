@@ -56,6 +56,17 @@ public class VfsResourceReference extends EntityResourceReference
     private List<String> pathSegments;
 
     /**
+     * Create a new reference by copying the passed one.
+     * 
+     * @param reference the reference to copy
+     * @since 12.3RC1
+     */
+    public VfsResourceReference(VfsResourceReference reference)
+    {
+        this(reference.uri, reference.pathSegments);
+    }
+
+    /**
      * @param uri the URI pointing to the archive (without the path inside the archive),
      *       e.g. {@code attach:space.page@attachment}
      * @param pathSegments see {@link #getPathSegments()}
@@ -174,5 +185,14 @@ public class VfsResourceReference extends EntityResourceReference
     public String getContentType()
     {
         return getParameterValue(PARAMETER_CONTENTTYPE);
+    }
+
+    /**
+     * @param contentType the Content-Type to return with the response
+     * @since 12.3RC1
+     */
+    public void setContentType(String contentType)
+    {
+        setParameter(PARAMETER_CONTENTTYPE, contentType);
     }
 }

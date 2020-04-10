@@ -90,6 +90,23 @@ public abstract class AbstractResourceReference implements ResourceReference
         this.parameters.put(name, list);
     }
 
+    /**
+     * Add or replace an existing parameter with the passed value.
+     * 
+     * @param name the name of the parameter to add
+     * @param value the value of the parameter to add. If null then no value is added. Collections are also supported in
+     *            which case a multivalued parameter is used.
+     * @since 12.3RC1
+     */
+    protected void setParameter(String name, Object value)
+    {
+        // Clear any pre existing value for this parameter
+        this.parameters.remove(name);
+
+        // Add the parameter
+        addParameter(name, value);
+    }
+
     @Override
     public Map<String, List<String>> getParameters()
     {

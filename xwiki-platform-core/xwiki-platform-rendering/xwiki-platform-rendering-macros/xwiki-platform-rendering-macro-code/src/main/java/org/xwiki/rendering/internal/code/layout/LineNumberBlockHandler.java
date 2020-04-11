@@ -73,7 +73,8 @@ public class LineNumberBlockHandler implements CodeLayoutHandler
         return Arrays.<Block>asList(wrapper);
     }
     
-    private void setClassParameter(Block block, String value) {
+    private void setClassParameter(Block block, String value)
+    {
         block.setParameter("class", value);
     }
 }

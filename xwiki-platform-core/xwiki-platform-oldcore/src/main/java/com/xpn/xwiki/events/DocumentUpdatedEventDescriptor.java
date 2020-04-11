@@ -57,7 +57,8 @@ public class DocumentUpdatedEventDescriptor extends AbstractXWikiRecordableEvent
     }
 
     @Override
-    public EventFilter getFilter() {
+    public EventFilter getFilter()
+    {
         return EventFilter.WIKI_SPACE_AND_DOCUMENT_FILTER;
     }
 

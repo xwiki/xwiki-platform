@@ -60,7 +60,8 @@ public class DefaultUserBridge implements UserBridge
     /**
      * @return the current {@code XWikiContext}
      */
-    private XWikiContext getXWikiContext() {
+    private XWikiContext getXWikiContext()
+    {
         return ((XWikiContext) execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
     }
 

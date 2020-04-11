@@ -43,7 +43,8 @@ public class DefaultSecurityShadowEntry implements SecurityShadowEntry
      * @param user The user shadowed by this entry.
      * @param wikiReference The wiki where the user is shadowed.
      */
-    DefaultSecurityShadowEntry(UserSecurityReference user, SecurityReference wikiReference) {
+    DefaultSecurityShadowEntry(UserSecurityReference user, SecurityReference wikiReference)
+    {
         this.user = user;
         this.wikiReference = wikiReference;
     }

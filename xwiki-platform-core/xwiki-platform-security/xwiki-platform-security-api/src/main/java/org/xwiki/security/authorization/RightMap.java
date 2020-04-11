@@ -65,8 +65,9 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     private transient int size;
 
     /** Default constructor. */
-    public RightMap() {
-        rights = new ArrayList<Object>(Right.size());
+    public RightMap()
+    {
+        rights = new ArrayList<>(Right.size());
     }
 
     /**
@@ -74,7 +75,8 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
      * @param value the value to convert
      * @return the converted value
      */
-    private Object maskNull(Object value) {
+    private Object maskNull(Object value)
+    {
         return (value == null ? NULL : value);
     }
 
@@ -84,7 +86,8 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
      * @return the converted value
      */
     @SuppressWarnings("unchecked")
-    private V unmaskNull(Object value) {
+    private V unmaskNull(Object value)
+    {
         return (V) (value == NULL ? null : value);
     }
 
@@ -255,7 +258,8 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     }
 
     @Override
-    public Set<Right> keySet() {
+    public Set<Right> keySet()
+    {
         if (keySet == null) {
             keySet = new RightSet();
         }
@@ -268,35 +272,41 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     private class RightSet extends AbstractSet<Right>
     {
         @Override
-        public Iterator<Right> iterator() {
+        public Iterator<Right> iterator()
+        {
             return new RightIterator();
         }
 
         @Override
-        public int size() {
+        public int size()
+        {
             return size;
         }
 
         @Override
-        public boolean contains(Object o) {
+        public boolean contains(Object o)
+        {
             return containsKey(o);
         }
 
         @Override
-        public boolean remove(Object o) {
+        public boolean remove(Object o)
+        {
             int oldSize = size;
             RightMap.this.remove(o);
             return size != oldSize;
         }
 
         @Override
-        public void clear() {
+        public void clear()
+        {
             RightMap.this.clear();
         }
     }
 
     @Override
-    public Collection<V> values() {
+    public Collection<V> values()
+    {
         if (values == null) {
             values = new Values();
         }
@@ -340,7 +350,8 @@ public class RightMap<V> extends AbstractMap<Right, V> implements Serializable, 
     }
 
     @Override
-    public Set<Entry<Right, V>> entrySet() {
+    public Set<Entry<Right, V>> entrySet()
+    {
         if (entrySet == null) {
             entrySet = new EntrySet();
         }

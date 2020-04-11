@@ -55,7 +55,8 @@ public class DocumentSkinReference implements SkinReference
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (o instanceof DocumentSkinReference) {
             DocumentSkinReference documentSkinReference = (DocumentSkinReference) o;
             return skinDocument.equals(documentSkinReference.skinDocument);
@@ -64,7 +65,8 @@ public class DocumentSkinReference implements SkinReference
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return skinDocument.hashCode();
     }
 

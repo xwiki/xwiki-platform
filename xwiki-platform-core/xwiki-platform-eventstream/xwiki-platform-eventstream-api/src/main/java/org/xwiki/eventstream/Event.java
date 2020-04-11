@@ -342,7 +342,8 @@ public interface Event
      * @param target a list of entities (users, groups) that are interested by this event
      * @since 9.2RC1
      */
-    default void setTarget(Set<String> target) {
+    default void setTarget(Set<String> target)
+    {
         LoggerFactory.getLogger(Event.class)
                 .warn("org.xwiki.eventstream.Event#setTarget() has been called without being reimplemented.");
     }
@@ -351,7 +352,8 @@ public interface Event
      * @return a list of entities (users, groups) that are interested by this event
      * @since 9.2RC1
      */
-    default Set<String> getTarget() {
+    default Set<String> getTarget()
+    {
         return Collections.emptySet();
     }
 

@@ -298,7 +298,8 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     }
 
     @Override
-    public Date getStartingDate() {
+    public Date getStartingDate()
+    {
         return startingDate;
     }
 

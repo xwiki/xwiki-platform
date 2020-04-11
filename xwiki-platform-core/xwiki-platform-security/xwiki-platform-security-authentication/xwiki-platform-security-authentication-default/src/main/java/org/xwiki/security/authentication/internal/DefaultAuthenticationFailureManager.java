@@ -289,7 +289,8 @@ public class DefaultAuthenticationFailureManager implements AuthenticationFailur
         private long firstFailingDate;
         private int nbAttempts;
 
-        AuthFailureRecord() {
+        AuthFailureRecord()
+        {
             this.firstFailingDate = new Date().getTime();
             this.nbAttempts = 1;
         }

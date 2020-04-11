@@ -52,7 +52,8 @@ public class MergeDocumentResult extends MergeManagerResult<DocumentModelBridge,
      * @version $Id$
      * @since 11.8RC1
      */
-    public enum DocumentPart {
+    public enum DocumentPart
+    {
         /**
          * Merge of the title.
          */

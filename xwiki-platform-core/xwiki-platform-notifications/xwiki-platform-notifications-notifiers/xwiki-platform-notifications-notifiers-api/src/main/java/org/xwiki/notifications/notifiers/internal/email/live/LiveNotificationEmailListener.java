@@ -151,7 +151,8 @@ public class LiveNotificationEmailListener extends AbstractEventListener
     /**
      * If the notification grace time thread is not running, start it.
      */
-    private synchronized void startNotificationThread() {
+    private synchronized void startNotificationThread()
+    {
         // If the notification thread is not defined or is dead ...
         if (this.notificationGraceTimeThread == null
                 || (!this.notificationGraceTimeThread.isAlive()

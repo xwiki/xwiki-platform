@@ -111,7 +111,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         /**
          * Create Policies based on default initial policies.
          */
-        Policies() {
+        Policies()
+        {
             try {
                 if (initialAllowTie == null || Right.size() != initialPolicySize) {
                     initialPolicySize = Right.size();
@@ -140,7 +141,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
          * @param impliedRight the implied right to set
          * @param originalRight the original right to get
          */
-        public void set(Right impliedRight, Right originalRight) {
+        public void set(Right impliedRight, Right originalRight)
+        {
             if (originalRight.getTieResolutionPolicy() == RuleState.ALLOW) {
                 allowTie.add(impliedRight);
             }
@@ -153,7 +155,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
          * @param right the right to check.
          * @return the current tie resolution policy of this right.
          */
-        public RuleState getTieResolutionPolicy(Right right) {
+        public RuleState getTieResolutionPolicy(Right right)
+        {
             return (allowTie.contains(right)) ? RuleState.ALLOW : RuleState.DENY;
         }
 
@@ -161,7 +164,8 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
          * @param right the right to check.
          * @return the current tie resolution policy of this right.
          */
-        public boolean getInheritanceOverridePolicy(Right right) {
+        public boolean getInheritanceOverridePolicy(Right right)
+        {
             return !noOverride.contains(right);
         }
     }

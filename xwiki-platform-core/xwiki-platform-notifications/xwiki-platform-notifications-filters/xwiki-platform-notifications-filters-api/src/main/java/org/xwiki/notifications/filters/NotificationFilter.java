@@ -158,7 +158,8 @@ public interface NotificationFilter extends Comparable
      * @since 9.11.5
      * @since 10.3
      */
-    default int getPriority() {
+    default int getPriority()
+    {
         return 1000;
     }
 

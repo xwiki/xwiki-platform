@@ -66,7 +66,8 @@ public interface NotificationConfiguration
      * @since 12.2
      */
     @Unstable
-    default boolean isRestCacheEnabled() {
+    default boolean isRestCacheEnabled()
+    {
         return true;
     }
 }

@@ -80,7 +80,8 @@ public class DocumentsDeletingListener extends AbstractEventListener
         super("XAR Extension Documents Deleting Listener", EVENTS);
     }
 
-    private boolean shouldListenerBeTriggered(Job job, CancelableEvent event) {
+    private boolean shouldListenerBeTriggered(Job job, CancelableEvent event)
+    {
         if (event.isCanceled()) {
             logger.debug("Skipping [{}] as the event is already cancelled.", this.getName());
             return false;

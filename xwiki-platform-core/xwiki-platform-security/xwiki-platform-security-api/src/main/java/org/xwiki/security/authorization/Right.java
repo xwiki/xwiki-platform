@@ -115,13 +115,12 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * The enabled rights by entity types.  There is a special case hardcoded : The PROGRAM
      * right should only be enabled for the main wiki, not for wikis in general.
      */
-    private static final Map<EntityType, Set<Right>> ENABLED_RIGHTS = new HashMap<EntityType, Set<Right>>();
+    private static final Map<EntityType, Set<Right>> ENABLED_RIGHTS = new HashMap<>();
 
     /**
      * The enabled rights by entity types, but with unmodifiable list for getters.
      */
-    private static final Map<EntityType, Set<Right>> UNMODIFIABLE_ENABLED_RIGHTS
-        = new HashMap<EntityType, Set<Right>>();
+    private static final Map<EntityType, Set<Right>> UNMODIFIABLE_ENABLED_RIGHTS = new HashMap<>();
 
     static {
         LOGIN = new Right("login", ALLOW, ALLOW, true, null, WIKI_ONLY, true);
@@ -320,7 +319,7 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
     {
         Set<Right> enabledRights = UNMODIFIABLE_ENABLED_RIGHTS.get(entityType);
         if (enabledRights == null) {
-            enabledRights = Collections.<Right>emptySet();
+            enabledRights = Collections.emptySet();
         }
         return enabledRights;
     }
@@ -330,14 +329,16 @@ public class Right implements RightDescription, Serializable, Comparable<Right>
      * @param ordinal the ordinal of the right
      * @return the {@code Right}
      */
-    public static Right get(int ordinal) {
+    public static Right get(int ordinal)
+    {
         return VALUES.get(ordinal);
     }
 
     /**
      * @return the count of all existing rights
      */
-    public static int size() {
+    public static int size()
+    {
         return values().size();
     }
 

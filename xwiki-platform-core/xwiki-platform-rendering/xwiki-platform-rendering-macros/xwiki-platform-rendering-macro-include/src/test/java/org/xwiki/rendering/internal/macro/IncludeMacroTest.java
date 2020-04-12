@@ -63,7 +63,6 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.stability.Unstable;
 import static org.xwiki.rendering.test.BlockAssert.assertBlocks;
 import static org.xwiki.rendering.test.BlockAssert.assertBlocksStartsWith;
 

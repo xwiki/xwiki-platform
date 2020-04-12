@@ -52,7 +52,7 @@
     <hsqldb.version>2.5.0</hsqldb.version>
 
     <!-- Dependencies versions -->
-    <ckeditor.version>1.41</ckeditor.version>
+    <ckeditor.version>1.42-SNAPSHOT</ckeditor.version>
     <bootstrap.version>3.4.1</bootstrap.version>
     <batik.version>1.12</batik.version>
     <restlet.version>2.3.12</restlet.version>
@@ -86,7 +86,7 @@
     <xwiki.enforcer.check-dependency-version.skip>${xwiki.enforcer.skip}</xwiki.enforcer.check-dependency-version.skip>
 
     <!-- Hibernate -->
-    <hibernate.version>5.4.13.Final</hibernate.version>
+    <hibernate.version>5.4.14.Final</hibernate.version>
 
     <!-- Versions of JDBC connectors we want to use in our distribution, in our tests and when using build tools -->
     <hsqldb.groupId>org.hsqldb</hsqldb.groupId>
@@ -624,7 +624,7 @@
       <dependency>
         <groupId>com.icegreen</groupId>
         <artifactId>greenmail</artifactId>
-        <version>1.5.11</version>
+        <version>1.5.12</version>
         <exclusions>
           <!-- Not the right id -->
           <exclusion>
@@ -888,7 +888,8 @@
                   org.bouncycastle:bcprov-jdk15,
                   org.bouncycastle:bcprov-jdk14,
                   org.bouncycastle:bcprov-jdk13,
-                  org.bouncycastle:bcprov-jdk12
+                  org.bouncycastle:bcprov-jdk12,
+                  org.bouncycastle:bcprov-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>
@@ -903,7 +904,8 @@
                   org.bouncycastle:bcpkix-jdk15,
                   org.bouncycastle:bcpkix-jdk14,
                   org.bouncycastle:bcpkix-jdk13,
-                  org.bouncycastle:bcpkix-jdk12
+                  org.bouncycastle:bcpkix-jdk12,
+                  org.bouncycastle:bcpkix-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>
@@ -918,7 +920,8 @@
                   org.bouncycastle:bcmail-jdk15,
                   org.bouncycastle:bcmail-jdk14,
                   org.bouncycastle:bcmail-jdk13,
-                  org.bouncycastle:bcmail-jdk12
+                  org.bouncycastle:bcmail-jdk12,
+                  org.bouncycastle:bcmail-jdk15to18
                 </features>
               </extensionOverride>
               <extensionOverride>

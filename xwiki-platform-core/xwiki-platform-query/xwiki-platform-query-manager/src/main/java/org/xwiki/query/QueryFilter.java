@@ -70,7 +70,8 @@ public interface QueryFilter
      * @since 8.4.5
      * @since 9.3RC1
      */
-    default Query filterQuery(Query query) {
+    default Query filterQuery(Query query)
+    {
         return query;
     }
 }

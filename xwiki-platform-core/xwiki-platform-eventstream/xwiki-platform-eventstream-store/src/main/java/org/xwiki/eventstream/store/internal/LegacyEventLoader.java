@@ -138,6 +138,7 @@ public class LegacyEventLoader
     {
         Query query =
             this.queryManager.createQuery("select event from LegacyEvent event where eventId = :eventId", Query.HQL);
+        query.bindValue("eventId", eventId);
 
         if (configuration.useMainStore()) {
             query.setWiki(wikiDescriptorManager.getMainWikiId());

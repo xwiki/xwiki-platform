@@ -102,14 +102,12 @@ public class SolrQueryExecutorTest
     @Rule
     public final MockitoOldcoreRule oldCore = new MockitoOldcoreRule(this.componentManager);
 
-    private SolrInstance solr = mock(SolrInstance.class);
+    private SolrInstance solr;
 
     @Before
     public void configure() throws Exception
     {
-        ParameterizedType solrProviderType = new DefaultParameterizedType(null, Provider.class, SolrInstance.class);
-        Provider<SolrInstance> provider = this.componentManager.registerMockComponent(solrProviderType);
-        when(provider.get()).thenReturn(this.solr);
+        this.solr = this.componentManager.registerMockComponent(SolrInstance.class);
     }
 
     @Test

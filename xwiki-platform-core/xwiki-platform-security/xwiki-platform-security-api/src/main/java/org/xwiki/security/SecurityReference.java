@@ -119,7 +119,8 @@ public class SecurityReference extends EntityReference
     /**
      * @return a SecurityReference representing the first reference of EntityType.WIKI in this security reference.
      */
-    public SecurityReference getWikiReference() {
+    public SecurityReference getWikiReference()
+    {
         SecurityReference result = this;
         while (result != null && result.getType() != EntityType.WIKI) {
             result = result.getParentSecurityReference();

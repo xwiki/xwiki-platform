@@ -69,7 +69,8 @@ public interface UntypedRecordableEventDescriptor extends RecordableEventDescrip
      * @since 9.11.2
      * @since 10.0
      */
-    default String getTargetExpression() {
+    default String getTargetExpression()
+    {
         return null;
     }
 }

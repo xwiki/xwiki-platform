@@ -48,7 +48,8 @@ public class DocumentColorThemeReference implements ColorThemeReference
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(Object o)
+    {
         if (o instanceof DocumentColorThemeReference) {
             DocumentColorThemeReference documentSkinReference = (DocumentColorThemeReference) o;
             return colorThemeDocument.equals(documentSkinReference.colorThemeDocument);
@@ -57,7 +58,8 @@ public class DocumentColorThemeReference implements ColorThemeReference
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return colorThemeDocument.hashCode();
     }
 

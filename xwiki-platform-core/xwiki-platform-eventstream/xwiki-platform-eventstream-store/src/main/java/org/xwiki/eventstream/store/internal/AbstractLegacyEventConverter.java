@@ -152,7 +152,8 @@ public abstract class AbstractLegacyEventConverter implements LegacyEventConvert
         return result;
     }
 
-    private Event.Importance computePriorityFromLegacyEvent(int originalPriority) {
+    private Event.Importance computePriorityFromLegacyEvent(int originalPriority)
+    {
         if (originalPriority > 0) {
             int priority = originalPriority / 10 - 1;
             if (priority >= 0 && priority < Event.Importance.values().length) {

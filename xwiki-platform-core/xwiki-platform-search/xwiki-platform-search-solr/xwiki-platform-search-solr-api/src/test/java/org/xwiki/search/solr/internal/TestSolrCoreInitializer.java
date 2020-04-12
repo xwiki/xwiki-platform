@@ -17,54 +17,44 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.events;
+package org.xwiki.search.solr.internal;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.search.solr.AbstractSolrCoreInitializer;
+import org.xwiki.search.solr.SolrException;
 
 /**
- * Descriptor for the {@link org.xwiki.bridge.event.DocumentCreatedEvent}.
- *
+ * Test core.
+ * 
  * @version $Id$
- * @since 9.2RC1
+ * @since 12.3RC1
  */
 @Component
+@Named("test")
 @Singleton
-@Named(DocumentCreatedEventDescriptor.EVENT_TYPE)
-public class DocumentCreatedEventDescriptor extends AbstractXWikiRecordableEventDescriptor
+public class TestSolrCoreInitializer extends AbstractSolrCoreInitializer
 {
-    /**
-     * Name of the supported type (as it is stored in Activity Stream).
-     */
-    public static final String EVENT_TYPE = "create";
+    public static long VERSION = 42;
 
-    /**
-     * Construct a DocumentCreatedEventDescriptor.
-     */
-    public DocumentCreatedEventDescriptor()
+    public static String FIELD_TESTMAP = "testmap";
+
+    @Override
+    protected void createSchema() throws SolrException
     {
-        super("core.events.create.description",
-                "core.events.appName");
+        addMapField(FIELD_TESTMAP);
     }
 
     @Override
-    public String getEventType()
+    protected void migrateSchema(Long cversion)
     {
-        // Match the name used by Activity Stream.
-        return EVENT_TYPE;
     }
 
     @Override
-    public EventFilter getFilter()
+    protected long getVersion()
     {
-        return EventFilter.WIKI_SPACE_AND_DOCUMENT_FILTER;
-    }
-
-    @Override
-    public String getEventTypeIcon()
-    {
-        return "add";
+        return VERSION;
     }
 }

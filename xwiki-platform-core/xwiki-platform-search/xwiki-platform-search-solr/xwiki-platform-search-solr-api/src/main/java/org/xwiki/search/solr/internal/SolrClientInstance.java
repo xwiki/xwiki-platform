@@ -28,14 +28,13 @@ import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrException;
 
 /**
- * A wrapper around the new {@link Solr} API.
+ * A wrapper around the new {@link Solr} API for the search core.
  * 
  * @version $Id$
  * @since 12.2
  */
 @Component
 @Singleton
-@Deprecated
 public class SolrClientInstance extends AbstractSolrInstance
 {
     @Inject

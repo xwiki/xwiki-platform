@@ -127,16 +127,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     }
 
     /**
-     * Allows overriding the Document Access Bridge used (useful for unit tests).
-     * 
-     * @param documentAccessBridge the new Document Access Bridge to use
-     */
-    public void setDocumentAccessBridge(DocumentAccessBridge documentAccessBridge)
-    {
-        this.documentAccessBridge = documentAccessBridge;
-    }
-
-    /**
      * Allows overriding the Document Displayer used (useful for unit tests).
      * 
      * @param documentDisplayer the new Document Displayer to use

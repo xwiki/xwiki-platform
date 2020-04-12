@@ -216,15 +216,15 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         
         // Exclude the first heading from the content
         if (parameters.excludeFirstHeading()) {
-            HeaderBlock heading =
-                    result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT_OR_SELF);
+            HeaderBlock heading = result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class),
+                    Block.Axes.DESCENDANT_OR_SELF);
             if (heading != null) {
-                result.removeBlock(heading);
+                removeBlockRecursively(result, heading);
             } else {
                 String includeType = parameters.getSection() != null ? "section" : "document";
                 throw new MacroExecutionException(
-                    String.format("The included [%s] doesn't contain any heading",includeType));
-           }
+                        String.format("The included [%s] doesn't contain any heading", includeType));
+            }
         }
         
         // Step 5: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
@@ -238,7 +238,26 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 
         return Arrays.asList(metadata);
     }
-
+    
+    private boolean removeBlockRecursively(Block block, Block blockToRemove)
+    {
+        // Go through all children and remove the block if found
+        List<Block> allChildren = block.getChildren();
+        for (Block child : allChildren) {
+            if (child == blockToRemove) {
+                block.removeBlock(child);
+                return true;
+            } else {
+                // Check in children of the child
+                if (removeBlockRecursively(child, blockToRemove)) {
+                    // Return without moving on if child found
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
     /**
      * Protect form recursive inclusion.
      * 

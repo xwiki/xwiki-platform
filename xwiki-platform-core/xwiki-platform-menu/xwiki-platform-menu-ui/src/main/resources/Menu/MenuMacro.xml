@@ -595,6 +595,18 @@ $xwiki.getDocument('MenuTemplate').content
     display: none;
   }
 }
+
+/* Menu colors, initialized with the navbar colors*/
+@xmenu-default-bg: @navbar-default-bg;
+@xmenu-default-link-color: @navbar-default-link-color;
+@xmenu-default-link-hover-bg: @navbar-default-link-hover-bg;
+@xmenu-default-link-hover-color: @navbar-default-link-hover-color;
+@xmenu-default-link-active-color: @navbar-default-link-active-color;
+@xmenu-default-link-active-bg: @navbar-default-link-active-bg;
+@xmenu-default-border: @navbar-default-border;
+@xmenu-height: @navbar-height;
+@xmenu-padding-vertical: @navbar-padding-vertical;
+
 .menu {
   &amp;.menu-vertical {
     ul {
@@ -650,11 +662,11 @@ $xwiki.getDocument('MenuTemplate').content
   &amp;.menu-horizontal {
     /* Stylization: Navbars */
     .clearfix;
-    background-color: @navbar-default-bg;
-    border-color: @navbar-default-border;
+    background-color: @xmenu-default-bg;
+    border-color: @xmenu-default-border;
     /* Custom styling */
     .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
-    min-height: @navbar-height;
+    min-height: @xmenu-height;
     padding-left: 25px;
     &amp; &gt; ul {
       padding-left: 0;
@@ -664,27 +676,27 @@ $xwiki.getDocument('MenuTemplate').content
         position: relative;
         display: block;
         padding: @nav-link-padding;
-        padding-top: @navbar-padding-vertical;
-        padding-bottom: @navbar-padding-vertical;
+        padding-top: @xmenu-padding-vertical;
+        padding-bottom: @xmenu-padding-vertical;
         @media (min-width: @grid-float-breakpoint) {
           float: left;
         }
         line-height: @line-height-computed;
-        color: @navbar-default-link-color;
+        color: @xmenu-default-link-color;
         &amp;:hover {
-          color: @navbar-default-link-hover-color;
-          background-color: @navbar-default-link-hover-bg;
-          background-color: @navbar-default-link-active-bg;
-          color: @navbar-default-link-active-color;
+          color: @xmenu-default-link-hover-color;
+          background-color: @xmenu-default-link-hover-bg;
+          background-color: @xmenu-default-link-active-bg;
+          color: @xmenu-default-link-active-color;
           /* When hovering, have the same color for text and link usage */
           &amp; &gt; span &gt; a {
-            background-color: @navbar-default-link-active-bg;
-            color: @navbar-default-link-active-color;
+            background-color: @xmenu-default-link-active-bg;
+            color: @xmenu-default-link-active-color;
           }
         }
         /* Links inside menu */
         a {
-          color: @navbar-default-link-color;
+          color: @xmenu-default-link-color;
           &amp;:hover {
             text-decoration: none;
           }
@@ -692,15 +704,15 @@ $xwiki.getDocument('MenuTemplate').content
         /* Containers, images inside menu */
         div, img {
           /* Limit the height to the nav height minus the padding and minus border */
-          max-height: @navbar-height - (2 * @navbar-padding-vertical) - 2px;
+          max-height: @xmenu-height - (2 * @xmenu-padding-vertical) - 2px;
           overflow: hidden;
         }
         /* Separator vertical inside menu */
         &amp;:empty {
-          height: @navbar-height;
+          height: @xmenu-height;
           margin: 0 ((@line-height-computed / 2) - 1);
           padding: 0;
-          border-right: 1px solid @navbar-default-border;
+          border-right: 1px solid @xmenu-default-border;
         }
       }
       /* Stylization: Dropdowns */
@@ -825,7 +837,7 @@ $xwiki.getDocument('MenuTemplate').content
         margin: 0 0 0 -25px; /* Remove padding added in normal view */
         &gt; li {
           &amp;:empty {
-            .nav-divider(@navbar-default-border);
+            .nav-divider(@xmenu-default-border);
           }
         }
         ul {
@@ -839,28 +851,28 @@ $xwiki.getDocument('MenuTemplate').content
           box-shadow: none;
           li {
             /* Text inside menu */
-            color: @navbar-default-link-color;
+            color: @xmenu-default-link-color;
             /* Links inside menu */
             a {
-              color: @navbar-default-link-color;
+              color: @xmenu-default-link-color;
               &amp;:hover {
                 /* Preserve the styling from dropdown */
               }
             }
             /* Submenus inside menu */
             &amp;.xDropdown {
-              color: @navbar-default-link-color;
+              color: @xmenu-default-link-color;
               &amp;:hover {
                 background-color: transparent;
                 color: inherit;
               }
               /* When in dropdown we also have a link */
-              &gt; span &gt; a { 
-                color: @navbar-default-link-color;
+              &gt; span &gt; a {
+                color: @xmenu-default-link-color;
               }
             }
             &amp;:empty {
-              .nav-divider(@navbar-default-border);
+              .nav-divider(@xmenu-default-border);
             }
           }
         }
@@ -890,15 +902,15 @@ $xwiki.getDocument('MenuTemplate').content
 
 .menu-horizontal-toggle {
   .clearfix;
-  background-color: @navbar-default-bg;
-  border-color: @navbar-default-border;
+  background-color: @xmenu-default-bg;
+  border-color: @xmenu-default-border;
   .box-shadow(0 2px 8px rgba(0,0,0,0.4) inset);
-  min-height: @navbar-height;
+  min-height: @xmenu-height;
   &amp; .navbar-toggle {
     float: left;
     padding-left: 15px;
     &amp; .icon-bar {
-      background-color: @navbar-default-link-color;
+      background-color: @xmenu-default-link-color;
       transition: .3s ease all;
       &amp;:nth-of-type(2) {
         opacity: 0;

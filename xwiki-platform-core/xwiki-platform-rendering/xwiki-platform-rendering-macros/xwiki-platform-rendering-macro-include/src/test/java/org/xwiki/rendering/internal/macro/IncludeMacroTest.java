@@ -540,16 +540,124 @@ public class IncludeMacroTest
     @Test
     void executeIncludeMacroWhenExcludeFirstHeadingTrue() throws Exception 
     {
-        // Expected content containing no heading.
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginParagraph\n"
+            + "onWord [content]\n"
+            + "endParagraph\n"
+            + "beginSection\n"
+            + "endSection\n"
+            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("document");
+        parameters.setExcludeFirstHeading(true);
+
+        // Getting the macro context
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        when(this.macroEntityReferenceResolver.resolve("document", EntityType.DOCUMENT,
+                macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.dab.getTranslatedDocumentInstance(this.document)).thenReturn(this.document);
+        when(this.dab.getCurrentDocumentReference())
+                .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_1);
+        when(this.document.getXDOM()).thenReturn(getXDOM("content\n= Hello =")); // To test
+        when(this.document.getRealLanguage()).thenReturn("");
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeIncludeMacroWhenExcludeFirstHeadingFalse() throws Exception 
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+                + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+                + "beginParagraph\n"
+                + "onWord [content]\n"
+                + "endParagraph\n"
+                + "beginSection\n"
+                + "beginHeader [1, Hcontent1]\n"
+                + "onWord [content1]\n"
+                + "endHeader [1, Hcontent1]\n"
+                + "endSection\n"
+                + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+                + "endDocument";
+        // @formatter:on
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("wiki");
+        parameters.setExcludeFirstHeading(false);
+
+        // Getting the macro context
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        when(this.macroEntityReferenceResolver.resolve("wiki", EntityType.DOCUMENT,
+                macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM("content\n= content1 =")); // To test
+        when(this.document.getRealLanguage()).thenReturn("");
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeIncludeMacroWhenNoHeadingFoundInDocument() throws Exception 
+    {
+        
+        String expected = "The included [document] doesn't contain any heading";
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("document");
+        parameters.setExcludeFirstHeading(true);
+
+        // Getting the macro context
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        when(this.macroEntityReferenceResolver.resolve("document", EntityType.DOCUMENT,
+                macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM("\ncontent1")); // To test
+        when(this.document.getRealLanguage()).thenReturn("");
+
+        Throwable exception = assertThrows(MacroExecutionException.class,
+                () -> this.includeMacro.execute(parameters, null, macroContext));
+
+        assertEquals(expected, exception.getMessage());
+    }
+
+    @Test
+    void executeIncludeMacroForExcludingOnlyFirstHeading() throws Exception 
+    {
         // @formatter:off
         String expected = "beginDocument\n"
             + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
             + "beginSection\n"
-            + "beginSection\n"
             + "beginParagraph\n"
-            + "onWord [content]\n"
+            + "onWord [helloworld]\n"
             + "endParagraph\n"
             + "endSection\n"
+            + "beginSection\n"
+            + "beginHeader [1, Hcontent1]\n"
+            + "onWord [content1]\n"
+            + "endHeader [1, Hcontent1]\n"
             + "endSection\n"
             + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
             + "endDocument";
@@ -571,7 +679,50 @@ public class IncludeMacroTest
                 .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
         when(this.document.getDocumentReference()).thenReturn(resolvedReference);
         when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
-        when(this.document.getXDOM()).thenReturn(getXDOM("== Heading ==\ncontent")); // To test
+        when(this.document.getXDOM()).thenReturn(getXDOM("= content =\nhelloworld\n = content1 =")); // To test
+        when(this.document.getRealLanguage()).thenReturn("");
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeIncludeMacroWhenFirstHeadingIsChildOfAChild() throws Exception 
+    {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginGroup\n"
+            + "beginGroup\n"
+            + "beginSection\n"
+            + "endSection\n"
+            + "endGroup\n"
+            + "beginParagraph\n"
+            + "onWord [helloWorld]\n"
+            + "endParagraph\n"
+            + "endGroup\n"
+            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("document");
+        parameters.setExcludeFirstHeading(true);
+
+        // Getting the macro context
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        when(this.macroEntityReferenceResolver.resolve("document", EntityType.DOCUMENT,
+                macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.dab.getTranslatedDocumentInstance(this.document)).thenReturn(this.document);
+        when(this.dab.getCurrentDocumentReference())
+                .thenReturn(new DocumentReference("wiki", "Space", "IncludingPage"));
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM("((((((= content =)))\nhelloWorld)))")); // To test
         when(this.document.getRealLanguage()).thenReturn("");
 
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);

@@ -20,6 +20,7 @@
 package org.xwiki.notifications.sources.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStream;
@@ -46,6 +48,8 @@ import org.xwiki.query.Query;
 import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+import org.xwiki.user.group.GroupException;
+import org.xwiki.user.group.GroupManager;
 
 /**
  * Default implementation of {@link ParametrizedNotificationManager}.
@@ -81,6 +85,9 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
+    private GroupManager groupManager;
+
+    @Inject
     @Named(EventReadAlertFilter.FILTER_NAME)
     private NotificationFilter eventReadAlertFilter;
 
@@ -93,6 +100,9 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
 
     @Inject
     private PreferenceDateNotificationFilter preferenceDateNotificationFilter;
+
+    @Inject
+    private Logger logger;
 
     @Override
     public List<CompositeEvent> getEvents(NotificationParameters parameters)
@@ -187,11 +197,46 @@ public class DefaultParametrizedNotificationManager implements ParametrizedNotif
         return allowed;
     }
 
+    /**
+     * Determine if the given user reference is targeted by the event targets.
+     * @param event the event that is tested
+     * @param userReference the user reference given by the parameters
+     * @return {@code true} iff the user is explicitely target, or through a group.
+     */
+    private boolean eventTargetUser(Event event, DocumentReference userReference)
+    {
+        boolean result = false;
+        if (event.getTarget() != null && !event.getTarget().isEmpty() && userReference != null) {
+            String serializedUserReference = this.serializer.serialize(userReference);
+
+            // if the target explicitely contains the user reference we're good
+            if (event.getTarget().contains(serializedUserReference)) {
+                result = true;
+            // else we need to check that the targets does not contain any group the user belongs to
+            // note that we do the check by starting from the user groups for better scalability
+            // compared to loading each targets individually
+            } else {
+                try {
+                    Collection<DocumentReference> groups = this.groupManager.getGroups(userReference, null, true);
+                    for (DocumentReference group : groups) {
+                        if (event.getTarget().contains(this.serializer.serialize(group))) {
+                            result = true;
+                            break;
+                        }
+                    }
+                } catch (GroupException e) {
+                    logger.error("Error while checking groups for user [{}]", userReference, e);
+                }
+            }
+        }
+        return result;
+    }
+
     private boolean filterEvent(Event event, NotificationParameters parameters) throws EventStreamException
     {
         // Don't record events that have a target that don't include the current user
         if (!event.getTarget().isEmpty()
-            && (parameters.user == null || !event.getTarget().contains(serializer.serialize(parameters.user)))) {
+            && (parameters.user == null || !this.eventTargetUser(event, parameters.user))) {
             return true;
         }
 

@@ -42,9 +42,9 @@ import org.xwiki.vfs.VfsResourceReference;
  * Transform VFS URLs into a typed Resource Reference. The URL format handled is {@code http://server/<servlet
  * context>/vfs/<vfs reference as URI>/path/inside/zip}. For example:
  * <ul>
- *   <li>{@code http://localhost:8080/xwiki/vfs/encoded(attach:space.page@attachment)/some/path/file.txt}.</li>
- *   <li>{@code http://localhost:8080/xwiki/vfs/encoded(http://server/path/to/zip)/some/path/file.txt}.</li>
- *   <li>{@code http://localhost:8080/xwiki/vfs/encoded(file://server/path/to/zip)/some/path/file.txt}.</li>
+ * <li>{@code http://localhost:8080/xwiki/vfs/encoded(attach:space.page@attachment)/some/path/file.txt}.</li>
+ * <li>{@code http://localhost:8080/xwiki/vfs/encoded(http://server/path/to/zip)/some/path/file.txt}.</li>
+ * <li>{@code http://localhost:8080/xwiki/vfs/encoded(file://server/path/to/zip)/some/path/file.txt}.</li>
  * </ul>
  *
  * @version $Id$

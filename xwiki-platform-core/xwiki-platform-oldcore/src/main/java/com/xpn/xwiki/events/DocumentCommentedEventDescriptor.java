@@ -59,7 +59,8 @@ public class DocumentCommentedEventDescriptor extends AbstractXWikiRecordableEve
     }
 
     @Override
-    public EventFilter getFilter() {
+    public EventFilter getFilter()
+    {
         return EventFilter.WIKI_SPACE_AND_DOCUMENT_FILTER;
     }
 

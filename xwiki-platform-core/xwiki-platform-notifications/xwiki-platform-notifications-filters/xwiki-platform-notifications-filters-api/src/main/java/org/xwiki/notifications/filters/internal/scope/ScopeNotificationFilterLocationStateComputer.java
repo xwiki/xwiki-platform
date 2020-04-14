@@ -44,7 +44,8 @@ public class ScopeNotificationFilterLocationStateComputer
     @Inject
     private ScopeNotificationFilterPreferencesGetter preferencesGetter;
 
-    private enum WatchedState {
+    private enum WatchedState
+    {
         WATCHED,
         NOT_WATCHED,
         UNKNOWN
@@ -56,7 +57,7 @@ public class ScopeNotificationFilterLocationStateComputer
      * @return if the location is watched by the user, for the given event type and format
      */
     public boolean isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
-            EntityReference location)
+        EntityReference location)
     {
         return isLocationWatched(filterPreferences, location, null, null).isWatched();
     }
@@ -69,7 +70,7 @@ public class ScopeNotificationFilterLocationStateComputer
      * @return if the location is watched by the user, for the given event type and format
      */
     public WatchedLocationState isLocationWatched(Collection<NotificationFilterPreference> filterPreferences,
-            EntityReference location, String eventType, NotificationFormat format)
+        EntityReference location, String eventType, NotificationFormat format)
     {
         // TODO: write a unit test with a complex set of preferences
 
@@ -114,7 +115,7 @@ public class ScopeNotificationFilterLocationStateComputer
     }
 
     private WatchedLocationState handleExclusiveFilters(EntityReference location,
-            ScopeNotificationFilterPreferencesHierarchy preferences)
+        ScopeNotificationFilterPreferencesHierarchy preferences)
     {
         WatchedState state = WatchedState.UNKNOWN;
         int deepestLevel = 0;
@@ -144,7 +145,7 @@ public class ScopeNotificationFilterLocationStateComputer
         }
 
         return state == WatchedState.UNKNOWN ? null
-                : new WatchedLocationState(state == WatchedState.WATCHED, startingDate);
+            : new WatchedLocationState(state == WatchedState.WATCHED, startingDate);
     }
 
     private boolean match(ScopeNotificationFilterPreference pref, EntityReference location)

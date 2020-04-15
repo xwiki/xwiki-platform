@@ -36,7 +36,7 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         ##
         <dt#if ($hasEdit && $tdoc.realLocale == $doc.realLocale && $xwiki.isMultiLingual()) class="editableProperty"
             data-property="defaultLocale"#end>
-          $escapetool.xml($services.localization.render('core.viewers.information.locale'))
+          <label>$escapetool.xml($services.localization.render('core.viewers.information.locale'))</label>
         </dt>
         #set ($displayParams = {'value': $tdoc.realLocale})
         <dd>#displayProperty_locale($displayParams)</dd>
@@ -44,7 +44,9 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         ## Original Locale
         ##
         #if ($tdoc.realLocale != $doc.realLocale)
-          <dt>$escapetool.xml($services.localization.render('core.viewers.information.originalLocale'))</dt>
+          <dt>
+            <label>$escapetool.xml($services.localization.render('core.viewers.information.originalLocale'))</label>
+          </dt>
           #set ($originalLocaleName = $doc.realLocale.getDisplayName($xcontext.locale))
           #set ($styleName = '')
           #if ("$!originalLocaleName" == '')
@@ -72,7 +74,9 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
           #set ($discard = $supportedLocales.remove($tdoc.realLocale.toString()))
           #set ($discard = $supportedLocales.remove($doc.realLocale.toString()))
           #if (!$supportedLocales.isEmpty())
-            <dt>$escapetool.xml($services.localization.render('core.viewers.information.translations'))</dt>
+            <dt>
+              <label>$escapetool.xml($services.localization.render('core.viewers.information.translations'))</label>
+            </dt>
             #set ($output = [])
             #foreach ($supportedLocale in $supportedLocales)
               #set ($supportedLocaleName = $services.localization.toLocale($supportedLocale).getDisplayName(
@@ -103,14 +107,14 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         ## Syntax
         ##
         <dt#if ($hasEdit) class="editableProperty"#end data-property="syntax">
-          $escapetool.xml($services.localization.render('core.viewers.information.syntax'))
+          <label>$escapetool.xml($services.localization.render('core.viewers.information.syntax'))</label>
         </dt>
         <dd>#displayDocumentProperty_syntax()</dd>
         ##
         ## Hidden
         ##
         <dt#if ($hasEdit) class="editableProperty"#end data-property="hidden">
-          $escapetool.xml($services.localization.render('core.viewers.information.hidden'))
+          <label>$escapetool.xml($services.localization.render('core.viewers.information.hidden'))</label>
         </dt>
         <dd>#displayDocumentProperty_hidden()</dd>
       </dl>
@@ -123,7 +127,9 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         ##
         ## Included Pages
         ##
-        <dt>$escapetool.xml($services.localization.render('core.viewers.information.includedPages'))</dt>
+        <dt>
+          <label>$escapetool.xml($services.localization.render('core.viewers.information.includedPages'))</label>
+        </dt>
         <dd>
           #set ($includedPages = $tdoc.includedPages)
           #if ($includedPages.isEmpty())
@@ -137,7 +143,9 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         ##
         ## Backlinks
         ##
-        <dt>$escapetool.xml($services.localization.render('core.viewers.information.backlinks'))</dt>
+        <dt>
+          <label>$escapetool.xml($services.localization.render('core.viewers.information.backlinks'))</label>
+        </dt>
         <dd>
           #set ($backlinks = $doc.backlinks)
           #set ($discard = $collectiontool.sortModifiable($backlinks))
@@ -152,7 +160,9 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         ##
         ## Reference
         ##
-        <dt>$escapetool.xml($services.localization.render('core.viewers.information.pageReference'))</dt>
+        <dt>
+          <label>$escapetool.xml($services.localization.render('core.viewers.information.pageReference'))</label>
+        </dt>
         <dd id="information-reference">
           <div class="reference-group input-group flat-buttons">
             #set ($globalHint = $services.localization.render('core.viewers.information.pageReference.globalButton'))

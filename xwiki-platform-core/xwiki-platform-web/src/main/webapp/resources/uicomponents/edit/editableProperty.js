@@ -27,17 +27,20 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   var init = function() {
     // Maybe add the action icons.
     if ($(this).find('.editableProperty-edit').length === 0) {
-      var editIcon = $('<a href="#editProperty" class="editableProperty-edit"></a>').appendTo($(this));
+      var editIcon = $('<a href="#editProperty" class="editableProperty-edit"></a>');
       editIcon.attr('title', $jsontool.serialize($services.localization.render('edit')));
       editIcon.html($jsontool.serialize($services.icon.renderHTML('pencil')));
 
-      var cancelIcon = $('<a href="#cancelProperty" class="editableProperty-cancel"></a>').appendTo($(this));
+      var cancelIcon = $('<a href="#cancelProperty" class="editableProperty-cancel"></a>');
       cancelIcon.attr('title', $jsontool.serialize($services.localization.render('cancel')));
       cancelIcon.hide().html($jsontool.serialize($services.icon.renderHTML('cross')));
 
-      var saveIcon = $('<a href="#saveProperty" class="editableProperty-save"></a>').appendTo($(this));
+      var saveIcon = $('<a href="#saveProperty" class="editableProperty-save"></a>');
       saveIcon.attr('title', $jsontool.serialize($services.localization.render('save')));
       saveIcon.hide().html($jsontool.serialize($services.icon.renderHTML('check')));
+
+      // Insert the action icons right after the label because it may be followed by a hint on the next line.
+      $(this).find('label').after(editIcon, cancelIcon, saveIcon);
     }
 
     // Mark the viewer.
@@ -121,6 +124,8 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
     var editor = editableProperty.next('.editableProperty-viewer').next('.editableProperty-editor');
     var data = editor.find(':input').serializeArray();
     data.push({name: 'language', value: xcontext.locale});
+    data.push({name: 'comment', value: 'Update property ' + editableProperty.data('property')});
+    data.push({name: 'minorEdit', value: true});
     data.push({name: 'form_token', value: xcontext.form_token});
     data.push({name: 'ajax', value: true});
     var notification = new XWiki.widgets.Notification(

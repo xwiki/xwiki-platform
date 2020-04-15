@@ -226,35 +226,22 @@
       <category>Tools</category>
     </property>
     <property>
-      <content>{{velocity}}
+      <content>{{template name="display_macros.vm" /}}
+
+{{velocity}}
 #set ($discard = $xwiki.ssx.use('Panels.DocumentInformation'))
 #set ($pages = $tdoc.includedPages)
 #largepanelheader($services.localization.render('panels.documentInformation.title'))
 #if ("$tdoc.locale" == '' &amp;&amp; $xwiki.isMultiLingual())
 ; {{html}}&lt;label for="xwikidoclanguageinput2"&gt;$services.localization.render('panels.documentInformation.defaultLanguage')&lt;/label&gt;{{/html}}
-: {{html}}&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLocale" size="30"/&gt;{{/html}}
+: {{html clean="false"}}#displayDocumentProperty_defaultLocale('edit'){{/html}}
 #end
 ##----------------------------------
 ## Display the wiki syntax combo box
 ##----------------------------------
 #set ($discard = $xwiki.jsx.use($paneldoc.fullName))
-#set ($configuredSyntaxes = $services.rendering.getConfiguredSyntaxes())
 ; {{html}}&lt;label for="xwikidocsyntaxinput2"&gt;$services.localization.render('panels.documentInformation.syntax')&lt;/label&gt;{{/html}}
-: {{html}}
-  &lt;select name="syntaxId" id="xwikidocsyntaxinput2"&gt;
-    #set ($docSyntax = $tdoc.getSyntax())
-    #foreach ($syntax in $configuredSyntaxes)
-      &lt;option value="$syntax.toIdString()"#if($syntax.equals($docSyntax))selected="selected"#end&gt;$syntax.toString()&lt;/option&gt;
-    #end
-    ## If the current document's syntax is not in the list of configured syntax, add it to the Select so that the user sees the Document's Syntax.
-    #if (!$configuredSyntaxes.contains($docSyntax))
-      &lt;option value="$docSyntax.toIdString()" selected="selected"&gt;$docSyntax.toString()&lt;/option&gt;
-    #end
-  &lt;/select&gt;
-{{/html}}
-#if ($hasAdmin &amp;&amp; $configuredSyntaxes.size() &lt; 2)
-: [[$services.localization.render('panels.documentInformation.configureSyntaxes')&gt;&gt;path:$xwiki.getURL('XWiki.XWikiPreferences', 'admin', 'editor=globaladmin&amp;section=Syntaxes')]]
-#end
+: {{html clean="false"}}#displayDocumentProperty_syntax('edit'){{/html}}
 ##--------------------------------------------------------------------------
 ; {{html}}
 &lt;label for="xhidden"&gt;&lt;input id="xhidden" type="checkbox" name="xhidden" #if($tdoc.isHidden()) checked="checked"#end value="1"/&gt;$services.localization.render('panels.documentInformation.hiddenDocument')&lt;/label&gt;

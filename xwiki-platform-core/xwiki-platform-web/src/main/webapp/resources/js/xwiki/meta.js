@@ -54,6 +54,9 @@ define(['jquery'], function($) {
         }
         // Since 11.2RC1
         self.isNew = html.data('xwiki-isnew');
+        // Since 12.3RC1
+        // Note that the 'data-xwiki-locale' attribute is set since XWiki 10.4RC1 but it hasn't been exposed here.
+        self.locale = html.data('xwiki-locale');
       } else {
         // Case 2: meta information are stored in deprecated <meta> tags
         // (in colibri)

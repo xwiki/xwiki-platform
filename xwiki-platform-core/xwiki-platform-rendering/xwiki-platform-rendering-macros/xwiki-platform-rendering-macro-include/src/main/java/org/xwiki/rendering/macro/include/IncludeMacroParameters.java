@@ -26,6 +26,8 @@ import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
+import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
@@ -60,7 +62,7 @@ public class IncludeMacroParameters
      * @see #getType()
      */
     private EntityType type = EntityType.DOCUMENT;
-
+    
     /**
      * Defines whether the included page is executed in its separated execution context or whether it's executed in the
      * context of the current page.
@@ -71,6 +73,11 @@ public class IncludeMacroParameters
      * @see #getSection()
      */
     private String section;
+    
+    /**
+     * @see #getIndentHeadingLevel()
+     */
+    private int indentHeadingLevel;
 
     /**
      * @param reference the reference of the resource to include
@@ -151,7 +158,29 @@ public class IncludeMacroParameters
     {
         return this.section;
     }
+    
+    /**
+     * @param indentHeadingLevel the heading level for first heading in the included
+     *        document or section.
+     * @since 12.3RC1
+     */
+    @Unstable
+    @PropertyName("Indent Heading Level")
+    @PropertyDescription("Adjust the heading level for first heading in the included document or section.")
+    public void setIndentHeadingLevel(int indentHeadingLevel) {
+        this.indentHeadingLevel = indentHeadingLevel;
+    }
 
+    /**
+     * @return the heading level to apply to the first heading. If not specified or
+     *         zero, default heading level will be applied.
+     * @since 12.3RC1
+     */
+    @Unstable
+    public int getIndentHeadingLevel() {
+        return this.indentHeadingLevel;
+    }
+    
     /**
      * @param page the reference of the page to include
      * @since 10.6RC1

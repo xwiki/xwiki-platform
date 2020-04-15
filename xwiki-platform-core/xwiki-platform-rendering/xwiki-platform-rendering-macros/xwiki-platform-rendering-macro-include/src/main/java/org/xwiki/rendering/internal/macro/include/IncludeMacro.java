@@ -202,7 +202,38 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 references.pop();
             }
         }
+        
+        if (parameters.getIndentHeadingLevel() > 0) {
 
+            HeaderBlock heading = result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
+
+            if (heading != null) {
+
+                // Define header Levels
+                HeaderLevel[] headerLevels = { HeaderLevel.LEVEL1, HeaderLevel.LEVEL2, HeaderLevel.LEVEL3,
+                        HeaderLevel.LEVEL4, HeaderLevel.LEVEL5, HeaderLevel.LEVEL6 };
+                HeaderLevel headinglevel;
+
+                // Get specified header level
+                if (parameters.getIndentHeadingLevel() > 6) {
+                    headinglevel = headerLevels[5];
+                } else {
+                    headinglevel = headerLevels[parameters.getIndentHeadingLevel() - 1];
+                }
+
+                HeaderBlock newHeading = new HeaderBlock(heading.getChildren(), headinglevel);
+
+                // Get the parent block in document
+                Block parent = result.getChildren().get(0);
+
+                // Get the first child Block of the document
+                Block child = parent.getChildren().get(0);
+                if (child == heading) {
+                    parent.replaceChild(newHeading, child);
+                }
+            }
+        }
+        
         // Step 5: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());

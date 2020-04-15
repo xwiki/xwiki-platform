@@ -114,8 +114,9 @@
 
 #macro (displayProperty_locale $parameters)
   #if ($parameters.mode == 'edit')
-    <input type="text" id="$!escapetool.xml($parameters.id)" name="$!escapetool.xml($parameters.name)"
-      value="$!escapetool.xml($parameters.value)"/>
+    #set ($discard = $xwiki.jsfx.use('localePicker.js', true))
+    <input type="text" data-type="locale" id="$!escapetool.xml($parameters.id)"
+      name="$!escapetool.xml($parameters.name)" value="$!escapetool.xml($parameters.value)"/>
   #else
     #set ($localeName = $parameters.value.getDisplayName($xcontext.locale))
     #set ($styleName = '')

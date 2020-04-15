@@ -204,13 +204,26 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             }
         }
         
-        // Exclude the first heading from the content
         if (parameters.excludeFirstHeading()) {
-            HeaderBlock heading = result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class),
-                    Block.Axes.DESCENDANT_OR_SELF);
-            if (heading != null) {
-                removeBlockRecursively(result, heading);
-            } else {
+            List<HeaderBlock> headingList = result.getBlocks(new ClassBlockMatcher(HeaderBlock.class),
+                    Block.Axes.DESCENDANT);
+
+            if (!headingList.isEmpty()) {
+
+                // Get the First Heading Block from list of Heading Blocks
+                HeaderBlock heading = headingList.get(0);
+
+                // Get the parent block in document
+                Block parent = result.getChildren().get(0);
+
+                // Get the first child Block of the document
+                Block child = parent.getChildren().get(0);
+                if (child == heading) {
+                    parent.removeBlock(child);
+                }
+            }
+              
+            else {
                 String includeType = parameters.getSection() != null ? "section" : "document";
                 throw new MacroExecutionException(
                         String.format("The included [%s] doesn't contain any heading", includeType));
@@ -227,25 +240,6 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
 
         return Arrays.asList(metadata);
-    }
-    
-    private boolean removeBlockRecursively(Block block, Block blockToRemove)
-    {
-        // Go through all children and remove the block if found
-        List<Block> allChildren = block.getChildren();
-        for (Block child : allChildren) {
-            if (child == blockToRemove) {
-                block.removeBlock(child);
-                return true;
-            } else {
-                // Check in children of the child
-                if (removeBlockRecursively(child, blockToRemove)) {
-                    // Return without moving on if child found
-                    return true;
-                }
-            }
-        }
-        return false;
     }
     
     /**

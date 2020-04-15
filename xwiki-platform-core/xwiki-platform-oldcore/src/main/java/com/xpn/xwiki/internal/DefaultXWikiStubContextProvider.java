@@ -25,6 +25,8 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
 
 import com.xpn.xwiki.XWikiContext;
@@ -57,6 +59,9 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 
     @Inject
     private Provider<DocumentReference> defaultDocumentReferenceProvider;
+
+    @Inject
+    private Execution execution;
 
     /**
      * The initial stub XWikiContext.
@@ -107,33 +112,64 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         if (this.initialContext != null) {
             stubContext = this.initialContext.clone();
 
-            // We make sure to not share the same Request instance with several threads
-            if (this.initialContext.getRequest() != null) {
-                XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(this.initialContext.getRequest());
-                XWikiServletRequest request = new XWikiServletRequest(stubRequest);
-                stubContext.setRequest(request);
+            ExecutionContext econtext = this.execution.getContext();
 
-                // Each context is supposed to have a dedicated URL factory
-                if (stubContext.getWiki() != null) {
-                    XWikiURLFactory urlf = stubContext.getWiki().getURLFactoryService()
-                        .createURLFactory(XWikiContext.MODE_SERVLET, stubContext);
-                    stubContext.setURLFactory(urlf);
+            XWikiContext currentXContext;
+            if (econtext != null) {
+                // Remember current XWikiContext to restore it
+                currentXContext = (XWikiContext) econtext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+
+                // Set the context in the execution context in case any part of it's initialization requires it
+                // (which might create an infinite loop if there was none already in Provider<XWikiContext> use case
+                // for example)
+                stubContext.declareInExecutionContext(econtext);
+            } else {
+                currentXContext = null;
+            }
+
+            try {
+                initiazeXWikiContext(stubContext);
+            } finally {
+                if (econtext != null) {
+                    // Restore previous XWikiContext
+                    if (currentXContext != null) {
+                        currentXContext.declareInExecutionContext(econtext);
+                    } else {
+                        econtext.removeProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+                    }
                 }
             }
-
-            // We make sure to not share the same Response instance with several threads
-            if (this.initialContext.getResponse() != null) {
-                XWikiServletResponseStub stubResponse = new XWikiServletResponseStub();
-                XWikiServletResponse response = new XWikiServletResponse(stubResponse);
-                stubContext.setResponse(response);
-            }
-
-            // We make sure to not share the same document instance with several threads
-            stubContext.setDoc(new XWikiDocument(this.defaultDocumentReferenceProvider.get()));
         } else {
             stubContext = null;
         }
 
         return stubContext;
+    }
+
+    private void initiazeXWikiContext(XWikiContext stubContext)
+    {
+        // We make sure to not share the same Request instance with several threads
+        if (this.initialContext.getRequest() != null) {
+            XWikiServletRequestStub stubRequest = new XWikiServletRequestStub(this.initialContext.getRequest());
+            XWikiServletRequest request = new XWikiServletRequest(stubRequest);
+            stubContext.setRequest(request);
+
+            // Each context is supposed to have a dedicated URL factory
+            if (stubContext.getWiki() != null) {
+                XWikiURLFactory urlf = stubContext.getWiki().getURLFactoryService()
+                    .createURLFactory(XWikiContext.MODE_SERVLET, stubContext);
+                stubContext.setURLFactory(urlf);
+            }
+        }
+
+        // We make sure to not share the same Response instance with several threads
+        if (this.initialContext.getResponse() != null) {
+            XWikiServletResponseStub stubResponse = new XWikiServletResponseStub();
+            XWikiServletResponse response = new XWikiServletResponse(stubResponse);
+            stubContext.setResponse(response);
+        }
+
+        // We make sure to not share the same document instance with several threads
+        stubContext.setDoc(new XWikiDocument(this.defaultDocumentReferenceProvider.get()));
     }
 }

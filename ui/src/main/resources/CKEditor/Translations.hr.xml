@@ -89,6 +89,24 @@ ckeditor.plugin.save.leaveConfirmationMessage=Ima nespremljenih izmjena. Želite
 ### Missing: ckeditor.plugin.save.failed=The content cannot be saved because of a CKEditor internal error. You should try to copy your important changes and reload the editor.
 ckeditor.plugin.source.conversionFailed=Konverzija nije uspjela.
 
+### Missing: ckeditor.plugin.toolbar.basicStyles=Basic Styles
+### Missing: ckeditor.plugin.toolbar.lists=Lists
+### Missing: ckeditor.plugin.toolbar.bulletedlist=Bulleted List
+### Missing: ckeditor.plugin.toolbar.numberedlist=Numbered List
+### Missing: ckeditor.plugin.toolbar.insert=Insert
+### Missing: ckeditor.plugin.toolbar.horizontalrule=Horizontal Line
+### Missing: ckeditor.plugin.toolbar.specialchar=Special Character
+### Missing: ckeditor.plugin.toolbar.infoBox=Info Box
+### Missing: ckeditor.plugin.toolbar.successBox=Success Box
+### Missing: ckeditor.plugin.toolbar.warningBox=Warning Box
+### Missing: ckeditor.plugin.toolbar.errorBox=Error Box
+### Missing: ckeditor.plugin.toolbar.toc=Table of Contents
+### Missing: ckeditor.plugin.toolbar.include=Include
+### Missing: ckeditor.plugin.toolbar.code=Code Snippet
+### Missing: ckeditor.plugin.toolbar.otherMacros=Other Macros
+
+### Missing: ckeditor.inline.failedToInit=Failed to initialize CKEditor.
+
 modal.ok=OK
 modal.cancel=Otkaži
 modal.close=Zatvori

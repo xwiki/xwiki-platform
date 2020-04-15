@@ -46,7 +46,7 @@
   .edit-meta-tools {
     .pull-right();
     margin: @breadcrumb-padding-vertical @breadcrumb-padding-horizontal 0 0;
-    
+
     a {
       display: block;
       width: 16px;
@@ -56,11 +56,11 @@
       background: none no-repeat scroll left top transparent;
       margin-left: 4px;
     }
-    
+
     a.edit-parent {
       background-image: url(@xwiki-icon-parent-edit);
     }
-    
+
     a.hide-edit-parent {
       background-image: url(@xwiki-silk-icon-chart-organization);
     }
@@ -87,4 +87,59 @@
 
 textarea#content {
   width: 100%;
+}
+
+//
+// Editable properties (in-place editing)
+//
+
+@button-spacing: 2px;
+@button-border-width: 1px;
+
+.editableProperty-edit,
+.editableProperty-save,
+.editableProperty-cancel {
+  border: @button-border-width solid @btn-default-border;
+  border-radius: @btn-border-radius-small;
+  color: inherit;
+  display: inline-block;
+  font-size: @font-size-base;
+  line-height: @line-height-small;
+  margin-right: @button-spacing;
+  text-align: center;
+  width: @font-size-base * @line-height-small + 2 * @button-border-width;
+}
+
+.editableProperty-edit.disabled,
+.editableProperty-save.disabled,
+.editableProperty-cancel.disabled {
+  opacity: .3;
+}
+
+.editableProperty-edit {
+  border-color: transparent;
+  opacity: .3;
+}
+
+.editableProperty-edit:hover,
+.editableProperty-edit:focus {
+  border-color: @btn-default-border;
+  color: inherit;
+}
+
+.editableProperty-edit:not(.disabled):hover,
+.editableProperty-edit:not(.disabled):focus {
+  opacity: 1;
+}
+
+.editableProperty-save:not(.disabled):hover,
+.editableProperty-save:not(.disabled):focus,
+.editableProperty-cancel:not(.disabled):hover,
+.editableProperty-cancel:not(.disabled):focus {
+  border-color: darken(@btn-default-border, 20%);
+  color: inherit;
+}
+
+.editableProperty-editor {
+  margin-top: @button-spacing;
 }

@@ -52,7 +52,9 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
-
+import org.xwiki.rendering.block.match.ClassBlockMatcher;
+import org.xwiki.rendering.listener.HeaderLevel;
+import org.xwiki.rendering.block.HeaderBlock;
 /**
  * @version $Id$
  * @since 1.5M2

@@ -30,17 +30,17 @@ import org.xwiki.query.QueryException;
  * 
  * @version $Id$
  * @since 3.0M2
- * @deprecated since 12.3RC1, use {@link EventStore} instead
  */
 @Role
-@Deprecated
 public interface EventStream
 {
     /**
      * Add a new event to the storage.
      * 
      * @param e the event to store
+     * @deprecated since 12.3RC1, use {@link EventStore#saveEvent(Event)} instead
      */
+    @Deprecated
     void addEvent(Event e);
 
     /**
@@ -67,7 +67,9 @@ public interface EventStream
      * this method.
      * 
      * @param e the event to delete
+     * @deprecated since 12.3RC1, use {@link EventStore#deleteEvent(String)} instead
      */
+    @Deprecated
     void deleteEvent(Event e);
 
     /**
@@ -76,7 +78,9 @@ public interface EventStream
      * @throws QueryException if failing to get the event
      * @since 12.2
      * @since 11.10.4
+     * @deprecated since 12.3RC1, use {@link EventStore#getEvent(String)} instead
      */
+    @Deprecated
     default Event getEvent(String eventId) throws QueryException
     {
         return null;

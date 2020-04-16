@@ -79,7 +79,7 @@
                  which has its own mapping and migrators. -->
             <dependency>
               <groupId>org.xwiki.platform</groupId>
-              <artifactId>xwiki-platform-eventstream-store</artifactId>
+              <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
               <version>${project.version}</version>
             </dependency>
             <!-- Annotation has it own migrator that we need to execute to set the rigth version to the DB. -->

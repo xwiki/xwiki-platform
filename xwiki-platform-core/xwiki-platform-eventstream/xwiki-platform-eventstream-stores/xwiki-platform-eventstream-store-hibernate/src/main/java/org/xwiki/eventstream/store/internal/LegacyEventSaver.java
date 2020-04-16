@@ -19,9 +19,12 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
+import java.util.Date;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -29,17 +32,14 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.model.namespace.WikiNamespace;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
-import java.util.Date;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * Save an event into the legacy event store.
@@ -75,9 +75,6 @@ public class LegacyEventSaver
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private ObservationManager observationManager;
-
-    @Inject
     private Logger logger;
 
     @Inject
@@ -110,8 +107,6 @@ public class LegacyEventSaver
                 // otherwise we would duplicate the event)
                 saveLegacyEvent(legacyEvent, wikiDescriptorManager.getMainWikiId());
             }
-
-            observationManager.notify(new EventStreamAddedEvent(), event);
         } catch (Exception e) {
             logger.error("Failed to save an event in the event stream.", e);
         }

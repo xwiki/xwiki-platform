@@ -32,6 +32,7 @@
   <packaging>pom</packaging>
   <description>Various implementations of the event store API</description>
   <modules>
+    <module>xwiki-platform-eventstream-store-common</module>
     <module>xwiki-platform-eventstream-store-hibernate</module>
     <module>xwiki-platform-eventstream-store-solr</module>
   </modules>

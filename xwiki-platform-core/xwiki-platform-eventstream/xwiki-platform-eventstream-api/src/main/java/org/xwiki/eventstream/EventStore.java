@@ -20,6 +20,7 @@
 package org.xwiki.eventstream;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.stability.Unstable;
 
 /**
  * Save and access store events.
@@ -28,6 +29,7 @@ import org.xwiki.component.annotation.Role;
  * @since 12.3RC1
  */
 @Role
+@Unstable
 public interface EventStore
 {
     /**
@@ -42,9 +44,18 @@ public interface EventStore
      * Deleted the event matching the passed identifier.
      * 
      * @param eventId the unique identifier of the event
+     * @return the deleted event, null if none could be found
      * @throws EventStreamException when failing to delete the event
      */
-    void deleteEvent(String eventId) throws EventStreamException;
+    Event deleteEvent(String eventId) throws EventStreamException;
+
+    /**
+     * Deleted the event. Do nothing if the passed event does not exist.
+     * 
+     * @param event the event to remove from the store
+     * @throws EventStreamException when failing to delete the event
+     */
+    void deleteEvent(Event event) throws EventStreamException;
 
     /**
      * Get the event matching the passed identifier.
@@ -80,4 +91,13 @@ public interface EventStore
      * @throws EventStreamException when failing to get the event status
      */
     EventStatus getEventStatus(String eventId, String entity) throws EventStreamException;
+
+    /**
+     * Search for event according to condition provided by the {@link EventQuery}.
+     * 
+     * @param query the query containing the filtering conditions
+     * @return the result of the search
+     * @throws EventStreamException when failing to execute the search
+     */
+    EventSearchResult search(EventQuery query) throws EventStreamException;
 }

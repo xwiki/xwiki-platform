@@ -19,6 +19,26 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+import org.xwiki.annotation.event.AnnotationAddedEvent;
+import org.xwiki.annotation.event.AnnotationDeletedEvent;
+import org.xwiki.annotation.event.AnnotationUpdatedEvent;
+import org.xwiki.bridge.event.DocumentCreatedEvent;
+import org.xwiki.bridge.event.DocumentDeletedEvent;
+import org.xwiki.bridge.event.DocumentUpdatedEvent;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.EventStore;
+import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.observation.event.Event;
+import org.xwiki.rendering.syntax.Syntax;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
@@ -27,23 +47,6 @@ import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
 import com.xpn.xwiki.internal.event.CommentAddedEvent;
 import com.xpn.xwiki.internal.event.CommentDeletedEvent;
 import com.xpn.xwiki.internal.event.CommentUpdatedEvent;
-import org.xwiki.annotation.event.AnnotationAddedEvent;
-import org.xwiki.annotation.event.AnnotationDeletedEvent;
-import org.xwiki.annotation.event.AnnotationUpdatedEvent;
-import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.bridge.event.DocumentUpdatedEvent;
-import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.internal.DefaultEvent;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.observation.event.Event;
-import org.xwiki.rendering.syntax.Syntax;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 
 /**
  * Store the recordable event inside the event stream (except events that are already handled by the Activity Stream
@@ -61,17 +64,19 @@ public class DocumentEventRecorder
     private EntityReferenceSerializer<String> serializer;
 
     @Inject
-    private EventStream eventStream;
+    private EventStore eventStore;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
 
     /**
      * Record the given event.
+     * 
      * @param event the event to record
      * @param source the source that has triggered the event
+     * @throws EventStreamException when failing to record the passed event
      */
-    public void recordEvent(Event event, Object source)
+    public void recordEvent(Event event, Object source) throws EventStreamException
     {
         XWikiDocument currentDoc = (XWikiDocument) source;
         XWikiDocument originalDoc = currentDoc.getOriginalDocument();
@@ -111,7 +116,7 @@ public class DocumentEventRecorder
             eventType = EventType.ADD_ANNOTATION;
         } else if (event instanceof AnnotationDeletedEvent) {
             eventType = EventType.DELETE_ANNOTATION;
-        } else if (event instanceof AnnotationUpdatedEvent){
+        } else if (event instanceof AnnotationUpdatedEvent) {
             // update annotation
             eventType = EventType.UPDATE_ANNOTATION;
         } else {
@@ -122,6 +127,7 @@ public class DocumentEventRecorder
     }
 
     private void recordEvent(String streamName, XWikiDocument doc, String type, String title)
+        throws EventStreamException
     {
         final String msgPrefix = "activitystream.event.";
 
@@ -138,6 +144,7 @@ public class DocumentEventRecorder
         event.setUser(doc.getAuthorReference());
         event.setHidden(doc.isHidden());
         event.setDocumentTitle(doc.getRenderedTitle(Syntax.PLAIN_1_0, contextProvider.get()));
-        eventStream.addEvent(event);
+
+        this.eventStore.saveEvent(event);
     }
 }

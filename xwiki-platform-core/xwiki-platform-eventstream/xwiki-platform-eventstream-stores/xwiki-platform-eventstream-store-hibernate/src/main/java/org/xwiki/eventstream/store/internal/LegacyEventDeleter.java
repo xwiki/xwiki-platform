@@ -19,21 +19,20 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.store.XWikiHibernateStore;
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.events.EventStreamDeletedEvent;
 import org.xwiki.model.namespace.WikiNamespace;
-import org.xwiki.observation.ObservationManager;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.store.XWikiHibernateStore;
 
 /**
  * Delete an event from the legacy event store.
@@ -58,9 +57,6 @@ public class LegacyEventDeleter
     private Provider<XWikiContext> contextProvider;
 
     @Inject
-    private ObservationManager observationManager;
-
-    @Inject
     private Logger logger;
 
     @Inject
@@ -68,6 +64,7 @@ public class LegacyEventDeleter
 
     /**
      * Delete the given event.
+     * 
      * @param event the event to delete
      */
     public void deleteEvent(Event event)
@@ -93,38 +90,34 @@ public class LegacyEventDeleter
                 logger.error("Failed to delete the event [%s] in the main store.", event.getId(), e);
             }
         }
-
-        observationManager.notify(new EventStreamDeletedEvent(), event);
     }
 
     private void deleteLegacyEvent(LegacyEvent event, String wikiId) throws Exception
     {
-        namespaceContextExecutor.execute(new WikiNamespace(wikiId),
-            () -> {
-                XWikiContext context = contextProvider.get();
-                XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-                boolean bTransaction = true;
+        namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
+            XWikiContext context = contextProvider.get();
+            XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+            boolean bTransaction = true;
 
-                try {
-                    hibernateStore.checkHibernate(context);
-                    bTransaction = hibernateStore.beginTransaction(context);
-                    Session session = hibernateStore.getSession(context);
+            try {
+                hibernateStore.checkHibernate(context);
+                bTransaction = hibernateStore.beginTransaction(context);
+                Session session = hibernateStore.getSession(context);
 
-                    session.delete(event);
+                session.delete(event);
 
-                    if (bTransaction) {
-                        hibernateStore.endTransaction(context, true);
-                    }
-
-                } catch (Exception e) {
-                    if (bTransaction) {
-                        hibernateStore.endTransaction(context, false);
-                    }
-                    throw e;
+                if (bTransaction) {
+                    hibernateStore.endTransaction(context, true);
                 }
 
-                return null;
+            } catch (Exception e) {
+                if (bTransaction) {
+                    hibernateStore.endTransaction(context, false);
+                }
+                throw e;
             }
-        );
+
+            return null;
+        });
     }
 }

@@ -24,16 +24,24 @@ import java.net.URL;
 import javax.inject.Inject;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.eventstream.EqualEventQuery;
+import org.xwiki.eventstream.EqualEventQuery.EqualQueryCondition;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
+import org.xwiki.eventstream.EventQuery;
+import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.eventstream.internal.StreamEventSearchResult;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -73,14 +81,19 @@ public class SolrEventStore implements EventStore, Initializable
     {
         try {
             this.client.add(toSolrInputDocument(event));
-            this.client.commit();
         } catch (Exception e) {
             throw new EventStreamException("Failed to save event", e);
         }
+
+        commit();
     }
 
     private SolrInputDocument toSolrInputDocument(Event event)
     {
+        if (event == null) {
+            return null;
+        }
+
         SolrInputDocument document = new SolrInputDocument();
 
         this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
@@ -109,12 +122,40 @@ public class SolrEventStore implements EventStore, Initializable
     }
 
     @Override
-    public void deleteEvent(String eventId) throws EventStreamException
+    public Event deleteEvent(String eventId) throws EventStreamException
+    {
+        Event event = getEvent(eventId);
+
+        deleteById(eventId);
+
+        commit();
+
+        return event;
+    }
+
+    @Override
+    public void deleteEvent(Event event) throws EventStreamException
+    {
+        deleteById(event.getId());
+
+        commit();
+    }
+
+    private void deleteById(String eventId) throws EventStreamException
     {
         try {
             this.client.deleteById(eventId);
         } catch (Exception e) {
             throw new EventStreamException("Failed to delete the event", e);
+        }
+    }
+
+    private void commit() throws EventStreamException
+    {
+        try {
+            this.client.commit();
+        } catch (Exception e) {
+            throw new EventStreamException("Failed to commit", e);
         }
     }
 
@@ -128,9 +169,18 @@ public class SolrEventStore implements EventStore, Initializable
             throw new EventStreamException("Failed to get Solr document with id [" + eventId + "]", e);
         }
 
+        return toEvent(document);
+    }
+
+    private Event toEvent(SolrDocument document)
+    {
+        if (document == null) {
+            return null;
+        }
+
         DefaultEvent event = new DefaultEvent();
 
-        event.setId(eventId);
+        event.setId(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_ID, document));
 
         event.setApplication(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_APPLICATION, document));
         event.setBody(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_BODY, document));
@@ -178,5 +228,56 @@ public class SolrEventStore implements EventStore, Initializable
     {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public EventSearchResult search(EventQuery query) throws EventStreamException
+    {
+        if (query instanceof EqualEventQuery) {
+            return search((EqualEventQuery) query);
+        } else {
+            throw new EventStreamException("Unsupported query [" + query + "]");
+        }
+    }
+
+    private EventSearchResult search(EqualEventQuery query) throws EventStreamException
+    {
+        SolrQuery solrQuery = new SolrQuery();
+
+        if (query.getOffset() > 0) {
+            solrQuery.setStart((int) query.getOffset());
+        }
+
+        if (query.getLimit() > 0) {
+            solrQuery.setRows((int) query.getLimit());            
+        }
+
+        for (EqualQueryCondition condition : query.getConditions()) {
+            StringBuilder builder = new StringBuilder();
+
+            if (EventsSolrCoreInitializer.KNOWN_FIELDS.contains(condition.getProperty())) {
+                builder.append(condition.getProperty());
+
+                builder.append(':');
+
+                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+
+                solrQuery.addFilterQuery(builder.toString());
+            } else {
+                // TODO: add support for custom properties
+            }
+        }
+
+        QueryResponse response;
+        try {
+            response = this.client.query(solrQuery);
+        } catch (Exception e) {
+            throw new EventStreamException("Failed to execute Solr query", e);
+        }
+
+        SolrDocumentList documents = response.getResults();
+
+        return new StreamEventSearchResult(documents.getNumFound(), documents.getStart(), documents.size(),
+            documents.stream().map(this::toEvent));
     }
 }

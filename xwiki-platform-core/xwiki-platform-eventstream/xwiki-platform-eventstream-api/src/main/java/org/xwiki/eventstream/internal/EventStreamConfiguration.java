@@ -40,10 +40,18 @@ public class EventStreamConfiguration
     private ConfigurationSource configuration;
 
     /**
-     * @return the {@link EventStore} implementation to use
+     * @return the hint of the {@link EventStore} implementation to use
      */
-    public String getStore()
+    public String getEventStore()
     {
         return this.configuration.getProperty("eventstream.store", "solr");
+    }
+
+    /**
+     * @return true if the {@link EventStore} system is enabled
+     */
+    public boolean isEventStoreEnabled()
+    {
+        return this.configuration.getProperty("eventstream.store.enabled", false);
     }
 }

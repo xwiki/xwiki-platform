@@ -249,7 +249,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @param cversion the version of the schema currently stored
      * @throws SolrException when failing to migrate the schema
      */
-    protected abstract void migrateSchema(Long cversion);
+    protected abstract void migrateSchema(Long cversion) throws SolrException;
 
     @Override
     public String getCoreName()
@@ -503,8 +503,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * Add a field type in the Solr schema.
      * 
      * @param name the name of the field type
-     * @param class the class of the field type
-     * @param add true if the field type should be added, false for replace
+     * @param solrClass the class of the field type
      * @param attributes the other attributes of the field type
      * @throws SolrException when failing to add the field
      */
@@ -517,8 +516,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * Add a field type in the Solr schema.
      * 
      * @param name the name of the field type
-     * @param class the class of the field type
-     * @param add true if the field type should be added, false for replace
+     * @param solrClass the class of the field type
      * @param attributes the other attributes of the field type
      * @throws SolrException when failing to add the field
      */
@@ -531,7 +529,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * Add a field type in the Solr schema.
      * 
      * @param name the name of the field type
-     * @param class the class of the field type
+     * @param solrClass the class of the field type
      * @param add true if the field type should be added, false for replace
      * @param attributes the other attributes of the field type
      * @throws SolrException when failing to add the field
@@ -551,8 +549,8 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     /**
      * Add a field type in the Solr schema.
      * 
-     * @param fieldAttributes the attributes of the field to add
-     * @param dynamic true to create a dynamic field
+     * @param attributes the attributes of the field to add
+     * @param add true if the field type should be added, false for replace
      * @throws SolrException when failing to add the field
      */
     protected void setFieldType(Map<String, Object> attributes, boolean add) throws SolrException
@@ -576,6 +574,8 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
 
     /**
      * Performs an explicit commit, causing pending documents to be committed for indexing.
+     * 
+     * @throws SolrException when failing to commit
      */
     protected void commit() throws SolrException
     {

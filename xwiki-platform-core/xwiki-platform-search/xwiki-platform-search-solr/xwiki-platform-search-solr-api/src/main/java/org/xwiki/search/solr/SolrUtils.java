@@ -48,15 +48,15 @@ public interface SolrUtils
      * entries have the same type (and only String and primitive types). The point of this API is to provide binding for
      * a generic Map of objects.
      * <p>
-     * This API imply that it exist in the schema dynamic fields of the form "<mapname>_*_string" (and
-     * "<mapname>_*_boolean", "<mapname>_*_pint", etc.). Can be done using
+     * This API imply that it exist in the schema dynamic fields of the form {@code <mapname>_*_string} (and
+     * {@code <mapname>_*_boolean}, {@code <mapname>_*_pint}, etc.). Can be done using
      * {@link AbstractSolrCoreInitializer#addMapField(String)}.
      * 
      * @param <V> the type of the value in the map
      * @param fieldName the prefix of the fields containing the map data
      * @param document the Solr document
      * @return the Map extracted from the Solr document
-     * @see #setMap(String, Map, SolrDocument)
+     * @see #setMap(String, Map, SolrInputDocument)
      */
     <V> Map<String, V> getMap(String fieldName, SolrDocument document);
 
@@ -126,6 +126,14 @@ public interface SolrUtils
      * @param document the Solr document
      */
     void setString(String fieldName, Object fieldValue, SolrInputDocument document);
+
+    /**
+     * Serialize the value into a value usable in a Solr filter query.
+     * 
+     * @param fieldValue the value of a field
+     * @return the Solr query version of the passed value
+     */
+    String toFilterQueryString(Object fieldValue);
 
     /**
      * Extract from the document the value associated with the passed field name.

@@ -257,7 +257,7 @@ public class PageClassFieldTest extends AbstractClassEditorTest
         entryEditPage.clickSaveAndView().waitUntilPageIsLoaded();
 
         // Assert the view mode.
-        List<WebElement> pages = getDriver().findElements(By.cssSelector("#xwikicontent a"));
+        List<WebElement> pages = getDriver().findElements(By.cssSelector(".editableProperty-viewer a"));
         assertEquals(1, pages.size());
         assertEquals(className + " TestHome", pages.get(0).getText());
     }

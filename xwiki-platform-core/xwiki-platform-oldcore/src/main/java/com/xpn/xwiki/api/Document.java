@@ -43,6 +43,7 @@ import org.xwiki.display.internal.DocumentDisplayerParameters;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.ObjectReference;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
@@ -1342,6 +1343,21 @@ public class Document extends Api
             } else {
                 return newObjectApi(obj, getXWikiContext());
             }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param objectReference the object reference
+     * @return the XWiki object from this document that matches the specified object reference
+     * @since 12.3RC1
+     */
+    public Object getObject(ObjectReference objectReference)
+    {
+        try {
+            BaseObject obj = this.getDoc().getXObject(objectReference);
+            return obj == null ? null : newObjectApi(obj, getXWikiContext());
         } catch (Exception e) {
             return null;
         }

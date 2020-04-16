@@ -56,7 +56,8 @@ public interface ClassPropertyValuesProvider
      * @since 10.9
      */
     default PropertyValue getValue(ClassPropertyReference propertyReference, Object rawValue)
-        throws XWikiRestException {
+        throws XWikiRestException
+    {
         throw new UnsupportedOperationException();
     }
 }

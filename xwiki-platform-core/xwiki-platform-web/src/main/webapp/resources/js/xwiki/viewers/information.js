@@ -18,7 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 require(['jquery', 'xwiki-meta'], function($, xm) {
+  // Select the reference value on focus.
+  $(document).on('focus', '#reference-value', function() {
+    $(this).select();
+  });
 
+  // Toggle between local and global reference.
   $(document).on('click', '#button-inout', function() {
     var button = $('#button-inout');
     var referenceValue= $('#reference-value');
@@ -26,28 +31,20 @@ require(['jquery', 'xwiki-meta'], function($, xm) {
     var globalReference = xm.documentReference;
 
     if (button.hasClass('btn-info')) {
-      referenceValue.text(localReference);
-      button.removeClass('btn-info');
+      referenceValue.val(localReference);
+      button.removeClass('btn-info').addClass('btn-default');
       button.attr('title',"$services.localization.render('core.viewers.information.pageReference.globalButton')");
     } else {
-      referenceValue.text(globalReference);
-      button.addClass('btn-info');
+      referenceValue.val(globalReference);
+      button.removeClass('btn-default').addClass('btn-info');
       button.attr('title',"$services.localization.render('core.viewers.information.pageReference.localButton')");
     }
   });
 
-  var copyToClipboard = function(element) {
-    var $temp = $("<input>");
-    $("body").append($temp);
-    var value = $(element).text();
-    $temp.val(value).select();
-    document.execCommand("copy");
-    $temp.remove();
-    return value;
-  };
-
+  // Copy the reference value to clipboard.
   $(document).on('click', '#button-paste', function() {
-    copyToClipboard('#reference-value');
+    $('#reference-value').select();
+    document.execCommand("copy");
     new XWiki.widgets.Notification("$services.localization.render('core.viewers.information.pageReference.copied')",
       'info');
   });

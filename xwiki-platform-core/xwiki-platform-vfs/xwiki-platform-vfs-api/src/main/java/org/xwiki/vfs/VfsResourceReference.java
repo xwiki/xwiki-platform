@@ -32,6 +32,7 @@ import org.xwiki.model.reference.WikiReference;
 import org.xwiki.resource.ResourceType;
 import org.xwiki.resource.entity.EntityResourceAction;
 import org.xwiki.resource.entity.EntityResourceReference;
+import org.xwiki.stability.Unstable;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
@@ -47,11 +48,25 @@ public class VfsResourceReference extends EntityResourceReference
      */
     public static final ResourceType TYPE = new ResourceType("vfs");
 
+    private static final String PARAMETER_CONTENTTYPE = "content-type";
+
     private static final String RESOURCE_PATH_SEPARATOR = "/";
 
     private URI uri;
 
     private List<String> pathSegments;
+
+    /**
+     * Create a new reference by copying the passed one.
+     * 
+     * @param reference the reference to copy
+     * @since 12.3RC1
+     */
+    @Unstable
+    public VfsResourceReference(VfsResourceReference reference)
+    {
+        this(reference.uri, reference.pathSegments);
+    }
 
     /**
      * @param uri the URI pointing to the archive (without the path inside the archive),
@@ -163,5 +178,25 @@ public class VfsResourceReference extends EntityResourceReference
     public URI toURI()
     {
         return URI.create(String.format("%s/%s", getURI().toString(), getPath()));
+    }
+
+    /**
+     * @return the Content-Type to return with the response
+     * @since 12.3RC1
+     */
+    @Unstable
+    public String getContentType()
+    {
+        return getParameterValue(PARAMETER_CONTENTTYPE);
+    }
+
+    /**
+     * @param contentType the Content-Type to return with the response
+     * @since 12.3RC1
+     */
+    @Unstable
+    public void setContentType(String contentType)
+    {
+        setParameter(PARAMETER_CONTENTTYPE, contentType);
     }
 }

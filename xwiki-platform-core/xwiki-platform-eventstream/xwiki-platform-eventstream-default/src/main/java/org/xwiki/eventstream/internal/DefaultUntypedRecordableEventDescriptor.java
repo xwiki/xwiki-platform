@@ -273,7 +273,8 @@ public class DefaultUntypedRecordableEventDescriptor implements UntypedRecordabl
     }
 
     @Override
-    public String getTargetExpression() {
+    public String getTargetExpression()
+    {
         return this.target;
     }
 

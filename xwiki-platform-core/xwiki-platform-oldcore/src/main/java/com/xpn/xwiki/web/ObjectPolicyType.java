@@ -46,7 +46,8 @@ package com.xpn.xwiki.web;
  * @version $Id$
  * @since 7.0RC1
  */
-public enum ObjectPolicyType {
+public enum ObjectPolicyType
+{
     /** Only update objects. */
     UPDATE("update"),
 
@@ -59,14 +60,16 @@ public enum ObjectPolicyType {
     /**
      * @param name The string name corresponding to the object policy type.
      */
-    ObjectPolicyType(String name) {
+    ObjectPolicyType(String name)
+    {
         this.name = name;
     }
 
     /**
      * @return The string name corresponding to the object policy type.
      */
-    public String getName() {
+    public String getName()
+    {
         return this.name;
     }
 
@@ -74,7 +77,8 @@ public enum ObjectPolicyType {
      * @param name The string name corresponding to the object policy type.
      * @return The ObjectPolicyType corresponding to the parameter 'name'.
      */
-    public static ObjectPolicyType forName(String name) {
+    public static ObjectPolicyType forName(String name)
+    {
         for (ObjectPolicyType type : values()) {
             if (type.getName().equals(name)) {
                 return type;

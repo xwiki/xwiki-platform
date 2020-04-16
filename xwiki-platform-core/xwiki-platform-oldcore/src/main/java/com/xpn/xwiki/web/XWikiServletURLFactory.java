@@ -108,6 +108,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public void init(XWikiContext context)
     {
         this.defaultURLs = null;
+        this.originalURL = null;
 
         this.contextPath = context.getWiki().getWebAppPath(context);
 
@@ -116,19 +117,32 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         // Set the configured home URL for the main wiki
         setDefaultURL(null, homepageConfigration);
 
+        // Check if the request is a deamon thread request
+        XWikiRequest request = context.getRequest();
+        boolean daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub
+            && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
+
         // Remember initial request base URL for path for last resort
         if (homepageConfigration != null && context.isMainWiki()) {
             // If the main wiki base URL is forced in the configuration use it
             this.originalURL = homepageConfigration;
-        } else {
-            // Remember the request base URL for last resort
+        } else if (daemon) {
+            // In case of daemon thread use the standard URL of the current wiki as reference
+            try {
+                this.originalURL = context.getWiki().getServerURL(context.getOriginalWikiId(), context);
+            } catch (MalformedURLException e) {
+                LOGGER.warn("Can't get the standard URL for wiki [{}]: {}", context.getWikiId(),
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
+        // Fallback on request base URL
+        if (this.originalURL == null) {
             this.originalURL = HttpServletUtils.getSourceBaseURL(context.getRequest());
         }
 
         // Only take into account initial request if it's meant to be
-        XWikiRequest request = context.getRequest();
-        if (!(request.getHttpServletRequest() instanceof XWikiServletRequestStub)
-            || !((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon()) {
+        if (!daemon) {
             URL defaultWikiURL = this.originalURL;
 
             // If protocol is forced in the configuration switch to it
@@ -627,9 +641,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                         querystring, xwikidb, context);
                 }
             } catch (XWikiException e) {
-                LOGGER.error("Failed to create attachment URL for filename [{}] in spaces [{}], page [{}], "
-                    + "action [{}], query string [{}] and wiki [{}]", filename, spaces, name, action, querystring,
-                    xwikidb, e);
+                LOGGER.error(
+                    "Failed to create attachment URL for filename [{}] in spaces [{}], page [{}], "
+                        + "action [{}], query string [{}] and wiki [{}]",
+                    filename, spaces, name, action, querystring, xwikidb, e);
             }
         }
 
@@ -638,21 +653,15 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             && Locale.ROOT.equals(context.getDoc().getLocale())) {
             attachment = context.getDoc().getAttachment(filename);
 
-        // We are getting an attachment from another doc: we can try to load it to retrieve its version
-        // in order to avoid cache issues.
+            // We are getting an attachment from another doc: we can try to load it to retrieve its version
+            // in order to avoid cache issues.
         } else if (action.equals("download")) {
             // The doc might be in a different wiki.
             WikiReference originalWikiReference = context.getWikiReference();
             context.setWikiId(xwikidb);
 
-            DocumentReference documentReference = new DocumentReference(
-                name,
-                new SpaceReference(getCurrentEntityReferenceResolver().resolve(
-                    spaces,
-                    EntityType.SPACE,
-                    context.getWikiReference()
-                ))
-            );
+            DocumentReference documentReference = new DocumentReference(name, new SpaceReference(
+                getCurrentEntityReferenceResolver().resolve(spaces, EntityType.SPACE, context.getWikiReference())));
 
             try {
                 XWikiDocument document = context.getWiki().getDocument(documentReference, context);

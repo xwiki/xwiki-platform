@@ -53,7 +53,7 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  * <pre>
  * &lt;input type=&quot;submit&quot; name=&quot;action_saveandcontinue&quot; value=&quot;...&quot;/&gt;
  * </pre>
- *
+ * <p>
  * As a result, when clicking the button, the request is not sent to the form's target (<tt>preview</tt>), but is
  * actually forwarded internally to <tt>/bin/saveandcontinue/The/Document</tt>.
  *
@@ -62,13 +62,19 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  */
 public class ActionFilter implements Filter
 {
-    /** Logging helper. */
+    /**
+     * Logging helper.
+     */
     private static final Logger LOGGER = LoggerFactory.getLogger(ActionFilter.class);
 
-    /** The query property name prefix that indicates the target action. */
+    /**
+     * The query property name prefix that indicates the target action.
+     */
     private static final String ACTION_PREFIX = "action_";
 
-    /** URL path separator. */
+    /**
+     * URL path separator.
+     */
     private static final String PATH_SEPARATOR = "/";
 
     /**
@@ -86,13 +92,12 @@ public class ActionFilter implements Filter
     @SuppressWarnings("unchecked")
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException,
-            ServletException
+        ServletException
     {
         // Only HTTP requests can be dispatched.
         if (request instanceof HttpServletRequest
-                && !Boolean.parseBoolean((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED)))
+            && !Boolean.parseBoolean((String) request.getAttribute(ATTRIBUTE_ACTION_DISPATCHED)))
         {
-            String[] xactions = request.getParameterValues("xaction");
             HttpServletRequest hrequest = (HttpServletRequest) request;
             Enumeration<String> parameterNames = hrequest.getParameterNames();
             while (parameterNames.hasMoreElements()) {
@@ -102,8 +107,9 @@ public class ActionFilter implements Filter
                  * into account if they are part of the xaction list.
                  * Otherwise, all the parameters prefixed with 'action_' are accepted.
                  */
+                String[] xactions = request.getParameterValues("xaction");
                 if (parameter.startsWith(ACTION_PREFIX) && (xactions == null || Stream.of(xactions)
-                        .anyMatch(it -> Objects.equals(parameter, String.format("action_%s", it)))))
+                    .anyMatch(it -> Objects.equals(parameter, String.format("action_%s", it)))))
                 {
                     String targetURL = getTargetURL(hrequest, parameter);
                     RequestDispatcher dispatcher = hrequest.getRequestDispatcher(targetURL);
@@ -138,7 +144,7 @@ public class ActionFilter implements Filter
      * @param request the original request
      * @param action the action parameter, starting with <tt>action_</tt>
      * @return The rebuilt URL path, with the specified action in place of the original Struts action. Note that unlike
-     *         the HTTP path, this does not contain the application context part.
+     *     the HTTP path, this does not contain the application context part.
      */
     private String getTargetURL(HttpServletRequest request, String action)
     {
@@ -165,7 +171,8 @@ public class ActionFilter implements Filter
             Utils.getComponent(ConfigurationSource.class, XWikiCfgConfigurationSource.ROLEHINT);
         if ("1".equals(configuration.getProperty("xwiki.virtual.usepath", "1"))) {
             if (servletPath.equals(PATH_SEPARATOR
-                + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki"))) {
+                + configuration.getProperty("xwiki.virtual.usepath.servletpath", "wiki")))
+            {
                 // Move the wiki name together with the servlet path
                 servletPath += path.substring(0, index);
                 index = path.indexOf(PATH_SEPARATOR, index + 1);

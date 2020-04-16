@@ -65,7 +65,7 @@ public class ActionFilterTest
         FilterChain chain = mock(FilterChain.class);
 
         filter.doFilter(request, response, chain);
-        
+
         verify(request, never()).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
     }
@@ -80,7 +80,7 @@ public class ActionFilterTest
         when(request.getAttribute(ActionFilter.class.getName() + ".actionDispatched")).thenReturn("true");
 
         filter.doFilter(request, response, chain);
-        
+
         verify(request, never()).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
     }
@@ -96,7 +96,7 @@ public class ActionFilterTest
         when(request.getParameterNames()).thenReturn(Collections.enumeration(Collections.singletonList("a")));
 
         filter.doFilter(request, response, chain);
-        
+
         verify(request).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
         verify(request, never()).getRequestDispatcher(any());
@@ -116,7 +116,7 @@ public class ActionFilterTest
         when(request.getContextPath()).thenReturn("/ctx/");
 
         filter.doFilter(request, response, chain);
-        
+
         verify(request).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
         verify(request).getRequestDispatcher(any());
@@ -129,8 +129,8 @@ public class ActionFilterTest
         ServletResponse response = mock(ServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
-        when(request.getParameterValues("xaction")).thenReturn(new String[]{
-                "a"
+        when(request.getParameterValues("xaction")).thenReturn(new String[] {
+            "a"
         });
 
         when(request.getParameterNames()).thenReturn(Collections.enumeration(Collections.singletonList("action_a")));
@@ -140,7 +140,7 @@ public class ActionFilterTest
         when(request.getContextPath()).thenReturn("/ctx/");
 
         filter.doFilter(request, response, chain);
-        
+
         verify(request).getParameterValues("xaction");
         verify(chain).doFilter(request, response);
         verify(request).getRequestDispatcher(any());
@@ -153,8 +153,8 @@ public class ActionFilterTest
         ServletResponse response = mock(ServletResponse.class);
         FilterChain chain = mock(FilterChain.class);
 
-        when(request.getParameterValues("xaction")).thenReturn(new String[]{
-                "b"
+        when(request.getParameterValues("xaction")).thenReturn(new String[] {
+            "b"
         });
 
         when(request.getParameterNames()).thenReturn(Collections.enumeration(Collections.singletonList("action_a")));

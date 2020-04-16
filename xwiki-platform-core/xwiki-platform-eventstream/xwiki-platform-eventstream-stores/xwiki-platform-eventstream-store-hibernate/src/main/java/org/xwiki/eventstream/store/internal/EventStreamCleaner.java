@@ -19,18 +19,21 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.util.Date;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.apache.commons.lang3.time.DateUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.Date;
 
 /**
  * Remove old events (according to the configuration) from the event stream.
@@ -49,6 +52,9 @@ public class EventStreamCleaner
     private EventStream eventStream;
 
     @Inject
+    private EventStore eventStore;
+
+    @Inject
     private QueryManager queryManager;
 
     @Inject
@@ -65,7 +71,11 @@ public class EventStreamCleaner
                 Query query = queryManager.createQuery("where event.date < :date", Query.HQL);
                 query.bindValue("date", DateUtils.addDays(new Date(), -days));
                 for (Event event : eventStream.searchEvents(query)) {
-                    eventStream.deleteEvent(event);
+                    try {
+                        this.eventStore.deleteEvent(event);
+                    } catch (EventStreamException e) {
+                        this.logger.error("Failed to delete event", e);
+                    }
                 }
             } catch (QueryException e) {
                 logger.error("Impossible to clean the old events of the event stream.", e);

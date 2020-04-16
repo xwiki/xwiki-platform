@@ -19,12 +19,15 @@
  */
 package org.xwiki.eventstream;
 
+import org.xwiki.stability.Unstable;
+
 /**
  * Allow querying events.
  * 
  * @version $Id$
  * @since 12.3RC1
  */
+@Unstable
 public interface EventQuery
 {
     

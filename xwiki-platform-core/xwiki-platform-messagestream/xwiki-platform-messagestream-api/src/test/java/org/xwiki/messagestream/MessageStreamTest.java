@@ -32,6 +32,7 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.messagestream.internal.DefaultMessageStream;
@@ -339,7 +340,7 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase<MessageS
         final Event e = new DefaultEvent();
         e.setId(UUID.randomUUID().toString());
         final ModelContext mockContext = getComponentManager().getInstance(ModelContext.class);
-        final EventStream mockEventStream = getComponentManager().getInstance(EventStream.class);
+        final EventStore mockEventStore = getComponentManager().getInstance(EventStore.class);
         getMockery().checking(new Expectations()
         {
             {
@@ -347,7 +348,7 @@ public class MessageStreamTest extends AbstractMockingComponentTestCase<MessageS
                 will(returnValue(e));
                 exactly(1).of(mockContext).getCurrentEntityReference();
                 will(returnValue(new DocumentReference("wiki", "Space", "Page")));
-                exactly(1).of(mockEventStream).addEvent(e);
+                exactly(1).of(mockEventStore).saveEvent(e);
             }
         });
         return e;

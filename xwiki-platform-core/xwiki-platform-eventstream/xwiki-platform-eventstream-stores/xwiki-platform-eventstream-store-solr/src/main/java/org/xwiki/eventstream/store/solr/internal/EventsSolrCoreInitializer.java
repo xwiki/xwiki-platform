@@ -19,6 +19,10 @@
  */
 package org.xwiki.eventstream.store.solr.internal;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -146,6 +150,15 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
      * The name of the field containing the list of users having this event in its inbox in unread state.
      */
     public static final String SOLR_FIELD_UNREADLISTENERS = "unreadListeners";
+
+    /**
+     * The known fields.
+     */
+    public static final Set<String> KNOWN_FIELDS = new HashSet<>(
+        Arrays.asList(SOLR_FIELD_ID, SOLR_FIELD_GROUPID, SOLR_FIELD_DATE, SOLR_FIELD_IMPORTANCE, SOLR_FIELD_TITLE,
+            SOLR_FIELD_BODY, SOLR_FIELD_APPLICATION, SOLR_FIELD_STREAM, SOLR_FIELD_TYPE, SOLR_FIELD_WIKI,
+            SOLR_FIELD_SPACE, SOLR_FIELD_DOCUMENT, SOLR_FIELD_DOCUMENTVERSION, SOLR_FIELD_RELATEDENTITY,
+            SOLR_FIELD_USER, SOLR_FIELD_URL, SOLR_FIELD_DOCUMENTTITLE, SOLR_FIELD_TARGET, SOLR_FIELD_HIDDEN));
 
     @Override
     protected long getVersion()

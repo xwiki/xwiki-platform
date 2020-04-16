@@ -1,5 +1,3 @@
-org.xwiki.eventstream.store.internal.DocumentEventListener
-org.xwiki.eventstream.store.internal.DocumentEventRecorder
 org.xwiki.eventstream.store.internal.EventStreamCleaner
 org.xwiki.eventstream.store.internal.EventStreamCleanerJob
 org.xwiki.eventstream.store.internal.EventStreamCleanerJobDocumentInitializer
@@ -11,6 +9,5 @@ org.xwiki.eventstream.store.internal.LegacyEventSaver
 org.xwiki.eventstream.store.internal.LegacyEventStatusManager
 org.xwiki.eventstream.store.internal.LegacyEventStream
 org.xwiki.eventstream.store.internal.LegacyEventStreamStoreConfiguration
-org.xwiki.eventstream.store.internal.RecordableEventListener
 org.xwiki.eventstream.store.internal.RecordableEventMigrator
 org.xwiki.eventstream.store.internal.observation.LegacyEventStatusEventConverter

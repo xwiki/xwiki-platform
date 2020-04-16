@@ -47,7 +47,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-platform-eventstream-store</artifactId>
+      <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- Test Dependencies -->

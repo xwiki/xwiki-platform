@@ -19,6 +19,11 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Arrays;
+import java.util.Collections;
+
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,6 +33,7 @@ import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextManager;
 import org.xwiki.context.internal.DefaultExecution;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.job.JobContext;
 import org.xwiki.job.JobStatusStore;
@@ -37,11 +43,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.test.mockito.MockitoComponentMockingRule;
-
-import javax.inject.Provider;
-
-import java.util.Arrays;
-import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -56,6 +57,7 @@ public class EventStreamWikiCleanerJobTest
             new MockitoComponentMockingRule<>(EventStreamWikiCleanerJob.class);
 
     private EventStream eventStream;
+    private EventStore eventStore;
     private QueryManager queryManager;
 
     private ObservationManager observationManager;
@@ -72,6 +74,7 @@ public class EventStreamWikiCleanerJobTest
     public void setUp() throws Exception
     {
         eventStream = mocker.getInstance(EventStream.class);
+        eventStore = mocker.getInstance(EventStore.class);
         queryManager = mocker.getInstance(QueryManager.class);
 
         observationManager = mocker.getInstance(ObservationManager.class);
@@ -112,10 +115,10 @@ public class EventStreamWikiCleanerJobTest
         job.runInternal();
 
         // Verify
-        verify(eventStream).deleteEvent(event1);
-        verify(eventStream).deleteEvent(event2);
-        verify(eventStream).deleteEvent(event3);
-        verify(eventStream).deleteEvent(event4);
+        verify(eventStore).deleteEvent(event1);
+        verify(eventStore).deleteEvent(event2);
+        verify(eventStore).deleteEvent(event3);
+        verify(eventStore).deleteEvent(event4);
         verify(query, times(3)).bindValue("wiki", "someWiki");
     }
 

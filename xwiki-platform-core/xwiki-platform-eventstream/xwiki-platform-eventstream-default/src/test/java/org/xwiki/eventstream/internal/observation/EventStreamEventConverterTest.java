@@ -20,14 +20,14 @@
 package org.xwiki.eventstream.internal.observation;
 
 import org.junit.jupiter.api.Test;
-import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.EventStore;
+import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.logging.event.LogEvent;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.LocalEventConverter;
-import org.xwiki.query.QueryException;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -47,7 +47,7 @@ import static org.mockito.Mockito.when;
 public class EventStreamEventConverterTest
 {
     @MockComponent
-    EventStream stream;
+    EventStore store;
 
     @InjectMockComponents(role = LocalEventConverter.class)
     EventStreamEventConverter converter;
@@ -55,10 +55,8 @@ public class EventStreamEventConverterTest
     @Test
     public void convertNoThing()
     {
-        assertFalse(this.converter.toRemote(new LocalEventData(new LogEvent(), null, null),
-            new RemoteEventData()));
-        assertFalse(this.converter.fromRemote(new RemoteEventData(new LogEvent(), null, null),
-            new LocalEventData()));
+        assertFalse(this.converter.toRemote(new LocalEventData(new LogEvent(), null, null), new RemoteEventData()));
+        assertFalse(this.converter.fromRemote(new RemoteEventData(new LogEvent(), null, null), new LocalEventData()));
     }
 
     @Test
@@ -76,7 +74,7 @@ public class EventStreamEventConverterTest
     }
 
     @Test
-    public void convertWithEvent() throws QueryException
+    public void convertWithEvent() throws EventStreamException
     {
         DefaultEvent initialEvent = new DefaultEvent();
         initialEvent.setId("id");
@@ -89,7 +87,7 @@ public class EventStreamEventConverterTest
         LocalEventData localEvent = new LocalEventData();
 
         DefaultEvent loadedEvent = new DefaultEvent();
-        when(this.stream.getEvent("id")).thenReturn(loadedEvent);
+        when(this.store.getEvent("id")).thenReturn(loadedEvent);
 
         assertTrue(this.converter.fromRemote(remoteEvent, localEvent));
 

@@ -30,10 +30,8 @@ import org.xwiki.stability.Unstable;
  *
  * @version $Id$
  * @since 9.2RC1
- * @deprecated since 12.3RC1, use {@link EventStore} instead
  */
 @Role
-@Deprecated
 public interface EventStatusManager
 {
     /**
@@ -51,7 +49,9 @@ public interface EventStatusManager
      * 
      * @param eventStatus the status to save
      * @throws Exception if an error occurs
+     * @deprecated since 12.3RC1, use {@link EventStore#saveEventStatus(EventStatus)} instead
      */
+    @Deprecated
     void saveEventStatus(EventStatus eventStatus) throws Exception;
 
     /**

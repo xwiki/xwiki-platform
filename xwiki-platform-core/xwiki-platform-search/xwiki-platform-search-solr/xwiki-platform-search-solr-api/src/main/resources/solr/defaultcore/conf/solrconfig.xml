@@ -27,5 +27,10 @@
 
   <jmx />
 
-  <requestHandler name="/select" class="solr.SearchHandler"/>
+  <requestHandler name="/select" class="solr.SearchHandler">
+    <lst name="defaults">
+      <str name="q">*</str>
+      <str name="df">id</str>
+    </lst>
+  </requestHandler>
 </config>

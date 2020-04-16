@@ -37,11 +37,13 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
+import org.xwiki.properties.internal.converter.LocaleConverter;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.Solr;
 import org.xwiki.search.solr.SolrUtils;
+import org.xwiki.search.solr.test.SolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
-import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -58,8 +60,9 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@AllComponents
+@SolrComponentList
 @ComponentTest
+@ComponentList({TestSolrCoreInitializer.class, LocaleConverter.class})
 public class DefaultSolrTest
 {
     @XWikiTempDir

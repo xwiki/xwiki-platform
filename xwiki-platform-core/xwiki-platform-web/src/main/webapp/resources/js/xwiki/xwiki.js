@@ -258,6 +258,9 @@ Object.extend(XWiki, {
                       // Replace the element's content with the temporary container's content, while also evaluating any inline scripts.
                       // Note: This also does stripScripts internally, but it's OK now, since we have already added the necessary external scripts to head.
                       $(extraID + "pane").update(container.innerHTML);
+
+                      // Notify the others that the DOM has been updated.
+                      document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});
                     },
                     onComplete: function(response){
                       if (response.status == 401) {

@@ -108,6 +108,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public void init(XWikiContext context)
     {
         this.defaultURLs = null;
+        this.originalURL = null;
 
         this.contextPath = context.getWiki().getWebAppPath(context);
 
@@ -132,11 +133,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             } catch (MalformedURLException e) {
                 LOGGER.warn("Can't get the standard URL for wiki [{}]: {}", context.getWikiId(),
                     ExceptionUtils.getRootCauseMessage(e));
-
-                // Fallback on request base URL
-                this.originalURL = HttpServletUtils.getSourceBaseURL(context.getRequest());
             }
-        } else {
+        }
+
+        // Fallback on request base URL
+        if (this.originalURL == null) {
             this.originalURL = HttpServletUtils.getSourceBaseURL(context.getRequest());
         }
 

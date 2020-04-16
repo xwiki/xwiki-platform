@@ -365,6 +365,12 @@ public class Utils
                             throw new RuntimeException("The 'spaceName' parameter must be a list!");
                         }
                         encodedPathElements[i] = generateEncodedSpacesURISegment((List) pathElements[i]);
+                    // see generateEncodedJobIdURISegment to understand why we manually handle "jobId"
+                    } else if (i < pathVariableNames.size() && "jobId".equals(pathVariableNames.get(i))) {
+                        if (!(pathElement instanceof List)) {
+                            throw new RuntimeException("The 'jobId' parameter must be a list!");
+                        }
+                        encodedPathElements[i] = generateEncodedJobIdURISegment((List) pathElements[i]);
                     } else if (pathElement instanceof EncodedElement) {
                         encodedPathElements[i] = pathElement.toString();
                     } else {
@@ -413,6 +419,32 @@ public class Utils
         }
 
         return variables;
+    }
+
+    /**
+     * Generate an encoded segment for the 'jobId' segment of a resource URL.
+     *
+     * We use the same trick as for 'spaceName' here but for jobId: we used to concatenate the jobId in
+     * {@link org.xwiki.rest.internal.url.resources.AbstractJobRestURLGenerator} but it's not a good idea since we want
+     * to encode that URL later and so it's then considered as a unique segment to be encoded.
+     * Performing the build of the URL here is safer since we encode it at the same time.
+     *
+     * @param jobId the list of elements to be used for the jobId
+     * @return a proper segment
+     * @throws URIException in case of problem when performing the encoding.
+     */
+    private static String generateEncodedJobIdURISegment(List<Object> jobId) throws URIException
+    {
+        StringBuilder jobIdSegment = new StringBuilder();
+        for (Object idElement : jobId) {
+            if (jobIdSegment.length() > 0) {
+                jobIdSegment.append('/');
+            }
+            // It looks like we cannot use URILUtil#encodeWithinPath because it does not encode the "%"
+            // character. So it seems safer here to just encode properly the '/'.
+            jobIdSegment.append(URIUtil.encodePath(idElement.toString()).replaceAll("/", "%2F"));
+        }
+        return jobIdSegment.toString();
     }
 
     /**

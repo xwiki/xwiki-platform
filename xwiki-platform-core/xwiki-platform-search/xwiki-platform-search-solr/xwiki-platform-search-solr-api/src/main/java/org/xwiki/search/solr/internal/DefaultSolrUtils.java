@@ -342,9 +342,30 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public String toFilterQueryString(Object fieldValue)
+    {
+        if (fieldValue == null) {
+            return null;
+        }
+
+        if (CLASS_SUFFIX_MAPPING.containsKey(fieldValue.getClass())) {
+            // TODO: this is not the right implementation (won't work for dates for example)
+            return fieldValue.toString();
+        }
+
+        return this.converter.convert(String.class, fieldValue);
+    }
+
+    @Override
     public <T> T get(String fieldName, SolrDocument document, Type targetType)
     {
-        return this.converter.convert(targetType, get(fieldName, document));
+        Object storedValue = get(fieldName, document);
+
+        if (storedValue == null && (!(targetType instanceof Class) || !((Class) targetType).isPrimitive())) {
+            return null;
+        }
+
+        return this.converter.convert(targetType, storedValue);
     }
 
     @Override

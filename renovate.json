@@ -1,5 +1,16 @@
 {
-  "extends": [
-    "config:base"
-  ]
+	"extends": [
+		"config:base"
+	],
+	"packageRules": [{
+		"packageNames": ["xstream"],
+		"allowedVersions": "/\\d+\\.\\d+\\.\\d+/"
+	}, {
+		"managers": ["maven"],
+		"registryUrls": ["http://nexus.xwiki.org/nexus/content/groups/public"]
+	}],
+	"hostRules": [{
+		"hostType": "maven",
+		"endpoint": "http://nexus.xwiki.org/nexus/content/groups/public"
+	}]
 }

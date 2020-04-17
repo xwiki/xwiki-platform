@@ -161,7 +161,9 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
         ## Reference
         ##
         <dt>
-          <label>$escapetool.xml($services.localization.render('core.viewers.information.pageReference'))</label>
+          <label for="reference-value">
+            $escapetool.xml($services.localization.render('core.viewers.information.pageReference'))
+          </label>
         </dt>
         <dd id="information-reference">
           <div class="reference-group input-group flat-buttons">

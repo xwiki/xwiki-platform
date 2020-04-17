@@ -205,33 +205,37 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             }
         }
         
+        // Indent the heading Level
         if (parameters.getIndentHeadingLevel() > 0) {
 
             HeaderBlock heading = result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
 
             if (heading != null) {
+                if (heading.getSection() != null) {
+                    
+                    // Define header Levels
+                    HeaderLevel[] headerLevels = { HeaderLevel.LEVEL1, HeaderLevel.LEVEL2, HeaderLevel.LEVEL3,
+                            HeaderLevel.LEVEL4, HeaderLevel.LEVEL5, HeaderLevel.LEVEL6 };
+                    HeaderLevel headinglevel;
 
-                // Define header Levels
-                HeaderLevel[] headerLevels = { HeaderLevel.LEVEL1, HeaderLevel.LEVEL2, HeaderLevel.LEVEL3,
-                        HeaderLevel.LEVEL4, HeaderLevel.LEVEL5, HeaderLevel.LEVEL6 };
-                HeaderLevel headinglevel;
+                    // Get specified header level
+                    if (parameters.getIndentHeadingLevel() > 5) {
+                        headinglevel = headerLevels[5];
+                    } else {
+                        headinglevel = headerLevels[parameters.getIndentHeadingLevel() - 1];
+                    }
 
-                // Get specified header level
-                if (parameters.getIndentHeadingLevel() > 6) {
-                    headinglevel = headerLevels[5];
-                } else {
-                    headinglevel = headerLevels[parameters.getIndentHeadingLevel() - 1];
-                }
+                    HeaderBlock newHeading = new HeaderBlock(heading.getChildren(), headinglevel);
+                    newHeading.setParameter("id", heading.getId());
+                    
+                    // Get the parent block in document
+                    Block parent = result.getChildren().get(0);
 
-                HeaderBlock newHeading = new HeaderBlock(heading.getChildren(), headinglevel);
-
-                // Get the parent block in document
-                Block parent = result.getChildren().get(0);
-
-                // Get the first child Block of the document
-                Block child = parent.getChildren().get(0);
-                if (child == heading) {
-                    parent.replaceChild(newHeading, child);
+                    // Get the first child Block of the document
+                    Block child = parent.getChildren().get(0);
+                    if (child == heading) {
+                        parent.replaceChild(newHeading, child);
+                    }
                 }
             }
         }

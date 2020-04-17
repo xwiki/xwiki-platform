@@ -883,14 +883,16 @@ $doc.display("content", $obj)
 ###    Message box
 ###
 #macro(xwikimessageboxstart $title $message)
-    <div class="centered">
+  <div class="centered">
     <fieldset class="xwikimessage">
       <legend><span>$title</span></legend>
-      <p class="xwikimessage">$message</p>
+      #if ("$!message" != '')
+        <p class="xwikimessage">$message</p>
+      #end
 #end
 #macro(xwikimessageboxend)
     </fieldset>
-    </div>
+  </div>
 #end
 
 #macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)

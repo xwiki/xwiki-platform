@@ -48,7 +48,7 @@ public class TestSolrCoreInitializer extends AbstractSolrCoreInitializer
     }
 
     @Override
-    protected void migrateSchema(Long cversion)
+    protected void migrateSchema(long cversion)
     {
     }
 

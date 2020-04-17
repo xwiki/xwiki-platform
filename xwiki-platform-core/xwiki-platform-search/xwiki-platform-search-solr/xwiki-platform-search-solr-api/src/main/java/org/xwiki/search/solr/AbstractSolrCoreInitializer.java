@@ -249,7 +249,7 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
      * @param cversion the version of the schema currently stored
      * @throws SolrException when failing to migrate the schema
      */
-    protected abstract void migrateSchema(Long cversion) throws SolrException;
+    protected abstract void migrateSchema(long cversion) throws SolrException;
 
     @Override
     public String getCoreName()

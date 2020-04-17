@@ -231,7 +231,7 @@ public class EditIT
     }
 
     /**
-     * Ensure that the Save&View display a "Saving..." message and that the form is disabled before loading the new
+     * Ensure that the Save&View displays a "Saved" message and that the form is disabled before loading the new
      * page.
      */
     @Test
@@ -242,23 +242,26 @@ public class EditIT
         ViewPage viewPage = setup.gotoPage(reference);
         WikiEditPage editWiki = viewPage.editWiki();
 
-        // Prevent from leaving the page so that we can check the UI before moving out of the page
-        setup.getDriver().executeJavascript("window.onbeforeunload = function () { return false; }");
-        editWiki.clickSaveAndView(false);
+        try {
+            // Prevent from leaving the page so that we can check the UI before moving out of the page
+            setup.getDriver().executeJavascript("window.onbeforeunload = function () { return false; }");
+            editWiki.clickSaveAndView(false);
 
-        // An alert should appear to ask the user if he wants to leave the page.
-        setup.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
+            // An alert should appear to ask the user if he wants to leave the page.
+            setup.getDriver().waitUntilCondition(ExpectedConditions.alertIsPresent());
 
-        // We dismiss it so we can stay on the page and check the UI.
-        setup.getDriver().switchTo().alert().dismiss();
+            // We dismiss it so we can stay on the page and check the UI.
+            setup.getDriver().switchTo().alert().dismiss();
 
-        // Check that the saving message is displayed.
-        editWiki.waitForNotificationInProgressMessage("Saving...");
-        // the form should remain disabled since we normally should be driven to another page.
-        assertFalse(editWiki.isEnabled());
+            // Check that the saving message is displayed.
+            editWiki.waitForNotificationSuccessMessage("Saved");
+            // the form should remain disabled since we normally should be driven to another page.
+            assertFalse(editWiki.isEnabled());
+        } finally {
+            // Now allow to leave the page.
+            setup.getDriver().executeJavascript("window.onbeforeunload = null;");
+        }
 
-        // Now allow to leave the page.
-        setup.getDriver().executeJavascript("window.onbeforeunload = null;");
         // Go back to the editor to reset the status
         viewPage = setup.gotoPage(reference);
         editWiki = viewPage.editWiki();

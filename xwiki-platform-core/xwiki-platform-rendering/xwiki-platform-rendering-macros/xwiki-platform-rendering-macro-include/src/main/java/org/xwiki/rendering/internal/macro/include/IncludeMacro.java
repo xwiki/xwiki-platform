@@ -202,7 +202,44 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 references.pop();
             }
         }
+        
+        // Exclude First Heading 
+        if (parameters.excludeFirstHeading()) {
+            List<HeaderBlock> headingList = result.getBlocks(new ClassBlockMatcher(HeaderBlock.class),
+                    Block.Axes.DESCENDANT);
 
+            if (!headingList.isEmpty()) {
+
+                // Get the First Heading Block from list of Heading Blocks.
+                HeaderBlock heading = headingList.get(0);
+
+                // Check if the first Block is Heading.
+                if (result.getChildren().get(0) instanceof HeaderBlock) {
+                    result.removeBlock(heading);
+                }
+                // Check if the first Block is Section.
+                else if (result.getChildren().get(0) instanceof SectionBlock) {
+                    if (heading.getSection() != null) {
+                        Block sectionBlock = result.getChildren().get(0);
+                        // Removing the heading from the section Block.
+                        sectionBlock.removeBlock(heading);
+                    }
+                    // If Section doesn't cotain any heading throw an exception.
+                    else {
+                        String includeType = parameters.getSection() != null ? "section" : "document";
+                        throw new MacroExecutionException(
+                                String.format("The included [%s] doesn't contain any heading", includeType));
+                    }
+                }
+            }
+            // If the FirstBlock is neither Heading nor a Section throw an exception.
+            else {
+                String includeType = parameters.getSection() != null ? "section" : "document";
+                throw new MacroExecutionException(
+                        String.format("The included [%s] doesn't contain any heading", includeType));
+            }
+        }
+        
         // Step 5: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());

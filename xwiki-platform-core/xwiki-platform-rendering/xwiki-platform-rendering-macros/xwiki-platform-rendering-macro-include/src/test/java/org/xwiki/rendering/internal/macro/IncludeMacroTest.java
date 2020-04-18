@@ -615,17 +615,7 @@ public class IncludeMacroTest
     @Test
     void executeIncludeMacroWhenHeadingIsNotFirstBlock() throws Exception {
         // @formatter:off
-        String expected = "beginDocument\n"
-                + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-                + "beginGroup\n"
-                + "beginSection\n"
-                + "beginHeader [1, Hcontent1]\n"
-                + "onWord [content1]\n"
-                + "endHeader [1, Hcontent1]\n"
-                + "endSection\n"
-                + "endGroup\n"
-                + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
-                + "endDocument";
+        String expected = "The included [document] doesn't contain any heading";
         // @formatter:on
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
@@ -644,9 +634,10 @@ public class IncludeMacroTest
         when(this.document.getXDOM()).thenReturn(getXDOM("(((= content1 =)))")); // To test
         when(this.document.getRealLanguage()).thenReturn("");
 
-        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+        Throwable exception = assertThrows(MacroExecutionException.class,
+                () -> this.includeMacro.execute(parameters, null, macroContext));
 
-        assertBlocks(expected, blocks, this.rendererFactory);
+        assertEquals(expected, exception.getMessage());
     }
 
     @Test

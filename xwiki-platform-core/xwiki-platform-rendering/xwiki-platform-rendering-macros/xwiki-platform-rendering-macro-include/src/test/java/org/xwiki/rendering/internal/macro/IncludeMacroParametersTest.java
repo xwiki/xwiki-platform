@@ -41,4 +41,14 @@ public class IncludeMacroParametersTest
 
         assertSame(EntityType.PAGE, parameters.getType());
     }
+    
+    @Test
+    public void setExcludeFirstHeading()
+    {
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+
+        parameters.setExcludeFirstHeading(true);
+        
+        assertSame(true, parameters.excludeFirstHeading());
+    }
 }

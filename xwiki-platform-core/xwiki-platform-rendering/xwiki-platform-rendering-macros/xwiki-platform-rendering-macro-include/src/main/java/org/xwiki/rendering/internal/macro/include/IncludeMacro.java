@@ -224,13 +224,14 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                         // Removing the heading from the section Block.
                         sectionBlock.removeBlock(heading);
                     }
-                    // If Section doesn't cotain any heading throw an exception.
-                    else {
-                        String includeType = parameters.getSection() != null ? "section" : "document";
-                        throw new MacroExecutionException(
-                                String.format("The included [%s] doesn't contain any heading", includeType));
-                    }
                 }
+                // If Section doesn't cotain any heading throw an exception.
+                else {
+                    String includeType = parameters.getSection() != null ? "section" : "document";
+                    throw new MacroExecutionException(
+                            String.format("The included [%s] doesn't contain any heading", includeType));
+                }
+
             }
             // If the FirstBlock is neither Heading nor a Section throw an exception.
             else {

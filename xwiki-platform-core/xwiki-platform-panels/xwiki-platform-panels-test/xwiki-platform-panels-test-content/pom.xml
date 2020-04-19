@@ -37,6 +37,10 @@
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
         <configuration>
+          <visibleTechnicalPages>
+            <visibleTechnicalPage>.*/Alice/WebHome\.xml</visibleTechnicalPage>
+            <visibleTechnicalPage>.*/Bob/WebHome\.xml</visibleTechnicalPage>
+          </visibleTechnicalPages>
           <entries>
             <entry>
               <document>Alice.WebHome</document>

@@ -77,7 +77,6 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -87,4 +86,17 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <visibleTechnicalPages>
+            <visibleTechnicalPage>.*/XWiki/XWikiSyntax\.xml</visibleTechnicalPage>
+          </visibleTechnicalPages>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

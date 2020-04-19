@@ -110,4 +110,17 @@
       <optional>true</optional>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <visibleTechnicalPages>
+            <visibleTechnicalPage>.*/Menu/WebHome\.xml</visibleTechnicalPage>
+          </visibleTechnicalPages>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

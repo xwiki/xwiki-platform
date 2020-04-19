@@ -35,13 +35,16 @@
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Sandbox Application</xwiki.extension.name>
   </properties>
-
   <build>
     <plugins>
       <plugin>
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
         <configuration>
+          <contentPages>
+            <contentPage>.*/Sandbox/TestPage.*\.xml</contentPage>
+            <contentPage>.*/Sandbox/WebHome.*\.xml</contentPage>
+          </contentPages>
           <entries>
             <entry>
               <document>Sandbox.TestPage1</document>

@@ -268,7 +268,7 @@
         }
         [0, newLength - 1].some(function(position) {
           if (isSpaceConvertedAt(mutation.oldValue, mutation.target.nodeValue, position) &&
-              !isNearSpace(mutation.target, position)) {
+              isNonBreakingSpaceOptional(mutation.target, position)) {
             scheduleFixNonBreakingSpace(mutation.target, position);
             return true;
           }
@@ -281,27 +281,27 @@
           newValue.substring(position + 1) === oldValue.substring(position + 1);
       };
 
-      var isNearSpace = function(textNode, position) {
-        return isPrecededBySpace(textNode, position) || isFollowedBySpace(textNode, position);
+      var isNonBreakingSpaceOptional = function(textNode, position) {
+        return isPrecededByNonSpace(textNode, position) && isFollowedByNonSpace(textNode, position);
       };
 
-      var isPrecededBySpace = function(textNode, position) {
+      var isPrecededByNonSpace = function(textNode, position) {
         if (position > 0) {
-          return textNode.nodeValue.charAt(position - 1) === ' ';
+          return textNode.nodeValue.charAt(position - 1) !== ' ';
         } else {
-          var previousNode = getAdjacentLeafNode(textNode, 'previousSibling', 'leftChild');
+          var previousNode = getAdjacentLeafNode(textNode, 'previousSibling', 'lastChild');
           return previousNode && previousNode.nodeType === Node.TEXT_NODE && previousNode.nodeValue.length > 0 &&
-            previousNode.nodeValue.charAt(previousNode.nodeValue.length - 1) === ' ';
+            previousNode.nodeValue.charAt(previousNode.nodeValue.length - 1) !== ' ';
         }
       };
 
-      var isFollowedBySpace = function(textNode, position) {
+      var isFollowedByNonSpace = function(textNode, position) {
         if (position < textNode.nodeValue.length - 1) {
-          return textNode.nodeValue.charAt(position + 1) === ' ';
+          return textNode.nodeValue.charAt(position + 1) !== ' ';
         } else {
           var nextNode = getAdjacentLeafNode(textNode, 'nextSibling', 'firstChild');
           return nextNode && nextNode.nodeType === Node.TEXT_NODE && nextNode.nodeValue.length > 0 &&
-            nextNode.nodeValue.charAt(0) === ' ';
+            nextNode.nodeValue.charAt(0) !== ' ';
         }
       };
 
@@ -317,7 +317,7 @@
           }
         // Go up but don't leave the current block.
         } else if (CKEDITOR.dtd.$inline[node.parentNode.nodeName.toLowerCase()]) {
-          return getAdjacentLeafNode(node.parentNode);
+          return getAdjacentLeafNode(node.parentNode, whichSibling, whichChild);
         }
       };
 

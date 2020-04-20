@@ -49,6 +49,6 @@ public class IncludeMacroParametersTest
 
         parameters.setExcludeFirstHeading(true);
         
-        assertSame(true, parameters.excludeFirstHeading());
+        assertTrue(parameters.excludeFirstHeading());
     }
 }

@@ -683,36 +683,8 @@ XWiki.Annotation = Class.create({
   hookMenuButton : function() {
     // Since 7.4M1, the annotations trigger is inserted via an UIX.
     var annotationsTrigger = $('tmAnnotationsTrigger');
-    if (annotationsTrigger) {
-      annotationsTrigger.observe('click', this.toggleSettingsPanel.bind(this));
-    } else {
-      // If the UIX is not there, then it means we are in an old skin (such as colibri), and so we let the following
-      // legacy code to maintain backward compatibility.
-      var contentmenu = $('contentmenu');
-      if (contentmenu) {
-        var rightMenu = contentmenu.down('.rightmenu');
-        // create and insert if it doesn't exist
-        if (!rightMenu) {
-          rightMenu = new Element('div', {'class':'rightmenu'});
-          // insert it before the left menu
-          var leftMenu = contentmenu.down('.leftmenu');
-          if (leftMenu) {
-            leftMenu.insert({before: rightMenu});
-          } else {
-            contentmenu.insert({bottom: rightMenu});
-          }
-        }
-        // create the annotations button
-        var annContainer = new Element('div', {'class': 'topmenuentry hasIcon', 'id': 'tmAnnotations'});
-        var annLink = new Element('a', {'class': 'tme', 'href': '#' + this.annTabname});
-        annLink.update("&lt;strong&gt;$services.localization.render('annotations.title')&lt;/strong&gt;");
-        annContainer.insert({top: annLink});
-        rightMenu.insert({bottom: annContainer});
-
-        annLink.observe('click', this.toggleSettingsPanel.bind(this));
-      }
-    }
-  },
+    annotationsTrigger.observe('click', this.toggleSettingsPanel.bind(this));
+ },
 
   setAnnotationVisibility : function (visibility) {
     this.displayingAnnotations = visibility;

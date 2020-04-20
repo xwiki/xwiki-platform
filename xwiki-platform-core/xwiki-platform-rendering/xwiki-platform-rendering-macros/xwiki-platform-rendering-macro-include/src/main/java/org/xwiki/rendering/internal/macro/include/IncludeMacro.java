@@ -205,39 +205,23 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         
         // Exclude First Heading 
         if (parameters.excludeFirstHeading()) {
-            List<HeaderBlock> headingList = result.getBlocks(new ClassBlockMatcher(HeaderBlock.class),
-                    Block.Axes.DESCENDANT);
 
-            if (!headingList.isEmpty()) {
+            // Getting the first block.
+            Block firstBlock = result.getChildren().get(0);
 
-                // Get the First Heading Block from list of Heading Blocks.
-                HeaderBlock heading = headingList.get(0);
-
-                // Check if the first Block is Heading.
-                if (result.getChildren().get(0) instanceof HeaderBlock) {
-                    result.removeBlock(heading);
+            // Check if the first Block is Section block.
+            if (firstBlock instanceof SectionBlock) {
+                // Check if first block of section is Header Block.
+                Block sectionFirstBlock = firstBlock.getChildren().get(0);
+                if (sectionFirstBlock instanceof HeaderBlock) {
+                    // Removing the header block
+                    firstBlock.removeBlock(sectionFirstBlock);
                 }
-                // Check if the first Block is Section.
-                else if (result.getChildren().get(0) instanceof SectionBlock) {
-                    if (heading.getSection() != null) {
-                        Block sectionBlock = result.getChildren().get(0);
-                        // Removing the heading from the section Block.
-                        sectionBlock.removeBlock(heading);
-                    }
-                }
-                // If Section doesn't cotain any heading throw an exception.
-                else {
-                    String includeType = parameters.getSection() != null ? "section" : "document";
-                    throw new MacroExecutionException(
-                            String.format("The included [%s] doesn't contain any heading", includeType));
-                }
+                // Getting Content of section Block
+                List<Block> sectionContent = firstBlock.getChildren();
 
-            }
-            // If the FirstBlock is neither Heading nor a Section throw an exception.
-            else {
-                String includeType = parameters.getSection() != null ? "section" : "document";
-                throw new MacroExecutionException(
-                        String.format("The included [%s] doesn't contain any heading", includeType));
+                // Replacing only the content of section block with the whole section Block .
+                result.replaceChild(sectionContent, firstBlock); // section block removed
             }
         }
         

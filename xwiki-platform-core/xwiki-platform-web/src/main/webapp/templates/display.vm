@@ -31,14 +31,20 @@
     ## Bad request.
     #set ($discard = $response.sendError(400, 'Property not specified.'))
   #else
+    #set ($knownPropertyTypes = ['document', 'object'])
     #set ($propertyType = $request.getParameter('type'))
     #if ("$!propertyType" == '')
-      #set ($propertyType = 'document')
+      #set ($propertyType = $knownPropertyTypes.get(0))
     #end
-    #if ($propertyType == 'document')
-      #displayDocumentProperty($propertyReference $displayMode)
-    #elseif ($propertyType == 'object')
-      #displayObjectProperty($propertyReference $displayMode)
+    #if ($knownPropertyTypes.contains($propertyType))
+      #initRequiredSkinExtensions()
+      #if ($propertyType == 'object')
+        #displayObjectProperty($propertyReference $displayMode)
+      #else
+        #displayDocumentProperty($propertyReference $displayMode)
+      #end
+      #getRequiredSkinExtensions($requiredSkinExtensions)
+      #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
     #else
       ## Bad request.
       #set ($discard = $response.sendError(400, 'Unknown property type.'))

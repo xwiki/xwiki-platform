@@ -24,6 +24,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link IncludeMacroParameters}.
@@ -43,12 +44,12 @@ public class IncludeMacroParametersTest
     }
     
     @Test
-    public void setExcludeFirstHeading()
+    public void setExcludeFirstHeading() 
     {
         IncludeMacroParameters parameters = new IncludeMacroParameters();
 
         parameters.setExcludeFirstHeading(true);
-        
-        assertTrue(parameters.excludeFirstHeading());
+
+        assertTrue(parameters.isExcludeFirstHeading());
     }
 }

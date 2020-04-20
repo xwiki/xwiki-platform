@@ -207,15 +207,13 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         if (parameters.excludeFirstHeading()) {
             if (result.getChildren().size() > 0) {
                 Block firstBlock = result.getChildren().get(0);
-                if (firstBlock instanceof SectionBlock) {
-                    if (firstBlock.getChildren().size() > 0) {
-                        Block sectionFirstBlock = firstBlock.getChildren().get(0);
-                        if (sectionFirstBlock instanceof HeaderBlock) {
-                            List<Block> contentWithoutheading = firstBlock.getChildren().subList(1,
-                                    firstBlock.getChildren().size());
-                            // To remove section blocks we will replace the content with the contentWithoutheading.
-                            result.replaceChild(contentWithoutheading, firstBlock); // section block removed
-                        }
+                if (firstBlock instanceof SectionBlock && firstBlock.getChildren().size() > 0) {
+                    Block sectionFirstBlock = firstBlock.getChildren().get(0);
+                    if (sectionFirstBlock instanceof HeaderBlock) {
+                        List<Block> contentWithoutheading = firstBlock.getChildren().subList(1,
+                                firstBlock.getChildren().size());
+                        // To remove section blocks we will replace the content with the contentWithoutheading.
+                        result.replaceChild(contentWithoutheading, firstBlock); // section block removed
                     }
                 }
             }

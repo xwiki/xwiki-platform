@@ -40,9 +40,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -52,6 +54,7 @@ import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
+
 
 /**
  * @version $Id$
@@ -204,17 +207,15 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
         
         // Exclude First Heading
-        if (parameters.excludeFirstHeading()) {
-            if (result.getChildren().size() > 0) {
-                Block firstBlock = result.getChildren().get(0);
-                if (firstBlock instanceof SectionBlock && firstBlock.getChildren().size() > 0) {
-                    Block sectionFirstBlock = firstBlock.getChildren().get(0);
-                    if (sectionFirstBlock instanceof HeaderBlock) {
-                        List<Block> contentWithoutheading = firstBlock.getChildren().subList(1,
-                                firstBlock.getChildren().size());
-                        // To remove section blocks we will replace the content with the contentWithoutheading.
-                        result.replaceChild(contentWithoutheading, firstBlock); // section block removed
-                    }
+        if (parameters.isExcludeFirstHeading() && result.getChildren().size() > 0) {
+            Block firstBlock = result.getChildren().get(0);
+            if (firstBlock instanceof SectionBlock && firstBlock.getChildren().size() > 0) {
+                Block sectionFirstBlock = firstBlock.getChildren().get(0);
+                if (sectionFirstBlock instanceof HeaderBlock) {
+                    List<Block> contentWithoutheading = firstBlock.getChildren().subList(1,
+                            firstBlock.getChildren().size());
+                    // To remove section blocks we will replace the content with the contentWithoutheading.
+                    result.replaceChild(contentWithoutheading, firstBlock); // section block removed
                 }
             }
         }

@@ -607,6 +607,7 @@ public class IncludeMacroTest
         List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
         assertBlocks(expected, blocks, this.rendererFactory);
     }
+    
     @Test
     void executeIncludeMacroWhenIndentHeadingLevelIsSpecifiedButHeadingLevelIsTwo() throws Exception {
         // @formatter:off

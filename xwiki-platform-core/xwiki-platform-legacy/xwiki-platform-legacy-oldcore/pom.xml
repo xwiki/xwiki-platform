@@ -201,6 +201,12 @@
                       <name>skipForeignDeclarations</name>
                       <value>true</value>
                     </property>
+                    <!-- TODO: Ideally inherit this from the top level pom but I couldn't find how to do it, or remove
+                         it when spoon is fixed, see https://github.com/INRIA/spoon/issues/3339 -->
+                    <property>
+                      <name>componentsTxtPath</name>
+                      <value>target/classes/META-INF/components.txt</value>
+                    </property>
                   </properties>
                 </processorProperty>
               </processorProperties>

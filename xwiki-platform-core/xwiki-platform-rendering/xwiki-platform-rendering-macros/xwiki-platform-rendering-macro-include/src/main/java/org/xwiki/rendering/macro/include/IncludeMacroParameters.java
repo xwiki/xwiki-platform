@@ -26,6 +26,8 @@ import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
+import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
@@ -71,7 +73,13 @@ public class IncludeMacroParameters
      * @see #getSection()
      */
     private String section;
-
+    
+    /**
+     * @see #isExcludeFirstHeading()
+     */
+    private boolean excludeFirstHeading;
+    
+    
     /**
      * @param reference the reference of the resource to include
      * @since 3.4M1
@@ -152,6 +160,29 @@ public class IncludeMacroParameters
         return this.section;
     }
 
+    /**
+     * @param excludeFirstHeading {@code true} to remove the first heading found inside
+     *        the document or the section, {@code false} to keep it 
+     * @since 12.4RC1 
+     */
+    @Unstable
+    @PropertyName("Exclude First Heading")
+    @PropertyDescription("Exclude the first heading from the included document or section.")
+    public void setExcludeFirstHeading(boolean excludeFirstHeading)
+    {
+        this.excludeFirstHeading = excludeFirstHeading;
+    }
+    
+    /**
+     * @return whether to exclude the first heading from the included document or section, or not.
+     * @since 12.4RC1 
+     */
+    @Unstable
+    public boolean isExcludeFirstHeading()
+    {
+        return this.excludeFirstHeading;
+    }
+    
     /**
      * @param page the reference of the page to include
      * @since 10.6RC1

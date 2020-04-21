@@ -536,4 +536,110 @@ public class IncludeMacroTest
 
         return blocks;
     }
+    
+    @Test
+    void executeIncludeMacroWhenIndentHeadingLevelIsSpecified() throws Exception {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginSection\n"
+            + "beginHeader [4, null] [[id]=[HHeading]]\n"
+            + "onWord [Heading]\n"
+            + "endHeader [4, null] [[id]=[HHeading]]\n"
+            + "beginParagraph\n"
+            + "onWord [content]\n"
+            + "endParagraph\n"
+            + "endSection\n"
+            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("wiki");
+        parameters.setIndentHeadingLevel(3);
+
+        // Getting the macro context
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        when(this.macroEntityReferenceResolver.resolve("wiki", EntityType.DOCUMENT,
+                macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM("= Heading =\ncontent")); // To test
+        when(this.document.getRealLanguage()).thenReturn("");
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+
+    @Test
+    void executeIncludeMacroWhenIndentHeadingLevelIsNotSpecifiedOrZero() throws Exception {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginSection\n"
+            + "beginHeader [1, Hcontent]\n"
+            + "onWord [content]\n"
+            + "endHeader [1, Hcontent]\n"
+            + "endSection\n"
+            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("wiki");
+        parameters.setIndentHeadingLevel(0);
+
+        // Getting the macro context
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        when(this.macroEntityReferenceResolver.resolve("wiki", EntityType.DOCUMENT,
+                macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM("= content =")); // To test
+        when(this.document.getRealLanguage()).thenReturn("");
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
+    @Test
+    void executeIncludeMacroWhenIndentHeadingLevelIsSpecifiedButHeadingLevelIsTwo() throws Exception {
+        // @formatter:off
+        String expected = "beginDocument\n"
+            + "beginMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "beginSection\n"
+            + "beginSection\n"
+            + "beginHeader [2, Hcontent]\n"
+            + "onWord [content]\n"
+            + "endHeader [2, Hcontent]\n"
+            + "endSection\n"
+            + "endSection\n"
+            + "endMetaData [[source]=[wiki:space.document][syntax]=[XWiki 2.0]]\n"
+            + "endDocument";
+        // @formatter:on
+
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setReference("wiki");
+        parameters.setIndentHeadingLevel(4);
+
+        // Getting the macro context
+        MacroTransformationContext macroContext = createMacroTransformationContext("whatever", false);
+        DocumentReference resolvedReference = new DocumentReference("wiki", "space", "document");
+        when(this.macroEntityReferenceResolver.resolve("wiki", EntityType.DOCUMENT,
+                macroContext.getCurrentMacroBlock())).thenReturn(resolvedReference);
+        when(this.contextualAuthorizationManager.hasAccess(Right.VIEW, resolvedReference)).thenReturn(true);
+        when(this.dab.getDocumentInstance((EntityReference) resolvedReference)).thenReturn(this.document);
+        when(this.document.getDocumentReference()).thenReturn(resolvedReference);
+        when(this.document.getSyntax()).thenReturn(Syntax.XWIKI_2_0);
+        when(this.document.getXDOM()).thenReturn(getXDOM("== content ==")); // To test
+        when(this.document.getRealLanguage()).thenReturn("");
+
+        List<Block> blocks = this.includeMacro.execute(parameters, null, macroContext);
+        assertBlocks(expected, blocks, this.rendererFactory);
+    }
 }

@@ -160,19 +160,19 @@ public class IncludeMacroParameters
     }
     
     /**
-     * @param indentHeadingLevel the heading level for headings in the included
+     * @param indentHeadingLevel the heading level for level 1 headings in the included
      *        document or section.
      * @since 12.4RC1
      */
     @Unstable
     @PropertyName("Indent Heading Level")
-    @PropertyDescription("Adjust the heading level for headings in the included document or section.")
+    @PropertyDescription("Adjust the heading level for level 1 headings in the included document or section.")
     public void setIndentHeadingLevel(int indentHeadingLevel) {
         this.indentHeadingLevel = indentHeadingLevel;
     }
 
     /**
-     * @return the heading level to apply to the headings. If not specified or
+     * @return the heading level to apply to the level 1 headings. If not specified or
      *         zero, default heading level will be applied.
      * @since 12.4RC1
      */

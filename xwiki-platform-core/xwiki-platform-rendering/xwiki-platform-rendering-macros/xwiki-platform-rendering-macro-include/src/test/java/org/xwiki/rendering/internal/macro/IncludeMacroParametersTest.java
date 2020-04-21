@@ -24,6 +24,7 @@ import org.xwiki.model.EntityType;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Validate {@link IncludeMacroParameters}.
@@ -40,5 +41,15 @@ public class IncludeMacroParametersTest
         parameters.setPage("page");
 
         assertSame(EntityType.PAGE, parameters.getType());
+    }
+    
+    @Test
+    public void setIndentHeadingLevel() 
+    {
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+
+        parameters.setIndentHeadingLevel(1);
+
+        assertEquals(1, parameters.getIndentHeadingLevel());
     }
 }

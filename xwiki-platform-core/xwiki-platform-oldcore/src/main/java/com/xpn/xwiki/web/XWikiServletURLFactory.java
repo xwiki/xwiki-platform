@@ -156,17 +156,19 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     private URL getOriginalURL(XWikiContext xcontext)
     {
+        URL url = null;
+
         // In case of daemon thread use the standard URL of the current wiki as reference
         if (this.daemon) {
             try {
-                return xcontext.getWiki().getServerURL(xcontext.getWikiId(), xcontext);
+                url = xcontext.getWiki().getServerURL(xcontext.getWikiId(), xcontext);
             } catch (MalformedURLException e) {
                 LOGGER.warn("Can't get the standard URL for wiki [{}]: {}", xcontext.getWikiId(),
                     ExceptionUtils.getRootCauseMessage(e));
             }
         }
 
-        return this.originalURL;
+        return url != null ? url : this.originalURL;
     }
 
     /**

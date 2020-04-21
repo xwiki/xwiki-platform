@@ -55,6 +55,8 @@ import org.xwiki.security.authorization.Right;
 import org.xwiki.rendering.block.match.ClassBlockMatcher;
 import org.xwiki.rendering.listener.HeaderLevel;
 import org.xwiki.rendering.block.HeaderBlock;
+import org.xwiki.rendering.block.SectionBlock;
+
 /**
  * @version $Id$
  * @since 1.5M2
@@ -206,35 +208,31 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
         
         // Indent the heading Level
-        if (parameters.getIndentHeadingLevel() > 0) {
+        if (parameters.getIndentHeadingLevel() > 0 && result.getChildren().size() > 0) {
 
-            HeaderBlock heading = result.getFirstBlock(new ClassBlockMatcher(HeaderBlock.class), Block.Axes.DESCENDANT);
+            // Getting all the HeaderBlocks
+            List<HeaderBlock> headingList = result.getBlocks(new ClassBlockMatcher(HeaderBlock.class),
+                    Block.Axes.DESCENDANT_OR_SELF);
 
-            if (heading != null) {
-                if (heading.getSection() != null) {
-                    
-                    // Define header Levels
-                    HeaderLevel[] headerLevels = { HeaderLevel.LEVEL1, HeaderLevel.LEVEL2, HeaderLevel.LEVEL3,
-                            HeaderLevel.LEVEL4, HeaderLevel.LEVEL5, HeaderLevel.LEVEL6 };
-                    HeaderLevel headinglevel;
+            if (!headingList.isEmpty()) {
+                HeaderLevel[] headerLevels = { HeaderLevel.LEVEL1, HeaderLevel.LEVEL2, HeaderLevel.LEVEL3,
+                        HeaderLevel.LEVEL4, HeaderLevel.LEVEL5, HeaderLevel.LEVEL6 };
+                HeaderLevel headinglevel;
 
-                    // Get specified header level
-                    if (parameters.getIndentHeadingLevel() > 5) {
-                        headinglevel = headerLevels[5];
-                    } else {
-                        headinglevel = headerLevels[parameters.getIndentHeadingLevel() - 1];
-                    }
+                // Looping through all the HeaderBlocks and changing levels of LEVEL1 HeaderBlocks
+                for (HeaderBlock heading : headingList) {
+                    if (heading.getLevel() == HeaderLevel.LEVEL1) {
 
-                    HeaderBlock newHeading = new HeaderBlock(heading.getChildren(), headinglevel);
-                    newHeading.setParameter("id", heading.getId());
-                    
-                    // Get the parent block in document
-                    Block parent = result.getChildren().get(0);
-
-                    // Get the first child Block of the document
-                    Block child = parent.getChildren().get(0);
-                    if (child == heading) {
-                        parent.replaceChild(newHeading, child);
+                        // Get specified header level from the user
+                        int indentHeadingLevel = parameters.getIndentHeadingLevel();
+                        if (indentHeadingLevel > 5) {
+                            headinglevel = headerLevels[5];
+                        } else {
+                            headinglevel = headerLevels[indentHeadingLevel];
+                        }
+                        HeaderBlock newHeading = new HeaderBlock(heading.getChildren(), headinglevel);
+                        newHeading.setParameter("id", heading.getId());
+                        heading.getParent().replaceChild(newHeading, heading);
                     }
                 }
             }

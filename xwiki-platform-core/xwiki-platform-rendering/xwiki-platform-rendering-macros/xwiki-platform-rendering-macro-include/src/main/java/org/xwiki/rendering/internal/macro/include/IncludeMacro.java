@@ -208,7 +208,8 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
         
         // Indent the heading Level
-        if (parameters.getIndentHeadingLevel() > 0 && result.getChildren().size() > 0) {
+        if (parameters.getIndentHeadingLevel() > 0 && result.getChildren().size() > 0
+                && result.getParent() instanceof SectionBlock) {
 
             // Getting all the HeaderBlocks
             List<HeaderBlock> headingList = result.getBlocks(new ClassBlockMatcher(HeaderBlock.class),

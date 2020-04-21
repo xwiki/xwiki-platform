@@ -313,7 +313,11 @@
             // in-line (because the returned HTML will be inserted directly into the main page).
             stripHTMLEnvelope: editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE,
             text: editor.getData()
-          }).done(function(html) {
+          }).done(function(html, textStatus, jqXHR) {
+            var requiredSkinExtensions = jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD');
+            require(['macroWizard'], function() {
+              $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
+            });
             editor.setData(html, {callback: $.proxy(command, 'done', true)});
           }).fail($.proxy(this, 'done'));
         },

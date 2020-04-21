@@ -94,24 +94,24 @@ public class DefaultXWikiStubContextProviderTest
     @Test
     public void createStubContextWithLoopProtection()
     {
-        XWikiContext currentXContext =
-            (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+        XWikiContext[] subContext = new XWikiContext[1];
 
         when(this.urlFactoryService.createURLFactory(anyInt(), any())).then(new Answer<XWikiURLFactory>()
         {
             @Override
             public XWikiURLFactory answer(InvocationOnMock invocation) throws Throwable
             {
-                // Try to cause an infinite loop by calling createStubContext again
-                assertNotSame(currentXContext, execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
+                // Check if the protection is set
+                subContext[0] = provider.createStubContext();
 
                 return null;
             }
         });
 
-        this.provider.createStubContext();
-
-        assertSame(currentXContext, execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY));
+        XWikiContext xcontext = this.provider.createStubContext();
+        assertNotNull(xcontext);
+        assertSame(subContext[0], xcontext);
+        assertNotSame(this.oldcore.getXWikiContext(), xcontext);
     }
 
     @Test

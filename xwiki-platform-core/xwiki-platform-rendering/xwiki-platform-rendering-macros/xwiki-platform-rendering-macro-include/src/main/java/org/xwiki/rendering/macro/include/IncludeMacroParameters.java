@@ -160,7 +160,7 @@ public class IncludeMacroParameters
     }
     
     /**
-     * @param indentHeadingLevel the heading level for first heading in the included
+     * @param indentHeadingLevel the heading level for headings in the included
      *        document or section.
      * @since 12.4RC1
      */

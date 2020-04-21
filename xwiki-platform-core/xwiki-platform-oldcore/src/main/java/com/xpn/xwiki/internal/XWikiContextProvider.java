@@ -78,7 +78,7 @@ public class XWikiContextProvider implements Provider<XWikiContext>
             xcontext = (XWikiContext) this.execution.getContext().getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
 
             if (xcontext == null) {
-                xcontext = createStubContext();
+                xcontext = createStubContext(econtext);
             }
         } else {
             xcontext = null;
@@ -87,13 +87,13 @@ public class XWikiContextProvider implements Provider<XWikiContext>
         return xcontext;
     }
 
-    private XWikiContext createStubContext()
+    private XWikiContext createStubContext(ExecutionContext econtext)
     {
         XWikiContext xcontext = this.contextProvider.createStubContext();
 
         if (xcontext != null) {
             // Set the XWiki context
-            this.execution.getContext().setProperty(XWikiContext.EXECUTIONCONTEXT_KEY, xcontext);
+            xcontext.declareInExecutionContext(econtext);
 
             // Set the stub request and the response
             if (this.container.getRequest() == null) {

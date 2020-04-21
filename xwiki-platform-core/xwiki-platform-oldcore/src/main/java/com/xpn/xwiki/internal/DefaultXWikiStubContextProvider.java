@@ -51,6 +51,8 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 @Singleton
 public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
 {
+    static final String XCONTEXT_STUB = DefaultXWikiStubContextProvider.class.getName();
+
     /**
      * The logger to log.
      */
@@ -110,33 +112,31 @@ public class DefaultXWikiStubContextProvider implements XWikiStubContextProvider
         XWikiContext stubContext;
 
         if (this.initialContext != null) {
-            stubContext = this.initialContext.clone();
-
             ExecutionContext econtext = this.execution.getContext();
 
-            XWikiContext currentXContext;
             if (econtext != null) {
-                // Remember current XWikiContext to restore it
-                currentXContext = (XWikiContext) econtext.getProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
+                stubContext = (XWikiContext) econtext.getProperty(XCONTEXT_STUB);
 
-                // Set the context in the execution context in case any part of it's initialization requires it
-                // (which might create an infinite loop if there was none already in Provider<XWikiContext> use case
-                // for example)
-                stubContext.declareInExecutionContext(econtext);
-            } else {
-                currentXContext = null;
+                // Return if the XWikiContext stub is already being initialized in this thread
+                if (stubContext != null) {
+                    return stubContext;
+                }
             }
 
             try {
+                stubContext = this.initialContext.clone();
+
+                // Protect again loop in case the XWikiContext stub initialization end up calling indirectly the
+                // XWikiContext Provider.
+                if (econtext != null) {
+                    econtext.setProperty(XCONTEXT_STUB, stubContext);
+                }
+
                 initiazeXWikiContext(stubContext);
             } finally {
                 if (econtext != null) {
-                    // Restore previous XWikiContext
-                    if (currentXContext != null) {
-                        currentXContext.declareInExecutionContext(econtext);
-                    } else {
-                        econtext.removeProperty(XWikiContext.EXECUTIONCONTEXT_KEY);
-                    }
+                    // Get rid of the XWikiContext stub initialization loop protection
+                    econtext.removeProperty(XCONTEXT_STUB);
                 }
             }
         } else {

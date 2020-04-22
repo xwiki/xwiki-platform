@@ -53,7 +53,7 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  * <pre>
  * &lt;input type=&quot;submit&quot; name=&quot;action_saveandcontinue&quot; value=&quot;...&quot;/&gt;
  * </pre>
- * <p>
+ *
  * As a result, when clicking the button, the request is not sent to the form's target (<tt>preview</tt>), but is
  * actually forwarded internally to <tt>/bin/saveandcontinue/The/Document</tt>.
  *
@@ -62,19 +62,13 @@ import com.xpn.xwiki.internal.XWikiCfgConfigurationSource;
  */
 public class ActionFilter implements Filter
 {
-    /**
-     * Logging helper.
-     */
+    /** Logging helper. */
     private static final Logger LOGGER = LoggerFactory.getLogger(ActionFilter.class);
 
-    /**
-     * The query property name prefix that indicates the target action.
-     */
+    /** The query property name prefix that indicates the target action. */
     private static final String ACTION_PREFIX = "action_";
 
-    /**
-     * URL path separator.
-     */
+    /** URL path separator. */
     private static final String PATH_SEPARATOR = "/";
 
     /**
@@ -144,7 +138,7 @@ public class ActionFilter implements Filter
      * @param request the original request
      * @param action the action parameter, starting with <tt>action_</tt>
      * @return The rebuilt URL path, with the specified action in place of the original Struts action. Note that unlike
-     *     the HTTP path, this does not contain the application context part.
+     *         the HTTP path, this does not contain the application context part.
      */
     private String getTargetURL(HttpServletRequest request, String action)
     {

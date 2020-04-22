@@ -194,6 +194,7 @@ download=download
 log-in=sign-in
 log-out=sign-out
 th=th
+translate=language
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check

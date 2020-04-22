@@ -36,7 +36,7 @@ import org.xwiki.xclass.test.po.DataTypesPage;
  * Tests the default class sheet (XWiki.ClassSheet).
  *
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.3
  */
 @UITest
 public class ClassSheetIT

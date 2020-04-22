@@ -146,7 +146,7 @@
                 "ignore" : [
                   // Add more ignores below...
                   // Note: you can use regexes by using the syntax: { "regex": true, ... }
-                  // Don't forget to '\'-espace dots and other special characters in this case ;)
+                  // Don't forget to '\'-escape dots and other special characters in this case ;)
                   {
                     "code": "java.annotation.removed",
                     "old": "interface org.xwiki.xar.XarEntryTypeResolver",

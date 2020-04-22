@@ -22,10 +22,11 @@ package org.xwiki.rendering.macro.include;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceString;
 import org.xwiki.model.reference.PageReference;
+import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
 import org.xwiki.properties.annotation.PropertyDisplayType;
-import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
+import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.stability.Unstable;
 
@@ -79,15 +80,17 @@ public class IncludeMacroParameters
      */
     private boolean excludeFirstHeading;
     
-    
     /**
      * @param reference the reference of the resource to include
      * @since 3.4M1
      */
     @PropertyDescription("the reference of the resource to display")
-    @PropertyGroup("stringReference")
-    @PropertyFeature("reference")
     @PropertyDisplayType(EntityReferenceString.class)
+    // We're keeping the Group property even thugh we no longer display the Page property (see below) because
+    // otherwise we loose the reference picker. This is a current limitation since keeping this annotation also
+    // leads to having a visual grouping effect that we would prefer to not have,
+    // see https://jira.xwiki.org/browse/XWIKI-17238
+    @PropertyGroup("stringReference")
     public void setReference(String reference)
     {
         this.reference = reference;
@@ -103,49 +106,10 @@ public class IncludeMacroParameters
     }
 
     /**
-     * @return the type of the reference
-     * @since 3.4M1
-     */
-    @PropertyDescription("the type of the reference")
-    @PropertyGroup("stringReference")
-    public EntityType getType()
-    {
-        return this.type;
-    }
-
-    /**
-     * @param type the type of the reference
-     * @since 3.4M1
-     */
-    public void setType(EntityType type)
-    {
-        this.type = type;
-    }
-
-    /**
-     * @param context defines whether the included page is executed in its separated execution context or whether it's
-     *            executed in the context of the current page.
-     */
-    @PropertyDescription("defines whether the included page is executed in its separated execution context"
-        + " or whether it's executed in the context of the current page")
-    public void setContext(Context context)
-    {
-        this.context = context;
-    }
-
-    /**
-     * @return defines whether the included page is executed in its separated execution context or whether it's executed
-     *         in the context of the current page.
-     */
-    public Context getContext()
-    {
-        return this.context;
-    }
-
-    /**
      * @param sectionId see {@link #getSection()}
      */
-    @PropertyDescription("an optional id of a section to include in the specified document")
+    @PropertyDescription("an optional id of a section to include in the specified document, e.g. 'HMyHeading'")
+    @PropertyAdvanced
     public void setSection(String sectionId)
     {
         this.section = sectionId;
@@ -168,6 +132,7 @@ public class IncludeMacroParameters
     @Unstable
     @PropertyName("Exclude First Heading")
     @PropertyDescription("Exclude the first heading from the included document or section.")
+    @PropertyAdvanced
     public void setExcludeFirstHeading(boolean excludeFirstHeading)
     {
         this.excludeFirstHeading = excludeFirstHeading;
@@ -182,14 +147,64 @@ public class IncludeMacroParameters
     {
         return this.excludeFirstHeading;
     }
-    
+
+    /**
+     * @param context defines whether the included page is executed in its separated execution context or whether it's
+     *            executed in the context of the current page.
+     */
+    @PropertyDescription("defines whether the included page is executed in its separated execution context"
+        + " or whether it's executed in the context of the current page")
+    @PropertyAdvanced
+    // Hidden because this property is now deprecated since we introduced the Display macro and displaying it in the
+    // UI would just make it more confusing for users. However we're keeping the property so that we don't break
+    // backward compatibility when using the macro in wiki edit mode.
+    @PropertyHidden
+    public void setContext(Context context)
+    {
+        this.context = context;
+    }
+
+    /**
+     * @return defines whether the included page is executed in its separated execution context or whether it's executed
+     *         in the context of the current page.
+     */
+    public Context getContext()
+    {
+        return this.context;
+    }
+
+    /**
+     * @param type the type of the reference
+     * @since 3.4M1
+     */
+    @PropertyDescription("the type of the reference")
+    @PropertyGroup("stringReference")
+    @PropertyAdvanced
+    public void setType(EntityType type)
+    {
+        this.type = type;
+    }
+
+    /**
+     * @return the type of the reference
+     * @since 3.4M1
+     */
+    public EntityType getType()
+    {
+        return this.type;
+    }
+
     /**
      * @param page the reference of the page to include
      * @since 10.6RC1
      */
     @PropertyDescription("The reference of the page to include")
-    @PropertyFeature("reference")
     @PropertyDisplayType(PageReference.class)
+    // Hidden because we don't want to confuse our users by proposing two ways to enter the reference to include and
+    // ATM we don't have a picker for PageReference types and we do have a picker for EntityReference string one so
+    // we choose to keep the other one visible and hide this one. We're keeping the property so that we don't break
+    // backward compatibility when using the macro in wiki edit mode.
+    @PropertyHidden
     public void setPage(String page)
     {
         this.reference = page;

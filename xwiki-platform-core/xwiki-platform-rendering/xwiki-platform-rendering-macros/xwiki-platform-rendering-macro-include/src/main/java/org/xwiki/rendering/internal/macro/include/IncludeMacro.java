@@ -55,7 +55,6 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
-
 /**
  * @version $Id$
  * @since 1.5M2
@@ -206,21 +205,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             }
         }
         
-        // Exclude First Heading
-        if (parameters.isExcludeFirstHeading() && result.getChildren().size() > 0) {
-            Block firstBlock = result.getChildren().get(0);
-            if (firstBlock instanceof SectionBlock && firstBlock.getChildren().size() > 0) {
-                Block sectionFirstBlock = firstBlock.getChildren().get(0);
-                if (sectionFirstBlock instanceof HeaderBlock) {
-                    List<Block> contentWithoutheading = firstBlock.getChildren().subList(1,
-                            firstBlock.getChildren().size());
-                    // To remove section blocks we will replace the content with the contentWithoutheading.
-                    result.replaceChild(contentWithoutheading, firstBlock); // section block removed
-                }
-            }
-        }
-        
-        // Step 5: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
+        // Step 5: If the user has asked for it, remove both Section and Heading Blocks if the first included block is
+        // a Section block with a Heading block inside.
+        excludeFirstHeading(parameters, result);
+
+        // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());
         String source = this.defaultEntityReferenceSerializer.serialize(includedReference);
@@ -230,6 +219,19 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
 
         return Arrays.asList(metadata);
+    }
+
+    private void excludeFirstHeading(IncludeMacroParameters parameters, XDOM xdom)
+    {
+        if (parameters.isExcludeFirstHeading()) {
+            xdom.getChildren().stream().findFirst().filter(block -> block instanceof SectionBlock)
+                .ifPresent(sectionBlock -> {
+                    List<Block> sectionChildren = sectionBlock.getChildren();
+                    sectionChildren.stream().findFirst().filter(block -> block instanceof HeaderBlock)
+                        .ifPresent(headerBlock ->
+                            xdom.replaceChild(sectionChildren.subList(1, sectionChildren.size()), sectionBlock));
+                });
+        }
     }
 
     /**

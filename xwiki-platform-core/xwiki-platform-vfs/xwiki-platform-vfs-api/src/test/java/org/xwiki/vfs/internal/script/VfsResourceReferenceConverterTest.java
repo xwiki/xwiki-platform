@@ -63,7 +63,7 @@ public class VfsResourceReferenceConverterTest
     {
         String value = "attach:Toto.WebHome@testvfs.zip///logo xwiki.png";
         VfsResourceReference expectedReference =
-            new VfsResourceReference(URI.create(URLEncoder.encode(value, "UTF-8")));
+            new VfsResourceReference("attach:Toto.WebHome@testvfs.zip///logo xwiki.png");
         assertEquals(expectedReference, this.vfsResourceReferenceConverter.convertToType(null, value));
     }
 }

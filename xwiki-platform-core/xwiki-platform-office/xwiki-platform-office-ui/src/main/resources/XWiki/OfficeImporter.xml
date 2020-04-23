@@ -39,7 +39,7 @@
   <content>{{velocity}}
 #if ($isguest)
   {{error}}$services.localization.render('xe.officeimporter.notallowed'){{/error}}
-#elseif ("$!services.officemanager.serverState" != 'Connected')
+#elseif (!$services.officemanager.isConnected())
   #if ($hasAdmin)
     {{error}}$services.localization.render('xe.officeimporter.error.adminuser', ['[[', '&gt;&gt;http://extensions.xwiki.org/xwiki/bin/Extension/Office%20Importer%20Application]]']){{/error}}
   #else

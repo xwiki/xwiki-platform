@@ -20,9 +20,6 @@
 package org.xwiki.vfs.internal.script;
 
 import java.lang.reflect.Type;
-import java.net.URI;
-import java.net.URLEncoder;
-
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
@@ -57,7 +54,7 @@ public class VfsResourceReferenceConverter extends AbstractConverter<VfsResource
         VfsResourceReference reference;
 
         try {
-            reference = new VfsResourceReference(URI.create(URLEncoder.encode(value.toString(), "UTF-8")));
+            reference = new VfsResourceReference(value.toString());
         } catch (Exception e) {
             throw new ConversionException(
                 String.format("Failed to convert [%s] to a VFS Resource Reference", value), e);

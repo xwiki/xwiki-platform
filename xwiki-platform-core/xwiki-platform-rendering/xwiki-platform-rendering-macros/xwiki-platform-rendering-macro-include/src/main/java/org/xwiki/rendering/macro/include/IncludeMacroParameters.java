@@ -24,9 +24,10 @@ import org.xwiki.model.reference.EntityReferenceString;
 import org.xwiki.model.reference.PageReference;
 import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayHidden;
 import org.xwiki.properties.annotation.PropertyDisplayType;
+import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
-import org.xwiki.properties.annotation.PropertyHidden;
 import org.xwiki.properties.annotation.PropertyName;
 import org.xwiki.stability.Unstable;
 
@@ -86,10 +87,7 @@ public class IncludeMacroParameters
      */
     @PropertyDescription("the reference of the resource to display")
     @PropertyDisplayType(EntityReferenceString.class)
-    // We're keeping the Group property even thugh we no longer display the Page property (see below) because
-    // otherwise we loose the reference picker. This is a current limitation since keeping this annotation also
-    // leads to having a visual grouping effect that we would prefer to not have,
-    // see https://jira.xwiki.org/browse/XWIKI-17238
+    @PropertyFeature("reference")
     @PropertyGroup("stringReference")
     public void setReference(String reference)
     {
@@ -155,10 +153,8 @@ public class IncludeMacroParameters
     @PropertyDescription("defines whether the included page is executed in its separated execution context"
         + " or whether it's executed in the context of the current page")
     @PropertyAdvanced
-    // Hidden because this property is now deprecated since we introduced the Display macro and displaying it in the
-    // UI would just make it more confusing for users. However we're keeping the property so that we don't break
-    // backward compatibility when using the macro in wiki edit mode.
-    @PropertyHidden
+    // Marked deprecated since there's now a Display macro instead.
+    @Deprecated
     public void setContext(Context context)
     {
         this.context = context;
@@ -180,6 +176,8 @@ public class IncludeMacroParameters
     @PropertyDescription("the type of the reference")
     @PropertyGroup("stringReference")
     @PropertyAdvanced
+    // Marking it as Display Hidden because it's complex and we don't want to confuse our users.
+    @PropertyDisplayHidden
     public void setType(EntityType type)
     {
         this.type = type;
@@ -200,11 +198,12 @@ public class IncludeMacroParameters
      */
     @PropertyDescription("The reference of the page to include")
     @PropertyDisplayType(PageReference.class)
-    // Hidden because we don't want to confuse our users by proposing two ways to enter the reference to include and
-    // ATM we don't have a picker for PageReference types and we do have a picker for EntityReference string one so
-    // we choose to keep the other one visible and hide this one. We're keeping the property so that we don't break
-    // backward compatibility when using the macro in wiki edit mode.
-    @PropertyHidden
+    @PropertyFeature("reference")
+    // Display hidden because we don't want to confuse our users by proposing two ways to enter the reference to
+    // include and ATM we don't have a picker for PageReference types and we do have a picker for EntityReference string
+    // one so we choose to keep the other one visible and hide this one. We're keeping the property so that we don't
+    // break backward compatibility when using the macro in wiki edit mode.
+    @PropertyDisplayHidden
     public void setPage(String page)
     {
         this.reference = page;

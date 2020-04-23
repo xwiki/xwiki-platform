@@ -277,13 +277,20 @@ define('macroParameterTreeSorter', ['jquery'], function($) {
 
   /**
    * The following macro parameters should be hidden:
+   * - parameters marked as "display hidden" in the descriptor and not having any value set
    * - deprecated parameters that don't have a value set
    * - parameters that can be edited in-place (as long as they are not mandatory and without a value set)
    */
   maybeHideParameter = function(parameter, macroCall, hiddenMacroParameters) {
     // We can't hide mandatory parameters that don't have a value set.
-    parameter.hidden = isDeprecatedParameterUnset(parameter) || (hiddenMacroParameters.indexOf(parameter.id) >= 0 &&
-      !isMandatoryParameterEmpty(parameter));
+    parameter.hidden = isHiddenParameterAndNoValue(parameter) || isDeprecatedParameterUnset(parameter) ||
+        (hiddenMacroParameters.indexOf(parameter.id) >= 0 && !isMandatoryParameterEmpty(parameter));
+  },
+
+  isHiddenParameterAndNoValue = function(macroParameter) {
+    // Don't display parameters that are marked hidden in the macro descriptor, unless they have a value set in which
+    // case we need to display it so that the user can see it/modify it.
+    return macroParameter.hidden && macroParameter.value === undefined;
   },
 
   isDeprecatedParameterUnset = function(macroParameter) {

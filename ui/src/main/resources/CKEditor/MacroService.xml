@@ -176,6 +176,13 @@
     #set ($parameterDescriptor = $entry.value)
     ## Translate the parameter name and description.
     #set ($parameterTranslationKey = "${macroTranslationKey}.parameter.$parameterDescriptor.id")
+    ## Note: The displayHidden parameter is new in XWiki 12.4RC1 so make sure we set 'hidden' to false if it doesn't
+    ## exist
+    #if ("$!parameterDescriptor.displayHidden" != '')
+      #set ($parameterHidden = $parameterDescriptor.displayHidden)
+    #else
+      #set ($parameterHidden = false)
+    #end
     #set ($translatedParameterDescriptor = {
       'id': $parameterDescriptor.id,
       'name': "#maybeTranslate(""${parameterTranslationKey}.name"" $parameterDescriptor.name)",
@@ -185,6 +192,7 @@
       'advanced': $parameterDescriptor.advanced,
       'defaultValue': $parameterDescriptor.defaultValue,
       'type': $parameterDescriptor.displayType,
+      'hidden' : $parameterHidden,
       'index': $foreach.index
     })
     #if ("$!translatedParameterDescriptor.type" == '')

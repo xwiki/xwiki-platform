@@ -42,7 +42,7 @@ import static org.mockito.Mockito.when;
  * Tests of {@link ActionFilter}.
  *
  * @version $Id$
- * @since 12.3
+ * @since 12.4RC1
  */
 @ComponentTest
 public class ActionFilterTest

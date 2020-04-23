@@ -96,11 +96,10 @@ public class ActionFilter implements Filter
             Enumeration<String> parameterNames = hrequest.getParameterNames();
             while (parameterNames.hasMoreElements()) {
                 String parameter = parameterNames.nextElement();
-                /*
-                 * If some xactions are passed as parameter, the parameters prefixed with 'action_' are only taken
-                 * into account if they are part of the xaction list.
-                 * Otherwise, all the parameters prefixed with 'action_' are accepted.
-                 */
+                
+                // If some xactions are passed as parameter, the parameters prefixed with 'action_' are only taken into
+                // account if they are part of the xaction list. Otherwise, all the parameters prefixed with 'action_'
+                // are accepted.
                 String[] xactions = request.getParameterValues("xaction");
                 if (parameter.startsWith(ACTION_PREFIX) && (xactions == null || Stream.of(xactions)
                     .anyMatch(it -> Objects.equals(parameter, String.format("action_%s", it)))))

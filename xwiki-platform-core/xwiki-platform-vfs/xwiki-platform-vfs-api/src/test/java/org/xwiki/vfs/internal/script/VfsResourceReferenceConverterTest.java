@@ -17,59 +17,53 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.vfs.script;
+package org.xwiki.vfs.internal.script;
 
 import java.net.URI;
+import java.net.URLEncoder;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
-import org.xwiki.test.junit5.mockito.MockComponent;
-import org.xwiki.vfs.VfsException;
-import org.xwiki.vfs.VfsManager;
+import org.xwiki.url.ExtendedURL;
 import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.mockito.Mockito.*;
 
 /**
- * Unit tests for {@link VfsScriptService}.
+ * Tests for {@link VfsResourceReferenceConverter}.
  *
  * @version $Id$
- * @since 7.4M2
+ * @since 12.3
+ * @since 11.10.5
  */
 @ComponentTest
-public class VfsScriptServiceTest
+public class VfsResourceReferenceConverterTest
 {
     @InjectMockComponents
-    private VfsScriptService scriptService;
-
-    @MockComponent
-    private VfsManager manager;
+    private VfsResourceReferenceConverter vfsResourceReferenceConverter;
 
     @Test
-    public void url() throws Exception
+    public void convertWithNull()
     {
-        VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
-
-        when(manager.getURL(reference)).thenReturn("/generated/url");
-
-        assertEquals("/generated/url",
-            this.scriptService.url(
-                new VfsResourceReference(URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt")));
+        assertNull(this.vfsResourceReferenceConverter.convertToType(null, null));
     }
 
     @Test
-    public void urlError() throws Exception
+    public void convertWithString() throws Exception
     {
-        VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt");
+        String value = "attach:Toto.WebHome@testvfs.zip///test.doc";
+        VfsResourceReference expectedReference = new VfsResourceReference(URI.create(value));
+        assertEquals(expectedReference, this.vfsResourceReferenceConverter.convertToType(null, value));
+    }
 
-        when(manager.getURL(reference)).thenThrow(new VfsException("error"));
-
-        assertNull(this.scriptService.url(
-            new VfsResourceReference(URI.create("attach:xwiki:space.page@attachment"), "path1/path2/test.txt")));
+    @Test
+    public void convertWithSpecialString() throws Exception
+    {
+        String value = "attach:Toto.WebHome@testvfs.zip///logo xwiki.png";
+        VfsResourceReference expectedReference =
+            new VfsResourceReference(URI.create(URLEncoder.encode(value, "UTF-8")));
+        assertEquals(expectedReference, this.vfsResourceReferenceConverter.convertToType(null, value));
     }
 }

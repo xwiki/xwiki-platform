@@ -21,6 +21,7 @@ package org.xwiki.vfs.internal.script;
 
 import java.lang.reflect.Type;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
@@ -68,7 +69,8 @@ public class PathConverter extends AbstractConverter<Path>
         Path path;
 
         try {
-            VfsResourceReference reference = new VfsResourceReference(new URI(value.toString()));
+            VfsResourceReference reference =
+                new VfsResourceReference(new URI(URLEncoder.encode(value.toString(), "UTF-8")));
 
             // Verify that the user has the permission for the specified VFS scheme. We need to do this at this level
             // since it's possible to do the check in the driver itself since TrueVFS controls whether the driver is

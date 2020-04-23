@@ -22,7 +22,9 @@ package org.xwiki.rendering.macro.display;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceString;
 import org.xwiki.model.reference.PageReference;
+import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayHidden;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
@@ -78,6 +80,9 @@ public class DisplayMacroParameters
      */
     @PropertyDescription("the type of the reference")
     @PropertyGroup("stringReference")
+    @PropertyAdvanced
+    // Marking it as Display Hidden because it's complex and we don't want to confuse our users.
+    @PropertyDisplayHidden
     public EntityType getType()
     {
         return this.type;
@@ -95,7 +100,8 @@ public class DisplayMacroParameters
     /**
      * @param sectionId see {@link #getSection()}
      */
-    @PropertyDescription("an optional id of a section to include in the specified document")
+    @PropertyDescription("an optional id of a section to display in the specified document, e.g. 'HMyHeading'")
+    @PropertyAdvanced
     public void setSection(String sectionId)
     {
         this.section = sectionId;
@@ -117,6 +123,11 @@ public class DisplayMacroParameters
     @PropertyDescription("The reference of the page to display")
     @PropertyFeature("reference")
     @PropertyDisplayType(PageReference.class)
+    // Display hidden because we don't want to confuse our users by proposing two ways to enter the reference to
+    // display and ATM we don't have a picker for PageReference types and we do have a picker for EntityReference string
+    // one so we choose to keep the other one visible and hide this one. We're keeping the property so that we don't
+    // break backward compatibility when using the macro in wiki edit mode.
+    @PropertyDisplayHidden
     public void setPage(String page)
     {
         this.reference = page;

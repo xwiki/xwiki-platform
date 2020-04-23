@@ -157,19 +157,19 @@
                   {
                     "regex": true,
                     "code": "java\.annotation\..*",
-                    "old": "method .* org\.xwiki\.rendering\.macro\.include\.IncludeMacroParameters::.*",
-                    "new": "method .* org\.xwiki\.rendering\.macro\.include\.IncludeMacroParameters::.*",
+                    "old": "method .* org\.xwiki\.rendering\.macro\.(include|display)\.(Include|Display)MacroParameters::.*",
+                    "new": "method .* org\.xwiki\.rendering\.macro\.(include|display)\.(Include|Display)MacroParameters::.*",
                     "annotation": "@org\.xwiki\.properties\.annotation\.Property.*",
                     "justification": "Not a breakage. Annotation harmonized and moved to the setters or removed to prevent properties to be visible in the WYSIWYG macro dialog UI"
                   },
                   {
                     "code": "java.annotation.attributeValueChanged",
-                    "old": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setSection(java.lang.String)",
-                    "new": "method void org.xwiki.rendering.macro.include.IncludeMacroParameters::setSection(java.lang.String)",
+                    "old": "method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)",
                     "annotationType": "org.xwiki.properties.annotation.PropertyDescription",
                     "attribute": "value",
                     "oldValue": "\"an optional id of a section to include in the specified document\"",
-                    "newValue": "\"an optional id of a section to include in the specified document, e.g. 'HMyHeading'\"",
+                    "newValue": "\"an optional id of a section to (include|display) in the specified document, e.g. 'HMyHeading'\"",
                     "justification": "Not a breakage, just improved text description!"
                   }
                 ]

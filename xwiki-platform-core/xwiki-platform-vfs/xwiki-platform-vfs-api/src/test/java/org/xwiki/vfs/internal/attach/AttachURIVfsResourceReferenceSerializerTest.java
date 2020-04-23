@@ -37,27 +37,23 @@ import org.xwiki.url.URLNormalizer;
 import org.xwiki.vfs.VfsResourceReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 /**
- * Unit tests for {@link AttachVfsResourceReferenceSerializer}.
+ * Unit tests for {@link AttachURIVfsResourceReferenceSerializer}.
  *
  * @version $Id$
- * @since 7.4M2
+ * @since 12.3
  */
 @ComponentTest
-public class AttachVfsResourceReferenceSerializerTest
+public class AttachURIVfsResourceReferenceSerializerTest
 {
     @InjectMockComponents
-    private AttachVfsResourceReferenceSerializer vfsResourceReferenceSerializer;
+    private AttachURIVfsResourceReferenceSerializer vfsResourceReferenceSerializer;
 
     @MockComponent
     @Named("current")
     private AttachmentReferenceResolver<String> attachmentReferenceResolver;
-
-    @MockComponent
-    @Named("contextpath")
-    private URLNormalizer<ExtendedURL> urlNormalizer;
 
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -66,19 +62,16 @@ public class AttachVfsResourceReferenceSerializerTest
     public void serialize() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:attachment"), "path1/path2/test.txt");
+            URI.create("attach:xwiki:Toto.WebHome@testvfs.zip"), "path1/path2/test.txt");
 
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
-            "vfs", "attach:wiki:space.page@attachment", "path1", "path2", "test.txt"));
-        when(urlNormalizer.normalize(extendedURL)).thenReturn(extendedURL);
+        AttachmentReference attachmentReference = new AttachmentReference("testvfs.zip",
+            new DocumentReference("xwiki", Arrays.asList("Toto"), "WebHome"));
+        when(attachmentReferenceResolver.resolve("xwiki:Toto.WebHome@testvfs.zip")).thenReturn(attachmentReference);
 
-        AttachmentReference attachmentReference = new AttachmentReference("attachment",
-            new DocumentReference("wiki", Arrays.asList("space"), "page"));
-        when(attachmentReferenceResolver.resolve("attachment")).thenReturn(attachmentReference);
+        when(entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()))
+            .thenReturn("xwiki:Toto.WebHome");
 
-        when(entityReferenceSerializer.serialize(attachmentReference)).thenReturn("wiki:space.page@attachment");
-
-        assertEquals("/vfs/attach%3Awiki%3Aspace.page%40attachment/path1/path2/test.txt",
+        assertEquals("attach://xwiki:Toto.WebHome/testvfs.zip/path1/path2/test.txt",
             vfsResourceReferenceSerializer.serialize(reference).toString());
     }
 
@@ -86,19 +79,16 @@ public class AttachVfsResourceReferenceSerializerTest
     public void serializeWithSpace() throws Exception
     {
         VfsResourceReference reference = new VfsResourceReference(
-            URI.create("attach:attachment"), "path1/path2/xwiki logo.png");
+            URI.create("attach:xwiki:Toto.WebHome@testvfs.zip"), "path1/path2/xwiki logo.png");
 
-        ExtendedURL extendedURL = new ExtendedURL(Arrays.asList(
-            "vfs", "attach:wiki:space.page@attachment", "path1", "path2", "xwiki logo.png"));
-        when(urlNormalizer.normalize(extendedURL)).thenReturn(extendedURL);
+        AttachmentReference attachmentReference = new AttachmentReference("testvfs.zip",
+            new DocumentReference("xwiki", Arrays.asList("Toto"), "WebHome"));
+        when(attachmentReferenceResolver.resolve("xwiki:Toto.WebHome@testvfs.zip")).thenReturn(attachmentReference);
 
-        AttachmentReference attachmentReference = new AttachmentReference("attachment",
-            new DocumentReference("wiki", Arrays.asList("space"), "page"));
-        when(attachmentReferenceResolver.resolve("attachment")).thenReturn(attachmentReference);
+        when(entityReferenceSerializer.serialize(attachmentReference.getDocumentReference()))
+            .thenReturn("xwiki:Toto.WebHome");
 
-        when(entityReferenceSerializer.serialize(attachmentReference)).thenReturn("wiki:space.page@attachment");
-
-        assertEquals("/vfs/attach%3Awiki%3Aspace.page%40attachment/path1/path2/xwiki+logo.png",
+        assertEquals("attach://xwiki:Toto.WebHome/testvfs.zip/path1/path2/xwiki%20logo.png",
             vfsResourceReferenceSerializer.serialize(reference).toString());
     }
 }

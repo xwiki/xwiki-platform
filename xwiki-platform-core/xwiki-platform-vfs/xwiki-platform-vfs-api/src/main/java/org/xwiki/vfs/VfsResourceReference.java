@@ -19,7 +19,9 @@
  */
 package org.xwiki.vfs;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +53,8 @@ public class VfsResourceReference extends EntityResourceReference
     private static final String PARAMETER_CONTENTTYPE = "content-type";
 
     private static final String RESOURCE_PATH_SEPARATOR = "/";
+
+    private static final String DECODER_LOCALE = "UTF-8";
 
     private URI uri;
 
@@ -95,14 +99,35 @@ public class VfsResourceReference extends EntityResourceReference
 
     /**
      * @param fullURI the full opaque URI containing both the reference to the archive and the path to the entry inside
-     *        it, e.g. {@code attach:space.page@attachment/path/to/file}. Note that this constructor requires that any
-     *        "/" character inside the reference to the archive be URL-encoded
+     *        it, e.g. {@code attach:space.page@attachment/path/to/file}. Note that this constructor requires that the
+     *        full URL to be URL-encoded.
      */
     public VfsResourceReference(URI fullURI)
     {
         // Find the first "/" and consider that everything after is the path
-        this(URI.create(StringUtils.substringBefore(fullURI.toString(), RESOURCE_PATH_SEPARATOR)),
-            StringUtils.substringAfter(fullURI.toString(), RESOURCE_PATH_SEPARATOR));
+        this(retrieveRootURI(fullURI), retrievePathSegment(fullURI));
+    }
+
+    private static URI retrieveRootURI(URI fullURI)
+    {
+        try {
+            return URI.create(StringUtils.substringBefore(
+                URLDecoder.decode(fullURI.toString(), DECODER_LOCALE), RESOURCE_PATH_SEPARATOR));
+        } catch (UnsupportedEncodingException e) {
+            // should never happen
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static String retrievePathSegment(URI fullURI)
+    {
+        try {
+            return StringUtils.substringAfter(
+                URLDecoder.decode(fullURI.toString(), DECODER_LOCALE), RESOURCE_PATH_SEPARATOR);
+        } catch (UnsupportedEncodingException e) {
+            // should never happen
+            throw new RuntimeException(e);
+        }
     }
 
     /**

@@ -64,16 +64,20 @@ public class AttachURIVfsResourceReferenceSerializer implements ResourceReferenc
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
         AttachmentReference attachmentReference =
-            this.attachmentResolver.resolve(reference.getURI().getSchemeSpecificPart());
-        String scheme = reference.getURI().getScheme();
+            this.attachmentResolver.resolve(reference.getReference());
+        String scheme = reference.getScheme();
         String documentRefefenceString = this.documentSerializer.serialize(attachmentReference.getDocumentReference());
         try {
+            // TODO: this encode the attachment name, but apparently the created URI is not valid for TPath
+            // so for example an URI such as attach://xwiki:Toto.Toto2.WebHome/test%20vfs.zip is generated as expected
+            // but this is not recognized properly in NIOTool it seems.
+            String attachmentName = URIUtil.encodePath(attachmentReference.getName());
             String referencePath = URIUtil.encodePath(reference.getPath());
             return URI.create(String.format("%s://%s/%s/%s", scheme, documentRefefenceString,
-                attachmentReference.getName(), referencePath));
+                attachmentName, referencePath));
         } catch (URIException e) {
             throw new SerializeResourceReferenceException(
-                String.format("Error when encoding attachment name [%s]", attachmentReference.getName()), e);
+                String.format("Error when encoding resource reference [%s]", reference.toString()), e);
         }
     }
 }

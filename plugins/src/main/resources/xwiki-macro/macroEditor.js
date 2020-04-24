@@ -511,20 +511,33 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skin
     });
     var firstInputType = valueInputs.prop('type');
     var value = parameter.hasOwnProperty('value') ? parameter.value : parameter.defaultValue;
+    var matchesParameterValue = function() {
+      if (parameter.caseInsensitive) {
+        return $(this).val().toUpperCase() === value.toUpperCase();
+      } else {
+        return $(this).val() === value;
+      }
+    };
     if (firstInputType === 'checkbox' || firstInputType === 'radio') {
       // Keep only the input elements with the same type as the first one.
       valueInputs = valueInputs.filter(function() {
         return $(this).prop('type') === firstInputType;
       });
+      if (parameter.caseInsensitive) {
+        // Use the canonical value.
+        value = valueInputs.filter(matchesParameterValue).val() || value;
+      }
     } else {
       // Keep only the first input element.
       valueInputs = valueInputs.first();
       // For select inputs we should add the value to the list of options if it's missing.
       if (value && valueInputs.is('select')) {
-        var found = valueInputs.find('option').filter(function() {
-          return $(this).val() === value;
-        }).length > 0;
-        if (!found) {
+        var matchedOption = valueInputs.find('option').filter(matchesParameterValue);
+        if (matchedOption.length > 0) {
+          // Use the canonical value.
+          value = matchedOption.val();
+        } else {
+          // Add the missing option.
           $('<option/>').val(value).text(value).appendTo(valueInputs);
         }
       }

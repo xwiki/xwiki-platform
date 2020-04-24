@@ -199,6 +199,7 @@
       ## displayType is not available before XWiki 11.0 so we need to fall back on parameterType.
       #set ($translatedParameterDescriptor.type = $parameterDescriptor.parameterType)
     #end
+    #set ($translatedParameterDescriptor.caseInsensitive = $translatedParameterDescriptor.type.isEnum())
     #set ($groupDescriptor = $parameterDescriptor.groupDescriptor)
     #if ($groupDescriptor)
       #handleMacroParameterGroup($groupDescriptor $groupDescriptorTree $translatedParameterDescriptor)

@@ -140,7 +140,7 @@ ul.macro-parameters .arrow-right {
   margin-right: 4px;
 }
 
-.macro-parameter-group > .tab-content {
+.macro-parameter-group:not(.invisible) > .tab-content {
   border-bottom: 1px solid $theme.borderColor;
   border-left: 1px solid $theme.borderColor;
   border-right: 1px solid $theme.borderColor;
@@ -150,4 +150,13 @@ ul.macro-parameters .arrow-right {
 ul.macro-parameter-group-members {
   padding: 0;
   list-style: none;
+}
+
+.macro-parameter-group.invisible {
+  /* We want to see the group members but hide the tabs. */
+  visibility: visible;
+}
+
+.macro-parameter-group.invisible > ul[role="tablist"] {
+  display: none;
 }

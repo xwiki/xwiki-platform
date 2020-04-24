@@ -447,6 +447,7 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skin
   displayMultipleChoiceGroup = function(groupNode) {
     var output = $(macroParameterGroupTemplate).addClass('multiple-choice');
     fillNodeTab(groupNode, output.find('.macro-parameter-group-name'), output.find('.macro-parameter-group-members'));
+    toggleMacroParameterGroupVisibility(output);
     return output;
   },
 
@@ -483,7 +484,15 @@ define('macroParameterTreeDisplayer', ['jquery', 'l10n!macroEditor', 'xwiki-skin
     var activeTab = tabs.children().not('.hidden').first();
     var activeTabPanel = tabPanels.children().not('.hidden').first();
     activeTab.add(activeTabPanel).addClass('active');
+    toggleMacroParameterGroupVisibility(output);
     return output;
+  },
+
+  // Make the macro parameter grouping (tabs) invisible if there is only one visible tab and it contains a single item.
+  toggleMacroParameterGroupVisibility = function(group) {
+    var visibleTabs = group.find('ul[role="tablist"]').first().children().not('.hidden');
+    var firstVisibleTabPanel = group.find('.tab-content').first().children().not('.hidden').first();
+    group.toggleClass('invisible', visibleTabs.length < 2 && firstVisibleTabPanel.children().not('.hidden').length < 2);
   },
 
   macroParameterTemplate =

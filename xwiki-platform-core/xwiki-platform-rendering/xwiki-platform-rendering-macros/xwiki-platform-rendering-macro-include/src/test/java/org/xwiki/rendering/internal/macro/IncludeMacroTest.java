@@ -124,16 +124,16 @@ public class IncludeMacroTest
     @MockComponent
     private WikiModel wikiModel;
 
-    private IncludeMacro includeMacro;
-
-    private PrintRendererFactory rendererFactory;
-
     /**
      * Mocks the component that is used to resolve the 'reference' parameter.
      */
     @MockComponent
     @Named("macro")
     private EntityReferenceResolver<String> macroEntityReferenceResolver;
+
+    private IncludeMacro includeMacro;
+
+    private PrintRendererFactory rendererFactory;
 
     @BeforeEach
     public void setUp() throws Exception
@@ -157,7 +157,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacro() throws Exception
+    void execute() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -175,7 +175,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWithNewContextShowsVelocityMacrosAreIsolated() throws Exception
+    void executeWithNewContextShowsVelocityMacrosAreIsolated() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -198,7 +198,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWithNewContextShowsPassingOnRestrictedFlag() throws Exception
+    void executeWithNewContextShowsPassingOnRestrictedFlag() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -222,7 +222,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
+    void executeWithCurrentContextShowsVelocityMacrosAreShared() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -240,7 +240,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWithNoDocumentSpecified()
+    void executeWithNoDocumentSpecified()
     {
         IncludeMacroParameters parameters = new IncludeMacroParameters();
 
@@ -254,7 +254,7 @@ public class IncludeMacroTest
      * Verify that relative links returned by the Include macro as wrapped with a MetaDataBlock.
      */
     @Test
-    void executeIncludeMacroWhenIncludingDocumentWithRelativeReferences() throws Exception
+    void executeWhenIncludingDocumentWithRelativeReferences() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -293,7 +293,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWithRecursiveIncludeContextCurrent() throws Exception
+    void executeWithRecursiveIncludeContextCurrent() throws Exception
     {
         MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
         // Add an Include Macro MarkerBlock as a parent of the include Macro block since this is what would have
@@ -316,15 +316,12 @@ public class IncludeMacroTest
         assertTrue(exception.getMessage().startsWith("Found recursive inclusion"));
     }
 
-    private static class ExpectedRecursiveInclusionException extends RuntimeException
-    {
-    }
-
     @Test
-    void executeIncludeMacroWithRecursiveIncludeContextNew() throws Exception
+    void executeWithRecursiveIncludeContextNew() throws Exception
     {
+        // Other tests use the real DocumentDisplayer component implementation but for this test we mock it so that
+        // we can control how it behaves.
         DocumentDisplayer documentDisplayer = mock(DocumentDisplayer.class);
-
         this.includeMacro.setDocumentDisplayer(documentDisplayer);
 
         MacroTransformationContext macroContext = createMacroTransformationContext("wiki:space.page", false);
@@ -338,24 +335,23 @@ public class IncludeMacroTest
 
         when(documentDisplayer.display(same(this.includedDocument), any(DocumentDisplayerParameters.class))).thenAnswer(
             (Answer) invocation -> {
-                try {
-                    this.includeMacro.execute(parameters, null, macroContext);
-                } catch (Exception expected) {
-                    if (expected.getMessage().contains("Found recursive inclusion")) {
-                        throw new ExpectedRecursiveInclusionException();
-                    }
-                }
-                return true;
+                // Call again the include macro when the document displayer executes to simulate a recursive call.
+                // Verify that it raises a MacroExecutionException in this case.
+                Throwable exception = assertThrows(MacroExecutionException.class,
+                    () -> this.includeMacro.execute(parameters, null, macroContext));
+                assertEquals("Found recursive inclusion of document [wiki:space.page]", exception.getMessage());
+                throw exception;
             }
         );
 
+        // Verify that the exception bubbles up.
         Throwable exception = assertThrows(MacroExecutionException.class,
             () -> this.includeMacro.execute(parameters, null, macroContext));
-        assertTrue(exception.getCause() instanceof ExpectedRecursiveInclusionException);
+        assertEquals("Found recursive inclusion of document [wiki:space.page]", exception.getMessage());
     }
 
     @Test
-    void executeIncludeMacroInsideSourceMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
+    void executeInsideSourceMetaDataBlockAndWithRelativeDocumentReferencePassed() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -386,7 +382,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWhenSectionSpecified() throws Exception
+    void executeWhenSectionSpecified() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -415,7 +411,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWhenInvalidSectionSpecified() throws Exception
+    void executeWhenInvalidSectionSpecified() throws Exception
     {
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setReference("document");
@@ -433,7 +429,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWhenExcludeFirstHeadingTrueAndHeadingIsFirstBlock() throws Exception
+    void executeWhenExcludeFirstHeadingTrueAndHeadingIsFirstBlock() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -461,7 +457,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWhenExcludeFirstHeadingFalseAndHeadingIsFirstBlock() throws Exception
+    void executeWhenExcludeFirstHeadingFalseAndHeadingIsFirstBlock() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"
@@ -491,7 +487,7 @@ public class IncludeMacroTest
     }
 
     @Test
-    void executeIncludeMacroWhenExcludeFirstHeadingTrueAndHeadingIsNotFirstBlock() throws Exception
+    void executeWhenExcludeFirstHeadingTrueAndHeadingIsNotFirstBlock() throws Exception
     {
         // @formatter:off
         String expected = "beginDocument\n"

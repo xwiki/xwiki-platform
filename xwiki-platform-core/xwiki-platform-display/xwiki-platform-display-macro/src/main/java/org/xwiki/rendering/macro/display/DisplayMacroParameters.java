@@ -28,6 +28,8 @@ import org.xwiki.properties.annotation.PropertyDisplayHidden;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
+import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.display.DisplayMacro} Macro.
@@ -51,6 +53,11 @@ public class DisplayMacroParameters
      * @see #getSection()
      */
     private String section;
+
+    /**
+     * @see #isExcludeFirstHeading()
+     */
+    private boolean excludeFirstHeading;
 
     /**
      * @param reference the reference to display
@@ -114,6 +121,30 @@ public class DisplayMacroParameters
     public String getSection()
     {
         return this.section;
+    }
+
+    /**
+     * @param excludeFirstHeading {@code true} to remove the first heading found inside
+     *        the document or the section, {@code false} to keep it
+     * @since 12.4RC1
+     */
+    @Unstable
+    @PropertyName("Exclude First Heading")
+    @PropertyDescription("Exclude the first heading from the displayed document or section.")
+    @PropertyAdvanced
+    public void setExcludeFirstHeading(boolean excludeFirstHeading)
+    {
+        this.excludeFirstHeading = excludeFirstHeading;
+    }
+
+    /**
+     * @return whether to exclude the first heading from the displayed document or section, or not.
+     * @since 12.4RC1
+     */
+    @Unstable
+    public boolean isExcludeFirstHeading()
+    {
+        return this.excludeFirstHeading;
     }
 
     /**

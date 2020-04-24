@@ -20,6 +20,7 @@
 package org.xwiki.rendering.internal.macro.include;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
@@ -28,31 +29,21 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.display.internal.DocumentDisplayer;
 import org.xwiki.display.internal.DocumentDisplayerParameters;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
-import org.xwiki.model.reference.EntityReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.HeaderBlock;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
-import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
-import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 
 /**
@@ -63,50 +54,15 @@ import org.xwiki.security.authorization.Right;
 @Component
 @Named("include")
 @Singleton
-public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
+public class IncludeMacro extends AbstractIncludeMacro<IncludeMacroParameters>
 {
     /**
      * The description of the macro.
      */
     private static final String DESCRIPTION = "Include other pages into the current page.";
 
-    /**
-     * Used to access document content and check view access right.
-     */
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
-
-    @Inject
-    private ContextualAuthorizationManager authorization;
-
-    /**
-     * Used to transform the passed reference macro parameter into a complete {@link DocumentReference} one.
-     */
-    @Inject
-    @Named("macro")
-    private EntityReferenceResolver<String> macroEntityReferenceResolver;
-
-    /**
-     * Used to serialize resolved document links into a string again since the Rendering API only manipulates Strings
-     * (done voluntarily to be independent of any wiki engine and not draw XWiki-specific dependencies).
-     */
-    @Inject
-    private EntityReferenceSerializer<String> defaultEntityReferenceSerializer;
-
-    /**
-     * Used to display the content of the included document.
-     */
-    @Inject
-    @Named("configured")
-    private DocumentDisplayer documentDisplayer;
-
     @Inject
     private BeanManager beans;
-
-    /**
-     * A stack of all currently executing include macros with context=new for catching recursive inclusion.
-     */
-    private ThreadLocal<Stack<Object>> inclusionsBeingExecuted = new ThreadLocal<>();
 
     /**
      * Default constructor.
@@ -127,38 +83,23 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         return true;
     }
 
-    /**
-     * Allows overriding the Document Displayer used (useful for unit tests).
-     * 
-     * @param documentDisplayer the new Document Displayer to use
-     */
-    public void setDocumentDisplayer(DocumentDisplayer documentDisplayer)
-    {
-        this.documentDisplayer = documentDisplayer;
-    }
-
     @Override
     public List<Block> execute(IncludeMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         // Step 1: Perform checks.
-        if (parameters.getReference() == null) {
-            throw new MacroExecutionException(
-                "You must specify a 'reference' parameter pointing to the entity to include.");
-        }
-
-        EntityReference includedReference = resolve(context.getCurrentMacroBlock(), parameters);
-
-        checkRecursiveInclusion(context.getCurrentMacroBlock(), includedReference);
-
-        Context parametersContext = parameters.getContext();
+        EntityReference includedReference = resolve(context.getCurrentMacroBlock(), parameters.getReference(),
+            parameters.getType(), "include");
+        checkRecursion(context.getCurrentMacroBlock(), includedReference);
 
         // Step 2: Retrieve the included document.
         DocumentModelBridge documentBridge;
         try {
             documentBridge = this.documentAccessBridge.getDocumentInstance(includedReference);
         } catch (Exception e) {
-            throw new MacroExecutionException("Failed to load Document [" + includedReference + "]", e);
+            throw new MacroExecutionException(
+                "Failed to load Document [" + this.defaultEntityReferenceSerializer.serialize(includedReference) + "]",
+                e);
         }
 
         // Step 3: Check right
@@ -176,6 +117,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         //
         // if CONTEXT_CURRENT then display the content without performing any transformations (we don't want any Macro
         // to be executed at this stage since they should be executed by the currently running Macro Transformation.
+        Context parametersContext = parameters.getContext();
         DocumentDisplayerParameters displayParameters = new DocumentDisplayerParameters();
         displayParameters.setContentTransformed(parametersContext == Context.NEW);
         displayParameters.setExecutionContextIsolated(displayParameters.isContentTransformed());
@@ -185,11 +127,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         displayParameters.setTargetSyntax(context.getTransformationContext().getTargetSyntax());
         displayParameters.setContentTranslated(true);
 
-        Stack<Object> references = this.inclusionsBeingExecuted.get();
+        Stack<Object> references = this.macrosBeingExecuted.get();
         if (parametersContext == Context.NEW) {
             if (references == null) {
                 references = new Stack<>();
-                this.inclusionsBeingExecuted.set(references);
+                this.macrosBeingExecuted.set(references);
             }
             references.push(includedReference);
         }
@@ -207,7 +149,9 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         
         // Step 5: If the user has asked for it, remove both Section and Heading Blocks if the first included block is
         // a Section block with a Heading block inside.
-        excludeFirstHeading(parameters, result);
+        if (parameters.isExcludeFirstHeading()) {
+            excludeFirstHeading(result);
+        }
 
         // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
@@ -218,39 +162,22 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
             metadata.getMetaData().addMetaData(MetaData.BASE, source);
         }
 
-        return Arrays.asList(metadata);
-    }
-
-    private void excludeFirstHeading(IncludeMacroParameters parameters, XDOM xdom)
-    {
-        if (parameters.isExcludeFirstHeading()) {
-            xdom.getChildren().stream().findFirst().filter(block -> block instanceof SectionBlock)
-                .ifPresent(sectionBlock -> {
-                    List<Block> sectionChildren = sectionBlock.getChildren();
-                    sectionChildren.stream().findFirst().filter(block -> block instanceof HeaderBlock)
-                        .ifPresent(headerBlock ->
-                            xdom.replaceChild(sectionChildren.subList(1, sectionChildren.size()), sectionBlock));
-                });
-        }
+        return Collections.singletonList(metadata);
     }
 
     /**
      * Protect form recursive inclusion.
      * 
-     * @param currrentBlock the child block to check
+     * @param currentBlock the child block to check
      * @param reference the reference of the document being included
      * @throws MacroExecutionException recursive inclusion has been found
      */
-    private void checkRecursiveInclusion(Block currrentBlock, EntityReference reference) throws MacroExecutionException
+    protected void checkRecursion(Block currentBlock, EntityReference reference) throws MacroExecutionException
     {
-        // Check for parent context=new macros
-        Stack<Object> references = this.inclusionsBeingExecuted.get();
-        if (references != null && references.contains(reference)) {
-            throw new MacroExecutionException("Found recursive inclusion of document [" + reference + "]");
-        }
+        super.checkRecursion(reference, "inclusion");
 
         // Check for parent context=current macros
-        Block parentBlock = currrentBlock.getParent();
+        Block parentBlock = currentBlock.getParent();
 
         if (parentBlock != null) {
             if (parentBlock instanceof MacroMarkerBlock) {
@@ -261,7 +188,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 }
             }
 
-            checkRecursiveInclusion(parentBlock, reference);
+            checkRecursion(parentBlock, reference);
         }
     }
 
@@ -296,17 +223,5 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
 
         return parameters;
-    }
-
-    private EntityReference resolve(MacroBlock block, IncludeMacroParameters parameters) throws MacroExecutionException
-    {
-        String reference = parameters.getReference();
-
-        if (reference == null) {
-            throw new MacroExecutionException(
-                "You must specify a 'reference' parameter pointing to the entity to include.");
-        }
-
-        return this.macroEntityReferenceResolver.resolve(reference, parameters.getType(), block);
     }
 }

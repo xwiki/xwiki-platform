@@ -307,17 +307,18 @@
     &lt;input type="hidden" name="$escapetool.xml($translatedParameterDescriptor.id)" value="false"/&gt;
   #elseif ($translatedParameterDescriptor.type.isEnum())
     #if ($translatedParameterDescriptor.defaultValue)
-      #set ($parameterValues = $translatedParameterDescriptor.defaultValue.values())
+      #set ($enumValues = $translatedParameterDescriptor.defaultValue.values())
     #else
       ## A parameter of type enum that doesn't have a default value is very unlikely. We attempt to read the list of
       ## possible values from the enum type in this case, which is currently forbidden, but at least it will generate
       ## a warning in the logs that will help us investigate the problem.
-      #set ($parameterValues = $translatedParameterDescriptor.type.getEnumConstants())
+      #set ($enumValues = $translatedParameterDescriptor.type.getEnumConstants())
     #end
     &lt;select name="$escapetool.xml($translatedParameterDescriptor.id)"&gt;##
-      #foreach ($parameterValue in $parameterValues)
-        #set ($label = "#maybeTranslate(""${parameterTranslationKey}.value.$parameterValue"" $parameterValue)")
-        &lt;option value="$escapetool.xml($parameterValue)"&gt;$escapetool.xml($label)&lt;/option&gt;##
+      #foreach ($enumValue in $enumValues)
+        #set ($value = $enumValue.name())
+        #set ($label = "#maybeTranslate(""${parameterTranslationKey}.value.$value"" $enumValue)")
+        &lt;option value="$escapetool.xml($value)"&gt;$escapetool.xml($label)&lt;/option&gt;##
       #end
     &lt;/select&gt;
   #else

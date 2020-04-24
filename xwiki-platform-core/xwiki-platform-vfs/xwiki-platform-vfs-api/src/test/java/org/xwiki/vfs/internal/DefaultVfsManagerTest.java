@@ -76,7 +76,7 @@ public class DefaultVfsManagerTest
             this.mocker.getComponentUnderTest().getURL(reference);
             fail("Should have thrown an exception");
         } catch (VfsException expected) {
-            assertEquals("Failed to compute URL for [uri = [attach:xwiki:space.page@attachment], "
+            assertEquals("Failed to compute URL for [scheme = [attach], reference = [xwiki:space.page@attachment], "
                 + "path = [path1/path2/test.txt], parameters = []]", expected.getMessage());
         }
     }

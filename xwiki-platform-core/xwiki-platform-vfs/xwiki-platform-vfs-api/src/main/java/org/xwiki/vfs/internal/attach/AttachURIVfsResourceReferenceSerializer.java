@@ -25,6 +25,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.AttachmentReference;
 import org.xwiki.model.reference.AttachmentReferenceResolver;
@@ -62,11 +64,17 @@ public class AttachURIVfsResourceReferenceSerializer implements ResourceReferenc
         throws SerializeResourceReferenceException, UnsupportedResourceReferenceException
     {
         AttachmentReference attachmentReference =
-            this.attachmentResolver.resolve(reference.getURI().getSchemeSpecificPart());
-        String scheme = reference.getURI().getScheme();
+            this.attachmentResolver.resolve(reference.getReference());
+        String scheme = reference.getScheme();
         String documentRefefenceString = this.documentSerializer.serialize(attachmentReference.getDocumentReference());
-
-        return URI.create(String.format("%s://%s/%s/%s", scheme, documentRefefenceString, attachmentReference.getName(),
-            reference.getPath()));
+        try {
+            String attachmentName = URIUtil.encodePath(attachmentReference.getName());
+            String referencePath = URIUtil.encodePath(reference.getPath());
+            return URI.create(String.format("%s://%s/%s/%s", scheme, documentRefefenceString,
+                attachmentName, referencePath));
+        } catch (URIException e) {
+            throw new SerializeResourceReferenceException(
+                String.format("Error when encoding resource reference [%s]", reference.toString()), e);
+        }
     }
 }

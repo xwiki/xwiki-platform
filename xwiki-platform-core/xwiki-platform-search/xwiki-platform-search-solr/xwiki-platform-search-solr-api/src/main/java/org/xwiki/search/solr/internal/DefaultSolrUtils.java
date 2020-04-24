@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
@@ -348,12 +349,15 @@ public class DefaultSolrUtils implements SolrUtils
             return null;
         }
 
+        String str;
         if (CLASS_SUFFIX_MAPPING.containsKey(fieldValue.getClass())) {
-            // TODO: this is not the right implementation (won't work for dates for example)
-            return fieldValue.toString();
+            // TODO: this is not the right implementation for date and arrays
+            str = fieldValue.toString();
         }
 
-        return this.converter.convert(String.class, fieldValue);
+        str = this.converter.convert(String.class, fieldValue);
+
+        return ClientUtils.escapeQueryChars(str);
     }
 
     @Override

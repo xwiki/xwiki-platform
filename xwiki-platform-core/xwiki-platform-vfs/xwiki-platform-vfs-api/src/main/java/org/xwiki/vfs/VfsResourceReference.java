@@ -52,13 +52,21 @@ public class VfsResourceReference extends EntityResourceReference
 
     private static final String RESOURCE_PATH_SEPARATOR = "/";
 
+    private static final String SCHEME_SEPARATOR = ":";
+
+    private static final WikiReference XWIKI_REFERENCE = new WikiReference("xwiki");
+
+    private String reference;
+
+    private String scheme;
+
     private URI uri;
 
     private List<String> pathSegments;
 
     /**
      * Create a new reference by copying the passed one.
-     * 
+     *
      * @param reference the reference to copy
      * @since 12.3RC1
      */
@@ -70,22 +78,24 @@ public class VfsResourceReference extends EntityResourceReference
 
     /**
      * @param uri the URI pointing to the archive (without the path inside the archive),
-     *       e.g. {@code attach:space.page@attachment}
+     * e.g. {@code attach:space.page@attachment}
      * @param pathSegments see {@link #getPathSegments()}
      */
     public VfsResourceReference(URI uri, List<String> pathSegments)
     {
         // FIXME: we don't know the wiki of the resource yet, putting main one
-        super(new WikiReference("xwiki"), EntityResourceAction.fromString(""));
+        super(XWIKI_REFERENCE, EntityResourceAction.fromString(""));
 
         setType(TYPE);
         this.uri = uri;
+        this.reference = this.uri.getSchemeSpecificPart();
+        this.scheme = uri.getScheme();
         this.pathSegments = new ArrayList<>(pathSegments);
     }
 
     /**
      * @param uri the URI pointing to the archive (without the path inside the archive),
-     *       e.g. {@code attach:space.page@attachment}
+     * e.g. {@code attach:space.page@attachment}
      * @param pathSegments see {@link #getPathSegments()}, specified as "/"-separated string (e.g. "path/to/file")
      */
     public VfsResourceReference(URI uri, String pathSegments)
@@ -95,22 +105,78 @@ public class VfsResourceReference extends EntityResourceReference
 
     /**
      * @param fullURI the full opaque URI containing both the reference to the archive and the path to the entry inside
-     *        it, e.g. {@code attach:space.page@attachment/path/to/file}. Note that this constructor requires that any
-     *        "/" character inside the reference to the archive be URL-encoded
+     * it, e.g. {@code attach:space.page@attachment/path/to/file}. Note that this constructor requires that the
+     * full URL to be URL-encoded.
+     * @deprecated Since 12.4RC1, this constructor shouldn't be used anymore, in particular not for internal
+     * references such as {@code attach:space.page@attachment/path/to/file}, {@link #VfsResourceReference(String)}
+     * should be used instead
      */
+    @Deprecated
     public VfsResourceReference(URI fullURI)
     {
         // Find the first "/" and consider that everything after is the path
-        this(URI.create(StringUtils.substringBefore(fullURI.toString(), RESOURCE_PATH_SEPARATOR)),
-            StringUtils.substringAfter(fullURI.toString(), RESOURCE_PATH_SEPARATOR));
+        this(URI.create(retrieveRootReference(fullURI.toString())), retrievePathSegment(fullURI.toString()));
+    }
+
+    /**
+     * @param fullReference the full opaque reference containing both the reference to the archive and the path to the
+     * entry inside it, e.g. {@code attach:space.page@attachment/path/to/file}.
+     * @since 12.4RC1
+     */
+    @Unstable
+    public VfsResourceReference(String fullReference)
+    {
+        super(XWIKI_REFERENCE, EntityResourceAction.fromString(""));
+
+        setType(TYPE);
+        String referenceWithScheme = retrieveRootReference(fullReference);
+        this.scheme = StringUtils.substringBefore(referenceWithScheme, SCHEME_SEPARATOR);
+        this.reference = StringUtils.substringAfter(referenceWithScheme, SCHEME_SEPARATOR);
+        this.pathSegments = Arrays.asList(
+            StringUtils.split(retrievePathSegment(fullReference), RESOURCE_PATH_SEPARATOR));
+    }
+
+    private static String retrieveRootReference(String fullReference)
+    {
+        return StringUtils.substringBefore(fullReference, RESOURCE_PATH_SEPARATOR);
+    }
+
+    private static String retrievePathSegment(String fullReference)
+    {
+        return StringUtils.substringAfter(fullReference, RESOURCE_PATH_SEPARATOR);
     }
 
     /**
      * @return the URI to the VFS (e.g. {@code attach:space.page@file.zip}, {@code http://server/path/to/zip})
+     * @deprecated Since 12.4RC1 this method shouldn't be used anymore, in favor of {@link #getReference}.
      */
+    @Deprecated
     public URI getURI()
     {
+        if (this.uri == null) {
+            this.uri = URI.create(String.format("%s:%s", getScheme(), getReference()));
+        }
         return this.uri;
+    }
+
+    /**
+     * @return the actual reference to the VFS (e.g. {@code attach:space.page@file.zip}).
+     * @since 12.4RC1
+     */
+    @Unstable
+    public String getReference()
+    {
+        return this.reference;
+    }
+
+    /**
+     * @return the scheme of this reference (e.g. {@code attach}).
+     * @since 12.4RC1
+     */
+    @Unstable
+    public String getScheme()
+    {
+        return this.scheme;
     }
 
     /**
@@ -134,7 +200,8 @@ public class VfsResourceReference extends EntityResourceReference
     public int hashCode()
     {
         return new HashCodeBuilder(7, 7)
-            .append(getURI())
+            .append(getScheme())
+            .append(getReference())
             .append(getPathSegments())
             .append(getType())
             .append(getParameters())
@@ -155,7 +222,8 @@ public class VfsResourceReference extends EntityResourceReference
         }
         VfsResourceReference rhs = (VfsResourceReference) object;
         return new EqualsBuilder()
-            .append(getURI(), rhs.getURI())
+            .append(getScheme(), rhs.getScheme())
+            .append(getReference(), rhs.getReference())
             .append(getPathSegments(), rhs.getPathSegments())
             .append(getType(), rhs.getType())
             .append(getParameters(), rhs.getParameters())
@@ -166,7 +234,8 @@ public class VfsResourceReference extends EntityResourceReference
     public String toString()
     {
         ToStringBuilder builder = new XWikiToStringBuilder(this);
-        builder.append("uri", getURI());
+        builder.append("scheme", getScheme());
+        builder.append("reference", getReference());
         builder.append("path", getPath());
         builder.append("parameters", getParameters());
         return builder.toString();
@@ -177,7 +246,7 @@ public class VfsResourceReference extends EntityResourceReference
      */
     public URI toURI()
     {
-        return URI.create(String.format("%s/%s", getURI().toString(), getPath()));
+        return URI.create(String.format("%s:%s/%s", getScheme(), getReference(), getPath()));
     }
 
     /**

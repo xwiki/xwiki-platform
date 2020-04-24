@@ -35,8 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * Tests for {@link VfsResourceReferenceConverter}.
  *
  * @version $Id$
- * @since 12.3
- * @since 11.10.5
+ * @since 12.4RC1
  */
 @ComponentTest
 public class VfsResourceReferenceConverterTest

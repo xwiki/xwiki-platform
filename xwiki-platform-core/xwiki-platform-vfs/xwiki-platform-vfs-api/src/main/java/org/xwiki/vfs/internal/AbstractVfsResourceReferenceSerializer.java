@@ -69,10 +69,10 @@ public abstract class AbstractVfsResourceReferenceSerializer
     }
 
     /**
-     * Converts the passed URI into a URI containing an absolute reference to the VFS.
+     * Get an absolute reference to the VFS from the resource reference.
      *
-     * @param resourceReference the URI containing a relative reference to the VFS
-     * @return a URI with an absolute reference to the VFS
+     * @param resourceReference the reference to the VFS
+     * @return a String with an absolute reference to the VFS
      */
     protected abstract String getAbsoluteReference(VfsResourceReference resourceReference);
 }

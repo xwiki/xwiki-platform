@@ -39,6 +39,7 @@ public class VfsResourceReferenceTest
     {
         VfsResourceReference reference = new VfsResourceReference(
             URI.create("attach:Sandbox.WebHome@my.zip/path/to/file"));
+        assertEquals("attach:Sandbox.WebHome@my.zip", reference.getURI().toString());
         assertEquals("Sandbox.WebHome@my.zip", reference.getReference());
         assertEquals("attach", reference.getScheme());
         assertEquals("path/to/file", reference.getPath());
@@ -47,6 +48,7 @@ public class VfsResourceReferenceTest
         assertEquals("Sandbox.WebHome@my.zip", reference.getReference());
         assertEquals("attach", reference.getScheme());
         assertEquals("path/to/file", reference.getPath());
+        assertEquals("attach:Sandbox.WebHome@my.zip", reference.getURI().toString());
     }
 
     @Test

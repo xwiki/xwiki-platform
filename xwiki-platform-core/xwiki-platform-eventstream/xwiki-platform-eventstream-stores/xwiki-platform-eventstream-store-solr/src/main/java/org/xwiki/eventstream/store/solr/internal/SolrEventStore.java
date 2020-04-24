@@ -20,8 +20,11 @@
 package org.xwiki.eventstream.store.solr.internal;
 
 import java.net.URL;
+import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -29,10 +32,9 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.eventstream.EqualEventQuery;
-import org.xwiki.eventstream.EqualEventQuery.EqualQueryCondition;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventQuery;
@@ -40,6 +42,9 @@ import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.PageableEventQuery;
+import org.xwiki.eventstream.SimpleEventQuery;
+import org.xwiki.eventstream.SimpleEventQuery.EqualQueryCondition;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.StreamEventSearchResult;
 import org.xwiki.model.reference.DocumentReference;
@@ -54,8 +59,11 @@ import org.xwiki.search.solr.SolrUtils;
  * Solr based implementation of {@link EventStore}.
  * 
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.4RC1
  */
+@Component
+@Singleton
+@Named("solr")
 public class SolrEventStore implements EventStore, Initializable
 {
     @Inject
@@ -97,24 +105,25 @@ public class SolrEventStore implements EventStore, Initializable
         SolrInputDocument document = new SolrInputDocument();
 
         this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_APPLICATION, event.getApplication(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_BODY, event.getBody(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_DATE, event.getDate(), document);
-        this.utils.setString(EventsSolrCoreInitializer.SOLR_FIELD_DOCUMENT, event.getDocument(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_DOCUMENTTITLE, event.getDocumentTitle(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_DOCUMENTVERSION, event.getDocumentVersion(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_GROUPID, event.getGroupId(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_HIDDEN, event.getHidden(), document);
-        this.utils.setString(EventsSolrCoreInitializer.SOLR_FIELD_IMPORTANCE, event.getImportance(), document);
-        this.utils.setString(EventsSolrCoreInitializer.SOLR_FIELD_RELATEDENTITY, event.getRelatedEntity(), document);
-        this.utils.setString(EventsSolrCoreInitializer.SOLR_FIELD_SPACE, event.getSpace(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_STREAM, event.getStream(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_TARGET, event.getTarget(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_TITLE, event.getTitle(), document);
-        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_TYPE, event.getType(), document);
-        this.utils.setString(EventsSolrCoreInitializer.SOLR_FIELD_URL, event.getUrl(), document);
-        this.utils.setString(EventsSolrCoreInitializer.SOLR_FIELD_USER, event.getUser(), document);
-        this.utils.setString(EventsSolrCoreInitializer.SOLR_FIELD_WIKI, event.getWiki(), document);
+
+        this.utils.set(Event.FIELD_APPLICATION, event.getApplication(), document);
+        this.utils.set(Event.FIELD_BODY, event.getBody(), document);
+        this.utils.set(Event.FIELD_DATE, event.getDate(), document);
+        this.utils.setString(Event.FIELD_DOCUMENT, event.getDocument(), document);
+        this.utils.set(Event.FIELD_DOCUMENTTITLE, event.getDocumentTitle(), document);
+        this.utils.set(Event.FIELD_DOCUMENTVERSION, event.getDocumentVersion(), document);
+        this.utils.set(Event.FIELD_GROUPID, event.getGroupId(), document);
+        this.utils.set(Event.FIELD_HIDDEN, event.getHidden(), document);
+        this.utils.setString(Event.FIELD_IMPORTANCE, event.getImportance(), document);
+        this.utils.setString(Event.FIELD_RELATEDENTITY, event.getRelatedEntity(), document);
+        this.utils.setString(Event.FIELD_SPACE, event.getSpace(), document);
+        this.utils.set(Event.FIELD_STREAM, event.getStream(), document);
+        this.utils.set(Event.FIELD_TARGET, event.getTarget(), document);
+        this.utils.set(Event.FIELD_TITLE, event.getTitle(), document);
+        this.utils.set(Event.FIELD_TYPE, event.getType(), document);
+        this.utils.setString(Event.FIELD_URL, event.getUrl(), document);
+        this.utils.setString(Event.FIELD_USER, event.getUser(), document);
+        this.utils.setString(Event.FIELD_WIKI, event.getWiki(), document);
 
         this.utils.setMap(EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, event.getParameters(), document);
 
@@ -122,9 +131,9 @@ public class SolrEventStore implements EventStore, Initializable
     }
 
     @Override
-    public Event deleteEvent(String eventId) throws EventStreamException
+    public Optional<Event> deleteEvent(String eventId) throws EventStreamException
     {
-        Event event = getEvent(eventId);
+        Optional<Event> event = getEvent(eventId);
 
         deleteById(eventId);
 
@@ -160,7 +169,7 @@ public class SolrEventStore implements EventStore, Initializable
     }
 
     @Override
-    public Event getEvent(String eventId) throws EventStreamException
+    public Optional<Event> getEvent(String eventId) throws EventStreamException
     {
         SolrDocument document;
         try {
@@ -169,7 +178,7 @@ public class SolrEventStore implements EventStore, Initializable
             throw new EventStreamException("Failed to get Solr document with id [" + eventId + "]", e);
         }
 
-        return toEvent(document);
+        return Optional.ofNullable(toEvent(document));
     }
 
     private Event toEvent(SolrDocument document)
@@ -182,27 +191,24 @@ public class SolrEventStore implements EventStore, Initializable
 
         event.setId(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_ID, document));
 
-        event.setApplication(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_APPLICATION, document));
-        event.setBody(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_BODY, document));
-        event.setDate(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_DATE, document));
-        event.setDocument(
-            this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_DOCUMENT, document, DocumentReference.class));
-        event.setDocumentTitle(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_DOCUMENTTITLE, document));
-        event.setDocumentVersion(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_DOCUMENTVERSION, document));
-        event.setGroupId(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_GROUPID, document));
-        event.setHidden(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_HIDDEN, document));
-        event
-            .setImportance(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_IMPORTANCE, document, Importance.class));
-        event.setRelatedEntity(
-            this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_RELATEDENTITY, document, EntityReference.class));
-        event.setSpace(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_SPACE, document, SpaceReference.class));
-        event.setStream(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_STREAM, document));
-        event.setTarget(this.utils.getSet(EventsSolrCoreInitializer.SOLR_FIELD_TARGET, document));
-        event.setTitle(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_TITLE, document));
-        event.setType(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_TYPE, document));
-        event.setUrl(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_URL, document, URL.class));
-        event.setUser(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_USER, document, DocumentReference.class));
-        event.setWiki(this.utils.get(EventsSolrCoreInitializer.SOLR_FIELD_WIKI, document, WikiReference.class));
+        event.setApplication(this.utils.get(Event.FIELD_APPLICATION, document));
+        event.setBody(this.utils.get(Event.FIELD_BODY, document));
+        event.setDate(this.utils.get(Event.FIELD_DATE, document));
+        event.setDocument(this.utils.get(Event.FIELD_DOCUMENT, document, DocumentReference.class));
+        event.setDocumentTitle(this.utils.get(Event.FIELD_DOCUMENTTITLE, document));
+        event.setDocumentVersion(this.utils.get(Event.FIELD_DOCUMENTVERSION, document));
+        event.setGroupId(this.utils.get(Event.FIELD_GROUPID, document));
+        event.setHidden(this.utils.get(Event.FIELD_HIDDEN, document));
+        event.setImportance(this.utils.get(Event.FIELD_IMPORTANCE, document, Importance.class));
+        event.setRelatedEntity(this.utils.get(Event.FIELD_RELATEDENTITY, document, EntityReference.class));
+        event.setSpace(this.utils.get(Event.FIELD_SPACE, document, SpaceReference.class));
+        event.setStream(this.utils.get(Event.FIELD_STREAM, document));
+        event.setTarget(this.utils.getSet(Event.FIELD_TARGET, document));
+        event.setTitle(this.utils.get(Event.FIELD_TITLE, document));
+        event.setType(this.utils.get(Event.FIELD_TYPE, document));
+        event.setUrl(this.utils.get(Event.FIELD_URL, document, URL.class));
+        event.setUser(this.utils.get(Event.FIELD_USER, document, DocumentReference.class));
+        event.setWiki(this.utils.get(Event.FIELD_WIKI, document, WikiReference.class));
 
         event.setParameters(this.utils.getMap(EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, document));
 
@@ -224,47 +230,44 @@ public class SolrEventStore implements EventStore, Initializable
     }
 
     @Override
-    public EventStatus getEventStatus(String eventId, String entity) throws EventStreamException
+    public Optional<EventStatus> getEventStatus(String eventId, String entity) throws EventStreamException
     {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public EventSearchResult search(EventQuery query) throws EventStreamException
     {
-        if (query instanceof EqualEventQuery) {
-            return search((EqualEventQuery) query);
-        } else {
-            throw new EventStreamException("Unsupported query [" + query + "]");
-        }
-    }
-
-    private EventSearchResult search(EqualEventQuery query) throws EventStreamException
-    {
         SolrQuery solrQuery = new SolrQuery();
 
-        if (query.getOffset() > 0) {
-            solrQuery.setStart((int) query.getOffset());
-        }
+        if (query instanceof PageableEventQuery) {
+            PageableEventQuery pageableQuery = (PageableEventQuery) query;
 
-        if (query.getLimit() > 0) {
-            solrQuery.setRows((int) query.getLimit());            
-        }
+            if (pageableQuery.getOffset() > 0) {
+                solrQuery.setStart((int) pageableQuery.getOffset());
+            }
 
-        for (EqualQueryCondition condition : query.getConditions()) {
-            StringBuilder builder = new StringBuilder();
+            if (pageableQuery.getLimit() > 0) {
+                solrQuery.setRows((int) pageableQuery.getLimit());
+            }
 
-            if (EventsSolrCoreInitializer.KNOWN_FIELDS.contains(condition.getProperty())) {
-                builder.append(condition.getProperty());
+            if (pageableQuery instanceof SimpleEventQuery) {
+                for (EqualQueryCondition condition : ((SimpleEventQuery) pageableQuery).getConditions()) {
+                    StringBuilder builder = new StringBuilder();
 
-                builder.append(':');
+                    if (EventsSolrCoreInitializer.KNOWN_FIELDS.contains(condition.getProperty())) {
+                        builder.append(condition.getProperty());
 
-                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                        builder.append(':');
 
-                solrQuery.addFilterQuery(builder.toString());
-            } else {
-                // TODO: add support for custom properties
+                        builder.append(this.utils.toFilterQueryString(condition.getValue()));
+
+                        solrQuery.addFilterQuery(builder.toString());
+                    } else {
+                        // TODO: add support for custom properties
+                    }
+                }
             }
         }
 

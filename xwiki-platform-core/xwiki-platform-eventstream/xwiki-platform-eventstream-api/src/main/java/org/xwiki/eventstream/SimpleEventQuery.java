@@ -28,10 +28,10 @@ import org.xwiki.stability.Unstable;
  * A very basic implementation of {@link EventQuery}.
  * 
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.4RC1
  */
 @Unstable
-public class EqualEventQuery implements EventQuery
+public class SimpleEventQuery implements PageableEventQuery
 {
     /**
      * An equal condition.
@@ -80,7 +80,7 @@ public class EqualEventQuery implements EventQuery
     /**
      * An empty query.
      */
-    public EqualEventQuery()
+    public SimpleEventQuery()
     {
     }
 
@@ -88,7 +88,7 @@ public class EqualEventQuery implements EventQuery
      * @param property the name of the property
      * @param value the value the property should be equal to
      */
-    public EqualEventQuery(String property, Object value)
+    public SimpleEventQuery(String property, Object value)
     {
         eq(property, value);
     }
@@ -99,10 +99,20 @@ public class EqualEventQuery implements EventQuery
      * @param offset the maximum number of events to return
      * @param limit the maximum number of events to return
      */
-    public EqualEventQuery(String property, Object value, long offset, long limit)
+    public SimpleEventQuery(String property, Object value, long offset, long limit)
     {
-        eq(property, value);
+        this(property, value);
 
+        setOffset(offset);
+        setLimit(limit);
+    }
+
+    /**
+     * @param offset the maximum number of events to return
+     * @param limit the maximum number of events to return
+     */
+    public SimpleEventQuery(long offset, long limit)
+    {
         setOffset(offset);
         setLimit(limit);
     }
@@ -111,6 +121,7 @@ public class EqualEventQuery implements EventQuery
      * @return limit the maximum number of events to return
      * @see #setLimit(long)
      */
+    @Override
     public long getLimit()
     {
         return this.limit;
@@ -120,7 +131,7 @@ public class EqualEventQuery implements EventQuery
      * @param limit the maximum number of events to return
      * @return this query.
      */
-    public EqualEventQuery setLimit(long limit)
+    public SimpleEventQuery setLimit(long limit)
     {
         this.limit = limit;
 
@@ -131,6 +142,7 @@ public class EqualEventQuery implements EventQuery
      * @return offset the index where to start returning events
      * @see #setOffset(long)
      */
+    @Override
     public long getOffset()
     {
         return this.offset;
@@ -140,7 +152,7 @@ public class EqualEventQuery implements EventQuery
      * @param offset the index where to start returning events
      * @return this query.
      */
-    public EqualEventQuery setOffset(long offset)
+    public SimpleEventQuery setOffset(long offset)
     {
         this.offset = offset;
 
@@ -150,9 +162,9 @@ public class EqualEventQuery implements EventQuery
     /**
      * @param property the name of the property
      * @param value the value the property should be equal to
-     * @return this {@link EqualEventQuery}
+     * @return this {@link SimpleEventQuery}
      */
-    public EqualEventQuery eq(String property, Object value)
+    public SimpleEventQuery eq(String property, Object value)
     {
         this.conditions.add(new EqualQueryCondition(property, value));
 

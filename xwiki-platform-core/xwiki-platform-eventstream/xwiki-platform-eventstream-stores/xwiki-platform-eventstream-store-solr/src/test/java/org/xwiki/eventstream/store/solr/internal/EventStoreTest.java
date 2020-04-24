@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -31,12 +32,14 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.environment.Environment;
-import org.xwiki.eventstream.EqualEventQuery;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.SimpleEventQuery;
 import org.xwiki.eventstream.internal.DefaultEvent;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.properties.converter.Converter;
 import org.xwiki.search.solr.test.SolrComponentList;
 import org.xwiki.test.annotation.AfterComponent;
 import org.xwiki.test.annotation.ComponentList;
@@ -44,11 +47,12 @@ import org.xwiki.test.junit5.XWikiTempDir;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -57,9 +61,9 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-@SolrComponentList
 @ComponentTest
 @ComponentList(EventsSolrCoreInitializer.class)
+@SolrComponentList
 public class EventStoreTest
 {
     @XWikiTempDir
@@ -68,6 +72,9 @@ public class EventStoreTest
     private ConfigurationSource mockXWikiProperties;
 
     private Environment mockEnvironment;
+
+    @MockComponent
+    private Converter<DocumentReference> converter;
 
     @InjectComponentManager
     private MockitoComponentManager componentManager;
@@ -116,26 +123,28 @@ public class EventStoreTest
     @Test
     public void saveGetDeleteEvent() throws Exception
     {
-        assertNull(this.eventStore.getEvent("id"));
+        assertFalse(this.eventStore.getEvent("id").isPresent());
 
         DefaultEvent event = event("id");
 
         this.eventStore.saveEvent(event);
 
-        Event storedEvent = this.eventStore.getEvent("id");
-        assertNotNull(storedEvent);
+        Optional<Event> storedEvent = this.eventStore.getEvent("id");
+        assertTrue(storedEvent.isPresent());
 
         this.eventStore.deleteEvent(event);
 
-        assertNull(this.eventStore.getEvent("id"));
+        assertFalse(this.eventStore.getEvent("id").isPresent());
 
         this.eventStore.saveEvent(event);
 
-        assertNotNull(this.eventStore.getEvent("id"));
+        assertEquals(event, this.eventStore.getEvent("id").get());
 
-        this.eventStore.deleteEvent("id");
+        Optional<Event> deleted = this.eventStore.deleteEvent("id");
 
-        assertNull(this.eventStore.getEvent("id"));
+        assertEquals(event, deleted.get());
+
+        assertFalse(this.eventStore.getEvent("id").isPresent());
     }
 
     @Test
@@ -146,12 +155,40 @@ public class EventStoreTest
         DefaultEvent event3 = event("id3");
         DefaultEvent event4 = event("id4");
 
+        event1.setHidden(true);
+        event2.setHidden(true);
+        event3.setHidden(false);
+        event4.setHidden(false);
+
+        event1.setUser(new DocumentReference("wiki", "space", "user1"));
+        when(this.converter.convert(DocumentReference.class, "wiki:space.user1")).thenReturn(event1.getUser());
+        when(this.converter.convert(String.class, event1.getUser())).thenReturn("wiki:space.user1");
+        event2.setUser(new DocumentReference("wiki", "space", "user2"));
+        when(this.converter.convert(DocumentReference.class, "wiki:space.user2")).thenReturn(event2.getUser());
+        when(this.converter.convert(String.class, event2.getUser())).thenReturn("wiki:space.user2");
+        event3.setUser(new DocumentReference("wiki", "space", "user3"));
+        when(this.converter.convert(DocumentReference.class, "wiki:space.user3")).thenReturn(event3.getUser());
+        when(this.converter.convert(String.class, event3.getUser())).thenReturn("wiki:space.user3");
+        event4.setUser(new DocumentReference("wiki", "space", "user4"));
+        when(this.converter.convert(DocumentReference.class, "wiki:space.user4")).thenReturn(event4.getUser());
+        when(this.converter.convert(String.class, event4.getUser())).thenReturn("wiki:space.user4");
+
         this.eventStore.saveEvent(event1);
         this.eventStore.saveEvent(event2);
         this.eventStore.saveEvent(event3);
         this.eventStore.saveEvent(event4);
 
-        assertSearch(Arrays.asList(event1, event2, event3, event4), new EqualEventQuery());
-        assertSearch(Arrays.asList(event1), new EqualEventQuery("id", "id1"));
+        assertSearch(Arrays.asList(event1, event2, event3, event4), new SimpleEventQuery());
+
+        SimpleEventQuery query = new SimpleEventQuery();
+        query.eq(Event.FIELD_ID, "id1");
+        assertSearch(Arrays.asList(event1), query);
+
+        query.eq(Event.FIELD_ID, "id2");
+        assertSearch(Arrays.asList(), query);
+
+        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery(Event.FIELD_HIDDEN, true));
+
+        assertSearch(Arrays.asList(event4), new SimpleEventQuery(Event.FIELD_USER, event4.getUser()));
     }
 }

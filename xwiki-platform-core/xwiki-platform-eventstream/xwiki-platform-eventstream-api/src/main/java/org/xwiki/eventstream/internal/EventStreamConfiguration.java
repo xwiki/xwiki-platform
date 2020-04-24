@@ -29,8 +29,8 @@ import org.xwiki.eventstream.EventStore;
 /**
  * The configuration of the event stream module.
  * 
- * @since 12.3RC1
  * @version $Id$
+ * @since 12.4RC1
  */
 @Component(roles = EventStreamConfiguration.class)
 @Singleton

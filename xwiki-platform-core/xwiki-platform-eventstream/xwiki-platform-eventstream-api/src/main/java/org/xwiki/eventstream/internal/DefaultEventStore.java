@@ -19,7 +19,10 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
@@ -44,9 +47,10 @@ import org.xwiki.query.QueryException;
  * The default implementation of {@link EventStore} dispatching the event in the various enabled stores.
  * 
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.4RC1
  */
 @Component
+@Singleton
 public class DefaultEventStore implements EventStore, Initializable
 {
     @Inject
@@ -114,22 +118,22 @@ public class DefaultEventStore implements EventStore, Initializable
     }
 
     @Override
-    public Event deleteEvent(String eventId) throws EventStreamException
+    public Optional<Event> deleteEvent(String eventId) throws EventStreamException
     {
-        Event event;
+        Optional<Event> event;
         if (this.store != null) {
             event = this.store.deleteEvent(eventId);
         } else {
             event = getEvent(eventId);
         }
 
-        if (event != null) {
+        if (event.isPresent()) {
             if (this.eventStream != null) {
-                this.eventStream.deleteEvent(event);
+                this.eventStream.deleteEvent(event.get());
             }
 
             // Notify about this change
-            this.observationManager.notify(new EventStreamDeletedEvent(), event);
+            this.observationManager.notify(new EventStreamDeletedEvent(), event.get());
         }
 
         return event;
@@ -153,9 +157,9 @@ public class DefaultEventStore implements EventStore, Initializable
     }
 
     @Override
-    public Event getEvent(String eventId) throws EventStreamException
+    public Optional<Event> getEvent(String eventId) throws EventStreamException
     {
-        Event event = null;
+        Optional<Event> event = Optional.empty();
 
         // Try the new store
         if (this.store != null) {
@@ -163,9 +167,9 @@ public class DefaultEventStore implements EventStore, Initializable
         }
 
         // Try the old store
-        if (this.eventStream != null && event == null) {
+        if (!event.isPresent() && this.eventStream != null) {
             try {
-                event = this.eventStream.getEvent(eventId);
+                event = Optional.ofNullable(this.eventStream.getEvent(eventId));
             } catch (QueryException e) {
                 throw new EventStreamException("Failed to get event from the old store", e);
             }
@@ -197,7 +201,7 @@ public class DefaultEventStore implements EventStore, Initializable
     }
 
     @Override
-    public EventStatus getEventStatus(String eventId, String entity) throws EventStreamException
+    public Optional<EventStatus> getEventStatus(String eventId, String entity) throws EventStreamException
     {
         return this.store.getEventStatus(eventId, entity);
     }

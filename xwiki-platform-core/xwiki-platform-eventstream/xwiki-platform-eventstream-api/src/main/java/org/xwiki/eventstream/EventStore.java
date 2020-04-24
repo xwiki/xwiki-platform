@@ -19,6 +19,8 @@
  */
 package org.xwiki.eventstream;
 
+import java.util.Optional;
+
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
 
@@ -26,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * Save and access store events.
  * 
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.4RC1
  */
 @Role
 @Unstable
@@ -47,7 +49,7 @@ public interface EventStore
      * @return the deleted event, null if none could be found
      * @throws EventStreamException when failing to delete the event
      */
-    Event deleteEvent(String eventId) throws EventStreamException;
+    Optional<Event> deleteEvent(String eventId) throws EventStreamException;
 
     /**
      * Deleted the event. Do nothing if the passed event does not exist.
@@ -64,7 +66,7 @@ public interface EventStore
      * @return the event corresponding to the passed id or null of none could be found
      * @throws EventStreamException when failing to get the event
      */
-    Event getEvent(String eventId) throws EventStreamException;
+    Optional<Event> getEvent(String eventId) throws EventStreamException;
 
     /**
      * Save in the storage the given status.
@@ -90,7 +92,7 @@ public interface EventStore
      * @return the event status or null if none could be found
      * @throws EventStreamException when failing to get the event status
      */
-    EventStatus getEventStatus(String eventId, String entity) throws EventStreamException;
+    Optional<EventStatus> getEventStatus(String eventId, String entity) throws EventStreamException;
 
     /**
      * Search for event according to condition provided by the {@link EventQuery}.

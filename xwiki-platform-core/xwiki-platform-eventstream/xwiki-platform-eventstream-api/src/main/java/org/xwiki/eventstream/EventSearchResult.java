@@ -28,7 +28,7 @@ import org.xwiki.stability.Unstable;
  * The result of a search in the {@link EventStore}.
  * 
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.4RC1
  */
 @Unstable
 public interface EventSearchResult extends AutoCloseable

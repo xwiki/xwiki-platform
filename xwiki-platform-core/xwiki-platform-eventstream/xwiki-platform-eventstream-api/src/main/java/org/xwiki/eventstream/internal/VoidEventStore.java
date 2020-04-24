@@ -19,6 +19,8 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Optional;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -34,7 +36,7 @@ import org.xwiki.eventstream.EventStreamException;
  * Implementation of {@link EventStore}doing nothing.
  * 
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.4RC1
  */
 @Component
 @Named(VoidEventStore.HINT)
@@ -53,7 +55,7 @@ public class VoidEventStore implements EventStore
     }
 
     @Override
-    public Event deleteEvent(String eventId) throws EventStreamException
+    public Optional<Event> deleteEvent(String eventId) throws EventStreamException
     {
         // Do nothing
         return null;
@@ -66,7 +68,7 @@ public class VoidEventStore implements EventStore
     }
 
     @Override
-    public Event getEvent(String eventId) throws EventStreamException
+    public Optional<Event> getEvent(String eventId) throws EventStreamException
     {
         // Do nothing
         return null;
@@ -85,7 +87,7 @@ public class VoidEventStore implements EventStore
     }
 
     @Override
-    public EventStatus getEventStatus(String eventId, String entity) throws EventStreamException
+    public Optional<EventStatus> getEventStatus(String eventId, String entity) throws EventStreamException
     {
         // Do nothing
         return null;

@@ -29,7 +29,7 @@ import org.xwiki.stability.Unstable;
  * {@link Iterable} based implementation of {@link EventSearchResult}.
  * 
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.4RC1
  */
 @Unstable
 public class StreamEventSearchResult implements EventSearchResult

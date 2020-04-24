@@ -27,6 +27,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.Event;
 import org.xwiki.search.solr.AbstractSolrCoreInitializer;
 import org.xwiki.search.solr.SolrException;
 
@@ -34,7 +35,7 @@ import org.xwiki.search.solr.SolrException;
  * Initialize the Solr core dedicated to events storage.
  * 
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.4RC1
  */
 @Component
 @Named(EventsSolrCoreInitializer.NAME)
@@ -45,96 +46,6 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
      * The name of the core.
      */
     public static final String NAME = "events";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getGroupId()
-     */
-    public static final String SOLR_FIELD_GROUPID = "groupId";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getDate()
-     */
-    public static final String SOLR_FIELD_DATE = "date";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getImportance()
-     */
-    public static final String SOLR_FIELD_IMPORTANCE = "importance";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getTitle()
-     */
-    public static final String SOLR_FIELD_TITLE = "title";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getBody()
-     */
-    public static final String SOLR_FIELD_BODY = "body";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getApplication()
-     */
-    public static final String SOLR_FIELD_APPLICATION = "application";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getStream()
-     */
-    public static final String SOLR_FIELD_STREAM = "stream";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getType()
-     */
-    public static final String SOLR_FIELD_TYPE = "type";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getWiki()
-     */
-    public static final String SOLR_FIELD_WIKI = "wiki";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getSpace()
-     */
-    public static final String SOLR_FIELD_SPACE = "space";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getDocument()
-     */
-    public static final String SOLR_FIELD_DOCUMENT = "document";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getDocumentVersion()
-     */
-    public static final String SOLR_FIELD_DOCUMENTVERSION = "documentVersion";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getRelatedEntity()
-     */
-    public static final String SOLR_FIELD_RELATEDENTITY = "relatedEntity";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getUser()
-     */
-    public static final String SOLR_FIELD_USER = "user";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getUrl()
-     */
-    public static final String SOLR_FIELD_URL = "url";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getDocumentTitle()
-     */
-    public static final String SOLR_FIELD_DOCUMENTTITLE = "documentTitle";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getTarget()
-     */
-    public static final String SOLR_FIELD_TARGET = "target";
-
-    /**
-     * @see org.xwiki.eventstream.Event#getHidden()
-     */
-    public static final String SOLR_FIELD_HIDDEN = "hidden";
 
     /**
      * @see org.xwiki.eventstream.Event#getParameters()
@@ -155,10 +66,10 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
      * The known fields.
      */
     public static final Set<String> KNOWN_FIELDS = new HashSet<>(
-        Arrays.asList(SOLR_FIELD_ID, SOLR_FIELD_GROUPID, SOLR_FIELD_DATE, SOLR_FIELD_IMPORTANCE, SOLR_FIELD_TITLE,
-            SOLR_FIELD_BODY, SOLR_FIELD_APPLICATION, SOLR_FIELD_STREAM, SOLR_FIELD_TYPE, SOLR_FIELD_WIKI,
-            SOLR_FIELD_SPACE, SOLR_FIELD_DOCUMENT, SOLR_FIELD_DOCUMENTVERSION, SOLR_FIELD_RELATEDENTITY,
-            SOLR_FIELD_USER, SOLR_FIELD_URL, SOLR_FIELD_DOCUMENTTITLE, SOLR_FIELD_TARGET, SOLR_FIELD_HIDDEN));
+        Arrays.asList(SOLR_FIELD_ID, Event.FIELD_GROUPID, Event.FIELD_DATE, Event.FIELD_IMPORTANCE, Event.FIELD_TITLE,
+            Event.FIELD_BODY, Event.FIELD_APPLICATION, Event.FIELD_STREAM, Event.FIELD_TYPE, Event.FIELD_WIKI,
+            Event.FIELD_SPACE, Event.FIELD_DOCUMENT, Event.FIELD_DOCUMENTVERSION, Event.FIELD_RELATEDENTITY,
+            Event.FIELD_USER, Event.FIELD_URL, Event.FIELD_DOCUMENTTITLE, Event.FIELD_TARGET, Event.FIELD_HIDDEN));
 
     @Override
     protected long getVersion()
@@ -169,24 +80,24 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     @Override
     protected void createSchema() throws SolrException
     {
-        addStringField(SOLR_FIELD_GROUPID, false, false);
-        addPDateField(SOLR_FIELD_DATE, false, false);
-        addStringField(SOLR_FIELD_IMPORTANCE, false, false);
-        addStringField(SOLR_FIELD_TITLE, false, false);
-        addStringField(SOLR_FIELD_BODY, false, false);
-        addStringField(SOLR_FIELD_APPLICATION, false, false);
-        addStringField(SOLR_FIELD_STREAM, false, false);
-        addStringField(SOLR_FIELD_TYPE, false, false);
-        addStringField(SOLR_FIELD_WIKI, false, false);
-        addStringField(SOLR_FIELD_SPACE, false, false);
-        addStringField(SOLR_FIELD_DOCUMENT, false, false);
-        addStringField(SOLR_FIELD_DOCUMENTVERSION, false, false);
-        addStringField(SOLR_FIELD_RELATEDENTITY, false, false);
-        addStringField(SOLR_FIELD_USER, false, false);
-        addStringField(SOLR_FIELD_URL, false, false);
-        addStringField(SOLR_FIELD_DOCUMENTTITLE, false, false);
-        addStringField(SOLR_FIELD_TARGET, true, false);
-        addBooleanField(SOLR_FIELD_HIDDEN, false, false);
+        addStringField(Event.FIELD_GROUPID, false, false);
+        addPDateField(Event.FIELD_DATE, false, false);
+        addStringField(Event.FIELD_IMPORTANCE, false, false);
+        addStringField(Event.FIELD_TITLE, false, false);
+        addStringField(Event.FIELD_BODY, false, false);
+        addStringField(Event.FIELD_APPLICATION, false, false);
+        addStringField(Event.FIELD_STREAM, false, false);
+        addStringField(Event.FIELD_TYPE, false, false);
+        addStringField(Event.FIELD_WIKI, false, false);
+        addStringField(Event.FIELD_SPACE, false, false);
+        addStringField(Event.FIELD_DOCUMENT, false, false);
+        addStringField(Event.FIELD_DOCUMENTVERSION, false, false);
+        addStringField(Event.FIELD_RELATEDENTITY, false, false);
+        addStringField(Event.FIELD_USER, false, false);
+        addStringField(Event.FIELD_URL, false, false);
+        addStringField(Event.FIELD_DOCUMENTTITLE, false, false);
+        addStringField(Event.FIELD_TARGET, true, false);
+        addBooleanField(Event.FIELD_HIDDEN, false, false);
 
         addStringField(SOLR_FIELD_READLISTENERS, true, false);
         addStringField(SOLR_FIELD_UNREADLISTENERS, true, false);
@@ -195,7 +106,7 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     }
 
     @Override
-    protected void migrateSchema(Long cversion)
+    protected void migrateSchema(long cversion)
     {
         // No migration needed yet
     }

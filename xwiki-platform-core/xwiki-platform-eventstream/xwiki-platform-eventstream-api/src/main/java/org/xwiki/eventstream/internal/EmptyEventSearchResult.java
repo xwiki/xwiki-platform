@@ -28,7 +28,7 @@ import org.xwiki.eventstream.EventSearchResult;
  * An empty {@link EventSearchResult}.
  * 
  * @version $Id$
- * @since 12.3RC1
+ * @since 12.4RC1
  */
 public class EmptyEventSearchResult implements EventSearchResult
 {

@@ -43,7 +43,7 @@ import static org.mockito.Mockito.when;
  * Unit tests for {@link AttachURIVfsResourceReferenceSerializer}.
  *
  * @version $Id$
- * @since 12.3
+ * @since 12.4RC1
  */
 @ComponentTest
 public class AttachURIVfsResourceReferenceSerializerTest

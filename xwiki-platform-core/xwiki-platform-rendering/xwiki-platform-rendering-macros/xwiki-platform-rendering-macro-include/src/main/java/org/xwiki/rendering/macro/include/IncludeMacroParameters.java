@@ -22,10 +22,14 @@ package org.xwiki.rendering.macro.include;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReferenceString;
 import org.xwiki.model.reference.PageReference;
+import org.xwiki.properties.annotation.PropertyAdvanced;
 import org.xwiki.properties.annotation.PropertyDescription;
+import org.xwiki.properties.annotation.PropertyDisplayHidden;
 import org.xwiki.properties.annotation.PropertyDisplayType;
 import org.xwiki.properties.annotation.PropertyFeature;
 import org.xwiki.properties.annotation.PropertyGroup;
+import org.xwiki.properties.annotation.PropertyName;
+import org.xwiki.stability.Unstable;
 
 /**
  * Parameters for the {@link org.xwiki.rendering.internal.macro.include.IncludeMacro} Macro.
@@ -71,15 +75,20 @@ public class IncludeMacroParameters
      * @see #getSection()
      */
     private String section;
-
+    
+    /**
+     * @see #isExcludeFirstHeading()
+     */
+    private boolean excludeFirstHeading;
+    
     /**
      * @param reference the reference of the resource to include
      * @since 3.4M1
      */
     @PropertyDescription("the reference of the resource to display")
-    @PropertyGroup("stringReference")
-    @PropertyFeature("reference")
     @PropertyDisplayType(EntityReferenceString.class)
+    @PropertyFeature("reference")
+    @PropertyGroup("stringReference")
     public void setReference(String reference)
     {
         this.reference = reference;
@@ -95,49 +104,10 @@ public class IncludeMacroParameters
     }
 
     /**
-     * @return the type of the reference
-     * @since 3.4M1
-     */
-    @PropertyDescription("the type of the reference")
-    @PropertyGroup("stringReference")
-    public EntityType getType()
-    {
-        return this.type;
-    }
-
-    /**
-     * @param type the type of the reference
-     * @since 3.4M1
-     */
-    public void setType(EntityType type)
-    {
-        this.type = type;
-    }
-
-    /**
-     * @param context defines whether the included page is executed in its separated execution context or whether it's
-     *            executed in the context of the current page.
-     */
-    @PropertyDescription("defines whether the included page is executed in its separated execution context"
-        + " or whether it's executed in the context of the current page")
-    public void setContext(Context context)
-    {
-        this.context = context;
-    }
-
-    /**
-     * @return defines whether the included page is executed in its separated execution context or whether it's executed
-     *         in the context of the current page.
-     */
-    public Context getContext()
-    {
-        return this.context;
-    }
-
-    /**
      * @param sectionId see {@link #getSection()}
      */
-    @PropertyDescription("an optional id of a section to include in the specified document")
+    @PropertyDescription("an optional id of a section to include in the specified document, e.g. 'HMyHeading'")
+    @PropertyAdvanced
     public void setSection(String sectionId)
     {
         this.section = sectionId;
@@ -153,12 +123,87 @@ public class IncludeMacroParameters
     }
 
     /**
+     * @param excludeFirstHeading {@code true} to remove the first heading found inside
+     *        the document or the section, {@code false} to keep it 
+     * @since 12.4RC1 
+     */
+    @Unstable
+    @PropertyName("Exclude First Heading")
+    @PropertyDescription("Exclude the first heading from the included document or section.")
+    @PropertyAdvanced
+    public void setExcludeFirstHeading(boolean excludeFirstHeading)
+    {
+        this.excludeFirstHeading = excludeFirstHeading;
+    }
+    
+    /**
+     * @return whether to exclude the first heading from the included document or section, or not.
+     * @since 12.4RC1 
+     */
+    @Unstable
+    public boolean isExcludeFirstHeading()
+    {
+        return this.excludeFirstHeading;
+    }
+
+    /**
+     * @param context defines whether the included page is executed in its separated execution context or whether it's
+     *            executed in the context of the current page.
+     */
+    @PropertyDescription("defines whether the included page is executed in its separated execution context"
+        + " or whether it's executed in the context of the current page")
+    @PropertyAdvanced
+    // Marked deprecated since there's now a Display macro instead.
+    @Deprecated
+    public void setContext(Context context)
+    {
+        this.context = context;
+    }
+
+    /**
+     * @return defines whether the included page is executed in its separated execution context or whether it's executed
+     *         in the context of the current page.
+     */
+    public Context getContext()
+    {
+        return this.context;
+    }
+
+    /**
+     * @param type the type of the reference
+     * @since 3.4M1
+     */
+    @PropertyDescription("the type of the reference")
+    @PropertyGroup("stringReference")
+    @PropertyAdvanced
+    // Marking it as Display Hidden because it's complex and we don't want to confuse our users.
+    @PropertyDisplayHidden
+    public void setType(EntityType type)
+    {
+        this.type = type;
+    }
+
+    /**
+     * @return the type of the reference
+     * @since 3.4M1
+     */
+    public EntityType getType()
+    {
+        return this.type;
+    }
+
+    /**
      * @param page the reference of the page to include
      * @since 10.6RC1
      */
     @PropertyDescription("The reference of the page to include")
-    @PropertyFeature("reference")
     @PropertyDisplayType(PageReference.class)
+    @PropertyFeature("reference")
+    // Display hidden because we don't want to confuse our users by proposing two ways to enter the reference to
+    // include and ATM we don't have a picker for PageReference types and we do have a picker for EntityReference string
+    // one so we choose to keep the other one visible and hide this one. We're keeping the property so that we don't
+    // break backward compatibility when using the macro in wiki edit mode.
+    @PropertyDisplayHidden
     public void setPage(String page)
     {
         this.reference = page;

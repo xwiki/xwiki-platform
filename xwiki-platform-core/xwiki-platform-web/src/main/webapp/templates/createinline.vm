@@ -141,7 +141,7 @@
           }
         ]
       }])
-    #if ($xwiki.exists($services.model.createDocumentReference('', 'XWiki', 'OfficeImporter')) && "$!services.officemanager.serverState" == 'Connected')
+    #if ($xwiki.exists($services.model.createDocumentReference('', 'XWiki', 'OfficeImporter')) && $services.officemanager.isConnected())
       ## TODO: handle this use case with an extension point
       #set ($discard = $options[0].options.add({
         'name': $services.localization.render('office.createForm.type.name'),

@@ -40,9 +40,11 @@ import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.properties.BeanManager;
 import org.xwiki.properties.PropertyException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.HeaderBlock;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.MetaDataBlock;
+import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.MetaData;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -202,8 +204,12 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
                 references.pop();
             }
         }
+        
+        // Step 5: If the user has asked for it, remove both Section and Heading Blocks if the first included block is
+        // a Section block with a Heading block inside.
+        excludeFirstHeading(parameters, result);
 
-        // Step 5: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
+        // Step 6: Wrap Blocks in a MetaDataBlock with the "source" meta data specified so that we know from where the
         // content comes and "base" meta data so that reference are properly resolved
         MetaDataBlock metadata = new MetaDataBlock(result.getChildren(), result.getMetaData());
         String source = this.defaultEntityReferenceSerializer.serialize(includedReference);
@@ -213,6 +219,19 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         }
 
         return Arrays.asList(metadata);
+    }
+
+    private void excludeFirstHeading(IncludeMacroParameters parameters, XDOM xdom)
+    {
+        if (parameters.isExcludeFirstHeading()) {
+            xdom.getChildren().stream().findFirst().filter(block -> block instanceof SectionBlock)
+                .ifPresent(sectionBlock -> {
+                    List<Block> sectionChildren = sectionBlock.getChildren();
+                    sectionChildren.stream().findFirst().filter(block -> block instanceof HeaderBlock)
+                        .ifPresent(headerBlock ->
+                            xdom.replaceChild(sectionChildren.subList(1, sectionChildren.size()), sectionBlock));
+                });
+        }
     }
 
     /**

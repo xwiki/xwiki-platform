@@ -114,11 +114,6 @@ table.xwiki-livetable {
 html>body .xwiki-livetable-display td {
   border: 0px;
 }
-.xwiki-livetable-display td.typetext {
-  max-width: 20em;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
 /* </Live Table Containers> */
 /* <Live Table Header> */
 table.xwiki-livetable table.xwiki-livetable-display thead.xwiki-livetable-display-header {

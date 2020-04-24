@@ -27,17 +27,20 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   var init = function() {
     // Maybe add the action icons.
     if ($(this).find('.editableProperty-edit').length === 0) {
-      var editIcon = $('<a href="#editProperty" class="editableProperty-edit"></a>').appendTo($(this));
+      var editIcon = $('<a href="#editProperty" class="editableProperty-edit"></a>');
       editIcon.attr('title', $jsontool.serialize($services.localization.render('edit')));
       editIcon.html($jsontool.serialize($services.icon.renderHTML('pencil')));
 
-      var cancelIcon = $('<a href="#cancelProperty" class="editableProperty-cancel"></a>').appendTo($(this));
+      var cancelIcon = $('<a href="#cancelProperty" class="editableProperty-cancel"></a>');
       cancelIcon.attr('title', $jsontool.serialize($services.localization.render('cancel')));
       cancelIcon.hide().html($jsontool.serialize($services.icon.renderHTML('cross')));
 
-      var saveIcon = $('<a href="#saveProperty" class="editableProperty-save"></a>').appendTo($(this));
+      var saveIcon = $('<a href="#saveProperty" class="editableProperty-save"></a>');
       saveIcon.attr('title', $jsontool.serialize($services.localization.render('save')));
       saveIcon.hide().html($jsontool.serialize($services.icon.renderHTML('check')));
+
+      // Insert the action icons right after the label because it may be followed by a hint on the next line.
+      $(this).find('label').after(editIcon, cancelIcon, saveIcon);
     }
 
     // Mark the viewer.
@@ -84,7 +87,8 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),
       language: xcontext.locale
-    }).done(function(html) {
+    }).done(function(html, textStatus, jqXHR) {
+      loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
       // Replace the edit action with the save and cancel actions.
       editIcon.hide();
       editableProperty.find('.editableProperty-save, .editableProperty-cancel').show();
@@ -115,12 +119,14 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
   var save = function(editableProperty) {
     // Disable the save and cancel actions while the property is being saved.
     editableProperty.find('.editableProperty-save, .editableProperty-cancel').addClass('disabled');
-    // Notify others that we're about to save.
-    $(document).trigger('xwiki:actions:beforeSave');
     // Collect the submit data.
     var editor = editableProperty.next('.editableProperty-viewer').next('.editableProperty-editor');
+    // Notify the others that we're about to save so that they have the chance to update the submit data.
+    editor.trigger('xwiki:actions:beforeSave');
     var data = editor.find(':input').serializeArray();
     data.push({name: 'language', value: xcontext.locale});
+    data.push({name: 'comment', value: 'Update property ' + editableProperty.data('property')});
+    data.push({name: 'minorEdit', value: true});
     data.push({name: 'form_token', value: xcontext.form_token});
     data.push({name: 'ajax', value: true});
     var notification = new XWiki.widgets.Notification(
@@ -128,11 +134,13 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       'inprogress'
     );
     return $.post(XWiki.currentDocument.getURL('save'), data).done(function() {
+      editor.trigger('xwiki:document:saved');
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.done')),
         'done'
       ));
     }).fail(function(response) {
+      editor.trigger('xwiki:document:saveFailed');
       notification.replace(new XWiki.widgets.Notification(
         $jsontool.serialize($services.localization.render('core.editors.saveandcontinue.notification.error',
           ['<span id="saveFailureReason"/>'])),
@@ -151,7 +159,8 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
       property: editableProperty.data('property'),
       type: editableProperty.data('propertyType'),
       language: xcontext.locale
-    }).done(function(html) {
+    }).done(function(html, textStatus, jqXHR) {
+      loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
       // Cancel the edit if needed.
       cancel(editableProperty);
       // Update the viewer.
@@ -168,6 +177,24 @@ define('editableProperty', ['jquery', 'xwiki-meta'], function($, xcontext) {
 
   var saveAndView = function(editableProperty) {
     return save(editableProperty).then($.proxy(view, null, editableProperty));
+  };
+
+  // Helpers
+
+  var loadRequiredSkinExtensions = function(requiredSkinExtensions) {
+    var existingSkinExtensions;
+    var getExistingSkinExtensions = function() {
+      return $('link, script').map(function() {
+        return $(this).attr('href') || $(this).attr('src');
+      }).get();
+    };
+    $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function() {
+      if (!existingSkinExtensions) {
+        existingSkinExtensions = getExistingSkinExtensions();
+      }
+      var url = $(this).attr('href') || $(this).attr('src');
+      return existingSkinExtensions.indexOf(url) < 0;
+    }).appendTo('head');
   };
 });
 

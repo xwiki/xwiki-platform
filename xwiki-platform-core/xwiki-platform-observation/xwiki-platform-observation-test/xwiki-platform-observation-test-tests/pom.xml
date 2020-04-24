@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-observation-test</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-observation-test-tests</artifactId>
   <name>XWiki Platform - Observation - Tests - Functional Tests</name>
@@ -217,14 +217,14 @@
           <execution>
             <phase>generate-test-resources</phase>
             <configuration>
-              <tasks>
+              <target>
                 <!-- Override hibernate configuration -->
                 <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml" todir="${xwiki.instance.directory}/webapps/xwiki/WEB-INF" />
                 <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml" todir="${xwiki.instance.directory}-1/webapps/xwiki/WEB-INF" />
                 <!-- Override xwiki.properties configuration -->
                 <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/xwiki.properties" todir="${xwiki.instance.directory}/webapps/xwiki/WEB-INF" />
                 <copy overwrite="true" file="${project.build.directory}/maven-shared-archive-resources/xwiki.properties" todir="${xwiki.instance.directory}-1/webapps/xwiki/WEB-INF" />
-              </tasks>
+              </target>
             </configuration>
             <goals>
               <goal>run</goal>

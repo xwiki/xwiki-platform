@@ -293,11 +293,11 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         File oldHome = new File(this.environment.getPermanentDirectory(), "solr");
         if (oldHome.exists()) {
             // Move old cores to the new location
-            for (File core : oldHome.listFiles()) {
+            for (File file : oldHome.listFiles()) {
                 // We don't care about the "xwiki" core since it needs to be recreated anyway
-                if (!core.getName().equals("xwiki") && !core.getName().equals("META-INF")) {
+                if (file.isDirectory() && !file.getName().equals("xwiki") && !file.getName().equals("META-INF")) {
                     // Move the folder in the new location
-                    FileUtils.moveDirectoryToDirectory(core, this.solrHomePath.toFile(), false);
+                    FileUtils.moveDirectoryToDirectory(file, this.solrHomePath.toFile(), false);
                 }
             }
         }

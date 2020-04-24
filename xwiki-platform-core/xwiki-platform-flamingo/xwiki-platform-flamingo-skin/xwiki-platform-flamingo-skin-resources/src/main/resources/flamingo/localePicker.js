@@ -47,6 +47,7 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
 
   var init = function(settings) {
     var input = $(this);
+    settings = $.extend({}, defaultSettings, input.data('settings'), settings);
     var selectedLocales = getLocalesFromInput(input);
     var select = $('<select/>');
     if (settings.multiple) {
@@ -109,9 +110,22 @@ define('xwiki-locale-picker', ['jquery', 'bootstrap-select'], function($) {
     return this.addClass('form-control').each(function() {
       $(this).selectpicker({
         // Enable filtering if there are a lot of choices.
-        liveSearch: $(this).find('option').length > 10
+        liveSearch: $(this).find('option').length > 10,
+        // We need this in case one of the parents has overflow:hidden (e.g. when the picker is used in a panel).
+        container: 'body',
+        // We need this in case there's not enough room on the right (e.g. when the picker is used in a panel).
+        dropdownAlignRight: 'auto'
       });
     });
   };
 });
 
+require(['jquery', 'xwiki-locale-picker', 'xwiki-events-bridge'], function($) {
+  var init = function(event, data) {
+    var container = $((data && data.elements) || document);
+    container.find('input[data-type="locale"]').localePicker();
+  };
+
+  $(document).on('xwiki:dom:updated', init);
+  return XWiki.domIsLoaded && init();
+});

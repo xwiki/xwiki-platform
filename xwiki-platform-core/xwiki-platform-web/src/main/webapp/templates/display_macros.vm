@@ -114,8 +114,9 @@
 
 #macro (displayProperty_locale $parameters)
   #if ($parameters.mode == 'edit')
-    <input type="text" id="$!escapetool.xml($parameters.id)" name="$!escapetool.xml($parameters.name)"
-      value="$!escapetool.xml($parameters.value)"/>
+    #set ($discard = $xwiki.jsfx.use('localePicker.js', true))
+    <input type="text" data-type="locale" id="$!escapetool.xml($parameters.id)"
+      name="$!escapetool.xml($parameters.name)" value="$!escapetool.xml($parameters.value)"/>
   #else
     #set ($localeName = $parameters.value.getDisplayName($xcontext.locale))
     #set ($styleName = '')
@@ -125,4 +126,29 @@
     #end
     <span data-value="$!escapetool.xml($parameters.value)" class="$styleName">$!escapetool.xml($localeName)</span>
   #end
+#end
+
+##
+## Helpers
+##
+
+#macro (initRequiredSkinExtensions)
+  #set ($requiredSkinExtensionsMap = $collectiontool.orderedMap)
+  ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
+  ## (they are aready available on the target page so there's no need to re-load them).
+  #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])
+    #set ($discard = $requiredSkinExtensionsMap.put($pluginName, $xwiki.get($pluginName).importString))
+  #end
+#end
+
+#macro (getRequiredSkinExtensions $return)
+  #set ($macro.importStrings = [])
+  #foreach ($entry in $requiredSkinExtensionsMap.entrySet())
+    #set ($macro.importString = $xwiki.get($entry.key).importString)
+    ## Remove the always used skin extensions, keep only those that have been requested by the display macros above.
+    #set ($discard = $macro.importStrings.add($!stringtool.removeStart($macro.importString, $entry.value).trim()))
+  #end
+  #set ($macro.importStrings = $stringtool.join($macro.importStrings, ''))
+  #set ($return = $NULL)
+  #setVariable("$return" $macro.importStrings)
 #end

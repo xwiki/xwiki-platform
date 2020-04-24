@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-panels</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-panels-ui</artifactId>
   <name>XWiki Platform - Panels - UI</name>
@@ -126,14 +126,11 @@
         <groupId>org.xwiki.commons</groupId>
         <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
         <configuration>
-          <!-- The EditTranslations page is not a Translation page and thus not a content page!
-               Note that we need to override the contentPages definition too as otherwise EditTranslations would be
-               considered as a content page and thus would require a language of "en" -->
-          <contentPages combine.self="override" />
-          <technicalPages>
-            <technicalPage>.*/EditTranslations\.xml</technicalPage>
-            <technicalPage>(?!.*/Translation.*\.xml).*\.xml</technicalPage>
-          </technicalPages>
+          <!-- The EditTranslations page is not a Translation page even though it follows the best practice for
+               naming translation pages. Thus we need to override the default list of translations pages -->
+          <translatablePages>
+            <translatablePage>.*/Translations\.xml</translatablePage>
+          </translatablePages>
           <entries>
             <!-- The Quick Links Panel contains demo content and is meant to be modified by users -->
             <entry>

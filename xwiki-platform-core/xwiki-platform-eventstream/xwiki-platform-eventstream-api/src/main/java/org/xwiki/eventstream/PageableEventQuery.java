@@ -28,6 +28,15 @@ import org.xwiki.stability.Unstable;
  * @since 12.4RC1
  */
 @Unstable
-public interface EventQuery
+public interface PageableEventQuery extends EventQuery
 {
+    /**
+     * @return the maximum number of events to return
+     */
+    long getLimit();
+
+    /**
+     * @return the index where to start returning events
+     */
+    long getOffset();
 }

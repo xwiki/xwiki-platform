@@ -95,7 +95,7 @@ public class EventStreamEventConverter extends AbstractEventConverter
     private org.xwiki.eventstream.Event unserializeEvent(Serializable remote) throws EventStreamException
     {
         if (remote instanceof String) {
-            return this.store.getEvent((String) remote);
+            return this.store.getEvent((String) remote).orElse(null);
         }
 
         return null;

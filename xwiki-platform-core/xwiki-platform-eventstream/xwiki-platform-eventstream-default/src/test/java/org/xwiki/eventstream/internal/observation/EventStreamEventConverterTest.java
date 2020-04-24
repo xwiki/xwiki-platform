@@ -19,6 +19,8 @@
  */
 package org.xwiki.eventstream.internal.observation;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
@@ -87,7 +89,7 @@ public class EventStreamEventConverterTest
         LocalEventData localEvent = new LocalEventData();
 
         DefaultEvent loadedEvent = new DefaultEvent();
-        when(this.store.getEvent("id")).thenReturn(loadedEvent);
+        when(this.store.getEvent("id")).thenReturn(Optional.of(loadedEvent));
 
         assertTrue(this.converter.fromRemote(remoteEvent, localEvent));
 

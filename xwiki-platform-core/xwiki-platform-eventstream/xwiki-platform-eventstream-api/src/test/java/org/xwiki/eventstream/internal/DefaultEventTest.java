@@ -17,17 +17,45 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream;
+package org.xwiki.eventstream.internal;
 
-import org.xwiki.stability.Unstable;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 /**
- * Allow querying events.
+ * Validate {@link DefaultEvent}.
  * 
  * @version $Id$
- * @since 12.4RC1
  */
-@Unstable
-public interface EventQuery
+public class DefaultEventTest
 {
+    @Test
+    void equals()
+    {
+        DefaultEvent event1 = new DefaultEvent();
+        DefaultEvent event2 = new DefaultEvent();
+
+        assertEquals(event1, event1);
+        assertEquals(event1, event2);
+
+        assertNotEquals(event1, null);
+        assertNotEquals(null, event1);
+
+        assertNotEquals(event1, new Object());
+        assertNotEquals(new Object(), event1);
+
+        event1.setId("id1");
+
+        assertNotEquals(event1, event2);
+
+        event2.setId("id2");
+
+        assertNotEquals(event1, event2);
+
+        event2.setId("id1");
+
+        assertEquals(event1, event2);
+    }
 }

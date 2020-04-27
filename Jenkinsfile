@@ -227,11 +227,15 @@ private void buildStandardAll(builds)
     'quality': {
       // Run the quality checks
       builds['Quality'].call()
-    },
+    }
+    /* TODO: 27/4/2020: Disable sonar build to check the hypptheis that it's causing kills on agents by using too
+       much memory.
+    ,
     'sonar': {
       // Sonar analysis + push to Sonarcloud.io
       builds['Sonar'].call()
     }
+    */
   )
 }
 

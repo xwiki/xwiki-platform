@@ -176,7 +176,12 @@
   ## way the Office server is not actually called so there's no risk of slowing down or blocking the CKEditor load (see
   ## CKEDITOR-294).
   #set ($missingAttachmentReference = $services.model.resolveAttachment('CKEditor.OfficeImporter@doesNotExist.txt'))
-  #set ($officeImporterSupported = $services.officemanager.serverState == 'Connected' &amp;&amp;
+  #set ($officeServerConnected = $services.officemanager.isConnected())
+  #if ("$!officeServerConnected" == '')
+    ## Before XWiki 12.3 and 11.10.5
+    #set ($officeServerConnected = $services.officemanager.serverState == 'Connected')
+  #end
+  #set ($officeImporterSupported = $officeServerConnected &amp;&amp;
     "$!services.wysiwyg.importOfficeAttachment($missingAttachmentReference, {'useOfficeViewer': true})" != '')
   #set ($discard = $parameters.attributes.putAll({
     'class': "$!parameters.attributes.get('class') ckeditor-textarea loading",

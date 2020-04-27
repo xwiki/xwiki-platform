@@ -25,6 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Type;
+import java.util.function.Consumer;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheManager;
@@ -47,6 +48,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.MockitoOldcore;
 import com.xpn.xwiki.test.junit5.mockito.InjectMockitoOldcore;
 
@@ -99,15 +101,12 @@ public abstract class AbstractTestDocumentConfigurationSource
             new DocumentReference(getClassReference(), new WikiReference(CURRENT_WIKI)));
     }
 
-    protected void setStringProperty(DocumentReference documentReference, String propertyName, String propertyValue)
+    protected void setupBaseObject(DocumentReference documentReference, Consumer<BaseObject> consumer)
         throws XWikiException
     {
         XWikiContext xcontext = this.oldcore.getXWikiContext();
-
         XWikiDocument document = this.oldcore.getXWikiContext().getWiki().getDocument(documentReference, xcontext);
-
         LocalDocumentReference classReference = getClassReference();
-
         BaseObject baseObject = document.getXObject(classReference);
         if (baseObject == null) {
             baseObject = new BaseObject();
@@ -115,10 +114,16 @@ public abstract class AbstractTestDocumentConfigurationSource
             baseObject.setXClassReference(classReference);
             document.addXObject(baseObject);
         }
-
-        baseObject.setStringValue(propertyName, propertyValue);
-
+        consumer.accept(baseObject);
         xcontext.getWiki().saveDocument(document, xcontext);
+    }
+
+    protected void setStringProperty(DocumentReference documentReference, String propertyName, String propertyValue)
+        throws XWikiException
+    {
+        setupBaseObject(documentReference, (baseObject) -> {
+            baseObject.setStringValue(propertyName, propertyValue);
+        });
     }
 
     protected void resetCache()

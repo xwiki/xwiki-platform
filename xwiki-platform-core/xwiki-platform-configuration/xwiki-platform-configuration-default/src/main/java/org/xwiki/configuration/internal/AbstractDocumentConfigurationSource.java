@@ -23,21 +23,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
 import org.xwiki.cache.CacheManager;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
@@ -48,6 +50,8 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.async.AsyncContext;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -98,6 +102,9 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 
     @Inject
     protected Logger logger;
+
+    @Inject
+    protected ContextualAuthorizationManager authorizationManager;
 
     protected Cache<Object> cache;
 
@@ -159,7 +166,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     }
 
     @Override
-    public void dispose() throws ComponentLifecycleException
+    public void dispose()
     {
         this.observation.removeListener(getCacheId());
         if (this.cache != null) {
@@ -172,7 +179,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         RegexEntityReference classMatcher =
             BaseObjectReference.any(this.referenceSerializer.serialize(getClassReference()));
 
-        return Arrays.<Event>asList(new XObjectAddedEvent(classMatcher), new XObjectDeletedEvent(classMatcher),
+        return Arrays.asList(new XObjectAddedEvent(classMatcher), new XObjectDeletedEvent(classMatcher),
             new XObjectUpdatedEvent(classMatcher), new WikiDeletedEvent());
     }
 
@@ -209,14 +216,16 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         LocalDocumentReference classReference = getFailsafeClassReference();
 
         if (documentReference != null && classReference != null) {
-            XWikiContext xcontext = this.xcontextProvider.get();
-
-            XWikiDocument document = xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
-
-            return document.getXObject(classReference);
+            return getDocument().getXObject(classReference);
         }
 
         return null;
+    }
+
+    private XWikiDocument getDocument() throws XWikiException
+    {
+        XWikiContext xcontext = this.xcontextProvider.get();
+        return xcontext.getWiki().getDocument(getDocumentReference(), xcontext);
     }
 
     protected Object getBaseProperty(String propertyName, boolean text) throws XWikiException
@@ -240,6 +249,14 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
         return null;
     }
 
+    protected void setBaseProperty(String propertyName, Object propertyValue) throws XWikiException
+    {
+        BaseObject baseObject = getBaseObject();
+        if (baseObject != null) {
+            baseObject.set(propertyName, propertyValue, this.xcontextProvider.get());
+        }
+    }
+
     @Override
     public List<String> getKeys()
     {
@@ -254,7 +271,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 
                 if (baseObject != null) {
                     Set<String> properties = baseObject.getPropertyList();
-                    keys = new ArrayList<String>(properties.size());
+                    keys = new ArrayList<>(properties.size());
                     for (String key : properties) {
                         // We need to check if the key really have a value as otherwise it does not really make sense to
                         // return it
@@ -349,6 +366,41 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     public boolean isEmpty()
     {
         return getKeys().isEmpty();
+    }
+
+    @Override
+    public void setProperties(Map<String, Object> properties) throws ConfigurationSaveException
+    {
+        // Verify that the current user has edit permissions on the document.
+        if (!this.authorizationManager.hasAccess(Right.EDIT, getDocumentReference())) {
+            throw new ConfigurationSaveException(String.format("Current logged-in user doesn't have [%s] permission "
+                + "on document [%s]. The properties [%s] have not been saved.", Right.EDIT, getDocumentReference(),
+                getPropertyListAsString(properties)));
+        }
+
+        try {
+            List<String> setPropertyNames = new ArrayList<>();
+            for (Map.Entry<String, Object> entry : properties.entrySet()) {
+                setBaseProperty(entry.getKey(), entry.getValue());
+                setPropertyNames.add(entry.getKey());
+            }
+            XWikiContext xcontext = this.xcontextProvider.get();
+            xcontext.getWiki().saveDocument(getDocument(), String.format("Set properties %s",
+                StringUtils.join(setPropertyNames, ',')), xcontext);
+        } catch (Exception e) {
+            throw new ConfigurationSaveException(String.format("Failed to set properties [%s] in document [%s]'s [%s] "
+                + "xobject", getPropertyListAsString(properties), getFailsafeClassReference(),
+                getFailsafeClassReference()), e);
+        }
+    }
+
+    private String getPropertyListAsString(Map<String, Object> properties)
+    {
+        List<String> setPropertyNames = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            setPropertyNames.add(String.format("[%s]", entry.getKey()));
+        }
+        return StringUtils.join(setPropertyNames, ',');
     }
 
     protected DocumentReference getFailsafeDocumentReference()

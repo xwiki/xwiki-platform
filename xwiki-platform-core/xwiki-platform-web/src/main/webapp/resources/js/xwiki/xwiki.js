@@ -460,7 +460,7 @@ Object.extend(XWiki, {
               }
           });
 
-          var spans = $(container || 'body').select("span.wikicreatelink");
+          var spans = $(container || 'body').select("span.wikicreatelink:not(.skipCreatePagePopup)");
           for (var i = 0; i < spans.length; i++) {
               spans[i].down('a').observe('click', function(event) {
                   // Remove the fragment identifier from the link URL.

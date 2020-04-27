@@ -108,15 +108,15 @@ public abstract class AbstractTestDocumentConfigurationSource
 
         LocalDocumentReference classReference = getClassReference();
 
-        BaseObject baseOject = document.getXObject(classReference);
-        if (baseOject == null) {
-            baseOject = new BaseObject();
-            baseOject.setDocumentReference(documentReference);
-            baseOject.setXClassReference(classReference);
-            document.addXObject(baseOject);
+        BaseObject baseObject = document.getXObject(classReference);
+        if (baseObject == null) {
+            baseObject = new BaseObject();
+            baseObject.setDocumentReference(documentReference);
+            baseObject.setXClassReference(classReference);
+            document.addXObject(baseObject);
         }
 
-        baseOject.setStringValue(propertyName, propertyValue);
+        baseObject.setStringValue(propertyName, propertyValue);
 
         xcontext.getWiki().saveDocument(document, xcontext);
     }

@@ -27,20 +27,30 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.properties.converter.ConversionException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 /**
@@ -154,7 +164,7 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
     }
 
     @Test
-    public void containsKey() throws XWikiException
+    void containsKey() throws XWikiException
     {
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
@@ -164,7 +174,7 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
     }
 
     @Test
-    public void isEmpty() throws XWikiException
+    void isEmpty() throws XWikiException
     {
         assertTrue(this.source.isEmpty());
 
@@ -172,5 +182,60 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
         assertFalse(this.source.isEmpty());
+    }
+
+    @Test
+    void setProperty() throws Exception
+    {
+        DocumentReference reference = new DocumentReference(CURRENT_WIKI,
+            WikiPreferencesConfigurationSource.CLASS_SPACE_NAME, WikiPreferencesConfigurationSource.CLASS_PAGE_NAME);
+        ContextualAuthorizationManager authorizationManager =
+            this.componentManager.getInstance(ContextualAuthorizationManager.class);
+        when(authorizationManager.hasAccess(Right.EDIT, reference)).thenReturn(true);
+        this.componentManager.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        setupBaseObject(reference, (baseObject -> {
+        }));
+
+        // Since setProperties() will call baseObject.set(), without any indication of the type to set we need to
+        // mock the base class too for the type to be found.
+        XWikiDocument document = this.oldcore.getXWikiContext().getWiki().getDocument(reference,
+            this.oldcore.getXWikiContext());
+        BaseClass baseClass = document.getXClass();
+        baseClass.addTextField("key", "Some Key", 30);
+
+        this.source.setProperties(Collections.singletonMap("key", "value"));
+
+        assertEquals("value", this.source.getProperty("key"));
+    }
+
+    @Test
+    void setPropertyWhenException() throws Exception
+    {
+        DocumentReference reference = new DocumentReference(CURRENT_WIKI,
+            WikiPreferencesConfigurationSource.CLASS_SPACE_NAME, WikiPreferencesConfigurationSource.CLASS_PAGE_NAME);
+        ContextualAuthorizationManager authorizationManager =
+            this.componentManager.getInstance(ContextualAuthorizationManager.class);
+        when(authorizationManager.hasAccess(Right.EDIT, reference)).thenReturn(true);
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        when(this.oldcore.getXWikiContext().getWiki().getDocument(reference, xcontext)).thenThrow(
+            new XWikiException(0, 0, "error"));
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("key1", "value1");
+        properties.put("key2", "value2");
+        Exception exception = assertThrows(ConfigurationSaveException.class,
+            () -> this.source.setProperties(properties));
+        assertEquals("Failed to set properties [[key1],[key2]] in document [XWiki.XWikiPreferences]'s "
+            + "[XWiki.XWikiPreferences] xobject", exception.getMessage());
+    }
+
+    @Test
+    void setPropertyWhenNoPermission()
+    {
+        Exception exception = assertThrows(ConfigurationSaveException.class,
+            () -> this.source.setProperties(Collections.singletonMap("key", "value")));
+        assertEquals("Current logged-in user doesn't have [edit] permission on document "
+            + "[currentwiki:XWiki.XWikiPreferences]. The properties [[key]] have not been saved.",
+            exception.getMessage());
     }
 }

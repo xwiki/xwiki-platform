@@ -45,24 +45,27 @@
   // See CKEDITOR-323: Insertion of &nbsp; in editor when deleting characters
   var hasNonBreakingSpaceIssue = false;
   CKEDITOR.once('instanceCreated', function() {
-    // Note that the editor must be visible in order to reproduce the issue. Make sure it doesn't appear on screen.
-    var container = $('<div id="CKEDITOR-323"/>').css({
+    // Note that the editor must be visible in order to reproduce the issue.
+    var container = $('<p id="CKEDITOR-323"/>').prop('contenteditable', true).css({
+      // Using position fixed in order to prevent the browser from scrolling the page when the editor is focused.
       position: 'fixed',
-      top: '-1000px',
-      height: '100px',
-      overflow: 'hidden'
-    }).appendTo('body');
-    var textArea = $('<textarea/>').text('<p>ab c</p>').appendTo(container);
-    CKEDITOR.replace(textArea[0], {
+      // Make sure the users don't notice the test editor instance.
+      color: 'transparent'
+    }).text('ab c').appendTo('body');
+    // Using the inline mode for the test editor instance because it's faster and take less UI space.
+    CKEDITOR.inline(container[0], {
       'xwiki-filter': {
         // Check if the problem reproduces without our fix.
         fixNonBreakingSpace: false
       }
     }).once('instanceReady', function(event) {
       var editor = event.editor;
-      var textNode = editor.editable().getFirst().getFirst();
+      var textNode = editor.editable().getFirst();
       // Split the text node after 'b' to simulate the CKEditor behavior when pressing the delete key.
       textNode.split(2);
+      // Backup the current text selection.
+      var nativeSelection = window.getSelection();
+      var originalRange = nativeSelection.rangeCount > 0 && nativeSelection.getRangeAt(0);
       // Select the 'b' character.
       var range = editor.createRange();
       range.setStart(textNode, 1);
@@ -73,8 +76,13 @@
       editor.document.$.execCommand('delete');
       // Destroy the test editor and check the produced HTML.
       editor.destroy();
-      hasNonBreakingSpaceIssue = textArea.val().indexOf('a&nbsp;c') >= 0;
+      hasNonBreakingSpaceIssue = container.html().indexOf('a&nbsp;c') >= 0;
       container.remove();
+      // Restore the original text selection.
+      if (originalRange) {
+        nativeSelection.removeAllRanges();
+        nativeSelection.addRange(originalRange);
+      }
     // This listener destroys the test editor so make sure it is called last.
     }, null, null, 1000);
   // Make sure this listener is called as early as possible.

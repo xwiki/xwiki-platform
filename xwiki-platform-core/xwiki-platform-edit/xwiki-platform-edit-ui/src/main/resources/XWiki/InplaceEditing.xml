@@ -768,8 +768,8 @@ define('editInPlace', [
       editContent.show();
       viewContent.remove();
       if (withFocus) {
-        // Restore the focus when the edit content is ready.
-        editContent.focus();
+        // Restore the focus when the edit content is ready but make sure we don't scroll the page.
+        editContent[0].focus({preventScroll: true});
       }
     });
     editContent.trigger('xwiki:actions:edit', data);

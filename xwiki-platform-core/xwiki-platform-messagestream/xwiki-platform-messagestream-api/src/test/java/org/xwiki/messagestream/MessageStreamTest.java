@@ -32,6 +32,7 @@ import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventFactory;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.messagestream.internal.DefaultMessageStream;
 import org.xwiki.model.ModelContext;
@@ -106,13 +107,19 @@ class MessageStreamTest
 
     private Event setupForNewMessage() throws ComponentLookupException, Exception
     {
-        Event e = new DefaultEvent();
-        e.setId(UUID.randomUUID().toString());
+        Event event = new DefaultEvent();
+        event.setId(UUID.randomUUID().toString());
 
-        when(this.mockEventFactory.createEvent()).thenReturn(e);
+        when(this.mockEventFactory.createEvent()).thenReturn(event);
         when(this.mockContext.getCurrentEntityReference()).thenReturn(new DocumentReference("wiki", "Space", "Page"));
 
-        return e;
+        return event;
+    }
+
+    private void verifyForNewMessage(Event event) throws EventStreamException
+    {
+        verify(this.mockEventFactory).createEvent();
+        verify(this.mockEventStore).saveEvent(event);
     }
 
     private Event setupForPublicMessage() throws Exception
@@ -265,6 +272,8 @@ class MessageStreamTest
 
         this.stream.postDirectMessageToUser("Hello World!", TARGET_USER);
 
+        verifyForNewMessage(postedMessage);
+
         assertEquals("Hello World!", postedMessage.getBody());
         assertEquals(Importance.CRITICAL, postedMessage.getImportance());
         assertEquals("directMessage", postedMessage.getType());
@@ -279,6 +288,8 @@ class MessageStreamTest
 
         this.stream.postDirectMessageToUser(null, TARGET_USER);
 
+        verifyForNewMessage(postedMessage);
+
         assertEquals(null, postedMessage.getBody());
     }
 
@@ -289,6 +300,8 @@ class MessageStreamTest
 
         this.stream.postDirectMessageToUser("", TARGET_USER);
 
+        verifyForNewMessage(postedMessage);
+
         assertEquals("", postedMessage.getBody());
     }
 
@@ -298,6 +311,8 @@ class MessageStreamTest
         Event postedMessage = setupForDirectMessage();
 
         this.stream.postDirectMessageToUser(StringUtils.repeat('a', 10000), TARGET_USER);
+
+        verifyForNewMessage(postedMessage);
 
         assertEquals(StringUtils.repeat('a', 2000), postedMessage.getBody());
     }

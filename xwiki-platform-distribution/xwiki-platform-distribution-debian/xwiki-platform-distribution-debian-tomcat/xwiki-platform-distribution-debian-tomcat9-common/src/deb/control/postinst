@@ -24,10 +24,4 @@ chown -R tomcat.tomcat /var/lib/xwiki/data
 systemctl daemon-reload
 
 # Restart tomcat9 service
-invoke-rc.d --quiet tomcat9 restart || {
-    RESULT=$?
-    # Ignore if tomcat9 init script does not exist (yet)
-    if [ $RESULT != 100 ]; then
-    exit $RESULT
-    fi
-}
+service tomcat9 restart

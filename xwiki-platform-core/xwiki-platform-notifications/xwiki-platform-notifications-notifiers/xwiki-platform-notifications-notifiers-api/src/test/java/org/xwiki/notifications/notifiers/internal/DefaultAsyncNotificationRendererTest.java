@@ -41,6 +41,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -167,5 +168,25 @@ public class DefaultAsyncNotificationRendererTest
         assertEquals(new AsyncRendererResult("Expected count cache result!"),
             this.asyncNotificationRenderer.render(false, true));
         verify(this.notificationCacheManager, never()).setInCache(CACHE_KEY, compositeEventList, false);
+    }
+
+    @Test
+    public void renderUserNull() throws Exception
+    {
+        notificationParameters.user = null;
+        List<CompositeEvent> compositeEventList = Arrays.asList(
+            mock(CompositeEvent.class),
+            mock(CompositeEvent.class)
+        );
+        when(this.notificationManager.getEvents(notificationParameters)).thenReturn(compositeEventList);
+        notificationParameters.expectedCount = 2;
+        when(this.htmlNotificationRenderer.render(compositeEventList, null, true))
+            .thenReturn("Expected result!");
+        this.asyncNotificationRenderer.initialize(
+            new NotificationAsyncRendererConfiguration(notificationParameters, false));
+        assertEquals(new AsyncRendererResult("Expected result!"), this.asyncNotificationRenderer.render(false, false));
+        verify(this.notificationCacheManager).getFromCache(CACHE_KEY, false);
+        verify(this.notificationCacheManager).setInCache(CACHE_KEY, compositeEventList, false);
+        verify(this.compositeEventStatusManager, never()).getCompositeEventStatuses(any(), any());
     }
 }

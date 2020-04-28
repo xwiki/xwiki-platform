@@ -19,10 +19,10 @@
  */
 package org.xwiki.messagestream;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -30,52 +30,45 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
+ * Validate {@link DirectMessageDescriptor}.
+ * 
  * @version $Id$
- * @since
  */
-public class DirectMessageDescriptorTest
+@ComponentTest
+class DirectMessageDescriptorTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DirectMessageDescriptor> mocker =
-            new MockitoComponentMockingRule<>(DirectMessageDescriptor.class);
-
+    @MockComponent
     private MessageStreamConfiguration messageStreamConfiguration;
 
-    @Before
-    public void setUp() throws Exception
+    @InjectMockComponents
+    private DirectMessageDescriptor descriptor;
+
+    @Test
+    void getEventType() throws Exception
     {
-        messageStreamConfiguration = mocker.getInstance(MessageStreamConfiguration.class);
+        assertEquals("directMessage", this.descriptor.getEventType());
     }
 
     @Test
-    public void getEventType() throws Exception
+    void getApplicationIcon() throws Exception
     {
-        assertEquals("directMessage", mocker.getComponentUnderTest().getEventType());
+        assertEquals("comment", this.descriptor.getApplicationIcon());
     }
 
     @Test
-    public void getApplicationIcon() throws Exception
+    void getApplicationId() throws Exception
     {
-        assertEquals("comment", mocker.getComponentUnderTest().getApplicationIcon());
+        assertEquals("org.xwiki.platform:xwiki-platform-messagestream-api", this.descriptor.getApplicationId());
     }
 
     @Test
-    public void getApplicationId() throws Exception
+    void isEnabled() throws Exception
     {
-        assertEquals("org.xwiki.platform:xwiki-platform-messagestream-api",
-                mocker.getComponentUnderTest().getApplicationId());
+        when(this.messageStreamConfiguration.isActive("wiki1")).thenReturn(true);
+        when(this.messageStreamConfiguration.isActive("wiki2")).thenReturn(false);
+
+        assertTrue(this.descriptor.isEnabled("wiki1"));
+        assertFalse(this.descriptor.isEnabled("wiki2"));
     }
-
-    @Test
-    public void isEnabled() throws Exception
-    {
-        when(messageStreamConfiguration.isActive("wiki1")).thenReturn(true);
-        when(messageStreamConfiguration.isActive("wiki2")).thenReturn(false);
-
-        assertTrue(mocker.getComponentUnderTest().isEnabled("wiki1"));
-        assertFalse(mocker.getComponentUnderTest().isEnabled("wiki2"));
-    }
-
 
 }
-

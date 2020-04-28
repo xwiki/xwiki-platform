@@ -407,9 +407,10 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
       }
       // Store the data in the DOM element so that any javascript code can retrieve it
       notif.data('notif', entry);
+      // Prevent the data to call the new macro augmentation
+      notif.data('augmented', true);
       // Add the notification entry
       self.insertElementInMacroContainer(notif);
-      notif.data('augmented', true);
       // Add the "mark as read" button if the notif is not already read
       if (!entry.read) {
         // Style the read button
@@ -560,29 +561,6 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
     self.macro = $(macro);
     self.displayReadStatus = self.macro.attr('data-displayReadStatus').toLowerCase() == 'true';
     self.asyncLoaded = false;
-    self.processEvents = function (mutations) {
-      for (var i = 0; i &lt; mutations.length; i++) {
-        var mutation = mutations[i];
-
-        for (var j = 0; j &lt; mutation.addedNodes.length; j++) {
-          var element = mutation.addedNodes[j];
-          // We perform the binding only if the newly added element concern the current macro container
-          if (self.macro.has($(element)).length &gt; 0) {
-            if ($(element).hasClass('notification-event')) {
-              self.augmentEntry($(element));
-            }
-
-            if ($(element).hasClass('notifications-macro-load-more')) {
-              self.bindLoadMore($(element))
-            }
-          }
-        }
-      }
-    };
-    
-    // Register a callback for when the async is done.
-    var observer = new MutationObserver(self.processEvents);
-    observer.observe(document, { childList: true, subtree : true});
 
     self.bindLoadMore = function (loadMore) {
       if (!loadMore.data('augmented')) {
@@ -639,6 +617,38 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         });
       }
     };
+
+    // Ensure that if the async already answered before the definition of the observer we augment it.
+    self.macro.find('.notifications-macro-load-more').each(function() {
+      self.bindLoadMore($(this));
+    });
+    self.macro.find('.notification-event').each(function() {
+      self.augmentEntry($(this));
+    });
+
+    self.processEvents = function (mutations) {
+      for (var i = 0; i &lt; mutations.length; i++) {
+        var mutation = mutations[i];
+        for (var j = 0; j &lt; mutation.addedNodes.length; j++) {
+          var element = mutation.addedNodes[j];
+
+          // We perform the binding only if the newly added element concern the current macro container
+          if (self.macro.has($(element)).length &gt; 0) {
+            if ($(element).hasClass('notification-event')) {
+              self.augmentEntry($(element));
+            }
+
+            if ($(element).hasClass('notifications-macro-load-more')) {
+              self.bindLoadMore($(element))
+            }
+          }
+        }
+      }
+    };
+
+    // Register a callback for when the async is done.
+    var observer = new MutationObserver(self.processEvents);
+    observer.observe(document, { childList: true, subtree : true});
   };
 });
 </code>

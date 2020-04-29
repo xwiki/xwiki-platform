@@ -17,25 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user;
+package org.xwiki.configuration;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReference;
 
 /**
- * Converts a {@link UserReference} into a serialized form (e.g. into a String representation).
+ * Provides authorization for a given {@link ConfigurationSource}.
  *
- * @param <T> the type into which to serialize the user reference (e.g. String)
  * @version $Id$
- * @since 12.2
+ * @since 12.4RC1
  */
 @Unstable
 @Role
-public interface UserReferenceSerializer<T>
+public interface ConfigurationSourceAuthorization
 {
     /**
-     * @param userReference the user reference to serialize
-     * @return the serialized representation
+     * @param key the key for which to check the access right for
+     * @param userReference the reference to the user to check for permissions
+     * @param right the right to check (e.g. {@code AccessRight.READ})
+     * @return true if the property can be accessed for the passed right (e.g. READ or WRITE)
      */
-    T serialize(UserReference userReference);
+    boolean hasAccess(String key, UserReference userReference, ConfigurationRight right);
 }

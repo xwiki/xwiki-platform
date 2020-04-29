@@ -21,10 +21,15 @@ package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.ConfigurationSourceAuthorization;
+import org.xwiki.security.authorization.AuthorizationManager;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Get the user properties (including all inherited ones) for a {@link DocumentUserReference}, by extracting them from
@@ -40,11 +45,13 @@ public class AllDocumentUserPropertiesResolver extends AbstractDocumentUserPrope
 {
     @Inject
     @Named("all")
-    protected ConfigurationSource configurationSource;
+    private ConfigurationSource configurationSource;
 
     @Override
-    protected ConfigurationSource getConfigurationSource()
+    protected ConfigurationSource getConfigurationSource(DocumentUserReference userReference,
+        ConfigurationSourceAuthorization authorization, AuthorizationManager authorizationManager,
+        Provider<XWikiContext> contextProvider)
     {
-        return this.configurationSource;
+        return new CurrentUserConfigurationSource(userReference, this.configurationSource, contextProvider);
     }
 }

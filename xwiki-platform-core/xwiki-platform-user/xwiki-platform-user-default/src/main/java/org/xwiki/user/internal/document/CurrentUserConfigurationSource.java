@@ -24,65 +24,61 @@ import java.util.function.Supplier;
 import javax.inject.Provider;
 
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.internal.ConfigurationSourceDecorator;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.model.reference.LocalDocumentReference;
-import org.xwiki.user.internal.DefaultUserProperties;
 
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Document-based implementation of a XWiki user properties.
- *
- * Always go through a {@link org.xwiki.user.UserPropertiesResolver} to get a
- * {@link DocumentUserProperties} object (this is why this class is package-protected). The reason is because the
- * resolvers know how to handle Guest and SuperAdmin users properly.
+ * Configuration source decorator that sets a passed user reference as the current user so that the wrapped
+ * configuration source operates with that user set as the current user.
  *
  * @version $Id$
- * @since 12.2
+ * @since 12.4RC1
  */
-class DocumentUserProperties extends DefaultUserProperties
+public class CurrentUserConfigurationSource extends ConfigurationSourceDecorator
 {
-    static final LocalDocumentReference USERS_CLASS_REFERENCE = new LocalDocumentReference("XWiki", "XWikiUsers");
-
     private DocumentUserReference userReference;
 
     private Provider<XWikiContext> contextProvider;
 
     /**
-     * @param userReference the user reference
-     * @param contextProvider the component to get/set the current user in the context
-     * @param userConfigurationSource the component to get the user properties
-     * @param
+     * @param userReference the user reference to set as the current use
+     * @param internalConfigurationSource the wrapped configuration source
+     * @param contextProvider the context provider used to set the current user
      */
-    DocumentUserProperties(DocumentUserReference userReference, Provider<XWikiContext> contextProvider,
-        ConfigurationSource userConfigurationSource)
+    public CurrentUserConfigurationSource(DocumentUserReference userReference,
+        ConfigurationSource internalConfigurationSource, Provider<XWikiContext> contextProvider)
     {
-        super(userConfigurationSource);
-
+        super(internalConfigurationSource);
         this.userReference = userReference;
         this.contextProvider = contextProvider;
     }
 
     @Override
-    protected <T> T execute(Supplier<T> supplier)
+    protected <T> T executeRead(Supplier<T> supplier)
     {
         XWikiContext xcontext = this.contextProvider.get();
         DocumentReference originalUserReference = xcontext.getUserReference();
         try {
-            xcontext.setUserReference(getInternalReference());
+            xcontext.setUserReference(this.userReference.getReference());
             return supplier.get();
         } finally {
             xcontext.setUserReference(originalUserReference);
         }
     }
 
-    private DocumentUserReference getUserReference()
+    @Override
+    protected <E extends Exception> void executeWrite(ThrowingRunnable<E> runnable) throws E
     {
-        return this.userReference;
-    }
-
-    private DocumentReference getInternalReference()
-    {
-        return getUserReference().getReference();
+        XWikiContext xcontext = this.contextProvider.get();
+        DocumentReference originalUserReference = xcontext.getUserReference();
+        try {
+            xcontext.setUserReference(this.userReference.getReference());
+            runnable.run();
+        } finally {
+            xcontext.setUserReference(originalUserReference);
+        }
+        super.executeWrite(runnable);
     }
 }

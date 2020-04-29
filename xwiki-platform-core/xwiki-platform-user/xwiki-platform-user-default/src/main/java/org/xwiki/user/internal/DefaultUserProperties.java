@@ -19,9 +19,11 @@
  */
 package org.xwiki.user.internal;
 
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.function.Supplier;
+import java.util.Map;
 
+import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.user.Editor;
 import org.xwiki.user.UserProperties;
@@ -44,14 +46,19 @@ import static org.xwiki.user.internal.UserPropertyConstants.USER_TYPE;
  */
 public class DefaultUserProperties implements UserProperties
 {
-    private ConfigurationSource userConfigurationSource;
+    /**
+     * Preserve the order in the map so that it's the same as expected by the user.
+     */
+    protected Map<String, Object> unsavedProperties = new LinkedHashMap<>();
+
+    private ConfigurationSource configurationSource;
 
     /**
-     * @param userConfigurationSource the component providing the user properties
+     * @param configurationSource the component providing the user properties
      */
-    public DefaultUserProperties(ConfigurationSource userConfigurationSource)
+    public DefaultUserProperties(ConfigurationSource configurationSource)
     {
-        this.userConfigurationSource = userConfigurationSource;
+        this.configurationSource = configurationSource;
     }
 
     @Override
@@ -61,9 +68,21 @@ public class DefaultUserProperties implements UserProperties
     }
 
     @Override
+    public void setDisplayHiddenDocuments(boolean displayHiddenDocuments)
+    {
+        this.unsavedProperties.put(DISPLAY_HIDDEN_DOCUMENTS, displayHiddenDocuments);
+    }
+
+    @Override
     public boolean isActive()
     {
         return getProperty(ACTIVE, Boolean.class, false);
+    }
+
+    @Override
+    public void setActive(boolean isActive)
+    {
+        this.unsavedProperties.put(ACTIVE, isActive);
     }
 
     @Override
@@ -73,9 +92,21 @@ public class DefaultUserProperties implements UserProperties
     }
 
     @Override
+    public void setFirstName(String firstName)
+    {
+        this.unsavedProperties.put(FIRST_NAME, firstName);
+    }
+
+    @Override
     public String getLastName()
     {
         return (String) getProperty(LAST_NAME);
+    }
+
+    @Override
+    public void setLastName(String lastName)
+    {
+        this.unsavedProperties.put(LAST_NAME, lastName);
     }
 
     @Override
@@ -85,9 +116,21 @@ public class DefaultUserProperties implements UserProperties
     }
 
     @Override
+    public void setEmail(String email)
+    {
+        this.unsavedProperties.put(EMAIL, email);
+    }
+
+    @Override
     public UserType getType()
     {
         return UserType.fromString(getProperty(USER_TYPE));
+    }
+
+    @Override
+    public void setType(UserType type)
+    {
+        this.unsavedProperties.put(USER_TYPE, type);
     }
 
     @Override
@@ -97,60 +140,80 @@ public class DefaultUserProperties implements UserProperties
     }
 
     @Override
+    public void setEditor(Editor editor)
+    {
+        this.unsavedProperties.put(EDITOR, editor);
+    }
+
+    @Override
     public boolean isEmailChecked()
     {
         return getProperty(EMAIL_CHECKED, Boolean.class, false);
     }
 
     @Override
+    public void setEmailChecked(boolean isEmailChecked)
+    {
+        this.unsavedProperties.put(EMAIL_CHECKED, isEmailChecked);
+    }
+
+    @Override
     public <T> T getProperty(String key, T defaultValue)
     {
-        return execute(() -> getUserConfigurationSource().getProperty(key, defaultValue));
+        return getConfigurationSource().getProperty(key, defaultValue);
     }
 
     @Override
     public <T> T getProperty(String key, Class<T> valueClass)
     {
-        return execute(() -> getUserConfigurationSource().getProperty(key, valueClass));
+        return getConfigurationSource().getProperty(key, valueClass);
     }
 
     @Override
     public List<String> getKeys()
     {
-        return execute(() -> getUserConfigurationSource().getKeys());
+        return getConfigurationSource().getKeys();
     }
 
     @Override
     public boolean containsKey(String key)
     {
-        return execute(() -> getUserConfigurationSource().containsKey(key));
+        return getConfigurationSource().containsKey(key);
     }
 
     @Override
     public boolean isEmpty()
     {
-        return execute(() -> getUserConfigurationSource().isEmpty());
+        return getConfigurationSource().isEmpty();
     }
 
     @Override
     public <T> T getProperty(String key, Class<T> valueClass, T defaultValue)
     {
-        return execute(() -> getUserConfigurationSource().getProperty(key, valueClass, defaultValue));
+        return getConfigurationSource().getProperty(key, valueClass, defaultValue);
     }
 
     @Override
     public <T> T getProperty(String key)
     {
-        return execute(() -> getUserConfigurationSource().getProperty(key));
+        return getConfigurationSource().getProperty(key);
     }
 
-    protected ConfigurationSource getUserConfigurationSource()
+    @Override
+    public void setProperties(Map<String, Object> properties) throws ConfigurationSaveException
     {
-        return this.userConfigurationSource;
+        getConfigurationSource().setProperties(properties);
     }
 
-    protected <T> T execute(Supplier<T> supplier)
+    @Override
+    public void save() throws ConfigurationSaveException
     {
-        return supplier.get();
+        getConfigurationSource().setProperties(this.unsavedProperties);
+        this.unsavedProperties.clear();
+    }
+
+    protected ConfigurationSource getConfigurationSource()
+    {
+        return this.configurationSource;
     }
 }

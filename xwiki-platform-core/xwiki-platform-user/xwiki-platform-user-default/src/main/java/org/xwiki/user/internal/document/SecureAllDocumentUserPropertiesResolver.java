@@ -32,19 +32,19 @@ import org.xwiki.security.authorization.AuthorizationManager;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Get the direct user properties for a {@link DocumentUserReference}, by extracting them from the
- * {@code XWiki.XWikiUsers} object.
+ * Get the user properties (including all inherited ones) for a {@link DocumentUserReference}, by extracting them from
+ * the {@code XWiki.XWikiUsers} object.
  *
  * @version $Id$
  * @since 12.2
  */
 @Component
-@Named("user/org.xwiki.user.internal.document.DocumentUserReference")
+@Named("secure/all/org.xwiki.user.internal.document.DocumentUserReference")
 @Singleton
-public class UserDocumentUserPropertiesResolver extends AbstractDocumentUserPropertiesResolver
+public class SecureAllDocumentUserPropertiesResolver extends AbstractDocumentUserPropertiesResolver
 {
     @Inject
-    @Named("user")
+    @Named("all")
     private ConfigurationSource configurationSource;
 
     @Override
@@ -52,6 +52,8 @@ public class UserDocumentUserPropertiesResolver extends AbstractDocumentUserProp
         ConfigurationSourceAuthorization authorization, AuthorizationManager authorizationManager,
         Provider<XWikiContext> contextProvider)
     {
-        return new CurrentUserConfigurationSource(userReference, this.configurationSource, this.contextProvider);
+        return new SecureDocumentConfigurationSource(userReference,
+            new CurrentUserConfigurationSource(userReference, this.configurationSource, contextProvider), authorization,
+            authorizationManager, contextProvider);
     }
 }

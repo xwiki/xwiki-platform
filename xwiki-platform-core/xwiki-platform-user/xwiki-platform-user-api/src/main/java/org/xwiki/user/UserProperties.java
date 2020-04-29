@@ -19,6 +19,7 @@
  */
 package org.xwiki.user;
 
+import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.stability.Unstable;
 
@@ -39,9 +40,19 @@ public interface UserProperties extends ConfigurationSource
     boolean displayHiddenDocuments();
 
     /**
+     * @param displayHiddenDocuments see {@link #displayHiddenDocuments()}
+     */
+    void setDisplayHiddenDocuments(boolean displayHiddenDocuments);
+
+    /**
      * @return true if the user is active in the wiki. An active user can log in.
      */
     boolean isActive();
+
+    /**
+     * @param isActive see {@link #isActive()}
+     */
+    void setActive(boolean isActive);
 
     /**
      * @return the first name of the user or null if not set
@@ -49,14 +60,29 @@ public interface UserProperties extends ConfigurationSource
     String getFirstName();
 
     /**
+     * @param firstName see {@link #getFirstName()}
+     */
+    void setFirstName(String firstName);
+
+    /**
      * @return the last name of the user or null if not set
      */
     String getLastName();
 
     /**
+     * @param lastName see {@link #getLastName()}
+     */
+    void setLastName(String lastName);
+
+    /**
      * @return the email address of the user and null if not set
      */
     String getEmail();
+
+    /**
+     * @param email see {@link #getEmail()}
+     */
+    void setEmail(String email);
 
     /**
      * @return the type of the user (simple user, advanced user)
@@ -65,9 +91,19 @@ public interface UserProperties extends ConfigurationSource
     UserType getType();
 
     /**
+     * @param type see {@link #getType()}
+     */
+    void setType(UserType type);
+
+    /**
      * @return the default editor to use when editing content for this user (text editor, wysiwyg editor)
      */
     Editor getEditor();
+
+    /**
+     * @param editor see {@link #getEditor()}
+     */
+    void setEditor(Editor editor);
 
     /**
      * @return true if the user's email has been checked. In some configurations, users must have had their emails
@@ -75,4 +111,16 @@ public interface UserProperties extends ConfigurationSource
      *         able to view pages.
      */
     boolean isEmailChecked();
+
+    /**
+     * @param isEmailChecked see {@link #isEmailChecked()}
+     */
+    void setEmailChecked(boolean isEmailChecked);
+
+    /**
+     * Persist the various {@code setXXX()} calls made since the last call to this method.
+     *
+     * @throws ConfigurationSaveException in case of an error during the save
+     */
+    void save() throws ConfigurationSaveException;
 }

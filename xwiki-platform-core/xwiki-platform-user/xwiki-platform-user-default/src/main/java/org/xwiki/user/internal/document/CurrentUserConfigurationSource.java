@@ -79,6 +79,5 @@ public class CurrentUserConfigurationSource extends ConfigurationSourceDecorator
         } finally {
             xcontext.setUserReference(originalUserReference);
         }
-        super.executeWrite(runnable);
     }
 }

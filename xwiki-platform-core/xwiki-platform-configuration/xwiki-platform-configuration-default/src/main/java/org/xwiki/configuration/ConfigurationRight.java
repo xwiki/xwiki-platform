@@ -17,25 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+package org.xwiki.configuration;
 
 /**
- * Converts a {@link UserReference} into a serialized form (e.g. into a String representation).
+ * Rights available for a configuration.
  *
- * @param <T> the type into which to serialize the user reference (e.g. String)
  * @version $Id$
- * @since 12.2
+ * @since 12.4RC1
  */
-@Unstable
-@Role
-public interface UserReferenceSerializer<T>
+public enum ConfigurationRight
 {
     /**
-     * @param userReference the user reference to serialize
-     * @return the serialized representation
+     * The configuration can be read from.
      */
-    T serialize(UserReference userReference);
+    READ,
+
+    /**
+     * The configuration can be written to.
+     */
+    WRITE
 }

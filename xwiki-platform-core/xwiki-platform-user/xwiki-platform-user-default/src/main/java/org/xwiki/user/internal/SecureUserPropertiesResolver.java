@@ -17,25 +17,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.user;
+package org.xwiki.user.internal;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.configuration.ConfigurationSource;
 
 /**
- * Converts a {@link UserReference} into a serialized form (e.g. into a String representation).
+ * Looks in the "user" {@link ConfigurationSource} to get User properties (i.e. no fallbacks) and returns a secure
+ * {@link org.xwiki.user.UserProperties} object that performs permissions checks when reading/writing properties.
  *
- * @param <T> the type into which to serialize the user reference (e.g. String)
  * @version $Id$
- * @since 12.2
+ * @since 12.4RC1
  */
-@Unstable
-@Role
-public interface UserReferenceSerializer<T>
+@Component
+@Named("secure")
+@Singleton
+public class SecureUserPropertiesResolver extends AbstractUserPropertiesResolver
 {
-    /**
-     * @param userReference the user reference to serialize
-     * @return the serialized representation
-     */
-    T serialize(UserReference userReference);
+    @Override
+    protected String getUnderlyingConfigurationSourceHint()
+    {
+        return "secure/user";
+    }
 }

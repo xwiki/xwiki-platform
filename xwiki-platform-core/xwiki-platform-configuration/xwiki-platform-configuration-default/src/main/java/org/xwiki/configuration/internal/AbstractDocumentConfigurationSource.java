@@ -50,8 +50,6 @@ import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.Event;
 import org.xwiki.properties.ConverterManager;
 import org.xwiki.rendering.async.AsyncContext;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -102,9 +100,6 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
 
     @Inject
     protected Logger logger;
-
-    @Inject
-    protected ContextualAuthorizationManager authorizationManager;
 
     protected Cache<Object> cache;
 
@@ -371,13 +366,6 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
     @Override
     public void setProperties(Map<String, Object> properties) throws ConfigurationSaveException
     {
-        // Verify that the current user has edit permissions on the document.
-        if (!this.authorizationManager.hasAccess(Right.EDIT, getDocumentReference())) {
-            throw new ConfigurationSaveException(String.format("Current logged-in user doesn't have [%s] permission "
-                + "on document [%s]. The properties [%s] have not been saved.", Right.EDIT, getDocumentReference(),
-                getPropertyListAsString(properties)));
-        }
-
         try {
             List<String> setPropertyNames = new ArrayList<>();
             for (Map.Entry<String, Object> entry : properties.entrySet()) {
@@ -385,7 +373,7 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
                 setPropertyNames.add(entry.getKey());
             }
             XWikiContext xcontext = this.xcontextProvider.get();
-            xcontext.getWiki().saveDocument(getDocument(), String.format("Set properties %s",
+            xcontext.getWiki().saveDocument(getDocument(), String.format("Set properties: %s",
                 StringUtils.join(setPropertyNames, ',')), xcontext);
         } catch (Exception e) {
             throw new ConfigurationSaveException(String.format("Failed to set properties [%s] in document [%s]'s [%s] "

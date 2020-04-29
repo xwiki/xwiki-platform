@@ -39,9 +39,9 @@ import com.xpn.xwiki.XWikiContext;
  * @since 12.2
  */
 @Component
-@Named("user/org.xwiki.user.internal.document.DocumentUserReference")
+@Named("secure/user/org.xwiki.user.internal.document.DocumentUserReference")
 @Singleton
-public class UserDocumentUserPropertiesResolver extends AbstractDocumentUserPropertiesResolver
+public class SecureUserDocumentUserPropertiesResolver extends AbstractDocumentUserPropertiesResolver
 {
     @Inject
     @Named("user")
@@ -52,6 +52,8 @@ public class UserDocumentUserPropertiesResolver extends AbstractDocumentUserProp
         ConfigurationSourceAuthorization authorization, AuthorizationManager authorizationManager,
         Provider<XWikiContext> contextProvider)
     {
-        return new CurrentUserConfigurationSource(userReference, this.configurationSource, this.contextProvider);
+        return new SecureDocumentConfigurationSource(userReference,
+            new CurrentUserConfigurationSource(userReference, this.configurationSource, contextProvider), authorization,
+            authorizationManager, contextProvider);
     }
 }

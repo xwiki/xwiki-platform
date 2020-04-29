@@ -171,6 +171,12 @@
                     "oldValue": "\"an optional id of a section to include in the specified document\"",
                     "newValue": "\"an optional id of a section to (include|display) in the specified document, e.g. 'HMyHeading'\"",
                     "justification": "Not a breakage, just improved text description!"
+                  },
+                  {
+                    "regex": true,
+                    "code": ".*",
+                    "new": "method .* org\.xwiki\.user\.UserProperties::.*",
+                    "justification": "Young API, not a breakage"
                   }
                 ]
               }

@@ -145,7 +145,7 @@ public class DefaultUserPropertiesResolverTest
         UserProperties userProperties = this.resolver.resolve(SuperAdminUserReference.INSTANCE);
         assertTrue(userProperties instanceof DefaultUserProperties);
         assertSame(this.superAdminConfigurationSource,
-            ((DefaultUserProperties) userProperties).getUserConfigurationSource());
+            ((DefaultUserProperties) userProperties).getConfigurationSource());
     }
 
     @Test
@@ -154,6 +154,6 @@ public class DefaultUserPropertiesResolverTest
         UserProperties userProperties = this.resolver.resolve(GuestUserReference.INSTANCE);
         assertTrue(userProperties instanceof DefaultUserProperties);
         assertSame(this.guestConfigurationSource,
-            ((DefaultUserProperties) userProperties).getUserConfigurationSource());
+            ((DefaultUserProperties) userProperties).getConfigurationSource());
     }
 }

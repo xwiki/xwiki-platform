@@ -91,8 +91,8 @@ import com.xpn.xwiki.objects.classes.ListClass;
  */
 public abstract class AbstractExtensionRESTResource extends XWikiResource implements Initializable
 {
-    public static final String[] EPROPERTIES_SUMMARY = new String[] { XWikiRepositoryModel.PROP_EXTENSION_ID,
-    XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME };
+    public static final String[] EPROPERTIES_SUMMARY = new String[] {XWikiRepositoryModel.PROP_EXTENSION_ID,
+        XWikiRepositoryModel.PROP_EXTENSION_TYPE, XWikiRepositoryModel.PROP_EXTENSION_NAME};
 
     protected static final String DEFAULT_BOOST;
 
@@ -305,7 +305,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         extension.setId((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_ID));
-        extension.setType((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE));
+        extension.setType(
+            StringUtils.stripToNull((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_TYPE)));
 
         License license = this.extensionObjectFactory.createLicense();
         license.setName((String) getValue(extensionObject, XWikiRepositoryModel.PROP_EXTENSION_LICENSENAME));
@@ -548,7 +549,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         ExtensionVersion extension = this.extensionObjectFactory.createExtensionVersion();
 
         extension.setId(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_ID));
-        extension.setType(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_TYPE));
+        extension.setType(
+            StringUtils.stripToNull(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_TYPE)));
         extension.setName(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_NAME));
         extension.setSummary(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_SUMMARY));
 
@@ -646,7 +648,7 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         ExtensionVersion extension = this.extensionObjectFactory.createExtensionVersion();
 
         extension.setId(this.<String>getSolrValue(document, Extension.FIELD_ID, true));
-        extension.setType(this.<String>getSolrValue(document, Extension.FIELD_TYPE, true));
+        extension.setType(StringUtils.stripToNull(this.<String>getSolrValue(document, Extension.FIELD_TYPE, true)));
         extension.setName(this.<String>getSolrValue(document, Extension.FIELD_NAME, false));
         extension.setSummary(this.<String>getSolrValue(document, Extension.FIELD_SUMMARY, false));
 
@@ -806,7 +808,8 @@ public abstract class AbstractExtensionRESTResource extends XWikiResource implem
         }
 
         extension.setId(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_ID));
-        extension.setType(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_TYPE));
+        extension.setType(
+            StringUtils.stripToNull(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_TYPE)));
         extension.setName(this.<String>getQueryValue(entry, XWikiRepositoryModel.PROP_EXTENSION_NAME));
 
         return extension;

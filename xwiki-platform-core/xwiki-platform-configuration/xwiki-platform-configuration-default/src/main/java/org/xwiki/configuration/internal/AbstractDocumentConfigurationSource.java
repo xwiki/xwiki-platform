@@ -372,9 +372,14 @@ public abstract class AbstractDocumentConfigurationSource extends AbstractConfig
                 setBaseProperty(entry.getKey(), entry.getValue());
                 setPropertyNames.add(entry.getKey());
             }
-            XWikiContext xcontext = this.xcontextProvider.get();
-            xcontext.getWiki().saveDocument(getDocument(), String.format("Set properties: %s",
-                StringUtils.join(setPropertyNames, ',')), xcontext);
+            DocumentReference documentReference = getFailsafeDocumentReference();
+            if (documentReference != null) {
+                XWikiContext xcontext = this.xcontextProvider.get();
+                xcontext.getWiki().saveDocument(getDocument(), String.format("Set properties: %s",
+                    StringUtils.join(setPropertyNames, ',')), xcontext);
+            } else {
+                // The configuration document doesn't exist, don't do anything
+            }
         } catch (Exception e) {
             throw new ConfigurationSaveException(String.format("Failed to set properties [%s] in document [%s]'s [%s] "
                 + "xobject", getPropertyListAsString(properties), getFailsafeClassReference(),

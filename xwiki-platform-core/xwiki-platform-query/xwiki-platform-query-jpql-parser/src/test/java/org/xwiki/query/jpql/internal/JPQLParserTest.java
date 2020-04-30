@@ -68,4 +68,11 @@ public class JPQLParserTest
         parser.parse("select doc from Document as doc where doc.object('XWiki.Test').prop=1");
         parser.parse("select doc from Document as doc where doc.object(XWiki.Test).prop=1");
     }
+
+    @Test
+    public void parseMethodsInLike() throws Exception
+    {
+        this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj where obj.first_name like LOWER('%DMIN%')");
+        this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj where obj.first_name like LOWER(CONCAT('%', 'DMIN%'))");
+    }
 }

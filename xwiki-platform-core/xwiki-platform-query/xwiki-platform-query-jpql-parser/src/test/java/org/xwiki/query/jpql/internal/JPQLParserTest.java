@@ -72,7 +72,9 @@ public class JPQLParserTest
     @Test
     public void parseMethodsInLike() throws Exception
     {
-        this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj where obj.first_name like LOWER('%DMIN%')");
-        this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj where obj.first_name like LOWER(CONCAT('%', 'DMIN%'))");
+        this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj " 
+            + "where obj.first_name like LOWER('%DMIN%')");
+        this.parser.parse("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj " 
+            + "where obj.first_name like LOWER(CONCAT('%', 'DMIN%'))");
     }
 }

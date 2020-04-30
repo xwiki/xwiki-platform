@@ -290,9 +290,19 @@ public class XWQLtoHQLTranslatorTest
     @Test
     public void parseMethodsInLike() throws Exception
     {
-        this.assertTranslate("SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj where obj.first_name like LOWER('%DMIN%')", "SELECT doc.fullName FROM XWikiDocument as doc , BaseObject as obj , StringProperty as obj_first_name1 where ( obj_first_name1.value like LOWER ( '%DMIN%' ) ) and doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' and obj_first_name1.id.id=obj.id and obj_first_name1.id.name='first_name'");
-        this.assertTranslate(
-            "SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj where obj.first_name like LOWER(CONCAT('%', 'DMIN%'))",
-            "SELECT doc.fullName FROM XWikiDocument as doc , BaseObject as obj , StringProperty as obj_first_name1 where ( obj_first_name1.value like LOWER ( CONCAT ( '%' , 'DMIN%' ) ) ) and doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' and obj_first_name1.id.id=obj.id and obj_first_name1.id.name='first_name'");
+        assertTranslate(
+            "SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj "
+                + "where obj.first_name like LOWER('%DMIN%')",
+            "SELECT doc.fullName FROM XWikiDocument as doc , BaseObject as obj , StringProperty as obj_first_name1 "
+                + "where ( obj_first_name1.value like LOWER ( '%DMIN%' ) ) "
+                + "and doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' "
+                + "and obj_first_name1.id.id=obj.id and obj_first_name1.id.name='first_name'");
+        assertTranslate(
+            "SELECT doc.fullName FROM Document doc, doc.object(XWiki.XWikiUsers) obj "
+                + "where obj.first_name like LOWER(CONCAT('%', 'DMIN%'))",
+            "SELECT doc.fullName FROM XWikiDocument as doc , BaseObject as obj , StringProperty as obj_first_name1 "
+                + "where ( obj_first_name1.value like LOWER ( CONCAT ( '%' , 'DMIN%' ) ) ) "
+                + "and doc.fullName=obj.name and obj.className='XWiki.XWikiUsers' "
+                + "and obj_first_name1.id.id=obj.id and obj_first_name1.id.name='first_name'");
     }
 }

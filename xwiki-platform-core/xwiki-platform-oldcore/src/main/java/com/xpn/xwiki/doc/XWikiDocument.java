@@ -7325,10 +7325,12 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         boolean hasVersioning = context.getWiki().hasVersioning(context);
         if (hasVersioning) {
             XWikiDocument doc = context.getDoc();
-            XWikiDocumentArchive documentArchive = doc.getDocumentArchive();
-            
-            if (documentArchive == null) {
-                doc.setDocumentArchive(new XWikiDocumentArchive());
+            if (doc != null) {
+                XWikiDocumentArchive documentArchive = doc.getDocumentArchive();
+
+                if (documentArchive == null) {
+                    doc.setDocumentArchive(new XWikiDocumentArchive());
+                }
             }
             this.getVersioningStore(context).resetRCSArchive(this, true, context);
         }

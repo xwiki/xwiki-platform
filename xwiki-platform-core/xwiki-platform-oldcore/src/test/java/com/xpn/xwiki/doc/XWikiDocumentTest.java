@@ -47,6 +47,7 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityManager;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -70,6 +71,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -745,5 +749,37 @@ public class XWikiDocumentTest
 
         assertEquals(0, this.document.getIntValue(new DocumentReference("foo", "bar", "bla"), "foo"));
         assertEquals(99, this.document.getIntValue(new DocumentReference("foo", "bar", "bla"), "foo", 99));
+    }
+
+    @Test
+    void resetArchiveNoVersionning() throws Exception
+    {
+        XWiki wiki = mock(XWiki.class);
+        XWikiContext context = new XWikiContext();
+        
+        when(wiki.hasVersioning(context)).thenReturn(false);
+        XWikiVersioningStoreInterface versionStore = mock(XWikiVersioningStoreInterface.class);
+        when(wiki.getVersioningStore()).thenReturn(versionStore);
+        context.setWiki(wiki);
+        
+        this.document.resetArchive(context);
+        verify(versionStore, never()).resetRCSArchive(this.document, true, context);
+    }
+
+    @Test
+    void resetArchiveDocArchiveNull() throws Exception
+    {
+        XWiki wiki = mock(XWiki.class);
+        XWikiContext context = new XWikiContext();
+        when(wiki.hasVersioning(context)).thenReturn(true);
+        XWikiVersioningStoreInterface versionStore = mock(XWikiVersioningStoreInterface.class);
+        when(wiki.getVersioningStore()).thenReturn(versionStore);
+        context.setWiki(wiki);
+        XWikiDocument doc = new XWikiDocument(new DocumentReference("xwiki", "XWiki", "doc"));
+        context.setDoc(doc);
+
+        this.document.resetArchive(context);
+        verify(versionStore).resetRCSArchive(this.document, true, context);
+        assertNotNull(doc.getDocumentArchive());
     }
 }

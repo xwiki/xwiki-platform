@@ -149,9 +149,9 @@ import org.xwiki.rendering.util.ErrorBlockGenerator;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
-import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.store.merge.MergeDocumentResult;
 import org.xwiki.store.merge.MergeManager;
+import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityContext;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -7324,7 +7324,13 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     {
         boolean hasVersioning = context.getWiki().hasVersioning(context);
         if (hasVersioning) {
-            getVersioningStore(context).resetRCSArchive(this, true, context);
+            XWikiDocument doc = context.getDoc();
+            XWikiDocumentArchive documentArchive = doc.getDocumentArchive();
+            
+            if (documentArchive == null) {
+                doc.setDocumentArchive(new XWikiDocumentArchive());
+            }
+            this.getVersioningStore(context).resetRCSArchive(this, true, context);
         }
     }
 

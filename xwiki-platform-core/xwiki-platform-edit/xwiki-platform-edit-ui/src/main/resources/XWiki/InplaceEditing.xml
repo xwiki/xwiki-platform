@@ -49,7 +49,8 @@
     ## Lock the document for editing.
     #set ($discard = $response.sendRedirect($tdoc.getURL('lock', $escapetool.url({
       'ajax': 1,
-      'action': $request.lockAction
+      'action': $request.lockAction,
+      'language': $tdoc.realLocale
     }))))
   #end
 #end
@@ -335,7 +336,9 @@ define('editInPlace', [
   // We preserve the document data between edits in order to be able to know which document translation should be edited
   // (e.g. when the document translation is missing and we create it, the next edit session should target the created
   // translation).
-  var currentXWikiDocument = $.extend({}, xwikiDocumentAPI);
+  var currentXWikiDocument = $.extend({
+    language: xcontext.locale
+  }, xwikiDocumentAPI);
 
   var editInPlace = function(options) {
     options = $.extend({

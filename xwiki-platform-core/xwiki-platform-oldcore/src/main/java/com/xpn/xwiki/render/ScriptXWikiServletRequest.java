@@ -21,6 +21,7 @@ package com.xpn.xwiki.render;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
@@ -62,10 +63,53 @@ public class ScriptXWikiServletRequest extends XWikiServletRequest
     @Override
     public ServletContext getServletContext()
     {
-        if (authorization.hasAccess(Right.PROGRAM)) {
+        if (this.authorization.hasAccess(Right.PROGRAM)) {
             return super.getServletContext();
         }
 
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Only allowed to author with programming right because it contains very sensitive data.
+     * 
+     * @see com.xpn.xwiki.web.XWikiServletRequest#getHttpServletRequest()
+     */
+    @Override
+    public HttpServletRequest getHttpServletRequest()
+    {
+        if (this.authorization.hasAccess(Right.PROGRAM)) {
+            return super.getHttpServletRequest();
+        }
+
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Return a protected version of the session.
+     * 
+     * @see javax.servlet.http.HttpServletRequestWrapper#getSession()
+     */
+    @Override
+    public HttpSession getSession()
+    {
+        return new ScriptHttpSession(super.getSession(), this.authorization);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Return a protected version of the session.
+     * 
+     * @see javax.servlet.http.HttpServletRequestWrapper#getSession(boolean)
+     */
+    @Override
+    public HttpSession getSession(boolean create)
+    {
+        return new ScriptHttpSession(super.getSession(create), this.authorization);
     }
 }

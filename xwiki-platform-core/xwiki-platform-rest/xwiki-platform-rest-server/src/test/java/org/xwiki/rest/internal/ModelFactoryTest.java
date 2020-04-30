@@ -20,6 +20,7 @@
 package org.xwiki.rest.internal;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,6 +46,7 @@ import org.xwiki.rest.model.jaxb.Hierarchy;
 import org.xwiki.rest.model.jaxb.HierarchyItem;
 import org.xwiki.rest.model.jaxb.Object;
 import org.xwiki.rest.model.jaxb.Property;
+import org.xwiki.rest.model.jaxb.Translations;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.junit5.mockito.InjectComponentManager;
@@ -55,6 +57,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -316,5 +319,50 @@ public class ModelFactoryTest
         assertEquals(xwikiAttachment.getVersion(), restAttachment.getVersion());
         assertEquals("attachment external URL", restAttachment.getXwikiAbsoluteUrl());
         assertEquals("attachment URL", restAttachment.getXwikiRelativeUrl());
+    }
+
+    @Test
+    public void toRestTranslations() throws XWikiException
+    {
+        DocumentReference documentReference = new DocumentReference("wiki", Arrays.asList("Path", "To"), "Page");
+        Document document = mock(Document.class);
+        when(document.getDocumentReference()).thenReturn(documentReference);
+        when(document.getWiki()).thenReturn("wiki");
+        when(document.getSpace()).thenReturn("Path.To");
+        when(document.getDefaultLocale()).thenReturn(Locale.FRENCH);
+        when(document.getTranslationList()).thenReturn(Arrays.asList("en", "ro"));
+
+        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, document);
+
+        assertEquals("fr", translations.getDefault());
+        // We include the default (original) translation.
+        assertEquals(3, translations.getTranslations().size());
+        assertEquals("fr", translations.getTranslations().get(0).getLanguage());
+        assertEquals("en", translations.getTranslations().get(1).getLanguage());
+        assertEquals("ro", translations.getTranslations().get(2).getLanguage());
+    }
+
+    @Test
+    public void toRestTranslationsWhenNoTranslation() throws XWikiException
+    {
+        Document document = mock(Document.class);
+        when(document.getDefaultLocale()).thenReturn(new Locale("foo", "bar", "test"));
+
+        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, document);
+
+        assertEquals("foo_BAR_test", translations.getDefault());
+        assertTrue(translations.getTranslations().isEmpty());
+    }
+
+    @Test
+    public void toRestTranslationsForRootLocale() throws XWikiException
+    {
+        Document document = mock(Document.class);
+        when(document.getDefaultLocale()).thenReturn(Locale.ROOT);
+
+        Translations translations = this.modelFactory.toRestTranslations(this.baseURI, document);
+
+        assertEquals("", translations.getDefault());
+        assertTrue(translations.getTranslations().isEmpty());
     }
 }

@@ -89,19 +89,35 @@ ${indentation}${escapetool.h}end
 {{velocity filter="none"}}
 {{{##
 {{velocity}}
-{{html wiki="true" clean="false"}}
+${escapetool.h}set (${escapetool.d}object = ${escapetool.d}doc.getObject('#escapeSingleQuotes($doc.fullName)'))
+#set ($appName = $stringtool.removeEnd($doc.documentReference.name, 'Class'))
+#set ($translationKeyPrefix = "#escapeSingleQuotes($appName.toLowerCase()).sheet.")
+${escapetool.h}if (!${escapetool.d}object)
+  ${escapetool.h}set (${escapetool.d}messageKey = '${translationKeyPrefix}description')
+  ${escapetool.h}set (${escapetool.d}messageType = 'info')
+  ${escapetool.h}if (${escapetool.d}doc.documentReference.name != '#escapeSingleQuotes("${appName}Sheet")')
+    ${escapetool.h}set (${escapetool.d}messageKey = '${translationKeyPrefix}noObject')
+    ${escapetool.h}set (${escapetool.d}messageType = 'warning')
+  ${escapetool.h}end
+  {{${escapetool.d}messageType}}
+  ${escapetool.d}services.localization.render(${escapetool.d}messageKey)
+  {{/${escapetool.d}messageType}}
+  ${escapetool.h}stop
+${escapetool.h}end
+#set ($properties = $doc.getxWikiClass().properties)
+#if ($properties &amp;&amp; $properties.size() &gt; 0)
 ## This is needed for in-place editing.
 ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {
   'forceSkinAction': true,
   'language': ${escapetool.d}xcontext.locale
 }))
-${escapetool.h}set (${escapetool.d}object = ${escapetool.d}doc.getObject('#escapeSingleQuotes($doc.fullName)'))
 ${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}doc.use(${escapetool.d}object))
 ${escapetool.h}set (${escapetool.d}editing = ${escapetool.d}xcontext.action == 'edit')
+{{html wiki="true" clean="false"}}
 ## We don't have access to the form element to set the CSS class for the vertical form layout standard.
 &lt;div class="xform"&gt;
   &lt;dl&gt;
-#foreach ($property in $doc.getxWikiClass().properties)
+#foreach ($property in $properties)
 #set ($displayFormType = $property.getProperty('displayFormType'))
 #if ($property.type.indexOf('Boolean') != -1 &amp;&amp; "$!displayFormType.value" == 'checkbox')
 #displayBooleanProperty($property '    ')
@@ -112,6 +128,11 @@ ${escapetool.h}set (${escapetool.d}editing = ${escapetool.d}xcontext.action == '
   &lt;/dl&gt;
 &lt;/div&gt;
 {{/html}}
+#else## No properties to display.
+{{info}}
+${escapetool.d}services.localization.render('${translationKeyPrefix}noFields')
+{{/info}}
+#end
 {{/velocity}}##
 }}}
 {{/velocity}}</content>

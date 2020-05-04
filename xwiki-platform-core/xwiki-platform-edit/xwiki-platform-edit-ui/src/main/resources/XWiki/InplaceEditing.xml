@@ -641,7 +641,8 @@ define('editInPlace', [
 
   var loadActionButtons = function(actionButtons) {
     $(document).on('xwiki:actions:view', function() {
-      actionButtons.hide();
+      // Hide the action buttons and disable the shortcut keys (by disabling the buttons).
+      actionButtons.hide().find(':input').prop('disabled', true);
     });
     return $.get(XWiki.currentDocument.getURL('get'), {
       xpage: 'editactions'
@@ -657,7 +658,10 @@ define('editInPlace', [
       require(['actionButtons'], function() {
         overrideEditActions();
         overrideAjaxSaveAndContinue();
-        deferred.resolve(actionButtons.data('xwikiDocument'));
+        var xwikiDocument = actionButtons.data('xwikiDocument');
+        // Enable the action buttons (and their shortcut keys) only if we're editing a document.
+        actionButtons.find(':input').prop('disabled', !xwikiDocument);
+        deferred.resolve(xwikiDocument);
       });
       return deferred.promise();
     }, function() {

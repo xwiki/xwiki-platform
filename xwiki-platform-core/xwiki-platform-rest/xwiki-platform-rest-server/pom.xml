@@ -25,14 +25,14 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-rest</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-rest-server</artifactId>
   <packaging>jar</packaging>
   <name>XWiki Platform - REST - Server</name>
   <description>Service for accessing XWiki through a RESTful API</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.21</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.24</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>30</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>

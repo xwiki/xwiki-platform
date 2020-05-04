@@ -52,7 +52,7 @@ public class CascadingVfsPermissionChecker implements VfsPermissionChecker
     public void checkPermission(VfsResourceReference resourceReference) throws VfsException
     {
         // Prevent using a VFS scheme that correspond to the hint of this component
-        String scheme = resourceReference.getURI().getScheme();
+        String scheme = resourceReference.getScheme();
         if (HINT.equals(scheme)) {
             throw new VfsException(String.format("[%s] is a reserved VFS URI scheme and cannot be used.", HINT));
         }

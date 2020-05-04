@@ -27,6 +27,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
@@ -102,7 +104,7 @@ public class DefaultEvent implements Event
     private Set<String> target;
 
     private boolean hidden;
-    
+
     @Override
     public String getId()
     {
@@ -328,7 +330,7 @@ public class DefaultEvent implements Event
     @Override
     public Map<String, String> getParameters()
     {
-        return this.parameters == null ? Collections.<String, String> emptyMap()
+        return this.parameters == null ? Collections.<String, String>emptyMap()
             : Collections.unmodifiableMap(this.parameters);
     }
 
@@ -352,8 +354,7 @@ public class DefaultEvent implements Event
     @Override
     public Set<String> getTarget()
     {
-        return this.target != null ? Collections.unmodifiableSet(this.target)
-                : Collections.emptySet();
+        return this.target != null ? Collections.unmodifiableSet(this.target) : Collections.emptySet();
     }
 
     @Override
@@ -372,5 +373,85 @@ public class DefaultEvent implements Event
     public void setHidden(boolean isHidden)
     {
         this.hidden = isHidden;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     * @since 12.4RC1
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
+
+        if (obj instanceof Event) {
+            Event otherEvent = (Event) obj;
+
+            EqualsBuilder builder = new EqualsBuilder();
+
+            builder.append(getApplication(), otherEvent.getApplication());
+            builder.append(getBody(), otherEvent.getBody());
+            builder.append(getDate(), otherEvent.getDate());
+            builder.append(getDocument(), otherEvent.getDocument());
+            builder.append(getDocumentTitle(), otherEvent.getDocumentTitle());
+            builder.append(getDocumentVersion(), otherEvent.getDocumentVersion());
+            builder.append(getGroupId(), otherEvent.getGroupId());
+            builder.append(getHidden(), otherEvent.getHidden());
+            builder.append(getId(), otherEvent.getId());
+            builder.append(getImportance(), otherEvent.getImportance());
+            builder.append(getParameters(), otherEvent.getParameters());
+            builder.append(getRelatedEntity(), otherEvent.getRelatedEntity());
+            builder.append(getSpace(), otherEvent.getSpace());
+            builder.append(getStream(), otherEvent.getStream());
+            builder.append(getTarget(), otherEvent.getTarget());
+            builder.append(getTitle(), otherEvent.getTitle());
+            builder.append(getType(), otherEvent.getType());
+            builder.append(getUrl(), otherEvent.getUrl());
+            builder.append(getUser(), otherEvent.getUser());
+            builder.append(getWiki(), otherEvent.getWiki());
+
+            return builder.build();
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     * @since 12.4RC1
+     */
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.append(getApplication());
+        builder.append(getBody());
+        builder.append(getDate());
+        builder.append(getDocument());
+        builder.append(getDocumentTitle());
+        builder.append(getDocumentVersion());
+        builder.append(getGroupId());
+        builder.append(getHidden());
+        builder.append(getId());
+        builder.append(getImportance());
+        builder.append(getParameters());
+        builder.append(getRelatedEntity());
+        builder.append(getSpace());
+        builder.append(getStream());
+        builder.append(getTarget());
+        builder.append(getTitle());
+        builder.append(getType());
+        builder.append(getUrl());
+        builder.append(getUser());
+        builder.append(getWiki());
+
+        return builder.build();
     }
 }

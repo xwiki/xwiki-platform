@@ -19,8 +19,6 @@
  */
 package org.xwiki.vfs.internal.attach;
 
-import java.net.URI;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -53,10 +51,10 @@ public class AttachVfsResourceReferenceSerializer extends AbstractVfsResourceRef
     private EntityReferenceSerializer<String> entitySerializer;
 
     @Override
-    protected URI makeAbsolute(URI uri)
+    protected String getAbsoluteReference(VfsResourceReference resourceReference)
     {
-        AttachmentReference attachmentReference = this.attachmentResolver.resolve(uri.getSchemeSpecificPart());
-        String scheme = uri.getScheme();
-        return URI.create(String.format("%s:%s", scheme, this.entitySerializer.serialize(attachmentReference)));
+        AttachmentReference attachmentReference = this.attachmentResolver.resolve(resourceReference.getReference());
+        String scheme = resourceReference.getScheme();
+        return String.format("%s:%s", scheme, this.entitySerializer.serialize(attachmentReference));
     }
 }

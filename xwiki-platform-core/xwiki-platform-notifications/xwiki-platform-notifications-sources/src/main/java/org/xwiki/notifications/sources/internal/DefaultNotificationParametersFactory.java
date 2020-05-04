@@ -409,6 +409,10 @@ public class DefaultNotificationParametersFactory
 
         String wikis = parameters.get(ParametersKey.WIKIS);
         String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
+
+        if (StringUtils.isEmpty(currentWiki)) {
+            currentWiki = wikiDescriptorManager.getCurrentWikiId();
+        }
         handleLocationParameter(wikis, notificationParameters, NotificationFilterProperty.WIKI);
         // When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
         // other wikis (except if the "wikis" parameter is set).

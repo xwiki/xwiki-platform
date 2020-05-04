@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-legacy</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-legacy-office-importer</artifactId>
   <name>XWiki Platform - Legacy - Office Importer</name>
@@ -138,20 +138,25 @@
       <plugin>
         <groupId>fr.inria.gforge.spoon</groupId>
         <artifactId>spoon-maven-plugin</artifactId>
-        <configuration>
-          <processorProperties combine.children="append">
-            <processorProperty>
-              <name>org.xwiki.tool.spoon.ComponentAnnotationProcessor</name>
-              <properties>
-                <property>
-                  <!-- Skip foreign declaration checks since we merge the components.txt -->
-                  <name>skipForeignDeclarations</name>
-                  <value>true</value>
-                </property>
-              </properties>
-            </processorProperty>
-          </processorProperties>
-        </configuration>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.ComponentAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Skip foreign declaration checks since we merge the components.txt -->
+                      <name>skipForeignDeclarations</name>
+                      <value>true</value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>

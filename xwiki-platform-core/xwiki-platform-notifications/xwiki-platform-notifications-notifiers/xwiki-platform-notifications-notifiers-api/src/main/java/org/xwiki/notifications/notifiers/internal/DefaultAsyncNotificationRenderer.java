@@ -124,9 +124,13 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
         } else {
             try {
                 boolean loadMore = events.size() == notificationParameters.expectedCount;
-                List<CompositeEventStatus> compositeEventStatuses =
-                    this.compositeEventStatusManager.getCompositeEventStatuses(events,
-                        documentReferenceSerializer.serialize(notificationParameters.user));
+                List<CompositeEventStatus> compositeEventStatuses = null;
+                // We cannot compute the read status if the user is not available.
+                if (notificationParameters.user != null) {
+                    compositeEventStatuses =
+                        this.compositeEventStatusManager.getCompositeEventStatuses(events,
+                            documentReferenceSerializer.serialize(notificationParameters.user));
+                }
                 stringResult = this.htmlNotificationRenderer.render(events, compositeEventStatuses, loadMore);
             } catch (Exception e) {
                 throw new RenderingException("Error while retrieving the event status", e);

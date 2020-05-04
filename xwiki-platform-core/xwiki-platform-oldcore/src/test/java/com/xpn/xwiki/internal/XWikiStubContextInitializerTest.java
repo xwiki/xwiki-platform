@@ -21,9 +21,6 @@ package com.xpn.xwiki.internal;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.internal.DefaultExecution;
-import org.xwiki.context.internal.DefaultExecutionContextManager;
-import org.xwiki.test.annotation.ComponentList;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
@@ -32,7 +29,6 @@ import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 import com.xpn.xwiki.util.XWikiStubContextProvider;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**

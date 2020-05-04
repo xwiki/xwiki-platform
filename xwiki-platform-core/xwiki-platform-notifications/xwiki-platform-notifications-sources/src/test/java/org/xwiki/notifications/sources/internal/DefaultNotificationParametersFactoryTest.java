@@ -59,6 +59,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.notifications.sources.internal.DefaultNotificationParametersFactory.ParametersKey;
 import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.test.mockito.MockitoComponentManager;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -66,6 +67,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -106,6 +108,9 @@ public class DefaultNotificationParametersFactoryTest
 
     @MockComponent
     private UsersParameterHandler usersParameterHandler;
+
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
 
     private List<NotificationFilter> filterList;
 
@@ -193,6 +198,7 @@ public class DefaultNotificationParametersFactoryTest
         );
         assertEquals(notificationParameters,
             this.parametersFactory.createNotificationParameters(Collections.emptyMap()));
+        verify(wikiDescriptorManager).getCurrentWikiId();
 
         Map<ParametersKey, String> parametersMap = new HashMap<>();
         parametersMap.put(ParametersKey.FORMAT, "EMAIL");
@@ -293,6 +299,12 @@ public class DefaultNotificationParametersFactoryTest
         obtainedParameters = this.parametersFactory.createNotificationParameters(parametersMap);
         assertEquals(notificationParameters, obtainedParameters);
         verify(this.usersParameterHandler).handleUsersParameter("foobar,barbar", notificationParameters);
+
+        parametersMap.remove(ParametersKey.CURRENT_WIKI);
+        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("mywiki");
+        obtainedParameters = this.parametersFactory.createNotificationParameters(parametersMap);
+        assertEquals(notificationParameters, obtainedParameters);
+        verify(wikiDescriptorManager, times(2)).getCurrentWikiId();
     }
 
     private DefaultNotificationFilterPreference getFilterPreference(String property, int number)

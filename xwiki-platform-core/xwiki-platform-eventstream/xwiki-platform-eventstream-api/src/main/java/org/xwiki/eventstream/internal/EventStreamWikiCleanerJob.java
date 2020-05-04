@@ -19,19 +19,21 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
 import org.xwiki.eventstream.Event;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStream;
 import org.xwiki.job.AbstractJob;
 import org.xwiki.job.DefaultJobStatus;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import java.util.List;
 
 /**
  * Job that delete the events related to a given wiki.
@@ -44,8 +46,8 @@ import java.util.List;
 @Component
 @InstantiationStrategy(ComponentInstantiationStrategy.PER_LOOKUP)
 @Named(EventStreamWikiCleanerJob.JOB_TYPE)
-public class EventStreamWikiCleanerJob extends AbstractJob<EventStreamWikiCleanerJobRequest,
-        DefaultJobStatus<EventStreamWikiCleanerJobRequest>>
+public class EventStreamWikiCleanerJob
+    extends AbstractJob<EventStreamWikiCleanerJobRequest, DefaultJobStatus<EventStreamWikiCleanerJobRequest>>
 {
     /**
      * Type of the job.
@@ -53,7 +55,11 @@ public class EventStreamWikiCleanerJob extends AbstractJob<EventStreamWikiCleane
     public static final String JOB_TYPE = "EventStreamWikiCleanerJob";
 
     @Inject
+    // TODO: don't use this anymore
     private EventStream eventStream;
+
+    @Inject
+    private EventStore eventStore;
 
     @Inject
     private QueryManager queryManager;
@@ -73,11 +79,11 @@ public class EventStreamWikiCleanerJob extends AbstractJob<EventStreamWikiCleane
                 // EventStreamDeletedEvent would not be triggered for each deleted event.
                 eventsToDelete = eventStream.searchEvents(query);
                 for (org.xwiki.eventstream.Event toDelete : eventsToDelete) {
-                    eventStream.deleteEvent(toDelete);
+                    eventStore.deleteEvent(toDelete);
                 }
             } catch (Exception e) {
-                logger.error("Failed to delete events related to the deleted wiki [{}] in the event stream.",
-                        wikiId, e);
+                logger.error("Failed to delete events related to the deleted wiki [{}] in the event stream.", wikiId,
+                    e);
             }
         } while (eventsToDelete != null && !eventsToDelete.isEmpty());
     }

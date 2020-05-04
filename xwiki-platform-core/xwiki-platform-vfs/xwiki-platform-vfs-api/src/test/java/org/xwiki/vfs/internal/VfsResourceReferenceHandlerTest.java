@@ -82,6 +82,8 @@ public class VfsResourceReferenceHandlerTest
 
     private VfsResourceReference reference;
 
+    private Response response = mock(Response.class);
+
     private void setUp(String scheme, String wikiName, String spaceName, String pageName, String attachmentName,
         List<String> path) throws Exception
     {
@@ -126,11 +128,10 @@ public class VfsResourceReferenceHandlerTest
             createZipInputStream(StringUtils.join(path, '/'), "success!"));
 
         Container container = this.mocker.getInstance(Container.class);
-        Response response = mock(Response.class);
         when(container.getResponse()).thenReturn(response);
 
         this.baos = new ByteArrayOutputStream();
-        when(response.getOutputStream()).thenReturn(this.baos);
+        when(this.response.getOutputStream()).thenReturn(this.baos);
 
         // Register our custom Attach Driver in TrueVFS
         TConfig config = TConfig.current();
@@ -150,6 +151,22 @@ public class VfsResourceReferenceHandlerTest
         this.mocker.getComponentUnderTest().handle(this.reference, mock(ResourceReferenceHandlerChain.class));
 
         assertEquals("success!", this.baos.toString());
+    }
+
+    @Test
+    public void handlecustomContentType() throws Exception
+    {
+        setUp("attach", "wiki1", "space1", "page1", "test.zip", Arrays.asList("test.txt"));
+
+        this.reference.addParameter("content-type", "custom content type");
+
+        assertEquals(Arrays.asList(VfsResourceReference.TYPE),
+            this.mocker.getComponentUnderTest().getSupportedResourceReferences());
+        this.mocker.getComponentUnderTest().handle(this.reference, mock(ResourceReferenceHandlerChain.class));
+
+        assertEquals("success!", this.baos.toString());
+
+        verify(this.response).setContentType("custom content type");
     }
 
     @Test

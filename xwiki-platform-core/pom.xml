@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-core</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -145,13 +145,38 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
-
+                  // Note: you can use regexes by using the syntax: { "regex": true, ... }
+                  // Don't forget to '\'-escape dots and other special characters in this case ;)
                   {
                     "code": "java.annotation.removed",
                     "old": "interface org.xwiki.xar.XarEntryTypeResolver",
                     "new": "interface org.xwiki.xar.XarEntryTypeResolver",
                     "annotation": "@org.xwiki.component.annotation.Component",
                     "justification": "Wrongly placed extension. Breakage is limited"
+                  },
+                  {
+                    "regex": true,
+                    "code": "java\.annotation\..*",
+                    "old": "method .* org\.xwiki\.rendering\.macro\.(include|display)\.(Include|Display)MacroParameters::.*",
+                    "new": "method .* org\.xwiki\.rendering\.macro\.(include|display)\.(Include|Display)MacroParameters::.*",
+                    "annotation": "@org\.xwiki\.properties\.annotation\.Property.*",
+                    "justification": "Not a breakage. Annotation harmonized and moved to the setters or removed to prevent properties to be visible in the WYSIWYG macro dialog UI"
+                  },
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)",
+                    "new": "method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)",
+                    "annotationType": "org.xwiki.properties.annotation.PropertyDescription",
+                    "attribute": "value",
+                    "oldValue": "\"an optional id of a section to include in the specified document\"",
+                    "newValue": "\"an optional id of a section to (include|display) in the specified document, e.g. 'HMyHeading'\"",
+                    "justification": "Not a breakage, just improved text description!"
+                  },
+                  {
+                    "regex": true,
+                    "code": ".*",
+                    "new": "method .* org\.xwiki\.user\.UserProperties::.*",
+                    "justification": "Young API, not a breakage"
                   }
                 ]
               }

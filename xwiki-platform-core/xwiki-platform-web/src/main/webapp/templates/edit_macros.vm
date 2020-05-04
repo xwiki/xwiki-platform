@@ -53,7 +53,10 @@
   ##
   #elseif ($tdoc.getLocked() && !$editForced)
     #define ($message)
-      $services.localization.render('doclockedby') #displayUser($tdoc.lockingUser {'useInlineHTML': true}).
+      #set ($lockingUser = "#displayUser($tdoc.lockingUser {'useInlineHTML': true})")
+      <p class="xwikimessage">
+        $escapetool.xml($services.localization.render('doclockedby')) ${lockingUser.trim()}.
+      </p>
     #end
     #set ($editConfirmation = {
       'title': $services.localization.render('warning'),
@@ -66,11 +69,16 @@
 
 #macro (documentProtectedMessage $protectionLevel)
   #set ($extensions = $services.extension.xar.getInstalledExtensions($tdoc.documentReferenceWithLocale))
-  <p>$services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.list")</p>
+  <p class="xwikimessage">
+    $escapetool.xml($services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.list"))
+  </p>
   <ul>
     #foreach ($extension in $extensions)
-      <li>$extension.name ($extension.id.version)</li>
+      <li>$escapetool.xml($extension.name) ($escapetool.xml($extension.id.version))</li>
     #end
   </ul>
-  <p>$services.localization.render("extension.xar.edit${protectionLevel.name().toLowerCase()}.explanation")</p>
+  <p>
+    $escapetool.xml($services.localization.render(
+      "extension.xar.edit${protectionLevel.name().toLowerCase()}.explanation"))
+  </p>
 #end

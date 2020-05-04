@@ -53,9 +53,8 @@ public class FollowedUserOnlyEventFilter implements NotificationFilter
      * @param entityReferenceSerializer the default entity reference serializer
      * @param followedUsers the collection of users to include
      */
-    public FollowedUserOnlyEventFilter(
-            EntityReferenceSerializer<String> entityReferenceSerializer,
-            Collection<String> followedUsers)
+    public FollowedUserOnlyEventFilter(EntityReferenceSerializer<String> entityReferenceSerializer,
+        Collection<String> followedUsers)
     {
         this.entityReferenceSerializer = entityReferenceSerializer;
         this.followedUsers = followedUsers;
@@ -63,7 +62,7 @@ public class FollowedUserOnlyEventFilter implements NotificationFilter
 
     @Override
     public FilterPolicy filterEvent(Event event, DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
+        Collection<NotificationFilterPreference> filterPreferences, NotificationFormat format)
     {
         return followedUsers.contains(entityReferenceSerializer.serialize(event.getUser())) ? FilterPolicy.NO_EFFECT
             : FilterPolicy.FILTER;
@@ -77,15 +76,15 @@ public class FollowedUserOnlyEventFilter implements NotificationFilter
 
     @Override
     public ExpressionNode filterExpression(DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences, NotificationPreference preference)
+        Collection<NotificationFilterPreference> filterPreferences, NotificationPreference preference)
     {
         return null;
     }
 
     @Override
     public ExpressionNode filterExpression(DocumentReference user,
-            Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
-            NotificationFormat format)
+        Collection<NotificationFilterPreference> filterPreferences, NotificationFilterType type,
+        NotificationFormat format)
     {
         if (type == NotificationFilterType.EXCLUSIVE) {
             return value(EventProperty.USER).inStrings(followedUsers);
@@ -100,7 +99,8 @@ public class FollowedUserOnlyEventFilter implements NotificationFilter
     }
 
     @Override
-    public int getPriority() {
+    public int getPriority()
+    {
         return 3000;
     }
 

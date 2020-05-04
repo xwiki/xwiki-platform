@@ -68,7 +68,7 @@ public class PathConverter extends AbstractConverter<Path>
         Path path;
 
         try {
-            VfsResourceReference reference = new VfsResourceReference(new URI(value.toString()));
+            VfsResourceReference reference = new VfsResourceReference(value.toString());
 
             // Verify that the user has the permission for the specified VFS scheme. We need to do this at this level
             // since it's possible to do the check in the driver itself since TrueVFS controls whether the driver is

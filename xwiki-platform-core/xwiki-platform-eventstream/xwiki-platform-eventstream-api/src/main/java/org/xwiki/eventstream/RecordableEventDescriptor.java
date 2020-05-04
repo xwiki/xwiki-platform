@@ -35,7 +35,8 @@ public interface RecordableEventDescriptor
      * The different filters we support to retrieve event.
      * @since 9.4RC1
      */
-    enum EventFilter {
+    enum EventFilter
+    {
         /** There is no filter (except the event type) on this kind of events. */
         NO_FILTER,
         /** There is a custom filter on this kind of events. */
@@ -57,7 +58,8 @@ public interface RecordableEventDescriptor
      * @return the id of the application that provide this event
      * @since 9.6RC1
      */
-    default String getApplicationId() {
+    default String getApplicationId()
+    {
         // Should be reimplemented
         return getApplicationName();
     }
@@ -81,7 +83,8 @@ public interface RecordableEventDescriptor
      * @return the kind of filter to use for this event type
      * @since 9.4RC1
      */
-    default EventFilter getFilter() {
+    default EventFilter getFilter()
+    {
         return EventFilter.NO_FILTER;
     }
 
@@ -89,7 +92,8 @@ public interface RecordableEventDescriptor
      * @return the id of the application that provide this event
      * @since 9.10RC1
      */
-    default String getEventTypeIcon() {
+    default String getEventTypeIcon()
+    {
         // Should be reimplemented
         return getApplicationIcon();
     }
@@ -100,7 +104,8 @@ public interface RecordableEventDescriptor
      * @since 10.5RC1
      * @since 9.11.6
      */
-    default boolean isEnabled(String wikiId) {
+    default boolean isEnabled(String wikiId)
+    {
         return true;
     }
 }

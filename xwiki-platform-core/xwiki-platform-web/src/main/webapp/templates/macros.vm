@@ -883,14 +883,16 @@ $doc.display("content", $obj)
 ###    Message box
 ###
 #macro(xwikimessageboxstart $title $message)
-    <div class="centered">
+  <div class="centered">
     <fieldset class="xwikimessage">
       <legend><span>$title</span></legend>
-      <p class="xwikimessage">$message</p>
+      #if ("$!message" != '')
+        <p class="xwikimessage">$message</p>
+      #end
 #end
 #macro(xwikimessageboxend)
     </fieldset>
-    </div>
+  </div>
 #end
 
 #macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
@@ -1102,10 +1104,18 @@ $html
       #foreach($document in $documentList)
         #if ($document.getSpace() != $previousSpace && $displaySpaces)
           #if($foreach.count > 1) </ul></div></li> #end ## Close previous space item if needed
-          <li class="xitem space"><div class="xitemcontainer">${escapetool.xml($document.getSpace())}<ul class="xlist"> ## Open new space item
+          <li class="xitem">
+            <div class="xitemcontainer">
+              $services.icon.renderHTML('space') $escapetool.xml($document.space)
+              <ul class="xlist"> ## Open new space item
           #set($previousSpace = $document.getSpace())
         #end
-        <li class="xitem page"><div class="xitemcontainer"><a href="$document.getURL()">${escapetool.xml($document.getPlainTitle())}</a></div></li>
+        <li class="xitem">
+          <div class="xitemcontainer">
+            $services.icon.renderHTML('page')
+            <a href="$document.getURL()">$escapetool.xml($document.plainTitle)</a>
+          </div>
+        </li>
       #end
       #if($displaySpaces)
         </ul></div></li> ## Close last space item

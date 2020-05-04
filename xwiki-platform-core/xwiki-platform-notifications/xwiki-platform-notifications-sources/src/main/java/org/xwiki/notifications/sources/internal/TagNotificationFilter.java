@@ -104,6 +104,10 @@ public class TagNotificationFilter implements NotificationFilter
 
         try {
             String currentWiki = findCurrentWiki(filterPreferences);
+            if (currentWiki == null) {
+                logger.warn("The current wiki shouldn't be null in the TagNotificationFilter.");
+                return null;
+            }
             Query query = queryManager.createQuery(
                     "SELECT DISTINCT doc.fullName FROM XWikiDocument doc, BaseObject obj, "
                             + "DBStringListProperty tags JOIN tags.list AS item "

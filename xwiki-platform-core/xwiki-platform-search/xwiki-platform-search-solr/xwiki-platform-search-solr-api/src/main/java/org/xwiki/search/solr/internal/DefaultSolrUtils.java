@@ -35,6 +35,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
@@ -342,9 +343,33 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public String toFilterQueryString(Object fieldValue)
+    {
+        if (fieldValue == null) {
+            return null;
+        }
+
+        String str;
+        if (CLASS_SUFFIX_MAPPING.containsKey(fieldValue.getClass())) {
+            // TODO: this is not the right implementation for date and arrays
+            str = fieldValue.toString();
+        }
+
+        str = this.converter.convert(String.class, fieldValue);
+
+        return ClientUtils.escapeQueryChars(str);
+    }
+
+    @Override
     public <T> T get(String fieldName, SolrDocument document, Type targetType)
     {
-        return this.converter.convert(targetType, get(fieldName, document));
+        Object storedValue = get(fieldName, document);
+
+        if (storedValue == null && (!(targetType instanceof Class) || !((Class) targetType).isPrimitive())) {
+            return null;
+        }
+
+        return this.converter.convert(targetType, storedValue);
     }
 
     @Override

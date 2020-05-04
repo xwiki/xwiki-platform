@@ -194,6 +194,7 @@ download=download
 log-in=sign-in
 log-out=sign-out
 th=th
+translate=language
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check
@@ -326,7 +327,6 @@ music = music
 newspaper=newspaper-o
 note=sticky-note-o
 paintbrush=paint-brush
-page = file
 page_white = file-o
 page_white_acrobat = file-pdf-o
 page_white_code = file-code-o

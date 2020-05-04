@@ -36,53 +36,103 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity filter="none"}}
+  <content>{{velocity output="false"}}
 #macro(escapeSingleQuotes $string)
 $string.replace("'", "''")##
 #end
+
 #**
  * Generic property display.
  *#
 #macro(displayProperty $property $indentation)
-${indentation}; &lt;label${escapetool.h}if (${escapetool.d}xcontext.action == 'edit') for="$escapetool.xml("${doc.fullName}_0_$property.name")"${escapetool.h}end&gt;${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('#escapeSingleQuotes($property.name)', false, false))&lt;/label&gt;##
-#if ("$!property.hint" != '')${escapetool.h}${escapetool.h}
-${indentation}  (% class="xHint" %)${escapetool.d}services.localization.render('#escapeSingleQuotes($property.hint)')
-#else
+${indentation}&lt;dt ${escapetool.h}if (!${escapetool.d}editing &amp;&amp; ${escapetool.d}hasEdit)
+${indentation}    class="editableProperty"
+${indentation}    data-property="${escapetool.d}escapetool.xml(${escapetool.d}services.model.serialize(${escapetool.d}object.getProperty('#escapeSingleQuotes($property.name)').reference))"
+${indentation}    data-property-type="object"${escapetool.h}end&gt;
+${indentation}  &lt;label${escapetool.h}if (${escapetool.d}editing) for="$escapetool.xml("${doc.fullName}_0_$property.name")"${escapetool.h}end&gt;
+${indentation}    ${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('#escapeSingleQuotes($property.name)', false, false))
+${indentation}  &lt;/label&gt;
+#if ("$!property.hint" != '')
+${indentation}  &lt;span class="xHint"&gt;
+${indentation}    ${escapetool.d}escapetool.xml(${escapetool.d}services.localization.render('#escapeSingleQuotes($property.hint)'))
+${indentation}  &lt;/span&gt;
+#end
+${indentation}&lt;/dt&gt;
+${indentation}&lt;dd&gt;${escapetool.d}doc.display('#escapeSingleQuotes($property.name)')&lt;/dd&gt;
+#end
 
-#end
-${indentation}: ${escapetool.d}doc.display('#escapeSingleQuotes($property.name)')
-#end
 #**
  * Unfortunately the custom display mechanism for properties doesn't offer a clean way to overwrite the display only when
  * some conditions are met (e.g. a specific action) so we're putting the custom display code in the sheet.
  *#
-#macro(displayBooleanProperty $property)
-  ${escapetool.h}if (${escapetool.d}context.display == 'edit')
-    ; &lt;label for="$escapetool.xml("${doc.fullName}_0_$property.name")"&gt;${escapetool.d}doc.display('#escapeSingleQuotes($property.name)')${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('#escapeSingleQuotes($property.name)', false, false))&lt;/label&gt;
+#macro(displayBooleanProperty $property $indentation)
+${indentation}${escapetool.h}if (${escapetool.d}editing)
+${indentation}  &lt;dt&gt;
+${indentation}    &lt;label for="$escapetool.xml("${doc.fullName}_0_$property.name")"&gt;
+${indentation}      ${escapetool.d}doc.display('#escapeSingleQuotes($property.name)')
+${indentation}      ${escapetool.d}escapetool.xml(${escapetool.d}doc.displayPrettyName('#escapeSingleQuotes($property.name)', false, false))
+${indentation}    &lt;/label&gt;
+${indentation}  &lt;/dt&gt;
 #if ("$!property.hint" != '')
-    : (% class="xHint" %)${escapetool.d}services.localization.render('#escapeSingleQuotes($property.hint)')
+${indentation}  &lt;dd&gt;
+${indentation}    &lt;span class="xHint"&gt;
+${indentation}      ${escapetool.d}escapetool.xml(${escapetool.d}services.localization.render('#escapeSingleQuotes($property.hint)'))
+${indentation}    &lt;/span&gt;
+${indentation}  &lt;/dd&gt;
 #end
-  ${escapetool.h}else
-#displayProperty($property '    ')
-  ${escapetool.h}end
+${indentation}${escapetool.h}else
+#displayProperty($property "$indentation  ")
+${indentation}${escapetool.h}end
 #end
+{{/velocity}}
+
+{{velocity filter="none"}}
 {{{##
 {{velocity}}
-{{html wiki="true"}}
-${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}doc.use('#escapeSingleQuotes($doc.fullName)'))
+${escapetool.h}set (${escapetool.d}object = ${escapetool.d}doc.getObject('#escapeSingleQuotes($doc.fullName)'))
+#set ($appName = $stringtool.removeEnd($doc.documentReference.name, 'Class'))
+#set ($translationKeyPrefix = "#escapeSingleQuotes($appName.toLowerCase()).sheet.")
+${escapetool.h}if (!${escapetool.d}object)
+  ${escapetool.h}set (${escapetool.d}messageKey = '${translationKeyPrefix}description')
+  ${escapetool.h}set (${escapetool.d}messageType = 'info')
+  ${escapetool.h}if (${escapetool.d}doc.documentReference.name != '#escapeSingleQuotes("${appName}Sheet")')
+    ${escapetool.h}set (${escapetool.d}messageKey = '${translationKeyPrefix}noObject')
+    ${escapetool.h}set (${escapetool.d}messageType = 'warning')
+  ${escapetool.h}end
+  {{${escapetool.d}messageType}}
+  ${escapetool.d}services.localization.render(${escapetool.d}messageKey)
+  {{/${escapetool.d}messageType}}
+  ${escapetool.h}stop
+${escapetool.h}end
+#set ($properties = $doc.getxWikiClass().properties)
+#if ($properties &amp;&amp; $properties.size() &gt; 0)
+## This is needed for in-place editing.
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {
+  'forceSkinAction': true,
+  'language': ${escapetool.d}xcontext.locale
+}))
+${escapetool.h}set (${escapetool.d}discard = ${escapetool.d}doc.use(${escapetool.d}object))
+${escapetool.h}set (${escapetool.d}editing = ${escapetool.d}xcontext.action == 'edit')
+{{html wiki="true" clean="false"}}
 ## We don't have access to the form element to set the CSS class for the vertical form layout standard.
-(% class="xform" %)
-(((
-#foreach($property in $doc.getxWikiClass().properties)
-#set($displayFormType = $property.getProperty('displayFormType'))
-#if($property.type.indexOf('Boolean') != -1 &amp;&amp; "$!displayFormType.value" == 'checkbox')
-#displayBooleanProperty($property)
+&lt;div class="xform"&gt;
+  &lt;dl&gt;
+#foreach ($property in $properties)
+#set ($displayFormType = $property.getProperty('displayFormType'))
+#if ($property.type.indexOf('Boolean') != -1 &amp;&amp; "$!displayFormType.value" == 'checkbox')
+#displayBooleanProperty($property '    ')
 #else
-#displayProperty($property '  ')
+#displayProperty($property '    ')
 #end
 #end
-)))
+  &lt;/dl&gt;
+&lt;/div&gt;
 {{/html}}
+#else## No properties to display.
+{{info}}
+${escapetool.d}services.localization.render('${translationKeyPrefix}noFields')
+{{/info}}
+#end
 {{/velocity}}##
 }}}
 {{/velocity}}</content>

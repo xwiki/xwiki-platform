@@ -27,13 +27,13 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.EventStream;
+import org.xwiki.eventstream.EventStore;
+import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.LocalEventData;
 import org.xwiki.observation.remote.RemoteEventData;
 import org.xwiki.observation.remote.converter.AbstractEventConverter;
-import org.xwiki.query.QueryException;
 
 /**
  * Convert all event status events to remote events and back to local events.
@@ -48,7 +48,7 @@ import org.xwiki.query.QueryException;
 public class EventStreamEventConverter extends AbstractEventConverter
 {
     @Inject
-    private EventStream stream;
+    private EventStore store;
 
     @Inject
     private Logger logger;
@@ -92,10 +92,10 @@ public class EventStreamEventConverter extends AbstractEventConverter
         return false;
     }
 
-    private org.xwiki.eventstream.Event unserializeEvent(Serializable remote) throws QueryException
+    private org.xwiki.eventstream.Event unserializeEvent(Serializable remote) throws EventStreamException
     {
         if (remote instanceof String) {
-            return this.stream.getEvent((String) remote);
+            return this.store.getEvent((String) remote).orElse(null);
         }
 
         return null;

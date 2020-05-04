@@ -138,21 +138,4 @@ public class ClassSheetIT
             setup.setHierarchyMode("reference");
         }
     }
-
-    /**
-     * Integration test fop <a href="https://jira.xwiki.org/browse/XWIKI-6936">XWIKI-6936</a>. The test is successful if
-     * the page save without error when a class with a field named "action" is defined in the class.
-     */
-    @Test
-    @Order(2)
-    public void createClassWithFieldNamedAction(TestUtils setup, TestReference reference)
-    {
-        setup.gotoPage(reference);
-        ClassSheetPage csp = new ClassSheetPage();
-        ClassEditPage ec = csp.editClass();
-        ec.addProperty("action", "String");
-
-        // the test succeed if this save action does not fail.
-        ec.clickSaveAndContinue(true);
-    }
 }

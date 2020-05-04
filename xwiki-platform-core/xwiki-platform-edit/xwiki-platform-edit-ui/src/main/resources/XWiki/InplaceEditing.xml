@@ -202,7 +202,9 @@ define('xwiki-document-api', ['jquery'], function($) {
         xpage: 'rendercontent',
         outputTitle: true,
         outputSyntax: forView ? null : 'annotatedxhtml',
-        language: this.getRealLocale()
+        language: this.getRealLocale(),
+        // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
+        timestamp: new Date().getTime()
       };
       var thisXWikiDocument = this;
       return $.get(this.getURL('view'), queryString).fail(function() {
@@ -226,7 +228,10 @@ define('xwiki-document-api', ['jquery'], function($) {
      */
     reload: function() {
       var thisXWikiDocument = this;
-      return $.getJSON(this.getRestURL()).then(function(newXWikiDocument) {
+      return $.getJSON(this.getRestURL(), {
+        // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
+        timestamp: new Date().getTime()
+      }).then(function(newXWikiDocument) {
         // Resolve the document reference.
         thisXWikiDocument.documentReference = XWiki.Model.resolve(newXWikiDocument.id, XWiki.EntityType.DOCUMENT);
         // We were able to load the document so it's not new.
@@ -250,7 +255,9 @@ define('xwiki-document-api', ['jquery'], function($) {
         lockAction: action,
         force: force,
         language: this.getRealLocale(),
-        outputSyntax: 'plain'
+        outputSyntax: 'plain',
+        // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
+        timestamp: new Date().getTime()
       }).then(function() {
         thisXWikiDocument.locked = action;
         return thisXWikiDocument;

@@ -325,12 +325,28 @@ define('editInPlace', [
         $('#xwikicontent').removeAttr('tabindex');
         if (sectionId) {
           // Select the heading of the specified section.
-          $('#xwikicontent &gt; #' + sectionId).each(function() {
+          $('#xwikicontent &gt; #' + escapeSelector(sectionId)).each(function() {
             selectText(this);
           });
         }
       }
     });
+  };
+
+  var escapeSelector = function(selector) {
+    if (window.CSS &amp;&amp; typeof CSS.escape === 'function') {
+      // Not supported by Internet Explorer.
+      return CSS.escape(selector);
+    } else if (typeof $.escapeSelector === 'function') {
+      // Added in jQuery 3.0
+      return $.escapeSelector(selector);
+    } else if (typeof selector === 'string') {
+      // Simple implementation.
+      // See https://learn.jquery.com/using-jquery-core/faq/how-do-i-select-an-element-by-an-id-that-has-characters-used-in-css-notation/
+      return selector.replace(/(:|\.|\[|\]|,|=|@)/g, '\\$1');
+    } else {
+      return selector;
+    }
   };
 
   // We preserve the document data between edits in order to be able to know which document translation should be edited

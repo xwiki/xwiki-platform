@@ -17,8 +17,9 @@
 ## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
-## TODO: Code copied from displayer_email.vm. Introduce an email picker, see https://jira.xwiki.org/browse/XWIKI-17290
-## which will also remove the code duplication.
+## TODO: Introduce an email picker, see https://jira.xwiki.org/browse/XWIKI-17290
+## TODO: Code copied from displayer_email.vm. Find a solution to remove duplication for the view mode. For the edit
+## mode, https://jira.xwiki.org/browse/XWIKI-17290 will remove the duplication.
 ## TODO: Improve this code so that it doesn't rely on magical page references and uses a stable API.
 ## Also this displayer should not be located in platform-web but in the mail extension so that it exists only if that
 ## extension is installed.

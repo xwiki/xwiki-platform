@@ -22,40 +22,24 @@ package org.xwiki.user.internal.document;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
-
-import javax.inject.Provider;
 
 import org.xwiki.configuration.ConfigurationRight;
 import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.ConfigurationSourceAuthorization;
 import org.xwiki.configuration.internal.ConfigurationSourceDecorator;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.AuthorizationManager;
-import org.xwiki.security.authorization.Right;
 import org.xwiki.text.StringUtils;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-
-import static org.xwiki.user.internal.UserPropertyConstants.EMAIL;
 
 /**
  * Configuration source decorator that performs permission checks for reading and writing user configuration
- * properties. Also handles the special case of the user email property (if the last current document's author has
- * Programming Rights, display the email in full, otherwise obfuscate it).
+ * properties.
  *
  * @version $Id$
  * @since 12.4RC1
  */
 public class SecureDocumentConfigurationSource extends ConfigurationSourceDecorator
 {
-    private Provider<XWikiContext> contextProvider;
-
     private ConfigurationSourceAuthorization authorization;
-
-    private AuthorizationManager authorizationManager;
 
     private DocumentUserReference userReference;
 
@@ -63,18 +47,13 @@ public class SecureDocumentConfigurationSource extends ConfigurationSourceDecora
      * @param userReference the user for which we're reading or writing the configuration properties
      * @param internalConfigurationSource the wrapped configuration source to call after the checks have been done
      * @param authorization the component to use to perform the checks on the configuration source
-     * @param authorizationManager the component to use to perform permissions checks for handling the email use case
-     * @param contextProvider the component to use to get the current document for the email use case
      */
     public SecureDocumentConfigurationSource(DocumentUserReference userReference,
-        ConfigurationSource internalConfigurationSource, ConfigurationSourceAuthorization authorization,
-        AuthorizationManager authorizationManager, Provider<XWikiContext> contextProvider)
+        ConfigurationSource internalConfigurationSource, ConfigurationSourceAuthorization authorization)
     {
         super(internalConfigurationSource);
         this.userReference = userReference;
         this.authorization = authorization;
-        this.authorizationManager = authorizationManager;
-        this.contextProvider = contextProvider;
     }
 
     @Override
@@ -82,7 +61,7 @@ public class SecureDocumentConfigurationSource extends ConfigurationSourceDecora
     {
         T value;
         if (hasAccess(key, ConfigurationRight.READ)) {
-            value = execute(key, () -> getWrappedConfigurationSource().getProperty(key, defaultValue));
+            value = getWrappedConfigurationSource().getProperty(key, defaultValue);
         } else {
             value = defaultValue;
         }
@@ -94,7 +73,7 @@ public class SecureDocumentConfigurationSource extends ConfigurationSourceDecora
     {
         T value;
         if (hasAccess(key, ConfigurationRight.READ)) {
-            value = execute(key, () -> getWrappedConfigurationSource().getProperty(key, valueClass));
+            value = getWrappedConfigurationSource().getProperty(key, valueClass);
         } else {
             // Return defaults
             value = null;
@@ -107,7 +86,7 @@ public class SecureDocumentConfigurationSource extends ConfigurationSourceDecora
     {
         T value;
         if (hasAccess(key, ConfigurationRight.READ)) {
-            value = execute(key, () -> getWrappedConfigurationSource().getProperty(key));
+            value = getWrappedConfigurationSource().getProperty(key);
         } else {
             // Return defaults
             value = null;
@@ -120,8 +99,7 @@ public class SecureDocumentConfigurationSource extends ConfigurationSourceDecora
     {
         T value;
         if (hasAccess(key, ConfigurationRight.READ)) {
-            value = execute(key,
-                () -> getWrappedConfigurationSource().getProperty(key, valueClass, defaultValue));
+            value = getWrappedConfigurationSource().getProperty(key, valueClass, defaultValue);
         } else {
             value = defaultValue;
         }
@@ -146,41 +124,6 @@ public class SecureDocumentConfigurationSource extends ConfigurationSourceDecora
             throw new ConfigurationSaveException(String.format("No permission for user [%s] to modify keys [%s]",
                 this.userReference, StringUtils.join(notAccessibleKeys, ',')));
         }
-    }
-
-    private <T> T execute(String key, Supplier<T> supplier)
-    {
-        T result;
-
-        if (EMAIL.equals(key)) {
-            // What we return depends on the permissions of the last author of the current document. If that author has
-            // PR rights on the current document then return the full email, otherwise return an obfuscated version.
-            XWikiContext xcontext = this.contextProvider.get();
-            XWikiDocument currentDocument = xcontext.getDoc();
-            if (currentDocument != null) {
-                DocumentReference lastAuthorDocumentReference = currentDocument.getAuthorReference();
-                if (this.authorizationManager.hasAccess(Right.PROGRAM, lastAuthorDocumentReference,
-                    currentDocument.getDocumentReference()))
-                {
-                    result = supplier.get();
-                } else {
-                    // Obfuscate the email
-                    result = (T) obfuscateEmail((String) supplier.get());
-                }
-            } else {
-                // Obfuscate the email to be safe
-                result = (T) obfuscateEmail((String) supplier.get());
-            }
-        } else {
-            result = supplier.get();
-        }
-
-        return result;
-    }
-
-    private String obfuscateEmail(String email)
-    {
-        return email.replaceAll("^(.).*@", "$1...@");
     }
 
     private boolean hasAccess(String key, ConfigurationRight configurationRight)

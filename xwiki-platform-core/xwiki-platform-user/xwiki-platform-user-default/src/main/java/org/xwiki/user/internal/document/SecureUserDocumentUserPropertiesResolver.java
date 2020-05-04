@@ -52,8 +52,7 @@ public class SecureUserDocumentUserPropertiesResolver extends AbstractDocumentUs
         ConfigurationSourceAuthorization authorization, AuthorizationManager authorizationManager,
         Provider<XWikiContext> contextProvider)
     {
-        return new SecureDocumentConfigurationSource(userReference,
-            new CurrentUserConfigurationSource(userReference, this.configurationSource, contextProvider), authorization,
-            authorizationManager, contextProvider);
+        return new SecureDocumentConfigurationSource(userReference, new CurrentUserConfigurationSource(userReference,
+            this.configurationSource, contextProvider), authorization);
     }
 }

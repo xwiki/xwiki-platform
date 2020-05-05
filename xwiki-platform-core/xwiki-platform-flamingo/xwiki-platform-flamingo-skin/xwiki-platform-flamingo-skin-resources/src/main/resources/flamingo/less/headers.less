@@ -2,12 +2,13 @@
 // Headers
 // --------------------------------------------------
 
-#xwikicontent > h1,
-#xwikicontent > h2,
-#xwikicontent > h3,
-#xwikicontent > h4,
-#xwikicontent > h5,
-#xwikicontent > h6 {
+// Display flex can cause problems while editing in-place so we use it only when viewing the headings.
+#xwikicontent:not([contenteditable]) > h1,
+#xwikicontent:not([contenteditable]) > h2,
+#xwikicontent:not([contenteditable]) > h3,
+#xwikicontent:not([contenteditable]) > h4,
+#xwikicontent:not([contenteditable]) > h5,
+#xwikicontent:not([contenteditable]) > h6 {
   // We use display flex because we want the section edit link to be displayed at the end of the heading row without
   // overflowing an existing floating box.
   display: flex;
@@ -15,12 +16,12 @@
   min-width: 1px;
 }
 
-#xwikicontent > h1 > span:first-child,
-#xwikicontent > h2 > span:first-child,
-#xwikicontent > h3 > span:first-child,
-#xwikicontent > h4 > span:first-child,
-#xwikicontent > h5 > span:first-child,
-#xwikicontent > h6 > span:first-child {
+#xwikicontent:not([contenteditable]) > h1 > span:first-child,
+#xwikicontent:not([contenteditable]) > h2 > span:first-child,
+#xwikicontent:not([contenteditable]) > h3 > span:first-child,
+#xwikicontent:not([contenteditable]) > h4 > span:first-child,
+#xwikicontent:not([contenteditable]) > h5 > span:first-child,
+#xwikicontent:not([contenteditable]) > h6 > span:first-child {
   // We want the heading text to take all the available space, while the section edit link takes only what is needed.
   flex: 1 1 auto;
 }

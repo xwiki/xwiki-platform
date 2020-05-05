@@ -45,6 +45,8 @@
 
 {{include reference="XWiki.DocumentTreeMacros"/}}
 
+{{include reference="CKEditor.VelocityMacros" /}}
+
 {{velocity output="false"}}
 #macro (setIcon $suggestion $icon)
   #set ($iconMetaData = $services.icon.getMetaData($icon))
@@ -134,7 +136,7 @@
   #set ($results = [])
   #searchDocumentsSolr($input $limit $results)
   #searchAttachmentsSolr($input $limit $results)
-  #set ($results = $sorttool.sort($results, 'score:desc'))
+  #set ($results = $resolvedSortTool.sort($results, 'score:desc'))
   #foreach ($result in $results.subList(0, $mathtool.min($results.size(), $limit)))
     #set ($discard = $entityReferences.add($services.solr.resolve($result)))
   #end

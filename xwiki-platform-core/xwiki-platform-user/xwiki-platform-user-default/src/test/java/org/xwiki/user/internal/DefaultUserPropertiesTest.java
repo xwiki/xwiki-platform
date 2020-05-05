@@ -22,6 +22,8 @@ package org.xwiki.user.internal;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.mail.internet.InternetAddress;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
@@ -94,10 +96,11 @@ public class DefaultUserPropertiesTest
     }
 
     @Test
-    void getEmail()
+    void getEmail() throws Exception
     {
-        when(this.configurationSource.getProperty("email")).thenReturn("john@doe.com");
-        assertEquals("john@doe.com", this.user.getEmail());
+        when(this.configurationSource.getProperty("email", InternetAddress.class)).thenReturn(
+            InternetAddress.parse("john@doe.com")[0]);
+        assertEquals("john@doe.com", this.user.getEmail().toString());
     }
 
     @Test
@@ -145,7 +148,7 @@ public class DefaultUserPropertiesTest
         this.user.setFirstName("firstname");
         this.user.setLastName("lastname");
         this.user.setEditor(Editor.WYSIWYG);
-        this.user.setEmail("john@doe.com");
+        this.user.setEmail(InternetAddress.parse("john@doe.com")[0]);
         this.user.setEmailChecked(true);
         this.user.setType(UserType.ADVANCED);
         this.user.setDisplayHiddenDocuments(true);
@@ -158,7 +161,7 @@ public class DefaultUserPropertiesTest
             assertEquals("lastname", map.get("last_name"));
             assertEquals(Editor.WYSIWYG, map.get("editor"));
             assertTrue((boolean) map.get("displayHiddenDocuments"));
-            assertEquals("john@doe.com", map.get("email"));
+            assertEquals("john@doe.com", map.get("email").toString());
             assertTrue((boolean) map.get("email_checked"));
             assertEquals(UserType.ADVANCED, map.get("usertype"));
             return null;

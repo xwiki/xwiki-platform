@@ -19,6 +19,8 @@
  */
 package org.xwiki.user;
 
+import javax.mail.internet.InternetAddress;
+
 import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.stability.Unstable;
@@ -77,12 +79,12 @@ public interface UserProperties extends ConfigurationSource
     /**
      * @return the email address of the user and null if not set
      */
-    String getEmail();
+    InternetAddress getEmail();
 
     /**
      * @param email see {@link #getEmail()}
      */
-    void setEmail(String email);
+    void setEmail(InternetAddress email);
 
     /**
      * @return the type of the user (simple user, advanced user)

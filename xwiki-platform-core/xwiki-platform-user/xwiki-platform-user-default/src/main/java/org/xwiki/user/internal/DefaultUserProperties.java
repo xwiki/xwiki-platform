@@ -23,6 +23,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.internet.InternetAddress;
+
 import org.xwiki.configuration.ConfigurationSaveException;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.user.Editor;
@@ -110,15 +112,15 @@ public class DefaultUserProperties implements UserProperties
     }
 
     @Override
-    public String getEmail()
+    public InternetAddress getEmail()
     {
-        return (String) getProperty(EMAIL);
+        return getProperty(EMAIL, InternetAddress.class);
     }
 
     @Override
-    public void setEmail(String email)
+    public void setEmail(InternetAddress emailAddress)
     {
-        this.unsavedProperties.put(EMAIL, email);
+        this.unsavedProperties.put(EMAIL, emailAddress);
     }
 
     @Override

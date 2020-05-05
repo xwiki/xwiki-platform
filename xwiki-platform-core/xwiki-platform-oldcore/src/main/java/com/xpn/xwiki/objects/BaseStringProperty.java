@@ -22,6 +22,10 @@ package com.xpn.xwiki.objects;
 import java.util.Objects;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.xwiki.properties.ConverterManager;
+import org.xwiki.text.StringUtils;
+
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Base string XProperty which all types of string XProperties extend. $Id$
@@ -45,8 +49,19 @@ public class BaseStringProperty extends BaseProperty
     @Override
     public void setValue(Object value)
     {
-        setValueDirty(value);
-        this.value = (String) value;
+        // Convert the value to a String, whatever its type.
+        String stringValue;
+        if (value instanceof String) {
+            stringValue = (String) value;
+        } else {
+            stringValue = getConverterManager().convert(String.class, value);
+        }
+
+        if (!isValueDirty() && !StringUtils.equals(stringValue, getValue())) {
+            setValueDirty(true);
+        }
+
+        this.value = stringValue;
     }
 
     @Override
@@ -96,5 +111,14 @@ public class BaseStringProperty extends BaseProperty
     {
         BaseStringProperty property = (BaseStringProperty) clone;
         property.setValue(getValue());
+    }
+
+    /**
+     * Used to resolve a string into a proper Document Reference using the current document's reference to fill the
+     * blanks.
+     */
+    private static ConverterManager getConverterManager()
+    {
+        return Utils.getComponent(ConverterManager.class);
     }
 }

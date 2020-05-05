@@ -222,4 +222,10 @@ public class ScriptXWikiServletRequestTest
 
         assertEqualsSet(Arrays.asList("name"), scriptSession.getAttributeNames());
     }
+
+    @Test
+    void getRequestURL()
+    {
+        this.scriptRequest.getRequestURL();
+    }
 }

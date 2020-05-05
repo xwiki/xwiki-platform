@@ -650,6 +650,8 @@ define('editInPlace', [
     $(document).on('xwiki:actions:view', function() {
       // Hide the action buttons and disable the shortcut keys (by disabling the buttons).
       actionButtons.hide().find(':input').prop('disabled', true);
+      // Hide the translate button because it can be used only in edit mode for the moment.
+      $('#tmTranslate').addClass('hidden');
     });
     return $.get(XWiki.currentDocument.getURL('get'), {
       xpage: 'editactions'

@@ -40,7 +40,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpUpgradeHandler;
 import javax.servlet.http.Part;
 
 import org.xwiki.stability.Unstable;
@@ -204,12 +203,6 @@ public class WrappingXWikiRequest implements XWikiRequest
     }
 
     @Override
-    public String changeSessionId()
-    {
-        return this.request.changeSessionId();
-    }
-
-    @Override
     public boolean isRequestedSessionIdValid()
     {
         return this.request.isRequestedSessionIdValid();
@@ -264,12 +257,6 @@ public class WrappingXWikiRequest implements XWikiRequest
     }
 
     @Override
-    public <T extends HttpUpgradeHandler> T upgrade(Class<T> handlerClass) throws IOException, ServletException
-    {
-        return this.request.upgrade(handlerClass);
-    }
-
-    @Override
     public Object getAttribute(String name)
     {
         return this.request.getAttribute(name);
@@ -297,12 +284,6 @@ public class WrappingXWikiRequest implements XWikiRequest
     public int getContentLength()
     {
         return this.request.getContentLength();
-    }
-
-    @Override
-    public long getContentLengthLong()
-    {
-        return this.request.getContentLengthLong();
     }
 
     @Override

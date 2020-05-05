@@ -19,10 +19,9 @@
  */
 package com.xpn.xwiki.objects;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import com.xpn.xwiki.objects.BaseStringProperty;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Unit tests for the {@link BaseStringProperty} class.
@@ -31,11 +30,10 @@ import com.xpn.xwiki.objects.BaseStringProperty;
  */
 public class BaseStringPropertyTest
 {
-
     @Test
     public void testHashCode()
     {
-        final String value = "test value";
+        String value = "test value";
 
         BaseStringProperty p1 = new BaseStringProperty();
         BaseStringProperty p2 = new BaseStringProperty();
@@ -43,6 +41,6 @@ public class BaseStringPropertyTest
         p1.setValue(value);
         p2.setValue(value);
 
-        Assert.assertEquals(p1.hashCode(), p2.hashCode());
+        assertEquals(p1.hashCode(), p2.hashCode());
     }
 }

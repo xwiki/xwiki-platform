@@ -19,7 +19,6 @@
  */
 package org.xwiki.mail.internal;
 
-import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.jupiter.api.Test;
@@ -32,42 +31,42 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Unit tests for {@link AddressesConverter}.
+ * Unit tests for {@link InternetAddressConverter}.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 12.4RC1
  */
 @ComponentTest
-public class AddressConverterTest
+public class InternetAddressConverterTest
 {
     @InjectMockComponents
-    private AddressConverter converter;
+    private InternetAddressConverter converter;
 
     @Test
     public void convert() throws Exception
     {
         InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-        assertEquals(address, this.converter.convert(Address.class, "John Doe(comment) <john1@doe.com>"));
+        assertEquals(address, this.converter.convert(InternetAddress.class, "John Doe(comment) <john1@doe.com>"));
     }
 
     @Test
     void convertWhenNull()
     {
-        assertNull(this.converter.convert(Address.class, null));
+        assertNull(this.converter.convert(InternetAddress.class, null));
     }
 
     @Test
     void convertWhenTypeIsAlreadyAnAddress() throws Exception
     {
         InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-        assertEquals(address, this.converter.convert(Address.class, address));
+        assertEquals(address, this.converter.convert(InternetAddress.class, address));
     }
 
     @Test
     void convertWhenInvalid()
     {
         Throwable exception = assertThrows(ConversionException.class,
-            () -> this.converter.convert(Address.class, "invalid("));
-        assertEquals("Failed to convert [invalid(] to [javax.mail.Address]", exception.getMessage());
+            () -> this.converter.convert(InternetAddress.class, "invalid("));
+        assertEquals("Failed to convert [invalid(] to [javax.mail.internet.InternetAddress]", exception.getMessage());
     }
 }

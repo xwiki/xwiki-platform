@@ -3,6 +3,7 @@ org.xwiki.mail.internal.DefaultMailSender
 org.xwiki.mail.internal.RecipientConverter
 org.xwiki.mail.internal.AddressesConverter
 org.xwiki.mail.internal.AddressConverter
+org.xwiki.mail.internal.InternetAddressConverter
 org.xwiki.mail.internal.MemoryMailListener
 org.xwiki.mail.internal.MailMandatoryDocumentInitializer
 org.xwiki.mail.internal.MailConfigMandatoryDocumentInitializer

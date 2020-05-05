@@ -20,20 +20,19 @@
 package org.xwiki.mail.internal;
 
 import javax.inject.Singleton;
-import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
 import org.xwiki.component.annotation.Component;
 
 /**
- * Converts a String to a {@link InternetAddress} instance when the target type asked is {@link Address}.
- * Useful when using the Mail Sender scripting API to add a recipient.
+ * Converts a String to a {@link InternetAddress} instance when the target type asked is {@link InternetAddress}.
+ * Useful when using the User API and setting the user email from a script.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 12.4RC1
  */
 @Component
 @Singleton
-public class AddressConverter extends AbstractAddressConverter<Address>
+public class InternetAddressConverter extends AbstractAddressConverter<InternetAddress>
 {
 }

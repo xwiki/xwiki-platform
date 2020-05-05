@@ -27,10 +27,11 @@ import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.stability.Unstable;
 
-import com.xpn.xwiki.web.XWikiServletRequest;
+import com.xpn.xwiki.web.WrappingXWikiRequest;
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
- * A wrapper around {@link XWikiServletRequest} with security related checks.
+ * A wrapper around {@link XWikiRequest} with security related checks.
  * 
  * @version $Id$
  * @since 12.3RC1
@@ -38,7 +39,7 @@ import com.xpn.xwiki.web.XWikiServletRequest;
  * @since 11.10.5
  */
 @Unstable
-public class ScriptXWikiServletRequest extends XWikiServletRequest
+public class ScriptXWikiServletRequest extends WrappingXWikiRequest
 {
     private final ContextualAuthorizationManager authorization;
 
@@ -46,7 +47,7 @@ public class ScriptXWikiServletRequest extends XWikiServletRequest
      * @param request the wrapped request
      * @param authorization used to check rights of the current author
      */
-    public ScriptXWikiServletRequest(HttpServletRequest request, ContextualAuthorizationManager authorization)
+    public ScriptXWikiServletRequest(XWikiRequest request, ContextualAuthorizationManager authorization)
     {
         super(request);
 

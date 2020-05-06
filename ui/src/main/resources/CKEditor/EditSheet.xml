@@ -208,7 +208,12 @@ require.config({
   },
   config: {
     l10n: {
-      url: new XWiki.Document('Translator', 'CKEditor').getURL('get', 'outputSyntax=plain&amp;language=$xcontext.locale')
+      // We need to specify the language because this URL can be used after the page is loaded and thus after the
+      // context language changes on the server session (e.g. if the user opens another page in another browser tab with
+      // a different language specified). We take the current language from the page HTML, rather than using Velocity,
+      // in order to avoid having the current language cached.
+      url: new XWiki.Document('Translator', 'CKEditor').getURL('get', 'outputSyntax=plain&amp;language=' +
+        encodeURIComponent(document.documentElement.getAttribute('lang') || ''))
     }
   }
 });
@@ -290,13 +295,15 @@ define('xwiki-ckeditor', [
     form_token: $('meta[name="form_token"]').attr('content')
   };
 
+  var currentLocale = $('html').attr('lang') || '';
+
   // We have to pass the plugin that makes the request (the initiator) because the expected response can be different
   // (e.g. between the filebrowser and filetools plugins).
   var getUploadURL = function(document, initiator) {
     return document.getURL('get', $.param({
       sheet: 'CKEditor.FileUploader',
       outputSyntax: 'plain',
-      language: $('html').attr('lang'),
+      language: currentLocale,
       form_token: xwikiMeta.form_token,
       initiator: initiator
     }));
@@ -316,27 +323,27 @@ define('xwiki-ckeditor', [
       fileTools_defaultFileName: '__fileCreatedFromDataURI__',
       height: $(element).height(),
       // CKEditor uses '-' (dash) as locale separator (between the language code and the country code).
-      language: ($('html').attr('xml:lang') || '').toLowerCase().replace('_', '-'),
+      language: currentLocale.toLowerCase().replace('_', '-'),
       uploadUrl: getUploadURL(sourceDocument, 'filetools'),
       'xwiki-link': {
         labelGenerator: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.LinkLabelGenerator',
           outputSyntax: 'plain',
-          language: $('html').attr('lang')
+          language: currentLocale
         }))
       },
       'xwiki-resource': {
         dispatcher: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.ResourceDispatcher',
           outputSyntax: 'plain',
-          language: $('html').attr('lang')
+          language: currentLocale
         }))
       },
       'xwiki-source': {
         htmlConverter: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.HTMLConverter',
           outputSyntax: 'plain',
-          language: $('html').attr('lang')
+          language: currentLocale
         }))
       },
       mentions: [
@@ -344,7 +351,7 @@ define('xwiki-ckeditor', [
           feed: sourceDocument.getURL('get', $.param({
             sheet: 'CKEditor.LinkSuggestions',
             outputSyntax: 'plain',
-            language: $('html').attr('lang')
+            language: currentLocale
           // Prevent the curly brackets from being URL encoded because they mark a placeholder that will be replaced
           // with the text typed by the user (and CKEditor takes care of URL encoding it).
           }) + '&amp;input={encodedQuery}'),
@@ -371,7 +378,7 @@ define('xwiki-ckeditor', [
       config['xwiki-office'] = {
         importer: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.OfficeImporter',
-          language: $('html').attr('lang')
+          language: currentLocale
         }))
       };
     }
@@ -434,7 +441,9 @@ define('xwiki-ckeditor', [
     // Load the translations for our custom CKEditor plugins. We didn't add this as a dependency to the xwiki-ckeditor
     // module because some of our plugins load their dependencies with RequireJS and thus they are loaded with a small
     // delay. The plugin needs to be defined before calling CKEDITOR.plugins.setLang().
-    '$!xwiki.getURL("CKEditor.Translations", "jsx", "language=$xcontext.locale")'
+    new XWiki.Document('Translations', 'CKEditor').getURL('jsx', $.param({
+      language: currentLocale
+    }))
   ], function() {
     deferred.resolve(ckeditor);
   });

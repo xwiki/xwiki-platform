@@ -20,12 +20,16 @@
 package org.xwiki.user.internal.document;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.xwiki.configuration.ConfigurationSource;
+import org.xwiki.configuration.ConfigurationSourceAuthorization;
+import org.xwiki.security.authorization.AuthorizationManager;
 import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserPropertiesResolver;
 import org.xwiki.user.UserReference;
+import org.xwiki.user.internal.DefaultUserProperties;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -40,6 +44,13 @@ public abstract class AbstractDocumentUserPropertiesResolver implements UserProp
     @Inject
     protected Provider<XWikiContext> contextProvider;
 
+    @Inject
+    @Named("normaluser")
+    protected ConfigurationSourceAuthorization authorization;
+
+    @Inject
+    protected AuthorizationManager authorizationManager;
+
     @Override
     public UserProperties resolve(UserReference userReference, Object... parameters)
     {
@@ -48,11 +59,14 @@ public abstract class AbstractDocumentUserPropertiesResolver implements UserProp
                 DocumentUserReference.class.getName()));
         }
         DocumentUserReference documentUserReference = (DocumentUserReference) userReference;
-        return new DocumentUserProperties(documentUserReference, this.contextProvider, getConfigurationSource());
+        return new DefaultUserProperties(getConfigurationSource(documentUserReference, this.authorization,
+            this.authorizationManager, this.contextProvider));
     }
 
     /**
      * @return the configuration source from which to resolve properties from
      */
-    protected abstract ConfigurationSource getConfigurationSource();
+    protected abstract ConfigurationSource getConfigurationSource(DocumentUserReference userReference,
+        ConfigurationSourceAuthorization authorization, AuthorizationManager authorizationManager,
+        Provider<XWikiContext> contextProvider);
 }

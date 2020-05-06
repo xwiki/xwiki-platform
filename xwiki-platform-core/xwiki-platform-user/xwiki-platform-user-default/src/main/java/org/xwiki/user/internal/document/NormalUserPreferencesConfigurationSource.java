@@ -66,6 +66,8 @@ public class NormalUserPreferencesConfigurationSource extends AbstractDocumentCo
     @Override
     protected DocumentReference getDocumentReference()
     {
+        // The current user is the user for which we're getting/setting the properties for since that user is put
+        // as the current user in DocumentUserProperties before this CS is used.
         return this.documentAccessBridge.getCurrentUserReference();
     }
 }

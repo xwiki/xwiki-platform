@@ -41,35 +41,33 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class AddressConverterTest
 {
     @InjectMockComponents
-    private AddressConverter addressConverter;
+    private AddressConverter converter;
 
     @Test
     public void convert() throws Exception
     {
         InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-        assertEquals(address,
-            this.addressConverter.convert(Address.class, "John Doe(comment) <john1@doe.com>"));
+        assertEquals(address, this.converter.convert(Address.class, "John Doe(comment) <john1@doe.com>"));
     }
 
     @Test
-    public void convertWhenNull()
+    void convertWhenNull()
     {
-        assertNull(this.addressConverter.convert(Address.class, null));
+        assertNull(this.converter.convert(Address.class, null));
     }
 
     @Test
-    public void convertWhenTypeIsAlreadyAnAddress() throws Exception
+    void convertWhenTypeIsAlreadyAnAddress() throws Exception
     {
         InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-        assertEquals(address, this.addressConverter.convert(Address.class, address));
+        assertEquals(address, this.converter.convert(Address.class, address));
     }
 
     @Test
-    public void convertWhenInvalid()
+    void convertWhenInvalid()
     {
-        Throwable exception = assertThrows(ConversionException.class, () -> {
-            this.addressConverter.convert(Address.class, "invalid(");
-        });
+        Throwable exception = assertThrows(ConversionException.class,
+            () -> this.converter.convert(Address.class, "invalid("));
         assertEquals("Failed to convert [invalid(] to [javax.mail.Address]", exception.getMessage());
     }
 }

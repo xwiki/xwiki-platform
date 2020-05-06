@@ -25,7 +25,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-platform-help</artifactId>
-    <version>12.3-SNAPSHOT</version>
+    <version>12.4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-platform-help-ui</artifactId>
   <name>XWiki Platform - Help - UI</name>
@@ -77,7 +77,6 @@
       <version>${rendering.version}</version>
       <scope>runtime</scope>
     </dependency>
-
     <!-- Test Dependencies -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -87,4 +86,17 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.xwiki.commons</groupId>
+        <artifactId>xwiki-commons-tool-xar-plugin</artifactId>
+        <configuration>
+          <visibleTechnicalPages>
+            <visibleTechnicalPage>.*/XWiki/XWikiSyntax\.xml</visibleTechnicalPage>
+          </visibleTechnicalPages>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>

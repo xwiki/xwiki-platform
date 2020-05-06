@@ -64,6 +64,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     private EntityResourceActionLister actionLister;
 
+    protected boolean daemon;
+
     protected URL originalURL;
 
     /**
@@ -119,30 +121,20 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         // Check if the request is a deamon thread request
         XWikiRequest request = context.getRequest();
-        boolean daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub
+        this.daemon = request.getHttpServletRequest() instanceof XWikiServletRequestStub
             && ((XWikiServletRequestStub) request.getHttpServletRequest()).isDaemon();
 
         // Remember initial request base URL for path for last resort
         if (homepageConfigration != null && context.isMainWiki()) {
             // If the main wiki base URL is forced in the configuration use it
             this.originalURL = homepageConfigration;
-        } else if (daemon) {
-            // In case of daemon thread use the standard URL of the current wiki as reference
-            try {
-                this.originalURL = context.getWiki().getServerURL(context.getOriginalWikiId(), context);
-            } catch (MalformedURLException e) {
-                LOGGER.warn("Can't get the standard URL for wiki [{}]: {}", context.getWikiId(),
-                    ExceptionUtils.getRootCauseMessage(e));
-            }
-        }
-
-        // Fallback on request base URL
-        if (this.originalURL == null) {
+        } else {
+            // Fallback on request base URL
             this.originalURL = HttpServletUtils.getSourceBaseURL(context.getRequest());
         }
 
         // Only take into account initial request if it's meant to be
-        if (!daemon) {
+        if (!this.daemon) {
             URL defaultWikiURL = this.originalURL;
 
             // If protocol is forced in the configuration switch to it
@@ -162,6 +154,23 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
+    private URL getOriginalURL(XWikiContext xcontext)
+    {
+        URL url = null;
+
+        // In case of daemon thread use the standard URL of the current wiki as reference
+        if (this.daemon) {
+            try {
+                url = xcontext.getWiki().getServerURL(xcontext.getWikiId(), xcontext);
+            } catch (MalformedURLException e) {
+                LOGGER.warn("Can't get the standard URL for wiki [{}]: {}", xcontext.getWikiId(),
+                    ExceptionUtils.getRootCauseMessage(e));
+            }
+        }
+
+        return url != null ? url : this.originalURL;
+    }
+
     /**
      * @param wikiId the wiki identifier to associate with this URL
      * @param baseURL the input URL to take into account, null to disable it
@@ -179,7 +188,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     protected URL getDefaultURL(String wikiId, XWikiContext xcontext)
     {
         if (this.defaultURLs == null) {
-            return this.originalURL;
+            return getOriginalURL(xcontext);
         }
 
         URL url = this.defaultURLs.get(wikiId);
@@ -274,7 +283,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
 
         // Fallback on initial request base URL
-        return this.originalURL;
+        return getOriginalURL(context);
     }
 
     @Override
@@ -812,7 +821,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             if (url != null) {
                 String surl = url.toString();
 
-                if (this.originalURL == null || !surl.startsWith(this.originalURL.toString())) {
+                URL referenceURL = getOriginalURL(context);
+                if (referenceURL == null || !surl.startsWith(referenceURL.toString())) {
                     // External URL: leave it as is.
                     relativeURL = surl;
                 } else {

@@ -40,16 +40,18 @@ public interface EventStatusManager
      * @param events a list of events
      * @param entityIds a list of ids of entities (users and groups)
      * @return the list of statuses corresponding to each pair or event/entity
-     *
      * @throws Exception if an error occurs
      */
     List<EventStatus> getEventStatus(List<Event> events, List<String> entityIds) throws Exception;
 
     /**
      * Save in the storage the given status.
+     * 
      * @param eventStatus the status to save
      * @throws Exception if an error occurs
+     * @deprecated since 12.3RC1, use {@link EventStore#saveEventStatus(EventStatus)} instead
      */
+    @Deprecated
     void saveEventStatus(EventStatus eventStatus) throws Exception;
 
     /**

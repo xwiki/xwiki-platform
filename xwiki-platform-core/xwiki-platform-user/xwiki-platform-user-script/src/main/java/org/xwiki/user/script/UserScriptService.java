@@ -53,10 +53,11 @@ public class UserScriptService implements ScriptService
     public static final String ROLEHINT = "user";
 
     @Inject
+    @Named("secure")
     private UserPropertiesResolver userPropertiesResolver;
 
     @Inject
-    @Named("all")
+    @Named("secure/all")
     private UserPropertiesResolver allUserPropertiesResolver;
 
     @Inject

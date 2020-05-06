@@ -65,6 +65,9 @@ public class BootstrapSwitch
     {
         this.webElement = webElement;
         this.driver = driver;
+
+        // Wait until the switch has a state.
+        driver.waitUntilCondition(webDriver -> isSwitchOff() || isSwitchOn() || isSwitchIndeterminate());
     }
 
     /**
@@ -72,15 +75,27 @@ public class BootstrapSwitch
      */
     public State getState()
     {
+        State result;
         if (isSwitchIndeterminate()) {
-            return State.UNDETERMINED;
+            result = State.UNDETERMINED;
+        } else if (isSwitchOn()) {
+            result = State.ON;
+        } else if (isSwitchOff()) {
+            result = State.OFF;
+        } else {
+            throw new AssertionError("Cannot find the state of the element");
         }
-        return isSwitchOn() ? State.ON : State.OFF;
+        return result;
     }
 
     private boolean isSwitchOn()
     {
         return getHTMLClass().contains("bootstrap-switch-on");
+    }
+
+    private boolean isSwitchOff()
+    {
+        return getHTMLClass().contains("bootstrap-switch-off");
     }
 
     private boolean isSwitchIndeterminate()

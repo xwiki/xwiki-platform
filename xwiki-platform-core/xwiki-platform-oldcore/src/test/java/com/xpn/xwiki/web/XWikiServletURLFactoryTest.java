@@ -449,19 +449,24 @@ public class XWikiServletURLFactoryTest
     {
         this.oldcore.getMockXWikiCfg().setProperty("xwiki.virtual.usepath", "0");
 
-        this.oldcore.getXWikiContext().setOriginalWikiId("wiki1");
-        this.oldcore.getXWikiContext().setWikiId("wiki2");
-
         // Set a deamon request
         initDaemonRequest("request", 42);
 
-        String url =
-            urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
-        assertEquals("/xwiki/bin/view/Space/Page", url);
+        this.oldcore.getXWikiContext().setWikiId("wiki1");
 
-        url =
-            urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext());
-        assertEquals("http://wiki2server/xwiki/bin/view/Space/Page", url);
+        assertEquals("/xwiki/bin/view/Space/Page",
+            urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext()));
+
+        assertEquals("http://wiki2server/xwiki/bin/view/Space/Page",
+            urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext()));
+
+        this.oldcore.getXWikiContext().setWikiId("wiki2");
+
+        assertEquals("http://wiki1server/xwiki/bin/view/Space/Page",
+            urlFactory.getURL(new URL("http://wiki1server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext()));
+
+        assertEquals("/xwiki/bin/view/Space/Page",
+            urlFactory.getURL(new URL("http://wiki2server/xwiki/bin/view/Space/Page"), this.oldcore.getXWikiContext()));
     }
 
     /**

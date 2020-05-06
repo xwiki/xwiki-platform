@@ -96,8 +96,8 @@ $xwiki.jsfx.use('uicomponents/edit/editableProperty.js', {'forceSkinAction': tru
                 #set ($supportedLocaleURL = $doc.getURL($action, $escapetool.url({
                   'language': $supportedLocale
                 })))
-                #set ($discard = $output.add("<span class='wikicreatelink'><a href='$supportedLocaleURL'>" +
-                  "$escapetool.xml($supportedLocaleName)</a></span>"))
+                #set ($discard = $output.add("<span class='wikicreatelink skipCreatePagePopup'><a" +
+                  " href='$supportedLocaleURL'>$escapetool.xml($supportedLocaleName)</a></span>"))
               #end
             #end
             <dd>$stringtool.join($output, ', ')</dd>

@@ -19,50 +19,21 @@
  */
 package org.xwiki.mail.internal;
 
-import java.lang.reflect.Type;
-
 import javax.inject.Singleton;
 import javax.mail.Address;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.properties.converter.AbstractConverter;
-import org.xwiki.properties.converter.ConversionException;
 
 /**
- * Converts a String to a {@link javax.mail.Address} instance. Useful when using the Mail Sender
- * scripting API to add a recipient.
+ * Converts a String to a {@link InternetAddress} instance when the target type asked is {@link Address}.
+ * Useful when using the Mail Sender scripting API to add a recipient.
  *
  * @version $Id$
  * @since 6.2M1
  */
 @Component
 @Singleton
-public class AddressConverter extends AbstractConverter<Address>
+public class AddressConverter extends AbstractAddressConverter<Address>
 {
-    @Override
-    protected Address convertToType(Type targetType, Object value)
-    {
-        if (value == null) {
-            return null;
-        }
-
-        Address address;
-
-        try {
-            address = InternetAddress.parse(value.toString())[0];
-        } catch (AddressException e) {
-            throw new ConversionException(
-                String.format("Failed to convert [%s] to [%s]", value, Address.class.getName()), e);
-        }
-
-        return address;
-    }
-
-    @Override
-    protected String convertToString(Address value)
-    {
-        return InternetAddress.toString(new Address[] {value});
-    }
 }

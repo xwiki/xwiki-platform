@@ -110,7 +110,8 @@ public class OtherFormatPane extends BaseElement
     /**
      * @return all the values of the "pages" hidden input fields aggregated in a list.
      */
-    public List<String> getPagesValues() {
+    public List<String> getPagesValues()
+    {
         return getForm().findElements(By.cssSelector("input[type=hidden][name=pages]")).stream()
             .map(webElement -> webElement.getAttribute(VALUE_ATTR)).collect(Collectors.toList());
     }
@@ -118,7 +119,8 @@ public class OtherFormatPane extends BaseElement
     /**
      * @return all the values of the "excludes" hidden input fields aggregated in a list.
      */
-    public List<String> getExcludesValues() {
+    public List<String> getExcludesValues()
+    {
         return getForm()
             .findElements(By.cssSelector("input[type=hidden][name=excludes]")).stream()
             .map(webElement -> webElement.getAttribute(VALUE_ATTR)).collect(Collectors.toList());

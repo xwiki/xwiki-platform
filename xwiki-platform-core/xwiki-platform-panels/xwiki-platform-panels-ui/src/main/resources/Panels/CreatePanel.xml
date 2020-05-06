@@ -38,16 +38,18 @@
   <hidden>true</hidden>
   <content>{{velocity output="false"}}
 #macro (displayCreatePanelForm)
-{{html}}
+{{html clean="false"}}
   &lt;form method="post" action="$doc.getURL('view', 'xpage=plain')" class="form-inline" onsubmit="cancelCancelEdit()"&gt;
     &lt;div&gt;
-      &lt;input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" /&gt;
+      &lt;input type="hidden" name="form_token" value="$!escapetool.xml($services.csrf.token)" /&gt;
       &lt;input type="hidden" name="create" value="1"/&gt;
       &lt;input type="hidden" name="parent" value="Panels.WebHome"/&gt;
-      &lt;label for="panelTitle" class="hidden"&gt;$services.localization.render('xe.panels.create.title')&lt;/label&gt;
-      &lt;input type="text" id="panelTitle" name="panelTitle" 
-          value="$escapetool.xml($services.localization.render('xe.panels.create.title'))" /&gt;
-      &lt;input type="submit" class="btn btn-success" 
+      &lt;label for="panelTitle" class="hidden"&gt;
+        $escapetool.xml($services.localization.render('xe.panels.create.title'))
+      &lt;/label&gt;
+      &lt;input type="text" id="panelTitle" name="panelTitle"
+          placeholder="$escapetool.xml($services.localization.render('xe.panels.create.title'))" /&gt;
+      &lt;input type="submit" class="btn btn-success"
           value="$escapetool.xml($services.localization.render('create'))"/&gt;
     &lt;/div&gt;
   &lt;/form&gt;

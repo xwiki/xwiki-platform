@@ -19,16 +19,15 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.text.StringUtils;
 
-import java.io.Serializable;
-
 /**
- * A Legacy Event Status is the equivalent of {@link EventStatus} for {@link LegacyEvent}.
- *
- * TODO: migrate the database schema so we don't need to use this legacy class anymore.
+ * A Legacy Event Status is the equivalent of {@link EventStatus} for {@link LegacyEvent}. TODO: migrate the database
+ * schema so we don't need to use this legacy class anymore.
  *
  * @since 11.1RC1
  * @version $Id$
@@ -38,6 +37,8 @@ public class LegacyEventStatus implements Serializable
     private LegacyEvent activityEvent;
 
     private String entityId;
+
+    private int format;
 
     private boolean isRead;
 
@@ -82,6 +83,24 @@ public class LegacyEventStatus implements Serializable
     }
 
     /**
+     * @param format the format associated with this status (alert, mail)
+     * @since 12.1RC1
+     */
+    public void setFormat(int format)
+    {
+        this.format = format;
+    }
+
+    /**
+     * @return the format associated with this status (alert, mail)
+     * @since 12.1RC1
+     */
+    public int getFormat()
+    {
+        return this.format;
+    }
+
+    /**
      * @param read either or nor the event has been read by the entity
      */
     public void setRead(boolean read)
@@ -95,7 +114,7 @@ public class LegacyEventStatus implements Serializable
         if (other instanceof LegacyEventStatus) {
             LegacyEventStatus o = (LegacyEventStatus) other;
             return StringUtils.equals(activityEvent.getEventId(), o.activityEvent.getEventId())
-                    && StringUtils.equals(entityId, o.entityId) && isRead == o.isRead();
+                && StringUtils.equals(entityId, o.entityId) && isRead == o.isRead();
         }
 
         return false;
@@ -105,7 +124,7 @@ public class LegacyEventStatus implements Serializable
     public int hashCode()
     {
         HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
-        return hashCodeBuilder.append(activityEvent.getEventId().hashCode())
-                .append(entityId.hashCode()).append(isRead).hashCode();
+        return hashCodeBuilder.append(activityEvent.getEventId().hashCode()).append(entityId.hashCode()).append(isRead)
+            .hashCode();
     }
 }

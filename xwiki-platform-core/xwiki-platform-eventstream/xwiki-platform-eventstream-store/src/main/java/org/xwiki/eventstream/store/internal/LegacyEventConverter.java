@@ -19,9 +19,30 @@
  */
 package org.xwiki.eventstream.store.internal;
 
+<<<<<<< Updated upstream
 import org.xwiki.component.annotation.Role;
+=======
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
+import org.apache.commons.lang3.StringUtils;
+import org.xwiki.component.annotation.Component;
+>>>>>>> Stashed changes
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
+<<<<<<< Updated upstream
+=======
+import org.xwiki.eventstream.internal.DefaultEventStatus;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+>>>>>>> Stashed changes
 
 /**
  * Helper that convert some objects from the Event Stream module to objects of the Activity Stream module
@@ -55,7 +76,19 @@ public interface LegacyEventConverter
      * @param eventStatus the status to transform
      * @return the equivalent activity event status
      */
+<<<<<<< Updated upstream
     LegacyEventStatus convertEventStatusToLegacyActivityStatus(EventStatus eventStatus);
+=======
+    public LegacyEventStatus convertEventStatusToLegacyActivityStatus(EventStatus eventStatus)
+    {
+        LegacyEventStatus legacyEventStatus = new LegacyEventStatus();
+        legacyEventStatus.setActivityEvent(convertEventToLegacyActivity(eventStatus.getEvent()));
+        legacyEventStatus.setEntityId(eventStatus.getEntityId());
+        legacyEventStatus.setRead(eventStatus.isRead());
+
+        return legacyEventStatus;
+    }
+>>>>>>> Stashed changes
 
     /**
      * Convert an {@link LegacyEventStatus} to an {@link EventStatus}.

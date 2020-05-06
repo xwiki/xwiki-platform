@@ -19,33 +19,53 @@
  */
 package org.xwiki.configuration.internal;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.xwiki.configuration.ConfigurationSaveException;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.configuration.internal.test.AbstractTestDocumentConfigurationSource;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.LocalDocumentReference;
 import org.xwiki.properties.converter.ConversionException;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.test.junit5.mockito.OldcoreTest;
 
 /**
  * Unit tests for {@link WikiPreferencesConfigurationSource}.
  * 
  * @version $Id: 31e2e0d488d6f5dbc1fcec1211d30dc30000b5eb
  */
+@OldcoreTest
 public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocumentConfigurationSource
 {
-    public WikiPreferencesConfigurationSourceTest()
+    @InjectMockComponents
+    private WikiPreferencesConfigurationSource source;
+
+    @Override
+    protected ConfigurationSource getConfigurationSource()
     {
-        super(WikiPreferencesConfigurationSource.class);
+        return this.source;
     }
 
     @Override
@@ -55,53 +75,50 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
     }
 
     @Override
+    @BeforeEach
     public void before() throws Exception
     {
         super.before();
-
         this.oldcore.getXWikiContext().setLocale(Locale.ENGLISH);
     }
 
-    // Tests
-
     @Test
-    public void testGetProperty() throws Exception
+    void getProperty() throws Exception
     {
-        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key", String.class));
-        Assert.assertEquals("default", this.componentManager.getComponentUnderTest().getProperty("key", "default"));
-        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key"));
-        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key", Integer.class));
+        assertNull(this.source.getProperty("key", String.class));
+        assertEquals("default", this.source.getProperty("key", "default"));
+        assertNull(this.source.getProperty("key"));
+        assertNull(this.source.getProperty("key", Integer.class));
 
         // Validate result for simple String key
 
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
-        Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key", String.class));
-        Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key", "default"));
-        Assert.assertEquals("value", this.componentManager.getComponentUnderTest().getProperty("key"));
+        assertEquals("value", this.source.getProperty("key", String.class));
+        assertEquals("value", this.source.getProperty("key", "default"));
+        assertEquals("value", this.source.getProperty("key"));
 
         // Validate result for non existing key
 
-        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("wrongkey", String.class));
-        Assert
-            .assertEquals("default", this.componentManager.getComponentUnderTest().getProperty("wrongkey", "default"));
-        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("wrongkey"));
-        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("wrongkey", Integer.class));
+        assertNull(this.source.getProperty("wrongkey", String.class));
+        assertEquals("default", this.source.getProperty("wrongkey", "default"));
+        assertNull(this.source.getProperty("wrongkey"));
+        assertNull(this.source.getProperty("wrongkey", Integer.class));
 
         // Check that the --- is empty hack "works"
 
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", WikiPreferencesConfigurationSource.NO_VALUE);
 
-        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key", String.class));
-        Assert.assertEquals("default", this.componentManager.getComponentUnderTest().getProperty("key", "default"));
-        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key"));
-        Assert.assertEquals(null, this.componentManager.getComponentUnderTest().getProperty("key", Integer.class));
+        assertNull(this.source.getProperty("key", String.class));
+        assertEquals("default", this.source.getProperty("key", "default"));
+        assertNull(this.source.getProperty("key"));
+        assertNull(this.source.getProperty("key", Integer.class));
     }
 
     @Test
-    public void testGetPropertyTwiceWithDifferentType() throws Exception
+    void getPropertyTwiceWithDifferentType() throws Exception
     {
         when(this.mockConverter.convert(String.class, "10")).thenReturn("10");
         when(this.mockConverter.convert(Integer.class, "10")).thenReturn(10);
@@ -109,24 +126,26 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "10");
 
-        Assert.assertEquals("10", this.componentManager.getComponentUnderTest().getProperty("key", String.class));
-        Assert.assertEquals((Integer) 10,
-            this.componentManager.getComponentUnderTest().<Integer>getProperty("key", Integer.class));
+        assertEquals("10", this.source.getProperty("key", String.class));
+        assertEquals((Integer) 10,
+            this.source.<Integer>getProperty("key", Integer.class));
     }
 
-    @Test(expected = ConversionException.class)
-    public void testGetPropertyWithWrongType() throws Exception
+    @Test
+    void getPropertyWithWrongType() throws Exception
     {
-        when(this.mockConverter.convert(Integer.class, "value")).thenThrow(ConversionException.class);
+        when(this.mockConverter.convert(Integer.class, "value")).thenThrow(new ConversionException("error"));
 
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
-        Assert.assertEquals("values", this.componentManager.getComponentUnderTest().getProperty("key", Integer.class));
+        Exception exception = assertThrows(ConversionException.class,
+            () -> this.source.getProperty("key", Integer.class));
+        assertEquals("error", exception.getMessage());
     }
 
     @Test
-    public void testGetKeys() throws ComponentLookupException, XWikiException
+    void getKeys() throws XWikiException
     {
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key1", "value");
@@ -137,29 +156,67 @@ public class WikiPreferencesConfigurationSourceTest extends AbstractTestDocument
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "emptykey2", "---");
 
-        List<String> result = this.componentManager.getComponentUnderTest().getKeys();
+        List<String> result = this.source.getKeys();
 
-        Assert.assertEquals(new HashSet<String>(Arrays.asList("key1", "key2")), new HashSet<String>(result));
+        assertEquals(new HashSet<>(Arrays.asList("key1", "key2")), new HashSet<>(result));
     }
 
     @Test
-    public void testContainsKey() throws XWikiException, ComponentLookupException
+    void containsKey() throws XWikiException
     {
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
-        Assert.assertTrue(this.componentManager.getComponentUnderTest().containsKey("key"));
-        Assert.assertFalse(this.componentManager.getComponentUnderTest().containsKey("wrongkey"));
+        assertTrue(this.source.containsKey("key"));
+        assertFalse(this.source.containsKey("wrongkey"));
     }
 
     @Test
-    public void testIsEmpty() throws ComponentLookupException, XWikiException
+    void isEmpty() throws XWikiException
     {
-        Assert.assertTrue(this.componentManager.getComponentUnderTest().isEmpty());
+        assertTrue(this.source.isEmpty());
 
         setStringProperty(new DocumentReference(CURRENT_WIKI, WikiPreferencesConfigurationSource.CLASS_SPACE_NAME,
             WikiPreferencesConfigurationSource.CLASS_PAGE_NAME), "key", "value");
 
-        Assert.assertFalse(this.componentManager.getComponentUnderTest().isEmpty());
+        assertFalse(this.source.isEmpty());
+    }
+
+    @Test
+    void setProperty() throws Exception
+    {
+        DocumentReference reference = new DocumentReference(CURRENT_WIKI,
+            WikiPreferencesConfigurationSource.CLASS_SPACE_NAME, WikiPreferencesConfigurationSource.CLASS_PAGE_NAME);
+        this.componentManager.registerMockComponent(EntityReferenceSerializer.TYPE_STRING, "local");
+        setupBaseObject(reference, (baseObject -> {}));
+
+        // Since setProperties() will call baseObject.set(), without any indication of the type to set we need to
+        // mock the base class too for the type to be found.
+        XWikiDocument document = this.oldcore.getXWikiContext().getWiki().getDocument(reference,
+            this.oldcore.getXWikiContext());
+        BaseClass baseClass = document.getXClass();
+        baseClass.addTextField("key", "Some Key", 30);
+
+        this.source.setProperties(Collections.singletonMap("key", "value"));
+
+        assertEquals("value", this.source.getProperty("key"));
+    }
+
+    @Test
+    void setPropertyWhenException() throws Exception
+    {
+        DocumentReference reference = new DocumentReference(CURRENT_WIKI,
+            WikiPreferencesConfigurationSource.CLASS_SPACE_NAME, WikiPreferencesConfigurationSource.CLASS_PAGE_NAME);
+        XWikiContext xcontext = this.oldcore.getXWikiContext();
+        when(this.oldcore.getXWikiContext().getWiki().getDocument(reference, xcontext)).thenThrow(
+            new XWikiException(0, 0, "error"));
+
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("key1", "value1");
+        properties.put("key2", "value2");
+        Exception exception = assertThrows(ConfigurationSaveException.class,
+            () -> this.source.setProperties(properties));
+        assertEquals("Failed to set properties [[key1],[key2]] in document [XWiki.XWikiPreferences]'s "
+            + "[XWiki.XWikiPreferences] xobject", exception.getMessage());
     }
 }

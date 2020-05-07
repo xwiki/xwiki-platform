@@ -67,11 +67,11 @@
   ##
   ## Convert all the translations of the specified document
   ##
-  #set($languages = $targetDoc.translationList)
+  #set ($translationLocales = $targetDoc.translationLocales)
   #if (!$error)
-    #foreach ($language in $languages)
+    #foreach ($translationLocale in $translationLocales)
       #if (!$error)
-        #set ($translatedDoc = $targetDoc.getTranslatedDocument($language))
+        #set ($translatedDoc = $targetDoc.getTranslatedDocument($translationLocale))
         #if ($translatedDoc.locale != $targetDoc.locale)
           #convertDocument($translatedDoc $error $oldSyntaxId $newSyntaxId)
         #end

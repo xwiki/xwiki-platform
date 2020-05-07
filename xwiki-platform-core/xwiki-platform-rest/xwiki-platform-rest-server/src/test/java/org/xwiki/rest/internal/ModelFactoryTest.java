@@ -330,7 +330,7 @@ public class ModelFactoryTest
         when(document.getWiki()).thenReturn("wiki");
         when(document.getSpace()).thenReturn("Path.To");
         when(document.getDefaultLocale()).thenReturn(Locale.FRENCH);
-        when(document.getTranslationList()).thenReturn(Arrays.asList("en", "ro"));
+        when(document.getTranslationLocales()).thenReturn(Arrays.asList(Locale.ENGLISH, Locale.GERMAN));
 
         Translations translations = this.modelFactory.toRestTranslations(this.baseURI, document);
 
@@ -339,7 +339,7 @@ public class ModelFactoryTest
         assertEquals(3, translations.getTranslations().size());
         assertEquals("fr", translations.getTranslations().get(0).getLanguage());
         assertEquals("en", translations.getTranslations().get(1).getLanguage());
-        assertEquals("ro", translations.getTranslations().get(2).getLanguage());
+        assertEquals("de", translations.getTranslations().get(2).getLanguage());
     }
 
     @Test

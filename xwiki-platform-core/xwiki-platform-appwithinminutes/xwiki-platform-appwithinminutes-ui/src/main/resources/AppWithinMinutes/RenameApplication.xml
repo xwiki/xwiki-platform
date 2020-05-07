@@ -169,7 +169,7 @@
     ## Update the default translation.
     #updateAppTranslation($newTranslations $oldApp $newApp)
     ## Update all the available translations.
-    #foreach ($locale in $newTranslations.translationList)
+    #foreach ($locale in $newTranslations.translationLocales)
       #set ($newTranslationsForLocale = $newTranslations.getTranslatedDocument($locale))
       #updateAppTranslation($newTranslationsForLocale $oldApp $newApp)
     #end

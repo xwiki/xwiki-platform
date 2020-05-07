@@ -146,9 +146,7 @@ require(['jquery', 'AddNotificationFilterPreferenceLivetable', 'bootstrap', 'boo
     var initBootstrapSwitches = function () {
       $('#notificationFilterPreferencesLiveTable .notificationFilterPreferenceCheckbox, #notificationFilterPreferencesLiveTable .toggleableFilterPreferenceCheckbox').bootstrapSwitch({
         size: 'mini',
-        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))',
-        onText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.on'))',
-        offText: '$escapetool.javascript($services.localization.render('notifications.toggle.label.off'))'
+        labelText: '$escapetool.javascript($services.icon.renderHTML("bell"))'
       });
     };
     $(document).on('xwiki:livetable:displayComplete', function (event, data) {

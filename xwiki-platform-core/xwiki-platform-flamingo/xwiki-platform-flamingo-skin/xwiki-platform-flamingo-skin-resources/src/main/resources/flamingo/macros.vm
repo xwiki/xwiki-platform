@@ -75,6 +75,7 @@
  *#
 #macro(editActionButton $action $resourceIdentifier $class)
 #submitButton("action_${action}", $services.localization.render("core.shortcuts.edit.${resourceIdentifier}"), $services.localization.render($resourceIdentifier), $class)
+<input type="hidden" name="xaction" value="$escapetool.xml($action)" />
 #end
 
 #**

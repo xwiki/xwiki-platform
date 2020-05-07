@@ -491,11 +491,6 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     watchSpaceSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('chart-organisation'))');
     watchWikiSwitch.bootstrapSwitch('labelText', '$escapetool.javascript($services.icon.renderHTML('wiki'))');
 
-    allWatchSwitches.each(function(index, elem) {
-        elem.bootstrapSwitch('onText', '$escapetool.javascript($services.localization.render('notifications.toggle.label.on'))');
-        elem.bootstrapSwitch('offText', '$escapetool.javascript($services.localization.render('notifications.toggle.label.off'))');
-    });
-
     ///
     /// Disabled switches if there is no enabled notification preferences
     ///

@@ -43,7 +43,7 @@ import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 @Singleton
 public class DefaultGeneralMailConfiguration implements GeneralMailConfiguration
 {
-    private static final String OBFUSCATE_EMAIL_ADDRESSES = "obfuscateEmailAddresses";
+    private static final String OBFUSCATE_EMAIL_ADDRESSES = "obfuscate";
 
     /**
      * By default email addresses are not obfuscated.

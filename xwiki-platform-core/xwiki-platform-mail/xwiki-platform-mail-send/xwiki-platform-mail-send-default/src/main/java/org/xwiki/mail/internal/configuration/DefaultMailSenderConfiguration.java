@@ -27,10 +27,8 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import com.xpn.xwiki.XWikiContext;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -133,9 +131,6 @@ public class DefaultMailSenderConfiguration implements MailSenderConfiguration
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
 
     @Override
     public String getHost()

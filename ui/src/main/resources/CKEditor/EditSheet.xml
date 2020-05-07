@@ -541,7 +541,26 @@ define('xwiki-ckeditor', [
       <cache>long</cache>
     </property>
     <property>
-      <code>// Fix the path to the arrow icon that indicates the presence of a sub-menu in the context menu.
+      <code>// Fix CKEDITOR.tools.escapeCss() for browsers that don't support CSS.escape()
+// See https://github.com/ckeditor/ckeditor4/issues/681
+require(['jquery', 'ckeditor'], function($, ckeditor) {
+  // Test if CKEDITOR.tools.escapeCss() works as expected.
+  if (ckeditor.tools.escapeCss('.') === '.') {
+    // Special CSS characters were not escaped so we need to fix this.
+    // Use jQuery's escapeSelector() if available (only since jQuery 3.0), otherwise use some naive implementation.
+    ckeditor.tools.escapeCss = $.escapeSelector || function(selector) {
+      if (typeof selector === 'string') {
+        // Simple implementation.
+        // See https://learn.jquery.com/using-jquery-core/faq/how-do-i-select-an-element-by-an-id-that-has-characters-used-in-css-notation/
+        return selector.replace(/(:|\.|\[|\]|,|=|@)/g, '\\$1');
+      } else {
+        return selector;
+      }
+    };
+  }
+});
+
+// Fix the path to the arrow icon that indicates the presence of a sub-menu in the context menu.
 if (CKEDITOR_BASEPATH.indexOf('?') &gt;= 0) {
   // The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving
   // relative paths. See XWIKI-10880 (A CSS file inside a webjar cannot use a resource from that webjar).

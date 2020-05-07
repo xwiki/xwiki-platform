@@ -72,14 +72,14 @@ public class DefaultGeneralMailConfigurationTest
     {
         // Simulate the default value returned by the call to getProperty() and not the value of the
         // "mail.general.obfuscateEmailAddresses" property which is supposed to be null here...
-        when(this.xwikiPropertiesSource.getProperty("mail.general.obfuscateEmailAddresses", false)).thenReturn(false);
+        when(this.xwikiPropertiesSource.getProperty("mail.general.obfuscate", false)).thenReturn(false);
         assertFalse(this.configuration.obfuscateEmailAddresses());
     }
 
     @Test
     public void obfuscateEmailAddressesWhenDefinedInXWikiProperties()
     {
-        when(this.xwikiPropertiesSource.getProperty("mail.general.obfuscateEmailAddresses", false)).thenReturn(true);
+        when(this.xwikiPropertiesSource.getProperty("mail.general.obfuscate", false)).thenReturn(true);
 
         assertTrue(this.configuration.obfuscateEmailAddresses());
     }
@@ -87,7 +87,7 @@ public class DefaultGeneralMailConfigurationTest
     @Test
     public void obfuscateEmailAddressesFromMailConfigDocumentInMainWiki()
     {
-        when(this.currentWikiMailConfigDocumentSource.getProperty("obfuscateEmailAddresses", Boolean.class))
+        when(this.currentWikiMailConfigDocumentSource.getProperty("obfuscate", Boolean.class))
             .thenReturn(true);
 
         assertTrue(this.configuration.obfuscateEmailAddresses());
@@ -99,9 +99,9 @@ public class DefaultGeneralMailConfigurationTest
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
 
-        when(this.currentWikiMailConfigDocumentSource.getProperty("obfuscateEmailAddresses", Boolean.class))
+        when(this.currentWikiMailConfigDocumentSource.getProperty("obfuscate", Boolean.class))
             .thenReturn(null);
-        when(this.mainWikiMailConfigDocumentSource.getProperty("obfuscateEmailAddresses", Boolean.class))
+        when(this.mainWikiMailConfigDocumentSource.getProperty("obfuscate", Boolean.class))
             .thenReturn(true);
 
         assertTrue(this.configuration.obfuscateEmailAddresses());

@@ -1396,6 +1396,17 @@ public class XWiki extends Api
     }
 
     /**
+     * Get the available locales according to the preferences.
+     *
+     * @return the list of available locales
+     * @since 12.4RC1
+     */
+    public List<Locale> getAvailableLocales()
+    {
+        return this.xwiki.getAvailableLocales(getXWikiContext());
+    }
+
+    /**
      * @return the list of all wiki names, including the main wiki, corresponding to the available wiki descriptors.
      *         Example: the descriptor for the wiki <i>wikiname</i> is a document in the main wiki, named
      *         <i>XWiki.XWikiServerWikiname</i>, containing an XWiki.XWikiServerClass object.

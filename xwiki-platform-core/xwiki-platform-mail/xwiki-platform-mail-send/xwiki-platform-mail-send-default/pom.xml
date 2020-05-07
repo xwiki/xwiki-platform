@@ -41,6 +41,11 @@
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-mail-general</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-mail-send-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -64,8 +69,8 @@
       <artifactId>xwiki-commons-text</artifactId>
       <version>${commons.version}</version>
     </dependency>
-    <!-- Needed for working with XWikiStubContextProvider and XWikiRequest and by the Extension Manager to properly load some
-      components (e.g. DefaultXWikiStubContextProvider) -->
+    <!-- Needed for working with XWikiStubContextProvider and XWikiRequest and by the Extension Manager to properly
+         load some components (e.g. DefaultXWikiStubContextProvider) -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>

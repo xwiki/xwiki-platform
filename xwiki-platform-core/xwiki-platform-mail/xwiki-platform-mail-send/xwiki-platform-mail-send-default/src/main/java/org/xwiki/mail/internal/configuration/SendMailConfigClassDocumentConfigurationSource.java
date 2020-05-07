@@ -26,9 +26,9 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 
 /**
- * Provides configuration from the Mail.SendMailConfigClass document in the current wiki.
- * If the Mail.SendMailConfigClass xobject exists in the Mail.MailConfig document then always use configuration
- * values from it and if it doesn't then use the passed default values (if a default value is passed).
+ * Provides configuration from the {@code Mail.MailConfig} document in the current wiki.
+ * If the {@code Mail.SendMailConfigClass} xobject exists in the {@code Mail.MailConfig} document then always use
+ * configuration values from it and if it doesn't then use the passed default values (if a default value is passed).
  *
  * @version $Id$
  * @since 6.4M2

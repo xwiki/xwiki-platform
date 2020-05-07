@@ -216,6 +216,26 @@
                     "new": "class com.xpn.xwiki.render.ScriptXWikiServletRequest (archive = MavenArchive[gav=org.xwiki.platform:xwiki-platform-legacy-oldcore:jar:12.4-SNAPSHOT, file=\/root\/workspace\/XWiki_xwiki-platform_master\/xwiki-platform-core\/xwiki-platform-legacy\/xwiki-platform-legacy-oldcore\/target\/xwiki-platform-legacy-oldcore-12.4-SNAPSHOT.jar], in api = true, through use = false)",
                     "superClass": "com.xpn.xwiki.web.WrappingXWikiRequest",
                     "justification": "Young API and should not have any impact on scripts"
+                  },
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class org.xwiki.mail.script.MailSenderScriptService",
+                    "new": "class org.xwiki.mail.script.MailSenderScriptService",
+                    "annotationType": "javax.inject.Named",
+                    "attribute": "value",
+                    "oldValue": "\"mailsender\"",
+                    "newValue": "\"mail.sender\"",
+                    "justification": "Not a breakage, we have added a legacy component with the old hint."
+                  },
+                  {
+                    "code": "java.annotation.attributeValueChanged",
+                    "old": "class org.xwiki.mail.script.MailStorageScriptService",
+                    "new": "class org.xwiki.mail.script.MailStorageScriptService",
+                    "annotationType": "javax.inject.Named",
+                    "attribute": "value",
+                    "oldValue": "\"mailstorage\"",
+                    "newValue": "\"mail.storage\"",
+                    "justification": "Not a breakage, we have added a legacy component with the old hint."
                   }
                 ]
               }

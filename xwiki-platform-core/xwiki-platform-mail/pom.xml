@@ -33,6 +33,8 @@
   <description>XWiki Platform - Mail - Parent POM</description>
   <modules>
     <!-- Sorted Alphabetically -->
+    <module>xwiki-platform-mail-general</module>
+    <module>xwiki-platform-mail-script</module>
     <module>xwiki-platform-mail-send</module>
     <module>xwiki-platform-mail-ui</module>
   </modules>

@@ -118,7 +118,7 @@ public class MailIT
 
         // Step 0: Delete all pre-existing mails to start clean. This also verifies the deleteAll() script service
         //         API.
-        String content = "{{velocity}}$services.mailstorage.deleteAll(){{/velocity}}";
+        String content = "{{velocity}}$services.mail.storage.deleteAll(){{/velocity}}";
         ViewPage deleteAllPage = setup.createPage(this.testClassName, "DeleteAll", content, "");
         // Verify that the page doesn't display any content (unless there's an error!)
         assertEquals("", deleteAllPage.getContent());
@@ -247,9 +247,9 @@ public class MailIT
         // Note that we don't set the type and thus this message should not appear in the LiveTable filter at the end
         // of the test.
         String velocity = "{{velocity}}\n"
-            + "#set ($message = $services.mailsender.createMessage('from@doe.com', 'to@doe.com', 'Subject'))\n"
+            + "#set ($message = $services.mail.sender.createMessage('from@doe.com', 'to@doe.com', 'Subject'))\n"
             + "#set ($discard = $message.addPart('text/plain', 'text message'))\n"
-            + "#set ($result = $services.mailsender.send([$message], 'database'))\n"
+            + "#set ($result = $services.mail.sender.send([$message], 'database'))\n"
             + "#foreach ($status in $result.statusResult.getAllErrors())\n"
             + "  MSGID $status.messageId SUMMARY $status.errorSummary DESCRIPTION $status.errorDescription\n"
             + "#end\n"
@@ -278,13 +278,13 @@ public class MailIT
                 + "', 'MailTemplate'))\n"
             + "#set ($parameters = {'velocityVariables' : { 'name' : 'John' }, 'language' : 'en', "
                 + "'includeTemplateAttachments' : true})\n"
-            + "#set ($message = $services.mailsender.createMessage('template', $templateReference, $parameters))\n"
+            + "#set ($message = $services.mail.sender.createMessage('template', $templateReference, $parameters))\n"
             + "#set ($discard = $message.setFrom('localhost@xwiki.org'))\n"
             + "#set ($discard = $message.addRecipients('to', 'john@doe.com'))\n"
             + "#set ($discard = $message.setType('Test'))\n"
-            + "#set ($result = $services.mailsender.send([$message], 'database'))\n"
-            + "#if ($services.mailsender.lastError)\n"
-            + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
+            + "#set ($result = $services.mail.sender.send([$message], 'database'))\n"
+            + "#if ($services.mail.sender.lastError)\n"
+            + "  {{error}}$exceptiontool.getStackTrace($services.mail.sender.lastError){{/error}}\n"
             + "#end\n"
             + "#foreach ($status in $result.statusResult.getByState('SEND_ERROR'))\n"
             + "  {{error}}\n"
@@ -339,10 +339,10 @@ public class MailIT
             + "#set ($user1Reference = $services.model.createDocumentReference('', 'XWiki', 'user1'))\n"
             + "#set ($user2Reference = $services.model.createDocumentReference('', 'XWiki', 'user2'))\n"
             + "#set ($source = {'groups' : [$groupReference], 'users' : [$user1Reference, $user2Reference]})\n"
-            + "#set ($messages = $services.mailsender.createMessages('usersandgroups', $source, $parameters))\n"
-            + "#set ($result = $services.mailsender.send($messages, 'database'))\n"
-            + "#if ($services.mailsender.lastError)\n"
-            + "  {{error}}$exceptiontool.getStackTrace($services.mailsender.lastError){{/error}}\n"
+            + "#set ($messages = $services.mail.sender.createMessages('usersandgroups', $source, $parameters))\n"
+            + "#set ($result = $services.mail.sender.send($messages, 'database'))\n"
+            + "#if ($services.mail.sender.lastError)\n"
+            + "  {{error}}$exceptiontool.getStackTrace($services.mail.sender.lastError){{/error}}\n"
             + "#end\n"
             + "#foreach ($status in $result.statusResult.getByState('SEND_ERROR'))\n"
             + "  {{error}}\n"

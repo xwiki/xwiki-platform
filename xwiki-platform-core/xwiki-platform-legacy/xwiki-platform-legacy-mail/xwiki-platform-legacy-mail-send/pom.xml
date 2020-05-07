@@ -32,7 +32,9 @@
   <packaging>pom</packaging>
   <description>Legacy package for xwiki-platform-mail-send</description>
   <modules>
+    <!-- Ordered Alphabetically -->
     <module>xwiki-platform-legacy-mail-send-default</module>
+    <module>xwiki-platform-legacy-mail-send-storage</module>
   </modules>
 </project>
 

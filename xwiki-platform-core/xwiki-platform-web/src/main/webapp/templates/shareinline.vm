@@ -26,7 +26,7 @@
   #set ($sender = $xwiki.getUserName($xcontext.user, false))
   #set ($display = "$!{request.includeDocument}")
   #set ($serverName = $request.serverName)
-  #set ($from = $services.mailsender.configuration.fromAddress)
+  #set ($from = $services.mail.sender.configuration.fromAddress)
   #if ("$!from" != '')
     ## Since the from can be specified as full address of the type "John Doe<john@doe.net", we need to get the address
     ## only (i.e. the part inside the "<" and ">" characters)

@@ -37,7 +37,7 @@ import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
  * <code>
  * {{velocity}}
  * ## Create a mime message, the way you like it, adding any part you like, without recipient.
- * #set ($message = $services.mailsender.createMessage('localhost@xwiki.org', null, 'SendMimeMessageToGroup'))
+ * #set ($message = $services.mail.sender.createMessage('localhost@xwiki.org', null, 'SendMimeMessageToGroup'))
  * #set ($discard = $message.addPart('text/plain', 'text content'))
  *
  * ## Use the mime message cloning factory as message factory to duplicate the created message
@@ -45,8 +45,8 @@ import org.xwiki.mail.internal.factory.AbstractMimeMessageFactory;
  *
  * #set ($source = {'groups' : [$services.model.createDocumentReference('', 'XWiki', 'XWikiAllGroup')]})
  *
- * #set ($messages = $services.mailsender.createMessages('usersandgroups', $source, $parameters))
- * #set ($result = $services.mailsender.send($messages, 'database'))
+ * #set ($messages = $services.mail.sender.createMessages('usersandgroups', $source, $parameters))
+ * #set ($result = $services.mail.sender.send($messages, 'database'))
  * {{/velocity}}
  * </code>
  *

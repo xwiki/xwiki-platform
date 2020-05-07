@@ -1,0 +1,4 @@
+org.xwiki.mail.internal.configuration.DefaultGeneralMailConfiguration
+org.xwiki.mail.internal.configuration.GeneralMailConfigClassDocumentConfigurationSource
+org.xwiki.mail.internal.configuration.MainWikiGeneralMailConfigClassDocumentConfigurationSource
+org.xwiki.mail.script.GeneralMailScriptService

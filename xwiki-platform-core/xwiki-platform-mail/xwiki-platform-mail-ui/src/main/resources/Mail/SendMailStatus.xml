@@ -42,7 +42,7 @@
 ##
 #if ($request.mailsendingaction_resend &amp;&amp; $request.mail_id &amp;&amp; $request.batch_id)
   ## resending email
-  #set($mailResult = $services.mailstorage.resend($request.batch_id, $request.mail_id))
+  #set($mailResult = $services.mail.storage.resend($request.batch_id, $request.mail_id))
   #set ($mailError = false)
   #macro (displayError $description)
 
@@ -58,7 +58,7 @@
   #end
   #if ("$!services.mailstorage.lastError" != '')
     #set ($mailError = true)
-    #displayError($exceptiontool.getStackTrace($services.mailstorage.lastError))
+    #displayError($exceptiontool.getStackTrace($services.mail.storage.lastError))
   #end
   #set ($statuses = $mailResult.statusResult.getAllErrors())
   #if ($statuses.hasNext())

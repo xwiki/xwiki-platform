@@ -135,14 +135,16 @@
             <artifactId>xwiki-platform-instance</artifactId>
             <version>${project.version}</version>
           </dependency>
-          <!-- Need explicit dependency here so the package tool does not fail to find activitystream.hbm.xml in the classpath. -->
+          <!-- Need explicit dependency here so the package tool does not fail to find activitystream.hbm.xml in the
+               classpath. -->
           <dependency>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-activitystream-api</artifactId>
             <scope>runtime</scope>
             <version>${project.version}</version>
           </dependency>
-          <!-- Need explicit dependency here so the package tool does not fail to find mailsender.hbm.xml in the classpath. -->
+          <!-- Need explicit dependency here so the package tool does not fail to find mailsender.hbm.xml in the
+               classpath. -->
           <dependency>
             <groupId>org.xwiki.platform</groupId>
             <artifactId>xwiki-platform-mail-send-storage</artifactId>

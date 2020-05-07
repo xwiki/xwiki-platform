@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail;
+package org.xwiki.mail.script;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,9 +35,11 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.util.DefaultParameterizedType;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.mail.MailResender;
+import org.xwiki.mail.MailStatus;
+import org.xwiki.mail.MailStatusResult;
+import org.xwiki.mail.MailStoreException;
 import org.xwiki.mail.internal.MemoryMailListener;
-import org.xwiki.mail.script.MailStorageScriptService;
-import org.xwiki.mail.script.ScriptMailResult;
 import org.xwiki.security.authorization.ContextualAuthorizationManager;
 import org.xwiki.security.authorization.Right;
 import org.xwiki.test.annotation.ComponentList;

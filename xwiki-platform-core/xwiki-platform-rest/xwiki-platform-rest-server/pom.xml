@@ -239,7 +239,7 @@
                     <property>
                       <!-- Exclude javax.ws.rs.core.Application since we use an Inject on it. This is a very special
                            case when we don't inject on an interface, and there's no way for the Spoon checker to find
-                           out about this, since only the EM knows what has been registered in it. -->
+                           out about this, since only the Component Manager knows what has been registered in it. -->
                       <name>excludedFieldTypes</name>
                       <value><![CDATA[
                         ["javax.ws.rs.core.Application"]

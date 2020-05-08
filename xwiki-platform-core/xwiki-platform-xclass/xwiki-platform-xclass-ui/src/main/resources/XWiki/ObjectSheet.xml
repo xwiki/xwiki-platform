@@ -74,7 +74,9 @@
     &lt;dd&gt;$doc.display($property.name)&lt;/dd&gt;
   #end
   #if (!$xclass.properties || $xclass.properties.size() == 0)
-    &lt;dd&gt;No properties&lt;/dd&gt;
+    ## Keep the empty definition term in order to have valid HTML.
+    &lt;dt&gt;&lt;/dt&gt;
+    &lt;dd&gt;$escapetool.xml($services.localization.render('xclass.defaultObjectSheet.noProperties'))&lt;/dd&gt;
   #end
   &lt;/dl&gt;
 &lt;/div&gt;

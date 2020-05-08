@@ -225,6 +225,33 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Exclude javax.ws.rs.core.Application since we use an Inject on it. This is a very special
+                           case when we don't inject on an interface, and there's no way for the Spoon checker to find
+                           out about this, since only the EM knows what has been registered in it. -->
+                      <name>excludedFieldTypes</name>
+                      <value><![CDATA[
+                        ["javax.ws.rs.core.Application"]
+                      ]]></value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

@@ -58,7 +58,7 @@ public class VoidEventStore implements EventStore
     public Optional<Event> deleteEvent(String eventId) throws EventStreamException
     {
         // Do nothing
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -71,7 +71,7 @@ public class VoidEventStore implements EventStore
     public Optional<Event> getEvent(String eventId) throws EventStreamException
     {
         // Do nothing
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -90,7 +90,7 @@ public class VoidEventStore implements EventStore
     public Optional<EventStatus> getEventStatus(String eventId, String entity) throws EventStreamException
     {
         // Do nothing
-        return null;
+        return Optional.empty();
     }
 
     @Override

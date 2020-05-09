@@ -23,17 +23,12 @@
   <input type="text" id="$!id" name="$!id" value="$!escapetool.xml($value)" class="email"
     #if ($disabled)disabled="disabled"#end />
 #elseif ($type == 'view' || $type == 'rendered')
-  #set ($mailConfigDoc = $xwiki.getDocument('Mail.MailConfig'))
-  #set ($generalMailConfigObject = $mailConfigDoc.getObject('Mail.GeneralMailConfigClass'))
-  #set ($obfuscate = $generalMailConfigObject.getValue('obfuscate'))
-  #if ("$!obfuscate" == '')
-    ## We handle backward compatibility by also looking in the XWikiPreferences xobject
-    #set ($obfuscate = $xwiki.getXWikiPreferenceAsInt('obfuscateEmailAddresses', 0))
-  #end
-  #if ($obfuscate == 1)
+  #if ("$!value" != '')
+    #if ($services.mail.general.obfuscateEmailAddresses())
 $!escapetool.xml($value.replaceAll('^(.).*@', '$1...@'))##
-  #elseif ($value != '')
+    #else
 <a href="mailto:$!{escapetool.xml($value)}">$!{escapetool.xml($value)}</a>##
+    #end
   #end
 #elseif ($type == 'hidden')
   #set ($id = $escapetool.xml("${prefix}${name}"))

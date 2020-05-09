@@ -18,21 +18,12 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 ## TODO: Introduce an email picker, see https://jira.xwiki.org/browse/XWIKI-17290
-## TODO: Code copied from displayer_email.vm. Find a solution to remove duplication for the view mode. For the edit
-## mode, https://jira.xwiki.org/browse/XWIKI-17290 will remove the duplication.
-## TODO: Improve this code so that it doesn't rely on magical page references and uses a stable API.
-## Also this displayer should not be located in platform-web but in the mail extension so that it exists only if that
-## extension is installed.
-## TODO: Also provide a java and scripting API to perform email obfuscation, and call it.
-#set ($mailConfigDoc = $xwiki.getDocument('Mail.MailConfig'))
-#set ($generalMailConfigObject = $mailConfigDoc.getObject('Mail.GeneralMailConfigClass'))
-#set ($obfuscate = $generalMailConfigObject.getValue('obfuscate'))
-#if ("$!obfuscate" == '')
-  ## We handle backward compatibility by also looking in the XWikiPreferences xobject
-  #set ($obfuscate = $xwiki.getXWikiPreferenceAsInt('obfuscateEmailAddresses', 0))
-#end
-#if ($obfuscate == 1)
+## TODO: This displayer should not be located in platform-web but in the mail extension so that it exists only if that
+##       extension is installed.
+#if ("$!$displayer.value" != '')
+  #if ($services.mail.general.obfuscateEmailAddresses())
 $!escapetool.xml($displayer.value.replaceAll('^(.).*@', '$1...@'))##
-#elseif ($displayer.value != '')
-<a href="mailto:$!{escapetool.xml($value)}">$!{escapetool.xml($displayer.value)}</a>##
+  #else
+<a href="mailto:$!{escapetool.xml($displayer.value)}">$!{escapetool.xml($displayer.value)}</a>##
+  #end
 #end

@@ -1401,6 +1401,7 @@ public class XWiki extends Api
      * @return the list of available locales
      * @since 12.4RC1
      */
+    @Unstable
     public List<Locale> getAvailableLocales()
     {
         return this.xwiki.getAvailableLocales(getXWikiContext());

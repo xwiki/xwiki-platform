@@ -21,9 +21,10 @@
 ## TODO: This displayer should not be located in platform-web but in the mail extension so that it exists only if that
 ##       extension is installed.
 #if ("$!displayer.value" != '')
+  #set ($value = $displayer.value.toString())
   #if ($services.mail.general.obfuscateEmailAddresses())
-$!escapetool.xml($displayer.value.replaceAll('^(.).*@', '$1...@'))##
+$!escapetool.xml($value.replaceAll('^(.).*@', '$1...@'))##
   #else
-<a href="mailto:$!{escapetool.xml($displayer.value)}">$!{escapetool.xml($displayer.value)}</a>##
+<a href="mailto:$!{escapetool.xml($value)}">$!{escapetool.xml($value)}</a>##
   #end
 #end

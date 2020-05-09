@@ -131,6 +131,7 @@ public class BridgeEventStream implements EventStream
     }
 
     @Override
+    @Deprecated
     public Event getEvent(String eventId) throws QueryException
     {
         Query q = this.qm.createQuery("select event from ActivityEventImpl event where eventId = :eventId", Query.HQL);

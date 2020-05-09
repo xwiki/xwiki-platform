@@ -695,21 +695,12 @@ public class Document extends Api
     }
 
     /**
-     * @return the list of existing translations for this document.
-     * @deprecated since 12.4RC1 use {@link #getTranslationLocales()} instead
-     */
-    @Deprecated
-    public List<String> getTranslationList() throws XWikiException
-    {
-        return this.doc.getTranslationList(getXWikiContext());
-    }
-
-    /**
      * @return the list of locales for which this document has a translation; the original (default) locale is not
      *         included
      * @throws XWikiException if retrieving the document translations from the database fails
      * @since 12.4RC1
      */
+    @Unstable
     public List<Locale> getTranslationLocales() throws XWikiException
     {
         return this.doc.getTranslationLocales(getXWikiContext());

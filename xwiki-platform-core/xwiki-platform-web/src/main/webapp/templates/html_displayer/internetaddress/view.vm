@@ -20,7 +20,7 @@
 ## TODO: Introduce an email picker, see https://jira.xwiki.org/browse/XWIKI-17290
 ## TODO: This displayer should not be located in platform-web but in the mail extension so that it exists only if that
 ##       extension is installed.
-#if ("$!$displayer.value" != '')
+#if ("$!displayer.value" != '')
   #if ($services.mail.general.obfuscateEmailAddresses())
 $!escapetool.xml($displayer.value.replaceAll('^(.).*@', '$1...@'))##
   #else

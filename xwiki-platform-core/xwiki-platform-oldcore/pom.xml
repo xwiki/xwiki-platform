@@ -967,6 +967,35 @@
           </excludes>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- TODO: To be fixed ASAP -->
+                      <name>excludedFieldTypes</name>
+                      <value><![CDATA[
+                        [
+                          "com.xpn.xwiki.internal.store.hibernate.HibernateStore",
+                          "com.xpn.xwiki.internal.store.StoreConfiguration",
+                          "com.xpn.xwiki.internal.store.hibernate.HibernateConfiguration"
+                        ]
+                      ]]></value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

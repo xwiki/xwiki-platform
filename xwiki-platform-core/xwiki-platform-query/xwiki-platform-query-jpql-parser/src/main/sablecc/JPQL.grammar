@@ -400,7 +400,8 @@ numeric_literal =
 
 pattern_value =
     {str} string_literal |
-    {param} input_parameter;
+    {param} input_parameter |
+    {funcstr} functions_returning_strings;
 
 escape_character =
     string_literal;

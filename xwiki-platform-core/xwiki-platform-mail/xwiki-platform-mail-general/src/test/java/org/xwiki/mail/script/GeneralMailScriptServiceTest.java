@@ -53,7 +53,7 @@ public class GeneralMailScriptServiceTest
     @Test
     void shouldObfuscateEmailAddresses()
     {
-        when(this.configuration.shouldObfuscateEmailAddresses()).thenReturn(true);
+        when(this.configuration.shouldObfuscate()).thenReturn(true);
         assertTrue(this.scriptService.shouldObfuscate());
     }
 

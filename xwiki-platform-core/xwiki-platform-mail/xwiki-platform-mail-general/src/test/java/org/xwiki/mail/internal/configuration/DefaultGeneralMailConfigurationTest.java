@@ -68,33 +68,33 @@ public class DefaultGeneralMailConfigurationTest
     }
 
     @Test
-    public void shouldObfuscateEmailAddressesWhenNotConfigured()
+    public void shouldObfuscateWhenNotConfigured()
     {
         // Simulate the default value returned by the call to getProperty() and not the value of the
         // "mail.general.obfuscateEmailAddresses" property which is supposed to be null here...
         when(this.xwikiPropertiesSource.getProperty("mail.general.obfuscate", false)).thenReturn(false);
-        assertFalse(this.configuration.shouldObfuscateEmailAddresses());
+        assertFalse(this.configuration.shouldObfuscate());
     }
 
     @Test
-    public void shouldObfuscateEmailAddressesWhenDefinedInXWikiProperties()
+    public void shouldObfuscateWhenDefinedInXWikiProperties()
     {
         when(this.xwikiPropertiesSource.getProperty("mail.general.obfuscate", false)).thenReturn(true);
 
-        assertTrue(this.configuration.shouldObfuscateEmailAddresses());
+        assertTrue(this.configuration.shouldObfuscate());
     }
 
     @Test
-    public void shouldObfuscateEmailAddressesFromMailConfigDocumentInMainWiki()
+    public void shouldObfuscateFromMailConfigDocumentInMainWiki()
     {
         when(this.currentWikiMailConfigDocumentSource.getProperty("obfuscate", Boolean.class))
             .thenReturn(true);
 
-        assertTrue(this.configuration.shouldObfuscateEmailAddresses());
+        assertTrue(this.configuration.shouldObfuscate());
     }
 
     @Test
-    public void shouldObfuscateEmailAddressesFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
+    public void shouldObfuscateFromMailConfigDocumentInSubwikiAndConfigInMainWiki()
     {
         when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("subwiki");
         when(this.wikiDescriptorManager.isMainWiki("subwiki")).thenReturn(false);
@@ -104,6 +104,6 @@ public class DefaultGeneralMailConfigurationTest
         when(this.mainWikiMailConfigDocumentSource.getProperty("obfuscate", Boolean.class))
             .thenReturn(true);
 
-        assertTrue(this.configuration.shouldObfuscateEmailAddresses());
+        assertTrue(this.configuration.shouldObfuscate());
     }
 }

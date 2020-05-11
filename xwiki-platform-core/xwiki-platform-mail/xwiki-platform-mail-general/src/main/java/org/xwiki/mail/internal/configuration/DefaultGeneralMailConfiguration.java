@@ -71,7 +71,7 @@ public class DefaultGeneralMailConfiguration implements GeneralMailConfiguration
     private WikiDescriptorManager wikiDescriptorManager;
 
     @Override
-    public boolean shouldObfuscateEmailAddresses()
+    public boolean shouldObfuscate()
     {
         Boolean obfuscateEmailAddresses =
             this.currentWikiMailConfigSource.getProperty(OBFUSCATE_EMAIL_ADDRESSES, Boolean.class);

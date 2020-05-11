@@ -30,7 +30,7 @@
   <packaging>pom</packaging>
   <artifactId>xwiki-platform-mail</artifactId>
   <name>XWiki Platform - Mail - Parent POM</name>
-  <description>XWiki Platform - Mail - Parent POM</description>
+  <description>Display and Send emails</description>
   <modules>
     <!-- Sorted Alphabetically -->
     <module>xwiki-platform-mail-general</module>

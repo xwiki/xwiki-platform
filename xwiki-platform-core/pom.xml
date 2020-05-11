@@ -145,6 +145,22 @@
                 },
                 "ignore" : [
                   // Add more ignores below...
+                  {
+                    "code": "java.field.visibilityReduced",
+                    "old": "field com.xpn.xwiki.objects.BaseElement<R extends org.xwiki.model.reference.EntityReference>.LOGGER",
+                    "new": "field com.xpn.xwiki.objects.BaseElement<R extends org.xwiki.model.reference.EntityReference>.LOGGER",
+                    "oldVisibility": "protected",
+                    "newVisibility": "private",
+                    "justification": "Was never meant to be protected and the class did not made any sense, probably a bad copy/paste"
+                  },
+                  {
+                    "code": "java.field.visibilityReduced",
+                    "old": "field com.xpn.xwiki.objects.BaseElement<R extends org.xwiki.model.reference.EntityReference>.LOGGER @ com.xpn.xwiki.objects.classes.BaseClass",
+                    "new": "field com.xpn.xwiki.objects.classes.BaseClass.LOGGER",
+                    "oldVisibility": "protected",
+                    "newVisibility": "private",
+                    "justification": "Was never meant to be protected and the class did not made any sense, probably a bad copy/paste"
+                  }
                 ]
               }
             }

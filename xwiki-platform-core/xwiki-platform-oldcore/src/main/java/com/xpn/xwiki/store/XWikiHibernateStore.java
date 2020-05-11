@@ -937,9 +937,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                         BaseObject newobject;
                         if (classReference.equals(doc.getDocumentReference())) {
-                            newobject = bclass.newCustomClassInstance(context);
+                            newobject = bclass.newCustomClassInstance(true);
                         } else {
-                            newobject = BaseClass.newCustomClassInstance(classReference, context);
+                            newobject = BaseClass.newCustomClassInstance(classReference, true, context);
                         }
                         if (newobject != null) {
                             newobject.setId(object.getId());
@@ -976,7 +976,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                             Object[] result = it2.next();
                             Integer number = (Integer) result[0];
                             String member = (String) result[1];
-                            BaseObject obj = BaseClass.newCustomClassInstance(groupsDocumentReference, context);
+                            BaseObject obj = BaseClass.newCustomClassInstance(groupsDocumentReference, true, context);
                             obj.setDocumentReference(doc.getDocumentReference());
                             obj.setXClassReference(localGroupEntityReference);
                             obj.setNumber(number.intValue());

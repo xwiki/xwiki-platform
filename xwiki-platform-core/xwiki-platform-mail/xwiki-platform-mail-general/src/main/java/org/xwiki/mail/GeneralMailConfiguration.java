@@ -37,5 +37,5 @@ public interface GeneralMailConfiguration
     /**
      * @return true when email addresses must be obfuscated and false otherwise. Defaults to false.
      */
-    boolean shouldObfuscateEmailAddresses();
+    boolean shouldObfuscate();
 }

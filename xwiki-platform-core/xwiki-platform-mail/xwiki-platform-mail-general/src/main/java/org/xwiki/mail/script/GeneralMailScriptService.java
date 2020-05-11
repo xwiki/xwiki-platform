@@ -53,7 +53,7 @@ public class GeneralMailScriptService implements ScriptService
      */
     public boolean shouldObfuscate()
     {
-        return this.configuration.shouldObfuscateEmailAddresses();
+        return this.configuration.shouldObfuscate();
     }
 
     /**

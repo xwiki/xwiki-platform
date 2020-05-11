@@ -28,16 +28,16 @@ import org.xwiki.mail.internal.configuration.DefaultGeneralMailConfiguration;
  */
 public class TestMailSenderConfiguration extends DefaultGeneralMailConfiguration
 {
-    private boolean shouldObfuscateEmailAddresses;
+    private boolean shouldObfuscate;
 
-    public TestMailSenderConfiguration(boolean shouldObfuscateEmailAddresses)
+    public TestMailSenderConfiguration(boolean shouldObfuscate)
     {
-        this.shouldObfuscateEmailAddresses = shouldObfuscateEmailAddresses;
+        this.shouldObfuscate = shouldObfuscate;
     }
 
     @Override
-    public boolean shouldObfuscateEmailAddresses()
+    public boolean shouldObfuscate()
     {
-        return this.shouldObfuscateEmailAddresses;
+        return this.shouldObfuscate;
     }
 }

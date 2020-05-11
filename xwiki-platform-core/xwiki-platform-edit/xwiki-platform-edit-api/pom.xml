@@ -72,4 +72,33 @@
       <version>${project.version}</version>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- TODO: To be fixed ASAP -->
+                      <name>excludedFieldTypes</name>
+                      <value><![CDATA[
+                        ["org.xwiki.edit.EditorDescriptorBuilder"]
+                      ]]></value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

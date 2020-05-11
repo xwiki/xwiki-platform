@@ -51,7 +51,7 @@ public class GeneralMailScriptService implements ScriptService
     /**
      * @return true when email addresses must be obfuscated and false otherwise. Defaults to false.
      */
-    public boolean shouldObfuscateEmailAddresses()
+    public boolean shouldObfuscate()
     {
         return this.configuration.shouldObfuscateEmailAddresses();
     }
@@ -60,7 +60,7 @@ public class GeneralMailScriptService implements ScriptService
      * @param emailAddress the email address to obfuscate
      * @return the obfuscated email address (e.g. {@code j...@doe.com} for {@code john@doe.com})
      */
-    public String obfuscateEmailAddress(InternetAddress emailAddress)
+    public String obfuscate(InternetAddress emailAddress)
     {
         return this.obfuscator.obfuscate(emailAddress);
     }

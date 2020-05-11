@@ -54,7 +54,7 @@ public class GeneralMailScriptServiceTest
     void shouldObfuscateEmailAddresses()
     {
         when(this.configuration.shouldObfuscateEmailAddresses()).thenReturn(true);
-        assertTrue(this.scriptService.shouldObfuscateEmailAddresses());
+        assertTrue(this.scriptService.shouldObfuscate());
     }
 
     @Test
@@ -62,6 +62,6 @@ public class GeneralMailScriptServiceTest
     {
         InternetAddress address = InternetAddress.parse("john@doe.com")[0];
         when(this.obfuscator.obfuscate(address)).thenReturn("obfuscatedemail");
-        assertEquals("obfuscatedemail", this.scriptService.obfuscateEmailAddress(address));
+        assertEquals("obfuscatedemail", this.scriptService.obfuscate(address));
     }
 }

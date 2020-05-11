@@ -28,7 +28,10 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.dom4j.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
@@ -65,6 +68,8 @@ import com.xpn.xwiki.web.Utils;
  */
 public class BaseClass extends BaseCollection<DocumentReference> implements ClassInterface
 {
+    private static final Logger LOGGER = LoggerFactory.getLogger(BaseClass.class);
+
     private static final long serialVersionUID = 1L;
 
     private String customMapping;
@@ -1213,19 +1218,39 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
 
     public BaseObject newCustomClassInstance(XWikiContext context) throws XWikiException
     {
+        return newCustomClassInstance(false);
+    }
+
+    /**
+     * @param fallback if true, fallback on BaseObject if there is any problem with the configured custom class
+     * @return a new Java instance of an object represented by this XWiki class
+     * @throws XWikiException if there is a problem when creating an new instance and {@code fallback} is false
+     * @since 12.4RC1
+     * @since 11.10.5
+     */
+    public BaseObject newCustomClassInstance(boolean fallback) throws XWikiException
+    {
         String customClass = getCustomClass();
+
         try {
-            if ((customClass == null) || (customClass.equals(""))) {
+            if (StringUtils.isEmpty(customClass)) {
                 return new BaseObject();
             } else {
                 return (BaseObject) Class
-                    .forName(getCustomClass(), true, Thread.currentThread().getContextClassLoader()).newInstance();
+                    .forName(customClass, true, Thread.currentThread().getContextClassLoader()).newInstance();
             }
         } catch (Exception e) {
-            Object[] args = { customClass };
-            throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
-                XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}", e,
-                args);
+            if (fallback) {
+                LOGGER.warn("Failed to create a nex sutom class instance ([{}]). Fallbacking on BaseObject.",
+                    ExceptionUtils.getRootCauseMessage(e));
+
+                return new BaseObject();
+            } else {
+                Object[] args = { customClass };
+                throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
+                    XWikiException.ERROR_XWIKI_CLASSES_CUSTOMCLASSINVOCATIONERROR, "Cannot instanciate custom class {0}", e,
+                    args);
+            }
         }
     }
 
@@ -1235,8 +1260,23 @@ public class BaseClass extends BaseCollection<DocumentReference> implements Clas
     public static BaseObject newCustomClassInstance(DocumentReference classReference, XWikiContext context)
         throws XWikiException
     {
+        return newCustomClassInstance(classReference, false, context);
+    }
+
+    /**
+     * @param classReference the reference of the document containing the XWiki class for which to create a new object
+     * @param fallback if true, fallback on BaseObject if there is any problem with the configured custom class
+     * @param context the XWiki context used to load the {@link BaseClass}
+     * @return a new Java instance of an object represented by this XWiki class
+     * @throws XWikiException if there is a problem when creating an new instance and {@code fallback} is false
+     * @since 12.4RC1
+     * @since 11.10.5
+     */
+    public static BaseObject newCustomClassInstance(DocumentReference classReference, boolean fallback,
+        XWikiContext context) throws XWikiException
+    {
         BaseClass bclass = context.getWiki().getXClass(classReference, context);
-        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(context);
+        BaseObject object = (bclass == null) ? new BaseObject() : bclass.newCustomClassInstance(fallback);
         object.setXClassReference(classReference);
 
         return object;

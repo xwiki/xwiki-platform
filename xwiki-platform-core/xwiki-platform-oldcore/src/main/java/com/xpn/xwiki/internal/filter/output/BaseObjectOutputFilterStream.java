@@ -104,10 +104,12 @@ public class BaseObjectOutputFilterStream extends AbstractEntityOutputFilterStre
                 if (this.externalEntity == null && StringUtils.isNotEmpty(xclass.getCustomClass())) {
                     BaseObject customObject;
                     try {
-                        customObject = xclass.newCustomClassInstance(this.xcontextProvider.get());
+                        customObject = xclass.newCustomClassInstance(true);
                         customObject.setDocumentReference(this.entity.getDocumentReference());
                         customObject.setXClassReference(this.entity.getXClassReference());
                         customObject.setOwnerDocument(this.entity.getOwnerDocument());
+                        customObject.setGuid(this.entity.getGuid());
+
                         // Pass false as an optimization since there is nothing to clean on a new object
                         customObject.apply(this.entity, false);
 

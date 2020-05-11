@@ -18,8 +18,6 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 ## TODO: Introduce an email picker, see https://jira.xwiki.org/browse/XWIKI-17290
-## TODO: This displayer should not be located in platform-web but in the mail extension so that it exists only if that
-##       extension is installed.
 #if ("$!displayer.value" != '')
   #set ($value = $displayer.value.toString())
   #if ($services.mail.general.obfuscateEmailAddresses())

@@ -17,27 +17,31 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.integration;
+package org.xwiki.mail.internal;
 
-import org.xwiki.mail.internal.configuration.DefaultGeneralMailConfiguration;
+import javax.mail.internet.InternetAddress;
+
+import org.junit.jupiter.api.Test;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * Makes {@link DefaultGeneralMailConfiguration} more easily testable.
+ * Unit tests for {@link DefaultEmailAddressObfuscator}.
  *
  * @version $Id$
+ * @since 12.4RC1
  */
-public class TestMailSenderConfiguration extends DefaultGeneralMailConfiguration
+@ComponentTest
+public class DefaultEmailAddressObfuscatorTest
 {
-    private boolean shouldObfuscateEmailAddresses;
+    @InjectMockComponents
+    private DefaultEmailAddressObfuscator obfuscator;
 
-    public TestMailSenderConfiguration(boolean shouldObfuscateEmailAddresses)
+    @Test
+    void obfuscate() throws Exception
     {
-        this.shouldObfuscateEmailAddresses = shouldObfuscateEmailAddresses;
-    }
-
-    @Override
-    public boolean shouldObfuscateEmailAddresses()
-    {
-        return this.shouldObfuscateEmailAddresses;
+        assertEquals("j...@doe.com", this.obfuscator.obfuscate(InternetAddress.parse("john@doe.com")[0]));
     }
 }

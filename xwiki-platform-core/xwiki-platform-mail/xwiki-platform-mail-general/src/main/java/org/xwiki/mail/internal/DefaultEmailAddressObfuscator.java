@@ -17,51 +17,27 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.script;
+package org.xwiki.mail.internal;
 
-import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.mail.internet.InternetAddress;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mail.EmailAddressObfuscator;
-import org.xwiki.mail.GeneralMailConfiguration;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
 
 /**
- * Access general mail APIs from scripts.
+ * Default email address obfuscator replacing {@code john@doe.com} with {@code j...@doe.com}.
  *
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
 @Component
-@Named("mail.general")
 @Singleton
-public class GeneralMailScriptService implements ScriptService
+public class DefaultEmailAddressObfuscator implements EmailAddressObfuscator
 {
-    @Inject
-    private GeneralMailConfiguration configuration;
-
-    @Inject
-    private EmailAddressObfuscator obfuscator;
-
-    /**
-     * @return true when email addresses must be obfuscated and false otherwise. Defaults to false.
-     */
-    public boolean shouldObfuscateEmailAddresses()
+    @Override
+    public String obfuscate(InternetAddress emailAddress)
     {
-        return this.configuration.shouldObfuscateEmailAddresses();
-    }
-
-    /**
-     * @param emailAddress the email address to obfuscate
-     * @return the obfuscated email address (e.g. {@code j...@doe.com} for {@code john@doe.com})
-     */
-    public String obfuscateEmailAddress(InternetAddress emailAddress)
-    {
-        return this.obfuscator.obfuscate(emailAddress);
+        return emailAddress.toString().replaceAll("^(.).*@", "$1...@");
     }
 }

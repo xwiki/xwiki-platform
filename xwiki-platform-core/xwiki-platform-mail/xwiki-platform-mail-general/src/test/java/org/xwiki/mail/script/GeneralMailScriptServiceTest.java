@@ -19,49 +19,49 @@
  */
 package org.xwiki.mail.script;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.mail.internet.InternetAddress;
 
-import org.xwiki.component.annotation.Component;
+import org.junit.jupiter.api.Test;
 import org.xwiki.mail.EmailAddressObfuscator;
 import org.xwiki.mail.GeneralMailConfiguration;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 /**
- * Access general mail APIs from scripts.
+ * Unit tests for {@link GeneralMailScriptService}.
  *
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
-@Component
-@Named("mail.general")
-@Singleton
-public class GeneralMailScriptService implements ScriptService
+@ComponentTest
+public class GeneralMailScriptServiceTest
 {
-    @Inject
-    private GeneralMailConfiguration configuration;
+    @InjectMockComponents
+    private GeneralMailScriptService scriptService;
 
-    @Inject
+    @MockComponent
     private EmailAddressObfuscator obfuscator;
 
-    /**
-     * @return true when email addresses must be obfuscated and false otherwise. Defaults to false.
-     */
-    public boolean shouldObfuscateEmailAddresses()
+    @MockComponent
+    private GeneralMailConfiguration configuration;
+
+    @Test
+    void shouldObfuscateEmailAddresses()
     {
-        return this.configuration.shouldObfuscateEmailAddresses();
+        when(this.configuration.shouldObfuscateEmailAddresses()).thenReturn(true);
+        assertTrue(this.scriptService.shouldObfuscateEmailAddresses());
     }
 
-    /**
-     * @param emailAddress the email address to obfuscate
-     * @return the obfuscated email address (e.g. {@code j...@doe.com} for {@code john@doe.com})
-     */
-    public String obfuscateEmailAddress(InternetAddress emailAddress)
+    @Test
+    void obfuscate() throws Exception
     {
-        return this.obfuscator.obfuscate(emailAddress);
+        InternetAddress address = InternetAddress.parse("john@doe.com")[0];
+        when(this.obfuscator.obfuscate(address)).thenReturn("obfuscatedemail");
+        assertEquals("obfuscatedemail", this.scriptService.obfuscateEmailAddress(address));
     }
 }

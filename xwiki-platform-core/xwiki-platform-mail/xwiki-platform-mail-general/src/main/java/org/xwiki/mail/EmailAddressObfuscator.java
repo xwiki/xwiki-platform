@@ -17,51 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mail.script;
+package org.xwiki.mail;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
 import javax.mail.internet.InternetAddress;
 
-import org.xwiki.component.annotation.Component;
-import org.xwiki.mail.EmailAddressObfuscator;
-import org.xwiki.mail.GeneralMailConfiguration;
-import org.xwiki.script.service.ScriptService;
-import org.xwiki.stability.Unstable;
+import org.xwiki.component.annotation.Role;
 
 /**
- * Access general mail APIs from scripts.
+ * Obfuscate email addresses.
  *
  * @version $Id$
  * @since 12.4RC1
  */
-@Unstable
-@Component
-@Named("mail.general")
-@Singleton
-public class GeneralMailScriptService implements ScriptService
+@Role
+public interface EmailAddressObfuscator
 {
-    @Inject
-    private GeneralMailConfiguration configuration;
-
-    @Inject
-    private EmailAddressObfuscator obfuscator;
-
-    /**
-     * @return true when email addresses must be obfuscated and false otherwise. Defaults to false.
-     */
-    public boolean shouldObfuscateEmailAddresses()
-    {
-        return this.configuration.shouldObfuscateEmailAddresses();
-    }
-
     /**
      * @param emailAddress the email address to obfuscate
      * @return the obfuscated email address (e.g. {@code j...@doe.com} for {@code john@doe.com})
      */
-    public String obfuscateEmailAddress(InternetAddress emailAddress)
-    {
-        return this.obfuscator.obfuscate(emailAddress);
-    }
+    String obfuscate(InternetAddress emailAddress);
 }

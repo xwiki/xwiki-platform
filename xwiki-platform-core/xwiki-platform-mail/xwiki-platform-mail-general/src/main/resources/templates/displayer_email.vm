@@ -24,7 +24,7 @@
     #if ($disabled)disabled="disabled"#end />
 #elseif ($type == 'view' || $type == 'rendered')
   #if ("$!value" != '')
-    #if ($services.mail.general.shouldObfuscateEmailAddresses())
+    #if ($services.mail.general.shouldObfuscate())
 $!escapetool.xml($services.mail.general.obfuscate($value))##
     #else
 <a href="mailto:$!{escapetool.xml($value)}">$!{escapetool.xml($value)}</a>##

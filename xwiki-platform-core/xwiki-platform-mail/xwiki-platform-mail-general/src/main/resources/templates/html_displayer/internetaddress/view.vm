@@ -20,7 +20,7 @@
 ## TODO: Introduce an email picker, see https://jira.xwiki.org/browse/XWIKI-17290
 #if ("$!displayer.value" != '')
   #set ($value = $displayer.value.toString())
-  #if ($services.mail.general.shouldObfuscateEmailAddresses())
+  #if ($services.mail.general.shouldObfuscate())
 $!escapetool.xml($services.mail.general.obfuscate($value))##
   #else
 <a href="mailto:$!{escapetool.xml($value)}">$!{escapetool.xml($value)}</a>##

@@ -88,6 +88,7 @@ public class CompareVersionsTest extends AbstractTest
         getUtil().setHierarchyMode("parentchild");
 
         // Create the test page.
+        // Version 1.1
         testPage = getUtil().createPage(getTestClassName(), pageName, "one\ntwo\nthree", "Test");
         // Change the content and the meta data.
         Map<String, String> queryMap = new HashMap<>();
@@ -96,12 +97,14 @@ public class CompareVersionsTest extends AbstractTest
         queryMap.put("parent", "Sandbox.WebHome");
         queryMap.put("commentinput", "Changed content and meta data.");
         queryMap.put("minorEdit", "true");
+        // Version 1.2
         getUtil().gotoPage(getTestClassName(), pageName, "save", queryMap);
 
         queryMap = new HashMap<>();
         queryMap.put("title", "Compare versions test");
         queryMap.put("commentinput", "Fix typo in title.");
         queryMap.put("minorEdit", "true");
+        // Version 1.3
         getUtil().gotoPage(getTestClassName(), pageName, "save", queryMap);
 
         ViewPage viewPage = getUtil().gotoPage(getTestClassName(), pageName);
@@ -113,44 +116,58 @@ public class CompareVersionsTest extends AbstractTest
         assignment.put("XWiki.JavaScriptExtension_0_code", "var tmp = alice;\nalice = bob;\nbob = tmp;");
         assignment.put("XWiki.JavaScriptExtension_0_use", "onDemand");
         form.fillFieldsByName(assignment);
+        // Version 1.4
         objectEditPage.clickSaveAndContinue();
         assignment.put("XWiki.JavaScriptExtension_0_name", "Code snippet");
         assignment.put("XWiki.JavaScriptExtension_0_code", "var tmp = alice;\nalice = 2 * bob;\nbob = tmp;");
         form.fillFieldsByName(assignment);
+        // Version 1.5
         objectEditPage.clickSaveAndContinue();
 
         // Create class.
         ClassEditPage classEditPage = objectEditPage.editClass();
+        // Version 1.6
         classEditPage.addProperty("age", "Number");
+        // Version 1.7
         classEditPage.addProperty("color", "String");
         classEditPage.getNumberClassEditElement("age").setNumberType("integer");
+        // Version 1.8
         classEditPage.clickSaveAndContinue();
+        // Version 1.9
         classEditPage.deleteProperty("color");
+        // Version 1.10
         testPage = classEditPage.clickSaveAndView();
 
         // Add tags.
         TaggablePage taggablePage = new TaggablePage();
         AddTagsPane addTagsPane = taggablePage.addTags();
         addTagsPane.setTags("foo,bar");
+        // Version 1.11
         addTagsPane.add();
+        // Version 1.12
         taggablePage.removeTag("foo");
 
         // Attach files.
         AttachmentsPane attachmentsPane = testPage.openAttachmentsDocExtraPane();
         // TODO: Update this code when we (re)add support for uploading multiple files at once.
+        // Version 2.1, 3.1, 4.1
         for (String fileName : new String[] {"SmallAttachment.txt", "SmallAttachment2.txt", "SmallAttachment.txt"}) {
             attachmentsPane.setFileToUpload(this.getClass().getResource('/' + fileName).getPath());
             attachmentsPane.waitForUploadToFinish(fileName);
             attachmentsPane.clickHideProgress();
         }
+        // Version 5.1
         attachmentsPane.deleteAttachmentByFileByName("SmallAttachment2.txt");
 
         // Add comments.
         getUtil().createUserAndLogin("Alice", "ecila");
         testPage = getUtil().gotoPage(getTestClassName(), pageName);
         CommentsTab commentsTab = testPage.openCommentsDocExtraPane();
+        // Version 5.2
         commentsTab.postComment("first line\nsecond line", true);
         commentsTab.editCommentByID(0, "first line\nline in between\nsecond line");
+
+        // Version 5.5
         commentsTab.replyToCommentByID(0, "this is a reply");
         commentsTab.deleteCommentByID(1);
     }
@@ -177,7 +194,7 @@ public class CompareVersionsTest extends AbstractTest
         getUtil().loginAsAdmin();
         testPage = getUtil().gotoPage(getTestClassName(), pageName);
         HistoryPane historyTab = testPage.openHistoryDocExtraPane().showMinorEdits();
-        HistoryPane historyPane = historyTab.deleteRangeVersions("1.3", "6.4");
+        historyTab.deleteRangeVersions("1.3", "5.4");
         String queryString = "viewer=changes&rev1=1.1&rev2=1.2";
         getUtil().gotoPage(getTestClassName(), testPage.getMetaDataValue("page"), "view", queryString);
         ChangesPane changesPane = new ChangesPane();
@@ -192,7 +209,7 @@ public class CompareVersionsTest extends AbstractTest
         changesPane.clickNextChange();
 
         assertEquals("1.2", changesPane.getFromVersion());
-        assertEquals("6.5", changesPane.getToVersion());
+        assertEquals("5.5", changesPane.getToVersion());
         assertTrue(changesPane.hasPreviousChange());
         assertFalse(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());
@@ -310,7 +327,7 @@ public class CompareVersionsTest extends AbstractTest
     {
         testPage = getUtil().gotoPage(getTestClassName(), pageName);
         ChangesPane changesPane =
-            testPage.openHistoryDocExtraPane().showMinorEdits().compare("2.2", "2.3").getChangesPane();
+            testPage.openHistoryDocExtraPane().showMinorEdits().compare("1.4", "1.5").getChangesPane();
         EntityDiff jsxDiff = changesPane.getEntityDiff("XWiki.JavaScriptExtension[0]");
         assertDiff(jsxDiff.getDiff("Code"), "@@ -1,3 +1,3 @@", " var tmp = alice;", "-alice = bob;",
             "+alice = <ins>2 * </ins>bob;", " bob = tmp;");
@@ -321,11 +338,11 @@ public class CompareVersionsTest extends AbstractTest
      */
     private void testVersionNavigation()
     {
-        String queryString = "viewer=changes&rev1=1.2&rev2=6.4";
+        String queryString = "viewer=changes&rev1=1.2&rev2=5.4";
         getUtil().gotoPage(getTestClassName(), testPage.getMetaDataValue("page"), "view", queryString);
         ChangesPane changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "1.2");
-        assertEquals(changesPane.getToVersion(), "6.4");
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("5.4", changesPane.getToVersion());
         assertTrue(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());
@@ -335,8 +352,8 @@ public class CompareVersionsTest extends AbstractTest
 
         changesPane.clickPreviousChange();
         changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "1.1");
-        assertEquals(changesPane.getToVersion(), "1.2");
+        assertEquals("1.1", changesPane.getFromVersion());
+        assertEquals("1.2", changesPane.getToVersion());
         assertFalse(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertFalse(changesPane.hasPreviousFromVersion());
@@ -346,8 +363,8 @@ public class CompareVersionsTest extends AbstractTest
 
         changesPane.clickNextChange();
         changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "1.2");
-        assertEquals(changesPane.getToVersion(), "1.3");
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("1.3", changesPane.getToVersion());
         assertTrue(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());
@@ -357,8 +374,8 @@ public class CompareVersionsTest extends AbstractTest
 
         changesPane.clickPreviousFromVersion();
         changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "1.1");
-        assertEquals(changesPane.getToVersion(), "1.3");
+        assertEquals("1.1", changesPane.getFromVersion());
+        assertEquals("1.3", changesPane.getToVersion());
         assertFalse(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertFalse(changesPane.hasPreviousFromVersion());
@@ -370,8 +387,8 @@ public class CompareVersionsTest extends AbstractTest
         changesPane = new ChangesPane();
         changesPane.clickNextFromVersion();
         changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "1.3");
-        assertEquals(changesPane.getToVersion(), "1.3");
+        assertEquals("1.3", changesPane.getFromVersion());
+        assertEquals("1.3", changesPane.getToVersion());
         assertTrue(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());
@@ -381,8 +398,8 @@ public class CompareVersionsTest extends AbstractTest
 
         changesPane.clickNextFromVersion();
         changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "2.1");
-        assertEquals(changesPane.getToVersion(), "1.3");
+        assertEquals("1.4", changesPane.getFromVersion());
+        assertEquals("1.3", changesPane.getToVersion());
         assertTrue(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());
@@ -392,8 +409,20 @@ public class CompareVersionsTest extends AbstractTest
 
         changesPane.clickPreviousChange();
         changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "1.3");
-        assertEquals(changesPane.getToVersion(), "1.2");
+        assertEquals("1.3", changesPane.getFromVersion());
+        assertEquals("1.2", changesPane.getToVersion());
+        assertTrue(changesPane.hasPreviousChange());
+        assertTrue(changesPane.hasNextChange());
+        assertTrue(changesPane.hasPreviousFromVersion());
+        assertTrue(changesPane.hasNextFromVersion());
+        assertTrue(changesPane.hasPreviousToVersion());
+        assertTrue(changesPane.hasNextToVersion());
+
+        queryString = "viewer=changes&rev1=1.9&rev2=2.1";
+        getUtil().gotoPage(getTestClassName(), testPage.getMetaDataValue("page"), "view", queryString);
+        changesPane = new ChangesPane();
+        assertEquals("1.9", changesPane.getFromVersion());
+        assertEquals("2.1", changesPane.getToVersion());
         assertTrue(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());
@@ -403,8 +432,8 @@ public class CompareVersionsTest extends AbstractTest
 
         changesPane.clickNextChange();
         changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "2.1");
-        assertEquals(changesPane.getToVersion(), "1.3");
+        assertEquals("2.1", changesPane.getFromVersion());
+        assertEquals("3.1", changesPane.getToVersion());
         assertTrue(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());
@@ -412,12 +441,12 @@ public class CompareVersionsTest extends AbstractTest
         assertTrue(changesPane.hasPreviousToVersion());
         assertTrue(changesPane.hasNextToVersion());
 
-        queryString = "viewer=changes&rev1=1.2&rev2=6.4";
+        queryString = "viewer=changes&rev1=1.2&rev2=5.4";
         getUtil().gotoPage(getTestClassName(), testPage.getMetaDataValue("page"), "view", queryString);
         changesPane.clickNextToVersion();
         changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "1.2");
-        assertEquals(changesPane.getToVersion(), "6.5");
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("5.5", changesPane.getToVersion());
         assertTrue(changesPane.hasPreviousChange());
         assertFalse(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());
@@ -427,8 +456,8 @@ public class CompareVersionsTest extends AbstractTest
 
         changesPane.clickPreviousToVersion();
         changesPane = new ChangesPane();
-        assertEquals(changesPane.getFromVersion(), "1.2");
-        assertEquals(changesPane.getToVersion(), "6.4");
+        assertEquals("1.2", changesPane.getFromVersion());
+        assertEquals("5.4", changesPane.getToVersion());
         assertTrue(changesPane.hasPreviousChange());
         assertTrue(changesPane.hasNextChange());
         assertTrue(changesPane.hasPreviousFromVersion());

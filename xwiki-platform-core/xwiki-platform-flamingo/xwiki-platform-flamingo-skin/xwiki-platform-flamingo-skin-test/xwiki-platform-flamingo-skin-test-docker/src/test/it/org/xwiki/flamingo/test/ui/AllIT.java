@@ -80,4 +80,10 @@ public class AllIT
     class NestedDeletePageIT extends DeletePageIT
     {
     }
+
+    @Nested
+    @DisplayName("Object editor Tests")
+    class NestedObjectEditorIT extends ObjectEditorIT
+    {
+    }
 }

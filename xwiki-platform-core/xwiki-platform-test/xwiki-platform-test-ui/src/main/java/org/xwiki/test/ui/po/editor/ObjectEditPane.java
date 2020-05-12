@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po.editor;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.po.FormContainerElement;
 import org.xwiki.test.ui.po.SuggestInputElement;
@@ -42,6 +43,8 @@ public class ObjectEditPane extends FormContainerElement
      */
     private int objectNumber;
 
+    private WebElement xobjectContainer;
+
     /**
      * Creates a new edit pane for an object of the specified type. The form fields from the given container should
      * correspond to properties of the specified type.
@@ -56,6 +59,7 @@ public class ObjectEditPane extends FormContainerElement
 
         this.className = className;
         this.objectNumber = objectNumber;
+        this.xobjectContainer = getDriver().findElementById(String.format("%s_%s_%s", "xobject", className, objectNumber));
     }
 
     /**
@@ -118,5 +122,28 @@ public class ObjectEditPane extends FormContainerElement
     {
         this.setFieldValue(byPropertyName(propertyName), propertyValue);
         return this;
+    }
+
+    public boolean isDeleteLinkDisplayed()
+    {
+        try {
+            return this.xobjectContainer.findElement(By.className("delete")).isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    public boolean isEditLinkDisplayed()
+    {
+        try {
+            return this.xobjectContainer.findElement(By.className("edit")).isDisplayed();
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    public int getObjectNumber()
+    {
+        return objectNumber;
     }
 }

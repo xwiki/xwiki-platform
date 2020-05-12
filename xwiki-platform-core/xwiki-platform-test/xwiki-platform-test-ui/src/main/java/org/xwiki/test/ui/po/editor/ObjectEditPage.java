@@ -20,9 +20,11 @@
 package org.xwiki.test.ui.po.editor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -167,10 +169,16 @@ public class ObjectEditPage extends EditPage
     /** className will look something like "XWiki.XWikiRights" */
     public List<ObjectEditPane> getObjectsOfClass(String className)
     {
-        List<WebElement> titles =
-            getDriver().findElement(By.id("xclass_" + className)).findElements(By.className("xobject-title"));
+        WebElement classElement;
+        try {
+            classElement = getDriver().findElement(By.id("xclass_" + className));
+        } catch (NoSuchElementException e) {
+            // if we cannot find the class elements it means there's no object of this class.
+            return Collections.emptyList();
+        }
+        List<WebElement> titles = classElement.findElements(By.className("xobject-title"));
         List<WebElement> elements =
-            getDriver().findElement(By.id("xclass_" + className)).findElements(By.className("xobject-content"));
+            classElement.findElements(By.className("xobject-content"));
         List<ObjectEditPane> objects = new ArrayList<ObjectEditPane>(elements.size());
         for (int i = 0; i < elements.size(); i++) {
             WebElement element = elements.get(i);

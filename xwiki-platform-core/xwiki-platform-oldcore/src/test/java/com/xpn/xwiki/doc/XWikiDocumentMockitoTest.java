@@ -344,6 +344,7 @@ public class XWikiDocumentMockitoTest
         generateFakeObjects();
         EditForm eform = new EditForm();
 
+        when(request.getParameter("objectPolicy")).thenReturn("updateOrCreate");
         when(request.getParameterMap()).thenReturn(parameters);
         when(documentReferenceResolverString.resolve("space.page")).thenReturn(this.document.getDocumentReference());
         when(documentReferenceResolverString.resolve("InvalidSpace.InvalidPage"))
@@ -356,6 +357,7 @@ public class XWikiDocumentMockitoTest
             context);
 
         eform.setRequest(request);
+        eform.readRequest();
         this.document.readObjectsFromFormUpdateOrCreate(eform, context);
 
         assertEquals(43, this.document.getXObjectSize(baseClass.getDocumentReference()));

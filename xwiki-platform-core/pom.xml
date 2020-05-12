@@ -173,9 +173,48 @@
                     "justification": "Not a breakage, just improved text description!"
                   },
                   {
-                    "regex": true,
-                    "code": ".*",
-                    "new": "method .* org\.xwiki\.user\.UserProperties::.*",
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.user.UserProperties::save() throws org.xwiki.configuration.ConfigurationSaveException",
+                    "justification": "Young API, not a breakage"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.user.UserProperties::setActive(boolean)",
+                    "justification": "Young API, not a breakage"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.user.UserProperties::setDisplayHiddenDocuments(boolean)",
+                    "justification": "Young API, not a breakage"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.user.UserProperties::setEditor(org.xwiki.user.Editor)",
+                    "justification": "Young API, not a breakage"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.user.UserProperties::setEmail(javax.mail.internet.InternetAddress)",
+                    "justification": "Young API, not a breakage"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.user.UserProperties::setEmailChecked(boolean)",
+                    "justification": "Young API, not a breakage"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.user.UserProperties::setFirstName(java.lang.String)",
+                    "justification": "Young API, not a breakage"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.user.UserProperties::setLastName(java.lang.String)",
+                    "justification": "Young API, not a breakage"
+                  },
+                  {
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.user.UserProperties::setType(org.xwiki.user.UserType)",
                     "justification": "Young API, not a breakage"
                   },
                   {

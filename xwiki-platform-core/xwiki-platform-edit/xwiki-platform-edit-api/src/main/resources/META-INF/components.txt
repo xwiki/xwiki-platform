@@ -9,4 +9,4 @@ org.xwiki.edit.internal.XDOMEditorConfiguration
 org.xwiki.edit.script.EditScriptService
 org.xwiki.edit.script.SyntaxContentEditScriptService
 org.xwiki.edit.script.XDOMEditScriptService
-org.xwiki.edit.EditorDescriptorBuilder
+org.xwiki.edit.internal.DefaultEditorDescriptorBuilder

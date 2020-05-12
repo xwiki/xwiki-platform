@@ -357,6 +357,64 @@
                     "new": "interface org.xwiki.refactoring.script.RequestFactory",
                     "annotation": "@org.xwiki.component.annotation.Role",
                     "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "regex": true,
+                    "code": "java.method.nowAbstract",
+                    "old": "method .+ org.xwiki.edit.EditorDescriptorBuilder::.+",
+                    "new": "method .+ org.xwiki.edit.EditorDescriptor(Builder)?::.+( @ org.xwiki.edit.EditorDescriptorBuilder)?",
+                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method void org.xwiki.edit.EditorDescriptorBuilder::<init>()",
+                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "regex": true,
+                    "code": "java.method.removed",
+                    "old": "method .+ java.lang.Object::.+ @ org.xwiki.edit.EditorDescriptorBuilder",
+                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.class.kindChanged",
+                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
+                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
+                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.class.nowAbstract",
+                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
+                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
+                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.annotation.removed",
+                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
+                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
+                    "annotation": "@javax.inject.Singleton",
+                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.annotation.removed",
+                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
+                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
+                    "annotation": "@org.xwiki.component.annotation.Component(roles = {org.xwiki.edit.EditorDescriptorBuilder.class})",
+                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
+                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
+                    "annotation": "@org.xwiki.component.annotation.Role",
+                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.annotation.removed",
+                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
+                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
+                    "annotation": "@org.xwiki.component.annotation.InstantiationStrategy(org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP)",
+                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
                   }
                 ]
               }

@@ -252,6 +252,11 @@
                     "oldVisibility": "protected",
                     "newVisibility": "private",
                     "justification": "Was never meant to be protected and the class did not made any sense, probably a bad copy/paste"
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method java.util.List<java.lang.String> com.xpn.xwiki.api.Document::getTranslationList() throws com.xpn.xwiki.XWikiException",
+                    "justification": "Not a breakage, the method was moved to the legacy module"
                   }
                 ]
               }

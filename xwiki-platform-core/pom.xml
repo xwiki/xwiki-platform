@@ -296,6 +296,67 @@
                     "code": "java.method.removed",
                     "old": "method java.util.List<java.lang.String> com.xpn.xwiki.api.Document::getTranslationList() throws com.xpn.xwiki.XWikiException",
                     "justification": "Not a breakage, the method was moved to the legacy module"
+                  },
+                  {
+                    "regex": true,
+                    "code": "java.method.nowAbstract",
+                    "old": "method .+ org.xwiki.refactoring.script.RequestFactory::.+",
+                    "new": "method .+ org.xwiki.refactoring.script.RequestFactory::.+",
+                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method void org.xwiki.refactoring.script.RefactoringScriptServiceAspect::ajc$interFieldInit$org_xwiki_refactoring_script_RefactoringScriptServiceAspect$org_xwiki_refactoring_script_RefactoringScriptService$documentAccessBridge(org.xwiki.refactoring.script.RefactoringScriptService)",
+                    "justification": "Not a breakage: a private field has been pushed back from legacy to the actual class."
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method void org.xwiki.refactoring.script.RequestFactory::<init>()",
+                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "regex": true,
+                    "code": "java.method.removed",
+                    "old": "method .+ java.lang.Object::.+ @ org.xwiki.refactoring.script.RequestFactory",
+                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.method.removed",
+                    "old": "method void org.xwiki.refactoring.script.RequestFactory::setRightsProperties(org.xwiki.job.api.AbstractCheckRightsRequest)",
+                    "justification": "As part of the refactoring of RequestFactory to transform it as an interface, this method has been made private."
+                  },
+                  {
+                    "code": "java.class.kindChanged",
+                    "old": "class org.xwiki.refactoring.script.RequestFactory",
+                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
+                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.class.nowAbstract",
+                    "old": "class org.xwiki.refactoring.script.RequestFactory",
+                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
+                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.annotation.removed",
+                    "old": "class org.xwiki.refactoring.script.RequestFactory",
+                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
+                    "annotation": "@javax.inject.Singleton",
+                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.annotation.removed",
+                    "old": "class org.xwiki.refactoring.script.RequestFactory",
+                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
+                    "annotation": "@org.xwiki.component.annotation.Component(roles = {org.xwiki.refactoring.script.RequestFactory.class})",
+                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
+                  },
+                  {
+                    "code": "java.annotation.added",
+                    "old": "class org.xwiki.refactoring.script.RequestFactory",
+                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
+                    "annotation": "@org.xwiki.component.annotation.Role",
+                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
                   }
                 ]
               }

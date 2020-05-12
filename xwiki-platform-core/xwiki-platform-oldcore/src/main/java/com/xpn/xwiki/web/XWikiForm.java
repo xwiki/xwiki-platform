@@ -32,7 +32,8 @@ public abstract class XWikiForm extends ActionForm
     private XWikiRequest request;
 
     /**
-     * Reset all properties to their default values.
+     * Set the request.
+     * Use {@link #readRequest()} to refresh the internal state after setting the request.
      *
      * @param request The servlet request we are processing
      */

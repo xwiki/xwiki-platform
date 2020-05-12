@@ -39,7 +39,7 @@
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}" class="xobject">
   #getFieldSummary($obj $firstField $firstFieldSummary)
   <div id="xobject_${escapetool.xml($class.name)}_${obj.number}_title" class="xobject-title">
-    <h3>#cleanClassname(${class.name}) ${obj.number}#if ($firstField): $firstFieldSummary#end
+    <h3>#cleanClassname(${class.name}) <span class="editor-objectNumber">${obj.number}</span>#if ($firstField): $firstFieldSummary#end
         <a href="$doc.getURL('objectremove', "form_token=$!{services.csrf.getToken()}&amp;classname=${escapetool.url($class.name)}&amp;classid=${obj.number}&amp;xredirect=${escapetool.url($doc.getURL('edit', 'editor=object'))}")" class="xobject-action delete" title="$services.localization.render('core.editors.object.removeObject.tooltip')">$services.localization.render('core.editors.object.removeObject')</a>
         #if (!$hasCustomObject)
           <a href="$doc.getURL('edit', "editor=object&amp;classname=${escapetool.url($class.name)}&amp;object=${obj.number}")" class="xobject-action edit" title="$services.localization.render('core.editors.object.editSingleObject.tooltip')">$services.localization.render('core.editors.object.editSingleObject')</a>
@@ -132,7 +132,7 @@
 #*
  * Display a class
  *#
-#macro(displayClass $class)
+#macro(displayClass $class $newObject)
   #set ($props = $class.getProperties())
   #getTitleField($props)
   <div id="xclass_${escapetool.xml($class.name)}" class="xclass">
@@ -147,7 +147,13 @@
         #warning($services.localization.render('core.editors.object.noObject'))
       #end
     #else
-      #set ($objects = $doc.getObjects($class.name))
+      ## If there's a new object, it supposed to be a new class: we only display the new object, we don't want to
+      ## display the other objects coming from the server since they are supposed to be deleted in the editor.
+      #if ("$!newObject" != "")
+        #set ($objects = [$newObject])
+      #else
+        #set ($objects = $doc.getObjects($class.name))
+      #end
       #set ($objectCount = $objects.size())
       <div id="xclass_${escapetool.xml($class.name)}_title" class="xclass-title"><h2>$services.localization.render('core.editors.object.objectsForClass', [${escapetool.xml($class.name)}]) <span id="xclass_${escapetool.xml($class.name)}_xobject_nb" class="xclass_xobject_nb">($objectCount)</span></h2></div>
       <div id="xclass_${escapetool.xml($class.name)}_content" class="xclass-content"><div>
@@ -241,9 +247,19 @@
     $response.setStatus(404)
     #error($services.localization.render('core.editors.object.add.invalidClassName', [$classname]))
   #else
-    #set ($isNewClass = $doc.getObjects($classname).isEmpty())
     #set ($newobj = $doc.newObject($classname))
-    #set ($discard = $doc.save())
+
+    ## We allow to set a specific object number to help dealing with the object numbers in the generated HTML and to
+    ## avoid having to change this number later in javascript with some error-prone regular expressions.
+    #if ("$!{request.objectNumber}" != "")
+      #set ($discard = $newobj.getXWikiObject().setNumber($request.objectNumber))
+    #end
+
+    ## We want to request for a new class info whenever the object number is 0.
+    ## We don't rely on the document state since we never save when creating a new object and we only manage data on
+    ## frontend.
+    #set ($isNewClass = $newobj.number == 0)
+    ##set ($discard = $doc.save())
     #if ("$!{request.xredirect}" != '')
       $response.sendRedirect($request.xredirect)
     #else
@@ -254,7 +270,7 @@
         ## Note that we need to pull the JavaScript/CSS only once, for the first object of a given type.
         <!-- com.xpn.xwiki.plugin.skinx.LinkExtensionPlugin -->
         #skinExtensionHooks
-        #displayClass($class)
+        #displayClass($class $newobj)
       #else
         #getTitleField($props)
         #displayObject($newobj $class $props $titleField)

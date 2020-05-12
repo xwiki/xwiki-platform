@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.job.Job;
@@ -54,6 +55,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -83,6 +85,9 @@ public class RefactoringScriptServiceTest
 
     @MockComponent
     private ContextualAuthorizationManager authorization;
+
+    @MockComponent
+    private DocumentAccessBridge documentAccessBridge;
 
     private ExecutionContext executionContext = new ExecutionContext();
 
@@ -126,9 +131,16 @@ public class RefactoringScriptServiceTest
         request.setCheckRights(false);
         request.setUserReference(new DocumentReference("wiki", "Users", "Bob"));
 
+        DocumentReference authorReference = mock(DocumentReference.class);
+        DocumentReference userReference = mock(DocumentReference.class);
+        when(this.documentAccessBridge.getCurrentAuthorReference()).thenReturn(authorReference);
+        when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(userReference);
+
         this.refactoringScriptService.move(request);
 
-        verify(this.requestFactory).setRightsProperties(request);
+        assertTrue(request.isCheckRights());
+        assertSame(userReference, request.getUserReference());
+        assertSame(authorReference, request.getAuthorReference());
     }
 
     @Test

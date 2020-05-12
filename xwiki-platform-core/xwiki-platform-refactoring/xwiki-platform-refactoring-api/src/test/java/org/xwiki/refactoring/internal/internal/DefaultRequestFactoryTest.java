@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.refactoring.script;
+package org.xwiki.refactoring.internal.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,6 +32,7 @@ import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.WikiReference;
+import org.xwiki.refactoring.internal.script.DefaultRequestFactory;
 import org.xwiki.refactoring.job.CopyRequest;
 import org.xwiki.refactoring.job.CreateRequest;
 import org.xwiki.refactoring.job.EntityRequest;
@@ -40,6 +41,7 @@ import org.xwiki.refactoring.job.PermanentlyDeleteRequest;
 import org.xwiki.refactoring.job.RefactoringJobs;
 import org.xwiki.refactoring.job.ReplaceUserRequest;
 import org.xwiki.refactoring.job.RestoreRequest;
+import org.xwiki.refactoring.script.RequestFactory;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -52,10 +54,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 @ComponentTest
-public class RequestFactoryTest
+public class DefaultRequestFactoryTest
 {
     @InjectMockComponents
-    private RequestFactory requestFactory;
+    private DefaultRequestFactory requestFactory;
 
     @MockComponent
     private DocumentAccessBridge documentAccessBridge;

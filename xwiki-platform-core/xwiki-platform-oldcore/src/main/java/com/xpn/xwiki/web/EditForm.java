@@ -470,9 +470,10 @@ public class EditForm extends XWikiForm
 
     /**
      * If current objectPolicyType is {@link ObjectPolicyType#UPDATE_OR_CREATE}, retrieve a map from the request
-     * parameters of the form '<spacename>.<classname>_<number>_<propertyname>' Keys of this map will be the reference
-     * '<spacename>.<classname>' to the Class (for example, 'XWiki.XWikiRights'), the content is a list where each
-     * element describe property for the object <number>. Element of the list is a map where key is <propertyname> and
+     * parameters of the form {@code &lt;spacename&gt;.&lt;classname&gt;_&lt;number&gt;_&lt;propertyname&gt;'}
+     * Keys of this map will be the reference {@code &lt;spacename&gt;.&lt;classname&gt;} to the Class
+     * (for example, 'XWiki.XWikiRights'), the content is a list where each element describe property for the
+     * object {@code &lt;number&gt;}. Element of the list is a map where key is {@code &lt;propertyname&gt;} and
      * content is the array of corresponding values.
      *
      * Example with a list of HTTP parameters:
@@ -483,7 +484,7 @@ public class EditForm extends XWikiForm
      * <li>XWiki.XWikiRights_1_user=XWiki.Admin</li>
      * <li>XWiki.XWikiUsers_1_name=Spirou</li>
      * </ul>
-     * will result in the following map <code><pre>
+     * will result in the following map <code>
      * {
      *   "XWiki.XWikiRights": {
      *     "0": {
@@ -500,7 +501,7 @@ public class EditForm extends XWikiForm
      *     }
      *   ]
      * }
-     * </pre></code>
+     * </code>
      * Note that the resulting map does not guarantee the consistency of the properties in regards with the actual
      * definition of the XClass. For example, the request could contain {@code XWiki.XWikiRights_0_foobar=value}: the
      * resulting map will always return a parameter "foobar" for XWiki.XWikiRights

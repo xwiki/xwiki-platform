@@ -117,6 +117,31 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- This module will be moved to the attic and shouldn't be used anymore. -->
+                      <name>excludedFieldTypes</name>
+                      <value><![CDATA[
+                        ["com.xpn.xwiki.plugin.activitystream.eventstreambridge.EventConverter"]
+                      ]]></value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

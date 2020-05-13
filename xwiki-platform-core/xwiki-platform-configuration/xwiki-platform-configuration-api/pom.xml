@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-configuration-api</artifactId>
   <name>XWiki Platform - Configuration - API</name>
   <packaging>jar</packaging>
-  <description>Plùtform Configuration API</description>
+  <description>Platform Configuration API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
     <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>

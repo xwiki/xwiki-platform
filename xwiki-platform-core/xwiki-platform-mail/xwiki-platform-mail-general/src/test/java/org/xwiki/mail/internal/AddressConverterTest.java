@@ -19,6 +19,7 @@
  */
 package org.xwiki.mail.internal;
 
+import javax.mail.Address;
 import javax.mail.internet.InternetAddress;
 
 import org.junit.jupiter.api.Test;
@@ -31,42 +32,49 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Unit tests for {@link InternetAddressConverter}.
+ * Unit tests for {@link AddressesConverter}.
  *
  * @version $Id$
- * @since 12.4RC1
+ * @since 6.2M1
  */
 @ComponentTest
-public class InternetAddressConverterTest
+public class AddressConverterTest
 {
     @InjectMockComponents
-    private InternetAddressConverter converter;
+    private AddressConverter converter;
 
     @Test
     public void convert() throws Exception
     {
-        InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-        assertEquals(address, this.converter.convert(InternetAddress.class, "John Doe(comment) <john1@doe.com>"));
+        InternetAddress expected = new InternetAddress("John Doe(comment) <john1@doe.com>");
+        assertEquals(expected, this.converter.convert(Address.class, "John Doe(comment) <john1@doe.com>"));
     }
 
     @Test
     void convertWhenNull()
     {
-        assertNull(this.converter.convert(InternetAddress.class, null));
+        assertNull(this.converter.convert(Address.class, null));
     }
 
     @Test
     void convertWhenTypeIsAlreadyAnAddress() throws Exception
     {
         InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-        assertEquals(address, this.converter.convert(InternetAddress.class, address));
+        assertEquals(address, this.converter.convert(Address.class, address));
     }
 
     @Test
     void convertWhenInvalid()
     {
         Throwable exception = assertThrows(ConversionException.class,
-            () -> this.converter.convert(InternetAddress.class, "invalid("));
-        assertEquals("Failed to convert [invalid(] to [javax.mail.internet.InternetAddress]", exception.getMessage());
+            () -> this.converter.convert(Address.class, "invalid("));
+        assertEquals("Failed to convert [invalid(] to [javax.mail.Address]", exception.getMessage());
+    }
+
+    @Test
+    void convertToString() throws Exception
+    {
+        InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
+        assertEquals("\"John Doe(comment)\" <john1@doe.com>", this.converter.convertToString(address));
     }
 }

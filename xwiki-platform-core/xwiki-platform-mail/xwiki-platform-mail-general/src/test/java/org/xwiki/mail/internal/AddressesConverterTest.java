@@ -27,47 +27,63 @@ import org.xwiki.properties.converter.ConversionException;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Unit tests for {@link AddressesConverter}.
+ * Unit tests for {@link AddressConverter}.
  *
  * @version $Id$
- * @since 6.2M1
+ * @since 6.1RC1
  */
 @ComponentTest
-public class AddressConverterTest
+public class AddressesConverterTest
 {
     @InjectMockComponents
-    private AddressConverter converter;
+    private AddressesConverter converter;
 
     @Test
     public void convert() throws Exception
     {
-        InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-        assertEquals(address, this.converter.convert(Address.class, "John Doe(comment) <john1@doe.com>"));
+        InternetAddress[] addresses = new InternetAddress[2];
+        addresses[0] = new InternetAddress("John Doe(comment) <john1@doe.com>");
+        addresses[1] = new InternetAddress("john2@doe.com");
+        assertArrayEquals(addresses, this.converter.convert(Address[].class,
+            "John Doe(comment) <john1@doe.com>,john2@doe.com"));
     }
 
     @Test
-    void convertWhenNull()
+    public void convertWhenNull()
     {
         assertNull(this.converter.convert(Address.class, null));
     }
 
     @Test
-    void convertWhenTypeIsAlreadyAnAddress() throws Exception
+    public void convertWhenTypeIsAlreadyAnAddressArray() throws Exception
     {
-        InternetAddress address = new InternetAddress("John Doe(comment) <john1@doe.com>");
-        assertEquals(address, this.converter.convert(Address.class, address));
+        InternetAddress[] addresses = new InternetAddress[2];
+        addresses[0] = new InternetAddress("John Doe(comment) <john1@doe.com>");
+        addresses[1] = new InternetAddress("john2@doe.com");
+        assertArrayEquals(addresses, this.converter.convert(Address.class, addresses));
     }
 
     @Test
-    void convertWhenInvalid()
+    public void convertWhenInvalid()
     {
-        Throwable exception = assertThrows(ConversionException.class,
-            () -> this.converter.convert(Address.class, "invalid("));
-        assertEquals("Failed to convert [invalid(] to [javax.mail.Address]", exception.getMessage());
+        Throwable exception = assertThrows(ConversionException.class, () -> {
+            this.converter.convert(Address[].class, "invalid(");
+        });
+        assertEquals("Failed to convert [invalid(] to an array of [javax.mail.Address]", exception.getMessage());
+    }
+
+    @Test
+    void convertToString() throws Exception
+    {
+        InternetAddress[] addresses = new InternetAddress[2];
+        addresses[0] = new InternetAddress("John Doe(comment) <john1@doe.com>");
+        addresses[1] = new InternetAddress("john2@doe.com");
+        assertEquals("\"John Doe(comment)\" <john1@doe.com>, john2@doe.com", this.converter.convertToString(addresses));
     }
 }

@@ -32,8 +32,8 @@
   <name>XWiki Platform - Mail - General API</name>
   <description>Mail APIs not related to sending emails</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.79</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>80</xwiki.pitest.mutationThreshold>
+    <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
+    <xwiki.pitest.mutationThreshold>88</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>General Mail API</xwiki.extension.name>
   </properties>

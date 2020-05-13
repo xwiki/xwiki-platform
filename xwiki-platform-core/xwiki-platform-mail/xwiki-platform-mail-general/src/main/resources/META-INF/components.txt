@@ -1,3 +1,6 @@
+org.xwiki.mail.internal.AddressesConverter
+org.xwiki.mail.internal.AddressConverter
+org.xwiki.mail.internal.InternetAddressConverter
 org.xwiki.mail.internal.configuration.DefaultGeneralMailConfiguration
 org.xwiki.mail.internal.configuration.GeneralMailConfigClassDocumentConfigurationSource
 org.xwiki.mail.internal.configuration.MainWikiGeneralMailConfigClassDocumentConfigurationSource

@@ -24,7 +24,7 @@ import org.xwiki.stability.Unstable;
 
 /**
  * Expose general mail configuration, such as whether email address obfuscation is turned on or not. Note that these
- * are configurations not related to the mail sender which can be found in the {@code MailSenderConfiguration)
+ * are configurations not related to the mail sender which can be found in the {@code MailSenderConfiguration}.
  * interface.
  *
  * @version $Id$

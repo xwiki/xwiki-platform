@@ -8,7 +8,11 @@
 {{velocity output="false"}}
 ## Globals
 #set ($currentNamespace = "wiki:${services.wiki.currentWikiId}")
-#set ($selectedFlavor = $services.distribution.getProperty('flavor.selected'))
+
+## Ensure that if we hit "Select another flavor" button we deselect the flavor.
+#if ("$!request.deselectFlavor" == "")
+  #set ($selectedFlavor = $services.distribution.getProperty('flavor.selected'))
+#end
 #set ($currentFlavor = $services.flavor.getFlavorExtension($currentNamespace))
 #set ($isCurrentFlavorValid = $currentFlavor && $currentFlavor.isValid($currentNamespace))
 #set ($knownFlavors = $services.flavor.knownFlavors)
@@ -166,6 +170,7 @@
         #if ($request.flavor)
           <input type="hidden" name="flavor" value="$escapetool.xml($request.flavor)" />
         #end
+        <input type="hidden" name="deselectFlavor" value="true" />
         <input class="button secondary" type="submit" value="$escapetool.xml($services.localization.render($backButtonMessage))" />
       </form>
     </div>

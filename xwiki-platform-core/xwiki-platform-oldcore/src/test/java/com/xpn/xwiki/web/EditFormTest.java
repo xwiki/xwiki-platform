@@ -103,6 +103,7 @@ class EditFormTest
         parameterMap.put("XWiki.XWikiRights_0_foo", paramValue1);
         parameterMap.put("XWiki.XWikiRights_1_foo", paramValue2);
         parameterMap.put("XWiki.XWikiRights_1_bar", paramValue3);
+        parameterMap.put("EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome_0_prop", paramValue1);
         parameterMap.put("foobar_18_buz", paramValue1);
         parameterMap.put("foo_48bar_buz", paramValue1);
 
@@ -130,6 +131,10 @@ class EditFormTest
         treeMap.put(0, Collections.singletonMap("Something_18_name", paramValue1));
         expectedMap.put("MyClass_18_param.WebHome", treeMap);
 
+        treeMap = new TreeMap<>();
+        treeMap.put(0, Collections.singletonMap("prop", paramValue1));
+        expectedMap.put("EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome", treeMap);
+
         assertEquals(expectedMap, this.editForm.getUpdateOrCreateMap());
     }
 
@@ -150,6 +155,7 @@ class EditFormTest
             "XWiki.XWikiRights_foo",
             "",
             "MyClass_18_param.WebHome_0_Something_18",
+            "EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome_0",
             "XWiki.MyClass_1",
             "XWiki.XWikiRights_23",
             "AnotherClass_010",
@@ -162,6 +168,7 @@ class EditFormTest
         expectedMap.put("XWiki.XWikiRights", Arrays.asList(42, 2, 23));
         expectedMap.put("XWiki.MyClass", Collections.singletonList(1));
         expectedMap.put("MyClass_18_param.WebHome_0_Something", Collections.singletonList(18));
+        expectedMap.put("EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome", Collections.singletonList(0));
         assertEquals(expectedMap, this.editForm.getObjectsToAdd());
     }
 
@@ -182,6 +189,7 @@ class EditFormTest
             "XWiki.XWikiRights_foo",
             "",
             "MyClass_18_param.WebHome_0_Something_18",
+            "EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome_0",
             "XWiki.MyClass_1",
             "XWiki.XWikiRights_23",
             "AnotherClass_010",
@@ -194,6 +202,7 @@ class EditFormTest
         expectedMap.put("XWiki.XWikiRights", Arrays.asList(42, 2, 23));
         expectedMap.put("XWiki.MyClass", Collections.singletonList(1));
         expectedMap.put("MyClass_18_param.WebHome_0_Something", Collections.singletonList(18));
+        expectedMap.put("EditIT.saveActionValidatesWhenXValidateIsPresent.WebHome", Collections.singletonList(0));
         assertEquals(expectedMap, this.editForm.getObjectsToRemove());
     }
 }

@@ -49,14 +49,14 @@ public class EditForm extends XWikiForm
      * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;_&lt;propertyName&gt;} (e.g.
      * {@code XWiki.XWikiRights_0_member}).
      */
-    private static final Pattern XPROPERTY_REFERENCE_PATTERN = Pattern.compile("^(\\w+\\.\\w+?)_([0-9]+)_(.+)$");
+    private static final Pattern XPROPERTY_REFERENCE_PATTERN = Pattern.compile("^((?:\\w+\\.)+\\w+?)_([0-9]+)_(.+)$");
 
     /**
      * Format for passing xobjects references in URLs. General format:
      * {@code &lt;space&gt;.&lt;pageClass&gt;_&lt;number&gt;} (e.g.
      * {@code XWiki.XWikiRights_0}).
      */
-    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^(\\w+\\.\\w+?)_([0-9]+)$");
+    private static final Pattern XOBJECTS_REFERENCE_PATTERN = Pattern.compile("^((?:\\w+\\.)+\\w+?)_([0-9]+)$");
 
     private static final String OBJECTS_CLASS_DELIMITER = "_";
 

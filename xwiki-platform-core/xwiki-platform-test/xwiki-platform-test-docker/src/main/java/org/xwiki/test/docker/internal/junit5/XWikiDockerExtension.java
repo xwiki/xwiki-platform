@@ -503,6 +503,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
     {
         String extraMessage = getAgentName() == null ? "" : String.format(" on agent [%s]", getAgentName());
         throw new RuntimeException(
-            String.format("Error setting up the XWiki testing environment %s", extraMessage), e);
+            String.format("Error setting up the XWiki testing environment%s", extraMessage), e);
     }
 }

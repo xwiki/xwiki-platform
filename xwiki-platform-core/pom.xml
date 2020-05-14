@@ -160,6 +160,16 @@
                     "oldVisibility": "protected",
                     "newVisibility": "private",
                     "justification": "Was never meant to be protected and the class did not made any sense, probably a bad copy/paste"
+                  },
+                  {
+                    "code": "java.field.removed",
+                    "old": "field com.xpn.xwiki.objects.BaseElement<R extends org.xwiki.model.reference.EntityReference>.LOGGER @ com.xpn.xwiki.objects.BaseObject",
+                    "justification": "Was never meant to be protected and the class did not made any sense, probably a bad copy/paste"
+                  },
+                  {
+                    "code": "java.field.removed",
+                    "old": "field com.xpn.xwiki.objects.BaseElement<R extends org.xwiki.model.reference.EntityReference>.LOGGER @ com.xpn.xwiki.objects.BaseProperty<R extends org.xwiki.model.reference.EntityReference>",
+                    "justification": "Was never meant to be protected and the class did not made any sense, probably a bad copy/paste"
                   }
                 ]
               }

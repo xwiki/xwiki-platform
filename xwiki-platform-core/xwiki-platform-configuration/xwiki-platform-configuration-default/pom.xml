@@ -35,7 +35,6 @@
     <xwiki.jacoco.instructionRatio>0.80</xwiki.jacoco.instructionRatio>
     <!-- TODO: Put back threshold of 87% when
          https://github.com/STAMP-project/pitest-descartes/issues/130 is fixed -->
-    <!--  -->
     <xwiki.pitest.mutationThreshold>76</xwiki.pitest.mutationThreshold>
     <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>

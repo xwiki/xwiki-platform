@@ -43,8 +43,6 @@ public class ObjectEditPane extends FormContainerElement
      */
     private int objectNumber;
 
-    private WebElement xobjectContainer;
-
     /**
      * Creates a new edit pane for an object of the specified type. The form fields from the given container should
      * correspond to properties of the specified type.
@@ -59,7 +57,6 @@ public class ObjectEditPane extends FormContainerElement
 
         this.className = className;
         this.objectNumber = objectNumber;
-        this.xobjectContainer = getDriver().findElementById(String.format("%s_%s_%s", "xobject", className, objectNumber));
     }
 
     /**
@@ -124,24 +121,45 @@ public class ObjectEditPane extends FormContainerElement
         return this;
     }
 
+    /**
+     * @return the div container of the current object edit. Note that this should only be used in the case of
+     * ObjectEditor.
+     */
+    private WebElement getXobjectContainer()
+    {
+        return getDriver().findElementById(String.format("%s_%s_%s", "xobject", className, objectNumber));
+    }
+
+    /**
+     * @return {@code true} if the delete link is displayed for this object.
+     * @since 12.4RC1
+     */
     public boolean isDeleteLinkDisplayed()
     {
         try {
-            return this.xobjectContainer.findElement(By.className("delete")).isDisplayed();
+            return getXobjectContainer().findElement(By.className("delete")).isDisplayed();
         } catch (NoSuchElementException e) {
             return false;
         }
     }
 
+    /**
+     * @return {@code true} if the edit link is displayed for this object.
+     * @since 12.4RC1
+     */
     public boolean isEditLinkDisplayed()
     {
         try {
-            return this.xobjectContainer.findElement(By.className("edit")).isDisplayed();
+            return getXobjectContainer().findElement(By.className("edit")).isDisplayed();
         } catch (NoSuchElementException e) {
             return false;
         }
     }
 
+    /**
+     * @return the current object number.
+     * @since 12.4RC1
+     */
     public int getObjectNumber()
     {
         return objectNumber;

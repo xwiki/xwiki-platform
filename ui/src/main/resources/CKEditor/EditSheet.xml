@@ -160,13 +160,7 @@
       <code>/*
 #set ($ckeditorPath = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'ckeditor'))
 #set ($bootstrap3typeaheadPath = $services.webjars.url('org.webjars.npm:bootstrap-3-typeahead', 'bootstrap3-typeahead.min'))
-#if ("$!ckeditorPath" == '')
-  ## Before XWiki 6.3RC1 (but 5.3M1+)
-  #set ($ckeditorWebJarVersion = $services.extension.installed.getInstalledExtension(
-    'org.xwiki.contrib:application-ckeditor-webjar', "wiki:$xcontext.database").id.version)
-  #set ($ckeditorPath = $services.webjars.url("application-ckeditor-webjar/$ckeditorWebJarVersion/ckeditor.js"))
-  #set ($bootstrap3typeaheadPath = $services.webjars.url('bootstrap-3-typeahead/4.0.2/bootstrap3-typeahead.min.js'))
-#elseif ($ckeditorPath.indexOf('?') &gt;= 0)
+#if ($ckeditorPath.indexOf('?') &gt;= 0)
   ## Before XWiki 7.1M1 the WebJar resource path was included in the query string which means we have to specify the
   ## '.js' extension (Require.js doesn't add it in this case).
   #set ($ckeditorPath = "${ckeditorPath}.js")
@@ -233,18 +227,6 @@ define('xwiki-ckeditor', [
 ], function($, ckeditor, xwikiMeta) {
   var deferred = $.Deferred();
 
-  if (!require.specified('tree')) {
-    // Before XWiki 6.4 the xwiki-platform-tree-webjar doesn't have the require-config.min.js file so we have to
-    // configure the path to tree module and its dependencies ourselves.
-    require.config({
-      paths: {
-        jsTree: "$!services.webjars.url('jstree', 'jstree.min.js')",
-        JobRunner: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-job-webjar', 'jobRunner.min.js')",
-        tree: "$!services.webjars.url('org.xwiki.platform:xwiki-platform-tree-webjar', 'tree.min.js')"
-      }
-    });
-  }
-
   var loadJavaScriptSkinExtensions = $jsontool.serialize($xwiki.getDocument('CKEditor.Config'
     ).getValue('loadJavaScriptSkinExtensions')) === 1;
 
@@ -289,11 +271,6 @@ define('xwiki-ckeditor', [
   // syntax. Actually it should not know either about the xwiki/2.0 and xwiki/2.1 syntaxes ;)
   // This should be fixed by implementing https://jira.xwiki.org/browse/CKEDITOR-319
   allowedContentBySyntax['markdown/1.2'] = allowedContentBySyntax['xwiki/2.1'];
-
-  // xwiki-meta module is available only since XWiki 6.3M2
-  xwikiMeta = xwikiMeta || {
-    form_token: $('meta[name="form_token"]').attr('content')
-  };
 
   var currentLocale = $('html').attr('lang') || '';
 
@@ -613,37 +590,6 @@ if (CKEDITOR_BASEPATH.indexOf('?') &gt;= 0) {
     submitActions.forEach(function(action) {
       document.observe(getBeforeEventName(action), onBeforeSubmit);
       document.observe('xwiki:actions:' + action, onSubmit);
-    });
-  }
-})();
-
-// Polyfill for xwiki-events-bridge module (available since 6.4).
-(function() {
-  if (typeof document.fire === 'function' &amp;&amp; require.toUrl('xwiki-events-bridge') === './xwiki-events-bridge') {
-    require(['jquery'], function($) {
-      // xwiki-events-bridge module is not available.
-      [
-        'xwiki:actions:cancel',
-        'xwiki:actions:preview',
-        'xwiki:actions:save',
-        'xwiki:document:saved'
-      ].forEach(function(eventType) {
-        // Catch the Prototype.js event.
-        var firing = false;
-        document.observe(eventType, function(event) {
-          // Fire the jQuery event.
-          if (firing) {
-            console.log("Attempted to fire an event inside of an event handler, stahp");
-          } else {
-            firing = true;
-            try {
-              $(document).triggerHandler(eventType, event.memo);
-            } finally {
-              firing = false;
-            }
-          }
-        });
-      });
     });
   }
 })();
@@ -973,12 +919,6 @@ require(['jquery'], function($) {
 
 /*
 #set ($ckeditorSkinPath = $services.webjars.url('org.xwiki.contrib:application-ckeditor-webjar', 'skins/moono-lisa'))
-#if ("$!ckeditorSkinPath" == '')
-  ## Before 6.3RC1 (but 5.3M1+)
-  #set ($ckeditorWebJarVersion = $services.extension.installed.getInstalledExtension(
-    'org.xwiki.contrib:application-ckeditor-webjar', "wiki:$xcontext.database").id.version)
-  #set ($ckeditorSkinPath = $services.webjars.url("application-ckeditor-webjar/$ckeditorWebJarVersion/skins/moono-lisa"))
-#end
 #if ($ckeditorSkinPath.indexOf('?') &gt;= 0)
   ## The WebJar resource path was specified in the query string before 7.1M1 which prevented the browser from resolving
   ## relative paths. See XWIKI-10880 (A CSS file inside a webjar cannot use a resource from that webjar).

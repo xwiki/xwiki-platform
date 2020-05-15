@@ -122,19 +122,13 @@
   #end
 #end
 
-#macro (importCSS $groupId $artifactId $version $path $evaluate)
+#macro (importCSS $groupId $artifactId $path $evaluate)
   #set ($url = $services.webjars.url("$groupId:$artifactId", $path, {'evaluate': $evaluate}))
-  #if ("$!url" == '')
-    ## Before XWiki 6.3RC1
-    #set ($url = $services.webjars.url("$artifactId/$version/$path"))
-  #end
   #set ($discard = $xwiki.linkx.use($url, {'type': 'text/css', 'rel': 'stylesheet'}))
 #end
 
 #macro (importCKEditorCSS $path $evaluate)
-  #set ($ckeditorWebJarVersion = $services.extension.installed.getInstalledExtension(
-    'org.xwiki.contrib:application-ckeditor-webjar', "wiki:$xcontext.database").id.version)
-  #importCSS('org.xwiki.contrib' 'application-ckeditor-webjar' $ckeditorWebJarVersion $path $evaluate)
+  #importCSS('org.xwiki.contrib' 'application-ckeditor-webjar' $path $evaluate)
 #end
 
 #macro (importCKEditorResources)
@@ -232,7 +226,7 @@
 #macro (displayCKEditorConfig $configDoc $action)
   #set ($discard = $xwiki.ssx.use('CKEditor.ConfigSheet'))
   #set ($discard = $xwiki.jsx.use('CKEditor.ConfigSheet'))
-  #importCSS('org.webjars' 'bootstrap-select' '1.11.2' 'css/bootstrap-select.min.css')
+  #importCSS('org.webjars' 'bootstrap-select' 'css/bootstrap-select.min.css')
   &lt;dl class="ckeditor-config#if ($configDoc.isNew()) new#end"&gt;
     #displayCKEditorConfigProperty($configDoc 'removePlugins' $action)
     #displayCKEditorConfigProperty($configDoc 'removeButtons' $action)

@@ -1,0 +1,23 @@
+paths: {
+  jquery: '/webjars/jquery.min',
+
+  bootstrap: '/webjars/bootstrap',
+  'bootstrap3-typeahead': '/webjars/bootstrap3-typeahead.min',
+
+  // Tree
+  jsTree: '/webjars/jstree',
+  JobRunner: '/webjars/jobRunner',
+  'tree-finder': '/webjars/finder',
+  tree: '/webjars/tree',
+
+  // We need the full path here because ckeditor.js loads other resources using relative paths.
+  ckeditor: '/webjars/application-ckeditor-base/${project.version}/ckeditor',
+
+  testUtils: '/spec/testUtils'
+},
+shim: {
+  bootstrap: ['jquery'],
+  ckeditor: {
+    exports: 'CKEDITOR'
+  }
+}

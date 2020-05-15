@@ -17,6 +17,23 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+require.config({
+  paths: {
+    'xwiki-loading': 'xwiki-loading/plugin',
+    'xwiki-localization': 'xwiki-localization/plugin',
+    'xwiki-macro': 'xwiki-macro/plugin',
+    'xwiki-marker': 'xwiki-marker/plugin',
+  },
+  shim: {
+    'xwiki-loading': ['ckeditor'],
+    'xwiki-localization': ['ckeditor'],
+    'xwiki-macro': ['ckeditor', 'xwiki-marker', 'xwiki-loading', 'xwiki-localization'],
+    'xwiki-marker': ['ckeditor']
+  }
+});
+
+define(['jquery', 'ckeditor', 'testUtils', 'xwiki-macro'], function($, CKEDITOR, testUtils) {
+
 describe('XWiki Macro Plugin for CKEditor', function() {
   var editor;
 
@@ -322,10 +339,10 @@ describe('XWiki Macro Plugin for CKEditor', function() {
   });
 
   it('checks if the edited content remains unchanged after performing data round-trips', function(done) {
-    jQuery.when.apply(jQuery, [
+    $.when.apply($, [
       // CKEDITOR-48: Wiki Page source gets into bad state when macro that produces no output is used with CKEditor
       '<!--startmacro:html|-||-|--><!--stopmacro--><p>text</p>'
-    ].map(jQuery.proxy(testUtils.assertNoChangeAfterDataRoundTrip, testUtils, editor))).then(done);
+    ].map($.proxy(testUtils.assertNoChangeAfterDataRoundTrip, testUtils, editor))).then(done);
   });
 
   it('protects empty elements in macro output', function(done) {
@@ -444,4 +461,6 @@ describe('XWiki Macro Plugin for CKEditor', function() {
       }
     });
   });
+});
+
 });

@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-var testUtils = (function() {
+define(['jquery', 'ckeditor'], function($, CKEDITOR) {
   return {
     createEditor: function(done, config) {
       var editor = CKEDITOR.appendTo(document.body, CKEDITOR.tools.extend({
@@ -32,7 +32,7 @@ var testUtils = (function() {
     },
 
     assertNoChangeAfterDataRoundTrip: function(editor, inputData) {
-      var deferred = jQuery.Deferred();
+      var deferred = $.Deferred();
       editor.setData(inputData, {
         callback: function() {
           editor.config.fullData = true;
@@ -49,7 +49,7 @@ var testUtils = (function() {
     },
 
     assertSnapshot: function(editor, inputData, expectedSnapshot) {
-      var deferred = jQuery.Deferred();
+      var deferred = $.Deferred();
       editor.setData(inputData, {
         callback: function() {
           expect(editor.getSnapshot()).toBe(expectedSnapshot);
@@ -60,7 +60,7 @@ var testUtils = (function() {
     },
 
     assertData: function(editor, inputData, expectedData, fullData) {
-      var deferred = jQuery.Deferred();
+      var deferred = $.Deferred();
       editor.setData(inputData, {
         callback: function() {
           editor.config.fullData = !!fullData;
@@ -72,4 +72,4 @@ var testUtils = (function() {
       return deferred.promise();
     }
   };
-})();
+});

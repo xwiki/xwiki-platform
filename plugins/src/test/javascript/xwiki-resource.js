@@ -26,7 +26,7 @@ require.config({
     'xwiki-marker': 'xwiki-marker/plugin'
   },
   shim: {
-    'xwiki-resource': ['ckeditor', 'resource', 'resourcePicker', 'l10n'],
+    'xwiki-resource': ['ckeditor', 'resource', 'resourcePicker', 'l10n', 'xwiki-marker'],
     'xwiki-marker': ['ckeditor']
   }
 });

@@ -58,15 +58,9 @@ public class ExtensionDependenciesPane extends BaseElement
     public List<DependencyPane> getDirectDependencies()
     {
         // Wait until all remote dependencies are resolved asynchronously.
-        getDriver().waitUntilCondition(new ExpectedCondition<WebElement>()
-        {
-            @Override
-            public WebElement apply(WebDriver driver)
-            {
-                return ((XWikiWebDriver) driver).findElementsWithoutWaiting(container,
-                    By.className("extension-item-loading")).size() > 0 ? null : container;
-            }
-        });
+        getDriver().waitUntilCondition(driver -> ((XWikiWebDriver) driver)
+            .findElementsWithoutWaiting(container, By.className("extension-item-loading")).size() > 0 ? null
+                : container, 20);
         return getDependenciesAfter("This extension depends on:");
     }
 

@@ -1023,6 +1023,12 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # eventstream.daystokeepevents = 0
 
+#-# [Since 12.4][EXPERIMENTAL]
+#-# The new experimental no-SQL oriented event store is disabled by default. Once enabled the Solr implementation is
+#-# used by default but other implementations (like a MongoDB based implementation for example) might come later.
+# eventstream.store.enabled=false
+# eventstream.store=solr
+
 #-------------------------------------------------------------------------------------
 # Logging
 #-------------------------------------------------------------------------------------

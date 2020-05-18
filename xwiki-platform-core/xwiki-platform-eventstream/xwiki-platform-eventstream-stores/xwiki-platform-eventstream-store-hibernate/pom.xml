@@ -36,9 +36,14 @@
         <!-- Name to display by the Extension Manager -->
         <xwiki.extension.name>Hibernate Event Stream Store</xwiki.extension.name>
 
-        <!-- Impossible to have both xwiki-platform-eventstream and xwiki-platform-activitystream-api
-             because they use the same table name (activitystream_events) -->
-        <xwiki.extension.features>org.xwiki.platform:xwiki-platform-activitystream-api</xwiki.extension.features>
+        <xwiki.extension.features>
+          <!-- Previous name of the module -->
+          org.xwiki.platform:xwiki-platform-eventstream-store
+
+          <!-- Impossible to have both xwiki-platform-eventstream and xwiki-platform-activitystream-api
+               because they use the same table name (activitystream_events) -->
+          org.xwiki.platform:xwiki-platform-activitystream-api
+        </xwiki.extension.features>
     </properties>
     <dependencies>
         <dependency>

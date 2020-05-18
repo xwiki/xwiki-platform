@@ -129,7 +129,7 @@ public class DefaultNotificationFilterPreference implements NotificationFilterPr
     public void setInternalId(long internalId)
     {
         this.internalId = internalId;
-        this.id = String.format("NFP_%x", internalId);
+        this.id = String.format("NFP_%d", internalId);
     }
 
     /**

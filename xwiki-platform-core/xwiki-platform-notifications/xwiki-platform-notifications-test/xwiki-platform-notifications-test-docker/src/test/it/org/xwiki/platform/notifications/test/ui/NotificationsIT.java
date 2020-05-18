@@ -34,6 +34,7 @@ import org.xwiki.platform.notifications.test.po.preferences.filters.Notification
 import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.TestReference;
 import org.xwiki.test.docker.junit5.UITest;
+import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.ui.TestUtils;
 import org.xwiki.test.ui.po.BootstrapSwitch;
 import org.xwiki.test.ui.po.CommentsTab;
@@ -61,8 +62,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 )
 public class NotificationsIT
 {
-    private static final String FIRST_USER_NAME = "user1";
-    private static final String SECOND_USER_NAME = "user2";
+    private static final String FIRST_USER_NAME = NotificationsIT.class.getSimpleName() + "user1";
+    private static final String SECOND_USER_NAME = NotificationsIT.class.getSimpleName() + "user2";
 
     private static final String FIRST_USER_PASSWORD = "notificationsUser1";
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";
@@ -239,15 +240,16 @@ public class NotificationsIT
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
         assertEquals("Linux as a title", tray.getNotificationPage(0));
-        assertTrue(tray.getNotificationDescription(0).startsWith("commented by user1"));
+        assertTrue(tray.getNotificationDescription(0).startsWith(String.format("commented by %s", FIRST_USER_NAME)));
         assertEquals("Linux as a title", tray.getNotificationPage(1));
         assertEquals("update", tray.getNotificationType(1));
-        assertTrue(tray.getNotificationDescription(1).startsWith("edited by user1"));
+        assertTrue(tray.getNotificationDescription(1).startsWith(String.format("edited by %s", FIRST_USER_NAME)));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
-        notificationsRSS.loadEntries(
-            testConfiguration.getServletEngine().getInternalIP(),
-            testConfiguration.getServletEngine().getIP());
+        ServletEngine servletEngine = testConfiguration.getServletEngine();
+            notificationsRSS.loadEntries(
+                String.format("%s:%s", servletEngine.getInternalIP(), servletEngine.getInternalPort()),
+                String.format("%s:%s", servletEngine.getIP(), servletEngine.getPort()));
         assertEquals(2, notificationsRSS.getEntries().size());
         assertEquals("A comment has been added to the page \"Linux as a title\"",
                 notificationsRSS.getEntries().get(0).getTitle());
@@ -338,7 +340,7 @@ public class NotificationsIT
             testUtils.gotoPage(testReference);
             NotificationsTrayPage notificationsTrayPage = new NotificationsTrayPage();
             assertEquals(1, notificationsTrayPage.getNotificationsCount());
-            assertEquals("created by user1\n" + "moments ago",
+            assertEquals(String.format("created by %s\n" + "moments ago", FIRST_USER_NAME),
                     notificationsTrayPage.getNotificationDescription(0));
             assertEquals(testReference.getLastSpaceReference().getName(), notificationsTrayPage.getNotificationPage(0));
 

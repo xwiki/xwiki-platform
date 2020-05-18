@@ -133,293 +133,302 @@
         <groupId>org.revapi</groupId>
         <artifactId>revapi-maven-plugin</artifactId>
         <configuration>
-          <analysisConfiguration><![CDATA[
-            {
-              "revapi": {
-                "filter": {
-                  // We're ignoring all API incompatibilities from XWiki dependencies (i.e. commons and rendering)
-                  // since they're already covered by their own builds and we release all of them together.
-                  "archives": {
-                    "exclude": ["org\\.xwiki\\.commons:.*:.*", "org\\.xwiki\\.rendering:.*:.*"]
-                  }
-                },
-                "ignore" : [
-                  // Add more ignores below...
-                  // Note: you can use regexes by using the syntax: { "regex": true, ... }
-                  // Don't forget to '\'-escape dots and other special characters in this case ;)
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "interface org.xwiki.xar.XarEntryTypeResolver",
-                    "new": "interface org.xwiki.xar.XarEntryTypeResolver",
-                    "annotation": "@org.xwiki.component.annotation.Component",
-                    "justification": "Wrongly placed extension. Breakage is limited"
-                  },
-                  {
-                    "regex": true,
-                    "code": "java\.annotation\..*",
-                    "old": "method .* org\.xwiki\.rendering\.macro\.(include|display)\.(Include|Display)MacroParameters::.*",
-                    "new": "method .* org\.xwiki\.rendering\.macro\.(include|display)\.(Include|Display)MacroParameters::.*",
-                    "annotation": "@org\.xwiki\.properties\.annotation\.Property.*",
-                    "justification": "Not a breakage. Annotation harmonized and moved to the setters or removed to prevent properties to be visible in the WYSIWYG macro dialog UI"
-                  },
-                  {
-                    "code": "java.annotation.attributeValueChanged",
-                    "old": "method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)",
-                    "new": "method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)",
-                    "annotationType": "org.xwiki.properties.annotation.PropertyDescription",
-                    "attribute": "value",
-                    "oldValue": "\"an optional id of a section to include in the specified document\"",
-                    "newValue": "\"an optional id of a section to (include|display) in the specified document, e.g. 'HMyHeading'\"",
-                    "justification": "Not a breakage, just improved text description!"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.user.UserProperties::save() throws org.xwiki.configuration.ConfigurationSaveException",
-                    "justification": "Young API, not a breakage"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.user.UserProperties::setActive(boolean)",
-                    "justification": "Young API, not a breakage"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.user.UserProperties::setDisplayHiddenDocuments(boolean)",
-                    "justification": "Young API, not a breakage"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.user.UserProperties::setEditor(org.xwiki.user.Editor)",
-                    "justification": "Young API, not a breakage"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.user.UserProperties::setEmail(javax.mail.internet.InternetAddress)",
-                    "justification": "Young API, not a breakage"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.user.UserProperties::setEmailChecked(boolean)",
-                    "justification": "Young API, not a breakage"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.user.UserProperties::setFirstName(java.lang.String)",
-                    "justification": "Young API, not a breakage"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.user.UserProperties::setLastName(java.lang.String)",
-                    "justification": "Young API, not a breakage"
-                  },
-                  {
-                    "code": "java.method.addedToInterface",
-                    "new": "method void org.xwiki.user.UserProperties::setType(org.xwiki.user.UserType)",
-                    "justification": "Young API, not a breakage"
-                  },
-                  {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter void com.xpn.xwiki.render.ScriptXWikiServletRequest::<init>(===javax.servlet.http.HttpServletRequest===, org.xwiki.security.authorization.ContextualAuthorizationManager)",
-                    "new": "parameter void com.xpn.xwiki.render.ScriptXWikiServletRequest::<init>(===com.xpn.xwiki.web.XWikiRequest===, org.xwiki.security.authorization.ContextualAuthorizationManager)",
-                    "justification": "Young API and should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method javax.servlet.ServletRequest javax.servlet.ServletRequestWrapper::getRequest() @ com.xpn.xwiki.render.ScriptXWikiServletRequest",
-                    "justification": "Young API and should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method boolean javax.servlet.ServletRequestWrapper::isWrapperFor(java.lang.Class<?>) @ com.xpn.xwiki.render.ScriptXWikiServletRequest",
-                    "justification": "Young API and should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method boolean javax.servlet.ServletRequestWrapper::isWrapperFor(javax.servlet.ServletRequest) @ com.xpn.xwiki.render.ScriptXWikiServletRequest",
-                    "justification": "Young API and should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method void javax.servlet.ServletRequestWrapper::setRequest(javax.servlet.ServletRequest) @ com.xpn.xwiki.render.ScriptXWikiServletRequest",
-                    "justification": "Young API and should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.class.noLongerInheritsFromClass",
-                    "old": "class com.xpn.xwiki.render.ScriptXWikiServletRequest (archive = MavenArchive[gav=org.xwiki.platform:xwiki-platform-legacy-oldcore:jar:12.3, file=\/root\/.m2\/repository\/org\/xwiki\/platform\/xwiki-platform-legacy-oldcore\/12.3\/xwiki-platform-legacy-oldcore-12.3.jar], in api = true, through use = false)",
-                    "new": "class com.xpn.xwiki.render.ScriptXWikiServletRequest (archive = MavenArchive[gav=org.xwiki.platform:xwiki-platform-legacy-oldcore:jar:12.4-SNAPSHOT, file=\/root\/workspace\/XWiki_xwiki-platform_master\/xwiki-platform-core\/xwiki-platform-legacy\/xwiki-platform-legacy-oldcore\/target\/xwiki-platform-legacy-oldcore-12.4-SNAPSHOT.jar], in api = true, through use = false)",
-                    "justification": "Young API and should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.class.nonFinalClassInheritsFromNewClass",
-                    "old": "class com.xpn.xwiki.render.ScriptXWikiServletRequest (archive = MavenArchive[gav=org.xwiki.platform:xwiki-platform-legacy-oldcore:jar:12.3, file=\/root\/.m2\/repository\/org\/xwiki\/platform\/xwiki-platform-legacy-oldcore\/12.3\/xwiki-platform-legacy-oldcore-12.3.jar], in api = true, through use = false)",
-                    "new": "class com.xpn.xwiki.render.ScriptXWikiServletRequest (archive = MavenArchive[gav=org.xwiki.platform:xwiki-platform-legacy-oldcore:jar:12.4-SNAPSHOT, file=\/root\/workspace\/XWiki_xwiki-platform_master\/xwiki-platform-core\/xwiki-platform-legacy\/xwiki-platform-legacy-oldcore\/target\/xwiki-platform-legacy-oldcore-12.4-SNAPSHOT.jar], in api = true, through use = false)",
-                    "superClass": "com.xpn.xwiki.web.WrappingXWikiRequest",
-                    "justification": "Young API and should not have any impact on scripts"
-                  },
-                  {
-                    "code": "java.annotation.attributeValueChanged",
-                    "old": "class org.xwiki.mail.script.MailSenderScriptService",
-                    "new": "class org.xwiki.mail.script.MailSenderScriptService",
-                    "annotationType": "javax.inject.Named",
-                    "attribute": "value",
-                    "oldValue": "\"mailsender\"",
-                    "newValue": "\"mail.sender\"",
-                    "justification": "Not a breakage, we have added a legacy component with the old hint."
-                  },
-                  {
-                    "code": "java.annotation.attributeValueChanged",
-                    "old": "class org.xwiki.mail.script.MailStorageScriptService",
-                    "new": "class org.xwiki.mail.script.MailStorageScriptService",
-                    "annotationType": "javax.inject.Named",
-                    "attribute": "value",
-                    "oldValue": "\"mailstorage\"",
-                    "newValue": "\"mail.storage\"",
-                    "justification": "Not a breakage, we have added a legacy component with the old hint."
-                  },
-                  {
-                    "code": "java.field.visibilityReduced",
-                    "old": "field com.xpn.xwiki.objects.BaseElement<R extends org.xwiki.model.reference.EntityReference>.LOGGER",
-                    "new": "field com.xpn.xwiki.objects.BaseElement<R extends org.xwiki.model.reference.EntityReference>.LOGGER",
-                    "oldVisibility": "protected",
-                    "newVisibility": "private",
-                    "justification": "Was never meant to be protected and the class did not made any sense, probably a bad copy/paste"
-                  },
-                  {
-                    "code": "java.field.visibilityReduced",
-                    "old": "field com.xpn.xwiki.objects.BaseElement<R extends org.xwiki.model.reference.EntityReference>.LOGGER @ com.xpn.xwiki.objects.classes.BaseClass",
-                    "new": "field com.xpn.xwiki.objects.classes.BaseClass.LOGGER",
-                    "oldVisibility": "protected",
-                    "newVisibility": "private",
-                    "justification": "Was never meant to be protected and the class did not made any sense, probably a bad copy/paste"
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method java.util.List<java.lang.String> com.xpn.xwiki.api.Document::getTranslationList() throws com.xpn.xwiki.XWikiException",
-                    "justification": "Not a breakage, the method was moved to the legacy module"
-                  },
-                  {
-                    "regex": true,
-                    "code": "java.method.nowAbstract",
-                    "old": "method .+ org.xwiki.refactoring.script.RequestFactory::.+",
-                    "new": "method .+ org.xwiki.refactoring.script.RequestFactory::.+",
-                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method void org.xwiki.refactoring.script.RefactoringScriptServiceAspect::ajc$interFieldInit$org_xwiki_refactoring_script_RefactoringScriptServiceAspect$org_xwiki_refactoring_script_RefactoringScriptService$documentAccessBridge(org.xwiki.refactoring.script.RefactoringScriptService)",
-                    "justification": "Not a breakage: a private field has been pushed back from legacy to the actual class."
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method void org.xwiki.refactoring.script.RequestFactory::<init>()",
-                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "regex": true,
-                    "code": "java.method.removed",
-                    "old": "method .+ java.lang.Object::.+ @ org.xwiki.refactoring.script.RequestFactory",
-                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method void org.xwiki.refactoring.script.RequestFactory::setRightsProperties(org.xwiki.job.api.AbstractCheckRightsRequest)",
-                    "justification": "As part of the refactoring of RequestFactory to transform it as an interface, this method has been made private."
-                  },
-                  {
-                    "code": "java.class.kindChanged",
-                    "old": "class org.xwiki.refactoring.script.RequestFactory",
-                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
-                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.class.nowAbstract",
-                    "old": "class org.xwiki.refactoring.script.RequestFactory",
-                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
-                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "class org.xwiki.refactoring.script.RequestFactory",
-                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
-                    "annotation": "@javax.inject.Singleton",
-                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "class org.xwiki.refactoring.script.RequestFactory",
-                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
-                    "annotation": "@org.xwiki.component.annotation.Component(roles = {org.xwiki.refactoring.script.RequestFactory.class})",
-                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.annotation.added",
-                    "old": "class org.xwiki.refactoring.script.RequestFactory",
-                    "new": "interface org.xwiki.refactoring.script.RequestFactory",
-                    "annotation": "@org.xwiki.component.annotation.Role",
-                    "justification": "RequestFactory has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "regex": true,
-                    "code": "java.method.nowAbstract",
-                    "old": "method .+ org.xwiki.edit.EditorDescriptorBuilder::.+",
-                    "new": "method .+ org.xwiki.edit.EditorDescriptor(Builder)?::.+( @ org.xwiki.edit.EditorDescriptorBuilder)?",
-                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.method.removed",
-                    "old": "method void org.xwiki.edit.EditorDescriptorBuilder::<init>()",
-                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "regex": true,
-                    "code": "java.method.removed",
-                    "old": "method .+ java.lang.Object::.+ @ org.xwiki.edit.EditorDescriptorBuilder",
-                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.class.kindChanged",
-                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
-                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
-                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.class.nowAbstract",
-                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
-                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
-                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
-                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
-                    "annotation": "@javax.inject.Singleton",
-                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
-                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
-                    "annotation": "@org.xwiki.component.annotation.Component(roles = {org.xwiki.edit.EditorDescriptorBuilder.class})",
-                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.annotation.added",
-                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
-                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
-                    "annotation": "@org.xwiki.component.annotation.Role",
-                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
-                  },
-                  {
-                    "code": "java.annotation.removed",
-                    "old": "class org.xwiki.edit.EditorDescriptorBuilder",
-                    "new": "interface org.xwiki.edit.EditorDescriptorBuilder",
-                    "annotation": "@org.xwiki.component.annotation.InstantiationStrategy(org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP)",
-                    "justification": "EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component."
-                  }
-                ]
-              }
-            }
-          ]]></analysisConfiguration>
+          <analysisConfiguration>
+            <revapi.filter>
+              <archives>
+                <!-- We're ignoring all API incompatibilities from XWiki dependencies (i.e. commons and rendering)
+                     since they're already covered by their own builds and we release all of them together. -->
+                <exclude>
+                  <item>org\.xwiki\.commons:.*:.*</item>
+                  <item>org\.xwiki\.rendering:.*:.*</item>
+                </exclude>
+              </archives>
+            </revapi.filter>
+            <!-- Add ignores here using the following syntax. You can use a single <revapi.ignore> entry but it
+                 cannot be empty.
+
+                 Note: you can use regexes by using the syntax: <regex>true</regex>
+                 Don't forget to '\'-escape dots and other special characters in this case ;)
+            <revapi.ignore>
+              <item>
+                <code>java.class.removed</code>
+                <old>class org.xwiki.velocity.tools.CollectionsTool</old>
+                <justification>Not a Breakage. Moved to Legacy</justification>
+              </item>
+            </revapi.ignore>
+            -->
+            <revapi.ignore>
+              <item>
+                <code>java.annotation.removed</code>
+                <old>interface org.xwiki.xar.XarEntryTypeResolver</old>
+                <new>interface org.xwiki.xar.XarEntryTypeResolver</new>
+                <annotation>@org.xwiki.component.annotation.Component</annotation>
+                <justification>Wrongly placed extension. Breakage is limited</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.annotation..*</code>
+                <old>method .* org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::.*</old>
+                <new>method .* org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::.*</new>
+                <annotation>@org.xwiki.properties.annotation.Property.*</annotation>
+                <justification>Not a breakage. Annotation harmonized and moved to the setters or removed to prevent properties to be visible in the WYSIWYG macro dialog UI</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)</old>
+                <new>method void org.xwiki.rendering.macro.(include|display).(Include|Display)MacroParameters::setSection(java.lang.String)</new>
+                <annotationType>org.xwiki.properties.annotation.PropertyDescription</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"an optional id of a section to include in the specified document"</oldValue>
+                <newValue>"an optional id of a section to (include|display) in the specified document, e.g. 'HMyHeading'"</newValue>
+                <justification>Not a breakage, just improved text description!</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.user.UserProperties::save() throws org.xwiki.configuration.ConfigurationSaveException</new>
+                <justification>Young API, not a breakage</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.user.UserProperties::setActive(boolean)</new>
+                <justification>Young API, not a breakage</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.user.UserProperties::setDisplayHiddenDocuments(boolean)</new>
+                <justification>Young API, not a breakage</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.user.UserProperties::setEditor(org.xwiki.user.Editor)</new>
+                <justification>Young API, not a breakage</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.user.UserProperties::setEmail(javax.mail.internet.InternetAddress)</new>
+                <justification>Young API, not a breakage</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.user.UserProperties::setEmailChecked(boolean)</new>
+                <justification>Young API, not a breakage</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.user.UserProperties::setFirstName(java.lang.String)</new>
+                <justification>Young API, not a breakage</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.user.UserProperties::setLastName(java.lang.String)</new>
+                <justification>Young API, not a breakage</justification>
+              </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.user.UserProperties::setType(org.xwiki.user.UserType)</new>
+                <justification>Young API, not a breakage</justification>
+              </item>
+              <item>
+                <code>java.method.parameterTypeChanged</code>
+                <old>parameter void com.xpn.xwiki.render.ScriptXWikiServletRequest::&lt;init>(===javax.servlet.http.HttpServletRequest===, org.xwiki.security.authorization.ContextualAuthorizationManager)</old>
+                <new>parameter void com.xpn.xwiki.render.ScriptXWikiServletRequest::&lt;init>(===com.xpn.xwiki.web.XWikiRequest===, org.xwiki.security.authorization.ContextualAuthorizationManager)</new>
+                <justification>Young API and should not have any impact on scripts</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method javax.servlet.ServletRequest javax.servlet.ServletRequestWrapper::getRequest() @ com.xpn.xwiki.render.ScriptXWikiServletRequest</old>
+                <justification>Young API and should not have any impact on scripts</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method boolean javax.servlet.ServletRequestWrapper::isWrapperFor(java.lang.Class&lt;?>) @ com.xpn.xwiki.render.ScriptXWikiServletRequest</old>
+                <justification>Young API and should not have any impact on scripts</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method boolean javax.servlet.ServletRequestWrapper::isWrapperFor(javax.servlet.ServletRequest) @ com.xpn.xwiki.render.ScriptXWikiServletRequest</old>
+                <justification>Young API and should not have any impact on scripts</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void javax.servlet.ServletRequestWrapper::setRequest(javax.servlet.ServletRequest) @ com.xpn.xwiki.render.ScriptXWikiServletRequest</old>
+                <justification>Young API and should not have any impact on scripts</justification>
+              </item>
+              <item>
+                <code>java.class.noLongerInheritsFromClass</code>
+                <old>class com.xpn.xwiki.render.ScriptXWikiServletRequest (archive = MavenArchive[gav=org.xwiki.platform:xwiki-platform-legacy-oldcore:jar:12.3, file=/root/.m2/repository/org/xwiki/platform/xwiki-platform-legacy-oldcore/12.3/xwiki-platform-legacy-oldcore-12.3.jar], in api = true, through use = false)</old>
+                <new>class com.xpn.xwiki.render.ScriptXWikiServletRequest (archive = MavenArchive[gav=org.xwiki.platform:xwiki-platform-legacy-oldcore:jar:12.4-SNAPSHOT, file=/root/workspace/XWiki_xwiki-platform_master/xwiki-platform-core/xwiki-platform-legacy/xwiki-platform-legacy-oldcore/target/xwiki-platform-legacy-oldcore-12.4-SNAPSHOT.jar], in api = true, through use = false)</new>
+                <justification>Young API and should not have any impact on scripts</justification>
+              </item>
+              <item>
+                <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                <old>class com.xpn.xwiki.render.ScriptXWikiServletRequest (archive = MavenArchive[gav=org.xwiki.platform:xwiki-platform-legacy-oldcore:jar:12.3, file=/root/.m2/repository/org/xwiki/platform/xwiki-platform-legacy-oldcore/12.3/xwiki-platform-legacy-oldcore-12.3.jar], in api = true, through use = false)</old>
+                <new>class com.xpn.xwiki.render.ScriptXWikiServletRequest (archive = MavenArchive[gav=org.xwiki.platform:xwiki-platform-legacy-oldcore:jar:12.4-SNAPSHOT, file=/root/workspace/XWiki_xwiki-platform_master/xwiki-platform-core/xwiki-platform-legacy/xwiki-platform-legacy-oldcore/target/xwiki-platform-legacy-oldcore-12.4-SNAPSHOT.jar], in api = true, through use = false)</new>
+                <superClass>com.xpn.xwiki.web.WrappingXWikiRequest</superClass>
+                <justification>Young API and should not have any impact on scripts</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>class org.xwiki.mail.script.MailSenderScriptService</old>
+                <new>class org.xwiki.mail.script.MailSenderScriptService</new>
+                <annotationType>javax.inject.Named</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"mailsender"</oldValue>
+                <newValue>"mail.sender"</newValue>
+                <justification>Not a breakage, we have added a legacy component with the old hint.</justification>
+              </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>class org.xwiki.mail.script.MailStorageScriptService</old>
+                <new>class org.xwiki.mail.script.MailStorageScriptService</new>
+                <annotationType>javax.inject.Named</annotationType>
+                <attribute>value</attribute>
+                <oldValue>"mailstorage"</oldValue>
+                <newValue>"mail.storage"</newValue>
+                <justification>Not a breakage, we have added a legacy component with the old hint.</justification>
+              </item>
+              <item>
+                <code>java.field.visibilityReduced</code>
+                <old>field com.xpn.xwiki.objects.BaseElement&lt;R extends org.xwiki.model.reference.EntityReference>.LOGGER</old>
+                <new>field com.xpn.xwiki.objects.BaseElement&lt;R extends org.xwiki.model.reference.EntityReference>.LOGGER</new>
+                <oldVisibility>protected</oldVisibility>
+                <newVisibility>private</newVisibility>
+                <justification>Was never meant to be protected and the class did not made any sense, probably a bad copy/paste</justification>
+              </item>
+              <item>
+                <code>java.field.visibilityReduced</code>
+                <old>field com.xpn.xwiki.objects.BaseElement&lt;R extends org.xwiki.model.reference.EntityReference>.LOGGER @ com.xpn.xwiki.objects.classes.BaseClass</old>
+                <new>field com.xpn.xwiki.objects.classes.BaseClass.LOGGER</new>
+                <oldVisibility>protected</oldVisibility>
+                <newVisibility>private</newVisibility>
+                <justification>Was never meant to be protected and the class did not made any sense, probably a bad copy/paste</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method java.util.List&lt;java.lang.String> com.xpn.xwiki.api.Document::getTranslationList() throws com.xpn.xwiki.XWikiException</old>
+                <justification>Not a breakage, the method was moved to the legacy module</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.method.nowAbstract</code>
+                <old>method .+ org.xwiki.refactoring.script.RequestFactory::.+</old>
+                <new>method .+ org.xwiki.refactoring.script.RequestFactory::.+</new>
+                <justification>RequestFactory has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void org.xwiki.refactoring.script.RefactoringScriptServiceAspect::ajc$interFieldInit$org_xwiki_refactoring_script_RefactoringScriptServiceAspect$org_xwiki_refactoring_script_RefactoringScriptService$documentAccessBridge(org.xwiki.refactoring.script.RefactoringScriptService)</old>
+                <justification>Not a breakage: a private field has been pushed back from legacy to the actual class.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void org.xwiki.refactoring.script.RequestFactory::&lt;init>()</old>
+                <justification>RequestFactory has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.method.removed</code>
+                <old>method .+ java.lang.Object::.+ @ org.xwiki.refactoring.script.RequestFactory</old>
+                <justification>RequestFactory has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void org.xwiki.refactoring.script.RequestFactory::setRightsProperties(org.xwiki.job.api.AbstractCheckRightsRequest)</old>
+                <justification>As part of the refactoring of RequestFactory to transform it as an interface, this method has been made private.</justification>
+              </item>
+              <item>
+                <code>java.class.kindChanged</code>
+                <old>class org.xwiki.refactoring.script.RequestFactory</old>
+                <new>interface org.xwiki.refactoring.script.RequestFactory</new>
+                <justification>RequestFactory has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.class.nowAbstract</code>
+                <old>class org.xwiki.refactoring.script.RequestFactory</old>
+                <new>interface org.xwiki.refactoring.script.RequestFactory</new>
+                <justification>RequestFactory has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.annotation.removed</code>
+                <old>class org.xwiki.refactoring.script.RequestFactory</old>
+                <new>interface org.xwiki.refactoring.script.RequestFactory</new>
+                <annotation>@javax.inject.Singleton</annotation>
+                <justification>RequestFactory has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.annotation.removed</code>
+                <old>class org.xwiki.refactoring.script.RequestFactory</old>
+                <new>interface org.xwiki.refactoring.script.RequestFactory</new>
+                <annotation>@org.xwiki.component.annotation.Component(roles = {org.xwiki.refactoring.script.RequestFactory.class})</annotation>
+                <justification>RequestFactory has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.annotation.added</code>
+                <old>class org.xwiki.refactoring.script.RequestFactory</old>
+                <new>interface org.xwiki.refactoring.script.RequestFactory</new>
+                <annotation>@org.xwiki.component.annotation.Role</annotation>
+                <justification>RequestFactory has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.method.nowAbstract</code>
+                <old>method .+ org.xwiki.edit.EditorDescriptorBuilder::.+</old>
+                <new>method .+ org.xwiki.edit.EditorDescriptor(Builder)?::.+( @ org.xwiki.edit.EditorDescriptorBuilder)?</new>
+                <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void org.xwiki.edit.EditorDescriptorBuilder::&lt;init>()</old>
+                <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <regex>true</regex>
+                <code>java.method.removed</code>
+                <old>method .+ java.lang.Object::.+ @ org.xwiki.edit.EditorDescriptorBuilder</old>
+                <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.class.kindChanged</code>
+                <old>class org.xwiki.edit.EditorDescriptorBuilder</old>
+                <new>interface org.xwiki.edit.EditorDescriptorBuilder</new>
+                <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.class.nowAbstract</code>
+                <old>class org.xwiki.edit.EditorDescriptorBuilder</old>
+                <new>interface org.xwiki.edit.EditorDescriptorBuilder</new>
+                <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.annotation.removed</code>
+                <old>class org.xwiki.edit.EditorDescriptorBuilder</old>
+                <new>interface org.xwiki.edit.EditorDescriptorBuilder</new>
+                <annotation>@javax.inject.Singleton</annotation>
+                <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.annotation.removed</code>
+                <old>class org.xwiki.edit.EditorDescriptorBuilder</old>
+                <new>interface org.xwiki.edit.EditorDescriptorBuilder</new>
+                <annotation>@org.xwiki.component.annotation.Component(roles = {org.xwiki.edit.EditorDescriptorBuilder.class})</annotation>
+                <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.annotation.added</code>
+                <old>class org.xwiki.edit.EditorDescriptorBuilder</old>
+                <new>interface org.xwiki.edit.EditorDescriptorBuilder</new>
+                <annotation>@org.xwiki.component.annotation.Role</annotation>
+                <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+              <item>
+                <code>java.annotation.removed</code>
+                <old>class org.xwiki.edit.EditorDescriptorBuilder</old>
+                <new>interface org.xwiki.edit.EditorDescriptorBuilder</new>
+                <annotation>@org.xwiki.component.annotation.InstantiationStrategy(org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP)</annotation>
+                <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
+              </item>
+            </revapi.ignore>
+          </analysisConfiguration>
         </configuration>
       </plugin>
     </plugins>

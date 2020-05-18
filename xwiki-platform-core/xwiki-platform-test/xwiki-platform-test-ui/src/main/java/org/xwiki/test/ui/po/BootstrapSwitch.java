@@ -20,6 +20,7 @@
 package org.xwiki.test.ui.po;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.xwiki.test.ui.XWikiWebDriver;
 
@@ -125,6 +126,7 @@ public class BootstrapSwitch
      */
     public void setState(State wantedState) throws Exception
     {
+        this.driver.scrollTo(webElement);
         if (wantedState == State.UNDETERMINED) {
             throw new Exception("It is not possible to set a switch to undetermined state manually.");
         }
@@ -133,7 +135,13 @@ public class BootstrapSwitch
             if (tries++ > 2) {
                 throw new Exception("Failed to give the desired state.");
             }
-            click();
+            try {
+                click();
+            } catch(TimeoutException e) {
+                // Workaround a possible flicker in click.
+                // If the error doesn't come because of a flicker then the wanted state will never be reached so
+                // we'll get the failure anyway.
+            }
         }
     }
 

@@ -72,8 +72,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 )
 public class NotificationsEmailsIT
 {
-    private static final String FIRST_USER_NAME = "user1";
-    private static final String SECOND_USER_NAME = "user2";
+    private static final String FIRST_USER_NAME = NotificationsEmailsIT.class.getSimpleName() + "user1";
+    private static final String SECOND_USER_NAME = NotificationsEmailsIT.class.getSimpleName() + "user2";
 
     private static final String FIRST_USER_PASSWORD = "notificationsUser1";
     private static final String SECOND_USER_PASSWORD = "notificationsUser2";

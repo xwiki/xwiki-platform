@@ -107,7 +107,7 @@
               <linkName>/var/solr/data/xwiki</linkName>
               <linkTarget>/usr/lib/xwiki-solr-core</linkTarget>
             </data>
-            <!-- Insert the date in the XWiki Solr core -->
+            <!-- Insert the data in the XWiki Solr core -->
             <data>
               <type>link</type>
               <symlink>true</symlink>

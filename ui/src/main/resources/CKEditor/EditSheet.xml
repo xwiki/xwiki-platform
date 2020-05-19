@@ -979,6 +979,14 @@ a.cke_button_disabled &gt; span.cke_button_icon.loading {
   resize: none;
 }
 
+/* Source area styles */
+.cke_contents &gt; textarea.cke_source {
+  box-sizing: border-box;
+  color: $theme.textColor;
+  font: inherit;
+  padding: 15px;
+}
+
 /* Show the modal above the CKEditor dialogs */
 body &gt; .modal-backdrop {
   z-index: 10040;

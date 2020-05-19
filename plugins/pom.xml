@@ -147,12 +147,6 @@
             <!-- Copy the WebJar resources to the right path before packing the jar. -->
             <id>copy-webjar-resources</id>
             <phase>validate</phase>
-            <goals>
-              <goal>resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${webjar.contentDirectory}</outputDirectory>
-            </configuration>
           </execution>
         </executions>
       </plugin>

@@ -126,7 +126,9 @@
           </execution>
           <!-- Copy the WebJar resources (e.g. CKEditor overwrites) to the right path before packing the jar. -->
           <execution>
-            <id>copy-webjar-resources</id>
+            <!-- We can't use the inherited 'copy-webjar-resources' execution because it is executed before
+              'copy-ckeditor-resources', which means we loose our custom CKEditor configuration. -->
+            <id>copy-webjar-resources-custom</id>
             <phase>prepare-package</phase>
             <goals>
               <goal>resources</goal>

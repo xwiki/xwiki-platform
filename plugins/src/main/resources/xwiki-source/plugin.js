@@ -25,8 +25,16 @@
     __namespace: true
   };
 
+  CKEDITOR.plugins.xwikiSource = {};
+
   CKEDITOR.plugins.add('xwiki-source', {
     requires: 'sourcearea,notification,xwiki-loading,xwiki-localization',
+
+    onLoad: function() {
+      require(['textSelection'], function(textSelection) {
+        CKEDITOR.plugins.xwikiSource.textSelection = textSelection;
+      });
+    },
 
     init: function(editor) {
       // The source command is not registered if the editor is loaded in-line.
@@ -49,8 +57,11 @@
     },
 
     onBeforeSetMode: function(event) {
-      if (this.isModeSupported(event.data)) {
-        this.startLoading(event.editor);
+      var newMode = event.data;
+      var editor = event.editor;
+      var currentModeFailed = editor.mode && (editor._.modes[editor.mode] || {}).failed;
+      if (this.isModeSupported(newMode) && !currentModeFailed) {
+        this.startLoading(editor);
       }
     },
 
@@ -86,14 +97,18 @@
 
     onMode: function(event) {
       var editor = event.editor;
+      var promise;
       if (editor.mode === 'wysiwyg' && editor._.previousMode === 'source') {
         // Convert from wiki syntax to HTML.
-        this.maybeConvertHTML(editor, true);
+        promise = this.maybeConvertHTML(editor, true);
       } else if (editor.mode === 'source' && editor._.previousMode === 'wysiwyg') {
         // Convert from HTML to wiki syntax.
-        this.maybeConvertHTML(editor, false);
+        promise = this.maybeConvertHTML(editor, false);
       } else if (this.isModeSupported(editor.mode)) {
-        this.endLoading(editor);
+        promise = jQuery.Deferred().resolve(editor);
+      }
+      if (promise) {
+        promise.always(jQuery.proxy(this, 'endLoading'));
       }
     },
 
@@ -101,17 +116,20 @@
       var oldMode = editor._.modes[editor._.previousMode];
       var newMode = editor._.modes[editor.mode];
       if (oldMode.dirty || typeof newMode.data !== 'string') {
-        this.convertHTML(editor, toHTML);
+        return this.convertHTML(editor, toHTML);
       } else {
+        var deferred = jQuery.Deferred();
         editor.setData(newMode.data, {
-          callback: jQuery.proxy(this.endLoading, this, editor)
+          callback: jQuery.proxy(deferred, 'resolve', editor)
         });
+        return deferred.promise();
       }
     },
 
     convertHTML: function(editor, toHTML) {
       var thisPlugin = this;
       var config = editor.config['xwiki-source'] || {};
+      var deferred = jQuery.Deferred();
       jQuery.post(config.htmlConverter, {
         fromHTML: !toHTML,
         toHTML: toHTML,
@@ -121,20 +139,22 @@
           callback: function() {
             // Take a snapshot after the data has been set, in order to be able to detect changes.
             editor._.modes[editor.mode].data = thisPlugin.getFullData(editor);
-            thisPlugin.endLoading(editor);
+            deferred.resolve(editor);
           }
         });
       }).fail(function() {
         // Switch back to the previous edit mode without performing a conversion.
         editor._.modes[editor.mode].failed = true;
         editor.setMode(editor._.previousMode, function() {
-          thisPlugin.endLoading(editor);
+          deferred.reject(editor);
           editor.showNotification(editor.localization.get('xwiki-source.conversionFailed'), 'warning');
         });
       });
+      return deferred.promise();
     },
 
     startLoading: function(editor) {
+      this.saveSelection(editor);
       editor.setLoading(true);
       // Prevent the source command from being enabled while the conversion takes place.
       var sourceCommand = editor.getCommand('source');
@@ -181,6 +201,168 @@
       sourceCommand.running = false;
       sourceCommand.setState(editor.mode !== 'source' ? CKEDITOR.TRISTATE_OFF : CKEDITOR.TRISTATE_ON);
       editor.setLoading(false);
+      this.restoreSelection(editor);
+    },
+
+    saveSelection: function(editor) {
+      var editable = editor.editable();
+      if (editable) {
+        editor._.textSelection = CKEDITOR.plugins.xwikiSource.textSelection.from(editable.$);
+      } else {
+        delete editor._.textSelection;
+      }
+    },
+
+    restoreSelection: function(editor) {
+      var editable = editor.editable();
+      var textSelection = editor._.textSelection;
+      if (editable && textSelection) {
+        textSelection.applyTo(editable.$);
+      }
+      editor.focus();
     }
   });
 })();
+
+define('node-module', {
+  load: function(name, req, onLoad, config) {
+    window.module = window.module || {};
+    req([name], function () {
+      onLoad(window.module.exports);
+    });
+  }
+});
+
+define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
+  var isTextInput = function(element) {
+    return typeof element.setSelectionRange === 'function';
+  };
+
+  var getTextSelection = function(element) {
+    if (isTextInput(element)) {
+      return {
+        text: element.value,
+        startOffset: element.selectionStart,
+        endOffset: element.selectionEnd
+      };
+    } else {
+      var selection = element.ownerDocument.defaultView.getSelection();
+      if (selection && selection.rangeCount > 0) {
+        var range = selection.getRangeAt(0);
+        if (element.contains(range.commonAncestorContainer)) {
+          return getTextSelectionFromRange(element, range);
+        }
+      }
+      return {
+        text: element.innerText,
+        startOffset: 0,
+        endOffset: 0
+      };
+    }
+  };
+
+  var getTextSelectionFromRange = function(root, range) {
+    var beforeRange = root.ownerDocument.createRange();
+    beforeRange.setStartBefore(root);
+    beforeRange.setEnd(range.startContainer, range.startOffset);
+    var startOffset = beforeRange.toString().length;
+    return {
+      text: root.innerText,
+      startOffset: startOffset,
+      endOffset: startOffset + range.toString().length
+    };
+  };
+
+  var getRangeFromTextSelection = function(root, textSelection) {
+    var start = findTextOffsetInDOM(root, textSelection.startOffset);
+    var end = textSelection.endOffset === textSelection.startOffset ? start :
+      findTextOffsetInDOM(root, textSelection.endOffset);
+    var range = root.ownerDocument.createRange();
+    range.setStart(start.node, start.offset);
+    range.setEnd(end.node, end.offset);
+    return range;
+  };
+
+  var findTextOffsetInDOM = function(root, offset) {
+    var count = 0, node, iterator = root.ownerDocument.createNodeIterator(root, NodeFilter.SHOW_TEXT);
+    do {
+      node = iterator.nextNode();
+      count += node ? node.nodeValue.length : 0;
+    } while (node && count < offset);
+    if (node) {
+      return {
+        node: node,
+        offset: offset - (count - node.nodeValue.length)
+      };
+    } else {
+      return {
+        node: root,
+        offset: offset > 0 ? root.childNodes.length : 0
+      };
+    }
+  };
+
+  var changeText = function(textSelection, newText) {
+    var changes = diff(textSelection.text, newText);
+    var startOffset = findTextOffsetInChanges(changes, textSelection.startOffset);
+    var endOffset = textSelection.endOffset === textSelection.startOffset ? startOffset :
+      findTextOffsetInChanges(changes, textSelection.endOffset);
+    return {
+      text: newText,
+      startOffset: startOffset,
+      endOffset: endOffset
+    };
+  };
+
+  var findTextOffsetInChanges = function(changes, oldOffset) {
+    var count = 0, newOffset = oldOffset;
+    for (var i = 0; i < changes.length && count < oldOffset; i++) {
+      var change = changes[i];
+      if (change[0] < 0) {
+        // Delete: shift the offset to the left.
+        if (count + change[1].length > oldOffset) {
+          // Shift the offset to the left with the number of deleted characters before the original offset.
+          newOffset -= oldOffset - count;
+        } else {
+          // Shift the offset to the left with the number of deleted characters.
+          newOffset -= change[1].length;
+        }
+        count += change[1].length;
+      } else if (change[0] > 0) {
+        // Insert: shift the offset to the right with the number of inserted characters.
+        newOffset += change[1].length;
+      } else {
+        // Keep: don't change the offset.
+        count += change[1].length;
+      }
+    }
+    return newOffset;
+  };
+
+  return {
+    from: function(element) {
+      return $.extend({}, this, getTextSelection(element));
+    },
+    applyTo: function(element) {
+      if (isTextInput(element)) {
+        var textSelection = this.withText(element.value);
+        element.setSelectionRange(textSelection.startOffset, textSelection.endOffset);
+      } else {
+        var range = this.withText(element.innerText).asRange(element);
+        var selection = element.ownerDocument.defaultView.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+      }
+    },
+    withText: function(text) {
+      if (this.text === text) {
+        return this;
+      } else {
+        return $.extend({}, this, changeText(this, text));
+      }
+    },
+    asRange: function(root) {
+      return getRangeFromTextSelection(root, this);
+    }
+  };
+});

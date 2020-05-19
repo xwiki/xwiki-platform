@@ -10,6 +10,8 @@ paths: {
   'tree-finder': '/webjars/finder',
   tree: '/webjars/tree',
 
+  'fast-diff': '/webjars/diff',
+
   // We need the full path here because ckeditor.js loads other resources using relative paths.
   ckeditor: '/webjars/application-ckeditor-base/${project.version}/ckeditor',
 

@@ -70,6 +70,13 @@
       <version>4.0.2</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- This is used to preserve the selection when switching between WYSIWYG and Source modes. -->
+    <dependency>
+      <groupId>org.webjars.npm</groupId>
+      <artifactId>fast-diff</artifactId>
+      <version>1.2.0</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- Test dependencies -->
     <dependency>
       <groupId>org.xwiki.contrib</groupId>

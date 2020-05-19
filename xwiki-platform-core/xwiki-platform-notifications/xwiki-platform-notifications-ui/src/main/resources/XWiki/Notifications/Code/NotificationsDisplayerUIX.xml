@@ -42,17 +42,8 @@
 ********************************************************#
 #if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getUnreadCount' == $request.action)
   #set ($discard = $response.setHeader('Cache-Control', 'no-cache'))
-  #set ($discard = $response.setHeader('Content-Type', 'text/html'))
-  #set($parameters = {
-    "userId": $xcontext.user,
-    "useUserPreferences": "true",
-    "currentWiki": $xcontext.wiki,
-    "maxCount": "21",
-    "onlyUnread": "true"
-  })
-  #set($notifParameters = $services.notification.sources.getNotificationParameters($parameters))
-  #set($counterPlaceholder = $services.notification.notifiers.getNotificationCount($notifParameters))
-$counterPlaceholder
+    #set ($discard = $response.setHeader('Content-Type', 'application/json'))
+    $jsontool.serialize({'unread': $services.notification.sources.getEventsCount(21)})
 #********************************************************
              Mark a notification as read
 ********************************************************#
@@ -201,7 +192,7 @@ $counterPlaceholder
       </use>
     </class>
     <property>
-      <cache>forbid</cache>
+      <cache>long</cache>
     </property>
     <property>
       <code>require(['jquery', 'XWikiNotificationsMacro', 'xwiki-meta'], function ($, XWikiNotificationsMacro, xm) {
@@ -301,14 +292,27 @@ $counterPlaceholder
   /**
    * Get the number of unread notifications.
    */
-  var getUnreadNotificationsCount = function () {
-    var unreadCounterURL = new XWiki.Document('NotificationsDisplayerUIX', 'XWiki.Notifications.Code').getURL('get', 'action=getUnreadCount&amp;outputSyntax=plain');
-    
-    $.ajax(unreadCounterURL, {cache: false}).done(function (data, textStatus, jqXHR) {
-      if ($(data).find('notification-count')) {
-        updateNotificationCount($(data).first('notification-count').text())
-      } else {
-        $('#tmNotifications &gt; a.icon-navbar').after($(data));
+  var getUnreadNotificationsCount = function (asyncId) {
+    var restURL = '$!{escapetool.javascript($request.contextPath)}/rest/notifications/count?media=json';
+    var params = {
+      'userId':              XWiki.Model.serialize(xm.userReference),
+      'useUserPreferences':  true,
+      'currentWiki':         xm.documentReference.extractReferenceValue(XWiki.EntityType.WIKI),
+      'async':               true
+    };
+    if (asyncId) {
+      params.asyncId = asyncId;
+    }
+    $.ajax(restURL, {cache: false, data: params}).done(function (data, textStatus, jqXHR) {
+      switch (jqXHR.status) {
+        case 200:
+          // 200 means that the search is done, we displayer the count notifications
+          updateNotificationCount(data.unread);
+        break;
+        case 202:
+          // 202 means that the background search is still running, we wait 1 second and ask again if it's done this time
+          setTimeout(getUnreadNotificationsCount, 1000, data.asyncId);
+        break;
       }
     });
   };

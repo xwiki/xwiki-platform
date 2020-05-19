@@ -217,9 +217,16 @@
       var editable = editor.editable();
       var textSelection = editor._.textSelection;
       if (editable && textSelection) {
+        editor.focus();
         textSelection.applyTo(editable.$);
+        editor.selectionChange(true);
+        // The selection should be already scrolled into view (in most cases), but we do it again using the CKEditor API
+        // to cover the cases when the selection start container height is larger than the editing area.
+        var selection = editor.getSelection();
+        if (selection) {
+          selection.scrollIntoView();
+        }
       }
-      editor.focus();
     }
   });
 })();
@@ -339,20 +346,42 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
     return newOffset;
   };
 
+  var applySelection = function(element, range) {
+    if (isTextInput(element)) {
+      // Scroll the selection into view.
+      // See https://bugs.chromium.org/p/chromium/issues/detail?id=331233
+      var fullText = element.value;
+      element.value = fullText.substring(0, range.endOffset);
+      element.scrollTop = element.scrollHeight;
+      element.value = fullText;
+      // And then apply the selection.
+      element.setSelectionRange(range.startOffset, range.endOffset);
+    } else {
+      // Scroll the selection into view.
+      var scrollTarget = range.startContainer;
+      if (scrollTarget.nodeType !== Node.ELEMENT_NODE) {
+        scrollTarget = scrollTarget.parentNode;
+      }
+      scrollTarget.scrollIntoView();
+      // And then apply the selection.
+      var selection = element.ownerDocument.defaultView.getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+    }
+  };
+
   return {
     from: function(element) {
       return $.extend({}, this, getTextSelection(element));
     },
     applyTo: function(element) {
+      var range;
       if (isTextInput(element)) {
-        var textSelection = this.withText(element.value);
-        element.setSelectionRange(textSelection.startOffset, textSelection.endOffset);
+        range = this.withText(element.value);
       } else {
-        var range = this.withText(element.innerText).asRange(element);
-        var selection = element.ownerDocument.defaultView.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
+        range = this.withText(element.innerText).asRange(element);
       }
+      applySelection(element, range);
     },
     withText: function(text) {
       if (this.text === text) {

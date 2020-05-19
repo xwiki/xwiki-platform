@@ -348,8 +348,6 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         self.displayEntry(data.notifications[i]);
       }
       self.macro.find('.notifications-macro-load-more').remove();
-      var lastCompositeEvent = data.notifications[data.notifications.length - 1];
-      var lastEventDate = lastCompositeEvent.dates[lastCompositeEvent.dates.length - 1];
 
       // If there is other notifications to load
       if (data.notifications.length == self.notificationsLimit) {
@@ -364,6 +362,8 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
         btn.click(function(event) {
           loadMore.text('').addClass('loading').css('height', '50px');
           // We use the date of the last displayed event as an offset to display those that come next
+          var lastCompositeEvent = data.notifications[data.notifications.length - 1];
+          var lastEventDate = lastCompositeEvent.dates[lastCompositeEvent.dates.length - 1];
           self.load(lastEventDate);
         });
       }

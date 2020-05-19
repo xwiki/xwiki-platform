@@ -206,6 +206,8 @@
    * The current number of unread notifications (-1 means we don't know yet how many notifications there are)
    */
   var notificationCount = -1;
+  
+  var notificationsLimit = 10;
 
   /**
    * URL to the service that return the notifications to display
@@ -321,8 +323,8 @@
    * Initialize the widget.
    */
   $(document).ready(function () {
-
     var container = $('.notifications-area');
+    macro = new XWikiNotificationsMacro(container, XWiki.Model.serialize(xm.userReference), notificationsLimit, true, [], true);
     getUnreadNotificationsCount();
     container.on('eventMarkedAsRead', function (notif) {
       if (notificationCount &lt;= maxCountNumber) {
@@ -339,26 +341,22 @@
     $('#tmNotifications .dropdown-menu').click(function(event) {
       event.stopPropagation();
     });
-    
-    var processEvents = function (mutations) {
-      for (var i = 0; i &lt; mutations.length; i++) {
-        var mutation = mutations[i];
-        for (var j = 0; j &lt; mutation.addedNodes.length; j++) {
-          var element = mutation.addedNodes[j];
 
-          if ($(element).hasClass('notification-event')) {
-            // We don't specify the date since we want to fallback on the current date in the end.
-            createCleanButton();
+    /**
+     * Load the notifications content when the user open the notification menu (lazy loading to have better scalability).
+     */
+    var notificationsMenusHasBeenOpened = false;
+    $('#tmNotifications').on('show.bs.dropdown', function () {
+      // Don't load the notifications if the menu has already be opened before.
+      if (!notificationsMenusHasBeenOpened) {
+        macro.load(0).done(function (notifications) {
+          if (notifications.length &gt; 0) {
+            createCleanButton(notifications[0].date);
           }
-          if ($(element).hasClass('notifications-count')) {
-            // We call the method to handle the special cases like 0 notif etc.
-            updateNotificationCount($(element).text());
-          }
-        }
+        });
       }
-    };
-    var observer = new MutationObserver(processEvents);
-    observer.observe(document, { childList: true, subtree : true});
+      notificationsMenusHasBeenOpened = true;
+    });
   });
 
 });
@@ -950,11 +948,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       &lt;div class="notifications-header-uix col-xs-12"&gt;
       &lt;/div&gt;
     &lt;/div&gt;
-&lt;div class="notifications-area"&gt;
-
-{{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
-
-&lt;/div&gt;
+    &lt;div class="notifications-area loading clearfix"&gt;&lt;/div&gt;
   &lt;/li&gt;
 #end
 {{/html}}

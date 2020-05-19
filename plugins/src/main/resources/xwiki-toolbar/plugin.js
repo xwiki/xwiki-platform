@@ -30,7 +30,7 @@
       var allButtons = Object.keys(editor.ui.items).map(function(item) {
         return item.toLowerCase();
       });
-      var removedButtons = editor.config.removeButtons.toLowerCase();
+      var removedButtons = (editor.config.removeButtons || '').toLowerCase();
       $.each(menus, function(menuId, menu) {
         var activeMenuItems = [];
         // Default menu priority.

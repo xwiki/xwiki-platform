@@ -219,13 +219,8 @@
       if (editable && textSelection) {
         editor.focus();
         textSelection.applyTo(editable.$);
-        editor.selectionChange(true);
-        // The selection should be already scrolled into view (in most cases), but we do it again using the CKEditor API
-        // to cover the cases when the selection start container height is larger than the editing area.
-        var selection = editor.getSelection();
-        if (selection) {
-          selection.scrollIntoView();
-        }
+        // Update the tool bar state.
+        editor.selectionChange();
       }
     }
   });
@@ -261,7 +256,7 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
         }
       }
       return {
-        text: element.innerText,
+        text: element.textContent,
         startOffset: 0,
         endOffset: 0
       };
@@ -274,7 +269,7 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
     beforeRange.setEnd(range.startContainer, range.startOffset);
     var startOffset = beforeRange.toString().length;
     return {
-      text: root.innerText,
+      text: root.textContent,
       startOffset: startOffset,
       endOffset: startOffset + range.toString().length
     };
@@ -352,8 +347,11 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
       // See https://bugs.chromium.org/p/chromium/issues/detail?id=331233
       var fullText = element.value;
       element.value = fullText.substring(0, range.endOffset);
+      // Scroll to the bottom.
       element.scrollTop = element.scrollHeight;
       element.value = fullText;
+      // Scroll to center the selection.
+      element.scrollTop += element.clientHeight / 2;
       // And then apply the selection.
       element.setSelectionRange(range.startOffset, range.endOffset);
     } else {
@@ -362,7 +360,10 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
       if (scrollTarget.nodeType !== Node.ELEMENT_NODE) {
         scrollTarget = scrollTarget.parentNode;
       }
-      scrollTarget.scrollIntoView();
+      scrollTarget.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+      });
       // And then apply the selection.
       var selection = element.ownerDocument.defaultView.getSelection();
       selection.removeAllRanges();
@@ -379,7 +380,7 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
       if (isTextInput(element)) {
         range = this.withText(element.value);
       } else {
-        range = this.withText(element.innerText).asRange(element);
+        range = this.withText(element.textContent).asRange(element);
       }
       applySelection(element, range);
     },

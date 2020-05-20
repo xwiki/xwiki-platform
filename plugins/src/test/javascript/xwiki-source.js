@@ -41,6 +41,8 @@ define(['jquery', 'textSelection'], function($, textSelectionAPI) {
 
       assertSelection('{{abc/}} [[ab|c>>x|yz]] xyz', '<b>xyz</b> <a href="#xyz">ab|c|</a> xyz',
         '{{abc/}} [[ab|c|>>xyz]] xyz');
+
+      assertSelection('one\ntwo\nthr|ee', '<p>one</p><p>two</p><p>thr|ee</p>');
     });
   });
 

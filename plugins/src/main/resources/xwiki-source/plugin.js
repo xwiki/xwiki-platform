@@ -349,9 +349,12 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
       element.value = fullText.substring(0, range.endOffset);
       // Scroll to the bottom.
       element.scrollTop = element.scrollHeight;
+      var canScroll = element.scrollHeight > element.clientHeight;
       element.value = fullText;
-      // Scroll to center the selection.
-      element.scrollTop += element.clientHeight / 2;
+      if (canScroll) {
+        // Scroll to center the selection.
+        element.scrollTop += element.clientHeight / 2;
+      }
       // And then apply the selection.
       element.setSelectionRange(range.startOffset, range.endOffset);
     } else {

@@ -442,7 +442,7 @@ require(['jquery'], function($) {
 
   var addTerminalPageValidation = function(spaceValidator, terminalCheckbox) {
     spaceValidator.add(Validate.Custom, {
-      failureMessage: "$services.localization.render('core.validation.required.message')",
+      failureMessage: "$services.localization.render('core.validation.required.message.terminal')",
       against: function(value) {
         if (terminalCheckbox.prop('checked')) {
           // Space reference is required for terminal documents.

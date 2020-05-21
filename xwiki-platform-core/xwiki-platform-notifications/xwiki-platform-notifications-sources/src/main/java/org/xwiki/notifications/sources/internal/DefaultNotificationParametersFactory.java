@@ -415,7 +415,11 @@ public class DefaultNotificationParametersFactory
 
         enableAllEventTypes(notificationParameters);
 
-        final String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
+        String currentWiki = parameters.get(ParametersKey.CURRENT_WIKI);
+        if (StringUtils.isEmpty(currentWiki)) {
+            currentWiki = wikiDescriptorManager.getCurrentWikiId();
+        }
+
         handleLocationParameter(parameters.get(ParametersKey.PAGES),
             notificationParameters, NotificationFilterProperty.PAGE, currentWiki);
         handleLocationParameter(parameters.get(ParametersKey.SPACES),
@@ -423,7 +427,7 @@ public class DefaultNotificationParametersFactory
         handleLocationParameter(parameters.get(ParametersKey.WIKIS),
             notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
 
-	handleSubwikiWithoutLocationParameters(parameters, notificationParameters,  currentWiki);
+        handleSubwikiWithoutLocationParameters(parameters, notificationParameters,  currentWiki);
 
         usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
 
@@ -505,9 +509,6 @@ public class DefaultNotificationParametersFactory
      */
     private String makeReferenceAbsolute(String entityRefStr, EntityType entityType, String currentWiki)
     {
-        if (StringUtils.isBlank(currentWiki)) {
-            return entityRefStr;
-        }
         EntityReference entityRef = relativeEntityReferenceResolver.resolve(entityRefStr, entityType);
         if (entityRef.extractReference(EntityType.WIKI) == null) {
             entityRef = entityReferenceResolver.resolve(entityRefStr, entityType, new EntityReference(currentWiki, EntityType.WIKI));

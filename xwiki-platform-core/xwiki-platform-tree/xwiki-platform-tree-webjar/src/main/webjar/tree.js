@@ -35,12 +35,17 @@ define(['jquery', 'JobRunner', 'jsTree', 'tree-finder'], function($, JobRunner) 
       // Take the root node data from the tree container element.
       node.data = this.get_container().data('root') || {};
       // If the root node doesn't specify the valid child nodes then infer this information from its children.
-      if (!node.data.validChildren) {
+      // If the valid child nodes are inferred then refresh the list whenever the root node is refreshed.
+      if (!node.data.validChildren || node.data.validChildrenInferred) {
+        node.data.validChildrenInferred = true;
         var nestedCallback = callback;
         callback = function(children) {
           var validChildren = getNodeTypes(children);
           if (validChildren.length > 0) {
             node.data.validChildren = validChildren;
+          } else {
+            // Reset, in case the root node has been refreshed.
+            delete node.data.validChildren;
           }
           nestedCallback(children);
         };

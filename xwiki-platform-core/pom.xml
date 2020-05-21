@@ -427,6 +427,13 @@
                 <annotation>@org.xwiki.component.annotation.InstantiationStrategy(org.xwiki.component.descriptor.ComponentInstantiationStrategy.PER_LOOKUP)</annotation>
                 <justification>EditorDescriptorBuilder has been converted to an interface. Not breaking for using it as component.</justification>
               </item>
+              <item>
+                <code>java.annotation.added</code>
+                <old>method void org.xwiki.rendering.macro.useravatar.UserAvatarMacroParameters::setUsername(java.lang.String)</old>
+                <new>method void org.xwiki.rendering.macro.useravatar.UserAvatarMacroParameters::setUsername(java.lang.String)</new>
+                <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.user.UserReference.class})</annotation>
+                <justification>Not a breakage for using the User Avatar macro.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

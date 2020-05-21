@@ -84,7 +84,7 @@ import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.takeScreensh
  *     &#064;Test
  *     public void test(XWikiWebDriver driver, TestUtils setup)
  *     {
- *         driver.get("http://xwiki.org");
+ *         driver.get("https://xwiki.org");
  *         assertThat(driver.getTitle(),
  *             containsString("XWiki - The Advanced Open Source Enterprise and Application Wiki"));
  *         driver.findElement(By.linkText("XWiki's concept")).click();

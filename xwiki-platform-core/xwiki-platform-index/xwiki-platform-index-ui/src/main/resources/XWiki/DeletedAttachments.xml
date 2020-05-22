@@ -121,7 +121,11 @@ $xwiki.jsx.use('XWiki.DeletedAttachments', {'minify' : 'false'})##
   #end ## deletedAttachments != 0
 &lt;/noscript&gt;
 {{/html}}##
-#else ## request.list
+#end## !$request.list
+{{/velocity}}
+
+{{velocity wiki="false"}}
+#if ($request.list)
 ## ============================================================================================
 ## This page is called from live table via Ajax with the argument xpage=plain. It returns a
 ## set of results serialized in JSON.

@@ -1138,6 +1138,7 @@ require(['jquery', 'XWikiAsyncNotificationsMacro'], function ($, XWikiAsyncNotif
   "spaces": "$!escapetool.xml($xcontext.macro.params.spaces)",
   "pages": "$!escapetool.xml($xcontext.macro.params.pages)",
   "users": "$!escapetool.xml($users)",
+  "currentWiki": "$!escapetool.xml($services.wiki.currentWikiId)",
   "tags": "$!escapetool.xml($xcontext.macro.params.tags)"
 })
 #set ($dataParameters = [])

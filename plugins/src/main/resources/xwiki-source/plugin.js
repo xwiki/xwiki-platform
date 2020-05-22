@@ -251,7 +251,7 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
       var selection = element.ownerDocument.defaultView.getSelection();
       if (selection && selection.rangeCount > 0) {
         var range = selection.getRangeAt(0);
-        if (element.contains(range.commonAncestorContainer)) {
+        if (elementContainsRange(element, range)) {
           return getTextSelectionFromRange(element, range);
         }
       }
@@ -261,6 +261,15 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
         endOffset: 0
       };
     }
+  };
+
+  var elementContainsRange = function(element, range) {
+    var rangeContainer = range.commonAncestorContainer;
+    // Element#contains() returns false on IE11 if we pass text nodes. Let's pass the parent element in this case.
+    if (rangeContainer.nodeType !== Node.ELEMENT_NODE) {
+      rangeContainer = rangeContainer.parentNode;
+    }
+    return element.contains(rangeContainer);
   };
 
   var getTextSelectionFromRange = function(root, range) {
@@ -286,7 +295,11 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
   };
 
   var findTextOffsetInDOM = function(root, offset) {
-    var count = 0, node, iterator = root.ownerDocument.createNodeIterator(root, NodeFilter.SHOW_TEXT);
+    var count = 0, node, iterator = root.ownerDocument.createNodeIterator(root, NodeFilter.SHOW_TEXT,
+      // Accept all text nodes (we need this for IE11 which complains that the last 2 arguments are not optional).
+      function(node) {
+        return NodeFilter.FILTER_ACCEPT;
+      }, false);
     do {
       node = iterator.nextNode();
       count += node ? node.nodeValue.length : 0;

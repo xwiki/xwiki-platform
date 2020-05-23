@@ -83,7 +83,7 @@ public final class DockerTestUtils
      * @param container the container for which to follow the logs
      * @param loggingClass the SLF4J logging class to use for logging
      */
-    public static void followOutput(GenericContainer container, Class<?> loggingClass)
+    public static void followOutput(GenericContainer<?> container, Class<?> loggingClass)
     {
         LogContainerCmd cmd = container.getDockerClient().logContainerCmd(container.getContainerId())
             .withFollowStream(true)
@@ -133,7 +133,8 @@ public final class DockerTestUtils
      *        to pull the image
      * @throws Exception if the container fails to start
      */
-    public static void startContainer(GenericContainer container, TestConfiguration testConfiguration) throws Exception
+    public static void startContainer(GenericContainer<?> container, TestConfiguration testConfiguration)
+        throws Exception
     {
         // Get the latest image in case the tag has been updated on dockerhub.
         String dockerImageName = container.getDockerImageName();
@@ -267,11 +268,10 @@ public final class DockerTestUtils
         // Thus we currently extract the repetition index from the display name which is like:
         //     ...[test-template-invocation:#2]
         String repetitionIndex = getRepetitionIndex(extensionContext);
-        File newFile = new File(newDir, String.format("%s-%s-%s%s.%s",
+        return new File(newDir, String.format("%s-%s-%s%s.%s",
             DockerTestUtils.getTestConfigurationName(testConfiguration),
             extensionContext.getRequiredTestClass().getName(), extensionContext.getRequiredTestMethod().getName(),
             repetitionIndex, fileSuffix));
-        return newFile;
     }
 
     /**

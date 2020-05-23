@@ -27,7 +27,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
-import java.util.Properties;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
@@ -104,7 +105,7 @@ public class JettyStandaloneExecutor
 
             VelocityContext velocityContext = createVelocityContext();
             for (File startFile : startFiles) {
-                LOGGER.info(String.format("Replacing variables in [%s]...", startFile));
+                LOGGER.info("Replacing variables in [{}]...", startFile);
                 String content = org.apache.commons.io.FileUtils.readFileToString(startFile, StandardCharsets.UTF_8);
                 try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(startFile))) {
                     writer.write(replaceProperty(content, velocityContext));
@@ -158,10 +159,9 @@ public class JettyStandaloneExecutor
 
     private VelocityContext createVelocityContext()
     {
-        Properties properties = new Properties();
-        properties.setProperty("xwikiDataDir", DATA_SUBDIR);
-        VelocityContext context = new VelocityContext(properties);
-        return context;
+        Map<String, Object> properties = new HashMap<>();
+        properties.put("xwikiDataDir", DATA_SUBDIR);
+        return new VelocityContext(properties);
     }
 
     private String replaceProperty(String content, VelocityContext velocityContext)

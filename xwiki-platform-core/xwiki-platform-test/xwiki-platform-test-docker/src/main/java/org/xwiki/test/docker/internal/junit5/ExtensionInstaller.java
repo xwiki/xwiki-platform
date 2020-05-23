@@ -228,8 +228,7 @@ public class ExtensionInstaller
 
         // Set the extension list to install
         for (ExtensionId extensionId : extensions) {
-            LOGGER.info(String.format("...Adding extension [%s] to the list of extensions to provision...",
-                extensionId));
+            LOGGER.info("...Adding extension [{}] to the list of extensions to provision...", extensionId);
             installRequest.addExtension(extensionId);
         }
 

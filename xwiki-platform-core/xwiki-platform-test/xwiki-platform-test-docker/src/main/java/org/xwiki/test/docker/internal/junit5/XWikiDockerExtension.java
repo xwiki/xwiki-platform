@@ -216,7 +216,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         if (testConfiguration.vnc()) {
             LOGGER.info("(*) Start VNC container...");
 
-            BrowserWebDriverContainer webDriverContainer = loadBrowserWebDriverContainer(extensionContext);
+            BrowserWebDriverContainer<?> webDriverContainer = loadBrowserWebDriverContainer(extensionContext);
 
             // Use the maximum resolution available so that we have the maximum number of UI elements visible and
             // reduce the risks of false positives due to not visible elements.
@@ -360,7 +360,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         ExtensionContext extensionContext) throws Exception
     {
         BrowserContainerExecutor browserContainerExecutor = new BrowserContainerExecutor(testConfiguration);
-        BrowserWebDriverContainer webDriverContainer = browserContainerExecutor.start();
+        BrowserWebDriverContainer<?> webDriverContainer = browserContainerExecutor.start();
 
         // Store it so that we can retrieve it later on.
         // Note that we don't need to stop it as this is taken care of by TestContainers
@@ -427,7 +427,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         saveXWikiURL(extensionContext, xwikiURL);
 
         if (testConfiguration.isVerbose()) {
-            LOGGER.info("XWiki ping URL = " + xwikiURL);
+            LOGGER.info("XWiki ping URL = {}", xwikiURL);
         }
     }
 

@@ -21,6 +21,7 @@ package org.xwiki.test.docker.internal.junit5.database;
 
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.containers.Container;
@@ -32,7 +33,6 @@ import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
-import org.xwiki.text.StringUtils;
 
 /**
  * Create and execute the Docker database container for the tests.
@@ -95,7 +95,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         //     -e MYSQL_ROOT_PASSWORD=xwiki -e MYSQL_USER=xwiki -e MYSQL_PASSWORD=xwiki
         //     -e MYSQL_DATABASE=xwiki -d mysql:5.7 --character-set-server=utf8 --collation-server=utf8_bin
         //     --explicit-defaults-for-timestamp=1
-        JdbcDatabaseContainer databaseContainer;
+        JdbcDatabaseContainer<?> databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MySQLContainer<>(String.format("mysql:%s", testConfiguration.getDatabaseTag()));
         } else {
@@ -104,7 +104,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         startMySQLContainer(databaseContainer, testConfiguration);
     }
 
-    private void startMySQLContainer(JdbcDatabaseContainer databaseContainer, TestConfiguration testConfiguration)
+    private void startMySQLContainer(JdbcDatabaseContainer<?> databaseContainer, TestConfiguration testConfiguration)
         throws Exception
     {
         databaseContainer
@@ -138,7 +138,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         grantMySQLPrivileges(databaseContainer);
     }
 
-    private void grantMySQLPrivileges(JdbcDatabaseContainer databaseContainer) throws Exception
+    private void grantMySQLPrivileges(JdbcDatabaseContainer<?> databaseContainer) throws Exception
     {
         // Retry several times, as we're getting some flickering from time to time with the message:
         //   ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
@@ -194,7 +194,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
     private void startMariaDBContainer(TestConfiguration testConfiguration) throws Exception
     {
-        JdbcDatabaseContainer databaseContainer;
+        JdbcDatabaseContainer<?> databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new MariaDBContainer<>(String.format("mariadb:%s", testConfiguration.getDatabaseTag()));
         } else {
@@ -208,7 +208,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         // docker run --net=xwiki-nw --name postgres-xwiki -v /my/own/postgres:/var/lib/postgresql/data
         //     -e POSTGRES_ROOT_PASSWORD=xwiki -e POSTGRES_USER=xwiki -e POSTGRES_PASSWORD=xwiki
         //     -e POSTGRES_DB=xwiki -e POSTGRES_INITDB_ARGS="--encoding=UTF8" -d postgres:9.5
-        JdbcDatabaseContainer databaseContainer;
+        JdbcDatabaseContainer<?> databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer =
                 new PostgreSQLContainer<>(String.format("postgres:%s", testConfiguration.getDatabaseTag()));
@@ -229,7 +229,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         startDatabaseContainer(databaseContainer, 5432, testConfiguration);
     }
 
-    private void mountDatabaseDataIfNeeded(JdbcDatabaseContainer databaseContainer, String hostPath,
+    private void mountDatabaseDataIfNeeded(JdbcDatabaseContainer<?> databaseContainer, String hostPath,
         String containerPath, TestConfiguration testConfiguration)
     {
         if (testConfiguration.isDatabaseDataSaved()) {
@@ -244,7 +244,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
     private void startOracleContainer(TestConfiguration testConfiguration) throws Exception
     {
-        JdbcDatabaseContainer databaseContainer;
+        JdbcDatabaseContainer<?> databaseContainer;
         if (testConfiguration.getDatabaseTag() != null) {
             databaseContainer = new OracleContainer(String.format("xwiki/oracle-database:%s",
                 testConfiguration.getDatabaseTag()));
@@ -258,7 +258,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         startDatabaseContainer(databaseContainer, 1521, testConfiguration);
     }
 
-    private void startDatabaseContainer(JdbcDatabaseContainer databaseContainer, int port,
+    private void startDatabaseContainer(JdbcDatabaseContainer<?> databaseContainer, int port,
         TestConfiguration testConfiguration) throws Exception
     {
         // Note: default startup and connect timeout are at 120s (2mn) but we've noticed cases when it was taking
@@ -277,7 +277,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             testConfiguration.getDatabase().setIP(databaseContainer.getContainerIpAddress());
             testConfiguration.getDatabase().setPort(databaseContainer.getMappedPort(port));
         } else {
-            testConfiguration.getDatabase().setIP((String) databaseContainer.getNetworkAliases().get(0));
+            testConfiguration.getDatabase().setIP(databaseContainer.getNetworkAliases().get(0));
             testConfiguration.getDatabase().setPort(port);
         }
     }

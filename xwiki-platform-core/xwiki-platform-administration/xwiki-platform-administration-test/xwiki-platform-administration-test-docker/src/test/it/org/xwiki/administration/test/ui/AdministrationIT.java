@@ -66,15 +66,8 @@ public class AdministrationIT
         // TODO: Move these tests in their own modules, i.e. the modules that brought the Administration UI extension.
         Arrays.asList("Users", "Groups", "Rights", "Registration", "Themes", "Presentation", "Templates",
             "Localization", "Import", "Export", "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
-            .stream().forEach(new Consumer<String>()
-        {
-            @Override
-            public void accept(String sectionId)
-            {
-                assertTrue(administrationPage.hasSection(sectionId),
-                    String.format("Menu section [%s] is missing.", sectionId));
-            }
-        });
+            .stream().forEach(sectionId -> assertTrue(administrationPage.hasSection(sectionId),
+                String.format("Menu section [%s] is missing.", sectionId)));
 
         // These are page-only sections.
         assertTrue(administrationPage.hasNotSection("PageAndChildrenRights"));
@@ -94,14 +87,7 @@ public class AdministrationIT
         // All these sections should not be present (they provide global configuration).
         Arrays.asList("Users", "Groups", "Rights", "Registration", "Templates", "Localization", "Import", "Export",
             "Editing", "emailSend", "emailStatus", "emailGeneral", "analytics")
-            .stream().forEach(new Consumer<String>()
-        {
-            @Override
-            public void accept(String sectionId)
-            {
-                assertTrue(administrationPage.hasNotSection(sectionId),
-                    String.format("Menu section [%s] shouldn't be present.", sectionId));
-            }
-        });
+            .stream().forEach(sectionId -> assertTrue(administrationPage.hasNotSection(sectionId),
+                String.format("Menu section [%s] shouldn't be present.", sectionId)));
     }
 }

@@ -26,11 +26,12 @@ import org.testcontainers.containers.GenericContainer;
 /**
  * To be used to construct a container built from a local image (that is not available on Dockerhub). Such containers
  * won't have their images pulled when starting them.
- * 
+ *
+ * @param <T> the type of container
  * @version $Id$
  * @since 11.10
  */
-public class XWikiLocalGenericContainer extends GenericContainer
+public class XWikiLocalGenericContainer<T extends GenericContainer<T>> extends GenericContainer<T>
 {
     /**
      * @see GenericContainer#GenericContainer() 

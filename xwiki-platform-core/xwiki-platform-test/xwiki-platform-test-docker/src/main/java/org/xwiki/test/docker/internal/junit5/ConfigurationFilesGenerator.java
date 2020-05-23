@@ -33,6 +33,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarInputStream;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.aether.artifact.Artifact;
@@ -43,7 +44,6 @@ import org.xwiki.test.docker.junit5.TestConfiguration;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
-import org.xwiki.text.StringUtils;
 
 /**
  * Generate XWiki config files for a given database and a given version of XWiki.
@@ -105,7 +105,7 @@ public class ConfigurationFilesGenerator
                     String fileName = entry.getName().replace(VM_EXTENSION, "");
                     File outputFile = new File(configurationFileTargetDirectory, fileName);
                     if (this.testConfiguration.isVerbose()) {
-                        LOGGER.info("... Generating: " + outputFile);
+                        LOGGER.info("... Generating: {}", outputFile);
                     }
                     // Note: Init is done once even if this method is called several times...
                     Velocity.init();
@@ -125,8 +125,7 @@ public class ConfigurationFilesGenerator
     {
         Properties properties = this.propertiesMerger.merge(getDefaultConfigurationProperties(),
             this.testConfiguration.getProperties());
-        VelocityContext context = new VelocityContext((Map) properties);
-        return context;
+        return new VelocityContext((Map) properties);
     }
 
     private Properties getDefaultConfigurationProperties()

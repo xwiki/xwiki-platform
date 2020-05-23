@@ -175,7 +175,8 @@ public class ConfigurationFilesGenerator
             // Allow snapshot extensions to be resolved too when not offline
             // Note that the xwiki-commons-extension-repository-maven-snapshots artifact is added in
             // WARBuilder when resolving distribution artifacts.
-            repositories.add("maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots");
+            repositories.add(
+                "maven-xwiki-snapshot:maven:https://nexus.xwiki.org/nexus/content/groups/public-snapshots");
         }
 
         props.setProperty("xwikiExtensionRepositories", StringUtils.join(repositories, ','));

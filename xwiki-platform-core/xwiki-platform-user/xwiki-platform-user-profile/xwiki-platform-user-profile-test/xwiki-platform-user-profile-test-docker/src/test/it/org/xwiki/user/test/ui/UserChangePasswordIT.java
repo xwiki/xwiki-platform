@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 // Extra JARs needed for the hibernate mapping (since right now we don't support hibernate mappings contributed at
 // runtime by extensions.
-@UITest(extraJARs = { "org.xwiki.platform:xwiki-platform-eventstream-store" })
+@UITest(extraJARs = { "org.xwiki.platform:xwiki-platform-eventstream-store-hibernate" })
 public class UserChangePasswordIT
 {
     private static final String DEFAULT_PASSWORD = "testtest";

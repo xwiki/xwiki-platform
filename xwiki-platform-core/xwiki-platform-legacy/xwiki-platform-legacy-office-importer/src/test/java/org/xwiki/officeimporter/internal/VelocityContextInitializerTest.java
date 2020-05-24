@@ -19,19 +19,21 @@
  */
 package org.xwiki.officeimporter.internal;
 
-import java.util.Properties;
-
 import org.apache.velocity.VelocityContext;
-import org.jmock.Expectations;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.script.service.ScriptService;
-import org.xwiki.test.jmock.AbstractComponentTestCase;
+import org.xwiki.test.annotation.AllComponents;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectComponentManager;
+import org.xwiki.test.mockito.MockitoComponentManager;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityContextInitializer;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
 /**
  * Integration tests for various {@link VelocityContextInitializer} implementations specific to the Office Importer
@@ -40,26 +42,12 @@ import org.xwiki.velocity.VelocityContextInitializer;
  * @version $Id$
  * @since 1.9RC2
  */
-public class VelocityContextInitializerTest extends AbstractComponentTestCase
+@ComponentTest
+@AllComponents
+class VelocityContextInitializerTest
 {
-    @Override
-    protected void registerComponents() throws Exception
-    {
-        super.registerComponents();
-
-        registerMockComponent(ScriptService.class, "officeimporter", "importer");
-        registerMockComponent(ScriptService.class, "officemanager", "manager");
-        final ConfigurationSource configurationSource = registerMockComponent(ConfigurationSource.class);
-        getMockery().checking(new Expectations()
-        {
-            {
-                oneOf(configurationSource).getProperty("logging.deprecated.enabled", true);
-                will(returnValue(true));
-                oneOf(configurationSource).getProperty("velocity.tools", Properties.class);
-                will(returnValue(new Properties()));
-            }
-        });
-    }
+    @InjectComponentManager
+    private MockitoComponentManager componentManager;
 
     /**
      * Test the presence of velocity bridges.
@@ -67,16 +55,21 @@ public class VelocityContextInitializerTest extends AbstractComponentTestCase
      * @throws Exception
      */
     @Test
-    public void testVelocityBridges() throws Exception
+    void velocityBridges() throws Exception
     {
-        // Make sure the execution context is not null when velocity bridges are initialized.
-        getComponentManager().<Execution> getInstance(Execution.class).setContext(new ExecutionContext());
+        this.componentManager.registerMockComponent(ScriptService.class, "officeimporter");
+        this.componentManager.registerMockComponent(ScriptService.class, "officemanager");
+        ConfigurationSource source = this.componentManager.registerMockComponent(ConfigurationSource.class);
+        when(source.getProperty("logging.deprecated.enabled", true)).thenReturn(true);
 
-        VelocityContextFactory factory = getComponentManager().getInstance(VelocityContextFactory.class);
+        // Make sure the execution context is not null when velocity bridges are initialized.
+        this.componentManager.<Execution>getInstance(Execution.class).setContext(new ExecutionContext());
+
+        VelocityContextFactory factory = this.componentManager.getInstance(VelocityContextFactory.class);
         VelocityContext context = factory.createContext();
 
-        Assert.assertNotNull(context.get("officeimporter"));
-        Assert.assertNotNull(context.get("ooconfig"));
-        Assert.assertNotNull(context.get("oomanager"));
+        assertNotNull(context.get("officeimporter"));
+        assertNotNull(context.get("ooconfig"));
+        assertNotNull(context.get("oomanager"));
     }
 }

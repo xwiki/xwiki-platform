@@ -23,18 +23,19 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.activeinstalls.internal.client.data.ExtensionPingDataProvider;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.InstalledExtension;
 import org.xwiki.extension.repository.InstalledExtensionRepository;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -44,16 +45,19 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M1
  */
-public class ExtensionPingDataProviderTest
+@ComponentTest
+class ExtensionPingDataProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<ExtensionPingDataProvider> mocker =
-        new MockitoComponentMockingRule<>(ExtensionPingDataProvider.class);
+    @InjectMockComponents
+    private ExtensionPingDataProvider pingDataProvider;
+
+    @MockComponent
+    private InstalledExtensionRepository repository;
 
     @Test
-    public void provideMapping() throws Exception
+    void provideMapping()
     {
-        Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
+        Map<String, Object> mapping = this.pingDataProvider.provideMapping();
         assertEquals(1, mapping.size());
 
         Map<String, Object> extensionsMapping = (Map<String, Object>) mapping.get("extensions");
@@ -79,17 +83,16 @@ public class ExtensionPingDataProviderTest
     }
 
     @Test
-    public void provideData() throws Exception
+    void provideData()
     {
         ExtensionId extensionId = new ExtensionId("extensionid", "1.0");
         InstalledExtension extension = mock(InstalledExtension.class);
         when(extension.getId()).thenReturn(extensionId);
         when(extension.getFeatures()).thenReturn(Arrays.asList("feature1", "feature2"));
 
-        InstalledExtensionRepository repository = this.mocker.getInstance(InstalledExtensionRepository.class);
-        when(repository.getInstalledExtensions()).thenReturn(Collections.singletonList(extension));
+        when(this.repository.getInstalledExtensions()).thenReturn(Collections.singletonList(extension));
 
-        Map<String, Object> data = this.mocker.getComponentUnderTest().provideData();
+        Map<String, Object> data = this.pingDataProvider.provideData();
         assertEquals(1, data.size());
         JSONObject[] extensions = (JSONObject[]) data.get("extensions");
         assertEquals(1, extensions.length);

@@ -22,17 +22,18 @@ package org.xwiki.activeinstalls.internal.client;
 import java.util.Map;
 import java.util.UUID;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.activeinstalls.internal.client.data.DistributionPingDataProvider;
 import org.xwiki.extension.CoreExtension;
 import org.xwiki.extension.ExtensionId;
 import org.xwiki.extension.repository.CoreExtensionRepository;
 import org.xwiki.instance.InstanceId;
 import org.xwiki.instance.InstanceIdManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -42,16 +43,22 @@ import static org.mockito.Mockito.when;
  * @version $Id$
  * @since 6.1M1
  */
-public class DistributionPingDataProviderTest
+@ComponentTest
+class DistributionPingDataProviderTest
 {
-    @Rule
-    public MockitoComponentMockingRule<DistributionPingDataProvider> mocker =
-        new MockitoComponentMockingRule<>(DistributionPingDataProvider.class);
+    @InjectMockComponents
+    private DistributionPingDataProvider pingDataProvider;
+
+    @MockComponent
+    private InstanceIdManager idManager;
+
+    @MockComponent
+    private CoreExtensionRepository coreExtensionRepository;
 
     @Test
-    public void provideMapping() throws Exception
+    void provideMapping()
     {
-        Map<String, Object> mapping = this.mocker.getComponentUnderTest().provideMapping();
+        Map<String, Object> mapping = this.pingDataProvider.provideMapping();
         assertEquals(4, mapping.size());
 
         Map<String, Object> propertiesMapping = (Map<String, Object>) mapping.get("distributionId");
@@ -71,19 +78,17 @@ public class DistributionPingDataProviderTest
     }
 
     @Test
-    public void provideData() throws Exception
+    void provideData()
     {
         InstanceId id = new InstanceId(UUID.randomUUID().toString());
-        InstanceIdManager idManager = this.mocker.getInstance(InstanceIdManager.class);
-        when(idManager.getInstanceId()).thenReturn(id);
+        when(this.idManager.getInstanceId()).thenReturn(id);
 
         ExtensionId environmentExtensionId = new ExtensionId("environmentextensionid", "2.0");
         CoreExtension environmentExtension = mock(CoreExtension.class);
         when(environmentExtension.getId()).thenReturn(environmentExtensionId);
-        CoreExtensionRepository CoreExtensionRepository = this.mocker.getInstance(CoreExtensionRepository.class);
-        when(CoreExtensionRepository.getEnvironmentExtension()).thenReturn(environmentExtension);
+        when(this.coreExtensionRepository.getEnvironmentExtension()).thenReturn(environmentExtension);
 
-        Map<String, Object> data = this.mocker.getComponentUnderTest().provideData();
+        Map<String, Object> data = this.pingDataProvider.provideData();
         assertEquals(3, data.size());
         assertEquals("environmentextensionid", data.get("distributionId"));
         assertEquals("2.0", data.get("distributionVersion"));

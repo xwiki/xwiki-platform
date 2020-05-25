@@ -213,6 +213,12 @@
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>
+        <artifactId>xwiki-platform-index-tree-webjar</artifactId>
+        <version>12.4-SNAPSHOT</version>
+        <type>xar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-index-ui</artifactId>
         <version>12.4-SNAPSHOT</version>
         <type>xar</type>

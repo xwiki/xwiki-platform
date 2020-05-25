@@ -195,6 +195,8 @@ log-in=sign-in
 log-out=sign-out
 th=th
 translate=language
+minus-square = minus-square
+plus-square = plus-square
 
 ## Silk icons for backward compatibility (see: http://design.xwiki.org/xwiki/bin/view/Proposal/Silk+Mapping).
 accept = check

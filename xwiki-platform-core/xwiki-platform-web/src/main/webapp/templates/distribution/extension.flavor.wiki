@@ -10,9 +10,10 @@
 #set ($currentNamespace = "wiki:${services.wiki.currentWikiId}")
 
 ## Ensure that if we hit "Select another flavor" button we deselect the flavor.
-#if ("$!request.deselectFlavor" == "")
-  #set ($selectedFlavor = $services.distribution.getProperty('flavor.selected'))
+#if ("$!request.deselectFlavor" != "")
+  #set ($discard = $services.distribution.removeProperty('flavor.selected'))
 #end
+#set ($selectedFlavor = $services.distribution.getProperty('flavor.selected'))
 #set ($currentFlavor = $services.flavor.getFlavorExtension($currentNamespace))
 #set ($isCurrentFlavorValid = $currentFlavor && $currentFlavor.isValid($currentNamespace))
 #set ($knownFlavors = $services.flavor.knownFlavors)

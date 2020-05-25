@@ -57,7 +57,10 @@ user.profile.network.follow=Start following
 user.profile.network.unfollow=Stop following
 user.profile.network.done=Done
 user.profile.network.saving=Saving...
-user.profile.network.error=Error saving the notification setting</content>
+user.profile.network.error=Error saving the notification setting
+user.profile.status.done=Done
+user.profile.status.saving=Saving...
+user.profile.status.error=Error saving the user status</content>
   <object>
     <name>XWiki.UserProfileTranslations</name>
     <number>0</number>

@@ -263,4 +263,40 @@ public class UserProfileIT
         assertEquals(1, groupsPaneLiveTable.getRowCount());
         assertEquals("XWikiAllGroup", groupsPaneLiveTable.getCell(1, 1).getText());
     }
+
+    @Test
+    @Order(8)
+    public void toggleEnableDisable(TestUtils setup)
+    {
+        ProfileUserProfilePage userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        // We are already logged in with this user, so we shouldn't be able to change the status
+        assertFalse(userProfilePage.isDisableButtonAvailable());
+        assertFalse(userProfilePage.isEnableButtonAvailable());
+
+        // Buttons should be available with super admin
+        setup.loginAsSuperAdmin();
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        assertTrue(userProfilePage.isDisableButtonAvailable());
+        assertFalse(userProfilePage.isEnableButtonAvailable());
+
+        // Ensure that we can disable the user and buttons are switching
+        userProfilePage.clickDisable();
+        assertFalse(userProfilePage.isDisableButtonAvailable());
+        assertTrue(userProfilePage.isEnableButtonAvailable());
+
+        // Ensure that the state has been saved
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        assertFalse(userProfilePage.isDisableButtonAvailable());
+        assertTrue(userProfilePage.isEnableButtonAvailable());
+
+        // Enable back
+        userProfilePage.clickEnable();
+        assertTrue(userProfilePage.isDisableButtonAvailable());
+        assertFalse(userProfilePage.isEnableButtonAvailable());
+
+        userProfilePage = ProfileUserProfilePage.gotoPage(this.userName);
+        assertTrue(userProfilePage.isDisableButtonAvailable());
+        assertFalse(userProfilePage.isEnableButtonAvailable());
+    }
+
 }

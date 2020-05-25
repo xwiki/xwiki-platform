@@ -215,7 +215,6 @@
         <groupId>org.xwiki.platform</groupId>
         <artifactId>xwiki-platform-tree-webjar</artifactId>
         <version>12.5-SNAPSHOT</version>
-        <type>xar</type>
       </dependency>
       <dependency>
         <groupId>org.xwiki.platform</groupId>

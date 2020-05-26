@@ -84,13 +84,18 @@
     </dependency>
     <!-- Needed by TestContainers, to verify that the DBs are started -->
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
+      <groupId>${mysql.groupId}</groupId>
+      <artifactId>${mysql.artifactId}</artifactId>
       <version>${mysql.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.oracle.ojdbc</groupId>
-      <artifactId>ojdbc8</artifactId>
+      <groupId>${mariadb.groupId}</groupId>
+      <artifactId>${mariadb.artifactId}</artifactId>
+      <version>${mariadb.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${oracle.groupId}</groupId>
+      <artifactId>${oracle.artifactId}</artifactId>
       <version>${oracle.version}</version>
     </dependency>
     <!-- Dependencies for WARBuilder -->

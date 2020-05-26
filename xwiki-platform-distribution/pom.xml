@@ -74,6 +74,7 @@
     <xwiki.db.default.extraMappings>mailsender.hbm.xml</xwiki.db.default.extraMappings>
     <xwiki.db.oracle.extraMappings>mailsender.oracle.hbm.xml</xwiki.db.oracle.extraMappings>
     <xwiki.db.mysql.extraMappings>mailsender.hbm.xml</xwiki.db.mysql.extraMappings>
+    <xwiki.db.mariadb.extraMappings>mailsender.hbm.xml</xwiki.db.mariadb.extraMappings>
     <xwiki.db.hsqldb.extraMappings>mailsender.hbm.xml</xwiki.db.hsqldb.extraMappings>
     <xwiki.db.pgsql.extraMappings>mailsender.hbm.xml</xwiki.db.pgsql.extraMappings>
     <xwiki.db.derby.extraMappings>mailsender.hbm.xml</xwiki.db.derby.extraMappings>
@@ -289,6 +290,7 @@
                   <xwikiDbHbmDefaultExtraMappings>${xwiki.db.default.extraMappings}</xwikiDbHbmDefaultExtraMappings>
                   <xwikiDbHbmHSQLDBExtraMappings>${xwiki.db.hsqldb.extraMappings}</xwikiDbHbmHSQLDBExtraMappings>
                   <xwikiDbHbmMySQLExtraMappings>${xwiki.db.mysql.extraMappings}</xwikiDbHbmMySQLExtraMappings>
+                  <xwikiDbHbmMariaDBExtraMappings>${xwiki.db.mariadb.extraMappings}</xwikiDbHbmMariaDBExtraMappings>
                   <xwikiDbHbmPostgreSQLExtraMappings>${xwiki.db.pgsql.extraMappings}</xwikiDbHbmPostgreSQLExtraMappings>
                   <xwikiDbHbmOracleExtraMappings>${xwiki.db.oracle.extraMappings}</xwikiDbHbmOracleExtraMappings>
                   <xwikiDbHbmDerbyExtraMappings>${xwiki.db.derby.extraMappings}</xwikiDbHbmDerbyExtraMappings>
@@ -536,6 +538,21 @@
         <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
         <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
         <xwiki.db.connection.driver_class>com.mysql.jdbc.Driver</xwiki.db.connection.driver_class>
+        <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
+        <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
+      </properties>
+    </profile>
+    <profile>
+      <id>mariadb</id>
+      <properties>
+        <xwiki.db>mariadb</xwiki.db>
+        <xwiki.db.jdbc.groupId>${mariadb.groupId}</xwiki.db.jdbc.groupId>
+        <xwiki.db.jdbc.artifactId>${mariadb.artifactId}</xwiki.db.jdbc.artifactId>
+        <xwiki.db.jdbc.version>${mariadb.version}</xwiki.db.jdbc.version>
+        <xwiki.db.connection.url>jdbc:mariadb://localhost/xwiki?useSSL=false</xwiki.db.connection.url>
+        <xwiki.db.connection.username>xwiki</xwiki.db.connection.username>
+        <xwiki.db.connection.password>xwiki</xwiki.db.connection.password>
+        <xwiki.db.connection.driver_class>org.mariadb.jdbc.Driver</xwiki.db.connection.driver_class>
         <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
         <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
       </properties>

@@ -469,6 +469,7 @@
     $.get(url, data).done(function(html) {
       var newLiveTableContainer = $('&lt;div/&gt;').html(html).find('.xwiki-livetable-container');
       oldLiveTableContainer.replaceWith(newLiveTableContainer);
+      $(document).trigger('xwiki:dom:updated', {elements: newLiveTableContainer.toArray()});
     });
   });
 

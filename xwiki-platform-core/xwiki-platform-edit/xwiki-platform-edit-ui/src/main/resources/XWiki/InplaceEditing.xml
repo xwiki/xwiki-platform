@@ -598,8 +598,8 @@ define('editInPlace', [
     // we can't use yet because it's not implemented on IE11 which we still have to support.
     var actionButtonsWrapper = editContent.nextAll('.sticky-buttons-wrapper');
     if (actionButtonsWrapper.length === 0) {
-      actionButtonsWrapper = $('&lt;div class="sticky-buttons-wrapper col-xs-12"&gt;&lt;div class="sticky-buttons"/&gt;&lt;/div&gt;')
-        .insertAfter(editContent);
+      actionButtonsWrapper = $('&lt;div class="sticky-buttons-wrapper col-xs-12"&gt;' +
+        '&lt;div class="inplace-editing-buttons sticky-buttons"/&gt;&lt;/div&gt;').insertAfter(editContent);
       var actionButtons = actionButtonsWrapper.children('.sticky-buttons').data('xwikiDocument', xwikiDocument)
         .toggle(!!xwikiDocument);
       return loadActionButtons(actionButtons);
@@ -733,7 +733,7 @@ define('editInPlace', [
     // Override the EditActions.notify() function in order to pass a fake form in the event parameters.
     var originalNotify = XWiki.actionButtons.EditActions.prototype.notify;
     XWiki.actionButtons.EditActions.prototype.notify = function(originalEvent, action, params) {
-      if (params) {
+      if (params &amp;&amp; $(originalEvent.element()).closest('.inplace-editing-buttons').length &gt; 0) {
         // actionButtons.js expects a form so we use a fake form. Refactoring actionButtons.js is too dangerous ATM.
         // Note that we do this only when the event has parameters because we want to exclude the cancel event for which
         // actionButtons.js changes the window location if a form is specified, and we want to prevent that.
@@ -744,13 +744,22 @@ define('editInPlace', [
   };
 
   var overrideAjaxSaveAndContinue = function() {
+    var originalAjaxSaveAndContinue = $.extend({}, XWiki.actionButtons.AjaxSaveAndContinue.prototype);
     $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, {
       reloadEditor: function() {
-        $(document).trigger('xwiki:actions:reload');
+        if ($('.inplace-editing-buttons').is(':visible')) {
+          $(document).trigger('xwiki:actions:reload');
+        } else {
+          return originalAjaxSaveAndContinue.reloadEditor.apply(this, arguments);
+        }
       },
       maybeRedirect: function() {
-        // Never redirect when leaving the edit mode because we're already in view mode.
-        return false;
+        if ($('.inplace-editing-buttons').is(':visible')) {
+          // Never redirect when leaving the edit mode because we're already in view mode.
+          return false;
+        } else {
+          return originalAjaxSaveAndContinue.maybeRedirect.apply(this, arguments);
+        }
       }
     });
   };

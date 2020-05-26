@@ -57,6 +57,9 @@ user.profile.network.follow=Comenzar a seguir
 user.profile.network.unfollow=Dejar de seguir
 user.profile.network.done=Hecho
 user.profile.network.saving=Guardando...
-user.profile.network.error=Error al guardar la configuración de la notificación</content>
+user.profile.network.error=Error al guardar la configuración de la notificación
+### Missing: user.profile.status.done=Done
+### Missing: user.profile.status.saving=Saving...
+### Missing: user.profile.status.error=Error saving the user status</content>
   
 </xwikidoc>

@@ -57,6 +57,9 @@ user.profile.network.follow=팔로우 시작
 user.profile.network.unfollow=팔로우 중지
 user.profile.network.done=완료
 user.profile.network.saving=저장중...
-user.profile.network.error=알림 설정을 저장하는 중 오류가 발생했습니다</content>
+user.profile.network.error=알림 설정을 저장하는 중 오류가 발생했습니다
+### Missing: user.profile.status.done=Done
+### Missing: user.profile.status.saving=Saving...
+### Missing: user.profile.status.error=Error saving the user status</content>
   
 </xwikidoc>

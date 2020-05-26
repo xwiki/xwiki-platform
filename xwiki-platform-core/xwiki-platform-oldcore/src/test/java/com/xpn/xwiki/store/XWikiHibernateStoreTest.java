@@ -26,31 +26,48 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import javax.inject.Named;
+import javax.inject.Provider;
+
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.dialect.Dialect;
 import org.hibernate.query.NativeQuery;
 import org.hibernate.query.Query;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.xwiki.bridge.event.ActionExecutingEvent;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.test.mockito.MockitoComponentManager;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -65,37 +82,96 @@ import static org.mockito.Mockito.when;
  * 
  * @version $Id$
  */
-public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWikiStoreInterface>
+@ComponentTest
+public class XWikiHibernateStoreTest
 {
     /**
      * A special component manager that mocks automatically all the dependencies of the component under test.
      */
-    @Rule
-    public MockitoComponentMockingRule<XWikiStoreInterface> mocker =
-        new MockitoComponentMockingRule<XWikiStoreInterface>(XWikiHibernateStore.class);
-
-    /**
-     * The component being tested.
-     */
+    @InjectMockComponents
     private XWikiHibernateStore store;
 
-    @Override
-    protected MockitoComponentMockingRule<XWikiStoreInterface> getMocker()
-    {
-        return mocker;
-    }
+    @Mock
+    protected XWikiContext xcontext;
 
-    @Before
-    @Override
-    public void setUp() throws Exception
-    {
-        super.setUp();
+    /**
+     * The Hibernate session.
+     */
+    @Mock
+    protected Session session;
 
-        store = (XWikiHibernateStore) mocker.getComponentUnderTest();
+    /**
+     * The Hibernate transaction.
+     */
+    @Mock
+    protected Transaction transaction;
+
+    @MockComponent
+    protected HibernateStore hibernateStore;
+
+    @MockComponent
+    private Execution execution;
+
+    @MockComponent
+    private ObservationManager observationManager;
+
+    @MockComponent
+    private QueryManager queryManager;
+
+    @MockComponent
+    private Provider<XWikiContext> contextProvider;
+
+    @MockComponent
+    @Named("readonly")
+    private Provider<XWikiContext> readOnlyContextProvider;
+
+    @MockComponent
+    @Named("local")
+    private EntityReferenceSerializer<String> localEntityReferenceSerializer;
+
+    @MockComponent
+    @Named("currentmixed")
+    protected DocumentReferenceResolver<String> currentMixedDocumentReferenceResolver;
+
+    @MockComponent
+    @Named("compactwiki")
+    protected EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
+
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+
+    @BeforeEach
+    public void setUp(MockitoComponentManager componentManager) throws Exception
+    {
+        // For XWikiHibernateBaseStore#initialize()
+
+        ExecutionContext executionContext = mock(ExecutionContext.class);
+        when(executionContext.getProperty("xwikicontext")).thenReturn(xcontext);
+
+        when(execution.getContext()).thenReturn(executionContext);
+
+        when(contextProvider.get()).thenReturn(this.xcontext);
+        when(readOnlyContextProvider.get()).thenReturn(this.xcontext);
+
+        XWiki wiki = mock(XWiki.class);
+        when(this.xcontext.getWiki()).thenReturn(wiki);
+
+        // For XWikiHibernateBaseStore#beginTransaction()
+
+        SessionFactory wrappedSessionFactory = mock(SessionFactory.class);
+        when(wrappedSessionFactory.openSession()).thenReturn(session);
+        when(session.beginTransaction()).thenReturn(transaction);
+
+        // Return null on first get to force the session/transaction creation.
+        when(this.hibernateStore.getCurrentSession()).thenReturn(session);
+        when(this.hibernateStore.getCurrentTransaction()).thenReturn(transaction);
+
+        // Default is schema mode
+        when(this.hibernateStore.isConfiguredInSchemaMode()).thenReturn(true);
     }
 
     @Test
-    public void testGetColumnsForSelectStatement() throws Exception
+    public void getColumnsForSelectStatement() throws Exception
     {
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date desc"));
         assertEquals(", doc.date", store.getColumnsForSelectStatement("where 1=1 order by doc.date asc"));
@@ -110,7 +186,7 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
     }
 
     @Test
-    public void testCreateSQLQuery()
+    public void createSQLQuery()
     {
         assertEquals("select distinct doc.space, doc.name from XWikiDocument as doc",
             store.createSQLQuery("select distinct doc.space, doc.name", ""));
@@ -141,15 +217,14 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
 
         store.executeDeleteWikiStatement(statement, databaseProduct, "schema");
 
-        verify(mocker.getMockedLogger()).warn("Subwiki deletion not yet supported in Database mode for PostgreSQL");
+        assertEquals("Subwiki deletion not yet supported in Database mode for PostgreSQL", logCapture.getMessage(0));
         verify(statement, never()).execute(any(String.class));
     }
 
     @Test
-    public void testLocksAreReleasedOnLogout() throws Exception
+    public void locksAreReleasedOnLogout() throws Exception
     {
         // Capture the event listener.
-        ObservationManager observationManager = getMocker().getInstance(ObservationManager.class);
         ArgumentCaptor<EventListener> eventListenerCaptor = ArgumentCaptor.forClass(EventListener.class);
         verify(observationManager).addListener(eventListenerCaptor.capture());
         assertEquals("deleteLocksOnLogoutListener", eventListenerCaptor.getValue().getName());
@@ -313,12 +388,8 @@ public class XWikiHibernateStoreTest extends AbstractXWikiHibernateStoreTest<XWi
         List<Object> translationList = Arrays.<Object>asList("fr", "ro");
         when(query.execute()).thenReturn(translationList);
 
-        QueryManager queryManager = this.mocker.getInstance(QueryManager.class);
         when(queryManager.createQuery(any(String.class), eq(org.xwiki.query.Query.HQL))).thenReturn(query);
-
-        EntityReferenceSerializer<String> localEntityReferenceSerialzier =
-            this.mocker.getInstance(EntityReferenceSerializer.TYPE_STRING, "local");
-        when(localEntityReferenceSerialzier.serialize(documentReference.getParent())).thenReturn("Path.To");
+        when(localEntityReferenceSerializer.serialize(documentReference.getParent())).thenReturn("Path.To");
 
         assertEquals(translationList, store.getTranslationList(doc, xcontext));
 

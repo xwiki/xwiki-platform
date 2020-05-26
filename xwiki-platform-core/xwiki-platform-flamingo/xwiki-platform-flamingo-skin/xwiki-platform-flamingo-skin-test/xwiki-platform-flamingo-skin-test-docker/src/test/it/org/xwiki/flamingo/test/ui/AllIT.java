@@ -86,4 +86,10 @@ public class AllIT
     class NestedObjectEditorIT extends ObjectEditorIT
     {
     }
+
+    @Nested
+    @DisplayName("Rename page tests")
+    class NestedRenamePageIT extends RenamePageIT
+    {
+    }
 }

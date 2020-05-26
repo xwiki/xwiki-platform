@@ -112,7 +112,7 @@
     <property name="hibernate.dialect">$xwikiDbDialect</property>
 #end
 ## Note: This is starting the line in order not to put extra spaces when generated
-#if ($xwikiDb == 'mysql' || $xwikiDb == 'oracle')
+#if ($xwikiDb == 'mysql' || $xwikiDb == 'mariadb'|| $xwikiDb == 'oracle')
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
     <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
 #end
@@ -172,6 +172,36 @@
 #end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #foreach($mapping in $!xwikiDbHbmMySQLExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+#end
+    -->
+
+    <!-- MariaDB configuration.
+         Uncomment if you want to use MariaDB and comment out other database configurations.
+         Notes:
+           - if you want the main wiki database to be different than "xwiki"
+             you will also have to set the property xwiki.db in xwiki.cfg file
+
+    <property name="hibernate.connection.url">jdbc:mariadb://localhost/xwiki?useSSL=false</property>
+    <property name="hibernate.connection.username">xwiki</property>
+    <property name="hibernate.connection.password">xwiki</property>
+    <property name="hibernate.connection.driver_class">org.mariadb.jdbc.Driver</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.MariaDBDialect</property>
+    <property name="hibernate.dbcp.poolPreparedStatements">true</property>
+    <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
+
+    <property name="hibernate.connection.charSet">UTF-8</property>
+    <property name="hibernate.connection.useUnicode">true</property>
+    <property name="hibernate.connection.characterEncoding">utf8</property>
+
+    <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="feeds.hbm.xml"/>
+## Note: This is starting the line in order not to put extra spaces when generated
+#foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+#end
+## Note: This is starting the line in order not to put extra spaces when generated
+#foreach($mapping in $!xwikiDbHbmMariaDBExtraMappings.split(","))
     <mapping resource="$mapping"/>
 #end
     -->

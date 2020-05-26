@@ -207,6 +207,18 @@ public class ConfigurationFilesGenerator
                 null,
                 null,
                 null)));
+        } else if (this.testConfiguration.getDatabase().equals(Database.MARIADB)) {
+            props.putAll(getDBProperties(Arrays.asList(
+                "mariadb",
+                String.format("jdbc:mariadb://%s:%s/xwiki?useSSL=false", ipAddress, port),
+                DB_USERNAME,
+                DB_PASSWORD,
+                "org.mariadb.jdbc.Driver",
+                null,
+                null,
+                null,
+                null)));
+
         } else if (this.testConfiguration.getDatabase().equals(Database.POSTGRESQL)) {
             props.putAll(getDBProperties(Arrays.asList(
                 "pgsql",

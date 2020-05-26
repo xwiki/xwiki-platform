@@ -94,12 +94,17 @@
     <mysql.groupId>mysql</mysql.groupId>
     <mysql.artifactId>mysql-connector-java</mysql.artifactId>
     <mysql.version>5.1.48</mysql.version>
+    <mariadb.groupId>org.mariadb.jdbc</mariadb.groupId>
+    <mariadb.artifactId>mariadb-java-client</mariadb.artifactId>
+    <mariadb.version>2.6.0</mariadb.version>
     <derby.groupId>org.apache.derby</derby.groupId>
     <derby.artifactId>derby</derby.artifactId>
     <derby.version>10.14.2.0</derby.version>
     <pgsql.groupId>org.postgresql</pgsql.groupId>
     <pgsql.artifactId>postgresql</pgsql.artifactId>
     <pgsql.version>42.2.12</pgsql.version>
+    <oracle.groupId>com.oracle.ojdbc</oracle.groupId>
+    <oracle.artifactId>ojdbc8</oracle.artifactId>
     <oracle.version>19.3.0.0</oracle.version>
     <mariadb.version>2.3.0</mariadb.version>
 

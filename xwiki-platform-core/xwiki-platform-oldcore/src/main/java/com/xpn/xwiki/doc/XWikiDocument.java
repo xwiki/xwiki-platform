@@ -4088,7 +4088,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
      * Use the document passed as parameter as the new identity for the current document.
      *
      * @param document the document containing the new identity
-     * @throws XWikiException in case of error
      */
     public void clone(XWikiDocument document)
     {

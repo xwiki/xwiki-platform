@@ -165,6 +165,21 @@
                 <annotation>@org.xwiki.properties.annotation.PropertyDisplayType({org.xwiki.user.UserReference.class})</annotation>
                 <justification>Not a breakage for using the User Avatar macro.</justification>
               </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, java.util.List&lt;java.lang.String&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                <justification>Old deprecated method that has been moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, java.util.List&lt;java.lang.String&gt;, java.util.List&lt;java.lang.String&gt;, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                <justification>Old deprecated method that has been moved to legacy.</justification>
+              </item>
+              <item>
+                <code>java.method.removed</code>
+                <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
+                <justification>Old deprecated method that has been moved to legacy.</justification>
+              </item>
             </revapi.ignore>
           </analysisConfiguration>
         </configuration>

@@ -138,7 +138,7 @@ public class XWikiHibernateStoreTest
     private EntityReferenceSerializer<String> compactWikiEntityReferenceSerializer;
 
     @RegisterExtension
-    private LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
     @BeforeEach
     void setUp(MockitoComponentManager componentManager) throws Exception

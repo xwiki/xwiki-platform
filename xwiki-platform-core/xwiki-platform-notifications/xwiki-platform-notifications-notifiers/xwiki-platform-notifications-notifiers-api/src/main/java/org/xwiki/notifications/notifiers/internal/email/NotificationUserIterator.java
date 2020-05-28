@@ -69,7 +69,7 @@ public class NotificationUserIterator implements Iterator<DocumentReference>
      */
     // TODO: try with the solution suggested by Sergiu Dumitriu there: https://jira.xwiki.org/browse/XWIKI-14914
     private static final String XWQL_QUERY = "select distinct doc.fullName from Document doc, "
-            + "doc.object(XWiki.XWikiUsers) objUser where length(objUser.email) > 0 order by doc.fullName";
+            + "doc.object(XWiki.XWikiUsers) objUser where objUser.active = 1 and length(objUser.email) > 0 order by doc.fullName";
 
     @Inject
     private QueryManager queryManager;

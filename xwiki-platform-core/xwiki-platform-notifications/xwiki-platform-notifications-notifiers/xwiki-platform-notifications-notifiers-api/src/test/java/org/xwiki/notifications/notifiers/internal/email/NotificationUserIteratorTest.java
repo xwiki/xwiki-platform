@@ -77,8 +77,11 @@ public class NotificationUserIteratorTest
         Query query1 = mock(Query.class);
         Query query2 = mock(Query.class);
         Query query3 = mock(Query.class);
-        when(queryManager.createQuery(ArgumentMatchers.anyString(), eq(Query.XWQL))).thenReturn(query1, query2, query3,
-                query1, query2, query3);
+        when(queryManager.createQuery(ArgumentMatchers.eq("select distinct doc.fullName from Document doc, "
+            + "doc.object(XWiki.XWikiUsers) objUser where objUser.active = 1 and length(objUser.email) > 0 "
+                + "order by doc.fullName"),
+            eq(Query.XWQL))).thenReturn(query1, query2, query3,
+            query1, query2, query3);
         when(query1.execute()).thenReturn(Arrays.asList("XWiki.UserA", "XWiki.UserB", "XWiki.UserC"));
         when(query2.execute()).thenReturn(Arrays.asList("XWiki.UserD"));
         when(query3.execute()).thenReturn(Collections.emptyList());

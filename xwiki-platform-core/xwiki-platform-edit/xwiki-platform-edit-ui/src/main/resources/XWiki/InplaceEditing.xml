@@ -1024,15 +1024,17 @@ require(['jquery'], function($) {
   margin-bottom: @line-height-computed / 4;
 }
 
+@document-title-input-padding-vertical: @line-height-computed / 4 - 1;
 input#document-title-input {
   /* Preserve the heading styles. */
   border: 1px solid transparent;
   box-shadow: none;
   color: inherit;
   font-size: inherit;
-  height: auto;
+  /* It seems it's not enough to set the line height for the text input. We also need to set its height. */
+  height: @font-size-document-title * @headings-line-height + 2 * (1 + @document-title-input-padding-vertical);
   line-height: @headings-line-height;
-  padding: (@line-height-computed / 4 - 1) (ceil(@grid-gutter-width / 2) - 1);
+  padding: @document-title-input-padding-vertical (ceil(@grid-gutter-width / 2) - 1);
   width: 100%;
 }
 

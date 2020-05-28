@@ -199,7 +199,7 @@ define('xwiki-document-api', ['jquery'], function($) {
      */
     render: function(forView) {
       var queryString = {
-        xpage: 'rendercontent',
+        xpage: 'get',
         outputTitle: true,
         outputSyntax: forView ? null : 'annotatedxhtml',
         language: this.getRealLocale(),

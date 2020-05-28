@@ -31,7 +31,6 @@
   <artifactId>xwiki-platform-rendering-wikimacro-macro-wikimacroparameter</artifactId>
   <properties>
     <xwiki.jacoco.instructionRatio>0.94</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>1</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Wikimacro Parameter Macro</xwiki.extension.name>
   </properties>

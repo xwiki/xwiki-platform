@@ -33,7 +33,6 @@
   <description>Extra Configuration APIs related to platform concepts (e.g. user references)</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.0</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>0</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Platform Configuration API</xwiki.extension.name>
     <!-- Category to display in the Extension Manager -->

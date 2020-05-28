@@ -33,7 +33,6 @@
   <description>Script-oriented APIs to manipulate users and groups</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.12</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>10</xwiki.pitest.mutationThreshold>
     <xwiki.extension.name>User Scripting API</xwiki.extension.name>
     <xwiki.extension.features>
       <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->

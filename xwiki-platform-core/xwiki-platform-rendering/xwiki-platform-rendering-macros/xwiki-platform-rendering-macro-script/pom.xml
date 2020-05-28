@@ -32,7 +32,6 @@
   <description>Executes a script implementing the Java Scripting API (JSR-223)</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.71</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>24</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Script Macro</xwiki.extension.name>
     <!-- Too many dependencies required -->

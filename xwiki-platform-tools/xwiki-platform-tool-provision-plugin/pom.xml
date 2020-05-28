@@ -35,7 +35,6 @@
    </description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>50</xwiki.pitest.mutationThreshold>
     <!-- Allow Maven plugins to output to the console -->
     <xwiki.surefire.captureconsole.skip>true</xwiki.surefire.captureconsole.skip>
   </properties>

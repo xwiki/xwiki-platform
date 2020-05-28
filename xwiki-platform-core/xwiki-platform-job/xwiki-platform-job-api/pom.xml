@@ -35,8 +35,7 @@
 
   <properties>
     <xwiki.jacoco.instructionRatio>0.61</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>60</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
 
   <dependencies>
     <dependency>

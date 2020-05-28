@@ -33,8 +33,7 @@
   <description>Velocity Engine implementation when in a Servlet environment (templates located in the webapp's root)</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.16</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>33</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

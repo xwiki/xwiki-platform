@@ -33,7 +33,6 @@
   <description>Mail Script API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>1.00</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>100</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Mail Script API</xwiki.extension.name>
   </properties>

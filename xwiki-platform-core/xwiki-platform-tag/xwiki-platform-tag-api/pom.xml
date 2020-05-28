@@ -33,8 +33,7 @@
   <properties>
     <!-- code coverage: it is not much, but it is a start -->
     <xwiki.jacoco.instructionRatio>0.13</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>9</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

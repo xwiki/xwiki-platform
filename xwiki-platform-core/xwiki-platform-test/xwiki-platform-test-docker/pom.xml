@@ -33,7 +33,6 @@
   <description>Uses Docker to start/stop browsers and XWiki</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>25</xwiki.pitest.mutationThreshold>
     <testcontainers.version>1.14.2</testcontainers.version>
   </properties>
   <dependencies>

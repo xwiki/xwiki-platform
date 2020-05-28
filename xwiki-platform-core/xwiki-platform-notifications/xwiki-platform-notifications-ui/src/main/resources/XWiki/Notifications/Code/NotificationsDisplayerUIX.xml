@@ -904,7 +904,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
   &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
   &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
 #end
-{{html clean="false" wiki="true"}} ## we need clean="false" because we want to display the raw content
+{{html clean="false"}} ## we need clean="false" because we want to display the raw content
 #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
   &lt;li&gt;
     #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
@@ -951,9 +951,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       &lt;/div&gt;
     &lt;/div&gt;
 &lt;div class="notifications-area"&gt;
+{{/html}}
 
 {{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
 
+{{html clean="false"}}
 &lt;/div&gt;
   &lt;/li&gt;
 #end

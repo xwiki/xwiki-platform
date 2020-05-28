@@ -58,7 +58,9 @@
       ##
       ## * It's consistent with the way the title is displayed in the page itself (using html, see: `titlevars.vm`).
       <a href="$!escapetool.xml($document.getURL())">$document.displayTitle</a>
-      #if ("$!request.currentWiki" != '' && $request.currentWiki != $compositeEvent.document.wikiReference.name)
+      ## Notifications are rendered in the context of their wiki, so we need to use the XWikiContext#originalWikiId
+      ## to actually know where the request comes from.
+      #if ($xcontext.getContext().getOriginalWikiId() != $compositeEvent.document.wikiReference.name)
         <span class="text-muted">($services.wiki.getById($compositeEvent.document.wikiReference.name).prettyName)</span>
       #end
     </div>

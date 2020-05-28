@@ -109,7 +109,7 @@ public class ArtifactCoordinate
     }
 
     /**
-     * Parse an Artifact oordinate as a String. Note that version is optional (as opposed to Aether's @link
+     * Parse an Artifact coordinate as a String. Note that version is optional (as opposed to Aether's @link
      * DefaultArtifact} implementation
      *
      * @param coordinateAsString the coordinate to parse (e.g. {@code org.xwiki.contrib:myartifact} or {@code

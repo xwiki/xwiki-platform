@@ -174,8 +174,14 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
 
     private boolean isMySQL8xPlus(TestConfiguration testConfiguration)
     {
-        return (testConfiguration.getDatabaseTag() != null && extractMajor(testConfiguration.getDatabaseTag()) >= 8)
-            || (extractMajor(MySQLContainer.DEFAULT_TAG) >= 8 && testConfiguration.getDatabaseTag() == null);
+        boolean isMySQL8xPlus;
+        if (testConfiguration.getDatabaseTag() != null) {
+            isMySQL8xPlus = testConfiguration.getDatabaseTag().equals("latest")
+                || extractMajor(testConfiguration.getDatabaseTag()) >= 8;
+        } else {
+            isMySQL8xPlus = extractMajor(MySQLContainer.DEFAULT_TAG) >= 8;
+        }
+        return isMySQL8xPlus;
     }
 
     private int extractMajor(String version)

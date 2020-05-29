@@ -53,7 +53,7 @@ viewers.Comments = Class.create({
     this.addSubmitListener(this.form);
     this.addCancelListener();
     this.addEditListener();
-    this.addPreview(this.form);
+    this.reloadEditor();
   },
   /**
    * Parse the IDs of the comments to obtain the xobject number.
@@ -109,7 +109,7 @@ viewers.Comments = Class.create({
                 comment.insert({before: response.responseText});
                 item._x_editForm = comment.previous();
                 this.addSubmitListener(item._x_editForm);
-                this.addPreview(item._x_editForm);
+                // this.addPreview(item._x_editForm);
                 item._x_editForm.down('a.cancel').observe('click', this.cancelEdit.bindAsEventListener(this, item));
                 comment.hide();
                 item._x_notification.hide();
@@ -180,6 +180,9 @@ viewers.Comments = Class.create({
       }
       // Insert the form on top of that comment's discussion
       item.up(this.xcommentSelector).next('.commentthread').insert({'top' : this.form});
+
+      this.reloadEditor();
+
       // Set the replyto field to the replied comment's number
       this.form["XWiki.XWikiComments_replyto"].value = item.up(this.xcommentSelector)._x_number;
       // Clear the contents and focus the textarea
@@ -198,6 +201,9 @@ viewers.Comments = Class.create({
       // Add listener for submit
       form.down("input[type='submit']").observe('click', function(event) {
         event.stop();
+        
+        // triggers the copy of the content of the rich editor to hidden fields 
+        jQuery(document).trigger('xwiki:actions:beforeSave');
         if (form.down('textarea').value != "") {
           var formData = new Hash(form.serialize(true));
           formData.set('xredirect', window.docgeturl + '?xpage=xpart&vm=commentsinline.vm&skin=' + encodeURIComponent(XWiki.skin));
@@ -242,8 +248,14 @@ viewers.Comments = Class.create({
                   "id" : "Comments",
                   "element": this.container
                 });
+
+                // notifiy that the current page is properly saved
+                // has some effect but does not fix the issue
+                jQuery(document).trigger('xwiki:document:saved');
                 // Notify any displayed CAPTCHA that it was reloaded and it might need to reinitialize its JS.
                 this.container.fire('xwiki:captcha:reloaded');
+
+               this.reloadCKEditor();
               }
             }.bind(this)
           });
@@ -269,6 +281,9 @@ viewers.Comments = Class.create({
     if (!form || !XWiki.hasEdit) {
       return;
     }
+    
+    jQuery(document).trigger('xwiki:actions:beforeSave');
+    
     var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", encodeURIComponent(XWiki.currentSpace)).replace("__page__", encodeURIComponent(XWiki.currentPage));
     form.commentElt = form.down('textarea');
     var buttons = form.down('input[type=submit]').up('div');
@@ -348,6 +363,8 @@ viewers.Comments = Class.create({
       this.form.up(".commentthread").previous(this.xcommentSelector).down('a.commentreply').show();
       // Put the form back to its initial location and clear the contents
       this.initialLocation.insert({after: this.form});
+
+      this.reloadEditor();
     }
     this.form["XWiki.XWikiComments_replyto"].value = "";
     this.form["XWiki.XWikiComments_comment"].value = "";
@@ -364,6 +381,28 @@ viewers.Comments = Class.create({
       }
     }.bindAsEventListener(this);
     document.observe("xwiki:docextra:loaded", listener);
+  },
+  reloadEditor: function () {
+    // TODO: that code is dependent of CKEditor, must be abstracted.
+    require(['xwiki-ckeditor', 'xwiki-events-bridge'], function (ckeditorPromise) {
+      ckeditorPromise.done(function (ckeditor) {
+        function createEditors(container) {
+          container.find('.ckeditor-textarea').each(function() {
+            // Wrap in try/catch so that a failure to load one editor doesn't affect the other editors.
+            try {
+              ckeditor.replace(this);
+            } catch(e) {
+              console.log(e);
+            }
+          });
+        }
+        const ta= jQuery('<textarea class="ckeditor-textarea" id="XWiki.XWikiComments_comment" rows="5" cols="80" name="XWiki.XWikiComments_comment"></textarea>');
+        const wf = jQuery(".wysiwyg-field");
+        wf.empty();
+        wf.append(ta);
+        createEditors(wf)
+      });
+    });
   }
 });
 

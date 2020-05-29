@@ -229,10 +229,13 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         <input type="hidden" name="${xCommentClass}_replyto" value="$!replyTo"/>
         <div class="commentcontainer">
            <label for="${xCommentClass}_comment">$services.localization.render('core.viewers.comments.add.comment.label')</label>
-           <textarea id='${xCommentClass}_comment' rows='5' cols="80" name='${xCommentClass}_comment'>$!comment</textarea>
+          <div class="wysiwyg-field">
+              <!-- loaded by javascript (see comments.js) -->
+              <!--<textarea class="ckeditor-textarea" id='${xCommentClass}_comment' rows='5' cols="80" name='${xCommentClass}_comment'>$!comment</textarea>-->
+          </div>
         </div>
         #if($xcontext.user == 'XWiki.XWikiGuest' && $offerGuestsCaptcha)
-          #displayCaptcha()
+          #displayCaptcha('xwiki/2.1', "${xCommentClass}_comment", "${xCommentClass}_comment")
         #end
         <div>
           <input type="submit" value="$services.localization.render('core.viewers.comments.add.submit')" class="btn btn-primary"/>

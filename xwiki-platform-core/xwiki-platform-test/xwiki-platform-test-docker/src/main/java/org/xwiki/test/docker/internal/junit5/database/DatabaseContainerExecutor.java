@@ -144,8 +144,13 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         //   ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)
         LOGGER.info("Setting MySQL permissions to create subwikis");
         for (int i = 0; i < 3; i++) {
-            Container.ExecResult result = databaseContainer.execInContainer("mysql", "-u", "root", "-p" + DBPASSWORD,
-                "-e", String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
+            // In order to avoid "Warning: Using a password on the command line interface can be insecure.", we
+            // put the credentials in a file.
+            databaseContainer.execInContainer("sh", "-c",
+                String.format("echo '[client]\nuser = root\npassword = %s' > credentials.cnf", DBPASSWORD));
+            Container.ExecResult result = databaseContainer.execInContainer("mysql",
+                "--defaults-extra-file=credentials.cnf", "-e",
+                String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
             if (result.getExitCode() == 0) {
                 break;
             } else {

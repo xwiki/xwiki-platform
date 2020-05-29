@@ -49,7 +49,12 @@ public interface XWikiStoreInterface
      * @since 12.5RC1
      */
     @Unstable
-    void renameXWikiDoc(XWikiDocument doc, DocumentReference newReference, XWikiContext context) throws XWikiException;
+    default void renameXWikiDoc(XWikiDocument doc, DocumentReference newReference, XWikiContext context)
+        throws XWikiException
+    {
+        // Avoid breaking backward compatibility.
+        throw new UnsupportedOperationException("Not yet implemented.");
+    }
 
     void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;
 

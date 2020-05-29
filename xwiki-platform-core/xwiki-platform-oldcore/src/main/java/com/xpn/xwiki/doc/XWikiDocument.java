@@ -79,7 +79,6 @@ import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.util.DefaultParameterizedType;
-import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContextException;
 import org.xwiki.context.ExecutionContextManager;
@@ -167,13 +166,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.merge.MergeConfiguration;
-import org.xwiki.store.merge.MergeManagerResult;
 import com.xpn.xwiki.doc.merge.MergeResult;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.internal.cache.rendering.RenderingCache;
 import com.xpn.xwiki.internal.doc.XWikiAttachmentList;
 import com.xpn.xwiki.internal.filter.XWikiDocumentFilterUtils;
-import com.xpn.xwiki.internal.render.LinkedResourceHelper;
 import com.xpn.xwiki.internal.render.OldRendering;
 import com.xpn.xwiki.internal.xml.DOMXMLWriter;
 import com.xpn.xwiki.internal.xml.XMLWriter;
@@ -6851,7 +6848,7 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
         if (isNew() || getDocumentReference().equals(newDocumentReference)) {
             return;
         }
-        context.getWiki().renameCopyAndDelete(this,
+        context.getWiki().renameByCopyAndDelete(this,
             newDocumentReference,
             backlinkDocumentReferences,
             childDocumentReferences, context);

@@ -178,6 +178,5 @@ public interface ModelBridge
      * @return {@code true} if the document was renamed successfully, {@code false} if the rename failed
      * @since 12.5RC1
      */
-    @Unstable
     boolean rename(DocumentReference source, DocumentReference destination);
 }

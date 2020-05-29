@@ -4681,31 +4681,46 @@ public class XWiki implements EventListener
         List<DocumentReference> childDocumentReferences, XWikiContext context)
         throws XWikiException
     {
-        XWikiDocument sourceDocument = this.getDocument(sourceDocumentReference, context);
-        XWikiDocument targetDocument = this.getDocument(targetDocumentReference, context);
-
-        ConfigurationSource xwikiproperties = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
-        boolean useAtomicRename = xwikiproperties.getProperty("refactoring.rename.useAtomicRename", Boolean.TRUE);
-
         boolean result = false;
-        // Proceed on the rename only if the source document exists and if either the targetDoc does not exist or
-        // the overwritten is accepted.
-        if (!sourceDocument.isNew() && (overwrite || targetDocument.isNew())) {
-            if (!useAtomicRename) {
-                this.renameCopyAndDelete(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
-                    childDocumentReferences, context);
-                result = true;
-            } else {
-                WikiReference wikiReference = context.getWikiReference();
-                context.setWikiReference(sourceDocumentReference.getWikiReference());
-                try {
-                    this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
-                } finally {
-                    context.setWikiReference(wikiReference);
+
+        // if source and destination are same, no need to perform the rename.
+        if (sourceDocumentReference.equals(targetDocumentReference)) {
+            result = false;
+        } else {
+
+            XWikiDocument sourceDocument = this.getDocument(sourceDocumentReference, context);
+            XWikiDocument targetDocument = this.getDocument(targetDocumentReference, context);
+
+            ConfigurationSource xwikiproperties = Utils.getComponent(ConfigurationSource.class, "xwikiproperties");
+            boolean useAtomicRename = xwikiproperties.getProperty("refactoring.rename.useAtomicRename", Boolean.TRUE);
+
+            // Proceed on the rename only if the source document exists and if either the targetDoc does not exist or
+            // the overwritten is accepted.
+            if (!sourceDocument.isNew() && (overwrite || targetDocument.isNew())) {
+                if (!useAtomicRename) {
+                    this.renameByCopyAndDelete(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
+                        childDocumentReferences, context);
+                    result = true;
+                } else {
+                    // Ensure that the current context contains the wiki reference of the source document.
+                    WikiReference wikiReference = context.getWikiReference();
+                    context.setWikiReference(sourceDocumentReference.getWikiReference());
+                    // Step 1: Perform atomic rename in DB
+                    try {
+                        this.getStore().renameXWikiDoc(sourceDocument, targetDocumentReference, context);
+                    } finally {
+                        context.setWikiReference(wikiReference);
+                    }
+
+                    // Step 2: For each child document, update its parent reference.
+                    // Step 3: For each backlink to rename, parse the backlink document and replace the links with
+                    // the new name.
+                    // Step 4: Refactor the relative links contained in the document to make sure they are relative
+                    // to the new document's location.
+                    this.updateLinksForRename(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
+                        childDocumentReferences, context);
+                    result = true;
                 }
-                this.updateLinksForRename(sourceDocument, targetDocumentReference, backlinkDocumentReferences,
-                    childDocumentReferences, context);
-                result = true;
             }
         }
         return result;
@@ -4818,18 +4833,25 @@ public class XWiki implements EventListener
      *            document reference
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
+     * @since 12.5
      * @deprecated Old implementation of the rename by copy and delete. Since 12.5 the implementation using
      * {@link XWikiStoreInterface#renameXWikiDoc(XWikiDocument, DocumentReference, XWikiContext)} should be preferred.
      */
     @Deprecated
-    public void renameCopyAndDelete(XWikiDocument sourceDoc, DocumentReference newDocumentReference,
+    @Unstable
+    public void renameByCopyAndDelete(XWikiDocument sourceDoc, DocumentReference newDocumentReference,
         List<DocumentReference> backlinkDocumentReferences, List<DocumentReference> childDocumentReferences,
         XWikiContext context) throws XWikiException
     {
         // Step 1: Copy the document and all its translations under a new document with the new reference.
         copyDocument(sourceDoc.getDocumentReference(), newDocumentReference, false, context);
-        updateLinksForRename(sourceDoc, newDocumentReference, backlinkDocumentReferences,
-            childDocumentReferences, context);
+
+        // Step 2: For each child document, update its parent reference.
+        // Step 3: For each backlink to rename, parse the backlink document and replace the links with the new name.
+        // Step 4: Refactor the relative links contained in the document to make sure they are relative to the new
+        // document's location.
+        updateLinksForRename(sourceDoc, newDocumentReference, backlinkDocumentReferences, childDocumentReferences,
+            context);
 
         // Step 5: Delete the old document
         deleteDocument(sourceDoc, context);
@@ -4882,7 +4904,7 @@ public class XWiki implements EventListener
      * Used to resolve a ResourceReference into a proper Entity Reference using the current document to fill the blanks.
      */
     private static EntityReferenceResolver<org.xwiki.rendering.listener.reference.ResourceReference>
-    getResourceReferenceEntityReferenceResolver()
+        getResourceReferenceEntityReferenceResolver()
     {
         return Utils
             .getComponent(new DefaultParameterizedType(null, EntityReferenceResolver.class,

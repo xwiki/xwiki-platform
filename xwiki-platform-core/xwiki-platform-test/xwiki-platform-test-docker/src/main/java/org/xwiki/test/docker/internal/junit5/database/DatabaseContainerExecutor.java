@@ -125,8 +125,6 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         }
         // MySQL 8.x has changed the default authentication plugin value so we need to explicitly configure it to get
         // the native password mechanism.
-        // The reason we don't include when the tag is null is because with the TC version we use, MySQLContainer
-        // defaults to
         if (isMySQL8xPlus(testConfiguration)) {
             commands.setProperty("default-authentication-plugin", "mysql_native_password");
         }

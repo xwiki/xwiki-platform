@@ -145,7 +145,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
         LOGGER.info("Setting MySQL permissions to create subwikis");
         for (int i = 0; i < 3; i++) {
             Container.ExecResult result = databaseContainer.execInContainer("mysql", "-u", "root", "-p" + DBPASSWORD,
-                "-e", String.format("grant all privileges on *.* to '%s'@'%%' identified by '%s'", DBUSERNAME, DBNAME));
+                "-e", String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
             if (result.getExitCode() == 0) {
                 break;
             } else {

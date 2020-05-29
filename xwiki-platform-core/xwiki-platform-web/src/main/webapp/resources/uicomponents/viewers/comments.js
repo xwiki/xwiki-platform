@@ -69,6 +69,7 @@ viewers.Comments = Class.create({
    * For all edit buttons, listen to "click", and make ajax request to retrieve the form and save the comment.
    */
   addEditListener : function() {
+    var that = this;
     $$(this.xcommentSelector).each(function(item) {
       // Prototype bug in Opera: $$(".comment a.delete") returns only the first result.
       // Quick fix until Prototype 1.6.1 is integrated.
@@ -115,6 +116,7 @@ viewers.Comments = Class.create({
                 item._x_notification.hide();
                 // Currently editing: this comment
                 this.editing = item;
+                that.reloadEditor(item.readAttribute('href').match(/number=(\d+)/)[1]);
               }.bind(this),
               onFailure : function (response) {
                 var failureReason = response.statusText;
@@ -382,7 +384,14 @@ viewers.Comments = Class.create({
     }.bindAsEventListener(this);
     document.observe("xwiki:docextra:loaded", listener);
   },
-  reloadEditor: function () {
+  reloadEditor: function (commentNbr) {
+    
+    var name = 'XWiki.XWikiComments_comment'; 
+    var wfClass = '.wysiwyg-field';
+    if (commentNbr) {
+      name = 'XWiki.XWikiComments_' + commentNbr + '_comment';
+      wfClass = wfClass + '-' + commentNbr;
+    }
     // TODO: that code is dependent of CKEditor, must be abstracted.
     require(['xwiki-ckeditor', 'xwiki-events-bridge'], function (ckeditorPromise) {
       ckeditorPromise.done(function (ckeditor) {
@@ -396,11 +405,11 @@ viewers.Comments = Class.create({
             }
           });
         }
-        const ta= jQuery('<textarea class="ckeditor-textarea" id="XWiki.XWikiComments_comment" rows="5" cols="80" name="XWiki.XWikiComments_comment"></textarea>');
-        const wf = jQuery(".wysiwyg-field");
+        const ta= jQuery('<textarea class="ckeditor-textarea" id="'+name+'" rows="5" cols="80" name="'+name+'"></textarea>');
+        const wf = jQuery(wfClass);
         wf.empty();
         wf.append(ta);
-        createEditors(wf)
+        createEditors(wf);
       });
     });
   }

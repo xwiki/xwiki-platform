@@ -295,7 +295,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
       </div>
     </div>## commentheader
-    <div class="commentcontent">$doc.display('comment', 'edit', $comment)</div>
+    <div class="commentcontent wysiwyg-field-${comment.number}"></div>
     <div class="hidden">
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

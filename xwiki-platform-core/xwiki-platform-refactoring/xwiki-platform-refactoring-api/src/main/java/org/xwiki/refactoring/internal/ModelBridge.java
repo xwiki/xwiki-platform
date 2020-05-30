@@ -27,7 +27,6 @@ import org.xwiki.job.api.AbstractCheckRightsRequest;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.refactoring.internal.job.PermanentlyDeleteJob;
-import org.xwiki.stability.Unstable;
 
 /**
  * Interface used to access the XWiki model and to perform low level operations on it.

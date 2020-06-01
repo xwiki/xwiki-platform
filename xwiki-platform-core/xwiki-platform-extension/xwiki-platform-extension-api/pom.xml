@@ -33,8 +33,7 @@
   <description>XWiki Platform - Extension - API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.65</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>69</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.commons</groupId>

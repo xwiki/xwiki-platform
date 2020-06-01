@@ -47,7 +47,7 @@
        expired cache entries", which is solved by increasing the cache
        size. 
   -->
-  <Resources allowLinking="true" cachingAllowed="true" cacheMaxSize="20480"/>
+  <Resources allowLinking="true" cachingAllowed="true" cacheMaxSize="32768"/>
 
   <!-- Disable JAR scanning since XWiki does not need that -->
   <JarScanner scanClassPath="false">

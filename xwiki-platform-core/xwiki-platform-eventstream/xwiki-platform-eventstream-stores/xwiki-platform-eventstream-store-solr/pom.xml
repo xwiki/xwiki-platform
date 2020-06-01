@@ -32,7 +32,6 @@
     <description>Solr based events storage</description>
     <properties>
         <xwiki.jacoco.instructionRatio>0.90</xwiki.jacoco.instructionRatio>
-        <xwiki.pitest.mutationThreshold>100</xwiki.pitest.mutationThreshold>
         <!-- Name to display by the Extension Manager -->
         <xwiki.extension.name>Solr Event Stream Store</xwiki.extension.name>
         <!-- TODO: Remove once the tests have been fixed to not output anything to the console! -->

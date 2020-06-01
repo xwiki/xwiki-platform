@@ -136,8 +136,8 @@ public class ExtensionInstaller
 
         // Step 1: Get XAR extensions from the distribution (ie the mandatory ones), since they're not been installed
         // in WEB-INF/lib.
-        List<Artifact> extraArtifacts =
-            this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs());
+        List<Artifact> extraArtifacts = this.mavenResolver.convertToArtifacts(this.testConfiguration.getExtraJARs(),
+            this.testConfiguration.isResolveExtraJARs());
         this.mavenResolver.addCloverJAR(extraArtifacts);
         Collection<ArtifactResult> distributionArtifactResults =
             this.artifactResolver.getDistributionDependencies(xwikiVersion, extraArtifacts);
@@ -228,8 +228,7 @@ public class ExtensionInstaller
 
         // Set the extension list to install
         for (ExtensionId extensionId : extensions) {
-            LOGGER.info(String.format("...Adding extension [%s] to the list of extensions to provision...",
-                extensionId));
+            LOGGER.info("...Adding extension [{}] to the list of extensions to provision...", extensionId);
             installRequest.addExtension(extensionId);
         }
 

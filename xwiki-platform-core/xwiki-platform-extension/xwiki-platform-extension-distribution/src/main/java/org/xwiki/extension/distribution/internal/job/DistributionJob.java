@@ -58,4 +58,13 @@ public interface DistributionJob extends Job
      * @since 10.11.10
      */
     Object getProperty(String key);
+
+    /**
+     * Remove a stored property.
+     *
+     * @param key the name of the property to remove.
+     * @since 11.10.6
+     * @since 12.4
+     */
+    void removeProperty(String key);
 }

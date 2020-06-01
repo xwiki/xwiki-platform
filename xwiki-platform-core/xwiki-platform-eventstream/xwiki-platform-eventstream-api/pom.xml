@@ -33,7 +33,6 @@
   <properties>
     <xwiki.extension.features>org.xwiki.platform:xwiki-platform-eventstream</xwiki.extension.features>
     <xwiki.jacoco.instructionRatio>0.76</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>76</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Event Stream API</xwiki.extension.name>
   </properties>

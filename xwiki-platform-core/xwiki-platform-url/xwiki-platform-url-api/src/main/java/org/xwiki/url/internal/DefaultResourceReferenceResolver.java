@@ -70,7 +70,7 @@ public class DefaultResourceReferenceResolver implements ResourceReferenceResolv
     public ResourceReference resolve(ExtendedURL extendedURL, ResourceType type, Map<String, Object> parameters)
         throws CreateResourceReferenceException, UnsupportedResourceReferenceException
     {
-        ResourceReferenceResolver resolver;
+        ResourceReferenceResolver<ExtendedURL> resolver;
 
         // Step 1: Look for a URL-scheme-specific Resolver (a general one that is independent of the passed
         //         Resource Type). This allows URL-scheme implementation to completely override handling of any

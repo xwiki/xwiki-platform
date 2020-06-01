@@ -32,9 +32,6 @@
   <packaging>jar</packaging>
   <properties>
     <xwiki.jacoco.instructionRatio>0.87</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Remove once https://github.com/STAMP-project/pitest-descartes/issues/62#issuecomment-601641402 is
-     fixed -->
-    <xwiki.pitest.mutationThreshold>22</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>WebJars API</xwiki.extension.name>
     <!-- Old names of this module used for retro compatibility when resolving dependencies of old extensions -->

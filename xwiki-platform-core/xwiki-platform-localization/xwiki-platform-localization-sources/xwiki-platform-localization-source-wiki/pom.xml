@@ -33,9 +33,6 @@
   <description>XWiki Platform - Localization - Source - Wiki</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.68</xwiki.jacoco.instructionRatio>
-    <!-- TODO: Put back threshold of 59% when
-         https://github.com/STAMP-project/pitest-descartes/issues/132 is fixed -->
-    <xwiki.pitest.mutationThreshold>53</xwiki.pitest.mutationThreshold>
   </properties>
   <dependencies>
     <dependency>

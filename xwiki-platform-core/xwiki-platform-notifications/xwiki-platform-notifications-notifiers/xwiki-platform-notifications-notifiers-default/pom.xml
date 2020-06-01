@@ -34,7 +34,6 @@
     <!-- TODO: Put back to 19% once https://jira.xwiki.org/browse/XWIKI-17074 is fixed -->
     <xwiki.jacoco.instructionRatio>0.17</xwiki.jacoco.instructionRatio>
     <!-- TODO: Put back to 13% once https://jira.xwiki.org/browse/XWIKI-17074 is fixed -->
-    <xwiki.pitest.mutationThreshold>10</xwiki.pitest.mutationThreshold>
     <xwiki.extension.namespaces>{root}</xwiki.extension.namespaces>
   </properties>
   <dependencies>

@@ -21,7 +21,7 @@ package org.xwiki.url;
 
 import java.util.Arrays;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.xwiki.url.internal.RelativeExtendedURL;
 
 import static org.junit.Assert.assertEquals;
@@ -32,10 +32,10 @@ import static org.junit.Assert.assertEquals;
  * @version $Id$
  * @since 7.2M1
  */
-public class RelativeExtendedURLTest
+class RelativeExtendedURLTest
 {
     @Test
-    public void serialize()
+    void serialize()
     {
         RelativeExtendedURL url = new RelativeExtendedURL(Arrays.asList("a", "b"));
         assertEquals("a/b", url.serialize());

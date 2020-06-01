@@ -32,7 +32,6 @@
   <description>Bridge to Old core for the Event Stream API</description>
   <properties>
     <xwiki.jacoco.instructionRatio>0.91</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>97</xwiki.pitest.mutationThreshold>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Event Stream Bridge</xwiki.extension.name>
   </properties>

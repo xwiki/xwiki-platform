@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
-import org.xwiki.text.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Merges XWiki properties and handles special case such as the {@code xwikiCfgPlugins} property that needs to be
@@ -61,7 +61,7 @@ public class PropertiesMerger
                 // Allow full override if key starts with "^" character.
                 String overrideValue = override.getProperty(key);
                 String originalValue = original.getProperty(key);
-                if (!overrideValue.startsWith(CARET) && original != null) {
+                if (!overrideValue.startsWith(CARET)) {
                     Set<String> merge = mergeCommaSeparatedList(originalValue, overrideValue);
                     properties.setProperty(key, StringUtils.join(merge, SEPARATOR));
                 } else {

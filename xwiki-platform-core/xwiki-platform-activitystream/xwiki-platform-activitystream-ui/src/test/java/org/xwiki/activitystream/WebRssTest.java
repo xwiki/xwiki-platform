@@ -81,7 +81,7 @@ public class WebRssTest extends PageTest
         when(query.addFilter(anyString())).thenReturn(query);
         when(query.setLimit(20)).thenReturn(query);
         when(query.setOffset(0)).thenReturn(query);
-        when(query.execute()).thenReturn(Arrays.<Object>asList("Space1.Page1", "Space2.Page2"));
+        when(query.execute()).thenReturn(Arrays.asList("Space1.Page1", "Space2.Page2"));
 
         FeedPlugin plugin = new FeedPlugin("feed", FeedPlugin.class.getName(), context);
         FeedPluginApi pluginApi = new FeedPluginApi(plugin, context);

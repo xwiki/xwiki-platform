@@ -146,7 +146,7 @@
   paths: {
     'actionButtons': $jsontool.serialize($xwiki.getSkinFile('js/xwiki/actionbuttons/actionButtons.js', true)),
     // Required in case the user needs to resolve merge conflicts on save.
-    'diff': $jsontool.serialize($xwiki.getSkinFile('uicomponents/viewers/diff.js'))
+    'xwiki-diff': $jsontool.serialize($xwiki.getSkinFile('uicomponents/viewers/diff.js'))
   }
 });
 
@@ -199,7 +199,7 @@ define('xwiki-document-api', ['jquery'], function($) {
      */
     render: function(forView) {
       var queryString = {
-        xpage: 'rendercontent',
+        xpage: 'get',
         outputTitle: true,
         outputSyntax: forView ? null : 'annotatedxhtml',
         language: this.getRealLocale(),
@@ -213,11 +213,15 @@ define('xwiki-document-api', ['jquery'], function($) {
           'error'
         );
       }).then(function(html) {
+        // Render succeeded.
         var container = $('&lt;div/&gt;').html(html);
         return $.extend(thisXWikiDocument, {
           renderedTitle: container.find('#document-title h1').html(),
           renderedContent: container.find('#xwikicontent').html()
         });
+      }, function() {
+        // Render failed.
+        return thisXWikiDocument;
       });
     },
 
@@ -232,11 +236,15 @@ define('xwiki-document-api', ['jquery'], function($) {
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
       }).then(function(newXWikiDocument) {
+        // Reload succeeded.
         // Resolve the document reference.
         thisXWikiDocument.documentReference = XWiki.Model.resolve(newXWikiDocument.id, XWiki.EntityType.DOCUMENT);
         // We were able to load the document so it's not new.
         thisXWikiDocument.isNew = false;
         return $.extend(thisXWikiDocument, newXWikiDocument);
+      }, function() {
+        // Reload failed.
+        return thisXWikiDocument;
       });
     },
 
@@ -259,7 +267,18 @@ define('xwiki-document-api', ['jquery'], function($) {
         // Make sure the response is not retrieved from cache (IE11 doesn't obey the caching HTTP headers).
         timestamp: new Date().getTime()
       }).then(function() {
+        // Lock succeeded.
         thisXWikiDocument.locked = action;
+        return thisXWikiDocument;
+      }, function(response) {
+        // Lock failed.
+        delete thisXWikiDocument.locked;
+        // Check if the user can force the lock.
+        var lockConfirmation = response.responseJSON;
+        if (response.status === 423 &amp;&amp; lockConfirmation) {
+          // The user can force the lock, but needs confirmation.
+          thisXWikiDocument.lockConfirmation = lockConfirmation;
+        }
         return thisXWikiDocument;
       });
     },
@@ -369,26 +388,34 @@ define('editInPlace', [
       lockFailed: function() {}
     }, options);
     $('#xwikicontent').addClass('loading');
+    // Lock the document first.
     return lock(currentXWikiDocument).fail(options.lockFailed)
+      // Then load the document only if we managed to lock it.
       .then(load)
+      // Then load the editors only if we managed to load the document.
       .then(edit).done(options.afterEdit).always(function() {
         $('#xwikicontent').removeClass('loading');
+      // Then wait for an action (save, cancel, reload) only if the editors were loaded successfuly.
       }).then(maybeSave)
-      .then(unlock)
-      .then(view);
+      // Then unlock the document both when the edit ended with success and with a failure.
+      .then(unlock, unlock)
+      // Finally view the document both when the edit ended with success and with a failure.
+      .then(view, view);
   };
 
   var lock = function(xwikiDocument) {
-    return xwikiDocument.lock().then(null, function(response) {
-      var confirmation = response.responseJSON;
+    return xwikiDocument.lock().then(null, function(xwikiDocument) {
       // If the document was already locked then we need to ask the user if they want to force the lock.
-      if (response.status === 423 &amp;&amp; confirmation) {
+      if (xwikiDocument.lockConfirmation) {
+        var confirmation = xwikiDocument.lockConfirmation;
+        delete xwikiDocument.lockConfirmation;
         return maybeForceLock(confirmation).then($.proxy(xwikiDocument, 'lock', 'edit', true));
       } else {
         new XWiki.widgets.Notification(
           $jsontool.serialize($services.localization.render('edit.inplace.page.lockFailed')),
           'error'
         );
+        return xwikiDocument;
       }
     });
   };
@@ -512,24 +539,18 @@ define('editInPlace', [
   };
 
   var save = function(data) {
-    // Push the changes to the server then render the document for view. We need the view HTML both if we stop editing
-    // now and if we continue but cancel the edit later.
-    return push(data.document).then($.proxy(render, null, true)).then(function(xwikiDocument) {
+    // Push the changes to the server.
+    return push(data.document).then(function(xwikiDocument) {
       // Save succeeded.
-      if (data['continue']) {
-        // Update the original version in order to be able to restore it on cancel.
-        delete xwikiDocument.originalDocument;
-        xwikiDocument.originalDocument = $.extend(true, {}, xwikiDocument);
-        // Continue editing.
-        return maybeSave(xwikiDocument);
-      } else {
-        // This is the final version.
-        return xwikiDocument;
-      }
-    }, function(xwikiDocument) {
-      // Save failed. Continue editing.
-      return maybeSave(xwikiDocument);
-    });
+      return shouldReload(xwikiDocument).then(
+        // The document was saved with merge and thus if we want to continue eding we need to reload the editor (because
+        // its content doesn't match the saved content).
+        reload,
+        // No need to reload the editor because either the action was Save &amp; View or there was no merge on save.
+        $.proxy(maybeContinueEditing, null, data['continue'])
+      );
+    // Save failed. Continue editing because we may have unsaved content.
+    }, maybeSave);
   };
 
   var push = function(xwikiDocument) {
@@ -542,7 +563,31 @@ define('editInPlace', [
     // effect.
     $(document).one('xwiki:document:saved', $.proxy(deferred, 'resolve', xwikiDocument));
     $(document).one('xwiki:document:saveFailed', $.proxy(deferred, 'reject', xwikiDocument));
-    return deferred.promise().then($.proxy(xwikiDocument, 'reload'));
+    return deferred.promise();
+  };
+
+  var maybeContinueEditing = function(continueEditing, xwikiDocument) {
+    var afterReloadAndRender = function(success, xwikiDocument) {
+      if (continueEditing) {
+        if (success) {
+          // Update the original version in order to be able to restore it on cancel.
+          delete xwikiDocument.originalDocument;
+          xwikiDocument.originalDocument = $.extend(true, {}, xwikiDocument);
+        }
+        // Continue editing.
+        return maybeSave(xwikiDocument);
+      } else {
+        // This is the final version. We stop editing even if the reload / render failed.
+        return xwikiDocument;
+      }
+    };
+
+    // Reload the document JSON data (to have the new version) and render the document for view. We need the view HTML
+    // both if we stop editing now and if we continue but cancel the edit later.
+    return xwikiDocument.reload().then($.proxy(render, null, true)).then(
+      $.proxy(afterReloadAndRender, null, /* success: */ true),
+      $.proxy(afterReloadAndRender, null, /* success: */ false)
+    );
   };
 
   var cancel = function(xwikiDocument) {
@@ -561,6 +606,25 @@ define('editInPlace', [
 
   // Make sure we unlock the document when the user navigates to another page.
   $(window).on('unload pagehide', $.proxy(unlock, null, currentXWikiDocument));
+
+  var shouldReload = function(xwikiDocument) {
+    var reloadEventFired = false;
+    $(document).one('xwiki:actions:reload.maybe', function() {
+      reloadEventFired = true;
+    });
+    var deferred = $.Deferred();
+    // Wait a bit to see if the reload event is fired.
+    setTimeout(function() {
+      // Remove the listener in case the reload event wasn't fired.
+      $(document).off('xwiki:actions:reload.maybe');
+      if (reloadEventFired) {
+        deferred.resolve(xwikiDocument);
+      } else {
+        deferred.reject(xwikiDocument);
+      }
+    }, 0);
+    return deferred.promise();
+  };
 
   var reload = function(xwikiDocument) {
     // Leave the edit mode and then re-enter.
@@ -598,8 +662,8 @@ define('editInPlace', [
     // we can't use yet because it's not implemented on IE11 which we still have to support.
     var actionButtonsWrapper = editContent.nextAll('.sticky-buttons-wrapper');
     if (actionButtonsWrapper.length === 0) {
-      actionButtonsWrapper = $('&lt;div class="sticky-buttons-wrapper col-xs-12"&gt;&lt;div class="sticky-buttons"/&gt;&lt;/div&gt;')
-        .insertAfter(editContent);
+      actionButtonsWrapper = $('&lt;div class="sticky-buttons-wrapper col-xs-12"&gt;' +
+        '&lt;div class="inplace-editing-buttons sticky-buttons"/&gt;&lt;/div&gt;').insertAfter(editContent);
       var actionButtons = actionButtonsWrapper.children('.sticky-buttons').data('xwikiDocument', xwikiDocument)
         .toggle(!!xwikiDocument);
       return loadActionButtons(actionButtons);
@@ -664,7 +728,7 @@ define('editInPlace', [
       // We need a place where actionButtons.js can add more hidden inputs.
       actionButtons.append('&lt;div class="hidden extra"/&gt;');
       var deferred = $.Deferred();
-      require(['actionButtons'], function() {
+      require(['actionButtons', 'xwiki-diff'], function() {
         overrideEditActions();
         overrideAjaxSaveAndContinue();
         var xwikiDocument = actionButtons.data('xwikiDocument');
@@ -733,7 +797,7 @@ define('editInPlace', [
     // Override the EditActions.notify() function in order to pass a fake form in the event parameters.
     var originalNotify = XWiki.actionButtons.EditActions.prototype.notify;
     XWiki.actionButtons.EditActions.prototype.notify = function(originalEvent, action, params) {
-      if (params) {
+      if (params &amp;&amp; $(originalEvent.element()).closest('.inplace-editing-buttons').length &gt; 0) {
         // actionButtons.js expects a form so we use a fake form. Refactoring actionButtons.js is too dangerous ATM.
         // Note that we do this only when the event has parameters because we want to exclude the cancel event for which
         // actionButtons.js changes the window location if a form is specified, and we want to prevent that.
@@ -744,13 +808,25 @@ define('editInPlace', [
   };
 
   var overrideAjaxSaveAndContinue = function() {
+    var originalAjaxSaveAndContinue = $.extend({}, XWiki.actionButtons.AjaxSaveAndContinue.prototype);
     $.extend(XWiki.actionButtons.AjaxSaveAndContinue.prototype, {
       reloadEditor: function() {
-        $(document).trigger('xwiki:actions:reload');
+        if ($('.inplace-editing-buttons').is(':visible')) {
+          $(document).trigger('xwiki:actions:reload');
+        } else {
+          return originalAjaxSaveAndContinue.reloadEditor.apply(this, arguments);
+        }
       },
-      maybeRedirect: function() {
-        // Never redirect when leaving the edit mode because we're already in view mode.
-        return false;
+      maybeRedirect: function(continueEditing) {
+        if ($('.inplace-editing-buttons').is(':visible')) {
+          // Overwrite the default behavior so that we don't redirect when leaving the edit mode because we're already
+          // in view mode. We still need to report a redirect (return true) if we don't continue editing, so that
+          // actionButtons.js behaves as if a redirect was done.
+          return !continueEditing;
+        } else {
+          // Fallback on the default behavior if the in-place editing buttons are hidden.
+          return originalAjaxSaveAndContinue.maybeRedirect.apply(this, arguments);
+        }
       }
     });
   };
@@ -1015,15 +1091,17 @@ require(['jquery'], function($) {
   margin-bottom: @line-height-computed / 4;
 }
 
+@document-title-input-padding-vertical: @line-height-computed / 4 - 1;
 input#document-title-input {
   /* Preserve the heading styles. */
   border: 1px solid transparent;
   box-shadow: none;
   color: inherit;
   font-size: inherit;
-  height: auto;
+  /* It seems it's not enough to set the line height for the text input. We also need to set its height. */
+  height: @font-size-document-title * @headings-line-height + 2 * (1 + @document-title-input-padding-vertical);
   line-height: @headings-line-height;
-  padding: (@line-height-computed / 4 - 1) (ceil(@grid-gutter-width / 2) - 1);
+  padding: @document-title-input-padding-vertical (ceil(@grid-gutter-width / 2) - 1);
   width: 100%;
 }
 

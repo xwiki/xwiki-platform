@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testcontainers.DockerClientFactory;
@@ -44,7 +45,6 @@ import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactResolver;
 import org.xwiki.test.integration.maven.MavenResolver;
 import org.xwiki.test.integration.maven.RepositoryResolver;
-import org.xwiki.text.StringUtils;
 
 import com.github.dockerjava.api.model.Image;
 
@@ -77,7 +77,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private TestConfiguration testConfiguration;
 
-    private GenericContainer servletContainer;
+    private GenericContainer<?> servletContainer;
 
     /**
      * @param testConfiguration the configuration to build (database, debug mode, etc)
@@ -170,7 +170,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
     {
         // Configure Tomcat logging for debugging. Create a logging.properties file
         File logFile = new File(sourceWARDirectory, "WEB-INF/classes/logging.properties");
-        logFile.createNewFile();
+        if (!logFile.createNewFile()) {
+            throw new Exception(String.format("Failed to create logging configuration file at [%s]", logFile));
+        }
         try (FileWriter writer = new FileWriter(logFile)) {
             IOUtils.write("org.apache.catalina.core.ContainerBase.[Catalina].level = FINE\n"
                 + "org.apache.catalina.core.ContainerBase.[Catalina].handlers = "
@@ -262,9 +264,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
 
     private GenericContainer createServletContainer() throws Exception
     {
-        final String baseImageName = String.format("%s:%s",
+        String baseImageName = String.format("%s:%s",
             this.testConfiguration.getServletEngine().getDockerImageName(), getDockerImageTag(this.testConfiguration));
-        final GenericContainer container;
+        GenericContainer<?> container;
 
         if (this.testConfiguration.isOffice()) {
             // We only build the image once for performance reason.
@@ -322,7 +324,7 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
                 container = new XWikiLocalGenericContainer(imageName);
             }
         } else {
-            container = new GenericContainer(baseImageName);
+            container = new GenericContainer<>(baseImageName);
         }
 
         return container;
@@ -333,12 +335,9 @@ public class ServletContainerExecutor extends AbstractContainerExecutor
      */
     public void stop() throws Exception
     {
-        switch (this.testConfiguration.getServletEngine()) {
-            case JETTY_STANDALONE:
-                this.jettyStandaloneExecutor.stop();
-                break;
-            default:
-                // Nothing else to do, TestContainers automatically stops the container
+        // Nothing else to do, TestContainers automatically stops the container
+        if (ServletEngine.JETTY_STANDALONE == this.testConfiguration.getServletEngine()) {
+            this.jettyStandaloneExecutor.stop();
         }
 
         // If the Clover database system property is setup, then copy back the data to the parent container if need be.

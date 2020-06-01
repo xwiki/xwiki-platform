@@ -32,7 +32,6 @@
     <description>Hibernate based events storage</description>
     <properties>
         <xwiki.jacoco.instructionRatio>0.18</xwiki.jacoco.instructionRatio>
-        <xwiki.pitest.mutationThreshold>8</xwiki.pitest.mutationThreshold>
         <!-- Name to display by the Extension Manager -->
         <xwiki.extension.name>Hibernate Event Stream Store</xwiki.extension.name>
 

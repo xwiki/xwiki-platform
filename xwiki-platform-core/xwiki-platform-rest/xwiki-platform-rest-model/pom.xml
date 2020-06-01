@@ -36,8 +36,7 @@
       that are not excluded in the analysis.
     -->
     <xwiki.jacoco.instructionRatio>0.03</xwiki.jacoco.instructionRatio>
-    <xwiki.pitest.mutationThreshold>2</xwiki.pitest.mutationThreshold>
-  </properties>
+    </properties>
   <dependencies>
     <!-- Test dependencies. -->
     <dependency>

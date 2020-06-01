@@ -25,12 +25,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.extension.Extension;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
 import org.xwiki.test.integration.maven.ArtifactCoordinate;
-import org.xwiki.text.StringUtils;
 import org.xwiki.tool.extension.ExtensionOverride;
 
 /**
@@ -103,6 +103,8 @@ public class TestConfiguration
 
     private List<ArtifactCoordinate> extraJARs;
 
+    private boolean resolveExtraJARs;
+
     private List<Integer> sshPorts;
 
     private List<String> profiles;
@@ -132,6 +134,7 @@ public class TestConfiguration
         resolveVNC();
         resolveProperties();
         resolveExtraJARs();
+        resolveResolveExtraJARs();
         resolveExtensionOverrides();
         resolveSSHPorts();
         resolveProfiles();
@@ -304,6 +307,11 @@ public class TestConfiguration
         this.extraJARs = artifactCoordinates;
     }
 
+    private void resolveResolveExtraJARs()
+    {
+        this.resolveExtraJARs = this.uiTestAnnotation.resolveExtraJARs();
+    }
+
     private void resolveExtensionOverrides()
     {
         List<ExtensionOverride> overrides = new ArrayList<>();
@@ -473,6 +481,15 @@ public class TestConfiguration
     public List<ArtifactCoordinate> getExtraJARs()
     {
         return this.extraJARs;
+    }
+
+    /**
+     * @return true if extra JARs version should be resolved when missing, see {@link UITest#resolveExtraJARs()}
+     * @since 12.5RC1
+     */
+    public boolean isResolveExtraJARs()
+    {
+        return this.resolveExtraJARs;
     }
 
     /**

@@ -61,7 +61,7 @@ public class DefaultStringResourceTypeResolver implements ResourceTypeResolver<S
     public ResourceType resolve(String type, Map<String, Object> parameters)
         throws CreateResourceTypeException
     {
-        ResourceTypeResolver resolver;
+        ResourceTypeResolver<String> resolver;
 
         DefaultParameterizedType parameterizedType =
             new DefaultParameterizedType(null, ResourceTypeResolver.class, String.class);

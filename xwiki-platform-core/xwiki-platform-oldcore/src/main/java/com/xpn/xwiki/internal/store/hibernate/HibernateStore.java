@@ -116,11 +116,17 @@ public class HibernateStore implements Disposable, Integrator, Initializable
 
     private static final Map<String, DatabaseProduct> DRIVER_MAPPING = new HashMap<>();
 
+    /**
+     * Recognize the database used based on the JDBC driver class used.
+     */
     static {
         DRIVER_MAPPING.put("org.postgresql.Driver", DatabaseProduct.POSTGRESQL);
         DRIVER_MAPPING.put("oracle.jdbc.driver.OracleDriver", DatabaseProduct.ORACLE);
-        DRIVER_MAPPING.put("com.mysql.jdbc.Driver", DatabaseProduct.MYSQL);
         DRIVER_MAPPING.put("org.hsqldb.jdbcDriver", DatabaseProduct.HSQLDB);
+        // MySQL has 2 possible driver classes that can be used. The "com.mysql.jdbc.Driver" one is deprecated but we
+        // must still recognize the DB as MySQL.
+        DRIVER_MAPPING.put("com.mysql.jdbc.Driver", DatabaseProduct.MYSQL);
+        DRIVER_MAPPING.put("com.mysql.cj.jdbc.Driver", DatabaseProduct.MYSQL);
     }
 
     @Inject
@@ -431,11 +437,11 @@ public class HibernateStore implements Disposable, Integrator, Initializable
             } else {
                 // Not initialized yet so we can't use the actual database product, try to deduce it from the configured
                 // driver
-                String driver = this.configuration.getProperty("hibernate.connection.driver_class");
-                if (driver == null) {
-                    driver = this.configuration.getProperty("connection.driver_class");
+                String driverClassName = this.configuration.getProperty("hibernate.connection.driver_class");
+                if (driverClassName == null) {
+                    driverClassName = this.configuration.getProperty("connection.driver_class");
                 }
-                product = DRIVER_MAPPING.getOrDefault(driver, DatabaseProduct.UNKNOWN);
+                product = DRIVER_MAPPING.getOrDefault(driverClassName, DatabaseProduct.UNKNOWN);
             }
         }
 

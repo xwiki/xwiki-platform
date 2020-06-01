@@ -428,18 +428,7 @@ public class DefaultNotificationParametersFactory
         handleLocationParameter(wikis,
             notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
 
-        // When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
-        // other wikis (except if the "wikis" parameter is set).
-        // The concept of the subwiki is to restrict a given domain of interest into a given wiki, this is why it does
-        // not make sense to show events from other wikis in a "timeline" such as the notifications macro.
-        // TODO: add a "handleAllWikis" parameter to disable this behaviour
-        // Note that on the main wiki, which is often a "portal" for all the others wikis, we assure it's OK to display
-        // events from other wikis.
-        if (StringUtils.isBlank(wikis) && StringUtils.isBlank(parameters.get(ParametersKey.PAGES)) && StringUtils.isBlank(parameters.get(ParametersKey.SPACES))
-            && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
-            handleLocationParameter(currentWiki,
-                notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
-        }
+        handleSubwikiWithoutLocationParameters(notificationParameters, parameters, currentWiki);
 
         usersParameterHandler.handleUsersParameter(parameters.get(ParametersKey.USERS), notificationParameters);
 
@@ -453,6 +442,43 @@ public class DefaultNotificationParametersFactory
             for (int i = 0; i < tagArray.length; ++i) {
                 parameters.filterPreferences.add(new TagNotificationFilterPreference(tagArray[i], currentWiki));
             }
+        }
+    }
+
+    /**
+     * When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
+     * other wikis (except if the "wikis" parameter is set).
+     * The concept of the subwiki is to restrict a given domain of interest into a given wiki, this is why it does
+     * not make sense to show events from other wikis in a "timeline" such as the notifications macro.
+     * Note that on the main wiki, which is often a "portal" for all the others wikis, we assure it's OK to display
+     * events from other wikis.
+     * This restriction needs only to be applied if the following two conditions hold:
+     * <ol>
+     *   <li>there are no other restrictions about pages, their subpages or wikis defined</li>
+     *   <li>we are actually in a subwiki, and not the main wiki</li>
+     * </ol>
+     * The first condition is necessary because if there is already a restriction on e.g. pages in the subwiki
+     * then adding another restriction to show only events from the subwiki has the effect that all events
+     * from the subwiki are shown, making the restriction to the pages of the subwiki void. This is because
+     * all filters added here to the notificationParameters are are considered in conjunction, so only
+     * one filter needs to evaluate to true to display an event.
+     * Also if one has already the wikis parameter defined, then only the specified wikis should be considered,
+     * not the current wiki, too (unless it is explicitly mentioned in the list of wikis)
+     *
+     * TODO: add a "handleAllWikis" parameter to disable this behaviour.
+     *
+     * @param notificationParameters the parameters which are passed to the notification API.
+     * @param parameters the parameters of the notification macro
+     * @param currentWiki the identifier of the current wiki
+     */
+    private void handleSubwikiWithoutLocationParameters(NotificationParameters notificationParameters,
+        Map<ParametersKey, String> parameters, String currentWiki)
+    {
+        if (StringUtils.isBlank(parameters.get(ParametersKey.WIKIS)) && StringUtils.isBlank(parameters.get(ParametersKey.PAGES))
+            && StringUtils.isBlank(parameters.get(ParametersKey.SPACES))
+            && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
+            handleLocationParameter(currentWiki,
+                notificationParameters, NotificationFilterProperty.WIKI, currentWiki);
         }
     }
 

@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.model.reference.DocumentReference;
@@ -31,6 +30,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Parameters to fill to retrieve notifications using {@link ParametrizedNotificationManager}.
@@ -137,6 +137,17 @@ public class NotificationParameters
     @Override
     public String toString()
     {
-        return ToStringBuilder.reflectionToString(this);
+        return new XWikiToStringBuilder(this)
+            .append("user", user)
+            .append("format", format)
+            .append("expectedCount", expectedCount)
+            .append("endDate", endDate)
+            .append("fromDate", fromDate)
+            .append("onlyUnread", onlyUnread)
+            .append("blackList", blackList)
+            .append("preferences", preferences)
+            .append("filterPreferences", filterPreferences)
+            .append("filters", filters)
+            .toString();
     }
 }

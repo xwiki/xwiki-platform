@@ -26,7 +26,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
@@ -34,6 +33,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.filters.NotificationFilterType;
 import org.xwiki.text.StringUtils;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Represent a preferences that filter some event type to given scope (a wiki, a space, a page...).
@@ -253,6 +253,10 @@ public class ScopeNotificationFilterPreference implements NotificationFilterPref
     @Override
     public String toString()
     {
-        return ToStringBuilder.reflectionToString(this);
+        return new XWikiToStringBuilder(this).append("hasParent", hasParent)
+            .append("filterPreference", filterPreference)
+            .append("scopeReference", scopeReference)
+            .append("children", children)
+            .toString();
     }
 }

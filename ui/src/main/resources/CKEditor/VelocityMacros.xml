@@ -243,7 +243,11 @@
 #end
 
 #macro (initRequiredSkinExtensions)
-  #set ($requiredSkinExtensions = $resolvedSortTool.orderedMap)
+  #set ($requiredSkinExtensions = $collectiontool.orderedMap)
+  #if ("$!requiredSkinExtensions" == '')
+    ## For XWiki versions older than 12.1RC1 fallback on the old $collectionstool (available since 4.0M1).
+    #set ($requiredSkinExtensions = $collectionstool.orderedMap)
+  #end
   ## Save the import string for each skin extension plugin in order to be able to remove the always used extensions
   ## (they are aready available on the edit page so there's no need to load them).
   #foreach ($pluginName in ['ssrx', 'ssfx', 'ssx', 'linkx', 'jsrx', 'jsfx', 'jsx'])

@@ -53,7 +53,11 @@ viewers.Comments = Class.create({
     this.addSubmitListener(this.form);
     this.addCancelListener();
     this.addEditListener();
-    this.reloadEditor();
+    this.reloadEditor({
+      callback: function () {
+        this.addPreview(this.form);
+      }.bind(this)
+    });
   },
   /**
    * Parse the IDs of the comments to obtain the xobject number.
@@ -69,7 +73,6 @@ viewers.Comments = Class.create({
    * For all edit buttons, listen to "click", and make ajax request to retrieve the form and save the comment.
    */
   addEditListener : function() {
-    var that = this;
     $$(this.xcommentSelector).each(function(item) {
       // Prototype bug in Opera: $$(".comment a.delete") returns only the first result.
       // Quick fix until Prototype 1.6.1 is integrated.
@@ -110,13 +113,18 @@ viewers.Comments = Class.create({
                 comment.insert({before: response.responseText});
                 item._x_editForm = comment.previous();
                 this.addSubmitListener(item._x_editForm);
-                // this.addPreview(item._x_editForm);
-                item._x_editForm.down('a.cancel').observe('click', this.cancelEdit.bindAsEventListener(this, item));
-                comment.hide();
-                item._x_notification.hide();
-                // Currently editing: this comment
-                this.editing = item;
-                that.reloadEditor(item.readAttribute('href').match(/number=(\d+)/)[1]);
+                
+                this.reloadEditor({
+                  commentNbr: item.readAttribute('href').match(/number=(\d+)/)[1],
+                  callback: function() {
+                    this.addPreview(item._x_editForm);
+                    item._x_editForm.down('a.cancel').observe('click', this.cancelEdit.bindAsEventListener(this, item));
+                    comment.hide();
+                    item._x_notification.hide();
+                    // Currently editing: this comment
+                    this.editing = item;
+                  }.bind(this)
+                });
               }.bind(this),
               onFailure : function (response) {
                 var failureReason = response.statusText;
@@ -247,17 +255,14 @@ viewers.Comments = Class.create({
               if (this.restartNeeded) {
                 this.container.update(response.responseText);
                 document.fire("xwiki:docextra:loaded", {
-                  "id" : "Comments",
+                  "id": "Comments",
                   "element": this.container
                 });
-
-                // notifiy that the current page is properly saved
-                // has some effect but does not fix the issue
-                jQuery(document).trigger('xwiki:document:saved');
+                
                 // Notify any displayed CAPTCHA that it was reloaded and it might need to reinitialize its JS.
                 this.container.fire('xwiki:captcha:reloaded');
 
-               this.reloadCKEditor();
+                this.reloadEditor();
               }
             }.bind(this)
           });
@@ -270,7 +275,7 @@ viewers.Comments = Class.create({
    */
   addCancelListener : function() {
     if (this.form) {
-      this.initialLocation = new Element("span", {className : "hidden"});
+      this.initialLocation = new Element("span", {className: "hidden"});
       $('_comments').insert(this.initialLocation);
       // If the form is inside a thread, as a reply form, move it back to the bottom.
       this.form.down('a.cancel').observe('click', this.resetForm.bindAsEventListener(this));
@@ -280,11 +285,9 @@ viewers.Comments = Class.create({
    * Add a preview button that generates the rendered comment,
    */
   addPreview : function(form) {
-    if (!form || !XWiki.hasEdit) {
+    if (!form || !XWiki.hasEdit || jQuery("[name='defaultEditorId']").first().val() !== "text") {
       return;
     }
-    
-    jQuery(document).trigger('xwiki:actions:beforeSave');
     
     var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__", encodeURIComponent(XWiki.currentSpace)).replace("__page__", encodeURIComponent(XWiki.currentPage));
     form.commentElt = form.down('textarea');
@@ -292,7 +295,8 @@ viewers.Comments = Class.create({
     form.previewButton = new Element('span', {'class' : 'buttonwrapper'}).update(new Element('input', {'type' : 'button', 'class' : 'button', 'value' : "$services.localization.render('core.viewers.comments.preview.button.preview')"}));
     form.previewButton._x_modePreview = false;
     form.previewContent = new Element('div', {'class' : 'commentcontent commentPreview'});
-    form.commentElt.insert({'before' : form.previewContent});
+    form.commentElt.insert({'before': form.previewContent});
+    
     form.previewContent.hide();
     buttons.insert({'top' : form.previewButton});
     form.previewButton.observe('click', function() {
@@ -301,7 +305,7 @@ viewers.Comments = Class.create({
          var notification = new XWiki.widgets.Notification("$services.localization.render('core.viewers.comments.preview.inProgress')", "inprogress");
          new Ajax.Request(previewURL, {
             method : 'post',
-            parameters : {'xpage' : 'plain', 'sheet' : '', 'content' : form.commentElt.value, 'form_token': form.form_token.value, 'restricted': 'true'},
+            parameters : {'xpage' : 'plain', 'sheet' : '', 'content' : form.down('textarea').value, 'form_token': form.form_token.value, 'restricted': 'true'},
             onSuccess : function (response) {
               this.doPreview(response.responseText, form);
               notification.hide();
@@ -366,7 +370,7 @@ viewers.Comments = Class.create({
       // Put the form back to its initial location and clear the contents
       this.initialLocation.insert({after: this.form});
 
-      this.reloadEditor();
+      //this.reloadEditor();
     }
     this.form["XWiki.XWikiComments_replyto"].value = "";
     this.form["XWiki.XWikiComments_comment"].value = "";
@@ -376,44 +380,48 @@ viewers.Comments = Class.create({
    * Registers a listener that watches for the insertion of the Comments tab and triggers the enhancements.
    * After that, the listener removes itself, since it is no longer needed.
    */
-  addTabLoadListener : function(event) {
-    var listener = function(event) {
+  addTabLoadListener: function (event) {
+    var listener = function (event) {
       if (event.memo.id == 'Comments') {
         this.startup();
       }
     }.bindAsEventListener(this);
     document.observe("xwiki:docextra:loaded", listener);
   },
-  reloadEditor: function (commentNbr) {
-    
-    var name = 'XWiki.XWikiComments_comment'; 
+  reloadEditor: function (options) {
+    var name = 'XWiki.XWikiComments_comment';
     var wfClass = '.wysiwyg-field';
+    options = options || {};
+    const commentNbr = options.commentNbr;
+    const callback = options.callback;
     if (commentNbr) {
       name = 'XWiki.XWikiComments_' + commentNbr + '_comment';
       wfClass = wfClass + '-' + commentNbr;
     }
-    // TODO: that code is dependent of CKEditor, must be abstracted.
-    require(['xwiki-ckeditor', 'xwiki-events-bridge'], function (ckeditorPromise) {
-      ckeditorPromise.done(function (ckeditor) {
-        function createEditors(container) {
-          container.find('.ckeditor-textarea').each(function() {
-            // Wrap in try/catch so that a failure to load one editor doesn't affect the other editors.
-            try {
-              ckeditor.replace(this);
-            } catch(e) {
-              console.log(e);
-            }
-          });
-        }
-        const ta= jQuery('<textarea class="ckeditor-textarea" id="'+name+'" rows="5" cols="80" name="'+name+'"></textarea>');
-        const wf = jQuery(wfClass);
-        wf.empty();
-        wf.append(ta);
-        createEditors(wf);
-      });
+    require(['jquery', 'xwiki-events-bridge'], function ($) {
+      if ($(".wysiwyg-field").size() > 0) {
+        $.post(new XWiki.Document().getURL("view") + '?' + $.param({
+          number: commentNbr,
+          xpage: 'xpart',
+          vm: 'commentfield.vm',
+          syntax: 'xwiki/2.1',
+          id: name,
+          name: name,
+          rows: 5,
+          cols: 80
+        }), function (data) {
+          const wf = $(wfClass);
+          wf.empty();
+          wf.append(data);
+          $(document).trigger('xwiki:dom:updated', {'elements': wf.toArray()});
+          if (callback) {
+            callback();
+          }
+        });
+      }
     });
   }
-});
+})
 
 function init() {
   return new viewers.Comments();

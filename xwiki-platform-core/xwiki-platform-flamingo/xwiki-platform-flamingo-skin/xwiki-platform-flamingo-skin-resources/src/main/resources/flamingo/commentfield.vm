@@ -1,0 +1,54 @@
+## ---------------------------------------------------------------------------
+## See the NOTICE file distributed with this work for additional
+## information regarding copyright ownership.
+##
+## This is free software; you can redistribute it and/or modify it
+## under the terms of the GNU Lesser General Public License as
+## published by the Free Software Foundation; either version 2.1 of
+## the License, or (at your option) any later version.
+##
+## This software is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this software; if not, write to the Free
+## Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+## ---------------------------------------------------------------------------
+###
+### Return a single comment field
+###
+###
+#set($xCommentClass = 'XWiki.XWikiComments')
+#set ($syntax = $request.syntax)
+#set ($id = $request.id + "$datetool.date.time")
+#set ($number = $numbertool.toNumber($request.number).intValue())
+#set ($name = $request.name)
+#set ($rows = $request.rows)
+#set ($cols = $request.cols)
+#if ($number > -1)
+    #set ($commentObj = $doc.getObject($xCommentClass, $number))
+    #set ($content = $commentObj.getProperty('comment').getValue())
+#else
+    #set ($content = '')
+#end
+
+#set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
+<input type='hidden' name='defaultEditorId' value="$defaultEditorId" />
+#if ($defaultEditorId == "wysiwyg")
+  $services.edit.syntaxContent.wysiwyg("$content",$services.rendering.resolveSyntax($syntax), {
+    'id': $id,
+    'name': $name,
+    'rows': $rows,
+    'cols': $cols
+  })
+#else
+  $services.edit.syntaxContent.text("$content",$services.rendering.resolveSyntax($syntax), {
+    'id': $id,
+    'name': $name,
+    'rows': $rows,
+    'cols': $cols
+  })
+#end

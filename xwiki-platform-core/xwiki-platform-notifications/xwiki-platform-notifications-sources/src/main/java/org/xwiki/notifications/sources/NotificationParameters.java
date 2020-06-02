@@ -30,6 +30,7 @@ import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.NotificationFilter;
 import org.xwiki.notifications.filters.NotificationFilterPreference;
 import org.xwiki.notifications.preferences.NotificationPreference;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Parameters to fill to retrieve notifications using {@link ParametrizedNotificationManager}.
@@ -131,5 +132,22 @@ public class NotificationParameters
             .append(filterPreferences)
             .append(filters)
             .toHashCode();
+    }
+
+    @Override
+    public String toString()
+    {
+        return new XWikiToStringBuilder(this)
+            .append("user", user)
+            .append("format", format)
+            .append("expectedCount", expectedCount)
+            .append("endDate", endDate)
+            .append("fromDate", fromDate)
+            .append("onlyUnread", onlyUnread)
+            .append("blackList", blackList)
+            .append("preferences", preferences)
+            .append("filterPreferences", filterPreferences)
+            .append("filters", filters)
+            .toString();
     }
 }

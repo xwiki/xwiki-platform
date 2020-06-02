@@ -40,9 +40,12 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.RecordableEventDescriptor;
 import org.xwiki.eventstream.RecordableEventDescriptorManager;
+import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.NotificationException;
 import org.xwiki.notifications.NotificationFormat;
@@ -106,6 +109,13 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
 
     @Inject
     private EntityReferenceResolver<String> entityReferenceResolver;
+
+    @Inject
+    @Named("relative")
+    private EntityReferenceResolver<String> relativeEntityReferenceResolver;
+
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
 
     @Inject
     private RecordableEventDescriptorManager recordableEventDescriptorManager;
@@ -367,9 +377,11 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             .filter(filter -> !excludedFilters.contains(filter.getName())).collect(Collectors.toList());
 
         enableAllEventTypes(parameters);
-        handlePagesParameter(pages, parameters);
-        handleSpacesParameter(spaces, parameters);
+        handlePagesParameter(pages, parameters, currentWiki);
+        handleSpacesParameter(spaces, parameters, currentWiki);
         handleWikisParameter(wikis, parameters, currentWiki);
+        handleSubwikiWithoutLocationParameters(parameters, pages, spaces, wikis, currentWiki);
+
         usersParameterHandler.handleUsersParameter(users, parameters);
 
         handleTagsParameter(parameters, tags, currentWiki);
@@ -390,34 +402,23 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
         return this.newNotificationManager.getEvents(parameters);
     }
 
-    private void handlePagesParameter(String pages, NotificationParameters parameters)
+    private void handlePagesParameter(String pages, NotificationParameters parameters, String currentWiki)
     {
-        handleLocationParameter(pages, parameters, NotificationFilterProperty.PAGE);
+        handleLocationParameter(pages, parameters, NotificationFilterProperty.PAGE, currentWiki);
     }
 
-    private void handleSpacesParameter(String spaces, NotificationParameters parameters)
+    private void handleSpacesParameter(String spaces, NotificationParameters parameters, String currentWiki)
     {
-        handleLocationParameter(spaces, parameters, NotificationFilterProperty.SPACE);
+        handleLocationParameter(spaces, parameters, NotificationFilterProperty.SPACE, currentWiki);
     }
 
     private void handleWikisParameter(String wikis, NotificationParameters parameters, String currentWiki)
     {
-        handleLocationParameter(wikis, parameters, NotificationFilterProperty.WIKI);
-
-        // When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
-        // other wikis (except if the "wikis" parameter is set).
-        // The concept of the subwiki is to restrict a given domain of interest into a given wiki, this is why it does
-        // not make sense to show events from other wikis in a "timeline" such as the notifications macro.
-        // TODO: add a "handleAllWikis" parameter to disable this behaviour
-        // Note that on the main wiki, which is often a "portal" for all the others wikis, we assure it's OK to display
-        // events from other wikis.
-        if (StringUtils.isBlank(wikis) && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
-            handleLocationParameter(currentWiki, parameters, NotificationFilterProperty.WIKI);
-        }
+        handleLocationParameter(wikis, parameters, NotificationFilterProperty.WIKI, currentWiki);
     }
 
     private void handleLocationParameter(String locations, NotificationParameters parameters,
-        NotificationFilterProperty property)
+        NotificationFilterProperty property, String currentWiki)
     {
         if (StringUtils.isNotBlank(locations)) {
             Set<NotificationFormat> formats = new HashSet<>();
@@ -437,10 +438,10 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                         pref.setWiki(locationArray[i]);
                         break;
                     case SPACE:
-                        pref.setPage(locationArray[i]);
+                        pref.setPage(makeReferenceAbsolute(locationArray[i], EntityType.SPACE, currentWiki));
                         break;
                     case PAGE:
-                        pref.setPageOnly(locationArray[i]);
+                        pref.setPageOnly(makeReferenceAbsolute(locationArray[i], EntityType.PAGE, currentWiki));
                         break;
                     default:
                         break;
@@ -448,6 +449,22 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
                 parameters.filterPreferences.add(new ScopeNotificationFilterPreference(pref, entityReferenceResolver));
             }
         }
+    }
+
+    /**
+     * add the current wiki to the reference if it is missing an explicit wiki reference.
+     * @param entityRefStr the reference to check
+     * @param entityType the (expected) type of the reference
+     * @param currentWiki the wiki to add to the reference, if missing
+     * @return a string representation if a reference with an explicit wiki
+     */
+    private String makeReferenceAbsolute(String entityRefStr, EntityType entityType, String currentWiki)
+    {
+        EntityReference entityRef = relativeEntityReferenceResolver.resolve(entityRefStr, entityType);
+        if (entityRef.extractReference(EntityType.WIKI) == null) {
+            entityRef = entityReferenceResolver.resolve(entityRefStr, entityType, new EntityReference(currentWiki, EntityType.WIKI));
+        }
+        return entityReferenceSerializer.serialize(entityRef);
     }
 
     private void enableAllEventTypes(NotificationParameters parameters) throws EventStreamException
@@ -468,4 +485,41 @@ public class DefaultNotificationsResource extends XWikiResource implements Notif
             }
         }
     }
+
+    /**
+     * When the notifications are displayed in a macro in a subwiki, we assume they should not contain events from
+     * other wikis (except if the "wikis" parameter is set).
+     * The concept of the subwiki is to restrict a given domain of interest into a given wiki, this is why it does
+     * not make sense to show events from other wikis in a "timeline" such as the notifications macro.
+     * Note that on the main wiki, which is often a "portal" for all the others wikis, we assure it's OK to display
+     * events from other wikis.
+     * This restriction needs only to be applied if the following two conditions hold:
+     * <ol>
+     *   <li>there are no other restrictions about pages, their subpages or wikis defined</li>
+     *   <li>we are actually in a subwiki, and not the main wiki</li>
+     * </ol>
+     * The first condition is necessary because if there is already a restriction on e.g. pages in the subwiki
+     * then adding another restriction to show only events from the subwiki has the effect that all events
+     * from the subwiki are shown, making the restriction to the pages of the subwiki void. This is because
+     * all filters added here to the notificationParameters are are considered in conjunction, so only
+     * one filter needs to evaluate to true to display an event.
+     * Also if one has already the wikis parameter defined, then only the specified wikis should be considered,
+     * not the current wiki, too (unless it is explicitly mentioned in the list of wikis)
+     *
+     * TODO: add a "handleAllWikis" parameter to disable this behaviour.
+     *
+     * @param notificationParameters the parameters which are passed to the notification API.
+     * @param parameters the parameters of the notification macro
+     * @param currentWiki the identifier of the current wiki
+     */
+    private void handleSubwikiWithoutLocationParameters(NotificationParameters notificationParameters,
+        String pages, String spaces, String wikis, String currentWiki)
+    {
+        if (StringUtils.isBlank(pages) && StringUtils.isBlank(spaces) && StringUtils.isBlank(wikis)
+            && !StringUtils.equals(currentWiki, wikiDescriptorManager.getMainWikiId())) {
+            handleLocationParameter(currentWiki, notificationParameters, NotificationFilterProperty.WIKI,
+                currentWiki);
+        }
+    }
+
 }

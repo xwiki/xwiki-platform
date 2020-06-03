@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.Script" locale="">
+<xwikidoc version="1.4" reference="AnnotationCode.Script" locale="">
   <web>AnnotationCode</web>
   <name>Script</name>
   <language/>
@@ -54,22 +54,27 @@
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -101,13 +106,15 @@
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -115,7 +122,7 @@
       </use>
     </class>
     <property>
-      <cache/>
+      <cache>long</cache>
     </property>
     <property>
       <code>var XWiki = (function (XWiki) {
@@ -524,22 +531,27 @@ return XWiki;
       <validationScript/>
       <cache>
         <cache>0</cache>
+        <defaultValue>long</defaultValue>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>cache</name>
         <number>5</number>
         <prettyName>Caching policy</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>long|short|default|forbid</values>
         <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
       </cache>
       <code>
+        <contenttype>PureText</contenttype>
         <disabled>0</disabled>
+        <editor>PureText</editor>
         <name>code</name>
         <number>2</number>
         <prettyName>Code</prettyName>
@@ -571,13 +583,15 @@ return XWiki;
         <cache>0</cache>
         <disabled>0</disabled>
         <displayType>select</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
         <multiSelect>0</multiSelect>
         <name>use</name>
         <number>3</number>
         <prettyName>Use this extension</prettyName>
         <relationalStorage>0</relationalStorage>
         <separator> </separator>
-        <separators> ,|</separators>
+        <separators>|, </separators>
         <size>1</size>
         <unmodifiable>0</unmodifiable>
         <values>currentPage|onDemand|always</values>
@@ -585,7 +599,7 @@ return XWiki;
       </use>
     </class>
     <property>
-      <cache/>
+      <cache>long</cache>
     </property>
     <property>
       <code>## Retrieve the annotation settings from the configuration object
@@ -1528,6 +1542,7 @@ XWiki.Annotation = Class.create({
     this.createPanel.down('input[type=reset]').observe('click', function() {
       this.hideAnnotationCreationForm();
     }.bind(this));
+    jQuery(document).trigger('xwiki:dom:updated', {'elements': jQuery('.annotation-box').toArray()});
   },
 
   hideAnnotationCreationForm : function(skipSelectionHighlightClear) {
@@ -1542,44 +1557,47 @@ XWiki.Annotation = Class.create({
   },
 
   onAnnotationAdd : function(event) {
-    // don't submit
     event.stop();
-    var form = this.createPanel.down('form');
-    var formData = new Hash(form.serialize(true));
-    // aaand submit
-    new Ajax.Request(form.action, {
-      method : form.method,
-      parameters : this.prepareRequestParameters(formData),
-      onCreate : function() {
-        // make it load while update is in progress
-        this.createPanel.update(new Element('div', {'class' : 'loading'}));
-      }.bind(this),
-      onSuccess : function (response) {
-        // check the response to see if all went fine
-        if (this.checkResponseCodeAndFail(response)) {
-          return;
+    require(['xwiki-events-bridge'], function() {
+      // don't submit
+      jQuery(document).trigger('xwiki:actions:beforeSave')
+      var form = this.createPanel.down('form');
+      var formData = new Hash(form.serialize(true));
+      // aaand submit
+      new Ajax.Request(form.action, {
+        method : form.method,
+        parameters : this.prepareRequestParameters(formData),
+        onCreate : function() {
+          // make it load while update is in progress
+          this.createPanel.update(new Element('div', {'class' : 'loading'}));
+        }.bind(this),
+        onSuccess : function (response) {
+          // check the response to see if all went fine
+          if (this.checkResponseCodeAndFail(response)) {
+            return;
+          }
+          if (this.displayAnnotationsCheckbox) {
+            this.displayAnnotationsCheckbox.checked = true;
+          }
+          this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
+          this.fetchedAnnotations = true;
+          form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
+          // and hide the create bubble, skipping selection highlight clear
+          this.hideAnnotationCreationForm(true);
+        }.bind(this),
+        onFailure : function(response) {
+          this.hideAnnotationCreationForm();
+          var failureReason = response.statusText;
+          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+            failureReason = 'Server not responding';
+          }
+          this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.loaderror')" + failureReason, 'error', {timeout : 5});
+        }.bind(this),
+        on0 : function (response) {
+          response.request.options.onFailure(response);
         }
-        if (this.displayAnnotationsCheckbox) {
-          this.displayAnnotationsCheckbox.checked = true;
-        }
-        this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
-        this.fetchedAnnotations = true;
-        form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
-        // and hide the create bubble, skipping selection highlight clear
-        this.hideAnnotationCreationForm(true);
-      }.bind(this),
-      onFailure : function(response) {
-        this.hideAnnotationCreationForm();
-        var failureReason = response.statusText;
-        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-          failureReason = 'Server not responding';
-        }
-        this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.loaderror')" + failureReason, 'error', {timeout : 5});
-      }.bind(this),
-      on0 : function (response) {
-        response.request.options.onFailure(response);
-      }
-    });
+      });
+    }.bind(this));
   },
 
   /**

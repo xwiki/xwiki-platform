@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.3" reference="AnnotationCode.Macros" locale="">
+<xwikidoc version="1.4" reference="AnnotationCode.Macros" locale="">
   <web>AnnotationCode</web>
   <name>Macros</name>
   <language/>
@@ -328,7 +328,22 @@
     #set($discard = $fakeObj.set($onlyProperty.name, "$!{ann.get($onlyProperty.name)}"))
     &lt;div class="annotationText"&gt;
       #if($mode == 'edit' || $mode == 'create')
-        $doc.displayEdit($onlyProperty, '', $fakeObj)
+        #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
+        #if ($defaultEditorId == "wysiwyg")
+        $services.edit.syntaxContent.wysiwyg('',$services.rendering.resolveSyntax('xwiki/2.1'), {
+            'id': 'comment',
+            'name': 'comment',
+            'rows': 5,
+            'cols': 40
+        })
+    #else
+        $services.edit.syntaxContent.text('',$services.rendering.resolveSyntax('xwiki/2.1'), {
+            'id': 'comment',
+            'name': 'comment',
+            'rows': 5,
+            'cols': 40
+        })
+        #end
       #else
         $doc.displayView($onlyProperty, '', $fakeObj)
       #end

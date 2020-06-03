@@ -26,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -48,6 +49,7 @@ import org.xwiki.annotation.rest.model.jaxb.AnnotationResponse;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rest.XWikiRestException;
+import org.xwiki.wysiwyg.converter.HTMLConverter;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -69,8 +71,16 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
     /**
      * Request parameter prefix for a filter in an annotation request.
      */
-
     private static final String ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX = "filter_";
+
+    private static final String DATE_KEY = "date";
+
+    private static final String AUTHOR_KEY = "author";
+
+    private static final String COMMENT_KEY = "comment";
+
+    @Inject
+    private HTMLConverter htmlConverter;
 
     /**
      * @param wiki the wiki of the document to get annotations for
@@ -95,10 +105,10 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             // Initialize the context with the correct value.
             updateContext(documentReference);
 
-            String documentName = referenceSerializer.serialize(documentReference);
+            String documentName = this.referenceSerializer.serialize(documentReference);
 
             // check access to this function
-            if (!annotationRightService.canViewAnnotatedTarget(documentName, getXWikiUser())) {
+            if (!this.annotationRightService.canViewAnnotatedTarget(documentName, getXWikiUser())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
@@ -110,7 +120,7 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             Form form = Request.getCurrent().getResourceRef().getQueryAsForm();
             AnnotationRequest request = new AnnotationRequest();
             AnnotationFieldCollection fields = new AnnotationFieldCollection();
-            List<AnnotationField> annotationFields = new ArrayList<AnnotationField>();
+            List<AnnotationField> annotationFields = new ArrayList<>();
             AnnotationRequest.Request requestedFields = new AnnotationRequest.Request();
             for (String name : form.getNames()) {
                 if (StringUtils.startsWith(name, ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX)) {
@@ -162,20 +172,30 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             // Initialize the context with the correct value.
             updateContext(documentReference);
 
-            String documentName = referenceSerializer.serialize(documentReference);
+            String documentName = this.referenceSerializer.serialize(documentReference);
 
             // check access to this function
-            if (!annotationRightService.canAddAnnotation(documentName, getXWikiUser())) {
+            if (!this.annotationRightService.canAddAnnotation(documentName, getXWikiUser())) {
                 throw new WebApplicationException(Status.UNAUTHORIZED);
             }
 
             // add the annotation
             Map<String, Object> annotationMetadata = getMap(request.getAnnotation());
-            annotationService.addAnnotation(documentName, request.getSelection(), request.getSelectionContext(),
-                request.getSelectionOffset(), getXWikiUser(), annotationMetadata);
+
+            Map<String, Object> annotationMetadata2 = new HashMap<>();
+            annotationMetadata2.put(DATE_KEY, annotationMetadata.get(DATE_KEY));
+            annotationMetadata2.put(AUTHOR_KEY, annotationMetadata.get(AUTHOR_KEY));
+            if (annotationMetadata.containsKey("RequiresHTMLConversion")) {
+                annotationMetadata2.put(COMMENT_KEY,
+                    this.htmlConverter.fromHTML(String.valueOf(annotationMetadata.get(COMMENT_KEY)), "xwiki/2.1"));
+            } else {
+                annotationMetadata2.put(COMMENT_KEY, annotationMetadata.get(COMMENT_KEY));
+            }
+
+            this.annotationService.addAnnotation(documentName, request.getSelection(), request.getSelectionContext(),
+                request.getSelectionOffset(), getXWikiUser(), annotationMetadata2);
             // and then return the annotated content, as specified by the annotation request
-            AnnotationResponse response = getSuccessResponseWithAnnotatedContent(documentName, request);
-            return response;
+            return getSuccessResponseWithAnnotatedContent(documentName, request);
         } catch (AnnotationServiceException | XWikiException e) {
             getLogger().error(e.getMessage(), e);
             return getErrorResponse(e);
@@ -190,11 +210,10 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
      */
     protected Map<String, Object> getMap(AnnotationFieldCollection fields)
     {
-        Map<String, Object> metadataMap = new HashMap<String, Object>();
+        Map<String, Object> metadataMap = new HashMap<>();
         for (AnnotationField f : fields.getFields()) {
             metadataMap.put(f.getName(), f.getValue());
         }
-
         return metadataMap;
     }
 }

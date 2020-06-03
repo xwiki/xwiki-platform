@@ -412,6 +412,23 @@ rendering.transformations = $xwikiRenderingTransformations
 #-# The default is 50.
 # job.statusCacheSize=50
 
+#-# [Since 12.5RC1]
+#-# The maximum number of entries to put in cache for the GroupedJobInitializer components.
+#-# The default is 100.
+# job.groupedJobInitializerCacheSize=100
+
+#-# [Since 12.5RC1]
+#-# The thread keep-alive time in milliseconds for the single job executor.
+#-# This value defines how long a thread can be idle before being terminated by the executor.
+#-# The default value is 60000 for 60 000ms.
+# job.singleJobThreadKeepAliveTime=60000
+
+#-# [Since 12.5RC1]
+#-# The thread keep-alive time in milliseconds for the grouped job executors.
+#-# This value defines how long a thread can be idle before being terminated by an executor.
+#-# The default value is 60000 for 60 000ms.
+# job.groupedJobThreadKeepAliveTime=60000
+
 #-------------------------------------------------------------------------------------
 # Extension Manager
 #-------------------------------------------------------------------------------------

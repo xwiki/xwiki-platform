@@ -59,9 +59,13 @@ public class AsyncNotificationRendererJobInitializer implements GroupedJobInitia
         return this.notificationConfiguration.getAsyncPoolSize();
     }
 
+    /**
+     * @return a lower priority than {@link Thread#NORM_PRIORITY} since notifications are resource consuming and we
+     *          want other threads to have the priority.
+     */
     @Override
     public int getDefaultPriority()
     {
-        return Thread.NORM_PRIORITY;
+        return Thread.NORM_PRIORITY - 1;
     }
 }

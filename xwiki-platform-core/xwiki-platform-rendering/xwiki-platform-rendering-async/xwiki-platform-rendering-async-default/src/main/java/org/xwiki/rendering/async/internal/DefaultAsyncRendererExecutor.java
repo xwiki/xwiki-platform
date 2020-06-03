@@ -190,6 +190,7 @@ public class DefaultAsyncRendererExecutor implements AsyncRendererExecutor
 
         AsyncRendererJobRequest request = new AsyncRendererJobRequest();
         request.setRenderer(renderer);
+        request.setJobGroupPath(renderer.getJobGroupPath());
 
         if (asyncAllowed) {
             this.cache.getLock().writeLock().lock();

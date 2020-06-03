@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.CompositeEventStatus;
@@ -156,5 +157,11 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
     public boolean isCacheAllowed()
     {
         return false;
+    }
+
+    @Override
+    public JobGroupPath getJobGroupPath()
+    {
+        return AsyncNotificationRendererJobInitializer.NOTIFICATION_JOBGROUPPATH;
     }
 }

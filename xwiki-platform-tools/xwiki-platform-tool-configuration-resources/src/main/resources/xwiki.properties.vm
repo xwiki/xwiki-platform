@@ -1013,6 +1013,14 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.eventPreFilteringEnabled = false
 
+#-# [Since 12.5RC1]
+#-# The async notifications renderer is using a dedicated thread pool to limit the impact on the rest of the XWiki
+#-# instance.
+#-# This properties controls the size of this pool.
+#-#
+#-# The default is :
+# notifications.async.poolSize=2
+
 #-------------------------------------------------------------------------------------
 # Event Stream
 #-------------------------------------------------------------------------------------

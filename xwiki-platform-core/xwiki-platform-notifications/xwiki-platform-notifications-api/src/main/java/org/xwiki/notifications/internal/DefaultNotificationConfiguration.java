@@ -72,4 +72,16 @@ public class DefaultNotificationConfiguration implements NotificationConfigurati
     {
         return configurationSource.getProperty(CONFIGURATION_PREFIX + "rest.cache", true);
     }
+
+    @Override
+    public int getRESTPoolSize()
+    {
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "rest.poolSize", 2);
+    }
+
+    @Override
+    public int getAsyncPoolSize()
+    {
+        return configurationSource.getProperty(CONFIGURATION_PREFIX + "async.poolSize", 2);
+    }
 }

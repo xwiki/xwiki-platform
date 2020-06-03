@@ -70,4 +70,24 @@ public interface NotificationConfiguration
     {
         return true;
     }
+
+    /**
+     * @return the number of threads to use for computing notifications in REST.
+     * @since 12.5RC1
+     */
+    @Unstable
+    default int getRESTPoolSize()
+    {
+        return 2;
+    }
+
+    /**
+     * @return the number of threads to use for computing notifications in Async renderer.
+     * @since 12.5RC1
+     */
+    @Unstable
+    default int getAsyncPoolSize()
+    {
+        return 2;
+    }
 }

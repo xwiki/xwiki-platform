@@ -341,14 +341,15 @@ private def getCustomJobProperties()
   // found a way to merge properties and calling the properties() step will override any pre-existing properties.
   //
   // Notes:
-  // - We use @midnight so that Jenkins doesn't execute all jobs from various branches at the same time
-  // - We don't use @weekly for docker-all since we want them to execute on weekends only so that they don't execute
-  //   at the same time as docker-latest during standard week days, as it'll mean that all agents will be used and
-  //   be available for standard builds during the working days.
+  // - docker-latest: We start them at 10PM to have more time available for them so that we're sure they're finished on
+  //   the next morning when committers start pushing code. That's why we don't use @midnight.
+  // - docker-all: We don't use @weekly for docker-all since we want them to execute on weekends only so that they
+  //   don't execute at the same time as docker-latest during standard week days, as it'll mean that all agents will
+  //   be used and be available for standard builds during the working days.
   return [
     parameters([string(defaultValue: 'standard', description: 'Job type', name: 'type')]),
     pipelineTriggers([
-      parameterizedCron('''@midnight %type=docker-latest
+      parameterizedCron('''H 22 * * * %type=docker-latest
 H 0 * * 6 %type=docker-all
 @monthly %type=docker-unsupported'''),
       cron("@monthly")

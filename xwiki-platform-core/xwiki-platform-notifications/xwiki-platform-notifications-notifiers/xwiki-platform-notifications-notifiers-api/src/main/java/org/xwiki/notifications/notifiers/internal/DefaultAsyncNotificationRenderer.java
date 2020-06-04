@@ -23,10 +23,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.annotation.InstantiationStrategy;
 import org.xwiki.component.descriptor.ComponentInstantiationStrategy;
+import org.xwiki.job.GroupedJobInitializer;
 import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
@@ -65,6 +67,10 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
 
     @Inject
     private EntityReferenceSerializer<String> documentReferenceSerializer;
+
+    @Inject
+    @Named("AsyncNotificationRenderer")
+    private GroupedJobInitializer jobInitializer;
 
     private String cacheKey;
 
@@ -162,6 +168,6 @@ public class DefaultAsyncNotificationRenderer implements AsyncRenderer
     @Override
     public JobGroupPath getJobGroupPath()
     {
-        return AsyncNotificationRendererJobInitializer.NOTIFICATION_JOBGROUPPATH;
+        return this.jobInitializer.getId();
     }
 }

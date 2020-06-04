@@ -24,9 +24,12 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.xwiki.job.GroupedJobInitializer;
+import org.xwiki.job.JobGroupPath;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.CompositeEvent;
@@ -74,6 +77,10 @@ public class DefaultAsyncNotificationRendererTest
 
     @MockComponent
     private EntityReferenceSerializer<String> documentReferenceSerializer;
+
+    @MockComponent
+    @Named("AsyncNotificationRenderer")
+    private GroupedJobInitializer jobInitializer;
 
     private NotificationParameters notificationParameters;
 
@@ -188,5 +195,13 @@ public class DefaultAsyncNotificationRendererTest
         verify(this.notificationCacheManager).getFromCache(CACHE_KEY, false);
         verify(this.notificationCacheManager).setInCache(CACHE_KEY, compositeEventList, false);
         verify(this.compositeEventStatusManager, never()).getCompositeEventStatuses(any(), any());
+    }
+
+    @Test
+    public void getJobGroupPath()
+    {
+        JobGroupPath jobGroupPath = new JobGroupPath(Arrays.asList("Something", "Foo", "Bar"));
+        when(this.jobInitializer.getId()).thenReturn(jobGroupPath);
+        assertEquals(jobGroupPath, this.asyncNotificationRenderer.getJobGroupPath());
     }
 }

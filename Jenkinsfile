@@ -147,7 +147,16 @@ if (!params.type || params.type == 'standard') {
     }
   }
 } else {
-  buildDocker(params.type)
+  // If the build is docker-latest, only build if the previous build was triggered by some source code changes
+  if (params.type == 'docker-latest') {
+		if (!currentBuild.rawBuild.getPreviousBuild().getChangeSets().isEmpty()) {
+		  buildDocker(params.type)
+		} else {
+		  echoXWiki "No changeset found in previous build, thus not executing the docker latest tests."
+		}
+  } else {
+    buildDocker(params.type)
+  }
 }
 
 private void buildStandardSingle(build)

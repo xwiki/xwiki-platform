@@ -348,6 +348,13 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Needed for Jobs components -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-job-default</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
 
     <!-- Dependencies not needed by the plugin itself but included in the WAR it generates,
          listed to be sure it's built before the plugin -->

@@ -111,6 +111,13 @@
       <version>${project.version}</version>
       <scope>runtime</scope>
     </dependency>
+    <!-- Components for Jobs execution -->
+    <dependency>
+      <groupId>org.xwiki.commons</groupId>
+      <artifactId>xwiki-commons-job-default</artifactId>
+      <version>${commons.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <!-- User management -->
     <dependency>
       <groupId>org.xwiki.platform</groupId>

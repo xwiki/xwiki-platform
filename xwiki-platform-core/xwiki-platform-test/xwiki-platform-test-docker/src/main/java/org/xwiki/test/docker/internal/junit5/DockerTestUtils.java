@@ -169,7 +169,8 @@ public final class DockerTestUtils
                 Thread.sleep(5000L);
                 startContainerInternal(container, testConfiguration);
             } else {
-                throw e;
+                throw new Exception(String.format("Failed to start container from image [%s], on agent [%s]",
+                    dockerImageName, getAgentName()), e);
             }
         }
     }
@@ -320,4 +321,12 @@ public final class DockerTestUtils
         return hostname;
     }
 
+    /**
+     * @return the CI agent on which the test is executing
+     * @since 12.5RC1
+     */
+    public static String getAgentName()
+    {
+        return System.getProperty("jenkinsAgentName");
+    }
 }

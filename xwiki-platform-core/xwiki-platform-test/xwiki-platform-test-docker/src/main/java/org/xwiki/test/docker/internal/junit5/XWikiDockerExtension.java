@@ -56,6 +56,7 @@ import com.google.common.primitives.Ints;
 import ch.qos.logback.classic.Level;
 
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.followOutput;
+import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getAgentName;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.getResultFileLocation;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.isLocal;
 import static org.xwiki.test.docker.internal.junit5.DockerTestUtils.setLogbackLoggerLevel;
@@ -485,11 +486,6 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         if (agentName != null) {
             LOGGER.info("Jenkins Agent: [{}]", agentName);
         }
-    }
-
-    private String getAgentName()
-    {
-        return System.getProperty("jenkinsAgentName");
     }
 
     private void raiseException(Exception e)

@@ -645,7 +645,7 @@ public abstract class ListClass extends PropertyClass
             displayValue = item.getValue();
         }
         if ((context == null) || (context.getWiki() == null)) {
-            return displayValue;
+            return sanitize(displayValue, context);
         }
         String msgname = getFieldFullName() + "_" + value;
         String newresult = localizePlain(msgname);
@@ -656,9 +656,11 @@ public abstract class ListClass extends PropertyClass
                 msgname = "option_" + value;
                 newresult = localizePlain(msgname);
                 if (newresult == null) {
-                    newresult = displayValue;
+                    newresult = sanitize(displayValue, context);
                 }
             }
+        } else {
+            newresult = sanitize(newresult, context);
         }
         return newresult;
     }

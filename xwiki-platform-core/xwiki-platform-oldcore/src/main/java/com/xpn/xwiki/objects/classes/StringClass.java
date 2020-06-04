@@ -123,4 +123,12 @@ public class StringClass extends PropertyClass
         buffer.append(input.toString());
     }
 
+    @Override
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
+    {
+        StringBuffer result = new StringBuffer();
+        super.displayViewNoEscape(result, name, object);
+        buffer.append(sanitize(result.toString(), context));
+    }
 }

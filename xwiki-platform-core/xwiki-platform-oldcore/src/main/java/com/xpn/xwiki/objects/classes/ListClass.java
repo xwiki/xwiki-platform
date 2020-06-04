@@ -645,10 +645,11 @@ public abstract class ListClass extends PropertyClass
             displayValue = item.getValue();
         }
         if ((context == null) || (context.getWiki() == null)) {
-            return sanitize(displayValue, context);
+            return displayValue;
         }
         String msgname = getFieldFullName() + "_" + value;
         String newresult = localizePlain(msgname);
+        String syntax = context.getDoc().getSyntax().toIdString();
         if (newresult == null) {
             msgname = "option_" + name + "_" + value;
             newresult = localizePlain(msgname);
@@ -656,11 +657,11 @@ public abstract class ListClass extends PropertyClass
                 msgname = "option_" + value;
                 newresult = localizePlain(msgname);
                 if (newresult == null) {
-                    newresult = sanitize(displayValue, context);
+                    newresult = context.getDoc().getRenderedInlineContent(displayValue, syntax);
                 }
             }
         } else {
-            newresult = sanitize(newresult, context);
+            newresult = context.getDoc().getRenderedInlineContent(newresult, syntax);
         }
         return newresult;
     }

@@ -52,9 +52,6 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.Utils;
 
-import static org.apache.commons.lang3.StringUtils.removeEnd;
-import static org.apache.commons.lang3.StringUtils.removeStart;
-
 /**
  * Represents an XClass property and contains property definitions (eg "relational storage", "display type",
  * "separator", "multi select", etc). Each property definition is of type {@link BaseProperty}.
@@ -213,11 +210,6 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
     @Override
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
-    {
-        displayViewNoEscape(buffer, name, object);
-    }
-
-    protected void displayViewNoEscape(StringBuffer buffer, String name, BaseCollection object)
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
@@ -851,24 +843,5 @@ public class PropertyClass extends BaseCollection<ClassPropertyReference>
         XWikiContext context, MergeResult mergeResult)
     {
         currentProperty.merge(previousProperty, newProperty, configuration, context, mergeResult);
-    }
-
-    /**
-     * Render the provided text to prevent XSS.
-     *
-     * @param text the text to escape.
-     * @param context the xwiki context.
-     * @return the text once sanitized.
-     */
-    protected String sanitize(String text, XWikiContext context)
-    {
-        String syntax;
-        if (context == null || context.getDoc() == null) {
-            return text;
-        } else {
-            syntax = context.getDoc().getSyntax().toIdString();
-            String renderedContent = context.getDoc().getRenderedContent(text, syntax, context);
-            return removeEnd(removeStart(renderedContent, "<p>"), "</p>");
-        }
     }
 }

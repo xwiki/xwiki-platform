@@ -161,17 +161,43 @@ public final class DockerTestUtils
 
         // Try to work around the following issue: https://github.com/testcontainers/testcontainers-java/issues/2208
         try {
-            container.start();
+            startContainerInternal(container, testConfiguration);
         } catch (Exception e) {
             if (ExceptionUtils.getRootCause(e) instanceof EOFException) {
                 // Retry once after waiting 5 seconds to increase the odds ;)
                 LOGGER.info("Error starting docker container [{}]. Retrying once", container.getDockerImageName(), e);
                 Thread.sleep(5000L);
-                container.start();
+                startContainerInternal(container, testConfiguration);
             } else {
                 throw e;
             }
         }
+    }
+
+    private static void startContainerInternal(GenericContainer<?> container, TestConfiguration testConfiguration)
+    {
+        // Try to debug a timeout error starting BrowserWebDriverContainer:
+        //   ...
+        //   Caused by: org.testcontainers.containers.ContainerLaunchException: Container startup failed
+        //   ...
+        //   Caused by: org.rnorth.ducttape.RetryCountExceededException: Retry limit hit with exception
+        //   ...
+        //   Caused by: org.testcontainers.containers.ContainerLaunchException: Could not create/start container
+        //   ...
+        //   Caused by: org.rnorth.ducttape.TimeoutException: org.rnorth.ducttape.TimeoutException: java.util
+        //     .concurrent.TimeoutException
+        //   ...
+        //   Caused by: org.rnorth.ducttape.TimeoutException: java.util.concurrent.TimeoutException
+        //   ...
+        //   Caused by: java.util.concurrent.TimeoutException
+        //   ...
+        // We noticed that several BrowserWebDriverContainer are started when it fails and we need to find out which
+        // code starts them.
+        if (testConfiguration.isVerbose()) {
+            LOGGER.info("XWiki starting container type/image: [{}]/[{}]", container.getClass().getName(),
+                container.getDockerImageName());
+        }
+        container.start();
     }
 
     /**

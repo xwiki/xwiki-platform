@@ -28,7 +28,7 @@ define([
     mockData
 ) {
 
-    var app = new Vue({
+    new Vue({
 
         el: "#livedata",
 

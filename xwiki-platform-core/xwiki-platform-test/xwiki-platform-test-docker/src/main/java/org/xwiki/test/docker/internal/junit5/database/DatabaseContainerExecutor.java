@@ -33,6 +33,7 @@ import org.testcontainers.containers.OracleContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.xwiki.test.docker.internal.junit5.AbstractContainerExecutor;
 import org.xwiki.test.docker.junit5.TestConfiguration;
+import org.xwiki.test.junit5.RuntimeUtils;
 
 /**
  * Create and execute the Docker database container for the tests.
@@ -148,11 +149,15 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer.execInContainer("sh", "-c",
                 String.format("echo '[client]\nuser = root\npassword = %s' > credentials.cnf", DBPASSWORD));
             Container.ExecResult result = databaseContainer.execInContainer("mysql",
-                "--defaults-extra-file=credentials.cnf", "-e",
+                "--defaults-extra-file=credentials.cnf", "--verbose", "--debug", "-e",
                 String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
             if (result.getExitCode() == 0) {
                 break;
             } else {
+                // Trying to debug the following error:
+                //   ERROR 2002 (HY000): Can't connect to local MySQL server through socket
+                //      '/var/run/mysqld/mysqld.sock'
+                LOGGER.info(RuntimeUtils.run("ps -ef | grep mysql"));
                 String errorMessage = result.getStderr().isEmpty() ? result.getStdout() : result.getStderr();
                 if (i == maxRetries) {
                     throw new RuntimeException(String.format("Failed to grant all privileges to user [%s] on MySQL "

@@ -382,7 +382,7 @@ public class TextAreaClass extends StringClass
             }
         } else {
             StringBuffer result = new StringBuffer();
-            super.displayView(result, name, prefix, object, context);
+            super.displayViewNoEscape(result, name, object);
             if (doc != null) {
                 String syntax = getObjectDocumentSyntax(object, context).toIdString();
                 buffer.append(context.getDoc().getRenderedContent(result.toString(), syntax, context));

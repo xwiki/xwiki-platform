@@ -240,10 +240,16 @@ public class NotificationsIT
         tray = new NotificationsTrayPage();
         assertEquals(2, tray.getNotificationsCount());
         assertEquals("Linux as a title", tray.getNotificationPage(0));
-        assertTrue(tray.getNotificationDescription(0).startsWith(String.format("commented by %s", FIRST_USER_NAME)));
+        String expectedComment = String.format("commented by %s", FIRST_USER_NAME);
+        String obtainedComment = tray.getNotificationDescription(0);
+        assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
+            + "Actual description: [%s]", expectedComment, obtainedComment));
         assertEquals("Linux as a title", tray.getNotificationPage(1));
         assertEquals("update", tray.getNotificationType(1));
-        assertTrue(tray.getNotificationDescription(1).startsWith(String.format("edited by %s", FIRST_USER_NAME)));
+        expectedComment = String.format("edited by %s", FIRST_USER_NAME);
+        obtainedComment = tray.getNotificationDescription(1);
+        assertTrue(obtainedComment.startsWith(expectedComment), String.format("Expected description start: [%s]. "
+            + "Actual description: [%s]", expectedComment, obtainedComment));
 
         NotificationsRSS notificationsRSS = tray.getNotificationRSS(SECOND_USER_NAME, SECOND_USER_PASSWORD);
         ServletEngine servletEngine = testConfiguration.getServletEngine();

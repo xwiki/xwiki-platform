@@ -36,7 +36,16 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{velocity wiki="false"}}
+  <content>{{velocity wiki="true"}}
+#********************************************************
+Get the actual notifications.
+********************************************************#
+#if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getNotifications' == $request.action)
+{{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
+#end
+{{/velocity}}
+
+{{velocity wiki="false"}}
 #********************************************************
     Get the number of unread notifications as JSON
 ********************************************************#
@@ -195,7 +204,8 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'XWikiNotificationsMacro', 'xwiki-meta'], function ($, XWikiNotificationsMacro, xm) {
+      <code>require(['jquery', 'XWikiNotificationsMacro', 'XWikiAsyncNotificationsMacro', 'xwiki-meta'],
+        function ($, XWikiNotificationsMacro, XWikiAsyncNotificationsMacro, xm) {
   'use strict';
   /**
    * Maximum number of events to count
@@ -211,7 +221,7 @@
    * URL to the service that return the notifications to display
    */
   var url = new XWiki.Document(XWiki.Model.resolve('XWiki.Notifications.Code.NotificationsDisplayerUIX',
-    XWiki.EntityType.DOCUMENT)).getURL('get', 'outputSyntax=plain');
+    XWiki.EntityType.DOCUMENT)).getURL('get');
 
   /**
    * Will contain the Notifications Macro object.
@@ -267,6 +277,7 @@
             var notification = new XWiki.widgets.Notification("$escapetool.javascript($services.localization.render('notifications.menu.clearing'))", 'inprogress');
             // Send the request to change the start date
             $.post(url, {
+              outputSyntax: 'plain',
               action: 'clear',
               date: startDate
             }).success(function (){
@@ -359,6 +370,27 @@
     };
     var observer = new MutationObserver(processEvents);
     observer.observe(document, { childList: true, subtree : true});
+
+    /**
+    * Load the notifications content when the user open the notification menu (lazy loading to have better scalability).
+    */
+    var notificationsMenusHasBeenOpened = false;
+    $('#tmNotifications').on('show.bs.dropdown', function () {
+      // Don't load the notifications if the menu has already be opened before.
+      if (!notificationsMenusHasBeenOpened) {
+        $.get(url, {
+          outputSyntax: 'html',
+          action: 'getNotifications'
+        }).success(function (data){
+          $('.notifications-area').html(data).removeClass('loading');
+          $('.notifications-area').find('.notifications-macro').each(function() {
+            new XWikiAsyncNotificationsMacro(this);
+          });
+        });
+      }
+      notificationsMenusHasBeenOpened = true;
+    });
+
   });
 
 });
@@ -950,13 +982,7 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       &lt;div class="notifications-header-uix col-xs-12"&gt;
       &lt;/div&gt;
     &lt;/div&gt;
-&lt;div class="notifications-area"&gt;
-{{/html}}
-
-{{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
-
-{{html clean="false"}}
-&lt;/div&gt;
+&lt;div class="notifications-area loading clearfix"&gt;&lt;/div&gt;
   &lt;/li&gt;
 #end
 {{/html}}

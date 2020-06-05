@@ -18,6 +18,8 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 ###
+#template('display_macros.vm')
+###
 ### Comments macros.
 ###
 ###
@@ -31,6 +33,6 @@
     'cols': $cols
   })
   #initRequiredSkinExtensions()
-  #getRequiredSkinExtensions($requiredSkinExtensions)
-  $requiredSkinExtensions
+  #getAllSkinExtensions($requiredSkinExtensions)
+  #set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
 #end

@@ -58,29 +58,6 @@ viewers.Comments = Class.create({
         this.addPreview(this.form);
       }.bind(this)
     });
-    // this.addPreview(this.form);
-    //   console.log("WIIIIIT");
-
-    // require(['jquery', 'xwiki-events-bridge'], function ($) {
-    //   $.when($(".commentcontainer")).then(function() {
-    //     console.log("MOUA")
-    //     this.reloadEditor();
-    //   }.bind(this));  
-    // }.bind(this));
-    //   // (function waitForEditor() {
-    //   //   console.log("WIIIIIT");
-    //   //   if($(".commentcontainer").length > 0) {
-    //   //     $(document).trigger('xwiki:dom:updated', {'elements': $('.wysiwyg-field').toArray()});
-    //   //   } else {
-    //   //     setTimeout(waitForEditor, 10);
-    //   //   }
-    //   // })();
-    // });
-    // require(['jquery', 'xwiki-events-bridge'], function ($) {
-    //   // console.log('CALLED', $('.wysiwyg-field'), $('.wysiwyg-field').size());
-    //   console.log({'elements': $('.wysiwyg-field').toArray()})
-    //   $(document).trigger('xwiki:dom:updated', {'elements': $('.wysiwyg-field').toArray()});
-    // });
   },
   /**
    * Parse the IDs of the comments to obtain the xobject number.
@@ -432,6 +409,7 @@ viewers.Comments = Class.create({
     document.observe("xwiki:docextra:loaded", listener);
   },
   reloadEditor: function (options) {
+    console.log('RELOAD EDITOR');
     var name = 'XWiki.XWikiComments_comment';
     var wfClass = '.wysiwyg-field';
     options = options || {};
@@ -452,11 +430,29 @@ viewers.Comments = Class.create({
           name: name,
           rows: 5,
           cols: 80
-        }), function (data) {
+        }), function (data, status, jqXHR) {
+          function loadRequiredSkinExtensions(requiredSkinExtensions)
+          {
+            var existingSkinExtensions;
+            var getExistingSkinExtensions = function () {
+              return $('link, script').map(function () {
+                return $(this).attr('href') || $(this).attr('src');
+              }).get();
+            };
+            $('<div/>').html(requiredSkinExtensions).find('link, script').filter(function () {
+              if (!existingSkinExtensions) {
+                existingSkinExtensions = getExistingSkinExtensions();
+              }
+              var url = $(this).attr('href') || $(this).attr('src');
+              return existingSkinExtensions.indexOf(url) < 0;
+            }).appendTo('head');
+          }
+
           const wf = $(wfClass);
           wf.empty();
           wf.append(data);
           $(document).trigger('xwiki:dom:updated', {'elements': wf.toArray()});
+          loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
           if (callback) {
             callback();
           }

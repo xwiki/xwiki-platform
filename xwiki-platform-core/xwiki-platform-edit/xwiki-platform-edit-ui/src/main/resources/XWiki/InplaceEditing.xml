@@ -781,12 +781,20 @@ define('editInPlace', [
       var xwikiDocument = this._getActionButtons().data('xwikiDocument');
       var formData = {
         title: xwikiDocument.title,
-        content: xwikiDocument.renderedContent,
-        RequiresHTMLConversion: 'content',
-        content_syntax: xwikiDocument.syntax,
         language: xwikiDocument.getRealLocale(),
         isNew: xwikiDocument.isNew
       };
+      if (xwikiDocument.content != xwikiDocument.originalDocument.content) {
+        // Submit the raw (source) content. No syntax conversion is needed in this case.
+        formData.content = xwikiDocument.content;
+      } else {
+        // Submit the rendered content (HTML), but make sure it is converted to the document syntax on the server.
+        $.extend(formData, {
+          content: xwikiDocument.renderedContent,
+          RequiresHTMLConversion: 'content',
+          content_syntax: xwikiDocument.syntax
+        });
+      }
       // Check for merge conflicts only if the document is not new and we know the current version.
       if (!xwikiDocument.isNew &amp;&amp; xwikiDocument.version) {
         formData.previousVersion = xwikiDocument.version;
@@ -873,7 +881,11 @@ define('editInPlace', [
       editMode: 'wysiwyg',
       document: xwikiDocument,
       // The content editor is loaded on demand, asynchronously.
-      deferred: $.Deferred()
+      deferred: $.Deferred(),
+      // We have to explicitly enable the source mode for in-line edit because the latest version of the content editor
+      // could be installed on an older version of XWiki where the in-place editor didn't support the source mode (so
+      // the content editor cannot enable the source mode by default).
+      enableSourceMode: true
     };
     var editContentPromise = data.deferred.promise();
     editContentPromise.done(function() {

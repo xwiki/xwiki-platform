@@ -166,8 +166,15 @@
         });
         $(document).one('xwiki:actions:view', function(event, data) {
           $(document).off('xwiki:actions:beforeSave.contentEditor');
-          editor.destroy();
-          container.prop('contenteditable', false).removeAttr('contenteditable');
+          // Blur the edited content to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit shortcut).
+          // We also do this because destroying the editor while the edited content has the focus can lead to an error.
+          // See below.
+          container.blur().prop('contenteditable', false).removeAttr('contenteditable');
+          // We destroy the editor after the edited content has lost the focus completely because the editor has a
+          // delayed event listener that tries to access the selection even after the editor has been destroyed.
+          setTimeout(function() {
+            editor.destroy();
+          }, 0);
         });
       } catch (e) {
         console.log(e);

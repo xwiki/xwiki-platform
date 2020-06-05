@@ -31,6 +31,11 @@
       if (editor.config.fullPage) {
         this.injectPluginStyles(editor);
       }
+
+      // Add support for WYSIWYG mode while editing in-line.
+      if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
+        this.overwriteWysiwygMode(editor);
+      }
     },
 
     // Inject the plugins styles into the editing area.
@@ -65,6 +70,31 @@
           }
         });
       }, null, null, 14);
+    },
+
+    overwriteWysiwygMode: function(editor) {
+      // Hide the content that is edited in-line when leaving the WYSIWYG mode.
+      editor.on('beforeModeUnload', function() {
+        if (editor.mode === 'wysiwyg') {
+          editor.element.hide();
+        }
+      });
+
+      editor.addMode('wysiwyg', function(callback) {
+        // Show the content that is edited in-line when getting back to WYSIWYG mode.
+        editor.element.show();
+        // Enable in-line editing.
+        editor.editable(editor.element);
+        // Load and process editor data.
+        editor.setData(editor.getData(1));
+
+        callback();
+      });
+
+      // Show the content that is edited in-line when the editor is destroyed, in case the current mode is not WYSIWYG.
+      editor.on('beforeDestroy', function() {
+        editor.element.show();
+      });
     }
   });
 })();

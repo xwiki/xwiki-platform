@@ -148,21 +148,29 @@
     if (data &amp;&amp; data.contentType === 'org.xwiki.rendering.syntax.SyntaxContent' &amp;&amp; data.editMode === 'wysiwyg') {
       var container = $(event.target);
       ckeditorPromise.done(function(ckeditor) {
-        createEditor(ckeditor, container, data.document, data.deferred);
+        createEditor(ckeditor, container, data.document, data.deferred, !data.enableSourceMode);
       });
     }
   });
 
-  var createEditor = function(ckeditor, container, xwikiDocument, deferred) {
+  var createEditor = function(ckeditor, container, xwikiDocument, deferred, disableSourceMode) {
     container.prop('contenteditable', true).attr('data-sourceDocumentSyntax', xwikiDocument.syntax);
     container.each(function() {
       try {
         var editor = ckeditor.inline(this);
+        // Disable the source mode if the in-place editor doesn't support it, i.e. XWiki [12.3RC1, 12.4].
+        if (disableSourceMode) {
+          editor.once('configLoaded', function(event) {
+            if (typeof editor.config.removePlugins === 'string') {
+              editor.config.removePlugins += ',xwiki-source,xwiki-sourcearea';
+            }
+          });
+        }
         editor.on('instanceReady', function() {
           deferred.resolve(xwikiDocument);
         });
         $(document).on('xwiki:actions:beforeSave.contentEditor', function(event) {
-          xwikiDocument.renderedContent = editor.getData();
+          xwikiDocument[editor.mode === 'source' ? 'content' : 'renderedContent'] = editor.getData();
         });
         $(document).one('xwiki:actions:view', function(event, data) {
           $(document).off('xwiki:actions:beforeSave.contentEditor');
@@ -173,7 +181,11 @@
           // We destroy the editor after the edited content has lost the focus completely because the editor has a
           // delayed event listener that tries to access the selection even after the editor has been destroyed.
           setTimeout(function() {
-            editor.destroy();
+            // Don't update the edited element with the data from the editor because:
+            // * the editor data might be wiki syntax if the current mode is Source
+            // * the in-place editor updates the edited element anyway using the view HTML (without rendering markers)
+            //   and we risk overwriting it.
+            editor.destroy(/* noUpdate: */ true);
           }, 0);
         });
       } catch (e) {

@@ -108,7 +108,9 @@ CKEDITOR.editorConfig = function(config) {
     removeButtons: 'Anchor,BulletedList,Copy,CopyFormatting,Cut,Find,HorizontalRule,Indent,Language,NumberedList,'
       + 'Outdent,Paste,PasteFromWord,PasteText,RemoveFormat,SpecialChar,Strike,Subscript,Superscript,Underline,Unlink,'
       + 'officeImporter,xwiki-macro',
-    removePlugins: 'bidi,colorbutton,font,justify,save',
+    // We remove the default sourcearea plugin because we use our own xwiki-sourcearea plugin which supports switching to
+    // Source while editing in-place. We still bundle the sourcearea plugin because we reuse its icons and translations.
+    removePlugins: 'bidi,colorbutton,font,justify,save,sourcearea',
     toolbarGroups: [
       {name: 'format'},
       {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},

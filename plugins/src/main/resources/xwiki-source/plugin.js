@@ -28,7 +28,7 @@
   CKEDITOR.plugins.xwikiSource = {};
 
   CKEDITOR.plugins.add('xwiki-source', {
-    requires: 'sourcearea,notification,xwiki-loading,xwiki-localization',
+    requires: 'notification,xwiki-loading,xwiki-localization,xwiki-sourcearea',
 
     onLoad: function() {
       require(['textSelection'], function(textSelection) {
@@ -133,6 +133,9 @@
       jQuery.post(config.htmlConverter, {
         fromHTML: !toHTML,
         toHTML: toHTML,
+        // Don't wrap the returned HTML with the BODY tag and don't include the HEAD tag when the editor is used
+        // in-line (because the returned HTML will be inserted directly into the main page).
+        stripHTMLEnvelope: editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE,
         text: editor._.previousModeData
       }).done(function(data) {
         editor.setData(data, {
@@ -170,7 +173,7 @@
         editor.fire('lockSnapshot');
       }
       if (editor.editable()) {
-        editor.container.findOne('.cke_button__source_icon').addClass('loading');
+        jQuery(editor.container.$).find('.cke_button__source_icon').first().addClass('loading');
       }
       // A bug in Internet Explorer 11 prevents the user from typing into the Source text area if the WYSIWYG text
       // area is focused and the selection is collapsed before switching to Source mode. In order to avoid this
@@ -190,7 +193,7 @@
 
     endLoading: function(editor) {
       if (editor.editable()) {
-        editor.container.findOne('.cke_button__source_icon').removeClass('loading');
+        jQuery(editor.container.$).find('.cke_button__source_icon').first().removeClass('loading');
       }
       if (editor.mode === 'wysiwyg') {
         // Unlock the undo history after the conversion is done and the WYSIWYG mode data is set.

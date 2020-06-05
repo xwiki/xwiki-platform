@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.xwiki.extension.Extension;
+import org.xwiki.test.docker.internal.junit5.DockerTestUtils;
 import org.xwiki.test.docker.junit5.browser.Browser;
 import org.xwiki.test.docker.junit5.database.Database;
 import org.xwiki.test.docker.junit5.servletengine.ServletEngine;
@@ -214,7 +215,14 @@ public class TestConfiguration
 
     private void resolveVerbose()
     {
-        this.verbose = resolve(this.uiTestAnnotation.verbose(), VERBOSE_PROPERTY);
+        boolean verbose;
+        // Always display verbose logs for debugging when inside a container.
+        if (DockerTestUtils.isInAContainer()) {
+            verbose = true;
+        } else {
+            verbose = resolve(this.uiTestAnnotation.verbose(), VERBOSE_PROPERTY);
+        }
+        this.verbose = verbose;
     }
 
     private void resolveDebug()

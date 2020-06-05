@@ -21,21 +21,27 @@
 define([
     "Vue",
     "vue!" + BASE_PATH + "layouts/livedata-table.html",
-    "mockData"
+    "logic"
 ], function (
     Vue,
     livedataTable,
-    mockData
+    logic
 ) {
 
+    /**
+     * Create the table layout from Vuejs
+     */
     new Vue({
 
+        // The element where to build the layout
         el: "#livedata",
 
+        // Constructs a livedata-table component and passes it the data
         template: '<livedata-table :data="data"></livedata-table>',
 
+
         data: {
-            data: mockData,
+            data: logic.data,
         },
 
     });

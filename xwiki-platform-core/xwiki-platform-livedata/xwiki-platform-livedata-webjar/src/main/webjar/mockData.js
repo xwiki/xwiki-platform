@@ -17,43 +17,50 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
+
+// This is mock data used while the front-end is not communicating with the macros
+// The data structure is not definitive, and may change to match the final specs
+
 define({
     "totalrows": 5,
     "returnedrows": 5,
     "offset": 1,
-    "sort": [{property: "age", dir: "desc"}],
-    layouts: ["table"],
-    currentLayout: "table",
+    "sort": [{"property": "age", "dir": "desc"}],
+    "layouts": {
+        "available": ["tableLayout"],
+        "default": "tableLayout",
+    },
 
-    properties: [
+    "properties": [
         {
-            name: "Name",
-            key: "doc_title",
-            type: "Text",
+            "name": "Name",
+            "key": "doc_title",
+            "type": "Text",
         },
         {
-            name: "Age",
-            key: "age",
-            type: "Number",
+            "name": "Age",
+            "key": "age",
+            "type": "Number",
         },
         {
-            name: "Job",
-            key: "job",
-            type: "Text",
+            "name": "Job",
+            "key": "job",
+            "type": "Text",
         },
         {
-            name: "Country",
-            key: "country",
-            type: "List",
+            "name": "Country",
+            "key": "country",
+            "type": "List",
         },
         {
-            name: "Autre truc",
-            key: "autre",
-            type: "Text",
+            "name": "Autre truc",
+            "key": "autre",
+            "type": "Text",
         },
     ],
     
-    entries: [
+    "entries": [
         {
             "doc_url": "#link1",
             "doc_name": "Name1",

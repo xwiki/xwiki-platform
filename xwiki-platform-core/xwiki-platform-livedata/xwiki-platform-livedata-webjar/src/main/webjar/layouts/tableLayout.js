@@ -28,30 +28,29 @@ define([
     Logic
 ) {
 
+
     return function (element) {
-
-        logic = Logic(element);
-
+        this.logic = Logic(element);
 
         /**
          * Create the table layout from Vuejs
          */
-        new Vue({
-
-            // The element where to build the layout
-            el: "#livedata",
+        var vueTableLayout = new Vue({
 
             // Constructs a livedata-table component and passes it the data
             template: '<livedata-table :data="data"></livedata-table>',
 
-
             data: {
-                logic: logic,
-                data: logic.data,
+                logic: this.logic,
+                data: this.logic.data,
             },
 
-        });
+        }).$mount();
+
+        // return the HTML Element of the layout for the logic script
+        return vueTableLayout.$el;
 
     };
+
 
 });

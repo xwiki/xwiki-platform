@@ -58,7 +58,10 @@ define([], function () {
     var Logic = function (element) {
         this.element = element;
         this.data = JSON.parse(element.getAttribute("data-data") || "{}");
+        element.removeAttribute("data-data");
+        this.layouts = {};
     };
+
 
     /**
      * Load a layout, or default layout if none specified
@@ -72,24 +75,38 @@ define([], function () {
 
         // load layout based on it's filename
         require([BASE_PATH + "layouts/" + layoutName + ".js"],
-        // load success
-        function (layout) {
-            layout(self.element);
-            self.data.layouts.current = layoutName;
-            var event = new Event("xwiki:livedata:layoutchange");
-            self.element.dispatchEvent(event);
 
-        },
-        // load failure
-        function (err) {
-            // try to load default layout instead
-            if (layoutName !== self.data.layouts["default"]) {
-                self.loadLayout(self.data.layouts["default"]);
+            // load success
+            function (layout) {
+                // remove current layout from the page
+                if (self.data.layouts.current && self.layouts[self.data.layouts.current]) {
+                    self.element.removeChild(self.layouts[self.data.layouts.current]);
+                }
+                // add layout element in loaded layouts list if not already loaded on the page
+                if (!self.layouts[layoutName]) {
+                    self.layouts[layoutName] = new layout(self.element);
+                }
+                // add new layout to the page
+                self.element.appendChild(self.layouts[layoutName]);
+                self.data.layouts.current = layoutName;
+
+                // dispatch events
+                var event = new Event("xwiki:livedata:layoutchange");
+                self.element.dispatchEvent(event);
+
+            },
+
+            // load failure
+            function (err) {
+                // try to load default layout instead
+                if (layoutName !== self.data.layouts["default"]) {
+                    self.loadLayout(self.data.layouts["default"]);
+                }
+                else {
+                    console.error(err);
+                }
             }
-            else {
-                console.error(err);
-            }
-        });
+        );
     };
 
 

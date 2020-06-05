@@ -419,7 +419,15 @@
   <script type="text/javascript">
   //<![CDATA[
     #if ($hasEdit && !$isReadOnly)
-      shortcut.add("$services.localization.render('core.shortcuts.view.edit')",function() { location.href=$('tmEdit').down('a').href; }, { 'disable_in_input':true });
+      shortcut.add("$services.localization.render('core.shortcuts.view.edit')", function() {
+        var editLink = $('tmEdit').down('a');
+        // Make sure the shortcut doesn't work when the edit link is disabled.
+        if (editLink && !editLink.classList.contains('disabled')) {
+          // Simulate the user click because the edit link can have click listeners registered (which aren't executed if
+          // we simply change the window location using the link URL).
+          editLink.click();
+        }
+      }, {'disable_in_input': true});
       #if($isAdvancedUser)
         shortcut.add("$services.localization.render('core.shortcuts.view.wiki')",function() { location.href=$('tmEditWiki').href; }, { 'disable_in_input':true });
         shortcut.add("$services.localization.render('core.shortcuts.view.wysiwyg')",function() { location.href=$('tmEditWysiwyg').href; }, { 'disable_in_input':true });

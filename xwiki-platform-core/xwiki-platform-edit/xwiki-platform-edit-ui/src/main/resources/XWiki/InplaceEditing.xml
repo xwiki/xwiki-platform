@@ -712,8 +712,12 @@ define('editInPlace', [
 
   var loadActionButtons = function(actionButtons) {
     $(document).on('xwiki:actions:view', function() {
-      // Hide the action buttons and disable the shortcut keys (by disabling the buttons).
-      actionButtons.hide().find(':input').prop('disabled', true);
+      // Blur the action buttons first to re-enable the "disabled in inputs" shortcut keys (e.g. the page edit
+      // shortcut), then disable the action buttons in order to disable their shortcut keys while we're not editing
+      // in-place (e.g. prevent the Save shortcut while the user is only viewing the page). Finally hide the action
+      // buttons to have them ready for the next editing session (the user can save or cancel and then edit again
+      // without reloading the page).
+      actionButtons.find(':input').blur().prop('disabled', true).end().hide();
       // Hide the translate button because it can be used only in edit mode for the moment.
       $('#tmTranslate').addClass('hidden');
     });

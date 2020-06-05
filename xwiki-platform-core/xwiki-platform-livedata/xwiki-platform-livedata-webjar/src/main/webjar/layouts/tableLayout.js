@@ -21,29 +21,37 @@
 define([
     "Vue",
     "vue!" + BASE_PATH + "layouts/livedata-table.html",
-    "logic"
+    "Logic"
 ], function (
     Vue,
     livedataTable,
-    logic
+    Logic
 ) {
 
-    /**
-     * Create the table layout from Vuejs
-     */
-    new Vue({
+    return function (element) {
 
-        // The element where to build the layout
-        el: "#livedata",
-
-        // Constructs a livedata-table component and passes it the data
-        template: '<livedata-table :data="data"></livedata-table>',
+        logic = Logic(element);
 
 
-        data: {
-            data: logic.data,
-        },
+        /**
+         * Create the table layout from Vuejs
+         */
+        new Vue({
 
-    });
+            // The element where to build the layout
+            el: "#livedata",
+
+            // Constructs a livedata-table component and passes it the data
+            template: '<livedata-table :data="data"></livedata-table>',
+
+
+            data: {
+                logic: logic,
+                data: logic.data,
+            },
+
+        });
+
+    };
 
 });

@@ -231,7 +231,8 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
            <label for="${xCommentClass}_comment">$services.localization.render('core.viewers.comments.add.comment.label')</label>
           <div class="wysiwyg-field">
               <!-- loaded by javascript (see comments.js) -->
-              <!--<textarea class="ckeditor-textarea" id='${xCommentClass}_comment' rows='5' cols="80" name='${xCommentClass}_comment'>$!comment</textarea>-->
+            #template('comments_macros.vm')
+            #renderCommentField('xwiki/2.1' "${xCommentClass}_comment" "${xCommentClass}_comment" '' 5 80 true)
           </div>
         </div>
         #if($xcontext.user == 'XWiki.XWikiGuest' && $offerGuestsCaptcha)

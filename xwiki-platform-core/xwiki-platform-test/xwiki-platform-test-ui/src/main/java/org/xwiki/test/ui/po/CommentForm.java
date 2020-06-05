@@ -19,6 +19,10 @@
  */
 package org.xwiki.test.ui.po;
 
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
@@ -59,8 +63,31 @@ public class CommentForm extends BaseElement
     }
 
     /**
+     * Find the content field and runs an action using the field.
+     *
+     * @param action The action.
+     */
+    public void runOnContentField(Consumer<WebElement> action)
+    {
+        List<WebElement> textareas = getContainer()
+                                         .findElements(By.tagName("textarea"))
+                                         .stream()
+                                         .filter(it -> !it.getAttribute("class").contains("ckeditor-textarea"))
+                                         .collect(Collectors.toList());
+
+        if (textareas.size() == 0 || !textareas.get(0).isDisplayed()) {
+            WebElement iframe = getContainer().findElement(By.tagName("iframe"));
+            getDriver().switchTo().frame(iframe);
+            action.accept(getDriver().findElement(By.tagName("body")));
+            getDriver().switchTo().parentFrame();
+        } else {
+            action.accept(textareas.get(0));
+        }
+    }
+
+    /**
      * Clicks on the preview button and waits for the preview to be ready.
-     * 
+     *
      * @return the element that wraps the content preview
      */
     public WebElement clickPreview()

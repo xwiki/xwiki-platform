@@ -300,7 +300,6 @@ public class CreatePageIT extends AbstractTest
     @IgnoreBrowser(value = "internet.*", version = "8\\.*", reason="See https://jira.xwiki.org/browse/XE-1146"),
     @IgnoreBrowser(value = "internet.*", version = "9\\.*", reason="See https://jira.xwiki.org/browse/XE-1177")
     })
-    @Ignore
     public void createPageWithSaveAndEditTemplate() throws Exception
     {
         // Cleanup of the test space for any leftovers from previous tests.

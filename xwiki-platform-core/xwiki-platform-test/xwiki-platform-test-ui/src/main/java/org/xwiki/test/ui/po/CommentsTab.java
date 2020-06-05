@@ -90,7 +90,7 @@ public class CommentsTab extends BaseElement
     public int postComment(String content, boolean wait)
     {
         CommentForm addCommentForm = getAddCommentForm();
-        addCommentForm.getContentField().sendKeys(content);
+        addCommentForm.runOnContentField(f -> f.sendKeys(content));
         addCommentForm.clickSubmit(wait);
         return this.getCommentID(content);
     }
@@ -141,7 +141,7 @@ public class CommentsTab extends BaseElement
     public void replyToCommentByID(int id, String replyContent)
     {
         CommentForm replyCommentForm = replyToCommentByID(id);
-        replyCommentForm.getContentField().sendKeys(replyContent);
+        replyCommentForm.runOnContentField(f -> f.sendKeys(replyContent));
         replyCommentForm.clickSubmit();
     }
 
@@ -156,7 +156,7 @@ public class CommentsTab extends BaseElement
         getDriver()
             .findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'edit')]"))
             .click();
-        getDriver().waitUntilElementIsVisible(By.id("XWiki.XWikiComments_" + id + "_comment"));
+        getDriver().waitUntilElementIsVisible(By.className("wysiwyg-field-" + id));
         return new CommentForm(By.className("edit-xcomment"));
     }
 
@@ -169,8 +169,10 @@ public class CommentsTab extends BaseElement
     public void editCommentByID(int id, String content)
     {
         CommentForm editCommentForm = editCommentByID(id);
-        editCommentForm.getContentField().clear();
-        editCommentForm.getContentField().sendKeys(content);
+        editCommentForm.runOnContentField(f -> {
+            f.clear();
+            f.sendKeys(content);
+        });
         editCommentForm.clickSubmit();
     }
 

@@ -329,7 +329,7 @@
     &lt;div class="annotationText"&gt;
       #if($mode == 'edit' || $mode == 'create')
         #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
-        #if ($defaultEditorId == "wysiwyg")
+        #if ($defaultEditorId == 'wysiwyg')
         $services.edit.syntaxContent.wysiwyg('',$services.rendering.resolveSyntax('xwiki/2.1'), {
             'id': 'comment',
             'name': 'comment',

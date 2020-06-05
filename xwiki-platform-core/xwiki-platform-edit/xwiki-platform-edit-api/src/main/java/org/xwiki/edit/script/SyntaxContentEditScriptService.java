@@ -20,6 +20,7 @@
 package org.xwiki.edit.script;
 
 import java.util.Map;
+import java.util.Objects;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -32,7 +33,7 @@ import org.xwiki.rendering.syntax.SyntaxContent;
 
 /**
  * Edit script service specialized in {@link SyntaxContent} {@link Editor}s.
- * 
+ *
  * @version $Id$
  * @since 8.2RC1
  */
@@ -41,12 +42,16 @@ import org.xwiki.rendering.syntax.SyntaxContent;
 @Named(EditScriptService.ROLE_HINT + ".syntaxContent")
 public class SyntaxContentEditScriptService extends AbstractTypedEditScriptService<SyntaxContent>
 {
+    private static final String WYSIWYG_EDITOR = "wysiwyg";
+
+    private static final String TEXT_EDITOR = "text";
+
     /**
      * @return the default {@link SyntaxContent} editor in the "Text" category
      */
     public Editor<SyntaxContent> getDefaultTextEditor()
     {
-        return getDefaultEditor("text");
+        return getDefaultEditor(TEXT_EDITOR);
     }
 
     /**
@@ -54,7 +59,7 @@ public class SyntaxContentEditScriptService extends AbstractTypedEditScriptServi
      */
     public Editor<SyntaxContent> getDefaultWysiwygEditor()
     {
-        return getDefaultEditor("wysiwyg");
+        return getDefaultEditor(WYSIWYG_EDITOR);
     }
 
     /**
@@ -85,5 +90,24 @@ public class SyntaxContentEditScriptService extends AbstractTypedEditScriptServi
     {
         Editor<SyntaxContent> editor = getDefaultWysiwygEditor();
         return editor == null ? null : editor.render(new SyntaxContent(content, syntax), parameters);
+    }
+
+    /**
+     * Generates the HTML code needed to edit the given data while taking into account the preference of the current
+     * user.
+     *
+     * @param content the text content to edit
+     * @param syntax the syntax of the given content 
+     * @param parameters the edit parameters
+     * @return the HTML code that displays the editor for {@link SyntaxContent}
+     * @throws EditException if rendering the editor fails
+     */
+    public String preferred(String content, Syntax syntax, Map<String, Object> parameters) throws EditException
+    {
+        if (Objects.equals(getDefaultEditorId().toLowerCase(), WYSIWYG_EDITOR)) {
+            return wysiwyg(content, syntax, parameters);
+        } else {
+            return text(content, syntax, parameters);
+        }
     }
 }

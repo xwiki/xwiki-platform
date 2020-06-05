@@ -21,6 +21,7 @@ package org.xwiki.test.ui;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.test.ui.po.CommentForm;
@@ -58,6 +59,7 @@ public class CommentAsAdminTest extends AbstractTest
         getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
         ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), CONTENT, TITLE);
         this.commentsTab = vp.openCommentsDocExtraPane();
+        definePreferedEditor("Wysiwyg");
     }
 
     @Test
@@ -103,6 +105,7 @@ public class CommentAsAdminTest extends AbstractTest
     @Test
     public void testPostCommentAsAdminNoJs()
     {
+        definePreferedEditor("Text");
         // In this test class, the only user who logs in is admin.
         getUtil().gotoPage(getTestClassName(), getTestMethodName(), "view", "xpage=xpart&vm=commentsinline.vm");
         this.commentsTab.postComment(COMMENT_CONTENT, false);
@@ -115,20 +118,28 @@ public class CommentAsAdminTest extends AbstractTest
             this.commentsTab.getCommentAuthorByID(this.commentsTab.getCommentID(COMMENT_CONTENT)));
     }
 
+    private void definePreferedEditor(String text)
+    {
+        getUtil().updateObject("XWiki", "Admin", "XWiki.XWikiUsers", 0, "editor", text);
+    }
+
     /**
      * Preview a comment on a plain wiki page.
      */
     @Test
     public void testPreviewComment()
     {
-        CommentForm addCommentForm = commentsTab.getAddCommentForm();
-        addCommentForm.getContentField().sendKeys("one **two** three");
+        definePreferedEditor("Text");
+        CommentForm addCommentForm = this.commentsTab.getAddCommentForm();
+        addCommentForm.runOnContentField(f -> f.sendKeys("one **two** three"));
+        getDriver().switchTo().parentFrame();
         Assert.assertEquals("one two three", addCommentForm.clickPreview().getText());
         addCommentForm.clickBack();
-        addCommentForm.getContentField().sendKeys(" //four//");
+        addCommentForm.runOnContentField(f -> f.sendKeys(" //four//"));
+        getDriver().switchTo().parentFrame();
         addCommentForm.clickPreview();
         addCommentForm.clickSubmit();
-        Assert.assertTrue(commentsTab.getCommentID("one two three four") >= 0);
+        Assert.assertTrue(this.commentsTab.getCommentID("one two three four") >= 0);
     }
 
     /**
@@ -137,10 +148,11 @@ public class CommentAsAdminTest extends AbstractTest
     @Test
     public void testPreviewCommentOnPageWithSheet()
     {
+        definePreferedEditor("Text");
         // We know Blog.BlogIntroduction has a sheet applied.
-        commentsTab = getUtil().gotoPage("XWiki", "DefaultSkin").openCommentsDocExtraPane();
-        CommentForm addCommentForm = commentsTab.getAddCommentForm();
-        addCommentForm.getContentField().sendKeys("xyz");
+        this.commentsTab = getUtil().gotoPage("XWiki", "DefaultSkin").openCommentsDocExtraPane();
+        CommentForm addCommentForm = this.commentsTab.getAddCommentForm();
+        addCommentForm.runOnContentField(f ->f.sendKeys("xyz"));
         Assert.assertEquals("xyz", addCommentForm.clickPreview().getText());
     }
 }

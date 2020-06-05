@@ -18,22 +18,19 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 ###
-### Return a single comment field
+### Comments macros.
 ###
 ###
-#set($xCommentClass = 'XWiki.XWikiComments')
-#set ($syntax = $request.syntax)
-#set ($id = $request.id + "$datetool.date.time")
-#set ($number = $numbertool.toNumber($request.number).intValue())
-#set ($name = $request.name)
-#set ($rows = $request.rows)
-#set ($cols = $request.cols)
-#if ($number > -1)
-    #set ($commentObj = $doc.getObject($xCommentClass, $number))
-    #set ($content = $commentObj.getProperty('comment').getValue())
-#else
-    #set ($content = '')
+#macro (renderCommentField $syntax $id $name $content $rows $cols)
+  #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
+  <input type='hidden' name='defaultEditorId' value="$defaultEditorId" />
+  $services.edit.syntaxContent.preferred("$content",$services.rendering.resolveSyntax($syntax), {
+    'id': $id,
+    'name': $name,
+    'rows': $rows,
+    'cols': $cols
+  })
+  #initRequiredSkinExtensions()
+  #getRequiredSkinExtensions($requiredSkinExtensions)
+  $requiredSkinExtensions
 #end
-
-#template('comments_macros.vm')
-#renderCommentField($syntax $id $name $content $rows $cols)

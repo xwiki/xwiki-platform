@@ -149,7 +149,7 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
             databaseContainer.execInContainer("sh", "-c",
                 String.format("echo '[client]\nuser = root\npassword = %s' > credentials.cnf", DBPASSWORD));
             Container.ExecResult result = databaseContainer.execInContainer("mysql",
-                "--defaults-extra-file=credentials.cnf", "--verbose", "--debug", "-e",
+                "--defaults-extra-file=credentials.cnf", "--verbose", "-e",
                 String.format("grant all privileges on *.* to '%s'@'%%'", DBUSERNAME));
             if (result.getExitCode() == 0) {
                 break;

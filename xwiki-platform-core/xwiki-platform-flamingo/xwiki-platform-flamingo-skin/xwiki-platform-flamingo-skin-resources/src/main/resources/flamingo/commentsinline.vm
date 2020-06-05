@@ -234,7 +234,7 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
           </div>
         </div>
         #if($xcontext.user == 'XWiki.XWikiGuest' && $offerGuestsCaptcha)
-          #displayCaptcha('xwiki/2.1', "${xCommentClass}_comment", "${xCommentClass}_comment")
+          #displayCaptcha()
         #end
         <div>
           <input type="submit" value="$services.localization.render('core.viewers.comments.add.submit')" class="btn btn-primary"/>

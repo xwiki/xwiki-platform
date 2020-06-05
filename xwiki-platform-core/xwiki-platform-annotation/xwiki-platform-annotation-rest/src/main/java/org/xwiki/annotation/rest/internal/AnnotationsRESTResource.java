@@ -180,20 +180,20 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             }
 
             // add the annotation
-            Map<String, Object> annotationMetadata = getMap(request.getAnnotation());
+            Map<String, Object> annotationsMap = getMap(request.getAnnotation());
 
-            Map<String, Object> annotationMetadata2 = new HashMap<>();
-            annotationMetadata2.put(DATE_KEY, annotationMetadata.get(DATE_KEY));
-            annotationMetadata2.put(AUTHOR_KEY, annotationMetadata.get(AUTHOR_KEY));
-            if (annotationMetadata.containsKey("RequiresHTMLConversion")) {
-                annotationMetadata2.put(COMMENT_KEY,
-                    this.htmlConverter.fromHTML(String.valueOf(annotationMetadata.get(COMMENT_KEY)), "xwiki/2.1"));
+            Map<String, Object> annotationMetadata = new HashMap<>();
+            annotationMetadata.put(DATE_KEY, annotationsMap.get(DATE_KEY));
+            annotationMetadata.put(AUTHOR_KEY, annotationsMap.get(AUTHOR_KEY));
+            if (annotationsMap.containsKey("RequiresHTMLConversion")) {
+                annotationMetadata.put(COMMENT_KEY,
+                    this.htmlConverter.fromHTML(String.valueOf(annotationsMap.get(COMMENT_KEY)), "xwiki/2.1"));
             } else {
-                annotationMetadata2.put(COMMENT_KEY, annotationMetadata.get(COMMENT_KEY));
+                annotationMetadata.put(COMMENT_KEY, annotationsMap.get(COMMENT_KEY));
             }
 
             this.annotationService.addAnnotation(documentName, request.getSelection(), request.getSelectionContext(),
-                request.getSelectionOffset(), getXWikiUser(), annotationMetadata2);
+                request.getSelectionOffset(), getXWikiUser(), annotationMetadata);
             // and then return the annotated content, as specified by the annotation request
             return getSuccessResponseWithAnnotatedContent(documentName, request);
         } catch (AnnotationServiceException | XWikiException e) {

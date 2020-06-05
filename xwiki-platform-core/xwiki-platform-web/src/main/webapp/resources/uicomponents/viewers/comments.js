@@ -348,7 +348,7 @@ viewers.Comments = Class.create({
           this.cancelPreview(form);
         }
       }.bindAsEventListener(this));
-    });
+    }.bind(this));
   },
   /**
    * Display the comment preview instead of the comment textarea.
@@ -409,7 +409,6 @@ viewers.Comments = Class.create({
     document.observe("xwiki:docextra:loaded", listener);
   },
   reloadEditor: function (options) {
-    console.log('RELOAD EDITOR');
     var name = 'XWiki.XWikiComments_comment';
     var wfClass = '.wysiwyg-field';
     options = options || {};

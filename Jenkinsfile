@@ -147,12 +147,15 @@ if (!params.type || params.type == 'standard') {
     }
   }
 } else {
-  // If the build is docker-latest, only build if the previous build was triggered by some source code changes
-  if (params.type == 'docker-latest') {
+  // If the build is docker-latest, only build if the previous build was triggered by some source code changes.
+  // Also always build if triggered manually by a user.
+  if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
 		if (!currentBuild.rawBuild.getPreviousBuild().getChangeSets().isEmpty()) {
 		  buildDocker(params.type)
 		} else {
 		  echoXWiki "No changeset found in previous build, thus not executing the docker latest tests."
+		  // Aborting so that the build isn't displayed as successful without doing anything.
+		  currentBuild.result = 'ABORTED'
 		}
   } else {
     buildDocker(params.type)

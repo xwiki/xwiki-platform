@@ -85,9 +85,8 @@
         editor.element.show();
         // Enable in-line editing.
         editor.editable(editor.element);
-        // Load and process editor data.
-        editor.setData(editor.getData(1));
-
+        // Note that we trigger the callback without setting the editor data because this is done later by our source
+        // plugin after converting the source wiki syntax to HTML.
         callback();
       });
 

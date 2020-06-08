@@ -20,13 +20,14 @@
 (function() {
   'use strict';
 
+  // The following code is partially taken (and adapted) from CKEditor's default sourcearea plugin.
   CKEDITOR.plugins.add('xwiki-sourcearea', {
     init: function(editor) {
       editor.addMode('source', function(callback) {
         var contentsSpace = editor.ui.space('contents');
 
-        var textarea = contentsSpace.getDocument().createElement('textarea');
-        textarea.setStyles(CKEDITOR.tools.extend({
+        var textArea = contentsSpace.getDocument().createElement('textarea');
+        textArea.setStyles(CKEDITOR.tools.extend({
           width: '100%',
           height: '100%',
           resize: 'none',
@@ -35,13 +36,17 @@
         }, CKEDITOR.tools.cssVendorPrefix('tab-size', editor.config.sourceAreaTabSize || 2)));
         // Make sure that source code is always displayed LTR, regardless of editor language.
         // See https://dev.ckeditor.com/ticket/10105
-        textarea.setAttribute('dir', 'ltr');
-        textarea.addClass('cke_source').addClass('cke_reset').addClass('cke_enable_context_menu');
+        textArea.setAttribute('dir', 'ltr');
+        textArea.addClass('cke_source').addClass('cke_reset').addClass('cke_enable_context_menu');
 
-        contentsSpace.append(textarea);
+        if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
+          jQuery(textArea.$).autoHeight();
+        }
 
-        var editable = editor.editable(new SourceEditable(editor, textarea));
-        // Fill the textarea with the current editor data.
+        contentsSpace.append(textArea);
+
+        var editable = editor.editable(new SourceEditable(editor, textArea));
+        // Fill the text area with the current editor data.
         editable.setData(editor.getData(1));
 
         editor.fire('ariaWidget', this);
@@ -97,6 +102,13 @@
           }
         }
       });
+
+      editor.on('dataReady', function() {
+        if (editor.mode === 'source' && editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
+          // Update the text area height.
+          jQuery(editor.editable().$).trigger('input');
+        }
+      });
     }
   });
 
@@ -130,4 +142,19 @@
       }
     }
   });
+
+  // Credits: https://stackoverflow.com/a/25621277
+  jQuery.fn.autoHeight = jQuery.fn.autoHeight || function() {
+    var autoHeight = function(element) {
+      return jQuery(element).css({
+        'height': 'auto',
+        'overflow-y': 'hidden'
+      }).height(element.scrollHeight);
+    };
+    return this.each(function() {
+      autoHeight(this).on('input', function() {
+        autoHeight(this);
+      });
+    });
+  };
 })();

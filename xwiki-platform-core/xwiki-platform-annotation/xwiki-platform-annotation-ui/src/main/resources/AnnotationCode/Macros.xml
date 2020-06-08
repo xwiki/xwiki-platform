@@ -328,10 +328,10 @@
     #set($discard = $fakeObj.set($onlyProperty.name, "$!{ann.get($onlyProperty.name)}"))
     &lt;div class="annotationText"&gt;
       #if($mode == 'edit' || $mode == 'create')
-        $services.edit.syntaxContent.preferred('',$services.rendering.resolveSyntax('xwiki/2.1'), {
+        $services.edit.syntaxContent.preferredEditor('',$services.rendering.resolveSyntax('xwiki/2.1'), {
           'id': 'comment',
           'name': 'comment',
-          'rows': 5,
+          'rows': 10,
           'cols': 40
         })
       #else

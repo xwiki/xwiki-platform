@@ -26,7 +26,7 @@
 #macro (renderCommentField $syntax $id $name $content $rows $cols)
   #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
   <input type='hidden' name='defaultEditorId' value="$defaultEditorId" />
-  $services.edit.syntaxContent.preferred("$content",$services.rendering.resolveSyntax($syntax), {
+  $services.edit.syntaxContent.preferredEditor("$content",$services.rendering.resolveSyntax($syntax), {
     'id': $id,
     'name': $name,
     'rows': $rows,

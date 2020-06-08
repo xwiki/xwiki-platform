@@ -101,8 +101,9 @@ public class SyntaxContentEditScriptService extends AbstractTypedEditScriptServi
      * @param parameters the edit parameters
      * @return the HTML code that displays the editor for {@link SyntaxContent}
      * @throws EditException if rendering the editor fails
+     * @since 12.5RC1
      */
-    public String preferred(String content, Syntax syntax, Map<String, Object> parameters) throws EditException
+    public String preferredEditor(String content, Syntax syntax, Map<String, Object> parameters) throws EditException
     {
         if (Objects.equals(getDefaultEditorId().toLowerCase(), WYSIWYG_EDITOR)) {
             return wysiwyg(content, syntax, parameters);

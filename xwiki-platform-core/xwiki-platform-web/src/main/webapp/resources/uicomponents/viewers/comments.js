@@ -91,6 +91,10 @@ viewers.Comments = Class.create({
           // without making a new request
           var comment = item.up(this.xcommentSelector);
           comment.hide();
+          const commentNbr = comment.id.match(/.+_(\d+)/)[1];
+          this.reloadEditor({
+            commentNbr: commentNbr,
+          });
           item._x_editForm.show();
         } else {
           new Ajax.Request(
@@ -113,10 +117,12 @@ viewers.Comments = Class.create({
                 comment.insert({before: response.responseText});
                 item._x_editForm = comment.previous();
                 this.addSubmitListener(item._x_editForm);
-                
+
+                const commentNbr = item.readAttribute('href').match(/number=(\d+)/)[1];
+
                 this.reloadEditor({
-                  commentNbr: item.readAttribute('href').match(/number=(\d+)/)[1],
-                  callback: function() {
+                  commentNbr: commentNbr,
+                  callback: function () {
                     this.addPreview(item._x_editForm);
                     item._x_editForm.down('a.cancel').observe('click', this.cancelEdit.bindAsEventListener(this, item));
                     comment.hide();
@@ -155,6 +161,9 @@ viewers.Comments = Class.create({
     }
     var comment = editActivator.up(this.xcommentSelector);
     editActivator._x_editForm.hide();
+    const commentNbr = comment.id.match(/.+_(\d+)/)[1];
+    const name = `XWiki.XWikiComments_${commentNbr}_comment`;
+    this.destroyEditor(`[name='${name}']`, name);
     comment.show();
     this.cancelPreview(editActivator._x_editForm);
     this.editing = false;
@@ -190,7 +199,8 @@ viewers.Comments = Class.create({
       }
       // Insert the form on top of that comment's discussion
       item.up(this.xcommentSelector).next('.commentthread').insert({'top' : this.form});
-
+      
+      this.addPreview(this.form);
       this.reloadEditor();
 
       // Set the replyto field to the replied comment's number
@@ -211,8 +221,8 @@ viewers.Comments = Class.create({
       // Add listener for submit
       form.down("input[type='submit']").observe('click', function(event) {
         event.stop();
-        
-        // triggers the copy of the content of the rich editor to hidden fields 
+
+        // triggers the copy of the content of the rich editor to hidden fields
         jQuery(document).trigger('xwiki:actions:beforeSave');
         if (form.down('textarea').value != "") {
           var formData = new Hash(form.serialize(true));
@@ -249,20 +259,30 @@ viewers.Comments = Class.create({
               response.request.options.onFailure(response);
             },
             onComplete : function (response) {
-              // We enable the form even when it is going to be replaced because the browser caches the state of the form
-              // input fields and the user will get disabled fields when (soft) reloading the page.
+              // We enable the form even when it is going to be replaced because the browser caches the state of the
+              // form input fields and the user will get disabled fields when (soft) reloading the page.
               form.enable();
+
+              var comment = form.down('.xwikicomment');
+              var name = `XWiki.XWikiComments_comment`;
+              if (comment !== undefined) {
+                const rgx = comment.id.match(/.+_(\d+)/).size();
+                if (rgx > 0) {
+                  const commentNbr = comment.id.match(/.+_(\d+)/)[1];
+                  name = `XWiki.XWikiComments_${commentNbr}_comment`;
+                }
+              }
+              this.destroyEditor(`[name='${name}']`, name);
+
               if (this.restartNeeded) {
                 this.container.update(response.responseText);
                 document.fire("xwiki:docextra:loaded", {
                   "id": "Comments",
                   "element": this.container
                 });
-                
+
                 // Notify any displayed CAPTCHA that it was reloaded and it might need to reinitialize its JS.
                 this.container.fire('xwiki:captcha:reloaded');
-
-                this.reloadEditor();
               }
             }.bind(this)
           });
@@ -286,6 +306,7 @@ viewers.Comments = Class.create({
    */
   addPreview : function(form) {
     require(['jquery'], function ($) {
+      console.log("add preview");
       if (!form || !XWiki.hasEdit || jQuery("[name='defaultEditorId']").first().val() !== "text") {
         return;
       }
@@ -304,8 +325,12 @@ viewers.Comments = Class.create({
       form.commentElt.insert({'before': form.previewContent});
 
       form.previewContent.hide();
+      const buttonName = jQuery(form.previewButton).find("input")[0].value;
+      const existingButton = jQuery(buttons).find(`input[value='${buttonName}']`);
+      existingButton.remove();
       buttons.insert({'top': form.previewButton});
       form.previewButton.observe('click', function () {
+        console.log('preview click');
         if (!form.previewButton._x_modePreview && !form.previewButton.disabled) {
           form.previewButton.disabled = true;
           var notification = new XWiki.widgets.Notification(
@@ -358,9 +383,14 @@ viewers.Comments = Class.create({
    */
   doPreview : function(content, form) {
     form.previewButton._x_modePreview = true;
-    form.previewContent.update(content);
-    form.previewContent.show();
-    form.commentElt.hide();
+    const commentElt = jQuery(form).find(".wysiwyg-field");
+    if(jQuery(form).find(".commentPreview").size() === 0) {
+      commentElt.before('<div class="commentcontent commentPreview" style="display: none;"></div>');
+    }
+    const pc = jQuery(form).find(".commentcontainer .commentPreview");
+    pc.html(content);
+    pc.show();
+    commentElt.hide();
     form.previewButton.down('input').value = "$services.localization.render('core.viewers.comments.preview.button.back')";
   },
   /**
@@ -374,12 +404,14 @@ viewers.Comments = Class.create({
       form.previewButton.down('input').value =
           "$services.localization.render('core.viewers.comments.preview.button.preview')";
     }
-    if (form.previewContent) {
-      form.previewContent.hide();
-      form.previewContent.update('');
+    const pc = jQuery(form).find(".commentPreview");
+    if (pc) {
+      pc.hide();
+      pc.html('');
     }
-    if (form.commentElt) {
-      form.commentElt.show();
+    const commentElt = jQuery(form).find(".wysiwyg-field");
+    if (commentElt) {
+      commentElt.show();
     }
   },
   resetForm : function (event) {
@@ -393,7 +425,7 @@ viewers.Comments = Class.create({
       this.initialLocation.insert({after: this.form});
     }
     this.form["XWiki.XWikiComments_replyto"].value = "";
-    this.form["XWiki.XWikiComments_comment"].value = "";
+    this.reloadEditor();
     this.cancelPreview(this.form);
   },
   /**
@@ -408,16 +440,35 @@ viewers.Comments = Class.create({
     }.bindAsEventListener(this);
     document.observe("xwiki:docextra:loaded", listener);
   },
-  reloadEditor: function (options) {
-    var name = 'XWiki.XWikiComments_comment';
+  destroyEditor: function (selector, name) {
+
+    // TODO: delete and find a way to directly call the editor destroy event.
+    if (typeof CKEDITOR !== 'undefined' && name in CKEDITOR.instances) {
+      CKEDITOR.instances[name].destroy();
+    }
+
+    require(['jquery'], function ($) {
+      if ($(selector).size() > 0) {
+        const parent = $(selector).parent(".wysiwyg-field");
+        parent.empty();
+        $(document).trigger('xwiki:dom:updated', {'elements': parent.toArray()});
+      }
+    });
+  },
+  reloadEditor : function (options) {
     var wfClass = '.wysiwyg-field';
     options = options || {};
     const commentNbr = options.commentNbr;
     const callback = options.callback;
+    var name = 'XWiki.XWikiComments_comment';
     if (commentNbr) {
       name = 'XWiki.XWikiComments_' + commentNbr + '_comment';
       wfClass = wfClass + '-' + commentNbr;
     }
+
+    console.log("DESTROY", name);
+    this.destroyEditor(`[name='${name}']`, name);
+
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       if ($(".wysiwyg-field").size() > 0) {
         $.post(new XWiki.Document().getURL("view") + '?' + $.param({
@@ -575,7 +626,7 @@ require(['jquery', 'xwiki-events-bridge'], function($) {
     var commentsNumber = $('.xwikicomment').size();
     if(commentsTab) {
       commentsTab.text("$services.localization.render('docextra.extranb', ['__number__'])".replace("__number__", commentsNumber));
-    };
+    }
     if($('#tmComment').length) {
       // All the sub-nodes of tmComment are added in a normalized form.
       $('#tmComment')[0].normalize();

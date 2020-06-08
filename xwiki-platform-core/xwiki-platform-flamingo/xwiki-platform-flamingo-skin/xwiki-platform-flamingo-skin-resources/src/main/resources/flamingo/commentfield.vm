@@ -23,14 +23,13 @@
 ###
 #set($xCommentClass = 'XWiki.XWikiComments')
 #set ($syntax = $request.syntax)
-#set ($id = $request.id + "$datetool.date.time")
+#set ($id = $request.id)
 #set ($number = $numbertool.toNumber($request.number).intValue())
 #set ($name = $request.name)
 #set ($rows = $request.rows)
 #set ($cols = $request.cols)
 #if ($number > -1)
-    #set ($commentObj = $doc.getObject($xCommentClass, $number))
-    #set ($content = $commentObj.getProperty('comment').getValue())
+    #set ($content = $commentObj.getValue('comment'))
 #else
     #set ($content = '')
 #end

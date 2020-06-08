@@ -162,8 +162,8 @@ viewers.Comments = Class.create({
     var comment = editActivator.up(this.xcommentSelector);
     editActivator._x_editForm.hide();
     const commentNbr = comment.id.match(/.+_(\d+)/)[1];
-    const name = `XWiki.XWikiComments_${commentNbr}_comment`;
-    this.destroyEditor(`[name='${name}']`, name);
+    const name = "XWiki.XWikiComments_ " + commentNbr + "+_comment";
+    this.destroyEditor("[name='" + name + "']", name);
     comment.show();
     this.cancelPreview(editActivator._x_editForm);
     this.editing = false;
@@ -264,15 +264,15 @@ viewers.Comments = Class.create({
               form.enable();
 
               var comment = form.down('.xwikicomment');
-              var name = `XWiki.XWikiComments_comment`;
+              var name = "XWiki.XWikiComments_comment";
               if (comment !== undefined) {
                 const rgx = comment.id.match(/.+_(\d+)/).size();
                 if (rgx > 0) {
                   const commentNbr = comment.id.match(/.+_(\d+)/)[1];
-                  name = `XWiki.XWikiComments_${commentNbr}_comment`;
+                  name = "XWiki.XWikiComments_" + commentNbr + "_comment";
                 }
               }
-              this.destroyEditor(`[name='${name}']`, name);
+              this.destroyEditor("[name='" + name + "']", name);
 
               if (this.restartNeeded) {
                 this.container.update(response.responseText);
@@ -306,7 +306,6 @@ viewers.Comments = Class.create({
    */
   addPreview : function(form) {
     require(['jquery'], function ($) {
-      console.log("add preview");
       if (!form || !XWiki.hasEdit || jQuery("[name='defaultEditorId']").first().val() !== "text") {
         return;
       }
@@ -326,11 +325,10 @@ viewers.Comments = Class.create({
 
       form.previewContent.hide();
       const buttonName = jQuery(form.previewButton).find("input")[0].value;
-      const existingButton = jQuery(buttons).find(`input[value='${buttonName}']`);
+      const existingButton = jQuery(buttons).find("input[value='" + buttonName + "']");
       existingButton.remove();
       buttons.insert({'top': form.previewButton});
       form.previewButton.observe('click', function () {
-        console.log('preview click');
         if (!form.previewButton._x_modePreview && !form.previewButton.disabled) {
           form.previewButton.disabled = true;
           var notification = new XWiki.widgets.Notification(
@@ -466,8 +464,7 @@ viewers.Comments = Class.create({
       wfClass = wfClass + '-' + commentNbr;
     }
 
-    console.log("DESTROY", name);
-    this.destroyEditor(`[name='${name}']`, name);
+    this.destroyEditor("[name='" + name + "']", name);
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       if ($(".wysiwyg-field").size() > 0) {

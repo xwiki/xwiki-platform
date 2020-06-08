@@ -1149,6 +1149,11 @@ input#document-title-input:focus,
 }
 #xwikicontent {
   padding-top: @line-height-computed * 0.75;
+}
+
+.sticky-buttons-wrapper {
+  /* Leave some space for the bottom box shadow of the editing area. */
+  margin-top: 7px;
 }</code>
     </property>
     <property>

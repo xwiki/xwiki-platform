@@ -1,48 +1,45 @@
 <template>
-    <table class="xwiki-livetable">
+  <table class="xwiki-livetable">
 
-        <thead>
+    <!-- Table Header -->
+    <thead>
+      <tr>
 
-            <tr>
+        <th
+          v-for="col in cols"
+          :key="col.id"
+        >
+          {{ col.name }}
+        </th>
 
-                <th
-                    v-for="(col, cIdx) in cols"
-                    :key="cIdx"
-                >
-                    <div class="column-header">
-                        <div>{{ col.name }}</div>
-                    </div>
-                </th>
-
-            </tr>
-
-        </thead>
+      </tr>
+    </thead>
 
 
+    <!-- Table Body -->
+    <tbody>
+      <tr
+        v-for="(row, rowId) in rows"
+        :key="rowId"
+      >
 
-        <tbody>
+        <td
+          class="cell"
+          v-for="col in cols"
+          :key="col.id"
+        >
+          <div
+            class="displayer"
+            v-text="row[col.id]"
+          ></div>
+        </td>
 
-            <tr
-                v-for="(row, rIdx) in rows"
-                :key="rIdx"
-            >
+      </tr>
+    </tbody>
 
-                <td
-                    v-for="col in cols"
-                    :key="col.key"
-                >
-                    <div
-                        class="cell"
-                        v-text="row[col.key]"
-                    ></div>
-                </td>
-
-            </tr>
-
-        </tbody>
-
-    </table>
+  </table>
 </template>
+
 
 <script>
 /*
@@ -65,26 +62,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 define(["Vue"], function (Vue) {
-    Vue.component("livedata-table", {
-            
-        name: "xwiki-livetable",
+  Vue.component("livedata-table", {
 
-        template: template,
+    name: "xwiki-livetable",
 
-        props: {
-            data: Object,
-        },
+    template: template,
 
-        computed: {
-            rows: function () { return this.data.entries; },
-            cols: function () { return this.data.properties; },
-        },
-        
-    });
+    props: {
+      data: Object,
+    },
+
+    computed: {
+      rows: function () { return this.data.data.entries; },
+      cols: function () { return this.data.meta.propertyDescriptors; },
+    },
+
+  });
 });
 </script>
 
 
-<style>
-
-</style>
+<style></style>

@@ -23,94 +23,122 @@
 // The data structure is not definitive, and may change to match the final specs
 
 define({
-    "totalrows": 5,
-    "returnedrows": 5,
-    "offset": 1,
-    "sort": [{"property": "age", "dir": "desc"}],
-    "layouts": {
-        "available": ["tableLayout"],
-        "default": "tableLayout",
+
+  query: {
+    properties: ["doc_title", "age", "job", "other"],
+
+    source: {
+      id: "...",
+      url: "...",
     },
 
-    "properties": [
-        {
-            "name": "Name",
-            "key": "doc_title",
-            "type": "Text",
-        },
-        {
-            "name": "Age",
-            "key": "age",
-            "type": "Number",
-        },
-        {
-            "name": "Job",
-            "key": "job",
-            "type": "Text",
-        },
-        {
-            "name": "Country",
-            "key": "country",
-            "type": "List",
-        },
-        {
-            "name": "Autre truc",
-            "key": "autre",
-            "type": "Text",
-        },
+    hiddenFilters: {},
+
+    filters: {},
+
+    sort: [ {properties: "age", descending: true} ],
+
+    offset: 0,
+    limit: 10,
+
+  },
+
+
+
+  meta: {
+
+    layouts: ["tableLayout"],
+    defaultLayout: "tableLayout",
+
+    propertyDescriptors: [
+      {
+        id: "doc_title",
+        name: "Name",
+        type: "Text",
+      },
+      {
+        id: "age",
+        name: "Age",
+        type: "Number",
+      },
+      {
+        id: "job",
+        name: "Job",
+        type: "Text",
+      },
+      {
+        id: "country",
+        name: "Country",
+        type: "List",
+      },
+      {
+        id: "other",
+        name: "Autre truc",
+        type: "Text",
+      },
     ],
-    
-    "entries": [
-        {
-            "doc_url": "#link1",
-            "doc_name": "Name1",
-            "doc_date": "2020/03/27 13:23",
-            "doc_title": "Title 1",
-            "doc_author": "Author 1",
-            "doc_creationDate": "2020/03/27 13:21",
-            "doc_creator": "Creator 1",
-            "age": 48,
-            "job": "Job 1",
-            "country": "France",
-            "autre": "lorem ipsum",
-        },
-        {
-            "doc_url": "#link2",
-            "doc_name": "Name2",
-            "doc_date": "2020/04/22 14:07",
-            "doc_title": "Title 2",
-            "doc_author": "Author 2",
-            "doc_creationDate": "2020/04/22 14:06",
-            "doc_creator": "Creator 2",
-            "age": 24,
-            "job": "Job 2",
-            "country": "France",
-            "autre": "dorol sit amet",
-        },
-        {
-            "doc_url": "#link3",
-            "doc_name": "Name3",
-            "doc_date": "2020/03/27 14:34",
-            "doc_title": "Title 3",
-            "doc_author": "Author 3",
-            "doc_creationDate": "2020/03/27 14:34",
-            "doc_creator": "Creator 3",
-            "age": 12,
-            "job": "Job 3",
-            "country": "Romania",
-            "autre": "consequtir",
-        },
-        {
-            "doc_url": "#link4",
-            "doc_name": "Name4",
-            "doc_date": "2020/03/27 14:34",
-            "doc_title": "Title 4",
-            "doc_author": "Author 4",
-            "doc_creationDate": "2020/03/27 14:34",
-            "doc_creator": "Creator 4",
-            "age": 52,
-            "country": "Romania",
-        },
+
+  },
+
+
+
+  data: {
+
+    count: 5,
+
+    entries: [
+      {
+        doc_url: "#link1",
+        doc_name: "Name1",
+        doc_date: "2020/03/27 13:23",
+        doc_title: "Title 1",
+        doc_author: "Author 1",
+        doc_creationDate: "2020/03/27 13:21",
+        doc_creator: "Creator 1",
+        age: 48,
+        job: "Job 1",
+        country: "France",
+        other: "lorem ipsum",
+      },
+      {
+        doc_url: "#link2",
+        doc_name: "Name2",
+        doc_date: "2020/04/22 14:07",
+        doc_title: "Title 2",
+        doc_author: "Author 2",
+        doc_creationDate: "2020/04/22 14:06",
+        doc_creator: "Creator 2",
+        age: 24,
+        job: "Job 2",
+        country: "France",
+        other: "dorol sit amet",
+      },
+      {
+        doc_url: "#link3",
+        doc_name: "Name3",
+        doc_date: "2020/03/27 14:34",
+        doc_title: "Title 3",
+        doc_author: "Author 3",
+        doc_creationDate: "2020/03/27 14:34",
+        doc_creator: "Creator 3",
+        age: 12,
+        job: "Job 3",
+        country: "Romania",
+        other: "consequtir",
+      },
+      {
+        doc_url: "#link4",
+        doc_name: "Name4",
+        doc_date: "2020/03/27 14:34",
+        doc_title: "Title 4",
+        doc_author: "Author 4",
+        doc_creationDate: "2020/03/27 14:34",
+        doc_creator: "Creator 4",
+        age: 52,
+        country: "Romania",
+      },
     ],
+
+  },
 
 });

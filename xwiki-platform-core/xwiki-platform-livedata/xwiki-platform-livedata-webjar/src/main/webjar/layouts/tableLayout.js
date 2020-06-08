@@ -19,38 +19,37 @@
  */
 
 define([
-    "Vue",
-    "vue!" + BASE_PATH + "layouts/livedata-table.html",
-    "Logic"
+  "Vue",
+  "vue!" + BASE_PATH + "layouts/livedata-table.html",
+  "Logic"
 ], function (
-    Vue,
-    livedataTable,
-    Logic
+  Vue,
+  livedataTable,
+  Logic
 ) {
 
+  return function (element) {
+    this.logic = Logic(element);
 
-    return function (element) {
-        this.logic = Logic(element);
+    /**
+     * Create the table layout from Vuejs
+     */
+    var vueTableLayout = new Vue({
 
-        /**
-         * Create the table layout from Vuejs
-         */
-        var vueTableLayout = new Vue({
+      // Constructs a livedata-table component and passes it the data
+      template: '<livedata-table :data="data"></livedata-table>',
 
-            // Constructs a livedata-table component and passes it the data
-            template: '<livedata-table :data="data"></livedata-table>',
+      data: {
+        logic: this.logic,
+        data: this.logic.data,
+      },
 
-            data: {
-                logic: this.logic,
-                data: this.logic.data,
-            },
+    }).$mount();
 
-        }).$mount();
+    // return the HTML Element of the layout for the logic script
+    return vueTableLayout.$el;
 
-        // return the HTML Element of the layout for the logic script
-        return vueTableLayout.$el;
-
-    };
+  };
 
 
 });

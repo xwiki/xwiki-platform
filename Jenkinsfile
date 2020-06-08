@@ -142,11 +142,17 @@ if (!params.type || params.type == 'standard') {
 } else {
   // If the build is docker-latest, only build if the previous build was triggered by some source code changes.
   // Also always build if triggered manually by a user.
-  if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
-		if (!currentBuild.rawBuild.getPreviousBuild().getChangeSets().isEmpty()) {
+  def build = currentBuild.rawBuild
+  def cause = build.getCauses()[0]
+  if (params.type == 'docker-latest' && (!cause.toString().contains('UserIdCause'))) {
+		// We trigger the build under two conditions:
+		// - The previous build has a non empty changeset (ie. there was some commit)
+		// - This build was triggered by an upstream job (like rendering triggering platform)
+		if (!build.getPreviousBuild().getChangeSets().isEmpty() || cause.toString().contains('UpstreamCause')) {
 		  buildDocker(params.type)
 		} else {
-		  echoXWiki "No changeset found in previous build, thus not executing the docker latest tests."
+		  echoXWiki "No changeset found in previous build and build not triggered by an upstream job, thus not executing \
+		  	the docker latest tests."
 		  // Aborting so that the build isn't displayed as successful without doing anything.
 		  currentBuild.result = 'ABORTED'
 		}

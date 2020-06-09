@@ -117,11 +117,9 @@ public class CommentAsAdminTest extends AbstractTest
         definePreferedEditor("Text");
         CommentForm addCommentForm = this.commentsTab.getAddCommentForm();
         addCommentForm.runOnContentField(f -> f.sendKeys("one **two** three"));
-        getDriver().switchTo().parentFrame();
         assertEquals("one two three", addCommentForm.clickPreview().getText());
         addCommentForm.clickBack();
         addCommentForm.runOnContentField(f -> f.sendKeys(" //four//"));
-        getDriver().switchTo().parentFrame();
         addCommentForm.clickPreview();
         addCommentForm.clickSubmit();
         assertTrue(this.commentsTab.getCommentID("one two three four") >= 0);

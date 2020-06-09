@@ -50,6 +50,8 @@ public class ConflictingInsertionException extends Exception
      *
      * @param message the detail message. The detail message is saved for later retrieval by the {@link #getMessage()}
      *            method.
+     * @since 12.5RC1
+     * @since 11.10.6
      */
     public ConflictingInsertionException(String message)
     {

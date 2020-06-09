@@ -628,10 +628,10 @@ public class DefaultSecurityCache implements SecurityCache, Initializable
         SecurityCacheEntry oldEntry = cache.get(key);
         if (oldEntry != null) {
             if (!oldEntry.getEntry().equals(entry)) {
-                // Another thread have inserted an entry which is different from this entry!
+                // Another thread has inserted an entry which is different from this entry!
                 throw new ConflictingInsertionException(
                     String.format(
-                        "Another thread have inserted an entry [%s] which is different from entry [%s]"
+                        "Another thread has inserted an entry [%s] which is different from entry [%s]"
                             + " with key [%s] and groups [%s]",
                         oldEntry, entry, key, groups));
             }

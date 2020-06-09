@@ -30,7 +30,6 @@
   <packaging>webjar</packaging>
   <artifactId>xwiki-platform-livedata-webjar</artifactId>
   <name>XWiki Platform - Live Data - WebJar</name>
-  <description>A UI component useful to display dynamic lists of data.</description>
   <properties>
     <!-- Name to display by the Extension Manager -->
     <xwiki.extension.name>Live Data WebJar</xwiki.extension.name>

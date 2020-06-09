@@ -381,8 +381,8 @@ public class TextAreaClass extends StringClass
                 buffer.append(result);
             }
         } else {
-            String result;
             BaseProperty prop = (BaseProperty) object.safeget(name);
+            String result;
             if (prop != null) {
                 result = prop.toText();
             } else {

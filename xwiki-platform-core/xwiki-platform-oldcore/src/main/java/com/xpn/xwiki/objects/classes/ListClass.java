@@ -51,8 +51,6 @@ import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
-import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
-
 public abstract class ListClass extends PropertyClass
 {
     /**

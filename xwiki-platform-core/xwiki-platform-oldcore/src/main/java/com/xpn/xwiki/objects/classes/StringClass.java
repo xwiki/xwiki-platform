@@ -128,15 +128,13 @@ public class StringClass extends PropertyClass
     public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object,
         XWikiContext context)
     {
-        String result;
         BaseProperty prop = (BaseProperty) object.safeget(name);
+        String result;
         if (prop != null) {
             result = prop.toText();
         } else {
             result = "";
         }
-        context.getDoc();
-        context.getDoc().getSyntax().toIdString();
         buffer.append(XMLUtils.escape(result));
     }
 }

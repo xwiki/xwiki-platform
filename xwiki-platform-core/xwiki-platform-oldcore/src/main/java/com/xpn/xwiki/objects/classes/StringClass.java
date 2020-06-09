@@ -20,6 +20,7 @@
 package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.input;
+import org.xwiki.xml.XMLUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -134,6 +135,8 @@ public class StringClass extends PropertyClass
         } else {
             result = "";
         }
-        buffer.append(context.getDoc().getRenderedInlineContent(result, context.getDoc().getSyntax().toIdString()));
+        context.getDoc();
+        context.getDoc().getSyntax().toIdString();
+        buffer.append(XMLUtils.escape(result));
     }
 }

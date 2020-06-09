@@ -51,6 +51,8 @@ import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
+import static org.apache.commons.lang.StringEscapeUtils.escapeHtml;
+
 public abstract class ListClass extends PropertyClass
 {
     /**
@@ -649,7 +651,6 @@ public abstract class ListClass extends PropertyClass
         }
         String msgname = getFieldFullName() + "_" + value;
         String newresult = localizePlain(msgname);
-        String syntax = context.getDoc().getSyntax().toIdString();
         if (newresult == null) {
             msgname = "option_" + name + "_" + value;
             newresult = localizePlain(msgname);
@@ -657,11 +658,9 @@ public abstract class ListClass extends PropertyClass
                 msgname = "option_" + value;
                 newresult = localizePlain(msgname);
                 if (newresult == null) {
-                    newresult = context.getDoc().getRenderedInlineContent(displayValue, syntax);
+                    newresult = displayValue;
                 }
             }
-        } else {
-            newresult = context.getDoc().getRenderedInlineContent(newresult, syntax);
         }
         return newresult;
     }
@@ -744,7 +743,7 @@ public abstract class ListClass extends PropertyClass
             }
             buffer.append(StringUtils.join(newlist, separator));
         } else {
-            buffer.append(getDisplayValue(prop.getValue(), name, map, context));
+            buffer.append(XMLUtils.escape(getDisplayValue(prop.getValue(), name, map, context)));
         }
     }
 

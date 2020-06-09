@@ -202,8 +202,6 @@ import com.xpn.xwiki.web.ObjectPolicyType;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
-
 public class XWikiDocument implements DocumentModelBridge, Cloneable
 {
     private static final Logger LOGGER = LoggerFactory.getLogger(XWikiDocument.class);
@@ -1241,31 +1239,6 @@ public class XWikiDocument implements DocumentModelBridge, Cloneable
     public String getRenderedContent(boolean transformationContextIsolated, XWikiContext context) throws XWikiException
     {
         return getRenderedContent(getOutputSyntax(), transformationContextIsolated, context);
-    }
-
-    /**
-     * Parse and render inline contents.
-     *
-     * @param content The content to render.
-     * @param syntax The syntax of the content.
-     * @return The content rendered in the output syntax of the current document.
-     * @since 12.5RC1
-     */
-    @Unstable
-    public String getRenderedInlineContent(String content, String syntax)
-    {
-        try {
-            XDOM xdom = parseContent(Syntax.valueOf(syntax), content, getDocumentReference());
-            BlockRenderer renderer = Utils.getComponent((Type) BlockRenderer.class, getOutputSyntax().toIdString());
-            WikiPrinter printer = new DefaultWikiPrinter();
-            if (!xdom.getChildren().isEmpty()) {
-                renderer.render(xdom.getChildren().get(0).getChildren(), printer);
-            }
-            return printer.toString();
-        } catch (XWikiException | ParseException e) {
-            LOGGER.warn("Error while rendering [{}]. Cause [{}].", content, getRootCauseMessage(e), e);
-            return "";
-        }
     }
 
     /**

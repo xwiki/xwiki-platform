@@ -1406,11 +1406,11 @@ XWiki.Annotation = Class.create({
       // it's not attached anymore: either mouseout or escape
       return;
     }
-    
-    if (typeof CKEDITOR !== 'undefined' && 'comment' in CKEDITOR.instances) {
+
+    if (typeof CKEDITOR !== 'undefined' &amp;&amp; 'comment' in CKEDITOR.instances) {
       CKEDITOR.instances['comment'].destroy();
     }
-    
+
     bubble.remove();
     var bubbleIndex = this.bubbles.indexOf(bubble);
     if (bubbleIndex &gt;= 0) {

@@ -320,10 +320,7 @@ viewers.Comments = Class.create({
         'value': "$services.localization.render('core.viewers.comments.preview.button.preview')"
       }));
       form.previewButton._x_modePreview = false;
-      form.previewContent = new Element('div', {'class': 'commentcontent commentPreview'});
-      form.commentElt.insert({'before': form.previewContent});
-
-      form.previewContent.hide();
+      
       const buttonName = jQuery(form.previewButton).find("input")[0].value;
       const existingButton = jQuery(buttons).find("input[value='" + buttonName + "']");
       existingButton.remove();

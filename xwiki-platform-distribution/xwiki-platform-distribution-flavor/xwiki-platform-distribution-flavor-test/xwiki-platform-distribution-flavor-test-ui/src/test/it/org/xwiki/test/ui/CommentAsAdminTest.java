@@ -19,14 +19,15 @@
  */
 package org.xwiki.test.ui;
 
-import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.xwiki.test.ui.po.CommentForm;
 import org.xwiki.test.ui.po.CommentsTab;
 import org.xwiki.test.ui.po.ViewPage;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Test comment and reply on XWiki Pages when logged as Administrator.
@@ -65,11 +66,11 @@ public class CommentAsAdminTest extends AbstractTest
     @Test
     public void testPostCommentAsAdmin()
     {
-        Assert.assertTrue(this.commentsTab.isCommentFormShown());
+        assertTrue(this.commentsTab.isCommentFormShown());
         this.commentsTab.postComment(COMMENT_CONTENT, true);
-        Assert.assertEquals(COMMENT_CONTENT,
+        assertEquals(COMMENT_CONTENT,
             this.commentsTab.getCommentContentByID(this.commentsTab.getCommentID(COMMENT_CONTENT)));
-        Assert.assertEquals(ADMIN,
+        assertEquals(ADMIN,
             this.commentsTab.getCommentAuthorByID(this.commentsTab.getCommentID(COMMENT_CONTENT)));
     }
 
@@ -78,44 +79,28 @@ public class CommentAsAdminTest extends AbstractTest
     {
         this.commentsTab.postComment(COMMENT_CONTENT, true);
         this.commentsTab.replyToCommentByID(this.commentsTab.getCommentID(COMMENT_CONTENT), COMMENT_REPLY);
-        Assert.assertEquals(COMMENT_REPLY,
+        assertEquals(COMMENT_REPLY,
             this.commentsTab.getCommentContentByID(this.commentsTab.getCommentID(COMMENT_REPLY)));
-        Assert.assertEquals(ADMIN, this.commentsTab.getCommentAuthorByID(this.commentsTab.getCommentID(COMMENT_REPLY)));
+        assertEquals(ADMIN, this.commentsTab.getCommentAuthorByID(this.commentsTab.getCommentID(COMMENT_REPLY)));
     }
 
     @Test
     public void testDeleteCommentAsAdmin()
     {
-        Assert.assertTrue(this.commentsTab.isCommentFormShown());
+        assertTrue(this.commentsTab.isCommentFormShown());
         this.commentsTab.postComment(COMMENT_CONTENT, true);
         this.commentsTab.deleteCommentByID(this.commentsTab.getCommentID(COMMENT_CONTENT));
-        Assert.assertTrue(this.commentsTab.getCommentID(COMMENT_CONTENT) == -1);
+        assertEquals(this.commentsTab.getCommentID(COMMENT_CONTENT), -1);
     }
 
     @Test
     public void testEditCommentAsAdmin()
     {
-        Assert.assertTrue(this.commentsTab.isCommentFormShown());
+        assertTrue(this.commentsTab.isCommentFormShown());
         this.commentsTab.postComment(COMMENT_CONTENT, true);
         this.commentsTab.editCommentByID(0, COMMENT_REPLACED_CONTENT);
-        Assert.assertEquals(COMMENT_REPLACED_CONTENT,
+        assertEquals(COMMENT_REPLACED_CONTENT,
             this.commentsTab.getCommentContentByID(this.commentsTab.getCommentID(COMMENT_REPLACED_CONTENT)));
-    }
-
-    @Test
-    public void testPostCommentAsAdminNoJs()
-    {
-        definePreferedEditor("Text");
-        // In this test class, the only user who logs in is admin.
-        getUtil().gotoPage(getTestClassName(), getTestMethodName(), "view", "xpage=xpart&vm=commentsinline.vm");
-        this.commentsTab.postComment(COMMENT_CONTENT, false);
-        ViewPage vp = new ViewPage();
-        // This opens with ?viewer=comments, don't explicitly load the comments tab
-        vp.waitUntilPageIsLoaded();
-        Assert.assertEquals(COMMENT_CONTENT,
-            this.commentsTab.getCommentContentByID(this.commentsTab.getCommentID(COMMENT_CONTENT)));
-        Assert.assertEquals(ADMIN,
-            this.commentsTab.getCommentAuthorByID(this.commentsTab.getCommentID(COMMENT_CONTENT)));
     }
 
     private void definePreferedEditor(String text)
@@ -133,13 +118,13 @@ public class CommentAsAdminTest extends AbstractTest
         CommentForm addCommentForm = this.commentsTab.getAddCommentForm();
         addCommentForm.runOnContentField(f -> f.sendKeys("one **two** three"));
         getDriver().switchTo().parentFrame();
-        Assert.assertEquals("one two three", addCommentForm.clickPreview().getText());
+        assertEquals("one two three", addCommentForm.clickPreview().getText());
         addCommentForm.clickBack();
         addCommentForm.runOnContentField(f -> f.sendKeys(" //four//"));
         getDriver().switchTo().parentFrame();
         addCommentForm.clickPreview();
         addCommentForm.clickSubmit();
-        Assert.assertTrue(this.commentsTab.getCommentID("one two three four") >= 0);
+        assertTrue(this.commentsTab.getCommentID("one two three four") >= 0);
     }
 
     /**
@@ -152,7 +137,7 @@ public class CommentAsAdminTest extends AbstractTest
         // We know Blog.BlogIntroduction has a sheet applied.
         this.commentsTab = getUtil().gotoPage("XWiki", "DefaultSkin").openCommentsDocExtraPane();
         CommentForm addCommentForm = this.commentsTab.getAddCommentForm();
-        addCommentForm.runOnContentField(f ->f.sendKeys("xyz"));
-        Assert.assertEquals("xyz", addCommentForm.clickPreview().getText());
+        addCommentForm.runOnContentField(f -> f.sendKeys("xyz"));
+        assertEquals("xyz", addCommentForm.clickPreview().getText());
     }
 }

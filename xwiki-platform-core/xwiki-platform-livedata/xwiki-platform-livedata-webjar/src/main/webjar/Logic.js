@@ -72,10 +72,10 @@ define(["jquery"], function ($) {
     var self = this;
     var defer = $.Deferred();
 
-    layoutId = layoutId || this.data.query.defaultLayout;
-    if (layoutId === this.data.query.currentLayout) return;
-    if (!this.data.meta.layoutDescriptors[layoutId]) return;
-    if (this.data.query.layouts.indexOf(layoutId) === -1) return;
+    layoutId = layoutId || this.data.meta.defaultLayout;
+    if (layoutId === this.data.query.currentLayout) return defer.reject();
+    if (!this.data.meta.layoutDescriptors[layoutId]) return defer.reject();
+    if (this.data.meta.layouts.indexOf(layoutId) === -1) return defer.reject();
 
     // load layout based on it's filename
     require([BASE_PATH + "layouts/" + this.data.meta.layoutDescriptors[layoutId].file],
@@ -104,8 +104,8 @@ define(["jquery"], function ($) {
       // load failure
       function (err) {
         // try to load default layout instead
-        if (layoutId !== self.data.query.defaultLayout) {
-          self.loadLayout(self.data.query.defaultLayout);
+        if (layoutId !== self.data.meta.defaultLayout) {
+          return self.loadLayout(self.data.meta.defaultLayout);
         }
         else {
           console.error(err);

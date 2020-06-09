@@ -9,7 +9,7 @@
 
       <li class="dropdown-header">Change Layout</li>
       <li
-        v-for="layout in data.query.layouts"
+        v-for="layout in data.meta.layouts"
       >
         <a href="#" @click.prevent="logic.loadLayout(layout)">
           <span :class="data.meta.layoutDescriptors[layout].icon"></span>

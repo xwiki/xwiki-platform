@@ -1,0 +1,115 @@
+<template>
+  <div class="livedata-cards-layout">
+
+    <div ref="dropdownMenu"></div>
+
+    <!-- Cards component -->
+    <div class="livedata-cards">
+
+    <!-- A card -->
+      <div
+        class="card"
+        v-for="(entry, entryId) in entries"
+        :key="entryId"
+      >
+        <div
+          class="card-property"
+          v-for="property in properties"
+          :key="property.id"
+        >
+          <strong>{{ property.name }}:</strong>
+          <span>{{ entry[property.id] }}</span>
+        </div>
+      </div>
+
+
+    </div>
+
+  </div>
+</template>
+
+
+<script>
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+define([
+  "Vue",
+  BASE_PATH + "dropdownMenu.js",
+], function (
+  Vue,
+  DropdownMenu,
+) {
+
+  Vue.component("livedata-cards", {
+
+    name: "livedata-cards",
+
+    template: template,
+
+    props: {
+      logic: Object,
+    },
+
+    computed: {
+      data: function () { return this.logic.data; },
+      entries: function () { return this.logic.data.data.entries; },
+      properties: function () { return this.logic.data.meta.propertyDescriptors; },
+    },
+
+    mounted: function () {
+      var dropdownMenu = new DropdownMenu(this.logic);
+      this.$refs.dropdownMenu.append(dropdownMenu);
+    },
+
+  });
+});
+</script>
+
+
+<style>
+
+.livedata-cards-layout .livedata-cards {
+  margin-top: 1rem;
+}
+
+.livedata-cards-layout .card {
+  display: inline-block;
+  padding: 1rem 2rem;
+  margin: 1rem;
+  border: 1px solid lightgray;
+  border-radius: 1rem;
+}
+
+@supports (display: grid) {
+
+  .livedata-cards-layout .livedata-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 30rem);
+    gap: 1.5rem;
+  }
+
+  .livedata-cards-layout .card {
+    margin: 0;
+  }
+
+}
+
+
+</style>

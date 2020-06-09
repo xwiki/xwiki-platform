@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Deque;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.model.EntityType;
 import org.xwiki.security.GroupSecurityReference;
 import org.xwiki.security.SecurityReference;
@@ -34,6 +35,7 @@ import org.xwiki.security.authorization.RuleState;
 import org.xwiki.security.authorization.SecurityAccess;
 import org.xwiki.security.authorization.SecurityAccessEntry;
 import org.xwiki.security.authorization.SecurityRuleEntry;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * Abstract super class for right resolvers.
@@ -94,6 +96,17 @@ abstract class AbstractAuthorizationSettler implements AuthorizationSettler
         public SecurityReference getReference()
         {
             return this.reference;
+        }
+
+        @Override
+        public String toString()
+        {
+            ToStringBuilder builder = new XWikiToStringBuilder(this);
+            builder.append("user", this.userReference);
+            builder.append("entity", this.reference);
+            builder.append("access", this.access);
+
+            return builder.toString();
         }
     }
 

@@ -1,43 +1,50 @@
 <template>
-  <table class="xwiki-livetable">
+  <div class="livedata-table-layout">
 
-    <!-- Table Header -->
-    <thead>
-      <tr>
+    <div ref="dropdownMenu"></div>
 
-        <th
-          v-for="col in cols"
-          :key="col.id"
+    <!-- Table component -->
+    <table class="livedata-table">
+
+      <!-- Table Header -->
+      <thead>
+        <tr>
+
+          <th
+            v-for="col in cols"
+            :key="col.id"
+          >
+            {{ col.name }}
+          </th>
+
+        </tr>
+      </thead>
+
+
+      <!-- Table Body -->
+      <tbody>
+        <tr
+          v-for="(row, rowId) in rows"
+          :key="rowId"
         >
-          {{ col.name }}
-        </th>
 
-      </tr>
-    </thead>
+          <td
+            class="cell"
+            v-for="col in cols"
+            :key="col.id"
+          >
+            <div
+              class="displayer"
+              v-text="row[col.id]"
+            ></div>
+          </td>
 
+        </tr>
+      </tbody>
 
-    <!-- Table Body -->
-    <tbody>
-      <tr
-        v-for="(row, rowId) in rows"
-        :key="rowId"
-      >
+    </table>
 
-        <td
-          class="cell"
-          v-for="col in cols"
-          :key="col.id"
-        >
-          <div
-            class="displayer"
-            v-text="row[col.id]"
-          ></div>
-        </td>
-
-      </tr>
-    </tbody>
-
-  </table>
+  </div>
 </template>
 
 
@@ -61,20 +68,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-define(["Vue"], function (Vue) {
+define([
+  "Vue",
+  BASE_PATH + "dropdownMenu.js",
+], function (
+  Vue,
+  DropdownMenu,
+) {
+
   Vue.component("livedata-table", {
 
-    name: "xwiki-livetable",
+    name: "livedata-table",
 
     template: template,
 
     props: {
-      data: Object,
+      logic: Object,
     },
 
     computed: {
-      rows: function () { return this.data.data.entries; },
-      cols: function () { return this.data.meta.propertyDescriptors; },
+      data: function () { return this.logic.data; },
+      rows: function () { return this.logic.data.data.entries; },
+      cols: function () { return this.logic.data.meta.propertyDescriptors; },
+    },
+
+    mounted: function () {
+      var dropdownMenu = new DropdownMenu(this.logic);
+      this.$refs.dropdownMenu.append(dropdownMenu);
     },
 
   });

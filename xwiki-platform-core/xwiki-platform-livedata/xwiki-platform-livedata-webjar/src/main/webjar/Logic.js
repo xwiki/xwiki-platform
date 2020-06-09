@@ -79,7 +79,7 @@ define(["jquery"], function ($) {
     require([BASE_PATH + "layouts/" + layoutName + ".js"],
       // load success
       function (Layout) {
-    // remove current layout from the page
+        // remove current layout from the page
         if (self.data.query.currentLayout && self.layouts[self.data.query.currentLayout]) {
           self.element.removeChild(self.layouts[self.data.query.currentLayout]);
         }

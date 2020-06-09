@@ -19,36 +19,35 @@
  */
 
 define([
-  "Vue",
-  "vue!" + BASE_PATH + "layouts/livedata-table.html",
-  "Logic"
-], function (
-  Vue,
-  livedataTable,
-  Logic
-) {
+    "Vue",
+    "vue!" + BASE_PATH + "dropdown-menu.html",
+  ], function (
+    Vue,
+    dropdownMenu
+  ) {
 
-  return function (element) {
-    this.logic = Logic(element);
+    return function (logic) {
 
-    /**
-     * Create the table layout from Vuejs
-     */
-    var vueTableLayout = new Vue({
+      console.log("DROPDOWN", logic);
 
-      // Constructs a livedata-table component and passes it the data
-      template: '<livedata-table :logic="logic"></livedata-table>',
+      /**
+       * Create the table layout from Vuejs
+       */
+      var vueDropdownMenu = new Vue({
 
-      data: {
-        logic: this.logic,
-      },
+        // Constructs a dropdown-menu component and passes it the data
+        template: '<dropdown-menu :logic="logic"></dropdown-menu>',
 
-    }).$mount();
+        data: {
+          logic: logic,
+        },
 
-    // return the HTML Element of the layout for the logic script
-    return vueTableLayout.$el;
+      }).$mount();
 
-  };
+      // return the HTML Element of the layout for the logic script
+      return vueDropdownMenu.$el;
+
+    };
 
 
-});
+  });

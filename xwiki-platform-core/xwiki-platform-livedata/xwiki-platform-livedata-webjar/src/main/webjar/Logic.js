@@ -65,18 +65,20 @@ define(["jquery"], function ($) {
 
   /**
    * Load a layout, or default layout if none specified
-   * @param {String} layoutName The name of the layout to load with requireJS
+   * @param {String} layoutId The id of the layout to load with requireJS
    * @returns {Object} A jquery promise
    */
-  Logic.prototype.loadLayout = function (layoutName) {
+  Logic.prototype.loadLayout = function (layoutId) {
     var self = this;
     var defer = $.Deferred();
 
-    layoutName = layoutName || this.data.meta.layouts[0];
-    if (layoutName === this.data.query.currentLayout) return;
+    layoutId = layoutId || this.data.query.defaultLayout;
+    if (layoutId === this.data.query.currentLayout) return;
+    if (!this.data.meta.layoutDescriptors[layoutId]) return;
+    if (this.data.query.layouts.indexOf(layoutId) === -1) return;
 
     // load layout based on it's filename
-    require([BASE_PATH + "layouts/" + layoutName + ".js"],
+    require([BASE_PATH + "layouts/" + this.data.meta.layoutDescriptors[layoutId].file],
       // load success
       function (Layout) {
         // remove current layout from the page
@@ -84,15 +86,15 @@ define(["jquery"], function ($) {
           self.element.removeChild(self.layouts[self.data.query.currentLayout]);
         }
         // add layout element in loaded layouts list if not already loaded on the page
-        if (!self.layouts[layoutName]) {
-          self.layouts[layoutName] = new Layout(self.element);
+        if (!self.layouts[layoutId]) {
+          self.layouts[layoutId] = new Layout(self.element);
         }
         // add new layout to the page
-        self.element.appendChild(self.layouts[layoutName]);
-        self.data.query.currentLayout = layoutName;
+        self.element.appendChild(self.layouts[layoutId]);
+        self.data.query.currentLayout = layoutId;
         // dispatch events
         var event = new CustomEvent("xwiki:livedata:layoutChange", {
-          layoutName: layoutName,
+          layoutId: layoutId,
           livedata: self,
         });
         self.element.dispatchEvent(event);
@@ -102,8 +104,8 @@ define(["jquery"], function ($) {
       // load failure
       function (err) {
         // try to load default layout instead
-        if (layoutName !== self.data.meta.layouts[0]) {
-          self.loadLayout(self.data.meta.layouts[0]);
+        if (layoutId !== self.data.query.defaultLayout) {
+          self.loadLayout(self.data.query.defaultLayout);
         }
         else {
           console.error(err);

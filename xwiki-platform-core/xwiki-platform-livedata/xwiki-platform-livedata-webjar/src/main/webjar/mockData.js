@@ -41,14 +41,14 @@ define({
     offset: 0,
     limit: 10,
 
+    layouts: ["table", "cards"],
+    defaultLayout: "table",
+
   },
 
 
 
   meta: {
-
-    layouts: ["tableLayout"],
-    defaultLayout: "tableLayout",
 
     propertyDescriptors: [
       {
@@ -77,6 +77,19 @@ define({
         type: "Text",
       },
     ],
+
+    layoutDescriptors: {
+      table: {
+        name: "Table",
+        icon: "fa fa-table",
+        file: "tableLayout.js",
+      },
+      cards: {
+        name: "Cards",
+        icon: "fa fa-th",
+        file: "cardsLayout.js",
+      },
+    },
 
   },
 

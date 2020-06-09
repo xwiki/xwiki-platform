@@ -6,7 +6,17 @@
     </a>
 
     <ul class="dropdown-menu">
-      <li><a href="#" @click.prevent="changeLayout">Switch layout</a></li>
+
+      <li class="dropdown-header">Change Layout</li>
+      <li
+        v-for="layout in data.query.layouts"
+      >
+        <a href="#" @click.prevent="logic.loadLayout(layout)">
+          <span :class="data.meta.layoutDescriptors[layout].icon"></span>
+          {{ data.meta.layoutDescriptors[layout].name }}
+        </a>
+      </li>
+
     </ul>
 
   </div>
@@ -46,13 +56,6 @@ define(["Vue"], function (Vue) {
 
     computed: {
       data: function () { return this.logic.data; },
-    },
-
-    methods: {
-      changeLayout: function () {
-        var newLayout = this.data.query.currentLayout === "tableLayout" ? "cardsLayout" : "tableLayout";
-        this.logic.loadLayout(newLayout);
-      },
     },
 
   });

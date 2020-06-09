@@ -28,8 +28,6 @@ define([
 
     return function (logic) {
 
-      console.log("DROPDOWN", logic);
-
       /**
        * Create the table layout from Vuejs
        */
@@ -44,7 +42,7 @@ define([
 
       }).$mount();
 
-      // return the HTML Element of the layout for the logic script
+      // return the HTML Element of the layout for the layout
       return vueDropdownMenu.$el;
 
     };

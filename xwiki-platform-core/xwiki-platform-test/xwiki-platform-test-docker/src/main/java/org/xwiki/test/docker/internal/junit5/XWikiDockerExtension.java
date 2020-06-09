@@ -131,6 +131,7 @@ public class XWikiDockerExtension extends AbstractExtension implements BeforeAll
         if (testConfiguration.isVerbose()) {
             setLogbackLoggerLevel("org.testcontainers", Level.TRACE);
             setLogbackLoggerLevel("org.rnorth", Level.TRACE);
+            setLogbackLoggerLevel("org.xwiki.test.docker.internal.junit5.browser", Level.TRACE);
             setLogbackLoggerLevel("com.github.dockerjava", Level.WARN);
             // Don't display the stack trace that TC displays when it cannot find a config file override
             // ("Testcontainers config override was found on file:/root/.testcontainers.properties but the file was not

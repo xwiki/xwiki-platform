@@ -237,6 +237,7 @@
     <module>xwiki-platform-logging</module>
     <module>xwiki-platform-mail</module>
     <module>xwiki-platform-mailsender</module>
+    <module>xwiki-platform-mentions</module>
     <module>xwiki-platform-menu</module>
     <module>xwiki-platform-messagestream</module>
     <module>xwiki-platform-minimaldependencies</module>

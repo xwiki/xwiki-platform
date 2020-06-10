@@ -20,7 +20,7 @@
 
 define([
     "Vue",
-    "vue!" + BASE_PATH + "dropdown-menu.html",
+    "vue!" + BASE_PATH + "dropdown-menu.html?evaluate=true",
   ], function (
     Vue,
     dropdownMenu

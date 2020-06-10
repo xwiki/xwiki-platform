@@ -1,17 +1,20 @@
 <template>
   <div class="livedata-dropdown btn-group">
 
-    <a class="btn btn-default dropdown-toggle" title="More Actions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
+    <a
+    class="btn btn-default dropdown-toggle"
+    title="$services.localization.render('livedata.dropdown.moreActions')"
+    data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
       <span class="fa fa-ellipsis-v"></span>
     </a>
 
     <ul class="dropdown-menu">
 
-      <li class="dropdown-header">Change Layout</li>
+      <li class="dropdown-header">$escapetool.xml($services.localization.render('livedata.dropdown.changeLayout'))</li>
       <li
         v-for="layout in data.meta.layouts"
       >
-        <a href="#" @click.prevent="logic.loadLayout(layout)">
+        <a href="#" @click.prevent="logic.changeLayout(layout)">
           <span :class="data.meta.layoutDescriptors[layout].icon"></span>
           {{ data.meta.layoutDescriptors[layout].name }}
         </a>

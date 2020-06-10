@@ -42,7 +42,7 @@ define(["jquery"], function ($) {
       var logic = new Logic(element);
       instancesMap.set(element, logic);
 
-      logic.loadLayout();
+      logic.changeLayout();
     }
 
     return instancesMap.get(element);
@@ -64,18 +64,18 @@ define(["jquery"], function ($) {
 
 
   /**
-   * Load a layout, or default layout if none specified
+   * Change layout to specified one, or default one if none specified
    * @param {String} layoutId The id of the layout to load with requireJS
    * @returns {Object} A jquery promise
    */
-  Logic.prototype.loadLayout = function (layoutId) {
+  Logic.prototype.changeLayout = function (layoutId) {
     var self = this;
     var defer = $.Deferred();
 
     layoutId = layoutId || this.data.meta.defaultLayout;
-    if (layoutId === this.data.query.currentLayout) return defer.reject();
-    if (!this.data.meta.layoutDescriptors[layoutId]) return defer.reject();
-    if (this.data.meta.layouts.indexOf(layoutId) === -1) return defer.reject();
+    if (layoutId === this.data.query.currentLayout) { return defer.reject(); }
+    if (!this.data.meta.layoutDescriptors[layoutId]) { return defer.reject(); }
+    if (this.data.meta.layouts.indexOf(layoutId) === -1) { return defer.reject(); }
 
     // load layout based on it's filename
     require([BASE_PATH + "layouts/" + this.data.meta.layoutDescriptors[layoutId].file],
@@ -105,7 +105,7 @@ define(["jquery"], function ($) {
       function (err) {
         // try to load default layout instead
         if (layoutId !== self.data.meta.defaultLayout) {
-          return self.loadLayout(self.data.meta.defaultLayout);
+          return self.changeLayout(self.data.meta.defaultLayout);
         }
         else {
           console.error(err);

@@ -1,23 +1,80 @@
 <template>
-  <div class="livedata-dropdown btn-group">
+  <div class="livedata-topbar">
 
-    <a class="btn btn-default dropdown-toggle" title="More Actions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
-      <span class="fa fa-ellipsis-v"></span>
-    </a>
+    <!-- Drowpdown -->
+    <div class="livedata-dropdown btn-group">
 
-    <ul class="dropdown-menu">
+      <!-- Drowpdown button-->
+      <a class="btn btn-default dropdown-toggle" title="More Actions" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" role="button">
+        <span class="fa fa-ellipsis-v"></span>
+      </a>
 
-      <li class="dropdown-header">Change Layout</li>
-      <li
-        v-for="layout in data.query.layouts"
+      <!-- Drowpdown content-->
+      <ul class="dropdown-menu">
+
+        <!-- Change layout-->
+        <li class="dropdown-header">Change Layout</li>
+        <li
+          v-for="layout in data.query.layouts"
+        >
+          <a href="#" @click.prevent="logic.loadLayout(layout)">
+            <span :class="data.meta.layoutDescriptors[layout].icon"></span>
+            {{ data.meta.layoutDescriptors[layout].name }}
+          </a>
+        </li>
+
+        <!-- Common actions -->
+        <li class="dropdown-header">Actions</li>
+        <li>
+          <a href="#" @click.prevent="sortPanelOpen = !sortPanelOpen">
+            <span class="fa fa-sort"></span> Toggle Sort Panel
+          </a>
+        </li>
+
+      </ul>
+
+    </div>
+
+    <!-- Sort Panel -->
+    <div
+      class="livedata-panel-sort"
+      v-show="sortPanelOpen"
+    >
+
+      <!-- A sort entry -->
+      <div
+        class="sort-entry"
+        v-for="(sortEntry, level) in data.query.sort"
+        :key="level"
       >
-        <a href="#" @click.prevent="logic.loadLayout(layout)">
-          <span :class="data.meta.layoutDescriptors[layout].icon"></span>
-          {{ data.meta.layoutDescriptors[layout].name }}
-        </a>
-      </li>
+        <!-- property select -->
+        <select
+          @change="logic.sort($event.target.value, level)"
+        >
+          <option
+            v-for="(property, i) in data.query.properties"
+            :key="i"
+            :value="property"
+            :selected="property === sortEntry.property"
+          >{{ property }}</option>
+        </select>
+        <!-- direction select -->
+        <select
+          @change="logic.sort(sortEntry.property, level, $event.target.value === 'true')"
+        >
+          <option
+            value="false"
+            :selected="!sortEntry.descending"
+          >Ascending</option>
+          <option
+            value="true"
+            :selected="sortEntry.descending"
+          >Descending</option>
+        </select>
+      </div>
 
-    </ul>
+    </div>
+
 
   </div>
 </template>
@@ -54,6 +111,12 @@ define(["Vue"], function (Vue) {
       logic: Object,
     },
 
+    data: function () {
+      return {
+        sortPanelOpen: false,
+      };
+    },
+
     computed: {
       data: function () { return this.logic.data; },
     },
@@ -76,6 +139,11 @@ define(["Vue"], function (Vue) {
 
 .livedata-dropdown .btn-default span {
   vertical-align: middle;
+}
+
+.livedata-panel-sort {
+  padding: 1rem;
+  background-color: #fafafa;
 }
 
 </style>

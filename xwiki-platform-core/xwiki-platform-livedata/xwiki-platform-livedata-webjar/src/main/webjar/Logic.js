@@ -145,7 +145,7 @@ define(["jquery"], function ($) {
     }
     // default descending
     if (descending === undefined) {
-      descending = (currentLevel !== -1) ? !this.data.query.sort[currentLevel].descending : true;
+      descending = (currentLevel !== -1) ? !this.data.query.sort[currentLevel].descending : false;
     }
     // create sort object
     var sortObject = {

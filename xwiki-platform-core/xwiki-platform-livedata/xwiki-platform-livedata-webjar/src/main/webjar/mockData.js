@@ -36,7 +36,7 @@ define({
 
     filters: {},
 
-    sort: [ {properties: "age", descending: true} ],
+    sort: [ {property: "age", descending: true} ],
 
     offset: 0,
     limit: 10,

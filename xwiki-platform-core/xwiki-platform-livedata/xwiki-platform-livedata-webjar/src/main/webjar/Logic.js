@@ -118,6 +118,60 @@ define(["jquery"], function ($) {
   };
 
 
+  /**
+  * Update sort configuration based on parameters, then fetch new data
+  * @param {String} property The property to filter according to
+  * @param {String} level The sort level of the property (0 is the highest).
+  *   Undefined means current. Negative value removes property sort.
+  * @param {String} descending Specify whether the sort should be descending or not.
+  *   Undefined means toggle current direction
+   */
+  Logic.prototype.sort = function (property, level, descending) {
+    if (this.data.query.properties.indexOf(property) === -1) { return; }
+    // find property current sort level
+    var currentLevel = -1;
+    this.data.query.sort.some(function (sortObject, i) {
+      if (sortObject.property === property) {
+        currentLevel = i;
+        return;
+      }
+    });
+    // default level
+    if (level === undefined) {
+      level = (currentLevel !== -1) ? currentLevel : 0;
+    }
+    else if (level < 0) {
+      level = -1;
+    }
+    // default descending
+    if (descending === undefined) {
+      descending = (currentLevel !== -1) ? !this.data.query.sort[currentLevel].descending : true;
+    }
+    // create sort object
+    var sortObject = {
+      property: property,
+      descending: descending,
+    };
+    // apply sort
+    if (level !== -1) {
+      this.data.query.sort.splice(level, 1, sortObject);
+    }
+    if (currentLevel !== -1) {
+      this.data.query.sort.splice(currentLevel, 1);
+    }
+    // dispatch events
+    var event = new CustomEvent("xwiki:livedata:sort", {
+      livedata: this,
+      property: property,
+      level: level,
+      descending: descending,
+    });
+    this.element.dispatchEvent(event);
+
+  };
+
+
+
 
   // return the init function to be used in the layouts
   return init;

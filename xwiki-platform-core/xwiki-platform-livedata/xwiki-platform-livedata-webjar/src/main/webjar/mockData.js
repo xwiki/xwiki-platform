@@ -25,7 +25,7 @@
 define({
 
   query: {
-    properties: ["doc_title", "age", "job", "other"],
+    properties: ["doc_title", "age", "country", "job", "other"],
 
     source: {
       id: "...",

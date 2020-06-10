@@ -14,7 +14,20 @@
             v-for="col in cols"
             :key="col.id"
           >
-            {{ col.name }}
+            <div
+              class="column-header"
+              @click="logic.sort(col.id)"
+            >
+              <span>{{ col.name }}</span>
+              <span
+                :class="[
+                  'sort-icon',
+                  'fa',
+                  { 'sorted': sorts[col.id] },
+                  (sorts[col.id] && !sorts[col.id].descending) ? 'fa-caret-up' : 'fa-caret-down',
+                ]"
+              ></span>
+            </div>
           </th>
 
         </tr>
@@ -86,10 +99,21 @@ define([
       logic: Object,
     },
 
+
     computed: {
       data: function () { return this.logic.data; },
       rows: function () { return this.logic.data.data.entries; },
       cols: function () { return this.logic.data.meta.propertyDescriptors; },
+      sorts: function () {
+          let sorts = {};
+          this.data.query.sort.forEach( function (sortObject, level) {
+            sorts[sortObject.property] = {
+              level: +level,
+              descending: sortObject.descending,
+            };
+          });
+          return sorts;
+      },
     },
 
     mounted: function () {
@@ -102,4 +126,23 @@ define([
 </script>
 
 
-<style></style>
+<style>
+.livedata-table-layout .column-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.livedata-table-layout .sort-icon {
+  color: currentColor;
+  opacity: 0;
+}
+.livedata-table-layout .sort-icon.sorted {
+  opacity: 1;
+}
+.livedata-table-layout .column-header:hover .sort-icon:not(.sorted) {
+  opacity: 0.5;
+}
+</style>

@@ -156,7 +156,7 @@ define(["jquery"], function ($) {
     if (level !== -1) {
       this.data.query.sort.splice(level, 1, sortObject);
     }
-    if (currentLevel !== -1) {
+    if (currentLevel !== -1 && currentLevel !== level) {
       this.data.query.sort.splice(currentLevel, 1);
     }
     // dispatch events
@@ -168,6 +168,7 @@ define(["jquery"], function ($) {
     });
     this.element.dispatchEvent(event);
 
+    // CALL FUNCTION TO FETCH NEW DATA HERE
   };
 
 

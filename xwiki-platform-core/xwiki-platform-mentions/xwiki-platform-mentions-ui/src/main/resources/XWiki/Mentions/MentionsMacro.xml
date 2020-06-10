@@ -799,7 +799,7 @@
       <name>style</name>
     </property>
     <property>
-      <type>org.xwiki.platform.mentions.DisplayStyle</type>
+      <type>org.xwiki.mentions.DisplayStyle</type>
     </property>
   </object>
   <object>

@@ -46,14 +46,15 @@
     rendering.macro.mention.parameter.anchor.name=Anchor
     rendering.macro.mention.parameter.anchor.description=The anchor to be used for linking to that mention (this anchor
     should be unique to the document as much as possible).
-    org.xwiki.platform.mentions.DisplayStyle.FULL_NAME=Full name of the user
-    org.xwiki.platform.mentions.DisplayStyle.FIRST_NAME=First name of the user only
-    org.xwiki.platform.mentions.DisplayStyle.LOGIN=Username
+    org.xwiki.mentions.DisplayStyle.FULL_NAME=Full name of the user
+    org.xwiki.mentions.DisplayStyle.FIRST_NAME=First name of the user only
+    org.xwiki.mentions.DisplayStyle.LOGIN=Username
     XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Mentions Color
     XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=The color of the mentions (note: used as the value of a
     background-color css attribute).
     XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Self Mentions Color
-    XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=The color of the mentions to the current user (note: used as
+    XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=The color of the mentions to the current user (note:
+    used as
     the value of a background-color css attribute).</content>
   <object>
     <name>XWiki.Mentions.MentionsTranslations</name>

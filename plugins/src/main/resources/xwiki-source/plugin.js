@@ -108,7 +108,7 @@
         promise = jQuery.Deferred().resolve(editor);
       }
       if (promise) {
-        promise.always(jQuery.proxy(this, 'endLoading'));
+        promise.always(jQuery.proxy(this, 'endLoading')).done(jQuery.proxy(editor, 'fire', 'modeReady'));
       }
     },
 

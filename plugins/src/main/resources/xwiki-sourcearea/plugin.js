@@ -40,7 +40,8 @@
         textArea.addClass('cke_source').addClass('cke_reset').addClass('cke_enable_context_menu');
 
         if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
-          jQuery(textArea.$).autoHeight();
+          // Initialize with the height of the content edited in-line in order to avoid the UI flicker.
+          jQuery(textArea.$).autoHeight(editor._.modes.wysiwyg.previousHeight);
         }
 
         contentsSpace.append(textArea);
@@ -68,6 +69,10 @@
         canUndo: false
       });
 
+      editor.on('mode', function() {
+        editor.getCommand('source').setState(editor.mode === 'source' ? CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF);
+      });
+
       if (editor.ui.addButton) {
         editor.ui.addButton('Source', {
           label: editor.lang.sourcearea.toolbar,
@@ -76,41 +81,56 @@
         });
       }
 
-      // Create a fake contents space, if needed, before switching to source.
-      editor.on('beforeSetMode', function(event) {
-        var contentsSpace = editor.ui.space('contents');
-        if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE && event.data === 'source' && !contentsSpace) {
-          // The contents space is normally not available when editing in-place so we need to fake it.
-          contentsSpace = editor.element.getDocument().createElement('div');
-          contentsSpace.setAttributes({
-            id: editor.ui.spaceId('contents'),
-            'class': 'cke_contents cke_reset fake',
-            role: 'presentation'
-          });
-          contentsSpace.insertAfter(editor.element);
-        }
-      });
-
-      editor.on('mode', function() {
-        editor.getCommand('source').setState(editor.mode === 'source' ? CKEDITOR.TRISTATE_ON : CKEDITOR.TRISTATE_OFF);
-
-        if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE && editor.mode !== 'source') {
-          // Remove the fake contents space we added above.
-          var contentsSpace = editor.ui.space('contents');
-          if (contentsSpace && contentsSpace.hasClass('fake')) {
-            contentsSpace.remove();
-          }
-        }
-      });
-
-      editor.on('dataReady', function() {
-        if (editor.mode === 'source' && editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
-          // Update the text area height.
-          jQuery(editor.editable().$).trigger('input');
-        }
-      });
+      if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
+        enhanceInlineSourceArea(editor);
+      }
     }
   });
+
+  var enhanceInlineSourceArea = function(editor) {
+    editor.on('beforeModeUnload', function() {
+      if (editor.mode === 'wysiwyg') {
+        // Save the height of the edited content so that we can initialize the Source text area with it.
+        editor._.modes.wysiwyg.previousHeight = jQuery(editor.element.$).height();
+      }
+    // Execute this listener before the content edited in-line is hidden.
+    }, null, null, 5);
+
+    // Create a fake contents space, if needed, before switching to source.
+    editor.on('beforeSetMode', function(event) {
+      var contentsSpace = editor.ui.space('contents');
+      if (event.data === 'source' && !contentsSpace) {
+        // The contents space is normally not available when editing in-place so we need to fake it.
+        contentsSpace = editor.element.getDocument().createElement('div');
+        contentsSpace.setAttributes({
+          id: editor.ui.spaceId('contents'),
+          'class': 'cke_contents cke_reset fake',
+          role: 'presentation'
+        });
+        contentsSpace.insertAfter(editor.element);
+      }
+    });
+
+    editor.on('mode', function() {
+      if (editor.mode !== 'source') {
+        // Remove the fake contents space we added above.
+        var contentsSpace = editor.ui.space('contents');
+        if (contentsSpace && contentsSpace.hasClass('fake')) {
+          contentsSpace.remove();
+        }
+      }
+    });
+
+    require(['centerTextAreaSelectionVertically'], function($) {
+      editor.on('modeReady', function() {
+        if (editor.mode === 'source') {
+          // Update the text area height after the HTML to Wiki Syntax conversion is done.
+          // Then try to center the text selection vertically.
+          $(editor.editable().$).trigger('input').centerTextAreaSelectionVertically();
+        }
+      });
+    });
+  };
 
   var SourceEditable = CKEDITOR.tools.createClass({
     base: CKEDITOR.editable,
@@ -144,7 +164,7 @@
   });
 
   // Credits: https://stackoverflow.com/a/25621277
-  jQuery.fn.autoHeight = jQuery.fn.autoHeight || function() {
+  jQuery.fn.autoHeight = jQuery.fn.autoHeight || function(initialHeight) {
     var autoHeight = function(element) {
       return jQuery(element).css({
         'height': 'auto',
@@ -152,9 +172,105 @@
       }).height(element.scrollHeight);
     };
     return this.each(function() {
-      autoHeight(this).on('input', function() {
+      var $this = initialHeight ? jQuery(this).height(initialHeight) : autoHeight(this);
+      // Make sure we don't register the input listener twice.
+      $this.off('input.autoHeight').on('input.autoHeight', function() {
         autoHeight(this);
       });
     });
   };
 })();
+
+define('centerTextAreaSelectionVertically', ['jquery'], function($) {
+  /**
+   * Tries to center vertically the start of the text area selection within the first parent that has vertical scroll
+   * bar.
+   */
+  var centerTextAreaSelectionVertically = function(textArea) {
+    var verticalScrollParent = getVerticalScrollParent(textArea);
+    if (verticalScrollParent) {
+      var relativeTopOffset = getRelativeTopOffset(textArea, verticalScrollParent);
+      var selectionTopOffset = getSelectionTopOffset(textArea);
+      // Compute the vertical distance from the start of the scroll parent to the start of the text selection, minus
+      // half of the scroll parent height (i.e. half of the visible vertical space).
+      var scrollTop = relativeTopOffset + selectionTopOffset - (verticalScrollParent.clientHeight / 2);
+      verticalScrollParent.scrollTop = scrollTop;
+    }
+  };
+
+  /**
+   * Look for the first ancestor, starting from the given element, that has vertical scroll.
+   */
+  var getVerticalScrollParent = function(element) {
+    var parent = element.parentNode;
+    while (parent && !(parent.nodeType === Node.ELEMENT_NODE && hasVerticalScrollBar(parent))) {
+      parent = parent.parentNode;
+    }
+    return parent;
+  };
+
+  var hasVerticalScrollBar = function(element) {
+    var overflowY = $(element).css('overflow-y');
+    // Use a delta to detect the vertical scroll bar, in order to overcome a bug in Chrome.
+    // See https://bugs.chromium.org/p/chromium/issues/detail?id=34224 (Incorrect scrollHeight on the <body> element)
+    var delta = 4;
+    return element.scrollHeight > (element.clientHeight + delta) && overflowY !== 'hidden' &&
+      // The HTML and BODY tags can have vertical scroll bars even if overflow is visible.
+      (overflowY !== 'visible' || element === element.ownerDocument.documentElement ||
+        element === element.ownerDocument.body);
+  };
+
+  /**
+   * Compute the top offset of the given element within the specified ancestor.
+   */
+  var getRelativeTopOffset = function(element, ancestor) {
+    // Save the vertical scroll position so that we can restore it afterwards.
+    var originalScrollTop = ancestor.scrollTop;
+    // Scroll the contents of the specified ancestor to the top, temporarily, so that the element offset, relative to
+    // its ancestor, is positive.
+    ancestor.scrollTop = 0;
+    var relativeTopOffset = $(element).offset().top - $(ancestor).offset().top;
+    // Restore the previous vertical scroll position.
+    ancestor.scrollTop = originalScrollTop;
+    return relativeTopOffset;
+  };
+
+  var getSelectionTopOffset = function(textArea) {
+    // Save the selection because we need to restore it at the end.
+    var selection = {
+      start: textArea.selectionStart,
+      end: textArea.selectionEnd
+    };
+
+    // Save the value because we need to restore it at the end.
+    var value = textArea.value;
+
+    // Save the original styles before we change them, so that we can restore them at the end.
+    var originalStyles = {};
+    ['height', 'overflowY'].forEach(function(style) {
+      originalStyles[style] = textArea.style[style] || '';
+    });
+
+    // Determine the height of the text area content before the selection.
+    var $textArea = $(textArea).css({
+      'height': 0,
+      'overflow-y': 'hidden'
+    }).val(value.substring(0, selection.start));
+
+    var topOffset = textArea.scrollHeight;
+
+    // Reset the styles, the value and the selection.
+    $textArea.css(originalStyles).val(value);
+    textArea.setSelectionRange(selection.start, selection.end);
+
+    return topOffset;
+  };
+
+  $.fn.centerTextAreaSelectionVertically = function() {
+    return this.filter('textarea').each(function() {
+      centerTextAreaSelectionVertically(this);
+    });
+  };
+
+  return $;
+});

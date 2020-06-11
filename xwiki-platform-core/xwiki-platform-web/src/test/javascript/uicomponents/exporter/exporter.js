@@ -53,12 +53,30 @@ define(['jquery', 'entityReference', 'export-tree'], function($) {
   // Ignore parameters when data URI is used.
   var originalGet = $.get;
   $.get = function() {
+    // PhantomJS, used to run the tests in headless mode, doesn't seem to support AJAX requests to data URIs.
     if (arguments[0].substring(0, 22) === 'data:application/json,') {
-      // PhantomJS, used to run the tests in headless mode, doesn't seem to support AJAX requests to data URIs.
-      return $.Deferred().resolve(JSON.parse(arguments[0].substring(22))).promise();
+      // We also need to handle the tree pagination.
+      // See XWIKI-17425: A tree node with checkboxes and pagination is removed from the tree when you open it
+      var data = JSON.parse(arguments[0].substring(22));
+      if ($.isArray(data)) {
+        var offset = (arguments[1] || {}).offset || 0;
+        data = extractPage(data, offset);
+      }
+      return $.Deferred().resolve(data).promise();
     } else {
       return originalGet.apply(this, arguments);
     }
+  };
+
+  var extractPage = function(data, offset) {
+    var page = [];
+    for (var i = offset; i < data.length; i++) {
+      page.push(data[i]);
+      if ((data[i].data || {}).type === 'pagination') {
+        break;
+      }
+    }
+    return page;
   };
 
   var createExportTree = function(data) {
@@ -132,7 +150,17 @@ define(['jquery', 'entityReference', 'export-tree'], function($) {
             text: 'More...',
             children: false,
             data: {
-              type: 'pagination'
+              type: 'pagination',
+              offset: 3
+            }
+          },
+          {
+            id: 'document:xwiki:B.F',
+            text: 'F',
+            children: false,
+            data: {
+              id: 'xwiki:B.F',
+              type: 'document'
             }
           }
         ])

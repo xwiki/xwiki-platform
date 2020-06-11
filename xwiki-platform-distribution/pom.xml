@@ -516,6 +516,30 @@
             </execution>
           </executions>
         </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-enforcer-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>enforce-platform-rendering-isolation</id>
+              <goals>
+                <goal>enforce</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <bannedDependencies>
+                    <excludes>
+                      <!-- Ensure that emory-util-classloader and dependencies using it are not bundled anymore -->
+                      <exclude>org.xwiki.commons:xwiki-commons-legacy-classloader-api:*</exclude>
+                      <exclude>edu.emory.mathcs.util:emory-util-classloader:*</exclude>
+                      <exclude>org.xwiki.commons:xwiki-commons-legacy-protocol-jar:*</exclude>
+                    </excludes>
+                  </bannedDependencies>
+                </rules>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
       </plugins>
     </pluginManagement>
   </build>

@@ -50,12 +50,6 @@
       <artifactId>commons-io</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.commons</groupId>
-      <artifactId>xwiki-commons-classloader-protocol-jar</artifactId>
-      <version>${commons.version}</version>
-      <scope>test</scope>
-    </dependency>
 
     <!-- Test Dependencies -->
     <dependency>

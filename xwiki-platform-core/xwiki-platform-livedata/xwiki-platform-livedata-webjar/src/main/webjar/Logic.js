@@ -119,12 +119,12 @@ define(["jquery"], function ($) {
 
 
   /**
-  * Update sort configuration based on parameters, then fetch new data
-  * @param {String} property The property to filter according to
-  * @param {String} level The sort level of the property (0 is the highest).
-  *   Undefined means current. Negative value removes property sort.
-  * @param {String} descending Specify whether the sort should be descending or not.
-  *   Undefined means toggle current direction
+   * Update sort configuration based on parameters, then fetch new data
+   * @param {String} property The property to sort according to
+   * @param {String} level The sort level of the property (0 is the highest).
+   *   Undefined means current. Negative value removes property sort.
+   * @param {String} descending Specify whether the sort should be descending or not.
+   *   Undefined means toggle current direction
    */
   Logic.prototype.sort = function (property, level, descending) {
     if (this.data.query.properties.indexOf(property) === -1) { return; }
@@ -171,6 +171,33 @@ define(["jquery"], function ($) {
     // CALL FUNCTION TO FETCH NEW DATA HERE
   };
 
+
+  /**
+   * Add new sort entry, shorthand of Logic.prototype.sort
+   * If the property is already sorting, does nothing
+   * @param {String} property The property to add to the sort
+   * @param {String} descending Specify whether the sort should be descending or not.
+   *   Undefined means toggle current direction
+   */
+  Logic.prototype.addSort = function (property, descending) {
+    var currentLevel = -1;
+    this.data.query.sort.some(function (sortObject, i) {
+      if (sortObject.property === property) {
+        currentLevel = i;
+        return;
+      }
+    });
+    if (currentLevel !== -1) { return; }
+    this.sort(property, this.data.query.sort.length, descending);
+  };
+
+  /**
+   * Remove a sort entry, shorthand of Logic.prototype.sort
+   * @param {String} property The property to remove to the sort
+   */
+  Logic.prototype.removeSort = function (property) {
+    this.sort(property, -1);
+  };
 
 
 

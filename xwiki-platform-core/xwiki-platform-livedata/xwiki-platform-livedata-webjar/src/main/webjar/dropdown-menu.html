@@ -37,42 +37,58 @@
 
     <!-- Sort Panel -->
     <div
-      class="livedata-panel-sort"
+      class="livedata-panel livedata-panel-sort panel panel-default"
       v-show="sortPanelOpen"
     >
+      <div class="panel-heading">
+        <span>
+          <span class="fa fa-sort"></span> Sort
+        </span>
+        <span
+          class="close-button"
+          @click="sortPanelOpen = false"
+        >
+          <span class="fa fa-times"></span>
+        </span>
 
-      <!-- A sort entry -->
-      <div
-        class="sort-entry"
-        v-for="(sortEntry, level) in data.query.sort"
-        :key="level"
-      >
-        <!-- property select -->
-        <select
-          @change="logic.sort($event.target.value, level)"
-        >
-          <option
-            v-for="(property, i) in data.query.properties"
-            :key="i"
-            :value="property"
-            :selected="property === sortEntry.property"
-          >{{ property }}</option>
-        </select>
-        <!-- direction select -->
-        <select
-          @change="logic.sort(sortEntry.property, level, $event.target.value === 'true')"
-        >
-          <option
-            value="false"
-            :selected="!sortEntry.descending"
-          >Ascending</option>
-          <option
-            value="true"
-            :selected="sortEntry.descending"
-          >Descending</option>
-        </select>
       </div>
 
+      <div class="panel-body">
+
+        <!-- A sort entry -->
+        <div
+          class="sort-entry"
+          v-for="(sortEntry, level) in data.query.sort"
+          :key="level"
+        >
+          <!-- property select -->
+          <select
+            @change="logic.sort($event.target.value, level)"
+          >
+            <option
+              v-for="(property, i) in data.query.properties"
+              :key="i"
+              :value="property"
+              :selected="property === sortEntry.property"
+            >{{ property }}</option>
+          </select>
+
+          <!-- direction select -->
+          <select
+            @change="logic.sort(sortEntry.property, level, $event.target.value === 'true')"
+          >
+            <option
+              value="false"
+              :selected="!sortEntry.descending"
+            >Ascending</option>
+            <option
+              value="true"
+              :selected="sortEntry.descending"
+            >Descending</option>
+          </select>
+        </div>
+
+      </div>
     </div>
 
 
@@ -128,6 +144,10 @@ define(["Vue"], function (Vue) {
 
 <style>
 
+.livedata-dropdown {
+  margin-bottom: 1rem;
+}
+
 .livedata-dropdown .btn-default {
   background-color: #f8f8f8;
   background-image: none;
@@ -141,9 +161,23 @@ define(["Vue"], function (Vue) {
   vertical-align: middle;
 }
 
-.livedata-panel-sort {
-  padding: 1rem;
-  background-color: #fafafa;
+.livedata-panel .panel-heading {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-button {
+  position: absolute;
+  top: 0; right: 0;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15px;
+  cursor: pointer;
 }
 
 </style>

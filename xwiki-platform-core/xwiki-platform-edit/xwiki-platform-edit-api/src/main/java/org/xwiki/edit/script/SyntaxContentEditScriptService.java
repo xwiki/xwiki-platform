@@ -20,7 +20,6 @@
 package org.xwiki.edit.script;
 
 import java.util.Map;
-import java.util.Objects;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -92,23 +91,4 @@ public class SyntaxContentEditScriptService extends AbstractTypedEditScriptServi
         return editor == null ? null : editor.render(new SyntaxContent(content, syntax), parameters);
     }
 
-    /**
-     * Generates the HTML code needed to edit the given data while taking into account the preference of the current
-     * user.
-     *
-     * @param content the text content to edit
-     * @param syntax the syntax of the given content 
-     * @param parameters the edit parameters
-     * @return the HTML code that displays the editor for {@link SyntaxContent}
-     * @throws EditException if rendering the editor fails
-     * @since 12.5RC1
-     */
-    public String preferredEditor(String content, Syntax syntax, Map<String, Object> parameters) throws EditException
-    {
-        if (Objects.equals(getDefaultEditorId().toLowerCase(), WYSIWYG_EDITOR)) {
-            return wysiwyg(content, syntax, parameters);
-        } else {
-            return text(content, syntax, parameters);
-        }
-    }
 }

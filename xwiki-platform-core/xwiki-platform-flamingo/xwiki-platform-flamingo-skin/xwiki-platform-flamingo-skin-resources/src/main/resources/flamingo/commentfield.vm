@@ -21,18 +21,35 @@
 ### Return a single comment field
 ###
 ###
-#set($xCommentClass = 'XWiki.XWikiComments')
-#set ($syntax = $request.syntax)
-#set ($id = $request.id)
-#set ($number = $numbertool.toNumber($request.number).intValue())
+## requested field name 
 #set ($name = $request.name)
-#set ($rows = $request.rows)
-#set ($cols = $request.cols)
-#if ($number > -1)
-    #set ($content = $commentObj.getValue('comment'))
+
+## the 'comment' field from the XWikiComments class is used as a template for the field to display
+#set($xCommentClass = 'XWiki.XWikiComments')
+#set($commentClass = $xwiki.getDocument($xCommentClass).getxWikiClass())
+
+## the number of the comment, if no number is provided we generate a field for a new comment.
+#set ($number = $numbertool.toNumber($request.number).intValue())
+
+## the number of the comment, if no number is provided we generate a field for a new comment.
+#if ($number && $number > -1)
+    #set ($commentObj = $doc.getObject($xCommentClass, $number))
+    #set ($value = $commentObj.getValue('comment'))
 #else
-    #set ($content = '')
+    #set ($commentObj = $doc.newObject($xCommentClass))
+    #set ($value = '')
 #end
 
-#template('comments_macros.vm')
-#renderCommentField($syntax $id $name $content $rows $cols)
+## copy and rename to the requested name of the comment field
+#set ($ocls = $commentObj.getxWikiClass())
+#set ($discard = $ocls.getXWikiClass().put($name, $commentClass.getXWikiClass().get('comment')))
+#set ($discard = $ocls.getXWikiClass().get($name).setName($name))
+#set ($ppt = $ocls.get($name))
+
+## attribution of the value to the new field in the object. 
+#set ($discard = $commentObj.set($name, $value))
+
+## display of the comment field
+$doc.displayEdit($ppt, '', $commentObj)
+
+#set ($discard = $ocls.getXWikiClass().removeField($name))

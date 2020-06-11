@@ -73,11 +73,16 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
      */
     private static final String ANNOTATION_REQUEST_FILTER_PARAMETER_PREFIX = "filter_";
 
-    private static final String DATE_KEY = "date";
-
-    private static final String AUTHOR_KEY = "author";
-
     private static final String COMMENT_KEY = "comment";
+
+    /**
+     * The name of the request parameter whose multiple values indicate the request parameters that require HTML
+     * conversion. For instance, if this parameter's value is {@code [description, content]} then the request has two
+     * parameters, {@code description} and {@code content}, requiring HTML conversion. The syntax these parameters must
+     * be converted to is found also on the request, under {@code description_syntax} and {@code content_syntax}
+     * parameters.
+     */
+    private static final String REQUIRES_HTML_CONVERSION = "RequiresHTMLConversion";
 
     @Inject
     private HTMLConverter htmlConverter;
@@ -180,17 +185,7 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             }
 
             // add the annotation
-            Map<String, Object> annotationsMap = getMap(request.getAnnotation());
-
-            Map<String, Object> annotationMetadata = new HashMap<>();
-            annotationMetadata.put(DATE_KEY, annotationsMap.get(DATE_KEY));
-            annotationMetadata.put(AUTHOR_KEY, annotationsMap.get(AUTHOR_KEY));
-            if (annotationsMap.containsKey("RequiresHTMLConversion")) {
-                annotationMetadata.put(COMMENT_KEY,
-                    this.htmlConverter.fromHTML(String.valueOf(annotationsMap.get(COMMENT_KEY)), "xwiki/2.1"));
-            } else {
-                annotationMetadata.put(COMMENT_KEY, annotationsMap.get(COMMENT_KEY));
-            }
+            Map<String, Object> annotationMetadata = getMap(request.getAnnotation());
 
             this.annotationService.addAnnotation(documentName, request.getSelection(), request.getSelectionContext(),
                 request.getSelectionOffset(), getXWikiUser(), annotationMetadata);
@@ -202,17 +197,19 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
         }
     }
 
-    /**
-     * Builds a simple map from a field collection.
-     *
-     * @param fields the collection of fields to build a map for
-     * @return a map of the fields, as string key and Object value pair
-     */
-    protected Map<String, Object> getMap(AnnotationFieldCollection fields)
+    private Map<String, Object> getMap(AnnotationFieldCollection annotation)
     {
         Map<String, Object> metadataMap = new HashMap<>();
-        for (AnnotationField f : fields.getFields()) {
+        for (AnnotationField f : annotation.getFields()) {
             metadataMap.put(f.getName(), f.getValue());
+        }
+
+        if (metadataMap.containsKey(REQUIRES_HTML_CONVERSION)) {
+            String syntax =
+                (String) metadataMap.getOrDefault(metadataMap.get(REQUIRES_HTML_CONVERSION) + "_syntax", "xwiki/2.1");
+            metadataMap
+                .put(COMMENT_KEY, this.htmlConverter.fromHTML(String.valueOf(metadataMap.get(COMMENT_KEY)), syntax));
+            metadataMap.remove(REQUIRES_HTML_CONVERSION);
         }
         return metadataMap;
     }

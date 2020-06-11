@@ -90,7 +90,7 @@ public class CommentAsAdminTest extends AbstractTest
         assertTrue(this.commentsTab.isCommentFormShown());
         this.commentsTab.postComment(COMMENT_CONTENT, true);
         this.commentsTab.deleteCommentByID(this.commentsTab.getCommentID(COMMENT_CONTENT));
-        assertEquals(this.commentsTab.getCommentID(COMMENT_CONTENT), -1);
+        assertEquals(-1, this.commentsTab.getCommentID(COMMENT_CONTENT));
     }
 
     @Test

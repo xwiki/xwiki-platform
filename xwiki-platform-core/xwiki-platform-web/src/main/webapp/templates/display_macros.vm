@@ -152,13 +152,3 @@
   #set ($return = $NULL)
   #setVariable("$return" $macro.importStrings)
 #end
-
-#macro (getAllSkinExtensions $return)
-  #set ($macro.importStrings = [])
-  #foreach ($entry in $requiredSkinExtensionsMap.entrySet())
-    #set ($discard = $macro.importStrings.add($entry.value))
-  #end
-  #set ($macro.importStrings = $stringtool.join($macro.importStrings, ''))
-  #set ($return = $NULL)
-  #setVariable("$return" $macro.importStrings)
-#end

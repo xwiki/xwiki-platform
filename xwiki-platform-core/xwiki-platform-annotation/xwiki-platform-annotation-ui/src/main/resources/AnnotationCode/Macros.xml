@@ -46,7 +46,7 @@
 ##
 ##
 ## Do not display these 'internal' properties in the form:
-#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state', 'replyto', 'highlight'])## TODO: 'color'
+#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state', 'replyto', 'highlight'])## TODO: 'color' , 'editor'
 ##
 ##
 #*
@@ -328,12 +328,7 @@
     #set($discard = $fakeObj.set($onlyProperty.name, "$!{ann.get($onlyProperty.name)}"))
     &lt;div class="annotationText"&gt;
       #if($mode == 'edit' || $mode == 'create')
-        $services.edit.syntaxContent.preferredEditor('',$services.rendering.resolveSyntax('xwiki/2.1'), {
-          'id': 'comment',
-          'name': 'comment',
-          'rows': 10,
-          'cols': 40
-        })
+        $doc.displayEdit($onlyProperty, '', $fakeObj)
       #else
         $doc.displayView($onlyProperty, '', $fakeObj)
       #end

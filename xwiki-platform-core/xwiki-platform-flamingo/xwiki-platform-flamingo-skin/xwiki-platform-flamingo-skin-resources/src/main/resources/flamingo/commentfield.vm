@@ -23,21 +23,20 @@
 ###
 ## requested field name 
 #set ($name = $request.name)
-
-## the 'comment' field from the XWikiComments class is used as a template for the field to display
-#set($xCommentClass = 'XWiki.XWikiComments')
-#set($commentClass = $xwiki.getDocument($xCommentClass).getxWikiClass())
-
 ## the number of the comment, if no number is provided we generate a field for a new comment.
 #set ($number = $numbertool.toNumber($request.number).intValue())
 
+## the 'comment' field from the XWikiComments class is used as a template for the field to display
+#set ($xCommentClass = 'XWiki.XWikiComments')
+#set ($commentClass = $xwiki.getDocument($xCommentClass).getxWikiClass())
+
 ## the number of the comment, if no number is provided we generate a field for a new comment.
 #if ($number && $number > -1)
-    #set ($commentObj = $doc.getObject($xCommentClass, $number))
-    #set ($value = $commentObj.getValue('comment'))
+  #set ($commentObj = $doc.getObject($xCommentClass, $number))
+  #set ($value = $commentObj.getValue('comment'))
 #else
-    #set ($commentObj = $doc.newObject($xCommentClass))
-    #set ($value = '')
+  #set ($commentObj = $doc.newObject($xCommentClass))
+  #set ($value = '')
 #end
 
 ## copy and rename to the requested name of the comment field
@@ -52,4 +51,5 @@
 ## display of the comment field
 $doc.displayEdit($ppt, '', $commentObj)
 
+## raz the temporary added field.
 #set ($discard = $ocls.getXWikiClass().removeField($name))

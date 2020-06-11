@@ -90,7 +90,7 @@ public class CommentsTab extends BaseElement
     public int postComment(String content, boolean wait)
     {
         CommentForm addCommentForm = getAddCommentForm();
-        addCommentForm.runOnContentField(f -> f.sendKeys(content));
+        addCommentForm.addToContentField(content);
         addCommentForm.clickSubmit(wait);
         return this.getCommentID(content);
     }
@@ -141,7 +141,7 @@ public class CommentsTab extends BaseElement
     public void replyToCommentByID(int id, String replyContent)
     {
         CommentForm replyCommentForm = replyToCommentByID(id);
-        replyCommentForm.runOnContentField(f -> f.sendKeys(replyContent));
+        replyCommentForm.addToContentField(replyContent);
         replyCommentForm.clickSubmit();
     }
 
@@ -169,10 +169,7 @@ public class CommentsTab extends BaseElement
     public void editCommentByID(int id, String content)
     {
         CommentForm editCommentForm = editCommentByID(id);
-        editCommentForm.runOnContentField(f -> {
-            f.clear();
-            f.sendKeys(content);
-        });
+        editCommentForm.clearAndSetContentField(content);
         editCommentForm.clickSubmit();
     }
 

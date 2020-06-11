@@ -67,7 +67,7 @@ public class CommentForm extends BaseElement
      *
      * @param action The action.
      */
-    public void runOnContentField(Consumer<WebElement> action)
+    private void runOnContentField(Consumer<WebElement> action)
     {
         List<WebElement> textareas = getContainer()
                                          .findElements(By.tagName("textarea"))
@@ -84,6 +84,25 @@ public class CommentForm extends BaseElement
             action.accept(textareas.get(0));
         }
     }
+
+    /**
+     * Replace the current content of the content field with the provided content.
+     * @param content the content
+     */
+    public void clearAndSetContentField(String content)
+    {
+        this.runOnContentField(f -> f.sendKeys(content));
+    }
+
+    /**
+     * Add some content to the content field.
+     * @param content the added content
+     */
+    public void addToContentField(String content)
+    {
+        this.runOnContentField(f -> f.sendKeys(content));
+    }
+
 
     /**
      * Clicks on the preview button and waits for the preview to be ready.

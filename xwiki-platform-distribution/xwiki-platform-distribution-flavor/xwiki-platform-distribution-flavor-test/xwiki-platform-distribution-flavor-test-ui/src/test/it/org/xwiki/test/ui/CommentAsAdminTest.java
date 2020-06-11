@@ -116,15 +116,16 @@ public class CommentAsAdminTest extends AbstractTest
     {
         definePreferedEditor("Text");
         CommentForm addCommentForm = this.commentsTab.getAddCommentForm();
-        addCommentForm.runOnContentField(f -> f.sendKeys("one **two** three"));
+        addCommentForm.addToContentField("one **two** three");
         assertEquals("one two three", addCommentForm.clickPreview().getText());
         addCommentForm.clickBack();
-        addCommentForm.runOnContentField(f -> f.sendKeys(" //four//"));
+        addCommentForm.addToContentField(" //four//");
         addCommentForm.clickPreview();
         addCommentForm.clickSubmit();
         assertTrue(this.commentsTab.getCommentID("one two three four") >= 0);
     }
 
+    
     /**
      * Preview a comment on a wiki page that has a sheet applied.
      */
@@ -135,7 +136,7 @@ public class CommentAsAdminTest extends AbstractTest
         // We know Blog.BlogIntroduction has a sheet applied.
         this.commentsTab = getUtil().gotoPage("XWiki", "DefaultSkin").openCommentsDocExtraPane();
         CommentForm addCommentForm = this.commentsTab.getAddCommentForm();
-        addCommentForm.runOnContentField(f -> f.sendKeys("xyz"));
+        addCommentForm.addToContentField("xyz");
         assertEquals("xyz", addCommentForm.clickPreview().getText());
     }
 }

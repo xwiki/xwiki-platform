@@ -46,7 +46,7 @@
 ##
 ##
 ## Do not display these 'internal' properties in the form:
-#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state', 'replyto', 'highlight'])## TODO: 'color' , 'editor'
+#set($hiddenProperties = ['selection', 'selectionLeftContext', 'selectionRightContext', 'originalSelection', 'target', 'date', 'author', 'state', 'replyto', 'highlight'])## TODO: 'color'
 ##
 ##
 #*

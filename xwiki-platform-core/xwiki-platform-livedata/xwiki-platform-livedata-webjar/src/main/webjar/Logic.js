@@ -201,6 +201,91 @@ define(["jquery"], function ($) {
 
 
 
+  /**
+   * Get the filter descriptor associated to a property
+   * @param {String} property
+   */
+  Logic.prototype.getFilterDescriptor = function (property) {
+    if (this.data.query.properties.indexOf(property) === -1) { return; }
+    var propertyFilter = this.data.meta.propertyDescriptors.filter || {};
+    var propertyType = propertyFilter.type || "text";
+    return this.data.meta.filters[propertyType];
+  };
+
+  /**
+   * Add a filter entry in the configuration, then fetch new data
+   * @param {String} property Which property to add the filter to
+   * @param {String} operator The operator of the filter. Should match the filter descriptor of the property
+   * @param {String} value Default value for the new filter entry
+   */
+  Logic.prototype.addFilter = function (property, operator, value) {
+    // Get associated filter descriptor and operators
+    var filterDescriptor = this.getFilterDescriptor(property);
+    if (!filterDescriptor) { return; }
+    var filterOperators = filterDescriptor.operators;
+    if (!(filterOperators instanceof Array)) { return; }
+    // default operator
+    if (operator === undefined) {
+      operator = filterOperators[0];
+    }
+    if (filterOperators.indexOf(operator) === -1) { return; }
+    // default value
+    if (value === undefined) {
+      value = "";
+    }
+    // add filter
+    if (!this.data.query.filters[property]) {
+      this.data.query.filters[property] = [];
+    }
+    this.data.query.filters[property].push({
+      operator: operator,
+      value: value,
+    });
+    // dispatch events
+    var event = new CustomEvent("xwiki:livedata:addFilter", {
+      livedata: this,
+      property: property,
+      operator: operator,
+      value: value,
+      index: this.data.query.filters[property].length - 1,
+    });
+    this.element.dispatchEvent(event);
+
+    // CALL FUNCTION TO FETCH NEW DATA HERE
+  };
+
+
+
+  /**
+   * Remove a filter entry in the configuration, then fetch new data
+   * @param {String} property Which property to add the filter to
+   * @param {String} index The index of the filter to remove. Undefined means last.
+   */
+  Logic.prototype.removeFilter = function (property, index) {
+    if (this.data.query.properties.indexOf(property) === -1) { return; }
+    if (!this.data.query.filters[property]) { return; }
+    // default index
+    if (index === undefined) {
+      index = this.data.query.filters[property].length - 1;
+    }
+    if (index < 0) { return; }
+    // remove filter
+    this.data.query.filters[property].splice(index, 1);
+    // dispatch events
+    var event = new CustomEvent("xwiki:livedata:removeFilter", {
+      livedata: this,
+      property: property,
+      index: this.data.query.filters[property].length - 1,
+    });
+    this.element.dispatchEvent(event);
+
+    // CALL FUNCTION TO FETCH NEW DATA HERE
+  };
+
+
+
+
+
   // return the init function to be used in the layouts
   return init;
 

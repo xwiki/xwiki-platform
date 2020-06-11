@@ -34,7 +34,11 @@ define({
 
     hiddenFilters: {},
 
-    filters: {},
+    filters: {
+      country: [
+        {operator: "equals", value: "france"},
+      ],
+    },
 
     sort: [ {property: "age", descending: false} ],
 
@@ -54,29 +58,35 @@ define({
       {
         id: "doc_title",
         name: "Name",
-        type: "Text",
+        type: "text",
       },
       {
         id: "age",
         name: "Age",
-        type: "Number",
+        type: "number",
       },
       {
         id: "job",
         name: "Job",
-        type: "Text",
+        type: "text",
       },
       {
         id: "country",
         name: "Country",
-        type: "List",
+        type: "text",
       },
       {
         id: "other",
         name: "Autre truc",
-        type: "Text",
+        type: "text",
       },
     ],
+
+    filters: {
+      text: {
+        operators: ["equals", "nequals"],
+      },
+    },
 
     layoutDescriptors: {
       table: {

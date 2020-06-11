@@ -151,9 +151,9 @@ if (!params.type || params.type == 'standard') {
   // Also always build if triggered manually by a user.
   if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
 		// We trigger the build under two conditions:
-		// - The previous build has a non empty changeset (ie. there was some commit)
+		// - The previous build has been triggered by a SCM change
 		// - This build was triggered by an upstream job (like rendering triggering platform)
-		if (!currentBuild.rawBuild.getPreviousBuild().getChangeSets().isEmpty()
+		if (!currentBuild.rawBuild.getCauses()[0].toString().contains('SCMTriggerCause')
 			|| currentBuild.rawBuild.getCauses()[0].toString().contains('UpstreamCause'))
 		{
 		  buildDocker(params.type)

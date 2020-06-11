@@ -63,8 +63,29 @@ basehome:modules/ssl/keystore|etc/keystore
 ## Thread priority delta to give to acceptor threads
 # jetty.ssl.acceptorPriorityDelta=0
 
+## The requested maximum length of the queue of incoming connections.
+# jetty.ssl.acceptQueueSize=0
+
+## Enable/disable the SO_REUSEADDR socket option.
+# jetty.ssl.reuseAddress=true
+
+## Enable/disable TCP_NODELAY on accepted sockets.
+# jetty.ssl.acceptedTcpNoDelay=true
+
+## The SO_RCVBUF option to set on accepted sockets. A value of -1 indicates that it is left to its default value.
+# jetty.ssl.acceptedReceiveBufferSize=-1
+
+## The SO_SNDBUF option to set on accepted sockets. A value of -1 indicates that it is left to its default value.
+# jetty.ssl.acceptedSendBufferSize=-1
+
 ## Connect Timeout in milliseconds
 # jetty.ssl.connectTimeout=15000
+
+## Whether SNI is required for all secure connections. Rejections are in TLS handshakes.
+# jetty.sslContext.sniRequired=false
+
+## Whether SNI is required for all secure connections. Rejections are in HTTP 400 response.
+# jetty.ssl.sniRequired=false
 
 ## Whether request host names are checked to match any SNI names
 # jetty.ssl.sniHostCheck=true

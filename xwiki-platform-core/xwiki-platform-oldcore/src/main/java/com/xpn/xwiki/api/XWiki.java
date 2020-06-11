@@ -166,15 +166,6 @@ public class XWiki extends Api
         return this.documentRevisionProvider;
     }
 
-    private ContextualAuthorizationManager getContextualAuthorizationManager()
-    {
-        if (this.contextualAuthorizationManager == null) {
-            this.contextualAuthorizationManager = Utils.getComponent(ContextualAuthorizationManager.class);
-        }
-
-        return this.contextualAuthorizationManager;
-    }
-
     /**
      * Privileged API allowing to access the underlying main XWiki Object
      *

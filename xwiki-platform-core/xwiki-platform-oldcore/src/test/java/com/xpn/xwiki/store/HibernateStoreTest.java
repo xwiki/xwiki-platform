@@ -23,43 +23,45 @@ import java.sql.SQLException;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.xwiki.component.manager.ComponentLookupException;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 
 import com.xpn.xwiki.internal.store.hibernate.HibernateStore;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class HibernateStoreTest
+@ComponentTest
+class HibernateStoreTest
 {
-    @Rule
-    public MockitoComponentMockingRule<HibernateStore> mocker =
-        new MockitoComponentMockingRule<HibernateStore>(HibernateStore.class);
+    @InjectMockComponents
+    private HibernateStore store;
 
-    private Transaction transaction = mock(Transaction.class);
+    @MockComponent
+    private Execution execution;
 
-    @Before
-    public void before() throws ComponentLookupException
+    @Mock
+    private Transaction transaction;
+
+    @BeforeEach
+    void before()
     {
         ExecutionContext executionContext = mock(ExecutionContext.class);
-
-        Execution execution = this.mocker.getInstance(Execution.class);
-        when(execution.getContext()).thenReturn(executionContext);
-
-        when(executionContext.getProperty("hibtransaction")).thenReturn(transaction);
+        when(this.execution.getContext()).thenReturn(executionContext);
+        when(executionContext.getProperty("hibtransaction")).thenReturn(this.transaction);
     }
 
     @Test
-    public void testEndTransactionWhenSQLBatchUpdateExceptionThrown() throws Exception
+    void endTransactionWhenSQLBatchUpdateExceptionThrown()
     {
         SQLException sqlException2 = new SQLException("sqlexception2");
         sqlException2.setNextException(new SQLException("nextexception2"));
@@ -68,15 +70,13 @@ public class HibernateStoreTest
         sqlException1.initCause(sqlException2);
         sqlException1.setNextException(new SQLException("nextexception1"));
 
-        doThrow(new HibernateException("exception1", sqlException1)).when(transaction).commit();
+        doThrow(new HibernateException("exception1", sqlException1)).when(this.transaction).commit();
 
-        try {
-            mocker.getComponentUnderTest().endTransaction(true);
-            fail("Should have thrown an exception here");
-        } catch (HibernateException e) {
-            assertEquals("Failed to commit or rollback transaction. Root cause [\n"
-                + "SQL next exception = [java.sql.SQLException: nextexception1]\n"
-                + "SQL next exception = [java.sql.SQLException: nextexception2]]", e.getMessage());
-        }
+        Throwable exception = assertThrows(HibernateException.class, () -> {
+            this.store.endTransaction(true);
+        });
+        assertEquals("Failed to commit or rollback transaction. Root cause [\n"
+            + "SQL next exception = [java.sql.SQLException: nextexception1]\n"
+            + "SQL next exception = [java.sql.SQLException: nextexception2]]", exception.getMessage());
     }
 }

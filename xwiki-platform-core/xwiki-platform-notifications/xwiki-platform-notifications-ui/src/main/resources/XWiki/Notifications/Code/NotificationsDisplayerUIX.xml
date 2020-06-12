@@ -41,7 +41,58 @@
 Get the actual notifications.
 ********************************************************#
 #if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getNotifications' == $request.action)
+  #macro (generateNotificationInput $id $reference $label)
+    &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
+    &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
+  #end
+  {{html clean="false"}} ## we need clean="false" because we want to display the raw content
+  #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
+    &lt;div class="notifications-header"&gt;
+      &lt;div class="clearfix"&gt;
+        &lt;div class="col-xs-4"&gt;
+          &lt;p&gt;&lt;strong&gt;$escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/strong&gt;&lt;/p&gt;
+        &lt;/div&gt;
+        &lt;div class="col-xs-8 text-right"&gt;
+          &lt;p&gt;
+            &lt;span class="notifications-header-link"&gt;
+              &lt;a href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"
+                  class="notifications-header-link notifications-rss-link" rel="nofollow external"&gt;
+                $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
+              &lt;/a&gt;
+            &lt;/span&gt;
+            &lt;span class="notifications-header-link"&gt;
+              &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings" rel="nofollow"&gt;
+                $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))
+              &lt;/a&gt;
+            &lt;/span&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+      ##
+      ## Display the 3 toggle buttons
+      ##
+      #if ($services.notification.watch.isEnabled())
+        &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
+          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
+          &lt;pre&gt;
+            #generateNotificationInput('notificationPageOnly' $doc.documentReference 'notifications.filters.preferences.label.page')
+            #generateNotificationInput('notificationPageAndChildren' $doc.documentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
+            #generateNotificationInput('notificationWiki' $doc.documentReference.wikiReference 'notifications.filters.preferences.label.wiki')
+          &lt;/pre&gt;
+        &lt;/div&gt;
+      #end
+      &lt;div class="notifications-header-uix col-xs-12"&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+    &lt;div class="notifications-area clearfix"&gt;
+{{/html}}
+
 {{notifications displayReadStatus="true" useUserPreferences="true" count="10" displayRSSLink="false" /}}
+
+{{html}}
+  &lt;/div&gt;
+  {{/html}}
+  #end
 #end
 {{/velocity}}
 
@@ -204,8 +255,8 @@ Get the actual notifications.
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['jquery', 'XWikiNotificationsMacro', 'XWikiAsyncNotificationsMacro', 'xwiki-meta'],
-        function ($, XWikiNotificationsMacro, XWikiAsyncNotificationsMacro, xm) {
+      <code>require(['jquery', 'XWikiAsyncNotificationsMacro', 'xwiki-meta'],
+        function ($, XWikiAsyncNotificationsMacro, xm) {
   'use strict';
   /**
    * Maximum number of events to count
@@ -333,7 +384,7 @@ Get the actual notifications.
    */
   $(document).ready(function () {
 
-    var container = $('.notifications-area');
+    var container = $('.notification-uix');
     getUnreadNotificationsCount();
     container.on('eventMarkedAsRead', function (notif) {
       if (notificationCount &lt;= maxCountNumber) {
@@ -382,10 +433,11 @@ Get the actual notifications.
           outputSyntax: 'html',
           action: 'getNotifications'
         }).success(function (data){
-          $('.notifications-area').html(data).removeClass('loading');
-          $('.notifications-area').find('.notifications-macro').each(function() {
+          $('.notification-uix').html(data).removeClass('loading');
+          $('.notification-uix').find('.notifications-macro').each(function() {
             new XWikiAsyncNotificationsMacro(this);
           });
+          $(document).trigger('xwiki:notification:loaded');
         });
       }
       notificationsMenusHasBeenOpened = true;
@@ -510,7 +562,7 @@ require.config({
 require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, xm) {
   'use strict';
   // Most of the code comes from the deprecated Watchlist Application
-  $(document).ready(function() {
+  $(document).on('xwiki:notification:loaded', function() {
 
     ///
     /// Get the notification inputs for future usage
@@ -918,13 +970,11 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
       </scope>
     </class>
     <property>
-      <async_cached>0</async_cached>
+      <async_cached>1</async_cached>
     </property>
     <property>
       <async_context>
-        <value>doc.reference</value>
-        <value>request.wiki</value>
-        <value>user</value>
+        <value>wiki</value>
       </async_context>
     </property>
     <property>
@@ -932,62 +982,16 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     </property>
     <property>
       <content>{{velocity}}
-#macro (generateNotificationInput $id $reference $label)
-  &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
-  &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
-#end
-{{html clean="false"}} ## we need clean="false" because we want to display the raw content
-#if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
-  &lt;li&gt;
-    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
-    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
-    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-    ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
-    #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
-    &lt;div class="notifications-header"&gt;
-      &lt;div class="clearfix"&gt;
-        &lt;div class="col-xs-4"&gt;
-          &lt;p&gt;&lt;strong&gt;$escapetool.xml($services.localization.render('notifications.menu.header'))&lt;/strong&gt;&lt;/p&gt;
-        &lt;/div&gt;
-        &lt;div class="col-xs-8 text-right"&gt;
-          &lt;p&gt;
-            &lt;span class="notifications-header-link"&gt;
-              &lt;a href="$xwiki.getURL('XWiki.Notifications.Code.NotificationRSSService', 'get', 'outputSyntax=plain')"
-                  class="notifications-header-link notifications-rss-link" rel="nofollow external"&gt;
-                $services.icon.renderHTML('rss')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.rss.feedLink'))
-              &lt;/a&gt;
-            &lt;/span&gt;
-            &lt;span class="notifications-header-link"&gt;
-              &lt;a href="$xwiki.getURL($xcontext.userReference, 'view', 'category=notifications')" class="notifications-settings" rel="nofollow"&gt;
-                $services.icon.renderHTML('cog')&amp;nbsp;$escapetool.xml($services.localization.render('notifications.menu.header.settings'))
-              &lt;/a&gt;
-            &lt;/span&gt;
-          &lt;/p&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-      ##
-      ## Display the 3 toggle buttons
-      ##
-      #if ($services.notification.watch.isEnabled())
-        &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
-          #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
-          &lt;pre&gt;
-            #generateNotificationInput('notificationPageOnly' $doc.documentReference 'notifications.filters.preferences.label.page')
-            #generateNotificationInput('notificationPageAndChildren' $doc.documentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
-            #generateNotificationInput('notificationWiki' $doc.documentReference.wikiReference 'notifications.filters.preferences.label.wiki')
-          &lt;/pre&gt;
-        &lt;/div&gt;
-      #end
-      &lt;div class="notifications-header-uix col-xs-12"&gt;
-      &lt;/div&gt;
-    &lt;/div&gt;
-&lt;div class="notifications-area loading clearfix"&gt;&lt;/div&gt;
-  &lt;/li&gt;
-#end
-{{/html}}
-{{/velocity}}
-</content>
+  #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
+  #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+  #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
+  #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+  ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
+  #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+  {{html clean="false"}} ## We need the clean false to avoid getting a supplementary ul element.
+  &lt;li class="notification-uix loading"&gt;&lt;/li&gt;
+  {{/html}}
+{{/velocity}}</content>
     </property>
     <property>
       <extensionPointId>org.xwiki.platform.notifications</extensionPointId>

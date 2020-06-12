@@ -19,22 +19,22 @@
  */
 package com.xpn.xwiki.store;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for {@link DatabaseProduct}.
  *
  * @version $Id$
  */
-public class DatabaseProductTest
+class DatabaseProductTest
 {
     @Test
-    public void testEquality()
+    void toProductEquality()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("Oracle");
         assertEquals(DatabaseProduct.ORACLE, product);
@@ -62,7 +62,7 @@ public class DatabaseProductTest
     }
 
     @Test
-    public void testDifference()
+    void toProductDifference()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("Oracle");
         assertTrue(product != DatabaseProduct.DERBY);
@@ -70,7 +70,7 @@ public class DatabaseProductTest
     }
 
     @Test
-    public void testUnknown()
+    void toProductUnknown()
     {
         DatabaseProduct product = DatabaseProduct.toProduct("whatever");
         assertSame(DatabaseProduct.UNKNOWN, product);

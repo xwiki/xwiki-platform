@@ -264,10 +264,15 @@ public class DatabaseContainerExecutor extends AbstractContainerExecutor
     private void startDatabaseContainer(JdbcDatabaseContainer<?> databaseContainer, int port,
         TestConfiguration testConfiguration) throws Exception
     {
+        // Note: default startup and connect timeout are at 120s (2mn) but we've noticed cases when it was taking
+        // longer than that on XWiki and thus our SQL code in grantMySQLPrivileges() is failing because of that.
+        // Thus we're doubling the timeouts to be safe.
         databaseContainer
             .withExposedPorts(port)
             .withNetwork(Network.SHARED)
-            .withNetworkAliases("xwikidb");
+            .withNetworkAliases("xwikidb")
+            .withStartupTimeoutSeconds(240)
+            .withConnectTimeoutSeconds(240);
 
         start(databaseContainer, testConfiguration);
 

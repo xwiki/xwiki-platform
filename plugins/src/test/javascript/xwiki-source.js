@@ -19,10 +19,12 @@
  */
 require.config({
   paths: {
-    textSelection: 'xwiki-source/plugin'
+    textSelection: 'xwiki-source/plugin',
+    scrollUtils: 'xwiki-sourcearea/plugin'
   },
   shim: {
-    textSelection: ['ckeditor']
+    textSelection: ['ckeditor'],
+    scrollUtils: ['ckeditor']
   }
 });
 

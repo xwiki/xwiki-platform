@@ -37,11 +37,13 @@
         // Make sure that source code is always displayed LTR, regardless of editor language.
         // See https://dev.ckeditor.com/ticket/10105
         textArea.setAttribute('dir', 'ltr');
-        textArea.addClass('cke_source').addClass('cke_reset').addClass('cke_enable_context_menu');
+        textArea.addClass('cke_source').addClass('cke_enable_context_menu');
 
         if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
           // Initialize with the height of the content edited in-line in order to avoid the UI flicker.
           jQuery(textArea.$).autoHeight(editor._.modes.wysiwyg.previousHeight);
+        } else {
+          textArea.addClass('cke_reset');
         }
 
         contentsSpace.append(textArea);
@@ -104,7 +106,9 @@
         contentsSpace = editor.element.getDocument().createElement('div');
         contentsSpace.setAttributes({
           id: editor.ui.spaceId('contents'),
-          'class': 'cke_contents cke_reset fake',
+          // Copy the classes from the editor element (the content edited in-line) to ensure consistent styles between
+          // WYSIWYG and Source editing modes.
+          'class': 'cke_contents fake ' + editor.element.getAttribute('class'),
           role: 'presentation'
         });
         contentsSpace.insertAfter(editor.element);
@@ -125,8 +129,8 @@
       editor.on('modeReady', function() {
         if (editor.mode === 'source') {
           // Update the text area height after the HTML to Wiki Syntax conversion is done.
-          // Then try to center the text selection vertically.
-          $(editor.editable().$).trigger('input').centerTextAreaSelectionVertically();
+          // Then try to center the text selection vertically, if needed.
+          $(editor.editable().$).trigger('input').centerTextAreaSelectionVertically({padding: 65});
         }
       });
     });
@@ -181,23 +185,70 @@
   };
 })();
 
-define('centerTextAreaSelectionVertically', ['jquery'], function($) {
+define('centerTextAreaSelectionVertically', ['jquery', 'scrollUtils'], function($, scrollUtils) {
   /**
    * Tries to center vertically the start of the text area selection within the first parent that has vertical scroll
    * bar.
    */
-  var centerTextAreaSelectionVertically = function(textArea) {
-    var verticalScrollParent = getVerticalScrollParent(textArea);
+  var centerTextAreaSelectionVertically = function(textArea, settings) {
+    var verticalScrollParent = scrollUtils.getVerticalScrollParent(textArea);
     if (verticalScrollParent) {
-      var relativeTopOffset = getRelativeTopOffset(textArea, verticalScrollParent);
+      var relativeTopOffset = scrollUtils.getRelativeTopOffset(textArea, verticalScrollParent);
       var selectionTopOffset = getSelectionTopOffset(textArea);
-      // Compute the vertical distance from the start of the scroll parent to the start of the text selection, minus
-      // half of the scroll parent height (i.e. half of the visible vertical space).
-      var scrollTop = relativeTopOffset + selectionTopOffset - (verticalScrollParent.clientHeight / 2);
-      verticalScrollParent.scrollTop = scrollTop;
+      // Compute the vertical distance from the start of the scroll parent to the start of the text selection.
+      var selectionPosition = relativeTopOffset + selectionTopOffset;
+      if (!settings.padding ||
+          !scrollUtils.isCenteredVertically(verticalScrollParent, settings.padding, selectionPosition)) {
+        // Center the selection by removing half of the scroll parent height (i.e. half of the visible vertical space)
+        // from the selection position. If this is a negative value then the browser will use 0 instead.
+        var scrollTop = selectionPosition - (verticalScrollParent.clientHeight / 2);
+        verticalScrollParent.scrollTop = scrollTop;
+      }
     }
   };
 
+  var getSelectionTopOffset = function(textArea) {
+    // Save the selection because we need to restore it at the end.
+    var selection = {
+      start: textArea.selectionStart,
+      end: textArea.selectionEnd
+    };
+
+    // Save the value because we need to restore it at the end.
+    var value = textArea.value;
+
+    // Save the original styles before we change them, so that we can restore them at the end.
+    var originalStyles = {};
+    ['height', 'overflowY'].forEach(function(style) {
+      originalStyles[style] = textArea.style[style] || '';
+    });
+
+    // Determine the height of the text area content before the selection.
+    var $textArea = $(textArea).css({
+      'height': 0,
+      'overflow-y': 'hidden'
+    }).val(value.substring(0, selection.start));
+
+    var topOffset = textArea.scrollHeight;
+
+    // Reset the styles, the value and the selection.
+    $textArea.css(originalStyles).val(value);
+    textArea.setSelectionRange(selection.start, selection.end);
+
+    return topOffset;
+  };
+
+  $.fn.centerTextAreaSelectionVertically = function(settings) {
+    settings = settings || {};
+    return this.filter('textarea').each(function() {
+      centerTextAreaSelectionVertically(this, settings);
+    });
+  };
+
+  return $;
+});
+
+define('scrollUtils', ['jquery'], function($) {
   /**
    * Look for the first ancestor, starting from the given element, that has vertical scroll.
    */
@@ -235,42 +286,37 @@ define('centerTextAreaSelectionVertically', ['jquery'], function($) {
     return relativeTopOffset;
   };
 
-  var getSelectionTopOffset = function(textArea) {
-    // Save the selection because we need to restore it at the end.
-    var selection = {
-      start: textArea.selectionStart,
-      end: textArea.selectionEnd
-    };
-
-    // Save the value because we need to restore it at the end.
-    var value = textArea.value;
-
-    // Save the original styles before we change them, so that we can restore them at the end.
-    var originalStyles = {};
-    ['height', 'overflowY'].forEach(function(style) {
-      originalStyles[style] = textArea.style[style] || '';
-    });
-
-    // Determine the height of the text area content before the selection.
-    var $textArea = $(textArea).css({
-      'height': 0,
-      'overflow-y': 'hidden'
-    }).val(value.substring(0, selection.start));
-
-    var topOffset = textArea.scrollHeight;
-
-    // Reset the styles, the value and the selection.
-    $textArea.css(originalStyles).val(value);
-    textArea.setSelectionRange(selection.start, selection.end);
-
-    return topOffset;
+  var isCenteredVertically = function(verticalScrollParent, padding, position) {
+    return position >= (verticalScrollParent.scrollTop + padding) &&
+      position <= (verticalScrollParent.scrollTop + verticalScrollParent.clientHeight - padding);
   };
 
-  $.fn.centerTextAreaSelectionVertically = function() {
-    return this.filter('textarea').each(function() {
-      centerTextAreaSelectionVertically(this);
-    });
+  /**
+   * Center the given element vertically within its scroll parent, if needed.
+   *
+   * @param element the element to center vertically
+   * @param padding the amount of pixels from the top and from the bottom of the scroll parent that delimits the center
+   *          area; when specified, the element is centered vertically only if it's not already in the center area
+   *          defined by this padding
+   */
+  var centerVertically = function(element, padding) {
+    var verticalScrollParent = getVerticalScrollParent(element);
+    if (verticalScrollParent) {
+      var relativeTopOffset = getRelativeTopOffset(element, verticalScrollParent);
+      if (!padding || !isCenteredVertically(verticalScrollParent, padding, relativeTopOffset)) {
+        // Center the element by removing half of the scroll parent height (i.e. half of the visible vertical space)
+        // from the element's relative position. If this is a negative value then the browser will use 0 instead.
+        var scrollTop = relativeTopOffset - (verticalScrollParent.clientHeight / 2);
+        verticalScrollParent.scrollTop = scrollTop;
+      }
+    }
   };
 
-  return $;
+  return {
+    getVerticalScrollParent: getVerticalScrollParent,
+    hasVerticalScrollBar: hasVerticalScrollBar,
+    getRelativeTopOffset: getRelativeTopOffset,
+    isCenteredVertically: isCenteredVertically,
+    centerVertically: centerVertically
+  };
 });

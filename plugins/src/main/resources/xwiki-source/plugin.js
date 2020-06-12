@@ -238,7 +238,7 @@ define('node-module', {
   }
 });
 
-define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
+define('textSelection', ['jquery', 'node-module!fast-diff', 'scrollUtils'], function($, diff, scrollUtils) {
   var isTextInput = function(element) {
     return typeof element.setSelectionRange === 'function';
   };
@@ -379,10 +379,7 @@ define('textSelection', ['jquery', 'node-module!fast-diff'], function($, diff) {
       if (scrollTarget.nodeType !== Node.ELEMENT_NODE) {
         scrollTarget = scrollTarget.parentNode;
       }
-      scrollTarget.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-      });
+      scrollUtils.centerVertically(scrollTarget, 65);
       // And then apply the selection.
       var selection = element.ownerDocument.defaultView.getSelection();
       selection.removeAllRanges();

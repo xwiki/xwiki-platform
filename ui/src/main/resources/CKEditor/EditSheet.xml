@@ -979,14 +979,6 @@ a.cke_button_disabled &gt; span.cke_button_icon.loading {
   resize: none;
 }
 
-/* Source area styles */
-.cke_contents &gt; textarea.cke_source {
-  box-sizing: border-box;
-  color: $theme.textColor;
-  font: inherit;
-  padding: 15px;
-}
-
 /* Show the modal above the CKEditor dialogs */
 body &gt; .modal-backdrop {
   z-index: 10040;
@@ -1355,10 +1347,21 @@ ul.cke_autocomplete_panel {
     </property>
     <property>
       <code>/**
- * Styles for the in-line source area
+ * Source mode
  */
-textarea.cke_source.cke_editable_inline {
+
+.cke_contents &gt; textarea.cke_source {
+  box-sizing: border-box;
+  color: @text-color;
+  font-family: @font-family-monospace;
+  font-size: inherit;
+  /* Same padding as on the page content. */
+  padding: @grid-gutter-width / 2;
+}
+
+.cke_contents &gt; textarea.cke_source.cke_editable_inline {
   border: 1px solid transparent;
+  border-radius: 0;
   box-shadow: none;
   margin-top: -1px;
   margin-left: -1px;
@@ -1371,6 +1374,14 @@ textarea.cke_source.cke_editable_inline {
 .cke_contents.fake {
   /* We need this to have the box shadow visible when the source area is focused. */
   overflow: visible;
+}
+
+#xwikicontent + .cke_contents &gt; textarea.cke_source.cke_editable_inline {
+  /* Don't take the padding and the margin into account when computing the 100% width. */
+  box-sizing: content-box;
+  /* Make sure the Source area has the same width as the WYSIWYG area. */
+  margin-left: -@grid-gutter-width / 2 - 1px;
+  margin-right: -@grid-gutter-width / 2 - 1px;
 }</code>
     </property>
     <property>

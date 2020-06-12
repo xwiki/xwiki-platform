@@ -88,6 +88,8 @@
         // Note that we trigger the callback without setting the editor data because this is done later by our source
         // plugin after converting the source wiki syntax to HTML.
         callback();
+        // Add selection change listeners (so that the tool bar state is synchronized with the current selection).
+        editor.fire('contentDom');
       });
 
       // Show the content that is edited in-line when the editor is destroyed, in case the current mode is not WYSIWYG.

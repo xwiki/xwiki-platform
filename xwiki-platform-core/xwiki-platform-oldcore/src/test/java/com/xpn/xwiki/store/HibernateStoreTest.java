@@ -19,13 +19,17 @@
  */
 package com.xpn.xwiki.store;
 
+import java.lang.reflect.Field;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.xwiki.component.util.ReflectionUtils;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -78,5 +82,18 @@ class HibernateStoreTest
         assertEquals("Failed to commit or rollback transaction. Root cause [\n"
             + "SQL next exception = [java.sql.SQLException: nextexception1]\n"
             + "SQL next exception = [java.sql.SQLException: nextexception2]]", exception.getMessage());
+    }
+
+    @Test
+    void getDatabaseProductNameWhenNoSessionFactory() throws Exception
+    {
+        Field field = ReflectionUtils.getField(this.store.getClass(), "configuration");
+        field.setAccessible(true);
+        Configuration configuration = (Configuration) field.get(this.store);
+        Properties properties = new Properties();
+        properties.setProperty("hibernate.connection.url", "jdbc:mysql://localhost/xwiki?useSSL=false");
+        configuration.addProperties(properties);
+
+        assertEquals(DatabaseProduct.MYSQL, this.store.getDatabaseProductName());
     }
 }

@@ -33,7 +33,6 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
-import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
@@ -143,8 +142,6 @@ public class DefaultEventStatusManager implements EventStatusManager
 
         if (configuration.useLocalStore()) {
             saveEventStatusInStore(status);
-
-            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
         }
 
         if (configuration.useMainStore()) {
@@ -157,8 +154,28 @@ public class DefaultEventStatusManager implements EventStatusManager
             } finally {
                 context.setWikiId(oriDatabase);
             }
+        }
+    }
 
-            this.observation.notify(new EventStatusAddOrUpdatedEvent(), eventStatus);
+    @Override
+    public void deleteEventStatus(EventStatus eventStatus) throws Exception
+    {
+        ActivityEventStatus status = eventConverter.convertEventStatusToActivityStatus(eventStatus);
+
+        if (configuration.useLocalStore()) {
+            deleteEventStatusFromStore(status);
+        }
+
+        if (configuration.useMainStore()) {
+            XWikiContext context = contextProvider.get();
+            // store event in the main database
+            String oriDatabase = context.getWikiId();
+            context.setWikiId(context.getMainXWiki());
+            try {
+                deleteEventStatusFromStore(status);
+            } finally {
+                context.setWikiId(oriDatabase);
+            }
         }
     }
 
@@ -170,6 +187,21 @@ public class DefaultEventStatusManager implements EventStatusManager
             hibernateStore.beginTransaction(context);
             Session session = hibernateStore.getSession(context);
             session.save(eventStatus);
+            hibernateStore.endTransaction(context, true);
+        } catch (XWikiException e) {
+            hibernateStore.endTransaction(context, false);
+            throw new ActivityStreamException(e);
+        }
+    }
+
+    private void deleteEventStatusFromStore(ActivityEventStatus eventStatus) throws ActivityStreamException
+    {
+        XWikiContext context = contextProvider.get();
+        XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+        try {
+            hibernateStore.beginTransaction(context);
+            Session session = hibernateStore.getSession(context);
+            session.delete(eventStatus);
             hibernateStore.endTransaction(context, true);
         } catch (XWikiException e) {
             hibernateStore.endTransaction(context, false);

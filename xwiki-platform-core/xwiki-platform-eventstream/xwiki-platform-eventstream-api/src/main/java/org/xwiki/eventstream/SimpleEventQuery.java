@@ -20,8 +20,10 @@
 package org.xwiki.eventstream;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition.CompareType;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -34,24 +36,62 @@ import org.xwiki.stability.Unstable;
 public class SimpleEventQuery implements PageableEventQuery
 {
     /**
-     * An equal condition.
+     * An comparison between a property value and a passed value.
      * 
      * @version $Id$
+     * @since 12.5RC1
      */
-    public static class EqualQueryCondition
+    public static class CompareQueryCondition
     {
-        private String property;
+        /**
+         * The type of comparison.
+         * 
+         * @version $Id$
+         */
+        public enum CompareType
+        {
+            /**
+             * The property value is greater than the passed value.
+             */
+            GREATER,
 
-        private Object value;
+            /**
+             * The property value is lower than the passed value.
+             */
+            LESS,
+
+            /**
+             * The property value is greater or equals to the passed value.
+             */
+            GREATER_OR_EQUALS,
+
+            /**
+             * The property value is lower or equals to the passed value.
+             */
+            LESS_OR_EQUALS,
+
+            /**
+             * The property value is equals to the passed value.
+             */
+            EQUALS
+        }
+
+        private final String property;
+
+        private final Object value;
+
+        private final CompareType type;
 
         /**
          * @param property the name of the property
          * @param value the value the property should be equal to
+         * @param type the type of comparison
          */
-        public EqualQueryCondition(String property, Object value)
+        public CompareQueryCondition(String property, Object value, CompareType type)
         {
             this.property = property;
             this.value = value;
+            this.type = type;
         }
 
         /**
@@ -69,13 +109,25 @@ public class SimpleEventQuery implements PageableEventQuery
         {
             return this.value;
         }
+
+        /**
+         * @return the type the type of comparison
+         */
+        public CompareType getType()
+        {
+            return this.type;
+        }
     }
 
-    private final List<EqualQueryCondition> conditions = new ArrayList<>();
+    private final List<CompareQueryCondition> conditions = new ArrayList<>();
 
     private long limit = -1;
 
     private long offset;
+
+    private String statusEntityId;
+
+    private Boolean statusRead;
 
     /**
      * An empty query.
@@ -166,15 +218,149 @@ public class SimpleEventQuery implements PageableEventQuery
      */
     public SimpleEventQuery eq(String property, Object value)
     {
-        this.conditions.add(new EqualQueryCondition(property, value));
+        this.conditions.add(new CompareQueryCondition(property, value, CompareType.EQUALS));
 
         return this;
     }
 
     /**
-     * @return the conditions the conditions
+     * @param property the name of the property
+     * @param value the value the property should be equal to
+     * @return this {@link SimpleEventQuery}
      */
-    public List<EqualQueryCondition> getConditions()
+    public SimpleEventQuery less(String property, Object value)
+    {
+        this.conditions.add(new CompareQueryCondition(property, value, CompareType.LESS));
+
+        return this;
+    }
+
+    /**
+     * @param property the name of the property
+     * @param value the value the property should be equal to
+     * @return this {@link SimpleEventQuery}
+     */
+    public SimpleEventQuery lessOrEq(String property, Object value)
+    {
+        this.conditions.add(new CompareQueryCondition(property, value, CompareType.LESS_OR_EQUALS));
+
+        return this;
+    }
+
+    /**
+     * @param property the name of the property
+     * @param value the value the property should be equal to
+     * @return this {@link SimpleEventQuery}
+     */
+    public SimpleEventQuery greater(String property, Object value)
+    {
+        this.conditions.add(new CompareQueryCondition(property, value, CompareType.GREATER));
+
+        return this;
+    }
+
+    /**
+     * @param property the name of the property
+     * @param value the value the property should be equal to
+     * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
+     */
+    public SimpleEventQuery greaterOrEq(String property, Object value)
+    {
+        this.conditions.add(new CompareQueryCondition(property, value, CompareType.GREATER_OR_EQUALS));
+
+        return this;
+    }
+
+    /**
+     * @param date the date before which events should be selected
+     * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
+     */
+    public SimpleEventQuery before(Date date)
+    {
+        less(Event.FIELD_DATE, date);
+
+        return this;
+    }
+
+    /**
+     * @param date the date after which the events should be selected
+     * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
+     */
+    public SimpleEventQuery after(Date date)
+    {
+        greater(Event.FIELD_DATE, date);
+
+        return this;
+    }
+
+    /**
+     * Select only event associated with the passed status entity.
+     * 
+     * @param entityId event status entity id
+     * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
+     */
+    public SimpleEventQuery withStatus(String entityId)
+    {
+        this.statusEntityId = entityId;
+
+        return this;
+    }
+
+    /**
+     * Select only event associated with the passed status entity.
+     * 
+     * @param entity event status entity id
+     * @param read indicate if read or unread statues should selected, null for all
+     * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
+     */
+    public SimpleEventQuery withStatus(String entity, boolean read)
+    {
+        this.statusRead = read;
+
+        return this;
+    }
+
+    /**
+     * Select only event associated with the passed status entity.
+     * 
+     * @param read indicate if read or unread events should be selected, null if disabled
+     * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
+     */
+    public SimpleEventQuery withStatus(boolean read)
+    {
+        this.statusRead = read;
+
+        return this;
+    }
+
+    /**
+     * @return the status entity to filter on or null if not enabled
+     * @since 12.5RC1
+     */
+    public String getStatusEntityId()
+    {
+        return this.statusEntityId;
+    }
+
+    /**
+     * @return indicate if read or unread event should be selected, null if disabled
+     */
+    public Boolean isStatusRead()
+    {
+        return this.statusRead;
+    }
+
+    /**
+     * @return the conditions the conditions
+     * @since 12.5RC1
+     */
+    public List<CompareQueryCondition> getConditions()
     {
         return this.conditions;
     }

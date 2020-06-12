@@ -180,7 +180,11 @@
                 <old>method void com.xpn.xwiki.doc.XWikiDocument::rename(java.lang.String, com.xpn.xwiki.XWikiContext) throws com.xpn.xwiki.XWikiException</old>
                 <justification>Not a breakage. Old deprecated method that has been moved to legacy.</justification>
               </item>
-
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method void org.xwiki.search.solr.SolrUtils::setAtomic(java.lang.String, java.lang.String, java.lang.Object, org.apache.solr.common.SolrInputDocument)</new>
+                <justification>Young API</justification>
+              </item>
             </revapi.ignore>
             </analysisConfiguration>
           </configuration>

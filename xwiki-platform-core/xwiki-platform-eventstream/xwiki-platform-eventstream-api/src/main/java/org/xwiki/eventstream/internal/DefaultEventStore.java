@@ -20,6 +20,7 @@
 package org.xwiki.eventstream.internal;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,14 +35,8 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStatus;
-import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.EventStore;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.events.EventStreamAddedEvent;
-import org.xwiki.eventstream.events.EventStreamDeletedEvent;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.query.QueryException;
 
 /**
  * The default implementation of {@link EventStore} dispatching the event in the various enabled stores.
@@ -53,18 +48,15 @@ import org.xwiki.query.QueryException;
 @Singleton
 public class DefaultEventStore implements EventStore, Initializable
 {
+    private static final String NO_STORE = "No event store available";
+
     @Inject
     private EventStreamConfiguration configuration;
 
     @Inject
     private ComponentManager componentManager;
 
-    @Inject
-    private ObservationManager observationManager;
-
-    private EventStream eventStream;
-
-    private EventStatusManager eventStatusManager;
+    private EventStore legacyStore;
 
     private EventStore store;
 
@@ -86,74 +78,124 @@ public class DefaultEventStore implements EventStore, Initializable
 
         // retro compatibility: make sure to synchronize the old storage until the new store covers everything we
         // want it to cover
-        if (this.componentManager.hasComponent(EventStream.class)) {
+        String legacyHint = this.store != null ? "legacy" : "legacy/verbose";
+        if (this.componentManager.hasComponent(EventStore.class, legacyHint)) {
             try {
-                this.eventStream = this.componentManager.getInstance(EventStream.class);
+                this.legacyStore = this.componentManager.getInstance(EventStore.class, legacyHint);
             } catch (ComponentLookupException e) {
                 throw new InitializationException("Failed to get the legacy event stream", e);
             }
         }
-        if (this.componentManager.hasComponent(EventStatusManager.class)) {
-            try {
-                this.eventStatusManager = this.componentManager.getInstance(EventStatusManager.class);
-            } catch (ComponentLookupException e) {
-                throw new InitializationException("Failed to get the legacy event status store", e);
-            }
-        }
     }
 
     @Override
-    public void saveEvent(Event event) throws EventStreamException
+    public CompletableFuture<Event> saveEvent(Event event)
     {
+        CompletableFuture<Event> future = null;
+
+        if (this.legacyStore != null) {
+            future = this.legacyStore.saveEvent(event);
+        }
+
         if (this.store != null) {
-            this.store.saveEvent(event);
+            // Forget about legacy store result if new store is enabled
+            future = this.store.saveEvent(event);
         }
 
-        if (this.eventStream != null) {
-            this.eventStream.addEvent(event);
+        if (future == null) {
+            future = new CompletableFuture<>();
+            future.completeExceptionally(new EventStreamException(NO_STORE));
         }
 
-        // Notify about this change
-        this.observationManager.notify(new EventStreamAddedEvent(), event);
+        return future;
     }
 
     @Override
-    public Optional<Event> deleteEvent(String eventId) throws EventStreamException
+    public CompletableFuture<Optional<Event>> deleteEvent(String eventId)
     {
-        Optional<Event> event;
+        CompletableFuture<Optional<Event>> future = null;
+
+        if (this.legacyStore != null) {
+            future = this.legacyStore.deleteEvent(eventId);
+        }
+
         if (this.store != null) {
-            event = this.store.deleteEvent(eventId);
-        } else {
-            event = getEvent(eventId);
+            // Forget about legacy store result if new store is enabled
+            future = this.store.deleteEvent(eventId);
         }
 
-        if (event.isPresent()) {
-            if (this.eventStream != null) {
-                this.eventStream.deleteEvent(event.get());
-            }
-
-            // Notify about this change
-            this.observationManager.notify(new EventStreamDeletedEvent(), event.get());
+        if (future == null) {
+            future = new CompletableFuture<>();
+            future.completeExceptionally(new EventStreamException(NO_STORE));
         }
 
-        return event;
+        return future;
     }
 
     @Override
-    public void deleteEvent(Event event) throws EventStreamException
+    public CompletableFuture<Optional<Event>> deleteEvent(Event event)
     {
+        CompletableFuture<Optional<Event>> future = null;
+
+        if (this.legacyStore != null) {
+            future = this.legacyStore.deleteEvent(event);
+        }
+
         if (this.store != null) {
-            this.store.deleteEvent(event);
+            // Forget about legacy store result if new store is enabled
+            future = this.store.deleteEvent(event);
         }
 
-        if (this.eventStream != null) {
-            this.eventStream.deleteEvent(event);
+        if (future == null) {
+            future = new CompletableFuture<>();
+            future.completeExceptionally(new EventStreamException(NO_STORE));
         }
 
-        if (this.store != null || this.eventStream != null) {
-            // Notify about this change
-            this.observationManager.notify(new EventStreamDeletedEvent(), event);
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<EventStatus> saveEventStatus(EventStatus status)
+    {
+        CompletableFuture<EventStatus> future = null;
+
+        if (this.legacyStore != null) {
+            future = this.legacyStore.saveEventStatus(status);
         }
+
+        if (this.store != null) {
+            // Forget about legacy store result if new store is enabled
+            future = this.store.saveEventStatus(status);
+        }
+
+        if (future == null) {
+            future = new CompletableFuture<>();
+            future.completeExceptionally(new EventStreamException(NO_STORE));
+        }
+
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Optional<EventStatus>> deleteEventStatus(EventStatus status)
+    {
+        CompletableFuture<Optional<EventStatus>> future = null;
+
+        if (this.legacyStore != null) {
+            future = this.legacyStore.deleteEventStatus(status);
+        }
+
+        if (this.store != null) {
+            // Forget about legacy store result if new store is enabled
+            future = this.store.deleteEventStatus(status);
+        }
+
+        if (future == null) {
+            future = new CompletableFuture<>();
+            future.completeExceptionally(new EventStreamException(NO_STORE));
+        }
+
+        return future;
     }
 
     @Override
@@ -164,51 +206,24 @@ public class DefaultEventStore implements EventStore, Initializable
         // Try the new store
         if (this.store != null) {
             event = this.store.getEvent(eventId);
-        }
-
-        // Try the old store
-        if (!event.isPresent() && this.eventStream != null) {
-            try {
-                event = Optional.ofNullable(this.eventStream.getEvent(eventId));
-            } catch (QueryException e) {
-                throw new EventStreamException("Failed to get event from the old store", e);
-            }
+        } else if (this.legacyStore != null) {
+            event = this.legacyStore.getEvent(eventId);
         }
 
         return event;
     }
 
     @Override
-    public void saveEventStatus(EventStatus status) throws EventStreamException
-    {
-        if (this.store != null) {
-            this.store.saveEventStatus(status);
-        }
-
-        if (this.eventStatusManager != null) {
-            try {
-                this.eventStatusManager.saveEventStatus(status);
-            } catch (Exception e) {
-                throw new EventStreamException("Failed to save the status in the old event store", e);
-            }
-        }
-    }
-
-    @Override
-    public void deleteEventStatus(EventStatus status) throws EventStreamException
-    {
-        this.store.deleteEventStatus(status);
-    }
-
-    @Override
-    public Optional<EventStatus> getEventStatus(String eventId, String entity) throws EventStreamException
-    {
-        return this.store.getEventStatus(eventId, entity);
-    }
-
-    @Override
     public EventSearchResult search(EventQuery query) throws EventStreamException
     {
-        return this.store.search(query);
+        if (this.store != null) {
+            return this.store.search(query);
+        }
+
+        if (this.legacyStore != null) {
+            return this.legacyStore.search(query);
+        }
+
+        return EventSearchResult.EMPTY;
     }
 }

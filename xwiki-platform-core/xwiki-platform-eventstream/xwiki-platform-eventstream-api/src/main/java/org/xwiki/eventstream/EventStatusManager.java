@@ -55,6 +55,20 @@ public interface EventStatusManager
     void saveEventStatus(EventStatus eventStatus) throws Exception;
 
     /**
+     * Delete from the storage the given status.
+     * 
+     * @param eventStatus the status to save
+     * @throws Exception if an error occurs
+     * @since 12.5RC1
+     * @deprecated since 12.5RC1, use {@link EventStore#deleteEventStatus(EventStatus)} instead
+     */
+    @Deprecated
+    default void deleteEventStatus(EventStatus eventStatus) throws Exception
+    {
+        
+    }
+
+    /**
      * @param startDate date before which to remove event status
      * @param entityId the id of the entity concerned by the status
      * @since 12.1RC1

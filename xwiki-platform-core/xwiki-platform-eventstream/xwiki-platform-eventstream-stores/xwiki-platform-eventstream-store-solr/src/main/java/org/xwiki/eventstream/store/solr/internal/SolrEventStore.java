@@ -20,6 +20,10 @@
 package org.xwiki.eventstream.store.solr.internal;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -33,7 +37,6 @@ import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
@@ -44,7 +47,9 @@ import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.PageableEventQuery;
 import org.xwiki.eventstream.SimpleEventQuery;
-import org.xwiki.eventstream.SimpleEventQuery.EqualQueryCondition;
+import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition;
+import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition.CompareType;
+import org.xwiki.eventstream.internal.AbstractAsynchronousEventStore;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.StreamEventSearchResult;
 import org.xwiki.model.reference.DocumentReference;
@@ -64,8 +69,22 @@ import org.xwiki.search.solr.SolrUtils;
 @Component
 @Singleton
 @Named("solr")
-public class SolrEventStore implements EventStore, Initializable
+public class SolrEventStore extends AbstractAsynchronousEventStore
 {
+    private static class CompareQueryConditionRange
+    {
+        final String property;
+
+        CompareQueryCondition less;
+
+        CompareQueryCondition greater;
+
+        CompareQueryConditionRange(String property)
+        {
+            this.property = property;
+        }
+    }
+
     @Inject
     private Solr solr;
 
@@ -77,6 +96,8 @@ public class SolrEventStore implements EventStore, Initializable
     @Override
     public void initialize() throws InitializationException
     {
+        initialize(100, false, true);
+
         try {
             this.client = this.solr.getClient(EventsSolrCoreInitializer.NAME);
         } catch (SolrException e) {
@@ -85,7 +106,19 @@ public class SolrEventStore implements EventStore, Initializable
     }
 
     @Override
-    public void saveEvent(Event event) throws EventStreamException
+    protected void afterTasks(List<EventStoreTask<?, ?>> tasks)
+    {
+        try {
+            commit();
+        } catch (EventStreamException e) {
+            this.logger.error("Failed to commit", e);
+        }
+
+        super.afterTasks(tasks);
+    }
+
+    @Override
+    protected Event syncSaveEvent(Event event) throws EventStreamException
     {
         try {
             this.client.add(toSolrInputDocument(event));
@@ -93,7 +126,53 @@ public class SolrEventStore implements EventStore, Initializable
             throw new EventStreamException("Failed to save event", e);
         }
 
-        commit();
+        return event;
+    }
+
+    @Override
+    protected EventStatus syncSaveEventStatus(EventStatus status) throws EventStreamException
+    {
+        saveEventStatus(status.getEvent().getId(), status.getEntityId(), status.isRead(), !status.isRead());
+
+        return status;
+    }
+
+    @Override
+    protected Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException
+    {
+        saveEventStatus(status.getEvent().getId(), status.getEntityId(), false, false);
+
+        return Optional.of(status);
+    }
+
+    private void saveEventStatus(String eventId, String entityId, boolean read, boolean unread)
+        throws EventStreamException
+    {
+        SolrInputDocument document = new SolrInputDocument();
+
+        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
+
+        this.utils.setAtomic(
+            read ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
+            EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS, entityId, document);
+        this.utils.setAtomic(
+            unread ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
+            EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, entityId, document);
+
+        document.setField(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS,
+            Collections.singletonMap(read ? "add-distinct" : "remove", entityId));
+
+        Map<String, Object> unreadModifier = new HashMap<>(1);
+        unreadModifier.put(read ? "add-distinct" : "remove", entityId);
+        document.setField(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, unreadModifier);
+
+        try {
+            this.client.add(document);
+        } catch (Exception e) {
+            throw new EventStreamException(
+                String.format("Failed to update the event status for event [%s] and entity id [%s]", eventId, entityId),
+                e);
+        }
     }
 
     private SolrInputDocument toSolrInputDocument(Event event)
@@ -131,23 +210,21 @@ public class SolrEventStore implements EventStore, Initializable
     }
 
     @Override
-    public Optional<Event> deleteEvent(String eventId) throws EventStreamException
+    protected Optional<Event> syncDeleteEvent(String eventId) throws EventStreamException
     {
         Optional<Event> event = getEvent(eventId);
 
-        deleteById(eventId);
-
-        commit();
+        if (event.isPresent()) {
+            deleteById(eventId);
+        }
 
         return event;
     }
 
     @Override
-    public void deleteEvent(Event event) throws EventStreamException
+    protected Optional<Event> syncDeleteEvent(Event event) throws EventStreamException
     {
-        deleteById(event.getId());
-
-        commit();
+        return syncDeleteEvent(event.getId());
     }
 
     private void deleteById(String eventId) throws EventStreamException
@@ -215,29 +292,7 @@ public class SolrEventStore implements EventStore, Initializable
         return event;
     }
 
-    @Override
-    public void saveEventStatus(EventStatus status) throws EventStreamException
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void deleteEventStatus(EventStatus status) throws EventStreamException
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public Optional<EventStatus> getEventStatus(String eventId, String entity) throws EventStreamException
-    {
-        // TODO Auto-generated method stub
-        return Optional.empty();
-    }
-
-    @Override
-    public EventSearchResult search(EventQuery query) throws EventStreamException
+    private SolrQuery toSolrQuery(EventQuery query)
     {
         SolrQuery solrQuery = new SolrQuery();
 
@@ -253,23 +308,94 @@ public class SolrEventStore implements EventStore, Initializable
             }
 
             if (pageableQuery instanceof SimpleEventQuery) {
-                for (EqualQueryCondition condition : ((SimpleEventQuery) pageableQuery).getConditions()) {
-                    StringBuilder builder = new StringBuilder();
+                Map<String, CompareQueryConditionRange> ranges = new HashMap<>();
+
+                for (CompareQueryCondition condition : ((SimpleEventQuery) pageableQuery).getConditions()) {
 
                     if (EventsSolrCoreInitializer.KNOWN_FIELDS.contains(condition.getProperty())) {
-                        builder.append(condition.getProperty());
+                        if (condition.getType() == CompareType.EQUALS) {
+                            StringBuilder builder = new StringBuilder();
+                            builder.append(condition.getProperty());
+                            builder.append(':');
+                            builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                            solrQuery.addFilterQuery(builder.toString());
+                        } else {
+                            // Optimize ranges to have one instead of two since Solr is based on a range syntax (no
+                            // lower/greater syntax)
+                            CompareQueryConditionRange range = ranges.computeIfAbsent(condition.getProperty(),
+                                k -> new CompareQueryConditionRange(condition.getProperty()));
 
-                        builder.append(':');
+                            switch (condition.getType()) {
+                                case LESS:
+                                case LESS_OR_EQUALS:
+                                    range.less = condition;
+                                    break;
 
-                        builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                                case GREATER:
+                                case GREATER_OR_EQUALS:
+                                    range.greater = condition;
+                                    break;
+                            }
 
-                        solrQuery.addFilterQuery(builder.toString());
+                            break;
+                        }
                     } else {
                         // TODO: add support for custom properties
                     }
                 }
+
+                // Add ranges to the filter query
+                for (CompareQueryConditionRange range : ranges.values()) {
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(range.property);
+                    builder.append(':');
+                    builder.append(toFilterQueryStringRange(range.greater, range.less));
+
+                    solrQuery.addFilterQuery(builder.toString());
+                }
             }
         }
+
+        return solrQuery;
+    }
+
+    public String toFilterQueryStringRange(CompareQueryCondition greater, CompareQueryCondition less)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        if (greater != null) {
+            if (greater.getType() == CompareType.GREATER) {
+                builder.append('{');
+            } else {
+                builder.append('[');
+            }
+
+            builder.append(this.utils.toFilterQueryString(greater.getValue()));
+        } else {
+            builder.append("[*");
+        }
+
+        builder.append(" TO ");
+
+        if (less != null) {
+            builder.append(this.utils.toFilterQueryString(less.getValue()));
+
+            if (less.getType() == CompareType.LESS) {
+                builder.append('}');
+            } else {
+                builder.append(']');
+            }
+        } else {
+            builder.append("*]");
+        }
+
+        return builder.toString();
+    }
+
+    @Override
+    public EventSearchResult search(EventQuery query) throws EventStreamException
+    {
+        SolrQuery solrQuery = toSolrQuery(query);
 
         QueryResponse response;
         try {

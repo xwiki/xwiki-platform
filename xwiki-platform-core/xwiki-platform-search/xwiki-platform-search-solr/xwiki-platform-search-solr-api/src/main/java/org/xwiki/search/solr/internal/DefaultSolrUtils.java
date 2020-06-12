@@ -23,6 +23,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -35,6 +36,7 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -127,6 +129,8 @@ public class DefaultSolrUtils implements SolrUtils
      * The name of the type binary.
      */
     public static final String SOLR_TYPE_BINARY = "binary";
+
+    private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private static final String PATTERN_GROUP = "(.+)";
 
@@ -330,6 +334,12 @@ public class DefaultSolrUtils implements SolrUtils
     }
 
     @Override
+    public void setAtomic(String modifier, String fieldName, Object fieldValue, SolrInputDocument document)
+    {
+        document.setField(fieldName, Collections.singletonMap(modifier, fieldValue));
+    }
+
+    @Override
     public void setString(String fieldName, Object fieldValue, SolrInputDocument document)
     {
         String value;
@@ -350,14 +360,16 @@ public class DefaultSolrUtils implements SolrUtils
         }
 
         String str;
-        if (CLASS_SUFFIX_MAPPING.containsKey(fieldValue.getClass())) {
+        if (fieldValue instanceof Date) {
+            str = ((Date) fieldValue).toInstant().toString();
+        } else if (CLASS_SUFFIX_MAPPING.containsKey(fieldValue.getClass())) {
             // TODO: this is not the right implementation for date and arrays
-            str = fieldValue.toString();
+            str = ClientUtils.escapeQueryChars(fieldValue.toString());
+        } else {
+            str = ClientUtils.escapeQueryChars(this.converter.convert(String.class, fieldValue));
         }
 
-        str = this.converter.convert(String.class, fieldValue);
-
-        return ClientUtils.escapeQueryChars(str);
+        return str;
     }
 
     @Override

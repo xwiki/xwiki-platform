@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.eventstream.EventStatusManager;
+import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.NotificationFormat;
@@ -49,7 +49,7 @@ public class UserEventStoreListener extends AbstractEventListener
     public static final String NAME = "org.xwiki.notifications.notifiers.internal.UserEventStore";
 
     @Inject
-    private EventStatusManager statuses;
+    private EventStore eventStore;
 
     @Inject
     private EntityReferenceSerializer<String> entityReferenceSerializer;
@@ -75,7 +75,7 @@ public class UserEventStoreListener extends AbstractEventListener
         try {
             String userId = this.entityReferenceSerializer.serialize(userEvent.getUserReference());
 
-            this.statuses.saveEventStatus(new DefaultEventStatus(streamEvent, userId, false));
+            this.eventStore.saveEventStatus(new DefaultEventStatus(streamEvent, userId, false));
         } catch (Exception e) {
             this.logger.error("Failed to store the status of the event [{}] for the user [{}]", streamEvent.getId(),
                 userEvent.getUserReference(), e);

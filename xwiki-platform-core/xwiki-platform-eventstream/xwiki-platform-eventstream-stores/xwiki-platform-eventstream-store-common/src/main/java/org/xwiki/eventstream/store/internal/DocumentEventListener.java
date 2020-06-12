@@ -19,12 +19,13 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
-import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
-import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
-import com.xpn.xwiki.internal.event.CommentAddedEvent;
-import com.xpn.xwiki.internal.event.CommentDeletedEvent;
-import com.xpn.xwiki.internal.event.CommentUpdatedEvent;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Singleton;
+
 import org.slf4j.Logger;
 import org.xwiki.annotation.event.AnnotationAddedEvent;
 import org.xwiki.annotation.event.AnnotationDeletedEvent;
@@ -34,7 +35,6 @@ import org.xwiki.bridge.event.DocumentDeletedEvent;
 import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.context.Execution;
-import org.xwiki.eventstream.EventStream;
 import org.xwiki.eventstream.events.AbstractEventStreamEvent;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.ObservationContext;
@@ -42,11 +42,12 @@ import org.xwiki.observation.event.BeginFoldEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-import java.util.ArrayList;
-import java.util.List;
+import com.xpn.xwiki.internal.event.AttachmentAddedEvent;
+import com.xpn.xwiki.internal.event.AttachmentDeletedEvent;
+import com.xpn.xwiki.internal.event.AttachmentUpdatedEvent;
+import com.xpn.xwiki.internal.event.CommentAddedEvent;
+import com.xpn.xwiki.internal.event.CommentDeletedEvent;
+import com.xpn.xwiki.internal.event.CommentUpdatedEvent;
 
 /**
  * Store the recordable event inside the event stream (except events that are already handled by the Activity Stream
@@ -81,10 +82,7 @@ public class DocumentEventListener extends AbstractEventListener
         }
     };
 
-    private static final BeginFoldEvent IGNORED_EVENTS = otherEvent ->  otherEvent instanceof BeginFoldEvent;
-
-    @Inject
-    private EventStream eventStream;
+    private static final BeginFoldEvent IGNORED_EVENTS = otherEvent -> otherEvent instanceof BeginFoldEvent;
 
     @Inject
     private RemoteObservationManagerContext remoteObservationManagerContext;
@@ -118,8 +116,7 @@ public class DocumentEventListener extends AbstractEventListener
         }
 
         try {
-            this.execution.getContext()
-                    .setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
+            this.execution.getContext().setProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY, true);
 
             // Handle separately some basic events
             for (Event ignoredEvent : LISTENER_EVENTS) {
@@ -132,8 +129,7 @@ public class DocumentEventListener extends AbstractEventListener
         } catch (Exception e) {
             logger.warn("Failed to save the event [{}].", event.getClass().getCanonicalName(), e);
         } finally {
-            this.execution.getContext()
-                    .removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
+            this.execution.getContext().removeProperty(AbstractEventStreamEvent.EVENT_LOOP_CONTEXT_LOCK_PROPERTY);
         }
     }
 }

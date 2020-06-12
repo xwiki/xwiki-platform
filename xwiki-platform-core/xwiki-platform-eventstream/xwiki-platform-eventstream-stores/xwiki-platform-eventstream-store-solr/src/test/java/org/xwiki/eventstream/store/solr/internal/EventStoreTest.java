@@ -22,8 +22,10 @@ package org.xwiki.eventstream.store.solr.internal;
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
@@ -104,9 +106,15 @@ public class EventStoreTest
 
     private DefaultEvent event(String id)
     {
+        return event(id, null);
+    }
+
+    private DefaultEvent event(String id, Date date)
+    {
         DefaultEvent event = new DefaultEvent();
 
         event.setId(id);
+        event.setDate(date);
 
         return event;
     }
@@ -127,20 +135,20 @@ public class EventStoreTest
 
         DefaultEvent event = event("id");
 
-        this.eventStore.saveEvent(event);
+        this.eventStore.saveEvent(event).get();
 
         Optional<Event> storedEvent = this.eventStore.getEvent("id");
         assertTrue(storedEvent.isPresent());
 
-        this.eventStore.deleteEvent(event);
+        this.eventStore.deleteEvent(event).get();
 
         assertFalse(this.eventStore.getEvent("id").isPresent());
 
-        this.eventStore.saveEvent(event);
+        this.eventStore.saveEvent(event).get();
 
         assertEquals(event, this.eventStore.getEvent("id").get());
 
-        Optional<Event> deleted = this.eventStore.deleteEvent("id");
+        Optional<Event> deleted = this.eventStore.deleteEvent("id").get();
 
         assertEquals(event, deleted.get());
 
@@ -148,7 +156,7 @@ public class EventStoreTest
     }
 
     @Test
-    public void search() throws EventStreamException
+    public void search() throws EventStreamException, InterruptedException, ExecutionException
     {
         DefaultEvent event1 = event("id1");
         DefaultEvent event2 = event("id2");
@@ -173,10 +181,10 @@ public class EventStoreTest
         when(this.converter.convert(DocumentReference.class, "wiki:space.user4")).thenReturn(event4.getUser());
         when(this.converter.convert(String.class, event4.getUser())).thenReturn("wiki:space.user4");
 
-        this.eventStore.saveEvent(event1);
-        this.eventStore.saveEvent(event2);
-        this.eventStore.saveEvent(event3);
-        this.eventStore.saveEvent(event4);
+        this.eventStore.saveEvent(event1).get();
+        this.eventStore.saveEvent(event2).get();
+        this.eventStore.saveEvent(event3).get();
+        this.eventStore.saveEvent(event4).get();
 
         assertSearch(Arrays.asList(event1, event2, event3, event4), new SimpleEventQuery());
 
@@ -190,5 +198,71 @@ public class EventStoreTest
         assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery(Event.FIELD_HIDDEN, true));
 
         assertSearch(Arrays.asList(event4), new SimpleEventQuery(Event.FIELD_USER, event4.getUser()));
+    }
+
+    @Test
+    public void searchDate() throws EventStreamException, InterruptedException, ExecutionException
+    {
+        Date date0 = new Date(0);
+        Date date10 = new Date(10);
+        Date date20 = new Date(20);
+        Date date30 = new Date(30);
+        Date date40 = new Date(40);
+
+        DefaultEvent event10 = event("id10", date10);
+        DefaultEvent event30 = event("id30", date30);
+
+        this.eventStore.saveEvent(event10).get();
+        this.eventStore.saveEvent(event30).get();
+
+        SimpleEventQuery query = new SimpleEventQuery();
+        query.after(date0);
+
+        assertSearch(Arrays.asList(event10, event30), query);
+
+        query = new SimpleEventQuery();
+        query.after(date10);
+
+        assertSearch(Arrays.asList(event30), query);
+
+        query = new SimpleEventQuery();
+        query.after(date20);
+
+        assertSearch(Arrays.asList(event30), query);
+
+        query = new SimpleEventQuery();
+        query.after(date30);
+
+        assertSearch(Arrays.asList(), query);
+
+        query = new SimpleEventQuery();
+        query.after(date40);
+
+        assertSearch(Arrays.asList(), query);
+
+        query = new SimpleEventQuery();
+        query.before(date0);
+
+        assertSearch(Arrays.asList(), query);
+
+        query = new SimpleEventQuery();
+        query.before(date10);
+
+        assertSearch(Arrays.asList(), query);
+
+        query = new SimpleEventQuery();
+        query.before(date20);
+
+        assertSearch(Arrays.asList(event10), query);
+
+        query = new SimpleEventQuery();
+        query.before(date30);
+
+        assertSearch(Arrays.asList(event10), query);
+
+        query = new SimpleEventQuery();
+        query.before(date40);
+
+        assertSearch(Arrays.asList(event10, event30), query);
     }
 }

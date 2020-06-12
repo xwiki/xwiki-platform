@@ -42,6 +42,52 @@ import org.xwiki.stability.Unstable;
 public interface SolrUtils
 {
     /**
+     * Set or replace the field value(s) with the specified value(s), or remove the values if 'null' or empty list is
+     * specified as the new value. May be specified as a single value, or as a list for multiValued fields.
+     * 
+     * @since 12.5RC1
+     */
+    String ATOMIC_UPDATE_MODIFIER_SET = "set";
+
+    /**
+     * Adds the specified values to a multiValued field. May be specified as a single value, or as a list.
+     * 
+     * @since 12.5RC1
+     */
+    String ATOMIC_UPDATE_MODIFIER_ADD = "add";
+
+    /**
+     * Adds the specified values to a multiValued field, only if not already present. May be specified as a single
+     * value, or as a list.
+     * 
+     * @since 12.5RC1
+     */
+    String ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT = "add-distinct";
+
+    /**
+     * Removes (all occurrences of) the specified values from a multiValued field. May be specified as a single value,
+     * or as a list.
+     * 
+     * @since 12.5RC1
+     */
+    String ATOMIC_UPDATE_MODIFIER_REMOVE = "remove";
+
+    /**
+     * Removes all occurrences of the specified regex from a multiValued field. May be specified as a single value, or
+     * as a list.
+     * 
+     * @since 12.5RC1
+     */
+    String ATOMIC_UPDATE_MODIFIER_REMOVEREGEX = "removeregex";
+
+    /**
+     * Increments a numeric value by a specific amount. Must be specified as a single numeric value.
+     * 
+     * @since 12.5RC1
+     */
+    String ATOMIC_UPDATE_MODIFIER_INC = "inc";
+
+    /**
      * Extract a {@code Map<String, Object>} from the passed {@link SolrDocument}.
      * <p>
      * Solr {@link DocumentObjectBinder} has native support for maps, unfortunately it only support maps for which all
@@ -104,6 +150,17 @@ public interface SolrUtils
      * @param document the Solr document
      */
     void set(String fieldName, Object fieldValue, SolrInputDocument document);
+
+    /**
+     * Store in the document the value associated with the passed field name.
+     * 
+     * @param modifier the atomic update modifier to apply (set, add, add-distinct, remove, removeregex, inc)
+     * @param fieldName the name of the field in the document
+     * @param fieldValue the value to store in the {@link SolrDocument}
+     * @param document the Solr document
+     * @since 12.5RC1
+     */
+    void setAtomic(String modifier, String fieldName, Object fieldValue, SolrInputDocument document);
 
     /**
      * Store in the document the values associated with the passed field name.

@@ -20,6 +20,7 @@
 package org.xwiki.eventstream;
 
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.stability.Unstable;
@@ -35,29 +36,52 @@ import org.xwiki.stability.Unstable;
 public interface EventStore
 {
     /**
-     * Add a new event to the storage.
+     * Asynchronously save in the store the given event.
      * 
-     * @param event the event to store
-     * @throws EventStreamException when failing to save the event
+     * @param event the event to save
+     * @return the new {@link CompletableFuture} providing the added {@link Event}
+     * @since 12.5RC1
      */
-    void saveEvent(Event event) throws EventStreamException;
+    CompletableFuture<Event> saveEvent(Event event);
 
     /**
-     * Deleted the event matching the passed identifier.
+     * Asynchronously save in the storage the given status.
+     * 
+     * @param status the status to save
+     * @return the new {@link CompletableFuture} providing the added {@link EventStatus}
+     * @since 12.5RC1
+     */
+    CompletableFuture<EventStatus> saveEventStatus(EventStatus status);
+
+    /**
+     * Asynchronously deleted the event matching the passed identifier.
      * 
      * @param eventId the unique identifier of the event
-     * @return the deleted event, null if none could be found
-     * @throws EventStreamException when failing to delete the event
+     * @return the new {@link CompletableFuture} providing the deleted {@link Event} or empty if none could be found
+     * @since 12.5RC1
      */
-    Optional<Event> deleteEvent(String eventId) throws EventStreamException;
+    CompletableFuture<Optional<Event>> deleteEvent(String eventId);
 
     /**
-     * Deleted the event. Do nothing if the passed event does not exist.
+     * Asynchronously deleted the event. Do nothing if the passed event does not exist.
      * 
      * @param event the event to remove from the store
-     * @throws EventStreamException when failing to delete the event
+     * @return the new {@link CompletableFuture} providing the deleted {@link Event} or empty if none could be found
+     * @since 12.5RC1
      */
-    void deleteEvent(Event event) throws EventStreamException;
+    CompletableFuture<Optional<Event>> deleteEvent(Event event);
+
+    /**
+     * Asynchronously delete from the store the given status.
+     * 
+     * @param status the status to delete
+     * @return the new {@link CompletableFuture} providing the deleted {@link EventStatus} or empty if none could be
+     *         found
+     * @since 12.5RC1
+     */
+    CompletableFuture<Optional<EventStatus>> deleteEventStatus(EventStatus status);
+
+    // Read
 
     /**
      * Get the event matching the passed identifier.
@@ -67,32 +91,6 @@ public interface EventStore
      * @throws EventStreamException when failing to get the event
      */
     Optional<Event> getEvent(String eventId) throws EventStreamException;
-
-    /**
-     * Save in the storage the given status.
-     * 
-     * @param status the status to save
-     * @throws EventStreamException when failing to save the event status
-     */
-    void saveEventStatus(EventStatus status) throws EventStreamException;
-
-    /**
-     * Delete from the storage the given status.
-     * 
-     * @param status the status to delete
-     * @throws EventStreamException when failing to delete the event status
-     */
-    void deleteEventStatus(EventStatus status) throws EventStreamException;
-
-    /**
-     * Get the event status identifier the passed event identifier and entity reference.
-     * 
-     * @param eventId the identifier of the event
-     * @param entity the identifier of the listening entity
-     * @return the event status or null if none could be found
-     * @throws EventStreamException when failing to get the event status
-     */
-    Optional<EventStatus> getEventStatus(String eventId, String entity) throws EventStreamException;
 
     /**
      * Search for event according to condition provided by the {@link EventQuery}.

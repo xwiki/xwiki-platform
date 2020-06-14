@@ -605,7 +605,9 @@
 #if ($isCurrentUser)
   #set ($discard = $cssClasses.add('self'))
 #end
-#if ($style == 'FIRST_NAME')
+#if ("$!firstName" == "")
+  #set($content = "@$reference.reference.name")
+#elseif ($style == 'FIRST_NAME')
   #set($content = "@$firstName")
 #elseif ($style == 'LOGIN')
   #set($content = "@$reference.reference.name")

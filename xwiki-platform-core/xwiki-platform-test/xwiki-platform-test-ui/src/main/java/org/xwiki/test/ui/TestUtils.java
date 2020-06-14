@@ -99,8 +99,8 @@ import org.xwiki.test.ui.po.ViewPage;
 import org.xwiki.test.ui.po.editor.ClassEditPage;
 import org.xwiki.test.ui.po.editor.ObjectEditPage;
 
-import static org.junit.Assert.fail;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Helper methods for testing, not related to a specific Page Object. Also made available to tests classes.

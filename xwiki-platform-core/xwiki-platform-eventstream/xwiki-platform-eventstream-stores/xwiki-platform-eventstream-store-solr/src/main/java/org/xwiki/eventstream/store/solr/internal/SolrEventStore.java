@@ -193,6 +193,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         this.utils.set(Event.FIELD_DOCUMENTVERSION, event.getDocumentVersion(), document);
         this.utils.set(Event.FIELD_GROUPID, event.getGroupId(), document);
         this.utils.set(Event.FIELD_HIDDEN, event.getHidden(), document);
+        this.utils.set(Event.FIELD_PREFILTERED, event.isPrefiltered(), document);
         this.utils.setString(Event.FIELD_IMPORTANCE, event.getImportance(), document);
         this.utils.setString(Event.FIELD_RELATEDENTITY, event.getRelatedEntity(), document);
         this.utils.setString(Event.FIELD_SPACE, event.getSpace(), document);
@@ -276,6 +277,7 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         event.setDocumentVersion(this.utils.get(Event.FIELD_DOCUMENTVERSION, document));
         event.setGroupId(this.utils.get(Event.FIELD_GROUPID, document));
         event.setHidden(this.utils.get(Event.FIELD_HIDDEN, document));
+        event.setPrefiltered(this.utils.get(Event.FIELD_PREFILTERED, document));
         event.setImportance(this.utils.get(Event.FIELD_IMPORTANCE, document, Importance.class));
         event.setRelatedEntity(this.utils.get(Event.FIELD_RELATEDENTITY, document, EntityReference.class));
         event.setSpace(this.utils.get(Event.FIELD_SPACE, document, SpaceReference.class));

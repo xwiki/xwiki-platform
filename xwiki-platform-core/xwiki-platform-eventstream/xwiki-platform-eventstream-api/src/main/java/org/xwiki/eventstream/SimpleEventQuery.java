@@ -320,9 +320,7 @@ public class SimpleEventQuery implements PageableEventQuery
      */
     public SimpleEventQuery withStatus(String entity, boolean read)
     {
-        this.statusRead = read;
-
-        return this;
+        return withStatus(entity).withStatus(read);
     }
 
     /**
@@ -351,7 +349,7 @@ public class SimpleEventQuery implements PageableEventQuery
     /**
      * @return indicate if read or unread event should be selected, null if disabled
      */
-    public Boolean isStatusRead()
+    public Boolean getStatusRead()
     {
         return this.statusRead;
     }

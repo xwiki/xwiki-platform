@@ -105,6 +105,8 @@ public class DefaultEvent implements Event
 
     private boolean hidden;
 
+    private boolean prefiltered;
+
     @Override
     public String getId()
     {
@@ -375,6 +377,18 @@ public class DefaultEvent implements Event
         this.hidden = isHidden;
     }
 
+    @Override
+    public boolean isPrefiltered()
+    {
+        return this.prefiltered;
+    }
+
+    @Override
+    public void setPrefiltered(boolean prefiltered)
+    {
+        this.prefiltered = prefiltered;
+    }
+
     /**
      * {@inheritDoc}
      * 
@@ -413,6 +427,7 @@ public class DefaultEvent implements Event
             builder.append(getUrl(), otherEvent.getUrl());
             builder.append(getUser(), otherEvent.getUser());
             builder.append(getWiki(), otherEvent.getWiki());
+            builder.append(isPrefiltered(), otherEvent.isPrefiltered());
 
             return builder.build();
         }
@@ -451,6 +466,7 @@ public class DefaultEvent implements Event
         builder.append(getUrl());
         builder.append(getUser());
         builder.append(getWiki());
+        builder.append(isPrefiltered());
 
         return builder.build();
     }

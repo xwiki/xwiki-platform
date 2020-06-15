@@ -65,11 +65,11 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     /**
      * The known fields.
      */
-    public static final Set<String> KNOWN_FIELDS = new HashSet<>(
-        Arrays.asList(SOLR_FIELD_ID, Event.FIELD_GROUPID, Event.FIELD_DATE, Event.FIELD_IMPORTANCE, Event.FIELD_TITLE,
-            Event.FIELD_BODY, Event.FIELD_APPLICATION, Event.FIELD_STREAM, Event.FIELD_TYPE, Event.FIELD_WIKI,
-            Event.FIELD_SPACE, Event.FIELD_DOCUMENT, Event.FIELD_DOCUMENTVERSION, Event.FIELD_RELATEDENTITY,
-            Event.FIELD_USER, Event.FIELD_URL, Event.FIELD_DOCUMENTTITLE, Event.FIELD_TARGET, Event.FIELD_HIDDEN));
+    public static final Set<String> KNOWN_FIELDS = new HashSet<>(Arrays.asList(SOLR_FIELD_ID, Event.FIELD_GROUPID,
+        Event.FIELD_DATE, Event.FIELD_IMPORTANCE, Event.FIELD_TITLE, Event.FIELD_BODY, Event.FIELD_APPLICATION,
+        Event.FIELD_STREAM, Event.FIELD_TYPE, Event.FIELD_WIKI, Event.FIELD_SPACE, Event.FIELD_DOCUMENT,
+        Event.FIELD_DOCUMENTVERSION, Event.FIELD_RELATEDENTITY, Event.FIELD_USER, Event.FIELD_URL,
+        Event.FIELD_DOCUMENTTITLE, Event.FIELD_TARGET, Event.FIELD_HIDDEN, Event.FIELD_PREFILTERED));
 
     @Override
     protected long getVersion()
@@ -98,6 +98,7 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
         addStringField(Event.FIELD_DOCUMENTTITLE, false, false);
         addStringField(Event.FIELD_TARGET, true, false);
         addBooleanField(Event.FIELD_HIDDEN, false, false);
+        addBooleanField(Event.FIELD_PREFILTERED, false, false);
 
         addStringField(SOLR_FIELD_READLISTENERS, true, false);
         addStringField(SOLR_FIELD_UNREADLISTENERS, true, false);

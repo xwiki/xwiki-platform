@@ -34,6 +34,7 @@ public interface SolrConfiguration
 {
     /**
      * Available modes of synchronization at startup.
+     * @since 12.5RC1
      */
     enum SynchronizeAtStartupMode
     {

@@ -141,7 +141,7 @@ public class IndexerRequest extends AbstractRequest
 
     @Override public int hashCode()
     {
-        return new HashCodeBuilder(17, 37)
+        return new HashCodeBuilder(2, 48)
             .appendSuper(super.hashCode())
             .append(rootReference)
             .append(overwrite)

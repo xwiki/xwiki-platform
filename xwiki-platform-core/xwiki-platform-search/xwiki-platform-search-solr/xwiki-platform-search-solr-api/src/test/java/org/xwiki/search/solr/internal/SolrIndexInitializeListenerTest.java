@@ -36,8 +36,12 @@ import org.xwiki.search.solr.internal.job.IndexerRequest;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
+import org.xwiki.wiki.descriptor.WikiDescriptor;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
+import org.xwiki.wiki.manager.WikiManagerException;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,6 +69,9 @@ public class SolrIndexInitializeListenerTest
 
     @MockComponent
     private EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @MockComponent
+    private WikiDescriptorManager wikiDescriptorManager;
 
     @BeforeEach
     void setup()
@@ -121,9 +128,14 @@ public class SolrIndexInitializeListenerTest
     }
 
     @Test
-    void onEventApplicationReadyForWiki() throws SolrIndexerException
+    void onEventApplicationReadyForWiki() throws SolrIndexerException, WikiManagerException
     {
         when(this.configuration.synchronizeAtStartupMode()).thenReturn(SolrConfiguration.SynchronizeAtStartupMode.WIKI);
+        WikiReference wikiReference = new WikiReference("foo");
+        WikiDescriptor wikiDescriptor = mock(WikiDescriptor.class);
+        when(this.wikiDescriptorManager.getMainWikiDescriptor()).thenReturn(wikiDescriptor);
+        when(wikiDescriptor.getReference()).thenReturn(wikiReference);
+        when(this.entityReferenceSerializer.serialize(wikiReference)).thenReturn("wiki:foo");
 
         when(this.configuration.synchronizeAtStartup()).thenReturn(false);
         this.solrIndexInitializeListener.onEvent(new ApplicationReadyEvent(), null, null);
@@ -131,6 +143,10 @@ public class SolrIndexInitializeListenerTest
 
         when(this.configuration.synchronizeAtStartup()).thenReturn(true);
         this.solrIndexInitializeListener.onEvent(new ApplicationReadyEvent(), null, null);
-        verify(this.solrIndexer, never()).startIndex(any());
+
+        IndexerRequest indexerRequest = new IndexerRequest();
+        indexerRequest.setRootReference(wikiReference);
+        indexerRequest.setId(Arrays.asList("solr", "indexer", "wiki:foo"));
+        verify(this.solrIndexer).startIndex(indexerRequest);
     }
 }

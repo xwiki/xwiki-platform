@@ -69,18 +69,6 @@ public class NotificationsTrayPage extends ViewPage
      */
     public NotificationsTrayPage()
     {
-        pageOnlyWatchedSwitch = new BootstrapSwitch(
-                toggles.findElement(By.className("bootstrap-switch-id-notificationPageOnly")),
-                getDriver()
-        );
-        pageAndChildrenWatchedSwitch = new BootstrapSwitch(
-            toggles.findElement(By.className("bootstrap-switch-id-notificationPageAndChildren")),
-            getDriver()
-        );
-        wikiWatchedSwitch = new BootstrapSwitch(
-                toggles.findElement(By.className("bootstrap-switch-id-notificationWiki")),
-                getDriver()
-        );
     }
 
     /**
@@ -178,6 +166,18 @@ public class NotificationsTrayPage extends ViewPage
             }
             return false;
         });
+        pageOnlyWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationPageOnly")),
+            getDriver()
+        );
+        pageAndChildrenWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationPageAndChildren")),
+            getDriver()
+        );
+        wikiWatchedSwitch = new BootstrapSwitch(
+            toggles.findElement(By.className("bootstrap-switch-id-notificationWiki")),
+            getDriver()
+        );
     }
 
     private List<WebElement> getNotifications()

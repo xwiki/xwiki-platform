@@ -212,46 +212,94 @@ define(["jquery"], function ($) {
     return this.data.meta.filters[propertyType];
   };
 
+
   /**
-   * Add a filter entry in the configuration, then fetch new data
+   * Get the default filter operator associated to a property
+   * @param {String} property
+   */
+  Logic.prototype.getFilterDefaultOperator = function (property) {
+    var filterDescriptor = this.getFilterDescriptor(property);
+    if (!filterDescriptor) { return; }
+    var filterOperators = filterDescriptor.operators;
+    if (!(filterOperators instanceof Array)) { return; }
+    return filterOperators[0];
+  };
+
+
+  /**
+   * Update sort configuration based on parameters, then fetch new data
+   * @param {String} property The property to filter according to
+   * @param {String} index The index of the filter entry
+   * @param {String} filterEntry The filter data used to update the filter configuration
+   *  filterEntry = {property, operator, value}
+   *  undefined values are defaulted to current values, then to default values.
+   * @param {String} filterEntry.property The new property to filter according to
+   * @param {String} filter.operator The operator of the filter.
+   *  Should match the filter descriptor of the filter property
+   * @param {String} filter.value Value for the new filter entry
+   */
+  Logic.prototype.filter = function (property, index, filterEntry) {
+    var self = this;
+    if (this.data.query.properties.indexOf(property) === -1) { return; }
+    // default index
+    if (index === undefined) {
+      index = 0;
+    }
+    if (index < 0) { return; }
+    // filter entry at current index
+    var queryFilter = this.data.query.filters[property] || [];
+    var currentEntry = queryFilter[index] || {};
+    // default filterEntry
+    if (filterEntry === undefined) {
+      filterEntry = {};
+    }
+    var defaultFilterEntry = {
+      property: property,
+      value: "",
+      get operator () {
+        return self.getFilterDefaultOperator(this.property);
+      },
+    };
+    filterEntry = $.extend({}, defaultFilterEntry, currentEntry, filterEntry);
+    if (filterEntry.operator === undefined) { return; }
+    // apply filter
+    // remove filter at current property and index
+    if (queryFilter[index]) {
+      queryFilter.splice(index, 1);
+    }
+    // add filter at new property and index
+    if (!this.data.query.filters[filterEntry.property]) {
+      this.data.query.filters[filterEntry.property] = [];
+    }
+    this.data.query.filters[filterEntry.property].splice(index, 0, filterEntry);
+    // dispatch events
+    var event = new CustomEvent("xwiki:livedata:filter", {
+      livedata: this,
+      property: filterEntry.property,
+      operator: filterEntry.operator,
+      value: filterEntry.value,
+      index: index,
+    });
+    this.element.dispatchEvent(event);
+
+    // CALL FUNCTION TO FETCH NEW DATA HERE
+  };
+
+
+
+  /**
+   * Add new filter entry, shorthand of Logic.prototype.sort
    * @param {String} property Which property to add the filter to
    * @param {String} operator The operator of the filter. Should match the filter descriptor of the property
    * @param {String} value Default value for the new filter entry
    */
   Logic.prototype.addFilter = function (property, operator, value) {
-    // Get associated filter descriptor and operators
-    var filterDescriptor = this.getFilterDescriptor(property);
-    if (!filterDescriptor) { return; }
-    var filterOperators = filterDescriptor.operators;
-    if (!(filterOperators instanceof Array)) { return; }
-    // default operator
-    if (operator === undefined) {
-      operator = filterOperators[0];
-    }
-    if (filterOperators.indexOf(operator) === -1) { return; }
-    // default value
-    if (value === undefined) {
-      value = "";
-    }
-    // add filter
-    if (!this.data.query.filters[property]) {
-      this.data.query.filters[property] = [];
-    }
-    this.data.query.filters[property].push({
-      operator: operator,
-      value: value,
-    });
-    // dispatch events
-    var event = new CustomEvent("xwiki:livedata:addFilter", {
-      livedata: this,
+    var index = (this.data.query.filters[property] || []).length;
+    this.filter(property, index, {
       property: property,
       operator: operator,
-      value: value,
-      index: this.data.query.filters[property].length - 1,
+      value: value
     });
-    this.element.dispatchEvent(event);
-
-    // CALL FUNCTION TO FETCH NEW DATA HERE
   };
 
 

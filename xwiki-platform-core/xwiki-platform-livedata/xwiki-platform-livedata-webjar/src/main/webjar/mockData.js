@@ -86,6 +86,9 @@ define({
       text: {
         operators: ["equals", "nequals"],
       },
+      number: {
+        operators: ["greater", "lower"],
+      },
     },
 
     layoutDescriptors: {

@@ -19,6 +19,7 @@
  */
 package org.xwiki.search.solr.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -29,7 +30,10 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.ApplicationReadyEvent;
+import org.xwiki.bridge.event.WikiReadyEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.event.Event;
 import org.xwiki.search.solr.internal.api.SolrConfiguration;
@@ -51,7 +55,9 @@ public class SolrIndexInitializeListener implements EventListener
     /**
      * The events to listen to that trigger the index update.
      */
-    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent());
+    private static final List<Event> EVENTS = Arrays.<Event> asList(new ApplicationReadyEvent(), new WikiReadyEvent());
+
+    private static final List<String> REQUEST_DEFAULT_ID = Arrays.asList("solr", "indexer");
 
     /**
      * Logging framework.
@@ -70,6 +76,9 @@ public class SolrIndexInitializeListener implements EventListener
     @Inject
     private SolrConfiguration configuration;
 
+    @Inject
+    private EntityReferenceSerializer<String> entityReferenceSerializer;
+
     @Override
     public List<Event> getEvents()
     {
@@ -86,14 +95,30 @@ public class SolrIndexInitializeListener implements EventListener
     public void onEvent(Event event, Object source, Object data)
     {
         if (this.configuration.synchronizeAtStartup()) {
-            // Start synchronization
-            IndexerRequest request = new IndexerRequest();
-            request.setId(Arrays.asList("solr", "indexer"));
+            IndexerRequest request = null;
+            if (this.configuration.synchronizeAtStartupMode() == SolrConfiguration.SynchronizeAtStartupMode.FARM
+                && event instanceof ApplicationReadyEvent) {
+                // Start synchronization
+                request = new IndexerRequest();
+                request.setId(REQUEST_DEFAULT_ID);
+            } else if (this.configuration.synchronizeAtStartupMode() == SolrConfiguration.SynchronizeAtStartupMode.WIKI
+                && event instanceof WikiReadyEvent) {
+                WikiReadyEvent wikiReadyEvent = (WikiReadyEvent) event;
+                WikiReference wikiReference = new WikiReference(wikiReadyEvent.getWikiId());
+                request = new IndexerRequest();
+                request.setRootReference(wikiReference);
 
-            try {
-                this.solrIndexer.get().startIndex(request);
-            } catch (SolrIndexerException e) {
-                this.logger.error("Failed to start initial Solr index synchronization", e);
+                ArrayList<String> requestId = new ArrayList<>(REQUEST_DEFAULT_ID);
+                requestId.add(this.entityReferenceSerializer.serialize(wikiReference));
+                request.setId(requestId);
+            }
+
+            if (request != null) {
+                try {
+                    this.solrIndexer.get().startIndex(request);
+                } catch (SolrIndexerException e) {
+                    this.logger.error("Failed to start initial Solr index synchronization", e);
+                }
             }
         }
     }

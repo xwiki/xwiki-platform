@@ -19,6 +19,8 @@
  */
 package org.xwiki.search.solr.internal.job;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.job.AbstractRequest;
 import org.xwiki.job.Request;
 import org.xwiki.model.reference.EntityReference;
@@ -114,5 +116,36 @@ public class IndexerRequest extends AbstractRequest
     public void setRemoveMissing(boolean removeMissing)
     {
         this.removeMissing = removeMissing;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        IndexerRequest that = (IndexerRequest) o;
+
+        return new EqualsBuilder()
+            .appendSuper(super.equals(o))
+            .append(overwrite, that.overwrite)
+            .append(removeMissing, that.removeMissing)
+            .append(rootReference, that.rootReference)
+            .isEquals();
+    }
+
+    @Override public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .appendSuper(super.hashCode())
+            .append(rootReference)
+            .append(overwrite)
+            .append(removeMissing)
+            .toHashCode();
     }
 }

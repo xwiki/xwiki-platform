@@ -70,4 +70,35 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Exclude javax.script.ScriptEngineFactory since it's not an XWiki interface and thus
+                           doesn't have a @Role annotation. there's no way for the Spoon checker to find
+                           out about this, since only the Component Manager knows what has been registered for it. -->
+                      <name>excludedFieldTypes</name>
+                      <value><![CDATA[
+                        ["javax.script.ScriptEngineFactory"]
+                      ]]></value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

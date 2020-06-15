@@ -90,22 +90,22 @@ ckeditor.plugin.save.failed=Der Inhalt kann nicht gespeichert werden aufgrund ei
 ckeditor.plugin.source.conversionFailed=Fehler beim Ausführen der Konvertierung.
 
 ### Missing: ckeditor.plugin.toolbar.basicStyles=Basic Styles
-### Missing: ckeditor.plugin.toolbar.lists=Lists
-### Missing: ckeditor.plugin.toolbar.bulletedlist=Bulleted List
-### Missing: ckeditor.plugin.toolbar.numberedlist=Numbered List
-### Missing: ckeditor.plugin.toolbar.insert=Insert
-### Missing: ckeditor.plugin.toolbar.horizontalrule=Horizontal Line
-### Missing: ckeditor.plugin.toolbar.specialchar=Special Character
-### Missing: ckeditor.plugin.toolbar.infoBox=Info Box
-### Missing: ckeditor.plugin.toolbar.successBox=Success Box
-### Missing: ckeditor.plugin.toolbar.warningBox=Warning Box
-### Missing: ckeditor.plugin.toolbar.errorBox=Error Box
-### Missing: ckeditor.plugin.toolbar.toc=Table of Contents
-### Missing: ckeditor.plugin.toolbar.include=Include
-### Missing: ckeditor.plugin.toolbar.code=Code Snippet
-### Missing: ckeditor.plugin.toolbar.otherMacros=Other Macros
+ckeditor.plugin.toolbar.lists=Listen
+ckeditor.plugin.toolbar.bulletedlist=Liste mit Aufzählungszeichen
+ckeditor.plugin.toolbar.numberedlist=Nummerierte Liste
+ckeditor.plugin.toolbar.insert=Einfügen
+ckeditor.plugin.toolbar.horizontalrule=Horizontale Linie
+ckeditor.plugin.toolbar.specialchar=Sonderzeichen
+ckeditor.plugin.toolbar.infoBox=Infobox
+ckeditor.plugin.toolbar.successBox=Erfolg Box
+ckeditor.plugin.toolbar.warningBox=Warnbox
+ckeditor.plugin.toolbar.errorBox=Fehlerbox
+ckeditor.plugin.toolbar.toc=Inhaltsverzeichnis
+ckeditor.plugin.toolbar.include=Enthalten
+ckeditor.plugin.toolbar.code=Codeausschnitt
+ckeditor.plugin.toolbar.otherMacros=Andere Makros
 
-### Missing: ckeditor.inline.failedToInit=Failed to initialize CKEditor.
+ckeditor.inline.failedToInit=Der Editor konnte nicht initialisiert werden.
 
 modal.ok=OK
 modal.cancel=Abbrechen

@@ -73,16 +73,45 @@
     },
 
     overwriteWysiwygMode: function(editor) {
-      // Hide the content that is edited in-line when leaving the WYSIWYG mode.
       editor.on('beforeModeUnload', function() {
+        var contentsSpace;
         if (editor.mode === 'wysiwyg') {
+          // Hide the content that is edited in-line when leaving the WYSIWYG mode and create a fake contents space
+          // where the new mode (e.g. Source) will be injected (because the contents space is not available when editing
+          // in-place).
+          contentsSpace = editor.element.getDocument().createElement('div');
+          contentsSpace.setAttributes({
+            id: editor.ui.spaceId('contents'),
+            // Copy the classes from the editor element (the content edited in-line) to ensure consistent styles
+            // between WYSIWYG and the other editing modes (like Source).
+            'class': 'cke_contents fake ' + editor.element.getAttribute('class'),
+            role: 'presentation'
+          });
+          // Initialize with the height of the WYSIWYG mode in order to prevent UI flickering when switching modes.
+          contentsSpace.setStyles({
+            'min-height': editor.element.getSize('height', true) + 'px',
+            // Reserve the space and show it only after the new mode is ready.
+            'visibility': 'hidden'
+          });
+          // Minimize UI flickering by reducing the number of redraws that have to be done.
+          editor.element.$.parentNode.replaceChild(contentsSpace.$, editor.element.$);
           editor.element.hide();
+          editor.element.insertBefore(contentsSpace);
+        } else {
+          // Preserve the height of the contents space while switching modes in order to prevent UI flickering.
+          contentsSpace = editor.ui.space('contents');
+          contentsSpace.setStyle('min-height', contentsSpace.getSize('height', true) + 'px');
         }
       });
 
       editor.addMode('wysiwyg', function(callback) {
-        // Show the content that is edited in-line when getting back to WYSIWYG mode.
-        editor.element.show();
+        // Replace the contents space used by the other edit modes with the content edited in-place.
+        var contentsSpace = editor.ui.space('contents');
+        // Use the height of the previous editing mode (e.g. while the conversion from Source to HTML takes place) in
+        // order to reduce the UI flickering.
+        editor.element.remove().setStyle('min-height', contentsSpace.getSize('height', true) + 'px').show();
+        // Minimize UI flickering by reducing the number of redraws that have to be done.
+        contentsSpace.$.parentNode.replaceChild(editor.element.$, contentsSpace.$);
         // Enable in-line editing.
         editor.editable(editor.element);
         // Note that we trigger the callback without setting the editor data because this is done later by our source
@@ -90,6 +119,18 @@
         callback();
         // Add selection change listeners (so that the tool bar state is synchronized with the current selection).
         editor.fire('contentDom');
+      });
+
+      editor.on('modeReady', function() {
+        // Remove the height constraint once the mode is ready (it prevented UI flickeing while switching modes).
+        if (editor.mode === 'wysiwyg') {
+          editor.element.removeStyle('min-height');
+        } else {
+          editor.ui.space('contents').setStyles({
+            'min-height': '',
+            'visibility': ''
+          });
+        }
       });
 
       // Show the content that is edited in-line when the editor is destroyed, in case the current mode is not WYSIWYG.

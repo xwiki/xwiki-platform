@@ -40,8 +40,9 @@
         textArea.addClass('cke_source').addClass('cke_enable_context_menu');
 
         if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
-          // Initialize with the height of the content edited in-line in order to avoid the UI flicker.
-          jQuery(textArea.$).autoHeight(editor._.modes.wysiwyg.previousHeight);
+          // Make the text area auto-resize to fit the content. Initialize with the height of the content edited in-line
+          // in order to prevent UI flickering.
+          jQuery(textArea.$).autoHeight(contentsSpace.getSize('height', true));
         } else {
           textArea.addClass('cke_reset');
         }
@@ -84,57 +85,18 @@
       }
 
       if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
-        enhanceInlineSourceArea(editor);
+        require(['centerTextAreaSelectionVertically'], function($) {
+          editor.on('modeReady', function() {
+            if (editor.mode === 'source') {
+              // Update the text area height after the HTML to Wiki Syntax conversion is done.
+              // Then try to center the text selection vertically, if needed.
+              $(editor.editable().$).trigger('input').centerTextAreaSelectionVertically({padding: 65});
+            }
+          });
+        });
       }
     }
   });
-
-  var enhanceInlineSourceArea = function(editor) {
-    editor.on('beforeModeUnload', function() {
-      if (editor.mode === 'wysiwyg') {
-        // Save the height of the edited content so that we can initialize the Source text area with it.
-        editor._.modes.wysiwyg.previousHeight = jQuery(editor.element.$).height();
-      }
-    // Execute this listener before the content edited in-line is hidden.
-    }, null, null, 5);
-
-    // Create a fake contents space, if needed, before switching to source.
-    editor.on('beforeSetMode', function(event) {
-      var contentsSpace = editor.ui.space('contents');
-      if (event.data === 'source' && !contentsSpace) {
-        // The contents space is normally not available when editing in-place so we need to fake it.
-        contentsSpace = editor.element.getDocument().createElement('div');
-        contentsSpace.setAttributes({
-          id: editor.ui.spaceId('contents'),
-          // Copy the classes from the editor element (the content edited in-line) to ensure consistent styles between
-          // WYSIWYG and Source editing modes.
-          'class': 'cke_contents fake ' + editor.element.getAttribute('class'),
-          role: 'presentation'
-        });
-        contentsSpace.insertAfter(editor.element);
-      }
-    });
-
-    editor.on('mode', function() {
-      if (editor.mode !== 'source') {
-        // Remove the fake contents space we added above.
-        var contentsSpace = editor.ui.space('contents');
-        if (contentsSpace && contentsSpace.hasClass('fake')) {
-          contentsSpace.remove();
-        }
-      }
-    });
-
-    require(['centerTextAreaSelectionVertically'], function($) {
-      editor.on('modeReady', function() {
-        if (editor.mode === 'source') {
-          // Update the text area height after the HTML to Wiki Syntax conversion is done.
-          // Then try to center the text selection vertically, if needed.
-          $(editor.editable().$).trigger('input').centerTextAreaSelectionVertically({padding: 65});
-        }
-      });
-    });
-  };
 
   var SourceEditable = CKEDITOR.tools.createClass({
     base: CKEDITOR.editable,

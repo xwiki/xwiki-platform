@@ -1,0 +1,69 @@
+<?xml version="1.1" encoding="UTF-8"?>
+
+<!--
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+-->
+
+<xwikidoc version="1.3" reference="PanelsCode.Translations" locale="de">
+  <web>PanelsCode</web>
+  <name>Translations</name>
+  <language>de</language>
+  <defaultLanguage>en</defaultLanguage>
+  <translation>1</translation>
+  <creator>xwiki:XWiki.Admin</creator>
+  <parent>Panels.WebHome</parent>
+  <author>xwiki:XWiki.Admin</author>
+  <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
+  <version>1.1</version>
+  <title/>
+  <comment/>
+  <minorEdit>false</minorEdit>
+  <syntaxId>plain/1.0</syntaxId>
+  <hidden>true</hidden>
+  <content>platform.panels.applications.helper=Hier können Sie entscheiden, welche Anwendung in dem Anwendungspanel angezeigt werden (per Voreinstellung in der linken Spalte angezeigt). Eine neu installierte Anwendung wird erst einmal hier angezeigt. Wenn Sie Anwendungen ausblenden wollen, können Sie diese mittels Drag &amp; Drop ihrer Icons von der linken Box in die rechte Box verschieben. Sie können auch die Anwendungen innerhalb der Box umsortieren. Vergessen Sie nicht, Ihre Änderungen zu speichern!
+platform.panels.applications.displayedapps=Eingeblendete Anwendungen
+platform.panels.applications.blacklistedapps=Ausgeblendete Anwendungen
+platform.panels.applications.save=Speichern
+platform.panels.applications.revert=Zurücksetzen
+platform.panels.applications.ajax.success=Die Konfiguration wurde gespeichert.
+platform.panels.applications.ajax.csrf=Die CSRF-Validierung ist beim Speichern fehlgeschlagen.
+platform.panels.applications.ajax.noright=Sie haben nicht das Recht, PanelsCode.ApplicationsPanelConfiguration zu bearbeiten.
+platform.panels.applications.ajax.error=Fehler beim Speichern Ihrer Änderungen.
+admin.panels.applications=Anwendungspanel
+admin.panels.applications.description=Entscheiden Sie, welche Anwendungen im Anwendungspanel angezeigt werden.
+
+admin.panels.navigation=Navigationspanel
+admin.panels.navigation.description=Entscheiden Sie, welche Seiten im Navigationspanel angezeigt werden.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages=Startseiten von Erweiterungen ausblenden
+PanelsCode.NavigationConfigurationClass_excludeTopLevelExtensionPages.hint=Dieser dynamische Filter entfernt aus dem Navigationsbaum die Startseiten von installieren Erweiterungen, wenn sie nicht geändert werden sollen.
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages=Startseiten von Anwendungen ausblenden
+PanelsCode.NavigationConfigurationClass_excludeTopLevelApplicationPages.hint=Dieser dynamische Filter entfernt aus dem Navigationsbaum die Startseiten von installieren Anwendungen, wenn sie nicht geändert werden sollen.
+PanelsCode.NavigationConfigurationClass_exclusions=Ausgeblendet
+PanelsCode.NavigationConfigurationClass_exclusions.hint=Die Liste der Seiten, die aus dem Navigationsbaum ausgeblendet werden sollen.
+PanelsCode.NavigationConfigurationClass_inclusions=Eingeblendet
+PanelsCode.NavigationConfigurationClass_inclusions.hint=Die Liste der Seiten, die in dem Navigationsbaum angezeigt werden sollen, auch wenn sie von einem vorherigen Filter ausgeschlossen wurden.
+platform.panels.navigation.configuration.excludedPages=Ausgeblendete Seiten
+platform.panels.navigation.configuration.excludedPages.hint=Verwenden Sie Drag &amp; Drop, um Seiten aus dem Navigationsbaum auszublenden oder wieder einzublenden.
+platform.panels.navigation.configuration.excludedPages.empty=Keine
+platform.panels.navigation.configuration.topLevelExtensionPages=Startseiten von Erweiterungen
+platform.panels.navigation.configuration.topLevelApplicationPages=Startseiten von Anwendungen
+platform.panels.navigation.configuration.otherPages=Andere Seiten
+platform.panels.navigation.configuration.saveComment=Die Konfiguration des Navigationspanels wurde über die Administration aktualisiert</content>
+  
+</xwikidoc>

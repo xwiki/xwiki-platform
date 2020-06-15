@@ -64,6 +64,46 @@ define(["jquery"], function ($) {
 
 
   /**
+   * Polyfill for the custom event function for IE 11
+   * Taken from https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
+   */
+  (function () {
+    if (typeof window.CustomEvent === "function") return false;
+    function CustomEvent (event, params) {
+      params = params || {bubbles: false, cancelable: false, detail: null};
+      var evt = document.createEvent('CustomEvent');
+      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
+      return evt;
+    }
+    window.CustomEvent = CustomEvent;
+  })();
+
+  /**
+   * Send custom events
+   * @param {String} eventName The name of the event, without the prefix "xwiki:livedata"
+   * @param {Object} eventData The data associated with the event.
+   *  The livedata object reference is automatically added
+   */
+  Logic.prototype._triggerEvent = function (eventName, eventData) {
+    // configure event
+    var defaultData = {
+      livedata: this,
+    };
+    eventName = "xwiki:livedata:" + eventName;
+    eventData = {
+      bubbles: false,
+      detail: $.extend({}, defaultData, eventData),
+    };
+    var event = new CustomEvent(eventName, eventData);
+    // dispatch event
+    this.element.dispatchEvent(event);
+    this.element.ownerDocument.dispatchEvent(event);
+  };
+
+
+
+
+  /**
    * Load a layout, or default layout if none specified
    * @param {String} layoutId The id of the layout to load with requireJS
    * @returns {Object} A jquery promise
@@ -93,11 +133,9 @@ define(["jquery"], function ($) {
         self.element.appendChild(self.layouts[layoutId]);
         self.data.query.currentLayout = layoutId;
         // dispatch events
-        var event = new CustomEvent("xwiki:livedata:layoutChange", {
+        self._triggerEvent("layoutChange", {
           layoutId: layoutId,
-          livedata: self,
         });
-        self.element.dispatchEvent(event);
         defer.resolve();
       },
 
@@ -160,13 +198,11 @@ define(["jquery"], function ($) {
       this.data.query.sort.splice(currentLevel, 1);
     }
     // dispatch events
-    var event = new CustomEvent("xwiki:livedata:sort", {
-      livedata: this,
+    this._triggerEvent("sort", {
       property: property,
       level: level,
       descending: descending,
     });
-    this.element.dispatchEvent(event);
 
     // CALL FUNCTION TO FETCH NEW DATA HERE
   };
@@ -242,17 +278,13 @@ define(["jquery"], function ($) {
     var self = this;
     if (this.data.query.properties.indexOf(property) === -1) { return; }
     // default index
-    if (index === undefined) {
-      index = 0;
-    }
+    index = index || 0;
     if (index < 0) { return; }
     // filter entry at current index
     var queryFilter = this.data.query.filters[property] || [];
     var currentEntry = queryFilter[index] || {};
     // default filterEntry
-    if (filterEntry === undefined) {
-      filterEntry = {};
-    }
+    filterEntry = filterEntry || {};
     var defaultFilterEntry = {
       property: property,
       value: "",
@@ -273,14 +305,12 @@ define(["jquery"], function ($) {
     }
     this.data.query.filters[filterEntry.property].splice(index, 0, filterEntry);
     // dispatch events
-    var event = new CustomEvent("xwiki:livedata:filter", {
-      livedata: this,
+    this._triggerEvent("filter", {
       property: filterEntry.property,
       operator: filterEntry.operator,
       value: filterEntry.value,
       index: index,
     });
-    this.element.dispatchEvent(event);
 
     // CALL FUNCTION TO FETCH NEW DATA HERE
   };

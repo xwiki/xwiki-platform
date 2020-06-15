@@ -8,14 +8,15 @@
 
       <!-- Table Header -->
       <thead>
-        <tr>
 
+        <!-- Column name -->
+        <tr class="column-header">
           <th
             v-for="col in cols"
             :key="col.id"
           >
             <div
-              class="column-header"
+              class="column-name"
               @click="logic.sort(col.id)"
             >
               <span>{{ col.name }}</span>
@@ -29,8 +30,22 @@
               ></span>
             </div>
           </th>
-
         </tr>
+
+        <!-- Column filter -->
+        <tr class="column-filters">
+          <th
+            v-for="col in cols"
+            :key="col.id"
+          >
+            <input
+              type="text" size="1"
+              :value="data.query.filters[col.id] && data.query.filters[col.id][0] && data.query.filters[col.id][0].value"
+              @change="logic.filter(col.id, 0, { value: $event.target.value })"
+            />
+          </th>
+        </tr>
+
       </thead>
 
 
@@ -127,7 +142,7 @@ define([
 
 
 <style>
-.livedata-table-layout .column-header {
+.livedata-table-layout .column-name {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -142,7 +157,18 @@ define([
 .livedata-table-layout .sort-icon.sorted {
   opacity: 1;
 }
-.livedata-table-layout .column-header:hover .sort-icon:not(.sorted) {
+.livedata-table-layout .column-name:hover .sort-icon:not(.sorted) {
   opacity: 0.5;
+}
+
+.livedata-table-layout .column-filters th {
+  padding-left: 0;
+  padding-right: 0;
+  font-weight: normal;
+}
+.livedata-table-layout .column-filters input {
+  padding-left: 8px;
+  padding-right: 8px;
+  width: 100%;
 }
 </style>

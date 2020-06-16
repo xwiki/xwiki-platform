@@ -76,11 +76,8 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
     private static final String COMMENT_KEY = "comment";
 
     /**
-     * The name of the request parameter whose multiple values indicate the request parameters that require HTML
-     * conversion. For instance, if this parameter's value is {@code [description, content]} then the request has two
-     * parameters, {@code description} and {@code content}, requiring HTML conversion. The syntax these parameters must
-     * be converted to is found also on the request, under {@code description_syntax} and {@code content_syntax}
-     * parameters.
+     * The name of the request parameter value represent the parameter that requires conversion.
+     * This parameter and its implementation is directly inspired from {@link org.xwiki.wysiwyg.filter.ConversionFilter}
      */
     private static final String REQUIRES_HTML_CONVERSION = "RequiresHTMLConversion";
 
@@ -204,9 +201,9 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             metadataMap.put(f.getName(), f.getValue());
         }
 
-        if (metadataMap.containsKey(REQUIRES_HTML_CONVERSION)) {
-            String syntax =
-                (String) metadataMap.getOrDefault(metadataMap.get(REQUIRES_HTML_CONVERSION) + "_syntax", "xwiki/2.1");
+        if (metadataMap.containsKey(REQUIRES_HTML_CONVERSION)
+            && COMMENT_KEY.equals(metadataMap.get(REQUIRES_HTML_CONVERSION))) {
+            String syntax = (String) metadataMap.getOrDefault(String.format("%s_syntax", COMMENT_KEY), "xwiki/2.1");
             metadataMap
                 .put(COMMENT_KEY, this.htmlConverter.fromHTML(String.valueOf(metadataMap.get(COMMENT_KEY)), syntax));
             metadataMap.remove(REQUIRES_HTML_CONVERSION);

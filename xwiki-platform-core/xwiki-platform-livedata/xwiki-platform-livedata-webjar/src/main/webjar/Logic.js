@@ -73,7 +73,7 @@ define(["jquery"], function ($) {
     var defer = $.Deferred();
 
     layoutId = layoutId || this.data.meta.defaultLayout;
-    if (layoutId === this.data.query.currentLayout) { return defer.reject(); }
+    if (layoutId === this.data.query.currentLayout) { return defer.resolve(this.layouts[layoutId]); }
     if (!this.data.meta.layoutDescriptors[layoutId]) { return defer.reject(); }
     if (this.data.meta.layouts.indexOf(layoutId) === -1) { return defer.reject(); }
 
@@ -108,8 +108,8 @@ define(["jquery"], function ($) {
       function (err) {
         // try to load default layout instead
         if (layoutId !== self.data.meta.defaultLayout) {
-          self.changeLayout(self.data.meta.defaultLayout).then(function () {
-            defer.resolve();
+          self.changeLayout(self.data.meta.defaultLayout).then(function (layout) {
+            defer.resolve(layout);
           }, function () {
             defer.reject();
           });

@@ -80,32 +80,39 @@ define(["jquery"], function ($) {
     // load layout based on it's filename
     require([BASE_PATH + "layouts/" + this.data.meta.layoutDescriptors[layoutId].file],
       // load success
-      function (Layout) {
+      function (createLayout) {
+        var previousLayoutId = self.data.query.currentLayout;
         // remove current layout from the page
-        if (self.data.query.currentLayout && self.layouts[self.data.query.currentLayout]) {
-          self.element.removeChild(self.layouts[self.data.query.currentLayout]);
+        if (previousLayoutId && self.layouts[previousLayoutId]) {
+          self.element.removeChild(self.layouts[previousLayoutId]);
         }
         // add layout element in loaded layouts list if not already loaded on the page
         if (!self.layouts[layoutId]) {
-          self.layouts[layoutId] = new Layout(self.element);
+          self.layouts[layoutId] = createLayout(self.element);
         }
         // add new layout to the page
         self.element.appendChild(self.layouts[layoutId]);
         self.data.query.currentLayout = layoutId;
         // dispatch events
         var event = new CustomEvent("xwiki:livedata:layoutChange", {
+          layout: self.layouts[layoutId],
           layoutId: layoutId,
+          previousLayoutId: previousLayoutId,
           livedata: self,
         });
         self.element.dispatchEvent(event);
-        defer.resolve();
+        defer.resolve(self.layouts[layoutId]);
       },
 
       // load failure
       function (err) {
         // try to load default layout instead
         if (layoutId !== self.data.meta.defaultLayout) {
-          return self.changeLayout(self.data.meta.defaultLayout);
+          self.changeLayout(self.data.meta.defaultLayout).then(function () {
+            defer.resolve();
+          }, function () {
+            defer.reject();
+          });
         }
         else {
           console.error(err);

@@ -29,7 +29,6 @@ define([
 ) {
 
   return function (element) {
-    this.logic = Logic(element);
 
     /**
      * Create the table layout from Vuejs
@@ -40,7 +39,7 @@ define([
       template: '<livedata-table :logic="logic"></livedata-table>',
 
       data: {
-        logic: this.logic,
+        logic: Logic(element),
       },
 
     }).$mount();

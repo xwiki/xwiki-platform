@@ -171,7 +171,7 @@ define(["jquery"], function ($) {
     this.data.query.sort.some(function (sortObject, i) {
       if (sortObject.property === property) {
         currentLevel = i;
-        return;
+        return true;
       }
     });
     // default level

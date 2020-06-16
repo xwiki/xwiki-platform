@@ -77,6 +77,7 @@ viewers.Comments = Class.create((function () {
       this.addSubmitListener(this.form);
       this.addCancelListener();
       this.addEditListener();
+      this.addPreview(this.form);
       this.reloadEditor({
         callback: function () {
           this.addPreview(this.form);
@@ -416,14 +417,13 @@ viewers.Comments = Class.create((function () {
      * @param form the form for which the preview is done
      */
     doPreview: function (content, form) {
-      require([jquery], function ($) {
+      require(['jquery'], function ($) {
         form.previewButton._x_modePreview = true;
         const commentElt = $(form).find(".wysiwyg-field");
         if ($(form).find(".commentPreview").size() === 0) {
           commentElt.before('<div class="commentcontent commentPreview" style="display: none;"></div>');
         }
-
-        const pc = $(form).find(".commentcontainer .commentPreview");
+        const pc = $(form).find(".commentcontent.commentPreview");
         pc.html(content);
         pc.show();
         commentElt.hide();

@@ -91,7 +91,10 @@ public class CommentForm extends BaseElement
      */
     public void clearAndSetContentField(String content)
     {
-        this.runOnContentField(f -> f.sendKeys(content));
+        this.runOnContentField(f -> {
+            f.clear();
+            f.sendKeys(content);
+        });
     }
 
     /**

@@ -39,6 +39,10 @@
   #set ($value = '')
 #end
 
+## We need to know the type of editor used for comments.
+#set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
+<input type='hidden' name='defaultEditorId' value="$defaultEditorId" />
+
 ## copy and rename to the requested name of the comment field
 #set ($ocls = $commentObj.getxWikiClass())
 #set ($discard = $ocls.getXWikiClass().put($name, $commentClass.getXWikiClass().get('comment')))

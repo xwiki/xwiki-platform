@@ -58,9 +58,9 @@ public class CommentAsAdminTest extends AbstractTest
     public void setUp() throws Exception
     {
         getUtil().rest().deletePage(getTestClassName(), getTestMethodName());
+        definePreferedEditor("Wysiwyg");
         ViewPage vp = getUtil().createPage(getTestClassName(), getTestMethodName(), CONTENT, TITLE);
         this.commentsTab = vp.openCommentsDocExtraPane();
-        definePreferedEditor("Wysiwyg");
     }
 
     @Test
@@ -99,8 +99,7 @@ public class CommentAsAdminTest extends AbstractTest
         assertTrue(this.commentsTab.isCommentFormShown());
         this.commentsTab.postComment(COMMENT_CONTENT, true);
         this.commentsTab.editCommentByID(0, COMMENT_REPLACED_CONTENT);
-        assertEquals(COMMENT_REPLACED_CONTENT,
-            this.commentsTab.getCommentContentByID(this.commentsTab.getCommentID(COMMENT_REPLACED_CONTENT)));
+        assertEquals(COMMENT_REPLACED_CONTENT, this.commentsTab.getCommentContentByID(0));
     }
 
     private void definePreferedEditor(String text)

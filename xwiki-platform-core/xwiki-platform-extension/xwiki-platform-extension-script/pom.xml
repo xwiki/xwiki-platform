@@ -109,6 +109,37 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>spoon-main</id>
+            <configuration>
+              <processorProperties combine.children="append">
+                <processorProperty>
+                  <name>org.xwiki.tool.spoon.InjectAnnotationProcessor</name>
+                  <properties>
+                    <property>
+                      <!-- Exclude org.xwiki.extension.repository.ExtensionRepository since it doesn't have a @Role
+                           annotation (it seems this is because there are other interfaces extending ExtensionRepository
+                           and they are using @Role and thus if ExtensionRepository also had it, there would be several
+                           components registered for all the roles). This is to be clarified and possibly refactored.
+                           In any case, static checking cannot guess that there's a RecommendedExtensionRepository class
+                           with "@Component(roles = ExtensionRepository.class)" (only the CM knows that), and thus
+                           excluding the check for now. -->
+                      <name>excludedFieldTypes</name>
+                      <value><![CDATA[
+                        ["org.xwiki.extension.repository.ExtensionRepository"]
+                      ]]></value>
+                    </property>
+                  </properties>
+                </processorProperty>
+              </processorProperties>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
 </project>

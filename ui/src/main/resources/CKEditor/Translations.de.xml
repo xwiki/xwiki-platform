@@ -89,7 +89,7 @@ ckeditor.plugin.save.leaveConfirmationMessage=Es existieren ungespeicherte Ände
 ckeditor.plugin.save.failed=Der Inhalt kann nicht gespeichert werden aufgrund eines internen Fehlers im CKEditor. Sie sollten versuchen wichtige Änderungen zu kopieren und den Editor neu zu laden.
 ckeditor.plugin.source.conversionFailed=Fehler beim Ausführen der Konvertierung.
 
-### Missing: ckeditor.plugin.toolbar.basicStyles=Basic Styles
+ckeditor.plugin.toolbar.basicStyles=Einfache Stile
 ckeditor.plugin.toolbar.lists=Listen
 ckeditor.plugin.toolbar.bulletedlist=Liste mit Aufzählungszeichen
 ckeditor.plugin.toolbar.numberedlist=Nummerierte Liste
@@ -97,7 +97,7 @@ ckeditor.plugin.toolbar.insert=Einfügen
 ckeditor.plugin.toolbar.horizontalrule=Horizontale Linie
 ckeditor.plugin.toolbar.specialchar=Sonderzeichen
 ckeditor.plugin.toolbar.infoBox=Infobox
-ckeditor.plugin.toolbar.successBox=Erfolg Box
+ckeditor.plugin.toolbar.successBox=Erfolgbox
 ckeditor.plugin.toolbar.warningBox=Warnbox
 ckeditor.plugin.toolbar.errorBox=Fehlerbox
 ckeditor.plugin.toolbar.toc=Inhaltsverzeichnis

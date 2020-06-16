@@ -156,6 +156,68 @@ define(["jquery"], function ($) {
   };
 
 
+
+
+  /**
+   * Return the property descriptor corresponding to a property id
+   * @param {String} propertyId
+   * @returns {Object}
+   */
+  Logic.prototype.getPropertyDescriptor = function (propertyId) {
+    var propertyDescriptor = null;
+    // Unfortunately the Array.prototype.find method is not supported in IE :(
+    this.data.meta.propertyDescriptors.some(function (descriptor) {
+    if (descriptor.id === propertyId) {
+        propertyDescriptor = descriptor;
+        return true;
+      }
+    });
+    return propertyDescriptor;
+  };
+
+
+
+  /**
+   * Return a new displayer based on the specified property and row data
+   * @param {String} propertyId The id of the property of the entry
+   * @param {Object} entry The entry data object
+   * @param {String} displayerId The
+   */
+  Logic.prototype.newDisplayer = function (propertyId, entry, displayerId) {
+    var self = this;
+    var defer = $.Deferred();
+
+    // default displayerId
+    if (displayerId === undefined) {
+      displayerId = (this.getPropertyDescriptor(propertyId).displayer || {}).id || "default";
+    }
+
+    // load displayer based on it's id
+    require([BASE_PATH + "displayers/" + displayerId + "Displayer.js"],
+      // load success
+      function (Displayer) {
+        var displayer = new Displayer(propertyId, entry, self);
+        defer.resolve(displayer);
+      },
+
+      // load failure
+      function (err) {
+        // try to load default layout instead
+        if (displayerId !== "default") {
+          return self.newDisplayer(propertyId, entry, "default");
+        }
+        else {
+          console.error(err);
+          defer.reject();
+        }
+      });
+
+      return defer.promise();
+  };
+
+
+
+
   /**
    * Update sort configuration based on parameters, then fetch new data
    * @param {String} property The property to sort according to

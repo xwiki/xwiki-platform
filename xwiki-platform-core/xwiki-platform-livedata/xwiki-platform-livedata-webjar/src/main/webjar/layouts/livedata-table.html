@@ -60,11 +60,8 @@
             class="cell"
             v-for="col in cols"
             :key="col.id"
-          >
-            <div
-              class="displayer"
-              v-text="row[col.id]"
-            ></div>
+            v-displayer="{col: col, row: row}"
+            >
           </td>
 
         </tr>

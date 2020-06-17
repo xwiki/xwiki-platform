@@ -19,34 +19,43 @@
  */
 
 define([
-    BASE_PATH + "displayers/defaultDisplayer.js"
-  ], function (
-    DefaultDisplayer
-  ) {
-
-    // Extend Default Displayer
-    var LinkDisplayer = function (propertyId, entryData, logic) {
-      DefaultDisplayer.call(this, propertyId, entryData, logic);
-    };
-    LinkDisplayer.prototype = Object.create(DefaultDisplayer.prototype);
-    LinkDisplayer.prototype.constructor = LinkDisplayer;
+  BASE_PATH + "displayers/defaultDisplayer.js"
+], function (
+  DefaultDisplayer
+) {
 
 
-    LinkDisplayer.prototype.createView = function (defer, params) {
-      // default href
-      var propertyHref = params.config.propertyHref && params.entry[params.config.propertyHref];
-      var href = propertyHref || params.config.href;
-      // default text
-      var text = params.value || href;
-      // create element
-      var element = document.createElement("a");
-      if (text !== undefined && text !== null) {
-        element.href = href || "#";
-        element.innerHTML = text;
-      }
-      return defer.resolve(element);
+  /**
+   * Create an HTML displayer for a property of an entry
+   * Extends the default displayer class
+   */
+  var LinkDisplayer = function (propertyId, entryData, logic) {
+    DefaultDisplayer.call(this, propertyId, entryData, logic);
+  };
+  LinkDisplayer.prototype = Object.create(DefaultDisplayer.prototype);
+  LinkDisplayer.prototype.constructor = LinkDisplayer;
 
-    };
+
+  /**
+   * Create link viewer element for the displayer
+   * Override the default inherted method
+   */
+  LinkDisplayer.prototype.createView = function (defer, params) {
+    // default href
+    var propertyHref = params.config.propertyHref && params.entry[params.config.propertyHref];
+    var href = propertyHref || params.config.href;
+    // default text
+    var text = params.value || href;
+    // create element
+    var element = document.createElement("a");
+    if (text !== undefined && text !== null) {
+      element.href = href || "#";
+      element.innerHTML = text;
+    }
+    defer.resolve(element);
+
+  };
+
 
     return LinkDisplayer;
-  });
+});

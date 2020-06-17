@@ -41,16 +41,12 @@ import org.xwiki.rendering.syntax.SyntaxContent;
 @Named(EditScriptService.ROLE_HINT + ".syntaxContent")
 public class SyntaxContentEditScriptService extends AbstractTypedEditScriptService<SyntaxContent>
 {
-    private static final String WYSIWYG_EDITOR = "wysiwyg";
-
-    private static final String TEXT_EDITOR = "text";
-
     /**
      * @return the default {@link SyntaxContent} editor in the "Text" category
      */
     public Editor<SyntaxContent> getDefaultTextEditor()
     {
-        return getDefaultEditor(TEXT_EDITOR);
+        return getDefaultEditor("text");
     }
 
     /**
@@ -58,7 +54,7 @@ public class SyntaxContentEditScriptService extends AbstractTypedEditScriptServi
      */
     public Editor<SyntaxContent> getDefaultWysiwygEditor()
     {
-        return getDefaultEditor(WYSIWYG_EDITOR);
+        return getDefaultEditor("wysiwyg");
     }
 
     /**
@@ -90,5 +86,4 @@ public class SyntaxContentEditScriptService extends AbstractTypedEditScriptServi
         Editor<SyntaxContent> editor = getDefaultWysiwygEditor();
         return editor == null ? null : editor.render(new SyntaxContent(content, syntax), parameters);
     }
-
 }

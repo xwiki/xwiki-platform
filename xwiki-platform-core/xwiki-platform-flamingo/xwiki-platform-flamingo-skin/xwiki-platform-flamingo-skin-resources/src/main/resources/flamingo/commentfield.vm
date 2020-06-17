@@ -39,7 +39,7 @@
   #set ($value = '')
 #end
 
-## We need to know the type of editor used for comments.
+## We need to know the type of editor used for comments in order to hide/display the preview button.
 #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
 <input type='hidden' name='defaultEditorId' value="$defaultEditorId" />
 

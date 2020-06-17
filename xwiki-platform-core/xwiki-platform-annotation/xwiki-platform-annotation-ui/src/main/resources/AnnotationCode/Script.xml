@@ -1407,7 +1407,7 @@ XWiki.Annotation = Class.create({
       return;
     }
 
-    jQuery(document).trigger('xwiki:actions:cancel');
+    document.fire('xwiki:actions:cancel');
 
     bubble.remove();
     var bubbleIndex = this.bubbles.indexOf(bubble);
@@ -1545,7 +1545,7 @@ XWiki.Annotation = Class.create({
     this.createPanel.down('input[type=reset]').observe('click', function() {
       this.hideAnnotationCreationForm();
     }.bind(this));
-    jQuery(document).trigger('xwiki:dom:updated', {'elements': jQuery('.annotation-box').toArray()});
+    document.fire('xwiki:dom:updated', {elements: [container]});
   },
 
   hideAnnotationCreationForm : function(skipSelectionHighlightClear) {
@@ -1563,7 +1563,7 @@ XWiki.Annotation = Class.create({
     event.stop();
     require(['xwiki-events-bridge'], function() {
       // don't submit
-      jQuery(document).trigger('xwiki:actions:beforeSave')
+      document.fire('xwiki:actions:beforeSave')
       var form = this.createPanel.down('form');
       var formData = new Hash(form.serialize(true));
       // aaand submit

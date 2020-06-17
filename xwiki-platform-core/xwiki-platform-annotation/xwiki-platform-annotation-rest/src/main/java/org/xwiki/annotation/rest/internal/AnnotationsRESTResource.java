@@ -75,9 +75,13 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
 
     private static final String COMMENT_KEY = "comment";
 
+    private static final String COMMENT_SYNTAX_KEY = "comment_syntax";
+
     /**
-     * The name of the request parameter value represent the parameter that requires conversion.
-     * This parameter and its implementation is directly inspired from {@link org.xwiki.wysiwyg.filter.ConversionFilter}
+     * The name of the request parameter value represents the parameter that requires
+     * conversion from HTML to wiki syntax.
+     * This parameter and its implementation is directly inspired from
+     * {@link org.xwiki.wysiwyg.filter.ConversionFilter}.
      */
     private static final String REQUIRES_HTML_CONVERSION = "RequiresHTMLConversion";
 
@@ -183,9 +187,9 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
 
             // add the annotation
             Map<String, Object> annotationMetadata = getMap(request.getAnnotation());
-
             this.annotationService.addAnnotation(documentName, request.getSelection(), request.getSelectionContext(),
                 request.getSelectionOffset(), getXWikiUser(), annotationMetadata);
+
             // and then return the annotated content, as specified by the annotation request
             return getSuccessResponseWithAnnotatedContent(documentName, request);
         } catch (AnnotationServiceException | XWikiException e) {
@@ -201,11 +205,17 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
             metadataMap.put(f.getName(), f.getValue());
         }
 
+        // We perform conversion only if:
+        //   1. there is a RequiresHTMLConversion parameter
+        //   2. the value of this parameter is exactly "comment"
+        //   3. the syntax of comment is given in the parameters
         if (metadataMap.containsKey(REQUIRES_HTML_CONVERSION)
-            && COMMENT_KEY.equals(metadataMap.get(REQUIRES_HTML_CONVERSION))) {
-            String syntax = (String) metadataMap.getOrDefault(String.format("%s_syntax", COMMENT_KEY), "xwiki/2.1");
-            metadataMap
-                .put(COMMENT_KEY, this.htmlConverter.fromHTML(String.valueOf(metadataMap.get(COMMENT_KEY)), syntax));
+            && COMMENT_KEY.equals(metadataMap.get(REQUIRES_HTML_CONVERSION))
+            && metadataMap.containsKey(COMMENT_SYNTAX_KEY)) {
+            String syntax = (String) metadataMap.get(COMMENT_SYNTAX_KEY);
+
+            String convertedComment = this.htmlConverter.fromHTML(String.valueOf(metadataMap.get(COMMENT_KEY)), syntax);
+            metadataMap.put(COMMENT_KEY, convertedComment);
             metadataMap.remove(REQUIRES_HTML_CONVERSION);
         }
         return metadataMap;

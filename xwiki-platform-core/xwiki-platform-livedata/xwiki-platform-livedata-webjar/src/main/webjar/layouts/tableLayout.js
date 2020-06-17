@@ -35,7 +35,7 @@ define([
     // vue directive to automatically create and insert the displayer inside the element
     Vue.directive("displayer", {
       bind: function (el, binding) {
-        self.logic.newDisplayer(binding.value.col.id, binding.value.row)
+        self.logic.createDisplayer(binding.value.col.id, binding.value.row)
         .done(function (displayer) {
           el.appendChild(displayer.element);
         });

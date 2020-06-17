@@ -29,6 +29,17 @@ define([
 ) {
 
   return function (element) {
+    var logic = Logic(element);
+
+    // vue directive to automatically create and insert the displayer inside the element
+    Vue.directive("displayer", {
+      bind: function (el, binding) {
+        logic.createDisplayer(binding.value.property.id, binding.value.entry)
+        .done(function (displayer) {
+          el.appendChild(displayer.element);
+        });
+      },
+    });
 
     /**
      * Create the cards layout from Vuejs
@@ -39,7 +50,7 @@ define([
       template: '<livedata-cards :logic="logic"></livedata-cards>',
 
       data: {
-        logic: Logic(element),
+        logic: logic,
       },
 
     }).$mount();

@@ -141,6 +141,7 @@ define(["jquery"], function ($) {
 
       // load failure
       function (err) {
+        console.warn(err);
         // try to load default layout instead
         if (layoutId !== self.data.query.defaultLayout) {
           self.loadLayout(self.data.query.defaultLayout);
@@ -183,7 +184,7 @@ define(["jquery"], function ($) {
    * @param {Object} entry The entry data object
    * @param {String} displayerId The
    */
-  Logic.prototype.newDisplayer = function (propertyId, entry, displayerId) {
+  Logic.prototype.createDisplayer = function (propertyId, entry, displayerId) {
     var self = this;
     var defer = $.Deferred();
 
@@ -204,7 +205,7 @@ define(["jquery"], function ($) {
       function (err) {
         // try to load default layout instead
         if (displayerId !== "default") {
-          self.newDisplayer(propertyId, entry, "default").then(function (displayer) {
+          self.createDisplayer(propertyId, entry, "default").then(function (displayer) {
             defer.resolve(displayer);
           }, function () {
             defer.reject();

@@ -65,6 +65,8 @@ public class ConfigurationFilesGenerator
 
     private static final String SKIN = "flamingo";
 
+    private static final String LOGBACK_FILE = "logback.xml";
+
     private TestConfiguration testConfiguration;
 
     private RepositoryResolver repositoryResolver;
@@ -119,6 +121,21 @@ public class ConfigurationFilesGenerator
         } catch (Exception e) {
             throw new Exception("Failed to extract configuration files", e);
         }
+
+
+        // Copy a logback config file for testing. This allows putting overrides in it that are needed only for the
+        // tests.
+        copyLogbackConfigFile(configurationFileTargetDirectory);
+    }
+
+    private void copyLogbackConfigFile(File configurationFileTargetDirectory) throws Exception
+    {
+        File source = new File(getClass().getClassLoader().getResource(LOGBACK_FILE).toURI());
+        File output = new File(configurationFileTargetDirectory, "Classes");
+        if (this.testConfiguration.isVerbose()) {
+            LOGGER.info("... Generating: {}", new File(output, LOGBACK_FILE));
+        }
+        FileTestUtils.copyFile(source, output);
     }
 
     private VelocityContext createVelocityContext()

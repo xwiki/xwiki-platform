@@ -79,6 +79,9 @@ define({
         id: "other",
         name: "Autre truc",
         type: "text",
+        displayer: {
+          id: "html",
+        },
       },
     ],
 
@@ -124,7 +127,7 @@ define({
         "age": 48,
         "job": "Job 1",
         "country": "France",
-        "other": "lorem ipsum",
+        "other": "<em>lorem ipsum<em>",
       },
       {
         "doc_url": "#link2",
@@ -137,7 +140,7 @@ define({
         "age": 24,
         "job": "Job 2",
         "country": "France",
-        "other": "dorol sit amet",
+        "other": "<strong>dorol sit amet<strong>",
       },
       {
         "doc_url": "#link3",
@@ -150,7 +153,7 @@ define({
         "age": 12,
         "job": "Job 3",
         "country": "Romania",
-        "other": "consequtir",
+        "other": "<span style='color:red'>consequtir</span>",
       },
       {
         "doc_url": "#link4",

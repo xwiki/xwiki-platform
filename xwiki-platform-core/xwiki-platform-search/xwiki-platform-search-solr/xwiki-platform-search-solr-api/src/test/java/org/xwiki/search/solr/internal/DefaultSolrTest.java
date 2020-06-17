@@ -134,6 +134,9 @@ public class DefaultSolrTest
         new SchemaRequest.AddField(fieldAttributes).process(client);
         fieldAttributes.put("name", "testlocale");
         new SchemaRequest.AddField(fieldAttributes).process(client);
+        fieldAttributes.put("name", "testlist");
+        fieldAttributes.put("multiValued", true);
+        new SchemaRequest.AddField(fieldAttributes).process(client);
 
         SolrInputDocument inputDocument = new SolrInputDocument();
 
@@ -154,7 +157,6 @@ public class DefaultSolrTest
         solrUtils.setString("testlocale", Locale.FRANCE, inputDocument);
 
         client.add(inputDocument);
-
         client.commit();
 
         SolrDocument storedDocument = client.getById("42");
@@ -182,5 +184,33 @@ public class DefaultSolrTest
         response = new SchemaRequest.FieldType("__cversion").process(client);
         assertEquals(String.valueOf(TestSolrCoreInitializer.VERSION),
             response.getFieldType().getAttributes().get("defVal"));
+
+        inputDocument = new SolrInputDocument();
+
+        solrUtils.setId("42", inputDocument);
+        solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT, "testlist", "atomic", inputDocument);
+
+        client.add(inputDocument);
+        client.commit();
+
+        assertEquals(Arrays.asList("atomic"), solrUtils.get("testlist", client.getById("42")));
+
+        solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT, "testlist", "atomic2", inputDocument);
+        client.add(inputDocument);
+        client.commit();
+
+        assertEquals(Arrays.asList("atomic", "atomic2"), solrUtils.get("testlist", client.getById("42")));
+
+        solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT, "testlist", "atomic2", inputDocument);
+        client.add(inputDocument);
+        client.commit();
+
+        assertEquals(Arrays.asList("atomic", "atomic2"), solrUtils.get("testlist", client.getById("42")));
+
+        solrUtils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE, "testlist", "atomic2", inputDocument);
+        client.add(inputDocument);
+        client.commit();
+
+        assertEquals(Arrays.asList("atomic"), solrUtils.get("testlist", client.getById("42")));
     }
 }

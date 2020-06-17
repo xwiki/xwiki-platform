@@ -22,7 +22,7 @@ package org.xwiki.eventstream;
 import org.xwiki.stability.Unstable;
 
 /**
- * Allow querying events.
+ * Allow paging events.
  * 
  * @version $Id$
  * @since 12.4RC1

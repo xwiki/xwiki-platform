@@ -19,6 +19,7 @@
  */
 package org.xwiki.notifications.sources.internal;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import javax.inject.Singleton;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.BooleanValueNode;
@@ -35,6 +37,7 @@ import org.xwiki.notifications.filters.expression.DateValueNode;
 import org.xwiki.notifications.filters.expression.EndsWith;
 import org.xwiki.notifications.filters.expression.EntityReferenceNode;
 import org.xwiki.notifications.filters.expression.EqualsNode;
+import org.xwiki.notifications.filters.expression.EventProperty;
 import org.xwiki.notifications.filters.expression.ExpressionNode;
 import org.xwiki.notifications.filters.expression.GreaterThanNode;
 import org.xwiki.notifications.filters.expression.InNode;
@@ -92,6 +95,27 @@ public class ExpressionNodeToHQLConverter
 
     private static final String VARIABLE_NAME = ":%s";
 
+    private static final EnumMap<EventProperty, String> PROPERTY_MAPPING = new EnumMap<>(EventProperty.class);
+
+    static {
+        PROPERTY_MAPPING.put(EventProperty.ID, "event.id");
+        PROPERTY_MAPPING.put(EventProperty.GROUP_ID, "event.requestId");
+        PROPERTY_MAPPING.put(EventProperty.STREAM, "event.stream");
+        PROPERTY_MAPPING.put(EventProperty.DATE, "event.date");
+        PROPERTY_MAPPING.put(EventProperty.IMPORTANCE, "event.priority");
+        PROPERTY_MAPPING.put(EventProperty.TYPE, "event.type");
+        PROPERTY_MAPPING.put(EventProperty.APPLICATION, "event.application");
+        PROPERTY_MAPPING.put(EventProperty.USER, "event.user");
+        PROPERTY_MAPPING.put(EventProperty.WIKI, "event.wiki");
+        PROPERTY_MAPPING.put(EventProperty.SPACE, "event.space");
+        PROPERTY_MAPPING.put(EventProperty.PAGE, "event.page");
+        PROPERTY_MAPPING.put(EventProperty.HIDDEN, "event.hidden");
+        PROPERTY_MAPPING.put(EventProperty.URL, "event.url");
+        PROPERTY_MAPPING.put(EventProperty.TITLE, "event.title");
+        PROPERTY_MAPPING.put(EventProperty.BODY, "event.body");
+        PROPERTY_MAPPING.put(EventProperty.DOCUMENT_VERSION, "event.version");
+    }
+
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
@@ -132,57 +156,9 @@ public class ExpressionNodeToHQLConverter
         String returnValue;
 
         if (value instanceof PropertyValueNode) {
-            switch (((PropertyValueNode) value).getContent()) {
-                case ID:
-                    returnValue = "event.id";
-                    break;
-                case GROUP_ID:
-                    returnValue = "event.requestId";
-                    break;
-                case STREAM:
-                    returnValue = "event.stream";
-                    break;
-                case DATE:
-                    returnValue = "event.date";
-                    break;
-                case APPLICATION:
-                    returnValue = "event.application";
-                    break;
-                case BODY:
-                    returnValue = "event.body";
-                    break;
-                case TYPE:
-                    returnValue = "event.type";
-                    break;
-                case HIDDEN:
-                    returnValue = "event.hidden";
-                    break;
-                case PAGE:
-                    returnValue = "event.page";
-                    break;
-                case IMPORTANCE:
-                    returnValue = "event.priority";
-                    break;
-                case SPACE:
-                    returnValue = "event.space";
-                    break;
-                case TITLE:
-                    returnValue = "event.title";
-                    break;
-                case USER:
-                    returnValue = "event.user";
-                    break;
-                case WIKI:
-                    returnValue = "event.wiki";
-                    break;
-                case URL:
-                    returnValue = "event.url";
-                    break;
-                case DOCUMENT_VERSION:
-                    returnValue = "event.version";
-                    break;
-                default:
-                    returnValue = StringUtils.EMPTY;
+            returnValue = PROPERTY_MAPPING.get(((PropertyValueNode) value).getContent());
+            if (returnValue == null) {
+                returnValue = StringUtils.EMPTY;
             }
         } else if (value instanceof StringValueNode) {
             // If we’re dealing with raw values, we have to put them in the queryParameters map

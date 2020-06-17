@@ -19,25 +19,12 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import java.util.Optional;
-
-import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.EventQuery;
-import org.xwiki.eventstream.EventSearchResult;
-import org.xwiki.eventstream.EventStatus;
-import org.xwiki.eventstream.EventStatusManager;
 import org.xwiki.eventstream.EventStore;
-import org.xwiki.eventstream.EventStream;
-import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.internal.AbstractAsynchronousEventStore;
-import org.xwiki.eventstream.internal.EmptyEventSearchResult;
-import org.xwiki.query.QueryException;
 
 /**
  * The default implementation of {@link EventStore} dispatching the event in the various enabled stores.
@@ -48,90 +35,11 @@ import org.xwiki.query.QueryException;
 @Component
 @Singleton
 @Named("legacy")
-public class LegacyEventStore extends AbstractAsynchronousEventStore
+public class LegacyEventStore extends AbstractLegacyEventStore
 {
-    @Inject
-    private EventStream eventStream;
-
-    @Inject
-    private EventStatusManager eventStatusManager;
-
     @Override
     public void initialize() throws InitializationException
     {
         initialize(100, false, false);
-    }
-
-    @Override
-    protected Event syncSaveEvent(Event event) throws EventStreamException
-    {
-        this.eventStream.addEvent(event);
-
-        return event;
-    }
-
-    @Override
-    protected Optional<Event> syncDeleteEvent(String eventId) throws EventStreamException
-    {
-        Optional<Event> existingEvent = getEvent(eventId);
-
-        if (existingEvent.isPresent()) {
-            this.eventStream.deleteEvent(existingEvent.get());
-        }
-
-        return existingEvent;
-    }
-
-    @Override
-    public Optional<Event> syncDeleteEvent(Event event) throws EventStreamException
-    {
-        Optional<Event> existingEvent = getEvent(event.getId());
-
-        if (existingEvent.isPresent()) {
-            this.eventStream.deleteEvent(event);
-        }
-
-        return existingEvent;
-    }
-
-    @Override
-    public EventStatus syncSaveEventStatus(EventStatus status) throws EventStreamException
-    {
-        try {
-            this.eventStatusManager.saveEventStatus(status);
-        } catch (Exception e) {
-            throw new EventStreamException("Failed to save the status in the old event store", e);
-        }
-
-        return status;
-    }
-
-    @Override
-    public Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException
-    {
-        try {
-            this.eventStatusManager.deleteEventStatus(status);
-        } catch (Exception e) {
-            throw new EventStreamException("Failed to delete the status from the old event store", e);
-        }
-
-        return Optional.of(status);
-    }
-
-    @Override
-    public Optional<Event> getEvent(String eventId) throws EventStreamException
-    {
-        try {
-            return Optional.ofNullable(this.eventStream.getEvent(eventId));
-        } catch (QueryException e) {
-            throw new EventStreamException("Failed to get event from the old store", e);
-        }
-    }
-
-    @Override
-    public EventSearchResult search(EventQuery query) throws EventStreamException
-    {
-        // TODO
-        return EmptyEventSearchResult.INSTANCE;
     }
 }

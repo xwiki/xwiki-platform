@@ -27,6 +27,9 @@
     <!-- The StrField type is not analyzed, but indexed/stored verbatim. -->
     <fieldType name="string" class="solr.StrField" sortMissingLast="true" docValues="true" />
 
+    <!-- Required for the _version_ field -->
+    <fieldType name="plong" class="solr.LongPointField" docValues="true" />
+
     <!--  -->
     <!-- FIELDS -->
     <!--  -->
@@ -36,6 +39,13 @@
 
     <!-- Make id unique -->
     <uniqueKey>id</uniqueKey>
+
+    <!-- Required for atomix updates.
+         If you remove this field, you must _also_ disable the update log in solrconfig.xml
+         or Solr won't start. _version_ and update log are required for SolrCloud
+    --> 
+    <!-- doc values are enabled by default for primitive types such as long so we don't index the version field  -->
+    <field name="_version_" type="plong" indexed="false" stored="false"/>
 
     <!-- The rest is initialized programmatically -->
 </schema>

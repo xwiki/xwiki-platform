@@ -20,12 +20,17 @@
 package org.xwiki.eventstream;
 
 import java.util.Date;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition;
 import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition.CompareType;
+import org.xwiki.eventstream.SortableEventQuery.SortClause;
+import org.xwiki.eventstream.SortableEventQuery.SortClause.Order;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -144,5 +149,56 @@ public class SimpleEventQueryTest
 
         assertTrue(query.getStatusRead());
         assertEquals("entity2", query.getStatusEntityId());
+    }
+
+    @Test
+    void equalsSortClause()
+    {
+        SimpleEventQuery query = new SimpleEventQuery();
+
+        query.addSort("property", Order.ASC);
+        query.addSort("property", Order.DESC);
+        query.addSort("property", Order.ASC);
+        query.addSort("property2", Order.ASC);
+
+        List<SortClause> sorts = query.getSorts();
+
+        assertEquals(sorts.get(0), sorts.get(2));
+        assertEquals(sorts.get(0).hashCode(), sorts.get(2).hashCode());
+
+        assertNotEquals(sorts.get(0), sorts.get(1));
+        assertNotEquals(sorts.get(0).hashCode(), sorts.get(1).hashCode());
+        assertNotEquals(sorts.get(0), sorts.get(3));
+        assertNotEquals(sorts.get(0).hashCode(), sorts.get(3).hashCode());
+    }
+
+    @Test
+    void equalsCompareQueryCondition()
+    {
+        SimpleEventQuery query = new SimpleEventQuery();
+
+        query.eq("property", "value");
+        query.eq("property", "value2");
+        query.not().eq("property", "value");
+        query.eq("property", "value");
+        query.less("property", "value");
+        query.eq("property2", "value");
+        query.eq("property", "value2");
+
+        List<CompareQueryCondition> conditions = query.getConditions();
+
+        assertEquals(conditions.get(0), conditions.get(3));
+        assertEquals(conditions.get(0).hashCode(), conditions.get(3).hashCode());
+
+        assertNotEquals(conditions.get(0), conditions.get(1));
+        assertNotEquals(conditions.get(0).hashCode(), conditions.get(1).hashCode());
+        assertNotEquals(conditions.get(0), conditions.get(2));
+        assertNotEquals(conditions.get(0).hashCode(), conditions.get(2).hashCode());
+        assertNotEquals(conditions.get(0), conditions.get(4));
+        assertNotEquals(conditions.get(0).hashCode(), conditions.get(4).hashCode());
+        assertNotEquals(conditions.get(0), conditions.get(5));
+        assertNotEquals(conditions.get(0).hashCode(), conditions.get(5).hashCode());
+        assertNotEquals(conditions.get(0), conditions.get(6));
+        assertNotEquals(conditions.get(0).hashCode(), conditions.get(6).hashCode());
     }
 }

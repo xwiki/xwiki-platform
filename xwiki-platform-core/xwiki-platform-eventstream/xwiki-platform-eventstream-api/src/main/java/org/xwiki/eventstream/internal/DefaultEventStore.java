@@ -19,24 +19,32 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 /**
  * The default implementation of {@link EventStore} dispatching the event in the various enabled stores.
@@ -48,6 +56,11 @@ import org.xwiki.eventstream.EventStreamException;
 @Singleton
 public class DefaultEventStore implements EventStore, Initializable
 {
+    /**
+     * Key used to store the request ID in the context.
+     */
+    private static final String GROUP_ID_CONTEXT_KEY = "activitystream_requestid";
+
     private static final String NO_STORE = "No event store available";
 
     @Inject
@@ -55,6 +68,18 @@ public class DefaultEventStore implements EventStore, Initializable
 
     @Inject
     private ComponentManager componentManager;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
+    @Inject
+    private DocumentAccessBridge documentAccessBridge;
+
+    @Inject
+    private WikiDescriptorManager wikiDescriptorManager;
+
+    @Inject
+    private Execution execution;
 
     private EventStore legacyStore;
 
@@ -91,6 +116,8 @@ public class DefaultEventStore implements EventStore, Initializable
     @Override
     public CompletableFuture<Event> saveEvent(Event event)
     {
+        prepareEvent(event);
+
         CompletableFuture<Event> future = null;
 
         if (this.legacyStore != null) {
@@ -225,5 +252,67 @@ public class DefaultEventStore implements EventStore, Initializable
         }
 
         return EventSearchResult.EMPTY;
+    }
+
+    /**
+     * Generate event ID for the given ID. Note that this method does not perform the set of the ID in the event object.
+     *
+     * @param event event to generate the ID for
+     * @param context the XWiki context
+     * @return the generated ID
+     */
+    private String generateEventId(Event event, ExecutionContext context)
+    {
+        final String key = String.format("%s-%s-%s-%s", event.getStream(), event.getApplication(),
+            serializer.serialize(event.getDocument()), event.getType());
+        long hash = key.hashCode();
+        if (hash < 0) {
+            hash = -hash;
+        }
+
+        final String id =
+            String.format("%d-%d-%s", hash, event.getDate().getTime(), RandomStringUtils.randomAlphanumeric(8));
+        if (context != null && context.getProperty(GROUP_ID_CONTEXT_KEY) == null) {
+            context.setProperty(GROUP_ID_CONTEXT_KEY, id);
+        }
+
+        return id;
+    }
+
+    /**
+     * Set fields in the given event object.
+     *
+     * @param event the event to prepare
+     */
+    private void prepareEvent(Event event)
+    {
+        ExecutionContext context = this.execution.getContext();
+
+        if (event.getUser() == null) {
+            event.setUser(this.documentAccessBridge.getCurrentUserReference());
+        }
+
+        if (event.getWiki() == null) {
+            String wikiId = this.wikiDescriptorManager.getCurrentWikiId();
+            if (wikiId != null) {
+                event.setWiki(new WikiReference(wikiId));
+            }
+        }
+
+        if (event.getApplication() == null) {
+            event.setApplication("xwiki");
+        }
+
+        if (event.getDate() == null) {
+            event.setDate(new Date());
+        }
+
+        if (event.getId() == null) {
+            event.setId(generateEventId(event, context));
+        }
+
+        if (event.getGroupId() == null && context != null) {
+            event.setGroupId((String) context.getProperty(GROUP_ID_CONTEXT_KEY));
+        }
     }
 }

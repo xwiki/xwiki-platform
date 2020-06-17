@@ -37,6 +37,7 @@ import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.mockito.MockitoComponentManager;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
@@ -176,7 +177,7 @@ public class AsynchronousEventStoreTest
         assertFalse(this.store.getEvent(event1.getId()).isPresent());
         assertSame(event2, this.store.getEvent(event2.getId()).get());
 
-        this.store.deleteEvent(event2).get();
+        this.store.deleteEvent(event2.getId()).get();
 
         assertFalse(this.store.getEvent(event1.getId()).isPresent());
         assertFalse(this.store.getEvent(event2.getId()).isPresent());
@@ -205,6 +206,15 @@ public class AsynchronousEventStoreTest
         this.store.saveEventStatus(status23).get();
 
         assertSame(status11, this.store.events.get(event1.getId()).statuses.get(status11.getEntityId()));
+        assertSame(status12, this.store.events.get(event1.getId()).statuses.get(status12.getEntityId()));
+        assertSame(status13, this.store.events.get(event1.getId()).statuses.get(status13.getEntityId()));
+        assertSame(status21, this.store.events.get(event2.getId()).statuses.get(status21.getEntityId()));
+        assertSame(status22, this.store.events.get(event2.getId()).statuses.get(status22.getEntityId()));
+        assertSame(status23, this.store.events.get(event2.getId()).statuses.get(status23.getEntityId()));
+
+        this.store.deleteEventStatus(status11).get();
+
+        assertNull(this.store.events.get(event1.getId()).statuses.get(status11.getEntityId()));
         assertSame(status12, this.store.events.get(event1.getId()).statuses.get(status12.getEntityId()));
         assertSame(status13, this.store.events.get(event1.getId()).statuses.get(status13.getEntityId()));
         assertSame(status21, this.store.events.get(event2.getId()).statuses.get(status21.getEntityId()));

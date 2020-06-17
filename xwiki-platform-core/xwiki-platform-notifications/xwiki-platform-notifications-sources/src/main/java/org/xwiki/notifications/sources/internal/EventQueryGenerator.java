@@ -19,44 +19,30 @@
  */
 package org.xwiki.notifications.sources.internal;
 
-import java.util.Map;
-
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.notifications.filters.expression.ExpressionNode;
+import org.xwiki.eventstream.SimpleEventQuery;
 import org.xwiki.notifications.sources.NotificationParameters;
-import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
-import org.xwiki.user.UserReferenceResolver;
 
 /**
  * Generate a query to retrieve notifications events according to the preferences of the user.
  *
  * @version $Id$
- * @since 9.4RC1
+ * @since 12.5RC1
  */
-@Component(roles = QueryGenerator.class)
+@Component(roles = EventQueryGenerator.class)
 @Singleton
-public class QueryGenerator
+public class EventQueryGenerator
 {
-    @Inject
-    private QueryManager queryManager;
-
     @Inject
     private QueryExpressionGenerator expressionGenerator;
 
     @Inject
-    private ExpressionNodeToHQLConverter hqlConverter;
-
-    @Inject
-    @Named("document")
-    private UserReferenceResolver<DocumentReference> userReferenceResolver;
+    private ExpressionNodeToEventQueryConverter eventQueryConverter;
 
     /**
      * Generate the query.
@@ -66,31 +52,8 @@ public class QueryGenerator
      * @throws QueryException if error happens
      * @throws EventStreamException if error happens
      */
-    public Query generateQuery(NotificationParameters parameters) throws QueryException, EventStreamException
+    public SimpleEventQuery generateQuery(NotificationParameters parameters) throws EventStreamException
     {
-        ExpressionNodeToHQLConverter.HQLQuery result =
-            hqlConverter.parse(this.expressionGenerator.generateQueryExpression(parameters));
-        if (result.getQuery().isEmpty()) {
-            return null;
-        }
-
-        Query query = queryManager.createQuery(String.format("where %s", result.getQuery()), Query.HQL);
-        for (Map.Entry<String, Object> queryParameter : result.getQueryParameters().entrySet()) {
-            query.bindValue(queryParameter.getKey(), queryParameter.getValue());
-        }
-
-        return query;
-    }
-
-    /**
-     * Generate the query.
-     *
-     * @param parameters parameters to use
-     * @return the query to execute
-     * @since 9.8RC12x
-     */
-    public ExpressionNode generateQueryExpression(NotificationParameters parameters) throws EventStreamException
-    {
-        return this.expressionGenerator.generateQueryExpression(parameters);
+        return this.eventQueryConverter.parse(this.expressionGenerator.generateQueryExpression(parameters));
     }
 }

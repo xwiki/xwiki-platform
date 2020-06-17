@@ -19,8 +19,9 @@
  */
 package org.xwiki.eventstream.store.solr.internal;
 
+import java.io.IOException;
 import java.net.URL;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ import javax.inject.Singleton;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -49,11 +52,15 @@ import org.xwiki.eventstream.PageableEventQuery;
 import org.xwiki.eventstream.SimpleEventQuery;
 import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition;
 import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition.CompareType;
+import org.xwiki.eventstream.SortableEventQuery;
+import org.xwiki.eventstream.SortableEventQuery.SortClause;
+import org.xwiki.eventstream.SortableEventQuery.SortClause.Order;
 import org.xwiki.eventstream.internal.AbstractAsynchronousEventStore;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.StreamEventSearchResult;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.search.solr.Solr;
@@ -71,6 +78,8 @@ import org.xwiki.search.solr.SolrUtils;
 @Named("solr")
 public class SolrEventStore extends AbstractAsynchronousEventStore
 {
+    private static final Map<String, String> SEARCH_FIELD_MAPPING = new HashMap<>();
+
     private static class CompareQueryConditionRange
     {
         final String property;
@@ -85,11 +94,23 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         }
     }
 
+    static {
+        SEARCH_FIELD_MAPPING.put(Event.FIELD_DOCUMENT, EventsSolrCoreInitializer.FIELD_DOCUMENT_INDEX);
+        SEARCH_FIELD_MAPPING.put(Event.FIELD_SPACE, EventsSolrCoreInitializer.FIELD_SPACE_INDEX);
+    }
+
     @Inject
     private Solr solr;
 
     @Inject
     private SolrUtils utils;
+
+    @Inject
+    private EntityReferenceSerializer<String> serializer;
+
+    @Inject
+    @Named("compact")
+    private EntityReferenceSerializer<String> compact;
 
     private SolrClient client;
 
@@ -159,13 +180,6 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             unread ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
             EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, entityId, document);
 
-        document.setField(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS,
-            Collections.singletonMap(read ? "add-distinct" : "remove", entityId));
-
-        Map<String, Object> unreadModifier = new HashMap<>(1);
-        unreadModifier.put(read ? "add-distinct" : "remove", entityId);
-        document.setField(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS, unreadModifier);
-
         try {
             this.client.add(document);
         } catch (Exception e) {
@@ -207,6 +221,21 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
 
         this.utils.setMap(EventsSolrCoreInitializer.SOLR_FIELD_PROPERTIES, event.getParameters(), document);
 
+        // Support various relative forms of the reference fields
+        if (event.getDocument() != null) {
+            this.utils.set(EventsSolrCoreInitializer.FIELD_DOCUMENT_INDEX,
+                Arrays.asList(this.serializer.serialize(event.getDocument()),
+                    this.compact.serialize(event.getDocument(), event.getWiki()),
+                    this.compact.serialize(event.getDocument(), event.getSpace())),
+                document);
+        }
+        if (event.getSpace() != null) {
+            this.utils.set(EventsSolrCoreInitializer.FIELD_SPACE_INDEX,
+                Arrays.asList(this.serializer.serialize(event.getSpace()),
+                    this.compact.serialize(event.getSpace(), event.getWiki())),
+                document);
+        }
+
         return document;
     }
 
@@ -246,12 +275,17 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         }
     }
 
+    public SolrDocument getEventDocument(String eventId) throws SolrServerException, IOException
+    {
+        return this.client.getById(eventId);
+    }
+
     @Override
     public Optional<Event> getEvent(String eventId) throws EventStreamException
     {
         SolrDocument document;
         try {
-            document = this.client.getById(eventId);
+            document = getEventDocument(eventId);
         } catch (Exception e) {
             throw new EventStreamException("Failed to get Solr document with id [" + eventId + "]", e);
         }
@@ -308,57 +342,107 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             if (pageableQuery.getLimit() > 0) {
                 solrQuery.setRows((int) pageableQuery.getLimit());
             }
+        }
 
-            if (pageableQuery instanceof SimpleEventQuery) {
-                Map<String, CompareQueryConditionRange> ranges = new HashMap<>();
+        if (query instanceof SortableEventQuery) {
+            for (SortClause sort : ((SortableEventQuery) query).getSorts()) {
+                solrQuery.addSort(sort.getProperty(), sort.getOrder() == Order.ASC ? ORDER.asc : ORDER.desc);
+            }
+        }
 
-                for (CompareQueryCondition condition : ((SimpleEventQuery) pageableQuery).getConditions()) {
+        if (query instanceof SimpleEventQuery) {
+            SimpleEventQuery simpleQuery = (SimpleEventQuery) query;
 
-                    if (EventsSolrCoreInitializer.KNOWN_FIELDS.contains(condition.getProperty())) {
-                        if (condition.getType() == CompareType.EQUALS) {
-                            StringBuilder builder = new StringBuilder();
-                            builder.append(condition.getProperty());
-                            builder.append(':');
-                            builder.append(this.utils.toFilterQueryString(condition.getValue()));
-                            solrQuery.addFilterQuery(builder.toString());
-                        } else {
-                            // Optimize ranges to have one instead of two since Solr is based on a range syntax (no
-                            // lower/greater syntax)
-                            CompareQueryConditionRange range = ranges.computeIfAbsent(condition.getProperty(),
-                                k -> new CompareQueryConditionRange(condition.getProperty()));
+            Map<String, CompareQueryConditionRange> ranges = new HashMap<>();
 
-                            switch (condition.getType()) {
-                                case LESS:
-                                case LESS_OR_EQUALS:
-                                    range.less = condition;
-                                    break;
+            for (CompareQueryCondition condition : simpleQuery.getConditions()) {
 
-                                case GREATER:
-                                case GREATER_OR_EQUALS:
-                                    range.greater = condition;
-                                    break;
-                            }
+                if (EventsSolrCoreInitializer.KNOWN_FIELDS.contains(condition.getProperty())) {
+                    if (condition.getType() == CompareType.EQUALS) {
+                        StringBuilder builder = new StringBuilder();
 
-                            break;
+                        if (condition.isReversed()) {
+                            builder.append('-');
                         }
+                        builder.append(toSearchFieldName(condition.getProperty()));
+                        builder.append(':');
+                        builder.append(this.utils.toFilterQueryString(condition.getValue()));
+
+                        solrQuery.addFilterQuery(builder.toString());
                     } else {
-                        // TODO: add support for custom properties
+                        // Optimize ranges to have one instead of two since Solr is based on a range syntax (no
+                        // lower/greater syntax)
+                        CompareQueryConditionRange range = ranges.computeIfAbsent(condition.getProperty(),
+                            k -> new CompareQueryConditionRange(condition.getProperty()));
+
+                        switch (condition.getType()) {
+                            case LESS:
+                            case LESS_OR_EQUALS:
+                                range.less = condition;
+                                break;
+
+                            case GREATER:
+                            case GREATER_OR_EQUALS:
+                                range.greater = condition;
+                                break;
+                        }
+
+                        break;
                     }
+                } else {
+                    // TODO: add support for custom properties
                 }
+            }
 
-                // Add ranges to the filter query
-                for (CompareQueryConditionRange range : ranges.values()) {
-                    StringBuilder builder = new StringBuilder();
-                    builder.append(range.property);
+            // Add ranges to the filter query
+            for (CompareQueryConditionRange range : ranges.values()) {
+                StringBuilder builder = new StringBuilder();
+                builder.append(toSearchFieldName(range.property));
+                builder.append(':');
+                builder.append(toFilterQueryStringRange(range.greater, range.less));
+
+                solrQuery.addFilterQuery(builder.toString());
+            }
+
+            // Filter on status
+            if (simpleQuery.getStatusRead() != null) {
+                StringBuilder builder = new StringBuilder();
+                if (simpleQuery.getStatusEntityId() != null) {
+                    builder.append(simpleQuery.getStatusRead() ? EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS
+                        : EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
                     builder.append(':');
-                    builder.append(toFilterQueryStringRange(range.greater, range.less));
-
-                    solrQuery.addFilterQuery(builder.toString());
+                    builder.append(this.utils.toFilterQueryString(simpleQuery.getStatusEntityId()));
+                } else {
+                    builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
+                    builder.append(':');
+                    builder.append("[* TO *]");
+                    builder.append(" OR ");
+                    builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
+                    builder.append(':');
+                    builder.append("[* TO *]");
                 }
+
+                solrQuery.addFilterQuery(builder.toString());
+            } else if (simpleQuery.getStatusEntityId() != null) {
+                StringBuilder builder = new StringBuilder();
+                builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
+                builder.append(':');
+                builder.append(this.utils.toFilterQueryString(simpleQuery.getStatusEntityId()));
+                builder.append(" OR ");
+                builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
+                builder.append(':');
+                builder.append(this.utils.toFilterQueryString(simpleQuery.getStatusEntityId()));
+
+                solrQuery.addFilterQuery(builder.toString());
             }
         }
 
         return solrQuery;
+    }
+
+    private String toSearchFieldName(String property)
+    {
+        return SEARCH_FIELD_MAPPING.getOrDefault(property, property);
     }
 
     public String toFilterQueryStringRange(CompareQueryCondition greater, CompareQueryCondition less)

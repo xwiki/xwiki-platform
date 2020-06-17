@@ -23,8 +23,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition.CompareType;
+import org.xwiki.eventstream.SortableEventQuery.SortClause.Order;
 import org.xwiki.stability.Unstable;
+import org.xwiki.text.XWikiToStringBuilder;
 
 /**
  * A very basic implementation of {@link EventQuery}.
@@ -33,7 +38,7 @@ import org.xwiki.stability.Unstable;
  * @since 12.4RC1
  */
 @Unstable
-public class SimpleEventQuery implements PageableEventQuery
+public class SimpleEventQuery implements PageableEventQuery, SortableEventQuery
 {
     /**
      * An comparison between a property value and a passed value.
@@ -76,6 +81,8 @@ public class SimpleEventQuery implements PageableEventQuery
             EQUALS
         }
 
+        private final boolean reversed;
+
         private final String property;
 
         private final Object value;
@@ -89,9 +96,21 @@ public class SimpleEventQuery implements PageableEventQuery
          */
         public CompareQueryCondition(String property, Object value, CompareType type)
         {
+            this(property, value, type, false);
+        }
+
+        /**
+         * @param property the name of the property
+         * @param value the value the property should be equal to
+         * @param type the type of comparison
+         * @param reversed true if the condition should be reversed
+         */
+        public CompareQueryCondition(String property, Object value, CompareType type, boolean reversed)
+        {
             this.property = property;
             this.value = value;
             this.type = type;
+            this.reversed = reversed;
         }
 
         /**
@@ -117,6 +136,63 @@ public class SimpleEventQuery implements PageableEventQuery
         {
             return this.type;
         }
+
+        /**
+         * @return true of the condition should be reversed
+         */
+        public boolean isReversed()
+        {
+            return this.reversed;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            HashCodeBuilder builder = new HashCodeBuilder();
+
+            builder.append(isReversed());
+            builder.append(getProperty());
+            builder.append(getValue());
+            builder.append(getType());
+
+            return builder.build();
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (obj == this) {
+                return true;
+            }
+
+            if (obj instanceof CompareQueryCondition) {
+                CompareQueryCondition compare = (CompareQueryCondition) obj;
+
+                EqualsBuilder builder = new EqualsBuilder();
+
+                builder.append(isReversed(), compare.isReversed());
+                builder.append(getProperty(), compare.getProperty());
+                builder.append(getValue(), compare.getValue());
+                builder.append(getType(), compare.getType());
+
+                return builder.build();
+            }
+
+            return false;
+        }
+
+        @Override
+        public String toString()
+        {
+            ToStringBuilder builder = new XWikiToStringBuilder(this);
+
+            builder.append("reversed", isReversed());
+            builder.append("property", getProperty());
+            builder.append("value", getValue());
+            builder.append("type", getType());
+
+            return builder.build();
+        }
     }
 
     private final List<CompareQueryCondition> conditions = new ArrayList<>();
@@ -128,6 +204,10 @@ public class SimpleEventQuery implements PageableEventQuery
     private String statusEntityId;
 
     private Boolean statusRead;
+
+    private List<SortClause> sorts = new ArrayList<>();
+
+    private boolean reversed;
 
     /**
      * An empty query.
@@ -212,13 +292,33 @@ public class SimpleEventQuery implements PageableEventQuery
     }
 
     /**
+     * Reverse the following condition.
+     * 
+     * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
+     */
+    public SimpleEventQuery not()
+    {
+        this.reversed = true;
+
+        return this;
+    }
+
+    private void addCondition(String property, Object value, CompareType type)
+    {
+        this.conditions.add(new CompareQueryCondition(property, value, type, this.reversed));
+
+        this.reversed = false;
+    }
+
+    /**
      * @param property the name of the property
      * @param value the value the property should be equal to
      * @return this {@link SimpleEventQuery}
      */
     public SimpleEventQuery eq(String property, Object value)
     {
-        this.conditions.add(new CompareQueryCondition(property, value, CompareType.EQUALS));
+        addCondition(property, value, CompareType.EQUALS);
 
         return this;
     }
@@ -227,10 +327,11 @@ public class SimpleEventQuery implements PageableEventQuery
      * @param property the name of the property
      * @param value the value the property should be equal to
      * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
      */
     public SimpleEventQuery less(String property, Object value)
     {
-        this.conditions.add(new CompareQueryCondition(property, value, CompareType.LESS));
+        addCondition(property, value, CompareType.LESS);
 
         return this;
     }
@@ -239,10 +340,11 @@ public class SimpleEventQuery implements PageableEventQuery
      * @param property the name of the property
      * @param value the value the property should be equal to
      * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
      */
     public SimpleEventQuery lessOrEq(String property, Object value)
     {
-        this.conditions.add(new CompareQueryCondition(property, value, CompareType.LESS_OR_EQUALS));
+        addCondition(property, value, CompareType.LESS_OR_EQUALS);
 
         return this;
     }
@@ -251,10 +353,11 @@ public class SimpleEventQuery implements PageableEventQuery
      * @param property the name of the property
      * @param value the value the property should be equal to
      * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
      */
     public SimpleEventQuery greater(String property, Object value)
     {
-        this.conditions.add(new CompareQueryCondition(property, value, CompareType.GREATER));
+        addCondition(property, value, CompareType.GREATER);
 
         return this;
     }
@@ -267,7 +370,7 @@ public class SimpleEventQuery implements PageableEventQuery
      */
     public SimpleEventQuery greaterOrEq(String property, Object value)
     {
-        this.conditions.add(new CompareQueryCondition(property, value, CompareType.GREATER_OR_EQUALS));
+        addCondition(property, value, CompareType.GREATER_OR_EQUALS);
 
         return this;
     }
@@ -348,6 +451,7 @@ public class SimpleEventQuery implements PageableEventQuery
 
     /**
      * @return indicate if read or unread event should be selected, null if disabled
+     * @since 12.5RC1
      */
     public Boolean getStatusRead()
     {
@@ -361,5 +465,41 @@ public class SimpleEventQuery implements PageableEventQuery
     public List<CompareQueryCondition> getConditions()
     {
         return this.conditions;
+    }
+
+    @Override
+    public List<SortClause> getSorts()
+    {
+        return this.sorts;
+    }
+
+    /**
+     * Adds a single sort clause to the end of the current sort information.
+     * 
+     * @param property the property name
+     * @param order the sort order
+     * @return this {@link SimpleEventQuery}
+     * @since 12.5RC1
+     */
+    public SimpleEventQuery addSort(String property, Order order)
+    {
+        this.sorts.add(new SortClause(property, order));
+
+        return this;
+    }
+
+    @Override
+    public String toString()
+    {
+        ToStringBuilder builder = new XWikiToStringBuilder(this);
+
+        builder.append("limit", this.limit);
+        builder.append("offset", this.offset);
+        builder.append("conditions", this.conditions);
+        builder.append("statusEntityId", this.statusEntityId);
+        builder.append("statusRead", this.statusRead);
+        builder.append("sorts", this.sorts);
+
+        return builder.build();
     }
 }

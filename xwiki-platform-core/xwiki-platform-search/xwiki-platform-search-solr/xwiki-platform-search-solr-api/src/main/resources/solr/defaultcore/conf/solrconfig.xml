@@ -25,8 +25,18 @@
 <config>
   <luceneMatchVersion>${lucene.version}</luceneMatchVersion>
 
+  <!-- Register the Solr core in JMX -->
   <jmx />
 
+  <!-- The default high-performance update handler -->
+  <updateHandler class="solr.DirectUpdateHandler2">
+    <!-- Required for atomic updates -->
+    <updateLog>
+      <str name="dir">${solr.ulog.dir:}</str>
+    </updateLog>
+  </updateHandler>
+
+  <!-- Required to do queries -->
   <requestHandler name="/select" class="solr.SearchHandler">
     <lst name="defaults">
       <str name="q">*</str>

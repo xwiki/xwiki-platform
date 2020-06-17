@@ -19,8 +19,11 @@
  */
 package org.xwiki.eventstream.internal;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
@@ -30,7 +33,11 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.concurrent.ContextStoreManager;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStore;
@@ -49,6 +56,8 @@ import org.xwiki.observation.ObservationManager;
  */
 public abstract class AbstractAsynchronousEventStore implements EventStore, Initializable
 {
+    private static final List<String> CONTEXT_ENTRIES = Arrays.asList("user", "author", "wiki");
+
     /**
      * The type of task.
      * 
@@ -84,12 +93,15 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
         private final EventStoreTaskType type;
 
+        private final Map<String, Serializable> context;
+
         private O output;
 
-        protected EventStoreTask(I input, EventStoreTaskType type)
+        protected EventStoreTask(I input, EventStoreTaskType type, Map<String, Serializable> contextStore)
         {
             this.input = input;
             this.type = type;
+            this.context = contextStore;
 
             this.future = new CompletableFuture<>();
         }
@@ -120,6 +132,12 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     @Inject
     protected ObservationManager observation;
 
+    @Inject
+    private ContextStoreManager contextStore;
+
+    @Inject
+    private Execution execution;
+
     private BlockingQueue<EventStoreTask<?, ?>> queue;
 
     private boolean notifyEach;
@@ -128,7 +146,17 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
     private <O, I> CompletableFuture<O> addTask(I input, EventStoreTaskType type)
     {
-        EventStoreTask<O, I> task = new EventStoreTask<>(input, type);
+        // Remember a few standard things from the context
+        Map<String, Serializable> context;
+        try {
+            context = this.contextStore.save(CONTEXT_ENTRIES);
+        } catch (ComponentLookupException e) {
+            this.logger.error("Failed to save context of the event", e);
+
+            context = null;
+        }
+
+        EventStoreTask<O, I> task = new EventStoreTask<>(input, type, context);
 
         try {
             this.queue.put(task);
@@ -193,6 +221,8 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
     private boolean processTasks(EventStoreTask<?, ?> firstTask)
     {
+        this.execution.setContext(new ExecutionContext());
+
         List<EventStoreTask<?, ?>> tasks = new ArrayList<>();
         try {
             for (EventStoreTask<?, ?> task = firstTask; task != null; task = this.queue.poll()) {
@@ -208,6 +238,8 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
             }
         } finally {
             afterTasks(tasks);
+
+            this.execution.removeContext();
         }
 
         return false;
@@ -254,15 +286,26 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         task.output = output;
 
         if (this.notifyEach) {
-            // Complete and notify right away
-            task.future.complete(output);
-
-            notify(task);
+            complete(task, output);
         }
     }
 
-    private void notify(EventStoreTask<?, ?> task)
+    private <O, I> void complete(EventStoreTask<O, I> task, O output)
     {
+        if (task.context != null) {
+            // Restore a few things from the context in case the listener need them (for example to lookup the right
+            // components for the context of the event)
+            try {
+                this.contextStore.restore(task.context);
+            } catch (ComponentLookupException e) {
+                this.logger.error("Failed to restore context of the event", output, e);
+            }
+        }
+
+        // Notify Future listeners
+        task.future.complete(output);
+
+        // Notify event listeners
         switch (task.type) {
             case DELETE_EVENT:
                 this.observation.notify(new EventStreamDeletedEvent(), task.output);
@@ -318,8 +361,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     {
         if (this.notifyAll) {
             for (EventStoreTask task : tasks) {
-                task.future.complete(task.output);
-                notify(task);
+                complete(task, task.output);
             }
         }
     }

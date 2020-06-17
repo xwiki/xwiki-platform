@@ -63,6 +63,20 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     public static final String SOLR_FIELD_UNREADLISTENERS = "unreadListeners";
 
     /**
+     * The name of the field containing the different variation of space reference.
+     * 
+     * @since 12.5RC1
+     */
+    public static final String FIELD_SPACE_INDEX = "space_index";
+
+    /**
+     * The name of the field containing the different variations of document reference.
+     * 
+     * @since 12.5RC1
+     */
+    public static final String FIELD_DOCUMENT_INDEX = "document_index";
+
+    /**
      * The known fields.
      */
     public static final Set<String> KNOWN_FIELDS = new HashSet<>(Arrays.asList(SOLR_FIELD_ID, Event.FIELD_GROUPID,
@@ -74,7 +88,7 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_12_3;
+        return SCHEMA_VERSION_12_5;
     }
 
     @Override
@@ -104,11 +118,19 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
         addStringField(SOLR_FIELD_UNREADLISTENERS, true, false);
 
         addMapField(SOLR_FIELD_PROPERTIES);
+
+        migrateSchema(SCHEMA_VERSION_12_3);
     }
 
     @Override
-    protected void migrateSchema(long cversion)
+    protected void migrateSchema(long cversion) throws SolrException
     {
-        // No migration needed yet
+        if (cversion < SCHEMA_VERSION_12_5) {
+            // Add support for searching various forms of references
+            //setStringField(FIELD_SPACE_INDEX, true, false, SOLR_FIELD_STORED, false);
+            //setStringField(FIELD_DOCUMENT_INDEX, true, false, SOLR_FIELD_STORED, false);
+            setStringField(FIELD_SPACE_INDEX, true, false);
+            setStringField(FIELD_DOCUMENT_INDEX, true, false);
+        }
     }
 }

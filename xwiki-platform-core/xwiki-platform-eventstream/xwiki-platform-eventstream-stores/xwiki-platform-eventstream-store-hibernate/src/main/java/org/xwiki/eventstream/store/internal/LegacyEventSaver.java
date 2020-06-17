@@ -19,22 +19,16 @@
  */
 package org.xwiki.eventstream.store.internal;
 
-import java.util.Date;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.namespace.NamespaceContextExecutor;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.namespace.WikiNamespace;
-import org.xwiki.model.reference.EntityReferenceSerializer;
-import org.xwiki.model.reference.WikiReference;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import com.xpn.xwiki.XWikiContext;
@@ -51,11 +45,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 @Singleton
 public class LegacyEventSaver
 {
-    /**
-     * Key used to store the request ID in the context.
-     */
-    private static final String GROUP_ID_CONTEXT_KEY = "activitystream_requestid";
-
     @Inject
     private LegacyEventConverter eventConverter;
 
@@ -64,12 +53,6 @@ public class LegacyEventSaver
 
     @Inject
     private WikiDescriptorManager wikiDescriptorManager;
-
-    @Inject
-    private EntityReferenceSerializer<String> serializer;
-
-    @Inject
-    private DocumentAccessBridge documentAccessBridge;
 
     @Inject
     private Provider<XWikiContext> contextProvider;
@@ -87,10 +70,6 @@ public class LegacyEventSaver
      */
     public void saveEvent(Event event)
     {
-        XWikiContext context = contextProvider.get();
-
-        prepareEvent(event, context);
-
         LegacyEvent legacyEvent = eventConverter.convertEventToLegacyActivity(event);
 
         try {
@@ -112,80 +91,21 @@ public class LegacyEventSaver
         }
     }
 
-    /**
-     * Set fields in the given event object.
-     *
-     * @param event the event to prepare
-     */
-    private void prepareEvent(Event event, XWikiContext context)
-    {
-        if (event.getUser() == null) {
-            event.setUser(documentAccessBridge.getCurrentUserReference());
-        }
-
-        if (event.getWiki() == null) {
-            event.setWiki(new WikiReference(wikiDescriptorManager.getCurrentWikiId()));
-        }
-
-        if (event.getApplication() == null) {
-            event.setApplication("xwiki");
-        }
-
-        if (event.getDate() == null) {
-            event.setDate(new Date());
-        }
-
-        if (event.getId() == null) {
-            event.setId(generateEventId(event, context));
-        }
-
-        if (event.getGroupId() == null) {
-            event.setGroupId((String) context.get(GROUP_ID_CONTEXT_KEY));
-        }
-    }
-
-    /**
-     * Generate event ID for the given ID. Note that this method does not perform the set of the ID in the event object.
-     *
-     * @param event event to generate the ID for
-     * @param context the XWiki context
-     * @return the generated ID
-     */
-    private String generateEventId(Event event, XWikiContext context)
-    {
-        final String key = String.format("%s-%s-%s-%s", event.getStream(), event.getApplication(),
-                serializer.serialize(event.getDocument()), event.getType());
-        long hash = key.hashCode();
-        if (hash < 0) {
-            hash = -hash;
-        }
-
-        final String id = String.format("%d-%d-%s", hash, event.getDate().getTime(),
-                RandomStringUtils.randomAlphanumeric(8));
-        if (context.get(GROUP_ID_CONTEXT_KEY) == null) {
-            context.put(GROUP_ID_CONTEXT_KEY, id);
-        }
-
-        return id;
-    }
-
     private void saveLegacyEvent(LegacyEvent event, String wikiId) throws Exception
     {
-        namespaceContextExecutor.execute(new WikiNamespace(wikiId),
-            () -> {
-                XWikiContext context = contextProvider.get();
-                XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
-                try {
-                    hibernateStore.beginTransaction(context);
-                    Session session = hibernateStore.getSession(context);
-                    session.save(event);
-                    hibernateStore.endTransaction(context, true);
-                } catch (XWikiException e) {
-                    hibernateStore.endTransaction(context, false);
-                }
-
-                return null;
+        namespaceContextExecutor.execute(new WikiNamespace(wikiId), () -> {
+            XWikiContext context = contextProvider.get();
+            XWikiHibernateStore hibernateStore = context.getWiki().getHibernateStore();
+            try {
+                hibernateStore.beginTransaction(context);
+                Session session = hibernateStore.getSession(context);
+                session.save(event);
+                hibernateStore.endTransaction(context, true);
+            } catch (XWikiException e) {
+                hibernateStore.endTransaction(context, false);
             }
-        );
+
+            return null;
+        });
     }
 }

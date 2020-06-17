@@ -130,7 +130,6 @@ public class DocumentEventRecorder
     }
 
     private void recordEvent(String streamName, XWikiDocument doc, String type, String title)
-        throws InterruptedException, ExecutionException
     {
         final String msgPrefix = "activitystream.event.";
 

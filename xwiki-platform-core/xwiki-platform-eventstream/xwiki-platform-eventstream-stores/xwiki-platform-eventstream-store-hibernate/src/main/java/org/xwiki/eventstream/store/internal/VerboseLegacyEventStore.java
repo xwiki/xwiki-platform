@@ -33,8 +33,8 @@ import org.xwiki.component.phase.InitializationException;
  */
 @Component
 @Singleton
-@Named("legacy")
-public class VerboseLegacyEventStore extends LegacyEventStore
+@Named("legacy/verbose")
+public class VerboseLegacyEventStore extends AbstractLegacyEventStore
 {
     @Override
     public void initialize() throws InitializationException

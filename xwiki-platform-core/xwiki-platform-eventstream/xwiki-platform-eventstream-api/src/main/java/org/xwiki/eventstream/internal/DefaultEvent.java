@@ -44,7 +44,7 @@ public class DefaultEvent implements Event
 {
     /** The format of the {@link #toString()} result. */
     private static final MessageFormat STRING_FORMAT =
-        new MessageFormat("{0} at {1,time,yyyy-MM-dd HH:mm:ss} by {2} on {3}");
+        new MessageFormat("{0} at {1,time,yyyy-MM-dd HH:mm:ss} by {2} on {3} with id {4}");
 
     /** @see #getId() */
     private String id;
@@ -362,7 +362,7 @@ public class DefaultEvent implements Event
     @Override
     public String toString()
     {
-        return STRING_FORMAT.format(new Object[] {getType(), getDate(), getUser(), getDocument()});
+        return STRING_FORMAT.format(new Object[] {getType(), getDate(), getUser(), getDocument(), getId()});
     }
 
     @Override

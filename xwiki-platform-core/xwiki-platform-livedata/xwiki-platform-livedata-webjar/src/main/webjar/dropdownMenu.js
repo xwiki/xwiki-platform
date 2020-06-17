@@ -20,7 +20,7 @@
 
 define([
     "Vue",
-    "vue!" + BASE_PATH + "dropdown-menu.html",
+    "vue!" + BASE_PATH + "dropdown-menu.html?evaluate=true",
   ], function (
     Vue,
     dropdownMenu
@@ -29,7 +29,7 @@ define([
     return function (logic) {
 
       /**
-       * Create the table layout from Vuejs
+       * Create the dropdown menu from Vuejs
        */
       var vueDropdownMenu = new Vue({
 
@@ -42,7 +42,7 @@ define([
 
       }).$mount();
 
-      // return the HTML Element of the layout for the layout
+      // return the HTML Element of the dropdown menu for the layout
       return vueDropdownMenu.$el;
 
     };

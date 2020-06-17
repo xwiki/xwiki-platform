@@ -95,10 +95,10 @@
  */
 define([
   "Vue",
-  BASE_PATH + "dropdownMenu.js",
+  "dropdownMenu",
 ], function (
   Vue,
-  DropdownMenu,
+  createDropdownMenu,
 ) {
 
   Vue.component("livedata-table", {
@@ -129,7 +129,7 @@ define([
     },
 
     mounted: function () {
-      var dropdownMenu = new DropdownMenu(this.logic);
+      var dropdownMenu = createDropdownMenu(this.logic);
       this.$refs.dropdownMenu.append(dropdownMenu);
     },
 

@@ -42,7 +42,7 @@ define(["jquery"], function ($) {
       var logic = new Logic(element);
       instancesMap.set(element, logic);
 
-      logic.loadLayout();
+      logic.changeLayout();
     }
 
     return instancesMap.get(element);
@@ -108,33 +108,36 @@ define(["jquery"], function ($) {
    * @param {String} layoutId The id of the layout to load with requireJS
    * @returns {Object} A jquery promise
    */
-  Logic.prototype.loadLayout = function (layoutId) {
+  Logic.prototype.changeLayout = function (layoutId) {
     var self = this;
     var defer = $.Deferred();
 
-    layoutId = layoutId || this.data.query.defaultLayout;
-    if (layoutId === this.data.query.currentLayout) return;
-    if (!this.data.meta.layoutDescriptors[layoutId]) return;
-    if (this.data.query.layouts.indexOf(layoutId) === -1) return;
+    layoutId = layoutId || this.data.meta.defaultLayout;
+    if (layoutId === this.data.query.currentLayout) { return defer.resolve(this.layouts[layoutId]); }
+    if (!this.data.meta.layoutDescriptors[layoutId]) { return defer.reject(); }
+    if (this.data.meta.layouts.indexOf(layoutId) === -1) { return defer.reject(); }
 
     // load layout based on it's filename
     require([BASE_PATH + "layouts/" + this.data.meta.layoutDescriptors[layoutId].file],
       // load success
-      function (Layout) {
+      function (createLayout) {
+        var previousLayoutId = self.data.query.currentLayout;
         // remove current layout from the page
-        if (self.data.query.currentLayout && self.layouts[self.data.query.currentLayout]) {
-          self.element.removeChild(self.layouts[self.data.query.currentLayout]);
+        if (previousLayoutId && self.layouts[previousLayoutId]) {
+          self.element.removeChild(self.layouts[previousLayoutId]);
         }
         // add layout element in loaded layouts list if not already loaded on the page
         if (!self.layouts[layoutId]) {
-          self.layouts[layoutId] = new Layout(self.element);
+          self.layouts[layoutId] = createLayout(self.element);
         }
         // add new layout to the page
         self.element.appendChild(self.layouts[layoutId]);
         self.data.query.currentLayout = layoutId;
         // dispatch events
         self._triggerEvent("layoutChange", {
+          layout: self.layouts[layoutId],
           layoutId: layoutId,
+          previousLayoutId: previousLayoutId,
         });
         defer.resolve();
       },
@@ -143,10 +146,13 @@ define(["jquery"], function ($) {
       function (err) {
         console.warn(err);
         // try to load default layout instead
-        if (layoutId !== self.data.query.defaultLayout) {
-          self.loadLayout(self.data.query.defaultLayout);
-        }
-        else {
+        if (layoutId !== self.data.meta.defaultLayout) {
+          self.changeLayout(self.data.meta.defaultLayout).then(function (layout) {
+            defer.resolve(layout);
+          }, function () {
+            defer.reject();
+          });
+        } else {
           console.error(err);
           defer.reject();
         }
@@ -210,8 +216,7 @@ define(["jquery"], function ($) {
           }, function () {
             defer.reject();
           });
-        }
-        else {
+        } else {
           console.error(err);
           defer.reject();
         }
@@ -244,8 +249,7 @@ define(["jquery"], function ($) {
     // default level
     if (level === undefined) {
       level = (currentLevel !== -1) ? currentLevel : 0;
-    }
-    else if (level < 0) {
+    } else if (level < 0) {
       level = -1;
     }
     // default descending

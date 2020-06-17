@@ -45,14 +45,14 @@ define({
     offset: 0,
     limit: 10,
 
-    layouts: ["table", "cards"],
-    defaultLayout: "table",
-
   },
 
 
 
   meta: {
+
+    layouts: ["table", "cards"],
+    defaultLayout: "table",
 
     propertyDescriptors: [
       {

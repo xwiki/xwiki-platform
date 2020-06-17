@@ -29,13 +29,12 @@ define([
 ) {
 
   return function (element) {
-    var self = this;
-    this.logic = Logic(element);
+    var logic = Logic(element);
 
     // vue directive to automatically create and insert the displayer inside the element
     Vue.directive("displayer", {
       bind: function (el, binding) {
-        self.logic.createDisplayer(binding.value.col.id, binding.value.row)
+        logic.createDisplayer(binding.value.col.id, binding.value.row)
         .done(function (displayer) {
           el.appendChild(displayer.element);
         });
@@ -52,7 +51,7 @@ define([
       template: '<livedata-table :logic="logic"></livedata-table>',
 
       data: {
-        logic: this.logic,
+        logic: logic,
       },
 
     }).$mount();

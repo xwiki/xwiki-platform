@@ -30,7 +30,7 @@
   <artifactId>xwiki-platform-livedata</artifactId>
   <name>XWiki Platform - Live Data</name>
   <packaging>pom</packaging>
-  <description>A UI component useful to display dynamic lists of data.</description>
+  <description>Display dynamic lists of data</description>
   <modules>
     <module>xwiki-platform-livedata-webjar</module>
   </modules>

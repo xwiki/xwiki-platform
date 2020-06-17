@@ -21,7 +21,8 @@
 ### Return a single comment field
 ###
 ###
-## requested field name 
+## requested field name containing the comment number
+## (e.g. XWiki.XWikiComments_42_comment)
 #set ($name = $request.name)
 ## the number of the comment, if no number is provided we generate a field for a new comment.
 #set ($number = $numbertool.toNumber($request.number).intValue())
@@ -30,30 +31,36 @@
 #set ($xCommentClass = 'XWiki.XWikiComments')
 #set ($commentClass = $xwiki.getDocument($xCommentClass).getxWikiClass())
 
+
 ## the number of the comment, if no number is provided we generate a field for a new comment.
 #if ($number && $number > -1)
   #set ($commentObj = $doc.getObject($xCommentClass, $number))
   #set ($value = $commentObj.getValue('comment'))
+  #set ($fieldToDisplay = $commentObj.getxWikiClass().get('comment'))
 #else
   #set ($commentObj = $doc.newObject($xCommentClass))
-  #set ($value = '')
+
+  ## we can't simply call $doc.display() on this object because we would get XWiki.XWikiComments_N_comment as the
+  ## field name, where N is the number of the new temporary object.
+  ## Instead we want the field name to be XWiki.XWikiComments_comment.
+  ## To achieve this we add a new property to the comment class by copying the comment property and changing the name.
+  ## copy and rename to the requested name of the comment field
+  #set ($commentObjClass = $commentObj.getxWikiClass())
+  #set ($commentObjBaseClass = $commentObjClass.getXWikiClass())
+  #set ($discard = $commentObjBaseClass.put($name, $commentClass.getXWikiClass().get('comment')))
+  #set ($discard = $commentObjBaseClass.get($name).setName($name))
+
+  #set ($fieldToDisplay = $commentObjClass.get($name))
 #end
 
 ## We need to know the type of editor used for comments in order to hide/display the preview button.
 #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
 <input type='hidden' name='defaultEditorId' value="$defaultEditorId" />
 
-## copy and rename to the requested name of the comment field
-#set ($ocls = $commentObj.getxWikiClass())
-#set ($discard = $ocls.getXWikiClass().put($name, $commentClass.getXWikiClass().get('comment')))
-#set ($discard = $ocls.getXWikiClass().get($name).setName($name))
-#set ($ppt = $ocls.get($name))
-
-## attribution of the value to the new field in the object. 
-#set ($discard = $commentObj.set($name, $value))
-
 ## display of the comment field
-$doc.displayEdit($ppt, '', $commentObj)
+$doc.displayEdit($fieldToDisplay, '', $commentObj)
 
-## raz the temporary added field.
-#set ($discard = $ocls.getXWikiClass().removeField($name))
+## reset the temporary added field.
+#if ("$!commentObjBaseClass" == "")
+  #set ($discard = $commentObjBaseClass.removeField($name))
+#end

@@ -204,7 +204,11 @@ define(["jquery"], function ($) {
       function (err) {
         // try to load default layout instead
         if (displayerId !== "default") {
-          return self.newDisplayer(propertyId, entry, "default");
+          self.newDisplayer(propertyId, entry, "default").then(function (displayer) {
+            defer.resolve(displayer);
+          }, function () {
+            defer.reject();
+          });
         }
         else {
           console.error(err);

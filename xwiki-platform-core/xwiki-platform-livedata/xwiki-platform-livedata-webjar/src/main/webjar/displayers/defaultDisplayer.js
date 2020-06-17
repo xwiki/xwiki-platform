@@ -19,7 +19,18 @@
  */
 
 
-define(["jquery"], function ($) {
+define([
+  "jquery",
+], function ($) {
+
+  (function loadCss(url) {
+    var link = document.createElement("link");
+    link.type = "text/css";
+    link.rel = "stylesheet";
+    link.href = url;
+    document.getElementsByTagName("head")[0].appendChild(link);
+  })(BASE_PATH + "displayers/displayers.css");
+
 
   /**
    * Create a default displayer for a property of an entry
@@ -36,9 +47,10 @@ define(["jquery"], function ($) {
     this.element = document.createElement("div");
     this.element.className = "livedata-displayer";
 
-    this.createView();
+    this.view();
 
   };
+
 
   /**
    * Return the object of parameters to be passed to the viewer and editor functions
@@ -60,29 +72,33 @@ define(["jquery"], function ($) {
 
 
 
-  Displayer.prototype.view = function (defer, params) {
+  Displayer.prototype.createView = function (defer, params) {
     var element = document.createElement("div");
-    if (params.value !== undefined || params.value !== null) {
+    if (params.value !== undefined && params.value !== null) {
       element.innerText = params.value;
     }
     return defer.resolve(element);
   };
 
-  Displayer.prototype.edit = function (defer, params) {
+  Displayer.prototype.createEdit = function (defer, params) {
 
   };
 
 
 
-  Displayer.prototype.createView = function () {
+  Displayer.prototype.view = function () {
     var self = this;
     var defer = $.Deferred();
     var params = this._createParameters();
 
-    this.view(defer, params).done(function (element) {
+    this.createView(defer, params).done(function (element) {
       self.element.innerHTML = "";
       self.element.appendChild(element);
     });
+
+  };
+
+  Displayer.prototype.edit = function (defer, params) {
 
   };
 

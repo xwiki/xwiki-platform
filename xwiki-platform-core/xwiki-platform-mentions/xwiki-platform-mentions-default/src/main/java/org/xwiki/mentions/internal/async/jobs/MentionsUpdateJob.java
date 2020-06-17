@@ -19,12 +19,12 @@
  */
 package org.xwiki.mentions.internal.async.jobs;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -149,16 +149,30 @@ public class MentionsUpdateJob extends AbstractJob<MentionsUpdatedRequest, Menti
         Map<DocumentReference, List<String>> oldCounts = this.xdomService.countByIdentifier(oldMentions);
         Map<DocumentReference, List<String>> newCounts = this.xdomService.countByIdentifier(newMentions);
 
-        // for each user, we check its number of mentions and compare it to the same number on the 
-        // old document (or 0 if the user wan't mentionned before).
-        // If the number increased, a notification is send.
-        newCounts.forEach((key, value) -> {
-            List<String> oldCount = oldCounts.getOrDefault(key, Collections.emptyList());
-            List<String> mutatedValues = new ArrayList(value);
-            mutatedValues.removeAll(oldCount);
-            mutatedValues.forEach(anchorId ->
-                this.notificationService.sendNotif(authorReference, documentReference, key, location, anchorId));
-        });
+        for (Map.Entry<DocumentReference, List<String>> entry : newCounts.entrySet()) {
+            DocumentReference key = entry.getKey();
+            List<String> newAnchorIds = entry.getValue();
+            List<String> oldAnchorsIds = oldCounts.getOrDefault(key, Collections.emptyList());
+
+            // Compute if there's new mentions without an anchor
+            long newEmptyAnchorsNumber = newAnchorIds.stream().filter(StringUtils::isEmpty).count();
+            long oldEmptyAnchorsNumber = oldAnchorsIds.stream().filter(StringUtils::isEmpty).count();
+
+            // Retrieve new mentions with a new anchor
+            List<String> anchorsToNotify = newAnchorIds.stream()
+                .filter(value -> !StringUtils.isEmpty(value) && !oldAnchorsIds.contains(value))
+                .collect(Collectors.toList());
+
+            // Notify with an empty anchorId if there's new mentions without an anchor.
+            if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
+                this.notificationService.sendNotif(authorReference, documentReference, key, location, "");
+            }
+
+            // Notify all new mentions with new anchors.
+            for (String anchorId : anchorsToNotify) {
+                this.notificationService.sendNotif(authorReference, documentReference, key, location, anchorId);
+            }
+        }
     }
 
     private void handleMissing(XDOM newXdom, DocumentReference authorReference,

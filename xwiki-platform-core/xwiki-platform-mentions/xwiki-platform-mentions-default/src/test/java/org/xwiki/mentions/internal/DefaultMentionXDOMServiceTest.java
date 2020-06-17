@@ -82,14 +82,17 @@ public class DefaultMentionXDOMServiceTest
 
     private DocumentReference documentReferenceA;
     private DocumentReference documentReferenceB;
+    private DocumentReference documentReferenceC;
 
     @BeforeEach
     void setup()
     {
         this.documentReferenceA = new DocumentReference("xwiki", "A", "A");
         this.documentReferenceB = new DocumentReference("ywiki", "B", "B");
+        this.documentReferenceC = new DocumentReference("xwiki", "C", "C");
         when(this.resolver.resolve("A")).thenReturn(this.documentReferenceA);
         when(this.resolver.resolve("B")).thenReturn(this.documentReferenceB);
+        when(this.resolver.resolve("C")).thenReturn(this.documentReferenceC);
     }
 
     @Test
@@ -146,6 +149,24 @@ public class DefaultMentionXDOMServiceTest
         HashMap<DocumentReference, List<String>> expected = new HashMap<>();
         expected.put(this.documentReferenceB, Collections.singletonList("B1"));
         expected.put(this.documentReferenceA, Arrays.asList("A1", "A2"));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void countByIdentifierWithEmptyValues()
+    {
+        Map<DocumentReference, List<String>> actual = this.xdomService.countByIdentifier(asList(
+            initMentionMacro("A", null),
+            initMentionMacro("A", "A1"),
+            initMentionMacro("A", ""),
+            initMentionMacro("B", "B1"),
+            initMentionMacro("A", "A2"),
+            initMentionMacro("C", "")
+        ));
+        HashMap<DocumentReference, List<String>> expected = new HashMap<>();
+        expected.put(this.documentReferenceB, Collections.singletonList("B1"));
+        expected.put(this.documentReferenceA, Arrays.asList(null, "A1", "", "A2"));
+        expected.put(this.documentReferenceC, Collections.singletonList(""));
         assertEquals(expected, actual);
     }
 

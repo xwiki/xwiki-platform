@@ -76,10 +76,12 @@ public class MentionsUpdatedEventListener extends AbstractEventListener
 
         XWikiDocument doc = (XWikiDocument) source;
         XWikiContext ctx = (XWikiContext) data;
+        MentionsUpdatedRequest mentionsUpdatedRequest =
+            new MentionsUpdatedRequest(doc, doc.getOriginalDocument(), ctx.getUserReference());
+        mentionsUpdatedRequest.setVerbose(false);
 
         try {
-            this.jobExecutor.execute(MentionsUpdateJob.ASYNC_REQUEST_TYPE,
-                new MentionsUpdatedRequest(doc, doc.getOriginalDocument(), ctx.getUserReference()));
+            this.jobExecutor.execute(MentionsUpdateJob.ASYNC_REQUEST_TYPE, mentionsUpdatedRequest);
         } catch (JobException e) {
             this.logger.warn(
                 "Failed to create a Job for the Event [{}] received from [{}] with data [{}]. Cause: [{}]",

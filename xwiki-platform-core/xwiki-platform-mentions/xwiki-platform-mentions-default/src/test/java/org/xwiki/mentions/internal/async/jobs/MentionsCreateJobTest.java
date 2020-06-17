@@ -52,6 +52,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.mentions.MentionLocation.AWM_FIELD;
@@ -81,33 +82,50 @@ public class MentionsCreateJobTest
     @Test
     void runInternal()
     {
+        DocumentReference user1 = new DocumentReference("xwiki", "XWiki", "U1");
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "U2");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
         HashMap<String, String> mentionParams = new HashMap<>();
         mentionParams.put("reference", "XWiki.U1");
         mentionParams.put("anchor", "anchor1");
-        MacroBlock mention = new MacroBlock("mention", mentionParams, false);
+        MacroBlock mention1 = new MacroBlock("mention", mentionParams, false);
+
+        mentionParams = new HashMap<>();
+        mentionParams.put("reference", "XWiki.U2");
+        MacroBlock mention2 = new MacroBlock("mention", mentionParams, false);
+
+        mentionParams = new HashMap<>();
+        mentionParams.put("reference", "XWiki.U1");
+        mentionParams.put("anchor", "anchor2");
+        MacroBlock mention3 = new MacroBlock("mention", mentionParams, false);
+
         XDOM xdom = new XDOM(singletonList(new ParagraphBlock(asList(
             new NewLineBlock(),
             new MacroBlock("macro0", new HashMap<>(), false),
             new NewLineBlock(),
-            mention
+            mention1,
+            mention2,
+            mention3
         ))));
 
         when(this.document.getAuthorReference()).thenReturn(authorReference);
         when(this.document.getDocumentReference()).thenReturn(documentReference);
         when(this.document.getXDOM()).thenReturn(xdom);
-        List<MacroBlock> mentions = singletonList(mention);
+        List<MacroBlock> mentions = Arrays.asList(mention1, mention2, mention3);
         when(this.xdomService.listMentionMacros(xdom)).thenReturn(mentions);
-        DocumentReference user1 = new DocumentReference("xwiki", "XWiki", "U1");
+
         Map<DocumentReference, List<String>> value = new HashMap<>();
-        value.put(user1, Collections.singletonList("anchor1"));
+        value.put(user1, Arrays.asList("anchor1", "anchor2"));
+        value.put(authorReference, Arrays.asList("", null));
         when(this.xdomService.countByIdentifier(mentions)).thenReturn(value);
 
         this.job.initialize(new MentionsCreatedRequest(this.document));
         this.job.runInternal();
 
         verify(this.notificationService).sendNotif(authorReference, documentReference, user1, DOCUMENT, "anchor1");
+        verify(this.notificationService).sendNotif(authorReference, documentReference, user1, DOCUMENT, "anchor2");
+        verify(this.notificationService, times(1)).sendNotif(authorReference, documentReference, authorReference,
+            DOCUMENT, "");
     }
 
     @Test

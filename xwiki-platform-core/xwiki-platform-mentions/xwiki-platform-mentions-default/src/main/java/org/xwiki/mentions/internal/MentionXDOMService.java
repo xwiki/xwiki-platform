@@ -48,8 +48,10 @@ public interface MentionXDOMService
 
     /**
      * Count the number of mentions per reference.
+     *
      * @param mentions the list of mentions.
-     * @return the map of number of mentions per reference.
+     * @return the map of anchors of mentions per reference. If the anchor is not specified, then the list must contain
+     *          an empty value (null or empty string).
      */
     Map<DocumentReference, List<String>> countByIdentifier(List<MacroBlock> mentions);
 

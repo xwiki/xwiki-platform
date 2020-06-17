@@ -26,6 +26,7 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.MentionNotificationService;
@@ -84,8 +85,16 @@ public class MentionsCreateJob extends AbstractJob<MentionsCreatedRequest, Menti
 
         Map<DocumentReference, List<String>> counts = this.xdomService.countByIdentifier(blocks);
 
-        counts.forEach((key, value) -> value.forEach(anchorId ->
-                this.notificationService.sendNotif(authorReference, documentReference, key, location, anchorId)));
+        for (Entry<DocumentReference, List<String>> entry : counts.entrySet()) {
+            boolean emptyAnchorProcessed = false;
+            for (String anchorId : entry.getValue()) {
+                if (!StringUtils.isEmpty(anchorId) || !emptyAnchorProcessed) {
+                    this.notificationService.sendNotif(authorReference, documentReference, entry.getKey(), location,
+                        anchorId);
+                    emptyAnchorProcessed = emptyAnchorProcessed || StringUtils.isEmpty(anchorId);
+                }
+            }
+        }
     }
 
     private void traverseXObjects(Map<DocumentReference, List<BaseObject>> xObjects, DocumentReference authorReference,

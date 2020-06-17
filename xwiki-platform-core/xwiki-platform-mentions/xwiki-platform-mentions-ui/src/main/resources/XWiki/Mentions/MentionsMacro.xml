@@ -789,7 +789,7 @@
       </type>
     </class>
     <property>
-      <defaultValue/>
+      <defaultValue>FULL_NAME</defaultValue>
     </property>
     <property>
       <description>The display style of the mention (this is only supported for user mentions).</description>
@@ -873,7 +873,7 @@
       <description>Anchor name to be used to link to the mention. This should be preferably unique.</description>
     </property>
     <property>
-      <mandatory>1</mandatory>
+      <mandatory>0</mandatory>
     </property>
     <property>
       <name>anchor</name>

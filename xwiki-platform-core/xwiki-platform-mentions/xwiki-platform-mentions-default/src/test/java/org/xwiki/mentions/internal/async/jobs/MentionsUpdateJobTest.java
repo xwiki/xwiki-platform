@@ -91,6 +91,8 @@ public class MentionsUpdateJobTest
         XDOM dom2Mentions = new XDOM(singletonList(new IdBlock("ID DOM2")));
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Creator");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
+        DocumentReference u1 = new DocumentReference("xwiki", "XWiki", "u1");
+        DocumentReference u2 = new DocumentReference("xwiki", "XWiki", "u2");
 
         when(this.context.getDoc()).thenReturn(this.oldDocument);
         when(this.oldDocument.getXDOM()).thenReturn(dom1Mention);
@@ -99,29 +101,28 @@ public class MentionsUpdateJobTest
         when(this.newDocument.getAuthorReference()).thenReturn(authorReference);
         when(this.newDocument.getDocumentReference()).thenReturn(documentReference);
 
-        List<MacroBlock> l1mention = singletonList(
-            new MacroBlock("mention", new HashMap<>(), false)
-        );
+        List<MacroBlock> l1mention = mock(List.class);
         when(this.xdomService.listMentionMacros(dom1Mention)).thenReturn(l1mention);
 
-        List<MacroBlock> l2mentions = asList(
-            new MacroBlock("mention", new HashMap<>(), false),
-            new MacroBlock("mention", new HashMap<>(), false)
-        );
+        List<MacroBlock> l2mentions = mock(List.class);
         when(this.xdomService.listMentionMacros(dom2Mentions)).thenReturn(l2mentions);
 
-        DocumentReference u1 = new DocumentReference("xwiki", "XWiki", "u1");
         Map<DocumentReference, List<String>> mentionsCountL1 = new HashMap<>();
-        mentionsCountL1.put(u1, Collections.singletonList("anchor1"));
+        mentionsCountL1.put(u1, Arrays.asList("", "anchor1"));
+        mentionsCountL1.put(u2, Arrays.asList("anchor1", null));
         when(this.xdomService.countByIdentifier(l1mention)).thenReturn(mentionsCountL1);
+
         Map<DocumentReference, List<String>> mentionsCountL2 = new HashMap<>();
-        mentionsCountL2.put(u1, Arrays.asList("anchor1", "anchor2"));
+        mentionsCountL2.put(u1, Arrays.asList("", "anchor1", null, "anchor2"));
+        mentionsCountL2.put(u2, Collections.singletonList("anchor2"));
         when(this.xdomService.countByIdentifier(l2mentions)).thenReturn(mentionsCountL2);
         
         this.job.initialize(new MentionsUpdatedRequest(this.newDocument, this.oldDocument, authorReference));
         this.job.runInternal();
 
+        verify(this.notificationService).sendNotif(authorReference, documentReference, u1, DOCUMENT, "");
         verify(this.notificationService).sendNotif(authorReference, documentReference, u1, DOCUMENT, "anchor2");
+        verify(this.notificationService).sendNotif(authorReference, documentReference, u2, DOCUMENT, "anchor2");
     }
 
     @Test

@@ -19,46 +19,36 @@
  */
 
 define([
-  "Vue",
-  "vue!" + BASE_PATH + "layouts/livedata-cards.html",
-  "Logic"
+  BASE_PATH + "displayers/defaultDisplayer.js"
 ], function (
-  Vue,
-  livedataCards,
-  Logic
+  DefaultDisplayer
 ) {
 
-  return function (element) {
-    var logic = Logic(element);
 
-    // vue directive to automatically create and insert the displayer inside the element
-    Vue.directive("displayer", {
-      bind: function (el, binding) {
-        logic.createDisplayer(binding.value.property.id, binding.value.entry)
-        .done(function (displayer) {
-          el.appendChild(displayer.element);
-        });
-      },
-    });
+  /**
+   * Create an HTML displayer for a property of an entry
+   * Extends the default displayer class
+   */
+  var HTMLDisplayer = function (propertyId, entryData, logic) {
+    DefaultDisplayer.call(this, propertyId, entryData, logic);
+  };
+  HTMLDisplayer.prototype = Object.create(DefaultDisplayer.prototype);
+  HTMLDisplayer.prototype.constructor = HTMLDisplayer;
 
-    /**
-     * Create the cards layout from Vuejs
-     */
-    var vueCardsLayout = new Vue({
 
-      // Constructs a livedata-cards component and passes it the data
-      template: '<livedata-cards :logic="logic"></livedata-cards>',
-
-      data: {
-        logic: logic,
-      },
-
-    }).$mount();
-
-    // return the HTML Element of the layout for the logic script
-    return vueCardsLayout.$el;
+  /**
+   * Create html viewer element for the displayer
+   * Override the default inherted method
+   */
+  HTMLDisplayer.prototype.createView = function (defer, params) {
+    var element = document.createElement("div");
+    if (params.value !== undefined && params.value !== null) {
+      element.innerHTML = params.value;
+    }
+    defer.resolve(element);
 
   };
 
 
+  return HTMLDisplayer;
 });

@@ -29,7 +29,19 @@ define([
 ) {
 
   return function (element) {
+    var self = this;
     this.logic = Logic(element);
+
+    // vue directive to automatically create and insert the displayer inside the element
+    Vue.directive("displayer", {
+      bind: function (el, binding) {
+        self.logic.createDisplayer(binding.value.col.id, binding.value.row)
+        .done(function (displayer) {
+          el.appendChild(displayer.element);
+        });
+      },
+    });
+
 
     /**
      * Create the table layout from Vuejs

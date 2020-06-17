@@ -18,7 +18,10 @@
           :key="property.id"
         >
           <strong>{{ property.name }}:</strong>
-          <span>{{ entry[property.id] }}</span>
+          <span
+            class="value"
+            v-displayer="{property: property, entry: entry}"
+          ></span>
         </div>
       </div>
 
@@ -103,6 +106,10 @@ define([
 
   .livedata-cards-layout .card {
     margin: 0;
+  }
+
+  .livedata-cards-layout .value {
+    display: inline-block;
   }
 
 }

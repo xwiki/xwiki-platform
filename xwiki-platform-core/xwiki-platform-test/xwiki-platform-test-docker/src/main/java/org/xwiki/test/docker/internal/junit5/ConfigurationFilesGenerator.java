@@ -130,12 +130,14 @@ public class ConfigurationFilesGenerator
 
     private void copyLogbackConfigFile(File configurationFileTargetDirectory) throws Exception
     {
-        File source = new File(getClass().getClassLoader().getResource(LOGBACK_FILE).toURI());
-        File output = new File(configurationFileTargetDirectory, "Classes");
+        File outputDirectory = new File(configurationFileTargetDirectory, "Classes");
+        File outputFile = new File(outputDirectory, LOGBACK_FILE);
         if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Generating: {}", new File(output, LOGBACK_FILE));
+            LOGGER.info("... Generating: {}", outputFile);
         }
-        FileTestUtils.copyFile(source, output);
+        try (FileOutputStream fos = new FileOutputStream(outputFile)) {
+            IOUtils.copy(getClass().getClassLoader().getResourceAsStream(LOGBACK_FILE), fos);
+        }
     }
 
     private VelocityContext createVelocityContext()

@@ -133,7 +133,7 @@ public class ConfigurationFilesGenerator
         File outputDirectory = new File(configurationFileTargetDirectory, "Classes");
         File outputFile = new File(outputDirectory, LOGBACK_FILE);
         if (this.testConfiguration.isVerbose()) {
-            LOGGER.info("... Generating: {}", outputFile);
+            LOGGER.info("... Generating logging configuration: {}", outputFile);
         }
         try (FileOutputStream fos = new FileOutputStream(outputFile)) {
             IOUtils.copy(getClass().getClassLoader().getResourceAsStream(LOGBACK_FILE), fos);

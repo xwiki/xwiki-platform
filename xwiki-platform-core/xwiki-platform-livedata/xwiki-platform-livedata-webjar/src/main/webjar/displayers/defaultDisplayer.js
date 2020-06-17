@@ -23,6 +23,9 @@ define([
   "jquery",
 ], function ($) {
 
+  /**
+   * Load the displayer custom css to the page
+   */
   (function loadCss(url) {
     var link = document.createElement("link");
     link.type = "text/css";
@@ -54,12 +57,18 @@ define([
 
   /**
    * Return the object of parameters to be passed to the viewer and editor functions
-   * @returns {Object}
+   * @returns {Object} an object containing useful data for displayer: {
+   *  value: the entry property value to be displayed
+   *  property: the property descriptor object
+   *  entry: the entry data object
+   *  config: the configuration object of the displayer, found in the propertyDescriptor
+   *  data: the livedata data object
+   *  logic: the logic instance
+   * }
    */
   Displayer.prototype._createParameters = function () {
-    // find property descriptor sort level
     var propertyDescriptor = this.logic.getPropertyDescriptor(this.propertyId);
-    // return the params object
+    // return the param object
     return {
       value: this.entryData[this.propertyId],
       property: propertyDescriptor,
@@ -72,33 +81,59 @@ define([
 
 
 
+  /**
+   * Create viewer element for the displayer
+   * This method can be overriden by other displayers that inherit from this one
+   * Parameters are given by the Displayer.prototype.view function
+   * Must resolve the given promise at the end
+   * @param {Object} defer A jquery promise that must be resolved when the viewer has been created
+   * @param {object} params An object containing useful data for the displayer.
+   *  Param object detail can be found in the Displayer.prototype._createParameters method
+   */
   Displayer.prototype.createView = function (defer, params) {
     var element = document.createElement("div");
     if (params.value !== undefined && params.value !== null) {
       element.innerText = params.value;
     }
-    return defer.resolve(element);
+    defer.resolve(element);
   };
 
+
+
+  /**
+   * Create editor element for the displayer
+   * This method can be overriden by other displayers that inherit from this one
+   * Parameters are given by the Displayer.prototype.edit function
+   * Must resolve the given promise at the end
+   * @param {Object} defer A jquery promise that must be resolved when the editor has been created
+   * @param {object} params An object containing useful data for the displayer.
+   *  Param object detail can be found in the Displayer.prototype._createParameters method
+   */
   Displayer.prototype.createEdit = function (defer, params) {
 
   };
 
 
-
+  /**
+   * Call this.createView and append viewer to the displayer root element
+   */
   Displayer.prototype.view = function () {
     var self = this;
     var defer = $.Deferred();
     var params = this._createParameters();
 
-    this.createView(defer, params).done(function (element) {
+    this.createView(defer, params);
+    defer.done(function (element) {
       self.element.innerHTML = "";
       self.element.appendChild(element);
     });
 
   };
 
-  Displayer.prototype.edit = function (defer, params) {
+  /**
+   * Call this.createEdit and append editor to the displayer root element
+   */
+  Displayer.prototype.edit = function () {
 
   };
 

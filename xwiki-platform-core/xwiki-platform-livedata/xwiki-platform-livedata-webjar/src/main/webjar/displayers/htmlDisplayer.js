@@ -24,7 +24,11 @@ define([
   DefaultDisplayer
 ) {
 
-  // Extend Default Displayer
+
+  /**
+   * Create an HTML displayer for a property of an entry
+   * Extends the default displayer class
+   */
   var HTMLDisplayer = function (propertyId, entryData, logic) {
     DefaultDisplayer.call(this, propertyId, entryData, logic);
   };
@@ -32,14 +36,19 @@ define([
   HTMLDisplayer.prototype.constructor = HTMLDisplayer;
 
 
+  /**
+   * Create html viewer element for the displayer
+   * Override the default inherted method
+   */
   HTMLDisplayer.prototype.createView = function (defer, params) {
     var element = document.createElement("div");
     if (params.value !== undefined && params.value !== null) {
       element.innerHTML = params.value;
     }
-    return defer.resolve(element);
+    defer.resolve(element);
 
   };
+
 
   return HTMLDisplayer;
 });

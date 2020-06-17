@@ -59,6 +59,10 @@ define({
         id: "doc_title",
         name: "Name",
         type: "text",
+        displayer: {
+          id: "link",
+          propertyHref: "doc_url"
+        },
       },
       {
         id: "age",

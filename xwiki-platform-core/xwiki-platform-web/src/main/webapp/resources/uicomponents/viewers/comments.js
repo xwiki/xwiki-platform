@@ -33,7 +33,7 @@ viewers.Comments = Class.create({
    * @returns the comment object number
    */
   extractCommentNbr : function (comment) {
-    return comment.id.match(commentNbrRegex)[1];
+    return comment.id.match(this.commentNbrRegex)[1];
   },
 
   /**
@@ -42,7 +42,7 @@ viewers.Comments = Class.create({
    * @returns {boolean} true if the comment block has an object number
    */
   hasCommentNbr : function (comment) {
-    return comment.id.match(commentNbrRegex).size() > 1;
+    return comment.id.match(this.commentNbrRegex).size() > 1;
   },
 
   /** Constructor. Adds all the JS improvements of the Comments area. */

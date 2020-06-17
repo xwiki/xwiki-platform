@@ -130,7 +130,7 @@ public class ConfigurationFilesGenerator
 
     private void copyLogbackConfigFile(File configurationFileTargetDirectory) throws Exception
     {
-        File outputDirectory = new File(configurationFileTargetDirectory, "Classes");
+        File outputDirectory = new File(configurationFileTargetDirectory, "classes");
         File outputFile = new File(outputDirectory, LOGBACK_FILE);
         if (this.testConfiguration.isVerbose()) {
             LOGGER.info("... Generating logging configuration: {}", outputFile);

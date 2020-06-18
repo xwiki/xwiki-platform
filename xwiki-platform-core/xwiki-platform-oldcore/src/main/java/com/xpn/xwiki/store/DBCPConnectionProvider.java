@@ -222,7 +222,7 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
             conn.close();
 
             // Log pool statistics before continuing.
-            logStatistics();
+            logStatistics(new Exception("configure() finished"));
         } catch (Exception e) {
             String message = "Could not create a DBCP pool. There is an error in the Hibernate configuration file, "
                 + "please review it.";
@@ -253,7 +253,7 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
         try {
             conn = this.ds.getConnection();
         } finally {
-            logStatistics();
+            logStatistics(new Exception("getConnection() finished"));
         }
         return conn;
     }
@@ -264,14 +264,14 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
         try {
             conn.close();
         } finally {
-            logStatistics();
+            logStatistics(new Exception("closeConnection() finished"));
         }
     }
 
     public void close() throws HibernateException
     {
         SHUTDOWN_LOGGER.debug("Stopping Database Connection Pool...");
-        logStatistics();
+        logStatistics(new Exception("close"));
         try {
             if (this.ds != null) {
                 this.ds.close();
@@ -302,11 +302,12 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
         return false;
     }
 
-    protected void logStatistics()
+    protected void logStatistics(Exception e)
     {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("active: [{}] (max: [{}]), idle: [{}] (max: [{}])", this.ds.getNumActive(),
                 this.ds.getMaxTotal(), this.ds.getNumIdle(), this.ds.getMaxIdle());
+            LOGGER.debug("Context of call", e);
         }
     }
 

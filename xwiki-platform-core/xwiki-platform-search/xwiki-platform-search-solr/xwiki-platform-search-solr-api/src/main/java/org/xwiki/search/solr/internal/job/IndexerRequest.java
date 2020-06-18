@@ -139,9 +139,10 @@ public class IndexerRequest extends AbstractRequest
             .isEquals();
     }
 
-    @Override public int hashCode()
+    @Override
+    public int hashCode()
     {
-        return new HashCodeBuilder(2, 48)
+        return new HashCodeBuilder(3, 49)
             .appendSuper(super.hashCode())
             .append(rootReference)
             .append(overwrite)

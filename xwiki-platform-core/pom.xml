@@ -195,6 +195,13 @@
                 <newValue>{"id", "fullName", "wiki", "space", "name", "title", "rawTitle", "parent", "parentId", "version", "author", "authorName", "xwikiRelativeUrl", "xwikiAbsoluteUrl", "translations", "syntax"}</newValue>
                 <justification>Not a breakage. Added a new property to the Page REST resource.</justification>
               </item>
+              <item>
+                <regex>true</regex>
+                <code>java.method.returnTypeChanged</code>
+                <old>method void org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder::.+(.+)</old>
+                <new>method org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder::.+(.+)</new>
+                <justification>TargetableNotificationPreferenceBuilder is meant to be a builder but the API wasn't following the builder pattern. This change is not breaking for using that component, but it is breaking if you implemented the TargetableNotificationPreferenceBuilder interface.</justification>
+              </item>
             </revapi.ignore>
             </analysisConfiguration>
           </configuration>

@@ -185,6 +185,16 @@
                 <new>method void org.xwiki.search.solr.SolrUtils::setAtomic(java.lang.String, java.lang.String, java.lang.Object, org.apache.solr.common.SolrInputDocument)</new>
                 <justification>Young API</justification>
               </item>
+              <item>
+                <code>java.annotation.attributeValueChanged</code>
+                <old>class org.xwiki.rest.model.jaxb.PageSummary</old>
+                <new>class org.xwiki.rest.model.jaxb.PageSummary</new>
+                <annotationType>javax.xml.bind.annotation.XmlType</annotationType>
+                <attribute>propOrder</attribute>
+                <oldValue>{"id", "fullName", "wiki", "space", "name", "title", "parent", "parentId", "version", "author", "authorName", "xwikiRelativeUrl", "xwikiAbsoluteUrl", "translations", "syntax"}</oldValue>
+                <newValue>{"id", "fullName", "wiki", "space", "name", "title", "rawTitle", "parent", "parentId", "version", "author", "authorName", "xwikiRelativeUrl", "xwikiAbsoluteUrl", "translations", "syntax"}</newValue>
+                <justification>Not a breakage. Added a new property to the Page REST resource.</justification>
+              </item>
             </revapi.ignore>
             </analysisConfiguration>
           </configuration>

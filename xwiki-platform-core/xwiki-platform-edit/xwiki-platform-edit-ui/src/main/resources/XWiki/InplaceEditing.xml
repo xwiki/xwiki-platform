@@ -780,7 +780,7 @@ define('editInPlace', [
       }, {});
       var xwikiDocument = this._getActionButtons().data('xwikiDocument');
       var formData = {
-        title: xwikiDocument.title,
+        title: xwikiDocument.rawTitle,
         language: xwikiDocument.getRealLocale(),
         isNew: xwikiDocument.isNew
       };
@@ -846,7 +846,7 @@ define('editInPlace', [
   var initTitleEditor = function(xwikiDocument) {
     var label = $('&lt;label for="document-title-input" class="sr-only"/&gt;')
       .text($jsontool.serialize($services.localization.render('core.editors.content.titleField.label')));
-    var input = $('&lt;input type="text" id="document-title-input"/&gt;').val(xwikiDocument.title);
+    var input = $('&lt;input type="text" id="document-title-input"/&gt;').val(xwikiDocument.rawTitle);
     var placeholder = xwikiDocument.documentReference.name;
     if (placeholder === 'WebHome') {
       placeholder = xwikiDocument.documentReference.parent.name;
@@ -854,12 +854,12 @@ define('editInPlace', [
     input.attr('placeholder', placeholder);
     $('#document-title h1').addClass('editable').empty().append([label, input]);
     $(document).on('xwiki:actions:beforeSave.titleEditor', function(event) {
-      xwikiDocument.title = input.val();
+      xwikiDocument.rawTitle = input.val();
     });
     $(document).one('xwiki:actions:view', function(event, data) {
       // Destroy the title editor.
       $(document).off('xwiki:actions:beforeSave.titleEditor');
-      $('#document-title h1').removeClass('editable').text(xwikiDocument.title);
+      $('#document-title h1').removeClass('editable').text(xwikiDocument.rawTitle);
     });
     return xwikiDocument;
   };
@@ -1295,7 +1295,7 @@ input#document-title-input:focus,
     <property>
       <content>{{velocity}}
 {{html clean="false"}}
-#if ($xcontext.action == 'view' &amp;&amp; !$doc.isNew())
+#if ($hasEdit &amp;&amp; $xcontext.action == 'view' &amp;&amp; !$doc.isNew())
   ## We support in-place editing only for the WYSIWYG edit mode ATM.
   #getDefaultDocumentEditor($defaultEditMode)
   #if ($defaultEditMode == 'wysiwyg')

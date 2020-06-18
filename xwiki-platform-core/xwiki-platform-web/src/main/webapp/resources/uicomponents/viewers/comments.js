@@ -73,7 +73,6 @@ viewers.Comments = Class.create({
     this.addSubmitListener(this.form);
     this.addCancelListener();
     this.addEditListener();
-    this.addPreview(this.form);
     this.reloadEditor({
       callback: function () {
         this.addPreview(this.form);

@@ -36,22 +36,24 @@
 #if ($number && $number > -1)
   #set ($commentObj = $doc.getObject($xCommentClass, $number))
   #set ($value = $commentObj.getValue('comment'))
-  #set ($fieldToDisplay = $commentObj.getxWikiClass().get('comment'))
 #else
   #set ($commentObj = $doc.newObject($xCommentClass))
-
-  ## we can't simply call $doc.display() on this object because we would get XWiki.XWikiComments_N_comment as the
-  ## field name, where N is the number of the new temporary object.
-  ## Instead we want the field name to be XWiki.XWikiComments_comment.
-  ## To achieve this we add a new property to the comment class by copying the comment property and changing the name.
-  ## copy and rename to the requested name of the comment field
-  #set ($commentObjClass = $commentObj.getxWikiClass())
-  #set ($commentObjBaseClass = $commentObjClass.getXWikiClass())
-  #set ($discard = $commentObjBaseClass.put($name, $commentClass.getXWikiClass().get('comment')))
-  #set ($discard = $commentObjBaseClass.get($name).setName($name))
-
-  #set ($fieldToDisplay = $commentObjClass.get($name))
+  #set ($value = '')
 #end
+
+## We can't simply call $doc.display() on this object because we would get comment as the
+## field name. Instead we want the field name to be XWiki.XWikiComments_comment for new comments
+## and XWiki.XWikiComments_N_comment for edited comments.
+## To achieve this we add a new property to the comment class by copying the comment property and changing the name.
+#set ($commentObjClass = $commentObj.getxWikiClass())
+#set ($commentObjBaseClass = $commentObjClass.getXWikiClass())
+#set ($discard = $commentObjBaseClass.put($name, $commentClass.getXWikiClass().get('comment')))
+#set ($discard = $commentObjBaseClass.get($name).setName($name))
+
+## attribution of the value to the new field in the object.
+#set ($discard = $commentObj.set($name, $value))
+
+#set ($fieldToDisplay = $commentObjClass.get($name))
 
 ## We need to know the type of editor used for comments in order to hide/display the preview button.
 #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
@@ -61,6 +63,4 @@
 $doc.displayEdit($fieldToDisplay, '', $commentObj)
 
 ## reset the temporary added field.
-#if ("$!commentObjBaseClass" == "")
-  #set ($discard = $commentObjBaseClass.removeField($name))
-#end
+#set ($discard = $commentObjBaseClass.removeField($name))

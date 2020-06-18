@@ -1407,6 +1407,7 @@ XWiki.Annotation = Class.create({
       return;
     }
 
+    // Cancel the edit otherwise the user will be asked for confirmation when leaving the page.
     document.fire('xwiki:actions:cancel');
 
     bubble.remove();

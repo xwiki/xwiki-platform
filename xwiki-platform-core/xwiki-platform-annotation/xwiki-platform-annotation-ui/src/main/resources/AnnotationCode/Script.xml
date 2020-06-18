@@ -1546,6 +1546,7 @@ XWiki.Annotation = Class.create({
     this.createPanel.down('input[type=reset]').observe('click', function() {
       this.hideAnnotationCreationForm();
     }.bind(this));
+    // Initialize the widgets / editors used on the annotation popup.
     document.fire('xwiki:dom:updated', {elements: [container]});
   },
 

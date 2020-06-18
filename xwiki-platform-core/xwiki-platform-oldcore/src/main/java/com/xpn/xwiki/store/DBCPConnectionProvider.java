@@ -302,11 +302,18 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
         return false;
     }
 
-    protected void logStatistics(Exception e)
+    protected void logStatistics()
     {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("active: [{}] (max: [{}]), idle: [{}] (max: [{}])", this.ds.getNumActive(),
                 this.ds.getMaxTotal(), this.ds.getNumIdle(), this.ds.getMaxIdle());
+        }
+    }
+
+    private void logStatistics(Exception e)
+    {
+        logStatistics();
+        if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Context of call", e);
         }
     }

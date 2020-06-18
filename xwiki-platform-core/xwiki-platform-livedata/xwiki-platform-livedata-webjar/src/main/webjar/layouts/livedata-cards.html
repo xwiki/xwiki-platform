@@ -57,7 +57,7 @@ define([
   "dropdownMenu",
 ], function (
   Vue,
-  DropdownMenu,
+  createDropdownMenu,
 ) {
 
   Vue.component("livedata-cards", {
@@ -77,7 +77,7 @@ define([
     },
 
     mounted: function () {
-      var dropdownMenu = new DropdownMenu(this.logic);
+      var dropdownMenu = createDropdownMenu(this.logic);
       this.$refs.dropdownMenu.append(dropdownMenu);
     },
 

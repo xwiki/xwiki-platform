@@ -795,7 +795,7 @@
       <description>The display style of the mention (this is only supported for user mentions).</description>
     </property>
     <property>
-      <mandatory>1</mandatory>
+      <mandatory>0</mandatory>
     </property>
     <property>
       <name>style</name>

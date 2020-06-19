@@ -47,11 +47,38 @@ define([
     this.propertyId = propertyId;
     this.entryData = entryData;
 
-    this.element = document.createElement("div");
-    this.element.className = "livedata-displayer";
+    this.isView = true;
+
+    this.element = undefined;
+    this.initElement();
 
     this.view();
 
+  };
+
+
+  /**
+   * Create the root element of the displayer
+   */
+  Displayer.prototype.initElement = function () {
+    var self = this;
+    if (this.element) { return; }
+
+    this.element = document.createElement("div");
+    // set attributes
+    this.element.className = "livedata-displayer";
+    this.element.tabIndex = "0";
+    // bind events (switching to edit mode)
+    this.element.ondblclick = function () {
+      if (self.isView) {
+        self.edit();
+      }
+    };
+    this.element.onkeydown = function (e) {
+      if (e.keyCode === 13 /*ENTER*/ && e.target === self.element && self.isView) {
+        self.edit();
+      }
+    };
   };
 
 
@@ -110,7 +137,40 @@ define([
    *  Param object detail can be found in the Displayer.prototype._createParameters method
    */
   Displayer.prototype.createEdit = function (defer, params) {
+    var self = this;
+    var input = document.createElement("input");
+    input.size = 1;
+    input.style.width = "100%";
+    if (params.value !== undefined && params.value !== null) {
+      input.value = params.value;
+    }
+    input.focus();
 
+    // validate / abort changes
+    input.onfocusout = function () {
+      self.applyEdit(input.value);
+    };
+    input.onkeydown = function (e) {
+      if (e.keyCode === 13 /*ENTER*/) {
+        self.applyEdit(input.value);
+      }
+      if (e.keyCode === 27 /*ESCAPE*/) {
+        self.abortEdit();
+      }
+    };
+    defer.resolve(input);
+  };
+
+
+  Displayer.prototype.applyEdit = function (newValue) {
+    // should call a logic API instead, but this is just for quick prove of concept
+    this.entryData[this.propertyId] = newValue;
+    this.view();
+    this.element.focus();
+  };
+  Displayer.prototype.abortEdit = function () {
+    this.view();
+    this.element.focus();
   };
 
 
@@ -128,13 +188,29 @@ define([
       self.element.appendChild(element);
     });
 
+    this.isView = true;
+    this.element.classList.remove("edit");
+    this.element.classList.add("view");
   };
 
   /**
    * Call this.createEdit and append editor to the displayer root element
    */
   Displayer.prototype.edit = function () {
+    var self = this;
+    var defer = $.Deferred();
+    var params = this._createParameters();
 
+    this.createEdit(defer, params);
+    defer.done(function (element) {
+      self.element.innerHTML = "";
+      self.element.appendChild(element);
+      element.focus();
+    });
+
+    this.isView = false;
+    this.element.classList.remove("view");
+    this.element.classList.add("edit");
   };
 
 

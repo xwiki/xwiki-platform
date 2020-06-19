@@ -32,7 +32,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.ls.LSInput;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.test.jmock.AbstractComponentTestCase;
-import org.xwiki.xml.script.XMLScriptService;
 
 /**
  * Unit tests for {@link org.xwiki.xml.script.XMLScriptService}.
@@ -47,10 +46,8 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
     @Override
     public void setUp() throws Exception
     {
-        this.xml = (XMLScriptService) getComponentManager().getInstance(ScriptService.class, "xml");
+        this.xml = getComponentManager().getInstance(ScriptService.class, "xml");
     }
-
-
 
     @Test
     public void testGetDomDocument()
@@ -111,7 +108,7 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testParseInvalidDocument() throws UnsupportedEncodingException
+    public void testParseInvalidDocument()
     {
         Document result = this.xml.parse("<?xml version=\"1.0\" encoding=\"UTF-8\"?><a></b>");
         Assert.assertNull("Invalid content shouldn't be parsed", result);
@@ -179,6 +176,7 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
         Assert.assertEquals("Wrong serialization for null document", "", this.xml.serialize(null));
     }
 
+    @Test
     public void testSerializeWithoutXmlDeclaration()
     {
         Document d = createSimpleDocument();
@@ -263,7 +261,7 @@ public class XMLScriptServiceTest extends AbstractComponentTestCase
     }
 
     @Test
-    public void testTransformString() throws UnsupportedEncodingException
+    public void testTransformString()
     {
         String d = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><a b='c'>d</a>";
         String s = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"

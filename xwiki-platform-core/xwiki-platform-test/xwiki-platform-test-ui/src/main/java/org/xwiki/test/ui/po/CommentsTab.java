@@ -156,7 +156,7 @@ public class CommentsTab extends BaseElement
         getDriver()
             .findElementWithoutWaiting(By.xpath("//div[@id='xwikicomment_" + id + "']//a[contains(@class, 'edit')]"))
             .click();
-        getDriver().waitUntilElementIsVisible(By.className("wysiwyg-field-" + id));
+        getDriver().waitUntilElementIsVisible(By.className("commenteditor-" + id));
         return new CommentForm(By.className("edit-xcomment"));
     }
 

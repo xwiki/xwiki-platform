@@ -68,6 +68,9 @@ define({
         id: "age",
         name: "Age",
         type: "number",
+        filter: {
+          id: "number",
+        },
       },
       {
         id: "job",
@@ -89,14 +92,16 @@ define({
       },
     ],
 
-    filters: {
-      text: {
+    filters: [
+      {
+        id: "text",
         operators: ["equals", "nequals"],
       },
-      number: {
-        operators: ["greater", "lower"],
+      {
+        id: "number",
+        operators: ["equals", "nequals", "greater", "lower"],
       },
-    },
+    ],
 
     layoutDescriptors: {
       table: {

@@ -19,7 +19,7 @@
  */
 
 
-define(["jquery"], function ($) {
+define(["jquery", "polyfills"], function ($, _pollyfills) {
 
   /**
    * Map the element to its data object
@@ -63,20 +63,7 @@ define(["jquery"], function ($) {
   };
 
 
-  /**
-   * Polyfill for the custom event function for IE 11
-   * Taken from https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent
-   */
-  (function () {
-    if (typeof window.CustomEvent === "function") return false;
-    function CustomEvent (event, params) {
-      params = params || {bubbles: false, cancelable: false, detail: null};
-      var evt = document.createEvent('CustomEvent');
-      evt.initCustomEvent(event, params.bubbles, params.cancelable, params.detail);
-      return evt;
-    }
-    window.CustomEvent = CustomEvent;
-  })();
+
 
   /**
    * Send custom events
@@ -91,13 +78,12 @@ define(["jquery"], function ($) {
     };
     eventName = "xwiki:livedata:" + eventName;
     eventData = {
-      bubbles: false,
+      bubbles: true,
       detail: $.extend({}, defaultData, eventData),
     };
     var event = new CustomEvent(eventName, eventData);
     // dispatch event
     this.element.dispatchEvent(event);
-    this.element.ownerDocument.dispatchEvent(event);
   };
 
 
@@ -139,7 +125,7 @@ define(["jquery"], function ($) {
           layoutId: layoutId,
           previousLayoutId: previousLayoutId,
         });
-        defer.resolve();
+        defer.resolve(self.layouts[layoutId]);
       },
 
       // load failure
@@ -171,15 +157,9 @@ define(["jquery"], function ($) {
    * @returns {Object}
    */
   Logic.prototype.getPropertyDescriptor = function (propertyId) {
-    var propertyDescriptor = null;
-    // Unfortunately the Array.prototype.find method is not supported in IE :(
-    this.data.meta.propertyDescriptors.some(function (descriptor) {
-    if (descriptor.id === propertyId) {
-        propertyDescriptor = descriptor;
-        return true;
-      }
+    return this.data.meta.propertyDescriptors.find(function (descriptor) {
+      return descriptor.id === propertyId;
     });
-    return propertyDescriptor;
   };
 
 
@@ -196,7 +176,7 @@ define(["jquery"], function ($) {
 
     // default displayerId
     if (displayerId === undefined) {
-      displayerId = (this.getPropertyDescriptor(propertyId).displayer || {}).id || "default";
+      displayerId = ((this.getPropertyDescriptor(propertyId) || {}).displayer || {}).id || "default";
     }
 
     // load displayer based on it's id
@@ -209,7 +189,7 @@ define(["jquery"], function ($) {
 
       // load failure
       function (err) {
-        // try to load default layout instead
+        // try to load the default displayer instead
         if (displayerId !== "default") {
           self.createDisplayer(propertyId, entry, "default").then(function (displayer) {
             defer.resolve(displayer);
@@ -239,12 +219,8 @@ define(["jquery"], function ($) {
   Logic.prototype.sort = function (property, level, descending) {
     if (this.data.query.properties.indexOf(property) === -1) { return; }
     // find property current sort level
-    var currentLevel = -1;
-    this.data.query.sort.some(function (sortObject, i) {
-      if (sortObject.property === property) {
-        currentLevel = i;
-        return true;
-      }
+    var currentLevel = this.data.query.sort.findIndex(function (sortObject) {
+      return sortObject.property === property;
     });
     // default level
     if (level === undefined) {
@@ -314,9 +290,14 @@ define(["jquery"], function ($) {
    */
   Logic.prototype.getFilterDescriptor = function (property) {
     if (this.data.query.properties.indexOf(property) === -1) { return; }
-    var propertyFilter = this.data.meta.propertyDescriptors.filter || {};
-    var propertyType = propertyFilter.type || "text";
-    return this.data.meta.filters[propertyType];
+    var propertyFilter = this.getPropertyDescriptor(property).filter || {};
+    var filterId = propertyFilter.id || "text";
+    // get default filter configuration, and combine it with current property
+    var filterDescriptor = this.data.meta.filters.find(function (filterDescr) {
+      return filterDescr.id === filterId;
+    });
+    $.extend(filterDescriptor, propertyFilter);
+    return filterDescriptor;
   };
 
 
@@ -334,7 +315,7 @@ define(["jquery"], function ($) {
 
 
   /**
-   * Update sort configuration based on parameters, then fetch new data
+   * Update filter configuration based on parameters, then fetch new data
    * @param {String} property The property to filter according to
    * @param {String} index The index of the filter entry
    * @param {String} filterEntry The filter data used to update the filter configuration
@@ -389,7 +370,7 @@ define(["jquery"], function ($) {
 
 
   /**
-   * Add new filter entry, shorthand of Logic.prototype.sort
+   * Add new filter entry, shorthand of Logic.prototype.filter
    * @param {String} property Which property to add the filter to
    * @param {String} operator The operator of the filter. Should match the filter descriptor of the property
    * @param {String} value Default value for the new filter entry

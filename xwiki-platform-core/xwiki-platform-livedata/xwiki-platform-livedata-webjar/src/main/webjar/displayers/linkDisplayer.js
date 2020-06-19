@@ -50,7 +50,7 @@ define([
     var element = document.createElement("a");
     if (text !== undefined && text !== null) {
       element.href = href || "#";
-      element.innerHTML = text;
+      element.innerText = text;
     }
     defer.resolve(element);
 

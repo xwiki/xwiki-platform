@@ -285,6 +285,7 @@ define('xwiki-ckeditor', [
     return document.getURL('get', $.param({
       sheet: 'CKEditor.FileUploader',
       outputSyntax: 'plain',
+      syntax: document.syntax,
       language: currentLocale,
       form_token: xwikiMeta.form_token,
       initiator: initiator
@@ -298,8 +299,9 @@ define('xwiki-ckeditor', [
     if (sourceDocumentReference) {
       sourceDocument = new XWiki.Document(XWiki.Model.resolve(sourceDocumentReference, XWiki.EntityType.DOCUMENT));
     }
+    sourceDocument.syntax = $(element).attr('data-sourceDocumentSyntax');
     var config = {
-      allowedContent: allowedContentBySyntax[$(element).attr('data-sourceDocumentSyntax')],
+      allowedContent: allowedContentBySyntax[sourceDocument.syntax],
       filebrowserUploadUrl: getUploadURL(sourceDocument, 'filebrowser'),
       // This is used in CKEditor.FileUploader so we must keep them in sync.
       fileTools_defaultFileName: '__fileCreatedFromDataURI__',
@@ -325,6 +327,10 @@ define('xwiki-ckeditor', [
         htmlConverter: sourceDocument.getURL('get', $.param({
           sheet: 'CKEditor.HTMLConverter',
           outputSyntax: 'plain',
+          // Make sure we use the syntax specified when the editor was loaded. This is especially important when the
+          // edited document is new (unsaved) because we want the converter to use the syntax specified by the template
+          // rather than the default wiki syntax.
+          sourceSyntax: sourceDocument.syntax,
           language: currentLocale
         }))
       },

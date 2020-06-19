@@ -56,6 +56,11 @@
       #if ($rootLocale.equals($document.getDefaultLocale()))
         #set ($discard = $document.setDefaultLocale($xwiki.getLocalePreference()))
       #end
+      ## We also need to make sure the new document is created with the right syntax (e.g. the one coming from the
+      ## template used to create the document rather than the default wiki syntax).
+      #if ("$!request.syntax" != '')
+        #set ($discard = $document.setSyntaxId($request.syntax))
+      #end
     #end
     ## FIXME: Get the file content as an input stream instead of a byte array, but for this we need to expose
     ## getFileItemInputStream in the public API of the fileupload plugin (or use a script service).

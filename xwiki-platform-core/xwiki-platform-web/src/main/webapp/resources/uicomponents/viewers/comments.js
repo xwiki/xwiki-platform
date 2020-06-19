@@ -337,75 +337,76 @@ viewers.Comments = Class.create({
    * Add a preview button that generates the rendered comment,
    */
   addPreview : function(form) {
-    require(['jquery'], function ($) {
-      if (!form || !XWiki.hasEdit || $("[name='defaultEditorId']").first().val() !== "text") {
-        return;
-      }
+    // We only allow to preview comment if the user is using text editor.
+    if (!form || !XWiki.hasEdit || form.down("input[name='defaultEditorId']").value !== "text") {
+      return;
+    }
 
-      var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__",
-          encodeURIComponent(XWiki.currentSpace)).replace("__page__", encodeURIComponent(XWiki.currentPage));
-      form.commentElt = form.down('textarea');
-      var buttons = form.down('input[type=submit]').up('div');
-      form.previewButton = new Element('span', {'class': 'buttonwrapper'}).update(new Element('input', {
-        'type': 'button',
-        'class': 'button',
-        'value': "$services.localization.render('core.viewers.comments.preview.button.preview')"
-      }));
-      form.previewButton._x_modePreview = false;
+    var previewURL = "$xwiki.getURL('__space__.__page__', 'preview')".replace("__space__",
+        encodeURIComponent(XWiki.currentSpace)).replace("__page__", encodeURIComponent(XWiki.currentPage));
+    form.commentElt = form.down('textarea');
+    var buttons = form.down('input[type=submit]').up('div');
+    form.previewButton = new Element('span', {'class': 'buttonwrapper'}).update(new Element('input', {
+      'type': 'button',
+      'class': 'button',
+      'value': "$services.localization.render('core.viewers.comments.preview.button.preview')"
+    }));
+    form.previewButton._x_modePreview = false;
 
-      const buttonName = $(form.previewButton).find("input")[0].value;
-      const existingButton = $(buttons).find("input[value='" + buttonName + "']");
+    const buttonName = form.previewButton.down("input").value;
+    const existingButton = buttons.down("input[value='" + buttonName + "']");
+    if (existingButton) {
       existingButton.remove();
-      buttons.insert({'top': form.previewButton});
-      form.previewButton.observe('click', function () {
-        if (!form.previewButton._x_modePreview && !form.previewButton.disabled) {
-          form.previewButton.disabled = true;
-          var notification = new XWiki.widgets.Notification(
-              "$services.localization.render('core.viewers.comments.preview.inProgress')", "inprogress");
-          new Ajax.Request(previewURL, {
-            method: 'post',
-            parameters: {
-              'xpage': 'plain',
-              'sheet': '',
-              'content': form.down('textarea').value,
-              'form_token': form.form_token.value,
-              'restricted': 'true'
-            },
-            onSuccess: function (response) {
-              var comment = form.commentElt.up(this.xcommentSelector);
-              var commentNumber;
-              if (comment !== undefined && this.hasCommentNumber(comment)) {
-                commentNumber = this.extractCommentNumber(comment);
-              }
-              this.doPreview(response.responseText, form, commentNumber);
-              notification.hide();
-            }.bind(this),
-            /* If the content is empty or does not generate anything, we have the "This template does not exist" response,
-               with a 400 status code. */
-            on400: function (response) {
-              this.doPreview('&nbsp;', form);
-              notification.hide();
-            }.bind(this),
-            onFailure: function (response) {
-              var failureReason = response.statusText;
-              if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-                failureReason = 'Server not responding';
-              }
-              notification.replace(new XWiki.widgets.Notification(
-                  "$services.localization.render('core.viewers.comments.preview.failed')" + failureReason, "error"));
-            },
-            on0: function (response) {
-              response.request.options.onFailure(response);
-            },
-            onComplete: function (response) {
-              form.previewButton.disabled = false;
-            }.bind(this)
-          });
-        } else {
-          this.cancelPreview(form);
-        }
-      }.bindAsEventListener(this));
-    }.bind(this));
+    }
+    buttons.insert({'top': form.previewButton});
+    form.previewButton.observe('click', function () {
+      if (!form.previewButton._x_modePreview && !form.previewButton.disabled) {
+        form.previewButton.disabled = true;
+        var notification = new XWiki.widgets.Notification(
+            "$services.localization.render('core.viewers.comments.preview.inProgress')", "inprogress");
+        new Ajax.Request(previewURL, {
+          method: 'post',
+          parameters: {
+            'xpage': 'plain',
+            'sheet': '',
+            'content': form.down('textarea').value,
+            'form_token': form.form_token.value,
+            'restricted': 'true'
+          },
+          onSuccess: function (response) {
+            var comment = form.commentElt.up(this.xcommentSelector);
+            var commentNumber;
+            if (comment !== undefined && this.hasCommentNumber(comment)) {
+              commentNumber = this.extractCommentNumber(comment);
+            }
+            this.doPreview(response.responseText, form, commentNumber);
+            notification.hide();
+          }.bind(this),
+          /* If the content is empty or does not generate anything, we have the "This template does not exist" response,
+             with a 400 status code. */
+          on400: function (response) {
+            this.doPreview('&nbsp;', form);
+            notification.hide();
+          }.bind(this),
+          onFailure: function (response) {
+            var failureReason = response.statusText;
+            if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+              failureReason = 'Server not responding';
+            }
+            notification.replace(new XWiki.widgets.Notification(
+                "$services.localization.render('core.viewers.comments.preview.failed')" + failureReason, "error"));
+          },
+          on0: function (response) {
+            response.request.options.onFailure(response);
+          },
+          onComplete: function (response) {
+            form.previewButton.disabled = false;
+          }.bind(this)
+        });
+      } else {
+        this.cancelPreview(form);
+      }
+    }.bindAsEventListener(this));
   },
   /**
    * Display the comment preview instead of the comment textarea.

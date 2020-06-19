@@ -40,7 +40,9 @@
 #********************************************************
 Get the actual notifications.
 ********************************************************#
-#if ('get' == $xcontext.action &amp;&amp; 'GET' == $request.method &amp;&amp; 'getNotifications' == $request.action)
+## We use POST since we are sending the reference of the document and we want to avoid special characters in the URL.
+#if ('get' == $xcontext.action &amp;&amp; 'POST' == $request.method &amp;&amp; 'getNotifications' == $request.action)
+  #set ($requestedDocumentReference = $services.model.resolveDocument($request.document))
   #macro (generateNotificationInput $id $reference $label)
     &lt;label class="hidden" for="$id"&gt;$services.localization.render($label)&lt;/label&gt;##
     &lt;input type="checkbox" id="$id" name="$id" #displayCheckedIfWatched($reference)/&gt;##
@@ -75,9 +77,9 @@ Get the actual notifications.
         &lt;div class="notifications-toggles clearfix" data-enabled="$services.notification.preferences.hasAnyEnabledNotificationPreferences()"&gt;
           #macro(displayCheckedIfWatched $scope)#if($services.notification.watch.isLocationWatched($scope))checked="checked"#end#end
           &lt;pre&gt;
-            #generateNotificationInput('notificationPageOnly' $doc.documentReference 'notifications.filters.preferences.label.page')
-            #generateNotificationInput('notificationPageAndChildren' $doc.documentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
-            #generateNotificationInput('notificationWiki' $doc.documentReference.wikiReference 'notifications.filters.preferences.label.wiki')
+            #generateNotificationInput('notificationPageOnly' $requestedDocumentReference 'notifications.filters.preferences.label.page')
+            #generateNotificationInput('notificationPageAndChildren' $requestedDocumentReference.lastSpaceReference 'notifications.filters.preferences.label.space')
+            #generateNotificationInput('notificationWiki' $requestedDocumentReference.wikiReference 'notifications.filters.preferences.label.wiki')
           &lt;/pre&gt;
         &lt;/div&gt;
       #end
@@ -426,12 +428,15 @@ Get the actual notifications.
     * Load the notifications content when the user open the notification menu (lazy loading to have better scalability).
     */
     var notificationsMenusHasBeenOpened = false;
+    var documentReference = xm.documentReference.toString();
     $('#tmNotifications').on('show.bs.dropdown', function () {
       // Don't load the notifications if the menu has already be opened before.
+      // use POST to send the document reference without any issue with URL.
       if (!notificationsMenusHasBeenOpened) {
-        $.get(url, {
+        $.post(url, {
           outputSyntax: 'html',
-          action: 'getNotifications'
+          action: 'getNotifications',
+          document: documentReference
         }).success(function (data){
           $('.notification-uix').html(data).removeClass('loading');
           $('.notification-uix').find('.notifications-macro').each(function() {

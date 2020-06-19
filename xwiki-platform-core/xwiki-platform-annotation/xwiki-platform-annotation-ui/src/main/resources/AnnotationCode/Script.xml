@@ -1563,46 +1563,44 @@ XWiki.Annotation = Class.create({
 
   onAnnotationAdd : function(event) {
     event.stop();
-    require(['xwiki-events-bridge'], function() {
-      // don't submit
-      document.fire('xwiki:actions:beforeSave')
-      var form = this.createPanel.down('form');
-      var formData = new Hash(form.serialize(true));
-      // aaand submit
-      new Ajax.Request(form.action, {
-        method : form.method,
-        parameters : this.prepareRequestParameters(formData),
-        onCreate : function() {
-          // make it load while update is in progress
-          this.createPanel.update(new Element('div', {'class' : 'loading'}));
-        }.bind(this),
-        onSuccess : function (response) {
-          // check the response to see if all went fine
-          if (this.checkResponseCodeAndFail(response)) {
-            return;
-          }
-          if (this.displayAnnotationsCheckbox) {
-            this.displayAnnotationsCheckbox.checked = true;
-          }
-          this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
-          this.fetchedAnnotations = true;
-          form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
-          // and hide the create bubble, skipping selection highlight clear
-          this.hideAnnotationCreationForm(true);
-        }.bind(this),
-        onFailure : function(response) {
-          this.hideAnnotationCreationForm();
-          var failureReason = response.statusText;
-          if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
-            failureReason = 'Server not responding';
-          }
-          this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.loaderror')" + failureReason, 'error', {timeout : 5});
-        }.bind(this),
-        on0 : function (response) {
-          response.request.options.onFailure(response);
+    // don't submit
+    document.fire('xwiki:actions:beforeSave')
+    var form = this.createPanel.down('form');
+    var formData = new Hash(form.serialize(true));
+    // aaand submit
+    new Ajax.Request(form.action, {
+      method : form.method,
+      parameters : this.prepareRequestParameters(formData),
+      onCreate : function() {
+        // make it load while update is in progress
+        this.createPanel.update(new Element('div', {'class' : 'loading'}));
+      }.bind(this),
+      onSuccess : function (response) {
+        // check the response to see if all went fine
+        if (this.checkResponseCodeAndFail(response)) {
+          return;
         }
-      });
-    }.bind(this));
+        if (this.displayAnnotationsCheckbox) {
+          this.displayAnnotationsCheckbox.checked = true;
+        }
+        this.loadAnnotatedContent(response.responseJSON.annotatedContent, true);
+        this.fetchedAnnotations = true;
+        form._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.success')", 'done');
+        // and hide the create bubble, skipping selection highlight clear
+        this.hideAnnotationCreationForm(true);
+      }.bind(this),
+      onFailure : function(response) {
+        this.hideAnnotationCreationForm();
+        var failureReason = response.statusText;
+        if (response.statusText == '' /* No response */ || response.status == 12031 /* In IE */) {
+          failureReason = 'Server not responding';
+        }
+        this._x_notification = new XWiki.widgets.Notification("$services.localization.render('annotations.action.create.loaderror')" + failureReason, 'error', {timeout : 5});
+      }.bind(this),
+      on0 : function (response) {
+        response.request.options.onFailure(response);
+      }
+    });
   },
 
   /**

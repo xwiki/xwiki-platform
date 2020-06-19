@@ -24,7 +24,7 @@ var viewers = XWiki.viewers = XWiki.viewers || {};
  * Javascript enhancements for the comments viewer.
  */
 viewers.Comments = Class.create({
-  commentNbrRegex : /.+_(\d+)/,
+  commentNumberRegex : /.+_(\d+)/,
   xcommentSelector: ".xwikicomment",
 
   /**
@@ -32,8 +32,8 @@ viewers.Comments = Class.create({
    * @param comment the comment
    * @returns the comment object number
    */
-  extractCommentNbr : function (comment) {
-    return comment.id.match(this.commentNbrRegex)[1];
+  extractCommentNumber : function (comment) {
+    return comment.id.match(this.commentNumberRegex)[1];
   },
 
   /**
@@ -41,8 +41,8 @@ viewers.Comments = Class.create({
    * @param comment the comment block
    * @returns {boolean} true if the comment block has an object number
    */
-  hasCommentNbr : function (comment) {
-    return comment.id.match(this.commentNbrRegex).size() > 1;
+  hasCommentNumber : function (comment) {
+    return comment.id.match(this.commentNumberRegex).size() > 1;
   },
 
   /** Constructor. Adds all the JS improvements of the Comments area. */
@@ -111,7 +111,7 @@ viewers.Comments = Class.create({
           // without making a new request
           var comment = item.up(this.xcommentSelector);
           comment.hide();
-          const commentNbr = this.extractCommentNbr(comment);
+          const commentNbr = this.extractCommentNumber(comment);
           this.reloadEditor({
             commentNbr: commentNbr,
           });
@@ -187,7 +187,7 @@ viewers.Comments = Class.create({
     }
     var comment = editActivator.up(this.xcommentSelector);
     editActivator._x_editForm.hide();
-    const commentNbr = this.extractCommentNbr(comment);
+    const commentNbr = this.extractCommentNumber(comment);
     const name = "XWiki.XWikiComments_" + commentNbr + "_comment";
     this.destroyEditor("[name='" + name + "']", name);
     comment.show();
@@ -299,8 +299,8 @@ viewers.Comments = Class.create({
               var comment = form.down('.xwikicomment');
               var name = "XWiki.XWikiComments_comment";
               if (comment !== undefined) {
-                if (this.hasCommentNbr(comment)) {
-                  const commentNbr = this.extractCommentNbr(comment);
+                if (this.hasCommentNumber(comment)) {
+                  const commentNbr = this.extractCommentNumber(comment);
                   name = "XWiki.XWikiComments_" + commentNbr + "_comment";
                 }
               }
@@ -372,7 +372,12 @@ viewers.Comments = Class.create({
               'restricted': 'true'
             },
             onSuccess: function (response) {
-              this.doPreview(response.responseText, form);
+              var comment = form.commentElt.up(this.xcommentSelector);
+              var commentNumber;
+              if (comment !== undefined && this.hasCommentNumber(comment)) {
+                commentNumber = this.extractCommentNumber(comment);
+              }
+              this.doPreview(response.responseText, form, commentNumber);
               notification.hide();
             }.bind(this),
             /* If the content is empty or does not generate anything, we have the "This template does not exist" response,
@@ -408,19 +413,23 @@ viewers.Comments = Class.create({
    * @param content the rendered comment, as HTML text
    * @param form the form for which the preview is done
    */
-  doPreview : function(content, form) {
+  doPreview : function(content, form, commentNumber) {
     require(['jquery'], function ($) {
       form.previewButton._x_modePreview = true;
-      const commentElt = $(form).find(".wysiwyg-field");
+      var commentEditorSelector = ".commenteditor";
+      if (commentNumber) {
+        commentEditorSelector += "-" + commentNumber;
+      }
+      const commentElt = $(form).find(commentEditorSelector);
       if ($(form).find(".commentPreview").size() === 0) {
         commentElt.before('<div class="commentcontent commentPreview" style="display: none;"></div>');
       }
-      const pc = $(form).find(".commentcontent.commentPreview");
-      pc.html(content);
-      pc.show();
+      const commentPreview = $(form).find(".commentcontent.commentPreview");
+      commentPreview.html(content);
+      commentPreview.show();
       commentElt.hide();
-      form.previewButton.down('input').value =
-          "$services.localization.render('core.viewers.comments.preview.button.back')";
+      $(form.previewButton).find('input')
+        .val("$services.localization.render('core.viewers.comments.preview.button.back')");
     }.bind(this))
   },
   /**
@@ -432,15 +441,15 @@ viewers.Comments = Class.create({
     require(['jquery'], function ($) {
       if (form.previewButton) {
         form.previewButton._x_modePreview = false;
-        form.previewButton.down('input').value =
-            "$services.localization.render('core.viewers.comments.preview.button.preview')";
+        $(form.previewButton).find('input')
+          .val("$services.localization.render('core.viewers.comments.preview.button.preview')");
       }
       const pc = $(form).find(".commentPreview");
       if (pc) {
         pc.hide();
         pc.html('');
       }
-      const commentElt = $(form).find(".wysiwyg-field");
+      const commentElt = $(form).find(".commenteditor");
       if (commentElt) {
         commentElt.show();
       }
@@ -476,14 +485,14 @@ viewers.Comments = Class.create({
     require(['jquery', 'xwiki-events-bridge'], function ($) {
       $(document).trigger('xwiki:actions:cancel');
       if ($(selector).size() > 0) {
-        const parent = $(selector).parent(".wysiwyg-field");
+        const parent = $(selector).parent(".commenteditor");
         parent.empty();
         $(document).trigger('xwiki:dom:updated', {'elements': parent.toArray()});
       }
     });
   },
   reloadEditor: function (options) {
-    var wfClass = '.wysiwyg-field';
+    var wfClass = '.commenteditor';
     options = options || {};
     const commentNbr = options.commentNbr;
     const callback = options.callback;
@@ -496,8 +505,8 @@ viewers.Comments = Class.create({
     this.destroyEditor("[name='" + name + "']", name);
 
     require(['jquery', 'xwiki-events-bridge'], function ($) {
-      if ($(".wysiwyg-field").size() > 0) {
-        $.post(new XWiki.Document().getURL("view") + '?' + $.param({
+      if ($(".commenteditor").size() > 0) {
+        $.post(new XWiki.Document().getURL("get") + '?' + $.param({
           xpage: 'xpart',
           vm: 'commentfield.vm',
           number: commentNbr,
@@ -523,6 +532,7 @@ viewers.Comments = Class.create({
           const wf = $(wfClass);
           wf.empty();
           wf.append(data);
+          wf.show();
           $(document).trigger('xwiki:dom:updated', {'elements': wf.toArray()});
           loadRequiredSkinExtensions(jqXHR.getResponseHeader('X-XWIKI-HTML-HEAD'));
           if (callback) {

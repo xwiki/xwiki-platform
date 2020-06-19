@@ -57,7 +57,7 @@
 
 ## We need to know the type of editor used for comments in order to hide/display the preview button.
 #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
-<input type='hidden' name='defaultEditorId' value="$defaultEditorId" />
+<input type='hidden' name='defaultEditorId' value="$escapetool.xml($defaultEditorId)" />
 
 ## display of the comment field
 $doc.displayEdit($fieldToDisplay, '', $commentObj)

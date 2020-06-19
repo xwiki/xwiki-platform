@@ -106,6 +106,10 @@ public class SubWikiIT
         WikiIndexPage wikiIndexPage = WikiIndexPage.gotoPage();
         CreateWikiPage createWikiPage = wikiIndexPage.createWiki();
         createWikiPage.setPrettyName(SUBWIKI_NAME);
+        String wikiName = createWikiPage.getComputedName();
+        assertEquals(SUBWIKI_NAME, wikiName);
+        createWikiPage.setIsTemplate(false);
+        assertTrue(createWikiPage.isNextStepEnabled());
 
         // Code taken from WikiTemplateIT.
         WikiCreationPage wikiCreationPage = createWikiPage.goUserStep().create();

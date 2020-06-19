@@ -48,7 +48,7 @@
          at https://commons.apache.org/proper/commons-dbcp/configuration.html
     -->
     <property name="hibernate.dbcp.defaultAutoCommit">false</property>
-    <property name="hibernate.dbcp.maxTotal">50</property>
+    <property name="hibernate.dbcp.maxTotal">#if ("$!xwikiDbDbcpMaxTotal" != '')${xwikiDbDbcpMaxTotal}#{else}50#end</property>
     <property name="hibernate.dbcp.maxIdle">5</property>
     <property name="hibernate.dbcp.maxWaitMillis">30000</property>
     <property name="hibernate.connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
@@ -106,7 +106,10 @@
     <property name="hibernate.connection.url">$xwikiDbConnectionUrl</property>
     <property name="hibernate.connection.username">$!xwikiDbConnectionUsername</property>
     <property name="hibernate.connection.password">$!xwikiDbConnectionPassword</property>
+## Support JDBC driver that use the Service Loader mechanism to register themselves.
+#if ("$!xwikiDbConnectionDriverClass" != '')
     <property name="hibernate.connection.driver_class">$xwikiDbConnectionDriverClass</property>
+#end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDbDialect)
     <property name="hibernate.dialect">$xwikiDbDialect</property>
@@ -151,11 +154,13 @@
          Notes:
            - if you want the main wiki database to be different than "xwiki"
              you will also have to set the property xwiki.db in xwiki.cfg file
+           - if you're using a MySQL 8+ JDBC driver, you don't need the "hibernate.connection.driver_class" which will
+             generate a warning since it's not needed as the driver is registered automatically
 
     <property name="hibernate.connection.url">jdbc:mysql://localhost/xwiki?useSSL=false</property>
     <property name="hibernate.connection.username">xwiki</property>
     <property name="hibernate.connection.password">xwiki</property>
-    <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
+    <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
     <property name="hibernate.dialect">org.hibernate.dialect.MySQL5InnoDBDialect</property>
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
     <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>

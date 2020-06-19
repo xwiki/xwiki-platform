@@ -43,10 +43,10 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.SimpleEventQuery;
-import org.xwiki.eventstream.SortableEventQuery.SortClause.Order;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
+import org.xwiki.eventstream.query.SimpleEventQuery;
+import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.model.reference.SpaceReference;
@@ -229,9 +229,18 @@ public class EventStoreTest
         query.not().eq(Event.FIELD_ID, "id2");
         assertSearch(Arrays.asList(event1, event3, event4), query);
 
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery(Event.FIELD_HIDDEN, true));
+        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_HIDDEN, true));
 
-        assertSearch(Arrays.asList(event4), new SimpleEventQuery(Event.FIELD_USER, event4.getUser()));
+        assertSearch(Arrays.asList(event4), new SimpleEventQuery().eq(Event.FIELD_USER, event4.getUser()));
+
+        assertSearch(Arrays.asList(event1, event2),
+            new SimpleEventQuery().eq(Event.FIELD_ID, event1.getId()).or().eq(Event.FIELD_ID, event2.getId()));
+
+        assertSearch(Arrays.asList(event1), new SimpleEventQuery().eq(Event.FIELD_ID, event1.getId()).open()
+            .eq(Event.FIELD_ID, event1.getId()).or().eq(Event.FIELD_ID, event2.getId()).close());
+
+        assertSearch(Arrays.asList(event1, event2),
+            new SimpleEventQuery().in(Event.FIELD_ID, event1.getId(), event2.getId()));
     }
 
     @Test
@@ -368,16 +377,16 @@ public class EventStoreTest
         this.eventStore.saveEvent(event3).get();
 
         assertSearch(Arrays.asList(event1, event2, event3), new SimpleEventQuery());
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery(Event.FIELD_WIKI, wikiString));
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery(Event.FIELD_SPACE, spaceString));
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery(Event.FIELD_SPACE, space));
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery(Event.FIELD_SPACE, "space"));
-        assertSearch(Arrays.asList(event1), new SimpleEventQuery(Event.FIELD_DOCUMENT, "document1"));
-        assertSearch(Arrays.asList(event1), new SimpleEventQuery(Event.FIELD_DOCUMENT, "space.document1"));
-        assertSearch(Arrays.asList(event1), new SimpleEventQuery(Event.FIELD_DOCUMENT, documentString1));
-        assertSearch(Arrays.asList(event2), new SimpleEventQuery(Event.FIELD_DOCUMENT, "document2"));
-        assertSearch(Arrays.asList(event2), new SimpleEventQuery(Event.FIELD_DOCUMENT, "space.document2"));
-        assertSearch(Arrays.asList(event2), new SimpleEventQuery(Event.FIELD_DOCUMENT, documentString2));
+        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_WIKI, wikiString));
+        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_SPACE, spaceString));
+        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_SPACE, space));
+        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_SPACE, "space"));
+        assertSearch(Arrays.asList(event1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document1"));
+        assertSearch(Arrays.asList(event1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document1"));
+        assertSearch(Arrays.asList(event1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString1));
+        assertSearch(Arrays.asList(event2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document2"));
+        assertSearch(Arrays.asList(event2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document2"));
+        assertSearch(Arrays.asList(event2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString2));
     }
 
     @Test

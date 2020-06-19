@@ -17,41 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package com.xpn.xwiki.internal.model.reference;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.search.solr.Solr;
-import org.xwiki.search.solr.SolrException;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.model.reference.SpaceReference;
+import org.xwiki.properties.converter.Converter;
 
 /**
- * A wrapper around the new {@link Solr} API for the search core.
+ * {@link Converter} for the type SpaceReference.
  * 
  * @version $Id$
- * @since 12.2
+ * @since 12.5RC1
  */
 @Component
 @Singleton
-public class SolrClientInstance extends AbstractSolrInstance
+public class SpaceReferenceConverter extends AbstractCompleteEntityReferenceConverter<SpaceReference>
 {
     /**
-     * The name of the core containing the XWiki search index.
+     * Set the type.
      */
-    public static final String CORE_NAME = "search";
-
-    @Inject
-    private Solr solr;
+    public SpaceReferenceConverter()
+    {
+        super(EntityType.SPACE);
+    }
 
     @Override
-    public void initialize() throws InitializationException
+    protected SpaceReference toType(EntityReference result)
     {
-        try {
-            this.server = this.solr.getClient(CORE_NAME);
-        } catch (SolrException e) {
-            throw new InitializationException("Failed to create the solr client for core [search]", e);
-        }
+        return new SpaceReference(result);
     }
 }

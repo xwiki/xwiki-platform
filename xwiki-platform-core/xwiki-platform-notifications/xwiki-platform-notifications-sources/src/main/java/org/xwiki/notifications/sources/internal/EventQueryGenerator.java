@@ -24,7 +24,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.SimpleEventQuery;
+import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.notifications.sources.NotificationParameters;
 import org.xwiki.query.QueryException;
 

@@ -17,41 +17,43 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.search.solr.internal;
+package org.xwiki.model.internal.reference.converter;
 
-import javax.inject.Inject;
+import java.lang.reflect.Type;
+
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.search.solr.Solr;
-import org.xwiki.search.solr.SolrException;
+import org.xwiki.model.reference.WikiReference;
+import org.xwiki.properties.converter.AbstractConverter;
 
 /**
- * A wrapper around the new {@link Solr} API for the search core.
+ * Converter that converts a value into a {@link WikiReference} object.
  * 
  * @version $Id$
- * @since 12.2
+ * @since 12.5RC1
  */
 @Component
 @Singleton
-public class SolrClientInstance extends AbstractSolrInstance
+public class WikiReferenceConverter extends AbstractConverter<WikiReference>
 {
-    /**
-     * The name of the core containing the XWiki search index.
-     */
-    public static final String CORE_NAME = "search";
+    @Override
+    protected WikiReference convertToType(Type type, Object value)
+    {
+        if (value == null) {
+            return null;
+        }
 
-    @Inject
-    private Solr solr;
+        return new WikiReference(value.toString());
+    }
 
     @Override
-    public void initialize() throws InitializationException
+    protected String convertToString(WikiReference value)
     {
-        try {
-            this.server = this.solr.getClient(CORE_NAME);
-        } catch (SolrException e) {
-            throw new InitializationException("Failed to create the solr client for core [search]", e);
+        if (value == null) {
+            return null;
         }
+
+        return value.getName();
     }
 }

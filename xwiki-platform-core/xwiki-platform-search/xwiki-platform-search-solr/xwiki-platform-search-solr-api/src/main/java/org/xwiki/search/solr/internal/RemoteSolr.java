@@ -55,6 +55,11 @@ public class RemoteSolr extends AbstractSolr implements Initializable
      */
     public static final String DEFAULT_REMOTE_URL = "http://localhost:8983/solr/";
 
+    /**
+     * The name of the core containing the XWiki search index.
+     */
+    public static final String MAIN_CORE_NAME = "xwiki";
+
     @Inject
     private SolrConfiguration configuration;
 
@@ -70,14 +75,22 @@ public class RemoteSolr extends AbstractSolr implements Initializable
         // RETRO COMPATIBILITY: the seach core used to be configured using "solr.remote.url" property
         String searchCoreURL = this.configuration.getInstanceConfiguration(TYPE, "url", null);
         if (searchCoreURL != null) {
-            this.clients.put("search", new HttpSolrClient.Builder(searchCoreURL).build());
+            this.clients.put(SolrClientInstance.CORE_NAME, new HttpSolrClient.Builder(searchCoreURL).build());
         }
     }
 
     @Override
     protected SolrClient getInternalSolrClient(String coreName)
     {
-        return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + coreName).build();
+        String corePath = coreName;
+
+        // The name of the main XWiki search core is generally "xwiki" (that what is used in Debian package and what was
+        // used historically when there was only one core)
+        if (coreName.equals(SolrClientInstance.CORE_NAME)) {
+            corePath = MAIN_CORE_NAME;
+        }
+
+        return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + corePath).build();
     }
 
     @Override

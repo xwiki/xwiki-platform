@@ -96,7 +96,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
     public void initialize() throws InitializationException
     {
         this.solrHomePath = Paths.get(this.solrConfiguration.getHomeDirectory());
-        this.solrSearchCorePath = this.solrHomePath.resolve("search");
+        this.solrSearchCorePath = this.solrHomePath.resolve(SolrClientInstance.CORE_NAME);
 
         try {
             // Create the Solr home if it does not already exist

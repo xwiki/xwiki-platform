@@ -31,6 +31,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrQuery.ORDER;
@@ -48,16 +49,20 @@ import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.PageableEventQuery;
-import org.xwiki.eventstream.SimpleEventQuery;
-import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition;
-import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition.CompareType;
-import org.xwiki.eventstream.SortableEventQuery;
-import org.xwiki.eventstream.SortableEventQuery.SortClause;
-import org.xwiki.eventstream.SortableEventQuery.SortClause.Order;
 import org.xwiki.eventstream.internal.AbstractAsynchronousEventStore;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.StreamEventSearchResult;
+import org.xwiki.eventstream.query.CompareQueryCondition;
+import org.xwiki.eventstream.query.CompareQueryCondition.CompareType;
+import org.xwiki.eventstream.query.GroupQueryCondition;
+import org.xwiki.eventstream.query.InQueryCondition;
+import org.xwiki.eventstream.query.PageableEventQuery;
+import org.xwiki.eventstream.query.QueryCondition;
+import org.xwiki.eventstream.query.SimpleEventQuery;
+import org.xwiki.eventstream.query.SortableEventQuery;
+import org.xwiki.eventstream.query.SortableEventQuery.SortClause;
+import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
+import org.xwiki.eventstream.query.StatusQueryCondition;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
@@ -79,20 +84,6 @@ import org.xwiki.search.solr.SolrUtils;
 public class SolrEventStore extends AbstractAsynchronousEventStore
 {
     private static final Map<String, String> SEARCH_FIELD_MAPPING = new HashMap<>();
-
-    private static class CompareQueryConditionRange
-    {
-        final String property;
-
-        CompareQueryCondition less;
-
-        CompareQueryCondition greater;
-
-        CompareQueryConditionRange(String property)
-        {
-            this.property = property;
-        }
-    }
 
     static {
         SEARCH_FIELD_MAPPING.put(Event.FIELD_DOCUMENT, EventsSolrCoreInitializer.FIELD_DOCUMENT_INDEX);
@@ -353,91 +344,161 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         if (query instanceof SimpleEventQuery) {
             SimpleEventQuery simpleQuery = (SimpleEventQuery) query;
 
-            Map<String, CompareQueryConditionRange> ranges = new HashMap<>();
-
-            for (CompareQueryCondition condition : simpleQuery.getConditions()) {
-
-                if (EventsSolrCoreInitializer.KNOWN_FIELDS.contains(condition.getProperty())) {
-                    if (condition.getType() == CompareType.EQUALS) {
-                        StringBuilder builder = new StringBuilder();
-
-                        if (condition.isReversed()) {
-                            builder.append('-');
-                        }
-                        builder.append(toSearchFieldName(condition.getProperty()));
-                        builder.append(':');
-                        builder.append(this.utils.toFilterQueryString(condition.getValue()));
-
-                        solrQuery.addFilterQuery(builder.toString());
-                    } else {
-                        // Optimize ranges to have one instead of two since Solr is based on a range syntax (no
-                        // lower/greater syntax)
-                        CompareQueryConditionRange range = ranges.computeIfAbsent(condition.getProperty(),
-                            k -> new CompareQueryConditionRange(condition.getProperty()));
-
-                        switch (condition.getType()) {
-                            case LESS:
-                            case LESS_OR_EQUALS:
-                                range.less = condition;
-                                break;
-
-                            case GREATER:
-                            case GREATER_OR_EQUALS:
-                                range.greater = condition;
-                                break;
-                        }
-
-                        break;
-                    }
-                } else {
-                    // TODO: add support for custom properties
-                }
-            }
-
-            // Add ranges to the filter query
-            for (CompareQueryConditionRange range : ranges.values()) {
-                StringBuilder builder = new StringBuilder();
-                builder.append(toSearchFieldName(range.property));
-                builder.append(':');
-                builder.append(toFilterQueryStringRange(range.greater, range.less));
-
-                solrQuery.addFilterQuery(builder.toString());
-            }
-
-            // Filter on status
-            if (simpleQuery.getStatusRead() != null) {
-                StringBuilder builder = new StringBuilder();
-                if (simpleQuery.getStatusEntityId() != null) {
-                    builder.append(simpleQuery.getStatusRead() ? EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS
-                        : EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
-                    builder.append(':');
-                    builder.append(this.utils.toFilterQueryString(simpleQuery.getStatusEntityId()));
-                } else {
-                    builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
-                    builder.append(':');
-                    builder.append("[* TO *]");
-                    builder.append(" OR ");
-                    builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
-                    builder.append(':');
-                    builder.append("[* TO *]");
-                }
-
-                solrQuery.addFilterQuery(builder.toString());
-            } else if (simpleQuery.getStatusEntityId() != null) {
-                StringBuilder builder = new StringBuilder();
-                builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
-                builder.append(':');
-                builder.append(this.utils.toFilterQueryString(simpleQuery.getStatusEntityId()));
-                builder.append(" OR ");
-                builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
-                builder.append(':');
-                builder.append(this.utils.toFilterQueryString(simpleQuery.getStatusEntityId()));
-
-                solrQuery.addFilterQuery(builder.toString());
-            }
+            addConditions(simpleQuery.getConditions(), solrQuery);
         }
 
         return solrQuery;
+    }
+
+    private void addConditions(List<QueryCondition> conditions, SolrQuery solrQuery)
+    {
+        for (QueryCondition condition : conditions) {
+            String conditionString = serializeCondition(condition);
+            if (conditionString != null) {
+                if (condition.isReversed()) {
+                    solrQuery.addFilterQuery('-' + conditionString);
+                } else {
+                    solrQuery.addFilterQuery(conditionString);
+                }
+            }
+        }
+    }
+
+    private String serializeCondition(QueryCondition condition)
+    {
+        String conditionString;
+
+        if (condition instanceof CompareQueryCondition) {
+            conditionString = serializeCompareCondition((CompareQueryCondition) condition);
+        } else if (condition instanceof StatusQueryCondition) {
+            conditionString = serializeStatusCondition((StatusQueryCondition) condition);
+        } else if (condition instanceof InQueryCondition) {
+            conditionString = serializeInCondition((InQueryCondition) condition);
+        } else if (condition instanceof GroupQueryCondition) {
+            conditionString = serializeGroupCondition((GroupQueryCondition) condition);
+        } else {
+            conditionString = null;
+        }
+
+        return conditionString;
+    }
+
+    /**
+     * @param condition
+     * @return
+     */
+    private String serializeStatusCondition(StatusQueryCondition condition)
+    {
+        // Filter on status
+        if (condition.getStatusRead() != null) {
+            StringBuilder builder = new StringBuilder();
+            if (condition.getStatusEntityId() != null) {
+                builder.append(condition.getStatusRead() ? EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS
+                    : EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
+                builder.append(':');
+                builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+            } else {
+                builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
+                builder.append(':');
+                builder.append("[* TO *]");
+                builder.append(" OR ");
+                builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
+                builder.append(':');
+                builder.append("[* TO *]");
+            }
+
+            return builder.toString();
+        } else if (condition.getStatusEntityId() != null) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS);
+            builder.append(':');
+            builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+            builder.append(" OR ");
+            builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
+            builder.append(':');
+            builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+
+            return builder.toString();
+        }
+
+        return null;
+    }
+
+    /**
+     * @param condition
+     * @return
+     */
+    private String serializeInCondition(InQueryCondition condition)
+    {
+        StringBuilder builder = new StringBuilder();
+
+        builder.append(condition.getProperty());
+
+        builder.append(':');
+
+        builder.append('(');
+        builder.append(StringUtils.join(condition.getValues(), " OR "));
+        builder.append(')');
+
+        return builder.toString();
+    }
+
+    private String serializeGroupCondition(GroupQueryCondition group)
+    {
+        if (group.getConditions().isEmpty()) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append('(');
+
+        for (QueryCondition condition : group.getConditions()) {
+            if (builder.length() > 1) {
+                if (group.isOr()) {
+                    builder.append(" OR ");
+                } else {
+                    builder.append(" AND ");
+                }
+            }
+
+            String conditionString = serializeCondition(condition);
+            if (conditionString != null) {
+                if (condition.isReversed()) {
+                    builder.append('-');
+                }
+                builder.append(conditionString);
+            }
+        }
+
+        builder.append(')');
+
+        return builder.toString();
+    }
+
+    private String serializeCompareCondition(CompareQueryCondition condition)
+    {
+        StringBuilder builder = new StringBuilder();
+        builder.append(toSearchFieldName(condition.getProperty()));
+        builder.append(':');
+
+        switch (condition.getType()) {
+            case EQUALS:
+                builder.append(this.utils.toFilterQueryString(condition.getValue()));
+                break;
+
+            case LESS:
+            case LESS_OR_EQUALS:
+                builder.append(toFilterQueryStringRange(null, condition));
+                break;
+
+            case GREATER:
+            case GREATER_OR_EQUALS:
+                builder.append(toFilterQueryStringRange(condition, null));
+                break;
+        }
+
+        return builder.toString();
     }
 
     private String toSearchFieldName(String property)

@@ -19,10 +19,6 @@
  */
 package org.xwiki.eventstream.store.solr.internal;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -75,15 +71,6 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
      * @since 12.5RC1
      */
     public static final String FIELD_DOCUMENT_INDEX = "document_index";
-
-    /**
-     * The known fields.
-     */
-    public static final Set<String> KNOWN_FIELDS = new HashSet<>(Arrays.asList(SOLR_FIELD_ID, Event.FIELD_GROUPID,
-        Event.FIELD_DATE, Event.FIELD_IMPORTANCE, Event.FIELD_TITLE, Event.FIELD_BODY, Event.FIELD_APPLICATION,
-        Event.FIELD_STREAM, Event.FIELD_TYPE, Event.FIELD_WIKI, Event.FIELD_SPACE, Event.FIELD_DOCUMENT,
-        Event.FIELD_DOCUMENTVERSION, Event.FIELD_RELATEDENTITY, Event.FIELD_USER, Event.FIELD_URL,
-        Event.FIELD_DOCUMENTTITLE, Event.FIELD_TARGET, Event.FIELD_HIDDEN, Event.FIELD_PREFILTERED));
 
     @Override
     protected long getVersion()

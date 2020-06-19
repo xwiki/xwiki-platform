@@ -28,11 +28,14 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.SimpleEventQuery;
-import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition;
-import org.xwiki.eventstream.SimpleEventQuery.CompareQueryCondition.CompareType;
-import org.xwiki.eventstream.SortableEventQuery.SortClause;
-import org.xwiki.eventstream.SortableEventQuery.SortClause.Order;
+import org.xwiki.eventstream.query.CompareQueryCondition;
+import org.xwiki.eventstream.query.CompareQueryCondition.CompareType;
+import org.xwiki.eventstream.query.InQueryCondition;
+import org.xwiki.eventstream.query.QueryCondition;
+import org.xwiki.eventstream.query.SimpleEventQuery;
+import org.xwiki.eventstream.query.SortableEventQuery.SortClause;
+import org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order;
+import org.xwiki.eventstream.query.StatusQueryCondition;
 import org.xwiki.model.internal.reference.DefaultStringEntityReferenceSerializer;
 import org.xwiki.model.internal.reference.DefaultSymbolScheme;
 import org.xwiki.model.reference.DocumentReference;
@@ -49,7 +52,6 @@ import org.xwiki.user.UserProperties;
 import org.xwiki.user.UserReference;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.Mockito.mock;
@@ -80,23 +82,20 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        List<CompareQueryCondition> conditions = query.getConditions();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
-            conditions.get(0));
+            conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "create", CompareType.EQUALS, false),
-            conditions.get(1));
+            conditions.next());
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
-            conditions.get(2));
-        assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.get(3));
+            conditions.next());
+        assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
         assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
-
-        assertNull(query.getStatusEntityId());
-        assertNull(query.getStatusRead());
     }
 
     @Test
@@ -115,15 +114,15 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        List<CompareQueryCondition> conditions = query.getConditions();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
-            conditions.get(0));
+            conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "create", CompareType.EQUALS, false),
-            conditions.get(1));
+            conditions.next());
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
-            conditions.get(2));
+            conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
@@ -146,18 +145,51 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        List<CompareQueryCondition> conditions = query.getConditions();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
-            conditions.get(0));
+            conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "create", CompareType.EQUALS, false),
-            conditions.get(1));
+            conditions.next());
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
-            conditions.get(2));
+            conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, untilDate, CompareType.LESS_OR_EQUALS, false),
-            conditions.get(3));
-        assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.get(4));
+            conditions.next());
+        assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
+
+        List<SortClause> sortClause = query.getSorts();
+
+        assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
+    }
+
+    @Test
+    public void generateQueryWithUntilDateAndBlackList() throws Exception
+    {
+        Date untilDate = new Date(1000000000000L);
+
+        // Test
+        NotificationParameters parameters = new NotificationParameters();
+        parameters.user = USER_REFERENCE;
+        parameters.format = NotificationFormat.ALERT;
+        parameters.endDate = untilDate;
+        parameters.blackList = Arrays.asList("event1", "event2");
+        parameters.preferences = Arrays.asList(pref1);
+        parameters.filterPreferences = Arrays.asList(fakeFilterPreference);
+
+        SimpleEventQuery query = this.generator.generateQuery(parameters);
+
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
+
+        assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "create", CompareType.EQUALS, false),
+            conditions.next());
+        assertEquals(
+            new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
+            conditions.next());
+        assertEquals(new InQueryCondition(true, Event.FIELD_ID, Arrays.asList("event1", "event2")), conditions.next());
+        assertEquals(new CompareQueryCondition(Event.FIELD_DATE, untilDate, CompareType.LESS_OR_EQUALS, false),
+            conditions.next());
+        assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
@@ -178,19 +210,19 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        List<CompareQueryCondition> conditions = query.getConditions();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
-            conditions.get(0));
+            conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "create", CompareType.EQUALS, false),
-            conditions.get(1));
+            conditions.next());
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
-            conditions.get(2));
-        assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.get(3));
+            conditions.next());
+        assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
         assertEquals(
             new CompareQueryCondition(Event.FIELD_WIKI, USER_REFERENCE.getWikiReference(), CompareType.EQUALS, false),
-            conditions.get(4));
+            conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
@@ -223,13 +255,14 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
+        parameters.blackList = Arrays.asList("event1", "event2");
         parameters.filters = Arrays.asList(notificationFilter1, notificationFilter2);
         parameters.preferences = Arrays.asList(this.pref1);
         parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        Iterator<CompareQueryCondition> conditions = query.getConditions().iterator();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
@@ -242,6 +275,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
             conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_TYPE, "someValue2", CompareType.EQUALS, false),
             conditions.next());
+        assertEquals(new InQueryCondition(true, Event.FIELD_ID, Arrays.asList("event1", "event2")), conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
@@ -265,13 +299,14 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         parameters.user = USER_REFERENCE;
         parameters.format = NotificationFormat.ALERT;
         parameters.fromDate = this.startDate;
+        parameters.blackList = Arrays.asList("event1", "event2");
         parameters.filters = Collections.singleton(notificationFilter1);
         parameters.preferences = Arrays.asList(this.pref1);
         parameters.filterPreferences = Arrays.asList(this.fakeFilterPreference);
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        Iterator<CompareQueryCondition> conditions = query.getConditions().iterator();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
@@ -280,6 +315,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
+        assertEquals(new InQueryCondition(true, Event.FIELD_ID, Arrays.asList("event1", "event2")), conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
@@ -316,7 +352,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        Iterator<CompareQueryCondition> conditions = query.getConditions().iterator();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
@@ -350,7 +386,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        Iterator<CompareQueryCondition> conditions = query.getConditions().iterator();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
@@ -359,14 +395,12 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
+        assertEquals(new StatusQueryCondition(USER_REFERENCE.toString(), true, false), conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
         assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
-
-        assertEquals(USER_REFERENCE.toString(), query.getStatusEntityId());
-        assertEquals(true, query.getStatusRead());
     }
 
     @Test
@@ -392,7 +426,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        Iterator<CompareQueryCondition> conditions = query.getConditions().iterator();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
@@ -401,14 +435,12 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
+        assertEquals(new StatusQueryCondition(null, true, false), conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
         assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
-
-        assertNull(query.getStatusEntityId());
-        assertEquals(true, query.getStatusRead());
     }
 
     @Test
@@ -434,7 +466,7 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
 
         SimpleEventQuery query = this.generator.generateQuery(parameters);
 
-        Iterator<CompareQueryCondition> conditions = query.getConditions().iterator();
+        Iterator<QueryCondition> conditions = query.getConditions().iterator();
 
         assertEquals(new CompareQueryCondition(Event.FIELD_DATE, this.startDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
@@ -443,13 +475,11 @@ public class EventQueryGeneratorTest extends AbstractQueryGeneratorTest
         assertEquals(
             new CompareQueryCondition(Event.FIELD_DATE, this.pref1StartDate, CompareType.GREATER_OR_EQUALS, false),
             conditions.next());
+        assertEquals(new StatusQueryCondition(USER_REFERENCE.toString(), null, false), conditions.next());
         assertEquals(new CompareQueryCondition(Event.FIELD_HIDDEN, true, CompareType.EQUALS, true), conditions.next());
 
         List<SortClause> sortClause = query.getSorts();
 
         assertEquals(new SortClause(Event.FIELD_DATE, Order.DESC), sortClause.get(0));
-
-        assertEquals(USER_REFERENCE.toString(), query.getStatusEntityId());
-        assertNull(query.getStatusRead());
     }
 }

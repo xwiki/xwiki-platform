@@ -19,7 +19,9 @@
  */
 package org.xwiki.notifications.sources.internal;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -28,7 +30,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventStreamException;
-import org.xwiki.eventstream.SimpleEventQuery;
+import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.ConcatNode;
@@ -99,19 +101,19 @@ public class ExpressionNodeToEventQueryConverter
     {
         SimpleEventQuery result = new SimpleEventQuery();
 
-        parseBlock(node, result);
+        parseBlock(node, result, false);
 
         return result;
     }
 
-    private void parseBlock(ExpressionNode node, SimpleEventQuery result) throws EventStreamException
+    private void parseBlock(ExpressionNode node, SimpleEventQuery result, boolean ingroup) throws EventStreamException
     {
         if (node instanceof AbstractUnaryOperatorNode) {
-            parseUnaryOperator((AbstractUnaryOperatorNode) node, result);
+            parseUnaryOperator((AbstractUnaryOperatorNode) node, result, ingroup);
         } else if (node instanceof AbstractBinaryOperatorNode) {
-            parseBinaryOperator((AbstractBinaryOperatorNode) node, result);
+            parseBinaryOperator((AbstractBinaryOperatorNode) node, result, ingroup);
         } else if (node instanceof AbstractOperatorNode) {
-            parseOtherOperation((AbstractOperatorNode) node, result);
+            parseOtherOperation((AbstractOperatorNode) node, result, ingroup);
         } else {
             // Unsupported
             throw new EventStreamException(String.format("Unsupported block node [%s]", node));
@@ -140,15 +142,16 @@ public class ExpressionNodeToEventQueryConverter
         return value.getContent();
     }
 
-    private SimpleEventQuery parseUnaryOperator(AbstractUnaryOperatorNode operator, SimpleEventQuery result)
-        throws EventStreamException
+    private SimpleEventQuery parseUnaryOperator(AbstractUnaryOperatorNode operator, SimpleEventQuery result,
+        boolean ingroup) throws EventStreamException
     {
         if (operator instanceof NotNode) {
-            // TODO: unsupported
-            throw new EventStreamException(String.format("Unsupported not node [%s]", operator));
-        } else {
-            return result;
+            result.not();
+
+            parseBlock(operator.getOperand(), result, true);
         }
+
+        return result;
     }
 
     private void parseEqualsNode(AbstractBinaryOperatorNode operator, SimpleEventQuery result)
@@ -166,15 +169,28 @@ public class ExpressionNodeToEventQueryConverter
         }
     }
 
-    private void parseBinaryOperator(AbstractBinaryOperatorNode operator, SimpleEventQuery result)
+    private void parseBinaryOperator(AbstractBinaryOperatorNode operator, SimpleEventQuery result, boolean ingroup)
         throws EventStreamException
     {
         if (operator instanceof AndNode) {
-            parseBlock(operator.getLeftOperand(), result);
-            parseBlock(operator.getRightOperand(), result);
+            if (ingroup) {
+                result.open();
+            }
+
+            parseBlock(operator.getLeftOperand(), result, ingroup);
+            parseBlock(operator.getRightOperand(), result, ingroup);
+
+            if (ingroup) {
+                result.close();
+            }
         } else if (operator instanceof OrNode) {
-            // TODO: unsupported
-            throw new EventStreamException(String.format("Unsupported binary operator [%s]", operator));
+            result.open();
+
+            parseBlock(operator.getLeftOperand(), result, true);
+            result.or();
+            parseBlock(operator.getRightOperand(), result, true);
+
+            result.close();
         } else if (operator instanceof EqualsNode) {
             parseEqualsNode(operator, result);
         } else if (operator instanceof NotEqualsNode) {
@@ -215,29 +231,41 @@ public class ExpressionNodeToEventQueryConverter
         }
     }
 
-    private void parseOtherOperation(AbstractOperatorNode operator, SimpleEventQuery result) throws EventStreamException
+    private void parseOtherOperation(AbstractOperatorNode operator, SimpleEventQuery result, boolean ingroup)
+        throws EventStreamException
     {
         if (operator instanceof InNode) {
-            // TODO: Unsupported
-            throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
+            InNode inNode = (InNode) operator;
+            if (inNode.getLeftOperand() instanceof PropertyValueNode) {
+                List<Object> values = new ArrayList<>(inNode.getValues().size());
+                for (AbstractValueNode valueNode : inNode.getValues()) {
+                    values.add(getValue(valueNode));
+                }
+
+                result.in(getProperty((PropertyValueNode) inNode.getLeftOperand()), values);
+            } else {
+                // TODO: Unsupported
+                throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
+            }
         } else if (operator instanceof InSubQueryNode) {
             // TODO: Unsupported
             throw new EventStreamException(String.format(FORMAT_UNSUPPORTED_OPERATOR, operator));
         } else if (operator instanceof OrderByNode) {
             OrderByNode order = (OrderByNode) operator;
 
-            parseBlock(order.getQuery(), result);
+            parseBlock(order.getQuery(), result, ingroup);
 
             result.addSort(getProperty(order.getProperty()),
-                order.getOrder() == Order.ASC ? org.xwiki.eventstream.SortableEventQuery.SortClause.Order.ASC
-                    : org.xwiki.eventstream.SortableEventQuery.SortClause.Order.DESC);
+                order.getOrder() == Order.ASC ? org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order.ASC
+                    : org.xwiki.eventstream.query.SortableEventQuery.SortClause.Order.DESC);
         } else if (operator instanceof ForUserNode) {
             ForUserNode forUser = (ForUserNode) operator;
 
-            if (forUser.getUser() != null) {
+            if (forUser.getUser() != null && forUser.isRead() != null) {
+                result.withStatus(this.serializer.serialize(forUser.getUser()), forUser.isRead());
+            } else if (forUser.getUser() != null) {
                 result.withStatus(this.serializer.serialize(forUser.getUser()));
-            }
-            if (forUser.isRead() != null) {
+            } else if (forUser.isRead() != null) {
                 result.withStatus(forUser.isRead());
             }
         } else {

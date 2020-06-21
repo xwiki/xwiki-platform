@@ -155,7 +155,7 @@ if (!params.type || params.type == 'standard') {
 		// - The previous build was triggered by an upstream job (like rendering triggering platform)
 		def shouldExecute = false
 		currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
-			if (it.toString().contains('SCMTriggerCause') {
+			if (it.toString().contains('SCMTriggerCause')) {
 				echoXWiki 'Executing docker-latest because it was triggered by a SCM commit'
 				shouldExecute = true
 			}

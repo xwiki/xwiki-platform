@@ -145,14 +145,22 @@ if (!params.type || params.type == 'standard') {
   if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
 		// We trigger the build under two conditions:
 		// - The previous build has been triggered by a SCM change
-		// - This build was triggered by an upstream job (like rendering triggering platform)
-		if (!currentBuild.rawBuild.getCauses()[0].toString().contains('SCMTriggerCause')
-			|| currentBuild.rawBuild.getCauses()[0].toString().contains('UpstreamCause'))
-		{
-		  buildDocker(params.type)
+		// - The previous build was triggered by an upstream job (like rendering triggering platform)
+		def shouldExecute = false
+		currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
+			if (it.toString().contains('SCMTriggerCause') {
+				echoXWiki 'Executing docker-latest because it was triggered by a SCM commit'
+				shouldExecute = true
+			}
+			if (it.toString().contains('UpstreamCause')) {
+				echoXWiki 'Executing docker-latest because it was triggered by an upstream job'
+				shouldExecute = true
+			}
+		}
+		if (shouldExecute) {
+			buildDocker(params.type)
 		} else {
-		  echoXWiki "No changeset found in previous build and build not triggered by an upstream job, thus not executing \
-		  	the docker latest tests."
+		  echoXWiki 'No SCM trigger nor upstream job trigger, thus not executing the docker latest tests. Aborting.'
 		  // Aborting so that the build isn't displayed as successful without doing anything.
 		  currentBuild.result = 'ABORTED'
 		}

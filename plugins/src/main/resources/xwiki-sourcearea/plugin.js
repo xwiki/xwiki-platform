@@ -42,7 +42,7 @@
         if (editor.elementMode === CKEDITOR.ELEMENT_MODE_INLINE) {
           // Make the text area auto-resize to fit the content. Initialize with the height of the content edited in-line
           // in order to prevent UI flickering.
-          jQuery(textArea.$).autoHeight(contentsSpace.getSize('height', true));
+          initAutoHeight(textArea.$, contentsSpace.getSize('height', true));
         } else {
           textArea.addClass('cke_reset');
         }
@@ -130,19 +130,28 @@
   });
 
   // Credits: https://stackoverflow.com/a/25621277
-  jQuery.fn.autoHeight = jQuery.fn.autoHeight || function(initialHeight) {
-    var autoHeight = function(element) {
-      return jQuery(element).css({
+  // The text area needs to be the only child of its parent in order for this to work.
+  var initAutoHeight = function(textArea, initialHeight) {
+    var autoHeight = function(textArea) {
+      var $textArea = jQuery(textArea);
+      // Set the text area height on its parent (wrapper) in order to reserve the vertical space that the text area
+      // currently takes so that the page layout doesn't change while we compute the updated text area height. If we
+      // don't do this then the page vertical scroll position changes after we update the text area height and this
+      // makes the caret "jump" up or down which is very annoying.
+      $textArea.parent().css('min-height', $textArea.height() + 'px');
+      // Update the text area height.
+      $textArea.css({
         'height': 'auto',
         'overflow-y': 'hidden'
-      }).height(element.scrollHeight);
+      }).height(textArea.scrollHeight);
+      // Restore the parent (wrapper) styles.
+      $textArea.parent().css('min-height', '');
+      return $textArea;
     };
-    return this.each(function() {
-      var $this = initialHeight ? jQuery(this).height(initialHeight) : autoHeight(this);
-      // Make sure we don't register the input listener twice.
-      $this.off('input.autoHeight').on('input.autoHeight', function() {
-        autoHeight(this);
-      });
+    var $textArea = initialHeight ? jQuery(textArea).height(initialHeight) : autoHeight(textArea);
+    // Make sure we don't register the input listener twice.
+    $textArea.off('input.autoHeight').on('input.autoHeight', function() {
+      autoHeight(this);
     });
   };
 })();

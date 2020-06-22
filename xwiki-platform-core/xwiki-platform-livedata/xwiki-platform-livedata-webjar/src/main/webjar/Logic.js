@@ -71,7 +71,7 @@ define(["jquery", "polyfills"], function ($, _pollyfills) {
    * @param {Object} eventData The data associated with the event.
    *  The livedata object reference is automatically added
    */
-  Logic.prototype._triggerEvent = function (eventName, eventData) {
+  Logic.prototype.triggerEvent = function (eventName, eventData) {
     // configure event
     var defaultData = {
       livedata: this,
@@ -120,7 +120,7 @@ define(["jquery", "polyfills"], function ($, _pollyfills) {
         self.element.appendChild(self.layouts[layoutId]);
         self.data.query.currentLayout = layoutId;
         // dispatch events
-        self._triggerEvent("layoutChange", {
+        self.triggerEvent("layoutChange", {
           layout: self.layouts[layoutId],
           layoutId: layoutId,
           previousLayoutId: previousLayoutId,
@@ -245,7 +245,7 @@ define(["jquery", "polyfills"], function ($, _pollyfills) {
       this.data.query.sort.splice(currentLevel, 1);
     }
     // dispatch events
-    this._triggerEvent("sort", {
+    this.triggerEvent("sort", {
       property: property,
       level: level,
       descending: descending,
@@ -357,7 +357,7 @@ define(["jquery", "polyfills"], function ($, _pollyfills) {
     }
     this.data.query.filters[filterEntry.property].splice(index, 0, filterEntry);
     // dispatch events
-    this._triggerEvent("filter", {
+    this.triggerEvent("filter", {
       property: filterEntry.property,
       operator: filterEntry.operator,
       value: filterEntry.value,

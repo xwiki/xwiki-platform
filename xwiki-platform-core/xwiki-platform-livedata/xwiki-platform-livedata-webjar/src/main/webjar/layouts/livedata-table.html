@@ -1,7 +1,7 @@
 <template>
   <div class="livedata-table-layout">
 
-    <div ref="dropdownMenu"></div>
+    <div ref="topbar"></div>
 
     <!-- Table component -->
     <table class="livedata-table">
@@ -95,10 +95,10 @@
  */
 define([
   "Vue",
-  "dropdownMenu",
+  BASE_PATH + "topbar.js",
 ], function (
   Vue,
-  createDropdownMenu,
+  createTopBar,
 ) {
 
   Vue.component("livedata-table", {
@@ -129,8 +129,8 @@ define([
     },
 
     mounted: function () {
-      var dropdownMenu = createDropdownMenu(this.logic);
-      this.$refs.dropdownMenu.append(dropdownMenu);
+      var topbar = createTopBar(this.logic);
+      this.$refs.topbar.append(topbar);
     },
 
   });

@@ -1,0 +1,152 @@
+<template>
+  <div class="livedata-topbar">
+
+    <!-- Drowpdown -->
+    <div ref="dropdownMenu"></div>
+
+    <!-- Sort Panel -->
+    <div
+      class="livedata-panel livedata-panel-sort panel panel-default"
+      v-show="sortPanelOpen"
+    >
+      <div class="panel-heading">
+        <span>
+          <span class="fa fa-sort"></span> Sort
+        </span>
+        <span
+          class="close-button"
+          @click="sortPanelOpen = false"
+        >
+          <span class="fa fa-times"></span>
+        </span>
+
+      </div>
+
+      <div class="panel-body">
+
+        <!-- A sort entry -->
+        <div
+          class="sort-entry"
+          v-for="(sortEntry, level) in data.query.sort"
+          :key="level"
+        >
+          <!-- property select -->
+          <select
+            @change="logic.sort($event.target.value, level)"
+          >
+            <option
+              v-for="(property, i) in data.query.properties"
+              :key="i"
+              :value="property"
+              :selected="property === sortEntry.property"
+            >{{ property }}</option>
+          </select>
+
+          <!-- direction select -->
+          <select
+            @change="logic.sort(sortEntry.property, level, $event.target.value === 'true')"
+          >
+            <option
+              value="false"
+              :selected="!sortEntry.descending"
+            >Ascending</option>
+            <option
+              value="true"
+              :selected="sortEntry.descending"
+            >Descending</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+
+
+  </div>
+</template>
+
+
+<script>
+/*
+  * See the NOTICE file distributed with this work for additional
+  * information regarding copyright ownership.
+  *
+  * This is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of
+  * the License, or (at your option) any later version.
+  *
+  * This software is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this software; if not, write to the Free
+  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  */
+define([
+  "Vue",
+  BASE_PATH + "dropdownMenu.js",
+], function (
+  Vue,
+  createDropdownMenu,
+) {
+  Vue.component("top-bar", {
+
+    name: "top-bar",
+
+    template: template,
+
+    props: {
+      logic: Object,
+    },
+
+    data: function () {
+      return {
+        sortPanelOpen: false,
+      };
+    },
+
+    computed: {
+      data: function () { return this.logic.data; },
+    },
+
+    mounted: function () {
+      var self = this;
+      // create dropdown
+      var dropdownMenu = createDropdownMenu(this.logic);
+      this.$refs.dropdownMenu.parentNode.replaceChild(dropdownMenu, this.$refs.dropdownMenu);
+      // listen for event from the dropdown
+      this.logic.element.addEventListener("xwiki:livedata:toggleSortPanel", function () {
+        self.sortPanelOpen = !self.sortPanelOpen;
+      });
+    },
+
+  });
+});
+</script>
+
+
+<style>
+
+.livedata-panel .panel-heading {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.close-button {
+  position: absolute;
+  top: 0; right: 0;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0 15px;
+  cursor: pointer;
+}
+
+</style>

@@ -123,7 +123,11 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
 
             // DriverClass & url
             String jdbcDriverClass = (String) props.get(Environment.DRIVER);
-            dbcpProperties.put("driverClassName", jdbcDriverClass);
+            // Some drivers register themselves automatically using the Service Loader mechanism and thus we don't need
+            // to set the Hibernate "driverClassName" property.
+            if (jdbcDriverClass != null) {
+                dbcpProperties.put("driverClassName", jdbcDriverClass);
+            }
 
             String jdbcUrl = System.getProperty(Environment.URL);
             if (jdbcUrl == null) {
@@ -222,7 +226,7 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
             conn.close();
 
             // Log pool statistics before continuing.
-            logStatistics(new Exception("configure() finished"));
+            logStatistics();
         } catch (Exception e) {
             String message = "Could not create a DBCP pool. There is an error in the Hibernate configuration file, "
                 + "please review it.";
@@ -253,7 +257,7 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
         try {
             conn = this.ds.getConnection();
         } finally {
-            logStatistics(new Exception("getConnection() finished"));
+            logStatistics();
         }
         return conn;
     }
@@ -264,14 +268,14 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
         try {
             conn.close();
         } finally {
-            logStatistics(new Exception("closeConnection() finished"));
+            logStatistics();
         }
     }
 
     public void close() throws HibernateException
     {
         SHUTDOWN_LOGGER.debug("Stopping Database Connection Pool...");
-        logStatistics(new Exception("close"));
+        logStatistics();
         try {
             if (this.ds != null) {
                 this.ds.close();
@@ -307,14 +311,6 @@ public class DBCPConnectionProvider implements ConnectionProvider, Configurable,
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("active: [{}] (max: [{}]), idle: [{}] (max: [{}])", this.ds.getNumActive(),
                 this.ds.getMaxTotal(), this.ds.getNumIdle(), this.ds.getMaxIdle());
-        }
-    }
-
-    private void logStatistics(Exception e)
-    {
-        logStatistics();
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Context of call", e);
         }
     }
 

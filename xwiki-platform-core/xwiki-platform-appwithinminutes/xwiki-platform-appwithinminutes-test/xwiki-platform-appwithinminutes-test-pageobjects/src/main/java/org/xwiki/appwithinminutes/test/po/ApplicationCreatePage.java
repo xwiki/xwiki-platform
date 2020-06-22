@@ -80,14 +80,9 @@ public class ApplicationCreatePage extends ViewPage
     public void waitForApplicationNamePreview()
     {
         final String appName = this.locationPicker.getTitle();
-        getDriver().waitUntilCondition(new ExpectedCondition<Boolean>()
-        {
-            @Override
-            public Boolean apply(WebDriver driver)
-            {
-                List<WebElement> previews = driver.findElements(By.className("appName-preview"));
-                return previews.size() == 1 && previews.get(0).getText().contains(appName);
-            }
+        getDriver().waitUntilCondition(driver -> {
+            List<WebElement> previews = driver.findElements(By.className("appName-preview"));
+            return previews.size() == 1 && previews.get(0).getText().contains(appName);
         });
     }
 

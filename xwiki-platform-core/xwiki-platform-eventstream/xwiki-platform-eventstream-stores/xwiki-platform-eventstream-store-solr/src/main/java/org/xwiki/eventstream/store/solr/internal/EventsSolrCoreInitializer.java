@@ -81,43 +81,39 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     @Override
     protected void createSchema() throws SolrException
     {
-        addStringField(Event.FIELD_GROUPID, false, false);
-        addPDateField(Event.FIELD_DATE, false, false);
-        addStringField(Event.FIELD_IMPORTANCE, false, false);
-        addStringField(Event.FIELD_TITLE, false, false);
-        addStringField(Event.FIELD_BODY, false, false);
-        addStringField(Event.FIELD_APPLICATION, false, false);
-        addStringField(Event.FIELD_STREAM, false, false);
-        addStringField(Event.FIELD_TYPE, false, false);
-        addStringField(Event.FIELD_WIKI, false, false);
-        addStringField(Event.FIELD_SPACE, false, false);
-        addStringField(Event.FIELD_DOCUMENT, false, false);
-        addStringField(Event.FIELD_DOCUMENTVERSION, false, false);
-        addStringField(Event.FIELD_RELATEDENTITY, false, false);
-        addStringField(Event.FIELD_USER, false, false);
-        addStringField(Event.FIELD_URL, false, false);
-        addStringField(Event.FIELD_DOCUMENTTITLE, false, false);
-        addStringField(Event.FIELD_TARGET, true, false);
-        addBooleanField(Event.FIELD_HIDDEN, false, false);
-        addBooleanField(Event.FIELD_PREFILTERED, false, false);
+        setStringField(Event.FIELD_GROUPID, false, false);
+        setPDateField(Event.FIELD_DATE, false, false);
+        setStringField(Event.FIELD_IMPORTANCE, false, false);
+        setStringField(Event.FIELD_TITLE, false, false);
+        setStringField(Event.FIELD_BODY, false, false);
+        setStringField(Event.FIELD_APPLICATION, false, false);
+        setStringField(Event.FIELD_STREAM, false, false);
+        setStringField(Event.FIELD_TYPE, false, false);
+        setStringField(Event.FIELD_WIKI, false, false);
+        setStringField(Event.FIELD_SPACE, false, false);
+        setStringField(Event.FIELD_DOCUMENT, false, false);
+        setStringField(Event.FIELD_DOCUMENTVERSION, false, false);
+        setStringField(Event.FIELD_RELATEDENTITY, false, false);
+        setStringField(Event.FIELD_USER, false, false);
+        setStringField(Event.FIELD_URL, false, false);
+        setStringField(Event.FIELD_DOCUMENTTITLE, false, false);
+        setStringField(Event.FIELD_TARGET, true, false);
+        setBooleanField(Event.FIELD_HIDDEN, false, false);
+        setBooleanField(Event.FIELD_PREFILTERED, false, false);
 
-        addStringField(SOLR_FIELD_READLISTENERS, true, false);
-        addStringField(SOLR_FIELD_UNREADLISTENERS, true, false);
+        setStringField(SOLR_FIELD_READLISTENERS, true, false);
+        setStringField(SOLR_FIELD_UNREADLISTENERS, true, false);
 
-        addMapField(SOLR_FIELD_PROPERTIES);
+        setMapField(SOLR_FIELD_PROPERTIES);
 
-        migrateSchema(SCHEMA_VERSION_12_3);
+        // Add support for searching various forms of references
+        setStringField(FIELD_SPACE_INDEX, true, false, SOLR_FIELD_STORED, false);
+        setStringField(FIELD_DOCUMENT_INDEX, true, false, SOLR_FIELD_STORED, false);
     }
 
     @Override
     protected void migrateSchema(long cversion) throws SolrException
     {
-        if (cversion < SCHEMA_VERSION_12_5) {
-            // Add support for searching various forms of references
-            //setStringField(FIELD_SPACE_INDEX, true, false, SOLR_FIELD_STORED, false);
-            //setStringField(FIELD_DOCUMENT_INDEX, true, false, SOLR_FIELD_STORED, false);
-            setStringField(FIELD_SPACE_INDEX, true, false);
-            setStringField(FIELD_DOCUMENT_INDEX, true, false);
-        }
+        // Not needed yet
     }
 }

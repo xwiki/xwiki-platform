@@ -17,7 +17,7 @@
           v-for="property in properties"
           :key="property.id"
         >
-          <strong>{{ property.name }}:</strong>
+          <strong class="property-name">{{ property.name }}:</strong>
           <span
             class="value"
             v-displayer="{property: property, entry: entry}"
@@ -96,6 +96,21 @@ define([
   border-radius: 1rem;
 }
 
+.livedata-cards-layout .card-property {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.livedata-cards-layout .property-name {
+  margin-right: 0.5em;
+}
+
+.livedata-cards-layout .value {
+  flex-grow: 1;
+}
+
 @supports (display: grid) {
 
   .livedata-cards-layout .livedata-cards {
@@ -106,10 +121,6 @@ define([
 
   .livedata-cards-layout .card {
     margin: 0;
-  }
-
-  .livedata-cards-layout .value {
-    display: inline-block;
   }
 
 }

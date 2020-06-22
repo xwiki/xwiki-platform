@@ -105,7 +105,8 @@
   #set ($results = $services.mail.storage.load($filterMap, $offset, $limit, $order, $orderDirection))
   ## If there's an error then log it since we cannot return an error to the Livetable
   #if ($services.mail.sender.lastError)
-    $services.logging.getLogger('Mail Store Livetable').error('Failed to load mails from store', $services.mail.sender.lastError)
+    $services.logging.getLogger('Mail Status Livetable').error('Failed to load mails from store',
+    $services.mail.sender.lastError)
     ## Return an empty result in case of error
     #set ($result = $collectiontool.getArrayList())
   #end

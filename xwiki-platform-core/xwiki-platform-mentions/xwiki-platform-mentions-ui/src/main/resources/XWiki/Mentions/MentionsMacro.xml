@@ -161,7 +161,7 @@
     }
     
     var counter = existingIds.length + 1;
-    var refId = reference.replaceAll(/[.:]/g, '-');
+    var refId = reference.replace(/[.:]/g, '-');
     var proposedAnchor = refId + "-" + counter;
     while (existingIds.indexOf(proposedAnchor) != -1) {
       counter++;

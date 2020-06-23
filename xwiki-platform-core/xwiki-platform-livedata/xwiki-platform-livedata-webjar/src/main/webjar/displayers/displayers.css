@@ -36,3 +36,10 @@
 .livedata-displayer {
   min-height: 1em;
 }
+
+
+.livedata-displayer .explicit-empty-value::before {
+  content: attr(data-text);
+  font-style: italic;
+  color: grey;
+}

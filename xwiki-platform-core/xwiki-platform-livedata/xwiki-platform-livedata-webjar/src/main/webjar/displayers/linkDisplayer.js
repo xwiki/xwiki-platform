@@ -45,15 +45,18 @@ define([
     return new Promise (function (resolve, reject) {
 
       // default href
-      var href = params.config.propertyHref && params.entry[params.config.propertyHref];
-      // default text
-      var text = params.value || href;
+      var href = params.config.propertyHref && params.entry[params.config.propertyHref] || "#";
 
       // create element
       var element = document.createElement("a");
-      if (text !== undefined && text !== null) {
-        element.href = href || "#";
-        element.innerText = text;
+      element.href = href ;
+      if (params.value) {
+        element.innerText = params.value;
+      } else {
+        var emptyValue = document.createElement("span");
+        emptyValue.className = "explicit-empty-value";
+        emptyValue.setAttribute("data-text", "- no title -");
+        element.appendChild(emptyValue);
       }
 
       resolve(element);

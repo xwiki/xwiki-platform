@@ -20,8 +20,8 @@
 
 
 define([
-  "jquery",
-], function ($) {
+  "polyfills"
+], function () {
 
   /**
    * Load the displayer custom css to the page
@@ -51,8 +51,6 @@ define([
 
     this.element = undefined;
     this.initElement();
-
-    this.view();
 
   };
 
@@ -112,17 +110,18 @@ define([
    * Create viewer element for the displayer
    * This method can be overriden by other displayers that inherit from this one
    * Parameters are given by the Displayer.prototype.view function
-   * Must resolve the given promise at the end
-   * @param {Object} defer A jquery promise that must be resolved when the viewer has been created
    * @param {object} params An object containing useful data for the displayer.
    *  Param object detail can be found in the Displayer.prototype._createParameters method
+   * @returns {Promise}
    */
-  Displayer.prototype.createView = function (defer, params) {
-    var element = document.createElement("div");
-    if (params.value !== undefined && params.value !== null) {
-      element.innerText = params.value;
-    }
-    defer.resolve(element);
+  Displayer.prototype.createView = function (params) {
+    return new Promise (function (resolve, reject) {
+      var element = document.createElement("div");
+      if (params.value !== undefined && params.value !== null) {
+        element.innerText = params.value;
+      }
+      resolve(element);
+    });
   };
 
 
@@ -131,43 +130,51 @@ define([
    * Create editor element for the displayer
    * This method can be overriden by other displayers that inherit from this one
    * Parameters are given by the Displayer.prototype.edit function
-   * Must resolve the given promise at the end
-   * @param {Object} defer A jquery promise that must be resolved when the editor has been created
    * @param {object} params An object containing useful data for the displayer.
    *  Param object detail can be found in the Displayer.prototype._createParameters method
+   * @returns {Promise}
    */
-  Displayer.prototype.createEdit = function (defer, params) {
+  Displayer.prototype.createEdit = function (params) {
     var self = this;
-    var input = document.createElement("input");
-    input.size = 1;
-    input.style.width = "100%";
-    if (params.value !== undefined && params.value !== null) {
-      input.value = params.value;
-    }
-    input.focus();
+    return new Promise (function (resolve, reject) {
+      var input = document.createElement("input");
+      input.size = 1;
+      input.style.width = "100%";
+      if (params.value !== undefined && params.value !== null) {
+        input.value = params.value;
+      }
+      input.focus();
 
-    // validate / abort changes
-    input.onfocusout = function () {
-      self.applyEdit(input.value);
-    };
-    input.onkeydown = function (e) {
-      if (e.keyCode === 13 /*ENTER*/) {
+      // validate / abort changes
+      input.onfocusout = function () {
         self.applyEdit(input.value);
-      }
-      if (e.keyCode === 27 /*ESCAPE*/) {
-        self.abortEdit();
-      }
-    };
-    defer.resolve(input);
+      };
+      input.onkeydown = function (e) {
+        if (e.keyCode === 13 /*ENTER*/) {
+          self.applyEdit(input.value);
+        }
+        if (e.keyCode === 27 /*ESCAPE*/) {
+          self.abortEdit();
+        }
+      };
+      resolve(input);
+    });
   };
 
-
+  /**
+   * Modify property with the given value, then switch back to view mode
+   * @param {String} newValue
+   */
   Displayer.prototype.applyEdit = function (newValue) {
     // should call a logic API instead, but this is just for quick prove of concept
     this.entryData[this.propertyId] = newValue;
     this.view();
     this.element.focus();
   };
+
+  /**
+   * Switch back to view mode, discarding any changes in edit mode
+   */
   Displayer.prototype.abortEdit = function () {
     this.view();
     this.element.focus();
@@ -178,41 +185,36 @@ define([
    * Call this.createView and append viewer to the displayer root element
    */
   Displayer.prototype.view = function () {
-    var self = this;
-    var defer = $.Deferred();
-    var params = this._createParameters();
-
-    this.createView(defer, params);
-    defer.done(function (element) {
-      self.element.innerHTML = "";
-      self.element.appendChild(element);
-    });
-
     this.isView = true;
     this.element.classList.remove("edit");
     this.element.classList.add("view");
+
+    var self = this;
+    var params = this._createParameters();
+    return this.createView(params)
+    .then(function (element) {
+      self.element.innerHTML = "";
+      self.element.appendChild(element);
+    });
   };
 
   /**
    * Call this.createEdit and append editor to the displayer root element
    */
   Displayer.prototype.edit = function () {
-    var self = this;
-    var defer = $.Deferred();
-    var params = this._createParameters();
+    this.isView = false;
+    this.element.classList.remove("view");
+    this.element.classList.add("edit");
 
-    this.createEdit(defer, params);
-    defer.done(function (element) {
+    var self = this;
+    var params = this._createParameters();
+    return this.createEdit(params)
+    .then(function (element) {
       self.element.innerHTML = "";
       self.element.appendChild(element);
       element.focus();
     });
-
-    this.isView = false;
-    this.element.classList.remove("view");
-    this.element.classList.add("edit");
   };
-
 
 
   return Displayer;

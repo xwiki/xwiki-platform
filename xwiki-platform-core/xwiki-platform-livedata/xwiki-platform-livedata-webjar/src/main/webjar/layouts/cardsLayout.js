@@ -35,8 +35,9 @@ define([
     Vue.directive("displayer", {
       bind: function (el, binding) {
         logic.createDisplayer(binding.value.property.id, binding.value.entry)
-        .done(function (displayer) {
+        .then(function (displayer) {
           el.appendChild(displayer.element);
+          displayer.view();
         });
       },
     });

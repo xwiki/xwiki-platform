@@ -40,12 +40,17 @@ define([
    * Create html viewer element for the displayer
    * Override the default inherted method
    */
-  HTMLDisplayer.prototype.createView = function (defer, params) {
-    var element = document.createElement("div");
-    if (params.value !== undefined && params.value !== null) {
-      element.innerHTML = params.value;
-    }
-    defer.resolve(element);
+  HTMLDisplayer.prototype.createView = function (params) {
+    return new Promise (function (resolve, reject) {
+
+      var element = document.createElement("div");
+      if (params.value !== undefined && params.value !== null) {
+        element.innerHTML = params.value;
+      }
+
+      resolve(element);
+
+    });
 
   };
 

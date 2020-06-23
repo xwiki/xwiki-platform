@@ -19,7 +19,8 @@
  */
 
 define([
-  BASE_PATH + "displayers/defaultDisplayer.js"
+  BASE_PATH + "displayers/defaultDisplayer.js",
+  "polyfills",
 ], function (
   DefaultDisplayer
 ) {
@@ -40,20 +41,25 @@ define([
    * Create link viewer element for the displayer
    * Override the default inherted method
    */
-  LinkDisplayer.prototype.createView = function (defer, params) {
-    // default href
-    var propertyHref = params.config.propertyHref && params.entry[params.config.propertyHref];
-    var href = propertyHref || params.config.href;
-    // default text
-    var text = params.value || href;
-    // create element
-    var element = document.createElement("a");
-    if (text !== undefined && text !== null) {
-      element.href = href || "#";
-      element.innerText = text;
-    }
-    defer.resolve(element);
+  LinkDisplayer.prototype.createView = function (params) {
+    return new Promise (function (resolve, reject) {
 
+      // default href
+      var propertyHref = params.config.propertyHref && params.entry[params.config.propertyHref];
+      var href = propertyHref || params.config.href;
+      // default text
+      var text = params.value || href;
+
+      // create element
+      var element = document.createElement("a");
+      if (text !== undefined && text !== null) {
+        element.href = href || "#";
+        element.innerText = text;
+      }
+
+      resolve(element);
+
+    });
   };
 
 

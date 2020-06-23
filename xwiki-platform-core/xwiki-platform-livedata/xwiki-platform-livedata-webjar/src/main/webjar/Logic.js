@@ -19,9 +19,9 @@
  */
 
 
-define(["jquery", "polyfills"], function ($, _pollyfills) {
+define(["jquery", "polyfills"], function ($) {
 
-  /**
+  /**>
    * Map the element to its data object
    * So that each instance of the livedata on the page handle there own data
    */
@@ -92,21 +92,23 @@ define(["jquery", "polyfills"], function ($, _pollyfills) {
   /**
    * Load a layout, or default layout if none specified
    * @param {String} layoutId The id of the layout to load with requireJS
-   * @returns {Object} A jquery promise
+   * @returns {Promise}
    */
   Logic.prototype.changeLayout = function (layoutId) {
     var self = this;
-    var defer = $.Deferred();
+    return new Promise (function (resolve, reject) {
 
-    layoutId = layoutId || this.data.meta.defaultLayout;
-    if (layoutId === this.data.query.currentLayout) { return defer.resolve(this.layouts[layoutId]); }
-    if (!this.data.meta.layoutDescriptors[layoutId]) { return defer.reject(); }
-    if (this.data.meta.layouts.indexOf(layoutId) === -1) { return defer.reject(); }
+      layoutId = layoutId || self.data.meta.defaultLayout;
+      // layout already loaded
+      if (layoutId === self.data.query.currentLayout && self.layouts[layoutId]) {
+        return void resolve(thselfis.layouts[layoutId]);
+      }
+      // bad layout
+      if (!self.data.meta.layoutDescriptors[layoutId]) { return void reject(); }
+      if (self.data.meta.layouts.indexOf(layoutId) === -1) { return void reject(); }
 
-    // load layout based on it's filename
-    require([BASE_PATH + "layouts/" + this.data.meta.layoutDescriptors[layoutId].file],
-      // load success
-      function (createLayout) {
+      // requirejs success callback
+      var loadLayoutSuccess = function (createLayout) {
         var previousLayoutId = self.data.query.currentLayout;
         // remove current layout from the page
         if (previousLayoutId && self.layouts[previousLayoutId]) {
@@ -125,28 +127,37 @@ define(["jquery", "polyfills"], function ($, _pollyfills) {
           layoutId: layoutId,
           previousLayoutId: previousLayoutId,
         });
-        defer.resolve(self.layouts[layoutId]);
-      },
+        resolve(self.layouts[layoutId]);
+      };
 
-      // load failure
-      function (err) {
+      // requirejs error callback
+      var loadLayoutFailure = function (err) {
         console.warn(err);
         // try to load default layout instead
         if (layoutId !== self.data.meta.defaultLayout) {
           self.changeLayout(self.data.meta.defaultLayout).then(function (layout) {
-            defer.resolve(layout);
+            resolve(layout);
           }, function () {
-            defer.reject();
+            reject();
           });
         } else {
           console.error(err);
-          defer.reject();
+          reject();
         }
-      }
-    );
+      };
 
-    return defer.promise();
+      // load layout based on it's filename
+      require([BASE_PATH + "layouts/" + self.data.meta.layoutDescriptors[layoutId].file],
+        loadLayoutSuccess,
+        loadLayoutFailure
+      );
+
+    });
   };
+
+
+
+
 
 
 
@@ -168,41 +179,46 @@ define(["jquery", "polyfills"], function ($, _pollyfills) {
    * Return a new displayer based on the specified property and row data
    * @param {String} propertyId The id of the property of the entry
    * @param {Object} entry The entry data object
-   * @param {String} displayerId The
+   * @param {String} displayerId
+   * @returns {Promise}
    */
   Logic.prototype.createDisplayer = function (propertyId, entry, displayerId) {
     var self = this;
-    var defer = $.Deferred();
 
-    // default displayerId
-    if (displayerId === undefined) {
-      displayerId = ((this.getPropertyDescriptor(propertyId) || {}).displayer || {}).id || "default";
-    }
+    return new Promise (function (resolve, reject) {
+      // default displayerId
+      if (displayerId === undefined) {
+        displayerId = ((self.getPropertyDescriptor(propertyId) || {}).displayer || {}).id || "default";
+      }
 
-    // load displayer based on it's id
-    require([BASE_PATH + "displayers/" + displayerId + "Displayer.js"],
-      // load success
-      function (Displayer) {
+      // load success callback
+      var loadDisplayerSuccess = function (Displayer) {
         var displayer = new Displayer(propertyId, entry, self);
-        defer.resolve(displayer);
-      },
+        resolve(displayer);
+      };
 
-      // load failure
-      function (err) {
+      // load error callback
+      var loadDisplayerFailure = function (err) {
         // try to load the default displayer instead
         if (displayerId !== "default") {
           self.createDisplayer(propertyId, entry, "default").then(function (displayer) {
-            defer.resolve(displayer);
+            resolve(displayer);
           }, function () {
-            defer.reject();
+            reject();
           });
         } else {
           console.error(err);
-          defer.reject();
+          reject();
         }
-      });
+      };
 
-      return defer.promise();
+      // load displayer based on it's id
+      require([BASE_PATH + "displayers/" + displayerId + "Displayer.js"],
+        loadDisplayerSuccess,
+        loadDisplayerFailure
+      );
+
+    });
   };
 
 

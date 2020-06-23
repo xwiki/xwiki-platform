@@ -58,10 +58,10 @@ define({
       {
         id: "doc_title",
         name: "Name",
-        type: "text",
+        type: "string",
         displayer: {
-          id: "link",
-          propertyHref: "doc_url"
+          id: 'link',
+          propertyHref: "doc_url",
         },
       },
       {
@@ -75,19 +75,42 @@ define({
       {
         id: "job",
         name: "Job",
-        type: "text",
+        type: "string",
       },
       {
         id: "country",
         name: "Country",
-        type: "text",
+        type: "string",
       },
       {
         id: "other",
         name: "Autre truc",
-        type: "text",
+        type: "string",
         displayer: {
           id: "html",
+        },
+      },
+    ],
+
+    propertyTypes: [
+      {
+        id: 'string',
+        name: 'String',
+        displayer: {
+          id: 'text',
+        },
+        filter: {
+          id: 'text'
+        },
+      },
+      {
+        id: 'number',
+        name: 'Number',
+        displayer: {
+          id: 'text',
+        },
+        filter: {
+          id: 'number'
         },
       },
     ],
@@ -100,6 +123,21 @@ define({
       {
         id: "number",
         operators: ["equals", "nequals", "greater", "lower"],
+      },
+    ],
+
+    displayers: [
+      {
+        id: "default",
+      },
+      {
+        id: "text",
+      },
+      {
+        id: "link",
+      },
+      {
+        id: "html",
       },
     ],
 

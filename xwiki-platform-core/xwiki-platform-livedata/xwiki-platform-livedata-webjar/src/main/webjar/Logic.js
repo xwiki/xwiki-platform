@@ -176,6 +176,30 @@ define(["jquery", "polyfills"], function ($) {
 
 
   /**
+   * Get the displayer descriptor associated to a property id
+   * @param {String} propertyId
+   */
+  Logic.prototype.getDisplayerDescriptor = function (propertyId) {
+    if (this.data.query.properties.indexOf(propertyId) === -1) { return; }
+    // property descriptor config
+    var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+    var propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
+    // property type descriptor config
+    var typeDescriptor = this.data.meta.propertyTypes.find(function (typeDescr) {
+      return typeDescr.id === propertyDescriptor.type;
+    });
+    var typeDescriptorDisplayer = typeDescriptor.displayer || {};
+    // default displayer config
+    var displayerId = propertyDescriptorDisplayer.id || typeDescriptorDisplayer.id;
+    var displayer = this.data.meta.displayers.find(function (displayer) {
+      return displayer.id === displayerId;
+    });
+
+    return $.extend({}, displayer, typeDescriptorDisplayer, propertyDescriptorDisplayer);
+  };
+
+
+  /**
    * Return a new displayer based on the specified property and row data
    * @param {String} propertyId The id of the property of the entry
    * @param {Object} entry The entry data object
@@ -188,7 +212,7 @@ define(["jquery", "polyfills"], function ($) {
     return new Promise (function (resolve, reject) {
       // default displayerId
       if (displayerId === undefined) {
-        displayerId = ((self.getPropertyDescriptor(propertyId) || {}).displayer || {}).id || "default";
+        displayerId = self.getDisplayerDescriptor(propertyId).id;
       }
 
       // load success callback
@@ -301,19 +325,26 @@ define(["jquery", "polyfills"], function ($) {
 
 
   /**
-   * Get the filter descriptor associated to a property
-   * @param {String} property
+   * Get the filter descriptor associated to a property id
+   * @param {String} propertyId
    */
-  Logic.prototype.getFilterDescriptor = function (property) {
-    if (this.data.query.properties.indexOf(property) === -1) { return; }
-    var propertyFilter = this.getPropertyDescriptor(property).filter || {};
-    var filterId = propertyFilter.id || "text";
-    // get default filter configuration, and combine it with current property
-    var filterDescriptor = this.data.meta.filters.find(function (filterDescr) {
-      return filterDescr.id === filterId;
+  Logic.prototype.getFilterDescriptor = function (propertyId) {
+    if (this.data.query.properties.indexOf(propertyId) === -1) { return; }
+    // property descriptor config
+    var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+    var propertyDescriptorFilter = propertyDescriptor.filter || {};
+    // property type descriptor config
+    var typeDescriptor = this.data.meta.propertyTypes.find(function (typeDescr) {
+      return typeDescr.id === propertyDescriptor.type;
     });
-    $.extend(filterDescriptor, propertyFilter);
-    return filterDescriptor;
+    var typeDescriptorFilter = typeDescriptor.filter || {};
+    // default filter config
+    var filterId = propertyDescriptorFilter.id || typeDescriptorFilter.id;
+    var filter = this.data.meta.filters.find(function (filter) {
+      return filter.id === filterId;
+    });
+
+    return $.extend({}, filter, typeDescriptorFilter, propertyDescriptorFilter);
   };
 
 

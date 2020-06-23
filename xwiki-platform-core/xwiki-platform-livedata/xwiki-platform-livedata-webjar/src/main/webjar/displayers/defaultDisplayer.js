@@ -92,13 +92,12 @@ define([
    * }
    */
   Displayer.prototype._createParameters = function () {
-    var propertyDescriptor = this.logic.getPropertyDescriptor(this.propertyId);
     // return the param object
     return {
       value: this.entryData[this.propertyId],
-      property: propertyDescriptor,
+      property: this.logic.getPropertyDescriptor(this.propertyId),
       entry: this.entryData,
-      config: propertyDescriptor.displayer || {},
+      config: this.logic.getDisplayerDescriptor(this.propertyId),
       data: this.logic.data,
       logic: this.logic,
     };

@@ -62,5 +62,5 @@ define([
   };
 
 
-    return LinkDisplayer;
+  return LinkDisplayer;
 });

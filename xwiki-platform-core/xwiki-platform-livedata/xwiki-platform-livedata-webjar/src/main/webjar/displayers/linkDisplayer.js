@@ -45,8 +45,7 @@ define([
     return new Promise (function (resolve, reject) {
 
       // default href
-      var propertyHref = params.config.propertyHref && params.entry[params.config.propertyHref];
-      var href = propertyHref || params.config.href;
+      var href = params.config.propertyHref && params.entry[params.config.propertyHref];
       // default text
       var text = params.value || href;
 

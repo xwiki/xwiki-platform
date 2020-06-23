@@ -949,6 +949,16 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is:
 # edit.conflictChecking.enabled = true
 
+#-# [Since 12.5]
+#-# Indicate if the XWiki documents should be edited in-place, without leaving the view mode, whenever possible (e.g. if
+#-# the default edit mode for that document and the preferred editor both support in-place editing). When enabled,
+#-# clicking on the document Edit button makes the document title and content editable in-place, without leaving the view
+#-# mode. When disabled, clicking on the document Edit button loads the default (stand-alone) edit mode for that
+#-# document.
+#-#
+#-# The default is:
+# edit.document.inPlaceEditing.enabled = true
+
 #-------------------------------------------------------------------------------------
 # Notifications
 #-------------------------------------------------------------------------------------

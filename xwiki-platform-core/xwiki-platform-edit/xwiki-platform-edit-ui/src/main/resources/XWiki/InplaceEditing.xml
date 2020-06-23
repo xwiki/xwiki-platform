@@ -923,6 +923,11 @@ define('editInPlace', [
 });
 
 require(['jquery'], function($) {
+  // We can edit in-place only if the #xwikicontent element is present.
+  if (!$('#xwikicontent').length) {
+    return;
+  }
+
   var inplaceEditingConfig = $('div[data-inplace-editing-config]').data('inplaceEditingConfig') || {};
   var wysiwygEditorModule = 'xwiki-' + inplaceEditingConfig.wysiwygEditor + '-inline';
 
@@ -1295,7 +1300,7 @@ input#document-title-input:focus,
     <property>
       <content>{{velocity}}
 {{html clean="false"}}
-#if ($hasEdit &amp;&amp; $xcontext.action == 'view' &amp;&amp; !$doc.isNew())
+#if ($services.edit.document.inPlaceEditingEnabled() &amp;&amp; $hasEdit &amp;&amp; $xcontext.action == 'view' &amp;&amp; !$doc.isNew())
   ## We support in-place editing only for the WYSIWYG edit mode ATM.
   #getDefaultDocumentEditor($defaultEditMode)
   #if ($defaultEditMode == 'wysiwyg')
@@ -1457,8 +1462,8 @@ input#document-title-input:focus,
 ## * we're loading the original document version
 ## * the original document version has a locale specified (it doesn't make sense to translate technical documents)
 ## * the current UI locale doesn't match the original document locale
-#if ($xwiki.isMultiLingual() &amp;&amp; $tdoc.realLocale == $doc.realLocale &amp;&amp; "$!doc.realLocale" != ''
-    &amp;&amp; $doc.realLocale != $xcontext.locale)
+#if ($services.edit.document.inPlaceEditingEnabled() &amp;&amp; $hasEdit &amp;&amp; $xwiki.isMultiLingual()
+    &amp;&amp; $tdoc.realLocale == $doc.realLocale &amp;&amp; "$!doc.realLocale" != '' &amp;&amp; $doc.realLocale != $xcontext.locale)
   #set ($url = $doc.getURL('edit', $escapetool.url({'language': $xcontext.locale})))
   #set ($hint = $services.localization.render('edit.inplace.page.translate.hint',
     [$xcontext.locale.getDisplayName($xcontext.locale)]))

@@ -117,7 +117,7 @@
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDb == 'mysql' || $xwikiDb == 'mariadb'|| $xwikiDb == 'oracle')
     <property name="hibernate.dbcp.poolPreparedStatements">true</property>
-    <property name="hibernate.dbcp.maxOpenPreparedStatements">20</property>
+    <property name="hibernate.dbcp.maxOpenPreparedStatements">#if ("$!xwikiDbDbcpMaxOpenPreparedStatements" != '')${xwikiDbDbcpMaxOpenPreparedStatements}#{else}20#end</property>
 #end
 ## Note: This is starting the line in order not to put extra spaces when generated
 #if ($xwikiDbVirtualMode)

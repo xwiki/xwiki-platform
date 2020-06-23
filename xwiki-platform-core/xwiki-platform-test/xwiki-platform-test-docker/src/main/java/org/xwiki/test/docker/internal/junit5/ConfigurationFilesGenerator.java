@@ -321,6 +321,12 @@ public class ConfigurationFilesGenerator
         // Thus trying with 300 max connections to see if that's the problem.
         props.setProperty("xwikiDbDbcpMaxTotal", "300");
 
+        // Set the xwikiDbDbcpMaxOpenPreparedStatements to unlimited (default) since we saw the message
+        // "Data source rejected establishment of connection,  message from server: "Too many connections"" and at
+        // that time the number of connections (95) was well under the maximum allowed (300). Thus, as a hunch, we're
+        // trying to increase the pooled statement maximum too.
+        props.setProperty("xwikiDbDbcpMaxOpenPreparedStatements", "-1");
+
         return props;
     }
 }

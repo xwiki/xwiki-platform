@@ -878,28 +878,6 @@ store.file.directory=$xwikiPropertiesStoreFileDirectory
 # mail.sender.sendQueueCapacity = 1000
 
 #-------------------------------------------------------------------------------------
-# WatchList
-#-------------------------------------------------------------------------------------
-
-#-# [Since 10.0]
-#-# [Since 9.11.2]
-#-# Controls if the notifications feature is enabled. Default value is false.
-#-# Thanks to this option, you can disable the application without uninstalling it.
-# watchlist.enabled = false
-
-#-# [Since 7.0RC1]
-#-# Controls if the realtime notifications feature is enabled. Default value is false.
-#-# This is currently an experimental feature which is not yet ready for producton. Enabling it right now will cause
-#-# performance issues.
-#-# Once the feature stabilizes, it will be enabled by default and the option to disabled it will be removed.
-# watchlist.realtime.enabled = false
-
-#-# [Since 8.1M2]
-#-# Controls if realtime notifications are triggered by remote events. Default value is false.
-#-# Enable if you don't have watchlist loaded on all instances in cluster.
-# watchlist.realtime.allowRemote = false
-
-#-------------------------------------------------------------------------------------
 # Debug
 #-------------------------------------------------------------------------------------
 

@@ -151,17 +151,22 @@ if (!params.type || params.type == 'standard') {
   // Also always build if triggered manually by a user.
   if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
 		// We trigger the build under two conditions:
-		// - The previous build has been triggered by a SCM change
+		// - The previous build has been triggered by a SCM change or a Branch Event (not sure what this is about but it
+		//   seems we need that too since it happens when we push changes to master)
 		// - The previous build was triggered by an upstream job (like rendering triggering platform)
 		def shouldExecute = false
 		currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
 		  echoXWiki "Build trigger cause: [${it.toString()}]"
 			if (it.toString().contains('SCMTriggerCause')) {
-				echoXWiki 'Executing docker-latest because it was triggered by a SCM commit'
+				echoXWiki 'Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}'
+				shouldExecute = true
+			}
+			if (it.toString().contains('BranchEventCause')) {
+				echoXWiki 'Executing docker-latest because it was triggered by a Branch Event - ${it.getShortDescription()}'
 				shouldExecute = true
 			}
 			if (it.toString().contains('UpstreamCause')) {
-				echoXWiki 'Executing docker-latest because it was triggered by an upstream job'
+				echoXWiki 'Executing docker-latest because it was triggered by an upstream job - ${it.getShortDescription()}'
 				shouldExecute = true
 			}
 		}

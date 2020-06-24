@@ -622,17 +622,17 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 # solr.indexer.queue.capacity=100000
 
 #-# [Since 6.1M2]
-#-# Indicating if a synchronization between SOLR index and XWiki database should be run at startup.
-#-# Synchronization can be started from search administration.
+#-# Indicates if a synchronization between SOLR index and XWiki database should be performed at startup.
+#-# Synchronization can be started from the search administration UI.
 #-# The default is true.
 # solr.synchronizeAtStartup=false
 
 #-# [Since 12.5RC1]
-#-# Indicate which synchronization at startup mode to use when the previous property is set to true.
+#-# Indicates which wiki synchronization to perform when the "solr.synchronizeAtStartup" property is set to true.
 #-# Two modes are available:
-#-#   - WIKI: indicate that the synchronization is performed when each wiki started
-#-#   - FARM: indicate that the synchronization is performed once for the full farm when the application is started.
-#-# For performance reason the WIKI value is recommended.
+#-#   - WIKI: indicate that the synchronization is performed when each wiki is accessed for the first time.
+#-#   - FARM: indicate that the synchronization is performed once for the full farm when XWiki is started.
+#-# For performance reasons for large farms, the WIKI value is recommended, especially if some wikis are not used.
 #-# The default is:
 # solr.synchronizeAtStartupMode=WIKI
 

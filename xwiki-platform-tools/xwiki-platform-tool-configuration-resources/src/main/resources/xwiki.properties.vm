@@ -632,7 +632,8 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# Two modes are available:
 #-#   - WIKI: indicate that the synchronization is performed when each wiki is accessed for the first time.
 #-#   - FARM: indicate that the synchronization is performed once for the full farm when XWiki is started.
-#-# For performance reasons for large farms, the WIKI value is recommended, especially if some wikis are not used.
+#-# For large farms and in order to spread the machine's indexing load, the WIKI value is recommended, especially if
+#-# some wikis are not used.
 #-# The default is:
 # solr.synchronizeAtStartupMode=WIKI
 
@@ -1118,8 +1119,8 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-------------------------------------------------------------------------------------
 
 #-# [Since 12.5RC1]
-#-# Indicate to use the old implementation based on copy and delete, or the new implementation
-#-# using an atomic operation on database (which allows efficient rollback).
+#-# Indicate to use the old implementation based on copy and delete, or the new implementation using an atomic operation
+#-# on database (which allows efficient rollback).
 #-# This property aims at being removed in the future once the atomic rename has been validated
 #-# to work 100% fine. Only use it if you are facing an issue with the move/rename features.
 #-#

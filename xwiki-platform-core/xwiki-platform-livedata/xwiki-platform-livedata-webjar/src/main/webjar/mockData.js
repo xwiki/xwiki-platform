@@ -43,7 +43,7 @@ define({
     sort: [ {property: "age", descending: false} ],
 
     offset: 0,
-    limit: 10,
+    limit: 25,
 
   },
 
@@ -154,13 +154,19 @@ define({
       },
     },
 
+
+    pagination: {
+      maxShownPages: 10,
+      pageSizes: [10, 25, 50, 100, 250],
+    },
+
   },
 
 
 
   data: {
 
-    count: 5,
+    count: 545,
 
     entries: [
       {

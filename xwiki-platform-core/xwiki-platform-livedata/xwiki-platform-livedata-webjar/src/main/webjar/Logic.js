@@ -159,6 +159,88 @@ define(["jquery", "polyfills"], function ($) {
 
 
 
+  /**
+   * Get total number of pages
+   * @returns {Number}
+   */
+  Logic.prototype.getPageCount = function () {
+    return Math.ceil(this.data.data.count / this.data.query.limit);
+  };
+
+  /**
+   * Get the page corresponding to the specified entry (0-based index)
+   * @param {Number} entryIndex The index of the entry. Uses current entry if undefined.
+   * @returns {Number}
+   */
+  Logic.prototype.getPageIndex = function (entryIndex) {
+    if (entryIndex === undefined) {
+      entryIndex = this.data.query.offset;
+    }
+    return Math.floor(entryIndex / this.data.query.limit);
+  };
+
+  /**
+   * Set page index (0-based index), then fetch new data
+   * @param {Number} pageIndex
+   * @returns {Number}
+   */
+  Logic.prototype.setPageIndex = function (pageIndex) {
+    if (pageIndex < 0 || pageIndex >= this.getPageCount()) { return; }
+    var previousPageIndex = this.data.query.offset;
+    this.data.query.offset = this.getFirstIndexOfPage(pageIndex);
+    this.triggerEvent("pageChange", {
+      pageIndex: pageIndex,
+      previousPageIndex: previousPageIndex,
+    });
+    // CALL FUNCTION TO FETCH NEW DATA HERE
+  };
+
+  /**
+   * Get the first entry index of the given page index
+   * @param {Number} pageIndex The page index. Uses current page if undefined.
+   * @returns {Number}
+   */
+  Logic.prototype.getFirstIndexOfPage = function (pageIndex) {
+    if (pageIndex === undefined) {
+      pageIndex = this.getPageIndex();
+    }
+    if (0 <= pageIndex && pageIndex < this.getPageCount()) {
+      return pageIndex * this.data.query.limit;
+    } else {
+      return -1;
+    }
+  };
+
+  /**
+   * Get the last entry index of the given page index
+   * @param {Number} pageIndex The page index. Uses current page if undefined.
+   * @returns {Number}
+   */
+  Logic.prototype.getLastIndexOfPage = function (pageIndex) {
+    if (pageIndex === undefined) {
+      pageIndex = this.getPageIndex();
+    }
+    if (0 <= pageIndex && pageIndex < this.getPageCount()) {
+      return Math.min(this.getFirstIndexOfPage(pageIndex) + this.data.query.limit, this.data.data.count) - 1;
+    } else {
+      return -1;
+    }
+  };
+
+
+  Logic.prototype.setPageSize = function (pageSize) {
+    if (pageSize < 0) { return; }
+    var previousPageSize = this.data.query.limit;
+    this.data.query.limit = pageSize;
+    this.triggerEvent("pageSizeChange", {
+      pageSize: pageSize,
+      previousPageSize: previousPageSize,
+    });
+    // CALL FUNCTION TO FETCH NEW DATA HERE
+  };
+
+
+
 
 
 

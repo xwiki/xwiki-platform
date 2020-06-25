@@ -317,7 +317,11 @@ define('export-tree-filter', ['jquery', 'bootstrap', 'export-tree'], function($)
       exportTree.data('exportTreeFilter', exportTreeFilterData);
     }
     var tree = $.jstree.reference(exportTree);
-    exportTreeFilterData[currentFilter] = tree.get_json();
+    exportTreeFilterData[currentFilter] = {
+      // This doesn't include the root node data so we need to save that separately.
+      children: tree.get_json(),
+      data: tree.get_node($.jstree.root).data
+    }
   };
 
   var getFilterData = function(exportTree) {
@@ -330,9 +334,10 @@ define('export-tree-filter', ['jquery', 'bootstrap', 'export-tree'], function($)
   var getChildren = function(node, callback) {
     if (node.id === $.jstree.root) {
       // Use the stored tree data if available.
-      var children = getFilterData(this.element);
-      if (children) {
-        return callback(children);
+      var root = getFilterData(this.get_container());
+      if (root) {
+        node.data = root.data;
+        return callback(root.children);
       }
     }
     return originalGetChildren.apply(this, arguments);
@@ -355,11 +360,20 @@ define('export-tree-filter', ['jquery', 'bootstrap', 'export-tree'], function($)
       originalGetChildren = tree.settings.core.data;
       tree.settings.core.data = getChildren;
     }
-    tree.refresh();
+    var skipLoading = !!exportTree.data('exportTreeFilter')[filter];
+    if (skipLoading) {
+      // Disable selection cascading while refreshing the tree if the new filter has a previous state.
+      var originalCheckboxCascade = tree.settings.checkbox.cascade;
+      tree.settings.checkbox.cascade = '';
+      exportTree.one('refresh.jstree', function() {
+        tree.settings.checkbox.cascade = originalCheckboxCascade;
+      });
+    }
+    tree.refresh(skipLoading);
   };
 
   // Handle filter change.
-  $('.export-tree-filter a').click(function(event) {
+  $(document).on('click', '.export-tree-filter a', function(event) {
     event.preventDefault();
     var li = $(this).closest('li');
     if (!li.hasClass('active')) {

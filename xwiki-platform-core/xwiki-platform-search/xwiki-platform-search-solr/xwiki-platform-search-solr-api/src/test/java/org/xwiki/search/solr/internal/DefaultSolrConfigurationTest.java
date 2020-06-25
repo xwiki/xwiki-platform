@@ -112,7 +112,7 @@ public class DefaultSolrConfigurationTest
 
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
             DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("foobar");
-        assertEquals(SolrConfiguration.SynchronizeAtStartupMode.WIKI, this.configuration.synchronizeAtStartupMode());
+        assertEquals(SolrConfiguration.SynchronizeAtStartupMode.FARM, this.configuration.synchronizeAtStartupMode());
 
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
             DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("wiki");
@@ -121,5 +121,9 @@ public class DefaultSolrConfigurationTest
         when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
             DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("WIKI");
         assertEquals(SolrConfiguration.SynchronizeAtStartupMode.WIKI, this.configuration.synchronizeAtStartupMode());
+
+        when(this.source.getProperty(DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE,
+            DefaultSolrConfiguration.SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT.name())).thenReturn("");
+        assertEquals(SolrConfiguration.SynchronizeAtStartupMode.FARM, this.configuration.synchronizeAtStartupMode());
     }
 }

@@ -143,7 +143,7 @@ public class DefaultSolrConfiguration implements SolrConfiguration
      * Indicate which mode to use for synchronize at startup by default.
      */
     public static final SynchronizeAtStartupMode SOLR_SYNCHRONIZE_AT_STARTUP_MODE_DEFAULT =
-        SynchronizeAtStartupMode.WIKI;
+        SynchronizeAtStartupMode.FARM;
 
     /**
      * The Solr configuration source.

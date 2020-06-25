@@ -643,7 +643,7 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# For large farms and in order to spread the machine's indexing load, the WIKI value is recommended, especially if
 #-# some wikis are not used.
 #-# The default is:
-# solr.synchronizeAtStartupMode=WIKI
+# solr.synchronizeAtStartupMode=FARM
 
 #-------------------------------------------------------------------------------------
 # Security

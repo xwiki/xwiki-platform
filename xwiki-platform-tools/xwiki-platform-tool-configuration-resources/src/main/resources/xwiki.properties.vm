@@ -634,7 +634,7 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-#   - FARM: indicate that the synchronization is performed once for the full farm when the application is started.
 #-# For performance reason the WIKI value is recommended.
 #-# The default is:
-# solr.synchronizeAtStartupMode=WIKI
+# solr.synchronizeAtStartupMode=FARM
 
 #-------------------------------------------------------------------------------------
 # Security

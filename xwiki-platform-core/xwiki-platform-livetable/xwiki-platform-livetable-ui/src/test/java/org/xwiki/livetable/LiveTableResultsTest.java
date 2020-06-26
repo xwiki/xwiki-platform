@@ -138,7 +138,7 @@ public class LiveTableResultsTest extends PageTest
         when(query.bindValues(anyMap())).thenReturn(query);
 
         when(query.count()).thenReturn(17L);
-        when(query.execute()).thenReturn(Arrays.<Object>asList("A.B", "X.Y"));
+        when(query.execute()).thenReturn(Arrays.asList("A.B", "X.Y"));
 
         DocumentReference abReference = new DocumentReference("wiki", "A", "B");
         when(modelService.resolveDocument("A.B")).thenReturn(abReference);

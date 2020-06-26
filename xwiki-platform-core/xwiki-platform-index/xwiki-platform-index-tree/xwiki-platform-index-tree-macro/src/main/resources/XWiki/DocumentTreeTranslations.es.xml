@@ -36,13 +36,13 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>rendering.macro.documentTree.name=Jerarquía de página
+  <content>rendering.macro.documentTree.name=Jerarquía de páginas
 rendering.macro.documentTree.description=Muestra la jerarquía de páginas de XWiki.
 rendering.macro.documentTree.parameter.readOnly.name=Solo lectura
 rendering.macro.documentTree.parameter.readOnly.description=¿Debe el usuario poder modificar la estructura del árbol, siempre que tenga los permisos necesarios?
 rendering.macro.documentTree.parameter.showWikis.name=Mostrar Wikis
 rendering.macro.documentTree.parameter.showWikis.description=Indica si mostrar los nodos wiki o no. Esto sólo se puede utilizar en el wiki principal y si la fuente del árbol se ha guardado con derechos de programación.
-rendering.macro.documentTree.parameter.showWikiPrettyName.name=Mostrar el nombre amigable del Wiki
+rendering.macro.documentTree.parameter.showWikiPrettyName.name=Mostrar el nombre amigable de la wiki
 rendering.macro.documentTree.parameter.showWikiPrettyName.description=Mostrar el nombre amigable del wiki en lugar del wiki id cuando se muestra un nodo wiki.
 rendering.macro.documentTree.parameter.showSpaces.name=Mostrar espacios
 rendering.macro.documentTree.parameter.showSpaces.description=Mostrar el nombre amigable del wiki en lugar del wiki id cuando se muestra un nodo wiki.

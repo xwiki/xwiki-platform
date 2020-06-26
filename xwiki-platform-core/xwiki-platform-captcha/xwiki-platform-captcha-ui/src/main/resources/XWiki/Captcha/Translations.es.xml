@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,14 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="XWiki.OfficeImporterTranslations" locale="es">
-  <web>XWiki</web>
-  <name>OfficeImporterTranslations</name>
+<xwikidoc version="1.3" reference="XWiki.Captcha.Translations" locale="es">
+  <web>XWiki.Captcha</web>
+  <name>Translations</name>
   <language>es</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.OfficeImporter</parent>
+  <parent>XWiki.Captcha.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
@@ -36,18 +36,8 @@
   <minorEdit>false</minorEdit>
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>office.createForm.type.name=Página de Office
-office.createForm.type.description=Importar documentos de Office a páginas wiki
-office.form.error.noDocument=Debe utilizar la acción {0}create{1} para importar un documento de Office.
-office.form.append.hint=¡El documento ya existe! Añada el resultado a la página wiki existente
-
-office.config.serverType.hint=El tipo de servidor de Office. Puede ser gestionado internamente (local) o externamente (remoto).
-office.config.serverPort.hint=El número de puerto utilizado para conectarse al servidor de Office
-office.config.autoStart.hint=Especifique si el servidor de Office debe iniciarse o conectarse automáticamente al inicio de XWiki
-office.config.serverPath.hint=La ruta a la instalación de Office
-office.config.serverState.connected=Conectado
-office.config.serverState.notConnected=No conectado
-office.config.serverState.confError=Configuración no válida
-office.config.serverState.error=Error</content>
+  <content>admin.captcha=CAPTCHA
+captcha.admin.defaultCaptchaName.label=CAPTCHA predeterminado
+captcha.admin.defaultCaptchaName.hint=La implementación predeterminada de CAPTCHA a utilizar.   Accede al Gestor de Extensiones para buscar otras implementaciones que puedas instalar y usar.</content>
   
 </xwikidoc>

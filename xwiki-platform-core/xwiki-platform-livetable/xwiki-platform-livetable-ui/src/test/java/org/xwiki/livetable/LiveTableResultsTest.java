@@ -90,20 +90,26 @@ public class LiveTableResultsTest extends PageTest
         // The LiveTableResultsMacros page includes the hierarchy_macros.vm template.
         this.oldcore.getMocker().registerMockComponent(TemplateManager.class);
 
+        // The LiveTableResultsMacros page expects that the HTTP query is done with the "get" action and asking for
+        // plain output.
         setOutputSyntax(Syntax.PLAIN_1_0);
         request.put("outputSyntax", "plain");
         request.put("xpage", "plain");
         oldcore.getXWikiContext().setAction("get");
 
+        // Prepare mock Query Service so that tests can control what the DB returns.
         queryService = mock(QueryManagerScriptService.class);
         oldcore.getMocker().registerComponent(ScriptService.class, "query", queryService);
 
+        // Prepare mock ModelScriptService so that tests can control what the model returns.
         modelService = mock(ModelScriptService.class);
         oldcore.getMocker().registerComponent(ScriptService.class, "model", modelService);
 
+        // The LiveTableResultsMacros page uses the tag plugin for the LT tag cloud feature
         TagPluginApi tagPluginApi = mock(TagPluginApi.class);
         doReturn(tagPluginApi).when(oldcore.getSpyXWiki()).getPluginApi(eq("tag"), any(XWikiContext.class));
 
+        // Register velocity tools used by the LiveTableResultsMacros page
         registerVelocityTool("stringtool", new StringUtils());
         registerVelocityTool("mathtool", new MathTool());
         registerVelocityTool("regextool", new RegexTool());

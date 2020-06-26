@@ -125,7 +125,13 @@
       <cache>long</cache>
     </property>
     <property>
-      <code>require(['deferred!ckeditor', 'jquery'], function (ckeditorPromise, $) {
+      <code>require.config({
+  paths: {
+    'xwiki-suggestUsers': "$xwiki.getSkinFile('uicomponents/suggest/suggestUsersAndGroups.js', {'forceSkinAction': true, 'language': $xcontext.locale}))" +
+      "?v=$escapetool.url($xwiki.version)"
+  }
+});
+require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery'], function (ckeditorPromise, suggestUsers, $) {
   /*
    * Keep records of the added anchors during the current edit session.
    * Note that the anchors saved here are not only the ones added on the current session,
@@ -135,6 +141,11 @@
    * { reference: Array&lt;String&gt; }
    */
   const anchorIds = {};
+  
+  /**
+   * Get the current wiki scope for displaying global, local or global and local users
+   */
+  const userScope = "$!services.wiki.user.userScope";
   
   /**
    * Compute a new unique anchor for the given reference.
@@ -152,7 +163,6 @@
       existingIds = [];
       $('.xwiki-mention').each(function() {
         var mention = $(this);
-        console.log(mention.attr('data-reference'));
         if (mention.attr('data-reference') === reference) {
           existingIds.push(mention.attr('id'));
         }
@@ -170,31 +180,26 @@
     anchorIds[reference].push(proposedAnchor);
     return proposedAnchor;
   };
-  
-  const getGlobalUsers = function (params) {
-    return getUsers($.extend(params, {
-      'wiki': 'global'
-    }));
-  };
-
-  const getUsers = function (params) {
-    return $.getJSON(XWiki.currentDocument.getURL('get'), $.extend(params, {
-      'xpage': 'uorgsuggest',
-      'media': 'json',
-      'uorg': 'user'
-    }));
-  };
 
   const search = function (text, callback) {
     const params = {
       'input': text,
       'limit': 6,
     };
-    $.when(getGlobalUsers(params)).then(function (globalUsers) {
-      const cct = globalUsers.map(function (x) {
+    $.when(suggestUsers.loadUsers(userScope, params)).then(function (user) {
+      const cct = user.map(function (x) {
         // insert an id because that's required by the mentions plugins.
         x.id = x.value;
-        x.cssClass = x.icon.cssClass;
+        // Make sure to display the icon avatar or the image one.
+        if (x.icon.cssClass) {
+          x.imgClass = "hidden";
+          x.cssClass = x.icon.cssClass;
+        } else {
+          x.imgUrl = x.icon.url;
+          x.cssClass = "hidden";
+          x.imgClass = "";
+        }
+        x.iconHtml
         return x;
       });
       callback(cct);
@@ -214,6 +219,7 @@
               '&lt;div&gt;'+
                 '&lt;span class="ckeditor-autocomplete-item-icon-wrapper"&gt;'+
                   '&lt;span class="{cssClass}"&gt;&lt;/span&gt;'+
+                  '&lt;img src="{imgUrl}" class="{imgClass}"/&gt;'+
                 '&lt;/span&gt;'+
                 '&lt;span class="ckeditor-autocomplete-item-label"&gt;{label}&lt;/span&gt;'+
               '&lt;/div&gt;'+
@@ -262,7 +268,7 @@
       <name/>
     </property>
     <property>
-      <parse>0</parse>
+      <parse>1</parse>
     </property>
     <property>
       <use>always</use>

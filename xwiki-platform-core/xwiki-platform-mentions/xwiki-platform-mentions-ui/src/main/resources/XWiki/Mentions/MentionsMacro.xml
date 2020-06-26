@@ -127,7 +127,7 @@
     <property>
       <code>require.config({
   paths: {
-    'xwiki-suggestUsers': "$xwiki.getSkinFile('uicomponents/suggest/suggestUsersAndGroups.js', {'forceSkinAction': true, 'language': $xcontext.locale}))" +
+    'xwiki-suggestUsers': "$xwiki.getSkinFile('uicomponents/suggest/suggestUsersAndGroups.js', true))" +
       "?v=$escapetool.url($xwiki.version)"
   }
 });

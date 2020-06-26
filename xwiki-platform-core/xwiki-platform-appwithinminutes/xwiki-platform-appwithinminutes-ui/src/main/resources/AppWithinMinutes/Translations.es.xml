@@ -37,7 +37,7 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>### Home page
-### Missing: platform.appwithinminutes.homePageTitle=App Within Minutes
+platform.appwithinminutes.homePageTitle=App Within Minutes (App en minutos)
 platform.appwithinminutes.description=Crea aplicaciones web colaborativas en cuestión de minutos, basadas en el potente sistema de gestión de datos estructurados de XWiki.
 platform.appwithinminutes.createAppButtonLabel=Crear Aplicación
 platform.appwithinminutes.appsLiveTableHeading=Aplicaciones
@@ -105,7 +105,7 @@ platform.appwithinminutes.classEditorUpdateTranslationsHint=Actualizar la traduc
 platform.appwithinminutes.classEditorMultipleSheetsWarning=Esta clase tiene varias hojas.
 platform.appwithinminutes.classEditorDuplicateFieldNameError=La clase tiene dos campos con el mismo nombre: {0}
 platform.appwithinminutes.classEditorTemplateSaveComment=Actualizar valores propuestos
-platform.appwithinminutes.classEditorBindSheetSaveComment=Ocultar la hoja de clases
+platform.appwithinminutes.classEditorBindSheetSaveComment=Forzar la hoja de clases
 platform.appwithinminutes.classEditorSheetSaveComment=Actualizar la hoja de clases
 platform.appwithinminutes.classEditorTranslationsSaveComment=Actualización de traducciones
 
@@ -210,8 +210,8 @@ platform.appwithinminutes.appHomePageEditAppLabel=Editar aplicación
 platform.appwithinminutes.appHomePageTranslateAppLabel=Traducir aplicación
 platform.appwithinminutes.appHomePageDeleteAppLabel=Borrar aplicación
 platform.appwithinminutes.appHomePageMovedWarning=Es posible que la aplicación no funcione correctamente porque ha sido renombrada o movida sin actualizar el código. Por favor, edite la aplicación y siga los pasos para actualizar el código.
-### Missing: AppWithinMinutes.LiveTableClass_description=Description
-### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
+AppWithinMinutes.LiveTableClass_description=Descripción
+AppWithinMinutes.LiveTableClass_columns=Columnas de la tabla dinámica ("Live Table")
 
 ### Delete application dialog
 platform.appwithinminutes.deleteAppConfirmation=La aplicación {0} y TODAS sus entradas serán borradas. ¿Seguro que quiere continuar?

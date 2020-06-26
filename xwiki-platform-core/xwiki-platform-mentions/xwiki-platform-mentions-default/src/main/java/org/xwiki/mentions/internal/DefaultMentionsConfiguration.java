@@ -45,12 +45,14 @@ public class DefaultMentionsConfiguration implements MentionsConfiguration
     @Override
     public String getMentionsColor()
     {
-        return this.configuration.getProperty("mentionsColor", "#c2c2c25e");
+        // default color is rgba, not hexa to allow setting opacity and keep working on IE11
+        return this.configuration.getProperty("mentionsColor", "rgba(194, 194, 194, 0.8)");
     }
 
     @Override
     public String getSelfMentionsColor()
     {
-        return this.configuration.getProperty("selfMentionsColor", "#ff00015e");
+        // default color is rgba, not hexa to allow setting opacity and keep working on IE11
+        return this.configuration.getProperty("selfMentionsColor", "rgba(255, 0, 1, 0.5)");
     }
 }

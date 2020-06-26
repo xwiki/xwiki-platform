@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.script.ModelScriptService;
+import org.xwiki.query.Query;
 import org.xwiki.query.internal.ScriptQuery;
 import org.xwiki.query.script.QueryManagerScriptService;
 import org.xwiki.rendering.syntax.Syntax;
@@ -41,6 +42,7 @@ import org.xwiki.template.TemplateManager;
 import org.xwiki.test.page.PageTest;
 import org.xwiki.test.page.XWikiSyntax20ComponentList;
 import org.xwiki.velocity.VelocityConfiguration;
+import org.xwiki.velocity.tools.EscapeTool;
 import org.xwiki.velocity.tools.JSONTool;
 import org.xwiki.velocity.tools.RegexTool;
 
@@ -49,11 +51,13 @@ import com.xpn.xwiki.plugin.tag.TagPluginApi;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
@@ -107,6 +111,7 @@ public class LiveTableResultsTest extends PageTest
         registerVelocityTool("mathtool", new MathTool());
         registerVelocityTool("regextool", new RegexTool());
         registerVelocityTool("numbertool", new NumberTool());
+        registerVelocityTool("escapetool", new EscapeTool());
 
         loadPage(new DocumentReference("xwiki", "XWiki", "LiveTableResultsMacros"));
     }
@@ -192,22 +197,57 @@ public class LiveTableResultsTest extends PageTest
         verify(queryService).hql("  where 1=1    order by lower(doc.fullName) desc, doc.fullName desc");
     }
 
+    /**
+     * Verify we can restrict pages by using a location filter and that we can also filter by doc.location
+     * at the same time. See <a href="https://jira.xwiki.org/browse/XWIKI-17463">XWIKI-17463</a>.
+     */
+    @Test
+    public void restrictLocationAndFilterByDocLocation() throws Exception
+    {
+        // Simulate the following type of URL:
+        // http://localhost:8080/xwiki/bin/get/XWiki/LiveTableResults?outputSyntax=plain&collist=doc.location
+        //   &location=Hello&offset=1&limit=15&reqNo=2&doc.location=t&sort=doc.location&dir=asc
+        setColumns("doc.location");
+        setLocation("Hello");
+        setFilter("doc.location", "test");
+
+        Query query = mock(Query.class);
+        when(queryService.hql(any(String.class))).thenReturn(query);
+        when(query.setLimit(anyInt())).thenReturn(query);
+        when(query.setOffset(anyInt())).thenReturn(query);
+        when(query.bindValues(anyMap())).thenReturn(query);
+
+        renderPage();
+
+        verify(queryService).hql("  where 1=1  AND ((doc.name = 'WebHome' AND LOWER(doc.space) LIKE "
+            + "LOWER(:locationFilterValue2) ESCAPE '!') OR (doc.name <> 'WebHome' AND LOWER(doc.fullName) LIKE "
+            + "LOWER(:locationFilterValue2) ESCAPE '!'))  AND LOWER(doc.fullName) LIKE "
+            + "LOWER(:locationFilterValue1) ESCAPE '!'");
+        ArgumentCaptor<Map<String, ?>> argument = ArgumentCaptor.forClass(Map.class);
+        verify(query).bindValues(argument.capture());
+        assertEquals(2, argument.getValue().size());
+        assertEquals("%Hello%", argument.getValue().get("locationFilterValue1"));
+        assertEquals("%test%", argument.getValue().get("locationFilterValue2"));
+    }
+
     //
     // Helper methods
     //
 
     @SuppressWarnings("unchecked")
-    private void renderPage() throws Exception
+    private String renderPage() throws Exception
     {
         JSONTool jsonTool = mock(JSONTool.class);
         registerVelocityTool("jsontool", jsonTool);
 
-        renderPage(new DocumentReference("xwiki", "XWiki", "LiveTableResults"));
+        String output = renderPage(new DocumentReference("xwiki", "XWiki", "LiveTableResults"));
 
         ArgumentCaptor<Object> argument = ArgumentCaptor.forClass(Object.class);
         verify(jsonTool).serialize(argument.capture());
 
         this.results = (Map<String, Object>) argument.getValue();
+
+        return output;
     }
 
     private void setClassName(String className)
@@ -218,6 +258,11 @@ public class LiveTableResultsTest extends PageTest
     private void setColumns(String... columns)
     {
         request.put("collist", StringUtils.join(columns, ','));
+    }
+
+    private void setLocation(String location)
+    {
+        request.put("location", location);
     }
 
     private void setOffset(int offset)

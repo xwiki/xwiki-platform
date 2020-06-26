@@ -81,10 +81,10 @@
       </selfMentionsColor>
     </class>
     <property>
-      <mentionsColor>#c2c2c25e</mentionsColor>
+      <mentionsColor>rgba(194, 194, 194, 0.8)</mentionsColor>
     </property>
     <property>
-      <selfMentionsColor>#ff00015e</selfMentionsColor>
+      <selfMentionsColor>rgba(255, 0, 1, 0.5)</selfMentionsColor>
     </property>
   </object>
   <object>

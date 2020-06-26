@@ -141,6 +141,11 @@ define([
 
 
 <style>
+
+.livedata-table-layout table {
+  height: 100%;
+}
+
 .livedata-table-layout .column-name {
   display: flex;
   flex-direction: row;
@@ -170,4 +175,14 @@ define([
   padding-right: 8px;
   width: 100%;
 }
+
+.livedata-table-layout .cell {
+  padding: 0;
+  height: 100%;
+}
+.livedata-table-layout .cell .livedata-displayer.view {
+  padding: 8px;
+}
+
+
 </style>

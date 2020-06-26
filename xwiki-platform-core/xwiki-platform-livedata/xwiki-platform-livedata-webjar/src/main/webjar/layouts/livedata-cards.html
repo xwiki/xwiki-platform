@@ -101,6 +101,7 @@ define([
   flex-direction: row;
   justify-content: flex-start;
   align-items: center;
+  transition: height 0.5s;
 }
 
 .livedata-cards-layout .property-name {
@@ -109,6 +110,7 @@ define([
 
 .livedata-cards-layout .value {
   flex-grow: 1;
+  align-self: stretch;
 }
 
 @supports (display: grid) {

@@ -20,7 +20,7 @@
 
 define([
   "Vue",
-  "vue!" + BASE_PATH + "top-bar.html",
+  "vue!" + BASE_PATH + "livedata-topbar.html",
 ], function (
   Vue,
   topbar
@@ -31,10 +31,10 @@ define([
     /**
      * Create the top bar from Vuejs
      */
-    var vueTopBar = new Vue({
+    var vueTopbar = new Vue({
 
       // Constructs a top bar component and passes it the data
-      template: '<top-bar :logic="logic"></top-bar>',
+      template: '<livedata-topbar :logic="logic"></livedata-topbar>',
 
       data: {
         logic: logic,
@@ -43,7 +43,7 @@ define([
     }).$mount();
 
     // return the HTML Element of the top bar for the layout
-    return vueTopBar.$el;
+    return vueTopbar.$el;
 
   };
 

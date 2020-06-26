@@ -19,7 +19,8 @@
  */
 
 define([
-  BASE_PATH + "displayers/defaultDisplayer.js"
+  BASE_PATH + "displayers/defaultDisplayer.js",
+  "polyfills"
 ], function (
   DefaultDisplayer
 ) {

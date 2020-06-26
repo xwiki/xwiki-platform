@@ -21,6 +21,7 @@
             >
               <span>{{ col.name }}</span>
               <span
+                v-if="logic.isPropertySortable(col.id)"
                 :class="[
                   'sort-icon',
                   'fa',
@@ -39,6 +40,7 @@
             :key="col.id"
           >
             <input
+              v-if="logic.isPropertyFilterable(col.id)"
               type="text" size="1"
               :value="data.query.filters[col.id] && data.query.filters[col.id][0] && data.query.filters[col.id][0].value"
               @change="logic.filter(col.id, 0, { value: $event.target.value })"
@@ -98,7 +100,7 @@ define([
   BASE_PATH + "topbar.js",
 ], function (
   Vue,
-  createTopBar,
+  createTopbar,
 ) {
 
   Vue.component("livedata-table", {
@@ -117,19 +119,19 @@ define([
       rows: function () { return this.logic.data.data.entries; },
       cols: function () { return this.logic.data.meta.propertyDescriptors; },
       sorts: function () {
-          let sorts = {};
-          this.data.query.sort.forEach( function (sortObject, level) {
-            sorts[sortObject.property] = {
-              level: +level,
-              descending: sortObject.descending,
-            };
-          });
-          return sorts;
+        let sorts = {};
+        this.data.query.sort.forEach( function (sortObject, level) {
+          sorts[sortObject.property] = {
+            level: level,
+            descending: sortObject.descending,
+          };
+        });
+        return sorts;
       },
     },
 
     mounted: function () {
-      var topbar = createTopBar(this.logic);
+      var topbar = createTopbar(this.logic);
       this.$refs.topbar.append(topbar);
     },
 

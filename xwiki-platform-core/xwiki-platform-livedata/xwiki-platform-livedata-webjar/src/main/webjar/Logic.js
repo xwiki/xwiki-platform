@@ -256,6 +256,19 @@ define(["jquery", "polyfills"], function ($) {
   };
 
 
+  /**
+   * Return the property type descriptor corresponding to a property id
+   * @param {String} propertyId
+   * @returns {Object}
+   */
+  Logic.prototype.getPropertyTypeDescriptor = function (propertyId) {
+    var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+    return this.data.meta.propertyTypes.find(function (typeDescr) {
+      return typeDescr.id === propertyDescriptor.type;
+    });
+  };
+
+
 
   /**
    * Get the displayer descriptor associated to a property id
@@ -267,9 +280,7 @@ define(["jquery", "polyfills"], function ($) {
     var propertyDescriptor = this.getPropertyDescriptor(propertyId);
     var propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
     // property type descriptor config
-    var typeDescriptor = this.data.meta.propertyTypes.find(function (typeDescr) {
-      return typeDescr.id === propertyDescriptor.type;
-    });
+    var typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
     var typeDescriptorDisplayer = typeDescriptor.displayer || {};
     // default displayer config
     var displayerId = propertyDescriptorDisplayer.id || typeDescriptorDisplayer.id;
@@ -329,6 +340,18 @@ define(["jquery", "polyfills"], function ($) {
 
 
 
+  /**
+   * Returns whether a certain property is sortable or not
+   * @param {String} propertyId
+   * @returns {Boolean}
+   */
+  Logic.prototype.isPropertySortable = function (propertyId) {
+    var propertyDescriptor = this.getPropertyDescriptor(propertyId);
+    var propertyTypeDescriptor = this.getPropertyTypeDescriptor(propertyId);
+    return propertyDescriptor.sortable ||
+      (propertyDescriptor.sortable === undefined && propertyTypeDescriptor.sortable);
+  };
+
 
   /**
    * Update sort configuration based on parameters, then fetch new data
@@ -340,6 +363,7 @@ define(["jquery", "polyfills"], function ($) {
    */
   Logic.prototype.sort = function (property, level, descending) {
     if (this.data.query.properties.indexOf(property) === -1) { return; }
+    if (!this.isPropertySortable(property)) { return; }
     // find property current sort level
     var currentLevel = this.data.query.sort.findIndex(function (sortObject) {
       return sortObject.property === property;
@@ -416,9 +440,7 @@ define(["jquery", "polyfills"], function ($) {
     var propertyDescriptor = this.getPropertyDescriptor(propertyId);
     var propertyDescriptorFilter = propertyDescriptor.filter || {};
     // property type descriptor config
-    var typeDescriptor = this.data.meta.propertyTypes.find(function (typeDescr) {
-      return typeDescr.id === propertyDescriptor.type;
-    });
+    var typeDescriptor = this.getPropertyTypeDescriptor(propertyId);
     var typeDescriptorFilter = typeDescriptor.filter || {};
     // default filter config
     var filterId = propertyDescriptorFilter.id || typeDescriptorFilter.id;
@@ -431,11 +453,22 @@ define(["jquery", "polyfills"], function ($) {
 
 
   /**
-   * Get the default filter operator associated to a property
-   * @param {String} property
+   * Returns whether a certain property is filterable or not
+   * @param {String} propertyId
+   * @returns {Boolean}
    */
-  Logic.prototype.getFilterDefaultOperator = function (property) {
-    var filterDescriptor = this.getFilterDescriptor(property);
+  Logic.prototype.isPropertyFilterable = function (propertyId) {
+    return !!this.getFilterDescriptor(propertyId).id;
+  };
+
+
+  /**
+   * Get the default filter operator associated to a property id
+   * @param {String} propertyId
+   * @returns {String}
+   */
+  Logic.prototype.getFilterDefaultOperator = function (propertyId) {
+    var filterDescriptor = this.getFilterDescriptor(propertyId);
     if (!filterDescriptor) { return; }
     var filterOperators = filterDescriptor.operators;
     if (!(filterOperators instanceof Array)) { return; }
@@ -458,6 +491,7 @@ define(["jquery", "polyfills"], function ($) {
   Logic.prototype.filter = function (property, index, filterEntry) {
     var self = this;
     if (this.data.query.properties.indexOf(property) === -1) { return; }
+    if (!this.isPropertyFilterable(property)) { return; }
     // default index
     index = index || 0;
     if (index < 0) { return; }

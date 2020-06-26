@@ -69,7 +69,7 @@ define({
         name: "Age",
         type: "number",
         filter: {
-          id: "number",
+          id: false,
         },
       },
       {
@@ -89,6 +89,7 @@ define({
         displayer: {
           id: "html",
         },
+        sortable: false,
       },
     ],
 
@@ -99,6 +100,7 @@ define({
         displayer: {
           id: 'text',
         },
+        sortable: true,
         filter: {
           id: 'text'
         },
@@ -109,6 +111,7 @@ define({
         displayer: {
           id: 'text',
         },
+        sortable: true,
         filter: {
           id: 'number'
         },

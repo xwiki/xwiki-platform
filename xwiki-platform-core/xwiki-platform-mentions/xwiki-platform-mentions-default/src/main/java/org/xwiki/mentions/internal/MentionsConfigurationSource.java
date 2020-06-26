@@ -19,6 +19,9 @@
  */
 package org.xwiki.mentions.internal;
 
+import java.util.Arrays;
+import java.util.List;
+
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -38,13 +41,13 @@ import org.xwiki.model.reference.LocalDocumentReference;
 @Named("mentions")
 public class MentionsConfigurationSource extends AbstractDocumentConfigurationSource
 {
-    private static final String SPACE_NAME = "Mentions";
+    private static final List<String> SPACE_NAMES = Arrays.asList("XWiki", "Mentions");
     
     private static final LocalDocumentReference DOCUMENT_REFERENCE =
-        new LocalDocumentReference(SPACE_NAME, "Configuration");
+        new LocalDocumentReference(SPACE_NAMES, "Configuration");
 
     private static final LocalDocumentReference CLASS_REFERENCE =
-        new LocalDocumentReference(SPACE_NAME, "MentionsConfigurationClass");
+        new LocalDocumentReference(SPACE_NAMES, "MentionsConfigurationClass");
 
     @Override
     protected DocumentReference getDocumentReference()

@@ -48,7 +48,7 @@ org.xwiki.mentions.DisplayStyle.FULL_NAME=Prénom et nom de l'utilisateur
 org.xwiki.mentions.DisplayStyle.FIRST_NAME=Prénom de l'utilisateur uniquement
 org.xwiki.mentions.DisplayStyle.LOGIN=Nom d'utilisateur
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor=Couleur des mentions
-XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=La couleur des mentions (note: utilisé comme valeur d'un attribut css background-color).
+XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=La couleur des mentions à l'utilisateur courant (note: utilisé comme valeur d'un attribut css background-color).
 XWiki.Mentions.MentionsConfigurationClass_selfMentionsColor=Couleurs des mentions pour sois même
 XWiki.Mentions.MentionsConfigurationClass_mentionsColor.hint=La couleur des mentions à l'utilisateur courant (note: utilisé comme valeur d'un attribut css background-color).</content>
 </xwikidoc>

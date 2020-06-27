@@ -53,14 +53,14 @@ XWiki.Captcha.JCaptcha.ConfigurationClass_engine=Motor
 XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=La implementación del motor de Captchas a utilizar al mostrar el tipo seleccionado de CAPTCHA.
 
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=Gimpy (Gmail) predeterminado
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Simple List
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Non Linear Text Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Lista Sencilla
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.NonLinearTextGimpyEngine=Gimpy con Texto No Lineal
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine=Hotmail
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Deformed Baffle List Gimpy
-captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Baffle List Gimpy
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DeformedBaffleListGimpyEngine=Gimpy con Lista Deflectora Deformada
+captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.BaffleListGimpyEngine=Gimpy con Lista Deflectora
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.HotmailEngine2008=Hotmail 2008
-captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Speller
-captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Simple List
-captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Simple Math</content>
+captcha.jcaptcha.engine.com.octo.captcha.engine.sound.speller.SpellerSoundCaptchaEngine=Deletreador
+captcha.jcaptcha.engine.com.octo.captcha.engine.sound.gimpy.SimpleListSoundCaptchaEngine=Lista Sencilla
+captcha.jcaptcha.engine.org.xwiki.captcha.internal.SimpleMathCaptchaEngine=Matemática Simple</content>
   
 </xwikidoc>

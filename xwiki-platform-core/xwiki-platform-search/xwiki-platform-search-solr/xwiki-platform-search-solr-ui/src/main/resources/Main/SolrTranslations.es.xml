@@ -40,7 +40,7 @@
 solr.admin.submit=Aplicar
 solr.admin.error.action={0} falló:
 solr.admin.error.notallowed=No está autorizado a realizar esta acción.
-solr.admin.error.norights=Se requieren permisos de administración para acceder a esta sección.
+solr.admin.error.norights=Necesita derechos administrativos para acceder a esta sección.
 solr.admin.success.action={0} ejecutado con éxito.
 
 solr.admin.status.title=Estado
@@ -128,7 +128,7 @@ solr.facet.date.start=Fecha y hora de inicio
 solr.facet.date.end=Fecha y hora de fin
 solr.facet.date.applyCustomInterval=Aplicar
 solr.facet.date.between=Desde {0} hasta {1}
-solr.facet.date.after=Después de {0}
+solr.facet.date.after=Tras {0}
 solr.facet.date.before=Antes de {0}
 solr.facet.date.any=Cualquier fecha
 

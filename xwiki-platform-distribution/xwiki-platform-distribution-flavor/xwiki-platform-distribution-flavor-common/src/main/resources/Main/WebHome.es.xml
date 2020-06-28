@@ -63,9 +63,9 @@ Utiliza el botón {{velocity}}$services.icon.render('pencil'){{/velocity}} de ar
 
 Utiliza el botón {{velocity}}$services.icon.render('add'){{/velocity}} de arriba para //añadir// más páginas a tu wiki y crear así la //jerarquía// que mejor organice tu contenido.
 
-Utilice las {{velocity}}$services.icon.render('home'){{/velocity}} pistas del historial de navegación o "breadcrumbs" situadas encima del título para //navegar// dentro de tus páginas.   Es fácil perderse sin ellas en una wiki grande.
+Utiliza las {{velocity}}$services.icon.render('home'){{/velocity}} pistas del historial de navegación o "breadcrumbs" situadas encima del título para //navegar// dentro de tus páginas.   Es fácil perderse sin ellas en una wiki grande.
 
-Además, puedes acceder a la [[Zona de pruebas&gt;&gt;Sandbox.WebHome]] para ver ejemplos de uso de la wiki y, en general, como un lugar donde experimentar con sus características.
+Además, puedes acceder a la [[Zona de Pruebas&gt;&gt;Sandbox.WebHome]] para ver ejemplos de uso de la wiki y, en general, como un lugar donde experimentar con sus funcionalidades.
 
 {{box}}Aprende más sobre cómo utilizar XWiki con la {{velocity}}[[Guía de Introducción&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/WebHome?version=$xwiki.version]]{{/velocity}}.{{/box}}
 
@@ -75,14 +75,14 @@ Además, puedes acceder a la [[Zona de pruebas&gt;&gt;Sandbox.WebHome]] para ver
 (((
 = Ampliando tu wiki  =
 
-Para aumentar la potencia y las funcionalidades de tu wiki con las características que //tu// necesites, accede a {{velocity}}[[Gestor de Extensiones&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} donde puedes buscar e instalar extensiones.
+Para aumentar la potencia y las funcionalidades de tu wiki con las funcionalidades que //tu// necesites, accede a {{velocity}}[[Gestor de Extensiones&gt;&gt;path:$xwiki.getURL($services.model.createDocumentReference('wiki', 'XWiki', 'XWikiPreferences'), 'admin', 'editor=globaladmin&amp;section=XWiki.Extensions')]]{{/velocity}} donde puedes buscar e instalar extensiones.
 
 Para navegar por las más de 900 extensiones proporcionadas por la comunidad disponibles para XWiki, accede al [[repositorio de extensiones&gt;&gt;http://extensions.xwiki.org]].
 )))
 (%class="col-xs-12 col-sm-6"%)
 (((
-= Crear tu applicación =
-Supera los límites de las extensiones disponibles y define la //estructura// de tus datos basada en //tus// necesidades, creando //tus// propias aplicaciones con [[App Within Minutes&gt;&gt;AppWithinMinutes]] (AWM).
+= Crea tu applicación =
+Supera los límites de las extensiones disponibles y define la //estructura// de tus datos basada en //tus// necesidades, creando //tus// propias aplicaciones con [[Aplicación en cuestión de minutos&gt;&gt;AppWithinMinutes]] (AWM).
 
 AWM se encargará de facilitarte a tí y a tus usuarios la creación y administración de los datos.
 )))

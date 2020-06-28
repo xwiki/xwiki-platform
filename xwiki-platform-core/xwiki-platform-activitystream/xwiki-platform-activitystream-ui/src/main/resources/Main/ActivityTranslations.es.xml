@@ -37,8 +37,8 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>activity.page.link.title=Ubicado en {0}
-activity.rss.pages.modified=Subscripciones de las páginas modificadas
-activity.rss.feed.description=Subscripción RSS a los cambios del documento
+activity.rss.pages.modified=Canal RSS de páginas modificadas
+activity.rss.feed.description=Canal RSS de los cambios del documento
 activity.rss.feed.tags.description=Canal RSS para documentos etiquetados con "{0}"
 activity.rss.feed.spaces.description=Canal RSS para documentos en el/los espacio(s) "{0}"
 activity.rss.feed.tagsAndSpaces.description=Canal RSS para los documentos etiquetados con "{0}" en el/los espacio/s "{1}"

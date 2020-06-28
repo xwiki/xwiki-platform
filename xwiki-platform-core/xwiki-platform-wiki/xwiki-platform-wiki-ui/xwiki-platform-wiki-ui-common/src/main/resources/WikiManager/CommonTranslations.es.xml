@@ -37,13 +37,13 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>admin.wikis=Wikis
-admin.wikis.descriptor=Descripción
-admin.wikis.descriptor.description=Configurar el descriptor wiki
-admin.wiki.description=Describe tu wiki (nombre original y descripción) y establece su propietario y página de inicio.
-platform.wiki.admin.wiki.ownerProblemConfirmation=El nuevo propietario del usuario no existe o puede provenir de otro Wiki.\\n¿Estás seguro de que quieres usarlo y continuar con la operación de guardar?
-platform.wiki.admin.wiki.csrfInvalidError=Token de seguridad no válido (CSRF). Por favor, actualice la página e inténtelo de nuevo.
+admin.wikis.descriptor=Descriptor
+admin.wikis.descriptor.description=Configurar el descriptor de la wiki
+admin.wiki.description=Describe tu wiki (nombre "amistoso" y descripción) y establece su propietario y página de inicio.
+platform.wiki.admin.wiki.ownerProblemConfirmation=El usuario del nuevo usuario no existe o puede provenir de una wiki diferente.\\n¿Estás seguro de querer usarlo y continuar con la operación de guardar?
+platform.wiki.admin.wiki.csrfInvalidError=Token de seguridad (CSRF) no válido. Por favor, refresque la página e inténtelo de nuevo.
 platform.wiki.admin.wiki.requiredFieldsError=El campo 'Homepage' no puede estar vacío.
-platform.wiki.admin.wiki.ownerWarning=Advertencia: Una vez que cambie esto, el propietario anterior perderá sus derechos de propietario. Si ese eres tú, asegúrate de no quedarte fuera de la wiki. Si esto ocurre por error, tendrás que contactar con los administradores del wiki principal o utilizar la cuenta superadmin.
+platform.wiki.admin.wiki.ownerWarning=Advertencia: Una vez que cambies esto, el propietario anterior perderá sus derechos de propietario. Si ese eres tú, asegúrate de no dejarte fuera de la wiki. Si esto ocurre por error, tendrás que contactar con los administradores de la wiki principal o utilizar la cuenta superadmin.
 
 ###############################################################################
 ## Deprecated

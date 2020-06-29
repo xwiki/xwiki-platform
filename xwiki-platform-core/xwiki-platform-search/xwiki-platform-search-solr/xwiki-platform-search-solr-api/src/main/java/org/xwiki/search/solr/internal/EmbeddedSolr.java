@@ -319,7 +319,7 @@ public class EmbeddedSolr extends AbstractSolr implements Disposable, Initializa
         }
 
         // Indicate the path of the data
-        Path dataPath = resolveSearchCoreDataPath().relativize(this.solrSearchCorePath);
+        Path dataPath = this.solrSearchCorePath.relativize(resolveSearchCoreDataPath());
         FileUtils.write(this.solrSearchCorePath.resolve("core.properties").toFile(), "dataDir=" + dataPath,
             StandardCharsets.UTF_8, true);
     }

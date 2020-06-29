@@ -1018,8 +1018,10 @@ body &gt; .selectize-dropdown {
   width: 3em;
 }
 
-/* Make sure the notifications are visible in full-screen mode (e.g. for Save &amp; Continue action) */
-body[data-maximized] .xnotification-container {
+/* Make sure the notifications (e.g. for Save &amp; Continue action) and the modals (e.g. for expired session) are visible
+  when editing in full-screen mode. */
+body[data-maximized] .xnotification-container,
+body[data-maximized] .xdialog-modal-container {
   z-index: 9996;
 }
 

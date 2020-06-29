@@ -260,13 +260,15 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
 
     private void setCacheFile(FontManager fontManager) throws InitializationException
     {
-        File fopDirectory = new File(this.environment.getPermanentDirectory(), "fop");
+        File cacheDirectory =  new File(this.environment.getPermanentDirectory(), "cache");
+        File fopDirectory = new File(cacheDirectory, "fop");
         File cacheFile = new File(fopDirectory, "fop-fonts.cache");
         try {
             FileUtils.forceMkdir(fopDirectory);
             fontManager.setCacheFile(cacheFile.toURI());
         } catch (IOException e) {
-            throw new InitializationException(String.format("Failed to create FOP cache file [%s]", fopDirectory), e);
+            throw new InitializationException(String.format("Failed to create FOP cache directory [%s]", fopDirectory),
+                e);
         }
     }
 }

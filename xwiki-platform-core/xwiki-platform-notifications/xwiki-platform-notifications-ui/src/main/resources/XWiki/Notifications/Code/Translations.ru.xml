@@ -96,8 +96,6 @@ notifications.filters.preferences.setEnabled.error=Не удалось сохр�
 
 ## Notifications toggles
 notifications.toggle.disabled.hint=Вам нужно включить уведомления в ваших настройках
-### Missing: notifications.toggle.label.off=OFF
-### Missing: notifications.toggle.label.on=ON
 
 ## Notifications formats
 notifications.format.alert=Оповещение

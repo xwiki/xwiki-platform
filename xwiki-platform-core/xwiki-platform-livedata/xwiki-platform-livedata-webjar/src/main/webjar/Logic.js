@@ -21,7 +21,7 @@
 
 define(["jquery", "polyfills"], function ($) {
 
-  /**>
+  /**
    * Map the element to its data object
    * So that each instance of the livedata on the page handle there own data
    */
@@ -101,7 +101,7 @@ define(["jquery", "polyfills"], function ($) {
       layoutId = layoutId || self.data.meta.defaultLayout;
       // layout already loaded
       if (layoutId === self.data.query.currentLayout && self.layouts[layoutId]) {
-        return void resolve(thselfis.layouts[layoutId]);
+        return void resolve(self.layouts[layoutId]);
       }
       // bad layout
       if (!self.data.meta.layoutDescriptors[layoutId]) { return void reject(); }
@@ -250,8 +250,8 @@ define(["jquery", "polyfills"], function ($) {
    * @returns {Object}
    */
   Logic.prototype.getPropertyDescriptor = function (propertyId) {
-    return this.data.meta.propertyDescriptors.find(function (descriptor) {
-      return descriptor.id === propertyId;
+    return this.data.meta.propertyDescriptors.find(function (propertyDescriptor) {
+      return propertyDescriptor.id === propertyId;
     });
   };
 
@@ -263,8 +263,8 @@ define(["jquery", "polyfills"], function ($) {
    */
   Logic.prototype.getPropertyTypeDescriptor = function (propertyId) {
     var propertyDescriptor = this.getPropertyDescriptor(propertyId);
-    return this.data.meta.propertyTypes.find(function (typeDescr) {
-      return typeDescr.id === propertyDescriptor.type;
+    return this.data.meta.propertyTypes.find(function (typeDescriptor) {
+      return typeDescriptor.id === propertyDescriptor.type;
     });
   };
 
@@ -563,15 +563,13 @@ define(["jquery", "polyfills"], function ($) {
     }
     if (index < 0) { return; }
     // remove filter
-    this.data.query.filters[property].splice(index, 1);
+    var removedFilterArray = this.data.query.filters[property].splice(index, 1);
     // dispatch events
-    var event = new CustomEvent("xwiki:livedata:removeFilter", {
-      livedata: this,
+    this.triggerEvent("removeFilter", {
       property: property,
-      index: this.data.query.filters[property].length - 1,
+      index: index,
+      removedFilter: removedFilterArray[0],
     });
-    this.element.dispatchEvent(event);
-
     // CALL FUNCTION TO FETCH NEW DATA HERE
   };
 

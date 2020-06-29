@@ -19,9 +19,7 @@
  */
 
 
-define([
-  "polyfills"
-], function () {
+define([], function () {
 
   /**
    * Load the displayer custom css to the page
@@ -165,7 +163,7 @@ define([
    * @param {String} newValue
    */
   Displayer.prototype.applyEdit = function (newValue) {
-    // should call a logic API instead, but this is just for quick prove of concept
+    // TODO: should call the logic API instead, but this is just for quick prove of concept
     this.entryData[this.propertyId] = newValue;
     this.view();
     this.element.focus();

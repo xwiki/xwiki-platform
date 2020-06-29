@@ -55,7 +55,7 @@ define([
       } else {
         var emptyValue = document.createElement("span");
         emptyValue.className = "explicit-empty-value";
-        emptyValue.setAttribute("data-text", "- no title -");
+        emptyValue.setAttribute("data-text", "(no value)");
         element.appendChild(emptyValue);
       }
 

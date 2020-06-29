@@ -76,7 +76,6 @@ import com.xpn.xwiki.web.Utils;
 import io.sf.carte.doc.dom4j.CSSStylableElement;
 import io.sf.carte.doc.dom4j.XHTMLDocument;
 import io.sf.carte.doc.dom4j.XHTMLDocumentFactory;
-import io.sf.carte.doc.style.css.CSSDocument;
 import io.sf.carte.doc.style.css.CSSStyleDeclaration;
 import io.sf.carte.doc.xml.dtd.DefaultEntityResolver;
 

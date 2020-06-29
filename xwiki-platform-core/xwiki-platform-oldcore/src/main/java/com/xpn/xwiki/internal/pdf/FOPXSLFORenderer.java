@@ -20,6 +20,7 @@
 package com.xpn.xwiki.internal.pdf;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -39,6 +40,7 @@ import org.apache.avalon.framework.configuration.Configuration;
 import org.apache.avalon.framework.configuration.ConfigurationException;
 import org.apache.avalon.framework.configuration.DefaultConfiguration;
 import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.fop.apps.EnvironmentProfile;
@@ -49,6 +51,7 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.FopFactoryBuilder;
 import org.apache.fop.apps.FormattingResults;
 import org.apache.fop.apps.PageSequenceResults;
+import org.apache.fop.fonts.FontManager;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
@@ -112,6 +115,12 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
         EnvironmentProfile environmentProfile =
             EnvironmentalProfileFactory.createDefault(new File(".").toURI(), this.resourceResolver);
         FopFactoryBuilder builder = new FopFactoryBuilder(environmentProfile);
+
+        // Change the location of the FOP font cache file so that it doesn't use the current user's home directory
+        // since the user used to start XWiki (i.e. the user with whom the servlet container is started) doesn't
+        // always have a home directory on servers, nor have a ".fop" directory in the current directory. Thus to be
+        // safe, we make it point to the XWiki permanent directory.
+        setCacheFile(environmentProfile.getFontManager());
 
         Configuration configuration = loadConfiguration();
         if (configuration != null) {
@@ -246,6 +255,18 @@ public class FOPXSLFORenderer implements XSLFORenderer, Initializable
                 + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
                 + "FOP cannot access this directory. If this is an upgrade from a previous version, "
                 + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
+        }
+    }
+
+    private void setCacheFile(FontManager fontManager) throws InitializationException
+    {
+        File fopDirectory = new File(this.environment.getPermanentDirectory(), "fop");
+        File cacheFile = new File(fopDirectory, "fop-fonts.cache");
+        try {
+            FileUtils.forceMkdir(fopDirectory);
+            fontManager.setCacheFile(cacheFile.toURI());
+        } catch (IOException e) {
+            throw new InitializationException(String.format("Failed to create FOP cache file [%s]", fopDirectory), e);
         }
     }
 }

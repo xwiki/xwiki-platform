@@ -1013,12 +1013,12 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # notifications.rest.cache = true
 
-#-# [Since 12.1] [Experimental]
-#-# Enabling this option will make user notifications be filtered and stored when the event is generated
-#-# instead of filtered each time they are displayed.
+#-# [Since 12.1]
+#-# When this option is enabled the relation between users and events is evaluated and stored when the event is
+#-# generated instead of each time they are displayed.
 #-#
 #-# The default is :
-# notifications.eventPreFilteringEnabled = false
+# notifications.eventPreFilteringEnabled = true
 
 #-# [Since 12.5RC1]
 #-# The async notifications renderer is using a dedicated thread pool to limit the impact on the rest of the XWiki
@@ -1055,10 +1055,12 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# The default is :
 # eventstream.daystokeepevents = 0
 
-#-# [Since 12.4][EXPERIMENTAL]
-#-# The new experimental no-SQL oriented event store is disabled by default. Once enabled the Solr implementation is
+#-# [Since 12.4]
+#-# Indicate if the new no-SQL oriented event store is enabled. Once enabled the Solr implementation is
 #-# used by default but other implementations (like a MongoDB based implementation for example) might come later.
-# eventstream.store.enabled = false
+#-# It's enabled by default since 12.6.
+# eventstream.store.enabled = true
+#-# Indicate which event store implementation to use. The default implementation is based on Solr.
 # eventstream.store = solr
 
 #-------------------------------------------------------------------------------------

@@ -80,11 +80,14 @@
           // where the new mode (e.g. Source) will be injected (because the contents space is not available when editing
           // in-place).
           contentsSpace = editor.element.getDocument().createElement('div');
+          // Copy the non-CKEditor related class names from the editor element (the content edited in-line) to ensure
+          // consistent styles between WYSIWYG and the other editing modes (like Source).
+          var classNames = (editor.element.getAttribute('class') || '').split(/\s+/).filter(function(className) {
+            return className.substring(0, 4) !== 'cke_';
+          }).join(' ');
           contentsSpace.setAttributes({
             id: editor.ui.spaceId('contents'),
-            // Copy the classes from the editor element (the content edited in-line) to ensure consistent styles
-            // between WYSIWYG and the other editing modes (like Source).
-            'class': 'cke_contents fake ' + editor.element.getAttribute('class'),
+            'class': 'cke_contents fake ' + classNames,
             role: 'presentation'
           });
           // Initialize with the height of the WYSIWYG mode in order to prevent UI flickering when switching modes.

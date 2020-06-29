@@ -33,17 +33,22 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.xwiki.component.descriptor.ComponentDescriptor;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.concurrent.ContextStoreManager;
+import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventStatus;
 import org.xwiki.eventstream.EventStore;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.events.EventStreamAddedEvent;
 import org.xwiki.eventstream.events.EventStreamDeletedEvent;
+import org.xwiki.eventstream.events.MailEntityAddedEvent;
+import org.xwiki.eventstream.events.MailEntityDeleteEvent;
 import org.xwiki.eventstream.internal.events.EventStatusAddOrUpdatedEvent;
 import org.xwiki.eventstream.internal.events.EventStatusDeletedEvent;
 import org.xwiki.observation.ObservationManager;
@@ -54,7 +59,7 @@ import org.xwiki.observation.ObservationManager;
  * @version $Id$
  * @since 12.5RC1
  */
-public abstract class AbstractAsynchronousEventStore implements EventStore, Initializable
+public abstract class AbstractAsynchronousEventStore implements EventStore, Initializable, Disposable
 {
     private static final List<String> CONTEXT_ENTRIES = Arrays.asList("user", "author", "wiki");
 
@@ -67,7 +72,15 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     {
         SAVE_EVENT,
 
-        SAVE_EVENT_STATUS,
+        /**
+         * @since 12.6RC1
+         */
+        SAVE_STATUS,
+
+        /**
+         * @since 12.6RC1
+         */
+        SAVE_MAIL_ENTITY,
 
         DELETE_EVENT,
 
@@ -75,7 +88,15 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
         DELETE_STATUS,
 
-        STOP_THREAD
+        /**
+         * @since 12.6RC1
+         */
+        DELETE_MAIL_ENTITY,
+
+        /**
+         * @since 12.6RC1
+         */
+        PREFILTER_EVENT
     }
 
     /**
@@ -144,6 +165,8 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
     private boolean notifyAll;
 
+    private boolean disposed;
+
     private <O, I> CompletableFuture<O> addTask(I input, EventStoreTaskType type)
     {
         // Remember a few standard things from the context
@@ -178,7 +201,13 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     @Override
     public CompletableFuture<EventStatus> saveEventStatus(EventStatus status)
     {
-        return addTask(status, EventStoreTaskType.SAVE_EVENT_STATUS);
+        return addTask(status, EventStoreTaskType.SAVE_STATUS);
+    }
+
+    @Override
+    public CompletableFuture<EventStatus> saveMailEntityEvent(EntityEvent event)
+    {
+        return addTask(event, EventStoreTaskType.SAVE_MAIL_ENTITY);
     }
 
     @Override
@@ -199,11 +228,21 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         return addTask(status, EventStoreTaskType.DELETE_STATUS);
     }
 
+    @Override
+    public CompletableFuture<Optional<EventStatus>> deleteMailEntityEvent(EntityEvent event)
+    {
+        return addTask(event, EventStoreTaskType.DELETE_MAIL_ENTITY);
+    }
+
+    @Override
+    public CompletableFuture<Event> prefilterEvent(Event event)
+    {
+        return addTask(event, EventStoreTaskType.PREFILTER_EVENT);
+    }
+
     private void run()
     {
-        boolean stop = false;
-
-        while (!stop) {
+        while (!this.disposed) {
             EventStoreTask<?, ?> firstTask;
             try {
                 firstTask = this.queue.take();
@@ -215,11 +254,11 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                 break;
             }
 
-            stop = processTasks(firstTask);
+            processTasks(firstTask);
         }
     }
 
-    private boolean processTasks(EventStoreTask<?, ?> firstTask)
+    private void processTasks(EventStoreTask<?, ?> firstTask)
     {
         this.execution.setContext(new ExecutionContext());
 
@@ -227,9 +266,7 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         try {
             for (EventStoreTask<?, ?> task = firstTask; task != null; task = this.queue.poll()) {
                 try {
-                    if (processTask(task)) {
-                        return true;
-                    }
+                    processTask(task);
                 } catch (Exception e) {
                     task.future.completeExceptionally(e);
                 }
@@ -241,8 +278,6 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
             this.execution.removeContext();
         }
-
-        return false;
     }
 
     private boolean processTask(EventStoreTask<?, ?> task) throws EventStreamException
@@ -265,14 +300,24 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                     syncDeleteEventStatus((EventStatus) task.input));
                 break;
 
-            case SAVE_EVENT_STATUS:
+            case SAVE_STATUS:
                 processTaskOutput((EventStoreTask<EventStatus, EventStatus>) task,
                     syncSaveEventStatus((EventStatus) task.input));
                 break;
 
-            case STOP_THREAD:
-                // Stop the thread
-                return true;
+            case DELETE_MAIL_ENTITY:
+                processTaskOutput((EventStoreTask<Optional<EntityEvent>, EntityEvent>) task,
+                    syncDeleteMailEntityEvent((EntityEvent) task.input));
+                break;
+
+            case SAVE_MAIL_ENTITY:
+                processTaskOutput((EventStoreTask<EntityEvent, EntityEvent>) task,
+                    syncSaveMailEntityEvent((EntityEvent) task.input));
+                break;
+
+            case PREFILTER_EVENT:
+                processTaskOutput((EventStoreTask<Event, Event>) task, syncPrefilterEvent((Event) task.input));
+                break;
 
             default:
                 break;
@@ -323,8 +368,16 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                 this.observation.notify(new EventStatusDeletedEvent(), task.output);
                 break;
 
-            case SAVE_EVENT_STATUS:
+            case SAVE_STATUS:
                 this.observation.notify(new EventStatusAddOrUpdatedEvent(), task.output);
+                break;
+
+            case DELETE_MAIL_ENTITY:
+                this.observation.notify(new MailEntityAddedEvent(), task.output);
+                break;
+
+            case SAVE_MAIL_ENTITY:
+                this.observation.notify(new MailEntityDeleteEvent(), task.output);
                 break;
 
             default:
@@ -333,22 +386,40 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
     }
 
     /**
-     * @param the event status to save
+     * @param status the event status to save
      */
     protected abstract EventStatus syncSaveEventStatus(EventStatus status) throws EventStreamException;
 
     /**
-     * @param the event to save
+     * @param event the event/entity relation to save
+     * @since 12.6RC1
+     */
+    protected abstract EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException;
+
+    /**
+     * @param event the event to save
      */
     protected abstract Event syncSaveEvent(Event event) throws EventStreamException;
 
     /**
-     * @param the event status to save
+     * @param event the event to save update
+     * @since 12.6RC1
+     */
+    protected abstract Event syncPrefilterEvent(Event event) throws EventStreamException;
+
+    /**
+     * @param status the event status to save
      */
     protected abstract Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException;
 
     /**
-     * @param the id of the event to delete
+     * @param event the event/entity relation to delete
+     * @since 12.6RC1
+     */
+    protected abstract Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event) throws EventStreamException;
+
+    /**
+     * @param eventId the id of the event to delete
      */
     protected abstract Optional<Event> syncDeleteEvent(String eventId) throws EventStreamException;
 
@@ -377,5 +448,11 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         thread.setName("Asynchronous handler for event store [" + descriptor.getRoleHint() + "]");
         thread.start();
         thread.setPriority(Thread.NORM_PRIORITY - 1);
+    }
+
+    @Override
+    public void dispose() throws ComponentLifecycleException
+    {
+        this.disposed = true;
     }
 }

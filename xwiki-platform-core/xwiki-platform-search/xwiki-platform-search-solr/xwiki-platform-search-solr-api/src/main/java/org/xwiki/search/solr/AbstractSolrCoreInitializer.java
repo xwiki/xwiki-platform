@@ -71,6 +71,13 @@ public abstract class AbstractSolrCoreInitializer implements SolrCoreInitializer
     public static final long SCHEMA_VERSION_12_5 = 120500000;
 
     /**
+     * The base schema version for XWiki 12.6.
+     * 
+     * @since 12.6RC1
+     */
+    public static final long SCHEMA_VERSION_12_6 = 120600000;
+
+    /**
      * The base schema version.
      */
     public static final long SCHEMA_BASE_VERSION = SCHEMA_VERSION_12_3;

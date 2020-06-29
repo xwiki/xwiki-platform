@@ -36,6 +36,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
+import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
@@ -138,6 +139,30 @@ public class DefaultEventStore implements EventStore, Initializable
     }
 
     @Override
+    public CompletableFuture<Event> prefilterEvent(Event event)
+    {
+        prepareEvent(event);
+
+        CompletableFuture<Event> future = null;
+
+        if (this.legacyStore != null) {
+            future = this.legacyStore.prefilterEvent(event);
+        }
+
+        if (this.store != null) {
+            // Forget about legacy store result if new store is enabled
+            future = this.store.prefilterEvent(event);
+        }
+
+        if (future == null) {
+            future = new CompletableFuture<>();
+            future.completeExceptionally(new EventStreamException(NO_STORE));
+        }
+
+        return future;
+    }
+
+    @Override
     public CompletableFuture<Optional<Event>> deleteEvent(String eventId)
     {
         CompletableFuture<Optional<Event>> future = null;
@@ -204,6 +229,28 @@ public class DefaultEventStore implements EventStore, Initializable
     }
 
     @Override
+    public CompletableFuture<EventStatus> saveMailEntityEvent(EntityEvent event)
+    {
+        CompletableFuture<EventStatus> future = null;
+
+        if (this.legacyStore != null) {
+            future = this.legacyStore.saveMailEntityEvent(event);
+        }
+
+        if (this.store != null) {
+            // Forget about legacy store result if new store is enabled
+            future = this.store.saveMailEntityEvent(event);
+        }
+
+        if (future == null) {
+            future = new CompletableFuture<>();
+            future.completeExceptionally(new EventStreamException(NO_STORE));
+        }
+
+        return future;
+    }
+
+    @Override
     public CompletableFuture<Optional<EventStatus>> deleteEventStatus(EventStatus status)
     {
         CompletableFuture<Optional<EventStatus>> future = null;
@@ -215,6 +262,28 @@ public class DefaultEventStore implements EventStore, Initializable
         if (this.store != null) {
             // Forget about legacy store result if new store is enabled
             future = this.store.deleteEventStatus(status);
+        }
+
+        if (future == null) {
+            future = new CompletableFuture<>();
+            future.completeExceptionally(new EventStreamException(NO_STORE));
+        }
+
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Optional<EventStatus>> deleteMailEntityEvent(EntityEvent event)
+    {
+        CompletableFuture<Optional<EventStatus>> future = null;
+
+        if (this.legacyStore != null) {
+            future = this.legacyStore.deleteMailEntityEvent(event);
+        }
+
+        if (this.store != null) {
+            // Forget about legacy store result if new store is enabled
+            future = this.store.deleteMailEntityEvent(event);
         }
 
         if (future == null) {

@@ -20,15 +20,20 @@
 package org.xwiki.eventstream;
 
 /**
- * Define a status for any couple of event/entity.
+ * Associated an event to an entity.
  *
  * @version $Id$
- * @since 9.2RC1
+ * @since 12.6RC1
  */
-public interface EventStatus extends EntityEvent
+public interface EntityEvent
 {
     /**
-     * @return either or nor the event has been read by the entity
+     * @return the event concerned by the status
      */
-    boolean isRead();
+    Event getEvent();
+
+    /**
+     * @return the id of the entity (a user or a group) concerned by the status
+     */
+    String getEntityId();
 }

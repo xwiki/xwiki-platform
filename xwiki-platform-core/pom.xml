@@ -202,6 +202,19 @@
                 <new>method org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder org.xwiki.notifications.preferences.TargetableNotificationPreferenceBuilder::.+(.+)</new>
                 <justification>TargetableNotificationPreferenceBuilder is meant to be a builder but the API wasn't following the builder pattern. This change is not breaking for using that component, but it is breaking if you implemented the TargetableNotificationPreferenceBuilder interface.</justification>
               </item>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;java.util.Optional&lt;org.xwiki.eventstream.EventStatus&gt;&gt; org.xwiki.eventstream.EventStore::deleteMailEntityEvent(org.xwiki.eventstream.EntityEvent)</new>
+                <justification>Young API</justification>
+              </item><item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.eventstream.Event&gt; org.xwiki.eventstream.EventStore::prefilterEvent(org.xwiki.eventstream.Event)</new>
+                <justification>Young API</justification>
+              </item><item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.eventstream.EventStatus&gt; org.xwiki.eventstream.EventStore::saveMailEntityEvent(org.xwiki.eventstream.EntityEvent)</new>
+                <justification>Young API</justification>
+              </item>
             </revapi.ignore>
             </analysisConfiguration>
           </configuration>

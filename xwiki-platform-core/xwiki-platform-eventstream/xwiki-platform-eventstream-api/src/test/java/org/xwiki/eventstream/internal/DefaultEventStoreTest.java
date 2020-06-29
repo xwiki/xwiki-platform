@@ -53,6 +53,8 @@ public class DefaultEventStoreTest
 
     private static final DefaultEventStatus EVENTSTATUS = new DefaultEventStatus(EVENT, "entity", true);
 
+    private static final DefaultEntityEvent MAILENTITY = new DefaultEntityEvent(EVENT, "entity");
+
     @MockComponent
     private EventStreamConfiguration configuration;
 
@@ -96,6 +98,15 @@ public class DefaultEventStoreTest
     }
 
     @Test
+    void saveMailEntityEvent() throws Exception
+    {
+        this.defaultStore.saveMailEntityEvent(MAILENTITY);
+
+        verify(this.store).saveMailEntityEvent(MAILENTITY);
+        verify(this.legacyStore).saveMailEntityEvent(MAILENTITY);
+    }
+
+    @Test
     void deleteEventByInstance() throws EventStreamException
     {
         this.defaultStore.deleteEvent(EVENT);
@@ -110,6 +121,16 @@ public class DefaultEventStoreTest
         this.defaultStore.deleteEventStatus(EVENTSTATUS);
 
         verify(this.store).deleteEventStatus(EVENTSTATUS);
+        verify(this.legacyStore).deleteEventStatus(EVENTSTATUS);
+    }
+
+    @Test
+    void deleteMailEntityEvent() throws EventStreamException
+    {
+        this.defaultStore.deleteMailEntityEvent(MAILENTITY);
+
+        verify(this.store).deleteMailEntityEvent(MAILENTITY);
+        verify(this.legacyStore).deleteMailEntityEvent(MAILENTITY);
     }
 
     @Test
@@ -144,5 +165,14 @@ public class DefaultEventStoreTest
         when(this.legacyStore.getEvent("id")).thenReturn(Optional.of(EVENT));
 
         assertFalse(this.defaultStore.getEvent("id").isPresent());
+    }
+
+    @Test
+    void prefilter() throws EventStreamException
+    {
+        this.defaultStore.prefilterEvent(EVENT);
+
+        verify(this.store).prefilterEvent(EVENT);
+        verify(this.legacyStore).prefilterEvent(EVENT);
     }
 }

@@ -23,6 +23,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
@@ -94,6 +95,13 @@ public abstract class AbstractLegacyEventStore extends AbstractAsynchronousEvent
     }
 
     @Override
+    public EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException
+    {
+        // Unsupported
+        return event;
+    }
+
+    @Override
     public Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException
     {
         try {
@@ -103,6 +111,20 @@ public abstract class AbstractLegacyEventStore extends AbstractAsynchronousEvent
         }
 
         return Optional.of(status);
+    }
+
+    @Override
+    protected Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event) throws EventStreamException
+    {
+        // Unsupported
+        return Optional.empty();
+    }
+
+    @Override
+    protected Event syncPrefilterEvent(Event event) throws EventStreamException
+    {
+        // Unsupported
+        return event;
     }
 
     @Override

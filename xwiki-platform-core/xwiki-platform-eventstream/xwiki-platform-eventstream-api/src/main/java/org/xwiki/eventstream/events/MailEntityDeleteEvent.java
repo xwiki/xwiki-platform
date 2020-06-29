@@ -17,18 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream;
+package org.xwiki.eventstream.events;
+
+import org.xwiki.eventstream.EntityEvent;
 
 /**
- * Define a status for any couple of event/entity.
+ * Event triggered when a mail entity event is removed from the store.
+ * <p>
+ * This event also send the following parameters:
+ * <ul>
+ * <li>source: the {@link EntityEvent} removed from the store</li>
+ * </ul>
  *
+ * @since 9.6RC1
  * @version $Id$
- * @since 9.2RC1
  */
-public interface EventStatus extends EntityEvent
+public class MailEntityDeleteEvent extends AbstractEventStreamEvent
 {
-    /**
-     * @return either or nor the event has been read by the entity
-     */
-    boolean isRead();
+    private static final long serialVersionUID = 1L;
 }

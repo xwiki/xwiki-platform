@@ -41,6 +41,7 @@ public interface EventStore
      * @param event the event to save
      * @return the new {@link CompletableFuture} providing the added {@link Event}
      * @since 12.5RC1
+     * @see #deleteEvent(Event)
      */
     CompletableFuture<Event> saveEvent(Event event);
 
@@ -50,15 +51,27 @@ public interface EventStore
      * @param status the status to save
      * @return the new {@link CompletableFuture} providing the added {@link EventStatus}
      * @since 12.5RC1
+     * @see #deleteEventStatus(EventStatus)
      */
     CompletableFuture<EventStatus> saveEventStatus(EventStatus status);
 
     /**
-     * Asynchronously deleted the event matching the passed identifier.
+     * Asynchronously save in the storage the given mail status.
+     * 
+     * @param event the status to save
+     * @return the new {@link CompletableFuture} providing the added {@link EntityEvent}
+     * @since 12.6RC1
+     * @see #deleteMailEntityEvent(EventStatus)
+     */
+    CompletableFuture<EventStatus> saveMailEntityEvent(EntityEvent event);
+
+    /**
+     * Asynchronously deleted the event matching the passed identifier and all associated statuses.
      * 
      * @param eventId the unique identifier of the event
      * @return the new {@link CompletableFuture} providing the deleted {@link Event} or empty if none could be found
      * @since 12.5RC1
+     * @see #saveEvent(Event)
      */
     CompletableFuture<Optional<Event>> deleteEvent(String eventId);
 
@@ -68,6 +81,7 @@ public interface EventStore
      * @param event the event to remove from the store
      * @return the new {@link CompletableFuture} providing the deleted {@link Event} or empty if none could be found
      * @since 12.5RC1
+     * @see #saveEventStatus(EventStatus)
      */
     CompletableFuture<Optional<Event>> deleteEvent(Event event);
 
@@ -78,8 +92,28 @@ public interface EventStore
      * @return the new {@link CompletableFuture} providing the deleted {@link EventStatus} or empty if none could be
      *         found
      * @since 12.5RC1
+     * @see #saveMailEntityEvent(EventStatus)
      */
     CompletableFuture<Optional<EventStatus>> deleteEventStatus(EventStatus status);
+
+    /**
+     * Asynchronously delete from the store the given mail status.
+     * 
+     * @param event the status to delete
+     * @return the new {@link CompletableFuture} providing the deleted {@link EntityEvent} or empty if none could be
+     *         found
+     * @since 12.5RC1
+     */
+    CompletableFuture<Optional<EventStatus>> deleteMailEntityEvent(EntityEvent event);
+
+    /**
+     * Asynchronously update the event to indicate that it's been pre filtered.
+     * 
+     * @param event the event to update
+     * @return the new {@link CompletableFuture} providing the updated {@link Event}
+     * @since 12.6RC1
+     */
+    CompletableFuture<Event> prefilterEvent(Event event);
 
     // Read
 

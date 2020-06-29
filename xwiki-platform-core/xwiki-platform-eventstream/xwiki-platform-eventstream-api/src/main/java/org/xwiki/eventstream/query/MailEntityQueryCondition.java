@@ -17,18 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream;
+package org.xwiki.eventstream.query;
 
 /**
- * Define a status for any couple of event/entity.
- *
+ * A condition related to the association indicating if an entity should receive a mail for an event.
+ * 
  * @version $Id$
- * @since 9.2RC1
+ * @since 12.6RC1
  */
-public interface EventStatus extends EntityEvent
+public class MailEntityQueryCondition extends AbstractEntityQueryCondition
 {
     /**
-     * @return either or nor the event has been read by the entity
+     * @param statusEntityId the entity associated with the events
+     * @param reversed true if the condition should be reversed
      */
-    boolean isRead();
+    public MailEntityQueryCondition(String statusEntityId, boolean reversed)
+    {
+        super(statusEntityId, reversed);
+    }
 }

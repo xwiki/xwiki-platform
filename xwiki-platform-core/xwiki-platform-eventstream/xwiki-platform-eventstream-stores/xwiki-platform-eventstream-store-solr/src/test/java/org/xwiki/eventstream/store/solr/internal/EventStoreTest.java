@@ -43,6 +43,7 @@ import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
 import org.xwiki.eventstream.EventStreamException;
+import org.xwiki.eventstream.internal.DefaultEntityEvent;
 import org.xwiki.eventstream.internal.DefaultEvent;
 import org.xwiki.eventstream.internal.DefaultEventStatus;
 import org.xwiki.eventstream.query.SimpleEventQuery;
@@ -78,6 +79,14 @@ import static org.mockito.Mockito.when;
 @SolrComponentList
 public class EventStoreTest
 {
+    private static final DefaultEvent EVENT1 = event("id1");
+
+    private static final DefaultEvent EVENT2 = event("id2");
+
+    private static final DefaultEvent EVENT3 = event("id3");
+
+    private static final DefaultEvent EVENT4 = event("id4");
+
     @XWikiTempDir
     private File permanentDirectory;
 
@@ -127,12 +136,12 @@ public class EventStoreTest
         this.permanentDirectory.mkdirs();
     }
 
-    private DefaultEvent event(String id)
+    private static DefaultEvent event(String id)
     {
         return event(id, null);
     }
 
-    private DefaultEvent event(String id, Date date)
+    private static DefaultEvent event(String id, Date date)
     {
         DefaultEvent event = new DefaultEvent();
 
@@ -142,9 +151,14 @@ public class EventStoreTest
         return event;
     }
 
-    private DefaultEventStatus eventstatus(Event event, String entityId, boolean read)
+    private static DefaultEventStatus eventstatus(Event event, String entityId, boolean read)
     {
         return new DefaultEventStatus(event, entityId, read);
+    }
+
+    private static DefaultEntityEvent entityevent(Event event, String entityId)
+    {
+        return new DefaultEntityEvent(event, entityId);
     }
 
     private EventSearchResult assertSearch(Collection<Event> expected, EventQuery query) throws EventStreamException
@@ -186,61 +200,80 @@ public class EventStoreTest
     }
 
     @Test
-    public void search() throws EventStreamException, InterruptedException, ExecutionException
+    public void allSearch()
+        throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
     {
-        DefaultEvent event1 = event("id1");
-        DefaultEvent event2 = event("id2");
-        DefaultEvent event3 = event("id3");
-        DefaultEvent event4 = event("id4");
+        // Misc
 
-        event1.setHidden(true);
-        event2.setHidden(true);
-        event3.setHidden(false);
-        event4.setHidden(false);
+        searchMisc();
 
-        event1.setUser(new DocumentReference("wiki", "space", "user1"));
-        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user1")).thenReturn(event1.getUser());
-        when(this.documentConverter.convert(String.class, event1.getUser())).thenReturn("wiki:space.user1");
-        event2.setUser(new DocumentReference("wiki", "space", "user2"));
-        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user2")).thenReturn(event2.getUser());
-        when(this.documentConverter.convert(String.class, event2.getUser())).thenReturn("wiki:space.user2");
-        event3.setUser(new DocumentReference("wiki", "space", "user3"));
-        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user3")).thenReturn(event3.getUser());
-        when(this.documentConverter.convert(String.class, event3.getUser())).thenReturn("wiki:space.user3");
-        event4.setUser(new DocumentReference("wiki", "space", "user4"));
-        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user4")).thenReturn(event4.getUser());
-        when(this.documentConverter.convert(String.class, event4.getUser())).thenReturn("wiki:space.user4");
+        // Status
 
-        this.eventStore.saveEvent(event1);
-        this.eventStore.saveEvent(event2);
-        this.eventStore.saveEvent(event3);
-        this.eventStore.saveEvent(event4).get();
+        searchStatus();
 
-        assertSearch(Arrays.asList(event1, event2, event3, event4), new SimpleEventQuery());
+        // Mail
+
+        searchMail();
+
+        // Reference
+
+        searchReference();
+    }
+
+    public void searchMisc() throws EventStreamException, InterruptedException, ExecutionException
+    {
+        EVENT1.setHidden(true);
+        EVENT2.setHidden(true);
+        EVENT3.setHidden(false);
+        EVENT4.setHidden(false);
+
+        EVENT1.setUser(new DocumentReference("wiki", "space", "user1"));
+        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user1")).thenReturn(EVENT1.getUser());
+        when(this.documentConverter.convert(String.class, EVENT1.getUser())).thenReturn("wiki:space.user1");
+        EVENT2.setUser(new DocumentReference("wiki", "space", "user2"));
+        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user2")).thenReturn(EVENT2.getUser());
+        when(this.documentConverter.convert(String.class, EVENT2.getUser())).thenReturn("wiki:space.user2");
+        EVENT3.setUser(new DocumentReference("wiki", "space", "user3"));
+        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user3")).thenReturn(EVENT3.getUser());
+        when(this.documentConverter.convert(String.class, EVENT3.getUser())).thenReturn("wiki:space.user3");
+        EVENT4.setUser(new DocumentReference("wiki", "space", "user4"));
+        when(this.documentConverter.convert(DocumentReference.class, "wiki:space.user4")).thenReturn(EVENT4.getUser());
+        when(this.documentConverter.convert(String.class, EVENT4.getUser())).thenReturn("wiki:space.user4");
+
+        this.eventStore.saveEvent(EVENT1);
+        this.eventStore.saveEvent(EVENT2);
+        this.eventStore.saveEvent(EVENT3);
+        this.eventStore.saveEvent(EVENT4);
+        this.eventStore.prefilterEvent(EVENT1).get();
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2, EVENT3, EVENT4), new SimpleEventQuery());
 
         SimpleEventQuery query = new SimpleEventQuery();
         query.eq(Event.FIELD_ID, "id1");
-        assertSearch(Arrays.asList(event1), query);
+        assertSearch(Arrays.asList(EVENT1), query);
 
         query.eq(Event.FIELD_ID, "id2");
         assertSearch(Arrays.asList(), query);
 
         query = new SimpleEventQuery();
         query.not().eq(Event.FIELD_ID, "id2");
-        assertSearch(Arrays.asList(event1, event3, event4), query);
+        assertSearch(Arrays.asList(EVENT1, EVENT3, EVENT4), query);
 
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_HIDDEN, true));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_HIDDEN, true));
 
-        assertSearch(Arrays.asList(event4), new SimpleEventQuery().eq(Event.FIELD_USER, event4.getUser()));
+        assertSearch(Arrays.asList(EVENT4), new SimpleEventQuery().eq(Event.FIELD_USER, EVENT4.getUser()));
 
-        assertSearch(Arrays.asList(event1, event2),
-            new SimpleEventQuery().eq(Event.FIELD_ID, event1.getId()).or().eq(Event.FIELD_ID, event2.getId()));
+        assertSearch(Arrays.asList(EVENT1, EVENT2),
+            new SimpleEventQuery().eq(Event.FIELD_ID, EVENT1.getId()).or().eq(Event.FIELD_ID, EVENT2.getId()));
 
-        assertSearch(Arrays.asList(event1), new SimpleEventQuery().eq(Event.FIELD_ID, event1.getId()).open()
-            .eq(Event.FIELD_ID, event1.getId()).or().eq(Event.FIELD_ID, event2.getId()).close());
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_ID, EVENT1.getId()).open()
+            .eq(Event.FIELD_ID, EVENT1.getId()).or().eq(Event.FIELD_ID, EVENT2.getId()).close());
 
-        assertSearch(Arrays.asList(event1, event2),
-            new SimpleEventQuery().in(Event.FIELD_ID, event1.getId(), event2.getId()));
+        assertSearch(Arrays.asList(EVENT1, EVENT2),
+            new SimpleEventQuery().in(Event.FIELD_ID, EVENT1.getId(), EVENT2.getId()));
+
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, true));
+        assertSearch(Arrays.asList(EVENT2, EVENT3, EVENT4), new SimpleEventQuery().eq(Event.FIELD_PREFILTERED, false));
     }
 
     @Test
@@ -331,7 +364,6 @@ public class EventStoreTest
         assertEquals(2, result.getTotalHits());
     }
 
-    @Test
     public void searchReference() throws EventStreamException, InterruptedException, ExecutionException
     {
         WikiReference wiki = new WikiReference("wiki");
@@ -361,76 +393,90 @@ public class EventStoreTest
         when(this.wikiConverter.convert(WikiReference.class, wikiString)).thenReturn(wiki);
         when(this.wikiConverter.convert(String.class, wiki)).thenReturn(wikiString);
 
-        DefaultEvent event1 = event("id1");
-        DefaultEvent event2 = event("id2");
-        DefaultEvent event3 = event("id3");
+        EVENT1.setWiki(wiki);
+        EVENT1.setSpace(space);
+        EVENT1.setDocument(document1);
+        EVENT2.setWiki(wiki);
+        EVENT2.setSpace(space);
+        EVENT2.setDocument(document2);
 
-        event1.setWiki(wiki);
-        event1.setSpace(space);
-        event1.setDocument(document1);
-        event2.setWiki(wiki);
-        event2.setSpace(space);
-        event2.setDocument(document2);
+        this.eventStore.saveEvent(EVENT1);
+        this.eventStore.saveEvent(EVENT2);
+        this.eventStore.saveEvent(EVENT3).get();
 
-        this.eventStore.saveEvent(event1);
-        this.eventStore.saveEvent(event2);
-        this.eventStore.saveEvent(event3).get();
-
-        assertSearch(Arrays.asList(event1, event2, event3), new SimpleEventQuery());
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_WIKI, wikiString));
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_SPACE, spaceString));
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_SPACE, space));
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().eq(Event.FIELD_SPACE, "space"));
-        assertSearch(Arrays.asList(event1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document1"));
-        assertSearch(Arrays.asList(event1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document1"));
-        assertSearch(Arrays.asList(event1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString1));
-        assertSearch(Arrays.asList(event2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document2"));
-        assertSearch(Arrays.asList(event2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document2"));
-        assertSearch(Arrays.asList(event2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString2));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_WIKI, wikiString));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_SPACE, spaceString));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_SPACE, space));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().eq(Event.FIELD_SPACE, "space"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document1"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document1"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString1));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "document2"));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, "space.document2"));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().eq(Event.FIELD_DOCUMENT, documentString2));
     }
 
-    @Test
     public void searchStatus()
         throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
     {
-        DefaultEvent event1 = event("id1");
-        DefaultEvent event2 = event("id2");
-        DefaultEvent event3 = event("id3");
-        DefaultEventStatus status11 = eventstatus(event1, "entity1", true);
-        DefaultEventStatus status12 = eventstatus(event1, "entity2", false);
-        DefaultEventStatus status21 = eventstatus(event2, "entity1", false);
-        DefaultEventStatus status22 = eventstatus(event2, "entity3", true);
+        DefaultEventStatus status11 = eventstatus(EVENT1, "entity1", true);
+        DefaultEventStatus status12 = eventstatus(EVENT1, "entity2", false);
+        DefaultEventStatus status21 = eventstatus(EVENT2, "entity1", false);
+        DefaultEventStatus status22 = eventstatus(EVENT2, "entity3", true);
 
-        this.eventStore.saveEvent(event1);
-        this.eventStore.saveEvent(event2);
-        this.eventStore.saveEvent(event3);
         this.eventStore.saveEventStatus(status11).get();
         this.eventStore.saveEventStatus(status12);
         this.eventStore.saveEventStatus(status21);
         this.eventStore.saveEventStatus(status22).get();
 
-        SolrDocument document1 = this.eventStore.getEventDocument(event1.getId());
+        SolrDocument document1 = this.eventStore.getEventDocument(EVENT1.getId());
         assertEquals(Arrays.asList("entity1"), document1.get(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS));
         assertEquals(Arrays.asList("entity2"), document1.get(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS));
 
-        SolrDocument document2 = this.eventStore.getEventDocument(event2.getId());
+        SolrDocument document2 = this.eventStore.getEventDocument(EVENT2.getId());
         assertEquals(Arrays.asList("entity3"), document2.get(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS));
         assertEquals(Arrays.asList("entity1"), document2.get(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS));
 
-        assertSearch(Arrays.asList(event1, event2, event3), new SimpleEventQuery());
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().withStatus(true));
 
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().withStatus(true));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().withStatus(false));
 
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().withStatus(false));
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().withStatus("entity1"));
 
-        assertSearch(Arrays.asList(event1, event2), new SimpleEventQuery().withStatus("entity1"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().withStatus("entity2"));
 
-        assertSearch(Arrays.asList(event1), new SimpleEventQuery().withStatus("entity2"));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().withStatus("entity3"));
 
-        assertSearch(Arrays.asList(event2), new SimpleEventQuery().withStatus("entity3"));
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().withStatus("entity1", true));
 
-        assertSearch(Arrays.asList(event1), new SimpleEventQuery().withStatus("entity1", true));
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().withStatus("entity1", false));
+    }
 
-        assertSearch(Arrays.asList(event2), new SimpleEventQuery().withStatus("entity1", false));
+    public void searchMail()
+        throws EventStreamException, InterruptedException, ExecutionException, SolrServerException, IOException
+    {
+        DefaultEntityEvent mail11 = entityevent(EVENT1, "entity1");
+        DefaultEntityEvent mail12 = entityevent(EVENT1, "entity2");
+        DefaultEntityEvent mail21 = entityevent(EVENT2, "entity1");
+        DefaultEntityEvent mail22 = entityevent(EVENT2, "entity3");
+
+        this.eventStore.saveMailEntityEvent(mail11);
+        this.eventStore.saveMailEntityEvent(mail12);
+        this.eventStore.saveMailEntityEvent(mail21);
+        this.eventStore.saveMailEntityEvent(mail22).get();
+
+        SolrDocument document1 = this.eventStore.getEventDocument(EVENT1.getId());
+        assertEquals(Arrays.asList("entity1"), document1.get(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS));
+        assertEquals(Arrays.asList("entity2"), document1.get(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS));
+
+        SolrDocument document2 = this.eventStore.getEventDocument(EVENT2.getId());
+        assertEquals(Arrays.asList("entity3"), document2.get(EventsSolrCoreInitializer.SOLR_FIELD_READLISTENERS));
+        assertEquals(Arrays.asList("entity1"), document2.get(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS));
+
+        assertSearch(Arrays.asList(EVENT1, EVENT2), new SimpleEventQuery().withMail("entity1"));
+
+        assertSearch(Arrays.asList(EVENT1), new SimpleEventQuery().withMail("entity2"));
+
+        assertSearch(Arrays.asList(EVENT2), new SimpleEventQuery().withMail("entity3"));
     }
 }

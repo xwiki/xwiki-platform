@@ -17,18 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream;
+package org.xwiki.eventstream.internal.events;
+
+import org.junit.jupiter.api.Test;
+import org.xwiki.eventstream.events.MailEntityDeleteEvent;
+import org.xwiki.observation.event.ApplicationStartedEvent;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Define a status for any couple of event/entity.
- *
+ * Validate {@link MailEntityDeleteEvent}.
+ * 
  * @version $Id$
- * @since 9.2RC1
  */
-public interface EventStatus extends EntityEvent
+public class MailEntityDeleteEventTest
 {
-    /**
-     * @return either or nor the event has been read by the entity
-     */
-    boolean isRead();
+    @Test
+    public void matches()
+    {
+        MailEntityDeleteEvent event = new MailEntityDeleteEvent();
+
+        assertTrue(event.matches(event));
+        assertTrue(event.matches(new MailEntityDeleteEvent()));
+
+        assertFalse(event.matches(new ApplicationStartedEvent()));
+    }
 }

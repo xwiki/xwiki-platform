@@ -416,6 +416,20 @@ public class SimpleEventQuery extends GroupQueryCondition implements PageableEve
         return this;
     }
 
+    /**
+     * Select events associated for which the passed entity should receive mails.
+     * 
+     * @param entityId the identifier of the entity that should receive the mail
+     * @return this {@link SimpleEventQuery}
+     * @since 12.6RC1
+     */
+    public SimpleEventQuery withMail(String entityId)
+    {
+        addCondition(new MailEntityQueryCondition(entityId, this.reversed));
+
+        return this;
+    }
+
     @Override
     public List<SortClause> getSorts()
     {

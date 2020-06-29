@@ -19,44 +19,58 @@
  */
 package org.xwiki.eventstream.internal;
 
+import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.Event;
-import org.xwiki.eventstream.EventStatus;
 
 /**
- * Default implementation for {@link EventStatus}.
+ * Default implementation for {@link EntityEvent}.
  *
  * @version $Id$
- * @since 9.2RC1
+ * @since 12.6RC1
  */
-public class DefaultEventStatus extends DefaultEntityEvent implements EventStatus
+public class DefaultEntityEvent implements EntityEvent
 {
-    private boolean isRead;
+    private Event event;
+
+    private String entityId;
 
     /**
      * Construct a DefaultEventStatus.
      * 
      * @param event the event concerned by the status
      * @param entityId the id of the entity concerned by the status
-     * @param isRead either or not the entity as read the given entity
      */
-    public DefaultEventStatus(Event event, String entityId, boolean isRead)
+    public DefaultEntityEvent(Event event, String entityId)
     {
-        super(event, entityId);
-
-        this.isRead = isRead;
+        this.event = event;
+        this.entityId = entityId;
     }
 
     @Override
-    public boolean isRead()
+    public Event getEvent()
     {
-        return this.isRead;
+        return event;
+    }
+
+    @Override
+    public String getEntityId()
+    {
+        return entityId;
     }
 
     /**
-     * @param read either or not the entity as read the given entity
+     * @param event the event concerned by the status
      */
-    public void setRead(boolean read)
+    public void setEvent(Event event)
     {
-        this.isRead = read;
+        this.event = event;
+    }
+
+    /**
+     * @param entityId the id of the entity concerned by the status
+     */
+    public void setEntityId(String entityId)
+    {
+        this.entityId = entityId;
     }
 }

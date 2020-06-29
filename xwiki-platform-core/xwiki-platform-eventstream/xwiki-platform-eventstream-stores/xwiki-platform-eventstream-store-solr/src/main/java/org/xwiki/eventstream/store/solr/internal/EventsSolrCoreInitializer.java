@@ -59,6 +59,13 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     public static final String SOLR_FIELD_UNREADLISTENERS = "unreadListeners";
 
     /**
+     * The name of the field containing the list of users who should get this event by mail.
+     * 
+     * @since 12.6RC1
+     */
+    public static final String SOLR_FIELD_MAILLISTENERS = "mailListeners";
+
+    /**
      * The name of the field containing the different variation of space reference.
      * 
      * @since 12.5RC1
@@ -75,7 +82,7 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
     @Override
     protected long getVersion()
     {
-        return SCHEMA_VERSION_12_5;
+        return SCHEMA_VERSION_12_6;
     }
 
     @Override
@@ -109,11 +116,15 @@ public class EventsSolrCoreInitializer extends AbstractSolrCoreInitializer
         // Add support for searching various forms of references
         setStringField(FIELD_SPACE_INDEX, true, false, SOLR_FIELD_STORED, false);
         setStringField(FIELD_DOCUMENT_INDEX, true, false, SOLR_FIELD_STORED, false);
+
+        migrateSchema(SCHEMA_VERSION_12_5);
     }
 
     @Override
     protected void migrateSchema(long cversion) throws SolrException
     {
-        // Not needed yet
+        if (cversion < SCHEMA_VERSION_12_6) {
+            setStringField(SOLR_FIELD_MAILLISTENERS, true, false);
+        }
     }
 }

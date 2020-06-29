@@ -25,33 +25,32 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.xwiki.text.XWikiToStringBuilder;
 
 /**
- * A condition related to the status of an event for a specific entity.
+ * A condition related to an entity associated with and event.
  * 
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-public class StatusQueryCondition extends AbstractEntityQueryCondition
+public abstract class AbstractEntityQueryCondition extends QueryCondition
 {
-    private Boolean statusRead;
+    private String statusEntityId;
 
     /**
      * @param statusEntityId the entity associated with the events
-     * @param statusRead indicate if read or unread event should be selected, null if disabled
      * @param reversed true if the condition should be reversed
      */
-    public StatusQueryCondition(String statusEntityId, Boolean statusRead, boolean reversed)
+    public AbstractEntityQueryCondition(String statusEntityId, boolean reversed)
     {
-        super(statusEntityId, reversed);
+        super(reversed);
 
-        this.statusRead = statusRead;
+        this.statusEntityId = statusEntityId;
     }
 
     /**
-     * @return indicate if read or unread event should be selected, null if disabled
+     * @return the status entity to filter on or null if not enabled
      */
-    public Boolean getStatusRead()
+    public String getStatusEntityId()
     {
-        return this.statusRead;
+        return this.statusEntityId;
     }
 
     @Override
@@ -60,7 +59,7 @@ public class StatusQueryCondition extends AbstractEntityQueryCondition
         HashCodeBuilder builder = new HashCodeBuilder();
 
         builder.appendSuper(super.hashCode());
-        builder.append(getStatusRead());
+        builder.append(getStatusEntityId());
 
         return builder.build();
     }
@@ -72,13 +71,13 @@ public class StatusQueryCondition extends AbstractEntityQueryCondition
             return true;
         }
 
-        if (obj instanceof StatusQueryCondition) {
-            StatusQueryCondition status = (StatusQueryCondition) obj;
+        if (obj instanceof AbstractEntityQueryCondition) {
+            AbstractEntityQueryCondition status = (AbstractEntityQueryCondition) obj;
 
             EqualsBuilder builder = new EqualsBuilder();
 
             builder.appendSuper(super.equals(obj));
-            builder.append(getStatusRead(), status.getStatusRead());
+            builder.append(getStatusEntityId(), status.getStatusEntityId());
 
             return builder.build();
         }
@@ -92,7 +91,7 @@ public class StatusQueryCondition extends AbstractEntityQueryCondition
         ToStringBuilder builder = new XWikiToStringBuilder(this);
 
         builder.appendSuper(super.toString());
-        builder.append("statusRead", getStatusRead());
+        builder.append("statusEntityId", getStatusEntityId());
 
         return builder.build();
     }

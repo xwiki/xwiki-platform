@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 
 import org.junit.jupiter.api.Test;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventSearchResult;
@@ -39,6 +40,7 @@ import org.xwiki.test.mockito.MockitoComponentManager;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Validate {@link AbstractAsynchronousEventStore}.
@@ -52,9 +54,11 @@ public class AsynchronousEventStoreTest
     {
         class EventEntry
         {
-            Event event;
+            DefaultEvent event;
 
             Map<String, EventStatus> statuses = new ConcurrentHashMap<>();
+
+            Map<String, EntityEvent> mailstatuses = new ConcurrentHashMap<>();
         }
 
         Map<String, EventEntry> events = new ConcurrentHashMap<>();
@@ -101,11 +105,29 @@ public class AsynchronousEventStoreTest
         }
 
         @Override
-        protected Event syncSaveEvent(Event event) throws EventStreamException
+        protected EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException
         {
-            getEventEntry(event.getId(), true).event = event;
+            getEventEntry(event.getEvent().getId(), true).mailstatuses.put(event.getEntityId(), event);
 
             return event;
+        }
+
+        @Override
+        protected Event syncSaveEvent(Event event) throws EventStreamException
+        {
+            getEventEntry(event.getId(), true).event = (DefaultEvent) event;
+
+            return event;
+        }
+
+        @Override
+        protected Event syncPrefilterEvent(Event event) throws EventStreamException
+        {
+            DefaultEvent storeEvent = getEventEntry(event.getId(), true).event;
+
+            storeEvent.setPrefiltered(true);
+
+            return storeEvent;
         }
 
         @Override
@@ -114,7 +136,19 @@ public class AsynchronousEventStoreTest
             EventEntry entry = getEventEntry(status.getEvent().getId(), false);
 
             if (entry != null) {
-                entry.statuses.remove(status.getEntityId());
+                return Optional.ofNullable(entry.statuses.remove(status.getEntityId()));
+            }
+
+            return Optional.empty();
+        }
+
+        @Override
+        protected Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event) throws EventStreamException
+        {
+            EventEntry entry = getEventEntry(event.getEvent().getId(), false);
+
+            if (entry != null) {
+                return Optional.ofNullable(entry.mailstatuses.remove(event.getEntityId()));
             }
 
             return Optional.empty();
@@ -155,6 +189,11 @@ public class AsynchronousEventStoreTest
     private DefaultEventStatus eventStatus(DefaultEvent event, String entityId, boolean read)
     {
         return new DefaultEventStatus(event, entityId, read);
+    }
+
+    private DefaultEntityEvent entityEvent(DefaultEvent event, String entityId)
+    {
+        return new DefaultEntityEvent(event, entityId);
     }
 
     // Tests
@@ -220,5 +259,53 @@ public class AsynchronousEventStoreTest
         assertSame(status21, this.store.events.get(event2.getId()).statuses.get(status21.getEntityId()));
         assertSame(status22, this.store.events.get(event2.getId()).statuses.get(status22.getEntityId()));
         assertSame(status23, this.store.events.get(event2.getId()).statuses.get(status23.getEntityId()));
+    }
+
+    @Test
+    void mailentity() throws InterruptedException, ExecutionException, EventStreamException
+    {
+        DefaultEvent event1 = event("id1");
+        DefaultEvent event2 = event("id2");
+        DefaultEntityEvent status11 = entityEvent(event1, "entity1");
+        DefaultEntityEvent status13 = entityEvent(event1, "entity3");
+        DefaultEntityEvent status21 = entityEvent(event2, "entity1");
+        DefaultEntityEvent status24 = entityEvent(event2, "entity4");
+
+        this.store.saveEvent(event1);
+        this.store.saveEvent(event2);
+        this.store.saveMailEntityEvent(status11);
+        this.store.saveMailEntityEvent(status13);
+        this.store.saveMailEntityEvent(status21);
+        this.store.saveMailEntityEvent(status24).get();
+
+        assertSame(status11, this.store.events.get(event1.getId()).mailstatuses.get(status11.getEntityId()));
+        assertSame(status13, this.store.events.get(event1.getId()).mailstatuses.get(status13.getEntityId()));
+        assertSame(status21, this.store.events.get(event2.getId()).mailstatuses.get(status21.getEntityId()));
+        assertSame(status24, this.store.events.get(event2.getId()).mailstatuses.get(status24.getEntityId()));
+
+        this.store.deleteMailEntityEvent(status11).get();
+
+        assertNull(this.store.events.get(event1.getId()).mailstatuses.get(status11.getEntityId()));
+        assertSame(status13, this.store.events.get(event1.getId()).mailstatuses.get(status13.getEntityId()));
+        assertSame(status21, this.store.events.get(event2.getId()).mailstatuses.get(status21.getEntityId()));
+        assertSame(status24, this.store.events.get(event2.getId()).mailstatuses.get(status24.getEntityId()));
+    }
+
+    @Test
+    void prefilter() throws InterruptedException, ExecutionException, EventStreamException
+    {
+        DefaultEvent event1 = event("id1");
+        DefaultEvent event2 = event("id2");
+
+        this.store.saveEvent(event1);
+        this.store.saveEvent(event2).get();
+
+        assertFalse(this.store.getEvent(event1.getId()).get().isPrefiltered());
+        assertFalse(this.store.getEvent(event2.getId()).get().isPrefiltered());
+
+        this.store.prefilterEvent(event1).get();
+
+        assertTrue(this.store.getEvent(event1.getId()).get().isPrefiltered());
+        assertFalse(this.store.getEvent(event2.getId()).get().isPrefiltered());
     }
 }

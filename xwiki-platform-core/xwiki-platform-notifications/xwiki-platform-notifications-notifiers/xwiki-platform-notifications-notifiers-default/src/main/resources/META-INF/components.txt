@@ -2,7 +2,6 @@ org.xwiki.notifications.notifiers.internal.DefaultModelBridge
 org.xwiki.notifications.notifiers.internal.UserEventDispatcher
 org.xwiki.notifications.notifiers.internal.UserEventDispatcherListener
 org.xwiki.notifications.notifiers.internal.UserEventManager
-org.xwiki.notifications.notifiers.internal.UserEventStoreListener
 org.xwiki.notifications.notifiers.internal.email.live.DefaultLiveMimeMessageIterator
 org.xwiki.notifications.notifiers.internal.email.DefaultNotificationEmailRenderer
 org.xwiki.notifications.notifiers.internal.email.DefaultPeriodicMimeMessageIterator

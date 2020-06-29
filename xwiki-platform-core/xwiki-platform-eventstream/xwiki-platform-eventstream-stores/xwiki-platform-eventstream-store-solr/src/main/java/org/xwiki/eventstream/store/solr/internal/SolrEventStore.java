@@ -42,6 +42,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.eventstream.EntityEvent;
 import org.xwiki.eventstream.Event;
 import org.xwiki.eventstream.Event.Importance;
 import org.xwiki.eventstream.EventQuery;
@@ -56,6 +57,7 @@ import org.xwiki.eventstream.query.CompareQueryCondition;
 import org.xwiki.eventstream.query.CompareQueryCondition.CompareType;
 import org.xwiki.eventstream.query.GroupQueryCondition;
 import org.xwiki.eventstream.query.InQueryCondition;
+import org.xwiki.eventstream.query.MailEntityQueryCondition;
 import org.xwiki.eventstream.query.PageableEventQuery;
 import org.xwiki.eventstream.query.QueryCondition;
 import org.xwiki.eventstream.query.SimpleEventQuery;
@@ -150,11 +152,51 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
     }
 
     @Override
+    protected EntityEvent syncSaveMailEntityEvent(EntityEvent event) throws EventStreamException
+    {
+        saveMailEntityEvent(event.getEvent().getId(), event.getEntityId(), true);
+
+        return event;
+    }
+
+    @Override
     protected Optional<EventStatus> syncDeleteEventStatus(EventStatus status) throws EventStreamException
     {
         saveEventStatus(status.getEvent().getId(), status.getEntityId(), false, false);
 
         return Optional.of(status);
+    }
+
+    @Override
+    protected Optional<EntityEvent> syncDeleteMailEntityEvent(EntityEvent event) throws EventStreamException
+    {
+        saveMailEntityEvent(event.getEvent().getId(), event.getEntityId(), false);
+
+        return Optional.of(event);
+    }
+
+    @Override
+    protected Event syncPrefilterEvent(Event event) throws EventStreamException
+    {
+        SolrInputDocument document = new SolrInputDocument();
+
+        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, event.getId(), document);
+
+        this.utils.setAtomic(SolrUtils.ATOMIC_UPDATE_MODIFIER_SET, Event.FIELD_PREFILTERED, true, document);
+
+        try {
+            this.client.add(document);
+        } catch (Exception e) {
+            throw new EventStreamException(
+                String.format("Failed to to set the event [%s] as prefiltered", event.getId()), e);
+        }
+
+        // Update the event so that we return something with the right value
+        if (event instanceof DefaultEvent) {
+            event.setPrefiltered(true);
+        }
+
+        return event;
     }
 
     private void saveEventStatus(String eventId, String entityId, boolean read, boolean unread)
@@ -177,6 +219,24 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             throw new EventStreamException(
                 String.format("Failed to update the event status for event [%s] and entity id [%s]", eventId, entityId),
                 e);
+        }
+    }
+
+    private void saveMailEntityEvent(String eventId, String entityId, boolean add) throws EventStreamException
+    {
+        SolrInputDocument document = new SolrInputDocument();
+
+        this.utils.set(EventsSolrCoreInitializer.SOLR_FIELD_ID, eventId, document);
+
+        this.utils.setAtomic(
+            add ? SolrUtils.ATOMIC_UPDATE_MODIFIER_ADD_DISTINCT : SolrUtils.ATOMIC_UPDATE_MODIFIER_REMOVE,
+            EventsSolrCoreInitializer.SOLR_FIELD_MAILLISTENERS, entityId, document);
+
+        try {
+            this.client.add(document);
+        } catch (Exception e) {
+            throw new EventStreamException(String.format(
+                "Failed to update the event mail status for event [%s] and entity id [%s]", eventId, entityId), e);
         }
     }
 
@@ -372,6 +432,8 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             conditionString = serializeCompareCondition((CompareQueryCondition) condition);
         } else if (condition instanceof StatusQueryCondition) {
             conditionString = serializeStatusCondition((StatusQueryCondition) condition);
+        } else if (condition instanceof MailEntityQueryCondition) {
+            conditionString = serializeMailCondition((MailEntityQueryCondition) condition);
         } else if (condition instanceof InQueryCondition) {
             conditionString = serializeInCondition((InQueryCondition) condition);
         } else if (condition instanceof GroupQueryCondition) {
@@ -383,10 +445,6 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
         return conditionString;
     }
 
-    /**
-     * @param condition
-     * @return
-     */
     private String serializeStatusCondition(StatusQueryCondition condition)
     {
         // Filter on status
@@ -415,6 +473,21 @@ public class SolrEventStore extends AbstractAsynchronousEventStore
             builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
             builder.append(" OR ");
             builder.append(EventsSolrCoreInitializer.SOLR_FIELD_UNREADLISTENERS);
+            builder.append(':');
+            builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
+
+            return builder.toString();
+        }
+
+        return null;
+    }
+
+    private String serializeMailCondition(MailEntityQueryCondition condition)
+    {
+        // Filter on status
+        if (condition.getStatusEntityId() != null) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(EventsSolrCoreInitializer.SOLR_FIELD_MAILLISTENERS);
             builder.append(':');
             builder.append(this.utils.toFilterQueryString(condition.getStatusEntityId()));
 

@@ -17,18 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.eventstream;
+package org.xwiki.eventstream.internal.events;
+
+import org.junit.jupiter.api.Test;
+import org.xwiki.eventstream.events.MailEntityAddedEvent;
+import org.xwiki.observation.event.ApplicationStartedEvent;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Define a status for any couple of event/entity.
- *
+ * Validate {@link MailEntityAddedEvent}.
+ * 
  * @version $Id$
- * @since 9.2RC1
  */
-public interface EventStatus extends EntityEvent
+public class MailEntityAddedEventTest
 {
-    /**
-     * @return either or nor the event has been read by the entity
-     */
-    boolean isRead();
+    @Test
+    public void matches()
+    {
+        MailEntityAddedEvent event = new MailEntityAddedEvent();
+
+        assertTrue(event.matches(event));
+        assertTrue(event.matches(new MailEntityAddedEvent()));
+
+        assertFalse(event.matches(new ApplicationStartedEvent()));
+    }
 }

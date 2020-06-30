@@ -40,8 +40,8 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   
-  <content>### Missing: help.syntaxpage.title=XWiki Syntax Guide
-### Missing: help.syntaxtitle=XWiki Syntax {0}
+  <content>help.syntaxpage.title=Guía de Sintaxis XWiki
+help.syntaxtitle=Sintaxis XWiki {0}
 help.syntaxall=Todo
 help.changesyntax=Cambiar sintaxis
 help.choose_syntax=Seleccionar sintaxis</content>

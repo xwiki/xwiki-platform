@@ -61,7 +61,7 @@ public interface EventStore
      * @param event the status to save
      * @return the new {@link CompletableFuture} providing the added {@link EntityEvent}
      * @since 12.6RC1
-     * @see #deleteMailEntityEvent(EventStatus)
+     * @see #deleteMailEntityEvent(EntityEvent)
      */
     CompletableFuture<EventStatus> saveMailEntityEvent(EntityEvent event);
 
@@ -92,7 +92,7 @@ public interface EventStore
      * @return the new {@link CompletableFuture} providing the deleted {@link EventStatus} or empty if none could be
      *         found
      * @since 12.5RC1
-     * @see #saveMailEntityEvent(EventStatus)
+     * @see #saveMailEntityEvent(EntityEvent)
      */
     CompletableFuture<Optional<EventStatus>> deleteEventStatus(EventStatus status);
 

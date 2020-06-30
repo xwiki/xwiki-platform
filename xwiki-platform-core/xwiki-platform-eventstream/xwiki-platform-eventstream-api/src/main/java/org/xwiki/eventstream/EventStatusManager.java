@@ -71,6 +71,7 @@ public interface EventStatusManager
     /**
      * @param startDate date before which to remove event status
      * @param entityId the id of the entity concerned by the status
+     * @throws Exception if an error occurs
      * @since 12.1RC1
      */
     @Unstable

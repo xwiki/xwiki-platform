@@ -1563,7 +1563,8 @@ XWiki.Annotation = Class.create({
 
   onAnnotationAdd : function(event) {
     event.stop();
-    // don't submit
+    // Notify the others that we're about to submit the annotation, in order to give them the chance to update the form
+    // fields before the submit.
     document.fire('xwiki:actions:beforeSave')
     var form = this.createPanel.down('form');
     var formData = new Hash(form.serialize(true));

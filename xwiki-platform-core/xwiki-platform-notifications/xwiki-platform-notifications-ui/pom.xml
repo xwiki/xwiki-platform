@@ -74,6 +74,17 @@
       <artifactId>xwiki-platform-notifications-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <!-- Include the two default event stores -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-store-hibernate</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-eventstream-store-solr</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- Needed to have a nice toggle buttons on watchlist notifications area. -->
     <dependency>

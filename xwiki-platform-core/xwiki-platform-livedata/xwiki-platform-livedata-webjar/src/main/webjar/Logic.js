@@ -19,7 +19,14 @@
  */
 
 
-define(["jquery", "polyfills"], function ($) {
+define([
+  "jquery",
+  BASE_PATH + "advancedPanels.js",
+  "polyfills"
+], function (
+  $,
+  advancedPanels,
+) {
 
   /**
    * Map the element to its data object
@@ -60,6 +67,7 @@ define(["jquery", "polyfills"], function ($) {
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
     element.removeAttribute("data-data");
     this.layouts = {};
+    this.element.appendChild(advancedPanels(this));
   };
 
 

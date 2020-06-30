@@ -11,6 +11,7 @@
 
       <!-- Change layout-->
       <li class="dropdown-header">Change Layout</li>
+
       <li
         v-for="layout in data.meta.layouts"
       >
@@ -22,9 +23,16 @@
 
       <!-- Common actions -->
       <li class="dropdown-header">Actions</li>
+
       <li>
         <a href="#" @click.prevent="logic.triggerEvent('toggleSortPanel')">
-          <span class="fa fa-sort"></span> Toggle Sort Panel
+          <span class="fa fa-sort"></span> Advanced Sorting
+        </a>
+      </li>
+
+      <li>
+        <a href="#" @click.prevent="logic.triggerEvent('toggleFilterPanel')">
+          <span class="fa fa-filter"></span> Advanced Filtering
         </a>
       </li>
 

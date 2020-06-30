@@ -1,155 +1,91 @@
 <template>
-  <div class="livedata-topbar-wrapper">
+  <div class="livedata-topbar">
 
+    <!-- Drowpdown -->
+    <div ref="dropdownMenu"></div>
 
-    <div class="livedata-topbar">
+    <!-- Pagination -->
+    <nav class="livedata-pagination">
 
-      <!-- Drowpdown -->
-      <div ref="dropdownMenu"></div>
+      <!-- should go in the dropdown ?
+      <span>
+        Entries per page
+        <select
+          class="pagination-entries-per-page"
+          @change="logic.setPageSize(+$event.target.value)"
+        >
+          <option
+            v-for="pageSize in data.meta.pagination.pageSizes"
+            :value="pageSize"
+            :selected="pageSize === data.query.limit"
+          >{{ pageSize }}</option>
+        </select>
+      </span>
+      -->
 
-      <!-- Pagination -->
-      <nav class="livedata-pagination">
+      <span class="pagination-current-entries">
+        {{ logic.getFirstIndexOfPage() + 1}} - {{ logic.getLastIndexOfPage() + 1}}
+        of {{ data.data.count }}
+      </span>
 
-        <!-- should go in the dropdown ?
-        <span>
-          Entries per page
-          <select
-            class="pagination-entries-per-page"
-            @change="logic.setPageSize(+$event.target.value)"
-          >
-            <option
-              v-for="pageSize in data.meta.pagination.pageSizes"
-              :value="pageSize"
-              :selected="pageSize === data.query.limit"
-            >{{ pageSize }}</option>
-          </select>
-        </span>
+      <nav class="pagination-indexes">
+        <!--
+        <a
+          class="page-nav"
+          href="#"
+          @click.prevent="logic.setPageIndex(0)"
+        >
+          <span class="fa fa-angle-double-left"></span>
+        </a>
         -->
 
-        <span class="pagination-current-entries">
-          {{ logic.getFirstIndexOfPage() + 1}} - {{ logic.getLastIndexOfPage() + 1}}
-          of {{ data.data.count }}
+        <a
+          class="page-nav"
+          href="#"
+          @click.prevent="logic.setPageIndex(logic.getPageIndex() - 1)"
+        >
+          <span class="fa fa-angle-left"></span>
+        </a>
+
+        <span
+          v-for="pageIndex in paginationIndexesAndDots"
+          keys="pageIndex"
+        >
+          <span v-if="pageIndex === '...'">...</span>
+          <a
+            v-else
+            :class="{
+              'page-nav': true,
+              'current': pageIndex === logic.getPageIndex(),
+            }"
+            href="#"
+            @click.prevent="logic.setPageIndex(pageIndex)"
+          >
+            {{ pageIndex + 1 }}
+          </a>
         </span>
 
-        <nav class="pagination-indexes">
-          <!--
-          <a
-            class="page-nav"
-            href="#"
-            @click.prevent="logic.setPageIndex(0)"
-          >
-            <span class="fa fa-angle-double-left"></span>
-          </a>
-          -->
+        <a
+          class="page-nav"
+          href="#"
+          @click.prevent="logic.setPageIndex(logic.getPageIndex() + 1)"
+        >
+          <span class="fa fa-angle-right"></span>
+        </a>
 
-          <a
-            class="page-nav"
-            href="#"
-            @click.prevent="logic.setPageIndex(logic.getPageIndex() - 1)"
-          >
-            <span class="fa fa-angle-left"></span>
-          </a>
-
-          <span
-            v-for="pageIndex in paginationIndexesAndDots"
-            keys="pageIndex"
-          >
-            <span v-if="pageIndex === '...'">...</span>
-            <a
-              v-else
-              :class="{
-                'page-nav': true,
-                'current': pageIndex === logic.getPageIndex(),
-              }"
-              href="#"
-              @click.prevent="logic.setPageIndex(pageIndex)"
-            >
-              {{ pageIndex + 1 }}
-            </a>
-          </span>
-
-          <a
-            class="page-nav"
-            href="#"
-            @click.prevent="logic.setPageIndex(logic.getPageIndex() + 1)"
-          >
-            <span class="fa fa-angle-right"></span>
-          </a>
-
-          <!--
-          <a
-            class="page-nav"
-            href="#"
-            @click.prevent="logic.setPageIndex(logic.getPageCount() - 1)"
-          >
-            <span class="fa fa-angle-double-right"></span>
-          </a>
-          -->
-
-        </nav>
+        <!--
+        <a
+          class="page-nav"
+          href="#"
+          @click.prevent="logic.setPageIndex(logic.getPageCount() - 1)"
+        >
+          <span class="fa fa-angle-double-right"></span>
+        </a>
+        -->
 
       </nav>
 
-    </div>
-
-
-
-    <!-- Sort Panel -->
-    <div
-      class="livedata-panel livedata-panel-sort panel panel-default"
-      v-show="sortPanelOpen"
-    >
-      <div class="panel-heading">
-        <span>
-          <span class="fa fa-sort"></span> Sort
-        </span>
-        <span
-          class="close-button"
-          @click="sortPanelOpen = false"
-        >
-          <span class="fa fa-times"></span>
-        </span>
-
-      </div>
-
-      <div class="panel-body">
-
-        <!-- A sort entry -->
-        <div
-          class="sort-entry"
-          v-for="(sortEntry, level) in data.query.sort"
-          :key="level"
-        >
-          <!-- property select -->
-          <select
-            @change="logic.sort($event.target.value, level)"
-          >
-            <option
-              v-for="(property, i) in data.query.properties"
-              :key="i"
-              :value="property"
-              :selected="property === sortEntry.property"
-            >{{ property }}</option>
-          </select>
-
-          <!-- direction select -->
-          <select
-            @change="logic.sort(sortEntry.property, level, $event.target.value === 'true')"
-          >
-            <option
-              value="false"
-              :selected="!sortEntry.descending"
-            >Ascending</option>
-            <option
-              value="true"
-              :selected="sortEntry.descending"
-            >Descending</option>
-          </select>
-        </div>
-
-      </div>
-    </div>
-
+    </nav>
 
   </div>
 </template>
@@ -190,12 +126,6 @@ define([
 
     props: {
       logic: Object,
-    },
-
-    data: function () {
-      return {
-        sortPanelOpen: false,
-      };
     },
 
     computed: {
@@ -250,10 +180,6 @@ define([
       // create dropdown
       var dropdownMenu = createDropdownMenu(this.logic);
       this.$refs.dropdownMenu.parentNode.replaceChild(dropdownMenu, this.$refs.dropdownMenu);
-      // listen for event from the dropdown
-      this.logic.element.addEventListener("xwiki:livedata:toggleSortPanel", function () {
-        self.sortPanelOpen = !self.sortPanelOpen;
-      });
     },
 
   });
@@ -301,26 +227,6 @@ define([
 .livedata-pagination .pagination-entries-per-page {
   height: unset;
   padding: 2px 4px;
-}
-
-
-.livedata-panel .panel-heading {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.close-button {
-  position: absolute;
-  top: 0; right: 0;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 15px;
-  cursor: pointer;
 }
 
 

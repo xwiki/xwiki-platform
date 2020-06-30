@@ -36,7 +36,6 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.time.FastDateFormat;
 import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrInputDocument;
@@ -129,8 +128,6 @@ public class DefaultSolrUtils implements SolrUtils
      * The name of the type binary.
      */
     public static final String SOLR_TYPE_BINARY = "binary";
-
-    private static final FastDateFormat DATE_FORMAT = FastDateFormat.getInstance("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
     private static final String PATTERN_GROUP = "(.+)";
 

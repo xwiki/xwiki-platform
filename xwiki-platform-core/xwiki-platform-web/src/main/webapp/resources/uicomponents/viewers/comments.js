@@ -448,7 +448,7 @@ viewers.Comments = Class.create({
       const pc = $(form).find(".commentPreview");
       if (pc) {
         pc.hide();
-        pc.html('');
+        pc.empty();
       }
       const commentElt = $(form).find(".commenteditor");
       if (commentElt) {

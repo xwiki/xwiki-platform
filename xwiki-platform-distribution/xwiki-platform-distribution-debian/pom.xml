@@ -182,7 +182,7 @@
                     <mapper>
                         <type>perm</type>
                         <strip>1</strip>
-                        <prefix>/usr/share/doc/${debian.package}/</prefix>
+                        <prefix>/usr/share/doc/${debian.package}</prefix>
                     </mapper>
                 </data>
             </dataSet>

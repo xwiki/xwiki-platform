@@ -209,6 +209,8 @@ public class AnnotationsRESTResource extends AbstractAnnotationRESTResource
         //   1. there is a RequiresHTMLConversion parameter
         //   2. the value of this parameter is exactly "comment"
         //   3. the syntax of comment is given in the parameters
+        // Note that this transformation only makes sense if the annotations are saved in an xobject that contains
+        // a "comment" property.
         if (metadataMap.containsKey(REQUIRES_HTML_CONVERSION)
             && COMMENT_KEY.equals(metadataMap.get(REQUIRES_HTML_CONVERSION))
             && metadataMap.containsKey(COMMENT_SYNTAX_KEY)) {

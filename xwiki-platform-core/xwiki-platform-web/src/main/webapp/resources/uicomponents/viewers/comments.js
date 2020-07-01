@@ -488,7 +488,6 @@ viewers.Comments = Class.create({
       if ($(selector).size() > 0) {
         const parent = $(selector).parent(".commenteditor");
         parent.empty();
-        $(document).trigger('xwiki:dom:updated', {'elements': parent.toArray()});
       }
     });
   },

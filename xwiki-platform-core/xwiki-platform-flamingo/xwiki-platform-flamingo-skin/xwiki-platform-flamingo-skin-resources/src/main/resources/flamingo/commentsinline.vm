@@ -229,7 +229,9 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
         <input type="hidden" name="${xCommentClass}_replyto" value="$!replyTo"/>
         <div class="commentcontainer">
            <label for="${xCommentClass}_comment">$services.localization.render('core.viewers.comments.add.comment.label')</label>
-           <textarea id='${xCommentClass}_comment' rows='5' cols="80" name='${xCommentClass}_comment'>$!comment</textarea>
+          <div class="commenteditor">
+              <!-- loaded by javascript (see comments.js) -->
+          </div>
         </div>
         #if($xcontext.user == 'XWiki.XWikiGuest' && $offerGuestsCaptcha)
           #displayCaptcha()
@@ -292,7 +294,9 @@ $xwiki.ssfx.use('uicomponents/viewers/comments.css', true)
 #if($date), <span class="commentdate">$!xwiki.formatDate($date)</span>#end
       </div>
     </div>## commentheader
-    <div class="commentcontent">$doc.display('comment', 'edit', $comment)</div>
+    <div class="commentcontent commenteditor-${comment.number}">
+      <!-- loaded by javascript (see comments.js) -->
+    </div>
     <div class="hidden">
       ## CSRF prevention
       <input type="hidden" name="form_token" value="$!{services.csrf.getToken()}" />

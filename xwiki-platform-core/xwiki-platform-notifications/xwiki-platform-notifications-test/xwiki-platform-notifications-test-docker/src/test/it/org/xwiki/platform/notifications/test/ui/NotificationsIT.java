@@ -364,4 +364,15 @@ public class NotificationsIT
             testUtils.rest().deletePage(testReference.getLastSpaceReference().getName(), testReference.getName());
         }
     }
+
+    @Test
+    @Order(5)
+    public void guestUsersDontSeeNotificationPanel(TestUtils testUtils)
+    {
+        testUtils.login(FIRST_USER_NAME, FIRST_USER_PASSWORD);
+        testUtils.gotoPage("Main", "WebHome");
+        assertTrue(new NotificationsTrayPage().isNotificationMenuVisible());
+        testUtils.forceGuestUser();
+        assertFalse(new NotificationsTrayPage().isNotificationMenuVisible());
+    }
 }

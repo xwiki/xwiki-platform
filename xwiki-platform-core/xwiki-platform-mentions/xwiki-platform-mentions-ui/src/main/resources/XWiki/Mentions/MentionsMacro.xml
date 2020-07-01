@@ -131,7 +131,7 @@
       "?v=$escapetool.url($xwiki.version)"
   }
 });
-require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery'], function (ckeditorPromise, suggestUsers, $) {
+require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], function (ckeditorPromise, suggestUsers, $, xm) {
   /*
    * Keep records of the added anchors during the current edit session.
    * Note that the anchors saved here are not only the ones added on the current session,
@@ -226,14 +226,22 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery'], function (ckedito
             '&lt;/li&gt;',
         outputTemplate: function (param) {
           var editor = ckeditor.instances[name];
+          var currentWikiReference = xm.documentReference.extractReference(XWiki.EntityType.WIKI);
+          
+          // Compute an absolute reference containing the wiki reference even if the user is local.
+          var documentReference = XWiki.Model.resolve(param.id, XWiki.EntityType.DOCUMENT);
+          if (!documentReference.extractReference(XWiki.EntityType.WIKI)) {
+            documentReference = documentReference.appendParent(currentWikiReference);
+          }
+          var serializedReference = XWiki.Model.serialize(documentReference);
           editor.once('afterInsertHtml', function () {
             editor.execCommand('xwiki-macro-insert', {
               name: 'mention',
               inline: true,
               parameters: {
-                reference: param.id,
+                reference: serializedReference,
                 style: 'FULL_NAME',
-                anchor: getAnchor(param.id)
+                anchor: getAnchor(serializedReference)
               }
             });
           });
@@ -622,7 +630,7 @@ require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery'], function (ckedito
 #end
 #set ($link = $xwiki.getURL($reference.reference, 'view'))
 {{html}}
-&lt;a id="$anchor" class="$stringtool.join($cssClasses, ' ')" data-reference="$services.model.serialize($reference.reference, 'compactwiki')" href="$link"&gt;$content&lt;/a&gt;
+&lt;a id="$anchor" class="$stringtool.join($cssClasses, ' ')" data-reference="$services.model.serialize($reference.reference, 'default')" href="$link"&gt;$content&lt;/a&gt;
 {{/html}}
 {{/velocity}}</code>
     </property>

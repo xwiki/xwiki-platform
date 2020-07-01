@@ -55,7 +55,7 @@
     <dependency>
       <groupId>nu.validator</groupId>
       <artifactId>validator</artifactId>
-      <version>20.6.30</version>
+      <version>18.11.5</version>
       <exclusions>
         <exclusion>
           <groupId>log4j</groupId>
@@ -72,6 +72,14 @@
         <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>javax.servlet-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.velocity</groupId>
+          <artifactId>velocity</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.velocity</groupId>
+          <artifactId>velocity-tools</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

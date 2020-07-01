@@ -979,7 +979,9 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     </property>
     <property>
       <async_context>
-        <value>wiki</value>
+        <value>doc.reference</value>
+        <value>request.wiki</value>
+        <value>user</value>
       </async_context>
     </property>
     <property>
@@ -987,15 +989,17 @@ require(['jquery', 'xwiki-meta', 'bootstrap', 'bootstrap-switch'], function ($, 
     </property>
     <property>
       <content>{{velocity}}
-  #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
-  #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-  #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
-  #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
-  ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
-  #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
-  {{html clean="false"}} ## We need the clean false to avoid getting a supplementary ul element.
-  &lt;li class="notification-uix loading"&gt;&lt;/li&gt;
-  {{/html}}
+  #if ("$!xcontext.userReference" != '' &amp;&amp; $services.notification.isEnabled())
+    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
+    #set ($discard = $xwiki.jsx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.Macro.NotificationsMacro'))
+    #set ($discard = $xwiki.ssx.use('XWiki.Notifications.Code.NotificationsDisplayerUIX'))
+    ## TODO: replace by $xwiki.sswx.use() or something like this when XWIKI-12788 is closed.
+    #set ($discard = $xwiki.linkx.use($services.webjars.url('bootstrap-switch', 'css/bootstrap3/bootstrap-switch.min.css'), {'type': 'text/css', 'rel': 'stylesheet'}))
+    {{html clean="false"}} ## We need the clean false to avoid getting a supplementary ul element.
+    &lt;li class="notification-uix loading"&gt;&lt;/li&gt;
+    {{/html}}
+  #end
 {{/velocity}}</content>
     </property>
     <property>

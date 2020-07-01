@@ -32,6 +32,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 import java.util.function.Function;
 
 import javax.inject.Inject;
@@ -113,6 +114,11 @@ public class HibernateStore implements Disposable, Integrator, Initializable
      * The name of the property for configuring the environment permanent directory.
      */
     private static final String PROPERTY_PERMANENTDIRECTORY = "environment.permanentDirectory";
+
+    /**
+     * The name of the property for configuring the current timezone.
+     */
+    private static final String PROPERTY_TIMEZONE = "timezone";
 
     private static final Map<String, DatabaseProduct> DRIVER_MAPPING = new HashMap<>();
 
@@ -274,6 +280,9 @@ public class HibernateStore implements Disposable, Integrator, Initializable
         if (url.matches(".*\\$\\{.*\\}.*")) {
             String newURL = StringUtils.replace(url, String.format("${%s}", PROPERTY_PERMANENTDIRECTORY),
                 this.environment.getPermanentDirectory().getAbsolutePath());
+
+            newURL =
+                StringUtils.replace(newURL, String.format("${%s}", PROPERTY_TIMEZONE), TimeZone.getDefault().getID());
 
             // Set the new URL
             hibernateConfiguration.setProperty(org.hibernate.cfg.Environment.URL, newURL);

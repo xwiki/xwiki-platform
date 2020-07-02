@@ -45,6 +45,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,6 +58,8 @@ import static org.mockito.Mockito.when;
 @ComponentTest
 public class NormalUserConfigurationSourceAuthorizationTest
 {
+    private static final String IS_IN_RENDERING_ENGINE = "isInRenderingEngine";
+
     @InjectMockComponents
     private NormalUserConfigurationSourceAuthorization authorization;
 
@@ -129,6 +132,7 @@ public class NormalUserConfigurationSourceAuthorizationTest
         this.previousCurrentUserDocumentReference = new DocumentReference("wiki", "space", "previouscurrentuser");
         when(this.documentAccessBridge.getCurrentUserReference()).thenReturn(this.previousCurrentUserDocumentReference,
             this.userDocumentReference, this.previousCurrentUserDocumentReference);
+        when(this.xcontext.get(IS_IN_RENDERING_ENGINE)).thenReturn(true);
     }
 
     @Test
@@ -157,6 +161,16 @@ public class NormalUserConfigurationSourceAuthorizationTest
     }
 
     @Test
+    void hasAccessREADWhenNotInRenderingEngine()
+    {
+        when(this.xcontext.get(IS_IN_RENDERING_ENGINE)).thenReturn(false);
+        assertTrue(this.authorization.hasAccess("key", userReference, ConfigurationRight.READ));
+
+        verify(this.xcontext, never()).setUserReference(this.userDocumentReference);
+        verify(this.xcontext, never()).setUserReference(this.previousCurrentUserDocumentReference);
+    }
+
+    @Test
     void hasAccessWRITEWhenLastAuthorHasEditPermissionOnUserDoc()
     {
         when(this.authorizationManager.hasAccess(Right.EDIT, this.lastAuthorDocumentReference,
@@ -180,5 +194,15 @@ public class NormalUserConfigurationSourceAuthorizationTest
         InOrder inOrder = inOrder(this.xcontext);
         inOrder.verify(this.xcontext).setUserReference(this.userDocumentReference);
         inOrder.verify(this.xcontext).setUserReference(this.previousCurrentUserDocumentReference);
+    }
+
+    @Test
+    void hasAccessWriteWhenNotInRenderingEngine()
+    {
+        when(this.xcontext.get(IS_IN_RENDERING_ENGINE)).thenReturn(false);
+        assertTrue(this.authorization.hasAccess("key", userReference, ConfigurationRight.WRITE));
+
+        verify(this.xcontext, never()).setUserReference(this.userDocumentReference);
+        verify(this.xcontext, never()).setUserReference(this.previousCurrentUserDocumentReference);
     }
 }

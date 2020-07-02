@@ -24,6 +24,7 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.configuration.ConfigurationRight;
@@ -72,28 +73,37 @@ public class NormalUserConfigurationSourceAuthorization extends AbstractDocument
     {
         boolean hasAccess;
 
-        // Check: Verify that the last author of the current document has the permissions. This is to protect against
-        // some "honeypot" attack where you'd have someone without the proper permission (but still having edit rights
-        // on a page) to write a script that calls the configuration API and then waiting for someone with the proper
-        // permissions to view the page, thus making the configuration calls work.
         XWikiContext xcontext = this.contextProvider.get();
-        XWikiDocument currentDocument = xcontext.getDoc();
-        if (currentDocument != null) {
-            DocumentReference lastAuthorDocumentReference = currentDocument.getAuthorReference();
-            DocumentReference originalUserReference = this.documentAccessBridge.getCurrentUserReference();
-            try {
-                // Note: The userReference passed is the reference to the user for which we're retrieving or setting
-                // the configuration properties. Thus we set it as the current user so that the call to
-                // super.hasAccess() checks the permissions of the last author of current doc on that user's document.
-                xcontext.setUserReference(((DocumentUserReference) userReference).getReference());
-                hasAccess = super.hasAccess(key, this.documentResolver.resolve(lastAuthorDocumentReference), right);
-            } finally {
-                xcontext.setUserReference(originalUserReference);
+        boolean isInRenderingEngine = BooleanUtils.toBoolean((Boolean) xcontext.get("isInRenderingEngine"));
+
+        // Check: Verify that the last author did not create some "honeypot" attack where you'd have someone without
+        // the proper permission (but still having edit rights on a page) to write a script that calls the configuration
+        // API and then waiting for someone with the proper permissions to view the page, thus making the configuration
+        // calls work.
+        // We only perform this check if the call is made inside the page content (hence isInRenderingEngine is true)
+        // since if the call is made inside a velocity template the access should always be granted.
+        if (isInRenderingEngine) {
+            XWikiDocument currentDocument = xcontext.getDoc();
+            if (currentDocument != null) {
+                DocumentReference lastAuthorDocumentReference = currentDocument.getAuthorReference();
+                DocumentReference originalUserReference = this.documentAccessBridge.getCurrentUserReference();
+                try {
+                    // Note: The userReference passed is the reference to the user for which we're retrieving or setting
+                    // the configuration properties. Thus we set it as the current user so that the call to
+                    // super.hasAccess() checks the permissions of the last author of current doc on that user's
+                    // document.
+                    xcontext.setUserReference(((DocumentUserReference) userReference).getReference());
+                    hasAccess = super.hasAccess(key, this.documentResolver.resolve(lastAuthorDocumentReference), right);
+                } finally {
+                    xcontext.setUserReference(originalUserReference);
+                }
+            } else {
+                // No current document, this is not really normal. To be extra safe, check that the current user has the
+                // permissions.
+                hasAccess = super.hasAccess(key, this.currentResolver.resolve(null), right);
             }
         } else {
-            // No current document, this is not really normal. To be extra safe, check that the current user has the
-            // permissions.
-            hasAccess = super.hasAccess(key, this.currentResolver.resolve(null), right);
+            hasAccess = true;
         }
         return hasAccess;
     }

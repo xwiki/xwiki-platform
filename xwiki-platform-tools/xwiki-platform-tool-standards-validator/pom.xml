@@ -45,17 +45,13 @@
       <artifactId>commons-collections</artifactId>
     </dependency>
     <dependency>
-      <groupId>rome</groupId>
+      <groupId>com.rometools</groupId>
       <artifactId>rome</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jdom</groupId>
-      <artifactId>jdom</artifactId>
     </dependency>
     <dependency>
       <groupId>nu.validator</groupId>
       <artifactId>validator</artifactId>
-      <version>18.11.5</version>
+      <version>20.7.2</version>
       <exclusions>
         <exclusion>
           <groupId>log4j</groupId>
@@ -72,14 +68,6 @@
         <exclusion>
           <groupId>javax.servlet</groupId>
           <artifactId>javax.servlet-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.velocity</groupId>
-          <artifactId>velocity</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.velocity</groupId>
-          <artifactId>velocity-tools</artifactId>
         </exclusion>
       </exclusions>
     </dependency>

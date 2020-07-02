@@ -23,7 +23,7 @@
      this file, see http://wiki.apache.org/solr/SolrConfigXml.
 -->
 <config>
-  <luceneMatchVersion>${lucene.version}</luceneMatchVersion>
+  <luceneMatchVersion>${solr.version}</luceneMatchVersion>
 
   <!-- Register the Solr core in JMX -->
   <jmx />

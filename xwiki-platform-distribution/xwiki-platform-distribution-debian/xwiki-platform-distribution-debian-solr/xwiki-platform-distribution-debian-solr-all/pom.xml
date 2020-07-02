@@ -24,51 +24,39 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-search-solr-server</artifactId>
+    <artifactId>xwiki-platform-distribution-debian-solr</artifactId>
     <version>12.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search-solr-server-debian</artifactId>
-  <name>XWiki Platform - Search - SOLR - Server - Debian</name>
-  <packaging>pom</packaging>
-  <description>Debian installer for XWiki SOLR server</description>
-  <modules>
-    <module>xwiki-platform-search-solr-server-debian-core</module>
-  </modules>
+  <artifactId>xwiki-platform-distribution-debian-solr-all</artifactId>
+  <packaging>deb</packaging>
+  <name>XWiki Platform - Distribution - Debian - Solr - All</name>
+  <description>Trigger the installation of all the Solr cores of XWiki Standard</description>
   <properties>
-    <jdeb.version>1.3</jdeb.version>
-    <debian.maintainer>XWiki Team (devs@xwiki.org)</debian.maintainer>
-    <debian.license>LGPL 2.1</debian.license>
+    <data.path>${project.build.directory}/data</data.path>
+
+    <debian.package>xwiki-solr-all</debian.package>
+
     <debian.solr.description>
  XWiki is a free wiki software platform written in Java with a design emphasis
  on extensibility.
  .
- This package contains preconfigured SOLR server synchronized with XWiki version
-  to be used to setup a standalone Solr server.
+ Trigger the installation of all the Solr cores of XWiki Standard.
     </debian.solr.description>
-    <debian.description>
- ${debian.solr.description}
-    </debian.description>
   </properties>
-  <build>
-    <extensions>
-      <!-- Needed to add support for the "deb" packaging -->
-      <extension>
-        <groupId>org.vafer</groupId>
-        <artifactId>jdeb</artifactId>
-        <version>${jdeb.version}</version>
-      </extension>
-    </extensions>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>jdeb</artifactId>
-          <groupId>org.vafer</groupId>
-          <version>${jdeb.version}</version>
-          <configuration>
-            <snapshotExpand>true</snapshotExpand>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-debian-solr-events</artifactId>
+      <version>${project.version}</version>
+      <type>deb</type>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-platform-distribution-debian-solr-search</artifactId>
+      <version>${project.version}</version>
+      <type>deb</type>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

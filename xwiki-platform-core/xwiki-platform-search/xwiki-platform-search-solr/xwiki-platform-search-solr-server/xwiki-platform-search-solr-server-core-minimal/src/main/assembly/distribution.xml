@@ -20,20 +20,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <parent>
-    <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-search-solr</artifactId>
-    <version>12.6-SNAPSHOT</version>
-  </parent>
-  <artifactId>xwiki-platform-search-solr-server</artifactId>
-  <name>XWiki Platform - Search - SOLR - Server</name>
-  <packaging>pom</packaging>
-  <description>SOLR server configured for XWiki needs</description>
-  <modules>
-    <module>xwiki-platform-search-solr-server-plugin</module>
-    <module>xwiki-platform-search-solr-server-core</module>
-    <module>xwiki-platform-search-solr-server-core-minimal</module>
-  </modules>
-</project>
+<assembly>
+  <id>distribution</id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>false</includeBaseDirectory>
+  <fileSets>
+    <fileSet>
+      <filtered>true</filtered>
+      <directory>${basedir}/src/main/resources</directory>
+      <outputDirectory>/</outputDirectory>
+      <fileMode>755</fileMode>
+    </fileSet>
+  </fileSets>
+</assembly>

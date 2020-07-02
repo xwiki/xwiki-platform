@@ -34,6 +34,7 @@ public interface SolrConfiguration
 {
     /**
      * Available modes of synchronization at startup.
+     * 
      * @since 12.5RC1
      */
     enum SynchronizeAtStartupMode
@@ -66,9 +67,16 @@ public interface SolrConfiguration
     /**
      * Retrieves the configuration files required by the Solr XWiki core in order to initialize.
      * 
-     * @return an input stream of a zip package containing the default core setup
+     * @return an input stream of a zip package containing the core setup
      */
     InputStream getSearchCoreDefaultContent();
+
+    /**
+     * Retrieves the minimal configuration reqiuired for a Solr core.
+     * 
+     * @return an input stream of a zip package containing the core setup
+     */
+    InputStream getMinimalCoreDefaultContent();
 
     // Indexer
 

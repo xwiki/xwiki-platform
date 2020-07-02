@@ -72,8 +72,8 @@
     <!-- Follow the specifications regarding the WebJar content path. -->
     <webjar.outputDirectory>${project.build.outputDirectory}/META-INF/resources/webjars/${project.artifactId}/${project.version}</webjar.outputDirectory>
 
-    <!-- The recommended version of known extensions to use -->
     <xwiki.extension.recommendedVersions.platform>
+    <!-- The recommended version of known extensions to use -->
       ${xwiki.extension.recommendedVersions.commons},
       org.xwiki.rendering:.*/[${rendering.version}],
       org.xwiki.platform:.*/[${platform.version}]

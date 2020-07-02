@@ -24,16 +24,33 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.xwiki.platform</groupId>
-    <artifactId>xwiki-platform-search-solr</artifactId>
+    <artifactId>xwiki-platform-search-solr-server</artifactId>
     <version>12.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-search-solr-server</artifactId>
-  <name>XWiki Platform - Search - SOLR - Server</name>
+  <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
+  <name>XWiki Plarform - Search - SOLR - Server - Minimal Core</name>
   <packaging>pom</packaging>
-  <description>SOLR server configured for XWiki needs</description>
-  <modules>
-    <module>xwiki-platform-search-solr-server-plugin</module>
-    <module>xwiki-platform-search-solr-server-core</module>
-    <module>xwiki-platform-search-solr-server-core-minimal</module>
-  </modules>
+  <description>A package containing a SOLR core which the minimum things, mostly used for custom cores</description>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <configuration>
+              <appendAssemblyId>false</appendAssemblyId>
+              <descriptors>
+                <descriptor>${basedir}/src/main/assembly/distribution.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

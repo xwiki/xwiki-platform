@@ -175,6 +175,12 @@ public class DefaultSolrConfiguration implements SolrConfiguration
     }
 
     @Override
+    public InputStream getMinimalCoreDefaultContent()
+    {
+        return getClass().getResourceAsStream("/xwiki-platform-search-solr-server-core-minimal.zip");
+    }
+
+    @Override
     public int getIndexerBatchSize()
     {
         return this.configuration.getProperty(SOLR_INDEXER_BATCH_SIZE_PROPERTY, SOLR_INDEXER_BATCH_SIZE_DEFAULT);

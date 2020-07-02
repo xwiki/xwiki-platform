@@ -91,6 +91,7 @@ public class MentionsRecordableEventConverter implements RecordableEventConverte
                 convertedEvent.setUser(userDocument);
                 convertedEvent.setDocument(document);
                 convertedEvent.setType(EVENT_TYPE);
+                convertedEvent.setWiki(document.getWikiReference());
                 Map<String, String> parameters = initializeParameters(json);
                 convertedEvent.setParameters(parameters);
                 return convertedEvent;

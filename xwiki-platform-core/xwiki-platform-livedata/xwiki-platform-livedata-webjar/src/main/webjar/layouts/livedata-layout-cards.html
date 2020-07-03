@@ -1,7 +1,7 @@
 <template>
-  <div class="livedata-cards-layout">
+  <div class="livedata-layout-cards">
 
-    <div ref="topbar"></div>
+    <livedata-topbar :logic="logic"></livedata-topbar>
 
     <!-- Cards component -->
     <div class="livedata-cards">
@@ -54,17 +54,29 @@
  */
 define([
   "Vue",
-  BASE_PATH + "topbar.js",
+  "vue!" + BASE_PATH + "livedata-topbar.html",
 ], function (
-  Vue,
-  createTopbar,
+  Vue
 ) {
 
-  Vue.component("livedata-cards", {
+  Vue.component("livedata-layout-cards", {
 
-    name: "livedata-cards",
+    name: "livedata-layout-cards",
 
     template: template,
+
+    directives: {
+      // vue directive to automatically create and insert the displayer inside the element
+      displayer: {
+        bind: function (el, binding, vnode) {
+          vnode.context.$parent.logic.createDisplayer(binding.value.property.id, binding.value.entry)
+          .then(function (displayer) {
+            el.appendChild(displayer.element);
+            displayer.view();
+          });
+        },
+      },
+    },
 
     props: {
       logic: Object,
@@ -76,11 +88,6 @@ define([
       properties: function () { return this.logic.data.meta.propertyDescriptors; },
     },
 
-    mounted: function () {
-      var topbar = createTopbar(this.logic);
-      this.$refs.topbar.append(topbar);
-    },
-
   });
 });
 </script>
@@ -88,7 +95,7 @@ define([
 
 <style>
 
-.livedata-cards-layout .card {
+.livedata-layout-cards .card {
   display: inline-block;
   padding: 1rem 2rem;
   margin: 1rem;
@@ -96,7 +103,7 @@ define([
   border-radius: 1rem;
 }
 
-.livedata-cards-layout .card-property {
+.livedata-layout-cards .card-property {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -104,24 +111,24 @@ define([
   transition: height 0.5s;
 }
 
-.livedata-cards-layout .property-name {
+.livedata-layout-cards .property-name {
   margin-right: 0.5em;
 }
 
-.livedata-cards-layout .value {
+.livedata-layout-cards .value {
   flex-grow: 1;
   align-self: stretch;
 }
 
 @supports (display: grid) {
 
-  .livedata-cards-layout .livedata-cards {
+  .livedata-layout-cards .livedata-cards {
     display: grid;
     grid-template-columns: repeat(auto-fill, 30rem);
     gap: 1.5rem;
   }
 
-  .livedata-cards-layout .card {
+  .livedata-layout-cards .card {
     margin: 0;
   }
 

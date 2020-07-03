@@ -45,6 +45,8 @@ define({
     offset: 0,
     limit: 25,
 
+    currentLayout: null,
+
   },
 
 
@@ -53,6 +55,19 @@ define({
 
     layouts: ["table", "cards"],
     defaultLayout: "table",
+
+    layoutDescriptors: [
+      {
+        id: "table",
+        name: "Table",
+        icon: "fa fa-table",
+      },
+      {
+        id: "cards",
+        name: "Cards",
+        icon: "fa fa-th",
+      },
+    ],
 
     propertyDescriptors: [
       {
@@ -143,19 +158,6 @@ define({
         id: "html",
       },
     ],
-
-    layoutDescriptors: {
-      table: {
-        name: "Table",
-        icon: "fa fa-table",
-        file: "tableLayout.js",
-      },
-      cards: {
-        name: "Cards",
-        icon: "fa fa-th",
-        file: "cardsLayout.js",
-      },
-    },
 
 
     pagination: {

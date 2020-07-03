@@ -1,7 +1,7 @@
 <template>
-  <div class="livedata-table-layout">
+  <div class="livedata-layout-table">
 
-    <div ref="topbar"></div>
+    <livedata-topbar :logic="logic"></livedata-topbar>
 
     <!-- Table component -->
     <table class="livedata-table">
@@ -97,22 +97,33 @@
  */
 define([
   "Vue",
-  BASE_PATH + "topbar.js",
+  "vue!" + BASE_PATH + "livedata-topbar.html",
 ], function (
-  Vue,
-  createTopbar,
+  Vue
 ) {
 
-  Vue.component("livedata-table", {
+  Vue.component("livedata-layout-table", {
 
-    name: "livedata-table",
+    name: "livedata-layout-table",
 
     template: template,
+
+    directives: {
+      // vue directive to automatically create and insert the displayer inside the element
+      displayer: {
+        bind: function (el, binding, vnode) {
+          vnode.context.$parent.logic.createDisplayer(binding.value.col.id, binding.value.row)
+          .then(function (displayer) {
+            el.appendChild(displayer.element);
+            displayer.view();
+          });
+        },
+      },
+    },
 
     props: {
       logic: Object,
     },
-
 
     computed: {
       data: function () { return this.logic.data; },
@@ -130,11 +141,6 @@ define([
       },
     },
 
-    mounted: function () {
-      var topbar = createTopbar(this.logic);
-      this.$refs.topbar.append(topbar);
-    },
-
   });
 });
 </script>
@@ -142,11 +148,11 @@ define([
 
 <style>
 
-.livedata-table-layout table {
+.livedata-layout-table table {
   height: 100%;
 }
 
-.livedata-table-layout .column-name {
+.livedata-layout-table .column-name {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -154,33 +160,33 @@ define([
   cursor: pointer;
 }
 
-.livedata-table-layout .sort-icon {
+.livedata-layout-table .sort-icon {
   color: currentColor;
   opacity: 0;
 }
-.livedata-table-layout .sort-icon.sorted {
+.livedata-layout-table .sort-icon.sorted {
   opacity: 1;
 }
-.livedata-table-layout .column-name:hover .sort-icon:not(.sorted) {
+.livedata-layout-table .column-name:hover .sort-icon:not(.sorted) {
   opacity: 0.5;
 }
 
-.livedata-table-layout .column-filters th {
+.livedata-layout-table .column-filters th {
   padding-left: 0;
   padding-right: 0;
   font-weight: normal;
 }
-.livedata-table-layout .column-filters input {
+.livedata-layout-table .column-filters input {
   padding-left: 8px;
   padding-right: 8px;
   width: 100%;
 }
 
-.livedata-table-layout .cell {
+.livedata-layout-table .cell {
   padding: 0;
   height: 100%;
 }
-.livedata-table-layout .cell .livedata-displayer.view {
+.livedata-layout-table .cell .livedata-displayer.view {
   padding: 8px;
 }
 

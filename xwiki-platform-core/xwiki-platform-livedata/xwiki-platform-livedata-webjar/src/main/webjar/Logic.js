@@ -21,11 +21,12 @@
 
 define([
   "jquery",
-  BASE_PATH + "advancedPanels.js",
+  "Vue",
+  "vue!" + BASE_PATH + "livedata-root.html",
   "polyfills"
 ], function (
   $,
-  advancedPanels
+  Vue,
 ) {
 
   /**
@@ -66,8 +67,14 @@ define([
     this.element = element;
     this.data = JSON.parse(element.getAttribute("data-data") || "{}");
     element.removeAttribute("data-data");
-    this.layouts = {};
-    this.element.appendChild(advancedPanels(this));
+    // create Vuejs instance
+    new Vue({
+      el: this.element,
+      template: "<livedata-root :logic='logic'></livedata-root>",
+      data: {
+        logic: this,
+      },
+    });
   };
 
 
@@ -141,6 +148,18 @@ define([
 
 
     /**
+     * Return the property type descriptor corresponding to a property id
+     * @param {String} propertyId
+     * @returns {Object}
+     */
+    getLayoutDescriptor: function (layoutId) {
+      return this.data.meta.layoutDescriptors.find(function (layoutDescriptor) {
+        return layoutDescriptor.id === layoutId;
+      });
+    },
+
+
+    /**
      * Get the displayer descriptor associated to a property id
      * @param {String} propertyId
      */
@@ -203,34 +222,24 @@ define([
 
         layoutId = layoutId || self.data.meta.defaultLayout;
         // layout already loaded
-        if (layoutId === self.data.query.currentLayout && self.layouts[layoutId]) {
-          return void resolve(self.layouts[layoutId]);
+        if (layoutId === self.data.query.currentLayout) {
+          return void resolve(layoutId);
         }
         // bad layout
-        if (!self.data.meta.layoutDescriptors[layoutId]) { return void reject(); }
         if (self.data.meta.layouts.indexOf(layoutId) === -1) { return void reject(); }
+        var layoutDescriptor = self.getLayoutDescriptor(layoutId);
+        if (!layoutDescriptor) { return void reject(); }
 
         // requirejs success callback
-        var loadLayoutSuccess = function (createLayout) {
+        var loadLayoutSuccess = function (vueLayout) {
           var previousLayoutId = self.data.query.currentLayout;
-          // remove current layout from the page
-          if (previousLayoutId && self.layouts[previousLayoutId]) {
-            self.element.removeChild(self.layouts[previousLayoutId]);
-          }
-          // add layout element in loaded layouts list if not already loaded on the page
-          if (!self.layouts[layoutId]) {
-            self.layouts[layoutId] = createLayout(self.element);
-          }
-          // add new layout to the page
-          self.element.appendChild(self.layouts[layoutId]);
           self.data.query.currentLayout = layoutId;
           // dispatch events
           self.triggerEvent("layoutChange", {
-            layout: self.layouts[layoutId],
             layoutId: layoutId,
             previousLayoutId: previousLayoutId,
           });
-          resolve(self.layouts[layoutId]);
+          resolve(layoutId);
         };
 
         // requirejs error callback
@@ -250,7 +259,7 @@ define([
         };
 
         // load layout based on it's filename
-        require([BASE_PATH + "layouts/" + self.data.meta.layoutDescriptors[layoutId].file],
+        require(["vue!" + BASE_PATH + "layouts/livedata-layout-" + layoutId + ".html"],
           loadLayoutSuccess,
           loadLayoutFailure
         );
@@ -538,6 +547,11 @@ define([
       var filterOperators = filterDescriptor.operators;
       if (!(filterOperators instanceof Array)) { return; }
       return filterOperators[0];
+    },
+
+
+    _computeFilterEntry: function (property, index, filterEntry) {
+
     },
 
 

@@ -2,7 +2,7 @@
   <div class="livedata-topbar">
 
     <!-- Drowpdown -->
-    <div ref="dropdownMenu"></div>
+    <livedata-dropdown-menu :logic="logic"></livedata-dropdown-menu>
 
     <!-- Pagination -->
     <nav class="livedata-pagination">
@@ -113,10 +113,9 @@
   */
 define([
   "Vue",
-  BASE_PATH + "dropdownMenu.js",
+  "vue!" + BASE_PATH + "livedata-dropdown-menu.html",
 ], function (
   Vue,
-  createDropdownMenu,
 ) {
   Vue.component("livedata-topbar", {
 
@@ -173,13 +172,6 @@ define([
         return indexesAndDots;
       },
 
-    },
-
-    mounted: function () {
-      var self = this;
-      // create dropdown
-      var dropdownMenu = createDropdownMenu(this.logic);
-      this.$refs.dropdownMenu.parentNode.replaceChild(dropdownMenu, this.$refs.dropdownMenu);
     },
 
   });

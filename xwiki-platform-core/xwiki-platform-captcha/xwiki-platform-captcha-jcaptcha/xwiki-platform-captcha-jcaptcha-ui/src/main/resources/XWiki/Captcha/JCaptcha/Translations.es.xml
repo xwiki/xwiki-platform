@@ -37,20 +37,20 @@
   <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
   <content>captcha.jcaptcha=JCaptcha
-captcha.jcaptcha.displayer.image.alt=Imagen CAPTCHA
+captcha.jcaptcha.displayer.image.alt=Imagen del CAPTCHA
 captcha.jcaptcha.displayer.audio.error.audioElementNotSupported=Tu navegador no soporta el componente de sonido.
 captcha.jcaptcha.displayer.audio.play=Escuchar
 captcha.jcaptcha.displayer.error.unsupportedType=JCaptcha no está configurado correctamente
 captcha.jcaptcha.displayer.refresh=Volver a cargar
 captcha.jcaptcha.displayer.answer.placeholder=Respuesta
 
-XWiki.Captcha.JCaptcha.ConfigurationClass_type=Teclear
+XWiki.Captcha.JCaptcha.ConfigurationClass_type=Tipo
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_hint=El tipo de CAPTCHA a mostrar.
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_image=Imagen
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_sound=Sonido
 XWiki.Captcha.JCaptcha.ConfigurationClass_type_text=Texto
 XWiki.Captcha.JCaptcha.ConfigurationClass_engine=Motor
-XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=La implementación del motor de Captchas a utilizar al mostrar el tipo seleccionado de CAPTCHA.
+XWiki.Captcha.JCaptcha.ConfigurationClass_engine_hint=La implementación del "CaptchaEngine" a utilizar al mostrar el tipo seleccionado de CAPTCHA.
 
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.DefaultGimpyEngine=Gimpy (Gmail) predeterminado
 captcha.jcaptcha.engine.com.octo.captcha.engine.image.gimpy.SimpleListImageCaptchaEngine=Lista Sencilla

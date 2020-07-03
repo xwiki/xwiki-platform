@@ -162,8 +162,8 @@ public class UserEventDispatcher implements Runnable, Disposable, Initializable
         // Associated event with event's wiki users
         dispatch(event, this.userCache.getUsers(eventWiki, true));
 
-        // Also take into account global users (main wiki users)
-        if (this.wikiManager.isMainWiki(eventWiki.getName())) {
+        // Also take into account global users (main wiki users) if the event is on a subwiki
+        if (!this.wikiManager.isMainWiki(eventWiki.getName())) {
             dispatch(event, this.userCache.getUsers(new WikiReference(this.wikiManager.getMainWikiId()), true));
         }
     }

@@ -210,7 +210,7 @@ platform.appwithinminutes.appHomePageEditAppLabel=Anwendung bearbeiten
 platform.appwithinminutes.appHomePageTranslateAppLabel=Anwendung übersetzen
 platform.appwithinminutes.appHomePageDeleteAppLabel=Anwendung löschen
 platform.appwithinminutes.appHomePageMovedWarning=Die Anwendung funktioniert möglicherweise nicht richtig, da sie umbenannt oder verschoben wurde, ohne den Code zu aktualisieren. Bitte bearbeiten Sie die Anwendung und folgen Sie den Schritten, um den Code zu aktualisieren.
-### Missing: AppWithinMinutes.LiveTableClass_description=Description
+AppWithinMinutes.LiveTableClass_description=Beschreibung
 ### Missing: AppWithinMinutes.LiveTableClass_columns=Live Table Columns
 
 ### Delete application dialog

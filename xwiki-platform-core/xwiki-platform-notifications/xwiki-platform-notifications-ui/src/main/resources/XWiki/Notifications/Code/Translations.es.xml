@@ -68,25 +68,25 @@ notifications.filters.name.minorEventEmailNotificationFilter=Evento Menor (Email
 notifications.filters.description.minorEventEmailNotificationFilter=Ocultar notificaciones sobre cambios menores en las páginas
 
 ## Filter Types
-### Missing: notifications.filters.type.inclusive=Inclusive
-### Missing: notifications.filters.type.exclusive=Exclusive
+notifications.filters.type.inclusive=Inclusivo
+notifications.filters.type.exclusive=No inclusivo
 
 ## Translation keys for the scopeNotificationFilter
-### Missing: notifications.filters.preferences.scopeNotificationFilter.name=Scope Notification Filter
-### Missing: notifications.filters.preferences.scopeNotificationFilter.page=Page only
-### Missing: notifications.filters.preferences.scopeNotificationFilter.space=Page and children
+notifications.filters.preferences.scopeNotificationFilter.name=Filtro de notificación del alcance
+notifications.filters.preferences.scopeNotificationFilter.page=Solo página
+notifications.filters.preferences.scopeNotificationFilter.space=Página e hijos
 notifications.filters.preferences.scopeNotificationFilter.wiki=Wiki
 
 notifications.filters.preferences.allEvents=-
 
-### Missing: notifications.filters.preferences.addPreference.filterType.inclusive=Inclusive
-### Missing: notifications.filters.preferences.addPreference.filterType.exclusive=Exclusive
+notifications.filters.preferences.addPreference.filterType.inclusive=Inclusivo
+notifications.filters.preferences.addPreference.filterType.exclusive=No inclusivo
 notifications.filters.preferences.addPreference.notificationFormat.label=Formato de notificación
-### Missing: notifications.filters.preferences.addPreference.notificationFormat.hint=On which format of notification the filter should apply?
+notifications.filters.preferences.addPreference.notificationFormat.hint=¿En qué formato de notificación debe aplicarse el filtro?
 notifications.filters.preferences.addPreference.eventType.label=Tipo de evento
-### Missing: notifications.filters.preferences.addPreference.eventType.hint=Which event type should be targeted by the filter?
+notifications.filters.preferences.addPreference.eventType.hint=¿Qué tipo de evento debe ser el objetivo del filtro?
 notifications.filters.preferences.addPreference.location.label=Ámbito del filtro
-### Missing: notifications.filters.preferences.addPreference.location.hint=Which page should be targeted by the filter?
+notifications.filters.preferences.addPreference.location.hint=¿Qué página debe ser el objetivo del filtro?
 notifications.filters.preferences.delete.inProgress=Eliminando...
 notifications.filters.preferences.delete.done=¡Preferencia del filtro eliminada!
 notifications.filters.preferences.delete.error=No se pudo eliminar la preferencia de filtro
@@ -138,7 +138,7 @@ notifications.settings.filters=Filtros ({0})
 notifications.settings.addFilter=Añadir filtro
 notifications.settings.errorFilterWiki=Error: debe seleccionar un wiki, no una página
 notifications.settings.preferences=Configuración
-### Missing: notifications.settings.preferences.hint=Capture what events are happening and deliver them in the stream or by email.
+notifications.settings.preferences.hint=Capturar qué eventos están ocurriendo y entregarlos en el flujo de eventos o por correo electrónico.
 notifications.settings.applications.title=Aplicaciones
 notifications.settings.applications.hint=Esta es la lista de aplicaciones que pueden enviar notificaciones. Puede activar o desactivar cualquiera de ellas.
 notifications.settings.applications.forGuest=Inicie sesión o regístrese para gestionar su configuración de notificaciones.
@@ -196,19 +196,19 @@ rendering.macro.notificationsApplicationsPreferences.parameter.target.name=Objet
 rendering.macro.notificationsApplicationsPreferences.parameter.target.description=Objetivo de la macro (puede ser "user" para el usuario actual o "wiki" para el wiki actual)
 
 rendering.macro.notificationsAutoWatchPreferences.name=Preferencias de notificaciones de autovigilancia
-### Missing: rendering.macro.notificationsAutoWatchPreferences.description=Display the preferences of the current user about auto watched pages.
+rendering.macro.notificationsAutoWatchPreferences.description=Mostrar las preferencias del usuario en curso sobre las páginas vistas automáticamente.
 rendering.macro.notificationsAutoWatchPreferences.parameter.target.name=Objetivo
-### Missing: rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Target of the macro (could be "user" for the current user or "wiki" for the current wiki)
+rendering.macro.notificationsAutoWatchPreferences.parameter.target.description=Objetivo de la macro (podría ser "usuario" para el usuario actual o "wiki" para la wiki en curso)
 
 ## Toggle notification filters labels
-### Missing: notifications.filters.preferences.label.page=Toggle Page notifications only
-### Missing: notifications.filters.preferences.label.space=Toggle Page and children notifications
-### Missing: notifications.filters.preferences.label.wiki=Toggle Wiki notifications
+notifications.filters.preferences.label.page=Conmutar "Solo notificaciones de página"
+notifications.filters.preferences.label.space=Conmutar "Notificaciones de página e hijos"
+notifications.filters.preferences.label.wiki=Conmutar "Notificaciones de la wiki"
 
 ## Notifications switches
-### Missing: notifications.switches.tooltip.page=Watch this page
-### Missing: notifications.switches.tooltip.pageAndChildren=Watch this page and its children
-### Missing: notifications.switches.tooltip.space=Watch the parent page and its children
-### Missing: notifications.switches.tooltip.wiki=Watch this wiki
-### Missing: notifications.switches.changeStatusError=Failed to change the status of the notifications.</content>
+notifications.switches.tooltip.page=Ver esta página
+notifications.switches.tooltip.pageAndChildren=Ver esta página y sus hijos
+notifications.switches.tooltip.space=Ver la página padre y sus hijos
+notifications.switches.tooltip.wiki=Ver esta wiki
+notifications.switches.changeStatusError=Error al cambiar el estado de las notificaciones.</content>
 </xwikidoc>

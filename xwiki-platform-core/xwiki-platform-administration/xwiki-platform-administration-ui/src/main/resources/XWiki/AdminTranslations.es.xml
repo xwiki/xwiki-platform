@@ -109,21 +109,21 @@ XWiki.XWikiPreferences_timezone.hint=Establecer globalmente la zona horaria
 administration.section.import.hint=Comience subiendo un nuevo paquete o seleccionando uno de la lista de paquetes disponibles. El contenido del paquete seleccionado se mostrará a la derecha junto con las opciones de importación.
 
 # Export Section
-### Missing: administration.section.export.pages=Pages
-### Missing: administration.section.export.pages.all=All pages
+administration.section.export.pages=Páginas
+administration.section.export.pages.all=Todas las páginas
 administration.section.export.withHistory.hint=Incluya el historial de páginas en la exportación. De lo contrario, sólo se exporta la última versión de una página.
-### Missing: administration.section.export.targetXWikiVersion=Target XWiki version
-### Missing: administration.section.export.targetXWikiVersion.hint=The version of XWiki where you want to import the pages. Your current version is {0}.
-### Missing: administration.section.export.targetXWikiVersion.12plus=12.0 and above
-### Missing: administration.section.export.targetXWikiVersion.below12=Below 12.0
-administration.section.export.packageName.hint=El nombre de archivo utilizado al generar el archivo comprimido con el contenido exportado.
-### Missing: administration.section.export.moreOptions=More options
-### Missing: administration.section.export.lessOptions=Less options
+administration.section.export.targetXWikiVersion=Versión de XWiki destino
+administration.section.export.targetXWikiVersion.hint=La versión de XWiki de la que quieres importar las páginas. Tu versión actual es {0}.
+administration.section.export.targetXWikiVersion.12plus=12.0 y superior
+administration.section.export.targetXWikiVersion.below12=Anteriores a la 12.0
+administration.section.export.packageName.hint=El nombre de fichero utilizado al generar el archivo comprimido con las páginas wiki exportadas.
+administration.section.export.moreOptions=Más opciones
+administration.section.export.lessOptions=Menos opciones
 administration.section.export.description.hint=La descripción del paquete, que se muestra al importar el paquete.
-administration.section.export.author.hint=El autor del paquete.
+administration.section.export.author.hint=El autor del paquete, mostrado al importar el paquete.
 administration.section.export.licence.hint=La licencia del contenido. Por ejemplo: LGPL, GPLV2, etc.
-administration.section.export.version.hint=La versión del paquete.
-administration.section.export.backupPack.hint=Especifique si el paquete se utilizará como copia de seguridad. Esta opción no afecta al contenido exportado. El único efecto es que la opción "Importar como paquete de copia de seguridad" estará preseleccionada cuando importe el paquete. La diferencia entre un paquete de copia de seguridad y un paquete normal es que en el primer caso el último autor de la página se conserva durante la importación, mientras que en el segundo caso el usuario que realiza la importación se convierte en el último autor de cada página importada.
+administration.section.export.version.hint=La versión del paquete, almacenada en el descriptor del paquete.
+administration.section.export.backupPack.hint=Preservar el autor de la página al importar las páginas. Esta opción no tiene efecto sobre el contenido exportado y se puede cambiar antes de la importación.
 
 # Users Section
 administration.section.users.enableUser.inProgress=Habilitando cuenta de usuario...

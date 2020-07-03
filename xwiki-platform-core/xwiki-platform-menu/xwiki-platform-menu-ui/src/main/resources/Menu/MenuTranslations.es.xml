@@ -54,7 +54,7 @@ menu.livetable._images=Imágenes
 menu.livetable._attachments=Adjuntos
 menu.livetable._actions=Acciones
 menu.livetable._actions.edit=Editar
-menu.livetable._actions.delete=Eliminar
+menu.livetable._actions.delete=Borrar
 menu.livetable.emptyvalue=-
 
 # Live table specific keys

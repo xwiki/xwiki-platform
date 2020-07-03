@@ -71,27 +71,27 @@
 ###############################################################################
 
 ## Menus
-platform.wiki.menu.wikiindex=Índice del Wiki
-platform.wiki.menu.deletewiki=Borrar
-platform.wiki.menu.userwikis=Espacios de Trabajo
+platform.wiki.menu.wikiindex=Índice de wikis
+platform.wiki.menu.deletewiki=Borrar wiki
+platform.wiki.menu.userwikis=Wikis
 
 ## Dependencies
-platform.wiki.dependencies.wiki.missing=El componente "Wiki" java no está instalado. Esta página no funcionará correctamente. Asegúrese de que las extensiones "Wiki API" y "Wiki Script" están instaladas (utilizando el Administrador de extensiones) o de que los archivos 'xwiki-platform-wiki-api-&lt;version&gt;.jar' y 'xwiki-platform-wiki-script-&lt;version&gt;.jar' están presentes en la carpeta de la aplicación web `WEB-INF/lib/' (en caso de una instalación manual).
-platform.wiki.dependencies.template.missing=El componente java "Plantilla Wiki" no está instalado. Esta página no funcionará correctamente. Asegúrese de que las extensiones "Wiki Template API" y "Wiki Template Script" están instaladas (utilizando el Administrador de extensiones) o que los archivos 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' y 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' están en la carpeta de la aplicación web `WEB-INF/lib/' (en el caso de que se realice una instalación manual).
-platform.wiki.dependencies.user.missing=El componente java "Wiki User" no está instalado. Esta página no funcionará correctamente. Asegúrese de que las extensiones "Wiki User API" y "Wiki User Script" están instaladas (utilizando el Administrador de extensiones) o de que los archivos 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' y 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' están en la carpeta de la aplicación web `WEB-INF/lib/' (en caso de una instalación manual).
+platform.wiki.dependencies.wiki.missing=El componente java "Wiki" no está instalado. Esta página no funcionará correctamente. Asegúrese de que las extensiones "Wiki API" y "Wiki Script" están instaladas (utilizando el Administrador de extensiones) o de que los ficheros 'xwiki-platform-wiki-api-&lt;version&gt;.jar' y 'xwiki-platform-wiki-script-&lt;version&gt;.jar' están presentes en la carpeta de la aplicación web `WEB-INF/lib/' (en caso de una instalación manual).
+platform.wiki.dependencies.template.missing=El componente java "Wiki Template" no está instalado. Esta página no funcionará correctamente. Asegúrese de que las extensiones "Wiki Template API" y "Wiki Template Script" están instaladas (utilizando el Administrador de extensiones) o que los ficheros 'xwiki-platform-wiki-template-api-&lt;version&gt;.jar' y 'xwiki-platform-wiki-template-script-&lt;version&gt;.jar' están en la carpeta de la aplicación web `WEB-INF/lib/' (en el caso de que se realice una instalación manual).
+platform.wiki.dependencies.user.missing=El componente java "Wiki User" no está instalado. Esta página no funcionará correctamente. Asegúrese de que las extensiones "Wiki User API" y "Wiki User Script" están instaladas (utilizando el Administrador de extensiones) o de que los ficheros 'xwiki-platform-wiki-user-api-&lt;version&gt;.jar' y 'xwiki-platform-wiki-user-script-&lt;version&gt;.jar' están en la carpeta de la aplicación web `WEB-INF/lib/' (en caso de una instalación manual).
 
 ## Create
-platform.wiki.create.button=Crear Wiki
-platform.wiki.create.title=Crear un nuevo espacio de trabajo
-platform.wiki.create.members=Miembros
+platform.wiki.create.button=Crear wiki
+platform.wiki.create.title=Crear una wiki nueva
+platform.wiki.create.members=MIEMBROS
 platform.wiki.create.prettyname.empty=El nombre amigable no debe estar vacío
-platform.wiki.create.error=La creación del wiki "{0}" ha fallado: {1}.
+platform.wiki.create.error=La creación de la wiki "{0}" ha fallado: {1}.
 platform.wiki.create.error.wikiname.databasealreadyexists=Ya existe una base de datos con ese identificador
 platform.wiki.create.error.wikiname.wikialreadyexists=Este identificador ya está en uso
 platform.wiki.create.error.wikiname.empty=El identificador no puede estar vacío
 
 ## Common errors and messages
-platform.wiki.error.wikidoesnotexist=El Wiki[{0}] no existe
+platform.wiki.error.wikidoesnotexist=La wiki [{0}] no existe
 platform.wiki.error.oneParameterNotSpecified=No se especificó el parámetro ''{0}''.
 platform.wiki.error.parameterAcceptsMultipleValues=Se aceptan múltiples valores.
 platform.wiki.error.exceptionWithMessage=Excepción: {0}
@@ -99,38 +99,38 @@ platform.wiki.form.requiredField=Obligatorio
 platform.wiki.csrf.error=Token de seguridad no válido. Por favor, vuelva a intentarlo.
 
 ## Users
-platform.wiki.users.userAlreadyMemberOfWiki=El usuario {0}{1}{2} ya es miembro del wiki {3}{4}{5}.
+platform.wiki.users.userAlreadyMemberOfWiki=El usuario {0}{1}{2} ya es miembro de la wiki {3}{4}{5}.
 platform.wiki.users.userNotMemberOfWiki=El usuario {0}{1}{2} no es miembro de la wiki {3}{4}{5}.
-platform.wiki.users.logInToContinue=Para poder continuar, debe {0}iniciar sesión{1} primero.
-platform.wiki.users.invitation.userAcceptedNotification=El usuario ''{0}'' ({1}) ha aceptado la invitación a unirse al wiki ''{2}'' ({3}).
-platform.wiki.users.invitation.userAcceptedSuccess=El usuario {0}{1}{2} aceptó la invitación y se unió al wiki {3}{4}{5}.
-platform.wiki.users.invitation.userRejectedSuccess=El usuario {0}{1}{2} rechazó la invitación para unirse al wiki {3}{4}{5}.
-platform.wiki.users.join.error.needInvitation=Este wiki es sólo para invitados. Para ello, necesita recibir una invitación de uno de sus administradores.
-platform.wiki.users.join.request.pendingRequestExists=El usuario {0}{1}{2} ya tiene una solicitud pendiente para unirse al wiki {3}{4}{5}. Por favor, espere a que un administrador de wiki lo revise.
-platform.wiki.users.join.request.cancelConfirmation=¿Estás seguro de que quieres cancelar la solicitud para unirte a la wiki {0}{1}{2}?
+platform.wiki.users.logInToContinue=Para poder continuar, primero tienes que {0}iniciar sesión{1}.
+platform.wiki.users.invitation.userAcceptedNotification=El usuario ''{0}'' ({1}) ha aceptado la invitación para unirse a la wiki ''{2}'' ({3}).
+platform.wiki.users.invitation.userAcceptedSuccess=El usuario {0}{1}{2} ha aceptado la invitación y se ha unido a la wiki {3}{4}{5}.
+platform.wiki.users.invitation.userRejectedSuccess=El usuario {0}{1}{2} ha rechazado la invitación para unirse a la wiki {3}{4}{5}.
+platform.wiki.users.join.error.needInvitation=Esta wiki es solo para invitados. Por ello, necesitas recibir una invitación de uno de sus administradores.
+platform.wiki.users.join.request.pendingRequestExists=El usuario {0}{1}{2} todavía tiene una solicitud pendiente para unirse a la wiki {3}{4}{5}. Por favor,, espere a que un administrador la revise.
+platform.wiki.users.join.request.cancelConfirmation=¿Estás seguro de querer cancelar la solicitud para unirte a la wiki {0}{1}{2}?
 platform.wiki.users.join.request.cancelYes=Sí
 platform.wiki.users.join.request.cancelNo=No
-platform.wiki.users.join.request.cancelSuccess=El usuario {0}{1}{2} canceló la petición de unirse al wiki {3}{4}{5}.
-platform.wiki.users.join.request.saveNotification=El usuario ''{0}'' ({1}) ha solicitado unirse al wiki ''{2}'' ({3}).
-platform.wiki.users.join.request.success=El usuario {0}{1}{2} ha enviado la solicitud para unirse al wiki {3}{4}{5}.
-platform.wiki.users.join.confirmation=¿Estás seguro de que quieres unirte a la wiki {0}{1}{2}?
+platform.wiki.users.join.request.cancelSuccess=El usuario {0}{1}{2} canceló la petición de unirse a la wiki {3}{4}{5}.
+platform.wiki.users.join.request.saveNotification=El usuario ''{0}'' ({1}) ha solicitado unirse a la wiki ''{2}'' ({3}).
+platform.wiki.users.join.request.success=El usuario {0}{1}{2} ha enviado la solicitud para unirse a la wiki {3}{4}{5}.
+platform.wiki.users.join.confirmation=¿Estás seguro de querer unirte a la wiki {0}{1}{2}?
 platform.wiki.users.join.yes=Sí
 platform.wiki.users.join.no=No
-platform.wiki.users.join.success=El usuario {0}{1}{2} se unió con éxito al wiki {3}{4}{5}.
-platform.wiki.users.leave.error.userIsOwner=El usuario {0}{1}{2} es el propietario del wiki {3}{4}{5}. El propietario de un wiki no puede abandonarlo a menos que el wiki sea eliminado o que el propietario sea cambiado.
-platform.wiki.users.leave.confirmation=¿Estás seguro de que quieres dejar la wiki {0}{1}{2}?
+platform.wiki.users.join.success=El usuario {0}{1}{2} se ha unido con éxito a la wiki {3}{4}{5}.
+platform.wiki.users.leave.error.userIsOwner=El usuario {0}{1}{2} es el propietario de la wiki {3}{4}{5}. El propietario de una wiki no puede abandonarla a menos que la wiki sea eliminado o el propietario cambiado.
+platform.wiki.users.leave.confirmation=¿Estás seguro de querer dejar la wiki {0}{1}{2}?
 platform.wiki.users.leave.confirmation.yes=Sí
 platform.wiki.users.leave.confirmation.no=No
-platform.wiki.users.leave.success=El usuario {0}{1}{2} abandonó el wiki {3}{4}{5}.
-platform.wiki.users.join.title=Unirse a Wiki
-platform.wiki.users.leave.title=Deja Espacio de trabajo "{0}"
+platform.wiki.users.leave.success=El usuario {0}{1}{2} abandonó la wiki {3}{4}{5}.
+platform.wiki.users.join.title=Unirte a la wiki
+platform.wiki.users.leave.title=Abandonar la wiki "{0}"
 platform.wiki.users.leave.empty=
-platform.wiki.users.delete.title=Eliminar Espacio de trabajo "{0}"
+platform.wiki.users.delete.title=Eliminar la wiki "{0}"
 platform.wiki.users.delete.empty=
-platform.wiki.users.invitation.reply.hint=Un mensaje de respuesta para enviar, visible para el administrador de la wiki, en el que puedes motivar tu decisión.
-platform.wiki.users.join.request.hint=Para unirse al wiki {0}{1}{2}, primero debe emitir una solicitud de ingreso. Después de hacerlo, un administrador de la wiki revisará y considerará su solicitud.
-platform.wiki.users.join.request.message.hint=Envíe un mensaje, visible por el administrador del wiki, mediante el cuál justifique la solicitud de ingreso.
-platform.wiki.users.invitation.title=Has sido invitado a unirte a la wiki {0}{1}{2}.
+platform.wiki.users.invitation.reply.hint=Un mensaje de respuesta a enviar, visible para el administrador de la wiki, en el cual puedes motivar tu decisión.
+platform.wiki.users.join.request.hint=Para unirse a la wiki {0}{1}{2}, primero tienes que enviar una solicitud de ingreso. Una vez hecho, un administrador de la wiki revisará y considerará tu solicitud.
+platform.wiki.users.join.request.message.hint=Un mensaje a enviar, visible para el administrador de la wiki, en el cuál puedes motivar la solicitud de ingreso.
+platform.wiki.users.invitation.title=Te han invitado a unirte a la wiki {0}{1}{2}.
 platform.wiki.users.invitation.message.label=Mensaje de invitación
 platform.wiki.users.invitation.reply.title=Responder
 platform.wiki.users.invitation.accept.label=Aceptar
@@ -142,31 +142,31 @@ platform.wiki.users.join.request.cancel.label=Atrás
 
 ## User profile
 platform.wiki.users.profile.joinedwikis.label=Wikis a las que perteneces
-platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Aún no eres miembro de ningún wiki.
-platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=El usuario aún no es miembro de ningún wiki.
+platform.wiki.users.profile.joinedwikis.notMemberOfAnyWiki=Todavía no eres miembro de ninguna wiki.
+platform.wiki.users.profile.joinedwikis.userNotMemberOfAnyWiki=El usuario aún no es miembro de ninguna wiki.
 platform.wiki.users.profile.activity.title=Actividad de la wiki {0}
-platform.wiki.users.profile.activity.hint=Genera un flujo de actividad para el wiki(s) dado(s).
+platform.wiki.users.profile.activity.hint=Genera un flujo de actividad para la(s) wiki(s) dada(s).
 platform.wiki.users.profile.activity.multipletitle=Actividad de las wikis {0}
 platform.wiki.users.profile.activity.show=mostrar actividad
 
 ## Wiki Deletion
-platform.wiki.delete.confirmation=¿Estás seguro de que quieres borrar el wiki {0}{1}{2}? ¡Esta acción no se puede deshacer!
-platform.wiki.delete.confirmation.retypeWikiId=Por favor, repita el identificador del wiki aquí:
-platform.wiki.delete.error.wikiIdDoesNotMatch=Escriba el identificador Wiki del wiki que debe ser eliminado.
-platform.wiki.delete.success=El usuario {0}{1}{2} ha eliminado con éxito la wiki ''{3}''.
+platform.wiki.delete.confirmation=¿Estás seguro de querer borrar la wiki {0}{1}{2}? ¡Esta acción no se puede deshacer!
+platform.wiki.delete.confirmation.retypeWikiId=Por favor, repite el identificador de la wiki aquí:
+platform.wiki.delete.error.wikiIdDoesNotMatch=Escribe el identificador de wiki exacto de la wiki que se debería eliminar.
+platform.wiki.delete.success=El usuario {0}{1}{2} ha eliminado la wiki ''{3}''.
 
 ## Wiki macro
-platform.wiki.macro.noWikis=Actualmente no hay wikis creados (excepto el principal).
+platform.wiki.macro.noWikis=Actualmente no hay wikis creadas (excepto la principal).
 rendering.macro.wikis.name=Wikis
-rendering.macro.wikis.description=Mostrat todas las wikis
+rendering.macro.wikis.description=Mostrar todas las wikis
 
 ## LegacyWorkspaces macro
-rendering.macro.workspaces.name=Espacios de trabajo (Legacy)
-rendering.macro.workspaces.description=Macro obsoleta que no debería utilizarse aquí por razones de compatibilidad. Por favor, use la macro "wikis" en su lugar.
+rendering.macro.workspaces.name=Espacios de trabajo ("Legacy", en desuso)
+rendering.macro.workspaces.description=Macro obsoleta que no debería utilizarse aquí por razones de compatibilidad. Por favor, utiliza la macro "wikis" en su lugar.
 
 ## Browse
-platform.wiki.browse=Examinar Wikis
-platform.wiki.browse.emptyvalue=N/A
+platform.wiki.browse=Examinar wikis
+platform.wiki.browse.emptyvalue=N/D
 platform.wiki.browse.wikiprettyname=Nombre
 platform.wiki.browse.description=Descripción
 platform.wiki.browse.owner=Propietario
@@ -174,35 +174,35 @@ platform.wiki.browse.membershipType=Tipo de afiliación
 platform.wiki.browse.doc.creationDate=Fecha de creación
 platform.wiki.browse._actions=Acciones
 platform.wiki.browse._actions.join=Unirse
-platform.wiki.browse._actions.requestJoin=Solicitar autorización
+platform.wiki.browse._actions.requestJoin=Solicitar inscripción
 platform.wiki.browse._actions.viewInvitation=Ver invitación
 platform.wiki.browse._actions.cancelJoinRequest=Cancelar la petición
-platform.wiki.browse._actions.leave=Salir
+platform.wiki.browse._actions.leave=Abandonar
 platform.wiki.browse._actions.delete=Borrar
 
 ## Classes
 WikiManager.WikiUserClass_membershipType_open=Abierto para que cualquier usuario se una
-WikiManager.WikiUserClass_membershipType_request=Cualquier usuario puede solicitar unirse, pero un administrador debe aceptar
-WikiManager.WikiUserClass_membershipType_invite=Sólo un administrador puede enviar invitaciones para unirse a este wiki
-WikiManager.WikiUserClass_userScope_local_only=Sólo los usuarios locales están disponibles en el wiki
-WikiManager.WikiUserClass_userScope_global_only=Sólo los usuarios globales están disponibles en el wiki
-WikiManager.WikiUserClass_userScope_local_and_global=Tanto los usuarios globales como los locales están disponibles en el wiki
-platform.wiki.prop.wikiname=Identificador del Wiki
-platform.wiki.prop.wikiprettyname=Nombre amigable
+WikiManager.WikiUserClass_membershipType_request=Cualquier usuario global puede solicitar unirse, pero un administrador debe aceptarlo
+WikiManager.WikiUserClass_membershipType_invite=Solo un administrador puede enviar invitaciones para unirse a esta wiki
+WikiManager.WikiUserClass_userScope_local_only=Esta wiki solo puede tener usuarios locales
+WikiManager.WikiUserClass_userScope_global_only=Esta wiki solo puede tener usuarios globales
+WikiManager.WikiUserClass_userScope_local_and_global=Tanto los usuarios globales como los locales están disponibles en la wiki
+platform.wiki.prop.wikiname=Identificador de la wiki
+platform.wiki.prop.wikiprettyname=Nombre "amigable"
 platform.wiki.prop.wikialias=Alias
 platform.wiki.prop.description=Descripción
 platform.wiki.prop.owner=Propietario
 platform.wiki.prop.membershipType.label=Tipo de afiliación
-platform.wiki.prop.membershipType.hint=La forma en que los usuarios pueden unirse a este wiki.
+platform.wiki.prop.membershipType.hint=La forma en que los usuarios pueden unirse a esta wiki.
 
 ## Wizard
-platform.wiki.create.wizard.desc.wikiname=El identificador único del nuevo wiki.
-platform.wiki.create.wizard.desc.wikiprettyname=El nombre para mostrar del wiki.
-platform.wiki.create.wizard.desc.wikialias=El nombre de dominio que apuntará al wiki.
-platform.wiki.create.wizard.desc.newTemplateHint=Plantilla para usar en este nuevo wiki (todas las páginas serán clonadas).
-platform.wiki.create.wizard.desc.description=Una breve descripción del wiki y su propósito.
-platform.wiki.create.wizard.desc.owner=Un usuario que tendrá todos los derechos sobre este wiki, independientemente de los derechos configurados en la Administración.
-platform.wiki.create.wizard.desc.members=Los usuarios que pueden participar en el wiki.
+platform.wiki.create.wizard.desc.wikiname=El identificador único de la wiki nueva.
+platform.wiki.create.wizard.desc.wikiprettyname=El nombre para mostrar de la wiki.
+platform.wiki.create.wizard.desc.wikialias=El nombre de dominio que apuntará a la wiki.
+platform.wiki.create.wizard.desc.newTemplateHint=Plantilla a utilizar en esta nueva wiki (se clonará todas las páginas).
+platform.wiki.create.wizard.desc.description=Una breve descripción de la wiki y su propósito.
+platform.wiki.create.wizard.desc.owner=Un usuario que tendrá todos los derechos sobre esta wiki, independientemente de los derechos configurados en la Administración.
+platform.wiki.create.wizard.desc.members=Los usuarios que pueden participar en la wiki.
 platform.wiki.create.wizard.step.nameAndType=Paso 1 - Elija un nombre
 platform.wiki.create.wizard.step.nameAndType.shortname=Nombre
 platform.wiki.create.wizard.step.users=Paso 2 - Elegir a los miembros
@@ -214,48 +214,48 @@ platform.wiki.create.wizard.step.cleaningup.error=Error, la wiki {0} no ha sido 
 platform.wiki.create.wizard.step.cleaningUp.confirmmessage=Está a punto de borrar la wiki {0}. Por favor, confírmelo.
 platform.wiki.create.wizard.step.cleaningUp.confirm=Confirmar
 platform.wiki.create.wizard.setAsTemplate.label=Esta wiki será una plantilla
-platform.wiki.create.wizard.template.noTemplate=Sin plantilla (por defecto)
-platform.wiki.create.wizard.userScope.label=Ámbito del usuario
-platform.wiki.create.wizard.userScope.hint=Selecciona qué tipo de usuarios pueden acceder al wiki
+platform.wiki.create.wizard.template.noTemplate=Sin plantilla (predeterminado)
+platform.wiki.create.wizard.userScope.label=Ámbito de usuario
+platform.wiki.create.wizard.userScope.hint=Selecciona qué tipo de usuarios pueden acceder a la wiki
 platform.wiki.create.wizard.template.label=Plantilla
-platform.wiki.create.wizard.flavortemplate.label=Paquete / Plantilla
-platform.wiki.create.wizard.flavortemplate.hint=Paquete o Plantilla para usar como el contenido inicial del nuevo wiki
-platform.wiki.create.wizard.flavortemplate.flavorTab=Paquete
+platform.wiki.create.wizard.flavortemplate.label=Edición / Plantilla
+platform.wiki.create.wizard.flavortemplate.hint=Edición o Plantilla a utilizar como  contenido inicial de la nueva wiki
+platform.wiki.create.wizard.flavortemplate.flavorTab=Edición
 platform.wiki.create.wizard.flavortemplate.templateTab=Plantilla
-platform.wiki.create.wizard.step.dw=Después de hacer clic en el botón "Crear", se creará el wiki y se iniciará el Asistente de Distribución para ayudarle a inicializar su wiki. Si omite el asistente, su wiki estará vacío.
+platform.wiki.create.wizard.step.dw=Después de clicar en el botón "Crear", se creará la wiki y se iniciará el Asistente de Distribución para ayudarte a inicializar tu wiki. Si omites el asistente, tu wiki estará vacía.
 platform.wiki.create.wizard.step.previous=Paso anterior
-platform.wiki.create.wizard.step.next=Siguiente paso
+platform.wiki.create.wizard.step.next=Paso siguiente
 platform.wiki.create.wizard.step.create=Crear
 
-platform.wiki.create.wizard.step.creation=Creación de wiki
-platform.wiki.create.wizard.step.creation.wait=Por favor, espere hasta que el wiki sea creado.
-platform.wiki.create.wizard.step.creation.complete=El wiki {0} ha sido creado con éxito. Ahora puede acceder a ella.
-platform.wiki.create.wizard.step.creation.errorlog=Sin embargo, se han generado errores durante ese proceso y es posible que desee revisarlos.
-platform.wiki.create.wizard.step.creation.error=La creación del wiki {0} falló. Se recomienda eliminarlo.
-platform.wiki.create.wizard.step.creation.go=Ir al wiki
+platform.wiki.create.wizard.step.creation=Creación de wikis
+platform.wiki.create.wizard.step.creation.wait=Por favor, espere hasta que se haya creado la wiki.
+platform.wiki.create.wizard.step.creation.complete=La wiki {0} se ha creado con éxito. Ya puedes acceder a ella.
+platform.wiki.create.wizard.step.creation.errorlog=Sin embargo, se ha(n) producido error(es) durante este proceso y quizás desees revisarlos.
+platform.wiki.create.wizard.step.creation.error=La creación de la wiki {0} falló. Se recomienda eliminarla.
+platform.wiki.create.wizard.step.creation.go=Ir a la wiki
 
 ## Admin
-admin.wikis.description=Gestión de wikis.
-admin.wikis.templates=Plantillas Wiki
-admin.wikis.templates.description=Administrar las plantillas wiki
-admin.wikis.templates.hint=Una plantilla es un wiki que será considerado como un modelo para crear nuevos wikis. Cuando un usuario selecciona una plantilla para crear un nuevo wiki, todo el contenido de la plantilla se copia en el nuevo wiki.
+admin.wikis.description=Administración de wikis.
+admin.wikis.templates=Plantillas de wiki
+admin.wikis.templates.description=Administrar las plantillas de wiki
+admin.wikis.templates.hint=Una plantilla es una wiki que será considerada como modelo para crear wikis nuevas. Al seleccionar un usuario una plantilla para crear una wiki nueva, todo el contenido de la plantilla se copia a la wiki nueva.
 admin.wikis.rights=Permiso de creación
 
 ## XWikiServer Sheet
-platform.wiki.sheet.title=Descripción del wiki "{0}"
+platform.wiki.sheet.title=Descripción de la wiki "{0}"
 platform.wiki.sheet.erroraliasalreadynotexists=El alias wiki "{0}" ya existe.
 platform.wiki.sheet.erroraliasdoesnotexists=El alias wiki "{0}" no existe.
-platform.wiki.sheet.title.settings=Propiedades de la Wiki
-platform.wiki.sheet.title.createnewalias=Crear nuevo alias
+platform.wiki.sheet.title.settings=Propiedades de la wiki
+platform.wiki.sheet.title.createnewalias=Crear alias nuevo
 platform.wiki.sheet.title.viewaliases=Ver alias
-platform.wiki.sheet.desc.wikiprettyname=El nombre para mostrar del wiki.
-platform.wiki.sheet.desc.owner=Un usuario que tendrá todos los derechos sobre este wiki.
-platform.wiki.sheet.desc.secure=Si está habilitado, todas las URLs externas generadas por el wiki comenzarán con "https".
-platform.wiki.sheet.desc.port=El puerto a usar para todas las URLs externas generadas por este wiki. Si no está configurado, se hereda de la configuración y del wiki principal. Sólo se tiene en cuenta para las URL basadas en dominio.
-platform.wiki.sheet.desc.iswikitemplate=Indique si este wiki puede ser utilizado como plantilla al crear un nuevo wiki.
-platform.wiki.sheet.desc.server=El alias usado para acceder al wiki.
-platform.wiki.sheet.desc.description=Una breve descripción de la wiki.
-platform.wiki.sheet.desc.homepage=La página principal del wiki.
+platform.wiki.sheet.desc.wikiprettyname=El nombre para mostrar de la wiki.
+platform.wiki.sheet.desc.owner=Un usuario que tendrá todos los derechos sobre esta wiki.
+platform.wiki.sheet.desc.secure=Si está habilitado, todas las URLs externas generadas por la wiki comenzarán con "https".
+platform.wiki.sheet.desc.port=El puerto a usar para todas las URLs externas generadas por esta wiki. Si no está configurado, se hereda de la configuración y de la wiki principal. Sólo se tiene en cuenta para las URL basadas en dominio.
+platform.wiki.sheet.desc.iswikitemplate=Indica si esta wiki se puede utilizar como plantilla al crear una wiki nueva.
+platform.wiki.sheet.desc.server=El alias usado para acceder a la wiki.
+platform.wiki.sheet.desc.description=Una descripción breve de la wiki.
+platform.wiki.sheet.desc.homepage=La página principal de la wiki.
 platform.wiki.sheet.prop.wikiprettyname=Nombre "amigable"
 platform.wiki.sheet.prop.owner=Propietario
 platform.wiki.sheet.prop.secure=Seguro (SSL)
@@ -264,9 +264,9 @@ platform.wiki.sheet.prop.description=Descripción
 platform.wiki.sheet.prop.server=Alias
 platform.wiki.sheet.prop.homepage=Página de inicio
 platform.wiki.sheet.prop.iswikitemplate=Plantilla de wiki
-platform.wiki.sheet.descriptor=Esta página define cómo acceder al wiki "{0}", y algunas propiedades sobre él. Para más configuraciones, por favor diríjase a la sección
-platform.wiki.sheet.descriptor.admin=página de administración del wiki.
-platform.wiki.sheet.aliases=Un alias es otro nombre para el wiki. Puedes añadir alias para crear diferentes URLs para el wiki.
+platform.wiki.sheet.descriptor=Esta página define cómo acceder a la wiki "{0}", y algunas propiedades sobre ella. Para más configuraciones, por favor ve a la
+platform.wiki.sheet.descriptor.admin=página de administración de la wiki.
+platform.wiki.sheet.aliases=Un alias es otro nombre para la wiki. Puedes añadir alias para crear diferentes URLs para la wiki.
 
 ###############################################################################
 ## Deprecated

@@ -38,11 +38,11 @@
   <hidden>true</hidden>
   <content>help.tipsPanel.title=Tipps
 help.tipsPanel.noTipMessage=Kein Tipp vorhanden!
-help.tipsPanel.gettingStartedTip=Wenn Sie ein neuer XWiki-Benutzer sind, lesen Sie den [[Getting Started Guide&gt;&gt;http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]].
-help.tipsPanel.jumpToPageTip=Wechseln Sie mit Strg+G oder Meta+G zu einer beliebigen Seite im Wiki.\nSiehe [[mehr Tastenkombinationen&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
-help.tipsPanel.improveXWikiTip=Wussten Sie, dass Sie XWiki verbessern können? Nehmen Sie sich 5 Minuten Zeit, um [[diese Umfrage auszufüllen&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] und diesem Open-Source-Projekt zu helfen!
+help.tipsPanel.gettingStartedTip=Wenn Sie ein neuer XWiki-Benutzer sind, lesen Sie den [[Getting Started Guide&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]].
+help.tipsPanel.jumpToPageTip=Wechseln Sie mit Strg+G oder Meta+G zu einer beliebigen Seite im Wiki.\nSiehe [[mehr Tastenkombinationen&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=Wussten Sie, dass Sie XWiki verbessern können? Nehmen Sie sich 5 Minuten Zeit, um [[diese Umfrage auszufüllen&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]] und diesem Open-Source-Projekt zu helfen!
 help.tipsPanel.breadcrumbsTip=Sie können auf die Pfeile neben den Breadcrumb-Elementen klicken, um schnell zu anderen und Unterseiten zu navigieren.
-help.tipsPanel.advancedHiddenShortcutTip=Drücken Sie die Tastenkombination x+x+x+a um in den [[Fortgeschrittenen Modus&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] zu wechseln und x+x+x+h, um die Anzeige von [[versteckten Seiten&gt;&gt;http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]] umzuschalten.
+help.tipsPanel.advancedHiddenShortcutTip=Drücken Sie die Tastenkombination x+x+x+a um in den [[Fortgeschrittenen Modus&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]] zu wechseln und x+x+x+h, um die Anzeige von [[versteckten Seiten&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]] umzuschalten.
 help.tipsPanel.linkAutocompleteWYSIWYGTip=Geben Sie beim Bearbeiten im WYSIWYG-Editor ## [## ein gefolgt von Buchstaben, um Vorschläge zum Erstellen eines Links zu erhalten.
 help.macroList.title=Verfügbare Makros
 help.macroList.id=Id

@@ -38,11 +38,11 @@
   <hidden>true</hidden>
   <content>help.tipsPanel.title=提示
 help.tipsPanel.noTipMessage=没有可用的提示！
-help.tipsPanel.gettingStartedTip=如果您是XWiki的新用户，请查看[[入门指南&gt;&gt; http://enterprise.xwiki.org/xwiki/bin/view/GettingStarted/]]。
-help.tipsPanel.jumpToPageTip=使用 Ctrl+G 或 Meta+G 跳转到Wiki中的任意页面。\n查看 [[更多快捷键&gt;&gt;http://platform.xwiki.org/xwiki/bin/view/Features/KeyboardShortcuts]].
-help.tipsPanel.improveXWikiTip=您知道您可以改善XWiki吗？花5分钟时间[[填写此调查问卷&gt;&gt; http://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]]并帮助本开源项目！
+help.tipsPanel.gettingStartedTip=如果您是XWiki的新用户，请查看[[入门指南&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/GettingStarted/]]。
+help.tipsPanel.jumpToPageTip=使用 Ctrl+G 或 Meta+G 跳转到Wiki中的任意页面。\n查看 [[更多快捷键&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/KeyboardShortcuts]].
+help.tipsPanel.improveXWikiTip=您知道您可以改善XWiki吗？花5分钟时间[[填写此调查问卷&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Survey/ProductFeedback]]并帮助本开源项目！
 help.tipsPanel.breadcrumbsTip=您可以单击面包屑元素旁边的箭头，以快速导航到同级和子级页面。
-help.tipsPanel.advancedHiddenShortcutTip=使用x+x+x+a组合键可切换[[高级模式&gt;&gt; http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]]，x+x+x+h可切换[[隐藏页面&gt;&gt; http://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]]的显示。
+help.tipsPanel.advancedHiddenShortcutTip=使用x+x+x+a组合键可切换[[高级模式&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HSimpleandAdvancededitingmodes]]，x+x+x+h可切换[[隐藏页面&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Documentation/UserGuide/Features/PageEditing#HHidingPages]]的显示。
 help.tipsPanel.linkAutocompleteWYSIWYGTip=在WYSIWYG模式中进行编辑时，输入##[##，然后开始输入字母以获取有关创建链接的建议。
 help.macroList.title=可用的宏
 help.macroList.id=Id

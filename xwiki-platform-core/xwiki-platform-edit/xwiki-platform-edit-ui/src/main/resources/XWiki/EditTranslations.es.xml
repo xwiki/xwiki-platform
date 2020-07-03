@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,23 +20,34 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.2" reference="Help.SupportPanel.Content" locale="es">
-  <web>Help.SupportPanel</web>
-  <name>Content</name>
+<xwikidoc version="1.4" reference="XWiki.EditTranslations" locale="es">
+  <web>XWiki</web>
+  <name>EditTranslations</name>
   <language>es</language>
   <defaultLanguage>en</defaultLanguage>
   <translation>1</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>Help.SupportPanel.WebHome</parent>
+  <parent>XWiki.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>¿Necesita ayuda?</title>
+  <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.1</syntaxId>
+  <syntaxId>plain/1.0</syntaxId>
   <hidden>true</hidden>
-  <content>Si necesita ayuda con XWiki puede contactar con:
-* [[Apoyo a la Comunidad&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Main/Support#HCommunitySupport]]
-* [[Apoyo Profesional&gt;&gt;https://www.xwiki.org/xwiki/bin/view/Main/Support#HProfessionalSupport]]</content>
+  <content>edit.inplace.close=Cerrar
+
+edit.inplace.page.lockFailed=Error al bloquear la página.
+edit.inplace.page.loadFailed=Error al cargar la página.
+edit.inplace.page.renderFailed=Error al renderizar la página.
+
+edit.inplace.page.original=Estás editando la página original ({0})
+edit.inplace.page.translation=Estás editando la traducción siguiente: {0}.
+
+edit.inplace.page.translate=Traducir
+edit.inplace.page.translate.hint=Traducir esta página al: {0}
+
+edit.inplace.actionButtons.loadFailed=Error al cargar los botones de acción.</content>
+  
 </xwikidoc>

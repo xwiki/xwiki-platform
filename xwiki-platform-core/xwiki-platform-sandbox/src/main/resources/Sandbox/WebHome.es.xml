@@ -31,40 +31,53 @@
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
-  <title>Zona de pruebas</title>
+  <title>Zona de Pruebas</title>
   <comment/>
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>false</hidden>
-  <content>La zona de pruebas es una parte de su wiki que puede modificar libremente. Esta pensada para permitirle practicar la edición. Podrá escribir como funciona la creación y edición de páginas. Para empezar simplemente pinche en **Editar**.
+  <content>La Zona de Pruebas ("Sandbox") es una parte de tu wiki que puedes modificar libremente.   Está concebida para permitirte practicar la edición.   Descubrirás como funciona la creación y edición de páginas.   Solo tienes que clicar en **Editar** para comenzar.
 
-{{info}}No se preocupe acerca de sobreescribir o perder cosas cuando edite la página, simepre puede volver a la versión inicial de la página desde la pestaña de "Historial" al final de la página.{{/info}}
+{{info}}No se preocupe por sobrescribir o perder contenido al editar la página, siempre puedes volver a la versión inicial de la página desde la pestaña "Historial" al final de la página.{{/info}}
 
-Aquí hay unas cuantas páginas de prueba con las que puede jugar:
+Si quieres echar un vistazo a la [[Sintaxis XWiki&gt;&gt;XWiki.XWikiSyntax]] subyacente, puedes clicar en "Código wiki" en el menú "Mostrar" o clicar en la pestaña "Fuente" al editar la página.
 
-* [[Página de Pruebas 1&gt;&gt;Sandbox.TestPage1]]
-* [[Página de Pruebas 2&gt;&gt;Sandbox.TestPage2]]
-* [[Página de Pruebas 3&gt;&gt;Sandbox.TestPage3]]
+A continuación, unas cuantas páginas de prueba con las que puedes jugar:
 
-Abajo hay una demostración de la [[Sintaxis XWiki&gt;&gt;XWiki.XWikiSyntax]] que puede usar en las páginas del wiki (encabezados, imágenes, tablas).
+* [[Página de prueba de la Zona de Pruebas 1&gt;&gt;Sandbox.TestPage1]]
+* [[Página de prueba de la Zona de Pruebas 2&gt;&gt;Sandbox.TestPage2]]
+* [[Página de prueba de la Zona de Pruebas 3&gt;&gt;Sandbox.TestPage3]]
 
-= Encabezados = 
+Sigue una demostración de la [[Sintaxis XWiki&gt;&gt;XWiki.XWikiSyntax]] que puedes usar en páginas wiki (encabezados, imágenes, tablas).
 
-XWiki ofrece 6 niveles de encabezado. Puede usarlos para estructurar sus páginas.
+= Encabezados =
 
-== Nivel 2 de Encabezado ==
+XWiki ofrece 6 niveles de encabezado.   Los puedes usar para estructurar tus páginas.
 
-=== Nivel 3 de Encabezado ===
+== Nivel 2 de encabezado ==
 
-==== Nivel 4 de Encabezado 4 ====
+=== Nivel 3 de encabezado ===
 
-===== Nivel 5 de Encabezado 5 =====
+==== Nivel 4 de encabezado 4 ====
 
-====== Nivel 6 de Encabezado 6 ======
+===== Nivel 5 de encabezado 5 =====
+
+====== Nivel 6 de encabezado 6 ======
 
 = Estilos =
 
-Puede crear varios tipos de lista en las páginas de su wiki:
+XWiki soporta los estilos básicos:
+
+* **Texto en negrita**
+* //Texto en cursiva//
+* __Texto subrayando__
+* --Texto tachado--
+* Texto con ,,subíndice,,
+* Texto con ^^superíndice^^
+
+= Listas =
+
+Puedes crear varios tipos de listas en tus páginas wiki:
 
 == Listas no ordenadas ==
 
@@ -76,22 +89,22 @@ Puede crear varios tipos de lista en las páginas de su wiki:
 
 == Listas numeradas ==
 
-1. Elemento
-11. Subelemento
-111. Elemento
-1. Subelemento
+1. Ítem
+11. Subítem
+111. Subítem
+1. Ítem
 
 == Listas mixtas ==
 
-1. Elemento 1
-11. Elemento 2
-11*. Elemento 3
-11*. Elemento 4
-1. Elemento 5
+1. Ítem 1
+11. Ítem 2
+11*. Ítem 3
+11*. Ítem 4
+1. Ítem 5
 
 = Tablas =
 
-Puede crear tablas dentro de sus páginas wiki:
+Puedes crear tablas directamente en tus páginas wiki:
 
 == Tabla con cabecera en la fila superior ==
 
@@ -99,35 +112,47 @@ Puede crear tablas dentro de sus páginas wiki:
 | celda | celda | celda
 | celda | celda | celda
 
+== Table con cabeceras en la fila superior y la columna izquierda ==
+
+|= cabecera de tabla |= cabecera de tabla |= cabecera de tabla
+|= cabecera de tabla | celda | celda
+|= cabecera de tabla | celda | celda
+
 = Enlaces =
 
-XWiki le permite crear enlaces a otras páginas de su wiki o de la web:
+XWiki te permite crear enlaces a otras páginas de tu wiki o de la web:
 
 * [[WebHome]] -&gt; enlaces a la página de inicio del espacio actual
-* [[Sandbox Home&gt;&gt;WebHome]] -&gt; los enlaces pueden tener texto
-* [[Wiki Home&gt;&gt;Main.WebHome]] -&gt; un enlace puede usar en formato de enlace NombreEspacio.NombrePagina para enlazar con una página ubicada en otro espacio.
-* [[http://www.xwiki.org]] -&gt; puede enlazar a páginas del wiki o de sitios webs externos.
-* [[Sitio Web XWiki.org&gt;&gt;http://www.xwiki.org]] -&gt; el texto de los enlaces funciona también para los enlaces externos
+* [[De Zona de Pruebas a Home&gt;&gt;WebHome]] -&gt; los enlaces pueden tener etiquetas
+* [[Página de inicio de la wiki&gt;&gt;Main.WebHome]] -&gt; un enlace puede usar el formato NombreDeEspacio.NombreDePágina para enlazar con una página de otro espacio
+* [[http://www.xwiki.org]] -&gt; puedes enlazar a páginas wiki o de sitios web externos
+* [[Sitio web de XWiki.org&gt;&gt;http://www.xwiki.org]] -&gt; las etiquetas de enlaces también funcionan con los enlaces externos
+
+También puedes crear enlaces a adjuntos:
+
+attach:XWikiLogo.png
 
 = Imágenes =
 
-Puede insertar imágenes en sus páginas del wiki:
+Puedes insertar imágenes en tus páginas wiki:
 
 [[image:XWikiLogo.png]]
 
 = Macros =
 
-Las macros le permiten hacer que el contenido del wiki luzca mejor y para añadir características adicionales a su wiki. Aquí hay dos ejemplos de como las macros pueden usarse en las páginas del wiki:
+Las macros te permiten mejorar la presentación del contenido wiki y añadir funcionalidades adicionales a tu wiki.    A continuación, dos ejemplos de como utilizar las macros en páginas wiki:
 
-== Macro de Atención ==
+== Macro de Advertencia ==
 
-Esta macro le permite atraer la atención de los usuarios a un trozo específico de información:
+Esta macro te permite atraer la atención de los usuarios a una parte específica de la información:
 
-{{warning}}Hola Mundo{{/warning}}
+{{warning}}
+Hola Mundo
+{{/warning}}
 
-== Tabla de Contenidos ==
+== Tabla de contenidos ==
 
-Este macro genera de forma automática la tabla de contenidos de su página wiki basada en los encabezados:
+Este macro genera de forma automática la tabla de contenidos de tu página wiki basándose en los encabezados:
 
 {{toc/}}</content>
 </xwikidoc>

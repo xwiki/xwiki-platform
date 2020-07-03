@@ -155,7 +155,26 @@
               </item>
             </revapi.ignore>
             -->
-            
+            <revapi.ignore>
+              <item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;java.util.Optional&lt;org.xwiki.eventstream.EventStatus&gt;&gt; org.xwiki.eventstream.EventStore::deleteMailEntityEvent(org.xwiki.eventstream.EntityEvent)</new>
+                <justification>Young API</justification>
+              </item><item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.eventstream.Event&gt; org.xwiki.eventstream.EventStore::prefilterEvent(org.xwiki.eventstream.Event)</new>
+                <justification>Young API</justification>
+              </item><item>
+                <code>java.method.addedToInterface</code>
+                <new>method java.util.concurrent.CompletableFuture&lt;org.xwiki.eventstream.EventStatus&gt; org.xwiki.eventstream.EventStore::saveMailEntityEvent(org.xwiki.eventstream.EntityEvent)</new>
+                <justification>Young API</justification>
+              </item><item>
+                <code>java.class.nonFinalClassInheritsFromNewClass</code>
+                <old>class org.xwiki.eventstream.query.StatusQueryCondition</old>
+                <new>class org.xwiki.eventstream.query.StatusQueryCondition</new>
+                <justification>Young API</justification>
+              </item>
+            </revapi.ignore>
           </analysisConfiguration>
         </configuration>
       </plugin>

@@ -161,6 +161,9 @@ define({
     pagination: {
       maxShownPages: 10,
       pageSizes: [10, 25, 50, 100, 250],
+      showNextPrevious: true,
+      showFirstLast: false,
+      showPageSizeDropdown: false,
     },
 
   },

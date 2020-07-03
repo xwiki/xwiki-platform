@@ -7,11 +7,12 @@
     <!-- Pagination -->
     <nav class="livedata-pagination">
 
-      <!-- should go in the dropdown ?
-      <span>
+      <span
+        class="pagination-page-size"
+        v-if="data.meta.pagination.showPageSizeDropdown"
+      >
         Entries per page
         <select
-          class="pagination-entries-per-page"
           @change="logic.setPageSize(+$event.target.value)"
         >
           <option
@@ -21,7 +22,6 @@
           >{{ pageSize }}</option>
         </select>
       </span>
-      -->
 
       <span class="pagination-current-entries">
         {{ logic.getFirstIndexOfPage() + 1}} - {{ logic.getLastIndexOfPage() + 1}}
@@ -29,18 +29,18 @@
       </span>
 
       <nav class="pagination-indexes">
-        <!--
         <a
           class="page-nav"
+          v-if="data.meta.pagination.showFirstLast"
           href="#"
           @click.prevent="logic.setPageIndex(0)"
         >
           <span class="fa fa-angle-double-left"></span>
         </a>
-        -->
 
         <a
           class="page-nav"
+          v-if="data.meta.pagination.showNextPrevious"
           href="#"
           @click.prevent="logic.setPageIndex(logic.getPageIndex() - 1)"
         >
@@ -67,21 +67,21 @@
 
         <a
           class="page-nav"
+          v-if="data.meta.pagination.showNextPrevious"
           href="#"
           @click.prevent="logic.setPageIndex(logic.getPageIndex() + 1)"
         >
           <span class="fa fa-angle-right"></span>
         </a>
 
-        <!--
         <a
           class="page-nav"
+          v-if="data.meta.pagination.showFirstLast"
           href="#"
           @click.prevent="logic.setPageIndex(logic.getPageCount() - 1)"
         >
           <span class="fa fa-angle-double-right"></span>
         </a>
-        -->
 
       </nav>
 
@@ -203,7 +203,7 @@ define([
 
 .livedata-pagination .pagination-current-entries {
   color: #777777;
-  margin-right: 10px;
+  margin-right: 1rem;
 }
 
 .livedata-pagination .pagination-indexes {
@@ -224,7 +224,10 @@ define([
   text-decoration: underline;
 }
 
-.livedata-pagination .pagination-entries-per-page {
+.livedata-pagination .pagination-page-size {
+  margin-right: 1rem;
+}
+.livedata-pagination .pagination-page-size select {
   height: unset;
   padding: 2px 4px;
 }

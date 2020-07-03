@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+import com.cloudbees.groovy.cps.NonCPS
 
 // It's assumed that Jenkins has been configured to implicitly load the vars/*.groovy libraries.
 // Note that the version used is the one defined in Jenkins but it can be overridden as follows:
@@ -148,7 +149,7 @@ if (!params.type || params.type == 'standard') {
 		//   seems we need that too since it happens when we push changes to master)
 		// - The previous build was triggered by an upstream job (like rendering triggering platform)
 		def shouldExecute = false
-		currentBuild.rawBuild.getPreviousBuild().getCauses().each() {
+		getFirstNonDockerBuild(currentBuild.rawBuild).getCauses().each() {
 		  echoXWiki "Build trigger cause: [${it.toString()}]"
 			if (it.toString().contains('SCMTriggerCause')) {
 				echoXWiki 'Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}'
@@ -173,6 +174,16 @@ if (!params.type || params.type == 'standard') {
   } else {
     buildDocker(params.type)
   }
+}
+
+@NonCPS
+private def getFirstNonDockerBuild(def rawBuild)
+{
+  def previous = rawBuild.getPreviousBuild()
+  while (previous != null && isBadgeFound(previous, 'Docker Build')) {
+    previous = previous.getPreviousBuild()
+  }
+  return previous
 }
 
 private void buildStandardSingle(build)

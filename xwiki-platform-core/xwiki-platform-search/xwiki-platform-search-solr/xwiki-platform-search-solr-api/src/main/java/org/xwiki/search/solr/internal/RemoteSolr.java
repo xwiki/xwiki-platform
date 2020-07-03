@@ -58,7 +58,7 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     /**
      * The name of the core containing the XWiki search index.
      */
-    public static final String MAIN_CORE_NAME = "xwiki";
+    public static final String DEFAULT_CORE_PREFIX = "xwiki";
 
     @Inject
     private SolrConfiguration configuration;
@@ -82,12 +82,14 @@ public class RemoteSolr extends AbstractSolr implements Initializable
     @Override
     protected SolrClient getInternalSolrClient(String coreName)
     {
-        String corePath = coreName;
+        // Prefix Solr cores to avoid collision with other non-xwiki cores
 
-        // The name of the main XWiki search core is generally "xwiki" (that what is used in Debian package and what was
-        // used historically when there was only one core)
-        if (coreName.equals(SolrClientInstance.CORE_NAME)) {
-            corePath = MAIN_CORE_NAME;
+        StringBuilder corePath =
+            new StringBuilder(this.configuration.getInstanceConfiguration(TYPE, "corePrefix", DEFAULT_CORE_PREFIX));
+
+        if (!coreName.equals(SolrClientInstance.CORE_NAME)) {
+            corePath.append('_');
+            corePath.append(coreName);
         }
 
         return new HttpSolrClient.Builder(this.rootClient.getBaseURL() + '/' + corePath).build();

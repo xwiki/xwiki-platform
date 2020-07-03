@@ -613,6 +613,11 @@ extension.versioncheck.environment.enabled=$xwikiPropertiesEnvironmentVersionChe
 #-# using the default port.
 # solr.remote.baseURL=http://localhost:8983/solr
 
+#-# [Since 12.6RC1]
+#-# The prefix to add in front on each remote core name to avoid collisions with non-XWiki cores.
+#-# The default is "xwiki" which will produce names likes "xwiki_events" for example.
+# solr.remote.corePrefix=xwiki
+
 #-# [Since 5.1M1]
 #-# Elements to index are not sent to the Solr server one by one but in batch to improve performances.
 #-# It's possible to configure this behavior with the following properties:

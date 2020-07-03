@@ -107,7 +107,7 @@
             <data>
               <type>link</type>
               <symlink>true</symlink>
-              <linkName>/var/solr/data/events</linkName>
+              <linkName>/var/solr/data/xwiki_events</linkName>
               <linkTarget>/var/lib/xwiki/solr/events</linkTarget>
             </data>
           </dataSet>

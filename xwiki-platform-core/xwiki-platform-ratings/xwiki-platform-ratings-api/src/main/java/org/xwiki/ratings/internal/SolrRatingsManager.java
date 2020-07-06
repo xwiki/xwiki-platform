@@ -86,9 +86,9 @@ public class SolrRatingsManager extends AbstractRatingsManager
     private SolrUtils solrUtils;
 
     @Inject
-    private Solr solr;
+    protected Solr solr;
 
-    private SolrClient getSolrClient() throws SolrException
+    protected SolrClient getSolrClient() throws SolrException
     {
         return this.solr.getClient(RatingCoreSolrInitializer.NAME);
     }

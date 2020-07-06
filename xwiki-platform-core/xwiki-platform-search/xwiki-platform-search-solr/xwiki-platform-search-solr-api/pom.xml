@@ -109,6 +109,7 @@
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-platform-search-solr-server-core-minimal</artifactId>
       <version>${project.version}</version>
+      <type>zip</type>
       <scope>provided</scope>
     </dependency>
 

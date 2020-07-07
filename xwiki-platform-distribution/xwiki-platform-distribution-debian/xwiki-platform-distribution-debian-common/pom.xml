@@ -62,6 +62,12 @@
       <version>${pgsql.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>${mariadb.groupId}</groupId>
+      <artifactId>${mariadb.artifactId}</artifactId>
+      <version>${mariadb.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -132,6 +138,24 @@
                     <groupId>${pgsql.groupId}</groupId>
                     <artifactId>${pgsql.artifactId}</artifactId>
                     <version>${pgsql.version}</version>
+                  </artifactItem>
+                </artifactItems>
+                <outputDirectory>${war.path}/WEB-INF/lib</outputDirectory>
+              </configuration>
+            </execution>
+            <!-- Copy MariaDB JDBC connector -->
+            <execution>
+              <id>copy-mariadb</id>
+              <phase>process-resources</phase>
+              <goals>
+                <goal>copy</goal>
+              </goals>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>${mariadb.groupId}</groupId>
+                    <artifactId>${mariadb.artifactId}</artifactId>
+                    <version>${mariadb.version}</version>
                   </artifactItem>
                 </artifactItems>
                 <outputDirectory>${war.path}/WEB-INF/lib</outputDirectory>

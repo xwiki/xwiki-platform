@@ -33,6 +33,7 @@
   <description>Debian installer for XWiki</description>
   <modules>
     <module>xwiki-platform-distribution-debian-common</module>
+    <module>xwiki-platform-distribution-debian-mariadb-common</module>
     <module>xwiki-platform-distribution-debian-mysql-common</module>
     <module>xwiki-platform-distribution-debian-pgsql-common</module>
     <module>xwiki-platform-distribution-debian-tomcat</module>

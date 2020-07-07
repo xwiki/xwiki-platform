@@ -1535,7 +1535,7 @@ ul.cke_autocomplete_panel {
     </property>
     <property>
       <parameters>id=xwiki-ckeditor
-path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.extension.installed.getInstalledExtension('org.xwiki.contrib:application-ckeditor-ui', "wiki:$xcontext.database").version.value}))</parameters>
+path=$xwiki.getURL('CKEditor.EditSheet', 'jsx', $escapetool.url({'v': $services.extension.installed.getInstalledExtension('org.xwiki.contrib:application-ckeditor-ui', "wiki:$xcontext.database").version.value, 'xwiki-version': $services.extension.core.getCoreExtension('org.xwiki.platform:xwiki-platform-tree-webjar').version.value, 'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff', "wiki:$xcontext.database").version.value, 'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead', "wiki:$xcontext.database").version.value}))</parameters>
     </property>
     <property>
       <scope>wiki</scope>

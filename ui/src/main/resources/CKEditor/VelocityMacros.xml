@@ -140,7 +140,19 @@
 
 #macro (importCKEditorResources)
   #set ($discard = $xwiki.ssx.use('CKEditor.EditSheet'))
-  #set ($discard = $xwiki.jsx.use('CKEditor.EditSheet'))
+  ## Add the version of each JavaScript dependency of CKEditor Integration to the URL used to load the CKEditor in order
+  ## to make sure the browser cache is invalidated when one of these versions changes (e.g. when we upgrade XWiki or one
+  ## of these dependencies but the CKEditor version remains the same).
+  #set ($discard = $xwiki.jsx.use('CKEditor.EditSheet', {
+    'v': $services.extension.installed.getInstalledExtension('org.xwiki.contrib:application-ckeditor-ui',
+      "wiki:$xcontext.database").version.value,
+    'xwiki-version': $services.extension.core.getCoreExtension(
+      'org.xwiki.platform:xwiki-platform-tree-webjar').version.value,
+    'fast-diff-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:fast-diff',
+      "wiki:$xcontext.database").version.value,
+    'bs3typeahead-version': $services.extension.installed.getInstalledExtension('org.webjars.npm:bootstrap-3-typeahead',
+      "wiki:$xcontext.database").version.value
+  }))
   #importCKEditorCSS('plugins/xwiki-resource/resourcePicker.min.css' true)
   #importCKEditorCSS('plugins/xwiki-macro/macroWizard.min.css' true)
   ## Tree styles needed for the document/attachment tree picker.

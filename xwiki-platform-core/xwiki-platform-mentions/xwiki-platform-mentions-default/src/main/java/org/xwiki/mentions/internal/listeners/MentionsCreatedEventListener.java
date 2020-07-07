@@ -20,6 +20,7 @@
 package org.xwiki.mentions.internal.listeners;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -28,17 +29,18 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mentions.internal.async.MentionsCreatedRequest;
-import org.xwiki.mentions.internal.async.jobs.MentionsCreateJob;
-import org.xwiki.job.JobException;
-import org.xwiki.job.JobExecutor;
+import org.xwiki.mentions.MentionsEventExecutor;
+import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.LargeStringProperty;
 
 import static java.util.Collections.singletonList;
-import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
+import static org.xwiki.mentions.MentionLocation.AWM_FIELD;
+import static org.xwiki.mentions.MentionLocation.DOCUMENT;
 
 /**
  * Listen to entities creation. 
@@ -57,7 +59,7 @@ public class MentionsCreatedEventListener extends AbstractEventListener
     private Logger logger;
 
     @Inject
-    private JobExecutor jobExecutor;
+    private MentionsEventExecutor executor;
 
     /**
      * Default constructor.
@@ -74,16 +76,28 @@ public class MentionsCreatedEventListener extends AbstractEventListener
             DocumentCreatedEvent.class.getName(), source, data);
 
         XWikiDocument doc = (XWikiDocument) source;
-        MentionsCreatedRequest mentionsCreatedRequest = new MentionsCreatedRequest(doc);
-        mentionsCreatedRequest.setVerbose(false);
+        DocumentReference authorReference = doc.getAuthorReference();
+        DocumentReference documentReference = doc.getDocumentReference();
 
-        try {
-            this.jobExecutor.execute(MentionsCreateJob.ASYNC_REQUEST_TYPE, mentionsCreatedRequest);
-        } catch (JobException e) {
-            this.logger.warn(
-                "Failed to create a Job for the Event [{}] received from [{}] with data [{}]. Cause: [{}]",
-                DocumentCreatedEvent.class.getName(), source, data, getRootCauseMessage(e));
-        }
+        this.executor.executeCreate(doc.getXDOM(), authorReference, documentReference, DOCUMENT);
+
+        traverseXObjects(doc.getXObjects(), authorReference, documentReference);
     }
 
+    private void traverseXObjects(Map<DocumentReference, List<BaseObject>> xObjects, DocumentReference authorReference,
+        DocumentReference documentReference)
+    {
+        for (Map.Entry<DocumentReference, List<BaseObject>> entry : xObjects.entrySet()) {
+            for (BaseObject baseObject : entry.getValue()) {
+                if (baseObject != null) {
+                    for (Object o : baseObject.getProperties()) {
+                        if (o instanceof LargeStringProperty) {
+                            String content = ((LargeStringProperty) o).getValue();
+                            this.executor.executeCreate(content, authorReference, documentReference, AWM_FIELD);
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

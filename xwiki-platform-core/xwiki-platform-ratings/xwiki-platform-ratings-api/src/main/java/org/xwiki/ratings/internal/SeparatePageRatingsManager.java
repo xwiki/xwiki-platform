@@ -177,17 +177,27 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
         String sql =
             ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name and obj.className=?1"
                 + " and obj.id=parentprop.id.id and parentprop.id.name=?2 and parentprop.value=?3"
-                + " and obj.name not in (select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className=?4"
-                + " and obj2.id=statusprop.id.id and statusprop.id.name=?5 and (statusprop.value=?6 or statusprop.value= ?7) and obj.id=obj2.id) order by doc.date "
+                + " and obj.name not in ("
+                + "select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className=?4"
+                + " and obj2.id=statusprop.id.id and statusprop.id.name=?5 and "
+                + "(statusprop.value=?6 or statusprop.value= ?7) and obj.id=obj2.id"
+                + ") order by doc.date "
                 + (asc ? "asc" : "desc");
 
-        List<?> params = new ArrayList<>(Arrays.asList(getRatingsClassName(), RATING_CLASS_FIELDNAME_PARENT,
-            entityReferenceSerializer.serialize(documentRef), getRatingsClassName(), "status", "moderated", "refused"));
+        List<?> params = new ArrayList<>(Arrays.asList(
+            getRatingsClassName(),
+            RATING_CLASS_FIELDNAME_PARENT,
+            entityReferenceSerializer.serialize(documentRef),
+            getRatingsClassName(),
+            "status",
+            "moderated",
+            "refused"
+        ));
 
         List<Rating> ratings = new ArrayList<>();
         try {
-            List<DocumentReference> ratingPageReferenceList =
-                getXWikiContext().getWiki().getStore().searchDocumentReferences(sql, params, getXWikiContext());
+            List<DocumentReference> ratingPageReferenceList = getXWikiContext().getWiki().getStore()
+                    .searchDocumentReferences(sql, count, start, params, getXWikiContext());
 
             for (DocumentReference ratingPageReference : ratingPageReferenceList) {
                 ratings.add(

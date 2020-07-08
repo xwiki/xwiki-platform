@@ -179,10 +179,14 @@ if (!params.type || params.type == 'standard') {
 @NonCPS
 private def getFirstNonDockerBuild(def rawBuild)
 {
+  echoXWiki "Finding first non-docker build..."
   def previous = rawBuild.getPreviousBuild()
+  echoXWiki "  Checking build ${previous.getDisplayName()} (${previous.id})..."
   while (previous != null && isBadgeFound(previous, 'Docker Build')) {
     previous = previous.getPreviousBuild()
+    echoXWiki "  Checking build ${previous.getDisplayName()} (${previous.id})..."
   }
+  echoXWiki "  Selected build ${previous.getDisplayName()} (${previous.id})..."
   return previous
 }
 

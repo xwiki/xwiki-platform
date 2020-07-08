@@ -17,31 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.internal.async;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.mentions.internal.MentionsThreadPoolProvider;
 
 /**
- * A service to send mentions notification.
+ * Default implementation of {@link MentionsThreadPoolProvider}.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-@Role
-@Unstable
-public interface MentionNotificationService
+@Component
+@Singleton
+public class DefaultMentionsThreadPoolProvider implements MentionsThreadPoolProvider
 {
-    /**
-     * Send a notification on behalf of the author, informing the mentioned user that he/she is mentioned on the a page.
-     *
-     * @param authorReference the reference of the author of the mention.
-     * @param documentReference the document in which the mention has been done.
-     * @param mentionedIdentity the identity of the mentioned user.
-     * @param location The location of the mention.
-     * @param anchorId The anchor link to use.
-     */
-    void sendNotif(String authorReference, String documentReference, DocumentReference mentionedIdentity,
-        MentionLocation location, String anchorId);
+    private static final int POOL_SIZE = 4;
+
+    @Override
+    public ThreadPoolExecutor initializePool()
+    {
+        return new MentionsThreadPoolExecutor(POOL_SIZE);
+    }
+
+    @Override public int getPoolSize()
+    {
+        return POOL_SIZE;
+    }
 }

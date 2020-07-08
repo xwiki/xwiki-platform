@@ -19,35 +19,18 @@
  */
 package org.xwiki.mentions.internal;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import javax.inject.Singleton;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextException;
-import org.xwiki.context.ExecutionContextInitializer;
-import org.xwiki.context.ExecutionContextManager;
-import org.xwiki.mentions.MentionLocation;
-import org.xwiki.mentions.MentionNotificationService;
-import org.xwiki.mentions.MentionsEventExecutor;
-import org.xwiki.mentions.internal.async.MentionsThreadPoolExecutor;
+import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.XDOM;
-
-import com.xpn.xwiki.XWikiContext;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
@@ -62,338 +45,99 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @Singleton
 public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Initializable
 {
-    private static final int POOL_SIZE = 4;
-
     private ThreadPoolExecutor executor;
 
-    @Inject
-    private MentionNotificationService notificationService;
-
-    @Inject
-    private MentionXDOMService xdomService;
-
-    @Inject
-    private ExecutionContextManager contextManager;
-
-    @Inject
-    private Provider<XWikiContext> xcontextProvider;
+    private BlockingQueue<MentionsData> queue;
 
     @Inject
     private Logger logger;
 
     @Inject
-    private Execution execution;
+    private MentionsBlockingQueueProvider blockingQueueProvider;
+
+    @Inject
+    private MentionsThreadPoolProvider threadPoolProvider;
+
+    @Inject
+    private MentionsDataConsumer dataConsumer;
 
     @Override
     public void initialize()
     {
-        this.executor = new MentionsThreadPoolExecutor(POOL_SIZE);
+        this.executor = this.threadPoolProvider.initializePool();
+        this.queue = this.blockingQueueProvider.initBlockingQueue();
+        IntStream.range(0, this.threadPoolProvider.getPoolSize())
+            .forEach(i -> this.executor.execute(new MentionsConsumer()));
     }
 
     @Override
-    public void executeCreate(XDOM xdom, DocumentReference authorReference,
-        DocumentReference documentReference, MentionLocation location)
+    public void execute(DocumentReference documentReference, DocumentReference authorReference, String version)
     {
-        this.executor.execute(new CreateRunnable(xdom, authorReference, documentReference, location));
-    }
-
-    @Override
-    public void executeCreate(String content, DocumentReference authorReference, DocumentReference documentReference,
-        MentionLocation location)
-    {
-        this.executor.execute(new CreateRunnable(content, authorReference, documentReference, location));
-    }
-
-    @Override
-    public void executeUpdate(XDOM oldXdom, XDOM newXdom, DocumentReference authorReference,
-        DocumentReference documentReference, MentionLocation location)
-    {
-        this.executor.execute(new UpdateRunnable(oldXdom, newXdom, authorReference, documentReference, location));
-    }
-
-    @Override
-    public void executeUpdate(String oldContent, String newContent, DocumentReference authorReference,
-        DocumentReference documentReference, MentionLocation location)
-    {
-        this.executor.execute(new UpdateRunnable(oldContent, newContent, authorReference, documentReference, location));
+        try {
+            this.queue.put(new MentionsData()
+                               .setDocumentReference(documentReference.toString())
+                               .setAuthorReference(authorReference.toString())
+                               .setVersion(version)
+                               .setWikiId(documentReference.getWikiReference().getName())
+            );
+        } catch (InterruptedException e) {
+            this.logger
+                .warn("Error while adding a task to the mentions analysis queue. Cause [{}]", getRootCauseMessage(e));
+        }
     }
 
     @Override
     public long getQueueSize()
     {
-        return this.executor.getTaskCount();
+        return this.queue.size();
     }
 
     @Override
     public void clearQueue()
     {
-        this.executor.getQueue().clear();
+        this.queue.clear();
     }
 
-    private class UpdateRunnable implements Runnable
+    /**
+     * Consumer of the mentions analysis task queue.
+     */
+    public class MentionsConsumer implements Runnable
     {
-        private final String oldContent;
-
-        private final String newContent;
-
-        private final XDOM oldXdom;
-
-        private final XDOM newXdom;
-
-        private final DocumentReference authorReference;
-
-        private final DocumentReference documentReference;
-
-        private final MentionLocation location;
-
-        /**
-         * Initialize the task with the xdom to compare, and other information about the element ot analyze.
-         *
-         * @param oldXdom the old xdom 
-         * @param newXdom the new xdom
-         * @param authorReference the author reference
-         * @param documentReference the document reference
-         * @param location the location type
-         */
-        UpdateRunnable(XDOM oldXdom, XDOM newXdom, DocumentReference authorReference,
-            DocumentReference documentReference, MentionLocation location)
-        {
-            this.oldContent = null;
-            this.newContent = null;
-            this.oldXdom = oldXdom;
-            this.newXdom = newXdom;
-            this.authorReference = authorReference;
-            this.documentReference = documentReference;
-            this.location = location;
-        }
-
-        /**
-         * Initialize the task with the string content to compare, and other information about the element to analyze.  
-         * @param oldContent the old content
-         * @param newContent the new content
-         * @param authorReference the author reference
-         * @param documentReference the document reference
-         * @param location the location typew
-         */
-        UpdateRunnable(String oldContent, String newContent, DocumentReference authorReference,
-            DocumentReference documentReference, MentionLocation location)
-        {
-            this.oldContent = oldContent;
-            this.newContent = newContent;
-            this.oldXdom = null;
-            this.newXdom = null;
-            this.authorReference = authorReference;
-            this.documentReference = documentReference;
-            this.location = location;
-        }
-
         @Override
         public void run()
         {
-            try {
-                DefaultMentionsEventExecutor.this.initContext(this.authorReference);
-                getXdom(this.newXdom, this.newContent).ifPresent(newXdom -> {
-                    if (this.oldXdom != null || this.oldContent != null) {
-                        getXdom(this.oldXdom, this.oldContent).ifPresent(
-                            oldXdom -> handle(oldXdom, newXdom, this.authorReference, this.documentReference,
-                                this.location));
-                    } else {
-                        handleMissing(newXdom, this.authorReference, this.documentReference, this.location);
-                    }
-                });
-            } catch (ExecutionContextException e) {
-                DefaultMentionsEventExecutor.this.logger
-                    .warn("Failed to initalize the context of the mention update runnable. Cause [{}]",
-                        getRootCauseMessage(e));
-            } finally {
-                endContext();
+            while (true) {
+                runOnce();
             }
-        }
-
-        private void handle(XDOM oldXdom, XDOM newXdom, DocumentReference authorReference,
-            DocumentReference documentReference, MentionLocation location)
-        {
-            List<MacroBlock> oldMentions = DefaultMentionsEventExecutor.this.xdomService.listMentionMacros(oldXdom);
-            List<MacroBlock> newMentions = DefaultMentionsEventExecutor.this.xdomService.listMentionMacros(newXdom);
-
-            Map<DocumentReference, List<String>> oldCounts =
-                DefaultMentionsEventExecutor.this.xdomService.countByIdentifier(oldMentions);
-            Map<DocumentReference, List<String>> newCounts =
-                DefaultMentionsEventExecutor.this.xdomService.countByIdentifier(newMentions);
-
-            for (Map.Entry<DocumentReference, List<String>> entry : newCounts.entrySet()) {
-                DocumentReference key = entry.getKey();
-                List<String> newAnchorIds = entry.getValue();
-                List<String> oldAnchorsIds = oldCounts.getOrDefault(key, Collections.emptyList());
-
-                // Compute if there's new mentions without an anchor
-                long newEmptyAnchorsNumber = newAnchorIds.stream().filter(org.xwiki.text.StringUtils::isEmpty).count();
-                long oldEmptyAnchorsNumber = oldAnchorsIds.stream().filter(org.xwiki.text.StringUtils::isEmpty).count();
-
-                // Retrieve new mentions with a new anchor
-                List<String> anchorsToNotify = newAnchorIds.stream()
-                                                   .filter(value -> !org.xwiki.text.StringUtils.isEmpty(value)
-                                                                        && !oldAnchorsIds.contains(value))
-                                                   .collect(Collectors.toList());
-
-                // Notify with an empty anchorId if there's new mentions without an anchor.
-                if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
-                    sendNotif(authorReference, documentReference, location, key, "");
-                }
-
-                // Notify all new mentions with new anchors.
-                for (String anchorId : anchorsToNotify) {
-                    sendNotif(authorReference, documentReference, location, key, anchorId);
-                }
-            }
-        }
-
-        private void handleMissing(XDOM newXdom, DocumentReference authorReference,
-            DocumentReference documentReference, MentionLocation location)
-        {
-            List<MacroBlock> newMentions = DefaultMentionsEventExecutor.this.xdomService.listMentionMacros(newXdom);
-
-            // the matching element has not be found in the previous version of the document
-            // notification are send unconditionally to all mentioned users.
-            DefaultMentionsEventExecutor.this.xdomService.countByIdentifier(newMentions)
-                .forEach((key, value) -> value.forEach(
-                    anchorId -> sendNotif(authorReference, documentReference, location, key, anchorId)));
-        }
-    }
-
-    private void sendNotif(DocumentReference authorReference, DocumentReference documentReference,
-        MentionLocation location, DocumentReference key, String anchorId)
-    {
-        this.notificationService.sendNotif(authorReference, documentReference, key, location, anchorId);
-    }
-
-    private class CreateRunnable implements Runnable
-    {
-        private final String content;
-
-        private final XDOM xdom;
-
-        private final DocumentReference authorReference;
-
-        private final DocumentReference documentReference;
-
-        private final MentionLocation location;
-
-        /**
-         * Initialize the task with the xdom, and other information about the element to analyze.  
-         *
-         * @param xdom the xdom
-         * @param authorReference the author reference
-         * @param documentReference the document reference
-         * @param location the location typew
-         */
-        CreateRunnable(XDOM xdom, DocumentReference authorReference, DocumentReference documentReference,
-            MentionLocation location)
-        {
-            this.content = null;
-            this.xdom = xdom;
-            this.authorReference = authorReference;
-            this.documentReference = documentReference;
-            this.location = location;
         }
 
         /**
-         * Initialize the task with the string content, and other information about the element to analyze.  
-         * @param content the content
-         * @param authorReference the author reference
-         * @param documentReference the document reference
-         * @param location the location typew
+         * Consume a single queue task.
          */
-        CreateRunnable(String content, DocumentReference authorReference, DocumentReference documentReference,
-            MentionLocation location)
+        public void runOnce()
         {
-            this.content = content;
-            this.xdom = null;
-            this.authorReference = authorReference;
-            this.documentReference = documentReference;
-            this.location = location;
-        }
-
-        @Override
-        public void run()
-        {
+            MentionsData data = null;
             try {
-                DefaultMentionsEventExecutor.this.initContext(this.authorReference);
-
-                getXdom(this.xdom, this.content).ifPresent(xdom -> {
-                    List<MacroBlock> blocks = DefaultMentionsEventExecutor.this.xdomService.listMentionMacros(xdom);
-
-                    Map<DocumentReference, List<String>> counts =
-                        DefaultMentionsEventExecutor.this.xdomService.countByIdentifier(blocks);
-
-                    for (Map.Entry<DocumentReference, List<String>> entry : counts.entrySet()) {
-                        boolean emptyAnchorProcessed = false;
-                        for (String anchorId : entry.getValue()) {
-                            if (!StringUtils.isEmpty(anchorId) || !emptyAnchorProcessed) {
-                                sendNotif(this.authorReference, this.documentReference, this.location, entry.getKey(),
-                                    anchorId);
-                                emptyAnchorProcessed = emptyAnchorProcessed || StringUtils.isEmpty(anchorId);
-                            }
-                        }
-                    }
-                });
-            } catch (ExecutionContextException e) {
+                data = DefaultMentionsEventExecutor.this.queue.take();
                 DefaultMentionsEventExecutor.this.logger
-                    .warn("Failed to initalize the context of the mention create runnable. Cause [{}]",
-                        getRootCauseMessage(e));
-            } finally {
-                endContext();
+                    .debug("[{}] - [{}] consumed. Queue size [{}]", data.getDocumentReference(), data.getVersion(),
+                        DefaultMentionsEventExecutor.this.queue.size());
+
+                DefaultMentionsEventExecutor.this.dataConsumer.consume(data);
+            } catch (Exception e) {
+                DefaultMentionsEventExecutor.this.logger
+                    .warn("Error during mention analysis of task [{}]. Cause [{}].", data, getRootCauseMessage(e));
+                if (data != null) {
+                    // push back the failed task at the beginning of the queue.
+                    try {
+                        DefaultMentionsEventExecutor.this.queue.put(data);
+                    } catch (InterruptedException interruptedException) {
+                        DefaultMentionsEventExecutor.this.logger
+                            .error("Error when adding back a fail failed task [{}]. Cause [{}].", data,
+                                getRootCauseMessage(e));
+                    }
+                }
             }
         }
     }
-
-    /**
-     * Initialize a context for the duration of a {@link CreateRunnable} or {@link UpdateRunnable}.
-     *
-     * @param authorReference the author of the analyzed document
-     * @throws ExecutionContextException in case one {@link ExecutionContextInitializer} fails to execute 
-     * @see DefaultMentionsEventExecutor#endContext()
-     */
-    private void initContext(DocumentReference authorReference) throws ExecutionContextException
-    {
-        ExecutionContext context = new ExecutionContext();
-        this.contextManager.initialize(context);
-
-        XWikiContext xWikiContext = DefaultMentionsEventExecutor.this.xcontextProvider.get();
-        xWikiContext.setUserReference(authorReference);
-        xWikiContext.setWikiReference(authorReference.getWikiReference());
-    }
-
-    /**
-     * Cleanup the context at the end of a {@link CreateRunnable} or {@link UpdateRunnable} execution.
-     * @see DefaultMentionsEventExecutor#initContext(DocumentReference)
-     */
-    private void endContext()
-    {
-        this.execution.removeContext();
-    }
-
-    /**
-     * Get the xdom, either directly if provided, or by parsing the provided content.
-     *
-     * @param xdom a xdom
-     * @param content a page content in string format
-     * @return the xdom
-     */
-    private Optional<XDOM> getXdom(XDOM xdom, String content)
-    {
-        if (xdom != null) {
-            return Optional.of(xdom);
-        } else {
-            return DefaultMentionsEventExecutor.this.xdomService.parse(content);
-        }
-    }
-    @Override
-    public void setExecutor(ThreadPoolExecutor executor)
-    {
-        this.executor = executor;
-    }
-    
-    
 }
-

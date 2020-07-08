@@ -49,6 +49,36 @@
     <module>xwiki-platform-mentions-ui</module>
     <module>xwiki-platform-mentions-default</module>
   </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.revapi</groupId>
+        <artifactId>revapi-maven-plugin</artifactId>
+        <configuration>
+          <analysisConfiguration><![CDATA[
+            {
+              "revapi": {
+                "ignore": [
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.mentions.MentionNotificationService::sendNotif(===org.xwiki.model.reference.DocumentReference===, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
+                    "new": "parameter void org.xwiki.mentions.MentionNotificationService::sendNotif(===java.lang.String===, java.lang.String, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
+                    "justification": "Unstable API. Only a serialized reference to the document is required."
+                  },
+                  {
+                    "code": "java.method.parameterTypeChanged",
+                    "old": "parameter void org.xwiki.mentions.MentionNotificationService::sendNotif(org.xwiki.model.reference.DocumentReference, ===org.xwiki.model.reference.DocumentReference===, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
+                    "new": "parameter void org.xwiki.mentions.MentionNotificationService::sendNotif(java.lang.String, ===java.lang.String===, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
+                    "justification": "Unstable API. Only a serialized reference to the document is required."
+                  }
+                ]
+              }
+            }
+          ]]></analysisConfiguration>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
   <profiles>
     <profile>
       <id>integration-tests</id>

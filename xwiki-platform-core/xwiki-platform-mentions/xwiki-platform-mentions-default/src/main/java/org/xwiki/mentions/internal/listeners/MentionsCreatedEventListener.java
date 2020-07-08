@@ -20,7 +20,6 @@
 package org.xwiki.mentions.internal.listeners;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -29,18 +28,14 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.xwiki.bridge.event.DocumentCreatedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.mentions.MentionsEventExecutor;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.remote.RemoteObservationManagerContext;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.LargeStringProperty;
 
 import static java.util.Collections.singletonList;
-import static org.xwiki.mentions.MentionLocation.AWM_FIELD;
-import static org.xwiki.mentions.MentionLocation.DOCUMENT;
 
 /**
  * Listen to entities creation. 
@@ -60,6 +55,9 @@ public class MentionsCreatedEventListener extends AbstractEventListener
 
     @Inject
     private MentionsEventExecutor executor;
+    
+    @Inject
+    private RemoteObservationManagerContext remoteObservationManagerContext;
 
     /**
      * Default constructor.
@@ -72,32 +70,12 @@ public class MentionsCreatedEventListener extends AbstractEventListener
     @Override
     public void onEvent(Event event, Object source, Object data)
     {
+        if (!(event instanceof DocumentCreatedEvent) || this.remoteObservationManagerContext.isRemoteState()) {
+            return;
+        }
         this.logger.debug("Event [{}] received from [{}] with data [{}].",
             DocumentCreatedEvent.class.getName(), source, data);
-
         XWikiDocument doc = (XWikiDocument) source;
-        DocumentReference authorReference = doc.getAuthorReference();
-        DocumentReference documentReference = doc.getDocumentReference();
-
-        this.executor.executeCreate(doc.getXDOM(), authorReference, documentReference, DOCUMENT);
-
-        traverseXObjects(doc.getXObjects(), authorReference, documentReference);
-    }
-
-    private void traverseXObjects(Map<DocumentReference, List<BaseObject>> xObjects, DocumentReference authorReference,
-        DocumentReference documentReference)
-    {
-        for (Map.Entry<DocumentReference, List<BaseObject>> entry : xObjects.entrySet()) {
-            for (BaseObject baseObject : entry.getValue()) {
-                if (baseObject != null) {
-                    for (Object o : baseObject.getProperties()) {
-                        if (o instanceof LargeStringProperty) {
-                            String content = ((LargeStringProperty) o).getValue();
-                            this.executor.executeCreate(content, authorReference, documentReference, AWM_FIELD);
-                        }
-                    }
-                }
-            }
-        }
+        this.executor.execute(doc.getDocumentReference(), doc.getAuthorReference(), doc.getVersion());
     }
 }

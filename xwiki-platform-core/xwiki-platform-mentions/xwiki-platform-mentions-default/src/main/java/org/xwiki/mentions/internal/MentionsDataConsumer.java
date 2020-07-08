@@ -17,31 +17,30 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.internal;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.stability.Unstable;
 
+import com.xpn.xwiki.XWikiException;
+
 /**
- * A service to send mentions notification.
+ * Consume a mention data and analyse it.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-@Role
 @Unstable
-public interface MentionNotificationService
+@Role
+public interface MentionsDataConsumer
 {
     /**
-     * Send a notification on behalf of the author, informing the mentioned user that he/she is mentioned on the a page.
+     * Read the mention data to identify if mention notification needs to be save for the document or object 
+     * creation or modification.
      *
-     * @param authorReference the reference of the author of the mention.
-     * @param documentReference the document in which the mention has been done.
-     * @param mentionedIdentity the identity of the mentioned user.
-     * @param location The location of the mention.
-     * @param anchorId The anchor link to use.
+     * @param data the mention data
+     * @throws XWikiException in case of error during the analysis
      */
-    void sendNotif(String authorReference, String documentReference, DocumentReference mentionedIdentity,
-        MentionLocation location, String anchorId);
+    void consume(MentionsData data) throws XWikiException;
 }

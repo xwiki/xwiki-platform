@@ -46,6 +46,13 @@
       <type>xar</type>
     </dependency>
 
+    <!--  set an explicit version to avoid inconsistencies -->
+    <dependency>
+      <groupId>org.jetbrains</groupId>
+      <artifactId>annotations</artifactId>
+      <version>19.0.0</version>
+    </dependency>
+
    
     <!-- ================================
         Test only dependencies

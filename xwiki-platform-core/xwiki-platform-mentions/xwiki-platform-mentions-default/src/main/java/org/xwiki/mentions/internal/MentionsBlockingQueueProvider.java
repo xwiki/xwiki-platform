@@ -17,31 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.internal;
+
+import java.util.concurrent.BlockingQueue;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.stability.Unstable;
 
 /**
- * A service to send mentions notification.
+ * Blocking queue provider.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
-@Role
 @Unstable
-public interface MentionNotificationService
+@Role
+public interface MentionsBlockingQueueProvider
 {
     /**
-     * Send a notification on behalf of the author, informing the mentioned user that he/she is mentioned on the a page.
+     * Initialize a blocking queue.
      *
-     * @param authorReference the reference of the author of the mention.
-     * @param documentReference the document in which the mention has been done.
-     * @param mentionedIdentity the identity of the mentioned user.
-     * @param location The location of the mention.
-     * @param anchorId The anchor link to use.
+     * @return The blocking queue
      */
-    void sendNotif(String authorReference, String documentReference, DocumentReference mentionedIdentity,
-        MentionLocation location, String anchorId);
+    BlockingQueue<MentionsData> initBlockingQueue();
 }

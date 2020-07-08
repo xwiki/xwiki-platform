@@ -25,7 +25,7 @@ import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.MentionsConfiguration;
-import org.xwiki.mentions.MentionsEventExecutor;
+import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.script.service.ScriptService;
 import org.xwiki.stability.Unstable;
 

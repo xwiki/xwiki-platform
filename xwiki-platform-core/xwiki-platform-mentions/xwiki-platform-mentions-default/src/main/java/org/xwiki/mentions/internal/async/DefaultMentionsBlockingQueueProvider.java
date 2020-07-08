@@ -19,29 +19,35 @@
  */
 package org.xwiki.mentions.internal.async;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
+import java.io.File;
+import java.util.concurrent.BlockingQueue;
 
-import static java.lang.Thread.NORM_PRIORITY;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.xwiki.component.annotation.Component;
+import org.xwiki.environment.Environment;
+import org.xwiki.mentions.internal.MentionsBlockingQueueProvider;
+
+import ch.rasc.xodusqueue.XodusBlockingQueue;
 
 /**
- * {@link ThreadFactory} dedicated to asynchronous tasks needed for the mentions.
+ * Default implementation of {@link MentionsBlockingQueueProvider}.
  *
  * @version $Id$
  * @since 12.6RC1
  */
-class MentionsThreadFactory implements ThreadFactory
+@Component
+@Singleton
+public class DefaultMentionsBlockingQueueProvider implements MentionsBlockingQueueProvider
 {
-    private static final String THREAD_NAME = "Mentions pool thread";
-
-    private final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+    @Inject
+    private Environment environment;
 
     @Override
-    public Thread newThread(Runnable runnable)
+    public BlockingQueue<MentionsData> initBlockingQueue()
     {
-        Thread thread = this.threadFactory.newThread(runnable);
-        thread.setName(THREAD_NAME);
-        thread.setPriority(NORM_PRIORITY - 1);
-        return thread;
+        File queueDirectory = new File(new File(this.environment.getPermanentDirectory(), "mentions"), "queue");
+        return new XodusBlockingQueue<>(queueDirectory.getAbsolutePath(), MentionsData.class, Long.MAX_VALUE);
     }
 }

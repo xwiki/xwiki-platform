@@ -64,7 +64,7 @@ public class DefaultMentionNotificationServiceTest
         Set<String> eventTarget = Collections.singleton("xwiki:XWiki.U2");
         when(this.serializer.serialize(mentionedIdentity)).thenReturn("xwiki:XWiki.U2");
 
-        this.notificationService.sendNotif(authorReference, documentReference, mentionedIdentity,
+        this.notificationService.sendNotif(authorReference.toString(), documentReference.toString(), mentionedIdentity,
             MentionLocation.COMMENT, "anchor");
 
         MentionEvent event = new MentionEvent(eventTarget,

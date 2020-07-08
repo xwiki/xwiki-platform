@@ -19,8 +19,11 @@
  */
 package org.xwiki.ratings.internal;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Vector;
 
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -31,6 +34,7 @@ import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.ratings.Rating;
@@ -42,28 +46,32 @@ import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.ratings.RatingsManager.RATINGS_CLASSREFERENCE;
 import static org.xwiki.ratings.RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR;
 import static org.xwiki.ratings.RatingsManager.RATING_CLASS_FIELDNAME_PARENT;
 
 /**
- * Tests for {@link SeparatePageRatingsManager}.
+ * Tests for {@link DefaultRatingsManager}.
  *
  * @version $Id$
  * @since 12.6RC1
  */
 @ComponentTest
-public class SeparatePageRatingsManagerTest
+public class DefaultRatingsManagerTest
 {
+    private static final DocumentReference RATING_CLASS_REFERENCE =
+        new DocumentReference(RATINGS_CLASSREFERENCE, new WikiReference("xwiki"));
+
     @InjectMockComponents
-    private SeparatePageRatingsManager ratingsManager;
+    private DefaultRatingsManager defaultRatingsManager;
 
     @MockComponent
     @Named("compactwiki")
@@ -71,9 +79,6 @@ public class SeparatePageRatingsManagerTest
 
     @MockComponent
     private Provider<XWikiContext> xcontextProvider;
-
-    @MockComponent
-    private XWikiStoreInterface xWikiStoreInterface;
 
     @MockComponent
     private QueryManager queryManager;
@@ -96,72 +101,22 @@ public class SeparatePageRatingsManagerTest
     {
         when(this.xcontextProvider.get()).thenReturn(this.context);
         when(this.context.getWiki()).thenReturn(this.xWiki);
-        when(this.xWiki.getStore()).thenReturn(this.xWikiStoreInterface);
-    }
-
-    @Test
-    public void getRatings() throws XWikiException
-    {
-        String sqlRequest = ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name"
-            + " and obj.className=?1 and obj.id=parentprop.id.id and parentprop.id.name=?2 and parentprop.value=?3"
-            + " and obj.name not in ("
-            + "select obj2.name from BaseObject as obj2, StringProperty as statusprop where obj2.className=?4"
-            + " and obj2.id=statusprop.id.id and statusprop.id.name=?5 and "
-            + "(statusprop.value=?6 or statusprop.value= ?7) and obj.id=obj2.id"
-            + ") order by doc.date asc";
-
-        DocumentReference documentReference = new DocumentReference("mywiki", "Foo", "Bar");
-        when(this.entityReferenceSerializer.serialize(documentReference)).thenReturn("mywiki:Foo.Bar");
-
-        List<String> arguments = Arrays.asList(
-            "XWiki.RatingsClass",
-            RATING_CLASS_FIELDNAME_PARENT,
-            "mywiki:Foo.Bar",
-            "XWiki.RatingsClass",
-            "status",
-            "moderated",
-            "refused"
-        );
-
-        DocumentReference result1 = new DocumentReference("mywiki", "Foo", "Rating1");
-        DocumentReference result2 = new DocumentReference("mywiki", "Foo", "Rating2");
-        DocumentReference result3 = new DocumentReference("mywiki", "Foo", "Rating3");
-
-        XWikiDocument result1Doc = mock(XWikiDocument.class);
-        when(this.xWiki.getDocument(result1, this.context)).thenReturn(result1Doc);
-
-        XWikiDocument result2Doc = mock(XWikiDocument.class);
-        when(this.xWiki.getDocument(result2, this.context)).thenReturn(result2Doc);
-
-        XWikiDocument result3Doc = mock(XWikiDocument.class);
-        when(this.xWiki.getDocument(result3, this.context)).thenReturn(result3Doc);
-
-        when(this.xWikiStoreInterface.searchDocumentReferences(sqlRequest, 12, 2, arguments, this.context))
-            .thenReturn(Arrays.asList(result1, result2, result3));
-
-        List<Rating> expectedRatings = Arrays.asList(
-            new SeparatePageRating(documentReference, result1Doc, this.context, this.ratingsManager),
-            new SeparatePageRating(documentReference, result2Doc, this.context, this.ratingsManager),
-            new SeparatePageRating(documentReference, result3Doc, this.context, this.ratingsManager)
-        );
-
-        assertEquals(expectedRatings, this.ratingsManager.getRatings(documentReference, 2, 12, true));
+        when(this.context.getWikiReference()).thenReturn(new WikiReference("xwiki"));
     }
 
     @Test
     public void getUserRatings() throws Exception
     {
-        String statement = "select distinct doc.fullName, parentProp.value, doc.date "
-            + "from XWikiDocument doc, BaseObject as obj, StringProperty as authorProp, StringProperty as parentProp "
+        String statement = "select distinct doc.fullName, obj.number, doc.date "
+            + "from XWikiDocument as doc, BaseObject as obj, StringProperty as authorProp "
             + "where doc.fullName=obj.name and doc.translation=0 and obj.className=:ratingClassName "
             + "and obj.id=authorProp.id.id and authorProp.id.name=:authorPropertyName and authorProp.value=:authorValue"
-            + " and obj.id=parentProp.id.id and parentProp.id.name=:parentPropertyName"
             + " and obj.name not in ("
             + "select obj2.name from BaseObject as obj2, StringProperty as statusprop "
             + "where obj.id=obj2.id and obj2.className=:ratingClassName and obj2.id=statusprop.id.id and "
             + "statusprop.id.name=:statusPropertyName and "
             + "(statusprop.value=:statusModerated or statusprop.value=:statusRefused)"
-            + ") order by doc.date desc";
+            + ") order by doc.date asc";
 
         DocumentReference userDocReference = new DocumentReference("mywiki", "Foo", "Bar");
         when(userReferenceSerializer.serialize(CurrentUserReference.INSTANCE)).thenReturn(userDocReference);
@@ -172,29 +127,23 @@ public class SeparatePageRatingsManagerTest
 
         when(query.bindValue("ratingClassName", "XWiki.RatingsClass")).thenReturn(query);
         when(query.bindValue("authorPropertyName", RATING_CLASS_FIELDNAME_AUTHOR)).thenReturn(query);
-        when(query.bindValue("parentPropertyName", RATING_CLASS_FIELDNAME_PARENT)).thenReturn(query);
         when(query.bindValue("authorValue", "mywiki:XWiki.Foo")).thenReturn(query);
         when(query.bindValue("statusPropertyName", "status")).thenReturn(query);
         when(query.bindValue("statusModerated", "moderated")).thenReturn(query);
         when(query.bindValue("statusRefused", "refused")).thenReturn(query);
-        when(query.setLimit(2)).thenReturn(query);
-        when(query.setOffset(10)).thenReturn(query);
-
-        DocumentReference rating1 = new DocumentReference("mywiki", "Foo", "Rating1");
-        DocumentReference rating2 = new DocumentReference("mywiki", "Foo", "Rating2");
-        DocumentReference rating3 = new DocumentReference("mywiki", "Foo", "Rating3");
+        when(query.setLimit(26)).thenReturn(query);
+        when(query.setOffset(12)).thenReturn(query);
 
         DocumentReference pageRated1 = new DocumentReference("mywiki", "Some", "Thing");
         DocumentReference pageRated2 = new DocumentReference("mywiki", "Foo", "Foo");
         DocumentReference pageRated3 = new DocumentReference("mywiki", "Bar", "Baz");
+
         when(query.execute()).thenReturn(Arrays.asList(
-            new Object[] { "mywiki:Foo.Rating1", "mywiki:Some.Thing" },
-            new Object[] { "mywiki:Foo.Rating2", "mywiki:Foo.Foo" },
-            new Object[] { "mywiki:Foo.Rating3", "mywiki:Bar.Baz" }
+            new Object[] { "mywiki:Some.Thing", 0 },
+            new Object[] { "mywiki:Foo.Foo", 3 },
+            new Object[] { "mywiki:Bar.Baz", 0 },
+            new Object[] { "mywiki:Some.Thing", 2 }
         ));
-        when(this.documentReferenceResolver.resolve("mywiki:Foo.Rating1")).thenReturn(rating1);
-        when(this.documentReferenceResolver.resolve("mywiki:Foo.Rating2")).thenReturn(rating2);
-        when(this.documentReferenceResolver.resolve("mywiki:Foo.Rating3")).thenReturn(rating3);
 
         when(this.documentReferenceResolver.resolve("mywiki:Some.Thing")).thenReturn(pageRated1);
         when(this.documentReferenceResolver.resolve("mywiki:Foo.Foo")).thenReturn(pageRated2);
@@ -202,33 +151,41 @@ public class SeparatePageRatingsManagerTest
 
 
         XWikiDocument result1Doc = mock(XWikiDocument.class);
-        when(this.xWiki.getDocument(rating1, this.context)).thenReturn(result1Doc);
+        when(this.xWiki.getDocument(pageRated1, this.context)).thenReturn(result1Doc);
+        BaseObject obj1 = mock(BaseObject.class);
+        BaseObject obj2 = mock(BaseObject.class);
+        when(result1Doc.getXObject(RATING_CLASS_REFERENCE, 0)).thenReturn(obj1);
+        when(result1Doc.getXObject(RATING_CLASS_REFERENCE, 2)).thenReturn(obj2);
 
         XWikiDocument result2Doc = mock(XWikiDocument.class);
-        when(this.xWiki.getDocument(rating2, this.context)).thenReturn(result2Doc);
+        when(this.xWiki.getDocument(pageRated2, this.context)).thenReturn(result2Doc);
+        BaseObject obj3 = mock(BaseObject.class);
+        when(result2Doc.getXObject(RATING_CLASS_REFERENCE, 3)).thenReturn(obj3);
 
         XWikiDocument result3Doc = mock(XWikiDocument.class);
-        when(this.xWiki.getDocument(rating3, this.context)).thenReturn(result3Doc);
+        when(this.xWiki.getDocument(pageRated3, this.context)).thenReturn(result3Doc);
+        BaseObject obj4 = mock(BaseObject.class);
+        when(result3Doc.getXObject(RATING_CLASS_REFERENCE, 0)).thenReturn(obj4);
 
         List<Rating> expectedRatings = Arrays.asList(
-            new SeparatePageRating(pageRated1, result1Doc, this.context, this.ratingsManager),
-            new SeparatePageRating(pageRated2, result2Doc, this.context, this.ratingsManager),
-            new SeparatePageRating(pageRated3, result3Doc, this.context, this.ratingsManager)
+            new DefaultRating(pageRated1, obj1, this.context, this.defaultRatingsManager),
+            new DefaultRating(pageRated2, obj3, this.context, this.defaultRatingsManager),
+            new DefaultRating(pageRated3, obj4, this.context, this.defaultRatingsManager),
+            new DefaultRating(pageRated1, obj2, this.context, this.defaultRatingsManager)
         );
 
-        List<Rating> ratings = this.ratingsManager.getRatings(CurrentUserReference.INSTANCE, 10, 2, false);
+        List<Rating> ratings = this.defaultRatingsManager.getRatings(CurrentUserReference.INSTANCE, 12, 26, true);
 
         assertEquals(expectedRatings, ratings);
 
         // Ensure that all arguments are binded
         verify(query).bindValue("ratingClassName", "XWiki.RatingsClass");
         verify(query).bindValue("authorPropertyName", RATING_CLASS_FIELDNAME_AUTHOR);
-        verify(query).bindValue("parentPropertyName", RATING_CLASS_FIELDNAME_PARENT);
         verify(query).bindValue("authorValue", "mywiki:XWiki.Foo");
         verify(query).bindValue("statusPropertyName", "status");
         verify(query).bindValue("statusModerated", "moderated");
         verify(query).bindValue("statusRefused", "refused");
-        verify(query).setLimit(2);
-        verify(query).setOffset(10);
+        verify(query).setLimit(26);
+        verify(query).setOffset(12);
     }
 }

@@ -17,7 +17,7 @@
           >
             <div
               class="column-name"
-              @click="logic.sort(col.id)"
+              @click="logic.sort(col.id, 0)"
             >
               <span>{{ col.name }}</span>
               <span
@@ -25,8 +25,8 @@
                 :class="[
                   'sort-icon',
                   'fa',
-                  { 'sorted': sorts[col.id] },
-                  (sorts[col.id] && sorts[col.id].descending) ? 'fa-caret-up' : 'fa-caret-down',
+                  { 'sorted': sortLevel1.property === col.id },
+                  (sortLevel1.property === col.id && sortLevel1.descending) ? 'fa-caret-up' : 'fa-caret-down',
                 ]"
               ></span>
             </div>
@@ -136,16 +136,7 @@ define([
       data: function () { return this.logic.data; },
       rows: function () { return this.logic.data.data.entries; },
       cols: function () { return this.logic.data.meta.propertyDescriptors; },
-      sorts: function () {
-        let sorts = {};
-        this.data.query.sort.forEach( function (sortObject, level) {
-          sorts[sortObject.property] = {
-            level: level,
-            descending: sortObject.descending,
-          };
-        });
-        return sorts;
-      },
+      sortLevel1: function () { return this.data.query.sort[0] || {}; },
     },
 
   });

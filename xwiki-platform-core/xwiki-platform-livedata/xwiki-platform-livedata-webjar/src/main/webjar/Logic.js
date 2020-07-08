@@ -155,6 +155,21 @@ define([
 
 
 
+
+    /**
+     * ---------------------------------------------------------------
+     * UTILS
+     */
+
+
+    isValidPropertyId: function (propertyId) {
+      return this.data.query.properties.indexOf(propertyId) !== -1;
+    },
+
+
+
+
+
     /**
      * ---------------------------------------------------------------
      * DESCRIPTORS
@@ -203,7 +218,7 @@ define([
      * @param {String} propertyId
      */
     getDisplayerDescriptor: function (propertyId) {
-      if (this.data.query.properties.indexOf(propertyId) === -1) { return; }
+      if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
       var propertyDescriptor = this.getPropertyDescriptor(propertyId);
       var propertyDescriptorDisplayer = propertyDescriptor.displayer || {};
@@ -225,7 +240,7 @@ define([
      * @param {String} propertyId
      */
     getFilterDescriptor: function (propertyId) {
-      if (this.data.query.properties.indexOf(propertyId) === -1) { return; }
+      if (!this.isValidPropertyId(propertyId)) { return; }
       // property descriptor config
       var propertyDescriptor = this.getPropertyDescriptor(propertyId);
       var propertyDescriptorFilter = propertyDescriptor.filter || {};
@@ -493,6 +508,18 @@ define([
 
 
     /**
+     * Get the sort query associated to a property id
+     * @param {String} propertyId
+     */
+    getQuerySort: function (propertyId) {
+      if (!this.isValidPropertyId(propertyId)) { return; }
+      return this.data.query.sort.find(function (sort) {
+        return sort.property === propertyId;
+      });
+    },
+
+
+    /**
      * Update sort configuration based on parameters, then fetch new data
      * @param {String} property The property to sort according to
      * @param {String} level The sort level of the property (0 is the highest).
@@ -501,7 +528,7 @@ define([
      *   Undefined means toggle current direction
      */
     sort: function (property, level, descending) {
-      if (this.data.query.properties.indexOf(property) === -1) { return; }
+      if (!this.isValidPropertyId(property)) { return; }
       if (!this.isPropertySortable(property)) { return; }
       // find property current sort level
       var currentLevel = this.data.query.sort.findIndex(function (sortObject) {
@@ -604,7 +631,7 @@ define([
      * @param {String} propertyId
      */
     getQueryFilter: function (propertyId) {
-      if (this.data.query.properties.indexOf(propertyId) === -1) { return; }
+      if (!this.isValidPropertyId(propertyId)) { return; }
       return this.data.query.filters.find(function (filter) {
         return filter.property === propertyId;
       });
@@ -639,7 +666,7 @@ define([
      */
     filter: function (property, index, filterEntry) {
       var self = this;
-      if (this.data.query.properties.indexOf(property) === -1) { return; }
+      if (!this.isValidPropertyId(property)) { return; }
       if (!this.isPropertyFilterable(property)) { return; }
       // default index
       index = index || 0;
@@ -707,7 +734,7 @@ define([
      * @param {String} index The index of the filter to remove. Undefined means last.
      */
     removeFilter: function (property, index) {
-      if (this.data.query.properties.indexOf(property) === -1) { return; }
+      if (!this.isValidPropertyId(property)) { return; }
       var filter = this.getQueryFilter(property);
       if (!filter || filter.constrains.length === 0) { return; }
       // default index
@@ -732,7 +759,7 @@ define([
      * @param {String} property Property to remove the filters to
      */
     removeAllFilters: function (property) {
-      if (this.data.query.properties.indexOf(property) === -1) { return; }
+      if (!this.isValidPropertyId(property)) { return; }
       var filterIndex = this.data.query.filters.findIndex(function (filterGroup, i) {
         return filterGroup.property === property;
       });

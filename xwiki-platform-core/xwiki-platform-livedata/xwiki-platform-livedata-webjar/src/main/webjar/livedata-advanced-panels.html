@@ -80,7 +80,32 @@
 
       <div class="panel-body">
 
+        <!-- Filter groups -->
+        <livedata-filter-group
+          v-for="filter in data.query.filters"
+          :key="filter.property"
+          :logic="logic"
+          :property-id="filter.property"
+        ></livedata-filter-group>
 
+        <!-- Add filters -->
+        <select
+          class="select-properties"
+          v-show="unfilteredProperties.length > 0"
+          @change="addFilterGroup($event.target.value)"
+        >
+          <option
+            value="none"
+            ref="selectFilterPropertiesNone"
+            selected disabled
+          >Add filters</option>
+          <option
+            v-for="property in unfilteredProperties"
+            :key="property.id"
+            :value="property.id"
+            v-text="property.name"
+          ></option>
+        </select>
 
       </div>
     </div>
@@ -112,6 +137,7 @@
   */
 define([
   "Vue",
+  "vue!" + BASE_PATH + "/filters/livedata-filter-group.html",
 ], function (
   Vue
 ) {
@@ -135,16 +161,33 @@ define([
 
     computed: {
       data: function () { return this.logic.data; },
+
+      // property descriptors that does not have filters
+      unfilteredProperties: function () {
+        var self = this;
+        return this.logic.getFilterablePropertyDescriptors().filter(function (propertyDescriptor) {
+          var filter = self.logic.getQueryFilter(propertyDescriptor.id);
+          return !filter || filter.constrains.length === 0;
+        });
+      },
+    },
+
+    methods: {
+      addFilterGroup: function (value) {
+        if (value === "none") { return; }
+        this.logic.addFilter(value);
+        this.$refs.selectFilterPropertiesNone.selected = true;
+      },
     },
 
     mounted: function () {
       var self = this;
       // listen for event from the dropdown
-      this.logic.element.addEventListener("xwiki:livedata:toggleSortPanel", function () {
+      this.logic.onEvent("triggerSortPanel", function () {
         self.sortPanelOpen = !self.sortPanelOpen;
       });
       // listen for event from the dropdown
-      this.logic.element.addEventListener("xwiki:livedata:toggleFilterPanel", function () {
+      this.logic.onEvent("triggerFilterPanel", function () {
         self.filterPanelOpen = !self.filterPanelOpen;
       });
     },
@@ -175,6 +218,15 @@ define([
     padding: 0 15px;
     cursor: pointer;
   }
+
+  .livedata-panel-filter .livedata-filter-group {
+    margin-bottom: 1rem;
+  }
+
+  .livedata-panel-filter .select-properties {
+    margin-top: 1rem;
+  }
+
 
 
 </style>

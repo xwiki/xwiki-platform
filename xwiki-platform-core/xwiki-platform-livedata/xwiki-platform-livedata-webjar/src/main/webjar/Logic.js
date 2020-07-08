@@ -26,7 +26,7 @@ define([
   "polyfills"
 ], function (
   $,
-  Vue,
+  Vue
 ) {
 
   /**
@@ -113,6 +113,45 @@ define([
       this.element.dispatchEvent(event);
     },
 
+    /**
+     * Listen for custom events
+     * @param {String} eventName The name of the event, without the prefix "xwiki:livedata"
+     * @param {Function} callback Function to call we the event is triggered
+     */
+    onEvent: function (eventName, callback) {
+      eventName = "xwiki:livedata:" + eventName;
+      this.element.addEventListener(eventName, function (e) {
+        callback(e.detail);
+      });
+    },
+
+
+    /**
+     * Listen for custom events, mathching certain conditions
+     * @param {String} eventName The name of the event, without the prefix "xwiki:livedata"
+     * @param {Object|Function} condition The condition to execute the callback
+     *  if Object, values of object properties must match e.detail properties values
+     *  if Function, the function must return true. e.detail is passed as argument
+     * @param {Function} callback Function to call we the event is triggered
+     */
+    onEventWhere: function (eventName, condition, callback) {
+      eventName = "xwiki:livedata:" + eventName;
+      this.element.addEventListener(eventName, function (e) {
+        // Object check
+        if (typeof condition === "object") {
+          var every = Object.keys(condition).every(function (key) {
+            return condition[key] === e.detail[key];
+          });
+          if (!every) { return; }
+        }
+        // Function check
+        if (typeof condition === "function") {
+          if (!condition(e.detail)) { return; }
+        }
+        // call callback
+        callback(e.detail);
+      });
+    },
 
 
 
@@ -231,7 +270,7 @@ define([
         if (!layoutDescriptor) { return void reject(); }
 
         // requirejs success callback
-        var loadLayoutSuccess = function (vueLayout) {
+        var loadLayoutSuccess = function () {
           var previousLayoutId = self.data.query.currentLayout;
           self.data.query.currentLayout = layoutId;
           // dispatch events
@@ -442,6 +481,18 @@ define([
 
 
     /**
+     * Returns the property descriptors of sortable properties
+     * @returns {Array}
+     */
+    getSortablePropertyDescriptors: function () {
+      var self = this;
+      return this.data.meta.propertyDescriptors.filter(function (propertyDescriptor) {
+        return self.isPropertySortable(propertyDescriptor.id);
+      });
+    },
+
+
+    /**
      * Update sort configuration based on parameters, then fetch new data
      * @param {String} property The property to sort according to
      * @param {String} level The sort level of the property (0 is the highest).
@@ -537,6 +588,30 @@ define([
 
 
     /**
+     * Returns the property descriptors of filterable properties
+     * @returns {Array}
+     */
+    getFilterablePropertyDescriptors: function () {
+      var self = this;
+      return this.data.meta.propertyDescriptors.filter(function (propertyDescriptor) {
+        return self.isPropertyFilterable(propertyDescriptor.id);
+      });
+    },
+
+
+    /**
+     * Get the filter query associated to a property id
+     * @param {String} propertyId
+     */
+    getQueryFilter: function (propertyId) {
+      if (this.data.query.properties.indexOf(propertyId) === -1) { return; }
+      return this.data.query.filters.find(function (filter) {
+        return filter.property === propertyId;
+      });
+    },
+
+
+    /**
      * Get the default filter operator associated to a property id
      * @param {String} propertyId
      * @returns {String}
@@ -546,12 +621,7 @@ define([
       if (!filterDescriptor) { return; }
       var filterOperators = filterDescriptor.operators;
       if (!(filterOperators instanceof Array)) { return; }
-      return filterOperators[0];
-    },
-
-
-    _computeFilterEntry: function (property, index, filterEntry) {
-
+      return filterOperators[0].id;
     },
 
 
@@ -575,7 +645,8 @@ define([
       index = index || 0;
       if (index < 0) { return; }
       // filter entry at current index
-      var queryFilter = this.data.query.filters[property] || [];
+      var queryFilterGroup = this.getQueryFilter(property) || {};
+      var queryFilter = queryFilterGroup.constrains || [];
       var currentEntry = queryFilter[index] || {};
       // default filterEntry
       filterEntry = filterEntry || {};
@@ -594,10 +665,14 @@ define([
         queryFilter.splice(index, 1);
       }
       // add filter at new property and index
-      if (!this.data.query.filters[filterEntry.property]) {
-        this.data.query.filters[filterEntry.property] = [];
+      if (!this.getQueryFilter(filterEntry.property)) {
+        this.data.query.filters.push({
+          property: filterEntry.property,
+          matchAll: true,
+          constrains: [],
+        });
       }
-      this.data.query.filters[filterEntry.property].splice(index, 0, filterEntry);
+      this.getQueryFilter(filterEntry.property).constrains.splice(index, 0, filterEntry);
       // dispatch events
       this.triggerEvent("filter", {
         property: filterEntry.property,
@@ -617,7 +692,7 @@ define([
      * @param {String} value Default value for the new filter entry
      */
     addFilter: function (property, operator, value) {
-      var index = (this.data.query.filters[property] || []).length;
+      var index = ((this.getQueryFilter(property) || []).constrains || []).length;
       this.filter(property, index, {
         property: property,
         operator: operator,
@@ -628,19 +703,20 @@ define([
 
     /**
      * Remove a filter entry in the configuration, then fetch new data
-     * @param {String} property Which property to add the filter to
+     * @param {String} property Property to remove the filter to
      * @param {String} index The index of the filter to remove. Undefined means last.
      */
     removeFilter: function (property, index) {
       if (this.data.query.properties.indexOf(property) === -1) { return; }
-      if (!this.data.query.filters[property]) { return; }
+      var filter = this.getQueryFilter(property);
+      if (!filter || filter.constrains.length === 0) { return; }
       // default index
       if (index === undefined) {
-        index = this.data.query.filters[property].length - 1;
+        index = filter.constrains.length - 1;
       }
       if (index < 0) { return; }
       // remove filter
-      var removedFilterArray = this.data.query.filters[property].splice(index, 1);
+      var removedFilterArray = filter.constrains.splice(index, 1);
       // dispatch events
       this.triggerEvent("removeFilter", {
         property: property,
@@ -650,6 +726,72 @@ define([
       // CALL FUNCTION TO FETCH NEW DATA HERE
     },
 
+
+    /**
+     * Remove all the filters associated to a property
+     * @param {String} property Property to remove the filters to
+     */
+    removeAllFilters: function (property) {
+      if (this.data.query.properties.indexOf(property) === -1) { return; }
+      var filterIndex = this.data.query.filters.findIndex(function (filterGroup, i) {
+        return filterGroup.property === property;
+      });
+      if (filterIndex === -1) { return; }
+      var removedFilterGroups = this.data.query.filters.splice(filterIndex, 1);
+      // dispatch events
+      this.triggerEvent("removeAllFilters", {
+        property: property,
+        removedFilters: removedFilterGroups[0].constrains,
+      });
+      // CALL FUNCTION TO FETCH NEW DATA HERE
+    },
+
+
+    /**
+     * Return a new filter based on the specified property
+     * @param {String} propertyId The id of the property of the entry
+     * @param {Number} index The index of the filter among the property filters
+     * @param {String} filterId
+     * @returns {Promise}
+     */
+    createFilter: function (propertyId, index, filterId) {
+      var self = this;
+
+      return new Promise (function (resolve, reject) {
+        // default filterId
+        if (filterId === undefined) {
+          filterId = self.getFilterDescriptor(propertyId).id;
+        }
+
+        // load success callback
+        var loadFilterSuccess = function (Filter) {
+          var filter = new Filter(propertyId, index, self);
+          resolve(filter);
+        };
+
+        // load error callback
+        var loadFilterFailure = function (err) {
+          // try to load the default filter instead
+          if (filterId !== "default") {
+            self.createFilter(propertyId, index, "default").then(function (filter) {
+              resolve(filter);
+            }, function () {
+              reject();
+            });
+          } else {
+            console.error(err);
+            reject();
+          }
+        };
+
+        // load filter based on it's id
+        require([BASE_PATH + "filters/" + filterId + "Filter.js"],
+          loadFilterSuccess,
+          loadFilterFailure
+        );
+
+      });
+    },
 
 
   };

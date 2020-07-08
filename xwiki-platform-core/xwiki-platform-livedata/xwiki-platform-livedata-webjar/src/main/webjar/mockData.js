@@ -34,11 +34,15 @@ define({
 
     hiddenFilters: {},
 
-    filters: {
-      country: [
-        {operator: "equals", value: "france"},
-      ],
-    },
+    filters: [
+      {
+        property: "country",
+        matchAll: true,
+        constrains: [
+          {operator: "equals", value: "france"},
+        ],
+      },
+    ],
 
     sort: [ {property: "age", descending: false} ],
 
@@ -83,9 +87,6 @@ define({
         id: "age",
         name: "Age",
         type: "number",
-        filter: {
-          id: false,
-        },
       },
       {
         id: "job",
@@ -105,6 +106,9 @@ define({
           id: "html",
         },
         sortable: false,
+        filter: {
+          id: false,
+        },
       },
     ],
 
@@ -136,11 +140,20 @@ define({
     filters: [
       {
         id: "text",
-        operators: ["equals", "nequals"],
+        operators: [
+          { id: "contains", name: "Contains", },
+          { id: "equals", name: "Equals", },
+          { id: "nequals", name: "Not Equals", },
+        ],
       },
       {
         id: "number",
-        operators: ["equals", "nequals", "greater", "lower"],
+        operators: [
+          { id: "equals", name: "=", },
+          { id: "nequals", name: "≠", },
+          { id: "lower", name: "<", },
+          { id: "greater", name: ">", },
+        ],
       },
     ],
 

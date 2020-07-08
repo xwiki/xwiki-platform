@@ -19,7 +19,7 @@
  */
 
 
-define([], function () {
+define(["polyfills"], function () {
 
   /**
    * Load the displayer custom css to the page
@@ -29,7 +29,7 @@ define([], function () {
     link.type = "text/css";
     link.rel = "stylesheet";
     link.href = url;
-    document.getElementsByTagName("head")[0].appendChild(link);
+    document.head.appendChild(link);
   })(BASE_PATH + "displayers/displayers.css");
 
 

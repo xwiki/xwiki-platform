@@ -1,0 +1,140 @@
+<template>
+  <div class="livedata-filter-group">
+
+    <div class="filter-group-title">
+      <span class="property-name">{{ propertyDescriptor.name }}</span>
+      <a
+        class="delete-filter-group"
+        href="#"
+        @click.prevent="logic.removeAllFilters(propertyId)"
+        title="Delete the whole property filters"
+      >
+        <span class="fa fa-trash-o"></span>
+      </a>
+    </div>
+
+    <!--
+    <select
+      class="select-combinaison"
+      @change=""
+    >
+      <option
+        v-for="operator in ['And', 'Or']"
+        :value="operator === 'And'"
+        v-text="operator"
+        :selected="operator === filterGroup.matchAll"
+      ></option>
+    </select>
+    -->
+
+    <div class="filters">
+      <livedata-filter
+        v-for="(filter, filterIdx) in filterGroup.constrains"
+        :key="filterIdx"
+        :logic="logic"
+        :filter="filter"
+        :filter-idx="filterIdx"
+        :property-id="propertyId"
+      >
+
+      </livedata-filter>
+
+      <a
+        class="add-filter"
+        href="#"
+        @click.prevent="logic.addFilter(propertyId)"
+      >
+        + Add filter
+      </a>
+    </div>
+
+  </div>
+</template>
+
+
+<script>
+/*
+  * See the NOTICE file distributed with this work for additional
+  * information regarding copyright ownership.
+  *
+  * This is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of
+  * the License, or (at your option) any later version.
+  *
+  * This software is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this software; if not, write to the Free
+  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  */
+define([
+  "Vue",
+  "vue!" + BASE_PATH + "/filters/livedata-filter.html",
+], function (
+  Vue
+) {
+
+  Vue.component("livedata-filter-group", {
+
+    name: "livedata-filter-group",
+
+    template: template,
+
+    props: {
+      logic: Object,
+      propertyId: String,
+    },
+
+    computed: {
+      data: function () { return this.logic.data; },
+
+      filterGroup: function () {
+        return this.logic.getQueryFilter(this.propertyId);
+      },
+
+      propertyDescriptor: function () {
+        return this.logic.getPropertyDescriptor(this.filterGroup.property);
+      },
+    },
+
+  });
+});
+</script>
+
+
+<style>
+
+  .livedata-filter-group .property-name {
+    display: inline-block;
+    margin-right: 0.5rem;
+    padding: 5px;
+    font-weight: bold;
+  }
+  .livedata-filter-group .delete-filter-group {
+    display: none;
+    padding: 5px;
+    color: currentColor;
+  }
+  .livedata-filter-group .filter-group-title:hover .delete-filter-group {
+    display: inline-block;
+  }
+
+  .livedata-filter-group .filters {
+    margin-left: 3rem;
+  }
+
+  .livedata-filter-group .add-filter {
+    display: inline-block;
+    margin-top: 3px;
+    font-style: italic;
+  }
+  .livedata-filter-group .add-filter:hover {
+    text-decoration: none;
+  }
+
+</style>

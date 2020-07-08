@@ -39,12 +39,10 @@
             v-for="col in cols"
             :key="col.id"
           >
-            <input
+            <div
               v-if="logic.isPropertyFilterable(col.id)"
-              type="text" size="1"
-              :value="data.query.filters[col.id] && data.query.filters[col.id][0] && data.query.filters[col.id][0].value"
-              @change="logic.filter(col.id, 0, { value: $event.target.value })"
-            />
+              v-filter="col.id"
+            ></div>
           </th>
         </tr>
 
@@ -116,6 +114,15 @@ define([
           .then(function (displayer) {
             el.appendChild(displayer.element);
             displayer.view();
+          });
+        },
+      },
+      // vue directive to automatically create and insert filters
+      filter: {
+        bind: function (el, binding, vnode) {
+          vnode.context.$parent.logic.createFilter(binding.value, 0)
+          .then(function (filter) {
+            el.appendChild(filter.element);
           });
         },
       },

@@ -1,4 +1,4 @@
-package org.xwiki.mentions.internal;/*
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -17,6 +17,7 @@ package org.xwiki.mentions.internal;/*
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+package org.xwiki.mentions.internal;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -83,7 +84,7 @@ class DefaultMentionsDataConsumerTest
     private DocumentRevisionProvider documentRevisionProvider;
 
     @Test
-    void executeCreate() throws Exception
+    void consumeCreate() throws Exception
     {
         DocumentReference user1 = new DocumentReference("xwiki", "XWiki", "U1");
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "U2");
@@ -141,7 +142,7 @@ class DefaultMentionsDataConsumerTest
     }
 
     @Test
-    void executeCreateString() throws Exception
+    void consumeCreateString() throws Exception
     {
         DocumentReference user1 = new DocumentReference("xwiki", "XWiki", "U1");
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "U2");
@@ -201,7 +202,7 @@ class DefaultMentionsDataConsumerTest
     }
 
     @Test
-    void executeCreateNoMention() throws Exception
+    void consumeCreateNoMention() throws Exception
     {
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "U2");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
@@ -234,7 +235,7 @@ class DefaultMentionsDataConsumerTest
     }
 
     @Test
-    void executeUpdate() throws Exception
+    void consumeUpdate() throws Exception
     {
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Creator");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
@@ -302,7 +303,7 @@ class DefaultMentionsDataConsumerTest
     }
 
     @Test
-    void executeUpdateMissing() throws Exception
+    void consumeUpdateMissing() throws Exception
     {
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Creator");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");

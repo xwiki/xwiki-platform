@@ -45,6 +45,7 @@
       <version>${project.version}</version>
       <type>xar</type>
     </dependency>
+
    
     <!-- ================================
         Test only dependencies

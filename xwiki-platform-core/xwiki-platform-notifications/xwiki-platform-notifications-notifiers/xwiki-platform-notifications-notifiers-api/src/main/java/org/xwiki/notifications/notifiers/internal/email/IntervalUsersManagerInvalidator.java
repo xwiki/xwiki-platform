@@ -23,15 +23,18 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.xwiki.bridge.event.DocumentCreatedEvent;
-import org.xwiki.bridge.event.DocumentDeletedEvent;
-import org.xwiki.bridge.event.DocumentUpdatedEvent;
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.model.EntityType;
+import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.internal.event.XObjectAddedEvent;
+import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
+import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
+import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
  * Listener to event to invalidate the cache of IntervalUsersManager.
@@ -50,6 +53,8 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
      */
     public static final String NAME = "IntervalUsersManagerInvalidator";
 
+    private static final EntityReference USER_OBJECT = BaseObjectReference.any("XWiki.XWikiUsers");
+
     @Inject
     private IntervalUsersManager users;
 
@@ -58,7 +63,8 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
      */
     public IntervalUsersManagerInvalidator()
     {
-        super(NAME, new DocumentUpdatedEvent(), new DocumentCreatedEvent(), new DocumentDeletedEvent(),
+        super(NAME, new XObjectAddedEvent(USER_OBJECT), new XObjectDeletedEvent(USER_OBJECT),
+            new XObjectPropertyUpdatedEvent(new EntityReference("interval", EntityType.OBJECT_PROPERTY, USER_OBJECT)),
             new WikiDeletedEvent());
     }
 

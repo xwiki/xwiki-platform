@@ -20,20 +20,26 @@
 package org.xwiki.notifications.notifiers.internal.email;
 
 import java.util.Arrays;
-import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.mockito.ArgumentMatchers;
 import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.model.internal.reference.EntityReferenceFactory;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.WikiReference;
 import org.xwiki.notifications.notifiers.email.NotificationEmailInterval;
 import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
 import org.xwiki.query.QueryManager;
-import org.xwiki.test.mockito.MockitoComponentMockingRule;
+import org.xwiki.test.LogLevel;
+import org.xwiki.test.annotation.ComponentList;
+import org.xwiki.test.junit5.LogCaptureExtension;
+import org.xwiki.test.junit5.mockito.ComponentTest;
+import org.xwiki.test.junit5.mockito.InjectMockComponents;
+import org.xwiki.test.junit5.mockito.MockComponent;
 import org.xwiki.wiki.descriptor.WikiDescriptorManager;
 
 import static org.junit.Assert.assertEquals;
@@ -48,43 +54,43 @@ import static org.mockito.Mockito.when;
 /**
  * @version $Id$
  */
+@ComponentTest
+@ComponentList({IntervalUsersManager.class, EntityReferenceFactory.class})
 public class NotificationUserIteratorTest
 {
-    @Rule
-    public final MockitoComponentMockingRule<NotificationUserIterator> mocker =
-            new MockitoComponentMockingRule<>(NotificationUserIterator.class);
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(LogLevel.WARN);
 
+    @InjectMockComponents
+    private NotificationUserIterator userIterator;
+
+    @MockComponent
     private QueryManager queryManager;
+
+    @MockComponent
     private DocumentReferenceResolver<String> resolver;
+
+    @MockComponent
     private WikiDescriptorManager wikiDescriptorManager;
+
+    @MockComponent
     private DocumentAccessBridge documentAccessBridge;
 
-    @Before
-    public void setUp() throws Exception
+    @BeforeEach
+    void setUp()
     {
-        queryManager = mocker.getInstance(QueryManager.class);
-        resolver = mocker.getInstance(DocumentReferenceResolver.TYPE_STRING);
-        wikiDescriptorManager = mocker.getInstance(WikiDescriptorManager.class);
-        documentAccessBridge = mocker.getInstance(DocumentAccessBridge.class);
-
-        when(wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiA");
+        when(this.wikiDescriptorManager.getCurrentWikiId()).thenReturn("wikiA");
     }
 
     @Test
-    public void test() throws Exception
+    public void iterate() throws Exception
     {
         // Mocks
-        Query query1 = mock(Query.class);
-        Query query2 = mock(Query.class);
-        Query query3 = mock(Query.class);
+        Query query = mock(Query.class);
         when(queryManager.createQuery(ArgumentMatchers.eq("select distinct doc.fullName from Document doc, "
-            + "doc.object(XWiki.XWikiUsers) objUser where objUser.active = 1 and length(objUser.email) > 0 "
-                + "order by doc.fullName"),
-            eq(Query.XWQL))).thenReturn(query1, query2, query3,
-            query1, query2, query3);
-        when(query1.execute()).thenReturn(Arrays.asList("XWiki.UserA", "XWiki.UserB", "XWiki.UserC"));
-        when(query2.execute()).thenReturn(Arrays.asList("XWiki.UserD"));
-        when(query3.execute()).thenReturn(Collections.emptyList());
+            + "doc.object(XWiki.XWikiUsers) objUser where objUser.active = 1 and length(objUser.email) > 0 order by doc.fullName"),
+            eq(Query.XWQL))).thenReturn(query);
+        when(query.execute()).thenReturn(Arrays.asList("XWiki.UserA", "XWiki.UserB", "XWiki.UserC", "XWiki.UserD"));
 
         DocumentReference userA = new DocumentReference("wikiA", "XWiki", "UserA");
         DocumentReference userB = new DocumentReference("wikiA", "XWiki", "UserB");
@@ -96,14 +102,13 @@ public class NotificationUserIteratorTest
         when(resolver.resolve("XWiki.UserD", new WikiReference("wikiA"))).thenReturn(userD);
 
         DocumentReference classReference = new DocumentReference("wikiA",
-                Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass");
+            Arrays.asList("XWiki", "Notifications", "Code"), "NotificationEmailPreferenceClass");
         when(documentAccessBridge.getProperty(userA, classReference, "interval")).thenReturn("weekly");
         when(documentAccessBridge.getProperty(userB, classReference, "interval")).thenReturn("daily");
         when(documentAccessBridge.getProperty(userC, classReference, "interval")).thenReturn(null);
         when(documentAccessBridge.getProperty(userD, classReference, "interval")).thenReturn("daily");
 
         // Test with DAILY interval
-        NotificationUserIterator userIterator = mocker.getComponentUnderTest();
         userIterator.initialize(NotificationEmailInterval.DAILY);
 
         assertTrue(userIterator.hasNext());
@@ -115,21 +120,26 @@ public class NotificationUserIteratorTest
         assertFalse(userIterator.hasNext());
 
         // Test with WEEKLY interval
-        userIterator = mocker.getComponentUnderTest();
         userIterator.initialize(NotificationEmailInterval.WEEKLY);
         assertTrue(userIterator.hasNext());
         assertEquals(userA, userIterator.next());
         assertFalse(userIterator.hasNext());
 
         // Checks
-        verify(query1, atLeastOnce()).setLimit(50);
-        verify(query1, atLeastOnce()).setOffset(0);
-
-        verify(query2, atLeastOnce()).setLimit(50);
-        verify(query2, atLeastOnce()).setOffset(50);
-
-        verify(query3, atLeastOnce()).setLimit(50);
-        verify(query3, atLeastOnce()).setOffset(100);
+        verify(query, atLeastOnce()).setLimit(100);
+        verify(query, atLeastOnce()).setOffset(0);
     }
 
+    @Test
+    public void iterateWhenException() throws Exception
+    {
+        when(queryManager.createQuery(ArgumentMatchers.anyString(), eq(Query.XWQL)))
+            .thenThrow(new QueryException("error", null, null));
+
+        userIterator.initialize(NotificationEmailInterval.DAILY);
+        assertFalse(userIterator.hasNext());
+
+        assertEquals("Failed to retrieve the notification users. Root error [QueryException: error]",
+            logCapture.getMessage(0));
+    }
 }

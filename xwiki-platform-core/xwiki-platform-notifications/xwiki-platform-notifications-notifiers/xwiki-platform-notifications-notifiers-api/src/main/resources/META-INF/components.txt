@@ -3,6 +3,8 @@ org.xwiki.notifications.notifiers.internal.DefaultNotificationRenderer
 org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailListener
 org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailManager
 org.xwiki.notifications.notifiers.internal.email.live.LiveNotificationEmailSender
+org.xwiki.notifications.notifiers.internal.email.IntervalUsersManager
+org.xwiki.notifications.notifiers.internal.email.IntervalUsersManagerInvalidator
 org.xwiki.notifications.notifiers.internal.email.NotificationEmailSender
 org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator
 org.xwiki.notifications.notifiers.internal.rss.DefaultNotificationRSSManager

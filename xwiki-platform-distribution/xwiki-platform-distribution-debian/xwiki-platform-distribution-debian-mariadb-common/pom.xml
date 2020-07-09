@@ -27,20 +27,19 @@
     <artifactId>xwiki-platform-distribution-debian</artifactId>
     <version>12.6-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-platform-distribution-debian-mysql-common</artifactId>
-  <name>XWiki Platform - Distribution - Debian - MySQL - Common</name>
+  <artifactId>xwiki-platform-distribution-debian-mariadb-common</artifactId>
+  <name>XWiki Platform - Distribution - Debian - MariaDB - Common</name>
   <packaging>deb</packaging>
-  <description>XWiki MySQL common package</description>
+  <description>XWiki MariaDB common package</description>
   <properties>
-    <xwiki.db>mysql</xwiki.db>
-    <!-- Set current timezone explicitly to workaround a bug in the MySQL 8.x connector -->
-    <xwiki.db.connection.url>jdbc:mysql://_DBC_DBSERVER_/_DBC_DBNAME_?useSSL=false&amp;amp;serverTimezone=${timezone}&amp;amp;allowPublicKeyRetrieval=true</xwiki.db.connection.url>
+    <xwiki.db>mariadb</xwiki.db>
+    <xwiki.db.connection.url>jdbc:mariadb://_DBC_DBSERVER_/_DBC_DBNAME_?useSSL=false</xwiki.db.connection.url>
     <xwiki.db.connection.username>_DBC_DBUSER_</xwiki.db.connection.username>
     <xwiki.db.connection.password>_DBC_DBPASS_</xwiki.db.connection.password>
-    <xwiki.db.connection.driver_class>com.mysql.cj.jdbc.Driver</xwiki.db.connection.driver_class>
+    <xwiki.db.connection.driver_class>org.mariadb.jdbc.Driver</xwiki.db.connection.driver_class>
     <xwiki.db.hbm.xwiki>xwiki.hbm.xml</xwiki.db.hbm.xwiki>
     <xwiki.db.hbm.feeds>feeds.hbm.xml</xwiki.db.hbm.feeds>
-    <debian.package>xwiki-mysql-common</debian.package>
+    <debian.package>xwiki-mariadb-common</debian.package>
   </properties>
   <build>
     <plugins>
@@ -61,7 +60,7 @@
               <type>file</type>
               <mapper>
                 <type>perm</type>
-                <prefix>/usr/share/xwiki/templates/mysql</prefix>
+                <prefix>/usr/share/xwiki/templates/mariadb</prefix>
               </mapper>
             </data>
           </dataSet>

@@ -149,7 +149,7 @@ if (!params.type || params.type == 'standard') {
 		//   seems we need that too since it happens when we push changes to master)
 		// - The previous build was triggered by an upstream job (like rendering triggering platform)
 		def shouldExecute = false
-		getFirstNonDockerBuild(currentBuild.rawBuild).getCauses().each() {
+		getFirstNonDockerBuild(currentBuild.rawBuild)?.getCauses()?.each() {
 		  echoXWiki "Build trigger cause: [${it.toString()}]"
 			if (it.toString().contains('SCMTriggerCause')) {
 				echoXWiki 'Executing docker-latest because it was triggered by a SCM commit - ${it.getShortDescription()}'
@@ -179,10 +179,16 @@ if (!params.type || params.type == 'standard') {
 @NonCPS
 private def getFirstNonDockerBuild(def rawBuild)
 {
+  echoXWiki "Finding first non-docker build..."
+  echoXWiki " current rawBuild = ${rawBuild.class.name}"
+  echoXWiki " previous rawBuild = ${rawBuild.getPreviousBuild().class.name}"
   def previous = rawBuild.getPreviousBuild()
+  echoXWiki "  Checking build [${previous.getDisplayName()}] (${previous.id})..."
   while (previous != null && isBadgeFound(previous, 'Docker Build')) {
     previous = previous.getPreviousBuild()
+    echoXWiki "  Checking build [${previous.getDisplayName()}] (${previous.id})..."
   }
+  echoXWiki "  Selected build [${previous.getDisplayName()}] (${previous.id})..."
   return previous
 }
 

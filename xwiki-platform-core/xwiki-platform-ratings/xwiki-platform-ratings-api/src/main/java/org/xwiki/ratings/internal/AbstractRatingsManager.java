@@ -22,17 +22,23 @@ package org.xwiki.ratings.internal;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 
 import org.slf4j.Logger;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.DocumentReferenceResolver;
+import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.query.QueryManager;
 import org.xwiki.ratings.AverageRating;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsConfiguration;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.ReputationException;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.UserReferenceSerializer;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -51,6 +57,20 @@ public abstract class AbstractRatingsManager implements RatingsManager
     protected ObservationManager observationManager;
 
     @Inject
+    @Named("compactwiki")
+    protected EntityReferenceSerializer<String> entityReferenceSerializer;
+
+    @Inject
+    protected DocumentReferenceResolver<String> documentReferenceResolver;
+
+    @Inject
+    @Named("document")
+    protected UserReferenceSerializer<DocumentReference> userReferenceSerializer;
+
+    @Inject
+    protected QueryManager queryManager;
+
+    @Inject
     private Logger logger;
 
     @Inject
@@ -63,6 +83,16 @@ public abstract class AbstractRatingsManager implements RatingsManager
     public String getRatingsClassName()
     {
         return RATINGS_CLASSNAME;
+    }
+
+    /**
+     * @return the class reference of the rating.
+     * @since 12.6RC1
+     */
+    @Unstable
+    protected DocumentReference getRatingsClassReference()
+    {
+        return new DocumentReference(RATINGS_CLASSREFERENCE, getXWikiContext().getWikiReference());
     }
 
     /**

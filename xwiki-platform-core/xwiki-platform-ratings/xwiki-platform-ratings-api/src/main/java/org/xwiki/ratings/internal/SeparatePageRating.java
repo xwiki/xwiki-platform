@@ -21,6 +21,8 @@ package org.xwiki.ratings.internal;
 
 import java.util.Date;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.localization.ContextualLocalizationManager;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.SpaceReference;
@@ -92,7 +94,7 @@ public class SeparatePageRating implements Rating
      * SeparatePageRating constructor.
      * 
      * @param documentRef the document reference of the document with which the rating is associated
-     * @param doc the document with which the rating is associated
+     * @param doc the actual document which will store the rating information.
      * @param context the context in which the rating took place
      * @param ratingsManager the RatingsManager to be used in processing the rating
      * @throws RatingsException when encountering an error while instantiating a SeparatePageRating
@@ -342,5 +344,37 @@ public class SeparatePageRating implements Rating
     public DocumentReference getDocumentReference()
     {
         return this.documentRef;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        SeparatePageRating that = (SeparatePageRating) o;
+
+        return new EqualsBuilder()
+            .append(documentRef, that.documentRef)
+            .append(document, that.document)
+            .append(context, that.context)
+            .append(ratingsManager, that.ratingsManager)
+            .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+            .append(documentRef)
+            .append(document)
+            .append(context)
+            .append(ratingsManager)
+            .toHashCode();
     }
 }

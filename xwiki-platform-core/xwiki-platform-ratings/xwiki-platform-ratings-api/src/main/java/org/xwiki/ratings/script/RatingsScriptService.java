@@ -35,8 +35,11 @@ import org.xwiki.ratings.AverageRatingApi;
 import org.xwiki.ratings.ConfiguredProvider;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsConfiguration;
+import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.stability.Unstable;
+import org.xwiki.user.CurrentUserReference;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
@@ -412,5 +415,25 @@ public class RatingsScriptService implements ScriptService
     public Document getConfigurationDocument(DocumentReference documentReference)
     {
         return ratingsConfiguration.getConfigurationDocument(documentReference).newDocument(getXWikiContext());
+    }
+
+    /**
+     * Retrieve all the ratings of the current user.
+     * @param start offset of ratings to start retrieve.
+     * @param count maximum number of ratings to retrieve.
+     * @param asc if the results should be ordered in ascending or descending order.
+     * @return a list of ratings.
+     * @since 12.6RC1
+     */
+    @Unstable
+    public List<RatingApi> getCurrentUserRatings(int start, int count, boolean asc)
+    {
+        try {
+            return wrapRatings(this.ratingsManagerProvider.get(getGlobalConfig())
+                .getRatings(CurrentUserReference.INSTANCE, start, count, asc));
+        } catch (RatingsException e) {
+            setError(e);
+            return null;
+        }
     }
 }

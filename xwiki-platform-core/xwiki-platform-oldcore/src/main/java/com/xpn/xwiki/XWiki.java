@@ -2977,10 +2977,6 @@ public class XWiki implements EventListener
         String result =
             getUserPropertiesResolver().resolve(CurrentUserReference.INSTANCE).getProperty(prefname, String.class);
 
-        if (StringUtils.isEmpty(result)) {
-            result = getSpacePreference(prefname, context);
-        }
-
         return result != null ? result : "";
     }
 

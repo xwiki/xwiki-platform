@@ -30,4 +30,10 @@
       #end
     </div>
   </div>
+  ## --------------------------------------------------------
+  ## Display UI Extensions after the authors.
+  ## --------------------------------------------------------
+  #foreach ($uix in $services.uix.getExtensions('org.xwiki.platform.flamingo.skin.resources.footerAfterAuthor'))
+    $services.rendering.render($uix.execute(), 'xhtml/1.0')
+  #end
 </div>

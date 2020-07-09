@@ -143,7 +143,7 @@ if (!params.type || params.type == 'standard') {
 } else {
   // If the build is docker-latest, only build if the previous build was triggered by some source code changes.
   // Also always build if triggered manually by a user.
-  if (params.type == 'docker-latest' && (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))) {
+  if (params.type == 'docker-latest' /*&& (!currentBuild.rawBuild.getCauses()[0].toString().contains('UserIdCause'))*/) {
 		// We trigger the build under two conditions:
 		// - The previous build has been triggered by a SCM change or a Branch Event (not sure what this is about but it
 		//   seems we need that too since it happens when we push changes to master)

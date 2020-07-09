@@ -17,33 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.internal;
+package org.xwiki.mentions.internal.jmx;
 
-import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
+import java.util.Collection;
+
+import org.xwiki.mentions.internal.async.MentionsData;
 
 /**
- * Execution the notifications for the mentions asynchronously.
+ * Implementation of the Mentions JXM MBean.
  *
  * @version $Id$
  * @since 12.6RC1
  */
-@Role
-public interface MentionsEventExecutor
+public class JMXMentions implements JMXMentionsMBean
 {
-    /**
-     * Looks for mentions in the content and creates notifications accordingly.
-     *
-     * @param documentReference the document reference
-     * @param authorReference the author reference
-     * @param version the document version
-     *
-     */
-    void execute(DocumentReference documentReference, DocumentReference authorReference, String version);
+    private final Collection<MentionsData> queue;
 
-    /**
-     *
-     * @return the current size of the queue of mentions to analyze.
-     */
-    long getQueueSize();
+    public JMXMentions(Collection<MentionsData> queue)
+    {
+        this.queue = queue;
+    }
+
+    @Override
+    public int getQueueSize()
+    {
+        return this.queue.size();
+    }
+
+    @Override
+    public void clearQueue()
+    {
+        this.queue.clear();
+    }
 }

@@ -17,33 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.internal;
-
-import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
+package org.xwiki.mentions.internal.jmx;
 
 /**
- * Execution the notifications for the mentions asynchronously.
+ * Interface of the Mentions JMX MBean.
  *
  * @version $Id$
  * @since 12.6RC1
  */
-@Role
-public interface MentionsEventExecutor
+public interface JMXMentionsMBean
 {
     /**
-     * Looks for mentions in the content and creates notifications accordingly.
      *
-     * @param documentReference the document reference
-     * @param authorReference the author reference
-     * @param version the document version
-     *
+     * @return the mentions analysis tasks queue size.
      */
-    void execute(DocumentReference documentReference, DocumentReference authorReference, String version);
+    int getQueueSize();
 
     /**
-     *
-     * @return the current size of the queue of mentions to analyze.
+     * Clear the mentions analysis tasks queue.
      */
-    long getQueueSize();
+    void clearQueue();
 }

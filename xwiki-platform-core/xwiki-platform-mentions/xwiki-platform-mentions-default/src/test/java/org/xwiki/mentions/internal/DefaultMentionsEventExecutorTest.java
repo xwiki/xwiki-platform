@@ -27,7 +27,6 @@ import org.mockito.Mockito;
 import org.xwiki.mentions.internal.DefaultMentionsEventExecutor.MentionsConsumer;
 import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
@@ -98,12 +97,5 @@ class DefaultMentionsEventExecutorTest
     {
         this.executor.getQueueSize();
         verify(this.blockingQueue).size();
-    }
-
-    @Test
-    void clearQueue() throws AccessDeniedException
-    {
-        this.executor.clearQueue();
-        verify(this.blockingQueue).clear();
     }
 }

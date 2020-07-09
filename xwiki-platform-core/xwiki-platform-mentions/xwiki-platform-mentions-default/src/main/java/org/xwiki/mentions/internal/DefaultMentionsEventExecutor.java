@@ -28,12 +28,13 @@ import javax.inject.Singleton;
 
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.mentions.internal.async.MentionsData;
+import org.xwiki.mentions.internal.jmx.JMXMentions;
+import org.xwiki.mentions.internal.jmx.JMXMentionsMBean;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.security.authorization.AccessDeniedException;
-import org.xwiki.security.authorization.ContextualAuthorizationManager;
-import org.xwiki.security.authorization.Right;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
@@ -52,7 +53,7 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
  */
 @Component
 @Singleton
-public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Initializable
+public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Initializable, Disposable
 {
     private ThreadPoolExecutor executor;
 
@@ -71,7 +72,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     private MentionsDataConsumer dataConsumer;
 
     @Inject
-    private ContextualAuthorizationManager authorizationManager;
+    private JMXBeanRegistration jmxRegistration;
 
     @Override
     public void initialize()
@@ -81,6 +82,14 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
         IntStream
             .range(0, this.threadPoolProvider.getPoolSize())
             .forEach(i -> this.executor.execute(new MentionsConsumer()));
+        JMXMentionsMBean mbean = new JMXMentions(this.queue);
+        this.jmxRegistration.registerMBean(mbean, "name=mentions");
+    }
+
+    @Override
+    public void dispose()
+    {
+        this.jmxRegistration.unregisterMBean("name=mentions");
     }
 
     @Override
@@ -103,13 +112,6 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     public long getQueueSize()
     {
         return this.queue.size();
-    }
-
-    @Override
-    public void clearQueue() throws AccessDeniedException
-    {
-        this.authorizationManager.checkAccess(Right.ADMIN);
-        this.queue.clear();
     }
 
     /**

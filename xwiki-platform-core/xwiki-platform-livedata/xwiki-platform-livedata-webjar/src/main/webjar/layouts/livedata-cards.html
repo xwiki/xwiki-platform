@@ -1,7 +1,7 @@
 <template>
   <div class="livedata-cards-layout">
 
-    <div ref="dropdownMenu"></div>
+    <div ref="topbar"></div>
 
     <!-- Cards component -->
     <div class="livedata-cards">
@@ -17,8 +17,11 @@
           v-for="property in properties"
           :key="property.id"
         >
-          <strong>{{ property.name }}:</strong>
-          <span>{{ entry[property.id] }}</span>
+          <strong class="property-name">{{ property.name }}:</strong>
+          <span
+            class="value"
+            v-displayer="{property: property, entry: entry}"
+          ></span>
         </div>
       </div>
 
@@ -51,10 +54,10 @@
  */
 define([
   "Vue",
-  "dropdownMenu",
+  BASE_PATH + "topbar.js",
 ], function (
   Vue,
-  DropdownMenu,
+  createTopbar,
 ) {
 
   Vue.component("livedata-cards", {
@@ -74,8 +77,8 @@ define([
     },
 
     mounted: function () {
-      var dropdownMenu = new DropdownMenu(this.logic);
-      this.$refs.dropdownMenu.append(dropdownMenu);
+      var topbar = createTopbar(this.logic);
+      this.$refs.topbar.append(topbar);
     },
 
   });
@@ -85,16 +88,29 @@ define([
 
 <style>
 
-.livedata-cards-layout .livedata-cards {
-  margin-top: 1rem;
-}
-
 .livedata-cards-layout .card {
   display: inline-block;
   padding: 1rem 2rem;
   margin: 1rem;
   border: 1px solid lightgray;
   border-radius: 1rem;
+}
+
+.livedata-cards-layout .card-property {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  transition: height 0.5s;
+}
+
+.livedata-cards-layout .property-name {
+  margin-right: 0.5em;
+}
+
+.livedata-cards-layout .value {
+  flex-grow: 1;
+  align-self: stretch;
 }
 
 @supports (display: grid) {

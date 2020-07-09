@@ -20,36 +20,21 @@
 
 define([
   "Vue",
-  "vue!" + BASE_PATH + "layouts/livedata-table.html",
-  "Logic"
+  "vue!" + BASE_PATH + "livedata-topbar.html",
 ], function (
   Vue,
-  livedataTable,
-  Logic
+  topbar
 ) {
 
-  return function (element) {
-    var logic = Logic(element);
-
-    // vue directive to automatically create and insert the displayer inside the element
-    Vue.directive("displayer", {
-      bind: function (el, binding) {
-        logic.createDisplayer(binding.value.col.id, binding.value.row)
-        .then(function (displayer) {
-          el.appendChild(displayer.element);
-          displayer.view();
-        });
-      },
-    });
-
+  return function (logic) {
 
     /**
-     * Create the table layout from Vuejs
+     * Create the top bar from Vuejs
      */
-    var vueTableLayout = new Vue({
+    var vueTopbar = new Vue({
 
-      // Constructs a livedata-table component and passes it the data
-      template: '<livedata-table :logic="logic"></livedata-table>',
+      // Constructs a top bar component and passes it the data
+      template: '<livedata-topbar :logic="logic"></livedata-topbar>',
 
       data: {
         logic: logic,
@@ -57,8 +42,8 @@ define([
 
     }).$mount();
 
-    // return the HTML Element of the layout for the logic script
-    return vueTableLayout.$el;
+    // return the HTML Element of the top bar for the layout
+    return vueTopbar.$el;
 
   };
 

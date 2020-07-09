@@ -25,7 +25,7 @@
 define({
 
   query: {
-    properties: ["doc_title", "age", "job", "other"],
+    properties: ["doc_title", "age", "country", "job", "other"],
 
     source: {
       id: "...",
@@ -34,12 +34,16 @@ define({
 
     hiddenFilters: {},
 
-    filters: {},
+    filters: {
+      country: [
+        {operator: "equals", value: "france"},
+      ],
+    },
 
-    sort: [ {properties: "age", descending: true} ],
+    sort: [ {property: "age", descending: false} ],
 
     offset: 0,
-    limit: 10,
+    limit: 25,
 
   },
 
@@ -54,27 +58,89 @@ define({
       {
         id: "doc_title",
         name: "Name",
-        type: "Text",
+        type: "string",
+        displayer: {
+          id: 'link',
+          propertyHref: "doc_url",
+        },
       },
       {
         id: "age",
         name: "Age",
-        type: "Number",
+        type: "number",
+        filter: {
+          id: false,
+        },
       },
       {
         id: "job",
         name: "Job",
-        type: "Text",
+        type: "string",
       },
       {
         id: "country",
         name: "Country",
-        type: "List",
+        type: "string",
       },
       {
         id: "other",
         name: "Autre truc",
-        type: "Text",
+        type: "string",
+        displayer: {
+          id: "html",
+        },
+        sortable: false,
+      },
+    ],
+
+    propertyTypes: [
+      {
+        id: 'string',
+        name: 'String',
+        displayer: {
+          id: 'text',
+        },
+        sortable: true,
+        filter: {
+          id: 'text'
+        },
+      },
+      {
+        id: 'number',
+        name: 'Number',
+        displayer: {
+          id: 'text',
+        },
+        sortable: true,
+        filter: {
+          id: 'number'
+        },
+      },
+    ],
+
+    filters: [
+      {
+        id: "text",
+        operators: ["equals", "nequals"],
+      },
+      {
+        id: "number",
+        operators: ["equals", "nequals", "greater", "lower"],
+      },
+    ],
+
+    displayers: [
+      {
+        id: "default",
+      },
+      {
+        id: "text",
+      },
+      {
+        id: "link",
+      },
+      {
+        id: "html",
       },
     ],
 
@@ -91,13 +157,19 @@ define({
       },
     },
 
+
+    pagination: {
+      maxShownPages: 10,
+      pageSizes: [10, 25, 50, 100, 250],
+    },
+
   },
 
 
 
   data: {
 
-    count: 5,
+    count: 545,
 
     entries: [
       {
@@ -111,7 +183,7 @@ define({
         "age": 48,
         "job": "Job 1",
         "country": "France",
-        "other": "lorem ipsum",
+        "other": "<em>lorem ipsum<em>",
       },
       {
         "doc_url": "#link2",
@@ -124,7 +196,7 @@ define({
         "age": 24,
         "job": "Job 2",
         "country": "France",
-        "other": "dorol sit amet",
+        "other": "<strong>dorol sit amet<strong>",
       },
       {
         "doc_url": "#link3",
@@ -137,7 +209,7 @@ define({
         "age": 12,
         "job": "Job 3",
         "country": "Romania",
-        "other": "consequtir",
+        "other": "<span style='color:red'>consequtir</span>",
       },
       {
         "doc_url": "#link4",

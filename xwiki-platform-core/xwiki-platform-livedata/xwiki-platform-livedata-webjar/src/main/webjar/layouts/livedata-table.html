@@ -1,23 +1,53 @@
 <template>
   <div class="livedata-table-layout">
 
-    <div ref="dropdownMenu"></div>
+    <div ref="topbar"></div>
 
     <!-- Table component -->
     <table class="livedata-table">
 
       <!-- Table Header -->
       <thead>
-        <tr>
 
+        <!-- Column name -->
+        <tr class="column-header">
           <th
             v-for="col in cols"
             :key="col.id"
           >
-            {{ col.name }}
+            <div
+              class="column-name"
+              @click="logic.sort(col.id)"
+            >
+              <span>{{ col.name }}</span>
+              <span
+                v-if="logic.isPropertySortable(col.id)"
+                :class="[
+                  'sort-icon',
+                  'fa',
+                  { 'sorted': sorts[col.id] },
+                  (sorts[col.id] && sorts[col.id].descending) ? 'fa-caret-up' : 'fa-caret-down',
+                ]"
+              ></span>
+            </div>
           </th>
-
         </tr>
+
+        <!-- Column filter -->
+        <tr class="column-filters">
+          <th
+            v-for="col in cols"
+            :key="col.id"
+          >
+            <input
+              v-if="logic.isPropertyFilterable(col.id)"
+              type="text" size="1"
+              :value="data.query.filters[col.id] && data.query.filters[col.id][0] && data.query.filters[col.id][0].value"
+              @change="logic.filter(col.id, 0, { value: $event.target.value })"
+            />
+          </th>
+        </tr>
+
       </thead>
 
 
@@ -32,11 +62,8 @@
             class="cell"
             v-for="col in cols"
             :key="col.id"
-          >
-            <div
-              class="displayer"
-              v-text="row[col.id]"
-            ></div>
+            v-displayer="{col: col, row: row}"
+            >
           </td>
 
         </tr>
@@ -70,10 +97,10 @@
  */
 define([
   "Vue",
-  "dropdownMenu",
+  BASE_PATH + "topbar.js",
 ], function (
   Vue,
-  createDropdownMenu,
+  createTopbar,
 ) {
 
   Vue.component("livedata-table", {
@@ -86,15 +113,26 @@ define([
       logic: Object,
     },
 
+
     computed: {
       data: function () { return this.logic.data; },
       rows: function () { return this.logic.data.data.entries; },
       cols: function () { return this.logic.data.meta.propertyDescriptors; },
+      sorts: function () {
+        let sorts = {};
+        this.data.query.sort.forEach( function (sortObject, level) {
+          sorts[sortObject.property] = {
+            level: level,
+            descending: sortObject.descending,
+          };
+        });
+        return sorts;
+      },
     },
 
     mounted: function () {
-      var dropdownMenu = createDropdownMenu(this.logic);
-      this.$refs.dropdownMenu.append(dropdownMenu);
+      var topbar = createTopbar(this.logic);
+      this.$refs.topbar.append(topbar);
     },
 
   });
@@ -102,4 +140,49 @@ define([
 </script>
 
 
-<style></style>
+<style>
+
+.livedata-table-layout table {
+  height: 100%;
+}
+
+.livedata-table-layout .column-name {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.livedata-table-layout .sort-icon {
+  color: currentColor;
+  opacity: 0;
+}
+.livedata-table-layout .sort-icon.sorted {
+  opacity: 1;
+}
+.livedata-table-layout .column-name:hover .sort-icon:not(.sorted) {
+  opacity: 0.5;
+}
+
+.livedata-table-layout .column-filters th {
+  padding-left: 0;
+  padding-right: 0;
+  font-weight: normal;
+}
+.livedata-table-layout .column-filters input {
+  padding-left: 8px;
+  padding-right: 8px;
+  width: 100%;
+}
+
+.livedata-table-layout .cell {
+  padding: 0;
+  height: 100%;
+}
+.livedata-table-layout .cell .livedata-displayer.view {
+  padding: 8px;
+}
+
+
+</style>

@@ -19,48 +19,42 @@
  */
 
 define([
-  "Vue",
-  "vue!" + BASE_PATH + "layouts/livedata-table.html",
-  "Logic"
+  BASE_PATH + "displayers/defaultDisplayer.js",
+  "polyfills"
 ], function (
-  Vue,
-  livedataTable,
-  Logic
+  DefaultDisplayer
 ) {
 
-  return function (element) {
-    var logic = Logic(element);
 
-    // vue directive to automatically create and insert the displayer inside the element
-    Vue.directive("displayer", {
-      bind: function (el, binding) {
-        logic.createDisplayer(binding.value.col.id, binding.value.row)
-        .then(function (displayer) {
-          el.appendChild(displayer.element);
-          displayer.view();
-        });
-      },
+  /**
+   * Create an HTML displayer for a property of an entry
+   * Extends the default displayer class
+   */
+  var HTMLDisplayer = function (propertyId, entryData, logic) {
+    DefaultDisplayer.call(this, propertyId, entryData, logic);
+  };
+  HTMLDisplayer.prototype = Object.create(DefaultDisplayer.prototype);
+  HTMLDisplayer.prototype.constructor = HTMLDisplayer;
+
+
+  /**
+   * Create html viewer element for the displayer
+   * Override the default inherted method
+   */
+  HTMLDisplayer.prototype.createView = function (params) {
+    return new Promise (function (resolve, reject) {
+
+      var element = document.createElement("div");
+      if (params.value !== undefined && params.value !== null) {
+        element.innerHTML = params.value;
+      }
+
+      resolve(element);
+
     });
-
-
-    /**
-     * Create the table layout from Vuejs
-     */
-    var vueTableLayout = new Vue({
-
-      // Constructs a livedata-table component and passes it the data
-      template: '<livedata-table :logic="logic"></livedata-table>',
-
-      data: {
-        logic: logic,
-      },
-
-    }).$mount();
-
-    // return the HTML Element of the layout for the logic script
-    return vueTableLayout.$el;
 
   };
 
 
+  return HTMLDisplayer;
 });

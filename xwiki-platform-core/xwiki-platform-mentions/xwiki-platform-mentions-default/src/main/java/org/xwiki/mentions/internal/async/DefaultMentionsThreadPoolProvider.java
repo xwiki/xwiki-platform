@@ -44,7 +44,8 @@ public class DefaultMentionsThreadPoolProvider implements MentionsThreadPoolProv
         return new MentionsThreadPoolExecutor(POOL_SIZE);
     }
 
-    @Override public int getPoolSize()
+    @Override
+    public int getPoolSize()
     {
         return POOL_SIZE;
     }

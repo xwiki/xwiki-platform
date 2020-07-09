@@ -22,7 +22,6 @@ package org.xwiki.mentions.internal;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.stability.Unstable;
 
 /**
  * Provide a thread pool to analyze the mentions.
@@ -30,7 +29,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.6RC1
  */
-@Unstable
 @Role
 public interface MentionsThreadPoolProvider
 {

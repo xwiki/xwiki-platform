@@ -132,14 +132,12 @@ class DefaultMentionsDataConsumerTest
                 .setWikiId("xwiki")
                 .setDocumentReference(documentReference.toString())
                 .setAuthorReference(authorReference.toString()));
-        String authorReferenceStr = authorReference.toString();
-        String documentReferenceStr = documentReference.toString();
         verify(this.notificationService)
-            .sendNotif(authorReferenceStr, documentReferenceStr, user1, DOCUMENT, "anchor1");
+            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor1");
         verify(this.notificationService)
-            .sendNotif(authorReferenceStr, documentReferenceStr, user1, DOCUMENT, "anchor2");
+            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor2");
         verify(this.notificationService, times(1))
-            .sendNotif(authorReferenceStr, documentReferenceStr, authorReference, DOCUMENT, "");
+            .sendNotification(authorReference, documentReference, authorReference, DOCUMENT, "");
     }
 
     @Test
@@ -194,14 +192,12 @@ class DefaultMentionsDataConsumerTest
                 .setDocumentReference(documentReference.toString())
                 .setAuthorReference(authorReference.toString()));
 
-        String authorReferenceStr = authorReference.toString();
-        String documentReferenceStr = documentReference.toString();
         verify(this.notificationService)
-            .sendNotif(authorReferenceStr, documentReferenceStr, user1, DOCUMENT, "anchor1");
+            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor1");
         verify(this.notificationService)
-            .sendNotif(authorReferenceStr, documentReferenceStr, user1, DOCUMENT, "anchor2");
+            .sendNotification(authorReference, documentReference, user1, DOCUMENT, "anchor2");
         verify(this.notificationService, times(1))
-            .sendNotif(authorReferenceStr, documentReferenceStr, authorReference, DOCUMENT, "");
+            .sendNotification(authorReference, documentReference, authorReference, DOCUMENT, "");
     }
 
     @Test
@@ -234,7 +230,7 @@ class DefaultMentionsDataConsumerTest
                 .setDocumentReference(documentReference.toString())
                 .setAuthorReference(authorReference.toString()));
 
-        verify(this.notificationService, never()).sendNotif(any(), any(), any(), any(), any());
+        verify(this.notificationService, never()).sendNotification(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -302,8 +298,7 @@ class DefaultMentionsDataConsumerTest
                                       .setVersion("1.3")
         );
 
-        verify(this.notificationService)
-            .sendNotif(authorReference.toString(), documentReference.toString(), U1, COMMENT, "anchor1");
+        verify(this.notificationService).sendNotification(authorReference, documentReference, U1, COMMENT, "anchor1");
     }
 
     @Test
@@ -364,7 +359,7 @@ class DefaultMentionsDataConsumerTest
                 .setWikiId("xwiki")
                 .setDocumentReference(documentReference.toString())
                 .setAuthorReference(authorReference.toString()));
-        verify(this.notificationService)
-            .sendNotif(authorReference.toString(), documentReference.toString(), U1, ANNOTATION, "anchor1");
+        verify(this.notificationService).sendNotification(authorReference, documentReference, U1, ANNOTATION,
+            "anchor1");
     }
 }

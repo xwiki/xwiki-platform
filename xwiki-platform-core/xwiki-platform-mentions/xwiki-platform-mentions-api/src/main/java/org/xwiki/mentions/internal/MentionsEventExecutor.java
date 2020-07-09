@@ -21,7 +21,8 @@ package org.xwiki.mentions.internal;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
-import org.xwiki.stability.Unstable;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.Right;
 
 /**
  * Execution the notifications for the mentions asynchronously.
@@ -29,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.6RC1
  */
-@Unstable
 @Role
 public interface MentionsEventExecutor
 {
@@ -50,7 +50,9 @@ public interface MentionsEventExecutor
     long getQueueSize();
 
     /**
-     * Clear the queue of mentions to analyze.
+     * Clear the queue of mentions to analyze. This operation is only allowed for users with 
+     * {@link Right#ADMIN} rights. 
+     * @exception AccessDeniedException In case of access control error.
      */
-    void clearQueue();
+    void clearQueue() throws AccessDeniedException;
 }

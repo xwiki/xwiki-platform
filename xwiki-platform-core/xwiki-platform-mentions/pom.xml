@@ -43,6 +43,15 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jetbrains</groupId>
+        <artifactId>annotations</artifactId>
+        <version>19.0.0</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
   <modules>
     <module>xwiki-platform-mentions-api</module>
     <module>xwiki-platform-mentions-notifications</module>
@@ -60,16 +69,14 @@
               "revapi": {
                 "ignore": [
                   {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter void org.xwiki.mentions.MentionNotificationService::sendNotif(===org.xwiki.model.reference.DocumentReference===, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
-                    "new": "parameter void org.xwiki.mentions.MentionNotificationService::sendNotif(===java.lang.String===, java.lang.String, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
-                    "justification": "Unstable API. Only a serialized reference to the document is required."
+                    "code": "java.method.removed",
+                    "old": "method void org.xwiki.mentions.MentionNotificationService::sendNotif(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
+                    "justification": "Unstable API. Method renamed."
                   },
                   {
-                    "code": "java.method.parameterTypeChanged",
-                    "old": "parameter void org.xwiki.mentions.MentionNotificationService::sendNotif(org.xwiki.model.reference.DocumentReference, ===org.xwiki.model.reference.DocumentReference===, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
-                    "new": "parameter void org.xwiki.mentions.MentionNotificationService::sendNotif(java.lang.String, ===java.lang.String===, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
-                    "justification": "Unstable API. Only a serialized reference to the document is required."
+                    "code": "java.method.addedToInterface",
+                    "new": "method void org.xwiki.mentions.MentionNotificationService::sendNotification(org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.model.reference.DocumentReference, org.xwiki.mentions.MentionLocation, java.lang.String)",
+                    "justification": "Unstable API. Method renamed."
                   }
                 ]
               }

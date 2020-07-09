@@ -27,6 +27,7 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.MentionsConfiguration;
 import org.xwiki.mentions.internal.MentionsEventExecutor;
 import org.xwiki.script.service.ScriptService;
+import org.xwiki.security.authorization.AccessDeniedException;
 import org.xwiki.stability.Unstable;
 
 /**
@@ -86,7 +87,7 @@ public class MentionsScriptService implements ScriptService
      *
      */
     @Unstable
-    public void clearQueue()
+    public void clearQueue() throws AccessDeniedException
     {
         this.eventExecutor.clearQueue();
     }

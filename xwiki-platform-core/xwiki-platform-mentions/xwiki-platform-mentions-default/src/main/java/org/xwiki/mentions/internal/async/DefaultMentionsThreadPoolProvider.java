@@ -19,12 +19,18 @@
  */
 package org.xwiki.mentions.internal.async;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.inject.Singleton;
 
 import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.internal.MentionsThreadPoolProvider;
+
+import static java.lang.Thread.NORM_PRIORITY;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Default implementation of {@link MentionsThreadPoolProvider}.
@@ -48,5 +54,47 @@ public class DefaultMentionsThreadPoolProvider implements MentionsThreadPoolProv
     public int getPoolSize()
     {
         return POOL_SIZE;
+    }
+
+    /**
+     * A {@link ThreadPoolExecutor} dedicated to the asynchronous tasks of the mentions.
+     *
+     * @version $Id$
+     * @since 12.6RC1
+     */
+    private static class MentionsThreadPoolExecutor extends ThreadPoolExecutor
+    {
+        /**
+         * Default constructor.
+         *
+         * @param poolSize size of the thead pool.
+         */
+        MentionsThreadPoolExecutor(int poolSize)
+        {
+            super(poolSize, poolSize, 0L, MILLISECONDS, new LinkedBlockingQueue<>());
+            setThreadFactory(new MentionsThreadFactory());
+        }
+
+        /**
+         * {@link ThreadFactory} dedicated to asynchronous tasks needed for the mentions.
+         *
+         * @version $Id$
+         * @since 12.6RC1
+         */
+        private static class MentionsThreadFactory implements ThreadFactory
+        {
+            private static final String THREAD_NAME = "Mentions pool thread";
+
+            private final ThreadFactory threadFactory = Executors.defaultThreadFactory();
+
+            @Override
+            public Thread newThread(Runnable runnable)
+            {
+                Thread thread = this.threadFactory.newThread(runnable);
+                thread.setName(THREAD_NAME);
+                thread.setPriority(NORM_PRIORITY - 1);
+                return thread;
+            }
+        }
     }
 }

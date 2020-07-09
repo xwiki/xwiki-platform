@@ -23,7 +23,6 @@ import java.util.concurrent.BlockingQueue;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.mentions.internal.async.MentionsData;
-import org.xwiki.stability.Unstable;
 
 /**
  * Blocking queue provider.
@@ -31,7 +30,6 @@ import org.xwiki.stability.Unstable;
  * @version $Id$
  * @since 12.6RC1
  */
-@Unstable
 @Role
 public interface MentionsBlockingQueueProvider
 {

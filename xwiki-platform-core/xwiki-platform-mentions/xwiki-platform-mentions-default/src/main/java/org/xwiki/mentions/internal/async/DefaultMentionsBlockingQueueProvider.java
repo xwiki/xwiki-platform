@@ -34,6 +34,12 @@ import ch.rasc.xodusqueue.XodusBlockingQueue;
 /**
  * Default implementation of {@link MentionsBlockingQueueProvider}.
  *
+ * The {@link BlockingQueue} provided here is the {@link XodusBlockingQueue} implemention. This queue is persisted to 
+ * disk, in the /mentions/queue directory of the permanent directory.
+ * The queue is persisted to disk. If a directory is already existing when 
+ * {@link DefaultMentionsBlockingQueueProvider#initBlockingQueue()} is called (for instance, after restart), the queue
+ * is loaded with the elements stored in disk.
+ *
  * @version $Id$
  * @since 12.6RC1
  */

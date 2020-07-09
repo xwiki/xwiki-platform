@@ -42,6 +42,6 @@ public interface MentionNotificationService
      * @param location The location of the mention.
      * @param anchorId The anchor link to use.
      */
-    void sendNotif(String authorReference, String documentReference, DocumentReference mentionedIdentity,
-        MentionLocation location, String anchorId);
+    void sendNotification(DocumentReference authorReference, DocumentReference documentReference,
+        DocumentReference mentionedIdentity, MentionLocation location, String anchorId);
 }

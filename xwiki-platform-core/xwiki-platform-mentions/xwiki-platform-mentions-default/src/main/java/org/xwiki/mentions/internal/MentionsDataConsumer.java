@@ -21,7 +21,6 @@ package org.xwiki.mentions.internal;
 
 import org.xwiki.component.annotation.Role;
 import org.xwiki.mentions.internal.async.MentionsData;
-import org.xwiki.stability.Unstable;
 
 import com.xpn.xwiki.XWikiException;
 
@@ -31,7 +30,6 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id$
  * @since 12.6RC1
  */
-@Unstable
 @Role
 public interface MentionsDataConsumer
 {

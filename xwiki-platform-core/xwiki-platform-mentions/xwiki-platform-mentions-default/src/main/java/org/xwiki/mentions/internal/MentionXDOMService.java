@@ -27,7 +27,6 @@ import org.xwiki.component.annotation.Role;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.stability.Unstable;
 
 /**
  * A service for manipulating XDOM trees in the context of the mentions.
@@ -36,7 +35,6 @@ import org.xwiki.stability.Unstable;
  * @since 12.5RC1
  */
 @Role
-@Unstable
 public interface MentionXDOMService
 {
     /**

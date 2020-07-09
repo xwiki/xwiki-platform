@@ -31,12 +31,21 @@ import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.security.authorization.AccessDeniedException;
+import org.xwiki.security.authorization.ContextualAuthorizationManager;
+import org.xwiki.security.authorization.Right;
 
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
  * Default implementation of {@link MentionsEventExecutor}.
- * All the operations are done asynchronously.
+ *
+ * This class is in charge of the management of mentions task analysis.
+ * First, when {@link DefaultMentionsEventExecutor#execute(DocumentReference, DocumentReference, String)} is called,
+ * a {@link MentionsData} is added to a queue.
+ * Then, a pool of {@link MentionsConsumer} workers is consuming the queue and delegate the actual analyis to
+ * {@link MentionsDataConsumer#consume(MentionsData)} which deals with actual implementation of the user mentions 
+ * analysis.  
  *
  * @version $Id$
  * @since 12.6RC1
@@ -61,12 +70,16 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     @Inject
     private MentionsDataConsumer dataConsumer;
 
+    @Inject
+    private ContextualAuthorizationManager authorizationManager;
+
     @Override
     public void initialize()
     {
         this.executor = this.threadPoolProvider.initializePool();
         this.queue = this.blockingQueueProvider.initBlockingQueue();
-        IntStream.range(0, this.threadPoolProvider.getPoolSize())
+        IntStream
+            .range(0, this.threadPoolProvider.getPoolSize())
             .forEach(i -> this.executor.execute(new MentionsConsumer()));
     }
 
@@ -93,8 +106,9 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     }
 
     @Override
-    public void clearQueue()
+    public void clearQueue() throws AccessDeniedException
     {
+        this.authorizationManager.checkAccess(Right.ADMIN);
         this.queue.clear();
     }
 

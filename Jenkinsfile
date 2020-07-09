@@ -180,6 +180,8 @@ if (!params.type || params.type == 'standard') {
 private def getFirstNonDockerBuild(def rawBuild)
 {
   echoXWiki "Finding first non-docker build..."
+  echoXWiki " current rawBuild = ${rawBuild.class.name}"
+  echoXWiki " previous rawBuild = ${rawBuild.getPreviousBuild().class.name}"
   def previous = rawBuild.getPreviousBuild()
   echoXWiki "  Checking build [${previous.getDisplayName()}] (${previous.id})..."
   while (previous != null && isBadgeFound(previous, 'Docker Build')) {

@@ -63,18 +63,11 @@ define(["polyfills"], function () {
       this.element.className = "livedata-filter";
 
       // listen to events
-      var callback = function (data) { self.filter(); };
       this.logic.onEventWhere("filter",
-        { property: self.propertyId, index: self.index },
-        callback
-      );
-      this.logic.onEventWhere("removeFilter",
-        { property: self.propertyId},
-        callback
-      );
-      this.logic.onEventWhere("removeAllFilters",
-        { property: self.propertyId},
-        callback
+        function (data) {
+          return (data.property === self.propertyId) && (data.index === undefined || data.index === self.index);
+        },
+        function (data) { self.filter(); }
       );
     };
 

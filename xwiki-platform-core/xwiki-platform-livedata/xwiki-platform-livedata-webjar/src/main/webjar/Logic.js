@@ -428,7 +428,7 @@ define([
 
 
     /**
-     * Return a new displayer based on the specified property and row data
+     * Return a new displayer widget based on the specified property and row data
      * @param {String} propertyId The id of the property of the entry
      * @param {Object} entry The entry data object
      * @param {String} displayerId
@@ -702,6 +702,7 @@ define([
       this.getQueryFilter(filterEntry.property).constrains.splice(index, 0, filterEntry);
       // dispatch events
       this.triggerEvent("filter", {
+        type: "modify",
         property: filterEntry.property,
         operator: filterEntry.operator,
         value: filterEntry.value,
@@ -745,7 +746,8 @@ define([
       // remove filter
       var removedFilterArray = filter.constrains.splice(index, 1);
       // dispatch events
-      this.triggerEvent("removeFilter", {
+      this.triggerEvent("filter", {
+        type: "remove",
         property: property,
         index: index,
         removedFilter: removedFilterArray[0],
@@ -766,7 +768,8 @@ define([
       if (filterIndex === -1) { return; }
       var removedFilterGroups = this.data.query.filters.splice(filterIndex, 1);
       // dispatch events
-      this.triggerEvent("removeAllFilters", {
+      this.triggerEvent("filter", {
+        type: "removeAll",
         property: property,
         removedFilters: removedFilterGroups[0].constrains,
       });
@@ -775,7 +778,7 @@ define([
 
 
     /**
-     * Return a new filter based on the specified property
+     * Return a new filter widget based on the specified property
      * @param {String} propertyId The id of the property of the entry
      * @param {Number} index The index of the filter among the property filters
      * @param {String} filterId

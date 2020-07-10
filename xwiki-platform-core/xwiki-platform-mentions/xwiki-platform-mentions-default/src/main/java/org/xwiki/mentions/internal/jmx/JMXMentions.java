@@ -21,6 +21,8 @@ package org.xwiki.mentions.internal.jmx;
 
 import java.util.Collection;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.mentions.internal.async.MentionsData;
 
 /**
@@ -33,6 +35,10 @@ public class JMXMentions implements JMXMentionsMBean
 {
     private final Collection<MentionsData> queue;
 
+    /**
+     * Default construct.
+     * @param queue The mentions analysis task queue.
+     */
     public JMXMentions(Collection<MentionsData> queue)
     {
         this.queue = queue;
@@ -48,5 +54,31 @@ public class JMXMentions implements JMXMentionsMBean
     public void clearQueue()
     {
         this.queue.clear();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        JMXMentions that = (JMXMentions) o;
+
+        return new EqualsBuilder()
+                   .append(this.queue, that.queue)
+                   .isEquals();
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder(17, 37)
+                   .append(this.queue)
+                   .toHashCode();
     }
 }

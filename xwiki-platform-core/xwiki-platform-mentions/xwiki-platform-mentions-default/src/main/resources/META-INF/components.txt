@@ -1,5 +1,5 @@
 org.xwiki.mentions.internal.async.DefaultMentionsBlockingQueueProvider
-org.xwiki.mentions.internal.async.DefaultMentionsThreadPoolProvider
+org.xwiki.mentions.internal.async.DefaultMentionsThreadsProvider
 org.xwiki.mentions.internal.DefaultMentionNotificationService
 org.xwiki.mentions.internal.DefaultMentionsConfiguration
 org.xwiki.mentions.internal.DefaultMentionsDataConsumer

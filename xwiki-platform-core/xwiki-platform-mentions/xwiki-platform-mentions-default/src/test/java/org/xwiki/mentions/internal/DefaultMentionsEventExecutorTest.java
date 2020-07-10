@@ -20,12 +20,11 @@
 package org.xwiki.mentions.internal;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.xwiki.mentions.internal.DefaultMentionsEventExecutor.MentionsConsumer;
+import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.mentions.internal.async.MentionsData;
+import org.xwiki.mentions.internal.jmx.JMXMentions;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.BeforeComponent;
 import org.xwiki.test.junit5.mockito.ComponentTest;
@@ -34,8 +33,10 @@ import org.xwiki.test.junit5.mockito.MockComponent;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.xwiki.mentions.internal.DefaultMentionsEventExecutor.NB_THREADS;
 
 /**
  * Test of {@link DefaultMentionsEventExecutor}.
@@ -50,21 +51,20 @@ class DefaultMentionsEventExecutorTest
     private DefaultMentionsEventExecutor executor;
 
     @MockComponent
-    private MentionsThreadPoolProvider threadPoolProvider;
+    private MentionsThreadsProvider threadPoolProvider;
 
     @MockComponent
     private MentionsBlockingQueueProvider blockingQueueProvider;
 
-    private ThreadPoolExecutor threadPoolExecutor;
-
     private BlockingQueue<MentionsData> blockingQueue;
+
+    @MockComponent
+    private JMXBeanRegistration jmxRegistration;
 
     @BeforeComponent
     void beforeComponent()
     {
-        when(this.threadPoolProvider.getPoolSize()).thenReturn(2);
-        this.threadPoolExecutor = mock(ThreadPoolExecutor.class);
-        when(this.threadPoolProvider.initializePool()).thenReturn(this.threadPoolExecutor);
+        when(this.threadPoolProvider.initializeThread(any(Runnable.class))).thenReturn(mock(Thread.class));
         this.blockingQueue = mock(BlockingQueue.class);
         when(this.blockingQueueProvider.initBlockingQueue()).thenReturn(this.blockingQueue);
     }
@@ -72,10 +72,10 @@ class DefaultMentionsEventExecutorTest
     @Test
     void initialize()
     {
-        verify(this.threadPoolProvider).initializePool();
         verify(this.blockingQueueProvider).initBlockingQueue();
-        verify(this.threadPoolExecutor, Mockito.times(this.threadPoolProvider.getPoolSize()))
-            .execute(any(MentionsConsumer.class));
+        verify(this.threadPoolProvider, times(NB_THREADS)).initializeThread(
+            any(Runnable.class));
+        verify(this.jmxRegistration).registerMBean(new JMXMentions(this.blockingQueue), "name=mentions");
     }
 
     @Test

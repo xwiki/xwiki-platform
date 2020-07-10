@@ -17,30 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions.internal;
+package org.xwiki.mentions.internal.async;
 
-import java.util.concurrent.ThreadPoolExecutor;
+import javax.inject.Singleton;
 
-import org.xwiki.component.annotation.Role;
+import org.xwiki.component.annotation.Component;
+import org.xwiki.mentions.internal.MentionsThreadsProvider;
+
+import static java.lang.Thread.NORM_PRIORITY;
 
 /**
- * Provide a thread pool to analyze the mentions.
+ * Default implementation of {@link MentionsThreadsProvider}.
  *
  * @version $Id$
  * @since 12.6RC1
  */
-@Role
-public interface MentionsThreadPoolProvider
+@Component
+@Singleton
+public class DefaultMentionsThreadsProvider implements MentionsThreadsProvider
 {
-    /**
-     * 
-     * @return the thread pool executor
-     */
-    ThreadPoolExecutor initializePool();
+    private static final String THREAD_NAME = "Mentions thread";
 
-    /**
-     * 
-     * @return the pool size
-     */
-    int getPoolSize();
+    @Override
+    public Thread initializeThread(Runnable runnable)
+    {
+        Thread thread = new Thread(runnable);
+        thread.setName(THREAD_NAME);
+        thread.setPriority(NORM_PRIORITY - 1);
+        return thread;
+    }
 }

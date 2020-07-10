@@ -20,8 +20,6 @@
 package org.xwiki.mentions.internal;
 
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.IntStream;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,6 +34,7 @@ import org.xwiki.mentions.internal.jmx.JMXMentions;
 import org.xwiki.mentions.internal.jmx.JMXMentionsMBean;
 import org.xwiki.model.reference.DocumentReference;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
@@ -55,7 +54,11 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @Singleton
 public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Initializable, Disposable
 {
-    private ThreadPoolExecutor executor;
+    static final int NB_THREADS = 4;
+
+    private static final String MBREAN_NAME = "name=mentions";
+
+    private MentionsConsumer[] consumers;
 
     private BlockingQueue<MentionsData> queue;
 
@@ -66,7 +69,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     private MentionsBlockingQueueProvider blockingQueueProvider;
 
     @Inject
-    private MentionsThreadPoolProvider threadPoolProvider;
+    private MentionsThreadsProvider threadPoolProvider;
 
     @Inject
     private MentionsDataConsumer dataConsumer;
@@ -77,19 +80,26 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     @Override
     public void initialize()
     {
-        this.executor = this.threadPoolProvider.initializePool();
         this.queue = this.blockingQueueProvider.initBlockingQueue();
-        IntStream
-            .range(0, this.threadPoolProvider.getPoolSize())
-            .forEach(i -> this.executor.execute(new MentionsConsumer()));
+        this.consumers = new MentionsConsumer[NB_THREADS];
+        for (int i = 0; i < this.consumers.length; i++) {
+            MentionsConsumer runnable = new MentionsConsumer();
+            this.consumers[i] = runnable;
+            this.threadPoolProvider
+                .initializeThread(runnable)
+                .start();
+        }
         JMXMentionsMBean mbean = new JMXMentions(this.queue);
-        this.jmxRegistration.registerMBean(mbean, "name=mentions");
+        this.jmxRegistration.registerMBean(mbean, MBREAN_NAME);
     }
 
     @Override
     public void dispose()
     {
-        this.jmxRegistration.unregisterMBean("name=mentions");
+        this.jmxRegistration.unregisterMBean(MBREAN_NAME);
+        for (MentionsConsumer consumer : this.consumers) {
+            consumer.halt();
+        }
     }
 
     @Override
@@ -119,27 +129,32 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
      */
     public class MentionsConsumer implements Runnable
     {
+        private boolean halt;
+
         @Override
         public void run()
         {
-            while (true) {
-                runOnce();
+            while (!this.halt) {
+                consume();
             }
         }
 
         /**
          * Consume a single queue task.
          */
-        public void runOnce()
+        public void consume()
         {
             MentionsData data = null;
             try {
-                data = DefaultMentionsEventExecutor.this.queue.take();
-                DefaultMentionsEventExecutor.this.logger
-                    .debug("[{}] - [{}] consumed. Queue size [{}]", data.getDocumentReference(), data.getVersion(),
-                        DefaultMentionsEventExecutor.this.queue.size());
+                // slightly active wait in order to let the loop be stopped when halt is set to true, once every second.
+                data = DefaultMentionsEventExecutor.this.queue.poll(10, SECONDS);
+                if (data != null) {
+                    DefaultMentionsEventExecutor.this.logger
+                        .debug("[{}] - [{}] consumed. Queue size [{}]", data.getDocumentReference(), data.getVersion(),
+                            DefaultMentionsEventExecutor.this.queue.size());
 
-                DefaultMentionsEventExecutor.this.dataConsumer.consume(data);
+                    DefaultMentionsEventExecutor.this.dataConsumer.consume(data);
+                }
             } catch (Exception e) {
                 DefaultMentionsEventExecutor.this.logger
                     .warn("Error during mention analysis of task [{}]. Cause [{}].", data, getRootCauseMessage(e));
@@ -154,6 +169,14 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
                     }
                 }
             }
+        }
+
+        /**
+         * Ask the consumer to stop its work.
+         */
+        public void halt()
+        {
+            this.halt = true;
         }
     }
 }

@@ -20,6 +20,8 @@
 package org.xwiki.mentions.internal.jmx;
 
 import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
@@ -35,13 +37,22 @@ public class JMXMentions implements JMXMentionsMBean
 {
     private final Collection<MentionsData> queue;
 
+    private final Consumer<Integer> updateThreadNumber;
+
+    private final Supplier<Integer> threadNumber;
+
     /**
      * Default construct.
      * @param queue The mentions analysis task queue.
+     * @param updateThreadNumber Operation to call on thread number update
+     * @param threadNumber The current number of threads
      */
-    public JMXMentions(Collection<MentionsData> queue)
+    public JMXMentions(Collection<MentionsData> queue, Consumer<Integer> updateThreadNumber,
+        Supplier<Integer> threadNumber)
     {
         this.queue = queue;
+        this.updateThreadNumber = updateThreadNumber;
+        this.threadNumber = threadNumber;
     }
 
     @Override
@@ -54,6 +65,18 @@ public class JMXMentions implements JMXMentionsMBean
     public void clearQueue()
     {
         this.queue.clear();
+    }
+
+    @Override
+    public void updateThreadNumber(int number)
+    {
+        this.updateThreadNumber.accept(number);
+    }
+
+    @Override
+    public Integer getThreadNumber()
+    {
+        return this.threadNumber.get();
     }
 
     @Override
@@ -71,6 +94,8 @@ public class JMXMentions implements JMXMentionsMBean
 
         return new EqualsBuilder()
                    .append(this.queue, that.queue)
+                   .append(this.updateThreadNumber, that.updateThreadNumber)
+                   .append(this.threadNumber, that.threadNumber)
                    .isEquals();
     }
 
@@ -79,6 +104,8 @@ public class JMXMentions implements JMXMentionsMBean
     {
         return new HashCodeBuilder(17, 37)
                    .append(this.queue)
+                   .append(this.updateThreadNumber)
+                   .append(this.threadNumber)
                    .toHashCode();
     }
 }

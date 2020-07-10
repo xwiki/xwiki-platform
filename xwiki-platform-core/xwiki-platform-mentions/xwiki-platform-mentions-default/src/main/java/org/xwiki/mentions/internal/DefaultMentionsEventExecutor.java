@@ -19,6 +19,8 @@
  */
 package org.xwiki.mentions.internal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 import javax.inject.Inject;
@@ -54,11 +56,14 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @Singleton
 public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Initializable, Disposable
 {
-    static final int NB_THREADS = 4;
+    /**
+     * The number of thread at startup.
+     */
+    static final int DEFAULT_NB_THREADS = 2;
 
-    private static final String MBREAN_NAME = "name=mentions";
+    private static final String MBEAN_NAME = "name=mentions";
 
-    private MentionsConsumer[] consumers;
+    private List<MentionsConsumer> consumers = new ArrayList<>();
 
     private BlockingQueue<MentionsData> queue;
 
@@ -81,24 +86,51 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     public void initialize()
     {
         this.queue = this.blockingQueueProvider.initBlockingQueue();
-        this.consumers = new MentionsConsumer[NB_THREADS];
-        for (int i = 0; i < this.consumers.length; i++) {
-            MentionsConsumer runnable = new MentionsConsumer();
-            this.consumers[i] = runnable;
-            this.threadPoolProvider
-                .initializeThread(runnable)
-                .start();
+        this.consumers = new ArrayList<>();
+        for (int i = 0; i < DEFAULT_NB_THREADS; i++) {
+            startConsumer();
         }
-        JMXMentionsMBean mbean = new JMXMentions(this.queue);
-        this.jmxRegistration.registerMBean(mbean, MBREAN_NAME);
+        JMXMentionsMBean mbean = new JMXMentions(this.queue, this::updateNbThreads, () -> this.consumers.size());
+        this.jmxRegistration.registerMBean(mbean, MBEAN_NAME);
+    }
+
+    private void startConsumer()
+    {
+        MentionsConsumer runnable = new MentionsConsumer();
+        this.consumers.add(runnable);
+        this.threadPoolProvider
+            .initializeThread(runnable)
+            .start();
     }
 
     @Override
     public void dispose()
     {
-        this.jmxRegistration.unregisterMBean(MBREAN_NAME);
+        this.jmxRegistration.unregisterMBean(MBEAN_NAME);
         for (MentionsConsumer consumer : this.consumers) {
             consumer.halt();
+        }
+    }
+
+    /**
+     * Update the number of threads.
+     *
+     * If the number increases, starts new threads
+     * If the number decreases, removes existing threads until the new number is reached
+     * @param nbThread the new number of threads. Negative values are equivalent to 0.
+     */
+    public void updateNbThreads(int nbThread)
+    {
+        int currentNbThreads = this.consumers.size();
+        if (nbThread > currentNbThreads) {
+            for (int i = currentNbThreads; i < nbThread; i++) {
+                startConsumer();
+            }
+        } else {
+            for (int i = Math.max(nbThread, 0); i < currentNbThreads; i++) {
+                MentionsConsumer remove = this.consumers.remove(0);
+                remove.halt();
+            }
         }
     }
 
@@ -146,7 +178,8 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
         {
             MentionsData data = null;
             try {
-                // slightly active wait in order to let the loop be stopped when halt is set to true, once every second.
+                // slightly active wait in order to let the loop be stopped when halt is set to true, once every 
+                // 10 seconds.
                 data = DefaultMentionsEventExecutor.this.queue.poll(10, SECONDS);
                 if (data != null) {
                     DefaultMentionsEventExecutor.this.logger
@@ -178,5 +211,14 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
         {
             this.halt = true;
         }
+    }
+
+    /**
+     * 
+     * @return the list of consumers
+     */
+    public List<MentionsConsumer> getConsumers()
+    {
+        return this.consumers;
     }
 }

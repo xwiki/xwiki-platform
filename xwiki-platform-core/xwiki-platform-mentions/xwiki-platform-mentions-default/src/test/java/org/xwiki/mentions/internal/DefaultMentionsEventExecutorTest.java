@@ -22,21 +22,26 @@ package org.xwiki.mentions.internal;
 import java.util.concurrent.BlockingQueue;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.mentions.internal.jmx.JMXMentions;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.test.annotation.BeforeComponent;
+import org.xwiki.test.junit5.LogCaptureExtension;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.xwiki.mentions.internal.DefaultMentionsEventExecutor.NB_THREADS;
+import static org.xwiki.mentions.internal.DefaultMentionsEventExecutor.DEFAULT_NB_THREADS;
+import static org.xwiki.test.LogLevel.DEBUG;
 
 /**
  * Test of {@link DefaultMentionsEventExecutor}.
@@ -47,6 +52,9 @@ import static org.xwiki.mentions.internal.DefaultMentionsEventExecutor.NB_THREAD
 @ComponentTest
 class DefaultMentionsEventExecutorTest
 {
+    @RegisterExtension
+    LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
+
     @InjectMockComponents
     private DefaultMentionsEventExecutor executor;
 
@@ -61,6 +69,9 @@ class DefaultMentionsEventExecutorTest
     @MockComponent
     private JMXBeanRegistration jmxRegistration;
 
+    @MockComponent
+    private MentionsDataConsumer dataConsumer;
+
     @BeforeComponent
     void beforeComponent()
     {
@@ -73,9 +84,8 @@ class DefaultMentionsEventExecutorTest
     void initialize()
     {
         verify(this.blockingQueueProvider).initBlockingQueue();
-        verify(this.threadPoolProvider, times(NB_THREADS)).initializeThread(
-            any(Runnable.class));
-        verify(this.jmxRegistration).registerMBean(new JMXMentions(this.blockingQueue), "name=mentions");
+        verify(this.threadPoolProvider, times(DEFAULT_NB_THREADS)).initializeThread(any(Runnable.class));
+        verify(this.jmxRegistration).registerMBean(new JMXMentions(this.blockingQueue, any(), any()), "name=mentions");
     }
 
     @Test
@@ -97,5 +107,48 @@ class DefaultMentionsEventExecutorTest
     {
         this.executor.getQueueSize();
         verify(this.blockingQueue).size();
+    }
+
+    @Test
+    void updateNbThreadsIncrease()
+    {
+        this.executor.updateNbThreads(10);
+        // two times at startup + the 8 new threads created to reach the new number
+        verify(this.threadPoolProvider, times(DEFAULT_NB_THREADS + 8)).initializeThread(any(Runnable.class));
+        assertEquals(10, this.executor.getConsumers().size());
+    }
+
+    @Test
+    void updateNbThreadsDecrease()
+    {
+        this.executor.updateNbThreads(1);
+
+        // two times at startup + the 8 new threads created to reach the new number
+        assertEquals(1, this.executor.getConsumers().size());
+    }
+
+    @Test
+    void updateNbThreadsNegative()
+    {
+        this.executor.updateNbThreads(-1);
+
+        // two times at startup + the 8 new threads created to reach the new number
+        assertEquals(0, this.executor.getConsumers().size());
+    }
+
+    @Test
+    void consume() throws Exception
+    {
+        MentionsData value = new MentionsData()
+                                 .setDocumentReference("xwiki:XWiki.Doc")
+                                 .setAuthorReference("xwiki:XWiki.Author")
+                                 .setWikiId("xwiki")
+                                 .setVersion("1.0");
+        when(this.blockingQueue.poll(10, SECONDS)).thenReturn(value);
+        this.executor.getConsumers().get(0).consume();
+
+        assertEquals(1, this.logCapture.size());
+        assertEquals("[xwiki:XWiki.Doc] - [1.0] consumed. Queue size [0]", this.logCapture.getMessage(0));
+        verify(this.dataConsumer).consume(value);
     }
 }

@@ -36,5 +36,7 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{mention reference="XWiki.Admin" style="FULL_NAME" anchor="mention-example-1" /}} {{mention reference="XWiki.Admin" style="FIRST_NAME" anchor="mention-example-2" /}} {{mention reference="XWiki.Admin" style="LOGIN" anchor="mention-example-3" /}}</content>
+  <content>To mention a user on a WYSIWYG field, type the {{{@}}} character followed by the name of the user to mention. Then you can select a user in the presented list, once selected the mention is inserted in the text.
+
+For instance, typing {{{@adm}}} should propose to mention the Administrator.</content>
 </xwikidoc>

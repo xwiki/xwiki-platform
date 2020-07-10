@@ -36,7 +36,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>To mention a user on a WYSIWYG field, type the ##@## character followed by the name of the user to mention. Then you can select a user in the presented list, once selected the mention is inserted in the text.
-
-For instance, typing ##@adm## should propose to mention the Administrator.</content>
+  <content>This space contains the code of the User Mentions application.</content>
 </xwikidoc>

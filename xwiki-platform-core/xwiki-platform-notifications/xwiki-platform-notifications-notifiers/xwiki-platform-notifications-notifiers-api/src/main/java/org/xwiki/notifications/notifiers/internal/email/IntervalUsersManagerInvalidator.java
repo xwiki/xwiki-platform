@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 
 import org.xwiki.bridge.event.WikiDeletedEvent;
 import org.xwiki.component.annotation.Component;
-import org.xwiki.model.EntityType;
 import org.xwiki.model.reference.EntityReference;
 import org.xwiki.observation.AbstractEventListener;
 import org.xwiki.observation.event.Event;
@@ -33,7 +32,7 @@ import org.xwiki.observation.event.Event;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.internal.event.XObjectAddedEvent;
 import com.xpn.xwiki.internal.event.XObjectDeletedEvent;
-import com.xpn.xwiki.internal.event.XObjectPropertyUpdatedEvent;
+import com.xpn.xwiki.internal.event.XObjectUpdatedEvent;
 import com.xpn.xwiki.objects.BaseObjectReference;
 
 /**
@@ -64,8 +63,7 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
     public IntervalUsersManagerInvalidator()
     {
         super(NAME, new XObjectAddedEvent(USER_OBJECT), new XObjectDeletedEvent(USER_OBJECT),
-            new XObjectPropertyUpdatedEvent(new EntityReference("interval", EntityType.OBJECT_PROPERTY, USER_OBJECT)),
-            new WikiDeletedEvent());
+            new XObjectUpdatedEvent(USER_OBJECT), new WikiDeletedEvent());
     }
 
     @Override

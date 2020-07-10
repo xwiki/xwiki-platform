@@ -32,7 +32,7 @@
   <packaging>jar</packaging>
   <description>XWiki Platform - Default</description>
   <properties>
-    <xwiki.jacoco.instructionRatio>0.73</xwiki.jacoco.instructionRatio>
+    <xwiki.jacoco.instructionRatio>0.75</xwiki.jacoco.instructionRatio>
     <xwiki.extension.features>
       <!-- Contrib extension to provide groups tab feature to pre 10.8 wikis -->
       org.xwiki.contrib.membership:application-membership-default

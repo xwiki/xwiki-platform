@@ -132,53 +132,34 @@
   }
 });
 require(['deferred!ckeditor', 'xwiki-suggestUsers', 'jquery', 'xwiki-meta'], function (ckeditorPromise, suggestUsers, $, xm) {
-  /*
-   * Keep records of the added anchors during the current edit session.
-   * Note that the anchors saved here are not only the ones added on the current session,
-   * but also those already present in the document. 
-   * For more information, see #getAnchor.
-   * The information are stored on the form:
-   * { reference: Array&lt;String&gt; }
-   */
-  const anchorIds = {};
   
   /**
    * Get the current wiki scope for displaying global, local or global and local users
    */
   const userScope = "$!services.wiki.user.userScope";
   
+  // see https://stackoverflow.com/a/6248722/657524
+  function random6chars() {
+    // I generate the UID from two parts here 
+    // to ensure the random number provide enough bits.
+    var firstPart = (Math.random() * 46656) | 0;
+    var secondPart = (Math.random() * 46656) | 0;
+    firstPart = ("000" + firstPart.toString(36)).slice(-3);
+    secondPart = ("000" + secondPart.toString(36)).slice(-3);
+    return firstPart + secondPart;
+  }
+  
   /**
    * Compute a new unique anchor for the given reference.
-   * The uniqueness of the anchor is given by two mechanisms:
-   *   - retrieve on first call all mentions available on current document and store them
-   *   - then use that information to compute a next anchor not overlapping an existing one on the current document.
-   * The mechanism is obviously not perfect and might be improved later but should be enough for most usage.
+   * The unique anchor is based on the mentionned user id, concatenaed with a random string of 6 alphanumeric
+   * characters.
+   * The chances of collision are quite low, about 46k mentions for a given mentioned user on a given page (assuming
+   * that no mentions are ever deleted).
    */
   const getAnchor = function (reference) {
-    var existingIds;
-    
-    if (anchorIds.hasOwnProperty(reference)) {
-      existingIds = anchorIds[reference];
-    } else {
-      existingIds = [];
-      $('.xwiki-mention').each(function() {
-        var mention = $(this);
-        if (mention.attr('data-reference') === reference) {
-          existingIds.push(mention.attr('id'));
-        }
-      });
-      anchorIds[reference] = existingIds;
-    }
-    
-    var counter = existingIds.length + 1;
-    var refId = reference.replace(/[.:]/g, '-');
-    var proposedAnchor = refId + "-" + counter;
-    while (existingIds.indexOf(proposedAnchor) != -1) {
-      counter++;
-      proposedAnchor = refId + "-" + counter;
-    }
-    anchorIds[reference].push(proposedAnchor);
-    return proposedAnchor;
+    const refId = reference.replace(/[.:]/g, '-');
+    const randomId = random6chars();
+    return refId + '-' + randomId;
   };
 
   const search = function (text, callback) {

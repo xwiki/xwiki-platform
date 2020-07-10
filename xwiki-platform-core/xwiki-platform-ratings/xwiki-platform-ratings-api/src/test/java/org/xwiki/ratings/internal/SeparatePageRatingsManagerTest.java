@@ -31,9 +31,12 @@ import org.mockito.Mock;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.WikiReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryManager;
 import org.xwiki.ratings.Rating;
+import org.xwiki.ratings.RatingsConfiguration;
+import org.xwiki.ratings.RatingsManager;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
@@ -47,7 +50,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.xwiki.ratings.RatingsManager.RATING_CLASS_FIELDNAME_AUTHOR;
@@ -85,6 +93,9 @@ public class SeparatePageRatingsManagerTest
     @MockComponent
     private DocumentReferenceResolver<String> documentReferenceResolver;
 
+    @MockComponent
+    private RatingsConfiguration ratingsConfiguration;
+
     @Mock
     private XWikiContext context;
 
@@ -92,7 +103,7 @@ public class SeparatePageRatingsManagerTest
     private XWiki xWiki;
 
     @BeforeEach
-    public void setup()
+    void setup()
     {
         when(this.xcontextProvider.get()).thenReturn(this.context);
         when(this.context.getWiki()).thenReturn(this.xWiki);
@@ -100,7 +111,7 @@ public class SeparatePageRatingsManagerTest
     }
 
     @Test
-    public void getRatings() throws XWikiException
+    void getRatings() throws XWikiException
     {
         String sqlRequest = ", BaseObject as obj, StringProperty as parentprop where doc.fullName=obj.name"
             + " and obj.className=?1 and obj.id=parentprop.id.id and parentprop.id.name=?2 and parentprop.value=?3"
@@ -149,7 +160,7 @@ public class SeparatePageRatingsManagerTest
     }
 
     @Test
-    public void getUserRatings() throws Exception
+    void getUserRatings() throws Exception
     {
         String statement = "select distinct doc.fullName, parentProp.value, doc.date "
             + "from XWikiDocument doc, BaseObject as obj, StringProperty as authorProp, StringProperty as parentProp "
@@ -230,5 +241,139 @@ public class SeparatePageRatingsManagerTest
         verify(query).bindValue("statusRefused", "refused");
         verify(query).setLimit(2);
         verify(query).setOffset(10);
+    }
+
+    @Test
+    void hasRatingsSpaceForeachSpace()
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "Foo", "Bar");
+
+        when(this.xWiki.Param("xwiki.ratings.separatepagemanager.ratingsspaceforeachspace", "0"))
+            .thenReturn("customVal");
+        when(this.xWiki.getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", "customVal",
+            this.context)).thenReturn("otherValue");
+        when(ratingsConfiguration.getConfigurationParameter(documentReference,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, "otherValue")).thenReturn("0");
+        assertFalse(this.ratingsManager.hasRatingsSpaceForeachSpace(documentReference));
+        verify(this.xWiki).Param("xwiki.ratings.separatepagemanager.ratingsspaceforeachspace", "0");
+        verify(this.xWiki).getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace", "customVal",
+            this.context);
+
+        when(ratingsConfiguration.getConfigurationParameter(documentReference,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, "otherValue")).thenReturn("1");
+        assertTrue(this.ratingsManager.hasRatingsSpaceForeachSpace(documentReference));
+        verify(this.xWiki, times(2)).Param("xwiki.ratings.separatepagemanager.ratingsspaceforeachspace", "0");
+        verify(this.xWiki, times(2)).getXWikiPreference("ratings_separatepagemanager_ratingsspaceforeachspace",
+            "customVal", this.context);
+    }
+
+    @Test
+    void getRatingsSpaceName()
+    {
+        DocumentReference documentReference = new DocumentReference("xwiki", "Foo", "Bar");
+
+        when(this.xWiki.Param("xwiki.ratings.separatepagemanager.spacename", ""))
+            .thenReturn("customVal");
+        when(this.xWiki.getXWikiPreference("ratings_separatepagemanager_spacename", "customVal",
+            this.context)).thenReturn("otherValue");
+        when(ratingsConfiguration.getConfigurationParameter(documentReference,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE, "otherValue")).thenReturn("Ratings");
+        assertEquals("Ratings", this.ratingsManager.getRatingsSpaceName(documentReference));
+        verify(this.xWiki).Param("xwiki.ratings.separatepagemanager.spacename", "");
+        verify(this.xWiki).getXWikiPreference("ratings_separatepagemanager_spacename", "customVal", this.context);
+    }
+
+    @Test
+    void getRatingDocumentReference() throws XWikiException
+    {
+        when(context.getWikiReference()).thenReturn(new WikiReference("xwiki"));
+        when(context.getWikiId()).thenReturn("xwiki");
+        DocumentReference ratedDocumentReference = new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpace"),
+            "WebHome");
+
+        when(this.xWiki.clearName(any(), eq(this.context))).then(invocation -> invocation.getArgument(0));
+        when(ratingsConfiguration.getConfigurationParameter(any(),
+            eq(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE), any())).thenReturn("RatingSpace");
+
+        // Test with separate space = false
+        when(ratingsConfiguration.getConfigurationParameter(ratedDocumentReference,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, null)).thenReturn("0");
+
+        DocumentReference expectedReference = new DocumentReference("xwiki", "RatingSpace", "MySpace_WebHome");
+        when(this.xWiki.exists(expectedReference, this.context)).thenReturn(false);
+        DocumentReference obtainedReference = this.ratingsManager.getRatingDocumentReference(ratedDocumentReference);
+        assertEquals(expectedReference, obtainedReference);
+
+        // Test with separate space = false and already existing ratings
+        expectedReference = new DocumentReference("xwiki", "RatingSpace", "MySpace_WebHomeR2");
+        when(this.xWiki.exists(expectedReference, this.context)).thenReturn(false);
+
+        when(this.xWiki.exists(new DocumentReference("xwiki", "RatingSpace", "MySpace_WebHome"), this.context))
+            .thenReturn(true);
+        when(this.xWiki.exists(new DocumentReference("xwiki", "RatingSpace", "MySpace_WebHomeR1"), this.context))
+            .thenReturn(true);
+        obtainedReference = this.ratingsManager.getRatingDocumentReference(ratedDocumentReference);
+        assertEquals(expectedReference, obtainedReference);
+
+        // Test with separate space = true
+        when(ratingsConfiguration.getConfigurationParameter(ratedDocumentReference,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, null)).thenReturn("1");
+
+        expectedReference = new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpaceRatingSpace"), "WebHome");
+        when(this.xWiki.exists(expectedReference, this.context)).thenReturn(false);
+        obtainedReference = this.ratingsManager.getRatingDocumentReference(ratedDocumentReference);
+        assertEquals(expectedReference, obtainedReference);
+
+        // Test with separate space = true and already existing ratings
+        when(ratingsConfiguration.getConfigurationParameter(ratedDocumentReference,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, null)).thenReturn("1");
+
+        expectedReference = new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpaceRatingSpace"), "WebHomeR2");
+        when(this.xWiki.exists(new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpaceRatingSpace"), "WebHome"), this.context))
+            .thenReturn(true);
+        when(this.xWiki.exists(new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpaceRatingSpace"), "WebHomeR1"), this.context))
+            .thenReturn(true);
+        obtainedReference = this.ratingsManager.getRatingDocumentReference(ratedDocumentReference);
+        assertEquals(expectedReference, obtainedReference);
+
+        // Tests when rating space is null
+        when(ratingsConfiguration.getConfigurationParameter(any(),
+            eq(RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SPACE), any())).thenReturn(null);
+
+        // Test with separate space = false and already existing ratings
+        when(ratingsConfiguration.getConfigurationParameter(ratedDocumentReference,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, null)).thenReturn("0");
+        expectedReference = new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpace"), "WebHomeR2");
+        when(this.xWiki.exists(expectedReference, this.context)).thenReturn(false);
+
+        when(this.xWiki.exists(new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpace"), "WebHomeR"), this.context))
+            .thenReturn(true);
+        when(this.xWiki.exists(new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpace"), "WebHomeR1"), this.context))
+            .thenReturn(true);
+        obtainedReference = this.ratingsManager.getRatingDocumentReference(ratedDocumentReference);
+        assertEquals(expectedReference, obtainedReference);
+
+        // Test with separate space = true and already existing ratings
+        when(ratingsConfiguration.getConfigurationParameter(ratedDocumentReference,
+            RatingsManager.RATINGS_CONFIG_CLASS_FIELDNAME_STORAGE_SEPARATE_SPACES, null)).thenReturn("1");
+
+        expectedReference = new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpacenull"), "WebHomeR2");
+        when(this.xWiki.exists(new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpacenull"), "WebHome"), this.context))
+            .thenReturn(true);
+        when(this.xWiki.exists(new DocumentReference("xwiki",
+            Arrays.asList("ParentSpace", "MySpacenull"), "WebHomeR1"), this.context))
+            .thenReturn(true);
+        obtainedReference = this.ratingsManager.getRatingDocumentReference(ratedDocumentReference);
+        assertEquals(expectedReference, obtainedReference);
     }
 }

@@ -30,23 +30,21 @@ import javax.inject.Singleton;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.DocumentReferenceResolver;
-import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.model.reference.SpaceReference;
 import org.xwiki.query.Query;
 import org.xwiki.query.QueryException;
-import org.xwiki.query.QueryManager;
 import org.xwiki.ratings.Rating;
 import org.xwiki.ratings.RatingsException;
 import org.xwiki.ratings.RatingsManager;
 import org.xwiki.ratings.UpdateRatingEvent;
 import org.xwiki.ratings.UpdatingRatingEvent;
 import org.xwiki.user.UserReference;
-import org.xwiki.user.UserReferenceSerializer;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -352,5 +350,60 @@ public class SeparatePageRatingsManager extends AbstractRatingsManager
     public Rating getRatingFromDocument(DocumentReference documentRef, XWikiDocument doc) throws RatingsException
     {
         return new SeparatePageRating(documentRef, doc, getXWikiContext(), this);
+    }
+
+    /**
+     * Generate a unique DocumentReference that aims to contain the rating object of a rated document.
+     *
+     * @param ratedDocumentReference reference to the document with which the rating is associated
+     * @return a reference to the document in which the rating is stored
+     */
+    public DocumentReference getRatingDocumentReference(DocumentReference ratedDocumentReference)
+    {
+        XWikiContext context = getXWikiContext();
+        String ratingsSpace = this.getRatingsSpaceName(ratedDocumentReference);
+        String pageSuffix = "R";
+
+        boolean hasRatingsSpaceForeachSpace = this.hasRatingsSpaceForeachSpace(ratedDocumentReference);
+
+        SpaceReference spaceReference = ratedDocumentReference.getLastSpaceReference();
+        spaceReference.replaceParent(spaceReference.getWikiReference(), context.getWikiReference());
+
+        if (hasRatingsSpaceForeachSpace) {
+            spaceReference = new SpaceReference(spaceReference.getName() + ratingsSpace, spaceReference.getParent());
+
+            return getUniquePageName(spaceReference, ratedDocumentReference.getName(), pageSuffix);
+        } else if (ratingsSpace == null) {
+            return getUniquePageName(spaceReference, ratedDocumentReference.getName() + pageSuffix, "");
+        } else {
+            SpaceReference ratingSpaceReference = new SpaceReference(context.getWikiId(), ratingsSpace);
+            return getUniquePageName(ratingSpaceReference,
+                ratedDocumentReference.getLastSpaceReference().getName() + "_" + ratedDocumentReference.getName(),
+                pageSuffix);
+        }
+    }
+
+    /**
+     * Gets a unique page name.
+     *
+     * @param spaceReference the reference of the space in which the document should be
+     * @param name the name of the document
+     * @param postfix post fix to add to the document name
+     * @return the unique document name
+     */
+    private DocumentReference getUniquePageName(SpaceReference spaceReference, String name, String postfix)
+    {
+        XWikiContext context = getXWikiContext();
+        String originalPageName = context.getWiki().clearName(name, context);
+        DocumentReference documentReference = new DocumentReference(originalPageName, spaceReference);
+        int i = 1;
+        if (context.getWiki().exists(documentReference, context)) {
+            do {
+                String pageName = originalPageName + postfix + i;
+                documentReference = new DocumentReference(pageName, spaceReference);
+                i++;
+            } while (context.getWiki().exists(documentReference, context));
+        }
+        return documentReference;
     }
 }

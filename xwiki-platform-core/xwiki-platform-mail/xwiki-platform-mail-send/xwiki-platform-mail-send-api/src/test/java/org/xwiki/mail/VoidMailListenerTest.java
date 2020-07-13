@@ -17,36 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.notifiers.email;
+package org.xwiki.mail;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
- * Several intervals to get notified by emails.
- *
+ * Validate {@link VoidMailListener}.
+ * 
  * @version $Id$
- * @since 9.5RC1
- * @deprecated since 12.6RC1, use {@link org.xwiki.notifications.preferences.NotificationEmailInterval} instead
  */
-@Deprecated
-public enum NotificationEmailInterval
+public class VoidMailListenerTest
 {
-    /**
-     * Receive a mail every hour (if needed).
-     */
-    HOURLY,
+    @Test
+    void test()
+    {
+        VoidMailListener listener = new VoidMailListener();
 
-    /**
-     * Receive a mail every day (if needed).
-     */
-    DAILY,
+        listener.onPrepareBegin(null, null);
+        listener.onPrepareMessageSuccess(null, null);
+        listener.onPrepareMessageError(null, null, null);
+        listener.onPrepareFatalError(null, null);
+        listener.onPrepareEnd(null);
+        listener.onSendMessageSuccess(null, null);
+        listener.onSendMessageError(null, null, null);
+        listener.onSendMessageFatalError(null, null, null);
 
-    /**
-     * Receive a mail every week (if needed).
-     */
-    WEEKLY,
-    /**
-     * Receive an e-mail when a notification is triggered in the wiki.
-     * 
-     * @since 9.6RC1
-     */
-    LIVE
+        assertSame(EmptyMailStatusResult.INSTANCE, listener.getMailStatusResult());
+    }
 }

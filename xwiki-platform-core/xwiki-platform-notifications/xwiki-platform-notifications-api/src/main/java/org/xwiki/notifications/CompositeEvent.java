@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.xwiki.eventstream.Event;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.text.StringUtils;
@@ -45,6 +47,7 @@ public class CompositeEvent
 
     /**
      * Construct a CompositeEvent.
+     * 
      * @param event the first event of the composite event
      */
     public CompositeEvent(Event event)
@@ -77,6 +80,7 @@ public class CompositeEvent
 
     /**
      * Add an event to the composite event.
+     * 
      * @param event the event to add
      * @param similarity the similarity between the event to add and the events of the composite events
      * @throws NotificationException if the addition is illegal (lower similarity for example)
@@ -119,7 +123,7 @@ public class CompositeEvent
             // We are most interested in "advanced" event that we are in "core" events such as "create" or "update",
             // which often are the technical consequences of the real event (ex: a comment has been added).
             if (StringUtils.isNotBlank(event.getType()) && !"create".equals(event.getType())
-                    && !"update".equals(event.getType())) {
+                && !"update".equals(event.getType())) {
                 type = event.getType();
             }
         }
@@ -186,10 +190,42 @@ public class CompositeEvent
 
     /**
      * Remove an event from the current object.
+     * 
      * @param event the event to remove
      */
     public void remove(Event event)
     {
         events.remove(event);
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == this) {
+            return true;
+        }
+
+        if (obj instanceof CompositeEvent) {
+            CompositeEvent compositeEvent = (CompositeEvent) obj;
+
+            EqualsBuilder builder = new EqualsBuilder();
+            builder.append(getSimilarityBetweenEvents(), compositeEvent.getSimilarityBetweenEvents());
+            builder.append(getEvents(), compositeEvent.getEvents());
+
+            return builder.build();
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        HashCodeBuilder builder = new HashCodeBuilder();
+
+        builder.append(getSimilarityBetweenEvents());
+        builder.append(getEvents());
+
+        return builder.build();
     }
 }

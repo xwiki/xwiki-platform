@@ -20,6 +20,7 @@
 package org.xwiki.notifications.filters.internal.status;
 
 import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.expression.generics.AbstractOperatorNode;
 
 /**
@@ -34,14 +35,28 @@ public class ForUserNode extends AbstractOperatorNode
 
     private final Boolean read;
 
+    private final NotificationFormat format;
+
     /**
      * @param user the user
      * @param read true if only read status should be included, false for only unread status and null for all
      */
     public ForUserNode(DocumentReference user, Boolean read)
     {
+        this(user, read, NotificationFormat.ALERT);
+    }
+
+    /**
+     * @param user the user
+     * @param read true if only read status should be included, false for only unread status and null for all
+     * @param format
+     * @since 12.6RC1
+     */
+    public ForUserNode(DocumentReference user, Boolean read, NotificationFormat format)
+    {
         this.user = user;
         this.read = read;
+        this.format = format;
     }
 
     /**
@@ -58,6 +73,15 @@ public class ForUserNode extends AbstractOperatorNode
     public Boolean isRead()
     {
         return this.read;
+    }
+
+    /**
+     * @return the format
+     * @since 12.6RC1
+     */
+    public NotificationFormat getFormat()
+    {
+        return format;
     }
 
     @Override

@@ -17,16 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.notifiers.email;
+package org.xwiki.notifications.preferences;
+
+import org.xwiki.stability.Unstable;
 
 /**
  * Several intervals to get notified by emails.
  *
  * @version $Id$
- * @since 9.5RC1
- * @deprecated since 12.6RC1, use {@link org.xwiki.notifications.preferences.NotificationEmailInterval} instead
+ * @since 12.6RC1
  */
-@Deprecated
+@Unstable
 public enum NotificationEmailInterval
 {
     /**

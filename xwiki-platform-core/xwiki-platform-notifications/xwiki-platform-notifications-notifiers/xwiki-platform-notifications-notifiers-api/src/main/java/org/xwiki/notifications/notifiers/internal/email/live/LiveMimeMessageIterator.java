@@ -25,6 +25,7 @@ import java.util.Map;
 import javax.mail.internet.MimeMessage;
 
 import org.xwiki.component.annotation.Role;
+import org.xwiki.mail.MailListener;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.notifications.CompositeEvent;
 import org.xwiki.notifications.notifiers.internal.email.NotificationUserIterator;
@@ -46,6 +47,11 @@ public interface LiveMimeMessageIterator extends Iterator<MimeMessage>, Iterable
      * @param event the event that has to be sent to every user
      * @param templateReference reference to the mail template
      */
-    void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters,
-            CompositeEvent event, DocumentReference templateReference);
+    void initialize(NotificationUserIterator userIterator, Map<String, Object> factoryParameters, CompositeEvent event,
+        DocumentReference templateReference);
+
+    /**
+     * @return the listener to notify about prepared mail
+     */
+    MailListener getMailListener();
 }

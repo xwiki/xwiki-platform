@@ -281,9 +281,9 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
                     } catch (Exception e) {
                         task.future.completeExceptionally(e);
                     }
-                }
 
-                tasks.add(task);
+                    tasks.add(task);
+                }
             }
         } finally {
             afterTasks(tasks);

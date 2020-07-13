@@ -36,5 +36,5 @@
   <minorEdit>false</minorEdit>
   <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
-  <content>{{mention reference="XWiki.Admin" style="FULL_NAME" anchor="mention-example-1" /}} {{mention reference="XWiki.Admin" style="FIRST_NAME" anchor="mention-example-2" /}} {{mention reference="XWiki.Admin" style="LOGIN" anchor="mention-example-3" /}}</content>
+  <content>This space contains the code of the User Mentions application.</content>
 </xwikidoc>

@@ -59,6 +59,7 @@
 #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
 <input type='hidden' name='defaultEditorId' value="$escapetool.xml($defaultEditorId)" />
 
+<label for="$name">$services.localization.render('core.viewers.comments.add.comment.label')</label>
 ## display of the comment field
 $doc.displayEdit($fieldToDisplay, '', $commentObj)
 

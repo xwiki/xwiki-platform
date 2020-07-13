@@ -55,7 +55,7 @@ public class IntervalUsersManagerInvalidator extends AbstractEventListener
     private static final EntityReference USER_OBJECT = BaseObjectReference.any("XWiki.XWikiUsers");
 
     private static final EntityReference INTERVAL_OBJECT =
-        BaseObjectReference.any("XWiki.Notifications.Code.NotificationEmailPreferenceClass");
+        BaseObjectReference.any("Notifications.Code.NotificationEmailPreferenceClass");
 
     @Inject
     private IntervalUsersManager users;

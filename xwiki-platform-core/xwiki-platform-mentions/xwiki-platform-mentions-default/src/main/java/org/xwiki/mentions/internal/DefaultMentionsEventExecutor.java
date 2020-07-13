@@ -86,7 +86,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     {
         this.queue = this.blockingQueueProvider.initBlockingQueue();
         this.consumers = new ArrayList<>();
-        int nbThreads = this.configuration.getProperty("mentions.poolSize", 2);
+        int nbThreads = this.configuration.getProperty("mentions.poolSize", 1);
         for (int i = 0; i < nbThreads; i++) {
             startConsumer();
         }

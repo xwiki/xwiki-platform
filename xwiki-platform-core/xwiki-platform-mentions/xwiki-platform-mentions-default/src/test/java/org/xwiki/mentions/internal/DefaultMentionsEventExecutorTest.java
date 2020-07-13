@@ -83,7 +83,7 @@ class DefaultMentionsEventExecutorTest
         when(this.threadPoolProvider.initializeThread(any(Runnable.class))).thenReturn(mock(Thread.class));
         this.blockingQueue = mock(BlockingQueue.class);
         when(this.blockingQueueProvider.initBlockingQueue()).thenReturn(this.blockingQueue);
-        when(this.configuration.getProperty("mentions.poolSize", 2)).thenReturn(NB_THREADS);
+        when(this.configuration.getProperty("mentions.poolSize", 1)).thenReturn(NB_THREADS);
     }
 
     @Test

@@ -1043,7 +1043,7 @@ edit.defaultEditor.org.xwiki.rendering.block.XDOM#wysiwyg=$xwikiPropertiesDefaul
 #-# This properties controls the size of this pool.
 #-#
 #-# The default is :
-# notifications.poolSize = 2
+# mentions.poolSize = 1
 
 #-------------------------------------------------------------------------------------
 # Event Stream

@@ -23,6 +23,7 @@ import java.util.concurrent.BlockingQueue;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.mentions.internal.jmx.JMXMentions;
@@ -40,7 +41,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.xwiki.mentions.internal.DefaultMentionsEventExecutor.DEFAULT_NB_THREADS;
 import static org.xwiki.test.LogLevel.DEBUG;
 
 /**
@@ -52,6 +52,8 @@ import static org.xwiki.test.LogLevel.DEBUG;
 @ComponentTest
 class DefaultMentionsEventExecutorTest
 {
+    private static final int NB_THREADS = 2;
+
     @RegisterExtension
     LogCaptureExtension logCapture = new LogCaptureExtension(DEBUG);
 
@@ -72,19 +74,23 @@ class DefaultMentionsEventExecutorTest
     @MockComponent
     private MentionsDataConsumer dataConsumer;
 
+    @MockComponent
+    private ConfigurationSource configuration;
+
     @BeforeComponent
     void beforeComponent()
     {
         when(this.threadPoolProvider.initializeThread(any(Runnable.class))).thenReturn(mock(Thread.class));
         this.blockingQueue = mock(BlockingQueue.class);
         when(this.blockingQueueProvider.initBlockingQueue()).thenReturn(this.blockingQueue);
+        when(this.configuration.getProperty("mentions.poolSize", 2)).thenReturn(NB_THREADS);
     }
 
     @Test
     void initialize()
     {
         verify(this.blockingQueueProvider).initBlockingQueue();
-        verify(this.threadPoolProvider, times(DEFAULT_NB_THREADS)).initializeThread(any(Runnable.class));
+        verify(this.threadPoolProvider, times(NB_THREADS)).initializeThread(any(Runnable.class));
         verify(this.jmxRegistration).registerMBean(new JMXMentions(this.blockingQueue, any(), any()), "name=mentions");
     }
 
@@ -114,7 +120,7 @@ class DefaultMentionsEventExecutorTest
     {
         this.executor.updateNbThreads(10);
         // two times at startup + the 8 new threads created to reach the new number
-        verify(this.threadPoolProvider, times(DEFAULT_NB_THREADS + 8)).initializeThread(any(Runnable.class));
+        verify(this.threadPoolProvider, times(NB_THREADS + 8)).initializeThread(any(Runnable.class));
         assertEquals(10, this.executor.getConsumers().size());
     }
 

@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.xwiki.component.annotation.Component;
 import org.xwiki.component.phase.Disposable;
 import org.xwiki.component.phase.Initializable;
+import org.xwiki.configuration.ConfigurationSource;
 import org.xwiki.management.JMXBeanRegistration;
 import org.xwiki.mentions.internal.async.MentionsData;
 import org.xwiki.mentions.internal.jmx.JMXMentions;
@@ -56,11 +57,6 @@ import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMess
 @Singleton
 public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Initializable, Disposable
 {
-    /**
-     * The number of thread at startup.
-     */
-    static final int DEFAULT_NB_THREADS = 2;
-
     private static final String MBEAN_NAME = "name=mentions";
 
     private List<MentionsConsumer> consumers = new ArrayList<>();
@@ -82,12 +78,16 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     @Inject
     private JMXBeanRegistration jmxRegistration;
 
+    @Inject
+    private ConfigurationSource configuration;
+
     @Override
     public void initialize()
     {
         this.queue = this.blockingQueueProvider.initBlockingQueue();
         this.consumers = new ArrayList<>();
-        for (int i = 0; i < DEFAULT_NB_THREADS; i++) {
+        int nbThreads = this.configuration.getProperty("mentions.poolSize", 2);
+        for (int i = 0; i < nbThreads; i++) {
             startConsumer();
         }
         JMXMentionsMBean mbean = new JMXMentions(this.queue, this::updateNbThreads, () -> this.consumers.size());

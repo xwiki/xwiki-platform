@@ -23,7 +23,7 @@
 ###
 ## requested field name containing the comment number
 ## (e.g. XWiki.XWikiComments_42_comment)
-#set ($name = $request.name)
+#set ($name = $escapetool.xml($request.name))
 ## the number of the comment, if no number is provided we generate a field for a new comment.
 #set ($number = $numbertool.toNumber($request.number).intValue())
 

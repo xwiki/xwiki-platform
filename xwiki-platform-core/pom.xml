@@ -191,7 +191,6 @@
   <modules>
       <!-- Sorted Alphabetically -->
     <module>xwiki-platform-activeinstalls</module>
-    <module>xwiki-platform-activitystream</module>
     <module>xwiki-platform-administration</module>
     <module>xwiki-platform-alerts</module>
     <module>xwiki-platform-annotation</module>
@@ -276,7 +275,6 @@
     <module>xwiki-platform-url</module>
     <module>xwiki-platform-velocity</module>
     <module>xwiki-platform-vfs</module>
-    <module>xwiki-platform-watchlist</module>
     <module>xwiki-platform-web</module>
     <module>xwiki-platform-webjars</module>
     <module>xwiki-platform-wiki</module>

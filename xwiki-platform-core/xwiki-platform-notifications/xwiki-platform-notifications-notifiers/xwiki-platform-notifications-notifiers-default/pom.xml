@@ -94,7 +94,8 @@
             <id>default</id>
             <configuration>
               <excludes>
-                org/xwiki/notifications/notifiers/internal/UserEventDispatcher.java
+                org/xwiki/notifications/notifiers/internal/UserEventDispatcher.java,
+                org/xwiki/notifications/notifiers/internal/email/AbstractMimeMessageIterator.java
               </excludes>
             </configuration>
           </execution>

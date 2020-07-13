@@ -39,14 +39,38 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @since 9.7RC1
  */
 @Component
-@Named("XWiki.Notifications.Code.NotificationEmailPreferenceClass")
+@Named(NotificationEmailPreferenceDocumentInitializer.REFERENCE_STRING)
 @Singleton
-public class NotificationEmailPreferenceDocumentInitializer  extends AbstractMandatoryClassInitializer
+public class NotificationEmailPreferenceDocumentInitializer extends AbstractMandatoryClassInitializer
 {
     /**
      * The path to the class parent document.
+     * 
+     * @since 12.6RC1
      */
-    private static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
+    public static final List<String> PARENT_PATH = Arrays.asList("XWiki", "Notifications", "Code");
+
+    /**
+     * The reference of the class of the object holding the notification email preferences.
+     * 
+     * @since 12.6RC1
+     */
+    public static final LocalDocumentReference REFERENCE =
+        new LocalDocumentReference(PARENT_PATH, "NotificationEmailPreferenceClass");
+
+    /**
+     * The reference of the class of the object holding the notification email preferences.
+     * 
+     * @since 12.6RC1
+     */
+    public static final String REFERENCE_STRING = "XWiki.Notifications.Code.NotificationEmailPreferenceClass";
+
+    /**
+     * The name of the field containing the notification interval.
+     * 
+     * @since 12.6RC1
+     */
+    public static final String FIELD_INTERVAL = "interval";
 
     private static final String SELECT = "select";
 
@@ -57,20 +81,18 @@ public class NotificationEmailPreferenceDocumentInitializer  extends AbstractMan
      */
     public NotificationEmailPreferenceDocumentInitializer()
     {
-        super(new LocalDocumentReference(PARENT_PATH, "NotificationEmailPreferenceClass"));
+        super(REFERENCE);
     }
 
     @Override
     protected void createClass(BaseClass xclass)
     {
-        xclass.addStaticListField("interval", "Notification interval", 1,
-                false, "hourly=Hourly|daily=Daily|weekly=Weekly|live=Live",
-                SELECT, SEPARATORS);
+        xclass.addStaticListField(FIELD_INTERVAL, "Notification interval", 1, false,
+            "hourly=Hourly|daily=Daily|weekly=Weekly|live=Live", SELECT, SEPARATORS);
 
         String values = Arrays.stream(NotificationEmailDiffType.values()).map(v -> v.name())
             .reduce((v1, v2) -> String.format("%s|%s", v1, v2)).get();
 
-        xclass.addStaticListField("diffType", "Diff Type", 1,
-                false, values, SELECT, SEPARATORS);
+        xclass.addStaticListField("diffType", "Diff Type", 1, false, values, SELECT, SEPARATORS);
     }
 }

@@ -32,6 +32,7 @@ import org.xwiki.eventstream.EventQuery;
 import org.xwiki.eventstream.EventStreamException;
 import org.xwiki.eventstream.query.SimpleEventQuery;
 import org.xwiki.model.reference.EntityReferenceSerializer;
+import org.xwiki.notifications.NotificationFormat;
 import org.xwiki.notifications.filters.expression.AndNode;
 import org.xwiki.notifications.filters.expression.ConcatNode;
 import org.xwiki.notifications.filters.expression.EndsWith;
@@ -261,12 +262,18 @@ public class ExpressionNodeToEventQueryConverter
         } else if (operator instanceof ForUserNode) {
             ForUserNode forUser = (ForUserNode) operator;
 
-            if (forUser.getUser() != null && forUser.isRead() != null) {
-                result.withStatus(this.serializer.serialize(forUser.getUser()), forUser.isRead());
-            } else if (forUser.getUser() != null) {
-                result.withStatus(this.serializer.serialize(forUser.getUser()));
-            } else if (forUser.isRead() != null) {
-                result.withStatus(forUser.isRead());
+            if (forUser.getFormat() == NotificationFormat.ALERT) {
+                if (forUser.getUser() != null && forUser.isRead() != null) {
+                    result.withStatus(this.serializer.serialize(forUser.getUser()), forUser.isRead());
+                } else if (forUser.getUser() != null) {
+                    result.withStatus(this.serializer.serialize(forUser.getUser()));
+                } else if (forUser.isRead() != null) {
+                    result.withStatus(forUser.isRead());
+                }
+            } else if (forUser.getFormat() == NotificationFormat.EMAIL) {
+                if (forUser.getUser() != null) {
+                    result.withMail(this.serializer.serialize(forUser.getUser()));
+                }
             }
         } else {
             // TODO: Unsupported

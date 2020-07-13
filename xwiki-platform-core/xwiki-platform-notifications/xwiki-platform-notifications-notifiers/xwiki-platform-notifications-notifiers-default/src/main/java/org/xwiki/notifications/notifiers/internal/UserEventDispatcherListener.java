@@ -78,7 +78,7 @@ public class UserEventDispatcherListener extends AbstractEventListener
     {
         // Make sure the notification module is enabled
         if (!this.remoteState.isRemoteState() && this.notificationConfiguration.isEnabled()
-            && this.notificationConfiguration.isEventPreFilteringEnabled()) {
+            && this.notificationConfiguration.isEventPrefilteringEnabled()) {
             org.xwiki.eventstream.Event eventStreamEvent = (org.xwiki.eventstream.Event) source;
 
             try {

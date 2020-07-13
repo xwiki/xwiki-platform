@@ -379,10 +379,10 @@ public class DefaultNotificationParametersFactory
     {
         if (parameters.user != null) {
             // Check if we should pre or post filter events
-            if (parameters.format == NotificationFormat.ALERT && this.configuration.isEventPreFilteringEnabled()) {
+            if (this.configuration.isEventPrefilteringEnabled()) {
                 enableAllEventTypes(parameters);
 
-                parameters.filters.add(new ForUserEventFilter(NotificationFormat.ALERT, null));
+                parameters.filters.add(new ForUserEventFilter(parameters.format, null));
             } else {
                 parameters.preferences =
                     notificationPreferenceManager.getPreferences(parameters.user, true, parameters.format);

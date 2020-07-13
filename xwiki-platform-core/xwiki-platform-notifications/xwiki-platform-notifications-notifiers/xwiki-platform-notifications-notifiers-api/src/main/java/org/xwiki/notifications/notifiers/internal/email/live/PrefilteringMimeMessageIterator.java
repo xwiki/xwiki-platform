@@ -17,36 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.notifications.notifiers.email;
+package org.xwiki.notifications.notifiers.internal.email.live;
+
+import java.util.Iterator;
+import java.util.Map;
+
+import javax.mail.internet.MimeMessage;
+
+import org.xwiki.component.annotation.Role;
+import org.xwiki.model.reference.DocumentReference;
+import org.xwiki.model.reference.EntityReference;
+import org.xwiki.notifications.CompositeEvent;
 
 /**
- * Several intervals to get notified by emails.
+ * MimeMessageIterator for sending pre filtered live mail notifications.
  *
  * @version $Id$
- * @since 9.5RC1
- * @deprecated since 12.6RC1, use {@link org.xwiki.notifications.preferences.NotificationEmailInterval} instead
+ * @since 12.6RC1
  */
-@Deprecated
-public enum NotificationEmailInterval
+@Role
+public interface PrefilteringMimeMessageIterator extends Iterator<MimeMessage>, Iterable<MimeMessage>
 {
     /**
-     * Receive a mail every hour (if needed).
+     * Initialize the iterator.
+     *
+     * @param events the events to send
+     * @param factoryParameters parameters for the email factory
+     * @param templateReference reference to the mail template
      */
-    HOURLY,
-
-    /**
-     * Receive a mail every day (if needed).
-     */
-    DAILY,
-
-    /**
-     * Receive a mail every week (if needed).
-     */
-    WEEKLY,
-    /**
-     * Receive an e-mail when a notification is triggered in the wiki.
-     * 
-     * @since 9.6RC1
-     */
-    LIVE
+    void initialize(Map<DocumentReference, CompositeEvent> events, Map<String, Object> factoryParameters,
+        EntityReference templateReference);
 }

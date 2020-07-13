@@ -106,8 +106,13 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
      * @param <I> the input type of the task
      * @version $Id$
      */
-    protected class EventStoreTask<O, I>
+    protected static class EventStoreTask<O, I>
     {
+        /**
+         * An order to stop the processing thread.
+         */
+        public static final EventStoreTask<Object, Object> STOP = new EventStoreTask<>(null, null, null);
+
         private final CompletableFuture<O> future;
 
         private final I input;
@@ -181,6 +186,13 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
         EventStoreTask<O, I> task = new EventStoreTask<>(input, type, context);
 
+        addTask(task);
+
+        return task.future;
+    }
+
+    private <O, I> void addTask(EventStoreTask<O, I> task)
+    {
         try {
             this.queue.put(task);
         } catch (InterruptedException e) {
@@ -188,8 +200,6 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
             Thread.currentThread().interrupt();
         }
-
-        return task.future;
     }
 
     @Override
@@ -265,10 +275,12 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
         List<EventStoreTask<?, ?>> tasks = new ArrayList<>();
         try {
             for (EventStoreTask<?, ?> task = firstTask; task != null; task = this.queue.poll()) {
-                try {
-                    processTask(task);
-                } catch (Exception e) {
-                    task.future.completeExceptionally(e);
+                if (task != EventStoreTask.STOP) {
+                    try {
+                        processTask(task);
+                    } catch (Exception e) {
+                        task.future.completeExceptionally(e);
+                    }
                 }
 
                 tasks.add(task);
@@ -446,13 +458,16 @@ public abstract class AbstractAsynchronousEventStore implements EventStore, Init
 
         Thread thread = new Thread(this::run);
         thread.setName("Asynchronous handler for event store [" + descriptor.getRoleHint() + "]");
-        thread.start();
         thread.setPriority(Thread.NORM_PRIORITY - 1);
+        thread.start();
     }
 
     @Override
     public void dispose() throws ComponentLifecycleException
     {
         this.disposed = true;
+
+        // Make sure to wake up the thread
+        addTask(EventStoreTask.STOP);
     }
 }

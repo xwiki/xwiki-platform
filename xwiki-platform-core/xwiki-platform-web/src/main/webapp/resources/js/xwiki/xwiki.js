@@ -252,11 +252,14 @@ Object.extend(XWiki, {
                         }
                       });
 
-                      require(['jquery'], function (jQuery) {
-                        jQuery("#" + extraID + "pane").html(container.innerHTML);
-                        // Notify the others that the DOM has been updated.
-                        document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});
+                      // jQuery's html() is used instead of prototype's update to avoid the undesired
+                      // interpretation of the innerHTML during the dom update.  
+                      require(['jquery'], function ($) {
+                        $("#" + extraID + "pane").html(container.innerHTML);
                       });
+
+                      // Notify the others that the DOM has been updated.
+                      document.fire('xwiki:dom:updated', {elements: [$(extraID + 'pane')]});
                     },
                     onComplete: function(response){
                       if (response.status == 401) {

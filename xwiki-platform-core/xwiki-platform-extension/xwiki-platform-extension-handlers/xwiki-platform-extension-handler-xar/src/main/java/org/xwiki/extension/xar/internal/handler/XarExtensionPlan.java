@@ -77,7 +77,7 @@ public class XarExtensionPlan implements Closeable
         Map<ExtensionId, XarExtensionPlanEntry> planEntry = new HashMap<>();
 
         for (ExtensionPlanAction action : plan.getActions()) {
-            if (action.getExtension().getType().equals(XarExtensionHandler.TYPE)) {
+            if (XarExtensionHandler.TYPE.equals(action.getExtension().getType())) {
                 // Get previous entries
                 Collection<InstalledExtension> previousExtensions = action.getPreviousExtensions();
                 for (InstalledExtension previousExtension : previousExtensions) {

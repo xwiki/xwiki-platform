@@ -92,4 +92,10 @@ public class AllIT
     class NestedRenamePageIT extends RenamePageIT
     {
     }
+
+    @Nested
+    @DisplayName("Section editing tests")
+    class NestedSectionEditIT extends SectionEditIT
+    {
+    }
 }

@@ -18,12 +18,13 @@
 ## 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 ## ---------------------------------------------------------------------------
 ###
+#template('display_macros.vm')
 ### Return a single comment field
 ###
 ###
 ## requested field name containing the comment number
 ## (e.g. XWiki.XWikiComments_42_comment)
-#set ($name = $request.name)
+#set ($name = $escapetool.xml($request.name))
 ## the number of the comment, if no number is provided we generate a field for a new comment.
 #set ($number = $numbertool.toNumber($request.number).intValue())
 
@@ -59,8 +60,14 @@
 #set ($defaultEditorId = $services.edit.syntaxContent.defaultEditorId)
 <input type='hidden' name='defaultEditorId' value="$escapetool.xml($defaultEditorId)" />
 
+<label for="$name">$services.localization.render('core.viewers.comments.add.comment.label')</label>
+#initRequiredSkinExtensions()
 ## display of the comment field
 $doc.displayEdit($fieldToDisplay, '', $commentObj)
+
+## ensure to load the appropriate JSX for the editor.
+#getRequiredSkinExtensions($requiredSkinExtensions)
+#set ($discard = $response.setHeader('X-XWIKI-HTML-HEAD', $requiredSkinExtensions))
 
 ## reset the temporary added field.
 #set ($discard = $commentObjBaseClass.removeField($name))

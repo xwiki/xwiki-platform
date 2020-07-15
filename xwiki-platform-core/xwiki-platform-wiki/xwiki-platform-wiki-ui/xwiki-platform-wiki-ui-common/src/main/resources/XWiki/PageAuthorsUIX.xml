@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8"?>
 
 <!--
  * See the NOTICE file distributed with this work for additional
@@ -20,28 +20,67 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 
-<xwikidoc version="1.1">
+<xwikidoc version="1.4" reference="XWiki.PageAuthorsUIX" locale="">
   <web>XWiki</web>
-  <name>XWikiUserWatchListSheet</name>
+  <name>PageAuthorsUIX</name>
   <language/>
   <defaultLanguage/>
   <translation>0</translation>
   <creator>xwiki:XWiki.Admin</creator>
-  <parent>XWiki.XWikiUserSheet</parent>
+  <parent>Main.WebHome</parent>
   <author>xwiki:XWiki.Admin</author>
   <contentAuthor>xwiki:XWiki.Admin</contentAuthor>
   <version>1.1</version>
   <title/>
   <comment/>
   <minorEdit>false</minorEdit>
-  <syntaxId>xwiki/2.0</syntaxId>
+  <syntaxId>xwiki/2.1</syntaxId>
   <hidden>true</hidden>
   <content/>
   <object>
-    <name>XWiki.XWikiUserWatchListSheet.WebHome</name>
+    <name>XWiki.PageAuthorsUIX</name>
+    <number>0</number>
+    <className>XWiki.TagClass</className>
+    <guid>069a8ff9-5133-4971-9f7d-bd4b409d8258</guid>
+    <class>
+      <name>XWiki.TagClass</name>
+      <customClass/>
+      <customMapping/>
+      <defaultViewSheet/>
+      <defaultEditSheet/>
+      <defaultWeb/>
+      <nameField/>
+      <validationScript/>
+      <tags>
+        <cache>0</cache>
+        <disabled>0</disabled>
+        <displayType>input</displayType>
+        <freeText>forbidden</freeText>
+        <largeStorage>0</largeStorage>
+        <multiSelect>1</multiSelect>
+        <name>tags</name>
+        <number>1</number>
+        <prettyName>Tags</prettyName>
+        <relationalStorage>1</relationalStorage>
+        <separator>|</separator>
+        <separators>|,</separators>
+        <size>30</size>
+        <unmodifiable>0</unmodifiable>
+        <values/>
+        <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+      </tags>
+    </class>
+    <property>
+      <tags>
+        <value>machin</value>
+      </tags>
+    </property>
+  </object>
+  <object>
+    <name>XWiki.PageAuthorsUIX</name>
     <number>0</number>
     <className>XWiki.UIExtensionClass</className>
-    <guid>7b807864-0297-4297-8dd4-d2f4141e36e5</guid>
+    <guid>4cf6cfe3-4804-4a99-8f6d-712ffce00d29</guid>
     <class>
       <name>XWiki.UIExtensionClass</name>
       <customClass/>
@@ -152,112 +191,38 @@
       </scope>
     </class>
     <property>
-      <async_cached>0</async_cached>
+      <async_cached>1</async_cached>
     </property>
     <property>
-      <async_context/>
+      <async_context>
+        <value>doc.reference</value>
+      </async_context>
     </property>
     <property>
-      <async_enabled>0</async_enabled>
+      <async_enabled>1</async_enabled>
     </property>
     <property>
       <content>{{velocity}}
-      #set($obj = $doc.getObject("XWiki.XWikiUsers"))
-      #if(!$obj)
-      = $services.localization.render('xe.admin.users.sheet') =
-
-      {{info}}$services.localization.render('xe.admin.users.applyonusers'){{/info}}##
-      #else
-        #macro (getNotifierPrettyName $notifier)
-          #set ($translationKey = "XWiki.WatchListClass_interval_${notifier}")
-          ## Look for a translation
-          #if ($services.localization.get($translationKey))
-            #set ($notifierPrettyName = $services.localization.render($translationKey))
-          #else
-            ## Look for a document's title
-            #set ($notifierReference = $services.model.resolveDocument($notifier, [$services.wiki.mainWikiId]))
-            #set ($notifierDoc = $xwiki.getDocument($notifierReference))
-            #set ($notifierPrettyName = $notifierDoc.plainTitle)
-            #if ("$!notifierPrettyName" == '')
-      ## Fallback on the actual value
-      #set ($notifierPrettyName = $notifier)
+{{html}}
+&lt;div id="xdocAuthors"&gt;
+  &lt;div class="xdocCreation"&gt; ## Creation
+    $services.localization.render('core.footer.creation', [$xwiki.getUserName($doc.creator), $xwiki.formatDate($doc.creationDate)])&lt;br/&gt;
+    #if($tdoc.realLocale != $doc.realLocale)
+      $services.localization.render('core.footer.translationCreation', [$tdoc.realLocale, $xwiki.getUserName($tdoc.creator), $xwiki.formatDate($tdoc.creationDate)])&lt;br/&gt;
     #end
-          #end##
-          $notifierPrettyName##
-        #end
-        #set($watchOject = $doc.getObject('XWiki.WatchListClass'))
-      {{html clean="false" wiki="true"}}
-        $xwiki.ssx.use("XWiki.XWikiUserSheet")##
-      &lt;div class="#if($xcontext.action == 'view')half #{else}full #{end}column xform"&gt;
-        &lt;div class="watchlistManagement"&gt;
-          #if($xcontext.action == 'view' &amp;&amp; $hasEdit)
-            &lt;div class="editProfileCategory"&gt;&lt;a href="$doc.getURL('edit', 'category=watchlist')"&gt;&lt;span class="hidden"&gt;$services.localization.render('platform.core.profile.category.watchlist.edit')&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-          #end
-          &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistManagement')&lt;/h1&gt;
-          &lt;dl&gt;
-            &lt;dt class="label"&gt;&lt;label&gt;$services.localization.render('platform.core.profile.watchlist.notifier')&lt;/label&gt;&lt;/dt&gt;
-              #set($notifiers = $services.watchlist.getIntervals())
-              #set($currentNotifier = $services.watchlist.getInterval($xcontext.user))
-            &lt;dd&gt;
-                #if($xcontext.action=='view')
-                #if("$!currentNotifier" != "")
-                  #foreach($notifier in $notifiers)
-                    #if($notifier == $currentNotifier)
-                      #getNotifierPrettyName($notifier)
-                    #end
-                  #end
-                #end
-                #else
-                &lt;select name="XWiki.WatchListClass_0_interval"&gt;
-                  &lt;option value=""&gt;&amp;nbsp;&lt;/option&gt;
-                  #foreach($notifier in $notifiers)
-                    &lt;option value="$notifier"#if($notifier == $currentNotifier) selected='selected'#end&gt;#getNotifierPrettyName($notifier)&lt;/option&gt;
-                  #end
-                &lt;/select&gt;
-                #end
-            &lt;/dd&gt;
-            &lt;dt class="label"&gt;&lt;label#if($xcontext.action != 'view') for="XWiki.WatchListClass_0_automaticwatch"#end&gt;$services.localization.render('XWiki.WatchListClass_automaticwatch')&lt;/label&gt;&lt;/dt&gt;
-            &lt;dd&gt;
-                $watchOject.automaticwatch
-            &lt;/dd&gt;
-          &lt;/dl&gt;
-        &lt;/div&gt;
-      &lt;/div&gt;
-        #if ($xcontext.action == 'view')
-    ## The live table display of the watchlist entries doesn't adapt i.e. in case of long page names
-    ## when the available width is limited so we need to ensure this column takes at least half of the container width
-    ## (unlike the rest of the columns). The result is that this column will be displayed below the previous one when
-    ## the page width is reduced.
-    &lt;div class="min-half column"&gt;
-      &lt;div class="watchlistRss"&gt;
-        &lt;h1&gt;$services.localization.render('watchlist.staytuned.rss')&lt;/h1&gt;
-        &lt;a id="watchlistRssLink" target="_blank" href="$xwiki.getURL('XWiki.WatchListRss', 'view', 'xpage=plain&amp;amp;outputSyntax=plain')"&gt;$services.localization.render('watchlist.staytuned.rss.info')&lt;/a&gt;
-      &lt;/div&gt;
-      &lt;div class="watchlistElements"&gt;
-        &lt;h1&gt;$services.localization.render('platform.core.profile.section.watchlistElements')&lt;/h1&gt;
-
-        {{watchlist /}}
-
-      &lt;/div&gt;
-    &lt;/div&gt;
-  #end
-      &lt;div class="clearfloats"&gt;&amp;nbsp;&lt;/div&gt;
-      {{/html}}##
-      #end
-      {{/velocity}}</content>
+  &lt;/div&gt;
+&lt;/div&gt;
+{{/html}}
+{{/velocity}}</content>
     </property>
     <property>
-      <extensionPointId>org.xwiki.plaftorm.user.profile.menu</extensionPointId>
+      <extensionPointId>org.xwiki.platform.template.contentFooter</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.watchlist.menu</name>
+      <name>org.xwiki.platform.wiki.ui.common.contentFooter.authors</name>
     </property>
     <property>
-      <parameters>id=watchlist
-icon=eye
-# isActive: The user is seeing her own profile.
-isActive=#if(($services.model.resolveDocument($xcontext.user) == $doc.documentReference) &amp;&amp; $hasWatch)true#{else}false#end
-priority=40</parameters>
+      <parameters>order=1</parameters>
     </property>
     <property>
       <scope>wiki</scope>

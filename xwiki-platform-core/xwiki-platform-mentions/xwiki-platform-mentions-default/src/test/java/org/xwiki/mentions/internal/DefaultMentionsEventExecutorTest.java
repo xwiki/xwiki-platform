@@ -34,9 +34,9 @@ import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -91,7 +91,7 @@ class DefaultMentionsEventExecutorTest
     {
         verify(this.blockingQueueProvider).initBlockingQueue();
         verify(this.threadPoolProvider, times(NB_THREADS)).initializeThread(any(Runnable.class));
-        verify(this.jmxRegistration).registerMBean(new JMXMentions(this.blockingQueue, any(), any()), "name=mentions");
+        verify(this.jmxRegistration).registerMBean(any(JMXMentions.class), eq("name=mentions"));
     }
 
     @Test
@@ -116,33 +116,6 @@ class DefaultMentionsEventExecutorTest
     }
 
     @Test
-    void updateNbThreadsIncrease()
-    {
-        this.executor.updateNbThreads(10);
-        // two times at startup + the 8 new threads created to reach the new number
-        verify(this.threadPoolProvider, times(NB_THREADS + 8)).initializeThread(any(Runnable.class));
-        assertEquals(10, this.executor.getConsumers().size());
-    }
-
-    @Test
-    void updateNbThreadsDecrease()
-    {
-        this.executor.updateNbThreads(1);
-
-        // two times at startup + the 8 new threads created to reach the new number
-        assertEquals(1, this.executor.getConsumers().size());
-    }
-
-    @Test
-    void updateNbThreadsNegative()
-    {
-        this.executor.updateNbThreads(-1);
-
-        // two times at startup + the 8 new threads created to reach the new number
-        assertEquals(0, this.executor.getConsumers().size());
-    }
-
-    @Test
     void consume() throws Exception
     {
         MentionsData value = new MentionsData()
@@ -150,7 +123,8 @@ class DefaultMentionsEventExecutorTest
                                  .setAuthorReference("xwiki:XWiki.Author")
                                  .setWikiId("xwiki")
                                  .setVersion("1.0");
-        when(this.blockingQueue.poll(10, SECONDS)).thenReturn(value);
+        when(this.blockingQueue.poll()).thenReturn(value);
+
         this.executor.getConsumers().get(0).consume();
 
         assertEquals(1, this.logCapture.size());

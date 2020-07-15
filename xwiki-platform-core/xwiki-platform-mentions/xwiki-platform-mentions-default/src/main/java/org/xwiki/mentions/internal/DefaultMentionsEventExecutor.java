@@ -37,7 +37,6 @@ import org.xwiki.mentions.internal.jmx.JMXMentions;
 import org.xwiki.mentions.internal.jmx.JMXMentionsMBean;
 import org.xwiki.model.reference.DocumentReference;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getRootCauseMessage;
 
 /**
@@ -90,7 +89,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
         for (int i = 0; i < nbThreads; i++) {
             startConsumer();
         }
-        JMXMentionsMBean mbean = new JMXMentions(this.queue, this::updateNbThreads, () -> this.consumers.size());
+        JMXMentionsMBean mbean = new JMXMentions(this.queue, () -> this.consumers.size());
         this.jmxRegistration.registerMBean(mbean, MBEAN_NAME);
     }
 
@@ -108,31 +107,14 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
     {
         this.jmxRegistration.unregisterMBean(MBEAN_NAME);
         for (MentionsConsumer consumer : this.consumers) {
+            // We ask the consumers to stop directly with halt, in case their is many elements in the queue.
+            // Additionally we fill the queue with stop element in order to wake up consumers and notify them
+            // to stop if the queue is empty.
             consumer.halt();
+            this.queue.add(new MentionsData().stop());
         }
     }
 
-    /**
-     * Update the number of threads.
-     *
-     * If the number increases, starts new threads
-     * If the number decreases, removes existing threads until the new number is reached
-     * @param nbThread the new number of threads. Negative values are equivalent to 0.
-     */
-    public void updateNbThreads(int nbThread)
-    {
-        int currentNbThreads = this.consumers.size();
-        if (nbThread > currentNbThreads) {
-            for (int i = currentNbThreads; i < nbThread; i++) {
-                startConsumer();
-            }
-        } else {
-            for (int i = Math.max(nbThread, 0); i < currentNbThreads; i++) {
-                MentionsConsumer remove = this.consumers.remove(0);
-                remove.halt();
-            }
-        }
-    }
 
     @Override
     public void execute(DocumentReference documentReference, DocumentReference authorReference, String version)
@@ -178,15 +160,18 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
         {
             MentionsData data = null;
             try {
-                // slightly active wait in order to let the loop be stopped when halt is set to true, once every 
-                // 10 seconds.
-                data = DefaultMentionsEventExecutor.this.queue.poll(10, SECONDS);
+                data = DefaultMentionsEventExecutor.this.queue.poll();
                 if (data != null) {
-                    DefaultMentionsEventExecutor.this.logger
-                        .debug("[{}] - [{}] consumed. Queue size [{}]", data.getDocumentReference(), data.getVersion(),
-                            DefaultMentionsEventExecutor.this.queue.size());
+                    if (data.isStop()) {
+                        this.halt = true;
+                    } else if (!data.isDeprecated()) {
+                        DefaultMentionsEventExecutor.this.logger
+                            .debug("[{}] - [{}] consumed. Queue size [{}]", data.getDocumentReference(),
+                                data.getVersion(),
+                                DefaultMentionsEventExecutor.this.queue.size());
 
-                    DefaultMentionsEventExecutor.this.dataConsumer.consume(data);
+                        DefaultMentionsEventExecutor.this.dataConsumer.consume(data);
+                    }
                 }
             } catch (Exception e) {
                 DefaultMentionsEventExecutor.this.logger
@@ -205,7 +190,7 @@ public class DefaultMentionsEventExecutor implements MentionsEventExecutor, Init
         }
 
         /**
-         * Ask the consumer to stop its work.
+         * Ask for the thread to stop.
          */
         public void halt()
         {

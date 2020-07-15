@@ -39,13 +39,6 @@ public interface JMXMentionsMBean
     void clearQueue();
 
     /**
-     * Update the number of thread consuming the user mentions analysis tasks.
-     *
-     * @param number the new number of threads.
-     */
-    void updateThreadNumber(int number);
-
-    /**
      * @return the current number of threads dedicated to user mentions analysis tasks
      */
     Integer getThreadNumber();

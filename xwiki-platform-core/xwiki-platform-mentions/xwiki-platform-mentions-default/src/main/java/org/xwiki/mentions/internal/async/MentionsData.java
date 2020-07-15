@@ -31,6 +31,12 @@ import org.xwiki.text.XWikiToStringBuilder;
  */
 public class MentionsData
 {
+    /**
+     * Static object used to identify if elements has been persisted 
+     * in the current JVM. 
+     */
+    private static final Object STOP = new Object();
+
     private String documentReference;
 
     private String authorReference;
@@ -38,6 +44,8 @@ public class MentionsData
     private String version;
 
     private String wikiId;
+
+    private Object stop;
 
     /**
      *
@@ -109,6 +117,37 @@ public class MentionsData
     public String getWikiId()
     {
         return this.wikiId;
+    }
+
+    /**
+     * Set the data as stop.
+     * When a data set to stop is consumed, the consumer just stop itself.
+     * @return this current objects
+     */
+    public MentionsData stop()
+    {
+        this.stop = STOP;
+        return this;
+    }
+
+    /**
+     *
+     * @return true if {@link MentionsData#stop()} has been called. 
+     */
+    public boolean isStop()
+    {
+        return this.stop != null;
+    }
+
+    /**
+     * Check if the stop flag is relevant. 
+     * The stop flag is deprecated when the server restarts.
+     *
+     * @return true if the stop flag is still relevant.
+     */
+    public boolean isDeprecated()
+    {
+        return this.stop != null && this.stop != STOP;
     }
 
     /**

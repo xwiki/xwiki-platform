@@ -97,9 +97,9 @@ public class MentionsUpdateJob extends AbstractJob<MentionsUpdatedRequest, Menti
     private void handBaseObject(DocumentReference authorReference, DocumentReference documentReference,
         List<BaseObject> oldEntry, BaseObject baseObject)
     {
-        Optional<BaseObject> oldBaseObject = Optional.ofNullable(oldEntry).flatMap(
-            optOldEntries -> optOldEntries.stream().filter(it -> it.getId() == baseObject.getId()).findAny());
         if (baseObject != null) {
+            Optional<BaseObject> oldBaseObject = Optional.ofNullable(oldEntry).flatMap(
+                optOldEntries -> optOldEntries.stream().filter(it -> it.getId() == baseObject.getId()).findAny());
             // special treatment on comment object to analyse only the comment field.
             if (Objects.equals(baseObject.getXClassReference().getLocalDocumentReference(),
                 XWikiDocument.COMMENTSCLASS_REFERENCE))

@@ -24,18 +24,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.AbstractJob;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.MentionNotificationService;
+import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.async.MentionsUpdatedRequest;
 import org.xwiki.mentions.internal.async.MentionsUpdatedStatus;
-import org.xwiki.mentions.internal.MentionXDOMService;
-import org.xwiki.job.AbstractJob;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -97,9 +98,9 @@ public class MentionsUpdateJob extends AbstractJob<MentionsUpdatedRequest, Menti
     private void handBaseObject(DocumentReference authorReference, DocumentReference documentReference,
         List<BaseObject> oldEntry, BaseObject baseObject)
     {
-        Optional<BaseObject> oldBaseObject = Optional.ofNullable(oldEntry).flatMap(
-            optOldEntries -> optOldEntries.stream().filter(it -> it.getId() == baseObject.getId()).findAny());
         if (baseObject != null) {
+            Optional<BaseObject> oldBaseObject = Optional.ofNullable(oldEntry).flatMap(
+                optOldEntries -> optOldEntries.stream().filter(it -> it.getId() == baseObject.getId()).findAny());
             // special treatment on comment object to analyse only the comment field.
             if (Objects.equals(baseObject.getXClassReference().getLocalDocumentReference(),
                 XWikiDocument.COMMENTSCLASS_REFERENCE))
@@ -165,12 +166,14 @@ public class MentionsUpdateJob extends AbstractJob<MentionsUpdatedRequest, Menti
 
             // Notify with an empty anchorId if there's new mentions without an anchor.
             if (newEmptyAnchorsNumber > oldEmptyAnchorsNumber) {
-                this.notificationService.sendNotif(authorReference, documentReference, key, location, "");
+                this.notificationService.sendNotification(authorReference, documentReference, key, location, "",
+                    newXdom);
             }
 
             // Notify all new mentions with new anchors.
             for (String anchorId : anchorsToNotify) {
-                this.notificationService.sendNotif(authorReference, documentReference, key, location, anchorId);
+                this.notificationService.sendNotification(authorReference, documentReference, key, location, anchorId,
+                    newXdom);
             }
         }
     }
@@ -182,8 +185,16 @@ public class MentionsUpdateJob extends AbstractJob<MentionsUpdatedRequest, Menti
 
         // the matching element has not be found in the previous version of the document
         // notification are send unconditionally to all mentioned users.
-        this.xdomService.countByIdentifier(newMentions).forEach((key, value) -> value.forEach(anchorId ->
-            this.notificationService.sendNotif(authorReference, documentReference, key, location, anchorId)));
+        Set<Map.Entry<DocumentReference, List<String>>> entrySet =
+            this.xdomService.countByIdentifier(newMentions).entrySet();
+        for (Map.Entry<DocumentReference, List<String>> entry : entrySet) {
+            DocumentReference key = entry.getKey();
+            List<String> value = entry.getValue();
+            for (String anchorId : value) {
+                this.notificationService
+                    .sendNotification(authorReference, documentReference, key, location, anchorId, newXdom);
+            }
+        }
     }
 
     @Override

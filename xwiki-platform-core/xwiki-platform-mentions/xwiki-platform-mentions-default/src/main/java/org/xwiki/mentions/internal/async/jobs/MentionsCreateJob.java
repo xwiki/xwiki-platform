@@ -28,12 +28,12 @@ import javax.inject.Named;
 
 import org.apache.commons.lang3.StringUtils;
 import org.xwiki.component.annotation.Component;
+import org.xwiki.job.AbstractJob;
 import org.xwiki.mentions.MentionLocation;
 import org.xwiki.mentions.MentionNotificationService;
+import org.xwiki.mentions.internal.MentionXDOMService;
 import org.xwiki.mentions.internal.async.MentionsCreatedRequest;
 import org.xwiki.mentions.internal.async.MentionsCreatedStatus;
-import org.xwiki.mentions.internal.MentionXDOMService;
-import org.xwiki.job.AbstractJob;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
@@ -89,8 +89,8 @@ public class MentionsCreateJob extends AbstractJob<MentionsCreatedRequest, Menti
             boolean emptyAnchorProcessed = false;
             for (String anchorId : entry.getValue()) {
                 if (!StringUtils.isEmpty(anchorId) || !emptyAnchorProcessed) {
-                    this.notificationService.sendNotif(authorReference, documentReference, entry.getKey(), location,
-                        anchorId);
+                    this.notificationService
+                        .sendNotification(authorReference, documentReference, entry.getKey(), location, anchorId, xdom);
                     emptyAnchorProcessed = emptyAnchorProcessed || StringUtils.isEmpty(anchorId);
                 }
             }

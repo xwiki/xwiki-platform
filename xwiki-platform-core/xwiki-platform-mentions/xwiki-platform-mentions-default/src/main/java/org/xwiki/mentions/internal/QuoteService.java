@@ -17,33 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.mentions;
+package org.xwiki.mentions.internal;
+
+import java.util.Optional;
 
 import org.xwiki.component.annotation.Role;
-import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.stability.Unstable;
 
 /**
- * A service to send mentions notification.
+ * Extract a quote around a mention.
  *
  * @version $Id$
- * @since 12.5RC1
+ * @since 12.6RC1
  */
 @Role
-@Unstable
-public interface MentionNotificationService
+public interface QuoteService
 {
     /**
-     * Send a notification on behalf of the author, informing the mentioned user that he/she is mentioned on the a page.
-     *  @param authorReference the reference of the author of the mention.
-     * @param documentReference the document in which the mention has been done.
-     * @param mentionedIdentity the identity of the mentioned user.
-     * @param location The location of the mention.
-     * @param anchorId The anchor link to use.
-     * @param xdom the content xdom
+     * Extract a quote around the mention on the content.
+     *
+     * @return the quote.
+     * @param xdom the xdom of the content
+     * @param anchorId The identifier of the mention to quote
      */
-    void sendNotification(DocumentReference authorReference, DocumentReference documentReference,
-        DocumentReference mentionedIdentity, MentionLocation location, String anchorId,
-        XDOM xdom);
+    Optional<String> extract(XDOM xdom, String anchorId);
 }

@@ -32,6 +32,7 @@ import org.xwiki.mentions.events.MentionEventParams;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.block.XDOM;
 
 /**
  * Default implementation of {@link MentionNotificationService}.
@@ -49,15 +50,20 @@ public class DefaultMentionNotificationService implements MentionNotificationSer
     @Inject
     private EntityReferenceSerializer<String> serializer;
 
+    @Inject
+    private QuoteService quote;
+
     @Override
-    public void sendNotif(DocumentReference authorReference, DocumentReference documentReference,
-        DocumentReference mentionedIdentity, MentionLocation location, String anchorId)
+    public void sendNotification(DocumentReference authorReference, DocumentReference documentReference,
+        DocumentReference mentionedIdentity, MentionLocation location, String anchorId,
+        XDOM xdom)
     {
         MentionEventParams params = new MentionEventParams()
                                         .setUserReference(authorReference.toString())
                                         .setDocumentReference(documentReference.toString())
                                         .setLocation(location)
-                                        .setAnchor(anchorId);
+                                        .setAnchor(anchorId)
+                                        .setQuote(this.quote.extract(xdom, anchorId).orElse(null));
         MentionEvent event =
             new MentionEvent(Collections.singleton(this.serializer.serialize(mentionedIdentity)), params);
         this.observationManager.notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);

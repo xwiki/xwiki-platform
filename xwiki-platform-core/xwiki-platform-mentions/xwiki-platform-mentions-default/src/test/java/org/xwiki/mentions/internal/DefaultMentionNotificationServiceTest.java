@@ -29,10 +29,12 @@ import org.xwiki.mentions.events.MentionEventParams;
 import org.xwiki.model.reference.DocumentReference;
 import org.xwiki.model.reference.EntityReferenceSerializer;
 import org.xwiki.observation.ObservationManager;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.test.junit5.mockito.ComponentTest;
 import org.xwiki.test.junit5.mockito.InjectMockComponents;
 import org.xwiki.test.junit5.mockito.MockComponent;
 
+import static java.util.Collections.emptyList;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,8 +66,8 @@ public class DefaultMentionNotificationServiceTest
         Set<String> eventTarget = Collections.singleton("xwiki:XWiki.U2");
         when(this.serializer.serialize(mentionedIdentity)).thenReturn("xwiki:XWiki.U2");
 
-        this.notificationService.sendNotif(authorReference, documentReference, mentionedIdentity,
-            MentionLocation.COMMENT, "anchor");
+        this.notificationService.sendNotification(authorReference, documentReference, mentionedIdentity,
+            MentionLocation.COMMENT, "anchor", new XDOM(emptyList()));
 
         MentionEvent event = new MentionEvent(eventTarget,
             new MentionEventParams()
@@ -74,6 +76,7 @@ public class DefaultMentionNotificationServiceTest
                 .setLocation(MentionLocation.COMMENT)
                 .setAnchor("anchor")
         );
-        verify(this.observationManager).notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);
+        verify(this.observationManager)
+            .notify(event, "org.xwiki.contrib:mentions-notifications", MentionEvent.EVENT_TYPE);
     }
 }

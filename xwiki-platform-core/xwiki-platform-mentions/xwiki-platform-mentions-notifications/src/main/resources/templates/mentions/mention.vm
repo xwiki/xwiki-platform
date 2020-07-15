@@ -41,6 +41,9 @@
     <td class="description">$summary</td>
     #insertEventDate($event)
 </tr>
+    <tr>
+        <td colspan="3"><blockquote style="font-size: inherit">$!eventParams.getQuote()</blockquote></td>
+    </tr>
 #end
 
 #define ($content)
@@ -63,7 +66,6 @@
             #set ($eventParams = $compositeEventParams.get($event))
             #set ($location = $eventParams.location)
             ## TODO: define variation for group mention
-            ## TODO: add an achor to the specific place on the document.
             #if ($location == "DOCUMENT")
                 #set ($descriptionKey = 'mentions.event.mention.description.document')
             #elseif($location == "COMMENT")

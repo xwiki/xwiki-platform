@@ -22,7 +22,9 @@ package org.xwiki.mentions.internal;
 import java.util.Objects;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import org.xwiki.component.annotation.Component;
 import org.xwiki.mentions.DisplayStyle;
 import org.xwiki.model.reference.DocumentReferenceResolver;
 import org.xwiki.user.UserProperties;
@@ -39,6 +41,8 @@ import static org.xwiki.mentions.DisplayStyle.LOGIN;
  * @version $Id$
  * @since 12.6RC1
  */
+@Singleton
+@Component
 public class DefaultMentionsFormatter implements MentionsFormatter
 {
     @Inject
@@ -59,12 +63,12 @@ public class DefaultMentionsFormatter implements MentionsFormatter
         String firstName = Objects.toString(userProperties.getFirstName(), "");
         String lastName = Objects.toString(userProperties.getLastName(), "");
         final String content;
-        if (Objects.equals(firstName, "")) {
+        if (Objects.equals(style, LOGIN) || Objects.equals(firstName, "") && Objects.equals(lastName, "")) {
+            // if the login is asked explicitly we display it
+            // if the user has no first name and no last name, we display the login by default
             content = this.documentReferenceResolver.resolve(userReference).getName();
         } else if (Objects.equals(style, FIRST_NAME)) {
             content = firstName;
-        } else if (Objects.equals(style, LOGIN)) {
-            content = this.documentReferenceResolver.resolve(userReference).getName();
         } else {
             content = String.format("%s %s", firstName, lastName).trim();
         }

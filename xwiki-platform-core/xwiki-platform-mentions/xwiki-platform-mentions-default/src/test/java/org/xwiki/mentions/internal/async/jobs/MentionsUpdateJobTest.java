@@ -87,7 +87,7 @@ public class MentionsUpdateJobTest
     void runInternalNewMention()
     {
         XDOM dom1Mention = new XDOM(singletonList(new IdBlock("ID DOM1")));
-        XDOM dom2Mentions = new XDOM(singletonList(new IdBlock("ID DOM2")));
+        XDOM dom2Mention = new XDOM(singletonList(new IdBlock("ID DOM2")));
         DocumentReference authorReference = new DocumentReference("xwiki", "XWiki", "Creator");
         DocumentReference documentReference = new DocumentReference("xwiki", "XWiki", "Doc");
         DocumentReference u1 = new DocumentReference("xwiki", "XWiki", "u1");
@@ -95,7 +95,7 @@ public class MentionsUpdateJobTest
 
         when(this.context.getDoc()).thenReturn(this.oldDocument);
         when(this.oldDocument.getXDOM()).thenReturn(dom1Mention);
-        when(this.newDocument.getXDOM()).thenReturn(dom2Mentions);
+        when(this.newDocument.getXDOM()).thenReturn(dom2Mention);
 
         when(this.newDocument.getAuthorReference()).thenReturn(authorReference);
         when(this.newDocument.getDocumentReference()).thenReturn(documentReference);
@@ -104,7 +104,7 @@ public class MentionsUpdateJobTest
         when(this.xdomService.listMentionMacros(dom1Mention)).thenReturn(l1mention);
 
         List<MacroBlock> l2mentions = mock(List.class);
-        when(this.xdomService.listMentionMacros(dom2Mentions)).thenReturn(l2mentions);
+        when(this.xdomService.listMentionMacros(dom2Mention)).thenReturn(l2mentions);
 
         Map<DocumentReference, List<String>> mentionsCountL1 = new HashMap<>();
         mentionsCountL1.put(u1, Arrays.asList("", "anchor1"));
@@ -115,15 +115,16 @@ public class MentionsUpdateJobTest
         mentionsCountL2.put(u1, Arrays.asList("", "anchor1", null, "anchor2"));
         mentionsCountL2.put(u2, Collections.singletonList("anchor2"));
         when(this.xdomService.countByIdentifier(l2mentions)).thenReturn(mentionsCountL2);
-        
+
         this.job.initialize(new MentionsUpdatedRequest(this.newDocument, this.oldDocument, authorReference));
         this.job.runInternal();
 
-        verify(this.notificationService).sendNotification(authorReference, documentReference, u1, DOCUMENT, "", new XDOM(emptyList()));
-        verify(this.notificationService).sendNotification(authorReference, documentReference, u1, DOCUMENT, "anchor2",
-            new XDOM(emptyList()));
-        verify(this.notificationService).sendNotification(authorReference, documentReference, u2, DOCUMENT, "anchor2",
-            new XDOM(emptyList()));
+        verify(this.notificationService)
+            .sendNotification(authorReference, documentReference, u1, DOCUMENT, "", dom2Mention);
+        verify(this.notificationService)
+            .sendNotification(authorReference, documentReference, u1, DOCUMENT, "anchor2", dom2Mention);
+        verify(this.notificationService)
+            .sendNotification(authorReference, documentReference, u2, DOCUMENT, "anchor2", dom2Mention);
     }
 
     @Test
@@ -219,8 +220,8 @@ public class MentionsUpdateJobTest
         this.job.initialize(new MentionsUpdatedRequest(this.newDocument, this.oldDocument, authorReference));
         this.job.runInternal();
 
-        verify(this.notificationService).sendNotification(authorReference, documentReference, U1, COMMENT, "anchor1",
-            new XDOM(emptyList()));
+        verify(this.notificationService)
+            .sendNotification(authorReference, documentReference, U1, COMMENT, "anchor1", newCommentXDOM);
     }
 
     @Test
